@@ -12,15 +12,19 @@ import junit.framework.Assert;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.RecordSummarySortField.Sortable;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
@@ -35,18 +39,23 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	
 	@Autowired
 	protected RecordDao recordDao;
+
+	private CollectSurvey survey;
 	
-	//@Test
-	public void testCRUD() throws Exception  {
+	@Before
+	public void initialize() throws SurveyImportException, IdmlParseException, SurveyValidationException {
 		// LOAD MODEL
-		CollectSurvey survey = surveyDao.loadByName("archenland1");
+		survey = surveyManager.get("archenland1");
 
 		if ( survey == null ) {
 			// IMPORT MODEL
 			survey = importModel();
 		}
-		
-		testLoadAllSurveys("archenland1");
+	}
+	
+	//@Test
+	public void testCRUD() throws Exception  {
+		testLoadAllSurveys();
 
 		// SAVE NEW
 		CollectRecord saved = createTestRecord(survey, "123_456");
@@ -60,14 +69,6 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	
 	@Test
 	public void testLoadSummariesByKey() throws Exception  {
-		// LOAD MODEL
-		CollectSurvey survey = surveyDao.loadByName("archenland1");
-
-		if ( survey == null ) {
-			// IMPORT MODEL
-			survey = importModel();
-		}
-		
 		// SAVE NEW
 		String testKey = "123_456";
 		CollectRecord record = createTestRecord(survey, testKey);
@@ -85,20 +86,20 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	}
 
 
-	private void testLoadAllSurveys(String surveyName) {
-		List<CollectSurvey> list = this.surveyDao.loadAll();
+	private void testLoadAllSurveys() {
+		List<SurveySummary> list = this.surveyManager.loadCombinedSummaries();
 		assertNotNull(list);
 	}
 	
 	@Test
 	public void testSurveyNotFoundById() {		
-		Survey survey = surveyDao.loadById(-100);
+		Survey survey = surveyManager.loadSurvey(-100);
 		assertNull(survey);
 	}
 	
 	@Test
 	public void testSurveyNotFoundByName() {		
-		Survey survey = surveyDao.loadByName("!!!!!!");
+		SurveySummary survey = surveyManager.loadSummaryByName("!!!!!!");
 		assertNull(survey);
 	}
 
@@ -174,7 +175,6 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 
 //	@Test
 	public void testLoadRecordSummaries() {
-		CollectSurvey survey = surveyDao.loadByName("archenland1");
 		//get the first root entity
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
 		String rootEntityName = rootEntity.getName();

@@ -288,8 +288,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		protected void validateHeaders() throws ParsingException {
 			List<String> colNames = getColumnNames();
 			List<String> expectedEntityKeyColumns = getExpectedAncestorKeyColumnNames();
-			if ( expectedEntityKeyColumns.size() > colNames.size() || 
-					!expectedEntityKeyColumns.equals(colNames.subList(0, expectedEntityKeyColumns.size()))) {
+			if (! colNames.containsAll(expectedEntityKeyColumns)) {
 				ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
 						(String) null, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
 				String messageArg = StringUtils.join(expectedEntityKeyColumns, ", ");

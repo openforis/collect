@@ -1,6 +1,7 @@
 package org.openforis.collect.presenter
 {
 	import flash.events.Event;
+	import flash.net.FileFilter;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
@@ -54,6 +55,11 @@ package org.openforis.collect.presenter
 			super.initEventListeners();
 			view.entitySelectionTree.addEventListener(ListEvent.ITEM_CLICK, entityTreeItemSelectHandler);
 			view.importType.addEventListener(Event.CHANGE, importTypeChangeHandler);
+		}
+		
+		override protected function createFileFilter():FileFilter {
+			//var description:String = ALLOWED_IMPORT_FILE_EXTENSIONS.join(", ");
+			return new FileFilter("Excel documents", AbstractReferenceDataImportPresenter.ALLOWED_IMPORT_FILE_EXTENSIONS.concat([".zip"]).join("; "));
 		}
 		
 		protected function importTypeChangeHandler(event:Event):void {

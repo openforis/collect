@@ -17,7 +17,6 @@ import org.openforis.collect.model.proxy.UserProxy;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
@@ -52,7 +51,6 @@ public class SessionService {
 	 * @throws DatabaseVersionNotCompatibleException 
 	 */
 	//@Secured("isAuthenticated()")
-	@Transactional
 	public Map<String, Object> initSession(String locale) throws DatabaseVersionNotCompatibleException {
 		databaseVersionManager.checkIsVersionCompatible();
 		
@@ -67,25 +65,21 @@ public class SessionService {
 		return result;
 	}
 	
-	@Transactional
 	public SurveyProxy setActiveSurvey(String name) {
 		CollectSurvey survey = surveyManager.get(name);
 		return setActiveSurvey(survey, false);
 	}
 
-	@Transactional
 	public SurveyProxy setActiveSurvey(int surveyId) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		return setActiveSurvey(survey, false);
 	}
 
-	@Transactional
 	public SurveyProxy setActivePreviewSurvey(int surveyId) {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		return setActiveSurvey(survey, true);
 	}
 
-	@Transactional
 	public SurveyProxy setDesignerSurveyAsActive(int surveyId, boolean work) {
 		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
 		if ( survey == null ) {

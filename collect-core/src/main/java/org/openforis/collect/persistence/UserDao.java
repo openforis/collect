@@ -23,22 +23,18 @@ import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRoleRecord;
-import org.springframework.transaction.annotation.Transactional;
-
 
 /**
  * @author M. Togna
  * @author S. Ricci
  * 
  */
-@Transactional
 public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 
 	public UserDao() {
 		super(UserDao.UserDSLContext.class);
 	}
 
-	@Transactional
 	public User loadById(int id){
 		UserDSLContext dsl = dsl();
 		SelectQuery<?> query = dsl.selectByIdQuery(id);
@@ -47,7 +43,6 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 		return user;
 	}
 	
-	@Transactional
 	public User loadByUserName(String userName, Boolean enabled){
 		UserDSLContext dsl = dsl();
 		SelectConditionStep<OfcUserRecord> query = 
@@ -62,7 +57,6 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 		return user;
 	}
 	
-	@Transactional
 	public List<User> loadAll() {
 		UserDSLContext dsl = dsl();
 		Result<OfcUserRecord> r = 
@@ -74,7 +68,6 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 		return users;
 	}
 	
-	@Transactional
 	public int getUserId(String username) {
 		UserDSLContext jf = dsl();
 		Record record =

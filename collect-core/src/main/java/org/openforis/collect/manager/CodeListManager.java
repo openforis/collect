@@ -50,7 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
-@Transactional
 public class CodeListManager {
 	
 	@Autowired(required=false)
@@ -58,6 +57,7 @@ public class CodeListManager {
 	@Autowired(required=false)
 	private CodeListItemDao codeListItemDao;
 	
+	@Transactional
 	public void importCodeLists(CollectSurvey survey, InputStream is) throws CodeListImportException {
 		int nextSystemId = codeListItemDao.nextSystemId();
 		CollectCodeListService service = new CollectCodeListService();
@@ -70,6 +70,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void importCodeLists(CollectSurvey survey, File file) throws CodeListImportException {
 		FileInputStream is = null;
 		try {
@@ -83,6 +84,7 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadItem(CodeList list, int itemId) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( list.isExternal() ) {
@@ -95,6 +97,7 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadItemByAttribute(CodeAttribute attribute) {
 		CodeAttributeDefinition defn = attribute.getDefinition();
 		CodeList list = defn.getList();
@@ -189,6 +192,7 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> List<T> loadItems(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( list.isExternal() ) {
@@ -201,6 +205,7 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> List<T> loadRootItems(CodeList list) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( persistedSurvey && list.isExternal() ) {
@@ -213,6 +218,7 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadRootItem(CodeList list, String code, ModelVersion version) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( persistedSurvey && list.isExternal() ) {
@@ -224,6 +230,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional(readOnly=true)
 	public boolean hasChildItemsInLevel(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( list.isExternal() ) {
@@ -235,6 +242,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void removeLevel(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( list.isExternal() ) {
@@ -267,12 +275,14 @@ public class CodeListManager {
 		return null;
 	}
 	
+	@Transactional(readOnly=true)
 	public CodeListItem findValidItem(Entity parent,
 			CodeAttributeDefinition defn, String code) {
 		List<CodeListItem> items = findValidItems(parent, defn, code);
 		return items.size() == 1 ? items.get(0): null;
 	}
 
+	@Transactional(readOnly=true)
 	public List<CodeListItem> findValidItems(Entity parent, CodeAttributeDefinition defn, String... codes) {
 		List<CodeListItem> result = new ArrayList<CodeListItem>();
 		List<CodeListItem> assignableItems = loadValidItems(parent, defn);
@@ -289,6 +299,7 @@ public class CodeListManager {
 		return CollectionUtils.unmodifiableList(result);
 	}
 
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> List<T> loadValidItems(Entity parent, CodeAttributeDefinition def) {
 		List<T> items = null;
 		CodeList list = def.getList();
@@ -341,6 +352,7 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> List<T> loadChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();
 		if ( list.isExternal() ) {
@@ -353,6 +365,7 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadChildItem(CodeList list,
 			String code, ModelVersion version) {
 		if ( list.isExternal() ) {
@@ -375,6 +388,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional(readOnly=true)
 	public boolean isEmpty(CodeList list) {
 		if ( list.isExternal() ) {
 			//TODO 
@@ -386,6 +400,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional(readOnly=true)
 	public boolean hasChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();
 		if ( list.isExternal() ) {
@@ -398,6 +413,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional(readOnly=true)
 	public boolean hasQualifiableItems(CodeList list) {
 		if ( list.isExternal() ) {
 			return false;
@@ -409,6 +425,7 @@ public class CodeListManager {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadChildItem(T parent, String code, ModelVersion version) {
 		CodeList list = parent.getCodeList();
 		if ( list.isExternal() ) {
@@ -421,6 +438,7 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
+	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadParentItem(T item) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {
@@ -448,6 +466,7 @@ public class CodeListManager {
 		codeListItemDao.copyItems(fromSurvey.getId(), toSurvey.getId());
 	}
 	
+	@Transactional
 	public void save(PersistedCodeListItem item) {
 		if ( item.getSystemId() == null ) {
 			codeListItemDao.insert(item);
@@ -456,10 +475,12 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void save(List<PersistedCodeListItem> items) {
 		codeListItemDao.insert(items);
 	}
 	
+	@Transactional
 	public void saveItemsAndDescendants(List<CodeListItem> items) {
 		List<PersistedCodeListItem> persistedItems = createPersistedItems(items, codeListItemDao.nextSystemId(), null);
 		save(persistedItems);
@@ -491,6 +512,7 @@ public class CodeListManager {
 		survey.removeCodeList(codeList);
 	}
 
+	@Transactional
 	public void delete(CodeListItem item) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {
@@ -509,6 +531,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void deleteAllItems(CodeList list) {
 		if ( list.isExternal()) {
 			throw new UnsupportedOperationException();
@@ -519,14 +542,17 @@ public class CodeListManager {
 		}
 	}
 
+	@Transactional
 	public void deleteAllItemsBySurvey(int surveyId, boolean work) {
 		codeListItemDao.deleteBySurvey(surveyId, work);
 	}
 
+	@Transactional
 	public void deleteInvalidCodeListReferenceItems(CollectSurvey survey) {
 		codeListItemDao.deleteInvalidCodeListReferenceItems(survey);
 	}
 	
+	@Transactional
 	public void removeVersioningReference(CollectSurvey survey, ModelVersion version) {
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList codeList : codeLists) {
@@ -540,6 +566,7 @@ public class CodeListManager {
 		}
 	}
 
+	@Transactional
 	public void deleteUnusedCodeLists(CollectSurvey survey) {
 		Set<CodeList> unusedCodeLists = getUnusedCodeLists(survey);
 		for (CodeList codeList : unusedCodeLists) {
@@ -547,6 +574,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void shiftItem(CodeListItem item, int indexTo) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {
@@ -588,6 +616,7 @@ public class CodeListManager {
 		return attrDefnUsingCodeList != null;
 	}
 	
+	@Transactional
 	public void persistCodeListItems(CodeList list) {
 		List<CodeListItem> items = list.getItems();
 		
@@ -596,6 +625,7 @@ public class CodeListManager {
 		list.removeAllItems();
 	}
 	
+	@Transactional
 	public void updateSurveyLanguages(CollectSurvey survey, List<String> newLanguageCodes) {
 		List<String> oldLanguageCodes = survey.getLanguages();
 		List<Integer> removedLanguageCodePositions = new ArrayList<Integer>();
@@ -618,14 +648,17 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional(readOnly=true)
 	public FileWrapper loadImageContent(PersistedCodeListItem item) {
 		return codeListItemDao.loadImageContent(item);
 	}
 
+	@Transactional
 	public void saveImageContent(PersistedCodeListItem item, FileWrapper fileWrapper) {
 		codeListItemDao.saveImageContent(item, fileWrapper);
 	}
 	
+	@Transactional
 	public void deleteImageContent(PersistedCodeListItem item) {
 		codeListItemDao.deleteImageContent(item);
 	}
@@ -642,6 +675,5 @@ public class CodeListManager {
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
 	}
-
 
 }

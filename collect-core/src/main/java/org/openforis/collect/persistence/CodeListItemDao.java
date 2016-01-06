@@ -37,12 +37,10 @@ import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyObject;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@Transactional
 public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem, CodeListItemDao.JooqDSLContext> {
 	
 	@SuppressWarnings("rawtypes")

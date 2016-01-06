@@ -3,9 +3,14 @@ package org.openforis.collect.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -13,13 +18,20 @@ import org.jooq.StoreQuery;
 import org.jooq.UpdateQuery;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
+import org.openforis.collect.manager.SurveyMigrator;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
+import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.versioning.Version;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -27,10 +39,54 @@ import org.springframework.transaction.annotation.Transactional;
  * @author M. Togna
  * @author S. Ricci
  */
-@Transactional
-public class SurveyDao extends SurveyBaseDao {
-//	private final Log LOG = LogFactory.getLog(SurveyDao.class);
+@Transactional(propagation=Propagation.SUPPORTS)
+public class SurveyDao extends JooqDaoSupport {
 
+	@Autowired
+	protected CollectSurveyIdmlBinder surveySerializer;
+	
+	public void init() {
+	}
+	
+	public CollectSurvey unmarshalIdml(String idml) throws IdmlParseException {
+		try {
+			byte[] bytes = idml.getBytes("UTF-8");
+			ByteArrayInputStream is = new ByteArrayInputStream(bytes);
+			return unmarshalIdml(is);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public CollectSurvey unmarshalIdml(InputStream is) throws IdmlParseException {
+		return unmarshalIdml(OpenForisIOUtils.toReader(is));
+	}
+	
+	public CollectSurvey unmarshalIdml(InputStream is, boolean includeCodeListItems) throws IdmlParseException {
+		return unmarshalIdml(OpenForisIOUtils.toReader(is), includeCodeListItems);
+	}
+
+	public CollectSurvey unmarshalIdml(Reader reader) throws IdmlParseException {
+		return unmarshalIdml(reader, true);
+	}
+	
+	public CollectSurvey unmarshalIdml(Reader reader, boolean includeCodeListItems) throws IdmlParseException {
+		try {
+			CollectSurvey survey = (CollectSurvey) surveySerializer.unmarshal(reader, includeCodeListItems);
+			SurveyMigrator migrator = getSurveyMigrator();
+			if (migrator.isMigrationNeeded(survey)) {
+				migrator.migrate(survey);
+			}
+			return survey;
+		} finally {
+			IOUtils.closeQuietly(reader);
+		}
+	}
+
+	public String marshalSurvey(Survey survey) throws SurveyImportException {
+		return surveySerializer.marshal(survey);
+	}
+	
 	public void insert(CollectSurvey survey) throws SurveyImportException {
 		CollectDSLContext dsl = dsl();
 		
@@ -44,7 +100,6 @@ public class SurveyDao extends SurveyBaseDao {
 		survey.setId(surveyId);
 	}
 
-	@Transactional(readOnly=true)
 	public CollectSurvey loadById(int id) {
 		Record record = dsl()
 				.select()
@@ -55,12 +110,10 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
-	@Transactional(readOnly=true)
 	public CollectSurvey loadByUri(String uri) {
 		return loadByUri(uri, false);
 	}
 
-	@Transactional(readOnly=true)
 	public CollectSurvey loadByUri(String uri, boolean temporary) {
 		Record record = dsl()
 				.select()
@@ -71,12 +124,10 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
-	@Transactional(readOnly=true)
 	public CollectSurvey loadByName(String name) {
 		return loadByName(name, false);
 	}
 	
-	@Transactional(readOnly=true)
 	public CollectSurvey loadByName(String name, boolean temporary) {
 		Record record = dsl()
 				.select()
@@ -87,7 +138,6 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
-	@Transactional(readOnly=true)
 	public List<SurveySummary> loadTemporarySummaries() {
 		List<SurveySummary> surveys = new ArrayList<SurveySummary>();
 		Result<Record> results = dsl().select()
@@ -103,7 +153,6 @@ public class SurveyDao extends SurveyBaseDao {
 		return surveys;
 	}
 	
-	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummary(int id) {
 		Record record = dsl().select()
 				.from(OFC_SURVEY)
@@ -113,12 +162,10 @@ public class SurveyDao extends SurveyBaseDao {
 		return result;
 	}
 	
-	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummaryByName(String name) {
 		return loadSurveySummaryByName(name, false);
 	}
 
-	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummaryByName(String name, boolean temporary) {
 		Record record = dsl().select()
 				.from(OFC_SURVEY)
@@ -128,12 +175,10 @@ public class SurveyDao extends SurveyBaseDao {
 		return result;
 	}
 	
-	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummaryByUri(String uri) {
 		return loadSurveySummaryByUri(uri, false);
 	}
 	
-	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummaryByUri(String uri, boolean temporary) {
 		Record record = dsl().select()
 				.from(OFC_SURVEY)
@@ -143,7 +188,6 @@ public class SurveyDao extends SurveyBaseDao {
 		return result;
 	}
 	
-	@Transactional(readOnly=true)
 	public List<CollectSurvey> loadAll() {
 		List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();
 		Result<Record> results = dsl()
@@ -157,7 +201,6 @@ public class SurveyDao extends SurveyBaseDao {
 		return surveys;
 	}
 
-	@Transactional(readOnly=true)
 	public List<CollectSurvey> loadAllPublished() {
 		List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();
 		Result<Record> results = dsl()
@@ -205,7 +248,6 @@ public class SurveyDao extends SurveyBaseDao {
 		addUpdateValues(storeQuery, survey);
 	}
 	
-	@Override
 	protected CollectSurvey processSurveyRow(Record row) {
 		try {
 			if (row == null) {
@@ -228,7 +270,6 @@ public class SurveyDao extends SurveyBaseDao {
 		}
 	}
 	
-	@Override
 	protected SurveySummary processSurveySummaryRow(Record row) {
 		if (row == null) {
 			return null;
@@ -244,4 +285,17 @@ public class SurveyDao extends SurveyBaseDao {
 		summary.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
 		return summary;
 	}
+	
+	protected SurveyMigrator getSurveyMigrator() {
+		return new SurveyMigrator();
+	}
+	
+	public CollectSurveyIdmlBinder getSurveySerializer() {
+		return surveySerializer;
+	}
+	
+	public void setSurveySerializer(CollectSurveyIdmlBinder surveySerializer) {
+		this.surveySerializer = surveySerializer;
+	}
 }
+

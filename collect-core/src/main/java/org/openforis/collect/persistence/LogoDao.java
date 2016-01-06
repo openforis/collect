@@ -11,12 +11,13 @@ import org.openforis.collect.model.Logo;
 import org.openforis.collect.model.LogoPosition;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@Transactional
+@Transactional(propagation=Propagation.SUPPORTS)
 public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.LogoDSLContext> {
 	
 	public LogoDao() {

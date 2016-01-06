@@ -22,6 +22,7 @@ import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -78,7 +79,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	@SuppressWarnings("deprecation")
 	@Before
-	public void init() throws IdmlParseException, IOException, SurveyImportException {
+	public void init() throws IdmlParseException, IOException, SurveyImportException, SurveyValidationException {
 		survey = loadSurvey();
 		survey.setTemporary(false);
 		surveyManager.importModel(survey);

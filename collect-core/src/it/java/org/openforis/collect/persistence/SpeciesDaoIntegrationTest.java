@@ -27,9 +27,6 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 //	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
 
 	@Autowired
-	private SurveyDao surveyDao;
-
-	@Autowired
 	private TaxonomyDao taxonomyDao;
 
 	@Autowired
@@ -388,7 +385,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		survey.setName("surveyTest");
 		survey.setUri("http://www.openforis.org/idm/species_dao_it");
 		try {
-			surveyDao.insert(survey);
+			surveyManager.importModel(survey);
 		} catch (SurveyImportException e) {
 			throw new RuntimeException(e);
 		}

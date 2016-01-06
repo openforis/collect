@@ -22,6 +22,7 @@ import org.openforis.collect.io.metadata.species.SpeciesBackupImportJob;
 import org.openforis.collect.io.metadata.species.SpeciesBackupImportTask;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
@@ -62,7 +63,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	
 	@SuppressWarnings("deprecation")
 	@Before
-	public void init() throws IdmlParseException, IOException, SurveyImportException {
+	public void init() throws IdmlParseException, IOException, SurveyImportException, SurveyValidationException {
 		survey = loadSurvey();
 		survey.setTemporary(false);
 		surveyManager.importModel(survey);

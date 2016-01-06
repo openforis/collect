@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@Transactional
 public class RecordValidationProcess extends AbstractProcess<Void, ProcessStatus> {
 
 //	private static Log LOG = LogFactory.getLog(RecordValidationProcess.class);
@@ -43,7 +42,7 @@ public class RecordValidationProcess extends AbstractProcess<Void, ProcessStatus
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.NOT_SUPPORTED)
+	@Transactional(propagation=Propagation.SUPPORTS)
 	public void startProcessing() throws Exception {
 		super.startProcessing();
 		validateParameters();

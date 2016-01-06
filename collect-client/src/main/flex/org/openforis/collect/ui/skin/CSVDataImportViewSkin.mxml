@@ -193,6 +193,9 @@
 		<s:DataGrid id="errorsDataGrid" width="100%" height="100%">
 			<s:columns>
 				<s:ArrayList>
+					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.file')}"
+								  dataField="fileName"
+								  width="100" />
 					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.row')}"
 								  dataField="row" 
 								  width="50" />

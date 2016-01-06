@@ -7,18 +7,19 @@ import org.openforis.collect.model.Logo;
 import org.openforis.collect.model.LogoPosition;
 import org.openforis.collect.persistence.LogoDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author E. Wibowo
  * 
  */
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class LogoManager {
 	
 	@Autowired
 	private LogoDao logoDao;
 	
-	@Transactional
 	public Logo loadLogo(LogoPosition position) {
 		Logo logo = logoDao.loadByPosition(position);
 		return logo;

@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -55,7 +56,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	
 	@SuppressWarnings("deprecation")
 	@Before
-	public void before() throws IdmlParseException, IOException, SurveyImportException, SQLException, LiquibaseException {
+	public void before() throws IdmlParseException, IOException, SurveyImportException, SQLException, LiquibaseException, SurveyValidationException {
 		SQLiteDatabase database = new SQLiteDatabase();
 		Connection connection = DataSourceUtils.getConnection(dataSource);
 		database.setConnection(new JdbcConnection(connection));

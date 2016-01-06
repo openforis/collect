@@ -156,9 +156,9 @@
 		<constructor-arg ref="eventQueue" />
 	</bean>
 
-	<bean id="recordEventBatchPublisher" class="org.openforis.collect.io.data.RecordEventBatchPublisher"
-		scope="prototype">
-		<constructor-arg ref="eventQueue" />
-	</bean>
+<!-- 	<bean id="recordEventBatchPublisher" class="org.openforis.collect.io.data.RecordEventBatchPublisher" -->
+<!-- 		scope="prototype"> -->
+<!-- 		<constructor-arg ref="eventQueue" /> -->
+<!-- 	</bean> -->
 	
 </beans>

@@ -18,6 +18,7 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -46,7 +47,7 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 	private RecordUpdater updater;
 	
 	@Before
-	public void init() throws IdmlParseException, IOException, SurveyImportException {
+	public void init() throws IdmlParseException, IOException, SurveyImportException, SurveyValidationException {
 		updater = new RecordUpdater();
 		survey = importModel();
 		initRecords();

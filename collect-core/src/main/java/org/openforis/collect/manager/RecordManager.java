@@ -39,12 +39,14 @@ import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
  * @author S. Ricci
  */
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class RecordManager {
 
 //	private final Log log = LogFactory.getLog(RecordManager.class);
@@ -83,12 +85,13 @@ public class RecordManager {
 		lockManager = new RecordLockManager(lockTimeoutMillis);
 	}
 	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void saveAndRun(CollectRecord record, Runnable callback) {
 		save(record);
 		callback.run();
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void save(CollectRecord record) {
 		try {
 			save(record, null);
@@ -98,13 +101,13 @@ public class RecordManager {
 		}
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void save(CollectRecord record, String sessionId) throws RecordPersistenceException {
 		User lockingUser = record.getModifiedBy();
 		save(record, lockingUser, sessionId);
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void save(CollectRecord record, User lockingUser, String sessionId) throws RecordPersistenceException {
 		record.updateSummaryFields();
 
@@ -126,12 +129,10 @@ public class RecordManager {
 		}
 	}
 	
-	@Transactional
 	public int nextId() {
 		return recordDao.nextId();
 	}
 	
-	@Transactional
 	public void restartIdSequence(Number value) {
 		recordDao.restartIdSequence(value);
 	}
@@ -144,17 +145,15 @@ public class RecordManager {
 		return recordDao.createUpdateQuery(record);	
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void execute(List<RecordStoreQuery> queries) {
 		recordDao.execute(queries);
 	}
 	
-	@Transactional
 	public void executeRecordOperations(List<RecordOperations> operationsForRecords) {
 		executeRecordOperations(operationsForRecords, null);
 	}
 	
-	@Transactional
 	public void executeRecordOperations(List<RecordOperations> operationsForRecords, Consumer<RecordStepOperation> consumer) {
 		int nextId = nextId();
 		List<RecordStoreQuery> queries = new ArrayList<RecordStoreQuery>();
@@ -177,7 +176,7 @@ public class RecordManager {
 		restartIdSequence(nextId);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void delete(int recordId) throws RecordPersistenceException {
 		if ( isLockingEnabled() && lockManager.isLocked(recordId) ) {
 			RecordLock lock = lockManager.getLock(recordId);
@@ -188,12 +187,12 @@ public class RecordManager {
 		}
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void deleteBySurvey(int surveyId) {
 		recordDao.deleteBySurvey(surveyId);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void assignOwner(CollectSurvey survey, int recordId, Integer ownerId, User user, String sessionId) 
 			throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
@@ -223,12 +222,10 @@ public class RecordManager {
 	 * @throws RecordPersistence
 	 */
 	@Deprecated
-	@Transactional(readOnly=true)
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
 		return checkout(survey, user, recordId, Step.valueOf(step), sessionId, forceUnlock);
 	}
 	
-	@Transactional(readOnly=true)
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
 		if(isLockingEnabled()) {
 			checkSurveyRecordValidationNotInProgress(survey);
@@ -256,29 +253,24 @@ public class RecordManager {
 	}
 
 	@Deprecated
-	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId, int step) {
 		Step stepEnum = Step.valueOf(step);
 		return load(survey, recordId, stepEnum);
 	}
 	
-	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId) {
 		Step lastStep = determineLastStep(survey, recordId);
 		return load(survey, recordId, lastStep);
 	}
 
-	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
 		return load(survey, recordId, step, true);
 	}
 	
-	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate) {
 		return load(survey, recordId, step, validate, true);
 	}
 	
-	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate, boolean addEmptyMultipleEntities) {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber(), validate);
 		recordConverter.convertToLatestVersion(record);
@@ -286,44 +278,36 @@ public class RecordManager {
 		return record;
 	}
 	
-	@Transactional(readOnly=true)
 	public byte[] loadBinaryData(CollectSurvey survey, int recordId, Step step) {
 		byte[] result = recordDao.loadBinaryData(survey, recordId, step.getStepNumber());
 		return result;
 	}
 
-	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
 		return loadSummaries(survey, rootEntity, (String[]) null);
 	}
 
-	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
 		return recordDao.loadSummaries(survey, rootEntity, step);
 	}
 	
-	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keys) {
 		return recordDao.loadSummaries(survey, rootEntity, keys);
 	}
 	
-	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, boolean caseSensitiveKeys, String... keys) {
 		return recordDao.loadSummaries(survey, rootEntity, caseSensitiveKeys, keys);
 	}
 	
-	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
 		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, keyValues);
 		return summaries;
 	}
 
-	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(RecordFilter filter) {
 		return loadSummaries(filter, null);
 	}
 	
-	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		List<CollectRecord> recordSummaries = recordDao.loadSummaries(filter, sortFields);
 		return recordSummaries;
@@ -332,38 +316,31 @@ public class RecordManager {
 	/**
 	 * Returns only the records modified after the specified date.
 	 */
-	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Date modifiedSince) {
 		return recordDao.loadSummaries(survey, rootEntity, modifiedSince);
 	}
 	
-	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey) {
 		return recordDao.countRecords(survey);
 	}
 	
-	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId) {
 		return recordDao.countRecords(survey, rootEntityDefinitionId);
 	}
 	
-	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId, int dataStepNumber) {
 		return recordDao.countRecords(survey, rootEntityDefinitionId, dataStepNumber);
 	}
 
-	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey, String rootEntityDefinition, Step step) {
 		EntityDefinition rootDef = survey.getSchema().getRootEntityDefinition(rootEntityDefinition);
 		return countRecords(survey, rootDef.getId(), step.getStepNumber());
 	}
 
-	@Transactional(readOnly=true)
 	public int countRecords(RecordFilter filter) {
 		return recordDao.countRecords(filter);
 	}
 	
-	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
@@ -375,7 +352,6 @@ public class RecordManager {
 	/**
 	 * Returns false if another record with the same root entity key values exists.
 	 */
-	@Transactional(readOnly=true)
 	public boolean isUnique(CollectRecord record) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		record.updateSummaryFields();
@@ -424,14 +400,14 @@ public class RecordManager {
 		return record;
 	}
 
-	@Transactional
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public CollectRecord promote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPromoteException, MissingRecordKeyException {
 		CollectRecord record = load(survey, recordId, currentStep);
 		performPromote(record, user);
 		return record;
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public void promote(CollectSurvey survey, int recordId, Step currentStep, User user, RecordCallback callback) throws RecordPromoteException, MissingRecordKeyException {
 		CollectRecord record = promote(survey, recordId, currentStep, user);
 		callback.run(record);
@@ -440,7 +416,7 @@ public class RecordManager {
 	/**
 	 * Saves a record and promotes it to the next phase
 	 */
-	@Transactional
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public void promote(CollectRecord record, User user) throws RecordPromoteException, MissingRecordKeyException {
 		Integer errors = record.getErrors();
 		Integer skipped = record.getSkipped();
@@ -490,7 +466,7 @@ public class RecordManager {
 		recordDao.update( record );
 	}
 
-	@Transactional
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public CollectRecord demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
 		CollectRecord record = recordDao.load( survey, recordId, prevStep.getStepNumber() );
@@ -504,13 +480,13 @@ public class RecordManager {
 		return record;
 	}
 
-	@Transactional
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user, RecordCallback callback) throws RecordPersistenceException {
 		CollectRecord record = demote(survey, recordId, currentStep, user);
 		callback.run(record);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public void validateAndSave(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
 			lockManager.isLockAllowed(user, recordId, sessionId, true);
@@ -726,7 +702,6 @@ public class RecordManager {
 			lockManager.releaseLock(recordId);
 		}
 	}
-
 
 	public long getLockTimeoutMillis() {
 		return lockTimeoutMillis;

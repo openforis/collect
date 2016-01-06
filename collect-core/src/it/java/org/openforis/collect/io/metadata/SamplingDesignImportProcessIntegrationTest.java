@@ -21,6 +21,7 @@ import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportProc
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportStatus;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
@@ -45,7 +46,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 	private CollectSurvey survey;
 	
 	@Before
-	public void init() throws IdmlParseException, IOException, SurveyStoreException {
+	public void init() throws IdmlParseException, IOException, SurveyStoreException, SurveyValidationException {
 		survey = loadSurvey();
 		survey.setTemporary(true);
 		surveyManager.save(survey);
