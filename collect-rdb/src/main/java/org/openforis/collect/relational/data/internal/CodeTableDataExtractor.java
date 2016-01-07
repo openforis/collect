@@ -12,6 +12,7 @@ import org.openforis.collect.relational.model.CodeParentKeyColumn;
 import org.openforis.collect.relational.model.CodePrimaryKeyColumn;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.Table;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
@@ -59,6 +60,11 @@ public class CodeTableDataExtractor extends DataExtractor {
 	@Override
 	public boolean hasNext() {
 		return count < total;
+	}
+	
+	@Override
+	public Table<?> getTable() {
+		return table;
 	}
 
 	private boolean isDefaultCodeRowToBeCreated() {
@@ -126,12 +132,7 @@ public class CodeTableDataExtractor extends DataExtractor {
 			}
 			return parent.getId();
 		} else if (col instanceof CodePrimaryKeyColumn) {
-			Integer id = item.getId();
-			if ( id == null ) {
-				throw new NullPointerException(String.format("Code list item id is null( survey: %s, code list: %s, item: %s)", 
-						item.getSurvey().getName(), item.getCodeList().getName(), item.getCode()));
-			}
-			return id;
+			return item.getId();
 		} else {
 			throw new UnsupportedOperationException("Code List Table Column type not supported: " + col.getClass().getName());
 		}

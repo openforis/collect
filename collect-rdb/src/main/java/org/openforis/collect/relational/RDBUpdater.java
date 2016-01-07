@@ -7,7 +7,6 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.relational.data.ColumnValuePair;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
-import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.concurrency.ProgressListener;
 
 /**
@@ -15,26 +14,24 @@ import org.openforis.concurrency.ProgressListener;
  */
 public interface RDBUpdater {
 	
-	void insertEntity(RelationalSchema schema, int recordId, 
+	void insertEntity(int recordId, 
 			Integer parentId, int entityId,
 			int entityDefinitionId);
 
-	void insertAttribute(RelationalSchema schema, int recordId, 
+	void insertAttribute(int recordId, 
 			Integer parentId, int attributeId,
 			int attributeDefinitionId);
 
-	void replaceRecordData(RelationalSchema schema, CollectRecord record, ProgressListener progressListener);
+	void replaceRecordData(CollectRecord record, ProgressListener progressListener);
 	
-	void updateEntityData(RelationalSchema rdbSchema, DataTable dataTable,
+	void updateEntityData(DataTable dataTable,
 			BigInteger pkValue,
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs);
 	
-	void deleteRecordData(RelationalSchema schema, int recordId, int rootDefId);
+	void deleteRecordData(int recordId, int rootDefId);
 
-	void deleteEntity(RelationalSchema schema, int recordId,
-			int entityId, int definitionId);
+	void deleteEntity(int recordId, int entityId, int definitionId);
 	
-	void deleteAttribute(RelationalSchema schema, int recordId,
-			int attributeId, int definitionId);
+	void deleteAttribute(int recordId, int attributeId, int definitionId);
 
 }

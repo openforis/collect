@@ -9,11 +9,13 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Batch;
+import org.jooq.Cursor;
 import org.jooq.Field;
 import org.jooq.InsertQuery;
 import org.jooq.JoinType;
@@ -174,6 +176,26 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		CollectSurvey survey = filter.getSurvey();
 		
 		RecordDSLContext jf = createDSLContext(survey);
+		SelectQuery<Record> q = createQuery(jf, filter, sortFields);
+
+		//fetch results
+		Result<Record> result = q.fetch();
+		
+		return jf.fromResult(result);
+	}
+
+	public Iterator<CollectRecord> iterateSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
+		CollectSurvey survey = filter.getSurvey();
+		
+		RecordDSLContext jf = createDSLContext(survey);
+		SelectQuery<Record> q = createQuery(jf, filter, sortFields);
+
+		Cursor<Record> it = q.fetchLazy();
+		return new RecordIterator(jf, it);
+	}
+
+	private SelectQuery<Record> createQuery(RecordDSLContext jf, RecordFilter filter,
+			List<RecordSummarySortField> sortFields) {
 		SelectQuery<Record> q = jf.selectQuery();	
 		
 		q.addSelect(SUMMARY_FIELDS);
@@ -193,13 +215,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 		//always order by ID to avoid pagination issues
 		q.addOrderBy(OFC_RECORD.ID);
-
-		//fetch results
-		Result<Record> result = q.fetch();
-		
-		return jf.fromResult(result);
+		return q;
 	}
-
+	
 	private void addFilterConditions(SelectQuery<?> q, RecordFilter filter) {
 		CollectSurvey survey = filter.getSurvey();
 		//survey
@@ -630,6 +648,30 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		
 		public Query getInternalQuery() {
 			return internalQuery;
+		}
+		
+	}
+	
+	private static class RecordIterator implements Iterator<CollectRecord> {
+
+		private RecordDSLContext jf;
+		private Cursor<Record> internalIterator;
+		
+		public RecordIterator(RecordDSLContext jf, Cursor<Record> it) {
+			super();
+			this.jf = jf;
+			this.internalIterator = it;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return internalIterator.hasNext();
+		}
+
+		@Override
+		public CollectRecord next() {
+			Record r = internalIterator.fetchOne();
+			return jf.fromRecord(r);
 		}
 		
 	}
