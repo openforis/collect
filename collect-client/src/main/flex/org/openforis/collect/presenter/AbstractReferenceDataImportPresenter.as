@@ -50,7 +50,6 @@ package org.openforis.collect.presenter {
 		
 		protected var _getStatusResponder:IResponder;
 		protected var _firstOpen:Boolean;
-		protected var _fileFilter:FileFilter;
 		
 		protected var _recordsOffset:int;
 		protected var _recordsPerPage:int;
@@ -66,8 +65,6 @@ package org.openforis.collect.presenter {
 			
 			_recordsOffset = 0;
 			_recordsPerPage = MAX_SUMMARIES_PER_PAGE
-
-			_fileFilter = createFileFilter();
 		}
 
 		protected function createFileFilter():FileFilter {
@@ -151,7 +148,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function browseFileToImport():void {
-			_fileReference.browse([_fileFilter]);
+			_fileReference.browse([createFileFilter()]);
 		}
 		
 		protected function checkCanImport():Boolean {
@@ -361,7 +358,11 @@ package org.openforis.collect.presenter {
 				}
 				view.progressBar.setProgress(0, 0);
 			} else {
-				progressText = Message.get(progressLabelResource, [_state.processed, _state.total]);
+				if (_state.total == 100) {
+					progressText = null; //completion percentage in progress bar 
+				} else {
+					progressText = Message.get(progressLabelResource, [_state.processed, _state.total]);
+				}
 				view.progressBar.setProgress(_state.processed, _state.total);
 			}
 			view.progressLabelText = progressText;

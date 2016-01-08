@@ -30,9 +30,11 @@
 			
 			public static const UPDATE_EXISTING_RECORDS_TYPE:String = "updateExistingRecords";
 			public static const INSERT_NEW_RECORDS_TYPE:String = "insertNewRecords";
+			public static const IMPORT_MULTIPLE_FILES_TYPE:String = "importMultipleFiles";
 			
 			public static const STATE_UPDATE_EXISTING_RECORDS:String = "updateExistingRecords";
 			public static const STATE_INSERT_NEW_RECORDS:String = "insertNewRecords";
+			public static const STATE_IMPORT_MULTIPLE_FILES:String = "importMultipleFiles";
 			
 			[SkinPart(required="true", type="mx.controls.Tree")]
 			public var entitySelectionTree:Tree;
@@ -95,6 +97,7 @@
 		<s:State name="default" enterState="invalidateSkinState()" />
 		<s:State name="insertNewRecords" enterState="invalidateSkinState()" />
 		<s:State name="updateExistingRecords" enterState="invalidateSkinState()" />
+		<s:State name="importMultipleFiles" enterState="invalidateSkinState()" />
 		<s:State name="loading" enterState="invalidateSkinState()" />
 		<s:State name="uploading" enterState="invalidateSkinState()" />
 		<s:State name="importing" enterState="invalidateSkinState()" />

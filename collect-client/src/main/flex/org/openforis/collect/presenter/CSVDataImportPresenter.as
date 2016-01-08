@@ -38,6 +38,7 @@ package org.openforis.collect.presenter
 	public class CSVDataImportPresenter extends AbstractReferenceDataImportPresenter {
 		
 		private static const ALL_STEPS_ITEM:Object = {label: Message.get('global.allItemsLabel')};
+		private static const ALLOWED_MULTIPLE_FILES_IMPORT_FILE_EXTENSIONS:Array = [".zip"];
 		
 		private var _importClient:CSVDataImportClient;
 		
@@ -58,8 +59,13 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function createFileFilter():FileFilter {
-			//var description:String = ALLOWED_IMPORT_FILE_EXTENSIONS.join(", ");
-			return new FileFilter("Excel documents", AbstractReferenceDataImportPresenter.ALLOWED_IMPORT_FILE_EXTENSIONS.concat([".zip"]).join("; "));
+			switch(view.importType.selectedValue) {
+			case CSVDataImportView.INSERT_NEW_RECORDS_TYPE:
+			case CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE:
+				return new FileFilter("Excel documents", AbstractReferenceDataImportPresenter.ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
+			case CSVDataImportView.IMPORT_MULTIPLE_FILES_TYPE:
+				return new FileFilter("Collect data export ZIP file", ALLOWED_MULTIPLE_FILES_IMPORT_FILE_EXTENSIONS.join("; "));
+			}
 		}
 		
 		protected function importTypeChangeHandler(event:Event):void {
@@ -156,10 +162,12 @@ package org.openforis.collect.presenter
 		}
 
 		override protected function fileReferenceSelectHandler(event:Event):void {
-			var importType:String = view.importType.selectedValue as String;
-			if ( importType == CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE ) {
+			switch(view.importType.selectedValue) {
+			case CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE:
+			case CSVDataImportView.IMPORT_MULTIPLE_FILES_TYPE:
 				confirmUploadStart(messageKeys.CONFIRM_IMPORT);
-			} else {
+				break;
+			default:
 				//when inserting new records, do not ask for confirmation
 				startUpload();
 			}
@@ -197,13 +205,20 @@ package org.openforis.collect.presenter
 			var insertNewRecords:Boolean;
 			var newRecordModelVersion:String = null;
 			
-			if ( view.importType.selectedValue == CSVDataImportView.INSERT_NEW_RECORDS_TYPE ) {
+			switch(view.importType.selectedValue) {
+			case CSVDataImportView.INSERT_NEW_RECORDS_TYPE:
 				//insert new records
 				insertNewRecords = true;
 				entityId = Application.activeRootEntity.id;
 				var version:ModelVersionProxy = view.formVersionDropDownList.selectedItem;
 				newRecordModelVersion = version == null ? null: version.name;
-			} else {
+				break;
+			case CSVDataImportView.IMPORT_MULTIPLE_FILES_TYPE:
+				insertNewRecords = true;
+				var version:ModelVersionProxy = view.formVersionDropDownList.selectedItem;
+				newRecordModelVersion = version == null ? null: version.name;
+				break;
+			default:
 				//update existing records
 				insertNewRecords = false;
 				entityId = NodeItem(view.entitySelectionTree.selectedItem).id;
@@ -289,10 +304,16 @@ package org.openforis.collect.presenter
 		}
 
 		override protected function backToDefaultView():void {
-			if ( view.importType.selectedValue == CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE ) {
+			switch(view.importType.selectedValue) {
+			case CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE:
 				view.currentState = CSVDataImportView.STATE_UPDATE_EXISTING_RECORDS;
-			} else {
+				break;
+			case CSVDataImportView.INSERT_NEW_RECORDS_TYPE:
 				view.currentState = CSVDataImportView.STATE_INSERT_NEW_RECORDS;
+				break;
+			case CSVDataImportView.IMPORT_MULTIPLE_FILES_TYPE:
+				view.currentState = CSVDataImportView.STATE_IMPORT_MULTIPLE_FILES;
+				break;
 			}
 		}
 		

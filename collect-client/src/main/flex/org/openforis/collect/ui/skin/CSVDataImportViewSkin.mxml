@@ -25,13 +25,14 @@
 		<s:State name="default" />
 		<s:State name="insertNewRecords" basedOn="default" />
 		<s:State name="updateExistingRecords" basedOn="default" />
+		<s:State name="importMultipleFiles" basedOn="default" />
 		<s:State name="loading" />
 		<s:State name="uploading" />
 		<s:State name="importing" />
 		<s:State name="error" />
 	</s:states>
 	
-	<s:VGroup includeIn="default, insertNewRecords, updateExistingRecords"
+	<s:VGroup includeIn="default, insertNewRecords, updateExistingRecords, importMultipleFiles"
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center"
 			  height="100%" width="100%"
@@ -54,13 +55,20 @@
 							   label="{Message.get('csvDataImport.insertNewRecords')}"
 							   value="{CSVDataImportView.INSERT_NEW_RECORDS_TYPE}"
 							   group="{importType}" />
+				
+				<s:RadioButton id="importMultipleFilesRadioButton"
+							   label="{Message.get('csvDataImport.importMultipleFiles')}"
+							   value="{CSVDataImportView.IMPORT_MULTIPLE_FILES_TYPE}"
+							   group="{importType}" />
 			</s:HGroup>
 			
 			<s:HGroup verticalAlign="middle"
 					  visible="false"
 					  visible.insertNewRecords="true"
+					  visible.importMultipleFiles="true"
 					  includeInLayout="false"
-					  includeInLayout.insertNewRecords="true">
+					  includeInLayout.insertNewRecords="true"
+					  includeInLayout.importMultipleFiles="true">
 				<s:Label text="{Message.get('csvDataImport.formVersion')}"
 						 styleName="formLabel"/>
 				<s:DropDownList id="formVersionDropDownList" 
@@ -107,6 +115,7 @@
 						 height="100%"
 						 width="100%"
 						 enabled.insertNewRecords="false"
+						 enabled.importMultipleFiles="false"
 						 defaultLeafIcon="{null}"
 						 folderOpenIcon="{null}"
 						 folderClosedIcon="{null}"

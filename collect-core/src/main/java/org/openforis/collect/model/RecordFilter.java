@@ -124,6 +124,8 @@ public class RecordFilter {
 	public void setKeyValues(String[] keyValues) {
 		if ( keyValues != null && keyValues.length > 0 ) {
 			setKeyValues(Arrays.asList(keyValues));
+		} else {
+			this.keyValues = null;
 		}
 	}
 	

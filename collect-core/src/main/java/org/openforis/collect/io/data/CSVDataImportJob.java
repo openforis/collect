@@ -39,6 +39,7 @@ import org.openforis.collect.model.NodeAddChange;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeChangeBatchProcessor;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -292,7 +293,7 @@ public class CSVDataImportJob extends Job {
 		private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "csvDataImport.error.internalErrorImportingFile";
 		private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";
 		private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
-		private static final String ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY = "csvDataImport.error.onlyNewRecordsAllowed";
+//		private static final String ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY = "csvDataImport.error.onlyNewRecordsAllowed";
 		private static final String MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY = "csvDataImport.error.multipleParentEntityFound";
 		private static final String PARENT_ENTITY_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.noParentEntityFound";
 		private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.unitNotFound";
@@ -336,7 +337,7 @@ public class CSVDataImportJob extends Job {
 				setErrorMessage(NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY);
 				changeStatus(Status.FAILED);
 			} else if ( input.settings.isInsertNewRecords() && input.settings.getNewRecordVersionName() != null && 
-					input.survey.getVersion(input.settings.getNewRecordVersionName()) == null ) {
+					input.survey.getVersion(input.settings.getNewRecordVersionName()) == null) {
 				setErrorMessage(NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY);
 				setErrorMessageArgs(new String[]{input.settings.getNewRecordVersionName()});
 				changeStatus(Status.FAILED);
@@ -406,9 +407,10 @@ public class CSVDataImportJob extends Job {
 			if (! validateRecordKey(line) ) {
 				return;
 			}
-			if ( input.settings.isInsertNewRecords() ) {
+			CollectRecord recordSummary = loadRecordSummary(line);
+			if (recordSummary == null && input.settings.isInsertNewRecords() ) {
 				//create new record
-				EntityDefinition rootEntityDefn = input.survey.getSchema().getRootEntityDefinition(input.parentEntityDefinitionId);
+				EntityDefinition rootEntityDefn = getParentEntityDefinition();
 				CollectRecord record = recordManager.instantiateRecord(input.survey, rootEntityDefn.getName(), adminUser, input.settings.getNewRecordVersionName(), Step.ENTRY);
 				NodeChangeSet changes = recordManager.initializeRecord(record);
 				if (nodeChangeBatchProcessor != null) {
@@ -418,7 +420,6 @@ public class CSVDataImportJob extends Job {
 				setValuesInRecord(line, record, Step.ENTRY);
 				insertRecord(record);
 			} else if ( input.step == null ) {
-				CollectRecord recordSummary = loadRecordSummary(line);
 				Step originalRecordStep = recordSummary.getStep();
 				//set values in each step data
 				for (Step currentStep : Step.values()) {
@@ -430,7 +431,6 @@ public class CSVDataImportJob extends Job {
 					}
 				}
 			} else {
-				CollectRecord recordSummary = loadRecordSummary(line);
 				Step originalRecordStep = recordSummary.getStep();
 				if ( input.step.beforeEqual(originalRecordStep) ) {
 					CollectRecord record;
@@ -452,6 +452,10 @@ public class CSVDataImportJob extends Job {
 				}
 			}
 			dataImportStatus.addProcessedRow(line.getLineNumber());
+		}
+
+		private EntityDefinition getParentEntityDefinition() {
+			return (EntityDefinition) input.survey.getSchema().getDefinitionById(input.parentEntityDefinitionId);
 		}
 
 		private CollectRecord loadRecord(Integer recordId, Step step) {
@@ -508,18 +512,21 @@ public class CSVDataImportJob extends Job {
 			EntityDefinition parentEntityDefn = getParentEntityDefinition();
 			EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 			String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-			List<CollectRecord> recordSummaries = recordManager.loadSummaries(input.survey, rootEntityDefn.getName(), recordKeyValues);
+			RecordFilter filter = new RecordFilter(input.survey);
+			filter.setRootEntityId(rootEntityDefn.getId());
+			filter.setKeyValues(recordKeyValues);
+			int recordCount = recordManager.countRecords(filter);
 			String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
 					parentEntityDefn,
 					rootEntityDefn.getKeyAttributeDefinitions());
 			String errorMessageKey = null;
-			if ( input.settings.isInsertNewRecords() ) {
-				if ( ! recordSummaries.isEmpty() ) {
-					errorMessageKey = ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY;
-				}
-			} else if ( recordSummaries.size() == 0 ) {
+			if ( input.settings.isInsertNewRecords()) {
+//				if ( recordCount > 0 ) {
+//					errorMessageKey = ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY;
+//				}
+			} else if ( recordCount == 0 ) {
 				errorMessageKey = NO_RECORD_FOUND_ERROR_MESSAGE_KEY;
-			} else if ( recordSummaries.size() > 1 ) {
+			} else if ( recordCount > 1 ) {
 				errorMessageKey = MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY;
 			}
 			if ( errorMessageKey == null ) {
@@ -538,7 +545,7 @@ public class CSVDataImportJob extends Job {
 			EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 			String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 			List<CollectRecord> recordSummaries = recordManager.loadSummaries(input.survey, rootEntityDefn.getName(), recordKeyValues);
-			CollectRecord recordSummary = recordSummaries.get(0);
+			CollectRecord recordSummary = recordSummaries.isEmpty() ? null : recordSummaries.get(0);
 			return recordSummary;
 		}
 
@@ -863,11 +870,7 @@ public class CSVDataImportJob extends Job {
 			setValuesInAttributes(entity, keyValuesByField, colNamesByField, row);
 		}
 		
-		private EntityDefinition getParentEntityDefinition() {
-			return (EntityDefinition) input.survey.getSchema().getDefinitionById(input.parentEntityDefinitionId);
-		}
-
-		public CSVDataImportInput getInput() {
+				public CSVDataImportInput getInput() {
 			return input;
 		}
 		
