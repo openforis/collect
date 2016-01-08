@@ -112,12 +112,14 @@ package org.openforis.collect.presenter {
 				return;
 			}
 			var message:String;
+			var messageArgs:Array = null;
 			if (selectedSurveyInfo != null && selectedSurveyInfo.updatedRecordsSinceBackup > 0) {
 				message = "restore.confirm.not_backed_up_records";
+				messageArgs = [selectedSurveyInfo.updatedRecordsSinceBackup];
 			} else {
 				message = "restore.confirm.message";
 			}
-			AlertUtil.showConfirm(message, null, 
+			AlertUtil.showConfirm(message, messageArgs, 
 				"Confirm data restore",
 				startUpload);
 		}

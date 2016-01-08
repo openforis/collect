@@ -127,12 +127,10 @@ public class RecordManager {
 		}
 	}
 	
-	@Transactional
 	public int nextId() {
 		return recordDao.nextId();
 	}
 	
-	@Transactional
 	public void restartIdSequence(Number value) {
 		recordDao.restartIdSequence(value);
 	}

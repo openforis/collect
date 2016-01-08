@@ -674,6 +674,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			return jf.fromRecord(r);
 		}
 		
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+		
 	}
 
 }
