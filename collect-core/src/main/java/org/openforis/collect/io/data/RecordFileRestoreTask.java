@@ -113,7 +113,7 @@ public class RecordFileRestoreTask extends Task {
 	}
 
 	protected CollectRecord findStoredRecord(CollectRecord lastStepBackupRecord) {
-		String[] recordKeys = lastStepBackupRecord.getRootEntityKeyValues().toArray(new String[]{});
+		String[] recordKeys = lastStepBackupRecord.getRootEntityKeyValues().toArray(new String[lastStepBackupRecord.getRootEntityKeyValues().size()]);
 		List<CollectRecord> summaries = recordManager.loadSummaries(survey, lastStepBackupRecord.getRootEntity().getName(), recordKeys);
 		if ( summaries.size() == 1 ) {
 			CollectRecord summary = summaries.get(0);

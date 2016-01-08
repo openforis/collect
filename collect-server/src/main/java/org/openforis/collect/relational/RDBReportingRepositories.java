@@ -182,15 +182,15 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			RelationalSchema targetSchema, Connection targetConn,
 			ProgressListener progressListener) throws CollectRdbException {
 		CollectSurvey survey = surveyManager.get(surveyName);
-		DatabaseExporter databaseUpdater = createRDBUpdater(targetConn);
-		databaseUpdater.insertReferenceData(targetSchema, progressListener);
+		DatabaseExporter databaseUpdater = createRDBUpdater(targetSchema, targetConn);
+		databaseUpdater.insertReferenceData(progressListener);
 		RecordFilter recordFilter = new RecordFilter(survey);
 		Step step = Step.fromRecordStep(recordStep);
 		recordFilter.setStepGreaterOrEqual(step);
 		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
 		for (CollectRecord summary : summaries) {
 			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
-			databaseUpdater.insertRecordData(targetSchema, record, progressListener);
+			databaseUpdater.insertRecordData(record, progressListener);
 		}
 	}
 
@@ -217,7 +217,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 		withConnection(survey.getName(), step, new Callback() {
 			public void execute(Connection connection) {
-				RDBUpdater rdbUpdater = createRDBUpdater(connection);
+				RDBUpdater rdbUpdater = createRDBUpdater(rdbSchema, connection);
 				for (RecordEvent recordEvent : recordTransaction.getEvents()) {
 					EventHandler handler = new EventHandler(recordEvent, rdbSchema, survey, rdbUpdater);
 					handler.handle();
@@ -317,8 +317,8 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 	}
 	
-	private JooqDatabaseExporter createRDBUpdater(Connection targetConn) {
-		return new JooqDatabaseExporter(targetConn);
+	private JooqDatabaseExporter createRDBUpdater(RelationalSchema schema, Connection targetConn) {
+		return new JooqDatabaseExporter(schema, targetConn);
 	}
 	
 	private interface Callback {
@@ -362,12 +362,12 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 
 		private void insertEntity() {
-			rdbUpdater.insertEntity(rdbSchema, recordEvent.getRecordId(), getParentEntityId(), 
+			rdbUpdater.insertEntity(recordEvent.getRecordId(), getParentEntityId(), 
 					getNodeId(), getDefinitionId());
 		}
 		
 		private void insertAttribute() {
-			rdbUpdater.insertAttribute(rdbSchema, recordEvent.getRecordId(), getParentEntityId(), 
+			rdbUpdater.insertAttribute(recordEvent.getRecordId(), getParentEntityId(), 
 					getNodeId(), getDefinitionId());
 		}
 
@@ -387,7 +387,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 			BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordEvent.getRecordId(), tableNodeDef, rowNodeId);
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = toColumnValuePairs(dataTable, def);
-			rdbUpdater.updateEntityData(rdbSchema, dataTable, pkValue, columnValuePairs);
+			rdbUpdater.updateEntityData(dataTable, pkValue, columnValuePairs);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -462,15 +462,15 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 
 		private void deleteEntity() {
-			rdbUpdater.deleteEntity(rdbSchema, recordEvent.getRecordId(), getNodeId(), getDefinitionId());
+			rdbUpdater.deleteEntity(recordEvent.getRecordId(), getNodeId(), getDefinitionId());
 		}
 		
 		private void deleteAttribute() {
-			rdbUpdater.deleteAttribute(rdbSchema, recordEvent.getRecordId(), getNodeId(), getDefinitionId());
+			rdbUpdater.deleteAttribute(recordEvent.getRecordId(), getNodeId(), getDefinitionId());
 		}
 
 		private void deleteRecord() {
-			rdbUpdater.deleteRecordData(rdbSchema, recordEvent.getRecordId(), getDefinitionId());
+			rdbUpdater.deleteRecordData(recordEvent.getRecordId(), getDefinitionId());
 		}
 		
 		private Integer getParentEntityId() {

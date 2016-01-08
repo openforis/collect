@@ -2,7 +2,7 @@ package org.openforis.collect.relational;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Iterator;
 
 import javax.sql.DataSource;
 
@@ -13,11 +13,15 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.relational.jooq.JooqDatabaseExporter;
 import org.openforis.collect.relational.jooq.JooqRelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.concurrency.ProcessProgressListener;
+import org.openforis.concurrency.ProcessStepProgressListener;
+import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.ProgressListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,47 +61,64 @@ public class CollectRDBPublisher {
 
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName, Connection targetConn, RelationalSchemaConfig config) throws CollectRdbException {
-		CollectSurvey survey = surveyManager.get(surveyName);
-		
-		// Generate relational model
-		RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(config);
-		RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, targetSchemaName);
-		
-		RelationalSchemaCreator relationalSchemaCreator = createRelationalSchemaCreator();
-		relationalSchemaCreator.createRelationalSchema(relationalSchema, targetConn);
-		
-		// Insert data
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, step);
-		int total = summaries.size();
-		if ( LOG.isInfoEnabled() ) {
-			LOG.info("Total records: " + total);
-		}
-		insertRecords(survey, summaries, step, relationalSchema, targetConn);
-		if ( LOG.isInfoEnabled() ) {
-			LOG.info("\nAll records exported");
-		}
+		export(surveyName, rootEntityName, step, targetSchemaName, targetConn, config, null);
 	}
-
-	private void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
-			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
+	
+	public void export(String surveyName, String rootEntityName, Step step,
+			String targetSchemaName, Connection targetConn, RelationalSchemaConfig config, ProgressListener progressListener) throws CollectRdbException {
 		try {
 			targetConn.setAutoCommit(false);
-		} catch (SQLException e1) {
-		}
-		DatabaseExporter databaseExporter = createDatabaseExporter(targetConn);
-		databaseExporter.insertReferenceData(targetSchema, ProgressListener.NULL_PROGRESS_LISTENER);
-		for (int i = 0; i < summaries.size(); i++) {
-			CollectRecord summary = summaries.get(i);
-//			if ( LOG.isInfoEnabled() ) {
-//				LOG.info("Exporting record #" + (++i) + " id: " + summary.getId());
-//			}
-			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
-			databaseExporter.insertRecordData(targetSchema, record, ProgressListener.NULL_PROGRESS_LISTENER);
+		} catch (SQLException e) {
 		}
 		try {
+			CollectSurvey survey = surveyManager.get(surveyName);
+			
+			// Generate relational model
+			RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(config);
+			RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, targetSchemaName);
+			
+			RelationalSchemaCreator relationalSchemaCreator = createRelationalSchemaCreator();
+			relationalSchemaCreator.createRelationalSchema(relationalSchema, targetConn);
+			
+			// Insert data
+			RecordFilter recordFilter = new RecordFilter(survey);
+			recordFilter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
+			recordFilter.setStepGreaterOrEqual(step);
+			
+			int total = recordManager.countRecords(recordFilter);
+			if ( LOG.isInfoEnabled() ) {
+				LOG.info("Total records: " + total);
+			}
+			Iterator<CollectRecord> iterator = recordManager.iterateSummaries(recordFilter, null);
+			
+			DatabaseExporter databaseExporter = null;
+			databaseExporter = createDatabaseExporter(relationalSchema, targetConn);
+			
+			ProcessProgressListener totalProgressListener = new ProcessProgressListener(2);
+			
+			databaseExporter.insertReferenceData(new ProcessStepProgressListener(totalProgressListener, progressListener));
+			
+			ProcessStepProgressListener insertRecordsProgressListener = new ProcessStepProgressListener(totalProgressListener, progressListener);
+			
+			int count = 0;
+			while(iterator.hasNext()) {
+				CollectRecord summary = iterator.next();
+				CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
+				databaseExporter.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
+				insertRecordsProgressListener.progressMade(new Progress(++count, total));
+			}
+			if ( LOG.isInfoEnabled() ) {
+				LOG.info("\nAll records exported");
+			}
+			databaseExporter.close();
+			
 			targetConn.commit();
-		} catch (SQLException e) {
-			throw new RuntimeException("Error inserting records into relational database", e);
+		} catch (Exception e) {
+			try {
+				targetConn.rollback();
+			} catch (SQLException e1) {
+			}
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -112,8 +133,8 @@ public class CollectRDBPublisher {
 		return new JooqRelationalSchemaCreator();
 	}
 	
-	private DatabaseExporter createDatabaseExporter(Connection targetConn) {
-		return new JooqDatabaseExporter(targetConn);
+	private DatabaseExporter createDatabaseExporter(RelationalSchema schema, Connection targetConn) {
+		return new JooqDatabaseExporter(schema, targetConn);
 	}
 	
 	/*

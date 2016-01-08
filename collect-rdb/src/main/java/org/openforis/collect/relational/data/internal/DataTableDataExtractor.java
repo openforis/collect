@@ -15,6 +15,7 @@ import org.openforis.collect.relational.model.DataAncestorFKColumn;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.DataTable;
+import org.openforis.collect.relational.model.Table;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Entity;
@@ -60,6 +61,11 @@ public class DataTableDataExtractor extends DataExtractor {
 		return row;
 	}
 
+	@Override
+	public Table<?> getTable() {
+		return table;
+	}
+	
 	public Dataset extractData(Node<?> source) {
 		Dataset data = new Dataset();
 		extractDataInternal(table, source, data);

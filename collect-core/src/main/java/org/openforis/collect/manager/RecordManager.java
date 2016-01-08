@@ -5,6 +5,7 @@ package org.openforis.collect.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -311,6 +312,11 @@ public class RecordManager {
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		List<CollectRecord> recordSummaries = recordDao.loadSummaries(filter, sortFields);
 		return recordSummaries;
+	}
+	
+	@Transactional(readOnly=true)
+	public Iterator<CollectRecord> iterateSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
+		return recordDao.iterateSummaries(filter, sortFields);
 	}
 	
 	/**
