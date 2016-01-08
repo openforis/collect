@@ -60,11 +60,10 @@ package org.openforis.collect.presenter
 		
 		override protected function createFileFilter():FileFilter {
 			switch(view.importType.selectedValue) {
-			case CSVDataImportView.INSERT_NEW_RECORDS_TYPE:
-			case CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE:
-				return new FileFilter("Excel documents", AbstractReferenceDataImportPresenter.ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
 			case CSVDataImportView.IMPORT_MULTIPLE_FILES_TYPE:
 				return new FileFilter("Collect data export ZIP file", ALLOWED_MULTIPLE_FILES_IMPORT_FILE_EXTENSIONS.join("; "));
+			default:
+				return new FileFilter("Excel documents", AbstractReferenceDataImportPresenter.ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
 			}
 		}
 		
