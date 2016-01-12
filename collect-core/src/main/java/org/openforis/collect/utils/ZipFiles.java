@@ -13,6 +13,8 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.openforis.concurrency.Progress;
+import org.openforis.concurrency.ProgressListener;
 
 /**
  * 
@@ -43,7 +45,15 @@ public class ZipFiles {
 	}
 	
 	public static void extract(ZipFile zipFile, File destinationFolder) throws IOException {
+		extract(zipFile, destinationFolder, null);
+	}
+	
+	public static void extract(ZipFile zipFile, File destinationFolder, ProgressListener progressListener) throws IOException {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		if (progressListener != null) {
+			progressListener.progressMade(new Progress(0, zipFile.size()));
+		}
+		int count = 0;
 		while (entries.hasMoreElements()) {
 			ZipEntry zipEntry = entries.nextElement();
 			if (! zipEntry.isDirectory()) {
@@ -54,6 +64,10 @@ public class ZipFiles {
 				newFile.createNewFile();
 				InputStream is = zipFile.getInputStream(zipEntry);
 				FileUtils.copyInputStreamToFile(is, newFile);
+			}
+			count ++;
+			if (progressListener != null) {
+				progressListener.progressMade(new Progress(count, zipFile.size()));
 			}
 		}
 	}

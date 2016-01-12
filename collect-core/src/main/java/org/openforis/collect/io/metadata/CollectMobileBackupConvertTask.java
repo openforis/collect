@@ -88,11 +88,11 @@ public class CollectMobileBackupConvertTask extends Task {
 		restoreJob.setValidateSurvey(false);
 		jobManager.start(restoreJob, false);
 		
-		incrementItemsProcessed();
+		incrementProcessedItems();
 		
 		if ( restoreJob.isCompleted() ) {
 			createOutpuFile();
-			incrementItemsProcessed();
+			incrementProcessedItems();
 		} else {
 			changeStatus(Status.FAILED);
 			setErrorMessage(restoreJob.getErrorMessage());

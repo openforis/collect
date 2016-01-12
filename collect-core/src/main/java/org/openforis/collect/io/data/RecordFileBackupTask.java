@@ -70,7 +70,7 @@ public class RecordFileBackupTask extends Task {
 				if ( isRunning() ) {
 					try {
 						backup(summary);
-						incrementItemsProcessed();
+						incrementProcessedItems();
 					} catch(Exception e) {
 						log.error(String.format("Error backing up record files for record with id %d and keys %s", 
 								summary.getId(), summary.getRootEntityKeyValues().toString()));

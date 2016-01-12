@@ -84,7 +84,7 @@ public class DataQueryGroupExectutorTask extends Task {
 					processNode(query, node);
 				}
 			}
-			incrementItemsProcessed();
+			incrementProcessedItems();
 		}
 	}
 

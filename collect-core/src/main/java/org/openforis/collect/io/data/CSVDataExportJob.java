@@ -144,7 +144,7 @@ public class CSVDataExportJob extends Job {
 				if ( isRunning() ) {
 					CollectRecord record = recordManager.load(survey, s.getId(), step, false);
 					modelWriter.printData(record);
-					incrementItemsProcessed();
+					incrementProcessedItems();
 				} else {
 					break;
 				}

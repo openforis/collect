@@ -74,7 +74,7 @@ public class RecordFileRestoreTask extends Task {
 			if ( isRunning() && ! processedRecords.contains(entryId) ) {
 				importRecordFiles(entryId);
 				processedRecords.add(entryId);
-				incrementItemsProcessed();
+				incrementProcessedItems();
 			} else {
 				break;
 			}

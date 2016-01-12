@@ -21,6 +21,7 @@ import org.openforis.collect.io.NewBackupFileExtractor;
 import org.openforis.collect.io.data.DataImportState.MainStep;
 import org.openforis.collect.io.data.DataImportState.SubStep;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
+import org.openforis.collect.io.data.XMLParsingRecordProvider.RecordUserLoader;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.io.exception.DataParsingExeption;
 import org.openforis.collect.manager.RecordFileManager;
@@ -36,11 +37,9 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.persistence.xml.DataHandler;
-import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
+import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -105,6 +104,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 	private List<RecordStoreQuery> queryBuffer;
 	private Integer nextRecordId;
 	private NewBackupFileExtractor backupFileExtractor;
+	private RecordUserLoader recordUserLoader;
 
 	public XMLDataImportProcess() {
 		super();
@@ -114,6 +114,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		this.includeRecordPredicate = null;
 		this.validateRecords = true;
 		this.queryBuffer = new ArrayList<RecordStoreQuery>();
+		this.recordUserLoader = new RecordUserLoader(userManager);
 	}
 
 	public DataImportState getState() {
@@ -172,7 +173,11 @@ public class XMLDataImportProcess implements Callable<Void> {
 
 			validatePackagedSurvey();
 			
-			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
+			if (existingSurvey == null) {
+				dataUnmarshaller = new DataUnmarshaller(packagedSurvey);
+			} else {
+				dataUnmarshaller = new DataUnmarshaller(existingSurvey, packagedSurvey);
+			}
 			
 			Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
 			for (Step step : Step.values()) {
@@ -262,7 +267,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		Step step = recordEntry.getStep();
 		InputStream is = backupFileExtractor.findEntryInputStream(entryName);
 		InputStreamReader reader = OpenForisIOUtils.toReader(is);
-		ParseRecordResult parseRecordResult = parseRecord(reader);
+		ParseRecordResult parseRecordResult = parseRecord(reader, false);
 		CollectRecord parsedRecord = parseRecordResult.getRecord();
 		if ( ! parseRecordResult.isSuccess()) {
 			List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
@@ -397,7 +402,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			InputStream inputStream = backupFileExtractor.findEntryInputStream(entryName);
 			if ( inputStream != null ) {
 				InputStreamReader reader = OpenForisIOUtils.toReader(inputStream);
-				ParseRecordResult parseRecordResult = parseRecord(reader);
+				ParseRecordResult parseRecordResult = parseRecord(reader, validateRecords);
 				CollectRecord parsedRecord = parseRecordResult.getRecord();
 				if (parsedRecord == null) {
 					String message = parseRecordResult.getMessage();
@@ -478,12 +483,6 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 
-	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
-		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
-		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey, validateRecords);
-		return new DataUnmarshaller(handler);
-	}
-
 	private CollectRecord findAlreadyExistingRecordSummary(CollectRecord parsedRecord) {
 		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
@@ -517,11 +516,14 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 
-	private ParseRecordResult parseRecord(Reader reader) throws IOException {
+	private ParseRecordResult parseRecord(Reader reader, boolean validateAndLoadReferences) throws IOException {
+		dataUnmarshaller.setRecordValidationEnabled(validateAndLoadReferences);
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
-			afterRecordUpdate(record);
+			if (validateAndLoadReferences) {
+				recordUserLoader.adjustUserReferences(record);
+			}
 		}
 		return result;
 	}

@@ -47,7 +47,7 @@ public abstract class ReferenceDataImportTask<E extends ParsingError> extends Ta
 	
 	public void addProcessedRow(long rowNumber) {
 		if ( !processedRows.contains(rowNumber)) {
-			incrementItemsProcessed();
+			incrementProcessedItems();
 			processedRows.add(rowNumber);
 		}
 	}

@@ -134,8 +134,8 @@ public class DataRestoreController extends BasicController {
 	}
 	
 	private DataRestoreJob startRestoreJob(UploadItem uploadItem, boolean newSurvey, 
-			String expectedSurveyName, boolean validateRecords, boolean deleteAllRecords) throws IOException,
-	FileNotFoundException, ZipException {
+			String expectedSurveyName, boolean validateRecords, boolean deleteAllRecords) 
+				throws IOException,	FileNotFoundException, ZipException {
 		File tempFile = copyContentToFile(uploadItem);
 		SurveyBackupInfo info = extractInfo(tempFile);
 		
@@ -146,7 +146,7 @@ public class DataRestoreController extends BasicController {
 			checkPackagedSurveyValidity(info, expectedSurveyName);
 		}
 		
-		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+		DataRestoreJob job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
 		job.setStoreRestoredFile(true);
 		job.setPublishedSurvey(publishedSurvey);
 		job.setFile(tempFile);

@@ -151,10 +151,12 @@ public class RecordManager {
 		recordDao.execute(queries);
 	}
 	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void executeRecordOperations(List<RecordOperations> operationsForRecords) {
 		executeRecordOperations(operationsForRecords, null);
 	}
 	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void executeRecordOperations(List<RecordOperations> operationsForRecords, Consumer<RecordStepOperation> consumer) {
 		int nextId = nextId();
 		List<RecordStoreQuery> queries = new ArrayList<RecordStoreQuery>();

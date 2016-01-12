@@ -194,7 +194,7 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 				case PENDING:
 					break;
 				case RUNNING:
-			    	setItemsProcessed(response.getJobProgress());
+			    	setProcessedItems(response.getJobProgress());
 			    	break;
 				case FAILED:
 					setErrorMessage(response.getJobErrorMessage());
@@ -203,7 +203,7 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 					changeStatus(Status.ABORTED);
 					break;
 				case COMPLETED:
-					setItemsProcessed(100);
+					setProcessedItems(100);
 					changeStatus(Status.COMPLETED);
 					break;
 				}

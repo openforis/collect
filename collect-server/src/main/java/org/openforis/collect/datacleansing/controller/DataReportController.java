@@ -503,7 +503,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 							break;
 						}
 						itemProcessor.process(item);
-						incrementItemsProcessed();
+						incrementProcessedItems();
 					}
 				}
 				itemProcessor.close();

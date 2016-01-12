@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.poi.util.IOUtils;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
+import org.openforis.concurrency.ProgressListener;
 
 /**
  * 
@@ -38,9 +39,13 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 
 	public void init() throws IOException {
+		init(null);
+	}
+	
+	public void init(ProgressListener progressListener) throws IOException {
 		tempUncompressedFolder = Files.createTempDirectory();
 		zipFile = new ZipFile(file);
-		ZipFiles.extract(zipFile, tempUncompressedFolder);
+		ZipFiles.extract(zipFile, tempUncompressedFolder, progressListener);
 	}
 	
 	public File extractInfoFile() {

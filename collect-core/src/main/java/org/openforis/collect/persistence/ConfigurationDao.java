@@ -11,12 +11,13 @@ import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@Transactional
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class ConfigurationDao extends JooqDaoSupport {
 	
 	public ConfigurationDao() {

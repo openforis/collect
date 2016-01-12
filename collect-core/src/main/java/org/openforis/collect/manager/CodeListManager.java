@@ -43,6 +43,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -50,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class CodeListManager {
 	
 	@Autowired(required=false)
@@ -84,7 +86,6 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadItem(CodeList list, int itemId) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( list.isExternal() ) {
@@ -97,7 +98,6 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadItemByAttribute(CodeAttribute attribute) {
 		CodeAttributeDefinition defn = attribute.getDefinition();
 		CodeList list = defn.getList();
@@ -192,7 +192,6 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> List<T> loadItems(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( list.isExternal() ) {
@@ -205,7 +204,6 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> List<T> loadRootItems(CodeList list) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( persistedSurvey && list.isExternal() ) {
@@ -218,7 +216,6 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadRootItem(CodeList list, String code, ModelVersion version) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( persistedSurvey && list.isExternal() ) {
@@ -230,7 +227,6 @@ public class CodeListManager {
 		}
 	}
 	
-	@Transactional(readOnly=true)
 	public boolean hasChildItemsInLevel(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( list.isExternal() ) {
@@ -275,14 +271,12 @@ public class CodeListManager {
 		return null;
 	}
 	
-	@Transactional(readOnly=true)
 	public CodeListItem findValidItem(Entity parent,
 			CodeAttributeDefinition defn, String code) {
 		List<CodeListItem> items = findValidItems(parent, defn, code);
 		return items.size() == 1 ? items.get(0): null;
 	}
 
-	@Transactional(readOnly=true)
 	public List<CodeListItem> findValidItems(Entity parent, CodeAttributeDefinition defn, String... codes) {
 		List<CodeListItem> result = new ArrayList<CodeListItem>();
 		List<CodeListItem> assignableItems = loadValidItems(parent, defn);
@@ -299,7 +293,6 @@ public class CodeListManager {
 		return CollectionUtils.unmodifiableList(result);
 	}
 
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> List<T> loadValidItems(Entity parent, CodeAttributeDefinition def) {
 		List<T> items = null;
 		CodeList list = def.getList();
@@ -352,7 +345,6 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> List<T> loadChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();
 		if ( list.isExternal() ) {
@@ -365,7 +357,6 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadChildItem(CodeList list,
 			String code, ModelVersion version) {
 		if ( list.isExternal() ) {
@@ -388,7 +379,6 @@ public class CodeListManager {
 		}
 	}
 	
-	@Transactional(readOnly=true)
 	public boolean isEmpty(CodeList list) {
 		if ( list.isExternal() ) {
 			//TODO 
@@ -400,7 +390,6 @@ public class CodeListManager {
 		}
 	}
 	
-	@Transactional(readOnly=true)
 	public boolean hasChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();
 		if ( list.isExternal() ) {
@@ -413,7 +402,6 @@ public class CodeListManager {
 		}
 	}
 	
-	@Transactional(readOnly=true)
 	public boolean hasQualifiableItems(CodeList list) {
 		if ( list.isExternal() ) {
 			return false;
@@ -425,7 +413,6 @@ public class CodeListManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadChildItem(T parent, String code, ModelVersion version) {
 		CodeList list = parent.getCodeList();
 		if ( list.isExternal() ) {
@@ -438,7 +425,6 @@ public class CodeListManager {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Transactional(readOnly=true)
 	public <T extends CodeListItem> T loadParentItem(T item) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {
@@ -648,7 +634,6 @@ public class CodeListManager {
 		}
 	}
 	
-	@Transactional(readOnly=true)
 	public FileWrapper loadImageContent(PersistedCodeListItem item) {
 		return codeListItemDao.loadImageContent(item);
 	}

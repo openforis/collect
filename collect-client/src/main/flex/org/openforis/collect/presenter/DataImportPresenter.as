@@ -227,8 +227,9 @@ package org.openforis.collect.presenter {
 					return;
 				}
 				var validateRecords:Boolean = view.validateRecordsCheckBox.selected;
+				var processInTransaction:Boolean = view.processInTransactionCheckBox.selected;
 				var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
-				_dataImportClient.startImport(responder, entryIdsToImport, validateRecords);
+				_dataImportClient.startImport(responder, entryIdsToImport, validateRecords, processInTransaction);
 				view.progressBar.setProgress(0, 0);
 				view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 			}

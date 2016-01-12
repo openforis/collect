@@ -370,7 +370,7 @@ public class CSVDataImportJob extends Job {
 		
 		@Override
 		protected void execute() throws Throwable {
-			incrementItemsProcessed();
+			incrementProcessedItems();
 			
 			long currentRowNumber = 1;
 			while ( isRunning() ) {
@@ -379,7 +379,7 @@ public class CSVDataImportJob extends Job {
 					DataLine line = reader.readNextLine();
 					if ( line != null ) {
 						processLine(line);
-						incrementItemsProcessed();
+						incrementProcessedItems();
 					}
 					if ( ! reader.isReady() ) {
 						//end of file reached

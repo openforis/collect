@@ -45,8 +45,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function startImport(responder:IResponder, entryIdsToImport:IList, validateRecords:Boolean = true):void {
-			var token:AsyncToken = this._startImportOperation.send(entryIdsToImport, validateRecords);
+		public function startImport(responder:IResponder, entryIdsToImport:IList, validateRecords:Boolean = true, processInTransaction:Boolean = true):void {
+			var token:AsyncToken = this._startImportOperation.send(entryIdsToImport, validateRecords, processInTransaction);
 			token.addResponder(responder);
 		}
 

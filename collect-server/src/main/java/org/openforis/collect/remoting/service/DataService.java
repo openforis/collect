@@ -98,7 +98,6 @@ public class DataService {
 	 */
 	private boolean hasActiveSurveyIndexedNodes;
 
-	@Transactional(readOnly=true)
 	@Secured("ROLE_ENTRY")
 	public RecordProxy loadRecord(int id, Integer stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
@@ -133,7 +132,6 @@ public class DataService {
 	 * 
 	 * @return map with "count" and "records" items
 	 */
-	@Transactional(readOnly=true)
 	@Secured("ROLE_ENTRY")
 	public Map<String, Object> loadRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String[] keyValues) {
 		Map<String, Object> result = new HashMap<String, Object>();
