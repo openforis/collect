@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.util.IOUtils;
-import org.jooq.BatchBindStep;
+import org.jooq.Batch;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.DeleteQuery;
@@ -262,13 +261,19 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 		
 		public void executeInserts(DataExtractor extractor) {
 			Table<?> table = extractor.getTable();
-			Object[] valuesPlaceholders = new String[table.getColumns().size()];
-			Arrays.fill(valuesPlaceholders, "?");
-			BatchBindStep batch = dsl.batch(queryCreator.createInsertQuery(table).values(valuesPlaceholders));
+//			Object[] valuesPlaceholders = new String[table.getColumns().size()];
+//			List<Column<?>> columns = table.getColumns();
+//			for (int i = 0; i < columns.size(); i++) {
+//				Column<?> col = columns.get(i);
+//				valuesPlaceholders[i] = null; 
+//			}
+			List<Query> inserts = new ArrayList<Query>();
 			while(extractor.hasNext()) {
 				Row row = extractor.next();
-				batch.bind(row.getValues().toArray(new Object[row.getValues().size()]));
+				InsertValuesStepN<Record> query = queryCreator.createInsertQuery(table).values(row.getValues().toArray(new Object[row.getValues().size()]));
+				inserts.add(query);
 			}
+			Batch batch = dsl.batch( inserts);
 			batch.execute();
 		}
 
@@ -373,7 +378,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 			if ( isSchemaLess() ) {
 				return table(name(table.getName()));
 			} else {
-				return table(schemaName, table.getName());
+				return table(name(schemaName, table.getName()));
 			}
 		}
 		
