@@ -58,6 +58,13 @@ public class CollectRDBPublisher {
 		Connection targetConn = getTargetConnection();
 		export(surveyName, rootEntityName, step, targetSchemaName, targetConn, config);
 	}
+	
+	public void export(String surveyName, String rootEntityName, Step step,
+			String targetSchemaName, RelationalSchemaConfig config, ProgressListener progressListener) throws CollectRdbException {
+		Connection targetConn = getTargetConnection();
+		export(surveyName, rootEntityName, step, targetSchemaName, targetConn, config, progressListener);
+	}
+
 
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName, Connection targetConn, RelationalSchemaConfig config) throws CollectRdbException {
