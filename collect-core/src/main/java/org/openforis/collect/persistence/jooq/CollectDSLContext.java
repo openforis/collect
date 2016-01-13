@@ -1,8 +1,12 @@
 package org.openforis.collect.persistence.jooq;
 
+import static org.jooq.impl.DSL.name;
+
 import java.sql.Connection;
 
 import org.jooq.Configuration;
+import org.jooq.Name;
+import org.jooq.CollectCreateIndexStep;
 import org.jooq.SQLDialect;
 import org.jooq.Schema;
 import org.jooq.Sequence;
@@ -10,6 +14,7 @@ import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultDSLContext;
 import org.jooq.impl.DialectAwareJooqConfiguration;
+import org.jooq.impl.CollectCreateIndexImpl;
 
 /**
  * 
@@ -27,6 +32,16 @@ public class CollectDSLContext extends DefaultDSLContext {
 	public CollectDSLContext(Configuration conf) {
 		super(conf);
 	}
+	
+	@Override
+    public CollectCreateIndexStep createIndex(String index) {
+        return createIndex(name(index));
+    }
+
+    @Override
+    public CollectCreateIndexStep createIndex(Name index) {
+        return new CollectCreateIndexImpl(configuration(), index);
+    }
 
 	public int nextId(TableField<?, Integer> idField, Sequence<? extends Number> idSequence) {
 		if (isSQLite()){
