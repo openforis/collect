@@ -3,8 +3,7 @@
  */
 package org.openforis.collect.relational.model;
 
-import java.sql.Types;
-
+import org.openforis.collect.relational.sql.RDBJdbcType;
 import org.openforis.idm.metamodel.CodeListItem;
 
 /**
@@ -18,7 +17,7 @@ public class CodeListDescriptionColumn extends AbstractColumn<CodeListItem> {
 	private String languageCode;
 
 	CodeListDescriptionColumn(String languageCode, String name) {
-		super(name, Types.VARCHAR, "varchar", MAX_LENGTH, true);
+		super(name, RDBJdbcType.VARCHAR, MAX_LENGTH, true);
 		this.languageCode = languageCode;
 	}
 

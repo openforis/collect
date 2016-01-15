@@ -3,8 +3,7 @@
  */
 package org.openforis.collect.relational.model;
 
-import java.sql.Types;
-
+import org.openforis.collect.relational.sql.RDBJdbcType;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.path.Path;
 
@@ -17,7 +16,7 @@ public class CodeValueFKColumn extends DataColumn {
 	private String defaultCodeValue;
 
 	CodeValueFKColumn(String name, CodeAttributeDefinition defn, Path relPath, String defaultCodeValue) {
-		super(name, Types.BIGINT, "bigint", defn, relPath, null, true);
+		super(name, RDBJdbcType.BIGINT, defn, relPath, null, true);
 		this.defaultCodeValue = defaultCodeValue;
 	}
 

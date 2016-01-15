@@ -1,5 +1,6 @@
 package org.openforis.collect.relational;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -86,46 +87,58 @@ public class CollectRDBPublisher {
 			
 			RelationalSchemaCreator relationalSchemaCreator = createRelationalSchemaCreator();
 			relationalSchemaCreator.createRelationalSchema(relationalSchema, targetConn);
-			
-			// Insert data
-			RecordFilter recordFilter = new RecordFilter(survey);
-			recordFilter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
-			recordFilter.setStepGreaterOrEqual(step);
-			
-			int total = recordManager.countRecords(recordFilter);
-			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Total records: " + total);
-			}
-			Iterator<CollectRecord> iterator = recordManager.iterateSummaries(recordFilter, null);
-			
-			DatabaseExporter databaseExporter = null;
-			databaseExporter = createDatabaseExporter(relationalSchema, targetConn);
-			
-			ProcessProgressListener totalProgressListener = new ProcessProgressListener(2);
-			
-			databaseExporter.insertReferenceData(new ProcessStepProgressListener(totalProgressListener, progressListener));
-			
-			ProcessStepProgressListener insertRecordsProgressListener = new ProcessStepProgressListener(totalProgressListener, progressListener);
-			
-			int count = 0;
-			while(iterator.hasNext()) {
-				CollectRecord summary = iterator.next();
-				CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
-				databaseExporter.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
-				insertRecordsProgressListener.progressMade(new Progress(++count, total));
-			}
-			if ( LOG.isInfoEnabled() ) {
-				LOG.info("\nAll records exported");
-			}
-			databaseExporter.close();
+
+			relationalSchemaCreator.addConstraints(relationalSchema, targetConn);
+			relationalSchemaCreator.addIndexes(relationalSchema, targetConn);
+
+			insertData(survey, rootEntityName, step, targetConn, relationalSchema, progressListener);
 			
 			targetConn.commit();
+			
+			if ( LOG.isInfoEnabled() ) {
+				LOG.info("RDB generation completed");
+			}
 		} catch (Exception e) {
 			try {
 				targetConn.rollback();
 			} catch (SQLException e1) {
 			}
 			throw new RuntimeException(e);
+		}
+	}
+
+	private void insertData(CollectSurvey survey, String rootEntityName, Step step, Connection targetConn,
+			RelationalSchema relationalSchema, ProgressListener progressListener) throws IOException {
+		// Insert data
+		RecordFilter recordFilter = new RecordFilter(survey);
+		recordFilter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
+		recordFilter.setStepGreaterOrEqual(step);
+		
+		int total = recordManager.countRecords(recordFilter);
+		if ( LOG.isInfoEnabled() ) {
+			LOG.info("Total records: " + total);
+		}
+		DatabaseExporter databaseExporter = createDatabaseExporter(relationalSchema, targetConn);
+		
+		ProcessProgressListener totalProgressListener = new ProcessProgressListener(2);
+		
+		databaseExporter.insertReferenceData(new ProcessStepProgressListener(totalProgressListener, progressListener));
+		
+		ProcessStepProgressListener insertRecordsProgressListener = new ProcessStepProgressListener(totalProgressListener, progressListener);
+		
+		Iterator<CollectRecord> iterator = recordManager.iterateSummaries(recordFilter, null);
+		int count = 0;
+		while(iterator.hasNext()) {
+			CollectRecord summary = iterator.next();
+			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
+			databaseExporter.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
+			insertRecordsProgressListener.progressMade(new Progress(++count, total));
+		}
+		databaseExporter.close();
+		
+		if ( LOG.isInfoEnabled() ) {
+			LOG.info("All records exported");
+			LOG.info("Adding constraints and indexes...");
 		}
 	}
 
@@ -144,19 +157,4 @@ public class CollectRDBPublisher {
 		return new JooqDatabaseExporter(schema, targetConn);
 	}
 	
-	/*
-	public static void main(String[] args) throws CollectRdbException {
-		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
-		CollectRDBPublisher publisher = ctx.getBean(CollectRDBPublisher.class);
-		RelationalSchemaConfig config = RelationalSchemaConfig.createDefault();
-//		config.setDefaultCode(null);
-		publisher.export(
-				"naforma1",
-				"cluster",
-				Step.ANALYSIS,
-				"naforma1",
-				config);
-//		DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1", "postgres","postgres")); 
-	}
-	*/
 }

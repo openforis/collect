@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
+import org.openforis.collect.relational.sql.RDBJdbcType;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.DateAttribute;
@@ -32,7 +33,7 @@ public class DataTableDataColumnValueExtractor extends ColumnValueExtractor<Data
 	public Object extractValue(Node<?> context) {
 		Node<?> valNode = extractValueNode(context);
 		Object val = extractNodeValue(valNode);
-		if ( column.getTypeName().equals("varchar") && val != null) {
+		if ( RDBJdbcType.VARCHAR == column.getType() && val != null) {
 			Integer colLength = column.getLength();
 			int valLength = val.toString().length();
 			if (valLength > colLength) {

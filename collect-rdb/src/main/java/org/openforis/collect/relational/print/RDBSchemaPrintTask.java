@@ -81,7 +81,7 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 		writer.write('\t');
 		writer.write(doubleQuote(column.getName()));
 		writer.write(' ');
-		writer.write(column.getTypeName());
+		writer.write(column.getType().getName());
 		if ( column.getLength() != null ) {
 			writer.write('(');
 			writer.write(column.getLength().toString());

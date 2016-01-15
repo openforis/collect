@@ -19,9 +19,8 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.util.IOUtils;
-import org.jooq.Batch;
+import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
-import org.jooq.DSLContext;
 import org.jooq.DeleteQuery;
 import org.jooq.Field;
 import org.jooq.InsertSetMoreStep;
@@ -65,7 +64,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 	
 	private static final Log LOG = LogFactory.getLog(JooqDatabaseExporter.class);
 	
-	private DSLContext dsl;
+	private CollectDSLContext dsl;
 	private RelationalSchema schema;
 	private BatchQueryExecutor batchExecutor;
 	
@@ -77,7 +76,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 		this(schema, new CollectDSLContext(conf));
 	}
 	
-	public JooqDatabaseExporter(RelationalSchema schema, DSLContext dsl) {
+	public JooqDatabaseExporter(RelationalSchema schema, CollectDSLContext dsl) {
 		this.schema = schema;
 		this.dsl = dsl;
 		this.batchExecutor = new BatchQueryExecutor(schema, ProgressListener.NULL_PROGRESS_LISTENER);
@@ -181,7 +180,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 	private List<Field<?>> toFields(List<? extends Column<?>> columns) {
 		List<Field<?>> ancestorColumns = new ArrayList<Field<?>>(columns.size());
 		for (Column<?> column : columns) {
-			ancestorColumns.add(field(column.getName()));
+			ancestorColumns.add(field(column.getName(), dsl.getDataType(column.getType().getJavaType())));
 		}
 		return ancestorColumns;
 	}
@@ -261,19 +260,13 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 		
 		public void executeInserts(DataExtractor extractor) {
 			Table<?> table = extractor.getTable();
-//			Object[] valuesPlaceholders = new String[table.getColumns().size()];
-//			List<Column<?>> columns = table.getColumns();
-//			for (int i = 0; i < columns.size(); i++) {
-//				Column<?> col = columns.get(i);
-//				valuesPlaceholders[i] = null; 
-//			}
-			List<Query> inserts = new ArrayList<Query>();
+			Object[] valuesPlaceholders = new Object[table.getColumns().size()];
+			InsertValuesStepN<Record> insertQuery = queryCreator.createInsertQuery(table).values(valuesPlaceholders);
+			BatchBindStep batch = dsl.batch(insertQuery);
 			while(extractor.hasNext()) {
 				Row row = extractor.next();
-				InsertValuesStepN<Record> query = queryCreator.createInsertQuery(table).values(row.getValues().toArray(new Object[row.getValues().size()]));
-				inserts.add(query);
+				batch.bind(row.getValues().toArray(new Object[row.getValues().size()]));
 			}
-			Batch batch = dsl.batch( inserts);
 			batch.execute();
 		}
 
@@ -331,10 +324,10 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 	
 	private class QueryCreator {
 		
-		private final DSLContext dsl;
+		private final CollectDSLContext dsl;
 		private final String schemaName;
 		
-		public QueryCreator(DSLContext dsl, String schemaName) {
+		public QueryCreator(CollectDSLContext dsl, String schemaName) {
 			super();
 			this.dsl = dsl;
 			this.schemaName = schemaName;
@@ -349,11 +342,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 		}
 		
 		public InsertValuesStepN<Record> createInsertQuery(Table<?> table) {
-			List<Column<?>> cols = table.getColumns();
-			List<Field<?>> fields = new ArrayList<Field<?>>(cols.size());
-			for (Column<?> col : cols) {
-				fields.add(field(name(col.getName())));
-			}
+			List<Field<?>> fields = toFields(table.getColumns());
 			InsertValuesStepN<Record> insert = dsl.insertInto(getJooqTable(table), fields);
 			return insert;
 		}
