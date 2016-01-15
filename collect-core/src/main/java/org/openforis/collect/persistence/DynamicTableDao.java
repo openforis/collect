@@ -27,14 +27,11 @@ import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
 import org.openforis.commons.collection.CollectionUtils;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
  * 
  */
-@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class DynamicTableDao extends JooqDaoSupport {
 
 	@Deprecated

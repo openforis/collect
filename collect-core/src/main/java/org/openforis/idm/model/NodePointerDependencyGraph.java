@@ -50,17 +50,19 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 
 	@Override
 	protected Collection<NodePointer> toItems(Node<?> node) {
-		Set<NodePointer> result = new HashSet<NodePointer>();
 		if (node instanceof Entity) {
 			EntityDefinition def = (EntityDefinition) node.getDefinition();
 			List<NodeDefinition> defs = def.getChildDefinitionsInVersion(node.getModelVersion());
+			Set<NodePointer> result = new HashSet<NodePointer>(defs.size());
 			for (NodeDefinition childDef : defs) {
 				result.add(new NodePointer((Entity) node, childDef));
 			}
+			return result;
 		} else if ( node.getParent() != null ) {
-			result.add(new NodePointer(node));
+			return Collections.singleton(new NodePointer(node));
+		} else {
+			return Collections.emptySet();
 		}
-		return result;
 	}
 
 	@Override

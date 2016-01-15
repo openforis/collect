@@ -3,11 +3,11 @@ package org.openforis.collect.datacleansing.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_QUERY_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DATA_QUERY;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.Select;
@@ -59,12 +59,12 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 
 		private static final long serialVersionUID = 1L;
 		
-		public JooqDSLContext(Connection connection) {
-			this(connection, null);
+		public JooqDSLContext(Configuration config) {
+			this(config, null);
 		}
 		
-		public JooqDSLContext(Connection connection, CollectSurvey survey) {
-			super(connection, OFC_DATA_QUERY.ID, OFC_DATA_QUERY_ID_SEQ, DataQuery.class, survey);
+		public JooqDSLContext(Configuration config, CollectSurvey survey) {
+			super(config, OFC_DATA_QUERY.ID, OFC_DATA_QUERY_ID_SEQ, DataQuery.class, survey);
 		}
 		
 		@Override

@@ -21,7 +21,7 @@ public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 
 	@Override
 	protected Database createDatabase(Connection c) throws DatabaseException {
-		String dbProductName = getDatabaseProductName();
+		String dbProductName = getDatabaseProductName(c);
 		if ( SQLITE_DBNAME.equals(dbProductName) ) {
 			//schemas are not supported
 			DatabaseFactory dbFactory = DatabaseFactory.getInstance();
@@ -30,6 +30,11 @@ public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 		} else {
 			return super.createDatabase(c);
 		}
+	}
+
+	private String getDatabaseProductName(Connection c) throws DatabaseException {
+		Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c));
+		return database.getDatabaseProductName();
 	}
 	
 }

@@ -3,21 +3,17 @@ package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO;
 
-import java.sql.Connection;
-
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.StoreQuery;
 import org.openforis.collect.model.Logo;
 import org.openforis.collect.model.LogoPosition;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@Transactional(propagation=Propagation.SUPPORTS)
 public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.LogoDSLContext> {
 	
 	public LogoDao() {
@@ -89,8 +85,8 @@ public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.LogoDSLContext>
 
 		private static final long serialVersionUID = 1L;
 
-		public LogoDSLContext(Connection connection) {
-			super(connection, OFC_LOGO.POS, null, Logo.class);
+		public LogoDSLContext(Configuration config) {
+			super(config, OFC_LOGO.POS, null, Logo.class);
 		}
 
 		@Override

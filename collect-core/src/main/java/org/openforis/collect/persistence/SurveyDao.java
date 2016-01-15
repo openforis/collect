@@ -31,15 +31,12 @@ import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  * @author M. Togna
  * @author S. Ricci
  */
-@Transactional(propagation=Propagation.SUPPORTS)
 public class SurveyDao extends JooqDaoSupport {
 
 	@Autowired
@@ -50,7 +47,7 @@ public class SurveyDao extends JooqDaoSupport {
 	
 	public CollectSurvey unmarshalIdml(String idml) throws IdmlParseException {
 		try {
-			byte[] bytes = idml.getBytes("UTF-8");
+			byte[] bytes = idml.getBytes(OpenForisIOUtils.UTF_8);
 			ByteArrayInputStream is = new ByteArrayInputStream(bytes);
 			return unmarshalIdml(is);
 		} catch (UnsupportedEncodingException e) {

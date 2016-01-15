@@ -5,10 +5,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import org.jooq.Configuration;
+import org.jooq.ConnectionProvider;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.conf.Settings;
-import org.jooq.impl.DefaultConfiguration;
 
 /**
  * 
@@ -52,10 +52,14 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 		}
 	}
 	
-	public DialectAwareJooqConfiguration(Connection connection) {
-		super(createConfiguration(connection));
+	public DialectAwareJooqConfiguration(ConnectionProvider connectionProvider) {
+		super(createConfiguration(connectionProvider));
 	}
-
+	
+	public DialectAwareJooqConfiguration(Connection conn) {
+		super(createConfiguration(conn, null));
+	}
+	
 	private static SQLDialect getDialect(Connection conn) {
 		try {
 			DatabaseMetaData metaData = conn.getMetaData();
@@ -70,22 +74,32 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 		}
 	}
 	
-	private static Configuration createConfiguration(Connection connection) {
-		SQLDialect dialect = getDialect(connection);
+	private static Configuration createConfiguration(ConnectionProvider connectionProvider) {
+		Connection conn = null;
+		try {
+			conn = connectionProvider.acquire();
+			return createConfiguration(conn, connectionProvider);
+		} finally {
+			connectionProvider.release(conn);
+		}
+	}
+
+	private static Configuration createConfiguration(Connection conn, ConnectionProvider connectionProvider) {
+		SQLDialect dialect = getDialect(conn);
 		Settings settings = new Settings();
 		switch ( dialect ) {
 		case SQLITE:
 			settings.withRenderSchema(false);
 			break;
 		case H2:
-            settings.setRenderNameStyle(RenderNameStyle.AS_IS);
-            break;
-        default:
-        }
+		    settings.setRenderNameStyle(RenderNameStyle.AS_IS);
+		    break;
+		default:
+		}
 		DefaultConfiguration configuration = new DefaultConfiguration();
-		configuration.set(settings);
-		configuration.set(dialect);
-		configuration.set(connection);
+		configuration.setConnectionProvider(connectionProvider);
+		configuration.setSettings(settings);
+		configuration.setSQLDialect(dialect);
 		return configuration;
 	}
 	

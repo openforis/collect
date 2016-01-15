@@ -4,13 +4,13 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_CLEANSIN
 import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChain.OFC_DATA_CLEANSING_CHAIN;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChainSteps.OFC_DATA_CLEANSING_CHAIN_STEPS;
 
-import java.sql.Connection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.jooq.BatchBindStep;
+import org.jooq.Configuration;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Record;
 import org.jooq.Record1;
@@ -101,12 +101,12 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 
 		private static final long serialVersionUID = 1L;
 		
-		public JooqDSLContext(Connection connection) {
-			this(connection, null);
+		public JooqDSLContext(Configuration config) {
+			this(config, null);
 		}
 		
-		public JooqDSLContext(Connection connection, CollectSurvey survey) {
-			super(connection, OFC_DATA_CLEANSING_CHAIN.ID, OFC_DATA_CLEANSING_CHAIN_ID_SEQ, DataCleansingChain.class, survey);
+		public JooqDSLContext(Configuration config, CollectSurvey survey) {
+			super(config, OFC_DATA_CLEANSING_CHAIN.ID, OFC_DATA_CLEANSING_CHAIN_ID_SEQ, DataCleansingChain.class, survey);
 		}
 		
 		@Override

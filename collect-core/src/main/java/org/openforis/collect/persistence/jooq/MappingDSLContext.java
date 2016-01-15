@@ -1,9 +1,9 @@
 package org.openforis.collect.persistence.jooq;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.Configuration;
 import org.jooq.DeleteQuery;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
@@ -29,8 +29,8 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 	private Sequence<? extends Number> idSequence;
 	private Class<E> clazz;
 	
-	public MappingDSLContext(Connection conn, TableField<?,Integer> idField, Sequence<? extends Number> idSequence, Class<E> clazz) {
-		super(conn);
+	public MappingDSLContext(Configuration config, TableField<?,Integer> idField, Sequence<? extends Number> idSequence, Class<E> clazz) {
+		super(config);
 		this.idField = idField;
 		this.idSequence = idSequence;
 		this.clazz = clazz;

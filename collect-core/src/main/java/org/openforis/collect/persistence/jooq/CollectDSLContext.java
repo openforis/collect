@@ -3,18 +3,21 @@ package org.openforis.collect.persistence.jooq;
 import static org.jooq.impl.DSL.name;
 
 import java.sql.Connection;
+import java.util.Date;
 
-import org.jooq.Configuration;
-import org.jooq.Name;
 import org.jooq.CollectCreateIndexStep;
+import org.jooq.Configuration;
+import org.jooq.DataType;
+import org.jooq.Name;
 import org.jooq.SQLDialect;
 import org.jooq.Schema;
 import org.jooq.Sequence;
 import org.jooq.TableField;
+import org.jooq.impl.CollectCreateIndexImpl;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultDSLContext;
+import org.jooq.impl.DefaultDataType;
 import org.jooq.impl.DialectAwareJooqConfiguration;
-import org.jooq.impl.CollectCreateIndexImpl;
 
 /**
  * 
@@ -25,12 +28,12 @@ public class CollectDSLContext extends DefaultDSLContext {
 
 	private static final long serialVersionUID = 1L;
 	
-	public CollectDSLContext(Connection connection) {
-		this(new DialectAwareJooqConfiguration(connection));
+	public CollectDSLContext(Configuration config) {
+		super(config);
 	}
 	
-	public CollectDSLContext(Configuration conf) {
-		super(conf);
+	public CollectDSLContext(Connection conn) {
+		super(new DialectAwareJooqConfiguration(conn));
 	}
 	
 	@Override
@@ -77,6 +80,10 @@ public class CollectDSLContext extends DefaultDSLContext {
 				throw new RuntimeException("DB dialeg not supported : " + configuration().dialect());
 			}
 		}
+	}
+	
+	public DataType<?> getDataType(Class<?> type) {
+		return DefaultDataType.getDataType(dialect(), type == Date.class ? java.sql.Date.class: type);
 	}
 	
 	private boolean isSequenceSupported() {

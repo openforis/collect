@@ -3,7 +3,6 @@ package org.openforis.collect.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SAMPLING_DESIGN_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OFC_SAMPLING_DESIGN;
 
-import java.sql.Connection;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
@@ -15,6 +14,7 @@ import java.util.Locale;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.BatchBindStep;
+import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
@@ -30,12 +30,10 @@ import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.Coordinate;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@Transactional
 public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem, SamplingDesignDao.SamplingDesignDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
@@ -212,8 +210,8 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		private static final String LOCATION_POINT_FORMAT = "#.#######";
 		private static final String LOCATION_PATTERN = "SRID={0};POINT({1} {2})";
 
-		public SamplingDesignDSLContext(Connection connection) {
-			super(connection, OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ, SamplingDesignItem.class);
+		public SamplingDesignDSLContext(Configuration config) {
+			super(config, OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ, SamplingDesignItem.class);
 		}
 
 		@Override

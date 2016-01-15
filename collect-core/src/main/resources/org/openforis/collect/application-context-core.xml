@@ -24,13 +24,37 @@
 
 	<!-- enables interpretation of the @Transactional annotations for declarative transaction management-->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+		
+	<!-- Start of JOOQ configuration -->
+	
+	<!-- Configure jOOQ's ConnectionProvider to use Spring's TransactionAwareDataSourceProxy,
+         which can dynamically discover the transaction context -->
+    <bean id="transactionAwareDataSource"
+        class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
+        <constructor-arg ref="dataSource" />
+    </bean>
+    
+	<bean class="org.jooq.impl.DataSourceConnectionProvider" name="connectionProvider">
+        <constructor-arg ref="transactionAwareDataSource" />
+    </bean>
+
+ 	<!-- Configure the DSL object, optionally overriding jOOQ Exceptions with Spring Exceptions -->
+    <bean id="dsl" class="org.openforis.collect.persistence.jooq.CollectDSLContext">
+        <constructor-arg>
+			 <bean autowire="no" class="org.jooq.impl.DialectAwareJooqConfiguration" >
+			 	<constructor-arg ref="connectionProvider" />
+			 </bean>
+		</constructor-arg>
+    </bean>
+    
+    <!-- End of JOOQ configuration -->
 	
     <!-- ===================================== -->
 	<!-- Liquibase -->
 	<!-- ===================================== -->
 	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase"
 			lazy-init="false">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="transactionAwareDataSource" />
 		<property name="changeLog" value="classpath:org/openforis/collect/db/changelog/db.changelog-master.xml" />
 		<property name="defaultSchema" value="collect" />
 	</bean>
@@ -38,55 +62,55 @@
 	<!-- DAOs -->
 	<bean id="applicationInfoDao" class="org.openforis.collect.persistence.ApplicationInfoDao"
 		lazy-init="false" depends-on="liquibase">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dsl" ref="dsl" />
 	</bean>
 	
 	<bean id="codeListItemDao" class="org.openforis.collect.persistence.CodeListItemDao"
 		lazy-init="false" depends-on="liquibase">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dsl" ref="dsl" />
 		<property name="useCache" value="true" />
 	</bean>
 	
 	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao"
 		lazy-init="false" depends-on="liquibase">
-  		<property name="dataSource" ref="dataSource"/>
+  		<property name="dsl" ref="dsl" />
 	</bean>
 	
 	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
-  		<property name="dataSource" ref="dataSource"/>
+  		<property name="dsl" ref="dsl" />
 	</bean>
 	
 	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
-  		<property name="dataSource" ref="dataSource"/>
+  		<property name="dsl" ref="dsl" />
 	</bean>
 	
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
-  		<property name="dataSource" ref="dataSource"/>
+  		<property name="dsl" ref="dsl" />
 	</bean>
 
 	<bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dsl" ref="dsl" />
 	</bean>
   
 	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao"
 		init-method="init">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dsl" ref="dsl" />
 	</bean>
 
 	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDao">
-  		<property name="dataSource" ref="dataSource"/>
+  		<property name="dsl" ref="dsl" />
 	</bean>
 	
 	<bean id="taxonDao" class="org.openforis.collect.persistence.TaxonDao">
-  		<property name="dataSource" ref="dataSource"/>
+  		<property name="dsl" ref="dsl" />
 	</bean>
 	
 	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDao">
-  		<property name="dataSource" ref="dataSource"/>
+  		<property name="dsl" ref="dsl" />
 	</bean>
 
 	<bean id="userDao" class="org.openforis.collect.persistence.UserDao">
-  		<property name="dataSource" ref="dataSource"/>
+  		<property name="dsl" ref="dsl" />
 	</bean>
 	
 	<!--  Managers -->

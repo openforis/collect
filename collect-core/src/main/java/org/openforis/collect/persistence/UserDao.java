@@ -6,10 +6,10 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_USER_ROLE_ID_
 import static org.openforis.collect.persistence.jooq.Tables.OFC_USER;
 import static org.openforis.collect.persistence.jooq.Tables.OFC_USER_ROLE;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.Configuration;
 import org.jooq.DeleteQuery;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -101,8 +101,8 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 
 		private static final long serialVersionUID = 1L;
 
-		public UserDSLContext(Connection conn) {
-			super(conn, OFC_USER.ID, OFC_USER_ID_SEQ, User.class);
+		public UserDSLContext(Configuration config) {
+			super(config, OFC_USER.ID, OFC_USER_ID_SEQ, User.class);
 		}
 
 		@Override

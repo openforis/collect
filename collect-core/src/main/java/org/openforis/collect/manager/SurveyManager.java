@@ -352,7 +352,7 @@ public class SurveyManager {
 	 * @throws SurveyImportException
 	 * @deprecated use {@link #importModel(File, String, boolean)} instead.
 	 */
-	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=Propagation.SUPPORTS)
 	@Deprecated
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.insert(survey);

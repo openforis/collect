@@ -22,6 +22,8 @@ import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import liquibase.Liquibase;
 import liquibase.database.core.SQLiteDatabase;
@@ -44,7 +46,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	private static final String TEST_FLAT_CODE_LIST_NAME = "flatTestCodeList";
 
 	@Autowired
-	private DataSource dataSource;
+	private DataSource transactionAwareDataSource;
 	
 	private CollectSurvey survey;
 	
@@ -56,9 +58,10 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	
 	@SuppressWarnings("deprecation")
 	@Before
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void before() throws IdmlParseException, IOException, SurveyImportException, SQLException, LiquibaseException, SurveyValidationException {
 		SQLiteDatabase database = new SQLiteDatabase();
-		Connection connection = DataSourceUtils.getConnection(dataSource);
+		Connection connection = DataSourceUtils.getConnection(transactionAwareDataSource);
 		database.setConnection(new JdbcConnection(connection));
 		Liquibase liquibase = new Liquibase(LIQUIBASE_CHANGELOG, new ClassLoaderResourceAccessor(), database);
 		liquibase.update((String) null);

@@ -22,7 +22,7 @@ public class ConfigurationManager {
 	private Configuration configuration;
 	
 	public void init() {
-		configuration = configurationDao.load();
+		this.configuration = configurationDao.load();
 	}
 	
 	@Transactional

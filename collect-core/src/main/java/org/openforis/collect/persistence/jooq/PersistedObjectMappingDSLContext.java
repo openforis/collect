@@ -3,8 +3,7 @@
  */
 package org.openforis.collect.persistence.jooq;
 
-import java.sql.Connection;
-
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.Sequence;
 import org.jooq.StoreQuery;
@@ -19,10 +18,10 @@ public abstract class PersistedObjectMappingDSLContext<T extends PersistedObject
 
 	private static final long serialVersionUID = 1L;
 	
-	public PersistedObjectMappingDSLContext(Connection conn,
+	public PersistedObjectMappingDSLContext(Configuration config,
 			TableField<?, Integer> idField,
 			Sequence<? extends Number> idSequence, Class<T> clazz) {
-		super(conn, idField, idSequence, clazz);
+		super(config, idField, idSequence, clazz);
 	}
 
 	@Override

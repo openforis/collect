@@ -3,9 +3,9 @@
  */
 package org.openforis.collect.persistence.jooq;
 
-import java.sql.Connection;
 import java.util.List;
 
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.ResultQuery;
 import org.openforis.collect.model.CollectSurvey;
@@ -44,9 +44,9 @@ public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurve
 	}
 	
 	protected C dsl(CollectSurvey survey) {
-		Connection conn = getConnection();
 		try {
-			return jooqFactoryClass.getConstructor(Connection.class, CollectSurvey.class).newInstance(conn, survey);
+			return jooqFactoryClass.getConstructor(Configuration.class, CollectSurvey.class)
+					.newInstance(getConfiguration(), survey);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to create " + jooqFactoryClass, e);
 		}
