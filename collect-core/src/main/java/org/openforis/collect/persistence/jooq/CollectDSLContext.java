@@ -32,10 +32,10 @@ public class CollectDSLContext extends DefaultDSLContext {
 		super(config);
 	}
 	
-	public CollectDSLContext(Connection conn) {
-		super(new DialectAwareJooqConfiguration(conn));
+	public CollectDSLContext(Connection connection) {
+		super(new DialectAwareJooqConfiguration(connection));
 	}
-	
+
 	@Override
     public CollectCreateIndexStep createIndex(String index) {
         return createIndex(name(index));

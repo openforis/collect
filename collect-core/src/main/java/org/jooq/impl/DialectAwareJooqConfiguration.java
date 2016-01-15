@@ -52,40 +52,16 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 		}
 	}
 	
+	public DialectAwareJooqConfiguration(Connection connection) {
+		this(new DefaultConnectionProvider(connection));
+	}
+
 	public DialectAwareJooqConfiguration(ConnectionProvider connectionProvider) {
 		super(createConfiguration(connectionProvider));
 	}
 	
-	public DialectAwareJooqConfiguration(Connection conn) {
-		super(createConfiguration(conn, null));
-	}
-	
-	private static SQLDialect getDialect(Connection conn) {
-		try {
-			DatabaseMetaData metaData = conn.getMetaData();
-			String dbName = metaData.getDatabaseProductName();
-			Database db = Database.getByProductName(dbName);
-			if ( db == null ) {
-				throw new IllegalArgumentException("Unknown database "+dbName);
-			}
-			return db.getDialect();
-		} catch (SQLException e) {
-			throw new RuntimeException("Error getting database name", e);
-		}
-	}
-	
 	private static Configuration createConfiguration(ConnectionProvider connectionProvider) {
-		Connection conn = null;
-		try {
-			conn = connectionProvider.acquire();
-			return createConfiguration(conn, connectionProvider);
-		} finally {
-			connectionProvider.release(conn);
-		}
-	}
-
-	private static Configuration createConfiguration(Connection conn, ConnectionProvider connectionProvider) {
-		SQLDialect dialect = getDialect(conn);
+		SQLDialect dialect = getDialect(connectionProvider);
 		Settings settings = new Settings();
 		switch ( dialect ) {
 		case SQLITE:
@@ -101,6 +77,24 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 		configuration.setSettings(settings);
 		configuration.setSQLDialect(dialect);
 		return configuration;
+	}
+
+	private static SQLDialect getDialect(ConnectionProvider connectionProvider) {
+		Connection conn = null;
+		try {
+			conn = connectionProvider.acquire();
+			DatabaseMetaData metaData = conn.getMetaData();
+			String dbName = metaData.getDatabaseProductName();
+			Database db = Database.getByProductName(dbName);
+			if ( db == null ) {
+				throw new IllegalArgumentException("Unknown database "+dbName);
+			}
+			return db.getDialect();
+		} catch (SQLException e) {
+			throw new RuntimeException("Error getting database name", e);
+		} finally {
+			connectionProvider.release(conn);
+		}
 	}
 	
 }
