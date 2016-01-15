@@ -487,7 +487,7 @@ public class CollectRecord extends Record {
 	public void updateAttributeValidationCache(Attribute<?, ?> attribute, ValidationResults validationResults) {
 		Integer attributeId = attribute.getInternalId();
 		
-		removeValidationCache(attributeId);
+		removeValidationCache(attribute);
 		
 		int errorCounts = validationResults.getErrors().size();
 		int warningCounts = validationResults.getWarnings().size();
@@ -503,7 +503,6 @@ public class CollectRecord extends Record {
 		Node<?> node = this.getNodeByInternalId(nodeId);
 		removeValidationCache(node);
 	}
-	
 	
 	private void removeValidationCache(Node<?> node) {
 		validationCache.remove(node);
