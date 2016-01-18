@@ -176,7 +176,7 @@ package org.openforis.collect.ui {
 				formItem = new CodeAttributeFormItem();
 			} else if(def.multiple) {
 				formItem = new MultipleAttributeFormItem();
-				MultipleAttributeFormItem(formItem).showLabel = false;
+				MultipleAttributeFormItem(formItem).showLabel = (parentLayout != UIUtil.LAYOUT_TABLE);
 			} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
 				formItem = new CompositeAttributeFormItem();
 			} else {

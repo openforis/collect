@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+import org.openforis.collect.relational.sql.RDBJdbcType;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -18,12 +19,12 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 	private NodeDefinition nodeDefinition;
 	private Path relativePath;
 
-	DataColumn(String name, int type, String typeName, NodeDefinition defn, Path relPath, Integer length, boolean nullable) {
-		this(name, type, typeName, defn, relPath, length, nullable, null);
+	DataColumn(String name, RDBJdbcType type, NodeDefinition defn, Path relPath, Integer length, boolean nullable) {
+		this(name, type, defn, relPath, length, nullable, null);
 	}
 
-	DataColumn(String name, int type, String typeName, NodeDefinition defn, Path relPath, Integer length, boolean nullable, Object defaultValue) {
-		super(name, type, typeName, length, nullable);
+	DataColumn(String name, RDBJdbcType type, NodeDefinition defn, Path relPath, Integer length, boolean nullable, Object defaultValue) {
+		super(name, type, length, nullable);
 		this.nodeDefinition = defn;
 		this.relativePath = relPath;
 		this.defaultValue = defaultValue;

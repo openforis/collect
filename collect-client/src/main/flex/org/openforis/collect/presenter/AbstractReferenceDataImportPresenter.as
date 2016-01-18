@@ -20,7 +20,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.PaginationBarEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
-	import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
+	import org.openforis.collect.manager.process.proxy.ProcessStatusProxy;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.view.AbstractReferenceDataImportView;
 	import org.openforis.collect.util.AlertUtil;
@@ -36,21 +36,20 @@ package org.openforis.collect.presenter {
 	public class AbstractReferenceDataImportPresenter extends AbstractPresenter {
 		
 		private static const PROGRESS_UPDATE_DELAY:int = 2000;
-		private static const ALLOWED_IMPORT_FILE_EXTENSIONS:Array = new Array("*.csv", "*.xls", "*.xlsx");
+		protected static const ALLOWED_IMPORT_FILE_EXTENSIONS:Array = new Array("*.csv", "*.xls", "*.xlsx");
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
 		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;
 		private static const VERANCULAR_NAMES_SEPARATOR:String = ", ";
 		
 		protected var _fileReference:FileReference;
 		protected var _progressTimer:Timer;
-		protected var _state:ReferenceDataImportStatusProxy;
+		protected var _state:ProcessStatusProxy;
 		protected var _messageKeys:ReferenceDataImportMessageKeys;
 		protected var _uploadUrl:String;
 		protected var _uploadedTempFileName:String;
 		
 		protected var _getStatusResponder:IResponder;
 		protected var _firstOpen:Boolean;
-		protected var _fileFilter:FileFilter;
 		
 		protected var _recordsOffset:int;
 		protected var _recordsPerPage:int;
@@ -66,9 +65,11 @@ package org.openforis.collect.presenter {
 			
 			_recordsOffset = 0;
 			_recordsPerPage = MAX_SUMMARIES_PER_PAGE
+		}
 
+		protected function createFileFilter():FileFilter {
 			//var description:String = ALLOWED_IMPORT_FILE_EXTENSIONS.join(", ");
-			_fileFilter = new FileFilter("Excel documents", ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
+			return new FileFilter("Excel documents", ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
 		}
 		
 		override public function init():void {
@@ -147,7 +148,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function browseFileToImport():void {
-			_fileReference.browse([_fileFilter]);
+			_fileReference.browse([createFileFilter()]);
 		}
 		
 		protected function checkCanImport():Boolean {
@@ -256,7 +257,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function getStatusResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as ReferenceDataImportStatusProxy;
+			_state = event.result as ProcessStatusProxy;
 			updateView();
 		}
 		
@@ -329,12 +330,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateViewForError():void {
-			if ( CollectionUtil.isEmpty(_state.errors) ) {
-				AlertUtil.showError(_messageKeys.ERROR, [_state.errorMessage]);
-				backToDefaultView();
-			} else {
-				view.currentState = AbstractReferenceDataImportView.STATE_ERROR;
-				view.errorsDataGrid.dataProvider = _state.errors;
+			if (_state.hasOwnProperty("errors")) {
+				if ( CollectionUtil.isEmpty(_state["errors"]) ) {
+					AlertUtil.showError(_messageKeys.ERROR, [_state.errorMessage]);
+					backToDefaultView();
+				} else {
+					view.currentState = AbstractReferenceDataImportView.STATE_ERROR;
+					view.errorsDataGrid.dataProvider = _state["errors"];
+				}
 			}
 		}
 		
@@ -355,7 +358,11 @@ package org.openforis.collect.presenter {
 				}
 				view.progressBar.setProgress(0, 0);
 			} else {
-				progressText = Message.get(progressLabelResource, [_state.processed, _state.total]);
+				if (_state.total == 100) {
+					progressText = null; //completion percentage in progress bar 
+				} else {
+					progressText = Message.get(progressLabelResource, [_state.processed, _state.total]);
+				}
 				view.progressBar.setProgress(_state.processed, _state.total);
 			}
 			view.progressLabelText = progressText;

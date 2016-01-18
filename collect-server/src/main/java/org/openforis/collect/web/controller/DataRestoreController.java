@@ -49,9 +49,12 @@ public class DataRestoreController extends BasicController {
 	private CollectJobManager jobManager;
 	
 	@RequestMapping(value = "/surveys/data/restore.json", method = RequestMethod.POST)
-	public @ResponseBody JobStatusResponse restoreData(UploadItem uploadItem, @RequestParam(required=false) String surveyName) throws IOException {
+	public @ResponseBody JobStatusResponse restoreData(UploadItem uploadItem, 
+			@RequestParam(required=false) String surveyName,
+			@RequestParam boolean validateRecords,
+			@RequestParam boolean deleteAllRecords) throws IOException {
 		try {
-			DataRestoreJob job = startRestoreJob(uploadItem, surveyName == null, surveyName);
+			DataRestoreJob job = startRestoreJob(uploadItem, surveyName == null, surveyName, validateRecords, deleteAllRecords);
 			return createResponse(job);
 		} catch (Exception e) {
 			JobStatusResponse response = new JobStatusResponse();
@@ -69,7 +72,7 @@ public class DataRestoreController extends BasicController {
 		if (StringUtils.isBlank(allowedRestoreKey) || allowedRestoreKey.equals(restoreKey)) {
 			try {
 				boolean newSurvey = surveyManager.get(surveyName) == null;
-				DataRestoreJob job = startRestoreJob(uploadItem, newSurvey, surveyName);
+				DataRestoreJob job = startRestoreJob(uploadItem, newSurvey, surveyName, true, false);
 				response.setJobId(job.getId().toString());
 			} catch (Exception e) {
 				response.setErrorStatus();
@@ -130,8 +133,9 @@ public class DataRestoreController extends BasicController {
 		response.setErrorMessage(job.getErrorMessage());
 	}
 	
-	private DataRestoreJob startRestoreJob(UploadItem uploadItem, boolean newSurvey, String expectedSurveyName) throws IOException,
-	FileNotFoundException, ZipException {
+	private DataRestoreJob startRestoreJob(UploadItem uploadItem, boolean newSurvey, 
+			String expectedSurveyName, boolean validateRecords, boolean deleteAllRecords) 
+				throws IOException,	FileNotFoundException, ZipException {
 		File tempFile = copyContentToFile(uploadItem);
 		SurveyBackupInfo info = extractInfo(tempFile);
 		
@@ -142,12 +146,14 @@ public class DataRestoreController extends BasicController {
 			checkPackagedSurveyValidity(info, expectedSurveyName);
 		}
 		
-		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+		DataRestoreJob job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
 		job.setStoreRestoredFile(true);
 		job.setPublishedSurvey(publishedSurvey);
 		job.setFile(tempFile);
 		job.setOverwriteAll(true);
 		job.setRestoreUploadedFiles(true);
+		job.setValidateRecords(validateRecords);
+		job.setDeleteAllRecordsBeforeRestore(deleteAllRecords);
 		
 		String lockId = extractSurveyUri(tempFile);
 		jobManager.start(job, lockId);

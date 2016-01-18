@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.8.27-SNAPSHOT</version>
+		<version>3.8.28-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
@@ -375,7 +375,7 @@
 			<artifactId>protostuff-xml</artifactId>
 			<version>${protostuff.version}</version>
 		</dependency>
-		
+	
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
 			<groupId>org.springframework</groupId>

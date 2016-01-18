@@ -1,5 +1,7 @@
 package org.openforis.collect.relational.model;
 
+import java.util.List;
+
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
@@ -62,4 +64,12 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 		return result;
 	}
 
+	public CodeListCodeColumn getCodeColumn() {
+		for (Column<?> column : getColumns()) {
+			if (column instanceof CodeListCodeColumn) {
+				return (CodeListCodeColumn) column;
+			}
+		}
+		return null;
+	}
 }

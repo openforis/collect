@@ -2,17 +2,18 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 
-import org.openforis.collect.io.data.CSVDataImportProcess;
-import org.openforis.collect.io.data.CSVDataImportProcess.CSVDataImportSettings;
+import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.io.data.CSVDataImportJob;
+import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportInput;
+import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportSettings;
+import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
+import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordSessionManager;
-import org.openforis.collect.manager.process.ProcessStatus;
-import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.annotation.Secured;
 
 /**
@@ -20,51 +21,52 @@ import org.springframework.security.access.annotation.Secured;
  * @author S. Ricci
  *
  */
-public class CSVDataImportService extends ReferenceDataImportService<ReferenceDataImportStatusProxy, CSVDataImportProcess> { 
+public class CSVDataImportService { 
 	
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
-	private ApplicationContext applicationContext;
+	private CollectJobManager jobManager;
+	private CSVDataImportJob importJob;
+	
+	protected void init() {
+	}
 	
 	@Secured("ROLE_ADMIN")
-	public ReferenceDataImportStatusProxy start(String tempFileName, int parentEntityId, CollectRecord.Step step, 
+	public DataImportStatusProxy start(String tempFileName, int parentEntityId, CollectRecord.Step step, 
 			boolean transactional, boolean validateRecords, 
 			boolean insertNewRecords, String newRecordVersionName,
 			boolean deleteExistingEntities) throws DataImportExeption {
-		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
+		if ( importJob == null || ! importJob.isRunning() ) {
 			File importFile = new File(tempFileName);
 			SessionState sessionState = sessionManager.getSessionState();
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			importProcess = (CSVDataImportProcess) applicationContext.getBean(
-					transactional ? "transactionalCsvDataImportProcess": "csvDataImportProcess");
-			importProcess.setFile(importFile);
-			importProcess.setSurvey(survey);
-			importProcess.setParentEntityDefinitionId(parentEntityId);
-			importProcess.setStep(step);
-			CSVDataImportSettings settings = new CSVDataImportProcess.CSVDataImportSettings();
+			if (transactional) {
+				importJob = jobManager.createJob(TransactionalCSVDataImportJob.class);
+			} else {
+				importJob = jobManager.createJob(CSVDataImportJob.BEAN_NAME, CSVDataImportJob.class);
+			}
+			CSVDataImportSettings settings = new CSVDataImportSettings();
 			settings.setRecordValidationEnabled(validateRecords);
 			settings.setInsertNewRecords(insertNewRecords);
 			settings.setNewRecordVersionName(newRecordVersionName);
 			settings.setDeleteExistingEntities(deleteExistingEntities);
-			importProcess.setSettings(settings);
-			importProcess.init();
-			ProcessStatus status = importProcess.getStatus();
-			if ( status != null && ! importProcess.getStatus().isError() ) {
-				startProcessThread();
-			}
+			CSVDataImportInput input = new CSVDataImportInput(importFile, survey, step, parentEntityId, settings);
+			importJob.setInput(input);
+			jobManager.start(importJob);
 		}
 		return getStatus();
 	}
 
-	@Override
 	@Secured("ROLE_ADMIN")
-	public ReferenceDataImportStatusProxy getStatus() {
-		if ( importProcess == null ) {
-			return null;
-		} else {
-			return new ReferenceDataImportStatusProxy(importProcess.getStatus());
-		}
+	public DataImportStatusProxy getStatus() {
+		return importJob == null ? null : new DataImportStatusProxy(importJob);
 	}
 	
+	@Secured("ROLE_ADMIN")
+	public void cancel() {
+		if ( importJob != null ) {
+			importJob.abort();
+		}
+	}
 }

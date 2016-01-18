@@ -477,7 +477,6 @@ public class SurveySelectVM extends BaseVM {
 			});
 		}
 	}
-		
 	
 	protected void performSurveyPublishing(CollectSurvey survey) {
 		try {
@@ -562,26 +561,31 @@ public class SurveySelectVM extends BaseVM {
 			//skip survey list update
 			return;
 		}
-		List<SurveySummary> newSummaries = surveyManager.loadCombinedSummaries(null, true);
-		if (summaries == null) {
-			summaries = newSummaries;
-		} else {
-			for (SurveySummary newSummary : newSummaries) {
-				SurveySummary oldSummary = findSummary(newSummary.getId(), newSummary.isPublished(), newSummary.isTemporary());
-				if (oldSummary == null) {
-					// TODO handle this??
-				} else {
-					oldSummary.setRecordValidationProcessStatus(newSummary
-							.getRecordValidationProcessStatus());
-					BindUtils.postNotifyChange(null, null, oldSummary,
-							"recordValidationProgressStatus");
-					BindUtils.postNotifyChange(null, null, oldSummary,
-							"recordValidationInProgress");
-					BindUtils.postNotifyChange(null, null, oldSummary,
-							"recordValidationProgressPercent");
+		try {
+			List<SurveySummary> newSummaries = surveyManager.loadCombinedSummaries(null, true);
+			if (summaries == null) {
+				summaries = newSummaries;
+			} else {
+				for (SurveySummary newSummary : newSummaries) {
+					SurveySummary oldSummary = findSummary(newSummary.getId(), newSummary.isPublished(), newSummary.isTemporary());
+					if (oldSummary == null) {
+						// TODO handle this??
+					} else {
+						oldSummary.setRecordValidationProcessStatus(newSummary
+								.getRecordValidationProcessStatus());
+						BindUtils.postNotifyChange(null, null, oldSummary,
+								"recordValidationProgressStatus");
+						BindUtils.postNotifyChange(null, null, oldSummary,
+								"recordValidationInProgress");
+						BindUtils.postNotifyChange(null, null, oldSummary,
+								"recordValidationProgressPercent");
+					}
 				}
 			}
+		} catch (Exception e) {
+			return;
 		}
+
 	}
 
 	private void loadSurveySummaries() {

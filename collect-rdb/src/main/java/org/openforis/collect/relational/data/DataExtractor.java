@@ -2,6 +2,8 @@ package org.openforis.collect.relational.data;
 
 import java.util.Iterator;
 
+import org.openforis.collect.relational.model.Table;
+
 /**
  * 
  * @author S. Ricci
@@ -9,6 +11,8 @@ import java.util.Iterator;
  */
 public abstract class DataExtractor implements Iterator<Row> {
 
+	public abstract Table<?> getTable();
+	
 	@Override
 	public abstract boolean hasNext();
 

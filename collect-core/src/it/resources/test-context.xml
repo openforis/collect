@@ -29,12 +29,16 @@
 		</property>
 	</bean>
      
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource" destroy-method="destroy">
 		<property name="driverClassName" value="${collect.devdb.driver}" />
 		<property name="url" value="${collect.devdb.url}"/>
 		<property name="username" value="${collect.devdb.username}" />
 		<property name="password" value="${collect.devdb.password}" />
 	</bean>
+	
+	<bean class="org.jooq.impl.SingleConnectionDataSourceConnectionProvider" name="connectionProvider">
+        <constructor-arg ref="transactionAwareDataSource" />
+    </bean>
 	
 	<bean id="recordEventBatchPublisher" class="org.openforis.collect.io.data.FakeNodeChangeBatchProcessor"
 		scope="prototype">

@@ -45,6 +45,7 @@ import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeAddRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.DefaultValueApplyRequest;
@@ -97,7 +98,6 @@ public class DataService {
 	 */
 	private boolean hasActiveSurveyIndexedNodes;
 
-	@Transactional
 	@Secured("ROLE_ENTRY")
 	public RecordProxy loadRecord(int id, Integer stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
@@ -132,7 +132,6 @@ public class DataService {
 	 * 
 	 * @return map with "count" and "records" items
 	 */
-	@Transactional
 	@Secured("ROLE_ENTRY")
 	public Map<String, Object> loadRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String[] keyValues) {
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -389,10 +388,14 @@ public class DataService {
 	 * @throws RecordIndexException 
 	 */
 	@Secured("ROLE_ENTRY")
-	public void clearActiveRecord() throws RecordPersistenceException, RecordIndexException {
-		sessionManager.releaseRecord();
+	public void clearActiveRecord() {
+		try {
+			sessionManager.releaseRecord();
+		} catch (RecordUnlockedException e) {} 
 		if ( isCurrentRecordIndexable() ) {
-			recordIndexService.cleanTemporaryIndex();
+			try {
+				recordIndexService.cleanTemporaryIndex();
+			} catch (RecordIndexException e) {}
 		}
 	}
 	

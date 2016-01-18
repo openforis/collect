@@ -417,6 +417,7 @@ public class MondrianCubeGenerator {
 			level.table = codeTableName;
 			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
 			level.nameColumn = codeTableName.substring(0, codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + language ;
+			level.type = "Integer";
 		} else {
 			level.column = attrName;
 		}

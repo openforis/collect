@@ -4,7 +4,6 @@ import static org.openforis.collect.relational.util.Constants.COLUMN_NAME_QNAME;
 import static org.openforis.collect.relational.util.Constants.DATA_TABLE_PK_FORMAT;
 import static org.openforis.collect.relational.util.Constants.TABLE_NAME_QNAME;
 
-import java.sql.Types;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +11,7 @@ import java.util.Set;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.CollectRdbException;
+import org.openforis.collect.relational.sql.RDBJdbcType;
 import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.collect.relational.util.DataTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -457,45 +457,9 @@ public class RelationalSchemaGenerator {
 
 	private DataColumn createDataColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) {
 		String name = columnNameGenerator.generateName(defn); 
-		int jdbcType;
-		String typeName;
-		Integer length = null;
-		boolean nullable = true;
-		
-		Class<?> type = defn.getValueType();
-		if ( type == Integer.class ) {
-			jdbcType = Types.INTEGER;
-			typeName =  "integer";
-		} else if ( type == Double.class ) {
-			jdbcType = Types.FLOAT;
-			typeName =  "float";
-			length = config.getFloatingPointPrecision();
-		} else if ( type == Long.class ) {
-			jdbcType = Types.BIGINT;
-			typeName = "bigint";
-		} else if ( type == Boolean.class ) {
-			jdbcType = Types.BOOLEAN;
-			typeName =  "boolean";
-		} else if ( type == String.class ) {
-			jdbcType = Types.VARCHAR;
-			typeName =  "varchar";
-			AttributeDefinition attr = ((FieldDefinition<?>) defn).getAttributeDefinition();
-			if ( attr instanceof TextAttributeDefinition ) {
-				TextAttributeDefinition textAttr = (TextAttributeDefinition) attr;
-				if ( textAttr.getType() == Type.MEMO ) {
-					length = config.getMemoMaxLength();
-				} else {
-					length = config.getTextMaxLength();
-				}
-			} else {
-				// default for string-like types (code, qualifier)
-				length = config.getTextMaxLength();
-			}
-		} else {
-			throw new UnsupportedOperationException("Unknown field type "+type);				
-		}
-		
-		return new DataColumn(name, jdbcType, typeName, defn, relativePath, length, nullable);
+		Integer length = getColumnLength(config, defn);
+		RDBJdbcType rdbType = RDBJdbcType.fromType(defn.getValueType());
+		return new DataColumn(name, rdbType, defn, relativePath, length, true);
 	}
 
 	/**
@@ -507,22 +471,30 @@ public class RelationalSchemaGenerator {
 	 */
 	private DataColumn createDataColumn(DataTable table, AttributeDefinition defn, Path relativePath) {
 		String name = columnNameGenerator.generateName(defn);
-		int jdbcType;
-		String typeName;
-		Integer length = null;
-		boolean nullable = true;
-		
-		if ( defn instanceof DateAttributeDefinition ) {
-			jdbcType = Types.DATE;
-			typeName =  "date";
-		} else if ( defn instanceof TimeAttributeDefinition ) {
-			jdbcType = Types.TIME;
-			typeName =  "time";
-		} else {
-			throw new UnsupportedOperationException("Unknown defn "+defn.getClass());
-		}
+		RDBJdbcType type = RDBJdbcType.fromCompositeAttributeDefinition(defn);
+		return new DataColumn(name, type, defn, relativePath, null, true);
+	}
 	
-		return new DataColumn(name, jdbcType, typeName, defn, relativePath, length, nullable);
+	private static Integer getColumnLength(RelationalSchemaConfig config, FieldDefinition<?> defn) {
+		Class<?> type = defn.getValueType();
+		if ( type == Double.class ) {
+			return config.getFloatingPointPrecision();
+		} else if ( type == String.class ) {
+			AttributeDefinition attr = ((FieldDefinition<?>) defn).getAttributeDefinition();
+			if ( attr instanceof TextAttributeDefinition ) {
+				TextAttributeDefinition textAttr = (TextAttributeDefinition) attr;
+				if ( textAttr.getType() == Type.MEMO ) {
+					return config.getMemoMaxLength();
+				} else {
+					return config.getTextMaxLength();
+				}
+			} else {
+				// default for string-like types (code, qualifier)
+				return config.getTextMaxLength();
+			}
+		} else {
+			return null;				
+		}
 	}
 
 	public void setConfig(RelationalSchemaConfig config) {

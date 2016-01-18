@@ -556,7 +556,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 				return Layout.FORM;
 			}
 		}
-		return layoutValue != null ? Layout.valueOf(layoutValue.toUpperCase()): null;
+		return layoutValue == null ? null : Layout.valueOf(layoutValue.toUpperCase());
 	}
 
 	public void setLayout(EntityDefinition entityDefn, Layout layout) {

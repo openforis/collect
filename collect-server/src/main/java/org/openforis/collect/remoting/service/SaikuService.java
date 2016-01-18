@@ -48,7 +48,7 @@ public class SaikuService {
 					protected void execute() throws Throwable {
 						reportingRepositories.createRepositories(surveyName, new ProgressListener() {
 							public void progressMade(Progress progress) {
-								setItemsProcessed(progress.getProcessedItems());
+								setProcessedItems(progress.getProcessedItems());
 								setTotalItems(progress.getTotalItems());
 							}
 						});

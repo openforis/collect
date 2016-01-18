@@ -5,10 +5,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import org.jooq.Configuration;
+import org.jooq.ConnectionProvider;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.conf.Settings;
-import org.jooq.impl.DefaultConfiguration;
 
 /**
  * 
@@ -53,11 +53,36 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 	}
 	
 	public DialectAwareJooqConfiguration(Connection connection) {
-		super(createConfiguration(connection));
+		this(new DefaultConnectionProvider(connection));
 	}
 
-	private static SQLDialect getDialect(Connection conn) {
+	public DialectAwareJooqConfiguration(ConnectionProvider connectionProvider) {
+		super(createConfiguration(connectionProvider));
+	}
+	
+	private static Configuration createConfiguration(ConnectionProvider connectionProvider) {
+		SQLDialect dialect = getDialect(connectionProvider);
+		Settings settings = new Settings();
+		switch ( dialect ) {
+		case SQLITE:
+			settings.withRenderSchema(false);
+			break;
+		case H2:
+		    settings.setRenderNameStyle(RenderNameStyle.AS_IS);
+		    break;
+		default:
+		}
+		DefaultConfiguration configuration = new DefaultConfiguration();
+		configuration.setConnectionProvider(connectionProvider);
+		configuration.setSettings(settings);
+		configuration.setSQLDialect(dialect);
+		return configuration;
+	}
+
+	private static SQLDialect getDialect(ConnectionProvider connectionProvider) {
+		Connection conn = null;
 		try {
+			conn = connectionProvider.acquire();
 			DatabaseMetaData metaData = conn.getMetaData();
 			String dbName = metaData.getDatabaseProductName();
 			Database db = Database.getByProductName(dbName);
@@ -67,26 +92,9 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 			return db.getDialect();
 		} catch (SQLException e) {
 			throw new RuntimeException("Error getting database name", e);
+		} finally {
+			connectionProvider.release(conn);
 		}
-	}
-	
-	private static Configuration createConfiguration(Connection connection) {
-		SQLDialect dialect = getDialect(connection);
-		Settings settings = new Settings();
-		switch ( dialect ) {
-		case SQLITE:
-			settings.withRenderSchema(false);
-			break;
-		case H2:
-            settings.setRenderNameStyle(RenderNameStyle.AS_IS);
-            break;
-        default:
-        }
-		DefaultConfiguration configuration = new DefaultConfiguration();
-		configuration.set(settings);
-		configuration.set(dialect);
-		configuration.set(connection);
-		return configuration;
 	}
 	
 }

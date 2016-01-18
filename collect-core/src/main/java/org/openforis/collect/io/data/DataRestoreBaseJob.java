@@ -4,12 +4,12 @@
 package org.openforis.collect.io.data;
 
 import java.io.File;
-import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.SurveyRestoreJob;
+import org.openforis.collect.io.data.RecordProviderInitializerTask.Input;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -36,20 +36,21 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected transient File file;
 	protected transient CollectSurvey publishedSurvey; //optional: if not specified, the packaged survey will be published as a new one
 	protected transient CollectSurvey packagedSurvey; //optional: if not specified, it will be extracted from the ZIP file
-	
+
+	protected RecordProvider recordProvider; //if null it will be created and initialized, otherwise it will be re-used
+
 	//temporary instance variables
 	protected transient boolean newSurvey;
 	protected transient String surveyName; //published survey name or packaged survey name
-	protected transient ZipFile zipFile;
 	protected transient BackupFileExtractor backupFileExtractor;
 	protected transient boolean oldBackupFormat;
+	protected transient boolean validateRecords;
 
 	@Override
 	public void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
 		newSurvey = publishedSurvey == null;
-		zipFile = new ZipFile(file);
-		backupFileExtractor = new BackupFileExtractor(zipFile);
+		backupFileExtractor = new BackupFileExtractor(file);
 		oldBackupFormat = backupFileExtractor.isOldFormat();
 		surveyName = newSurvey ? extractSurveyName() : publishedSurvey.getName();
 	}
@@ -92,6 +93,9 @@ public abstract class DataRestoreBaseJob extends Job {
 		} else if (packagedSurvey == null) {
 			addTask(createTask(IdmlUnmarshallTask.class));
 		}
+		if (recordProvider == null) {
+			addTask(RecordProviderInitializerTask.class);
+		}
 	}
 
 	@Override
@@ -108,6 +112,15 @@ public abstract class DataRestoreBaseJob extends Job {
 			t.setSurveyManager(surveyManager);
 			t.setFile(idmlFile);
 			t.setValidate(false);
+		} else if (task instanceof RecordProviderInitializerTask) {
+			RecordProviderInitializerTask t = (RecordProviderInitializerTask) task;
+			Input input = new Input();
+			input.setFile(file);
+			input.setExistingSurvey(publishedSurvey);
+			input.setPackagedSurvey(packagedSurvey);
+			input.setUserManager(userManager);
+			input.setValidateRecords(validateRecords);
+			t.setInput(input);
 		}
 		super.initializeTask(task);
 	}
@@ -126,6 +139,8 @@ public abstract class DataRestoreBaseJob extends Job {
 				packagedSurvey = survey;
 			}
 			this.packagedSurvey = survey;
+		} else if (task instanceof RecordProviderInitializerTask) {
+			this.recordProvider = ((RecordProviderInitializerTask) task).getOutput();
 		}
 	}
 
@@ -158,6 +173,14 @@ public abstract class DataRestoreBaseJob extends Job {
 		this.file = file;
 	}
 
+	public void setRecordProvider(RecordProvider recordProvider) {
+		this.recordProvider = recordProvider;
+	}
+	
+	public RecordProvider getRecordProvider() {
+		return recordProvider;
+	}
+	
 	public CollectSurvey getPublishedSurvey() {
 		return publishedSurvey;
 	}
@@ -174,4 +197,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		this.packagedSurvey = packagedSurvey;
 	}
 	
+	public void setValidateRecords(boolean validateRecords) {
+		this.validateRecords = validateRecords;
+	}
 }

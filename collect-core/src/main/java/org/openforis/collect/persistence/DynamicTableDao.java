@@ -27,29 +27,24 @@ import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
 import org.openforis.commons.collection.CollectionUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
  * 
  */
-@Transactional
 public class DynamicTableDao extends JooqDaoSupport {
 
 	@Deprecated
-	@Transactional
 	public Object load(String table, String column, Object... keys) {
 		NameValueEntry[] filters = NameValueEntry.fromKeyValuePairs(keys);
 		return loadValue(table, column, filters);
 	}
 
-	@Transactional
 	public Object loadValue(String table, String column, NameValueEntry... filters) {
 		Map<String, String> row = loadRow(table, filters);
 		return row == null ? null: row.get(column);
 	}
 
-	@Transactional
 	public Map<String, String> loadRow(String table, NameValueEntry[] filters) {
 		List<Map<String, String>> rows = loadRows(table, filters);
 		if ( rows == null || rows.isEmpty()) {
@@ -59,12 +54,10 @@ public class DynamicTableDao extends JooqDaoSupport {
 		}
 	}
 
-	@Transactional
 	public List<Map<String, String>> loadRows(String table, NameValueEntry[] filters) {
 		return loadRows(table, filters, (String[]) null);
 	}
 	
-	@Transactional
 	public List<Map<String, String>> loadRows(String table, NameValueEntry[] filters, String[] notNullColumns) {
 		Lookup lookupTable = getLookupTable(table);
 		CollectDSLContext dsl = dsl();
@@ -85,7 +78,6 @@ public class DynamicTableDao extends JooqDaoSupport {
 		return CollectionUtils.unmodifiableList(result);
 	}
 
-	@Transactional
 	public boolean exists(String table, NameValueEntry[] filters, String[] notNullColumns) {
 		Lookup lookupTable = getLookupTable(table);
 		SelectJoinStep<Record1<Integer>> select = dsl().selectCount().from(lookupTable);

@@ -49,6 +49,7 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -56,6 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  * 
  */
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class SurveyManager {
 	
 	private static Log LOG = LogFactory.getLog(SurveyManager.class);
@@ -148,7 +150,7 @@ public class SurveyManager {
 		return survey;
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importTemporaryModel(InputStream is, String name, boolean validate)
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
@@ -162,7 +164,7 @@ public class SurveyManager {
 		}
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importTemporaryModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
 		try {
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
@@ -181,7 +183,7 @@ public class SurveyManager {
 	/**
 	 * Duplicates a published survey into a temporary survey and import the survey file into this new temporary survey
 	 */
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importInPublishedTemporaryModel(String uri, File surveyFile, boolean validate) 
 			throws SurveyStoreException, SurveyValidationException {
 		createTemporarySurveyFromPublished(uri);
@@ -192,7 +194,7 @@ public class SurveyManager {
 	/**
 	 * Imports a survey from a XML file input stream and publishes it.
 	 */
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importModel(InputStream is, String name, boolean validate)
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
@@ -206,12 +208,12 @@ public class SurveyManager {
 		}
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
 		return importModel(surveyFile, name, validate, false);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importModel(File surveyFile, String name, boolean validate, boolean includeCodeLists) throws SurveyImportException, SurveyValidationException {
 		try {
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, includeCodeLists);
@@ -228,7 +230,7 @@ public class SurveyManager {
 		}
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey updateModel(InputStream is, boolean validate) throws IdmlParseException, SurveyValidationException, SurveyImportException {
 		File tempFile = OpenForisIOUtils.copyToTempFile(is);
 		try {
@@ -238,7 +240,7 @@ public class SurveyManager {
 		}
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey updateModel(File surveyFile, boolean validate)
 			throws SurveyValidationException, SurveyImportException {
 		return updateModel(surveyFile, validate, false);
@@ -250,7 +252,7 @@ public class SurveyManager {
 	 * If a temporary survey with the same URI as the survey in the surveyFile exists,
 	 * than it will be overwritten with the passed one, otherwise the published survey will be overwritten.
 	 */
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey updateModel(File surveyFile, boolean validate, boolean includeCodeLists)
 			throws SurveyValidationException, SurveyImportException {
 		CollectSurvey parsedSurvey;
@@ -275,7 +277,7 @@ public class SurveyManager {
 		return parsedSurvey;
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey updateModel(File surveyFile, CollectSurvey packagedSurvey)
 			throws SurveyValidationException, SurveyImportException {
 		String uri = packagedSurvey.getUri();
@@ -305,7 +307,7 @@ public class SurveyManager {
 		return packagedSurvey;
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey updateTemporaryModel(File surveyFile, boolean validate)
 			throws SurveyValidationException, SurveyStoreException {
 		CollectSurvey parsedSurvey;
@@ -350,7 +352,7 @@ public class SurveyManager {
 	 * @throws SurveyImportException
 	 * @deprecated use {@link #importModel(File, String, boolean)} instead.
 	 */
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.SUPPORTS)
 	@Deprecated
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.insert(survey);
@@ -366,7 +368,7 @@ public class SurveyManager {
 	 * @deprecated Use {@link #updateModel(File, boolean)} instead.
 	 */
 	@Deprecated
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
 		//remove old survey from surveys cache
 		CollectSurvey oldSurvey = get(survey.getName());
@@ -594,6 +596,7 @@ public class SurveyManager {
 		return survey;
 	}
 	
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		if ( includeDetails ) {
@@ -617,7 +620,7 @@ public class SurveyManager {
 
 	public SurveySummary loadTemporarySummaryByName(String name) {
 		return surveyDao.loadSurveySummaryByName(name, true);
-	}
+	}	
 	
 	public boolean isSurveyTemporary(CollectSurvey survey) {
 		Integer id = survey.getId();
@@ -653,7 +656,7 @@ public class SurveyManager {
 		return generateSurveyUri(UUID.randomUUID().toString());
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void save(CollectSurvey survey) throws SurveyStoreException {
 		survey.setModifiedDate(new Date());
 		survey.setCollectVersion(Collect.VERSION);
@@ -665,12 +668,12 @@ public class SurveyManager {
 		}
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey createTemporarySurveyFromPublished(String uri) {
 		return createTemporarySurveyFromPublished(uri, true, true);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey createTemporarySurveyFromPublished(String uri, boolean markCopyAsPublished, boolean preserveReferenceToPublishedSurvey) {
 		try {
 			SurveySummary existingTemporarySurvey = surveyDao.loadSurveySummaryByUri(uri, true);
@@ -701,7 +704,7 @@ public class SurveyManager {
 		}
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey duplicateSurveyIntoTemporary(String originalSurveyName, boolean originalSurveyIsTemporary, String newName) {
 		try {
 			CollectSurvey oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsTemporary);
@@ -750,7 +753,7 @@ public class SurveyManager {
 		return surveyDao.loadByName(name, temporary);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		codeListManager.deleteInvalidCodeListReferenceItems(survey);
 		
@@ -797,7 +800,7 @@ public class SurveyManager {
 	 * If no temporary survey is associated to the published one with the specified id, 
 	 * it duplicates the published survey into a temporary one, then removes the published one.
 	 */
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey unpublish(int surveyId) throws SurveyStoreException {
 		CollectSurvey publishedSurvey = getById(surveyId);
 		String uri = publishedSurvey.getUri();
@@ -853,7 +856,7 @@ public class SurveyManager {
 		}
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void deleteSurvey(int id) {
 		if ( isRecordValidationInProgress(id) ) {
 			cancelRecordValidation(id);
@@ -883,13 +886,13 @@ public class SurveyManager {
 		}
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void removeVersion(CollectSurvey survey, ModelVersion version) {
 		survey.removeVersion(version);
 		codeListManager.removeVersioningReference(survey, version);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void updateLanguages(CollectSurvey survey, List<String> newLanguageCodes) {
 		codeListManager.updateSurveyLanguages(survey, newLanguageCodes);
 		

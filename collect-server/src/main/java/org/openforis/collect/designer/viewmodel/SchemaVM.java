@@ -1318,7 +1318,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( selectedItem instanceof AttributeDefinition ) {
 			AttributeDefinition selectedNode = (AttributeDefinition) selectedItem;
 			
-			if(isDefinitionInPublishedSurvey(selectedNode)) {
+			if(isDefinitionInPublishedSurvey(selectedNode) && ! selectedNode.isCalculated()) {
 				MessageUtil.showWarning("survey.schema.cannot_convert_published_survey_node");
 				return;
 			} else {

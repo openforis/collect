@@ -4,13 +4,13 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_QUERY_GR
 import static org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroup.OFC_DATA_QUERY_GROUP;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroupQuery.OFC_DATA_QUERY_GROUP_QUERY;
 
-import java.sql.Connection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.jooq.BatchBindStep;
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -100,12 +100,12 @@ public class DataQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<DataQue
 
 		private static final long serialVersionUID = 1L;
 		
-		public JooqDSLContext(Connection connection) {
-			this(connection, null);
+		public JooqDSLContext(Configuration config) {
+			this(config, null);
 		}
 		
-		public JooqDSLContext(Connection connection, CollectSurvey survey) {
-			super(connection, OFC_DATA_QUERY_GROUP.ID, OFC_DATA_QUERY_GROUP_ID_SEQ, DataQueryGroup.class, survey);
+		public JooqDSLContext(Configuration config, CollectSurvey survey) {
+			super(config, OFC_DATA_QUERY_GROUP.ID, OFC_DATA_QUERY_GROUP_ID_SEQ, DataQueryGroup.class, survey);
 		}
 		
 		@Override

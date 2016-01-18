@@ -3,12 +3,12 @@ package org.openforis.collect.datacleansing.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_REPORT_ITEM_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataReportItem.OFC_DATA_REPORT_ITEM;
 
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import org.jooq.BatchBindStep;
+import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
@@ -125,7 +125,7 @@ public class DataReportItemDao extends MappingJooqDaoSupport<DataReportItem, Dat
 	}
 	
 	protected JooqDSLContext dsl(DataReport report) {
-		return new JooqDSLContext(getConnection(), report);
+		return new JooqDSLContext(getConfiguration(), report);
 	}
 	
 	protected static class JooqDSLContext extends PersistedObjectMappingDSLContext<DataReportItem> {
@@ -134,8 +134,8 @@ public class DataReportItemDao extends MappingJooqDaoSupport<DataReportItem, Dat
 		
 		private DataReport report;
 		
-		public JooqDSLContext(Connection connection, DataReport report) {
-			super(connection, OFC_DATA_REPORT_ITEM.ID, OFC_DATA_REPORT_ITEM_ID_SEQ, DataReportItem.class);
+		public JooqDSLContext(Configuration config, DataReport report) {
+			super(config, OFC_DATA_REPORT_ITEM.ID, OFC_DATA_REPORT_ITEM_ID_SEQ, DataReportItem.class);
 			this.report = report;
 		}
 		

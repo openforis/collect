@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class LogoDaoIntegrationTest extends CollectTest {
 
 	private static final int TEST_LOGO_ID = 100;
+	
 	@Autowired
 	protected LogoDao logoDao;
 

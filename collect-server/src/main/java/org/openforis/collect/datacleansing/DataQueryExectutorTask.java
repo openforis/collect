@@ -75,7 +75,7 @@ public class DataQueryExectutorTask extends Task {
 			for (Node<?> node : nodes) {
 				processNode(node);
 			}
-			incrementItemsProcessed();
+			incrementProcessedItems();
 		}
 	}
 

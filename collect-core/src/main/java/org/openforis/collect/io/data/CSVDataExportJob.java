@@ -10,7 +10,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -142,7 +144,7 @@ public class CSVDataExportJob extends Job {
 				if ( isRunning() ) {
 					CollectRecord record = recordManager.load(survey, s.getId(), step, false);
 					modelWriter.printData(record);
-					incrementItemsProcessed();
+					incrementProcessedItems();
 				} else {
 					break;
 				}
@@ -257,7 +259,7 @@ public class CSVDataExportJob extends Job {
 		
 	}
 	
-	private static class EntryNameGenerator {
+	public static class EntryNameGenerator {
 		
 		private Set<String> entryNames;
 		
@@ -272,6 +274,20 @@ public class CSVDataExportJob extends Job {
 			}
 			entryNames.add(name);
 			return name;
+		}
+		
+		public Map<String, EntityDefinition> generateMultipleEntitesEntryMap(CollectSurvey survey) {
+			final Map<String, EntityDefinition> result = new LinkedHashMap<String, EntityDefinition>();
+			survey.getSchema().traverse(new NodeDefinitionVisitor() {
+				public void visit(NodeDefinition def) {
+					if (def instanceof EntityDefinition && def.isMultiple()) {
+						EntityDefinition entityDef = (EntityDefinition) def;
+						String entryName = generateEntryName(entityDef);
+						result.put(entryName, entityDef);
+					}
+				}
+			});
+			return result;
 		}
 	}
 

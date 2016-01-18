@@ -84,15 +84,13 @@ public class DataTable extends AbstractTable<Node<?>> {
 	public void print(PrintStream out) {
 		out.printf("%-43s%s\n", getName()+":", getRelativePath());
 		for (Column<?> col : getColumns()) {
-			String name = col.getName();
-			int type = col.getType();
 			Integer length = col.getLength();
 			String path = "";
 			if ( col instanceof DataColumn ) {
 				DataColumn dcol = (DataColumn) col;
 				path = dcol.getRelativePath()+"";
 			}
-			out.printf("\t%-35s%-8s%-8s%s\n", name, type, length==null?"":length, path);
+			out.printf("\t%-35s%-8s%-8s%s\n", col.getName(), col.getType().getCode(), length == null ? "" : length, path);
 		}
 		out.flush();
 	}

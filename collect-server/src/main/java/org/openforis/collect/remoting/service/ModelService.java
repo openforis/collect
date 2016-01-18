@@ -14,7 +14,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -30,14 +29,12 @@ public class ModelService {
 	@Autowired
 	private RecordSessionManager sessionManager;
 
-	@Transactional
 	public List<SurveySummary> getSurveySummaries() {
 		String lang = getActiveLanguageCode();
 		List<SurveySummary> summaries = surveyManager.getSurveySummaries(lang);
 		return summaries;
 	}
 	
-	@Transactional
 	public List<NodeDefinitionSummary> getRootEntitiesSummaries(String surveyName) {
 		String lang = getActiveLanguageCode();
 		List<NodeDefinitionSummary> result = new ArrayList<NodeDefinitionSummary>();

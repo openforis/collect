@@ -1,6 +1,5 @@
 package org.openforis.collect.io.data;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +17,8 @@ import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
+import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -41,18 +40,8 @@ public class DataRestoreSummaryTask extends Task {
 	private UserManager userManager;
 
 	//input
-	private File file;
+	private CollectSurvey survey;
 	private boolean oldFormat;
-
-	/**
-	 * Survey packaged into the backup file
-	 */
-	private CollectSurvey packagedSurvey;
-	
-	/**
-	 * Published survey already inserted into the system
-	 */
-	private CollectSurvey existingSurvey;
 	
 	/**
 	 * If specified, it will be used to filter the records to include in the summary
@@ -61,7 +50,7 @@ public class DataRestoreSummaryTask extends Task {
 
 	//temporary instance variables
 	
-	private XMLParsingRecordProvider recordProvider;
+	private RecordProvider recordProvider;
 	
 	@SuppressWarnings("serial")
 	private final Map<Step, Integer> totalPerStep = new HashMap<Step, Integer>(){{
@@ -81,19 +70,13 @@ public class DataRestoreSummaryTask extends Task {
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
-		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, false);
-	}
-	
-	@Override
-	protected void initializeInternalVariables() throws Throwable {
-		super.initializeInternalVariables();
-		this.recordProvider.init();
+//		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, false);
 	}
 	
 	@Override
 	protected long countTotalItems() {
 		List<Integer> entryIds = recordProvider.findEntryIds();
-		return entryIds.size();
+		return Step.values().length * entryIds.size();
 	}
 	
 	@Override
@@ -138,7 +121,7 @@ public class DataRestoreSummaryTask extends Task {
 		String entryName = getEntryName(entryId, step);
 		List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
 		errorsByEntryName.put(entryName, failures);
-		incrementItemsSkipped();
+		incrementSkippedItems();
 	}
 
 	private void createRecordParsedCorrectlySummary(
@@ -159,7 +142,7 @@ public class DataRestoreSummaryTask extends Task {
 		}
 
 		incrementTotalPerStep(step);
-		incrementItemsProcessed();
+		incrementProcessedItems();
 	}
 
 	private void incrementTotalPerStep(Step step) {
@@ -188,7 +171,7 @@ public class DataRestoreSummaryTask extends Task {
 	
 	private DataImportSummary createFinalSummary() {
 		DataImportSummary summary = new DataImportSummary();
-		summary.setSurveyName(existingSurvey == null ? null: existingSurvey.getName());
+		summary.setSurveyName(survey == null ? null: survey.getName());
 		summary.setRecordsToImport(createRecordToImportItems());
 		summary.setSkippedFileErrors(createSkippedFileErrorItems());
 		summary.setConflictingRecords(createConflictingRecordItems());
@@ -336,24 +319,12 @@ public class DataRestoreSummaryTask extends Task {
 		this.userManager = userManager;
 	}
 	
-	public void setFile(File file) {
-		this.file = file;
+	public CollectSurvey getSurvey() {
+		return survey;
 	}
 	
-	public CollectSurvey getPackagedSurvey() {
-		return packagedSurvey;
-	}
-	
-	public void setPackagedSurvey(CollectSurvey packagedSurvey) {
-		this.packagedSurvey = packagedSurvey;
-	}
-	
-	public CollectSurvey getExistingSurvey() {
-		return existingSurvey;
-	}
-	
-	public void setExistingSurvey(CollectSurvey existingSurvey) {
-		this.existingSurvey = existingSurvey;
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
 	}
 	
 	public DataImportSummary getSummary() {
@@ -375,6 +346,10 @@ public class DataRestoreSummaryTask extends Task {
 	public void setIncludeRecordPredicate(
 			Predicate<CollectRecord> includeRecordPredicate) {
 		this.includeRecordPredicate = includeRecordPredicate;
+	}
+
+	public void setRecordProvider(RecordProvider recordProvider) {
+		this.recordProvider = recordProvider;
 	}
 	
 }

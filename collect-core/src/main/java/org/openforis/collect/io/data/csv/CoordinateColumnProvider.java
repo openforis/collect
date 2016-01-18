@@ -41,7 +41,7 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 		if ( getConfig().isIncludeKMLColumnForCoordinates() ) {
 			result.add(KML_FIELD_NAME);
 		}
-		return result.toArray(new String[]{});
+		return result.toArray(new String[result.size()]);
 	}
 
 	@Override

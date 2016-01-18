@@ -17,7 +17,6 @@ import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.exception.DataParsingExeption;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.commons.io.OpenForisIOUtils;
@@ -57,7 +56,7 @@ public class BackupDataExtractor implements Closeable {
 	public void init() throws ZipException, IOException {
 		this.fileExtractor = new BackupFileExtractor(zipFile);
 		this.oldFormat = this.fileExtractor.isOldFormat();
-		this.dataUnmarshaller = new DataUnmarshaller(new DataHandler(survey));
+		this.dataUnmarshaller = new DataUnmarshaller(survey);
 		this.zipEntries = zipFile.entries();
 		this.initialized = true;
 	}

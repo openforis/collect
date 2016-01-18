@@ -196,7 +196,7 @@ public class RDBPrintJob extends Job {
 //				}
 //			};
 				CodeTableDataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
-				setItemsProcessed(getItemsProcessed() + extractor.getTotal());
+				setProcessedItems(getProcessedItems() + extractor.getTotal());
 			}
 		}
 		
@@ -221,7 +221,7 @@ public class RDBPrintJob extends Job {
 					}
 					writeBatchInsert(table, DataExtractorFactory.getRecordDataExtractor(table, record));
 				}
-				incrementItemsProcessed();
+				incrementProcessedItems();
 			}
 		}
 		

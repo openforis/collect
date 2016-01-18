@@ -38,11 +38,9 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			DataRestoreSummaryTask t = (DataRestoreSummaryTask) task;
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
-			t.setFile(file);
+			t.setRecordProvider(recordProvider);
 			t.setOldFormat(oldBackupFormat);
-			t.setPackagedSurvey(packagedSurvey);
-			t.setExistingSurvey(publishedSurvey);
-			t.setPackagedSurvey(DataRestoreSummaryJob.this.packagedSurvey);
+			t.setSurvey(publishedSurvey);
 			t.setIncludeRecordPredicate(includeRecordPredicate);
 		}
 		super.initializeTask(task);

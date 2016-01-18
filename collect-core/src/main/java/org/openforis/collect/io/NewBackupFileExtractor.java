@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -14,8 +13,10 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.utils.Files;
+import org.openforis.collect.utils.ZipFiles;
+import org.openforis.concurrency.ProgressListener;
 
 /**
  * 
@@ -25,13 +26,12 @@ import org.openforis.collect.utils.Files;
 public class NewBackupFileExtractor implements Closeable {
 
 	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
-	private static final String ZIP_SEPARATOR_PATTERN = "[\\\\|/]";
-
+	
 	//input variables
 	private File file;
 	
-	private File tempUncompressedFolder;
 	//temporary variables
+	private transient File tempUncompressedFolder;
 	private transient ZipFile zipFile;
 
 	public NewBackupFileExtractor(File file) throws ZipException, IOException {
@@ -39,21 +39,13 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 
 	public void init() throws IOException {
+		init(null);
+	}
+	
+	public void init(ProgressListener progressListener) throws IOException {
 		tempUncompressedFolder = Files.createTempDirectory();
 		zipFile = new ZipFile(file);
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = entries.nextElement();
-			if (! zipEntry.isDirectory()) {
-				String entryName = zipEntry.getName();
-				File folder = getOrCreateEntryFolder(entryName);
-				String fileName = extractFileName(entryName);
-				File newFile = new File(folder, fileName);
-				newFile.createNewFile();
-				InputStream is = zipFile.getInputStream(zipEntry);
-				FileUtils.copyInputStreamToFile(is, newFile);
-			}
-		}
+		ZipFiles.extract(zipFile, tempUncompressedFolder, progressListener);
 	}
 	
 	public File extractInfoFile() {
@@ -79,31 +71,20 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 	
 	public File extract(String entryName, boolean required) {
-		File folder = getOrCreateEntryFolder(entryName);
-		String fileName = extractFileName(entryName);
+		File folder = ZipFiles.getOrCreateEntryFolder(tempUncompressedFolder, entryName);
+		String fileName = Files.extractFileName(entryName);
 		File result = new File(folder, fileName);
 		return result.exists() ? result: null;
 	}
 
-	public List<String> listFilesInFolder(String folderPath) {
-		List<String> result = new ArrayList<String>();
-		File folder = getOrCreateFolder(folderPath);
-		File[] files = folder.listFiles();
-		for (File file : files) {
-			result.add(file.getName());
-		}
-		Collections.sort(result);
-		return result;
-	}
-	
 	public List<String> listSpeciesEntryNames() {
-		List<String> entries = listFilesInFolder(SurveyBackupJob.SPECIES_FOLDER);
+		List<String> entries = Files.listFileNamesInFolder(tempUncompressedFolder, SurveyBackupJob.SPECIES_FOLDER);
 		return entries;
 	}
 	
 	public List<File> extractFilesInPath(String folder) throws IOException {
 		List<File> result = new ArrayList<File>();
-		List<String> entryNames = listFilesInFolder(folder);
+		List<String> entryNames = Files.listFileNamesInFolder(tempUncompressedFolder, folder);
 		for (String name : entryNames) {
 			File tempFile = extract(name);
 			result.add(tempFile);
@@ -130,6 +111,10 @@ public class NewBackupFileExtractor implements Closeable {
 		return ! fileNames.isEmpty();
 	}
 	
+	public List<String> listFilesInFolder(String path) {
+		return Files.listFileNamesInFolder(tempUncompressedFolder, path);
+	}
+	
 	public List<String> getEntryNames() {
 		List<String> result = new ArrayList<String>();
 		Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
@@ -154,35 +139,10 @@ public class NewBackupFileExtractor implements Closeable {
 		return zipFile.size();
 	}
 	
-	private File getOrCreateEntryFolder(String entryName) {
-		String path = FilenameUtils.getPathNoEndSeparator(entryName);
-		return getOrCreateFolder(path);
-	}
-
-	private File getOrCreateFolder(String path) {
-		String[] entryParts = path.split(ZIP_SEPARATOR_PATTERN);
-		File folder = tempUncompressedFolder;
-		for (int i = 0; i < entryParts.length; i++) {
-			String part = entryParts[i];
-			folder = new File(folder, part);
-		}
-		if (! folder.exists()) {
-			folder.mkdirs();
-		}
-		return folder;
-	}
-
-	private String extractFileName(String entryName) {
-		String name = FilenameUtils.getName(entryName);
-		return name;
-	}
-
 	@Override
 	public void close() throws IOException {
-		if (zipFile != null ) {
-			zipFile.close();
-		}
+		IOUtils.closeQuietly(zipFile);
 		FileUtils.deleteQuietly(tempUncompressedFolder);
 	}
-	
+
 }

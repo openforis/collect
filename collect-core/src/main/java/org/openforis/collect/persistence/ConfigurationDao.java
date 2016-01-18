@@ -11,12 +11,11 @@ import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
-import org.springframework.transaction.annotation.Transactional;
+import org.openforis.collect.persistence.jooq.tables.records.OfcConfigRecord;
 
 /**
  * @author S. Ricci
  */
-@Transactional
 public class ConfigurationDao extends JooqDaoSupport {
 	
 	public ConfigurationDao() {
@@ -26,10 +25,8 @@ public class ConfigurationDao extends JooqDaoSupport {
 	public Configuration load() {
 		Configuration c = new Configuration();
 		CollectDSLContext dsl = dsl();
-		Result<Record> fetch = dsl.select()
-				.from(OFC_CONFIG)
-				.fetch();
-		for (Record record : fetch) {
+		Result<OfcConfigRecord> result = dsl.selectFrom(OFC_CONFIG).fetch();
+		for (OfcConfigRecord record : result) {
 			String key = record.getValue(OFC_CONFIG.NAME);
 			String value = record.getValue(OFC_CONFIG.VALUE);
 			ConfigurationItem configurationItem = ConfigurationItem.fromKey(key);

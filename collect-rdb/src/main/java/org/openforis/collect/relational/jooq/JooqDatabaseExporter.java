@@ -5,6 +5,8 @@ import static org.jooq.impl.DSL.name;
 import static org.jooq.impl.DSL.table;
 import static org.openforis.collect.relational.data.internal.DataTableDataExtractor.getTableArtificialPK;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -16,12 +18,13 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.util.IOUtils;
+import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
-import org.jooq.DSLContext;
 import org.jooq.DeleteQuery;
 import org.jooq.Field;
-import org.jooq.InsertQuery;
 import org.jooq.InsertSetMoreStep;
+import org.jooq.InsertValuesStepN;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
@@ -57,62 +60,62 @@ import org.openforis.idm.metamodel.NodeDefinition;
  * @author S. Ricci
  *
  */
-public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
+public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Closeable {
 	
 	private static final Log LOG = LogFactory.getLog(JooqDatabaseExporter.class);
 	
-	private DSLContext dsl;
+	private CollectDSLContext dsl;
+	private RelationalSchema schema;
+	private BatchQueryExecutor batchExecutor;
 	
-	public JooqDatabaseExporter(Connection connection) {
-		this(new CollectDSLContext(connection));
+	public JooqDatabaseExporter(RelationalSchema schema, Connection connection) {
+		this(schema, new CollectDSLContext(connection));
 	}
 
-	public JooqDatabaseExporter(Configuration conf) {
-		this(new CollectDSLContext(conf));
+	public JooqDatabaseExporter(RelationalSchema schema, Configuration conf) {
+		this(schema, new CollectDSLContext(conf));
 	}
 	
-	public JooqDatabaseExporter(DSLContext dsl) {
+	public JooqDatabaseExporter(RelationalSchema schema, CollectDSLContext dsl) {
+		this.schema = schema;
 		this.dsl = dsl;
+		this.batchExecutor = new BatchQueryExecutor(schema, ProgressListener.NULL_PROGRESS_LISTENER);
 	}
 
 	@Override
-	public void insertReferenceData(RelationalSchema schema, ProgressListener progressListener) {
-		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema, ProgressListener.NULL_PROGRESS_LISTENER);
+	public void insertReferenceData(ProgressListener progressListener) {
 		List<CodeTable> codeListTables = schema.getCodeListTables();
 		long totalItems = codeListTables.size();
 		long processedItems = 0;
 		for (CodeTable codeTable : codeListTables) {
 			DataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
-			batchExecutor.addInserts(extractor);
+			batchExecutor.executeInserts(extractor);
 			processedItems++;
 			progressListener.progressMade(new Progress(processedItems, totalItems));
 		}
-		batchExecutor.flush();
 	}
 
 	@Override
-	public void insertRecordData(RelationalSchema schema, CollectRecord record, ProgressListener progressListener) {
-		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema, progressListener);
+	public void insertRecordData(CollectRecord record, ProgressListener progressListener) {
 		for (DataTable table : schema.getDataTables()) {
 			DataExtractor extractor = DataExtractorFactory.getRecordDataExtractor(table, record);
 			batchExecutor.addInserts(extractor);
 		}
-		batchExecutor.flush();
 	}
 
 	@Override
-	public void insertEntity(RelationalSchema schema, int recordId, 
+	public void insertEntity(int recordId, 
 			Integer parentId, int entityId, int entityDefinitionId) {
-		insertNode(schema, recordId, parentId, entityId, entityDefinitionId);
+		insertNode(recordId, parentId, entityId, entityDefinitionId);
 	}
 
 	@Override
-	public void insertAttribute(RelationalSchema schema, int recordId,
+	public void insertAttribute(int recordId,
 			Integer parentId, int attributeId, int attributeDefinitionId) {
-		insertNode(schema, recordId, parentId, attributeId, attributeDefinitionId);
+		insertNode(recordId, parentId, attributeId, attributeDefinitionId);
 	}
 	
-	private void insertNode(RelationalSchema schema, int recordId,
+	private void insertNode(int recordId,
 			Integer parentId, int nodeId, int nodeDefinitionId) {
 		DataTable table = schema.getDataTableByDefinitionId(nodeDefinitionId);
 		NodeDefinition nodeDef = table.getNodeDefinition();
@@ -177,38 +180,34 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	private List<Field<?>> toFields(List<? extends Column<?>> columns) {
 		List<Field<?>> ancestorColumns = new ArrayList<Field<?>>(columns.size());
 		for (Column<?> column : columns) {
-			ancestorColumns.add(field(column.getName()));
+			ancestorColumns.add(field(column.getName(), dsl.getDataType(column.getType().getJavaType())));
 		}
 		return ancestorColumns;
 	}
 	
 	@Override
-	public void replaceRecordData(RelationalSchema schema, CollectRecord record, ProgressListener progressListener) {
-		deleteRecordData(schema, record.getId(), record.getRootEntity().getDefinition().getId());
-		insertRecordData(schema, record, progressListener);
+	public void replaceRecordData(CollectRecord record, ProgressListener progressListener) {
+		deleteRecordData(record.getId(), record.getRootEntity().getDefinition().getId());
+		insertRecordData(record, progressListener);
 	}
 	
 	@Override
-	public void updateEntityData(RelationalSchema rdbSchema, DataTable dataTable,
+	public void updateEntityData(DataTable dataTable,
 			BigInteger pkValue,
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
-		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(rdbSchema);
 		batchExecutor.addUpdate(dataTable, pkValue, columnValuePairs);
-		batchExecutor.flush();
 	}
 	
 	@Override
-	public void deleteRecordData(RelationalSchema schema, int recordId, int rootDefId) {
-		deleteEntity(schema, recordId, recordId, rootDefId);
+	public void deleteRecordData(int recordId, int rootDefId) {
+		deleteEntity(recordId, recordId, rootDefId);
 	}
 	
 	@Override
-	public void deleteEntity(RelationalSchema schema, int recordId, int entityId, int entityDefinitionId) {
+	public void deleteEntity(int recordId, int entityId, int entityDefinitionId) {
 		DataTable tableToDeleteFor = schema.getDataTableByDefinitionId(entityDefinitionId);
 		EntityDefinition entityDefToDeleteFor = (EntityDefinition) tableToDeleteFor.getNodeDefinition();
 		BigInteger pkValue = getTableArtificialPK(recordId, entityDefToDeleteFor, entityId);
-		
-		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
 		
 		//delete data from the actual table
 		batchExecutor.addDelete(tableToDeleteFor, tableToDeleteFor.getPrimaryKeyColumn(), pkValue);
@@ -220,22 +219,24 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			DataAncestorFKColumn ancestorIdColumn = dataTable.getAncestorFKColumn(entityDefinitionId);
 			batchExecutor.addDelete(dataTable, ancestorIdColumn, pkValue);
 		}
-		batchExecutor.flush();
 	}
 	
 	@Override
-	public void deleteAttribute(RelationalSchema schema, int recordId,
+	public void deleteAttribute(int recordId,
 			int attributeId, int definitionId) {
 		DataTable tableToDeleteFor = schema.getDataTableByDefinitionId(definitionId);
 		NodeDefinition defToDeleteFor = tableToDeleteFor.getNodeDefinition();
 		BigInteger pkValue = getTableArtificialPK(recordId, defToDeleteFor, attributeId);
 		
-		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
 		batchExecutor.addDelete(tableToDeleteFor, tableToDeleteFor.getPrimaryKeyColumn(), pkValue);
-		batchExecutor.flush();
 	}
 	
-	private class BatchQueryExecutor {
+	@Override
+	public void close() throws IOException {
+		IOUtils.closeQuietly(batchExecutor);
+	}
+	
+	private class BatchQueryExecutor implements Closeable {
 		
 		private static final int BATCH_MAX_SIZE = 500;
 		
@@ -243,10 +244,6 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		private QueryCreator queryCreator;
 		private ProgressListener progressListener;
 		private long processedQueries;
-		
-		public BatchQueryExecutor(RelationalSchema schema) {
-			this(schema, null);
-		}
 		
 		public BatchQueryExecutor(RelationalSchema schema, ProgressListener progressListener) {
 			this.progressListener = progressListener;
@@ -259,6 +256,18 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 				Row row = extractor.next();
 				addInsert(row);
 			}
+		}
+		
+		public void executeInserts(DataExtractor extractor) {
+			Table<?> table = extractor.getTable();
+			Object[] valuesPlaceholders = new Object[table.getColumns().size()];
+			InsertValuesStepN<Record> insertQuery = queryCreator.createInsertQuery(table).values(valuesPlaceholders);
+			BatchBindStep batch = dsl.batch(insertQuery);
+			while(extractor.hasNext()) {
+				Row row = extractor.next();
+				batch.bind(row.getValues().toArray(new Object[row.getValues().size()]));
+			}
+			batch.execute();
 		}
 
 		public void addInsert(Row row) {
@@ -300,6 +309,11 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 				throw new RuntimeException(e);
 			}
 		}
+		
+		@Override
+		public void close() throws IOException {
+			flush();
+		}
 
 		private void notifyProgressListener() {
 			if (progressListener != null) {
@@ -310,27 +324,26 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	
 	private class QueryCreator {
 		
-		private final DSLContext dsl;
+		private final CollectDSLContext dsl;
 		private final String schemaName;
 		
-		public QueryCreator(DSLContext dsl, String schemaName) {
+		public QueryCreator(CollectDSLContext dsl, String schemaName) {
 			super();
 			this.dsl = dsl;
 			this.schemaName = schemaName;
 		}
 
-		public InsertQuery<Record> createInsertQuery(Row row) {
+		public InsertValuesStepN<Record> createInsertQuery(Row row) {
 			Table<?> table = row.getTable();
-			InsertQuery<Record> insert = dsl.insertQuery(getJooqTable(table));
+			InsertValuesStepN<Record> insert = createInsertQuery(table);
 			List<Object> values = row.getValues();
-			List<Column<?>> cols = table.getColumns();
-			for (int i = 0; i < cols.size(); i++) {
-				Object val = values.get(i);
-				if ( val != null ) {
-					String col = cols.get(i).getName();
-					insert.addValue(field(name(col)), val);
-				}
-			}
+			insert.values(values);
+			return insert;
+		}
+		
+		public InsertValuesStepN<Record> createInsertQuery(Table<?> table) {
+			List<Field<?>> fields = toFields(table.getColumns());
+			InsertValuesStepN<Record> insert = dsl.insertInto(getJooqTable(table), fields);
 			return insert;
 		}
 		
@@ -354,7 +367,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			if ( isSchemaLess() ) {
 				return table(name(table.getName()));
 			} else {
-				return table(schemaName, table.getName());
+				return table(name(schemaName, table.getName()));
 			}
 		}
 		

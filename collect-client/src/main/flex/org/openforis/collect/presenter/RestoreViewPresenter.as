@@ -112,12 +112,14 @@ package org.openforis.collect.presenter {
 				return;
 			}
 			var message:String;
+			var messageArgs:Array = null;
 			if (selectedSurveyInfo != null && selectedSurveyInfo.updatedRecordsSinceBackup > 0) {
 				message = "restore.confirm.not_backed_up_records";
+				messageArgs = [selectedSurveyInfo.updatedRecordsSinceBackup];
 			} else {
 				message = "restore.confirm.message";
 			}
-			AlertUtil.showConfirm(message, null, 
+			AlertUtil.showConfirm(message, messageArgs, 
 				"Confirm data restore",
 				startUpload);
 		}
@@ -239,6 +241,8 @@ package org.openforis.collect.presenter {
 			stopProgressTimer();
 			_job = null;
 			view.currentState = RestoreView.STATE_PARAMETER_SELECTION;
+			view.validateRecordsCheckBox.selected = true;
+			view.deleteAllExistingRecordsCheckBox.selected = false;
 			checkEnabledFields();
 		}
 		
@@ -299,6 +303,9 @@ package org.openforis.collect.presenter {
 			//request paramters
 			request.data = new URLVariables();
 			request.data.name = _fileReference.name;
+			request.data.validateRecords = view.validateRecordsCheckBox.selected;
+			request.data.deleteAllRecords = view.deleteAllExistingRecordsCheckBox.selected;
+
 			var surveyName:String = getSelectedSurveyName();
 			if (surveyName != null) {
 				request.data.surveyName = surveyName;

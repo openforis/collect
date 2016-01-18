@@ -3,6 +3,8 @@ package org.openforis.collect.util {
 	import org.granite.collections.BasicMap;
 	import org.openforis.collect.io.data.DataExportStatus$Format;
 	import org.openforis.collect.io.data.proxy.DataExportStatusProxy;
+	import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
+	import org.openforis.collect.io.data.proxy.DataParsingErrorProxy;
 	import org.openforis.collect.io.data.proxy.RecordImportErrorProxy;
 	import org.openforis.collect.manager.process.ProcessStatus;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
@@ -108,8 +110,10 @@ package org.openforis.collect.util {
 				DataExportStatus$Format,
 				DataExportStatusProxy,
 				DataImportStateProxy,
+				DataImportStatusProxy,
 				DataImportSummaryProxy,
 				DataImportSummaryItemProxy,
+				DataParsingErrorProxy,
 				DateAttributeDefinitionProxy,
 				EntityAddChangeProxy,
 				EntityDefinitionProxy,

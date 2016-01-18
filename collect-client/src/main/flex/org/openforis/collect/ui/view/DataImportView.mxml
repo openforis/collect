@@ -122,9 +122,14 @@
 				<s:TextInput id="surveyNameTextInput" editable="false" width="300"
 							 editable.summaryCreationCompleteNewSurvey="true" />
 			</s:FormItem>
-			<s:FormItem label="{Message.get('dataImport.validateRecords')}">
-				<s:CheckBox id="validateRecordsCheckBox" selected="true" />
-			</s:FormItem>
+			<s:HGroup>
+				<s:FormItem label="{Message.get('dataImport.validateRecords')}">
+					<s:CheckBox id="validateRecordsCheckBox" selected="true" />
+				</s:FormItem>
+				<s:FormItem label="{Message.get('dataImport.processInTransaction')}">
+					<s:CheckBox id="processInTransactionCheckBox" selected="true" />
+				</s:FormItem>
+			</s:HGroup>
 		</s:Form>
 		
 		<s:VGroup id="conflictsContainer" 

@@ -4,13 +4,13 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_VERNACU
 import static org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;
 import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
+import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
@@ -24,14 +24,12 @@ import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonVernacularNameRecord;
 import org.openforis.idm.model.species.TaxonVernacularName;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  * @author S. Ricci
  * @author E. Wibowo
  */
-@Transactional
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.TaxonVernacularNameDSLContext> {
 	
@@ -192,8 +190,8 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 
 		private static final long serialVersionUID = 1L;
 
-		public TaxonVernacularNameDSLContext(Connection connection) {
-			super(connection, OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ, TaxonVernacularName.class);
+		public TaxonVernacularNameDSLContext(Configuration config) {
+			super(config, OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ, TaxonVernacularName.class);
 		}
 
 		@Override

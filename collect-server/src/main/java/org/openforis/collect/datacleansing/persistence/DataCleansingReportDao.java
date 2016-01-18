@@ -4,10 +4,10 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_CLEANSIN
 import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChain.OFC_DATA_CLEANSING_CHAIN;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingReport.OFC_DATA_CLEANSING_REPORT;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.Select;
@@ -73,12 +73,12 @@ public class DataCleansingReportDao extends SurveyObjectMappingJooqDaoSupport<Da
 
 		private static final long serialVersionUID = 1L;
 		
-		public JooqDSLContext(Connection connection) {
-			this(connection, null);
+		public JooqDSLContext(Configuration config) {
+			this(config, null);
 		}
 		
-		public JooqDSLContext(Connection connection, CollectSurvey survey) {
-			super(connection, OFC_DATA_CLEANSING_REPORT.ID, OFC_DATA_CLEANSING_REPORT_ID_SEQ, DataCleansingReport.class, survey);
+		public JooqDSLContext(Configuration config, CollectSurvey survey) {
+			super(config, OFC_DATA_CLEANSING_REPORT.ID, OFC_DATA_CLEANSING_REPORT_ID_SEQ, DataCleansingReport.class, survey);
 		}
 		
 		@Override

@@ -6,7 +6,7 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
+import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 
 /**
  * 

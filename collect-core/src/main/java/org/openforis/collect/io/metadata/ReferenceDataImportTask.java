@@ -49,7 +49,7 @@ public abstract class ReferenceDataImportTask<E extends ParsingError> extends Ta
 	}
 	
 	protected synchronized void addProcessedRow(long rowNumber) {
-		incrementItemsProcessed();
+		incrementProcessedItems();
 		processedRows.add(rowNumber);
 	}
 	
