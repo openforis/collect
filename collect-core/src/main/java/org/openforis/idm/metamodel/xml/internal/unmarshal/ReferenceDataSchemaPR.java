@@ -36,8 +36,7 @@ class ReferenceDataSchemaPR extends IdmlPullReader {
 			XmlPullParserException, IOException {
 		super.onStartTag();
 		SurveyUnmarshaller parentReader = (SurveyUnmarshaller) getParentReader();
-		this.referenceDataSchema = new ReferenceDataSchema();
-		parentReader.survey.setReferenceDataSchema(this.referenceDataSchema);
+		this.referenceDataSchema = parentReader.survey.getReferenceDataSchema();
 	}
 
 	private abstract class ReferenceDataPR<T extends ReferenceDataDefinition> extends IdmlPullReader {

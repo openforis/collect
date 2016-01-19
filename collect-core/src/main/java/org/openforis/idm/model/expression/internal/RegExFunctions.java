@@ -2,6 +2,7 @@ package org.openforis.idm.model.expression.internal;
 
 import static java.util.regex.Pattern.*;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,13 +19,13 @@ public class RegExFunctions extends CustomFunctions {
 	public RegExFunctions(String namespace) {
 		super(namespace);
 		
-		register("test", 2, new CustomFunction() {
+		register("test", new CustomFunction(Arrays.asList(2)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return test((String) objects[0], (String) objects[1]);
 			}
 		});
 
-		register("test", 3, new CustomFunction() {
+		register("test", new CustomFunction(Arrays.asList(3)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return test((String) objects[0], (String) objects[1], (String) objects[2]);
 			}

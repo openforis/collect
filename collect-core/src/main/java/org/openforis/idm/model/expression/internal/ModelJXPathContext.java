@@ -13,6 +13,7 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyObject;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.expression.ExpressionFactory;
 
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	private LookupProvider lookupProvider;
 	private final Map<String, Object> compiled;
 	private static volatile ModelJXPathContext compilationContext;
+	private ExpressionFactory expressionFactory;
 	private ReferencedPathEvaluator referencedPathEvaluator;
 	private Survey survey;
 
@@ -48,18 +50,22 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	}
 
 	/**
-	 * Compiles the supplied XPath and returns an internal representation
-	 * of the path that can then be evaluated.  Use CompiledExpressions
-	 * when you need to evaluate the same expression multiple times
-	 * and there is a convenient place to cache CompiledExpression
-	 * between invocations.
+	 * Compiles the supplied XPath and returns an internal representation of the
+	 * path that can then be evaluated. Use CompiledExpressions when you need to
+	 * evaluate the same expression multiple times and there is a convenient
+	 * place to cache CompiledExpression between invocations.
+	 * 
+	 * @param expressionFactory
 	 *
-	 * @param xpath to compile
+	 * @param xpath
+	 *            to compile
 	 * @return CompiledExpression
 	 */
-	public synchronized static CompiledExpression compile(ReferencedPathEvaluator referencedPathEvaluator, String xpath, boolean normalizeNumbers) {
+	public synchronized static CompiledExpression compile(ExpressionFactory expressionFactory,
+			ReferencedPathEvaluator referencedPathEvaluator, String xpath, boolean normalizeNumbers) {
 		if (compilationContext == null) {
 			compilationContext = (ModelJXPathContext) JXPathContext.newContext(null);
+			compilationContext.expressionFactory = expressionFactory;
 			compilationContext.referencedPathEvaluator = referencedPathEvaluator;
 		}
 		ModelJXPathCompiledExpression compiledExpression = compilationContext.compilePath(xpath, normalizeNumbers);
@@ -87,7 +93,8 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 
 	private ModelJXPathCompiledExpression compilePath(String xpath, boolean normalizeNumbers) {
 		Expression expr = compileExpression(xpath, normalizeNumbers);
-		ModelJXPathCompiledExpression compiledExpression = new ModelJXPathCompiledExpression(referencedPathEvaluator, xpath, expr);
+		ModelJXPathCompiledExpression compiledExpression = new ModelJXPathCompiledExpression(expressionFactory,
+				referencedPathEvaluator, xpath, expr);
 		return compiledExpression;
 	}
 
@@ -95,7 +102,7 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	protected Compiler getCompiler() {
 		return new ModelTreeCompiler();
 	}
-	
+
 	protected Compiler getCompiler(boolean normalizeNumbers) {
 		ModelTreeCompiler compiler = (ModelTreeCompiler) getCompiler();
 		if (normalizeNumbers) {

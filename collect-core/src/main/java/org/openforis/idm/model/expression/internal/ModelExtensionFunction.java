@@ -53,14 +53,19 @@ public class ModelExtensionFunction extends ExtensionFunction {
 		return result;
 	}
 
-	protected String getPrefix() {
+	public String getPrefix() {
 		QName functionName = getFunctionName();
 		return functionName.getPrefix();
 	}
 
-	protected String getName() {
+	public String getName() {
 		QName functionName = getFunctionName();
 		return functionName.getName();
+	}
+
+	public String getFullName() {
+		QName functionName = getFunctionName();
+		return functionName.getPrefix() + ":" + functionName.getName();
 	}
 
 	/**

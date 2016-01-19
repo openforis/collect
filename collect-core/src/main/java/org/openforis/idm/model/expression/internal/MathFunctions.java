@@ -1,12 +1,13 @@
 package org.openforis.idm.model.expression.internal;
 
-import org.apache.commons.jxpath.ExpressionContext;
-import org.apache.commons.lang3.ObjectUtils;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.jxpath.ExpressionContext;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * @author S. Ricci
@@ -16,72 +17,72 @@ public class MathFunctions extends CustomFunctions {
 
 	public MathFunctions(String namespace) {
 		super(namespace);
-		register("PI", 0, new CustomFunction() {
+		register("PI", new CustomFunction(Arrays.asList(0)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return PI();
 			}
 		});
-		register("abs", 1, new SingleArgMathFunction() {
+		register("abs", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return abs(number);
 			}
 		});
-		register("pow", 2, new CustomFunction() {
+		register("pow", new CustomFunction(Arrays.asList(2)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return pow(objects[0], objects[1]);
 			}
 		});
-		register("min", 1, new CustomFunction() {
+		register("min", new CustomFunction(Arrays.asList(1)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return min(objects[0]);
 			}
 		});
-		register("max", 1, new CustomFunction() {
+		register("max", new CustomFunction(Arrays.asList(1)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return max(objects[0]);
 			}
 		});
-		register("rad", 1, new SingleArgMathFunction() {
+		register("rad", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return rad(number);
 			}
 		});
-		register("deg", 1, new SingleArgMathFunction() {
+		register("deg", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return deg(number);
 			}
 		});
-		register("sin", 1, new SingleArgMathFunction() {
+		register("sin", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return sin(number);
 			}
 		});
-		register("sinrad", 1, new SingleArgMathFunction() {
+		register("sinrad", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return sinrad(number);
 			}
 		});
-		register("cos", 1, new SingleArgMathFunction() {
+		register("cos", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return cos(number);
 			}
 		});
-		register("cosrad", 1, new SingleArgMathFunction() {
+		register("cosrad", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return cosrad(number);
 			}
 		});
-		register("tan", 1, new SingleArgMathFunction() {
+		register("tan", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return tan(number);
 			}
 		});
-		register("tanrad", 1, new SingleArgMathFunction() {
+		register("tanrad", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return tanrad(number);
 			}
 		});
-		register("tanrad", 1, new SingleArgMathFunction() {
+		register("tanrad", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return tanrad(number);
 			}
@@ -206,6 +207,11 @@ public class MathFunctions extends CustomFunctions {
 
 
 	private abstract static class SingleArgMathFunction extends CustomFunction {
+		
+		public SingleArgMathFunction() {
+			super(Arrays.asList(1));
+		}
+		
 		@SuppressWarnings("unchecked")
 		public final Object invoke(ExpressionContext context, Object[] objects) {
 			Object numberOrNumbers = objects[0];

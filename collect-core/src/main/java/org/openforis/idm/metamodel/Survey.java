@@ -65,6 +65,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	protected Survey(SurveyContext surveyContext) {
 		this.surveyContext = surveyContext;
 		this.schema = new Schema(this);
+		this.referenceDataSchema = new ReferenceDataSchema();
 		this.lastId = 1;
 		this.creationDate = this.modifiedDate = new Date();
 	}
