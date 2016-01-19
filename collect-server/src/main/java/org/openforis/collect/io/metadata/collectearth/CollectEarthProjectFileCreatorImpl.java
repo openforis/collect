@@ -368,7 +368,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	}
 	
 	private File generateCube(CollectSurvey survey, String language) throws IOException {
-		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey, language, SAIKU_SCHEMA_PLACEHOLDER, new RelationalSchemaContext().getRdbConfig());
+		MondrianSchemaGenerator cubeGenerator = new MondrianSchemaGenerator(survey, language, SAIKU_SCHEMA_PLACEHOLDER, new RelationalSchemaContext().getRdbConfig());
 		String xmlSchema = cubeGenerator.generateXMLSchema();
 		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
 	}

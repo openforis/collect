@@ -35,7 +35,6 @@ import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.event.TaxonAttributeUpdatedEvent;
 import org.openforis.collect.event.TextAttributeUpdatedEvent;
 import org.openforis.collect.event.TimeAttributeUpdatedEvent;
-import org.openforis.collect.io.metadata.collectearth.MondrianCubeGenerator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
@@ -51,6 +50,7 @@ import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.collect.relational.mondrian.Mondrian4SchemaGenerator;
 import org.openforis.collect.reporting.MondrianSchemaStorageManager;
 import org.openforis.collect.reporting.ReportingRepositories;
 import org.openforis.collect.reporting.SaikuDatasourceStorageManager;
@@ -329,7 +329,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	
 	private void initializeMondrianSchemaDefinition(CollectSurvey survey) {
 		try {
-			MondrianCubeGenerator schemaGenerator = new MondrianCubeGenerator(survey, survey.getDefaultLanguage(), "");
+			Mondrian4SchemaGenerator schemaGenerator = new Mondrian4SchemaGenerator(survey, rdbConfig);
 			String mondrianSchema = schemaGenerator.generateXMLSchema();
 			mondrianSchemaDefinitionBySurvey.put(survey.getName(), mondrianSchema);
 		} catch(CollectRdbException e) {

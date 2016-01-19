@@ -41,7 +41,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  * @author A. Sanchez-Paus Diaz
  *
  */
-public class MondrianCubeGenerator {
+public class MondrianSchemaGenerator {
 	
 	private static final String[] MEASURE_AGGREGATORS = new String[] {"min", "max", "avg", "sum"};
 	
@@ -51,11 +51,11 @@ public class MondrianCubeGenerator {
 	private String dbSchemaName;
 	private RelationalSchema rdbSchema;
 
-	public MondrianCubeGenerator(CollectSurvey survey, String language, String dbSchemaName) {
+	public MondrianSchemaGenerator(CollectSurvey survey, String language, String dbSchemaName) {
 		this(survey, language, dbSchemaName, RelationalSchemaConfig.createDefault());
 	}
 	
-	public MondrianCubeGenerator(CollectSurvey survey, String language, String dbSchemaName, RelationalSchemaConfig rdbConfig) {
+	public MondrianSchemaGenerator(CollectSurvey survey, String language, String dbSchemaName, RelationalSchemaConfig rdbConfig) {
 		this.survey = survey;
 		this.language = language;
 		this.rdbConfig = rdbConfig;
@@ -87,9 +87,9 @@ public class MondrianCubeGenerator {
 	}
 	
 	public String generateXMLSchema() {
-		MondrianCubeGenerator.Schema mondrianSchema = generateSchema();
+		MondrianSchemaGenerator.Schema mondrianSchema = generateSchema();
 		XStream xStream = new XStream();
-		xStream.processAnnotations(MondrianCubeGenerator.Schema.class);
+		xStream.processAnnotations(MondrianSchemaGenerator.Schema.class);
 		String xmlSchema = xStream.toXML(mondrianSchema);
 		return xmlSchema;
 	}

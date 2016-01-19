@@ -6,6 +6,29 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.relational.model.CodeTable;
+import org.openforis.collect.relational.model.CodeValueFKColumn;
+import org.openforis.collect.relational.model.DataColumn;
+import org.openforis.collect.relational.model.DataTable;
+import org.openforis.collect.relational.model.PrimaryKeyConstraint;
+import org.openforis.collect.relational.model.ReferentialConstraint;
+import org.openforis.collect.relational.model.RelationalSchema;
+import org.openforis.collect.relational.model.RelationalSchemaConfig;
+import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.collect.relational.model.UniquenessConstraint;
+import org.openforis.collect.relational.util.CodeListTables;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeLabel;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
+
+import com.thoughtworks.xstream.XStream;
+
 import mondrian.olap.MondrianDef;
 import mondrian.olap.MondrianDef.Attribute;
 import mondrian.olap.MondrianDef.Attributes;
@@ -30,27 +53,6 @@ import mondrian.olap.MondrianDef.NoLink;
 import mondrian.olap.MondrianDef.PhysicalSchema;
 import mondrian.olap.MondrianDef.Table;
 import mondrian.rolap.RolapAggregator;
-
-import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.relational.model.CodeTable;
-import org.openforis.collect.relational.model.CodeValueFKColumn;
-import org.openforis.collect.relational.model.DataColumn;
-import org.openforis.collect.relational.model.DataTable;
-import org.openforis.collect.relational.model.PrimaryKeyConstraint;
-import org.openforis.collect.relational.model.ReferentialConstraint;
-import org.openforis.collect.relational.model.RelationalSchema;
-import org.openforis.collect.relational.model.RelationalSchemaConfig;
-import org.openforis.collect.relational.model.RelationalSchemaGenerator;
-import org.openforis.collect.relational.model.UniquenessConstraint;
-import org.openforis.collect.relational.util.CodeListTables;
-import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.DateAttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.FieldDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NodeLabel;
-import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * 
@@ -87,6 +89,14 @@ public class Mondrian4SchemaGenerator {
 			schema.children.addAll(createCubes(rootEntityDef));
 		}
 		return schema;
+	}
+	
+	public String generateXMLSchema() {
+		MondrianDef.Schema schema = generateSchema();
+		XStream xStream = new XStream();
+		xStream.processAnnotations(MondrianDef.Schema.class);
+		String xmlSchema = xStream.toXML(schema);
+		return xmlSchema;
 	}
 
 	private List<Cube> createCubes(EntityDefinition entityDef) {
