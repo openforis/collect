@@ -14,14 +14,14 @@ import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionVali
 
 public abstract class CustomFunction implements Function {
 	private final Set<String> referencedPaths;
-	private List<Integer> supportedArgumentCounts;
+	private final List<Integer> supportedArgumentCounts;
 
 	/**
 	 * Create a custom function, optionally including paths that are referenced
 	 * independent on any parameters passed to the function.
 	 */
-	public CustomFunction(String... referencedPaths) {
-		this(Arrays.asList(0), referencedPaths);
+	public CustomFunction(int supportedArgumentCount, String... referencedPaths) {
+		this(Arrays.asList(supportedArgumentCount), referencedPaths);
 	}
 
 	public CustomFunction(List<Integer> supportedArgumentCounts, String... referencedPaths) {

@@ -1,7 +1,6 @@
 package org.openforis.idm.model.expression.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -17,7 +16,7 @@ public class MathFunctions extends CustomFunctions {
 
 	public MathFunctions(String namespace) {
 		super(namespace);
-		register("PI", new CustomFunction(Arrays.asList(0)) {
+		register("PI", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return PI();
 			}
@@ -27,17 +26,17 @@ public class MathFunctions extends CustomFunctions {
 				return abs(number);
 			}
 		});
-		register("pow", new CustomFunction(Arrays.asList(2)) {
+		register("pow", new CustomFunction(2) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return pow(objects[0], objects[1]);
 			}
 		});
-		register("min", new CustomFunction(Arrays.asList(1)) {
+		register("min", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return min(objects[0]);
 			}
 		});
-		register("max", new CustomFunction(Arrays.asList(1)) {
+		register("max", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return max(objects[0]);
 			}
@@ -209,7 +208,7 @@ public class MathFunctions extends CustomFunctions {
 	private abstract static class SingleArgMathFunction extends CustomFunction {
 		
 		public SingleArgMathFunction() {
-			super(Arrays.asList(1));
+			super(1);
 		}
 		
 		@SuppressWarnings("unchecked")

@@ -22,17 +22,15 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  */
 public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
 	
-	private final ReferencedPathEvaluator referencedPathEvaluator;
 	private ExpressionFactory expressionFactory;
 
-	public ModelJXPathCompiledExpression(ExpressionFactory expressionFactory, ReferencedPathEvaluator referencedPathEvaluator, String xpath, Expression expression) {
+	public ModelJXPathCompiledExpression(ExpressionFactory expressionFactory, String xpath, Expression expression) {
 		super(xpath, expression);
 		this.expressionFactory = expressionFactory;
-		this.referencedPathEvaluator = referencedPathEvaluator;
 	}
 
 	public Set<String> getReferencedPaths() {
-		return referencedPathEvaluator.determineReferencedPaths(getExpression());
+		return expressionFactory.getReferencedPathEvaluator().determineReferencedPaths(getExpression());
 	}
 
 	public ExpressionValidationResult validate(final NodeDefinition contextNodeDef) {

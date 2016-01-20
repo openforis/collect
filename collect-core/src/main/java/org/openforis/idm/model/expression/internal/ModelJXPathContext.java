@@ -3,7 +3,12 @@
  */
 package org.openforis.idm.model.expression.internal;
 
-import org.apache.commons.jxpath.CompiledExpression;
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.Compiler;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
@@ -14,12 +19,6 @@ import org.openforis.idm.metamodel.SurveyObject;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.expression.ExpressionFactory;
-
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author M. Togna
@@ -36,7 +35,6 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	private final Map<String, Object> compiled;
 	private static volatile ModelJXPathContext compilationContext;
 	private ExpressionFactory expressionFactory;
-	private ReferencedPathEvaluator referencedPathEvaluator;
 	private Survey survey;
 
 	protected ModelJXPathContext(JXPathContext parentContext, Object contextNode) {
@@ -61,12 +59,11 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	 *            to compile
 	 * @return CompiledExpression
 	 */
-	public synchronized static CompiledExpression compile(ExpressionFactory expressionFactory,
-			ReferencedPathEvaluator referencedPathEvaluator, String xpath, boolean normalizeNumbers) {
+	public synchronized static ModelJXPathCompiledExpression compile(ExpressionFactory expressionFactory,
+			String xpath, boolean normalizeNumbers) {
 		if (compilationContext == null) {
 			compilationContext = (ModelJXPathContext) JXPathContext.newContext(null);
 			compilationContext.expressionFactory = expressionFactory;
-			compilationContext.referencedPathEvaluator = referencedPathEvaluator;
 		}
 		ModelJXPathCompiledExpression compiledExpression = compilationContext.compilePath(xpath, normalizeNumbers);
 		return compiledExpression;
@@ -93,8 +90,7 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 
 	private ModelJXPathCompiledExpression compilePath(String xpath, boolean normalizeNumbers) {
 		Expression expr = compileExpression(xpath, normalizeNumbers);
-		ModelJXPathCompiledExpression compiledExpression = new ModelJXPathCompiledExpression(expressionFactory,
-				referencedPathEvaluator, xpath, expr);
+		ModelJXPathCompiledExpression compiledExpression = new ModelJXPathCompiledExpression(expressionFactory, xpath, expr);
 		return compiledExpression;
 	}
 

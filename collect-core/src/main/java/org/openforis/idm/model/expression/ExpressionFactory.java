@@ -123,10 +123,6 @@ public class ExpressionFactory {
 		}
 	}
 
-	public LookupProvider getLookupProvider() {
-		return lookupProvider;
-	}
-
 	public boolean isValidFunction(String namespace, String functionName) {
 		boolean inDefaultNamespace = StringUtils.isBlank(namespace);
 		if (inDefaultNamespace) {
@@ -191,8 +187,7 @@ public class ExpressionFactory {
 		if (compiled == null) {
 			try {
 				String normalizedExpression = Path.getNormalizedPath(expression);
-				compiled = (ModelJXPathCompiledExpression) ModelJXPathContext.compile(this, referencedPathEvaluator,
-						normalizedExpression, normalizeNumber);
+				compiled = ModelJXPathContext.compile(this, normalizedExpression, normalizeNumber);
 				COMPILED_EXPRESSIONS.put(key, compiled);
 			} catch (JXPathInvalidSyntaxException e) {
 				throw new InvalidExpressionException(e.getMessage());
@@ -202,6 +197,14 @@ public class ExpressionFactory {
 		return compiled;
 	}
 
+	public LookupProvider getLookupProvider() {
+		return lookupProvider;
+	}
+
+	public ReferencedPathEvaluator getReferencedPathEvaluator() {
+		return referencedPathEvaluator;
+	}
+	
 	private static class ExpressionKey {
 
 		private String expression;

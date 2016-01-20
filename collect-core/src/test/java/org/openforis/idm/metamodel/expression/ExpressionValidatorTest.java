@@ -24,27 +24,27 @@ import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionVali
  * @author S. Ricci
  *
  */
-public class ExpressionValidatorTest extends AbstractTest {
+public class ExpressionValidatorTest {
 	
-	private ExpressionValidator validator;
+//	private ExpressionValidator validator;
 	
 
-	@Before
-	public void init() {
-		validator = new ExpressionValidator(survey.getContext().getExpressionFactory());
-	}
+//	@Before
+//	public void init() {
+//		validator = new ExpressionValidator(survey.getContext().getExpressionFactory());
+//	}
 	
-	@Test
-	@Ignore
-	public void testCircularDependencies() {
-		Schema schema = survey.getSchema();
-		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
-		NodeDefinition regionDefn = clusterDefn.getChildDefinition("region");
-		
-		assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "region").isError());
-		assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "region_district").isError());
-		assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "district").isOk());
-	}
+//	@Test
+//	@Ignore
+//	public void testCircularDependencies() {
+//		Schema schema = survey.getSchema();
+//		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
+//		NodeDefinition regionDefn = clusterDefn.getChildDefinition("region");
+//		
+//		assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "region").isError());
+//		assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "region_district").isError());
+//		assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "district").isOk());
+//	}
 	
 	@Test
 	public void testInvalidExpression() {

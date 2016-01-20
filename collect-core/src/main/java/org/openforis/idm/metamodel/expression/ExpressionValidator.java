@@ -128,7 +128,6 @@ public class ExpressionValidator {
 	
 	private ExpressionValidationResult validateSyntax(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, AbstractExpression expression) {
 		ExpressionValidationResult result = expression.validate(contextNodeDef);
-//		ExpressionValidationResult result = validateFunctionNames(contextNodeDef.getSurvey(), expression);
 		if (result.isError()) {
 			return result;
 		}
@@ -136,29 +135,6 @@ public class ExpressionValidator {
 		return result;
 	}
 	
-//	public ExpressionValidationResult validateFunctionNames(Survey survey, AbstractExpression expression) {
-//		Set<String> names = expression.getFunctionNames();
-//		boolean valid = true;
-//		for (String name : names) {
-//			valid = valid && isFunctionNameValid(expression, name);
-//			if (valid && name.equals(COMPLETE_LAT_LONG_FUNCTION_NAME)
-//					&& survey.getSpatialReferenceSystem(CoordinateOperations.WGS84_SRS_ID) == null) {
-//				String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
-//						COMPLETE_LAT_LONG_FUNCTION_NAME, CoordinateOperations.WGS84_SRS_ID);
-//				ExpressionValidationResult validationResult = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
-//				return validationResult;
-//			} else if (! valid) {
-//				String message = String.format("function '%s' does not exist", name);
-//				String functionNames = expressionFactory.getFullFunctionNames().toString();
-//				String detailedMessage = String.format("function '%s' does not exist\n Possible function names:\n%s", name, functionNames);
-//				ExpressionValidationResult validationResult = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
-//				validationResult.setDetailedMessage(detailedMessage);
-//				return validationResult;
-//			}
-//		}
-//		return new ExpressionValidationResult();
-//	}
-
 	public boolean isFunctionNameValid(AbstractExpression expression, String name) {
 		Matcher matcher = FUNCTION_NAME_PATTERN.matcher(name);
 		boolean valid;

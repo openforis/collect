@@ -45,43 +45,43 @@ public class IDMFunctions extends CustomFunctions {
 	
 	public IDMFunctions(String namespace) {
 		super(namespace);
-		register("blank", new CustomFunction(Arrays.asList(1)) {
+		register("blank", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return blank(objects[0]);
 			}
 		});
 
-		register("index", new CustomFunction(Arrays.asList(0)) {
+		register("index", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return index(expressionContext);
 			}
 		});
 
-		register("index", new CustomFunction(Arrays.asList(1)) {
+		register("index", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return index((Node<?>) objects[0]);
 			}
 		});
 
-		register("position", new CustomFunction(Arrays.asList(0), THIS_SYMBOL) {
+		register("position", new CustomFunction(0, THIS_SYMBOL) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return position(expressionContext);
 			}
 		});
 
-		register("position", new CustomFunction(Arrays.asList(1)) {
+		register("position", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return position((Node<?>) objects[0]);
 			}
 		});
 
-		register("currentDate", new CustomFunction(Arrays.asList(0)) {
+		register("currentDate", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return currentDate();
 			}
 		});
 
-		register("currentTime", new CustomFunction(Arrays.asList(0)) {
+		register("currentTime", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return currentTime();
 			}
@@ -128,27 +128,32 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
-		register("distance", new CustomFunction(Arrays.asList(2)) {
+		register("distance", new CustomFunction(2) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return distance(expressionContext, objects[0], objects[1]);
 			}
+			@Override
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				return super.performArgumentValidation(contextNodeDef, arguments);
+			}
 		});
 		
-		register("datetime-diff", new CustomFunction(Arrays.asList(4)) {
+		register("datetime-diff", new CustomFunction(4) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
 						(Integer) objects[2], (Integer) objects[3]);
 			}
 		});
 
-		register("datetime-diff", new CustomFunction(Arrays.asList(5)) {
+		register("datetime-diff", new CustomFunction(5) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
 						(Integer) objects[2], (Integer) objects[3], (String) objects[4]);
 			}
 		});
 		
-		register(LATLONG_FUNCTION_NAME, new CustomFunction(Arrays.asList(1)) {
+		register(LATLONG_FUNCTION_NAME, new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return latLong(expressionContext, objects[0]);
 			}
@@ -176,7 +181,6 @@ public class IDMFunctions extends CustomFunctions {
 		}
 		return strings;
 	}
-
 
 	private static boolean blank(Object object) {
 		return object == null || object instanceof NullPointer ||
