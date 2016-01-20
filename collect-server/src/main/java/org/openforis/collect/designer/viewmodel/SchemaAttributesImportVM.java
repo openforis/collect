@@ -110,7 +110,7 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		
 		//calculate parent item (tab or entity)
 		final Window popup = SchemaTreePopUpVM.openPopup(title, parentEntityDefinition.getRootEntity(), null, includedNodePredicate, 
-				true, true, null, null, parentEntityDefinition);
+				true, true, null, null, parentEntityDefinition, false);
 		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();

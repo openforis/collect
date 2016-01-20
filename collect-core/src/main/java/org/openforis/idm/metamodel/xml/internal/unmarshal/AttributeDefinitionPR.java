@@ -23,6 +23,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.MESSAGE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.MIN;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.PATTERN;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.PRECISION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.REFERENCED_ATTRIBUTE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.REGEX;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.TO;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.UNIQUE;
@@ -80,6 +81,7 @@ abstract class AttributeDefinitionPR extends NodeDefinitionPR {
 			boolean calculated = getBooleanAttributeWithDefault(CALCULATED, false);
 			((Calculable) defn).setCalculated(calculated);
 		}
+		defn.setReferencedAttributeId(getIntegerAttribute(REFERENCED_ATTRIBUTE, false));
 	}
 	
 	private class DefaultPR extends IdmlPullReader {

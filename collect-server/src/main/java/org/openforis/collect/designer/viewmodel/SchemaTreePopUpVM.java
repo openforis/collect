@@ -39,6 +39,8 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 
 	private Predicate<SurveyObject> selectableNodePredicate;
 	private Predicate<SurveyObject> disabledNodePredicate;
+
+	private boolean allowEmptySelection;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("rootEntity") EntityDefinition rootEntity, 
@@ -48,13 +50,15 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 			@ExecutionArgParam("includeEmptyNodes") boolean includeEmtptyNodes,
 			@ExecutionArgParam("disabledNodePredicate") Predicate<SurveyObject> disabledNodePredicate,
 			@ExecutionArgParam("selectableNodePredicate") Predicate<SurveyObject> selectableNodePredicate,
-			@ExecutionArgParam("selection") SurveyObject selection) {
+			@ExecutionArgParam("selection") SurveyObject selection,
+			@ExecutionArgParam("allowEmptySelection") boolean allowEmptySelection) {
 		super.init();
 		SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(version, disabledNodePredicate, includedNodePredicate, includeRootEntity, includeEmtptyNodes, currentLanguageCode);
 		this.treeModel = modelCreator.createModel(rootEntity);
 		this.treeModel.openAllItems();
 		this.selectableNodePredicate = selectableNodePredicate;
 		this.disabledNodePredicate = disabledNodePredicate;
+		this.allowEmptySelection = allowEmptySelection;
 		if ( selection != null ) {
 			this.selectedNode = selection;
 			this.treeModel.select(selection);
@@ -65,7 +69,7 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	public static Window openPopup(String title, EntityDefinition rootEntity, ModelVersion version,  
 			Predicate<SurveyObject> includedNodePredicate, boolean includeRootEntity, boolean includeEmptyNodes, 
 			Predicate<SurveyObject> disabledNodePredicate, Predicate<SurveyObject> selectableNodePredicate, 
-			SurveyObject selection) {
+			SurveyObject selection, boolean allowEmptySelection) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("rootEntity", rootEntity);
 		args.put("version", version);
@@ -76,16 +80,16 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 		args.put("selection", selection);
 		args.put("includeRootEntity", includeRootEntity);
 		args.put("includeEmptyNodes", includeEmptyNodes);
-		
+		args.put("allowEmptySelection", allowEmptySelection);
 		return openPopUp(Resources.Component.SCHEMA_TREE_POPUP.getLocation(), true, args);
 	}
 	
 	@Command
 	public void apply(@BindingParam("selectedSurveyObject") SurveyObject selectedSurveyObject, 
 			@ContextParam(ContextType.VIEW) Component view) {
-		if (selectedSurveyObject == null) {
+		if (selectedSurveyObject == null && ! allowEmptySelection) {
 			MessageUtil.showWarning("survey.schema.tree.popup.select_a_node");
-		} else if(( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
+		} else if(selectedSurveyObject == null || ( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
 				&& ( selectableNodePredicate == null || selectableNodePredicate.evaluate(selectedSurveyObject) ) ) {
 			Events.postEvent(new NodeSelectedEvent(view, selectedSurveyObject));
 		}

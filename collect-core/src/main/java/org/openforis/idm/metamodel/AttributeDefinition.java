@@ -27,6 +27,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	private List<Check<?>> checks;
 	private List<AttributeDefault> attributeDefaults;
 	private boolean calculated;
+	private Integer referencedAttributeId;
+	private AttributeDefinition referencedAttribute;
 	/**
 	 * Custom field labels
 	 */
@@ -43,6 +45,14 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		this.calculated = attrDef.calculated;
 		this.checks = Objects.clone(attrDef.checks);
 		this.attributeDefaults = Objects.clone(attrDef.attributeDefaults);
+	}
+	
+	@Override
+	protected void init() {
+		super.init();
+		if (referencedAttributeId != null) {
+			referencedAttribute = (AttributeDefinition) getSchema().getDefinitionById(referencedAttributeId);
+		}
 	}
 	
 	@Override
@@ -181,6 +191,19 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	
 	public boolean hasField(String fieldName) {
 		return getFieldDefinitionMap().containsKey(fieldName);
+	}
+	
+	public void setReferencedAttributeId(Integer referencedAttributeId) {
+		this.referencedAttributeId = referencedAttributeId;
+	}
+	
+	public AttributeDefinition getReferencedAttribute() {
+		return referencedAttribute;
+	}
+	
+	public void setReferencedAttribute(AttributeDefinition referencedAttribute) {
+		this.referencedAttribute = referencedAttribute;
+		this.referencedAttributeId = referencedAttribute == null ? null : referencedAttribute.getId();
 	}
 	
 	public abstract boolean hasMainField();
