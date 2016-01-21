@@ -90,12 +90,13 @@ public class SurveyController extends BasicController {
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	@RequestMapping(value = "/collectearthpreview.html", method = RequestMethod.GET)
-	public void showCollectEarthBalloonPreview(HttpServletResponse response, @RequestParam("surveyId") Integer surveyId)  {
+	@RequestMapping(value = "/collectearthpreview.html", method = RequestMethod.GET, produces=MediaType.TEXT_HTML_VALUE)
+	public void showCollectEarthBalloonPreview(HttpServletResponse response, 
+			@RequestParam("surveyId") Integer surveyId, @RequestParam("lang") String languageCode)  {
 		PrintWriter writer = null;
 		try {
 			CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-			CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, survey.getDefaultLanguage());
+			CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, languageCode);
 			String html = generator.generateHTML();
 			writer = new PrintWriter(response.getOutputStream());
 			writer.print(html);
