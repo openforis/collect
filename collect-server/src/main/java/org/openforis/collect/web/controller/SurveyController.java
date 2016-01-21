@@ -1,5 +1,6 @@
 package org.openforis.collect.web.controller;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,14 +91,19 @@ public class SurveyController extends BasicController {
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	@RequestMapping(value = "/collectearthpreview.html", method = RequestMethod.GET, produces=MediaType.TEXT_HTML_VALUE)
+	@RequestMapping(value = "/collectearthpreview.html", method = RequestMethod.GET)
 	public void showCollectEarthBalloonPreview(HttpServletResponse response, 
-			@RequestParam("surveyId") Integer surveyId, @RequestParam("lang") String languageCode)  {
+			@RequestParam("surveyId") Integer surveyId, @RequestParam("lang") String languageCode) throws IOException  {
+		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, languageCode);
+		String html = generator.generateHTML();
+		writeHtmlToResponse(response, html);
+	}
+
+	private void writeHtmlToResponse(HttpServletResponse response, String html) throws IOException {
 		PrintWriter writer = null;
 		try {
-			CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-			CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, languageCode);
-			String html = generator.generateHTML();
+			response.setContentType(MediaType.TEXT_HTML_VALUE);
 			writer = new PrintWriter(response.getOutputStream());
 			writer.print(html);
 			writer.flush();
