@@ -64,7 +64,7 @@ public class SurveyValidator {
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
-	private static final String IDML_XSD_3_1_3_FILE_NAME = "idml3.1.3.xsd";
+	private static final String IDML_XSD_3_1_4_FILE_NAME = "idml3.1.4.xsd";
 	private static final String IDML_UI_XSD_FILE_NAME = "idml3-ui.xsd";
 
 	private static final String[] SURVEY_XSD_3_0_FILE_NAMES = new String[] {
@@ -75,7 +75,7 @@ public class SurveyValidator {
 	
 	private static final String[] SURVEY_LATEST_VERSION_XSD_FILE_NAMES = new String[] {
 		XML_XSD_FILE_NAME, 
-		IDML_XSD_3_1_3_FILE_NAME,
+		IDML_XSD_3_1_4_FILE_NAME,
 		IDML_UI_XSD_FILE_NAME 
 	};
 	

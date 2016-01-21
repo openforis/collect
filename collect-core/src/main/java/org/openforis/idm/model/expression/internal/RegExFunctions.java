@@ -1,6 +1,12 @@
 package org.openforis.idm.model.expression.internal;
 
-import static java.util.regex.Pattern.*;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static java.util.regex.Pattern.COMMENTS;
+import static java.util.regex.Pattern.DOTALL;
+import static java.util.regex.Pattern.MULTILINE;
+import static java.util.regex.Pattern.UNICODE_CASE;
+import static java.util.regex.Pattern.UNICODE_CHARACTER_CLASS;
+import static java.util.regex.Pattern.UNIX_LINES;
 
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
@@ -18,13 +24,13 @@ public class RegExFunctions extends CustomFunctions {
 	public RegExFunctions(String namespace) {
 		super(namespace);
 		
-		register("test", 2, new CustomFunction() {
+		register("test", new CustomFunction(2) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return test((String) objects[0], (String) objects[1]);
 			}
 		});
 
-		register("test", 3, new CustomFunction() {
+		register("test", new CustomFunction(3) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return test((String) objects[0], (String) objects[1], (String) objects[2]);
 			}

@@ -24,6 +24,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.expression.internal.ModelJXPathCompiledExpression;
@@ -86,6 +87,10 @@ public abstract class AbstractExpression {
 
 	public Set<String> getFunctionNames() {
 		return compiledExpression.getFunctionNames();
+	}
+	
+	public ExpressionValidationResult validate(NodeDefinition contextNodeDef) {
+		return compiledExpression.validate(contextNodeDef);
 	}
 	
 	protected Object evaluateSingle(Node<?> contextNode, Node<?> thisNode) throws InvalidExpressionException {

@@ -14,7 +14,7 @@ public class UtilFunctions extends CustomFunctions {
 	public UtilFunctions(String namespace) {
 		super(namespace);
 		
-		register("uuid", 0, new CustomFunction() {
+		register("uuid", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return uuid();
 			}

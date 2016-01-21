@@ -9,12 +9,18 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import org.apache.commons.jxpath.ExpressionContext;
+import org.apache.commons.jxpath.ri.compiler.Constant;
+import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResultFlag;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
@@ -39,49 +45,49 @@ public class IDMFunctions extends CustomFunctions {
 	
 	public IDMFunctions(String namespace) {
 		super(namespace);
-		register("blank", 1, new CustomFunction() {
+		register("blank", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return blank(objects[0]);
 			}
 		});
 
-		register("index", 0, new CustomFunction() {
+		register("index", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return index(expressionContext);
 			}
 		});
 
-		register("index", 1, new CustomFunction() {
+		register("index", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return index((Node<?>) objects[0]);
 			}
 		});
 
-		register("position", 0, new CustomFunction(THIS_SYMBOL) {
+		register("position", new CustomFunction(0, THIS_SYMBOL) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return position(expressionContext);
 			}
 		});
 
-		register("position", 1, new CustomFunction() {
+		register("position", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return position((Node<?>) objects[0]);
 			}
 		});
 
-		register("currentDate", 0, new CustomFunction() {
+		register("currentDate", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return currentDate();
 			}
 		});
 
-		register("currentTime", 0, new CustomFunction() {
+		register("currentTime", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return currentTime();
 			}
 		});
 
-		register("lookup", asList(4, 6, 8, 10), new CustomFunction() {
+		register("lookup", new CustomFunction(asList(4, 6, 8, 10)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				String[] strings = toStringArray(objects);
 				String[] keys = Arrays.copyOfRange(strings, 2, strings.length);
@@ -91,45 +97,76 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 
-		register("samplingPointCoordinate", asList(1, 2, 3), new CustomFunction() {
+		register("samplingPointCoordinate", new CustomFunction(asList(1, 2, 3)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				String[] strings = toStringArray(objects);
 				return samplingPointCoordinateLookup(expressionContext, strings);
 			}
 		});
 
-		register("samplingPointData", asList(2, 3, 4), new CustomFunction() {
+		register("samplingPointData", new CustomFunction(asList(1, 2, 3, 4)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				String[] strings = toStringArray(objects);
 				String[] keys = Arrays.copyOfRange(strings, 1, strings.length);
 				String attribute = strings[0];
 				return samplingPointDataLookup(expressionContext, attribute, keys);
 			}
-		});
-		
-		register("distance", 2, new CustomFunction() {
-			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return distance(expressionContext, objects[0], objects[1]);
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				Expression firstArgument = arguments[0];
+				if (firstArgument instanceof Constant) {
+					Object val = ((Constant) firstArgument).computeValue(null);
+					if (val instanceof String) {
+						Survey survey = contextNodeDef.getSurvey();
+						Attribute attr = survey.getReferenceDataSchema().getSamplingPointDefinition().getAttribute((String) val);
+						if (attr != null && ! attr.isKey()) {
+							return new ExpressionValidationResult();
+						}
+					}
+				}
+				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, "First argument must be a valid sampling point attribute");
 			}
 		});
 		
-		register("datetime-diff", 4, new CustomFunction() {
+		register("distance", new CustomFunction(2) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return distance(expressionContext, objects[0], objects[1]);
+			}
+			@Override
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				return super.performArgumentValidation(contextNodeDef, arguments);
+			}
+		});
+		
+		register("datetime-diff", new CustomFunction(4) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
 						(Integer) objects[2], (Integer) objects[3]);
 			}
 		});
 
-		register("datetime-diff", 5, new CustomFunction() {
+		register("datetime-diff", new CustomFunction(5) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
 						(Integer) objects[2], (Integer) objects[3], (String) objects[4]);
 			}
 		});
 		
-		register(LATLONG_FUNCTION_NAME, 1, new CustomFunction() {
+		register(LATLONG_FUNCTION_NAME, new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return latLong(expressionContext, objects[0]);
+			}
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				Survey survey = contextNodeDef.getSurvey();
+				if(survey.getSpatialReferenceSystem(CoordinateOperations.WGS84_SRS_ID) == null) {
+					String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
+							LATLONG_FUNCTION_NAME, CoordinateOperations.WGS84_SRS_ID);
+					return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
+				} else {
+					return new ExpressionValidationResult();
+				}
 			}
 		});
 	}
@@ -144,7 +181,6 @@ public class IDMFunctions extends CustomFunctions {
 		}
 		return strings;
 	}
-
 
 	private static boolean blank(Object object) {
 		return object == null || object instanceof NullPointer ||
