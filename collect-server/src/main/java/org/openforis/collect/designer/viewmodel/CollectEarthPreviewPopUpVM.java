@@ -18,7 +18,8 @@ public class CollectEarthPreviewPopUpVM extends SurveyBaseVM {
 	}
 	
 	public String getContentUrl() {
-		return "/collectearthpreview.html?surveyId=" + getSurveyId();
+		String url = String.format("/collectearthpreview.html?surveyId=%d&lang=%s", getSurveyId(), getCurrentLanguageCode());
+		return url;
 	}
 	
 }

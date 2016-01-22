@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.openforis.collect.designer.model.AttributeType;
-import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;

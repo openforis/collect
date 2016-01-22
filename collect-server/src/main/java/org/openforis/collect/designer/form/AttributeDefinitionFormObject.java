@@ -26,6 +26,8 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	public static final String CHECKS_FIELD = "checks";
 	public static final String KEY_FIELD = "key";
+	public static final String CALCULATED_FIELD = "calculated";
+	public static final String REFERENCED_ATTRIBUTE_PATH_FIELD = "referencedAttributePath";
 
 	private List<AttributeDefault> attributeDefaults;
 	private String phaseToApplyDefaultValue;
@@ -146,7 +148,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		return referencedAttributePath;
 	}
 
-	public void setReferencedAttributeDefinitionPath(String referencedAttributePath) {
+	public void setReferencedAttributePath(String referencedAttributePath) {
 		this.referencedAttributePath = referencedAttributePath;
 	}
 }

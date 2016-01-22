@@ -67,7 +67,7 @@
 	      		<row>
 		    		<cell>
 	    				<textbox width="500px"
-	    					value="@load(fx.referencedAttributePath)"
+	    					value="@bind(fx.referencedAttributePath)"
 	    					readonly="true" />
 	    				<button sclass="icon"
 	    					tooltiptext="${labels.survey.schema.attribute.select_referenced_attribute}"

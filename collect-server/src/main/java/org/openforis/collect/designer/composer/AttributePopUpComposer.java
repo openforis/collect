@@ -5,7 +5,7 @@ package org.openforis.collect.designer.composer;
 
 import java.util.Locale;
 
-import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.zkoss.bind.BindComposer;

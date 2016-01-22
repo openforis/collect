@@ -5,8 +5,10 @@ package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.lang.Objects;
@@ -53,6 +55,33 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		if (referencedAttributeId != null) {
 			referencedAttribute = (AttributeDefinition) getSchema().getDefinitionById(referencedAttributeId);
 		}
+	}
+	
+	@Override
+	void detach() {
+		clearReferenceFromAttributes();
+		super.detach();
+	}
+	
+	public Set<AttributeDefinition> getReferencingAttributes() {
+		final Set<AttributeDefinition> result = new HashSet<AttributeDefinition>();
+		getSchema().traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if (def instanceof AttributeDefinition 
+						&& ((AttributeDefinition) def).getReferencedAttribute() == AttributeDefinition.this) {
+					result.add((AttributeDefinition) def);
+				}
+			}
+		});
+		return result;
+	}
+	
+	public Set<AttributeDefinition> clearReferenceFromAttributes() {
+		Set<AttributeDefinition> referencingAttributes = getReferencingAttributes();
+		for (AttributeDefinition referencingAttribute : referencingAttributes) {
+			referencingAttribute.clearReferencedAttribute();
+		}
+		return referencingAttributes;
 	}
 	
 	@Override
@@ -204,6 +233,10 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	public void setReferencedAttribute(AttributeDefinition referencedAttribute) {
 		this.referencedAttribute = referencedAttribute;
 		this.referencedAttributeId = referencedAttribute == null ? null : referencedAttribute.getId();
+	}
+	
+	public void clearReferencedAttribute() {
+		setReferencedAttribute(null);
 	}
 	
 	public abstract boolean hasMainField();
