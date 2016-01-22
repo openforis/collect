@@ -61,6 +61,7 @@ import mondrian.rolap.RolapAggregator;
  */
 public class Mondrian4SchemaGenerator {
 
+	private static final String VERSION_4_0 = "4.0";
 	private CollectSurvey survey;
 	private RelationalSchemaConfig rdbConfig;
 	private RelationalSchema rdbSchema;
@@ -77,20 +78,6 @@ public class Mondrian4SchemaGenerator {
 		rdbSchema = schemaGenerator.generateSchema(survey, survey.getName());
 	}
 	
-	public MondrianDef.Schema generateSchema() {
-		MondrianDef.Schema schema = new MondrianDef.Schema();
-		schema.metamodelVersion = "4.0";
-		schema.name = survey.getName();
-		PhysicalSchema physicalSchema = generatePhysicalSchema();
-		schema.children.add(physicalSchema);
-		
-		List<EntityDefinition> rootEntityDefinitions = survey.getSchema().getRootEntityDefinitions();
-		for (EntityDefinition rootEntityDef : rootEntityDefinitions) {
-			schema.children.addAll(createCubes(rootEntityDef));
-		}
-		return schema;
-	}
-	
 	public String generateXMLSchema() {
 		MondrianDef.Schema schema = generateSchema();
 		XStream xStream = new XStream();
@@ -99,17 +86,29 @@ public class Mondrian4SchemaGenerator {
 		return xmlSchema;
 	}
 
-	private List<Cube> createCubes(EntityDefinition entityDef) {
-		List<Cube> result = new ArrayList<MondrianDef.Cube>();
-		DataTable dataTable = rdbSchema.getDataTable(entityDef);
+	public MondrianDef.Schema generateSchema() {
+		MondrianDef.Schema schema = new MondrianDef.Schema();
+		schema.metamodelVersion = VERSION_4_0;
+		schema.name = survey.getName();
+		PhysicalSchema physicalSchema = generatePhysicalSchema();
+		schema.children.add(physicalSchema);
+		
+		for (DataTable dataTable : rdbSchema.getDataTables()) {
+			schema.children.add(createCube(dataTable));
+		}
+		return schema;
+	}
+	
+	private Cube createCube(DataTable dataTable) {
+		NodeDefinition nodeDef = dataTable.getNodeDefinition();
 
 		Cube cube = new Cube();
-		cube.name = entityDef.getName();
+		cube.name = nodeDef.getName();
 		MeasureGroups measureGroups = new MondrianDef.MeasureGroups();
 		MeasureGroup measureGroup = new MeasureGroup();
 		measureGroup.name = cube.name;
 		Measures measures = new Measures();
-		List<Measure> measureList = createMeasures(entityDef);
+		List<Measure> measureList = createMeasures(dataTable);
 		measures.list().addAll(measureList);
 		measureGroup.children.add(measures);
 		measureGroup.table = dataTable.getName();
@@ -118,54 +117,39 @@ public class Mondrian4SchemaGenerator {
 		measureGroups.list().add(measureGroup);
 		cube.children.add(measureGroups);
 		
-		Dimensions dimensions = new Dimensions();
-		
-		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
-		queue.addAll(entityDef.getChildDefinitions());
-		while (! queue.isEmpty()) {
-			NodeDefinition def = queue.poll();
-			if (def instanceof AttributeDefinition) {
-				AttributeDefinition attrDef = (AttributeDefinition) def;
-				Dimension dimension = createDimension(dataTable, attrDef);
-				if (dimension != null) {
-					dimensions.list().add(dimension);
-					//add dimension link
-					DimensionLink dimensionLink = createDimensionLink(dimension, attrDef);
-					dimensionLinks.list().add(dimensionLink);
-				}
-			} else if (! def.isMultiple()) {
-				queue.addAll(((EntityDefinition) def).getChildDefinitions());
-			}
-		}
-		cube.children.add(dimensions);
-		result.add(cube);
-		
-		//create cubes for nested multiple entities
-		queue.addAll(entityDef.getChildDefinitions());
-		while (! queue.isEmpty()) {
-			NodeDefinition def = queue.poll();
-			if (def instanceof EntityDefinition) {
-				EntityDefinition childEntityDef = (EntityDefinition) def;
-				if (def.isMultiple()) {
-					result.addAll(createCubes(childEntityDef));
-				} else {
-					queue.addAll(childEntityDef.getChildDefinitions());
+		if (nodeDef instanceof EntityDefinition) {
+			Dimensions dimensions = new Dimensions();
+			Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
+			queue.addAll(((EntityDefinition) nodeDef).getChildDefinitions());
+			while (! queue.isEmpty()) {
+				NodeDefinition def = queue.poll();
+				if (def instanceof AttributeDefinition) {
+					AttributeDefinition attrDef = (AttributeDefinition) def;
+					Dimension dimension = createDimension(dataTable, attrDef);
+					if (dimension != null) {
+						dimensions.list().add(dimension);
+						//add dimension link
+						DimensionLink dimensionLink = createDimensionLink(dimension, attrDef);
+						dimensionLinks.list().add(dimensionLink);
+					}
+				} else if (! def.isMultiple()) {
+					queue.addAll(((EntityDefinition) def).getChildDefinitions());
 				}
 			}
+			cube.children.add(dimensions);
 		}
-		return result;
+		return cube;
 	}
 
-	private List<Measure> createMeasures(EntityDefinition entityDef) {
-		List<Measure> measureList = new ArrayList<Measure>();
-		DataTable dataTable = rdbSchema.getDataTable(entityDef);
+	private List<Measure> createMeasures(DataTable dataTable) {
+		List<Measure> result = new ArrayList<Measure>();
 		Measure measure = new Measure();
-		measure.name = entityDef.getName() + " count";
+		measure.name = dataTable.getNodeDefinition().getName() + " count";
 		measure.column = dataTable.getPrimaryKeyColumn().getName();
 		measure.aggregator = RolapAggregator.DistinctCount.name;
 		measure.table = dataTable.getName();
-		measureList.add(measure);
-		return measureList;
+		result.add(measure);
+		return result;
 	}
 
 	private DimensionLink createDimensionLink(Dimension dimension, AttributeDefinition attrDef) {
