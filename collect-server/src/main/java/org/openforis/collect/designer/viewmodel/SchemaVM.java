@@ -3,12 +3,12 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import static org.openforis.collect.designer.model.AttributeType.BOOLEAN;
-import static org.openforis.collect.designer.model.AttributeType.CODE;
-import static org.openforis.collect.designer.model.AttributeType.DATE;
-import static org.openforis.collect.designer.model.AttributeType.NUMBER;
-import static org.openforis.collect.designer.model.AttributeType.TEXT;
-import static org.openforis.collect.designer.model.AttributeType.TIME;
+import static org.openforis.collect.designer.metamodel.AttributeType.BOOLEAN;
+import static org.openforis.collect.designer.metamodel.AttributeType.CODE;
+import static org.openforis.collect.designer.metamodel.AttributeType.DATE;
+import static org.openforis.collect.designer.metamodel.AttributeType.NUMBER;
+import static org.openforis.collect.designer.metamodel.AttributeType.TEXT;
+import static org.openforis.collect.designer.metamodel.AttributeType.TIME;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
@@ -32,9 +33,9 @@ import org.openforis.collect.designer.component.SchemaTreeModelCreator;
 import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.UITreeModelCreator;
 import org.openforis.collect.designer.form.FormObject;
-import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.model.LabelKeys;
-import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
@@ -106,6 +107,7 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_NODE_MESSAGE_KEY = "survey.schema.confirm_remove_node";
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
 	private static final String CONFIRM_REMOVE_NODE_WITH_DEPENDENCIES_MESSAGE_KEY = "survey.schema.confirm_remove_node_with_dependencies";
+	private static final String CONFIRM_REMOVE_REFERENCED_ATTRIBUTE_MESSAGE_KEY = "survey.schema.attribute.confirm_remove_referenced_attribute";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
 
 	private static final Set<AttributeType> SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES = Sets.immutableEnumSet(BOOLEAN,
@@ -603,10 +605,17 @@ public class SchemaVM extends SurveyBaseVM {
 
 	protected void removeNodeDefinition(final NodeDefinition nodeDefn) {
 		String confirmMessageKey;
+		Object[] extraMessageArgs = null;
 		if (nodeDefn instanceof EntityDefinition && !((EntityDefinition) nodeDefn).getChildDefinitions().isEmpty()) {
 			confirmMessageKey = CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY;
 		} else if (nodeDefn.hasDependencies()) {
 			confirmMessageKey = CONFIRM_REMOVE_NODE_WITH_DEPENDENCIES_MESSAGE_KEY;
+		} else if (nodeDefn instanceof AttributeDefinition
+				&& !((AttributeDefinition) nodeDefn).getReferencingAttributes().isEmpty()) {
+			confirmMessageKey = CONFIRM_REMOVE_REFERENCED_ATTRIBUTE_MESSAGE_KEY;
+			List<String> referencedAttrNames = org.openforis.commons.collection.CollectionUtils
+					.project(((AttributeDefinition) nodeDefn).getReferencingAttributes(), "name");
+			extraMessageArgs = new String[] { StringUtils.join(referencedAttrNames, ", ") };
 		} else {
 			confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
 		}
@@ -617,6 +626,9 @@ public class SchemaVM extends SurveyBaseVM {
 			typeLabel = Labels.getLabel("survey.schema.root_entity");
 		}
 		Object[] messageArgs = new String[] { typeLabel, nodeDefn.getName() };
+		if (extraMessageArgs != null) {
+			messageArgs = ArrayUtils.addAll(messageArgs, extraMessageArgs);
+		}
 		Object[] titleArgs = new String[] { typeLabel };
 		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 			@Override

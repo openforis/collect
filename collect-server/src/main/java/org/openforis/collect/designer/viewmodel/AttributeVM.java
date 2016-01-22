@@ -6,7 +6,6 @@ import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_WARNING;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,13 +14,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
-import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.model.CheckType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
+import org.openforis.collect.manager.validation.SurveyValidator.ReferenceableKeyAttributeHelper;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -29,7 +29,6 @@ import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.SurveyObject;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
@@ -370,34 +369,10 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	@Command
 	public void openReferencedAttributeSelector(@ContextParam(ContextType.BINDER) final Binder binder) {
-		final Set<EntityDefinition> descendantEntityDefinitions = new HashSet<EntityDefinition>();
-		editedItem.getParentEntityDefinition().traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition def) {
-				if (def instanceof EntityDefinition && ! ((EntityDefinition) def).isRoot()) {
-					descendantEntityDefinitions.add((EntityDefinition) def);
-				}
-			}
-		});
-		final Set<EntityDefinition> referenceableEntityDefinitions = new HashSet<EntityDefinition>();
-		editedItem.getRootEntity().traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition def) {
-				if (def instanceof EntityDefinition && def.isMultiple() && ! ((EntityDefinition) def).isRoot() 
-						&& ! descendantEntityDefinitions.contains(def)) {
-					referenceableEntityDefinitions.add((EntityDefinition) def);
-				}
-			}
-		});
-		final Set<AttributeDefinition> selectableAttributes = new HashSet<AttributeDefinition>();
-		for (EntityDefinition entityDef : referenceableEntityDefinitions) {
-			List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
-			for (NodeDefinition def : childDefinitions) {
-				if (def instanceof AttributeDefinition && ((AttributeDefinition) def).isKey() 
-						&& def.getClass().isAssignableFrom(editedItem.getClass())) {
-					selectableAttributes.add((AttributeDefinition) def);
-				}
-			}
-		}
-		
+		ReferenceableKeyAttributeHelper referenceableKeyAttributeHelper = new ReferenceableKeyAttributeHelper(editedItem);
+		final Set<EntityDefinition> referenceableEntityDefinitions = referenceableKeyAttributeHelper.determineReferenceableEntities();
+		final Set<AttributeDefinition> selectableAttributes = referenceableKeyAttributeHelper.determineReferenceableAttributes();
+				
 		if ( selectableAttributes.isEmpty() ) {
 			MessageUtil.showWarning("survey.schema.attribute.no_referenceable_attributes_available");
 		} else {
@@ -409,8 +384,12 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 					} else {
 						parentEntity = ((NodeDefinition) item).getParentEntityDefinition(); 
 					}
-					return parentEntity.isRoot() || parentEntity.isMultiple() && referenceableEntityDefinitions.contains(parentEntity) 
-							|| referenceableEntityDefinitions.contains(parentEntity.getNearestAncestorMultipleEntity());
+					for (EntityDefinition entityDef : referenceableEntityDefinitions) {
+						if (parentEntity == entityDef || parentEntity.isAncestorOf(entityDef)) {
+							return true;
+						}
+					}
+					return false;
 				}
 			};
 			Predicate<SurveyObject> disabledNodePredicate = new Predicate<SurveyObject>() {
@@ -427,7 +406,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 				public void onEvent(NodeSelectedEvent event) throws Exception {
 					AttributeDefinition referencedAttribute = (AttributeDefinition) event.getSelectedItem();
 					AttributeDefinitionFormObject<?> fo = (AttributeDefinitionFormObject<?>) formObject;
-					fo.setReferencedAttributeDefinitionPath(referencedAttribute == null ? null : referencedAttribute.getPath());
+					fo.setReferencedAttributePath(referencedAttribute == null ? null : referencedAttribute.getPath());
 					notifyChange("formObject");
 					dispatchApplyChangesCommand(binder);
 					closePopUp(parentSelectorPopUp);
@@ -435,7 +414,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 			});
 		}
 	}
-
+	
 	public List<AttributeDefault> getAttributeDefaults() {
 		return attributeDefaults;
 	}

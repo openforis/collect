@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
-import org.openforis.collect.designer.model.AttributeType;
-import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;

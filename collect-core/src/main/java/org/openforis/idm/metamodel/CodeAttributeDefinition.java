@@ -68,8 +68,8 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 
 	@Override
 	void detach() {
-		super.detach();
 		removeParentCodeAttributeDependencies();
+		super.detach();
 	}
 	
 	@Override

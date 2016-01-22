@@ -1,4 +1,4 @@
-package org.openforis.collect.designer.model;
+package org.openforis.collect.designer.metamodel;
 
 import java.util.Locale;
 
