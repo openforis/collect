@@ -354,11 +354,10 @@ public class MondrianCubeGenerator {
 	}
 
 	private String extractLabel(NodeDefinition nodeDef) {
-		String attrLabel = nodeDef.getLabel(NodeLabel.Type.INSTANCE, language);
-		if (attrLabel == null) {
-			attrLabel = nodeDef.getName();
-		}
-		return attrLabel;
+		String label = nodeDef.getFailSafeLabel(language, 
+				NodeLabel.Type.REPORTING, 
+				NodeLabel.Type.INSTANCE);
+		return label;
 	}
 	
 
