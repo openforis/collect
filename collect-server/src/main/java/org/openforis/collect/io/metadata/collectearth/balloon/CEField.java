@@ -14,6 +14,7 @@ class CEField extends CEComponent {
 	
 	private CEFieldType type;
 	private boolean key;
+	private boolean readOnly = false;
 	
 	public CEField(String htmlParameterName, String name, String label, boolean multiple, CEField.CEFieldType type, boolean key) {
 		super(htmlParameterName, name, label, multiple);
@@ -27,6 +28,14 @@ class CEField extends CEComponent {
 
 	public boolean isKey() {
 		return key;
+	}
+	
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+	
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
 	}
 	
 }
