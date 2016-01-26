@@ -1,610 +1,1213 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<survey xmlns="http://www.openforis.org/idml/3.0" 
-	xmlns:collect="http://www.openforis.org/collect/3.0/collect"
-	xmlns:ui="http://www.openforis.org/collect/3.0/ui" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth"
-	xsi:schemaLocation="http://www.openforis.org/idml/3.0 
-		https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd      
-		http://www.openforis.org/collect/3.0/ui 
-		https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
-	lastId="1000">
-	<project>Open Foris Collect Earth - IPCC</project>
-	<uri>http://www.openforis.org/idm/earth</uri>
-	<description></description>
-	<language>en</language>
-	<language>es</language>
-	<language>fr</language>
-	<applicationOptions>
-		<options type="ui">
-			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="plot_tab_set">
-				<tab name="plot_tab">
-					<label xml:lang="en">Plot</label>
-					<label xml:lang="es">Parcela</label>
-					<label xml:lang="fr">Parcelle</label>
-				</tab>
-			</tabSet>
-		</options>
-	</applicationOptions>
-	<codeLists>
-		<list id="100" name="land_use">
-			<label type="item">Land Use</label>
-			<label type="list">Land Uses</label>
-			<codingScheme scope="local" />
-			<hierarchy>
-				<level name="use">
-					<label xml:lang="en">Use</label>
-					<label xml:lang="es">Uso</label>
-				</level>
-				<level name="type">
-					<label xml:lang="en">Type</label>
-					<label xml:lang="es">Tipo</label>
-				</level>
-			</hierarchy>
-			<items>
-				<item id="101">
-					<code>forest</code>
-					<label xml:lang="en">Forest</label>
-					<label xml:lang="es">Tierras forestales</label>
-					<label xml:lang="fr">Foret</label>
-					<item id="102">
-						<code>forest_subdivision</code>
-						<label>Forest subdivision (example)</label>
-					</item>
-					<item id="127">
-						<code>unknown_forest</code>
-						<label>Unknown Forest</label>
-					</item>					
-				</item>
-				<item id="220">
-					<code>cropland</code>
-					<label xml:lang="en">Cropland</label>
-					<label xml:lang="es">Tierras de cultivo</label>
-					<label xml:lang="fr">Terres cultivées</label>
-					<item id="221">
-						<code>crop_subdivision</code>
-						<label>Crop subdivision (example)</label>
-					</item>
-					<item id="233">
-						<code>unknown_crop</code>
-						<label>Unknown crop</label>
-					</item>
-				</item>
-				<item id="130">
-					<code>grassland</code>
-					 <label xml:lang="fr">Prairie</label>
-					<label xml:lang="en">Grassland</label>
-					<label xml:lang="es">Pastizales</label>
-					<item id="131">
-						<code>grassland_subdivision</code>
-						<label>Grassland subdivision (example)</label>
-					</item>
-					<item id="132">
-						<code>unknown_grassland</code>
-						<label>Unknown grassland</label>
-					</item>
-				</item>
-				<item id="140">
-					<code>settlement</code>
-					<label xml:lang="en">Settlement</label>
-					<label xml:lang="es">Asentamientos</label>
-					<label xml:lang="fr">Etablissemens</label>
-					<item id="141">
-						<code>settlement_example</code>
-						<label>Settlement (example)</label>
-					</item>
-					<item id="142">
-						<code>other_settlement</code>
-						<label>Other settlement</label>
-					</item>
-				</item>
-				<item id="150">
-					<code>otherLand</code>
-					<label xml:lang="en">Other Land</label>
-					<label xml:lang="es">Otras tierras</label>
-					<label xml:lang="fr">Autres terres</label>
-					<item id="151">
-						<code>other_example</code>
-						<label>Other (example)</label>
-					</item>
-				</item>
-				<item id="180">
-					<code>wetLand</code>
-					<label xml:lang="en">Wet Land</label>
-					<label xml:lang="es">Humedales</label>
-					<label xml:lang="fr">Terres humides</label>
-					<item id="181">
-						<code>wetland_example</code>
-						<label>Wetland example</label>
-					</item>
-					<item id="182">
-						<code>other_wetland</code>
-						<label>Other wetland</label>
-					</item>
-				</item>
-				<item id="170">
-					<code>noData</code>
-					<label xml:lang="en">No data</label>
-					<label xml:lang="fr">Pas dedonnées</label> 
-					<label xml:lang="es">Sin datos</label>	
-					<item id="171">
-						<code>sea</code>
-						<label xml:lang="en">Sea</label>
-						<label xml:lang="fr">Mer</label>
-						<label xml:lang="es">Mar</label>
-					</item>
-					<item id="172">
-						<code>clouds</code>
-						<label xml:lang="en">Clouds</label>
-						<label xml:lang="fr">Nuages</label>
-						<label xml:lang="es">Nubes</label>
-					</item>		
-					<item id="173">
-						<code>other_reason</code>
-						<label xml:lang="en">Other reason</label>
-						<label xml:lang="fr">Autre</label>
-						<label xml:lang="es">Otra razón</label>
-					</item>
-				</item>
-			</items>
-		</list>
-		<list id="200" name="site_accessibility">
-			<label type="item" xml:lang="en">Accessibility</label>
-			<label type="item" xml:lang="es">Accesibilidad</label>
-			<label type="list" xml:lang="en">Accessibility</label>
-			<label type="list" xml:lang="es">Accesibilidad</label>
-			<label type="item" xml:lang="fr">Accessibilité</label>
-			<label type="list" xml:lang="fr">Accessibilité</label>
-			<codingScheme scope="local" />
-			<items>
-				<item id="201">
-					<code>0-1</code>
-					<label>0-1 km</label>
-				</item>
-				<item id="202">
-					<code>1-2</code>
-					<label>1-2 km</label>
-				</item>
-				<item id="203">
-					<code>2-3</code>
-					<label>2-3 km</label>
-				</item>
-				<item id="204">
-					<code>3-5</code>
-					<label>3-5 km</label>
-				</item>
-				<item id="205">
-					<code>5-10</code>
-					<label>5-10 km</label>
-				</item>
-				<item id="206">
-					<code>10-more</code>
-					<label>&gt; 10 km</label>
-				</item>
-				<item id="207">
-					<code>inaccesible</code>
-					<label>Inaccesible</label>
-				</item>
-			</items>
-		</list>
-		<list id="350" name="land_use_subcategory">
-			<label type="item" xml:lang="en">Land Use Sub-category</label>
-			<label type="item" xml:lang="es">Subcategorias del uso de la tierra</label>
-			<label type="list" xml:lang="en">Sub-Categories</label>
-			<label type="list" xml:lang="es">Subcategorias</label>
-			<items>
-				<item id="351" >
-				    <code>FLtoFL</code>
-				    <label>Forest Land remaining Forest Land</label>
-				</item>
-				<item id="352">
-						<code>OTtoFL</code>
-						<label>Other Land becoming Forest Land</label>
-				</item>
-				<item id="370">
-						<code>CLtoFL</code>
-						<label>Crop Land becoming Forest Land</label>
-				</item>
-				<item id="371">
-						<code>GLtoFL</code>
-						<label>Grass Land becoming Forest Land</label>
-				</item>
-				<item id="372">
-						<code>WLtoFL</code>
-						<label>Wet Land becoming Forest Land</label>
-				</item>
-				<item id="373">
-						<code>SLtoFL</code>
-						<label>Settlement becoming Forest Land</label>
-				</item>
-				<item id="353" >
-				    <code>CLtoCL</code>
-				    <label>Crop Land remaining Crop Land</label>
-				</item>
-				<item id="354">
-						<code>OTtoCL</code>
-						<label>Other Land becoming Crop Land</label>
-				</item>
-				<item id="374">
-						<code>FLtoCL</code>
-						<label>Forest Land becoming Crop Land</label>
-				</item>
-				<item id="375">
-						<code>GLtoCL</code>
-						<label>Grass Land becoming Crop Land</label>
-				</item>
-				<item id="376">
-						<code>WLtoCL</code>
-						<label>Wet Land becoming Crop Land</label>
-				</item>
-				<item id="377">
-						<code>SLtoCL</code>
-						<label>Settlement becoming Crop Land</label>
-				</item>
-				<item id="355" >
-				    <code>OTtoOL</code>
-				    <label>Other Land remaining Other Land</label>
-				</item>
-				<item id="356">
-						<code>CLtoOL</code>
-						<label>Crop Land becoming Other Land</label>
-				</item>	
-				<item id="378">
-						<code>FLtoOL</code>
-						<label>Forest Land becoming Other Land</label>
-				</item>
-				<item id="379">
-						<code>GLtoOL</code>
-						<label>Grass Land becoming Other Land</label>
-				</item>
-				<item id="380">
-						<code>WLtoOL</code>
-						<label>Wet Land becoming Other Land</label>
-				</item>
-				<item id="381">
-						<code>SLtoOL</code>
-						<label>Settlement becoming Other Land</label>
-				</item>
-				<item id="357" >
-				    <code>GLtoGL</code>
-				    <label>Grass Land remaining Grass Land</label>
-				</item>
-				<item id="358">
-						<code>OTtoGL</code>
-						<label>Other Land becoming Grass Land</label>
-				</item>		
-				<item id="382">
-						<code>FLtoGL</code>
-						<label>Forest Land becoming Grass Land</label>
-				</item>
-				<item id="383">
-						<code>CLtoGL</code>
-						<label>Crop Land becoming Grass Land</label>
-				</item>
-				<item id="384">
-						<code>WLtoGL</code>
-						<label>Wet Land becoming Grass Land</label>
-				</item>
-				<item id="385">
-						<code>SLtoGL</code>
-						<label>Settlement becoming Grass Land</label>
-				</item>
-				<item id="359" >
-				    <code>WLtoWL</code>
-				    <label>Wet Land remaining Wet Land</label>
-				</item>
-				<item id="360">
-						<code>OTtoWL</code>
-						<label>Other Land becoming Wet Land</label>
-				</item>	
-				<item id="386">
-						<code>FLtoWL</code>
-						<label>Forest Land becoming Wet Land</label>
-				</item>
-				<item id="387">
-						<code>CLtoWL</code>
-						<label>Crop Land becoming Wet Land</label>
-				</item>
-				<item id="388">
-						<code>GLtoWL</code>
-						<label>Grass Land becoming Wet Land</label>
-				</item>
-				<item id="389">
-						<code>SLtoWL</code>
-						<label>Settlement becoming Wet Land</label>
-				</item>
-				<item id="361" >
-				    <code>SLtoSL</code>
-				    <label>Settlement remaining Settlement</label>
-				</item>
-				<item id="362">
-						<code>OTtoSL</code>
-						<label>Other Land becoming Settlement</label>
-				</item>
-				<item id="390">
-						<code>FLtoSL</code>
-						<label>Forest Land becoming Settlement</label>
-				</item>
-				<item id="391">
-						<code>CLtoSL</code>
-						<label>Crop Land becoming Settlement</label>
-				</item>
-				<item id="392">
-						<code>GLtoSL</code>
-						<label>Grass Land becoming Settlement</label>
-				</item>
-				<item id="393">
-						<code>WLtoSL</code>
-						<label>Wet Land becoming Settlement</label>
-				</item>
-			</items>
-		</list>
-		<list id="300" name="topographical_elements">
-			<label type="item"  xml:lang="en">Element</label>
-			<label type="item" xml:lang="es">Elemento</label>
-			<label type="list" xml:lang="en">Elements</label>
-			<label type="list" xml:lang="es">Elementos</label>
-			<items>
-				<item id="301" >
-				    <code>road</code>
-				    <label>Road</label>
-				</item>
-				<item id="302">
-						<code>river</code>
-						<label>River</label>
-				</item>
-				<item id="303">
-						<code>house</code>
-						<label>House</label>
-				</item>
-				<item id="304">
-						<code>other</code>
-						<label>Other</label>
-				</item>
-				<item id="305">
-						<code>trees</code>
-						<label>Trees</label>
-				</item>
-				<item id="306">
-						<code>lake</code>
-						<label>Lake</label>
-				</item>
-				<item id="307">
-						<code>garden</code>
-						<label>Garden</label>
-				</item>
-			</items>
-			
-		</list>
-		<list id="400" name="topographical_elements_coverage">
-			<label type="item" xml:lang="en">Coverage</label>
-			<label type="item" xml:lang="es">Area cbuierta</label>
-			<label type="list" xml:lang="en">Coverages</label>
-			<label type="list" xml:lang="es">Coberturas</label>
-				<items>
-				<item id="401">
-						<code>0-10</code>
-						<label>&lt; 10%</label>
-				</item>
-				<item id="402">
-						<code>10-30</code>
-						<label>10 - 30%</label>
-				</item>
-				<item id="403">
-						<code>30-60</code>
-						<label>30 - 60%</label>
-				</item>
-				<item id="404">
-						<code>60-100</code>
-						<label>60 - 100%</label>
-				</item>
-				<item id="405">
-						<code>na</code>
-						<label>Not Applicable</label>
-				</item>
-			</items>
-		</list>
-		<list id="500" name="human_impact_type">
-			<label type="item" xml:lang="en">Human Impact Type</label>
-			<label type="item" xml:lang="es">Tipo de impacto humano</label>
-			<label type="list" xml:lang="en">Human Impact Types</label>
-			<label type="list" xml:lang="es">Tipos de impacto humano</label>
-			<items>
-				<item id="501">
-						<code>logging</code>
-						<label>Logging</label>
-				</item>
-							<item id="502">
-						<code>fire</code>
-						<label>Fire</label>
-				</item>
-				<item id="503">
-						<code>grazing</code>
-						<label>Grazing</label>
-				</item>
-				<item id="504">
-						<code>gardening</code>
-						<label>Gardening</label>
-				</item>
-				<item id="505">
-						<code>other_human_impact</code>
-						<label>Other</label>
-				</item>
-				<item id="506">
-						<code>none</code>
-						<label>None</label>
-				</item>
-			</items>
-		</list>
-		<list id="600" name="human_impact_grade">
-			<label type="item" xml:lang="en">Human Impact Grade</label>
-			<label type="item" xml:lang="es">Grado de impacto humano</label>
-			<label type="list" xml:lang="en">Human Impact Grades</label>
-			<label type="list" xml:lang="es">Grados de Impacto humano</label>
-			<items>
-				<item id="601">
-						<code>low</code>
-						<label>Low</label>
-				</item>
-				<item id="602">
-						<code>medium</code>
-						<label>Medium</label>
-				</item>
-				<item id="603">
-						<code>high</code>
-						<label>High</label>
-				</item>
-			</items>
-		</list>
-		<list id="700" name="rs_satellite">
-			<label type="item" xml:lang="en">Satellite</label>
-			<label type="item" xml:lang="es">Satelite</label>
-			<label type="list" xml:lang="es">Satelites</label>
-			<label type="list" xml:lang="en">Satellites</label>
-			
-			<items>
-				<item id="701">
-						<code>landsat</code>
-						<label>Landsat</label>
-				</item>
-				<item id="702">
-						<code>digitalGlobe</code>
-						<label>Digital Globe</label>
-				</item>
-				<item id="703">
-						<code>rapidEye</code>
-						<label>Rapid Eye</label>
-				</item>
-				<item id="704">
-						<code>other_sat</code>
-						<label>Other</label>
-				</item>
-				<item id="705">
-						<code>spot</code>
-						<label>Spot</label>
-				</item>
-			</items>
-		</list>
-		<list id="800" name="canopy_cover_list">
-			<label type="list" xml:lang="en">Canopy Cover</label>
-			<label type="list" xml:lang="es">Cubierta de copas</label>
-			<items>
-				<item id="801">
-					<code>0</code>
-					<label>No cover (&lt;10%)</label>
-				</item>
-				<item id="809">
-					<code>0-10</code>
-					<label>0-10%</label>
-				</item>
-				<item id="805">
-					<code>10-30</code>
-					<label>10 - 30%</label>
-				</item>
-				<item id="806">
-					<code>30-50</code>
-					<label>30 - 50%</label>
-				</item>
-				<item id="807">
-					<code>50-70</code>
-					<label>50 - 70%</label>
-				</item>
-				<item id="808">
-					<code>70-100</code>
-					<label>70 - 100%</label>
-				</item>
-			</items>
-		</list>
-		<list id="810" name="deforestation_reason">
-			<label type="list" xml:lang="en">Reasons for no cover</label>
-			<label type="list" xml:lang="es">Razones de falta de cubierta</label>
-			<items>		
-				<item id="811">
-					<code>burnt</code>
-					<label>Burnt</label>
-				</item>
-				<item id="812">
-					<code>other_no_cover</code>
-					<label>Other</label>
-				</item>
-			</items>
-		</list>
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<survey lastId="3383" created="2016-01-21T14:33:28.351+01:00" modified="2016-01-22T15:06:15.524+01:00" collectearth:plotarea="0.5" collectearth:samplepoints="49" collect:target="CE" collect:collectVersion="3.8.27" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <project>Generic IPCC survey - CHANGE NAME</project>
+  <uri>http://www.openforis.org/idm/ipcc_afolu_generic</uri>
+  <cycle>2013-2014</cycle>
+  <description>This is a generic survey that can be used as the base for assessments of Land Use, Land Use Change and Forestry (LULUCF) that are compliant with the IPCC guidelines.
 
-		<list id="900" name="canopy_type_list">
-			<label type="item" xml:lang="en">Canopy Type</label>
-			<label type="item" xml:lang="es">Tipo de cubierta</label>
-			<label type="list" xml:lang="es">Tipo de cubierta</label>
-			<label type="list" xml:lang="en">Canopy Type</label>
-			<items>
-				<item id="901">
-					<code>sparse</code>
-					<label>Sparse</label>
-				</item>
-				<item id="902">
-					<code>grouped</code>
-					<label>Grouped</label>
-				</item>
-				<item id="903">
-					<code>linear</code>
-					<label>Linear</label>
-				</item>
-				<item id="904">
-					<code>unknown</code>
-					<label>Unknown</label>
-				</item>
-			    <item id="905">
-					<code>random</code>
-					<label>Random</label>
-				</item>				
-			</items>
-		</list>
-		
-		
-		<list id="920" name="bearing">
-		    <label type="item" xml:lang="en">Bearing</label>
-		    <label type="item" xml:lang="es">Rumbo</label>
-			<items>
-				<item id="921">
-					<code>N</code>
-					<label>NORTH</label>
-				</item>
-				<item id="922">
-					<code>N-E</code>
-					<label>NORTH EAST</label>
-				</item>
-				<item id="923">
-					<code>E</code>
-					<label>EAST</label>
-				</item>
-				<item id="924">
-					<code>S-E</code>
-					<label>SOUTH EAST</label>
-				</item>
-			    <item id="925">
-					<code>S</code>
-					<label>SOUTH</label>
-				</item>			
-				<item id="926">
-					<code>S-W</code>
-					<label>SOUTH WEST</label>
-				</item>
-				<item id="927">
-					<code>W</code>
-					<label>WEST</label>
-				</item>
-				<item id="928">
-					<code>N-W</code>
-					<label>NORTH WEST</label>
-				</item>
-			</items>
-		</list>
-		
-	</codeLists>
-	<spatialReferenceSystems>
-		<spatialReferenceSystem srid="EPSG:4326">
-			<label xml:lang="en">WGS 84</label>
-			<description xml:lang="en">WGS 84</description>
-			<wkt><![CDATA[
+Notice that you will need to adapt the Land Use Subdivisions ( in the land_use code in the Code Lists view). Please do not change the names/codes of the main categories (Forest, Grassland, Settlement...) only add the right subdivisions to the region/country you are assessing.
+
+This survey is also adapted to be used in conjunction with the ALU software (http://www.nrel.colostate.edu/projects/ALUsoftware/) in order to be able to produce the data for the Land Use segment of a Green House Gas inventory following the IPCC 2006 guidelines.
+
+In this survey there are also elements for evaluating the accessibility of the plots. This survey could be used in a two-phased forest inventory in which for the first phase the accessibility and type of forest is assessed and the second phase (field visit) is designed taking these factors into account.
+
+For more information or questions post a question in the forum : www.openforis.org/support</description>
+  <language>en</language>
+  <applicationOptions>
+    <options type="ui">
+<n0:tabSet name="plot_tab_set" xmlns:n0="http://www.openforis.org/collect/3.0/ui">
+  <n0:tab name="plot_tab">
+    <n0:label>IPCC</n0:label>
+    <n0:label xml:lang="es">Parcela</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_1015">
+    <n0:label>Element</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_1014">
+    <n0:label>Accessibility</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_1012">
+    <n0:label>Disturbance</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_1013">
+    <n0:label>RS Info</n0:label>
+  </n0:tab>
+</n0:tabSet>
+    </options>
+  </applicationOptions>
+  <codeLists>
+    <list id="35" name="land_use">
+      <label type="item">Land Use</label>
+      <label type="list">Land Uses</label>
+      <codingScheme scope="local" />
+      <hierarchy>
+        <level name="use" />
+        <level name="subdivision" />
+      </hierarchy>
+      <items>
+        <item id="3250">
+          <code>forest</code>
+          <label>Forest</label>
+          <item id="3251">
+            <code>EF</code>
+            <label>Evergreen</label>
+          </item>
+          <item id="3252">
+            <code>MD</code>
+            <label>Mixed deciduous</label>
+          </item>
+          <item id="3253">
+            <code>DD</code>
+            <label>Dry dipterocarp</label>
+          </item>
+          <item id="3254">
+            <code>CF</code>
+            <label>Coniferous forest</label>
+          </item>
+          <item id="3255">
+            <code>MCB</code>
+            <label>Mixed Coniferous and Broadleaved forest</label>
+          </item>
+          <item id="3256">
+            <code>UNF</code>
+            <label>Unknown Natural Forest</label>
+          </item>
+          <item id="3338">
+            <code>BB</code>
+            <label>Bamboo</label>
+          </item>
+          <item id="3259">
+            <code>plantation</code>
+            <label>Plantation</label>
+          </item>
+        </item>
+        <item id="3260">
+          <code>cropland</code>
+          <label>Cropland</label>
+          <item id="3261">
+            <code>UC</code>
+            <label>Upland crop</label>
+          </item>
+          <item id="3262">
+            <code>RP</code>
+            <label>Rice paddy</label>
+          </item>
+          <item id="3263">
+            <code>AP</code>
+            <label>Agricultural plantation</label>
+          </item>
+          <item id="3264">
+            <code>OA</code>
+            <label>Other agriculture</label>
+          </item>
+          <item id="3265">
+            <code>UA</code>
+            <label>Unknown agriculture</label>
+          </item>
+          <item id="3306">
+            <code>shifting_ag</code>
+            <label>Shifting agriculture</label>
+          </item>
+        </item>
+        <item id="3266">
+          <code>grassland</code>
+          <label>Grassland</label>
+          <item id="3267">
+            <code>SA</code>
+            <label>Savannah</label>
+          </item>
+          <item id="3268">
+            <code>SC</code>
+            <label>Scrub</label>
+          </item>
+          <item id="3269">
+            <code>G</code>
+            <label>Grassland</label>
+          </item>
+          <item id="3270">
+            <code>UG</code>
+            <label>Unknown grassland</label>
+          </item>
+        </item>
+        <item id="3271">
+          <code>settlement</code>
+          <label>Settlement</label>
+          <item id="3272">
+            <code>CS</code>
+            <label>City</label>
+          </item>
+          <item id="3273">
+            <code>VS</code>
+            <label>Village</label>
+          </item>
+          <item id="3274">
+            <code>RS</code>
+            <label>Road</label>
+          </item>
+          <item id="3275">
+            <code>IS</code>
+            <label>Infrastructure</label>
+          </item>
+          <item id="3276">
+            <code>MS</code>
+            <label>Mining</label>
+          </item>
+        </item>
+        <item id="3277">
+          <code>otherland</code>
+          <label>Other Land</label>
+          <item id="3278">
+            <code>RO</code>
+            <label>Rock</label>
+          </item>
+          <item id="3279">
+            <code>BO</code>
+            <label>Barren land</label>
+          </item>
+        </item>
+        <item id="3280">
+          <code>wetland</code>
+          <label>Wet Land</label>
+          <item id="3281">
+            <code>LW</code>
+            <label>Lake</label>
+          </item>
+          <item id="3282">
+            <code>RW</code>
+            <label>River</label>
+          </item>
+          <item id="3283">
+            <code>WW</code>
+            <label>Water reservoir</label>
+          </item>
+          <item id="3284">
+            <code>SW</code>
+            <label>Swamp</label>
+          </item>
+        </item>
+        <item id="3285">
+          <code>noData</code>
+          <label>No data</label>
+          <item id="3287">
+            <code>CL</code>
+            <label>Clouds</label>
+          </item>
+          <item id="3288">
+            <code>SH</code>
+            <label>Shadow</label>
+          </item>
+          <item id="3289">
+            <code>other_reason</code>
+            <label>Other reason</label>
+          </item>
+        </item>
+      </items>
+    </list>
+    <list id="111087" name="ecological_zones">
+      <label type="item">Ecological zone</label>
+      <label type="list">Ecological zones</label>
+      <description>These are the default FAO GEZ ( download here: http://www.fao.org/geonetwork/srv/en/resources.get?id=47105&amp;fname=gez2010.zip&amp;access=private - more info  http://www.fao.org/docrep/017/ap861e/ap861e00.pdf ) ecological zones that are used as the standard classes in the GHG inventory software ALU (http://www.nrel.colostate.edu/projects/ALUsoftware/).</description>
+      <codingScheme scope="local" />
+      <items>
+        <item id="3340">
+          <code>Ba</code>
+          <label>Ba</label>
+          <description>Boreal coniferous forest</description>
+        </item>
+        <item id="3341">
+          <code>P</code>
+          <label>P</label>
+          <description>Polar</description>
+        </item>
+        <item id="3342">
+          <code>TeM</code>
+          <label>TeM</label>
+          <description>Temperate mountain system</description>
+        </item>
+        <item id="3343">
+          <code>TBSh</code>
+          <label>TBSh</label>
+          <description>Tropical shrubland</description>
+        </item>
+        <item id="3344">
+          <code>BM</code>
+          <label>BM</label>
+          <description>Boreal mountain system</description>
+        </item>
+        <item id="3345">
+          <code>TeBSk</code>
+          <label>TeBSk</label>
+          <description>Temperate steppe</description>
+        </item>
+        <item id="3346">
+          <code>Bb</code>
+          <label>Bb</label>
+          <description>Boreal tundra woodland</description>
+        </item>
+        <item id="3347">
+          <code>SM</code>
+          <label>SM</label>
+          <description>Subtropical mountain system</description>
+        </item>
+        <item id="3348">
+          <code>TeDc</code>
+          <label>TeDc</label>
+          <description>Temperate continental forest</description>
+        </item>
+        <item id="3349">
+          <code>TAr</code>
+          <label>TAr</label>
+          <description>Tropical rainforest</description>
+        </item>
+        <item id="3350">
+          <code>SBWh</code>
+          <label>SBWh</label>
+          <description>Subtropical desert</description>
+        </item>
+        <item id="3351">
+          <code>SCs</code>
+          <label>SCs</label>
+          <description>Subtropical dry forest</description>
+        </item>
+        <item id="3352">
+          <code>SBSh</code>
+          <label>SBSh</label>
+          <description>Subtropical steppe</description>
+        </item>
+        <item id="3353">
+          <code>TBWh</code>
+          <label>TBWh</label>
+          <description>Tropical desert</description>
+        </item>
+        <item id="3354">
+          <code>Water</code>
+          <label>Water</label>
+          <description>Water</description>
+        </item>
+        <item id="3355">
+          <code>SCf</code>
+          <label>SCf</label>
+          <description>Subtropical humid forest</description>
+        </item>
+        <item id="3356">
+          <code>TeBWk</code>
+          <label>TeBWk</label>
+          <description>Temperate desert</description>
+        </item>
+        <item id="3357">
+          <code>TAwb</code>
+          <label>TAwb</label>
+          <description>Tropical dry forest</description>
+        </item>
+        <item id="3358">
+          <code>TeDo</code>
+          <label>TeDo</label>
+          <description>Temperate oceanic forest</description>
+        </item>
+        <item id="3359">
+          <code>TAwa</code>
+          <label>TAwa</label>
+          <description>Tropical moist forest</description>
+        </item>
+        <item id="3360">
+          <code>TM</code>
+          <label>TM</label>
+          <description>Tropical mountain system</description>
+        </item>
+      </items>
+    </list>
+    <list id="87" name="site_accessibility">
+      <label type="item">Accessibility</label>
+      <label type="list">Accessibility</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="88">
+          <code>&lt;1</code>
+          <label>&lt;1 km</label>
+        </item>
+        <item id="89">
+          <code>1-5</code>
+          <label>1-5 km</label>
+        </item>
+        <item id="90">
+          <code>5-10</code>
+          <label>5-10 km</label>
+        </item>
+        <item id="91">
+          <code>10-15</code>
+          <label>10-15 km</label>
+        </item>
+        <item id="92">
+          <code>&gt;15</code>
+          <label>&gt;15 km</label>
+        </item>
+        <item id="94">
+          <code>inaccesible</code>
+          <label>Inaccesible</label>
+        </item>
+      </items>
+    </list>
+    <list id="222129" name="land_use_subcategory">
+      <label type="item">Land Use Sub-category</label>
+      <label type="list">Sub-Categories</label>
+      <hierarchy>
+        <level name="use">
+          <label xml:lang="en">Use</label>
+          <label xml:lang="es">Uso</label>
+        </level>
+        <level name="subcategory">
+          <label xml:lang="en">Subcategory</label>
+          <label xml:lang="es">Subcategoria</label>
+        </level>
+      </hierarchy>
+      <items>
+        <item id="222130">
+          <code>forest</code>
+          <label>Forest land</label>
+          <item id="222131">
+            <code>FLtoFL</code>
+            <label>F &gt; F</label>
+            <description>Forest Land remaining Forest Land</description>
+          </item>
+          <item id="222132">
+            <code>OTtoFL</code>
+            <label>O &gt; F</label>
+            <description>Other Land becoming Forest Land</description>
+          </item>
+          <item id="222133">
+            <code>CLtoFL</code>
+            <label>C &gt; F</label>
+            <description>Crop Land becoming Forest Land</description>
+          </item>
+          <item id="222134">
+            <code>GLtoFL</code>
+            <label>G &gt; F</label>
+            <description>Grass Land becoming Forest Land</description>
+          </item>
+          <item id="222135">
+            <code>WLtoFL</code>
+            <label>W &gt; F</label>
+            <description>Wet Land becoming Forest Land</description>
+          </item>
+          <item id="222136">
+            <code>SLtoFL</code>
+            <label>S &gt; F</label>
+            <description>Settlement becoming Forest Land</description>
+          </item>
+        </item>
+        <item id="222137">
+          <code>cropland</code>
+          <label>Cropland</label>
+          <item id="222138">
+            <code>CLtoCL</code>
+            <label>C &gt; C</label>
+            <description>Crop Land remaining Crop Land</description>
+          </item>
+          <item id="222139">
+            <code>OTtoCL</code>
+            <label>O &gt; C</label>
+            <description>Other Land becoming Crop Land</description>
+          </item>
+          <item id="222140">
+            <code>FLtoCL</code>
+            <label>F &gt; C</label>
+            <description>Forest Land becoming Crop Land</description>
+          </item>
+          <item id="222141">
+            <code>GLtoCL</code>
+            <label>G &gt; C</label>
+            <description>Grass Land becoming Crop Land</description>
+          </item>
+          <item id="222142">
+            <code>WLtoCL</code>
+            <label>W &gt; C</label>
+            <description>Wet Land becoming Crop Land</description>
+          </item>
+          <item id="222143">
+            <code>SLtoCL</code>
+            <label>S &gt; C</label>
+            <description>Settlement becoming Crop Land</description>
+          </item>
+        </item>
+        <item id="222144">
+          <code>otherland</code>
+          <label>Otherland</label>
+          <item id="222145">
+            <code>OTtoOT</code>
+            <label>O &gt; O</label>
+            <description>Other Land remaining Other Land</description>
+          </item>
+          <item id="222146">
+            <code>CLtoOT</code>
+            <label>C &gt; O</label>
+            <description>Crop Land becoming Other Land</description>
+          </item>
+          <item id="222147">
+            <code>FLtoOT</code>
+            <label>F &gt; O</label>
+            <description>Forest Land becoming Other Land</description>
+          </item>
+          <item id="222148">
+            <code>GLtoOT</code>
+            <label>G &gt; O</label>
+            <description>Grass Land becoming Other Land</description>
+          </item>
+          <item id="222149">
+            <code>WLtoOT</code>
+            <label>W &gt; O</label>
+            <description>Wet Land becoming Other Land</description>
+          </item>
+          <item id="222150">
+            <code>SLtoOT</code>
+            <label>S &gt; O</label>
+            <description>Settlement becoming Other Land</description>
+          </item>
+        </item>
+        <item id="222151">
+          <code>grassland</code>
+          <label>Grassland</label>
+          <item id="222152">
+            <code>GLtoGL</code>
+            <label>G &gt; G</label>
+            <description>Grass Land remaining Grass Land</description>
+          </item>
+          <item id="222153">
+            <code>OTtoGL</code>
+            <label>O &gt; G</label>
+            <description>Other Land becoming Grass Land</description>
+          </item>
+          <item id="222154">
+            <code>FLtoGL</code>
+            <label>F &gt; G</label>
+            <description>Forest Land becoming Grass Land</description>
+          </item>
+          <item id="222155">
+            <code>CLtoGL</code>
+            <label>F &gt; G</label>
+            <description>Crop Land becoming Grass Land</description>
+          </item>
+          <item id="222156">
+            <code>WLtoGL</code>
+            <label>W &gt; G</label>
+            <description>Wet Land becoming Grass Land</description>
+          </item>
+          <item id="222157">
+            <code>SLtoGL</code>
+            <label>S &gt; G</label>
+            <description>Settlement becoming Grass Land</description>
+          </item>
+        </item>
+        <item id="222158">
+          <code>wetland</code>
+          <label>Wetland</label>
+          <item id="222159">
+            <code>WLtoWL</code>
+            <label>W &gt; W</label>
+            <description>Wet Land remaining Wet Land</description>
+          </item>
+          <item id="222160">
+            <code>OTtoWL</code>
+            <label>O &gt; W</label>
+            <description>Other Land becoming Wet Land</description>
+          </item>
+          <item id="222161">
+            <code>FLtoWL</code>
+            <label>F &gt; W</label>
+            <description>Forest Land becoming Wet Land</description>
+          </item>
+          <item id="222162">
+            <code>CLtoWL</code>
+            <label>C &gt; W</label>
+            <description>Crop Land becoming Wet Land</description>
+          </item>
+          <item id="222163">
+            <code>GLtoWL</code>
+            <label>G &gt; W</label>
+            <description>Grass Land becoming Wet Land</description>
+          </item>
+          <item id="222164">
+            <code>SLtoWL</code>
+            <label>S &gt; W</label>
+            <description>Settlement becoming Wet Land</description>
+          </item>
+        </item>
+        <item id="222165">
+          <code>settlement</code>
+          <label>Settlement</label>
+          <item id="222166">
+            <code>SLtoSL</code>
+            <label>S &gt; S</label>
+            <description>Settlement remaining Settlement</description>
+          </item>
+          <item id="222167">
+            <code>OTtoSL</code>
+            <label>O &gt; S</label>
+            <description>Other Land becoming Settlement</description>
+          </item>
+          <item id="222168">
+            <code>FLtoSL</code>
+            <label>F &gt; S</label>
+            <description>Forest Land becoming Settlement</description>
+          </item>
+          <item id="222169">
+            <code>CLtoSL</code>
+            <label>C &gt; S</label>
+            <description>Crop Land becoming Settlement</description>
+          </item>
+          <item id="222170">
+            <code>GLtoSL</code>
+            <label>G &gt; S</label>
+            <description>Grass Land becoming Settlement</description>
+          </item>
+          <item id="222171">
+            <code>WLtoSL</code>
+            <label>W &gt; S</label>
+            <description>Wet Land becoming Settlement</description>
+          </item>
+        </item>
+        <item id="222172">
+          <code>noData</code>
+          <label>No data</label>
+        </item>
+      </items>
+    </list>
+    <list id="132" name="topographical_elements">
+      <label type="item">Element</label>
+      <label type="list">Elements</label>
+      <items>
+        <item id="133">
+          <code>road</code>
+          <label>Road</label>
+        </item>
+        <item id="134">
+          <code>river</code>
+          <label>River</label>
+        </item>
+        <item id="135">
+          <code>house</code>
+          <label>House</label>
+        </item>
+        <item id="138">
+          <code>lake</code>
+          <label>Lake</label>
+        </item>
+        <item id="139">
+          <code>crops</code>
+          <label>Crops</label>
+        </item>
+        <item id="136">
+          <code>other</code>
+          <label>Other</label>
+        </item>
+        <item id="137">
+          <code>trees</code>
+          <label>Trees</label>
+        </item>
+      </items>
+    </list>
+    <list id="140" name="topographical_elements_coverage">
+      <label type="item">Coverage</label>
+      <label type="list">Coverages</label>
+      <items>
+        <item id="2012">
+          <code>na</code>
+          <label>Not Applicable</label>
+        </item>
+        <item id="2013">
+          <code>0-10</code>
+          <label>&lt; 10%</label>
+        </item>
+        <item id="2014">
+          <code>10-19</code>
+          <label>10 – 19%</label>
+        </item>
+        <item id="2015">
+          <code>20-29</code>
+          <label>20 – 29%</label>
+        </item>
+        <item id="2016">
+          <code>30-39</code>
+          <label>30 – 39%</label>
+        </item>
+        <item id="2017">
+          <code>40-49</code>
+          <label>40 – 49%</label>
+        </item>
+        <item id="2018">
+          <code>50-59</code>
+          <label>50 – 59%</label>
+        </item>
+        <item id="2019">
+          <code>60-69</code>
+          <label>60 – 69%</label>
+        </item>
+        <item id="2020">
+          <code>70-79</code>
+          <label>70 – 79%</label>
+        </item>
+        <item id="2021">
+          <code>80-89</code>
+          <label>80 – 89%</label>
+        </item>
+        <item id="2022">
+          <code>90-100</code>
+          <label>90 – 100%</label>
+        </item>
+      </items>
+    </list>
+    <list id="146" name="human_impact_type">
+      <label type="item">Human Impact Type</label>
+      <label type="list">Human Impact Types</label>
+      <items>
+        <item id="147">
+          <code>logging</code>
+          <label>Logging</label>
+        </item>
+        <item id="148">
+          <code>fire</code>
+          <label>Fire</label>
+        </item>
+        <item id="149">
+          <code>grazing</code>
+          <label>Grazing</label>
+        </item>
+        <item id="3311">
+          <code>tree_plantation</code>
+          <label>Tree plantation</label>
+        </item>
+        <item id="3308">
+          <code>shifting_cultivation</code>
+          <label>Shifting Cultivation</label>
+        </item>
+        <item id="151">
+          <code>other_human_impact</code>
+          <label>Other</label>
+        </item>
+        <item id="152">
+          <code>none</code>
+          <label>None</label>
+        </item>
+      </items>
+    </list>
+    <list id="153" name="human_impact_grade">
+      <label type="item">Human Impact Grade</label>
+      <label type="list">Human Impact Grades</label>
+      <items>
+        <item id="154">
+          <code>low</code>
+          <label>Low</label>
+        </item>
+        <item id="155">
+          <code>medium</code>
+          <label>Medium</label>
+        </item>
+        <item id="156">
+          <code>high</code>
+          <label>High</label>
+        </item>
+      </items>
+    </list>
+    <list id="157" name="rs_satellite">
+      <label type="item">Satellite</label>
+      <label type="list">Satellites</label>
+      <items>
+        <item id="3383">
+          <code>sentinel</code>
+          <label>Sentinel (GEE)</label>
+        </item>
+        <item id="158">
+          <code>landsat</code>
+          <label>Landsat (GEE)</label>
+        </item>
+        <item id="159">
+          <code>bing</code>
+          <label>Bing Maps</label>
+        </item>
+        <item id="160">
+          <code>googleEarth</code>
+          <label>Google Earth</label>
+        </item>
+        <item id="1019">
+          <code>here</code>
+          <label>Here Maps</label>
+        </item>
+        <item id="3382">
+          <code>streetView</code>
+          <label>Google Street View</label>
+        </item>
+        <item id="161">
+          <code>other_sat</code>
+          <label>Other VHR</label>
+        </item>
+      </items>
+    </list>
+    <list id="1000003" name="soil_types">
+      <label type="item">Soil Types</label>
+      <description>Soil classes that are consistent with the IPCC defaults expected by ALU. You can obtain this data from : http://www.isric.org/content/download-form?dataset=CBP_Global_IPCC_soil_classes_2010Nov04.zip</description>
+      <items>
+        <item id="3373">
+          <code>ORG</code>
+          <label>ORG</label>
+          <description>Organic</description>
+        </item>
+        <item id="3374">
+          <code>SAN</code>
+          <label>SAN</label>
+          <description>Sandy Soils</description>
+        </item>
+        <item id="3375">
+          <code>WET</code>
+          <label>WET</label>
+          <description>Wetland Soils</description>
+        </item>
+        <item id="3376">
+          <code>VOL</code>
+          <label>VOL</label>
+          <description>Volcanic Soils</description>
+        </item>
+        <item id="3377">
+          <code>SPO</code>
+          <label>SPO</label>
+          <description>Spodic Soils</description>
+        </item>
+        <item id="3378">
+          <code>HAC</code>
+          <label>HAC</label>
+          <description>High Activity Clay Soils</description>
+        </item>
+        <item id="3379">
+          <code>LAC</code>
+          <label>LAC</label>
+          <description>Low Activity Clay Soils</description>
+        </item>
+        <item id="3380">
+          <code>OtherAreas</code>
+          <label>OtherAreas</label>
+          <description>Other Areas</description>
+        </item>
+      </items>
+    </list>
+    <list id="1000012" name="climate_zones">
+      <label type="item">Climate Zone</label>
+      <description>These are the IPCC default climate zones as expected by the ALU tool, the dataset that can be used is hosted at  http://esdac.jrc.ec.europa.eu/projects/renewable-energy-directive</description>
+      <items>
+        <item id="3361">
+          <code>WTM</code>
+          <label>WTM</label>
+          <description>Warm Temperate Moist</description>
+        </item>
+        <item id="3362">
+          <code>WTD</code>
+          <label>WTD</label>
+          <description>Warm Temperate Dry</description>
+        </item>
+        <item id="3363">
+          <code>CTM</code>
+          <label>CTM</label>
+          <description>Cool Temperate Moist</description>
+        </item>
+        <item id="3364">
+          <code>CTD</code>
+          <label>CTD</label>
+          <description>Cool Temperate Dry</description>
+        </item>
+        <item id="3365">
+          <code>POM</code>
+          <label>POM</label>
+          <description>Polar Moist</description>
+        </item>
+        <item id="3366">
+          <code>POD</code>
+          <label>POD</label>
+          <description>Polar Dry</description>
+        </item>
+        <item id="3367">
+          <code>BOM</code>
+          <label>BOM</label>
+          <description>Boreal Moist</description>
+        </item>
+        <item id="3368">
+          <code>BOD</code>
+          <label>BOD</label>
+          <description>Boreal Dry</description>
+        </item>
+        <item id="3369">
+          <code>TRMT</code>
+          <label>TRMT</label>
+          <description>Tropical Montane</description>
+        </item>
+        <item id="3370">
+          <code>TRW</code>
+          <label>TRW</label>
+          <description>Tropical Wet</description>
+        </item>
+        <item id="3371">
+          <code>TMM</code>
+          <label>TMM</label>
+          <description>Tropical Moist</description>
+        </item>
+        <item id="3372">
+          <code>TRD</code>
+          <label>TRD</label>
+          <description>Tropical Dry</description>
+        </item>
+      </items>
+    </list>
+    <list id="1539" name="elevation_ranges">
+      <label type="item">Elevation ranges</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="1540">
+          <code>1</code>
+          <label>0-100</label>
+        </item>
+        <item id="1541">
+          <code>2</code>
+          <label>101-200</label>
+        </item>
+        <item id="1542">
+          <code>3</code>
+          <label>201-300</label>
+        </item>
+        <item id="1543">
+          <code>4</code>
+          <label>301-400</label>
+        </item>
+        <item id="1544">
+          <code>5</code>
+          <label>401-500</label>
+        </item>
+        <item id="1545">
+          <code>6</code>
+          <label>501-600</label>
+        </item>
+        <item id="1546">
+          <code>7</code>
+          <label>601-700</label>
+        </item>
+        <item id="1547">
+          <code>8</code>
+          <label>701-800</label>
+        </item>
+        <item id="1548">
+          <code>9</code>
+          <label>801-900</label>
+        </item>
+        <item id="1549">
+          <code>10</code>
+          <label>901-1000</label>
+        </item>
+        <item id="1550">
+          <code>11</code>
+          <label>1001-1100</label>
+        </item>
+        <item id="1551">
+          <code>12</code>
+          <label>1101-1200</label>
+        </item>
+        <item id="1552">
+          <code>13</code>
+          <label>1201-1300</label>
+        </item>
+        <item id="1553">
+          <code>14</code>
+          <label>1301-1400</label>
+        </item>
+        <item id="1554">
+          <code>15</code>
+          <label>1401-1500</label>
+        </item>
+        <item id="1555">
+          <code>16</code>
+          <label>1501-1600</label>
+        </item>
+        <item id="1556">
+          <code>17</code>
+          <label>1601-1700</label>
+        </item>
+        <item id="1557">
+          <code>18</code>
+          <label>1701-1800</label>
+        </item>
+        <item id="1558">
+          <code>19</code>
+          <label>1801-1900</label>
+        </item>
+        <item id="1559">
+          <code>20</code>
+          <label>1901-2000</label>
+        </item>
+        <item id="1560">
+          <code>21</code>
+          <label>2001-2100</label>
+        </item>
+        <item id="1561">
+          <code>22</code>
+          <label>2101-2200</label>
+        </item>
+        <item id="1562">
+          <code>23</code>
+          <label>2201-2300</label>
+        </item>
+        <item id="1563">
+          <code>24</code>
+          <label>2301-2400</label>
+        </item>
+        <item id="1564">
+          <code>25</code>
+          <label>2401-2500</label>
+        </item>
+        <item id="1565">
+          <code>26</code>
+          <label>2501-2600</label>
+        </item>
+        <item id="1566">
+          <code>27</code>
+          <label>2601-2700</label>
+        </item>
+        <item id="1567">
+          <code>28</code>
+          <label>2701-2800</label>
+        </item>
+        <item id="1568">
+          <code>29</code>
+          <label>2801-2900</label>
+        </item>
+        <item id="1569">
+          <code>30</code>
+          <label>2901-3000</label>
+        </item>
+        <item id="1570">
+          <code>31</code>
+          <label>3001-3100</label>
+        </item>
+        <item id="1571">
+          <code>32</code>
+          <label>3101-3200</label>
+        </item>
+        <item id="1572">
+          <code>33</code>
+          <label>3201-3300</label>
+        </item>
+        <item id="1573">
+          <code>34</code>
+          <label>3301-3400</label>
+        </item>
+        <item id="1574">
+          <code>35</code>
+          <label>3401-3500</label>
+        </item>
+        <item id="1575">
+          <code>36</code>
+          <label>3501-3600</label>
+        </item>
+        <item id="1576">
+          <code>37</code>
+          <label>3601-3700</label>
+        </item>
+        <item id="1577">
+          <code>38</code>
+          <label>3701-3800</label>
+        </item>
+        <item id="1578">
+          <code>39</code>
+          <label>3801-3900</label>
+        </item>
+        <item id="1579">
+          <code>40</code>
+          <label>3901-4000</label>
+        </item>
+        <item id="1580">
+          <code>41</code>
+          <label>4001-4100</label>
+        </item>
+        <item id="1581">
+          <code>42</code>
+          <label>4101-4200</label>
+        </item>
+        <item id="1582">
+          <code>43</code>
+          <label>4201-4300</label>
+        </item>
+        <item id="1583">
+          <code>44</code>
+          <label>4301-4400</label>
+        </item>
+        <item id="1584">
+          <code>45</code>
+          <label>4401-4500</label>
+        </item>
+        <item id="1585">
+          <code>46</code>
+          <label>4501-4600</label>
+        </item>
+        <item id="1586">
+          <code>47</code>
+          <label>4601-4700</label>
+        </item>
+        <item id="1587">
+          <code>48</code>
+          <label>4701-4800</label>
+        </item>
+        <item id="1588">
+          <code>49</code>
+          <label>4801-4900</label>
+        </item>
+        <item id="1589">
+          <code>50</code>
+          <label>4901-5000</label>
+        </item>
+        <item id="1590">
+          <code>51</code>
+          <label>5001-5100</label>
+        </item>
+        <item id="1591">
+          <code>52</code>
+          <label>5101-5200</label>
+        </item>
+        <item id="1592">
+          <code>53</code>
+          <label>5201-5300</label>
+        </item>
+        <item id="1593">
+          <code>54</code>
+          <label>5301-5400</label>
+        </item>
+        <item id="1594">
+          <code>55</code>
+          <label>5401-5500</label>
+        </item>
+        <item id="1595">
+          <code>56</code>
+          <label>5501-5600</label>
+        </item>
+        <item id="1596">
+          <code>57</code>
+          <label>5601-5700</label>
+        </item>
+        <item id="1597">
+          <code>58</code>
+          <label>5701-5800</label>
+        </item>
+        <item id="1598">
+          <code>59</code>
+          <label>5801-5900</label>
+        </item>
+        <item id="1599">
+          <code>60</code>
+          <label>5901-6000</label>
+        </item>
+        <item id="1600">
+          <code>61</code>
+          <label>6001-6100</label>
+        </item>
+        <item id="1601">
+          <code>62</code>
+          <label>6101-6200</label>
+        </item>
+        <item id="1602">
+          <code>63</code>
+          <label>6201-6300</label>
+        </item>
+        <item id="16023333">
+          <code>0</code>
+          <label>-100 / 0</label>
+        </item>
+        <item id="3002">
+          <code>-1</code>
+          <label>-200 / -100</label>
+        </item>
+      </items>
+    </list>
+    <list id="1604" name="orientation">
+      <label type="item">Orientation</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="1605">
+          <code>N</code>
+          <label>North</label>
+        </item>
+        <item id="1606">
+          <code>NE</code>
+          <label>North East</label>
+        </item>
+        <item id="1607">
+          <code>E</code>
+          <label>East</label>
+        </item>
+        <item id="1608">
+          <code>SE</code>
+          <label>South East</label>
+        </item>
+        <item id="1609">
+          <code>S</code>
+          <label>South</label>
+        </item>
+        <item id="1610">
+          <code>SW</code>
+          <label>South West</label>
+        </item>
+        <item id="1611">
+          <code>W</code>
+          <label>West</label>
+        </item>
+        <item id="1612">
+          <code>NW</code>
+          <label>North West</label>
+        </item>
+        <item id="3339">
+          <code>na</code>
+          <label>N/A</label>
+        </item>
+      </items>
+    </list>
+    <list id="1616" name="slope_classes">
+      <label type="item">Slope classes</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="1617">
+          <code>FLAT</code>
+          <label>0-5 °</label>
+        </item>
+        <item id="1618">
+          <code>SLIGHT</code>
+          <label>6-15 °</label>
+        </item>
+        <item id="1619">
+          <code>STEEP</code>
+          <label>16-30  °</label>
+        </item>
+        <item id="1620">
+          <code>VERY_STEEP</code>
+          <label>31-45  °</label>
+        </item>
+        <item id="1621">
+          <code>EXTREME</code>
+          <label>46-60  °</label>
+        </item>
+        <item id="1622">
+          <code>FALL</code>
+          <label>61-90 °</label>
+        </item>
+        <item id="1623">
+          <code>NA</code>
+          <label>NA</label>
+        </item>
+      </items>
+    </list>
+    <list id="3001" name="sampling_design" lookup="ofc_sampling_design">
+      <hierarchy>
+        <level name="level1" />
+        <level name="level2" />
+        <level name="level3" />
+      </hierarchy>
+    </list>
+  </codeLists>
+  <spatialReferenceSystems>
+    <spatialReferenceSystem srid="EPSG:4326">
+      <label xml:lang="en">WGS 84</label>
+      <description xml:lang="en">WGS 84</description>
+      <wkt><![CDATA[
 	        GEOGCS["WGS 84",
 		  		DATUM["WGS_1984",
 		  			SPHEROID["WGS 84",6378137,298.257223563, AUTHORITY["EPSG","7030"]],
@@ -614,155 +1217,299 @@
 	    		UNIT["degree",0.01745329251994328,
 	        		AUTHORITY["EPSG","9122"]],
 	    		AUTHORITY["EPSG","4326"]]
-			]]></wkt>
-		</spatialReferenceSystem>
-	</spatialReferenceSystems>
-	
-	<schema>
-		<entity id="1" name="plot" ui:tabSet="plot_tab_set" ui:tab="plot_tab">
-			<label xml:lang="en">Plot</label>
-			<label xml:lang="es">Parcela</label>
-			<label xml:lang="fr">Parcelle</label>
-			<text id="2" name="id" required="true" key="true">
-				<label xml:lang="en">Id</label>
-				<label xml:lang="es">Id</label>
-				<label xml:lang="fr">Id</label>
-			</text>
-			<coordinate id="3" name="location">
-				<label xml:lang="en">Location</label>
-				<label xml:lang="es">Posicion</label>
-				<label xml:lang="fr">Lieu</label>
-			</coordinate>
-			<text id="4" name="operator">
-				<label xml:lang="en">Operator</label>
-				<label xml:lang="es">Operador</label>
-				<label xml:lang="fr">Opérateur</label>
-			</text>
-			<code id="5" name="land_use_category" list="land_use">
-				<label xml:lang="en">Land use</label>
-				<label xml:lang="es">Uso de la tierra</label>
-			</code>
-			<boolean id="6" name="land_use_category_accuracy" relevant="land_use_category!='noData'">
-				<label xml:lang="en">Land use Category interpretation accuracy</label>
-				<label xml:lang="es">Precisión de la interpretación del uso de la tierra</label>
-			</boolean>
-			<code id="7" name="land_use_subcategory" relevant="land_use_category!='noData'" list="land_use_subcategory">
-				<label xml:lang="en">Land use Sub-Category</label>
-				<label xml:lang="es">Subcategoría del Uso de la Tierra</label>
-			</code>
-			<boolean id="8" name="land_use_subcategory_accuracy" relevant="land_use_category!='noData'">
-				<label xml:lang="en">Land use Sub-Category interpretation accuracy</label>
-				<label xml:lang="es">Precisión de la interpretación de la Subcategoria del Uso de la tierra</label>
-			</boolean>
-			<number id="33" type="integer" name="land_use_subcategory_year_of_change" required="false" relevant="false()">
-				<label xml:lang="en">Land use Sub-Category - year of change</label>
-				<label xml:lang="es">Subcategoría del Uso de la Tierra - año del cambio</label>
-			</number>
-			<code id="9" name="land_use_subdivision" list="land_use" parent="land_use_category" >
-				<label xml:lang="en">Land use Sub-Division</label>
-				<label xml:lang="es">Subdivisión del Uso de la Tierra</label>
-			</code>
 			
-			<boolean id="10" name="land_use_subdivision_accuracy" relevant="land_use_category!='noData'" >
-				<label xml:lang="en">Land Use Sub-Division interpretation accuracy</label>
-				<label xml:lang="es">Precisión de la interpretación de la Subcategoria del Uso de la tierra</label>
-			</boolean>
-			<code id="11" name="site_accessibility" list="site_accessibility" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland'">
-				<label xml:lang="en">Accessibility</label>
-				<label xml:lang="es">Accesibilidad</label>
-			</code>
-			<code id="12" name="site_bearing" list="bearing" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland' and site_accessibility!='inaccesible'" >
-				<label xml:lang="en">Bearing</label>
-				<label xml:lang="es">Rumbo</label>
-			</code>
-			<text name="site_directions" id="13" required="false" relevant="false()">
-			    <label xml:lang="en">Directions</label>
-			    <label xml:lang="es">Indicaciones</label>
-			</text>
-			<entity id="14" name="topography" multiple="true" >
-			    <label xml:lang="en">Topography</label>
-				<code id="15" name="element" list="topographical_elements" key="true">
-					<label xml:lang="en">Element</label>
-					<label xml:lang="es">Elemento</label>
-				</code>
-				<code id="16" name="coverage" list="topographical_elements_coverage">
-					<label xml:lang="en">Coverage</label>
-					<label xml:lang="es">Cobertura</label>
-				</code>
-			</entity>
-			<code id="17" name="human_impact_type" list="human_impact_type"
-				multiple="true" relevant="land_use_category!='settlement' and land_use_category!='cropland' and land_use_category!='noData'">
-				<label xml:lang="en">Human Impact Type</label>
-				<label xml:lang="es">Tipo de Impacto Humano</label>
-			</code>
-			<code id="18" name="human_impact_grade" list="human_impact_grade" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'">
-				<label xml:lang="en">Human Impact Grade</label>
-				<label xml:lang="es">Grado del Impacto Humano</label>
-			</code>
-			<number id="19" name="human_impact_year" type="integer" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'">
-				<label xml:lang="en">Human Impact Year</label>
-				<label xml:lang="es">Año del Impacto Humano</label>
-			</number>
-			<boolean id="30" name="human_impact_accuracy" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'">
-				<label xml:lang="en">Human Impact interpretation accuracy</label>
-				<label xml:lang="es">Precision de la interpretación del Impacto Humano</label>
-			</boolean>
-			
-			<date id="20" name="rs_date" relevant="land_use_category!='noData'">
-				<label xml:lang="en">RS Date</label>
-				<label xml:lang="es">Fecha teleobservación</label>
-			</date>
-			<code id="21" name="rs_satellite" list="rs_satellite" relevant="land_use_category!='noData'">
-				<label xml:lang="en">RS Satellite</label>
-				<label xml:lang="es">Satélite</label>
-			</code>
-			<code id="22" name="canopy_cover" list="canopy_cover_list" relevant="land_use_category='forest'" >
-				<label xml:lang="en">Canopy cover</label>
-				<label xml:lang="es">Cubierta de copas</label>
-			</code>
-			<boolean id="31" name="canopy_cover_accuracy" relevant="land_use_category='forest'" >
-				<label xml:lang="en">Canopy cover interpretation accuracy</label>
-				<label xml:lang="es">Precision de la interpretación de la cubierta de copas</label>
-			</boolean>
-			<code id="23" name="canopy_type" list="canopy_type_list" relevant="land_use_category='forest' and canopy_cover!='0'">
-				<label xml:lang="en">Canopy Type</label>
-				<label xml:lang="es">Tipo de copas</label>
-			</code>
-			<code id="24" name="deforestation_reason" list="deforestation_reason" relevant="land_use_category='forest' and canopy_cover='0'" >
-				<label xml:lang="en">Deforestation reason</label>
-				<label xml:lang="es">Razón para la deforestación</label>
-			</code>
-			<number id="25" name="elevation" type="integer" >
-				<label xml:lang="en">Elevation</label>
-				<label xml:lang="es">Elevacion</label>
-				<label xml:lang="fr">Elevation</label>
-			</number>
-			<number id="26" name="aspect"  type="real">
-				<label xml:lang="en">Aspect</label>
-				<label xml:lang="es">Exposicion</label>
-				<label xml:lang="fr">Aspect</label>
-			</number>
-			<number id="27" name="slope" type="real" >
-				<label xml:lang="en">Slope</label>
-				<label xml:lang="es">Pendiente</label>
-				<label xml:lang="fr">Pente</label>
-			</number>
-			<boolean id="28" name="actively_saved">
-				<label xml:lang="en">Actively saved by user</label>
-				<label xml:lang="es">Guardado por el usuario activamente</label>
-				<label xml:lang="fr">Sauvé par l'utilisateur</label>
-			</boolean>
-			<date id="32" name="actively_saved_on" required="false"
-				relevant="false()">
-				<label xml:lang="en">Last saved on</label>
-				<label xml:lang="es">Guardado por ultima vez</label>
-				<label xml:lang="fr">Sauvé la dernière fois sur</label>
-			</date>
-			<text id="34" name="plot_file" required="false" relevant="false()">
-				<label xml:lang="en">CSV file that contains the plot</label>
-				<label xml:lang="es">Archivo CSV que contiene al plot</label>
-				<label xml:lang="fr">Fichier CSV qui contient le point</label>
-			</text>
-		</entity>
-	</schema>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ]]>
+      </wkt>
+    </spatialReferenceSystem>
+  </spatialReferenceSystems>
+  <schema>
+    <entity id="1" name="plot" ui:tab="plot_tab" ui:tabSet="plot_tab_set">
+      <label type="instance">Plot</label>
+      <text id="2" name="id" required="true" key="true" type="short">
+        <label type="instance">Id</label>
+      </text>
+      <coordinate id="3" name="location">
+        <label type="instance">Location</label>
+      </coordinate>
+      <text id="4" name="operator" type="short">
+        <label type="instance">Operator</label>
+      </text>
+      <code id="5" name="land_use_category" required="true" list="land_use">
+        <label type="instance">Land Use</label>
+      </code>
+      <code id="6" name="land_use_category_alias" ui:hide="true" calculated="true" list="land_use_subcategory">
+        <label type="instance">ALU Current Land Use</label>
+        <default expr="land_use_category" />
+      </code>
+      <boolean id="7" name="land_use_category_accuracy" required="true">
+        <label type="instance">Land Use Category - Confidence</label>
+        <description>Is the user confident that the assessed Land Use category is the actual Land Use on the plot?</description>
+      </boolean>
+      <code id="8" name="land_use_subcategory" relevant="land_use_category!='noData'" required="true" ui:hideWhenNotRelevant="true" list="land_use_subcategory" parent="land_use_category_alias">
+        <label type="instance">Land Use Conversion</label>
+      </code>
+      <boolean id="9" name="land_use_subcategory_accuracy" relevant="land_use_category!='noData'" required="true" ui:hideWhenNotRelevant="true">
+        <label type="instance">Land Use Conversion - Confidence</label>
+        <description>Is the user confident that the assessed Land Use conversion is correct?</description>
+      </boolean>
+      <boolean id="463" name="land_use_subcategory_year_of_change_know" relevant="land_use_category!='noData' and land_use_subcategory!='GLtoGL' and land_use_subcategory!='FLtoFL' and land_use_subcategory!='SLtoSL' and land_use_subcategory!='OTtoOT' and land_use_subcategory!='WLtoWL' and land_use_subcategory!='CLtoCL'" required="true" ui:hideWhenNotRelevant="true">
+        <label type="instance">Land Use Change - Known year of change</label>
+        <description>Is it possible to asses the year in which the Land Use has changed?</description>
+      </boolean>
+      <number id="44410" name="land_use_subcategory_year_of_change" relevant="land_use_subcategory_year_of_change_know=true() and &#10;land_use_category!='noData' and land_use_subcategory!='GLtoGL' and land_use_subcategory!='FLtoFL' and land_use_subcategory!='SLtoSL' and land_use_subcategory!='OTtoOT' and land_use_subcategory!='WLtoWL' and land_use_subcategory!='CLtoCL'" required="true" ui:hideWhenNotRelevant="true" type="integer">
+        <label type="instance">Land Use Change - Year of change</label>
+        <compare flag="error" lt="2016" gt="1994" />
+      </number>
+      <code id="10" name="land_use_subdivision" relevant="boolean(land_use_category)" required="true" ui:layoutType="dropdown" list="land_use" parent="land_use_category">
+        <label type="instance">Land Use Sub-Division</label>
+      </code>
+      <boolean id="11" name="land_use_subdivision_accuracy" relevant="land_use_category!='noData'" required="true">
+        <label type="instance">Land Use Sub-Division - Confidence</label>
+      </boolean>
+      <boolean id="1064" name="land_use_subdivision_change" relevant="land_use_subcategory='GLtoGL' or land_use_subcategory='FLtoFL' or land_use_subcategory='SLtoSL' or land_use_subcategory='OTtoOT' or land_use_subcategory='WLtoWL' or land_use_subcategory='CLtoCL'" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab">
+        <label type="instance">Has the Sub-Division changed?</label>
+      </boolean>
+      <code id="1068" name="calculated_initial_land_use" ui:hide="true" ui:tab="plot_tab" calculated="true" list="land_use">
+        <label type="instance">Initial Land Use</label>
+        <default value="forest" if="land_use_subcategory='FLtoFL' or land_use_subcategory='FLtoCL' or land_use_subcategory='FLtoGL' or land_use_subcategory='FLtoOT' or land_use_subcategory='FLtoWL' or land_use_subcategory='FLtoSL'" />
+        <default value="cropland" if="land_use_subcategory='CLtoFL' or land_use_subcategory='CLtoCL' or land_use_subcategory='CLtoGL' or land_use_subcategory='CLtoOT' or land_use_subcategory='CLtoWL' or land_use_subcategory='CLtoSL'" />
+        <default value="grassland" if="land_use_subcategory='GLtoFL' or land_use_subcategory='GLtoCL' or land_use_subcategory='GLtoGL' or land_use_subcategory='GLtoOT' or land_use_subcategory='GLtoWL' or land_use_subcategory='GLtoSL'" />
+        <default value="settlement" if="land_use_subcategory='SLtoFL' or land_use_subcategory='SLtoCL' or land_use_subcategory='SLtoGL' or land_use_subcategory='SLtoOT' or land_use_subcategory='SLtoWL' or land_use_subcategory='SLtoSL'" />
+        <default value="otherland" if="land_use_subcategory='OTtoFL' or land_use_subcategory='OTtoCL' or land_use_subcategory='OTtoGL' or land_use_subcategory='OTtoOT' or land_use_subcategory='OTtoWL' or land_use_subcategory='OTtoSL'" />
+        <default value="wetland" if="land_use_subcategory='WLtoFL' or land_use_subcategory='WLtoCL' or land_use_subcategory='WLtoGL' or land_use_subcategory='WLtoOT' or land_use_subcategory='WLtoWL' or land_use_subcategory='WLtoSL'" />
+      </code>
+      <code id="12" name="site_accessibility" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland'" required="true" ui:tab="tab_1014" list="site_accessibility">
+        <label type="instance">Accessibility</label>
+        <description>This is used to measure the difficulty for a field visit to the plot.</description>
+      </code>
+      <code id="13" name="site_bearing" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland' and site_accessibility!='inaccesible' and site_accessibility!='0-1'" required="true" ui:tab="tab_1014" list="orientation">
+        <label type="instance">Bearing</label>
+        <description>Direction that the road/path/river used to access the plot is FROM the plot.</description>
+      </code>
+      <text id="14" name="site_directions" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland'" ui:tab="tab_1014" type="memo">
+        <label type="instance">Directions</label>
+      </text>
+      <entity id="15" name="topography" multiple="true" ui:layout="table" ui:tab="tab_1015">
+        <label type="instance">Topography</label>
+        <code id="16" name="element" key="true" list="topographical_elements">
+          <label type="instance">Element</label>
+        </code>
+        <code id="17" name="coverage" ui:layoutType="dropdown" list="topographical_elements_coverage">
+          <label type="instance">Coverage</label>
+        </code>
+      </entity>
+      <code id="18" name="human_impact_type" multiple="true" minCount="1" maxCount="5" ui:tab="tab_1012" list="human_impact_type">
+        <label type="instance">Type of Disturbance</label>
+      </code>
+      <code id="19" name="human_impact_grade" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'" required="true" ui:tab="tab_1012" list="human_impact_grade">
+        <label type="instance">Grade</label>
+        <description>Grade of the human impact, this is only relevant for Forest, Grassland and Otherland plots.</description>
+      </code>
+      <boolean id="1017" name="continuous_human_impact" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012">
+        <label type="instance">Is the disturbance continuous?</label>
+        <description>For instance grazing is a continuous impact while for instance clear cutting is an specific disturbance for which the date can be assessed.</description>
+      </boolean>
+      <number id="20" name="human_impact_year" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'and continuous_human_impact=false()" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012" type="integer">
+        <label type="instance">Year of the disturbance</label>
+        <compare flag="error" lt="2016" gt="1980" />
+      </number>
+      <boolean id="21" name="human_impact_accuracy" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012">
+        <label type="instance">Interpretation Confidence</label>
+        <description>How confident is the user that the human impact actually happened.</description>
+      </boolean>
+      <date id="22" name="rs_date" relevant="land_use_category!='noData'" required="true" ui:tab="tab_1013">
+        <label type="instance">RS Date</label>
+      </date>
+      <code id="23" name="rs_satellite" relevant="land_use_category!='noData'" required="true" ui:tab="tab_1013" list="rs_satellite">
+        <label type="instance">RS Satellite</label>
+      </code>
+      <boolean id="1041" name="more_than_thirty_trees" relevant="land_use_category!='forest' and land_use_category!='noData'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1015">
+        <label type="instance">More than thirty trees in plot?</label>
+        <description>This should be hidden when the user chooses the "Forest" land use.
+Using this attribute and the "Number of trees in the plot" it is possible to estimate the number of trees outside the forest in the region.</description>
+      </boolean>
+      <number id="1000" name="tress_outside_forest" relevant="land_use_category!='forest' and land_use_category!='noData' and more_than_thirty_trees=false()" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1015" type="integer">
+        <label type="instance">Number of trees in plot</label>
+        <compare flag="error" lte="30" gte="0">
+          <message xml:lang="en">The number of trees in the plot in non-forest categories should not exceed 30</message>
+        </compare>
+      </number>
+      <code id="1065" name="land_use_initial_subdivision" relevant="land_use_subdivision_change=true() or  (&#10;land_use_subcategory!='GLtoGL' and land_use_subcategory!='FLtoFL' and land_use_subcategory!='SLtoSL' and land_use_subcategory!='OTtoOT' and land_use_subcategory!='WLtoWL' and land_use_subcategory!='CLtoCL'&#10;)" required="true" ui:tab="plot_tab" ui:layoutType="dropdown" strict="false" list="land_use" parent="land_use_category">
+        <label type="instance">Previous Land Use Subdivision</label>
+      </code>
+      <number id="1066" name="land_use_subdivision_year_of_change" relevant="land_use_subdivision_change=true()&#10;and&#10;(land_use_subcategory='GLtoGL' or land_use_subcategory='FLtoFL' or land_use_subcategory='SLtoSL' or land_use_subcategory='OTtoOT' or land_use_subcategory='WLtoWL' or land_use_subcategory='CLtoCL')" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" type="integer">
+        <label type="instance">Year of the Sub-Division change</label>
+        <compare flag="error" lte="2016" gte="1980" />
+      </number>
+      <boolean id="31" name="actively_saved">
+        <label type="instance">Actively saved by user</label>
+      </boolean>
+      <date id="32" name="actively_saved_on" relevant="false()">
+        <label type="instance">Last saved on</label>
+      </date>
+      <text id="33" name="plot_file" relevant="false()" type="short">
+        <label type="instance">CSV file that contains the plot</label>
+      </text>
+      <number id="28" name="elevation" collectearth:fromcsv="true" type="integer">
+        <label type="instance">Elevation</label>
+      </number>
+      <number id="30" name="slope" collectearth:fromcsv="true" type="real">
+        <label type="instance">Slope</label>
+      </number>
+      <number id="29" name="aspect" collectearth:fromcsv="true" type="real">
+        <label type="instance">Aspect</label>
+      </number>
+      <code id="1031" name="soil" ui:tab="plot_tab" collectearth:fromcsv="true" list="soil_types">
+        <label type="instance">ALU Soil type</label>
+      </code>
+      <code id="1032" name="climate" ui:tab="plot_tab" collectearth:fromcsv="true" list="climate_zones">
+        <label type="instance">ALU Climate zone</label>
+      </code>
+      <code id="3381" name="ecological_zone" required="true" ui:tab="plot_tab" collectearth:fromcsv="true" list="ecological_zones">
+        <label type="instance">Ecological zone</label>
+      </code>
+      <text id="34" name="region" relevant="false()" collectearth:fromcsv="true" type="short">
+        <label type="instance">Region</label>
+      </text>
+      <code id="2538" name="calculated_elevation_range" ui:hide="true" ui:tab="plot_tab" calculated="true" list="elevation_ranges">
+        <label type="instance">Elevation - range</label>
+        <default expr=" format-number(ceiling(elevation div 100 ), '#')" />
+      </code>
+      <code id="2614" name="calculated_aspect" ui:hide="true" ui:tab="plot_tab" calculated="true" list="orientation">
+        <label type="instance">Aspect - ranges</label>
+        <default value="na" if="aspect=0 and slope=0" />
+        <default value="N" if="aspect&gt;337.5 or aspect&lt;=22.5" />
+        <default value="NE" if="aspect&gt;22.5 and aspect&lt;=67.5" />
+        <default value="E" if="aspect&gt;67.5 and aspect&lt;=112.5" />
+        <default value="SE" if="aspect&gt;112.5 and aspect&lt;=157.5" />
+        <default value="S" if="aspect&gt;157.5 and aspect&lt;=202.5" />
+        <default value="SW" if="aspect&gt;202.5 and aspect&lt;=247.5" />
+        <default value="W" if="aspect&gt;247.5 and aspect&lt;=292.5" />
+        <default value="NW" if="aspect&gt;292.5 and aspect&lt;=337.5" />
+      </code>
+      <code id="2615" name="calculated_slope" ui:hide="true" ui:tab="plot_tab" calculated="true" list="slope_classes">
+        <label type="instance">Slope - ranges</label>
+        <default value="FLAT" if="slope&gt;=0 and slope&lt;6" />
+        <default value="SLIGHT" if="slope&gt;=6 and slope&lt;16" />
+        <default value="STEEP" if="slope&gt;=16 and slope&lt;31" />
+        <default value="VERY_STEEP" if="slope&gt;=31 and slope&lt;45" />
+        <default value="EXTREME" if="slope&gt;=46 and slope&lt;61" />
+        <default value="FALL" if="slope&gt;=60" />
+        <default value="NA" if="idm:blank(aspect)" />
+      </code>
+    </entity>
+  </schema>
 </survey>
