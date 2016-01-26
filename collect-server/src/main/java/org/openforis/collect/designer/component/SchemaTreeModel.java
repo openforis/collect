@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.idm.metamodel.EntityDefinition;

@@ -14,8 +14,8 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.IOUtils;
-import org.openforis.collect.designer.model.AttributeType;
-import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
@@ -110,7 +110,7 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		
 		//calculate parent item (tab or entity)
 		final Window popup = SchemaTreePopUpVM.openPopup(title, parentEntityDefinition.getRootEntity(), null, includedNodePredicate, 
-				true, true, null, null, parentEntityDefinition);
+				true, true, null, null, parentEntityDefinition, false);
 		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();

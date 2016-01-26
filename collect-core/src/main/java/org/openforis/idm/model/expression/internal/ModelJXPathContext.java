@@ -3,7 +3,12 @@
  */
 package org.openforis.idm.model.expression.internal;
 
-import org.apache.commons.jxpath.CompiledExpression;
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.ri.Compiler;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
@@ -13,12 +18,7 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyObject;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Node;
-
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.openforis.idm.model.expression.ExpressionFactory;
 
 /**
  * @author M. Togna
@@ -34,7 +34,7 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	private LookupProvider lookupProvider;
 	private final Map<String, Object> compiled;
 	private static volatile ModelJXPathContext compilationContext;
-	private ReferencedPathEvaluator referencedPathEvaluator;
+	private ExpressionFactory expressionFactory;
 	private Survey survey;
 
 	protected ModelJXPathContext(JXPathContext parentContext, Object contextNode) {
@@ -48,19 +48,22 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	}
 
 	/**
-	 * Compiles the supplied XPath and returns an internal representation
-	 * of the path that can then be evaluated.  Use CompiledExpressions
-	 * when you need to evaluate the same expression multiple times
-	 * and there is a convenient place to cache CompiledExpression
-	 * between invocations.
+	 * Compiles the supplied XPath and returns an internal representation of the
+	 * path that can then be evaluated. Use CompiledExpressions when you need to
+	 * evaluate the same expression multiple times and there is a convenient
+	 * place to cache CompiledExpression between invocations.
+	 * 
+	 * @param expressionFactory
 	 *
-	 * @param xpath to compile
+	 * @param xpath
+	 *            to compile
 	 * @return CompiledExpression
 	 */
-	public synchronized static CompiledExpression compile(ReferencedPathEvaluator referencedPathEvaluator, String xpath, boolean normalizeNumbers) {
+	public synchronized static ModelJXPathCompiledExpression compile(ExpressionFactory expressionFactory,
+			String xpath, boolean normalizeNumbers) {
 		if (compilationContext == null) {
 			compilationContext = (ModelJXPathContext) JXPathContext.newContext(null);
-			compilationContext.referencedPathEvaluator = referencedPathEvaluator;
+			compilationContext.expressionFactory = expressionFactory;
 		}
 		ModelJXPathCompiledExpression compiledExpression = compilationContext.compilePath(xpath, normalizeNumbers);
 		return compiledExpression;
@@ -87,7 +90,7 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 
 	private ModelJXPathCompiledExpression compilePath(String xpath, boolean normalizeNumbers) {
 		Expression expr = compileExpression(xpath, normalizeNumbers);
-		ModelJXPathCompiledExpression compiledExpression = new ModelJXPathCompiledExpression(referencedPathEvaluator, xpath, expr);
+		ModelJXPathCompiledExpression compiledExpression = new ModelJXPathCompiledExpression(expressionFactory, xpath, expr);
 		return compiledExpression;
 	}
 
@@ -95,7 +98,7 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	protected Compiler getCompiler() {
 		return new ModelTreeCompiler();
 	}
-	
+
 	protected Compiler getCompiler(boolean normalizeNumbers) {
 		ModelTreeCompiler compiler = (ModelTreeCompiler) getCompiler();
 		if (normalizeNumbers) {

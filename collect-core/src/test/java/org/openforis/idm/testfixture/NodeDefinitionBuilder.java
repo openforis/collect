@@ -113,7 +113,7 @@ public abstract class NodeDefinitionBuilder {
 		
 		private NodeDefinitionBuilder[] builders;
 
-		private EntityDefinitionBuilder(String name, NodeDefinitionBuilder... builders) {
+		EntityDefinitionBuilder(String name, NodeDefinitionBuilder... builders) {
 			super(name);
 			this.builders = builders;
 		}
@@ -157,7 +157,7 @@ public abstract class NodeDefinitionBuilder {
 		private List<AttributeDefault> defaultValues;
 		private String validationExpression;
 
-		private AttributeDefinitionBuilder(String name) {
+		AttributeDefinitionBuilder(String name) {
 			super(name);
 			defaultValues = new ArrayList<AttributeDefault>();
 		}

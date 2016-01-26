@@ -8,20 +8,28 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.AttributeDefinitionFormObject;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
-import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.model.CheckType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
+import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
+import org.openforis.collect.manager.validation.SurveyValidator.ReferenceableKeyAttributeHelper;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
+import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SurveyObject;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
@@ -39,6 +47,7 @@ import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Window;
 
 /**
@@ -357,7 +366,55 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 			return up ? index <= 0: index < 0 || index >= siblings.size() - 1;
 		}
 	}
-
+	
+	@Command
+	public void openReferencedAttributeSelector(@ContextParam(ContextType.BINDER) final Binder binder) {
+		ReferenceableKeyAttributeHelper referenceableKeyAttributeHelper = new ReferenceableKeyAttributeHelper(editedItem);
+		final Set<EntityDefinition> referenceableEntityDefinitions = referenceableKeyAttributeHelper.determineReferenceableEntities();
+		final Set<AttributeDefinition> selectableAttributes = referenceableKeyAttributeHelper.determineReferenceableAttributes();
+				
+		if ( selectableAttributes.isEmpty() ) {
+			MessageUtil.showWarning("survey.schema.attribute.no_referenceable_attributes_available");
+		} else {
+			Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
+				public boolean evaluate(SurveyObject item) {
+					EntityDefinition parentEntity;
+					if (item instanceof UITab) {
+						parentEntity = survey.getUIOptions().getParentEntityForAssignedNodes((UITab) item);
+					} else {
+						parentEntity = ((NodeDefinition) item).getParentEntityDefinition(); 
+					}
+					for (EntityDefinition entityDef : referenceableEntityDefinitions) {
+						if (parentEntity == entityDef || parentEntity.isAncestorOf(entityDef)) {
+							return true;
+						}
+					}
+					return false;
+				}
+			};
+			Predicate<SurveyObject> disabledNodePredicate = new Predicate<SurveyObject>() {
+				public boolean evaluate(SurveyObject item) {
+					return ! selectableAttributes.contains(item);
+				}
+			};
+			String title = Labels.getLabel("survey.schema.attribute.select_attribute_referenced_by", new String[]{editedItem.getName()});
+			final Window parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title,
+					editedItem.getRootEntity(), null, includedNodePredicate,
+					false, false, disabledNodePredicate, null,
+					editedItem.getReferencedAttribute(), true);
+			parentSelectorPopUp.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+				public void onEvent(NodeSelectedEvent event) throws Exception {
+					AttributeDefinition referencedAttribute = (AttributeDefinition) event.getSelectedItem();
+					AttributeDefinitionFormObject<?> fo = (AttributeDefinitionFormObject<?>) formObject;
+					fo.setReferencedAttributePath(referencedAttribute == null ? null : referencedAttribute.getPath());
+					notifyChange("formObject");
+					dispatchApplyChangesCommand(binder);
+					closePopUp(parentSelectorPopUp);
+				}
+			});
+		}
+	}
+	
 	public List<AttributeDefault> getAttributeDefaults() {
 		return attributeDefaults;
 	}

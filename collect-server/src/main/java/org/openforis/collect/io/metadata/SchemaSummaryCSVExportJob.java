@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
 import org.apache.commons.io.IOUtils;
-import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Job;

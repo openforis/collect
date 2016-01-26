@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.model.CheckType;
-import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;

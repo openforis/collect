@@ -4,16 +4,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.expression.AbstractExpression;
 import org.openforis.idm.model.expression.BooleanExpression;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.model.expression.ValueExpression;
-import org.openforis.idm.model.expression.internal.IDMFunctions;
 import org.openforis.idm.path.Path;
 
 /**
@@ -23,7 +20,6 @@ import org.openforis.idm.path.Path;
  */
 public class ExpressionValidator {
 
-	private static final String COMPLETE_LAT_LONG_FUNCTION_NAME = ExpressionFactory.IDM_PREFIX + ":" + IDMFunctions.LATLONG_FUNCTION_NAME;
 	private static final Pattern FUNCTION_NAME_PATTERN = Pattern.compile("((\\w+):)?([a-zA-Z0-9-_]+)");
 
 	public enum ExpressionType {
@@ -131,7 +127,7 @@ public class ExpressionValidator {
 	}
 	
 	private ExpressionValidationResult validateSyntax(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, AbstractExpression expression) {
-		ExpressionValidationResult result = validateFunctionNames(contextNodeDef.getSurvey(), expression);
+		ExpressionValidationResult result = expression.validate(contextNodeDef);
 		if (result.isError()) {
 			return result;
 		}
@@ -139,29 +135,6 @@ public class ExpressionValidator {
 		return result;
 	}
 	
-	public ExpressionValidationResult validateFunctionNames(Survey survey, AbstractExpression expression) {
-		Set<String> names = expression.getFunctionNames();
-		boolean valid = true;
-		for (String name : names) {
-			valid = valid && isFunctionNameValid(expression, name);
-			if (valid && name.equals(COMPLETE_LAT_LONG_FUNCTION_NAME)
-					&& survey.getSpatialReferenceSystem(CoordinateOperations.WGS84_SRS_ID) == null) {
-				String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
-						COMPLETE_LAT_LONG_FUNCTION_NAME, CoordinateOperations.WGS84_SRS_ID);
-				ExpressionValidationResult validationResult = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
-				return validationResult;
-			} else if (! valid) {
-				String message = String.format("function '%s' does not exist", name);
-				String functionNames = expressionFactory.getFullFunctionNames().toString();
-				String detailedMessage = String.format("function '%s' does not exist\n Possible function names:\n%s", name, functionNames);
-				ExpressionValidationResult validationResult = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
-				validationResult.setDetailedMessage(detailedMessage);
-				return validationResult;
-			}
-		}
-		return new ExpressionValidationResult();
-	}
-
 	public boolean isFunctionNameValid(AbstractExpression expression, String name) {
 		Matcher matcher = FUNCTION_NAME_PATTERN.matcher(name);
 		boolean valid;
@@ -270,12 +243,24 @@ public class ExpressionValidator {
 			return flag;
 		}
 		
+		public void setFlag(ExpressionValidationResultFlag flag) {
+			this.flag = flag;
+		}
+		
 		public String getMessage() {
 			return message;
 		}
 		
+		public void setMessage(String message) {
+			this.message = message;
+		}
+		
 		public String[] getMessageArgs() {
 			return messageArgs;
+		}
+		
+		public void setMessageArgs(String[] messageArgs) {
+			this.messageArgs = messageArgs;
 		}
 		
 		public String getDetailedMessage() {
