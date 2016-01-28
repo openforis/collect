@@ -2,7 +2,7 @@ var SEPARATOR_MULTIPLE_PARAMETERS = "==="; //used to separate multiple attribute
 var SEPARATOR_MULTIPLE_VALUES = ";";
 var DATE_FORMAT = 'MM/DD/YYYY';
 var TIME_FORMAT = 'HH:ss';
-var SUBMIT_LABEL = "Submit and validate";
+
 var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
 
@@ -49,19 +49,17 @@ $(function() {
 		e.preventDefault();
 		
 		clearTimeout(ajaxTimeout); 	// So that the form
-									// is not saved twice
-									// if the user
-									// clicks the submit
-									// button before the
-									// auto-save timeout
-									// has started
-									// Mark this as the "real submit" (as opposed
-									// when saving data just because the user closes
-									// the window) so we can show the placemark as
-									// interpreted
-		setActivelySaved(true);
-
-		submitForm($(this), 0);
+						// is not saved twice
+						// if the user
+						// clicks the submit
+						// button before the
+						// auto-save timeout
+						// has started
+						// Mark this as the "real submit" (as opposed
+						// when saving data just because the user closes
+						// the window) so we can show the placemark as
+						// interpreted
+		submitData();
 	});
 
 	$(".code-item").tooltip();
@@ -69,55 +67,73 @@ $(function() {
 	checkIfPlacemarkAlreadyFilled(0);
 });
 
-var ajaxDataUpdate = function(delay, timesTried) {
+var submitData = function() {
+	sendDataUpdateRequest(findById(ACTIVELY_SAVED_FIELD_ID), true, true);
+};
+
+var updateData = function(inputField, delay) {
+	sendDataUpdateRequest(inputField, false, false, delay);
+};
+
+var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, timesTried) {
 	if (typeof delay == "undefined") {
 		delay = 100;
+	}
+	if (typeof timesTried == "undefined") {
+		timesTried = 0;
 	}
 	if (DEBUG) {
 		log("sending update request (delay=" + delay + ")");
 	}
 	abortLastUpdateRequest();
 
-	setActivelySaved(false);
+	setActivelySaved(activelySaved);
 
 	// Set a timeout so that the data is only sent to the server
 	// if the user stops clicking for over one second
 
 	ajaxTimeout = setTimeout(function() {
-		var data = createPlacemarkUpdateRequest();
+		var data = createPlacemarkUpdateRequest(inputField);
 		
 		lastUpdateRequest = $.ajax({
 			data : data,
 			type : "POST",
 			url : $form.attr("action"),
-			timeout: 1000,
-			dataType : 'json'
+			timeout: 2000,
+			dataType : 'json',
+			beforeSend : function() {
+				if (blockUI) {
+					$.blockUI({
+						message : 'Submitting data..'
+					});
+				}
+			}
 		})
 		.done(function(json) {
 			if (DEBUG) {
 				log("data updated successfully");
 			}
-			interpretJsonSaveResponse(json, false);
+			interpretJsonSaveResponse(json, activelySaved);
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
 			if (DEBUG) {
 				log("error updating data. Text status = " + textStatus + "; error thrown = " + errorThrown );
 			}
 			// try again
-			if (typeof timesTried == "undefined") {
-				timesTried = 0;
-			}
 			if( timesTried < 5){
-				ajaxDataUpdate(delay, timesTried + 1);
+				sendDataUpdateRequest(inputField, activelySaved, delay, blockUI, timesTried + 1);
 			}
 		})
 		.always(function() {
 			lastUpdateRequest = null;
+			if (blockUI) {
+				$.unblockUI();
+			}
 		});
 	}, delay);
 };
 
-var createPlacemarkUpdateRequest = function() {
+var createPlacemarkUpdateRequest = function(inputField) {
 
 	// Remove the value from the fields that are hidden!
 	$(".notrelevant").find("input[type='hidden']").each( function(){
@@ -126,10 +142,18 @@ var createPlacemarkUpdateRequest = function() {
 	$(".notrelevant").find(":input:not(:button)").each( function(){
 		$(this).val('');
 	});
-	
+
+	var values;
+	if (inputField == null) {
+		values = serializeFormToJSON($form);
+	} else {
+		values = {};
+		values[encodeURIComponent($(inputField).attr('name'))] = $(inputField).val();
+	}
+
 	var data = {
 		placemarkId : getPlacemarkId(),
-		values : serializeFormToJSON($form),
+		values : values,
 		currentStep : currentStepIndex
 	};
 	return data;
@@ -146,7 +170,7 @@ var abortLastUpdateRequest = function() {
 		lastUpdateRequest = null;
 	}
 };
-
+/*
 var submitForm = function(submitCounter) {
 	abortLastUpdateRequest();
 
@@ -160,7 +184,7 @@ var submitForm = function(submitCounter) {
 		timeout : 10000,
 		beforeSend : function() {
 			$.blockUI({
-				message : 'Sumitting data..'
+				message : 'Submitting data..'
 			});
 		}
 	})
@@ -180,7 +204,7 @@ var submitForm = function(submitCounter) {
 				submitCounter = 0;
 			}
 			
-			if (submitCounter < 5) {
+			if (submitCounter < 10) {
 				submitForm(submitCounter + 1);
 			} else {
 				showErrorMessage("Cannot save the data, the Collect Earth server is not running!");
@@ -191,7 +215,7 @@ var submitForm = function(submitCounter) {
 		$.unblockUI();
 	});
 };
-
+*/
 var interpretJsonSaveResponse = function(json, showUpdateMessage) {
 	if (showUpdateMessage) { // show feedback message
 		if (json.success) {
@@ -245,7 +269,7 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 	$.each(inputFieldInfoByParameterName, function(fieldName, info) {
 		var el = findById(fieldName);
 		if (el.length == 1) {
-			var parentCodeFieldId = el.data("parentCodeFieldId");
+			var parentCodeFieldId = el.data("parentIdFieldId");
 			var hasParentCode = parentCodeFieldId && parentCodeFieldId != "";
 			if (hasParentCode) {
 				switch (el.data("fieldType")) {
@@ -261,15 +285,17 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 					break;
 				case "CODE_BUTTON_GROUP":
 					var parentCodeInfo = inputFieldInfoByParameterName[parentCodeFieldId];
-					var parentCodeValue = parentCodeInfo.value;
+					var parentCodeItemId = parentCodeInfo.codeItemId;
 					var groupContainer = el.closest(".code-items-group");
 					
-					var validItemsContainer = groupContainer.find(".code-items[data-parent-code='" + parentCodeValue + "']");
-					if (validItemsContainer.is(':hidden')) {
-						var itemsContainers = groupContainer.find(".code-items");
-						itemsContainers.hide();
-						
-						validItemsContainer.show();
+					var itemsContainers = groupContainer.find(".code-items");
+					//itemsContainers.hide();
+					itemsContainers.css( "display", "none")
+
+					var validItemsContainer = groupContainer.find(".code-items[data-parent-id='" + parentCodeItemId + "']");
+					if (validItemsContainer.length > 0 && validItemsContainer.is(':hidden')) {
+						//validItemsContainer.show();
+						validItemsContainer.css( "display", "block")
 					}
 					break;
 				}
@@ -414,7 +440,9 @@ var initCodeButtonGroups = function() {
 		}
 		inputField.val(value);
 
-		ajaxDataUpdate();
+		updateData(inputField);
+		
+		return false;
 	});
 };
 
@@ -425,7 +453,8 @@ var initBooleanButtons = function() {
 		group.find("button").click(function() {
 			var btn = $(this);
 			hiddenField.val(btn.val());
-			ajaxDataUpdate();
+			updateData(hiddenField);
+			return false;
 		});
 	});
 };
@@ -435,15 +464,16 @@ var initDateTimePickers = function() {
 	$('.datepicker').datetimepicker({
 		format : DATE_FORMAT
 	}).on('dp.change', function(e) {
-		// var inputField = $(this).find(".form-control");
+		var inputField = $(this).find(".form-control");
 		// inputField.change();
-		ajaxDataUpdate();
+		updateData(inputField);
 	});
 
 	$('.timepicker').datetimepicker({
 		format : TIME_FORMAT
 	}).on('dp.change', function(e) {
-		ajaxDataUpdate();
+		var inputField = $(this).find(".form-control");
+		updateData(inputField);
 	});
 };
 
@@ -455,7 +485,10 @@ var initSteps = function() {
 		autoFocus : true,
 		titleTemplate : "#title#",
 		labels : {
-			finish : SUBMIT_LABEL
+			// These values come from the balloon.html file as they need to be localized (spanish,english,portuguese and french)
+			finish : SUBMIT_LABEL,
+		    next: NEXT_LABEL,
+		    previous: PREVIOUS_LABEL
 		},
 		onStepChanged : function(event, currentIndex, priorIndex) {
 			var stepHeading = $($form.find(".steps .steps ul li")[currentIndex]);
@@ -467,11 +500,12 @@ var initSteps = function() {
 				}
 			} else {
 				currentStepIndex = currentIndex;
-				ajaxDataUpdate();
+				//ajaxDataUpdate();
 			}
+			updateStepsErrorFeedback();
 		},
 		onFinished : function(event, currentIndex) {
-			$form.submit();
+			submitData();
 		}
 	});
 	$stepsContainer.find("a[href='#finish']").addClass("btn-finish");
@@ -497,16 +531,16 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 			checkCount = checkCount + 1;
 			checkIfPlacemarkAlreadyFilled(checkCount);
 		} else {
-			showErrorMessage("The Collect Earth server is not running!");
+			showErrorMessage(COLLECT_NOT_RUNNING);
 		}
 	})
 	.done(function(json) {
 		if (json.success) {
 			// placemark exists in database
 			if (json.activelySaved
-					&& json.inputFieldInfoByParameterName.collect_text_id.value != 'testPlacemark') { // 
+					&& json.inputFieldInfoByParameterName.collect_text_id.value != 'testPlacemark') {
 	
-				showErrorMessage("The data for this placemark has already been filled");
+				showErrorMessage(PLACEMARK_ALREADY_FILLED);
 	
 				if (json.skipFilled) {
 					forceWindowCloseAfterDialogCloses($("#dialogSuccess"));
@@ -520,10 +554,11 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 			currentStepIndex = json.currentStep == null ? null
 					: parseInt(json.currentStep);
 			showCurrentStep();
+			updateStepsErrorFeedback();
 		} else {
 			// if no placemark in database, force the creation
 			// of a new record
-			ajaxDataUpdate();
+			updateData();
 		}
 	});
 };
@@ -614,7 +649,7 @@ var setValueInInputField = function(inputField, value) {
 			var group = inputField.closest(".boolean-group");
 			group.find("button").removeClass('active');
 			if (value != null && value != "") {
-				group.find("button[value='" + value + "']").button('toggle');
+				group.find("button[value='" + escapeRegExp(value) + "']").button('toggle');
 			}
 			break;
 		case "CODE_BUTTON_GROUP":
@@ -627,11 +662,10 @@ var setValueInInputField = function(inputField, value) {
 				var activeCodeItemsContainer = itemsGroup
 						.find(".code-items:visible");
 				var splitted = value.split(SEPARATOR_MULTIPLE_PARAMETERS);
-				splitted
-						.forEach(function(value, index) {
-							var button = activeCodeItemsContainer.find(".code-item[value=" + value + "]");
-							button.addClass('active');
-						});
+				splitted.forEach(function(value, index) {
+					var button = activeCodeItemsContainer.find(".code-item[value=" + escapeRegExp(value) + "]");
+					button.addClass('active');
+				});
 			}
 			break;
 		}
@@ -648,6 +682,10 @@ var setValueInInputField = function(inputField, value) {
 	}
 };
 
+function escapeRegExp(string){
+	return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
 var initializeChangeEventSaver = function() {
 	// SAVING DATA WHEN DATA CHANGES
 	// Bind event to Before user leaves page with function parameter e
@@ -655,11 +693,11 @@ var initializeChangeEventSaver = function() {
 	// OBS! The change event is not fired for the hidden inputs when the value
 	// is updated through jQuery's val()
 	$('input[name^=collect], select[name^=collect],select[name^=hidden], button[name^=collect]').change(function(e) {
-		ajaxDataUpdate();
+		updateData(e.target);
 	});
 
 	$('input:text[name^=collect], textarea[name^=collect]').keyup(function(e) {
-		ajaxDataUpdate(1500);
+		updateData(e.target, 1500);
 	});
 
 };

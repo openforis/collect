@@ -11,7 +11,6 @@ import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.CodeAttribute;
 
 /**
@@ -45,14 +44,7 @@ public class CodeAttributeProxy extends AttributeProxy {
 
 	@ExternalizedProperty
 	public boolean isEnumerator() {
-		CodeAttributeDefinition definition = codeAttribute.getDefinition();
-		EntityDefinition parentDefinition = (EntityDefinition) definition.getParentDefinition();
-		if(parentDefinition.isEnumerable() && definition.isKey() && 
-				definition.getList() != null && ! definition.getList().isExternal()) {
-			return true;
-		} else {
-			return false;
-		}
+		return codeAttribute.isEnumerator();
 	}
 
 	protected boolean isExternalCodeList() {

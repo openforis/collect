@@ -7,6 +7,7 @@ package org.openforis.collect.ui.component.detail
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
+	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.util.UIUtil;
@@ -53,30 +54,32 @@ package org.openforis.collect.ui.component.detail
 		
 		private function canBeHidden(parentEntity:EntityProxy, defn:NodeDefinitionProxy):Boolean {
 			if ( defn.hideWhenNotRelevant ) {
-				var nodes:IList;
 				//if nearest parent entity is table, hide fields when all cousins are not relevant and empty
 				var nearestParentMultipleEntity:EntityDefinitionProxy = defn.nearestParentMultipleEntity;
 				
+				var nodes:IList;
 				if ( nearestParentMultipleEntity.layout == UIUtil.LAYOUT_TABLE ) {
 					nodes = parentEntity.getDescendantCousins(defn);
 				} else {
 					nodes = parentEntity.getChildren(defn);
 				}
-				//do not hide multiple entities renderer if they are relevant but no entities are defined or it will be impossible to add new entities
-				if ( defn is EntityDefinitionProxy && nodes.length == 0 ) {
-					var result:Boolean = ! parentEntity.isRelevant(defn);
-					return result;
-				}
-				//hide table columns when all the cells are not relevant and empty
-				var allNodesEmptyAndNotRelevant:Boolean = true;
-				for each (var node:NodeProxy in nodes) {
-					var calculated:Boolean = defn is AttributeDefinitionProxy && AttributeDefinitionProxy(defn).calculated;
-					if ( node.relevant || ( ! calculated && ! node.empty ) ) {
-						allNodesEmptyAndNotRelevant = false;
-						break;
+				if ( defn is EntityDefinitionProxy ) {
+					if (EntityDefinitionProxy(defn).enumerable || nodes.length > 0) {
+						//hide table columns when all the cells are not relevant and empty
+						var allNodesEmptyAndNotRelevant:Boolean = true;
+						for each (var node:NodeProxy in nodes) {
+							if ( node.relevant || (node.userSpecified && ! node.empty)) {
+								allNodesEmptyAndNotRelevant = false;
+								break;
+							}
+						}
+						return allNodesEmptyAndNotRelevant;
+					} else {
+						//do not hide multiple entities renderer if they are relevant but no entities are defined or it will be impossible to add new entities
+						var result:Boolean = ! parentEntity.isRelevant(defn);
+						return result;
 					}
 				}
-				return allNodesEmptyAndNotRelevant;
 			} else {
 				return false;
 			}

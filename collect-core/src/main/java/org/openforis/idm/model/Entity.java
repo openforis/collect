@@ -115,7 +115,7 @@ public class Entity extends Node<EntityDefinition> {
 		Collection<List<Node<?>>> childLists = childrenByDefinitionId.values();
 		for (List<Node<?>> list : childLists) {
 			for (Node<?> node : list) {
-				if (!node.isEmpty()) {
+				if (node.isUserSpecified() && ! node.isEmpty()) {
 					return false;
 				}
 			}
