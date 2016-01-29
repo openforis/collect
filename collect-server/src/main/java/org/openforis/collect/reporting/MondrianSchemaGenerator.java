@@ -10,6 +10,7 @@ import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -328,6 +329,8 @@ public class MondrianSchemaGenerator {
 		Level level = new Level(attrLabel);
 		if (nodeDef instanceof NumericAttributeDefinition) {
 			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? "Integer": "Numeric";
+		} else if (nodeDef instanceof BooleanAttributeDefinition) {
+			level.type = "Boolean";
 		} else {
 			level.type = "String";	
 		}

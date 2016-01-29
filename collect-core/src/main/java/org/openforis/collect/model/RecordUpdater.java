@@ -1,5 +1,6 @@
 package org.openforis.collect.model;
 
+
 import static org.openforis.collect.model.CollectRecord.APPROVED_MISSING_POSITION;
 import static org.openforis.collect.model.CollectRecord.CONFIRMED_ERROR_POSITION;
 import static org.openforis.collect.model.CollectRecord.DEFAULT_APPLIED_POSITION;
@@ -43,6 +44,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
+import static org.openforis.idm.model.NodePointers.*;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
@@ -55,6 +57,8 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  *
  */
 public class RecordUpdater {
+	
+	private boolean clearNotRelevantAttributes = false;
 	
 	/**
 	 * Updates an attribute with a new value
@@ -296,83 +300,113 @@ public class RecordUpdater {
 		Set<CodeAttribute> updatedCodeAttributes = new HashSet<CodeAttribute>();
 		if (attribute instanceof CodeAttribute && clearDependentCodeAttributes) {
 			updatedCodeAttributes.addAll(clearDependentCodeAttributes(attribute));
+			changeMap.addValueChanges(updatedCodeAttributes);
 		}
-		changeMap.addValueChanges(updatedCodeAttributes);
 		
 		if (validate) {
-		// relevance
-		Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
-		nodesToCheckRelevanceFor.add(attribute);
-		nodesToCheckRelevanceFor.addAll(updatedCodeAttributes);
-		
-		List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
-		RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
-		Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
-		changeMap.addRelevanceChanges(updatedRelevancePointers);
-		
-		// min count
-		Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
-		pointersToCheckMinCountFor.add(attributeNodePointer);
-		pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
-		pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCodeAttributes));
-		
-		Collection<NodePointer> minCountPointersToUpdate = record.determineMinCountDependentNodes(pointersToCheckMinCountFor);
-		Collection<NodePointer> updatedMinCountPointers = updateMinCount(minCountPointersToUpdate);
-		changeMap.addMinCountChanges(updatedMinCountPointers);
-		
-		// max count
-		Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
-		pointersToCheckMaxCountFor.add(attributeNodePointer);
-		pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
-		pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCodeAttributes));
-		
-		Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
-		Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
-		changeMap.addMaxCountChanges(updatedMaxCountPointers);
-		
-		Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
-		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
-
-		// validate cardinality
-		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(attribute);
-		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(
-				updatedMinCountPointers.size() + 
-				updatedMaxCountPointers.size() + 
-				updatedRelevancePointers.size() + 
-				ancestorsAndSelfPointers.size());
-		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
-		pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
-		pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
-		
-		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
-		pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
-		validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
-		
-		// validate attributes
-		Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(updatedCalculatedAttributes);
-		nodesToCheckValidationFor.add(attribute);
-		nodesToCheckValidationFor.addAll(updatedCodeAttributes);
-		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
-		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
-		
-		Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
-
-		validateAttributes(record, attributesToRevalidate, changeMap);
+			// relevance
+			Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
+			nodesToCheckRelevanceFor.add(attribute);
+			nodesToCheckRelevanceFor.addAll(updatedCodeAttributes);
+			
+			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
+			RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
+			Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
+			changeMap.addRelevanceChanges(updatedRelevancePointers);
+			
+			if (clearNotRelevantAttributes) {
+				Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
+				Set<Attribute<?, ?>> noMoreRelevantAttributes = retainNotRelevantAttributes(updatedRelevanceNodes);
+				Set<Attribute<?, ?>> clearedAttributes = clearAttributes(noMoreRelevantAttributes);
+				changeMap.addValueChanges(clearedAttributes);
+			}
+			
+			// min count
+			Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
+			pointersToCheckMinCountFor.add(attributeNodePointer);
+			pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
+			pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCodeAttributes));
+			
+			Collection<NodePointer> minCountPointersToUpdate = record.determineMinCountDependentNodes(pointersToCheckMinCountFor);
+			Collection<NodePointer> updatedMinCountPointers = updateMinCount(minCountPointersToUpdate);
+			changeMap.addMinCountChanges(updatedMinCountPointers);
+			
+			// max count
+			Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
+			pointersToCheckMaxCountFor.add(attributeNodePointer);
+			pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
+			pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCodeAttributes));
+			
+			Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
+			Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
+			changeMap.addMaxCountChanges(updatedMaxCountPointers);
+			
+			Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
+			updatedCardinalityPointers.addAll(updatedMaxCountPointers);
+	
+			// validate cardinality
+			List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(attribute);
+			Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(
+					updatedMinCountPointers.size() + 
+					updatedMaxCountPointers.size() + 
+					updatedRelevancePointers.size() + 
+					ancestorsAndSelfPointers.size());
+			pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
+			pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
+			pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
+			
+			// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
+			pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
+			validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
+			
+			// validate attributes
+			Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(updatedCalculatedAttributes);
+			nodesToCheckValidationFor.add(attribute);
+			nodesToCheckValidationFor.addAll(updatedCodeAttributes);
+			nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
+			nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
+			
+			Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
+	
+			validateAttributes(record, attributesToRevalidate, changeMap);
 		}
 		return changeMap;
 	}
 
 	private Set<CodeAttribute> clearDependentCodeAttributes(Attribute<?, ?> attribute) {
-		Set<CodeAttribute> updatedCodeAttributes = new HashSet<CodeAttribute>();
-		Set<CodeAttribute> dependentCodeAttributes = ((CodeAttribute) attribute).getDependentCodeAttributes();
-		for (CodeAttribute dependendAttr : dependentCodeAttributes) {
-			if (! dependendAttr.isEmpty()) {
-				dependendAttr.clearValue();
-				dependendAttr.updateSummaryInfo();
-				updatedCodeAttributes.add(dependendAttr);
+		return clearAttributes(((CodeAttribute) attribute).getDependentCodeAttributes());
+	}
+
+	private <A extends Attribute<?, ?>> Set<A> clearAttributes(Set<A> attributes) {
+		Set<A> updatedAttributes = new HashSet<A>();
+		for (A attr : attributes) {
+			if (! attr.isEmpty()) {
+				attr.clearValue();
+				attr.updateSummaryInfo();
+				updatedAttributes.add(attr);
 			}
 		}
-		return updatedCodeAttributes;
+		return updatedAttributes;
+	}
+
+	private Set<Attribute<?, ?>> retainNotRelevantAttributes(Set<Node<?>> nodes) {
+		Set<Attribute<?, ?>> result = new HashSet<Attribute<?,?>>();
+		for (Node<?> node : nodes) {
+			if (node instanceof Attribute && ! node.isRelevant()) {
+				result.add((Attribute<?, ?>) node);
+			}
+		}
+		return result;
+	}
+
+	private Set<Attribute<?, ?>> retainRelevantAttributes(Set<Node<?>> nodes) {
+		Set<Attribute<?, ?>> result = new HashSet<Attribute<?,?>>();
+		for (Node<?> node : nodes) {
+			if (node instanceof Attribute && node.isRelevant()) {
+				result.add((Attribute<?, ?>) node);
+			}
+		}
+		return result;
 	}
 
 	private void validateAttributes(Record record, Set<Attribute<?, ?>> attributes, NodeChangeMap changeMap) {
@@ -1058,22 +1092,10 @@ public class RecordUpdater {
 		return pointers;
 	}
 
-	private Collection<Node<?>> pointersToNodes(Collection<NodePointer> nodePointers) {
-		Set<Node<?>> result = new HashSet<Node<?>>();
-		for (NodePointer nodePointer : nodePointers) {
-			result.addAll(nodePointer.getNodes());
-		}
-		return result;
+	public void setClearNotRelevantAttributes(boolean clearNotRelevantAttributes) {
+		this.clearNotRelevantAttributes = clearNotRelevantAttributes;
 	}
 	
-	private Set<NodePointer> nodesToPointers(Collection<? extends Node<?>> nodes) {
-		Set<NodePointer> result = new HashSet<NodePointer>();
-		for (Node<?> n : nodes) {
-			result.add(new NodePointer(n));
-		}
-		return result;
-	}
-
 	private static class RelevanceUpdater {
 		private final List<NodePointer> pointersToUpdate;
 		private final Set<NodePointer> updatedNodePointers;
