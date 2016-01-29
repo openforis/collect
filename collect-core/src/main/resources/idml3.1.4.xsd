@@ -6,8 +6,8 @@
   xmlns="http://www.openforis.org/idml/3.0">
   <xs:annotation>
     <xs:documentation xml:lang="en">
-Inventory Data Modeling Language 3.0-rev1
-March 2013
+Inventory Data Modeling Language 3.1.4
+January 2016
 
 Inventory Data Modeling Language (IDML) is an XML implementation of the Inventory Data Metamodel (IDMM), providing a formal language for defining and describing inventory data models.  It is an abstraction which enables the creation of software that is flexible and reuseable in a wider range of scenarios.  The IDMM also allows tools to interoperate on the same field data, regardless of platform or implementation.  For example, mobile or personal data recorder (PDR) software, web or desktop-based data management software and data modeling tools that are designed to work with the IDMM would all be able work together and exchange data, regardless of vendor or inventory-specific details or functionality.
 
@@ -895,6 +895,13 @@ Used to link large code lists (e.g. cluster and plot ids or detailed lists of ad
               <xs:attribute name="type" use="optional" default="instance">
                  <xs:simpleType>
                   <xs:restriction base="xs:string">
+                    <xs:enumeration value="abbreviated">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Indicates that the label is an abbreviation of the instance label. 
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
                     <xs:enumeration value="instance">
                       <xs:annotation>
                         <xs:documentation xml:lang="en">
@@ -913,6 +920,13 @@ Used to link large code lists (e.g. cluster and plot ids or detailed lists of ad
                       <xs:annotation>
                         <xs:documentation xml:lang="en">
                           Indicates the number associated with the attribute or entity.  This code commonly appears on field forms and PC or PDR software, and may be number (1, 2, 3) or alphanumeric (2a, IV).  
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="reporting">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Indicates that the label is used for data reporting (e.g. Saiku).
                         </xs:documentation>
                       </xs:annotation>
                     </xs:enumeration>
