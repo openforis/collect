@@ -52,37 +52,38 @@ package org.openforis.collect.ui.component.detail
 			]);
 		}
 		
-		private function canBeHidden(parentEntity:EntityProxy, defn:NodeDefinitionProxy):Boolean {
-			if ( defn.hideWhenNotRelevant ) {
+		private function canBeHidden(parentEntity:EntityProxy, childDefn:NodeDefinitionProxy):Boolean {
+			if ( childDefn.hideWhenNotRelevant ) {
 				//if nearest parent entity is table, hide fields when all cousins are not relevant and empty
-				var nearestParentMultipleEntity:EntityDefinitionProxy = defn.nearestParentMultipleEntity;
+				var nearestParentMultipleEntity:EntityDefinitionProxy = childDefn.nearestParentMultipleEntity;
 				
 				var nodes:IList;
 				if ( nearestParentMultipleEntity.layout == UIUtil.LAYOUT_TABLE ) {
-					nodes = parentEntity.getDescendantCousins(defn);
+					nodes = parentEntity.getDescendantCousins(childDefn);
 				} else {
-					nodes = parentEntity.getChildren(defn);
+					nodes = parentEntity.getChildren(childDefn);
 				}
-				if ( defn is EntityDefinitionProxy ) {
-					if (EntityDefinitionProxy(defn).enumerable || nodes.length > 0) {
-						//hide table columns when all the cells are not relevant and empty
-						var allNodesEmptyAndNotRelevant:Boolean = true;
-						for each (var node:NodeProxy in nodes) {
-							if ( node.relevant || (node.userSpecified && ! node.empty)) {
-								allNodesEmptyAndNotRelevant = false;
-								break;
-							}
-						}
-						return allNodesEmptyAndNotRelevant;
-					} else {
-						//do not hide multiple entities renderer if they are relevant but no entities are defined or it will be impossible to add new entities
-						var result:Boolean = ! parentEntity.isRelevant(defn);
-						return result;
-					}
+				//do not hide multiple entities renderer if they are relevant but no entities are defined or it will be impossible to add new entities
+				if ( childDefn is EntityDefinitionProxy && nodes.length == 0 ) {
+					var result:Boolean = ! parentEntity.isRelevant(childDefn);
+					return result;
+				} else {
+					//hide table columns when all the cells are not relevant and empty
+					var allNodesEmptyAndNotRelevant:Boolean = allNodesEmptyAndNotRelevant(nodes);
+					return allNodesEmptyAndNotRelevant;
 				}
 			} else {
 				return false;
 			}
+		}
+		
+		private function allNodesEmptyAndNotRelevant(nodes:IList):Boolean {
+			for each (var node:NodeProxy in nodes) {
+				if ( node.relevant || (node.userSpecified && ! node.empty)) {
+					return false;
+				}
+			}
+			return true;
 		}
 		
 	}
