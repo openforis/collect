@@ -76,6 +76,10 @@ var updateData = function(inputField, delay) {
 	sendDataUpdateRequest(inputField, false, false, delay);
 };
 
+var sendCreateNewRecordRequest = function() {
+	sendDataUpdateRequest(findById(ACTIVELY_SAVED_FIELD_ID), false, false);
+};
+
 var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, retryCount) {
 	delay = defaultIfNull(delay, 100);
 	retryCount = defaultIfNull(retryCount, 0);
@@ -506,7 +510,7 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 		} else {
 			// if no placemark in database, force the creation
 			// of a new record
-			updateData();
+			sendCreateNewRecordRequest();
 		}
 	});
 };
