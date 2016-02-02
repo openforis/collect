@@ -331,6 +331,8 @@ public class MondrianSchemaGenerator {
 			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? "Integer": "Numeric";
 		} else if (nodeDef instanceof BooleanAttributeDefinition) {
 			level.type = "Boolean";
+		} else if (nodeDef instanceof CodeAttributeDefinition) {
+			level.type = "Integer";
 		} else {
 			level.type = "String";	
 		}
