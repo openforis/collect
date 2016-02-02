@@ -23,6 +23,7 @@ $(function() {
 		log("initializing");
 		log("using host: " + HOST);
 	}
+	$.blockUI({message: null});
 
 	$form = $("#formAll");
 	$stepsContainer = $(".steps");
@@ -49,7 +50,7 @@ $(function() {
 	$form.submit(function(e) {
 		e.preventDefault();
 		
-		clearTimeout(ajaxTimeout); 	// So that the form
+		abortLastUpdateRequest(); 	// So that the form
 						// is not saved twice
 						// if the user
 						// clicks the submit
@@ -73,11 +74,11 @@ var submitData = function() {
 };
 
 var updateData = function(inputField, delay) {
-	sendDataUpdateRequest(inputField, false, false, delay);
+	sendDataUpdateRequest(inputField, false, true, delay);
 };
 
 var sendCreateNewRecordRequest = function() {
-	sendDataUpdateRequest(findById(ACTIVELY_SAVED_FIELD_ID), false, false);
+	sendDataUpdateRequest(findById(ACTIVELY_SAVED_FIELD_ID), false, true);
 };
 
 var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, retryCount) {
@@ -106,9 +107,16 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 			dataType : 'json',
 			beforeSend : function() {
 				if (blockUI) {
-					$.blockUI({
-						message : 'Submitting data..'
-					});
+					if (activelySaved) {
+						$.blockUI({
+							message : 'Submitting data..'
+						});
+					} else {
+						$.blockUI({
+							message : null,
+							overlayCSS: { backgroundColor: 'transparent' }
+						});
+					}
 				}
 			}
 		})
@@ -256,16 +264,16 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 	if (DEBUG) {
 		log("updating errors feedback");
 	}
+	var changedFieldNames = [];
 	var errors = [];
 	$.each(inputFieldInfoByParameterName, function(fieldName, info) {
-		if (info.inError) {
-			errors.push({
-				field : fieldName,
-				defaultMessage : info.errorMessage
-			});
-		}
+		changedFieldNames.push(fieldName);
+		errors.push({
+			field : fieldName,
+			defaultMessage : info.errorMessage
+		});
 	});
-	OF.UI.Forms.Validation.updateErrors($form, errors);
+	OF.UI.Forms.Validation.updateErrorMessageInFields($form, changedFieldNames, errors);
 
 	updateStepsErrorFeedback();
 
@@ -507,6 +515,8 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 					: parseInt(json.currentStep);
 			showCurrentStep();
 			updateStepsErrorFeedback();
+
+			$.unblockUI();
 		} else {
 			// if no placemark in database, force the creation
 			// of a new record
