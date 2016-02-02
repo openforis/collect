@@ -110,7 +110,7 @@
 					<!-- tr><td><input type="checkbox" name="_spring_security_remember_me"></td><td>Don't ask for my password for two weeks</td></tr-->
 					<tr>
 						<td colspan='2' width="100%" style="text-align: center;">
-							<input name="submit" type="submit" class="button" /> 
+							<button type="submit" class="button">Login</button> 
 						</td>
 					</tr>
 					<tr><td></td></tr>
