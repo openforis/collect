@@ -39,7 +39,20 @@ OF.UI.Forms.Validation.findError = function(errors, fieldName) {
 		}
 	}
 	return null;
-}
+};
+
+OF.UI.Forms.Validation.updateErrorsByField = function ($form, fieldName, errors) {
+	$form.find('.form-group').each(function(idx, formGroup) {
+		var inputField = formGroup.find(".form-control");
+		if (inputField.length == 1) {
+			var oldTooltip = OF.UI.Forms.Validation._getErrorTooltip(formGroup);
+			var inputFieldName = inputField.attr("name");
+			if (inputFieldName == fieldName) {
+				OF.UI.Forms.Validation.updateErrorInFormGroup(formGroup, errors);
+			}
+		}
+	});
+};
 
 OF.UI.Forms.Validation.updateErrorInFormGroup = function(formGroup, errors, considerOnlyVisitedFields) {
 	var inputField = formGroup.find(".form-control");

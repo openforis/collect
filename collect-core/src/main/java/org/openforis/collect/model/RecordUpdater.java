@@ -319,7 +319,7 @@ public class RecordUpdater {
 			if (clearNotRelevantAttributes) {
 				Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
 				Set<Attribute<?, ?>> noMoreRelevantAttributes = retainNotRelevantAttributes(updatedRelevanceNodes);
-				Set<Attribute<?, ?>> clearedAttributes = clearAttributes(noMoreRelevantAttributes);
+				Set<Attribute<?, ?>> clearedAttributes = clearUserSpecifiedAttributes(noMoreRelevantAttributes);
 				updatedAttributes.addAll(clearedAttributes);
 				changeMap.addValueChanges(clearedAttributes);
 			}
@@ -375,13 +375,13 @@ public class RecordUpdater {
 	}
 
 	private Set<CodeAttribute> clearDependentCodeAttributes(Attribute<?, ?> attribute) {
-		return clearAttributes(((CodeAttribute) attribute).getDependentCodeAttributes());
+		return clearUserSpecifiedAttributes(((CodeAttribute) attribute).getDependentCodeAttributes());
 	}
 
-	private <A extends Attribute<?, ?>> Set<A> clearAttributes(Set<A> attributes) {
+	private <A extends Attribute<?, ?>> Set<A> clearUserSpecifiedAttributes(Set<A> attributes) {
 		Set<A> updatedAttributes = new HashSet<A>();
 		for (A attr : attributes) {
-			if (! attr.isEmpty()) {
+			if (attr.isUserSpecified() && ! attr.isEmpty()) {
 				attr.clearValue();
 				attr.updateSummaryInfo();
 				updatedAttributes.add(attr);

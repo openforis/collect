@@ -26,7 +26,7 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 
 	@Override
 	public boolean isUserSpecified() {
-		return ! getDefinition().isCalculated() && ! isEnumerator();
+		return ! ( getDefinition().isCalculated() || isEnumerator());
 	}
 	
 	@SuppressWarnings("unchecked")

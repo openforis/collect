@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +60,20 @@ public class NodeChangeMap implements NodeChangeSet {
 	public NodeChange<?> getChange(int nodeId) {
 		NodeChange<?> c = nodeIdToChange.get(nodeId);
 		return c;
+	}
+	
+	@Override
+	public Set<Node<?>> getChangedNodes() {
+		Set<Node<?>> result = new LinkedHashSet<Node<?>>();
+		List<NodeChange<?>> changes = getChanges();
+		for (NodeChange<?> nodeChange : changes) {
+			if (nodeChange instanceof AttributeChange) {
+				result.add(nodeChange.getNode());
+			} else if (nodeChange instanceof EntityChange) {
+				result.addAll(((EntityChange) nodeChange).extractChangedNodes());
+			}
+		}
+		return result;
 	}
 	
 	/**
