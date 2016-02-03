@@ -193,13 +193,12 @@ public class NodeChangeMap implements NodeChangeSet {
 	public void addValueChange(Attribute<?, ?> attribute) {
 		AttributeChange change = prepareAttributeChange(attribute);
 		
-		Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
 		int fieldCount = attribute.getFieldCount();
+		Map<Integer, Object> fieldValues = new HashMap<Integer, Object>(fieldCount);
 		for (int idx = 0; idx < fieldCount; idx ++) {
 			Field<?> field = attribute.getField(idx);
 			fieldValues.put(idx, field.getValue());
 		}
-		
 		change.setUpdatedFieldValues(fieldValues);
 	}
 

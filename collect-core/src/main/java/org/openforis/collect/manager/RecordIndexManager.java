@@ -356,9 +356,7 @@ public class RecordIndexManager extends BaseStorageManager {
 						Field recordKeyField = createRecordIdField(recordId);
 						doc.add(recordKeyField);
 					}
-					int fieldCount = attr.getFieldCount();
-					for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++ ) {
-						org.openforis.idm.model.Field<?> field = attr.getField(fieldIndex);
+					for (org.openforis.idm.model.Field<?> field : attr.getFields()) {
 						index(doc, indexName, field);
 					}
 					indexWriter.addDocument(doc);

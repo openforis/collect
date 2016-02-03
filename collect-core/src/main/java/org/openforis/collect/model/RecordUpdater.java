@@ -4,6 +4,8 @@ package org.openforis.collect.model;
 import static org.openforis.collect.model.CollectRecord.APPROVED_MISSING_POSITION;
 import static org.openforis.collect.model.CollectRecord.CONFIRMED_ERROR_POSITION;
 import static org.openforis.collect.model.CollectRecord.DEFAULT_APPLIED_POSITION;
+import static org.openforis.idm.model.NodePointers.nodesToPointers;
+import static org.openforis.idm.model.NodePointers.pointersToNodes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,7 +46,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
-import static org.openforis.idm.model.NodePointers.*;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
@@ -400,16 +401,6 @@ public class RecordUpdater {
 		return result;
 	}
 
-	private Set<Attribute<?, ?>> retainRelevantAttributes(Set<Node<?>> nodes) {
-		Set<Attribute<?, ?>> result = new HashSet<Attribute<?,?>>();
-		for (Node<?> node : nodes) {
-			if (node instanceof Attribute && node.isRelevant()) {
-				result.add((Attribute<?, ?>) node);
-			}
-		}
-		return result;
-	}
-
 	private void validateAttributes(Record record, Set<Attribute<?, ?>> attributes, NodeChangeMap changeMap) {
 		Validator validator = record.getSurveyContext().getValidator();
 		
@@ -461,6 +452,7 @@ public class RecordUpdater {
 		return updatedPointers;
 	}
 
+	@SuppressWarnings("deprecation")
 	private Collection<NodePointer> updateMaxCount(Collection<NodePointer> nodePointers) {
 		List<NodePointer> updatedPointers = new ArrayList<NodePointer>();
 		for (NodePointer nodePointer : nodePointers) {
@@ -649,9 +641,7 @@ public class RecordUpdater {
 	}
 	
 	private void setErrorConfirmed(Attribute<?,?> attribute, boolean confirmed){
-		int fieldCount = attribute.getFieldCount();
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
+		for (Field<?> field : attribute.getFields()) {
 			field.getState().set(CONFIRMED_ERROR_POSITION, confirmed);
 		}
 	}
@@ -662,10 +652,7 @@ public class RecordUpdater {
 	}
 	
 	private void setDefaultValueApplied(Attribute<?, ?> attribute, boolean applied) {
-		int fieldCount = attribute.getFieldCount();
-		
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
+		for (Field<?> field : attribute.getFields()) {
 			field.getState().set(DEFAULT_APPLIED_POSITION, applied);
 		}
 	}
