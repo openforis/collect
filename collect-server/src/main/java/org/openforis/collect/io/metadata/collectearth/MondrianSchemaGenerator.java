@@ -16,6 +16,7 @@ import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
@@ -411,6 +412,10 @@ public class MondrianSchemaGenerator {
 		level.levelType = "Regular";
 		if (nodeDef instanceof NumericAttributeDefinition) {
 			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? "Integer" : "Numeric";
+		} else if (nodeDef instanceof BooleanAttributeDefinition) {
+			level.type = "Boolean";
+		} else if (nodeDef instanceof CodeAttributeDefinition) {
+			level.type = "Integer";
 		} else {
 			level.type = "String";
 		}

@@ -66,7 +66,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String TEST_PLOTS_FILE_NAME = "test_plots.ced";
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
-	private static final double HECTARES_TO_METERS_CONVERSION_FACTOR = 10000d;
+	private static final double HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR = 10000d;
 	private static final String README_FILE = "README.txt";
 	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
 	
@@ -183,7 +183,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 
 	private int calculateFrameDistance(CollectSurvey survey) {
 		CollectAnnotations annotations = survey.getAnnotations();
-		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_METERS_CONVERSION_FACTOR);
+		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR);
 		int samplePoints = annotations.getCollectEarthSamplePoints();
 		if (samplePoints == 0) {
 			return Double.valueOf(Math.floor((double) (plotWidth / 2))).intValue();
@@ -196,7 +196,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private int calculateDistanceBetweenSamplePoints(CollectSurvey survey) {
 		CollectAnnotations annotations = survey.getAnnotations();
 		
-		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_METERS_CONVERSION_FACTOR);
+		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR);
 		int samplePoints = annotations.getCollectEarthSamplePoints();
 		if (samplePoints <= 1) {
 			return 0;

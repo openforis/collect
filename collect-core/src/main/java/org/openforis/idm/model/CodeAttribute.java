@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 
 /**
@@ -23,6 +24,11 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 		super(definition);
 	}
 
+	@Override
+	public boolean isUserSpecified() {
+		return ! ( getDefinition().isCalculated() || isEnumerator());
+	}
+	
 	@SuppressWarnings("unchecked")
 	public Field<String> getCodeField() {
 		return (Field<String>) getField(0);
@@ -131,5 +137,15 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 	public String extractTextValue() {
 		Code code = getValue();
 		return code == null ? null: code.getCode();
+	}
+	
+	public boolean isEnumerator() {
+		EntityDefinition parentDefinition = (EntityDefinition) definition.getParentDefinition();
+		if(parentDefinition.isEnumerable() && definition.isKey() && 
+				definition.getList() != null && ! definition.getList().isExternal()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

@@ -51,6 +51,10 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	public abstract boolean isEmpty();
 	
 	public abstract  boolean hasData();
+
+	public boolean isUserSpecified() {
+		return true;
+	}
 	
 	public List<Entity> getAncestors() {
 		List<Entity> ancestors = new ArrayList<Entity>();

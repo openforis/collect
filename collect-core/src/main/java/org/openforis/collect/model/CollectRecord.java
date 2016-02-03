@@ -355,10 +355,8 @@ public class CollectRecord extends Record {
 	}
 	
 	public boolean isErrorConfirmed(Attribute<?,?> attribute){
-		int fieldCount = attribute.getFieldCount();		
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
-			if( !field.getState().get(CONFIRMED_ERROR_POSITION) ){
+		for (Field<?> field : attribute.getFields()) {
+			if (!field.getState().get(CONFIRMED_ERROR_POSITION)) {
 				return false;
 			}
 		}
@@ -371,10 +369,8 @@ public class CollectRecord extends Record {
 	} 
 	
 	public boolean isDefaultValueApplied(Attribute<?, ?> attribute) {
-		int fieldCount = attribute.getFieldCount();		
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
-			if( !field.getState().get(DEFAULT_APPLIED_POSITION) ){
+		for (Field<?> field : attribute.getFields()) {
+			if (!field.getState().get(DEFAULT_APPLIED_POSITION)) {
 				return false;
 			}
 		}

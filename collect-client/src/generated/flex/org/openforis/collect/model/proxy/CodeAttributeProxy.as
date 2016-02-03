@@ -6,6 +6,7 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 
 	/**
 	 * @author S. Ricci
@@ -15,7 +16,19 @@ package org.openforis.collect.model.proxy {
     public class CodeAttributeProxy extends CodeAttributeProxyBase {
 		
 		override public function get filled():Boolean {
-			return FieldProxy(fields[0]).hasValue();
+			if (enumerator) {
+				return false;
+			} else {
+				return FieldProxy(fields[0]).hasValue();
+			}
+		}
+		
+		override public function get empty():Boolean {
+			if (enumerator) {
+				return true;
+			} else {
+				return super.empty;
+			}
 		}
 		
     }

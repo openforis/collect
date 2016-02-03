@@ -151,6 +151,20 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	public String getLabel(NodeLabel.Type type, String language) {
 		return labels == null ? null: labels.getText(type, language);
 	}
+
+	public String getFailSafeLabel(NodeLabel.Type... types) {
+		return getFailSafeLabel(getSurvey().getDefaultLanguage(), types);
+	}
+	
+	public String getFailSafeLabel(String language, NodeLabel.Type... types) {
+		for (NodeLabel.Type type : types) {
+			String label = getLabel(type, language);
+			if (label != null) {
+				return label;
+			}
+		}
+		return name;
+	}
 	
 	public void setLabel(NodeLabel.Type type, String language, String text) {
 		if ( labels == null ) {

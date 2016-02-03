@@ -15,7 +15,7 @@ public class NodeLabel extends TypedLanguageSpecificText<NodeLabel.Type> {
 	private static final long serialVersionUID = 1L;
 
 	public enum Type {
-		HEADING, INSTANCE, NUMBER;
+		ABBREVIATED, HEADING, INSTANCE, NUMBER, REPORTING;
 	}
 
 }

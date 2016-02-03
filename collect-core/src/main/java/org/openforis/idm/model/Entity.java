@@ -5,7 +5,6 @@ package org.openforis.idm.model;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -112,12 +111,9 @@ public class Entity extends Node<EntityDefinition> {
 	 */
 	@Override
 	public boolean isEmpty() {
-		Collection<List<Node<?>>> childLists = childrenByDefinitionId.values();
-		for (List<Node<?>> list : childLists) {
-			for (Node<?> node : list) {
-				if (!node.isEmpty()) {
-					return false;
-				}
+		for ( Node<?> child : children ) {
+			if (! child.isEmpty()) {
+				return false;
 			}
 		}
 		return true;
@@ -125,15 +121,14 @@ public class Entity extends Node<EntityDefinition> {
 	
 	@Override
 	public boolean hasData() {
-		List<Node<?>> children = getChildren();
 		for ( Node<?> child : children ) {
-			if( child.hasData() ){
+			if(child.hasData() ){
 				return true;
 			}
 		}
 		return false;
 	}
-
+	
 	public <N extends Node<? extends NodeDefinition>> N getChild(String name) {
 		NodeDefinition childDefn = definition.getChildDefinition(name);
 		return getChild(childDefn);

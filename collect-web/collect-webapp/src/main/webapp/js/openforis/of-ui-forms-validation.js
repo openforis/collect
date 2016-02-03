@@ -39,7 +39,20 @@ OF.UI.Forms.Validation.findError = function(errors, fieldName) {
 		}
 	}
 	return null;
-}
+};
+
+OF.UI.Forms.Validation.updateErrorMessageInFields = function ($form, fieldNames, errors) {
+	$form.find('.form-group').each(function(idx, formGroup) {
+		var $formGroup = $(formGroup);
+		var inputField = $formGroup.find(".form-control");
+		if (inputField.length == 1) {
+			var inputFieldName = inputField.attr("name");
+			if (OF.Arrays.contains(fieldNames, inputFieldName)) {
+				OF.UI.Forms.Validation.updateErrorInFormGroup($formGroup, errors);
+			}
+		}
+	});
+};
 
 OF.UI.Forms.Validation.updateErrorInFormGroup = function(formGroup, errors, considerOnlyVisitedFields) {
 	var inputField = formGroup.find(".form-control");
@@ -47,7 +60,7 @@ OF.UI.Forms.Validation.updateErrorInFormGroup = function(formGroup, errors, cons
 		var oldTooltip = OF.UI.Forms.Validation._getErrorTooltip(formGroup);
 		var fieldName = inputField.attr("name");
 		var error = OF.UI.Forms.Validation.findError(errors, fieldName);
-		if (error == null) {
+		if (error == null || error.defaultMessage == null) {
 			formGroup.removeClass('has-error');
 			if (oldTooltip) {
 				formGroup.tooltip('destroy');
@@ -130,7 +143,7 @@ OF.UI.Forms.Validation.createErrorTooltipWithTitle = function ($field, title) {
 	$targetField.tooltip({
 		title: title,
 		container: container,
-		trigger: "focus",
+		//trigger: "focus",
 		template: '<div class="tooltip error"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
 	});
 };

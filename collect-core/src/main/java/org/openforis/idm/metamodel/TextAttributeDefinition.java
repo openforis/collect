@@ -17,6 +17,7 @@ public class TextAttributeDefinition extends AttributeDefinition {
 	private static final long serialVersionUID = 1L;
 	
 	public static final String VALUE_FIELD = "value";
+	public static final Type DEFAULT_TYPE = Type.SHORT;
 	
 	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
 		new FieldDefinition<String>(VALUE_FIELD, "v", null, String.class, this)
@@ -26,7 +27,7 @@ public class TextAttributeDefinition extends AttributeDefinition {
 		SHORT, MEMO
 	}
 	
-	private Type type;
+	private Type type = DEFAULT_TYPE;
 	
 	protected TextAttributeDefinition(Survey survey, int id) {
 		super(survey, id);

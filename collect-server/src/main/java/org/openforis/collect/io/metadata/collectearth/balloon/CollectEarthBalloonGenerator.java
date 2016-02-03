@@ -347,6 +347,9 @@ public class CollectEarthBalloonGenerator {
 			} else {
 				comp = new CEField(htmlParameterName, def.getName(), label, multiple, type, key);
 			}
+			if (((AttributeDefinition) def).isCalculated()) {
+				((CEField) comp).setReadOnly(true);
+			}
 		}
 		comp.hideWhenNotRelevant = hideWhenNotRelevant;
 		componentByName.put(comp.getName(), comp);
