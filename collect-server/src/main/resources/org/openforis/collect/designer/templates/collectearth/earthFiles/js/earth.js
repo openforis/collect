@@ -7,6 +7,7 @@ var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
 
 var $form = null; //to be initialized
+var stateByInputFieldName = [];
 var lastUpdateRequest = null; //last update request sent to the server
 var lastUpdateInputFieldName = null;
 var currentStepIndex = null;
@@ -154,6 +155,8 @@ var createPlacemarkUpdateRequest = function(inputField) {
 	} else {
 		values = {};
 		values[encodeURIComponent($(inputField).attr('name'))] = $(inputField).val();
+		var activelySavedField = $(ACTIVELY_SAVED_FIELD_ID);
+		values[encodeURIComponent(activelySavedField.attr('name'))] = activelySavedField.val();
 	}
 	var data = {
 		placemarkId : getPlacemarkId(),
@@ -177,14 +180,16 @@ var abortLastUpdateRequest = function() {
 };
 
 var interpretJsonSaveResponse = function(json, showUpdateMessage) {
+	updateFieldStateCache(json.inputFieldInfoByParameterName);
+	updateInputFieldsState(json.inputFieldInfoByParameterName);
+	fillDataWithJson(json.inputFieldInfoByParameterName);
+
 	if (showUpdateMessage) { // show feedback message
 		if (json.success) {
-			if (json.validData) {
-				showSuccessMessage(json.message);
-				forceWindowCloseAfterDialogCloses($("#dialogSuccess"));
-			} else {
+			if (isAnyErrorInForm()) {
 				var message = "";
-				$.each(json.inputFieldInfoByParameterName, function(key, info) {
+				for(var key in stateByInputFieldName) {
+					var info = stateByInputFieldName[key];
 					if (info.inError) {
 						var inputField = findById(key);
 						var label;
@@ -195,19 +200,30 @@ var interpretJsonSaveResponse = function(json, showUpdateMessage) {
 						}
 						message += label + " : " + info.errorMessage + "<br>";
 					}
-				});
+				}
 				showErrorMessage(message);
 
 				// Resets the "actively saved" parameter to false so that it is
 				// not sent as true when the user fixes the validation
 				setActivelySaved(false);
+			} else {
+				showSuccessMessage(json.message);
+				forceWindowCloseAfterDialogCloses($("#dialogSuccess"));
 			}
 		} else {
 			showErrorMessage(json.message);
 		}
 	}
-	updateInputFieldsState(json.inputFieldInfoByParameterName);
-	fillDataWithJson(json.inputFieldInfoByParameterName);
+};
+
+var isAnyErrorInForm = function() {
+	for(var key in stateByInputFieldName) {
+		var info = stateByInputFieldName[key];
+		if (info.inError) {
+			return true;
+		}
+	};
+	return false;
 };
 
 var getEnumeratedEntityNestedAttributeErrorMessageLabel = function(inputField) {
@@ -296,9 +312,16 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 				.find(".form-group:not(.notrelevant)").length > 0;
 		toggleStepVisibility(index, hasNestedVisibleFormFields);
 	});
+	
 	if (DEBUG) {
 		log("input fields state updated successfully");
 	}
+};
+
+var updateFieldStateCache = function(inputFieldInfoByParameterName) {
+	$.each(inputFieldInfoByParameterName, function(fieldName, info) {
+		stateByInputFieldName[fieldName] = info;
+	});
 };
 
 var getStepHeading = function(index) {
@@ -509,6 +532,7 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 			}
 			// Pre-fills the form and after that initilizes the
 			// change event listeners for the inputs
+			updateFieldStateCache(json.inputFieldInfoByParameterName);
 			updateInputFieldsState(json.inputFieldInfoByParameterName);
 			fillDataWithJson(json.inputFieldInfoByParameterName);
 				
@@ -527,18 +551,18 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 };
 
 var getPlacemarkId = function() {
-	var id = $form.find("input[name='collect_text_id']").val();
+	var id = findById("collect_text_id").val();
 	return id;
 };
 
 var isActivelySaved = function() {
 	var activelySaved = findById(ACTIVELY_SAVED_FIELD_ID).val() == 'true';
 	return activelySaved;
-}
+};
 
 var setActivelySaved = function(value) {
 	findById(ACTIVELY_SAVED_FIELD_ID).val(value == true || value == 'true');
-}
+};
 
 var showSuccessMessage = function(message) {
 	showMessage(message, "success");
@@ -587,7 +611,7 @@ var fillDataWithJson = function(inputFieldInfoByParameterName) {
 		// value
 		// being
 		// 0;collect_code_deforestation_reason=burnt
-		var inputField = $("*[name=\'" + key + "\']");
+		var inputField = findById(key);
 		if (inputField.length == 1) {
 			setValueInInputField(inputField, value);
 		}
