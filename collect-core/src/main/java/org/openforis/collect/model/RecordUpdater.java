@@ -59,77 +59,48 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  */
 public class RecordUpdater {
 	
+	private boolean validateAfterUpdate = true;
 	private boolean clearNotRelevantAttributes = false;
+	private boolean clearDependentCodeAttributes = false;
+	private boolean addEmptyMultipleEntitiesWhenAddingNewEntities = true;
 	
 	/**
 	 * Updates an attribute with a new value
 	 */
 	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value) {
-		return updateAttribute(attribute, value, false);
-	}
-	
-	/**
-	 * Updates an attribute with a new value
-	 */
-	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value, boolean clearChildCodeAttributes) {
-		return updateAttribute(attribute, value, clearChildCodeAttributes, true);
-	}
-	
-	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value, boolean clearChildCodeAttributes, boolean validate) {
 		beforeAttributeUpdate(attribute);
 		attribute.setValue(value);
-		return afterAttributeUpdate(attribute, clearChildCodeAttributes);
-	}
-	
-	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol) {
-		return updateAttribute(attribute, symbol, false);
+		return afterAttributeUpdate(attribute);
 	}
 	
 	/**
 	 * Updates an attribute and sets the specified FieldSymbol on every field
 	 */
-	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol, boolean clearDependentCodeAttributes) {
+	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol) {
 		beforeAttributeUpdate(attribute);
 		attribute.clearValue();
 		setSymbolOnFields(attribute, symbol);
-		return afterAttributeUpdate(attribute, clearDependentCodeAttributes);
-	}
-	
-	public <V> NodeChangeSet updateField(Field<V> field, V value) {
-		return updateField(field, value, false);
+		return afterAttributeUpdate(attribute);
 	}
 	
 	/**
 	 * Updates a field with a new value.
 	 * The value will be parsed according to field data type.
-	 * @param clearDependentCodeAttributes 
 	 */
-	public <V> NodeChangeSet updateField(Field<V> field, V value, boolean clearDependentCodeAttributes) {
-		return updateField(field, value, clearDependentCodeAttributes, true);
-	}
-	
-	public <V> NodeChangeSet updateField(Field<V> field, V value, boolean clearDependentCodeAttributes, boolean validate) {
+	public <V> NodeChangeSet updateField(Field<V> field, V value) {
 		Attribute<?, ?> attribute = field.getAttribute();
 		beforeAttributeUpdate(attribute);
 		
 		field.setValue(value);
 		
-		return afterAttributeUpdate(attribute, clearDependentCodeAttributes, validate);
+		return afterAttributeUpdate(attribute);
 	}
 
-	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol) {
-		return updateField(field, symbol, false);
-	}
-	
 	/**
 	 * Updates a field with a new symbol.
 	 * @param clearChildCodeAttributes 
 	 */
-	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol, boolean clearChildCodeAttributes) {
-		return updateField(field, symbol, clearChildCodeAttributes, true);
-	}
-	
-	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol, boolean clearChildCodeAttributes, boolean validate) {
+	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol) {
 		Attribute<?, ?> attribute = field.getAttribute();
 
 		beforeAttributeUpdate(attribute);
@@ -137,7 +108,7 @@ public class RecordUpdater {
 		field.setValue(null);
 		setFieldSymbol(field, symbol);
 		
-		return afterAttributeUpdate(attribute, clearChildCodeAttributes, validate);
+		return afterAttributeUpdate(attribute);
 	}
 	
 	public NodeChangeSet addNode(Entity parentEntity, String nodeName) {
@@ -157,15 +128,11 @@ public class RecordUpdater {
 	 * @return Changes applied to the record 
 	 */
 	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
-		return addEntity(parentEntity, entityName, true);
-	}
-	
-	public NodeChangeSet addEntity(Entity parentEntity, String entityName, boolean addEmptyMultipleEntities) {
 		Entity entity = performEntityAdd(parentEntity, entityName);
 		
 		setMissingValueApproved(parentEntity, entityName, false);
 
-		NodeChangeMap changeMap = initializeEntity(entity, true, addEmptyMultipleEntities, true);
+		NodeChangeMap changeMap = initializeEntity(entity, true);
 		return changeMap;
 	}
 
@@ -194,15 +161,6 @@ public class RecordUpdater {
 									  Value value, 
 									  FieldSymbol symbol, 
 									  String remarks) {
-		return addAttribute(parentEntity, attributeName, value, symbol, remarks, true);
-	}
-	
-	public NodeChangeSet addAttribute(Entity parentEntity, 
-			  String attributeName, 
-			  Value value, 
-			  FieldSymbol symbol, 
-			  String remarks,
-			  boolean validate) {
 		Attribute<?, ?> attribute = performAttributeAdd(parentEntity, attributeName, value, symbol, remarks);
 		
 		setMissingValueApproved(parentEntity, attributeName, false);
@@ -212,7 +170,7 @@ public class RecordUpdater {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addAttributeAddChange(attribute);
 		
-		return afterAttributeInsertOrUpdate(changeMap, attribute, false, validate);
+		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 
 	/**
@@ -263,31 +221,23 @@ public class RecordUpdater {
 	 */
 	public NodeChangeSet applyDefaultValue(Attribute<?, ?> attribute) {
 		performDefaultValueApply(attribute);
-		return afterAttributeUpdate(attribute, false);
+		return afterAttributeUpdate(attribute);
 	}
 
 	private void beforeAttributeUpdate(Attribute<?, ?> attribute) {
-		beforeAttributeUpdate(attribute, false);
-	}
-	
-	private void beforeAttributeUpdate(Attribute<?, ?> attribute, boolean clearChildCodeAttributes) {
 		Entity parentEntity = attribute.getParent();
 		setErrorConfirmed(attribute, false);
 		setMissingValueApproved(parentEntity, attribute.getName(), false);
 		setDefaultValueApplied(attribute, false);
 	}
 
-	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute, boolean clearDependentCodeAttributes) {
-		return afterAttributeUpdate(attribute, clearDependentCodeAttributes, true);
-	}
-	
-	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute, boolean clearDependentCodeAttributes, boolean validate) {
+	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute) {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addValueChange(attribute);
-		return afterAttributeInsertOrUpdate(changeMap, attribute, clearDependentCodeAttributes, validate);
+		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 	
-	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute, boolean clearDependentCodeAttributes, boolean validate) {
+	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute) {
 		attribute.updateSummaryInfo();
 
 		Record record = attribute.getRecord();
@@ -307,7 +257,7 @@ public class RecordUpdater {
 			changeMap.addValueChanges(updatedCodeAttributes);
 		}
 		
-		if (validate) {
+		if (validateAfterUpdate) {
 			// relevance
 			Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedAttributes);
 			nodesToCheckRelevanceFor.add(attribute);
@@ -504,10 +454,6 @@ public class RecordUpdater {
 	 * @return
 	 */
 	public NodeChangeSet deleteNode(Node<?> node) {
-		return deleteNode(node, true);
-	}
-	
-	public NodeChangeSet deleteNode(Node<?> node, boolean validate) {
 		Record record = node.getRecord();
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
@@ -522,7 +468,7 @@ public class RecordUpdater {
 		List<Attribute<?, ?>> dependentCalculatedAttributes = record.determineCalculatedAttributes(nodesToBeDeleted);
 		dependentCalculatedAttributes.removeAll(nodesToBeDeleted);
 		
-		if (validate) {
+		if (validateAfterUpdate) {
 			// relevance
 			List<NodePointer> relevanceDependenciesToDeleted = record.determineRelevanceDependentNodes(nodesToBeDeleted);
 	
@@ -739,30 +685,18 @@ public class RecordUpdater {
 	}
 
 	public NodeChangeSet initializeRecord(Record record) {
-		return initializeRecord(record, true);
-	}
-	
-	public NodeChangeSet initializeRecord(Record record, boolean validate) {
-		return initializeRecord(record, validate, true);
-	}
-	
-	public NodeChangeSet initializeRecord(Record record, boolean validate, boolean addEmptyMultipleEntities) {
-		return initializeEntity(record.getRootEntity(), validate, addEmptyMultipleEntities, false);
+		return initializeEntity(record.getRootEntity(), false);
 	}
 	
 	public NodeChangeSet initializeNewRecord(Record record) {
-		return initializeEntity(record.getRootEntity(), true, true, true);
+		return initializeEntity(record.getRootEntity(), true);
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity) {
-		return initializeEntity(entity, true);
+		return initializeEntity(entity, false);
 	}
 	
-	protected NodeChangeMap initializeEntity(Entity entity, boolean validate) {
-		return initializeEntity(entity, validate, true, false);
-	}
-	
-	protected NodeChangeMap initializeEntity(Entity entity, boolean validate, boolean addEmptyMultipleEntities, boolean newEntity) {
+	protected NodeChangeMap initializeEntity(Entity entity, boolean newEntity) {
 		Record record = entity.getRecord();
 		
 		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
@@ -776,7 +710,7 @@ public class RecordUpdater {
 		updateMinCount(entityDescendantPointers);
 		updateMaxCount(entityDescendantPointers);
 
-		addEmptyNodes(entity, addEmptyMultipleEntities);
+		addEmptyNodes(entity);
 		
 		applyInitialValues(entity, newEntity);
 		
@@ -785,7 +719,7 @@ public class RecordUpdater {
 		List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
 		changeMap.addValueChanges(calculatedAttributes);
 		
-		if (validate) {
+		if (validateAfterUpdate) {
 			//min/max count
 			entityDescendantPointers = getDescendantNodePointers(entity);
 			
@@ -830,10 +764,6 @@ public class RecordUpdater {
 	}
 
 	private void addEmptyNodes(Entity entity) {
-		addEmptyNodes(entity, true);
-	}
-	
-	private void addEmptyNodes(Entity entity, boolean addEmptyMultipleEntities) {
 		Record record = entity.getRecord();
 		ModelVersion version = record.getVersion();
 		addEmptyEnumeratedEntities(entity);
@@ -841,26 +771,26 @@ public class RecordUpdater {
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitionsInVersion(version);
 		for (NodeDefinition childDefn : childDefinitions) {
 			if(entity.getCount(childDefn) == 0) {
-				if (addEmptyMultipleEntities || ! (childDefn instanceof EntityDefinition && childDefn.isMultiple())) {
+				if (addEmptyMultipleEntitiesWhenAddingNewEntities || ! (childDefn instanceof EntityDefinition && childDefn.isMultiple())) {
 					int toBeInserted = entity.getMinCount(childDefn);
 					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
 						//insert at least one node
 						toBeInserted = 1;
 					}
-					addEmptyChildren(entity, childDefn, toBeInserted, addEmptyMultipleEntities);
+					addEmptyChildren(entity, childDefn, toBeInserted);
 				}
 			} else {
 				List<Node<?>> children = entity.getChildren(childDefn);
 				for (Node<?> child : children) {
 					if(child instanceof Entity) {
-						addEmptyNodes((Entity) child, addEmptyMultipleEntities);
+						addEmptyNodes((Entity) child);
 					}
 				}
 			}
 		}
 	}
 
-	private int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted, boolean addEmptyMultipleEntities) {
+	private int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
 		String childName = childDefn.getName();
 		UIOptions uiOptions = getUIOptions(entity.getSurvey());
 		int count = 0;
@@ -873,7 +803,7 @@ public class RecordUpdater {
 					entity.add(createdNode);
 				} else if(childDefn instanceof EntityDefinition ) {
 					Entity childEntity = performEntityAdd(entity, childName);
-					addEmptyNodes(childEntity, addEmptyMultipleEntities);
+					addEmptyNodes(childEntity);
 				}
 				count ++;
 			}
@@ -1080,8 +1010,21 @@ public class RecordUpdater {
 		return pointers;
 	}
 
+	public void setValidateAfterUpdate(boolean validateAfterUpdate) {
+		this.validateAfterUpdate = validateAfterUpdate;
+	}
+	
 	public void setClearNotRelevantAttributes(boolean clearNotRelevantAttributes) {
 		this.clearNotRelevantAttributes = clearNotRelevantAttributes;
+	}
+	
+	public void setClearDependentCodeAttributes(boolean clearDependentCodeAttributes) {
+		this.clearDependentCodeAttributes = clearDependentCodeAttributes;
+	}
+	
+	public void setAddEmptyMultipleEntitiesWhenAddingNewEntities(
+			boolean addEmptyMultipleEntitiesWhenAddingNewEntities) {
+		this.addEmptyMultipleEntitiesWhenAddingNewEntities = addEmptyMultipleEntitiesWhenAddingNewEntities;
 	}
 	
 	private static class RelevanceUpdater {

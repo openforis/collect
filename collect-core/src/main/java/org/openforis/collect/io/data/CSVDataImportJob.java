@@ -322,7 +322,6 @@ public class CSVDataImportJob extends Job {
 
 		public CSVDataImportTask() {
 			deletedEntitiesRecordKeys = new HashSet<RecordStepKey>();
-			recordUpdater = new RecordUpdater();
 		}
 		
 		@Override
@@ -347,6 +346,8 @@ public class CSVDataImportJob extends Job {
 		@Override
 		protected void initializeInternalVariables() throws Throwable {
 			super.initializeInternalVariables();
+			recordUpdater = new RecordUpdater();
+			recordUpdater.setValidateAfterUpdate(input.settings.recordValidationEnabled);
 			dataImportStatus = new ReferenceDataImportStatus<ParsingError>();
 			adminUser = userManager.loadAdminUser();
 			EntityDefinition parentEntityDefn = getParentEntityDefinition();
@@ -473,7 +474,7 @@ public class CSVDataImportJob extends Job {
 			String parentEntitiesPath = getParentEntityDefinition().getPath();
 			List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
 			for (Entity entity : entitiesToBeDeleted) {
-				NodeChangeSet changes = recordUpdater.deleteNode(entity, input.settings.recordValidationEnabled);
+				NodeChangeSet changes = recordUpdater.deleteNode(entity);
 				if (nodeChangeBatchProcessor != null) {
 					nodeChangeBatchProcessor.add(changes, adminUser.getName());
 				}
@@ -581,7 +582,7 @@ public class CSVDataImportJob extends Job {
 					int tot = attributes.size();
 					for (int i = 0; i < tot; i++) {
 						Node<?> node = attributes.get(0);
-						NodeChangeSet changes = recordUpdater.deleteNode(node, input.settings.recordValidationEnabled);
+						NodeChangeSet changes = recordUpdater.deleteNode(node);
 						if (nodeChangeBatchProcessor != null) {
 							nodeChangeBatchProcessor.add(changes, adminUser.getName());
 						}
@@ -633,7 +634,7 @@ public class CSVDataImportJob extends Job {
 				@SuppressWarnings("unchecked")
 				Field<Object> field = (Field<Object>) attr.getField(fieldName);
 				Object fieldValue = field.parseValue(value);
-				NodeChangeSet changes = recordUpdater.updateField(field, fieldValue, false, input.settings.recordValidationEnabled);
+				NodeChangeSet changes = recordUpdater.updateField(field, fieldValue);
 				if (nodeChangeBatchProcessor != null) {
 					nodeChangeBatchProcessor.add(changes, adminUser.getName());
 				}
@@ -656,7 +657,7 @@ public class CSVDataImportJob extends Job {
 			}
 			if ( valid ) {
 				Field<String> field = ((CoordinateAttribute) attr).getSrsIdField();
-				NodeChangeSet changes = recordUpdater.updateField(field, value, false, input.settings.recordValidationEnabled);
+				NodeChangeSet changes = recordUpdater.updateField(field, value);
 				if (nodeChangeBatchProcessor != null) {
 					nodeChangeBatchProcessor.add(changes, adminUser.getName());
 				}
@@ -677,7 +678,7 @@ public class CSVDataImportJob extends Job {
 					dataImportStatus.addParsingError(parsingError);
 				} else {
 					Field<Integer> field = ((NumberAttribute<?, ?>) attr).getUnitField();
-					NodeChangeSet changes = recordUpdater.updateField(field, unit.getId(), false, input.settings.recordValidationEnabled);
+					NodeChangeSet changes = recordUpdater.updateField(field, unit.getId());
 					if (nodeChangeBatchProcessor != null) {
 						nodeChangeBatchProcessor.add(changes, adminUser.getName());
 					}
