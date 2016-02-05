@@ -90,7 +90,7 @@ public class CollectRDBPublisher {
 
 			relationalSchemaCreator.addConstraints(relationalSchema, targetConn);
 			relationalSchemaCreator.addIndexes(relationalSchema, targetConn);
-
+			
 			insertData(survey, rootEntityName, step, targetConn, relationalSchema, progressListener);
 			
 			targetConn.commit();

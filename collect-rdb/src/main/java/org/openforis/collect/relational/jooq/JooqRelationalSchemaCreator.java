@@ -9,17 +9,22 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.CreateTableAsStep;
 import org.jooq.DataType;
 import org.jooq.Field;
 import org.jooq.Query;
 import org.jooq.Record;
+import org.jooq.Select;
+import org.jooq.TableLike;
+import org.jooq.impl.DSL;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.model.CodeListCodeColumn;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.DataAncestorFKColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.PrimaryKeyConstraint;
 import org.openforis.collect.relational.model.ReferentialConstraint;
@@ -53,6 +58,8 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			}
 			createTableFinalQuery.execute();
 		}
+		
+		createDataTableViews(schema, conn);
 	}
 	
 	@Override
@@ -81,6 +88,44 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 		}
 	}
 
+	private void createDataTableViews(RelationalSchema schema, Connection conn) {
+		List<DataTable> dataTables = schema.getDataTables();
+		for (DataTable dataTable : dataTables) {
+			createDataTableView(schema, dataTable, conn);
+		}
+	}
+
+	private void createDataTableView(RelationalSchema schema, DataTable dataTable, Connection conn) {
+		CollectDSLContext dsl = new CollectDSLContext(conn);
+		List<Field<?>> fields = new ArrayList<Field<?>>();
+		List<TableLike<?>> tables = new ArrayList<TableLike<?>>();
+		List<Condition> conditions = new ArrayList<Condition>();
+		DataTable currentTable = dataTable;
+		while (currentTable != null) {
+			org.jooq.Table<Record> currentJooqTable = jooqTable(schema, currentTable, ! dsl.isSchemaLess());
+			tables.add(currentJooqTable);
+			List<Column<?>> columns = currentTable.getColumns();
+			for (Column<?> column : columns) {
+				if (! (column instanceof DataAncestorFKColumn)) {
+					fields.add(field(name(currentJooqTable.getName(), column.getName())));
+				}
+			}
+			//add parent table join condition
+			DataTable parentTable = currentTable.getParent();
+			if (parentTable != null) {
+				//names are duplicate, use the table name as prefix in the join condition
+				conditions.add(field(currentJooqTable.getName() + "." + currentTable.getParentFKColumn().getName())
+						.eq(field(parentTable.getName() + "." + parentTable.getPrimaryKeyColumn().getName())));
+			}
+			currentTable = parentTable;
+		}
+		Select<?> select = dsl.select(fields).from(tables).where(conditions);
+		dsl.createView(DSL.table(name(schema.getName(), dataTable.getName() + "_view")), 
+				fields.toArray(new Field[fields.size()]))
+			.as(select)
+			.execute();
+	}
+	
 	private void addCodeListsCodeIndexes(RelationalSchema schema, CollectDSLContext dsl) {
 		for (Table<?> table : schema.getTables()) {
 			if (table instanceof CodeTable) {
