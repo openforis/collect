@@ -5,6 +5,7 @@ var TIME_FORMAT = 'HH:ss';
 
 var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
+var EXTRA_FIELD_CLASS = "extra";
 
 var $form = null; //to be initialized
 var stateByInputFieldName = [];
@@ -155,8 +156,10 @@ var createPlacemarkUpdateRequest = function(inputField) {
 	} else {
 		values = {};
 		values[encodeURIComponent($(inputField).attr('name'))] = $(inputField).val();
-		var activelySavedField = $(ACTIVELY_SAVED_FIELD_ID);
-		values[encodeURIComponent(activelySavedField.attr('name'))] = activelySavedField.val();
+		$form.find("." + EXTRA_FIELD_CLASS).each(function() {
+			var $this = $(this);
+			values[encodeURIComponent($this.attr('name'))] = $this.val()
+		});
 	}
 	var data = {
 		placemarkId : getPlacemarkId(),
