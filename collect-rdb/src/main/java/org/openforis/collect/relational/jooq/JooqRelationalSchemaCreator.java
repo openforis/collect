@@ -13,6 +13,7 @@ import org.jooq.Condition;
 import org.jooq.CreateTableAsStep;
 import org.jooq.DataType;
 import org.jooq.Field;
+import org.jooq.Name;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.Select;
@@ -121,7 +122,13 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			currentTable = parentTable;
 		}
 		Select<?> select = dsl.select(fields).from(tables).where(conditions);
-		dsl.createView(DSL.table(name(schema.getName(), dataTable.getName() + "_view")), 
+		Name name;
+		if (dsl.isSchemaLess()) {
+			name = name(dataTable.getName() + "_view");
+		} else {
+			name = name(schema.getName(), dataTable.getName() + "_view");
+		}
+		dsl.createView(DSL.table(name), 
 				fields.toArray(new Field[fields.size()]))
 			.as(select)
 			.execute();

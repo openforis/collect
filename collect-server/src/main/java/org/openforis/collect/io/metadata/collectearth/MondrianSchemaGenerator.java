@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Stack;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.metamodel.SurveyTarget;
@@ -86,6 +85,7 @@ public class MondrianSchemaGenerator {
 				}
 			}
 		});
+		/*
 		VirtualCube virtualCube = new VirtualCube("Survey Data");
 		List<Cube> cubes = schema.cubes;
 		List<CubeUsage> cubeUsages = new ArrayList<CubeUsage>(cubes.size());
@@ -111,7 +111,7 @@ public class MondrianSchemaGenerator {
 		virtualCube.virtualCubeDimensions = cubeDimensions;
 		virtualCube.virtualCubeMeasures = cubeMeasures;
 		schema.virtualCubes.add(virtualCube);
-
+		 */
 		return schema;
 	}
 
@@ -121,18 +121,36 @@ public class MondrianSchemaGenerator {
 		return rdbSchema;
 	}
 
-	private Cube generateCube(EntityDefinition entityDef) {
-		Cube cube = new Cube(entityDef.getPath());
-		cube.caption = extractLabel(entityDef);
+	private Cube generateCube(EntityDefinition multipleEntityDef) {
+		Cube cube = new Cube(multipleEntityDef.getPath());
+		cube.caption = extractLabel(multipleEntityDef);
 		cube.visible = "false";
-		DataTable dataTable = rdbSchema.getDataTable(entityDef);
-		Table table = new Table(dbSchemaName, dataTable.getName());
+		DataTable dataTable = rdbSchema.getDataTable(multipleEntityDef);
+		Table table = new Table(dbSchemaName, dataTable.getName() + "_view");
 		cube.tables.add(table);
 
-		addCountMeasure(cube, entityDef);
+		addCountMeasure(cube, multipleEntityDef);
 
+		List<EntityDefinition> viewEntityDefinitions = new ArrayList<EntityDefinition>();
+		viewEntityDefinitions.addAll(multipleEntityDef.getAncestorEntityDefinitions());
+		viewEntityDefinitions.add(multipleEntityDef);
+		
+		for (EntityDefinition entityDef : viewEntityDefinitions) {
+			List<AttributeDefinition> attributes = entityDef.getNestedAttributes();
+			for (AttributeDefinition attrDef : attributes) {
+				if (canBeMeasured(attrDef)) {
+					EntityDefinition parentDef = attrDef.getParentEntityDefinition();
+					if (parentDef.isRoot()) {
+						addAttributeMeasuresAndDimension(cube, attrDef);
+					} else {
+						addNestedAttributeDimension(cube, attrDef);
+					}
+				}
+			}
+		}
+		/*
 		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
-		stack.addAll(entityDef.getChildDefinitions());
+		stack.addAll(multipleEntityDef.getChildDefinitions());
 		while (!stack.isEmpty()) {
 			NodeDefinition def = stack.pop();
 			if (def instanceof AttributeDefinition && isAttributeIncluded((AttributeDefinition) def)) {
@@ -147,6 +165,7 @@ public class MondrianSchemaGenerator {
 				stack.addAll(((EntityDefinition) def).getChildDefinitions());
 			}
 		}
+		*/
 		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
 			cube.measures.addAll(1, generateEarthSpecificMeasures());
 		}
@@ -441,7 +460,7 @@ public class MondrianSchemaGenerator {
 		return attrLabel;
 	}
 
-	private boolean isAttributeIncluded(AttributeDefinition def) {
+	private boolean canBeMeasured(AttributeDefinition def) {
 		return def instanceof CodeAttributeDefinition || def instanceof DateAttributeDefinition
 				|| def instanceof NumberAttributeDefinition || def instanceof TextAttributeDefinition
 				|| def instanceof TimeAttributeDefinition;
