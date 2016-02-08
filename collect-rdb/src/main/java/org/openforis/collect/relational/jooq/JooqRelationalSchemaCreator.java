@@ -114,8 +114,9 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			DataTable parentTable = currentTable.getParent();
 			if (parentTable != null) {
 				//names are duplicate, use the table name as prefix in the join condition
-				conditions.add(field(currentJooqTable.getName() + "." + currentTable.getParentFKColumn().getName())
-						.eq(field(parentTable.getName() + "." + parentTable.getPrimaryKeyColumn().getName())));
+				Condition parentTableJoinCondition = field(currentJooqTable.getName() + "." + currentTable.getParentFKColumn().getName())
+						.eq(field(parentTable.getName() + "." + parentTable.getPrimaryKeyColumn().getName()));
+				conditions.add(parentTableJoinCondition);
 			}
 			currentTable = parentTable;
 		}
