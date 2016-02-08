@@ -156,6 +156,14 @@ public class DataTable extends AbstractTable<Node<?>> {
 		return (DataPrimaryKeyColumn) pkConstraint.getPrimaryKeyColumn();
 	}
 	
+//	public DataTable getParentDataTable() {
+//		if (parentFKColumn == null) {
+//			return null;
+//		}
+//		DataTable parentTable = getReferencedTable(parentFKColumn);
+//		return parentTable;
+//	}
+	
 	public DataAncestorFKColumn getParentFKColumn() {
 		return parentFKColumn;
 	}

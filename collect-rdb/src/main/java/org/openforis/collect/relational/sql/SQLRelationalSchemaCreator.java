@@ -51,5 +51,5 @@ public class SQLRelationalSchemaCreator implements RelationalSchemaCreator {
 	public void addIndexes(RelationalSchema schema, Connection conn) {
 		throw new UnsupportedOperationException();
 	}
-
+	
 }
