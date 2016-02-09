@@ -142,25 +142,16 @@
 			<!-- <form id="formAll" class="form-horizontal" action="http://127.0.0.1:8028/earth/save-data-expanded"> -->
 								
 				<input type="hidden" id="collect_coord_location" 
-					name="collect_coord_location" value="$[latitude],$[longitude]" />
+					name="collect_coord_location" value="$[latitude],$[longitude]"
+					class="extra" />
 				
 				<input type="hidden" id="collect_text_plot_file" 
-					name="collect_text_plot_file" value="$[plot_file]" />
+					name="collect_text_plot_file" value="$[plot_file]"
+					class="extra" />
 
 				<input type="hidden" id="collect_boolean_actively_saved"
 					name="collect_boolean_actively_saved" value="false" />
 					
-				<!-- NOT NECESSARY // FILLED BY THE SCRIPT!
-				<input type="hidden" id="collect_integer_elevation"
-					name="collect_integer_elevation" value="$[elevation]" />
-
-				<input type="hidden" id="collect_integer_slope"
-					name="collect_real_slope" value="$[slope]" />
-
-				<input type="hidden" id="collect_integer_aspect"
-					name="collect_real_aspect" value="$[aspect]" />
-				-->
-
 <!-- DO NOT REMOVE THIS LINE - IT GENERATES THE EXTRA FIELDS FROM THE CSV-BALLOON INTEGRATION -->
 <!-- START OF EXTRA CSV DATA -->
 PLACEHOLDER_FOR_EXTRA_CSV_DATA

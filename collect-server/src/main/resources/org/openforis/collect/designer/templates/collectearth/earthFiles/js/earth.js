@@ -5,9 +5,10 @@ var TIME_FORMAT = 'HH:ss';
 
 var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
+var EXTRA_FIELD_CLASS = "extra";
 
 var $form = null; //to be initialized
-var stateByInputFieldName = [];
+var stateByInputFieldName = {};
 var lastUpdateRequest = null; //last update request sent to the server
 var lastUpdateInputFieldName = null;
 var currentStepIndex = null;
@@ -97,7 +98,7 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	// Set a timeout so that the data is only sent to the server
 	// if the user stops clicking for over one second
 
-	ajaxTimeout = setTimeout(function(inputField, activelySaved, blockUI, delay, retryCount) {
+	ajaxTimeout = setTimeout(function() {
 		var data = createPlacemarkUpdateRequest(inputField);
 		
 		lastUpdateRequest = $.ajax({
@@ -126,24 +127,31 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 				log("data updated successfully");
 			}
 			interpretJsonSaveResponse(json, activelySaved);
+			if (blockUI) {
+				$.unblockUI();
+			}
 		})
 		.fail(function(jqXHR, textStatus, errorThrown) {
-			if (DEBUG) {
-				log("error updating data. Text status = " + textStatus + "; error thrown = " + errorThrown );
-			}
 			// try again
-			if("abort" != errorThrown && retryCount < 5){
-				sendDataUpdateRequest(inputField, activelySaved, blockUI, delay, retryCount + 1);
+			if("abort" != errorThrown && retryCount < 5) {
+				if (DEBUG) {
+					log("error updating data. Trying again. Text status = " + textStatus + "; error thrown = " + errorThrown );
+				}
+				sendDataUpdateRequest(inputField, activelySaved, blockUI, 2000, retryCount + 1);
+			} else {
+				undoChanges();
+				logError("error updating data. Text status = " + textStatus + "; error thrown = " + errorThrown );
+				if (blockUI) {
+					$.unblockUI();
+				}
 			}
 		})
 		.always(function() {
 			lastUpdateRequest = null;
 			lastUpdateInputFieldName = null;
-			if (blockUI) {
-				$.unblockUI();
-			}
+
 		});
-	}, delay, inputField, activelySaved, blockUI, delay, retryCount);
+	}, delay);
 
 	lastUpdateInputFieldName = inputFieldName;
 };
@@ -155,8 +163,11 @@ var createPlacemarkUpdateRequest = function(inputField) {
 	} else {
 		values = {};
 		values[encodeURIComponent($(inputField).attr('name'))] = $(inputField).val();
-		var activelySavedField = $(ACTIVELY_SAVED_FIELD_ID);
-		values[encodeURIComponent(activelySavedField.attr('name'))] = activelySavedField.val();
+		values[encodeURIComponent(ACTIVELY_SAVED_FIELD_ID)] = findById(ACTIVELY_SAVED_FIELD_ID).val();
+		$form.find("." + EXTRA_FIELD_CLASS).each(function() {
+			var $this = $(this);
+			values[encodeURIComponent($this.attr('name'))] = $this.val()
+		});
 	}
 	var data = {
 		placemarkId : getPlacemarkId(),
@@ -169,6 +180,7 @@ var createPlacemarkUpdateRequest = function(inputField) {
 
 var abortLastUpdateRequest = function() {
 	clearTimeout(ajaxTimeout);
+	$.unblockUI();
 
 	if (lastUpdateRequest != null) {
 		if (DEBUG) {
@@ -177,6 +189,10 @@ var abortLastUpdateRequest = function() {
 		lastUpdateRequest.abort();
 		lastUpdateRequest = null;
 	}
+};
+
+var undoChanges = function() {
+	fillDataWithJson(stateByInputFieldName);
 };
 
 var interpretJsonSaveResponse = function(json, showUpdateMessage) {
@@ -219,7 +235,7 @@ var interpretJsonSaveResponse = function(json, showUpdateMessage) {
 var isAnyErrorInForm = function() {
 	for(var key in stateByInputFieldName) {
 		var info = stateByInputFieldName[key];
-		if (info.inError) {
+		if (info.visible && info.inError) {
 			return true;
 		}
 	};
@@ -422,7 +438,10 @@ var initCodeButtonGroups = function() {
 			value = btn.val();
 		}
 		inputField.val(value);
-		btn.toggleClass("active", !wasActive);
+		
+		if (! wasActive) {
+			btn.toggleClass("active", true);
+		}
 		
 		updateData(inputField);
 		
@@ -768,10 +787,10 @@ var findById = function(id) {
 
 var initLogConsole = function() {
 	consoleBox = $("<div>");
-	$("body").append(consoleBox);
 	consoleBox.css("overflow", "auto");
 	consoleBox.css("height", "100px");
 	consoleBox.css("width", "400px");
+	$("body").append(consoleBox);
 };
 
 var log = function(message) {
@@ -782,6 +801,13 @@ var log = function(message) {
 	consoleBox.html(newContent);
 	consoleBox.scrollTop(consoleBox[0].scrollHeight);
 }
+
+var logError = function(message) {
+	if (consoleBox == null) {
+		initLogConsole();
+	}
+	log(message);
+};
 
 var limitString = function(str, limit) {
 	var length = str.length;
