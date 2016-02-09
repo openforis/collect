@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.Collect;
 import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
@@ -58,6 +59,7 @@ public class CollectEarthBalloonGenerator {
 	
 	public static final String EXTRA_HIDDEN_PREFIX = "EXTRA_";
 	private static final Object EXTRA_HIDDEN_FIELD_CLASS = "extra";
+	private static final String RANDOM_NUMBER_PLACEHOLDER_REGEX = "\\$\\[randomNumber\\]";
 
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
@@ -89,8 +91,9 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	public String generateHTML() throws IOException {
-		String htmlTemplate = getHTMLTemplate();
-		String result = addHiddenFields(htmlTemplate);
+		String result = getHTMLTemplate();
+		result = result.replaceAll(RANDOM_NUMBER_PLACEHOLDER_REGEX, Collect.VERSION.toString());
+		result = addHiddenFields(result);
 		result = fillWithSurveyDefinitionFields(result);
 		result = replaceButtonLocalizationText(result);
 		return result;
@@ -107,7 +110,6 @@ public class CollectEarthBalloonGenerator {
 		
 		// Added to handle multiple id attributes within a survey
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_EXTRA_ID_ATTRIBUTES,  getIdAttributesSurvey() ); //$NON-NLS-1$
-		
 		
 		return htmlForBalloon;
 	}

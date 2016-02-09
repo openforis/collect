@@ -438,7 +438,10 @@ var initCodeButtonGroups = function() {
 			value = btn.val();
 		}
 		inputField.val(value);
-		btn.toggleClass("active", !wasActive);
+		
+		if (! wasActive) {
+			btn.toggleClass("active", true);
+		}
 		
 		updateData(inputField);
 		
