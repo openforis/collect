@@ -44,6 +44,11 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  */
 public class MondrianSchemaGenerator {
 
+	private static final String BOOLEAN_DATATYPE = "Boolean";
+	private static final String INTEGER_DATATYPE = "Integer";
+	private static final String NUMERIC_DATATYPE = "Numeric";
+	private static final String STRING_DATATYPE = "String";
+	
 	private static final String[] MEASURE_AGGREGATORS = new String[] { "min", "max", "avg", "sum" };
 
 	private CollectSurvey survey;
@@ -122,9 +127,8 @@ public class MondrianSchemaGenerator {
 	}
 
 	private Cube generateCube(EntityDefinition multipleEntityDef) {
-		Cube cube = new Cube(multipleEntityDef.getPath());
+		Cube cube = new Cube(determineCubeName(multipleEntityDef));
 		cube.caption = extractLabel(multipleEntityDef);
-		cube.visible = "false";
 		DataTable dataTable = rdbSchema.getDataTable(multipleEntityDef);
 		Table table = new Table(dbSchemaName, dataTable.getName() + "_view");
 		cube.tables.add(table);
@@ -225,12 +229,12 @@ public class MondrianSchemaGenerator {
 				measure.caption = StringEscapeUtils.escapeHtml4(
 						String.format("%s.%s [%s] %s", cube.name, extractLabel(attrDef), attrName, aggregator));
 				measure.aggregator = aggregator;
-				measure.datatype = "Numeric";
+				measure.datatype = NUMERIC_DATATYPE;
 				measure.formatString = "#.##";
 				cube.measures.add(measure);
 			}
 		}
-		Dimension dimension = generateDimension(attrDef);
+		Dimension dimension = generateDimension(cube, attrDef);
 		cube.dimensions.add(dimension);
 	}
 
@@ -243,7 +247,7 @@ public class MondrianSchemaGenerator {
 		String parentEntityLabel = extractLabel(parentDef);
 
 		String nodeLabel = parentEntityLabel + " - " + extractLabel(attrDef);
-		Dimension dimension = new Dimension(attrDef.getPath());
+		Dimension dimension = new Dimension(determineDimensionName(attrDef));
 		dimension.caption = nodeLabel;
 
 		if (attrDef.isMultiple()) {
@@ -276,7 +280,7 @@ public class MondrianSchemaGenerator {
 			hierarchy.levels.add(generateLevel(attrDef));
 			dimension.hierarchy = hierarchy;
 		} else {
-			dimension = generateDimension(attrDef);
+			dimension = generateDimension(cube, attrDef);
 		}
 		cube.dimensions.add(dimension);
 	}
@@ -293,7 +297,7 @@ public class MondrianSchemaGenerator {
 			measure.column = "expansion_factor";
 			measure.caption = "Area (HA)";
 			measure.aggregator = "sum";
-			measure.datatype = "Integer";
+			measure.datatype = INTEGER_DATATYPE;
 			measure.formatString = "###,###";
 			measures.add(measure);
 		}
@@ -304,7 +308,7 @@ public class MondrianSchemaGenerator {
 			measure.column = "plot_weight";
 			measure.caption = "Plot Weight";
 			measure.aggregator = "sum";
-			measure.datatype = "Integer";
+			measure.datatype = INTEGER_DATATYPE;
 			measure.formatString = "#,###";
 			measures.add(measure);
 		}
@@ -346,19 +350,20 @@ public class MondrianSchemaGenerator {
 		}
 		measure.caption = StringEscapeUtils.escapeHtml4(extractLabel(entityDef) + " Count");
 		measure.aggregator = "distinct count";
-		measure.datatype = "Integer";
+		measure.datatype = INTEGER_DATATYPE;
 		cube.measures.add(measure);
 	}
 
-	private Dimension generateDimension(AttributeDefinition attrDef) {
+	private Dimension generateDimension(Cube cube, AttributeDefinition attrDef) {
 		String attrName = attrDef.getName();
-		Dimension dimension = new Dimension(attrDef.getPath());
-		dimension.caption = String.format("%s.%s [%s]",
-				extractLabel(attrDef.getNearestAncestorMultipleEntity()), extractLabel(attrDef), attrDef.getName());
+		Dimension dimension = new Dimension(determineDimensionName(attrDef));
+//		dimension.caption = String.format("%s.%s [%s]",
+//				extractLabel(attrDef.getNearestAncestorMultipleEntity()), extractLabel(attrDef), attrDef.getName());
+		dimension.caption = String.format("%s %s",
+				extractLabel(attrDef.getNearestAncestorMultipleEntity()), extractLabel(attrDef));
 
 		Hierarchy hierarchy = dimension.hierarchy;
-		DataTable dataTable = rdbSchema.getDataTable(attrDef.getParentEntityDefinition());
-		hierarchy.table = new Table(dbSchemaName, dataTable.getName());
+		hierarchy.table = new Table(dbSchemaName, cube.tables.get(0).name);
 
 		if (attrDef instanceof CodeAttributeDefinition) {
 			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attrDef;
@@ -389,6 +394,7 @@ public class MondrianSchemaGenerator {
 					hierarchy.table = new Table(dbSchemaName, codeListTableName);
 //					dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix()
 //							+ rdbConfig.getIdColumnSuffix();
+					DataTable dataTable = rdbSchema.getDataTable(attrDef.getParentEntityDefinition());
 					CodeValueFKColumn foreignKeyCodeColumn = dataTable.getForeignKeyCodeColumn(codeAttrDef);
 					dimension.foreignKey = foreignKeyCodeColumn.getName();
 				}
@@ -400,11 +406,10 @@ public class MondrianSchemaGenerator {
 			hierarchy.allMemberName = "attrLabel";
 			String[] levelNames = new String[] { "Year", "Month", "Day" };
 			for (String levelName : levelNames) {
-				Level level = new Level(attrDef.getNearestAncestorMultipleEntity().getName() + "."
-						+ extractLabel(attrDef) + " - " + levelName);
+				Level level = new Level(determineLevelName(attrDef, levelName));
 				level.column = attrDef.getName() + "_" + levelName.toLowerCase(Locale.ENGLISH);
 				level.levelType = String.format("Time%ss", levelName);
-				level.type = "Numeric";
+				level.type = NUMERIC_DATATYPE;
 				hierarchy.levels.add(level);
 			}
 		} else if (attrDef instanceof CoordinateAttributeDefinition) {
@@ -426,17 +431,16 @@ public class MondrianSchemaGenerator {
 
 	private Level generateLevel(NodeDefinition nodeDef) {
 		String attrName = nodeDef.getName();
-		String attrLabel = extractLabel(nodeDef);
-		Level level = new Level(extractLabel(nodeDef.getNearestAncestorMultipleEntity()) + "." + attrLabel);
+		Level level = new Level(determineLevelName(nodeDef));
 		level.levelType = "Regular";
 		if (nodeDef instanceof NumericAttributeDefinition) {
-			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? "Integer" : "Numeric";
+			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? INTEGER_DATATYPE : NUMERIC_DATATYPE;
 		} else if (nodeDef instanceof BooleanAttributeDefinition) {
-			level.type = "Boolean";
+			level.type = BOOLEAN_DATATYPE;
 		} else if (nodeDef instanceof CodeAttributeDefinition) {
-			level.type = "Integer";
+			level.type = INTEGER_DATATYPE;
 		} else {
-			level.type = "String";
+			level.type = STRING_DATATYPE;
 		}
 		if (nodeDef instanceof CodeAttributeDefinition && !((CodeAttributeDefinition) nodeDef).getList().isExternal()) {
 			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
@@ -445,11 +449,37 @@ public class MondrianSchemaGenerator {
 			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
 			level.nameColumn = codeTableName.substring(0,
 					codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + language;
-			level.type = "Integer";
+			level.type = INTEGER_DATATYPE;
 		} else {
 			level.column = attrName;
 		}
 		return level;
+	}
+
+	private String determineCubeName(EntityDefinition entityDef) {
+		return String.valueOf(entityDef.getId());
+//		return adaptPathToName(entityDef.getPath());
+	}
+
+	private String determineDimensionName(AttributeDefinition attrDef) {
+		return String.valueOf(attrDef.getId());
+//		return adaptPathToName(attrDef.getPath());
+	}
+
+	private String determineLevelName(NodeDefinition nodeDef) {
+		return determineLevelName(nodeDef, null);
+	}
+	
+	private String determineLevelName(NodeDefinition attrDef, String subLevelName) {
+		String result = extractLabel(attrDef.getNearestAncestorMultipleEntity()) + " " + extractLabel(attrDef);
+		if (subLevelName != null) {
+			result += " - " + subLevelName;
+		}
+		return result;
+	}
+
+	private String adaptPathToName(String path) {
+		return path.substring(1).replaceAll("/", "_");
 	}
 
 	private String extractLabel(NodeDefinition nodeDef) {

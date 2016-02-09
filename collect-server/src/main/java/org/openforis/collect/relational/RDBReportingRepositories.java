@@ -329,7 +329,10 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	
 	private void initializeMondrianSchemaDefinition(CollectSurvey survey) {
 		try {
-			MondrianSchemaGenerator schemaGenerator = new MondrianSchemaGenerator(survey, survey.getDefaultLanguage(), survey.getName(), rdbConfig);
+			boolean schemaLess = true; //TODO
+			String schemaName = schemaLess ? "" : survey.getName();
+			MondrianSchemaGenerator schemaGenerator = new MondrianSchemaGenerator(survey, survey.getDefaultLanguage(), 
+					schemaName, rdbConfig);
 			String mondrianSchema = schemaGenerator.generateXMLSchema();
 			mondrianSchemaDefinitionBySurvey.put(survey.getName(), mondrianSchema);
 		} catch(CollectRdbException e) {
