@@ -589,7 +589,7 @@ var fillDataWithJson = function(inputFieldInfoByParameterName) {
 		// value
 		// being
 		// 0;collect_code_deforestation_reason=burnt
-		var inputField = $("*[name=\'" + key + "\']");
+		var inputField = findById(key);
 		if (inputField.length == 1) {
 			setValueInInputField(inputField, value);
 		}
@@ -622,14 +622,13 @@ var setValueInInputField = function(inputField, value) {
 			// deselect all code item buttons
 			itemsGroup.find(".code-item").removeClass('active');
 			if (value != null && value != "") {
-				// select code item button with value equals to the specified
-				// one
+				// select code item button with value equals to the specified one
 				var activeCodeItemsContainer = itemsGroup
 						.find(".code-items:visible");
 				var splitted = value.split(SEPARATOR_MULTIPLE_PARAMETERS);
 				splitted
 						.forEach(function(value, index) {
-							var button = activeCodeItemsContainer.find(".code-item[value=" + value + "]");
+							var button = activeCodeItemsContainer.find(".code-item[value=" + escapeRegExp(value) + "]");
 							button.addClass('active');
 						});
 			}
@@ -718,6 +717,10 @@ var serializeForm = function(formId) {
 	return result;
 };
 */
+
+function escapeRegExp(string){
+	return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+};
 
 var enableSelect = function(selectName, enable) { // #elementsCover
 	$(selectName).prop('disabled', !enable);

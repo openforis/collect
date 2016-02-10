@@ -165,7 +165,9 @@ public class RecordUpdater {
 		
 		setMissingValueApproved(parentEntity, attributeName, false);
 		
-		applyInitialValue(attribute, true);
+		if (value == null) {
+			applyInitialValue(attribute, true);
+		}
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addAttributeAddChange(attribute);
