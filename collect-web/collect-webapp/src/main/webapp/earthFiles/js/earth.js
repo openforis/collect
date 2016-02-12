@@ -85,7 +85,7 @@ var sendCreateNewRecordRequest = function() {
 };
 
 var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, retryCount) {
-	delay = defaultIfNull(delay, 0);
+	delay = defaultIfNull(delay, 100);
 	retryCount = defaultIfNull(retryCount, 0);
 	if (DEBUG) {
 		log("sending update request (delay=" + delay + ")");
@@ -467,7 +467,9 @@ var initCodeButtonGroups = function() {
 			value = btn.val();
 		}
 		inputField.val(value);
-		btn.toggleClass("active", !wasActive);
+		if (! wasActive) {
+			btn.toggleClass("active", true);
+		}
 		
 		updateData(inputField);
 		
@@ -482,6 +484,11 @@ var initBooleanButtons = function() {
 		group.find("button").click(function() {
 			var btn = $(this);
 			hiddenField.val(btn.val());
+			var wasSelected = btn.hasClass('active');
+			group.find('button').removeClass('active');
+			if (! wasSelected) {
+				btn.addClass('active');
+			}
 			updateData(hiddenField);
 			return false;
 		});
@@ -520,16 +527,18 @@ var initSteps = function() {
 		    previous: PREVIOUS_LABEL
 		},
 		onStepChanged : function(event, currentIndex, priorIndex) {
-			var stepHeading = $($form.find(".steps .steps ul li")[currentIndex]);
+			var stepHeadings = $form.find(".steps .steps ul li");
+			var stepHeading = $(stepHeadings[currentIndex]);
 			if (stepHeading.hasClass("notrelevant")) {
-				if (currentIndex > priorIndex) {
-					$stepsContainer.steps("next");
+				var nextStepIndex;
+				var firstRelevantHeadingIdx = findFirstRelevantElementIndex(stepHeadings, currentIndex, currentIndex < priorIndex);
+				if (firstRelevantHeadingIdx >= 0) {
+					nextStepIndex = firstRelevantHeadingIdx;
 				} else {
-					$stepsContainer.steps("previous");
+					//show last card
+					nextStepIndex = stepHeadings.length - 1;
 				}
-			} else {
-				currentStepIndex = currentIndex;
-				//ajaxDataUpdate();
+				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
 			}
 			updateStepsErrorFeedback();
 		},
@@ -538,6 +547,18 @@ var initSteps = function() {
 		}
 	});
 	$stepsContainer.find("a[href='#finish']").addClass("btn-finish");
+};
+
+var findFirstRelevantElementIndex = function(group, startFromIndex, reverseOrder) {
+	var idx = reverseOrder ? startFromIndex - 1 : startFromIndex + 1;
+	while (reverseOrder ? idx >= 0 : idx < group.length) {
+		var el = $(group[idx]);
+		if (! el.hasClass("notrelevant")) {
+			return idx;
+		}
+		idx = reverseOrder ? idx - 1 : idx + 1;
+	}
+	return -1;
 };
 
 var checkIfPlacemarkAlreadyFilled = function(checkCount) {
@@ -679,7 +700,7 @@ var setValueInInputField = function(inputField, value) {
 			var group = inputField.closest(".boolean-group");
 			group.find("button").removeClass('active');
 			if (value != null && value != "") {
-				group.find("button[value='" + escapeRegExp(value) + "']").button('toggle');
+				group.find("button[value='" + value + "']").addClass('active');
 			}
 			break;
 		case "CODE_BUTTON_GROUP":
@@ -693,7 +714,7 @@ var setValueInInputField = function(inputField, value) {
 				var splitted = value.split(SEPARATOR_MULTIPLE_PARAMETERS);
 				if (activeCodeItemsContainer != null) {
 					splitted.forEach(function(value, index) {
-						var button = activeCodeItemsContainer.find(".code-item[value=" + escapeRegExp(value) + "]");
+						var button = activeCodeItemsContainer.find(".code-item[value='" + escapeRegExp(value) + "']");
 						button.addClass('active');
 					});
 				}
