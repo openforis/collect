@@ -144,8 +144,8 @@
 		<span>PLACEHOLDER_COLLECT_NOT_RUNNING</span>
 	</div>
 	
-	<div id="contentDiv"  style="height:600px;width:100%;display: none;">
-		<div id="scrollingDiv" style="overflow :visible;" class="earthDiv">
+	<div id="contentDiv"  style="display: none;">
+		<div id="scrollingDiv" style="overflow: visible;" class="earthDiv">
 			<form id="formAll" class="form-horizontal" action="$[host]save-data-expanded">
 			<!-- <form id="formAll" class="form-horizontal" action="http://127.0.0.1:8028/earth/save-data-expanded"> -->
 								
