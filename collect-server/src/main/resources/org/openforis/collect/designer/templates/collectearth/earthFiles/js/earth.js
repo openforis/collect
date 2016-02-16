@@ -8,6 +8,10 @@ var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
 var EXTRA_FIELD_CLASS = "extra";
 var MAX_DATA_UPDATE_RETRY_COUNT = 5;
 
+var DEFAULT_STATE = "default";
+var LOADING_STATE = "loading";
+var COLLECT_EARTH_NOT_RUNNING_STATE = "collectEarthNotRunning";
+
 var $form = null; //to be initialized
 var stateByInputFieldName = {};
 var lastUpdateRequest = null; //last update request sent to the server
@@ -26,8 +30,6 @@ $(function() {
 		log("initializing");
 		log("using host: " + HOST);
 	}
-	$.blockUI({message: null});
-
 	$form = $("#formAll");
 	$stepsContainer = $(".steps");
 
@@ -53,23 +55,12 @@ $(function() {
 	$form.submit(function(e) {
 		e.preventDefault();
 		
-		abortLastUpdateRequest(); 	// So that the form
-						// is not saved twice
-						// if the user
-						// clicks the submit
-						// button before the
-						// auto-save timeout
-						// has started
-						// Mark this as the "real submit" (as opposed
-						// when saving data just because the user closes
-						// the window) so we can show the placemark as
-						// interpreted
 		submitData();
 	});
 
 	$(".code-item").tooltip();
 
-	checkIfPlacemarkAlreadyFilled(0);
+	checkIfPlacemarkAlreadyFilled();
 });
 
 var submitData = function() {
@@ -92,7 +83,17 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	}
 	var inputFieldName = $(inputField).attr("id");
 	if (lastUpdateInputFieldName == inputFieldName) {
-		abortLastUpdateRequest();
+		abortLastUpdateRequest(); 	// So that the form
+									// is not saved twice
+									// if the user
+									// clicks the submit
+									// button before the
+									// auto-save timeout
+									// has started
+									// Mark this as the "real submit" (as opposed
+									// when saving data just because the user closes
+									// the window) so we can show the placemark as
+									// interpreted
 	}
 	setActivelySaved(activelySaved);
 
@@ -159,6 +160,15 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	}, delay);
 	
 	lastUpdateInputFieldName = inputFieldName;
+};
+
+var isValidResponse = function(text) {
+	try {
+		var json = $.parseJSON(text);
+		return json.hasOwnProperty("success");
+	} catch(error) {
+		return false;
+	}
 };
 
 var isSuccessfullResponse = function(text) {
@@ -562,29 +572,32 @@ var findFirstRelevantElementIndex = function(group, startFromIndex, reverseOrder
 };
 
 var checkIfPlacemarkAlreadyFilled = function(checkCount) {
-
+	checkCount = defaultIfNull(checkCount, 0);
+	
 	var placemarkId = getPlacemarkId();
 
 	$.ajax({data : {id : placemarkId},
 		type : "GET",
 		url : HOST + "placemark-info-expanded",
 		dataType : 'json',
-		timeout : 10000
+		timeout : 2000
 	})
-	.fail(function(jqXHR, textStatus, errorThrown) {
-		// try again
-		if (typeof checkCount == "undefined") {
-			checkCount = 0;
-		}
-	
-		if (checkCount < 5) {
-			checkCount = checkCount + 1;
-			checkIfPlacemarkAlreadyFilled(checkCount);
+	.fail(function(xhr, textStatus, errorThrown) {
+		if (isValidResponse(xhr.responseText)) {
+			//valid response but for some (unknown) reason not handled properly by jquery
+			handleValidResponse($.parseJSON(xhr.responseText));
+		} else if (checkCount < 5) {
+			// try again
+			checkIfPlacemarkAlreadyFilled(checkCount + 1);
 		} else {
-			showErrorMessage(COLLECT_NOT_RUNNING);
+			changeState(COLLECT_EARTH_NOT_RUNNING_STATE);
 		}
 	})
 	.done(function(json) {
+		handleValidResponse(json);
+	});
+	
+	function handleValidResponse(json) {
 		if (json.success) {
 			// placemark exists in database
 			if (json.activelySaved
@@ -605,13 +618,13 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 			showCurrentStep();
 			updateStepsErrorFeedback();
 
-			$.unblockUI();
+			changeState(DEFAULT_STATE);
 		} else {
 			// if no placemark in database, force the creation
 			// of a new record
 			sendCreateNewRecordRequest();
 		}
-	});
+	}
 };
 
 var getPlacemarkId = function() {
@@ -783,6 +796,25 @@ var forceWindowCloseAfterDialogCloses = function($dialog) {
 												// see the plot
 	});
 };
+
+var changeState = function(state) {
+	switch(state) {
+		case LOADING_STATE:
+			$("#contentDiv").hide();
+			$("#collectEarthNotRunningPanel").hide();
+			$("#loadingPanel").show();
+			break;
+		case COLLECT_EARTH_NOT_RUNNING_STATE:
+			$("#loadingPanel").hide();
+			$("#contentDiv").hide();
+			$("#collectEarthNotRunningPanel").show();
+			break;
+		default:
+			$("#loadingPanel").hide();
+			$("#collectEarthNotRunningPanel").hide();
+			$("#contentDiv").show();
+	}
+}
 
 /**
  * Utility functions
