@@ -89,7 +89,7 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 			return null;
 		}
 		InputStreamReader reader = OpenForisIOUtils.toReader(entryIS);
-		ParseRecordResult parseRecordResult = parseRecord(reader);
+		ParseRecordResult parseRecordResult = parseRecord(reader, step);
 		return parseRecordResult;
 	}
 	
@@ -131,8 +131,11 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 		IOUtils.closeQuietly(backupFileExtractor);
 	}
 	
-	private ParseRecordResult parseRecord(Reader reader) throws IOException {
+	private ParseRecordResult parseRecord(Reader reader, Step step) throws IOException {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
+		if (result.isSuccess()) {
+			result.getRecord().setStep(step);
+		}
 		return result;
 	}
 	

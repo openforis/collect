@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 
 /**
@@ -16,23 +17,24 @@ import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 public class DataImportSummaryItem {
 
 	private int entryId;
-	private CollectRecord record;
-	private CollectRecord conflictingRecord;
+	private CollectRecordSummary record;
+	private CollectRecordSummary conflictingRecord;
 	private List<Step> steps;
+	
 	/**
 	 * Map containing the warnings for each step (if any).
 	 * The warnings are stored in a Map where the node path is the key of the warning.
 	 */
 	private Map<Step, List<NodeUnmarshallingError>> warnings;
 
-	public DataImportSummaryItem(int entryId, CollectRecord record, List<Step> steps) {
+	public DataImportSummaryItem(int entryId, CollectRecordSummary record, List<Step> steps) {
 		this.entryId = entryId;
 		this.record = record;
 		this.steps = steps;
 		this.warnings = new HashMap<CollectRecord.Step, List<NodeUnmarshallingError>>();
 	}
 	
-	public DataImportSummaryItem(int entryId, CollectRecord record, List<Step> steps, CollectRecord conflictingRecord) {
+	public DataImportSummaryItem(int entryId, CollectRecordSummary record, List<Step> steps, CollectRecordSummary conflictingRecord) {
 		this(entryId, record, steps);
 		this.conflictingRecord = conflictingRecord;
 	}
@@ -45,19 +47,19 @@ public class DataImportSummaryItem {
 		this.entryId = entryId;
 	}
 
-	public CollectRecord getRecord() {
+	public CollectRecordSummary getRecord() {
 		return record;
 	}
 
-	public void setRecord(CollectRecord record) {
+	public void setRecord(CollectRecordSummary record) {
 		this.record = record;
 	}
 
-	public CollectRecord getConflictingRecord() {
+	public CollectRecordSummary getConflictingRecord() {
 		return conflictingRecord;
 	}
 
-	public void setConflictingRecord(CollectRecord conflictingRecord) {
+	public void setConflictingRecord(CollectRecordSummary conflictingRecord) {
 		this.conflictingRecord = conflictingRecord;
 	}
 
@@ -76,4 +78,13 @@ public class DataImportSummaryItem {
 	public void setWarnings(Map<Step, List<NodeUnmarshallingError>> warnings) {
 		this.warnings = warnings;
 	}
+	
+	public int getRecordCompletionPercent() {
+		return record.getCompletionPercent();
+	}
+
+	public int getConflictingRecordCompletionPercent() {
+		return conflictingRecord == null ? -1 : conflictingRecord.getCompletionPercent();
+	}
+
 }

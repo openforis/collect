@@ -33,6 +33,7 @@ import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
@@ -317,7 +318,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			CollectRecord record = packagedRecords.get(entryId);
 			if ( ! conflictingPackagedRecords.containsKey(entryId)) {
 				List<Step> steps = packagedStepsPerRecord.get(entryId);
-				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps);
+				DataImportSummaryItem item = new DataImportSummaryItem(entryId, CollectRecordSummary.fromRecord(record), steps);
 				item.setWarnings(warnings.get(entryId));
 				recordsToImport.add(item);
 			}
@@ -328,7 +329,8 @@ public class XMLDataImportProcess implements Callable<Void> {
 			CollectRecord record = packagedRecords.get(entryId);
 			CollectRecord conflictingRecord = conflictingPackagedRecords.get(entryId);
 			List<Step> steps = packagedStepsPerRecord.get(entryId);
-			DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps, conflictingRecord);
+			DataImportSummaryItem item = new DataImportSummaryItem(entryId, CollectRecordSummary.fromRecord(record),
+					steps, CollectRecordSummary.fromRecord(conflictingRecord));
 			item.setWarnings(warnings.get(entryId));
 			conflictingRecordItems.add(item);
 		}

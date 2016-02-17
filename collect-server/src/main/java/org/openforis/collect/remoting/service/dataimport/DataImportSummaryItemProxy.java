@@ -9,9 +9,9 @@ import java.util.Set;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.io.data.DataImportSummaryItem;
-import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.model.CollectRecordSummary;
+import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 
 /**
@@ -46,20 +46,30 @@ public class DataImportSummaryItemProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
-	public RecordProxy getRecord() {
-		return getRecordProxy(item.getRecord(), locale);
+	public RecordSummaryProxy getRecord() {
+		return getRecordSummaryProxy(item.getRecord(), locale);
 	}
 
 	@ExternalizedProperty
-	public RecordProxy getConflictingRecord() {
-		return getRecordProxy(item.getConflictingRecord(), locale);
+	public RecordSummaryProxy getConflictingRecord() {
+		return getRecordSummaryProxy(item.getConflictingRecord(), locale);
 	}
 
-	private RecordProxy getRecordProxy(CollectRecord record, Locale locale) {
-		if ( record != null ) {
-			return new RecordProxy(record, locale);
-		} else {
+	@ExternalizedProperty
+	public int getRecordCompletionPercent() {
+		return item.getRecordCompletionPercent();
+	}
+	
+	@ExternalizedProperty
+	public int getConflictingRecordCompletionPercent() {
+		return item.getConflictingRecordCompletionPercent();
+	}
+	
+	private RecordSummaryProxy getRecordSummaryProxy(CollectRecordSummary summary, Locale locale) {
+		if ( summary == null ) {
 			return null;
+		} else {
+			return new RecordSummaryProxy(summary, locale);
 		}
 	}
 	

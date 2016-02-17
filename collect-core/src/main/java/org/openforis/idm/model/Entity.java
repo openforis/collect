@@ -461,12 +461,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public List<Node<? extends NodeDefinition>> getChildren() {
-		return Collections.unmodifiableList(children);
-//		List<Node<?>> result = new ArrayList<Node<?>>();
-//		for (List<Node<?>> list : childrenByDefinitionId.values()) {
-//			result.addAll(list);
-//		}
-//		return Collections.unmodifiableList(result);
+		return CollectionUtils.unmodifiableList(children);
 	}
 	
 	/**
