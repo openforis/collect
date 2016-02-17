@@ -59,7 +59,7 @@ public class CollectEarthBalloonGenerator {
 	
 	public static final String EXTRA_HIDDEN_PREFIX = "EXTRA_";
 	private static final Object EXTRA_HIDDEN_FIELD_CLASS = "extra";
-	private static final String RANDOM_NUMBER_PLACEHOLDER_REGEX = "\\$\\[randomNumber\\]";
+	//private static final String RANDOM_NUMBER_PLACEHOLDER_REGEX = "\\$\\[randomNumber\\]";
 
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
@@ -93,7 +93,8 @@ public class CollectEarthBalloonGenerator {
 
 	public String generateHTML() throws IOException {
 		String result = getHTMLTemplate();
-		result = result.replaceAll(RANDOM_NUMBER_PLACEHOLDER_REGEX, Collect.VERSION.toString());
+		// WTF Stefano !!! Don't touch this! (rememebr, if it works leave it alone! )
+		//result = result.replaceAll(RANDOM_NUMBER_PLACEHOLDER_REGEX, Collect.VERSION.toString());
 		result = addHiddenFields(result);
 		result = fillWithSurveyDefinitionFields(result);
 		result = replaceButtonLocalizationText(result);

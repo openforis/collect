@@ -68,8 +68,8 @@ ${html_for_balloon}
 		</ListStyle>
 	</Style>
 
-	<#if placemark.region?? >
 	<Folder >
+
 		<Region>
 			<LatLonAltBox>
 				<south>${placemark.region.south}</south>
@@ -87,7 +87,6 @@ ${html_for_balloon}
 			</Lod>
 		</Region>
 	</Folder>
-	</#if>
 	
 	<LookAt>
       <longitude>${placemark.coord.longitude}</longitude>
@@ -156,13 +155,6 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 	    
 		<styleUrl>#placemark-balloon-style</styleUrl>
    
-   		<#if placemark.kmlPolygon?? >
-   		
-   		<#-- If there was a polygon set for the placemark use it here!  -->
-   		${placemark.kmlPolygon}
-   		
-   		<#else>   
-        
         <Polygon id="poly_${placemark.placemarkId}">
         	<outerBoundaryIs>
 				<LinearRing>
@@ -191,8 +183,6 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 		      </#list>  
 		       </innerBoundaryIs>
    		</Polygon>
-   		
-   		<#if>
 	</Placemark>
 	
 	</Folder>
