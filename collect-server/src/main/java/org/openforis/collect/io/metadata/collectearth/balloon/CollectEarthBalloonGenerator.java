@@ -74,6 +74,7 @@ public class CollectEarthBalloonGenerator {
 	private static final String PLACEHOLDER_PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";//$NON-NLS-1$
 	private static final String PLACEHOLDER_EXTRA_ID_ATTRIBUTES = "PLACEHOLDER_EXTRA_ID_ATTRIBUTES";//$NON-NLS-1$
 	private static final String PLACEHOLDER_UI_LANGUAGE = "PLACEHOLDER_UI_LANGUAGE";
+	private static final String PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST = "PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST";
 
 	private CollectSurvey survey;
 	private String language;
@@ -111,6 +112,10 @@ public class CollectEarthBalloonGenerator {
 		// Added to handle multiple id attributes within a survey
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_EXTRA_ID_ATTRIBUTES,  getIdAttributesSurvey() ); //$NON-NLS-1$
 		
+		// Added to handle multiple id attributes within a survey
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST,  getIdPlaceholdersSurvey() ); //$NON-NLS-1$
+
+		
 		return htmlForBalloon;
 	}
 
@@ -130,6 +135,25 @@ public class CollectEarthBalloonGenerator {
 		return jsArrayKeys;		
 		
 	}
+	
+	private String getIdPlaceholdersSurvey() {
+		
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		StringBuilder sb = new StringBuilder();
+		for (AttributeDefinition def : keyAttributeDefinitions) {
+			sb.append(def.getName()).
+			append("=")
+			.append("$[")
+			.append(EXTRA_HIDDEN_PREFIX)
+			.append(def.getName())
+			.append("]")
+			.append("&"); 
+		}
+		// remove the last & character
+		return (String) sb.subSequence(0, sb.length() -1);
+	}
+	
+	
 
 	private String getHTMLTemplate() throws IOException {
 		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
@@ -173,7 +197,7 @@ public class CollectEarthBalloonGenerator {
 			sb.append(name);
 			sb.append("\" name=\""); //$NON-NLS-1$
 			sb.append(name);
-			sb.append("\" value=\"$[" + EXTRA_HIDDEN_PREFIX); //$NON-NLS-1$
+			sb.append("\" value=\"$[").append( EXTRA_HIDDEN_PREFIX); //$NON-NLS-1$
 			sb.append(def.getName());
 			sb.append("]\""); //$NON-NLS-1$
 			sb.append(" class=\""); //$NON-NLS-1$

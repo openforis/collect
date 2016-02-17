@@ -254,7 +254,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	}
 
 	/**
-	 * Goes though the attributes on the survey finding those that are marked as being key attributes or that are coming "From CSV" meaning that the popup-up will not show the attributes and they will be kept as hidden inputs
+	 * Goes though the attributes on the survey finding those that are marked as coming "From CSV" meaning that the popup-up will not show the attributes and they will be kept as hidden inputs
 	 * @param survey
 	 * @return The list of attributes that are marked as coming "From CSV" or that are key attributes
 	 */
@@ -265,9 +265,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			public void visit(NodeDefinition def) {
 				if (def instanceof AttributeDefinition) {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
-					if (annotations.isFromCollectEarthCSV(attrDef)
-														
-					) {
+					if (annotations.isFromCollectEarthCSV(attrDef) && !attrDef.isKey()) {
 						fromCsvAttributes.add(attrDef);
 					}					
 				}
