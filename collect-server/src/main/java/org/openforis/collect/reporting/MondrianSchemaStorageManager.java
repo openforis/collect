@@ -35,7 +35,7 @@ public class MondrianSchemaStorageManager extends BaseStorageManager {
 	}
 
 	protected void initStorageDirectory() {
-		super.initStorageDirectory(ConfigurationItem.LOCAL_MONDRIAN_SCHEMA_PATH);
+		super.initStorageDirectory(ConfigurationItem.MONDRIAN_SCHEMA_PATH);
 	}
 
 	public boolean existsSchemaFile(String surveyName) {
