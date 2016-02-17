@@ -372,13 +372,13 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 
 	@Override
 	public void update(CollectRecord record) {
-		createUpdateQuery(record).getInternalQuery().execute();
+		createUpdateQuery(record, record.getStep()).getInternalQuery().execute();
 	}
 	
-	public RecordStoreQuery createUpdateQuery(CollectRecord record) {
+	public RecordStoreQuery createUpdateQuery(CollectRecord record, Step step) {
 		Survey survey = record.getSurvey();
-		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey, record.getStep().getStepNumber());
-		UpdateQuery q = dsl.updateQuery(record);
+		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey, step.getStepNumber());
+		UpdateQuery q = dsl.updateQuery(record, step);
 		return new RecordStoreQuery(q);
 	}
 
@@ -389,8 +389,8 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	
 	public RecordStoreQuery createInsertQuery(CollectRecord record) {
 		Survey survey = record.getSurvey();
-		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey, record.getStep().getStepNumber());
-		InsertQuery q = dsl.insertQuery(record);
+		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey, Step.ENTRY.getStepNumber());
+		InsertQuery q = dsl.insertQuery(record, Step.ENTRY);
 		return new RecordStoreQuery(q);
 	}
 	
@@ -459,6 +459,18 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			}
 			this.dataAlias = step == null ? null: (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as("DATA");
 			this.modelSerializer = step == null ? null : new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
+		}
+
+		public UpdateQuery updateQuery(CollectRecord record, Step step) {
+			UpdateQuery<?> query = updateQuery(record);
+			query.addValue(OFC_RECORD.STEP, step.getStepNumber());
+			return query;
+		}
+		
+		public InsertQuery insertQuery(CollectRecord record, Step step) {
+			InsertQuery<?> query = insertQuery(record);
+			query.addValue(OFC_RECORD.STEP, step.getStepNumber());
+			return query;
 		}
 
 		public SelectQuery selectRecordQuery(int id) {

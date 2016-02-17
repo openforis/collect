@@ -40,7 +40,7 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 	@Test
 	public void roundTripTest() {
 		DataCleansingMetadata metadata = createTestMetadata();
-		metadataManager.saveMetadata(survey, metadata);
+		metadataManager.saveMetadata(survey, metadata, false);
 		
 		DataCleansingMetadata reloadedMetadata = metadataManager.loadMetadata(survey);
 		assertDeepEquals(metadata, reloadedMetadata);

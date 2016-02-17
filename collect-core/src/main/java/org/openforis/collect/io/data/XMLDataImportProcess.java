@@ -419,7 +419,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 							if ( includesRecordFiles ) {
 								recordFileManager.deleteAllFiles(parsedRecord);
 							}
-							query = recordManager.createUpdateQuery(parsedRecord);
+							query = recordManager.createUpdateQuery(parsedRecord, parsedRecord.getStep());
 						} else {
 							parsedRecord.setId(nextRecordId ++);
 							query = recordManager.createInsertQuery(parsedRecord);
@@ -427,7 +427,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 						lastProcessedRecord = parsedRecord;
 					} else {
 						replaceData(parsedRecord, lastProcessedRecord);
-						query = recordManager.createUpdateQuery(lastProcessedRecord);
+						query = recordManager.createUpdateQuery(lastProcessedRecord, lastProcessedRecord.getStep());
 					}
 					appendQuery(query);
 //					if ( parseRecordResult.hasWarnings() ) {
@@ -442,7 +442,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep, validateRecords);
 			originalRecord.setStep(originalRecordStep);
 			afterRecordUpdate(originalRecord);
-			appendQuery(recordManager.createUpdateQuery(originalRecord));
+			appendQuery(recordManager.createUpdateQuery(originalRecord, originalRecord.getStep()));
 		}
 		if ( includesRecordFiles ) {
 			importRecordFiles(lastProcessedRecord);
