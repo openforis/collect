@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
+import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
@@ -71,7 +71,14 @@ public class MondrianCubeGenerator {
 		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
 		Table table = new Table(rootEntityDef.getName());
 		
-		Cube cube = new Cube("Collect Data - " + rootEntityDef.getLabel(NodeLabel.Type.INSTANCE, language) );
+		String cubeLabel = survey.getProjectName(language);
+		if( cubeLabel == null ){
+			cubeLabel = survey.getProjectName(null);	
+		}
+		
+		cubeLabel = HtmlUnicodeEscaperUtil.escapeMondrianUnicode( cubeLabel );
+		
+		Cube cube = new Cube("Collect Data - " + cubeLabel );
 		cube.table = table;
 		
 		List<NodeDefinition> children = rootEntityDef.getChildDefinitions();
@@ -83,7 +90,7 @@ public class MondrianCubeGenerator {
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
 					measure.column = "_" + rootEntityDef.getName() + "_" + nodeName;
-					measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(rootEntityDef) + " Count" );
+					measure.caption = HtmlUnicodeEscaperUtil.escapeMondrianUnicode( extractLabel(rootEntityDef) + " Count" );
 					measure.aggregator = "distinct count";
 					measure.datatype = "Integer";
 					cube.measures.add(measure);
@@ -91,7 +98,7 @@ public class MondrianCubeGenerator {
 					for (String aggregator : MEASURE_AGGREGATORS) {
 						Measure measure = new Measure(nodeName + "_" + aggregator);
 						measure.column = nodeName;
-						measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(nodeDef) + " " + aggregator );
+						measure.caption = HtmlUnicodeEscaperUtil.escapeMondrianUnicode( extractLabel(nodeDef) + " " + aggregator );
 						measure.aggregator = aggregator;
 						measure.datatype = "Numeric";
 						measure.formatString = "#.##";
@@ -362,6 +369,9 @@ public class MondrianCubeGenerator {
 		String label = nodeDef.getFailSafeLabel(language, 
 				NodeLabel.Type.REPORTING, 
 				NodeLabel.Type.INSTANCE);
+		
+		label = HtmlUnicodeEscaperUtil.escapeMondrianUnicode( label);
+		
 		return label;
 	}
 	
@@ -373,7 +383,7 @@ public class MondrianCubeGenerator {
 
 		public MondrianSchemaObject(String name) {
 			super();
-			this.name = StringEscapeUtils.escapeHtml4(name);
+			this.name = HtmlUnicodeEscaperUtil.escapeMondrianUnicode(name);
 		}
 		
 	}
