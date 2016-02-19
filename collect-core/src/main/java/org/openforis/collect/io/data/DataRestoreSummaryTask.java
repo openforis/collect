@@ -42,7 +42,8 @@ public class DataRestoreSummaryTask extends Task {
 	//input
 	private CollectSurvey survey;
 	private boolean oldFormat;
-	
+	private boolean completeSummary;
+
 	/**
 	 * If specified, it will be used to filter the records to include in the summary
 	 */
@@ -262,7 +263,7 @@ public class DataRestoreSummaryTask extends Task {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {
 			CollectRecord summary = oldRecords.get(0);
-			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), false); //TODO avoid it when validation is not required
+			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), completeSummary);
 			return CollectRecordSummary.fromRecord(record);
 		} else {
 			throw new IllegalStateException(String.format("Multiple records found in survey %s with key(s): %s", survey.getName(), keyValues));
@@ -327,5 +328,13 @@ public class DataRestoreSummaryTask extends Task {
 	public void setRecordProvider(RecordProvider recordProvider) {
 		this.recordProvider = recordProvider;
 	}
-	
+
+	public boolean isCompleteSummary() {
+		return completeSummary;
+	}
+
+	public void setCompleteSummary(boolean completeSummary) {
+		this.completeSummary = completeSummary;
+	}
+
 }

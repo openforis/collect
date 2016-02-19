@@ -15,6 +15,7 @@ import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.User;
+import org.openforis.collect.utils.Proxies;
 import org.openforis.idm.metamodel.ModelVersion;
 
 /**
@@ -26,26 +27,9 @@ public class RecordSummaryProxy implements Proxy {
 	private transient CollectRecordSummary summary;
 	private transient Locale locale;
 
-	private Integer errors;
-	private Integer missing;
-	private Integer missingErrors;
-	private Integer missingWarnings;
-	private Integer skipped;
-	private Integer warnings;
-	private UserProxy owner;
-	
 	public RecordSummaryProxy(CollectRecordSummary summary, Locale locale) {
 		this.summary = summary;
 		this.locale = locale;
-		
-		errors = summary.getErrors();
-		skipped = summary.getSkipped();
-		missing = summary.getMissing();
-//		missingErrors = summary.getMissingErrors();
-//		missingWarnings = summary.getMissingWarnings();
-		/*missingErrors = missingWarnings = 0; //TODO these values are not stored in records table */
-//		warnings = summary.getWarnings();
-//		owner = summary.getOwner() == null ? null: new UserProxy(summary.getOwner());
 	}
 
 	public static List<RecordSummaryProxy> fromList(List<CollectRecordSummary> summaries, Locale locale) {
@@ -63,6 +47,11 @@ public class RecordSummaryProxy implements Proxy {
 		return summary.getStep();
 	}
 
+	@ExternalizedProperty
+	public int getStepNumber() {
+		return summary.getStep().getStepNumber();
+	}
+	
 	@ExternalizedProperty
 	public State getState() {
 		return summary.getState();
@@ -138,59 +127,39 @@ public class RecordSummaryProxy implements Proxy {
 		return false;
 	}
 
+	@ExternalizedProperty
 	public Integer getErrors() {
-		return errors;
+		return summary.getErrors();
 	}
 
-	public void setErrors(Integer errors) {
-		this.errors = errors;
-	}
-
+	@ExternalizedProperty
 	public Integer getSkipped() {
-		return skipped;
+		return summary.getSkipped();
 	}
 
-	public void setSkipped(Integer skipped) {
-		this.skipped = skipped;
-	}
-
+	@ExternalizedProperty
 	public Integer getMissing() {
-		return missing;
+		return summary.getMissing();
 	}
 
-	public void setMissing(Integer missing) {
-		this.missing = missing;
-	}
-
+	@ExternalizedProperty
 	public Integer getWarnings() {
-		return warnings;
+		return summary.getMissingWarnings();
 	}
 
-	public void setWarnings(Integer warnings) {
-		this.warnings = warnings;
-	}
-
+	@ExternalizedProperty
 	public Integer getMissingErrors() {
-		return missingErrors;
+		return summary.getMissingErrors();
 	}
 
-	public void setMissingErrors(Integer missingErrors) {
-		this.missingErrors = missingErrors;
-	}
-
+	@ExternalizedProperty
 	public Integer getMissingWarnings() {
-		return missingWarnings;
+		return summary.getMissingWarnings();
 	}
 
-	public void setMissingWarnings(Integer missingWarnings) {
-		this.missingWarnings = missingWarnings;
-	}
-
+	@ExternalizedProperty
 	public UserProxy getOwner() {
-		return owner;
+		return Proxies.fromObject(summary.getOwner(), UserProxy.class);
 	}
 	
-	public void setOwner(UserProxy owner) {
-		this.owner = owner;
-	}
 }

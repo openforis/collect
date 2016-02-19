@@ -14,8 +14,11 @@ public class CollectRecordSummary {
 	private Date creationDate;
 	private List<Integer> entityCounts;
 	private Integer errors;
+	private int filledAttributesCount;
 	private Integer id;
 	private Integer missing;
+	private Integer missingErrors;
+	private Integer missingWarnings;
 	private User modifiedBy;
 	private Date modifiedDate;
 	private List<String> rootEntityKeyValues;
@@ -23,7 +26,9 @@ public class CollectRecordSummary {
 	private State state;
 	private Step step;
 	private CollectSurvey survey;
+
 	private ModelVersion version;
+	private User owner;
 
 	public static CollectRecordSummary fromRecord(CollectRecord record) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
@@ -34,8 +39,11 @@ public class CollectRecordSummary {
 		result.setCreationDate(record.getCreationDate());
 		result.setEntityCounts(record.getEntityCounts());
 		result.setErrors(record.getErrors());
+		result.setFilledAttributesCount(record.countTotalFilledAttributes());
 		result.setId(record.getId());
 		result.setMissing(record.getMissing());
+		result.setMissingErrors(record.getMissingErrors());
+		result.setMissingWarnings(record.getMissingWarnings());
 		result.setModifiedBy(record.getModifiedBy());
 		result.setModifiedDate(record.getModifiedDate());
 		result.setRootEntityKeyValues(record.getRootEntityKeyValues());
@@ -44,6 +52,7 @@ public class CollectRecordSummary {
 		result.setStep(record.getStep());
 		result.setSurvey(survey);
 		result.setVersion(version);
+		result.setOwner(record.getOwner());
 		return result;
 	}
 
@@ -103,6 +112,22 @@ public class CollectRecordSummary {
 		this.missing = missing;
 	}
 
+	public Integer getMissingErrors() {
+		return missingErrors;
+	}
+	
+	public void setMissingErrors(Integer missingErrors) {
+		this.missingErrors = missingErrors;
+	}
+	
+	public Integer getMissingWarnings() {
+		return missingWarnings;
+	}
+	
+	public void setMissingWarnings(Integer missingWarnings) {
+		this.missingWarnings = missingWarnings;
+	}
+	
 	public User getModifiedBy() {
 		return modifiedBy;
 	}
@@ -167,4 +192,19 @@ public class CollectRecordSummary {
 		this.version = version;
 	}
 	
+	public User getOwner() {
+		return owner;
+	}
+	
+	public void setOwner(User owner) {
+		this.owner = owner;
+	}
+
+	public int getFilledAttributesCount() {
+		return filledAttributesCount;
+	}
+
+	public void setFilledAttributesCount(int filledAttributesCount) {
+		this.filledAttributesCount = filledAttributesCount;
+	}
 }

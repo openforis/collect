@@ -22,7 +22,7 @@ import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 public class DataImportSummaryItemProxy implements Proxy {
 
 	private transient DataImportSummaryItem item;
-	private Locale locale;
+	private transient Locale locale;
 	
 	public DataImportSummaryItemProxy(DataImportSummaryItem item, Locale locale) {
 		this.item = item;
@@ -47,32 +47,54 @@ public class DataImportSummaryItemProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public RecordSummaryProxy getRecord() {
-		return getRecordSummaryProxy(item.getRecord(), locale);
+		return createRecordSummaryProxy(item.getRecord(), locale);
 	}
-
+	
 	@ExternalizedProperty
-	public RecordSummaryProxy getConflictingRecord() {
-		return getRecordSummaryProxy(item.getConflictingRecord(), locale);
+	public int getRecordErrors() {
+		return item.getRecord().getErrors();
 	}
-
+	
 	@ExternalizedProperty
 	public int getRecordCompletionPercent() {
 		return item.getRecordCompletionPercent();
 	}
 	
 	@ExternalizedProperty
+	public int getRecordFilledAttributesCount() {
+		return item.getRecordFilledAttributesCount();
+	}
+
+	@ExternalizedProperty
+	public RecordSummaryProxy getConflictingRecord() {
+		return createRecordSummaryProxy(item.getConflictingRecord(), locale);
+	}
+
+	@ExternalizedProperty
+	public int getConflictingRecordErrors() {
+		return item.getConflictingRecord().getErrors();
+	}
+	
+	@ExternalizedProperty
 	public int getConflictingRecordCompletionPercent() {
 		return item.getConflictingRecordCompletionPercent();
 	}
-	
-	private RecordSummaryProxy getRecordSummaryProxy(CollectRecordSummary summary, Locale locale) {
-		if ( summary == null ) {
-			return null;
-		} else {
-			return new RecordSummaryProxy(summary, locale);
-		}
+
+	@ExternalizedProperty
+	public int getConflictingRecordFilledAttributesCount() {
+		return item.getConflictingRecordFilledAttributesCount();
 	}
 	
+	@ExternalizedProperty
+	public int getCompletionDifferencePercent() {
+		return item.calculateCompletionDifferencePercent();
+	}
+
+	@ExternalizedProperty
+	public int getImportabilityLevel() {
+		return item.calculateImportabilityLevel();
+	}
+
 	@ExternalizedProperty
 	public List<NodeUnmarshallingErrorProxy> getWarnings() {
 		List<NodeUnmarshallingError> result = new ArrayList<NodeUnmarshallingError>();
@@ -95,22 +117,42 @@ public class DataImportSummaryItemProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public boolean isEntryDataPresent() {
-		Step step = Step.ENTRY;
-		return hasStep(step);
+		return hasStep(Step.ENTRY);
 	}
 
 	@ExternalizedProperty
 	public boolean isCleansingDataPresent() {
-		Step step = Step.CLEANSING;
-		return hasStep(step);
+		return hasStep(Step.CLEANSING);
 	}
 
 	@ExternalizedProperty
 	public boolean isAnalysisDataPresent() {
-		Step step = Step.ANALYSIS;
-		return hasStep(step);
+		return hasStep(Step.ANALYSIS);
+	}
+	
+	@ExternalizedProperty
+	public boolean isConflictingRecordEntryDataPresent() {
+		return isConflictingRecordAfterStep(Step.ENTRY);
 	}
 
+	@ExternalizedProperty
+	public boolean isConflictingRecordCleansingDataPresent() {
+		return isConflictingRecordAfterStep(Step.CLEANSING);
+	}
+
+	@ExternalizedProperty
+	public boolean isConflictingRecordAnalysisDataPresent() {
+		return isConflictingRecordAfterStep(Step.ANALYSIS);
+	}
+
+	private RecordSummaryProxy createRecordSummaryProxy(CollectRecordSummary summary, Locale locale) {
+		if ( summary == null ) {
+			return null;
+		} else {
+			return new RecordSummaryProxy(summary, locale);
+		}
+	}
+	
 	protected boolean hasStep(Step step) {
 		if ( item.getSteps() != null ) {
 			return item.getSteps().contains(step);
@@ -119,5 +161,9 @@ public class DataImportSummaryItemProxy implements Proxy {
 		}
 	}
 	
+	private boolean isConflictingRecordAfterStep(Step step) {
+		return item.getConflictingRecord().getStep().afterEqual(step);
+	}
 
+	
 }

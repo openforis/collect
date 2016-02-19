@@ -125,7 +125,12 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 			}
 		})
 		.done(function(json) {
-			handleSuccessfullDataUpdateResponse(json, activelySaved, blockUI);
+			if (json.success) {
+				handleSuccessfullDataUpdateResponse(json, activelySaved, blockUI);
+			} else {
+				handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
+					json.message);
+			}
 		})
 		.fail(function(xhr, textStatus, errorThrown) {
 			// try again
@@ -135,20 +140,9 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 						log("failed but the response is successfull: " + xhr.responseText);
 					}
 					handleSuccessfullDataUpdateResponse($.parseJSON(xhr.responseText), activelySaved, blockUI);
-				} else if (retryCount < MAX_DATA_UPDATE_RETRY_COUNT){
-					if (DEBUG) {
-						log("error updating data. retrying for the " + (retryCount+1) + " time");
-					}
-					sendDataUpdateRequest(inputField, activelySaved, blockUI, 1000, retryCount + 1);
 				} else {
-					undoChanges();
-					if (DEBUG) {
-						log("error updating data. Status = " + xhr.status + "; Text status = " 
-								+ textStatus + "; error thrown = " + errorThrown + "; response = " + xhr.responseText );
-					}
-					if (blockUI) {
-						$.unblockUI();
-					}
+					handleFailureDataUpdateResponse(inputField, activelySaved, blockUI, retryCount, 
+						errorThrown, xhr, textStatus, errorThrown);
 				}
 			}
 		})
@@ -185,11 +179,35 @@ var handleSuccessfullDataUpdateResponse = function(json, showFeedbackMessage, un
 		log("data updated successfully, updating UI...");
 	}
 	interpretJsonSaveResponse(json, showFeedbackMessage);
+	
+	changeState(DEFAULT_STATE);
+	
 	if (unblockWhenDone) {
 		$.unblockUI();
 	}
 	if (DEBUG) {
 		log("UI update complete");
+	}
+};
+
+var handleFailureDataUpdateResponse = function(inputField, activelySaved, blockUI, retryCount, errorMessage, xhr, textStatus, errorThrown) {
+	if (retryCount < MAX_DATA_UPDATE_RETRY_COUNT){
+		if (DEBUG) {
+			log("error updating data. retrying for the " + (retryCount+1) + " time");
+		}
+		sendDataUpdateRequest(inputField, activelySaved, blockUI, 1000, retryCount + 1);
+	} else {
+		undoChanges();
+		var logErrorMessage = "error updating data: " + errorMessage;
+		if (xhr) {
+			logErrorMessage += " Status = " + xhr.status + "; Text status = " 
+					+ textStatus + "; error thrown = " + errorThrown + "; response = " + xhr.responseText;
+		}
+		logError(logErrorMessage);
+
+		if (blockUI) {
+			$.unblockUI();
+		}
 	}
 };
 
@@ -217,7 +235,6 @@ var createPlacemarkUpdateRequest = function(inputField) {
 
 var abortLastUpdateRequest = function() {
 	clearTimeout(ajaxTimeout);
-	$.unblockUI();
 
 	if (lastUpdateRequest != null) {
 		if (DEBUG) {
@@ -800,19 +817,19 @@ var forceWindowCloseAfterDialogCloses = function($dialog) {
 var changeState = function(state) {
 	switch(state) {
 		case LOADING_STATE:
-			$("#contentDiv").hide();
+			$("#formAll").hide();
 			$("#collectEarthNotRunningPanel").hide();
 			$("#loadingPanel").show();
 			break;
 		case COLLECT_EARTH_NOT_RUNNING_STATE:
 			$("#loadingPanel").hide();
-			$("#contentDiv").hide();
+			$("#formAll").hide();
 			$("#collectEarthNotRunningPanel").show();
 			break;
 		default:
 			$("#loadingPanel").hide();
 			$("#collectEarthNotRunningPanel").hide();
-			$("#contentDiv").show();
+			$("#formAll").show();
 	}
 }
 

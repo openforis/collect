@@ -354,6 +354,28 @@ public class Record implements DeepComparable {
 		return Double.valueOf(Math.floor((double) (100 * filledAttributes / totalRequiredAttributes))).intValue();
 	}
 	
+	public int countTotalFilledAttributes() {
+		if (getRootEntity() == null) {
+			return -1;
+		}
+		int total = 0;
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.push(getRootEntity());
+		while (! stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			if (node.isRelevant()) {
+				if (node instanceof Attribute) {
+					if (! node.isEmpty()) {
+						total ++;
+					}
+				} else {
+					stack.addAll(((Entity) node).getChildren());
+				}
+			}
+		}
+		return total;
+	}
+	
 	@Override
 	public boolean deepEquals(Object obj) {
 		if (this == obj)

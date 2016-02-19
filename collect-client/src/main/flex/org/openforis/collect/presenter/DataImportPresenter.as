@@ -112,6 +112,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS, selectAllConflictingRecords);
+			eventDispatcher.addEventListener(DataImportEvent.SELECT_ONLY_NEWER_CONFLICTING_RECORDS, selectOnlyNewerConflictingRecords);
 			eventDispatcher.addEventListener(DataImportEvent.CONFLICTING_RECORDS_SELECTION_CHANGE, conflictingRecordsSelectionChange);
 			eventDispatcher.addEventListener(DataImportEvent.RECORDS_TO_IMPORT_SELECTION_CHANGE, recordsToImportSelectionChange);
 		}
@@ -121,6 +122,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.removeEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 			eventDispatcher.removeEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
 			eventDispatcher.removeEventListener(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS, selectAllConflictingRecords);
+			eventDispatcher.removeEventListener(DataImportEvent.SELECT_ONLY_NEWER_CONFLICTING_RECORDS, selectOnlyNewerConflictingRecords);
 			eventDispatcher.removeEventListener(DataImportEvent.CONFLICTING_RECORDS_SELECTION_CHANGE, conflictingRecordsSelectionChange);
 			eventDispatcher.removeEventListener(DataImportEvent.RECORDS_TO_IMPORT_SELECTION_CHANGE, recordsToImportSelectionChange);
 		}
@@ -172,7 +174,8 @@ package org.openforis.collect.presenter {
 			var responder:AsyncResponder = new AsyncResponder(startSummaryCreationResultHandler, faultHandler);
 			var activeSurvey:SurveyProxy = Application.activeSurvey;
 			var selectedSurveyUri:String = activeSurvey == null ? null: activeSurvey.uri;
-			_dataImportClient.startSummaryCreation(responder, filePath, selectedSurveyUri);
+			var completeSummary:Boolean = view.completeSummaryCheckBox.selected;
+			_dataImportClient.startSummaryCreation(responder, filePath, selectedSurveyUri, false, completeSummary);
 			startProgressTimer();
 		}
 		
@@ -447,6 +450,10 @@ package org.openforis.collect.presenter {
 				view.selectedConflictingRecordsCount = 0;
 			}
 			setItemsSelected(_summary.conflictingRecords, _allConflictingRecordsSelected);
+		}
+		
+		protected function selectOnlyNewerConflictingRecords(event:DataImportEvent):void {
+			//TODO
 		}
 		
 		protected function conflictingRecordsSelectionChange(event:DataImportEvent):void {

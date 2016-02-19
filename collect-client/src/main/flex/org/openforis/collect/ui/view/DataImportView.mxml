@@ -100,6 +100,11 @@
 		<s:Label text="{Message.get('dataImport.introduction')}"
 				 styleName="infoMessageBig"
 				 textAlign="center" />
+		
+		<s:FormItem label="{Message.get('dataImport.completeSummary')}">
+			<s:CheckBox id="completeSummaryCheckBox" selected="false" />
+		</s:FormItem>
+
 		<s:Button id="uploadButton" 
 				  label="{Message.get('dataImport.selectFileToUpload')}"
 				  includeIn="default"
@@ -151,6 +156,7 @@
 											   headerText="{Message.get('dataImport.recordList.key')}"
 											   width="100" />
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
+						<!--
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
@@ -158,6 +164,7 @@
 												   		return UIUtil.gridColumnSortCompareFunction('conflictingRecord.creationDate', o1, o2);
 												   }}"
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						-->
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
@@ -165,18 +172,59 @@
 												   		return UIUtil.gridColumnSortCompareFunction('conflictingRecord.modifiedDate', o1, o2);
 												   }}"
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-						<mx:AdvancedDataGridColumn dataField="conflictingRecord.step"
-												   width="60"
+						<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}"
+														sortCompareFunction="{function(o1:Object, o2:Object):int {
+															return UIUtil.gridColumnSortCompareFunction('conflictingRecord.stepNumber', o1, o2);
+														}}">
+							<mx:AdvancedDataGridColumn dataField="conflictingRecordEntryDataPresent" 
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.entryDataPresent.abbreviation')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+							<mx:AdvancedDataGridColumn dataField="conflictingRecordCleansingDataPresent" 
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent.abbreviation')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+							<mx:AdvancedDataGridColumn dataField="conflictingRecordAnalysisDataPresent" 
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.analysisDataPresent.abbreviation')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+						</mx:AdvancedDataGridColumnGroup>
+						<!--
+						<mx:AdvancedDataGridColumn width="60"
 												   headerText="{Message.get('dataImport.recordList.step')}" 
 												   sortCompareFunction="{function(o1:Object, o2:Object):int {
-													   return UIUtil.gridColumnSortCompareFunction('conflictingRecord.step', o1, o2);
-												   }}"
-												   labelFunction="{UIUtil.gridColumnStepLabelFunction}" />
+													   return UIUtil.gridColumnSortCompareFunction('conflictingRecord.stepNumber', o1, o2);
+												   }}">
+							<mx:itemRenderer>
+								<fx:Component>
+									<component:RecordStepProgressBarItemRenderer width="80%" height="10"
+																valuePropertyName="conflictingRecord.stepNumber">
+									</component:RecordStepProgressBarItemRenderer>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:AdvancedDataGridColumn>
+						
 						<mx:AdvancedDataGridColumn dataField="conflictingRecordCompletionPercent"
-												   width="60"
-												   headerText="{Message.get('dataImport.recordList.conflictingRecordCompletion')}" />
+												   width="30"
+												   headerText="{Message.get('dataImport.recordList.recordCompletion.abbreviation')}">
+							<mx:itemRenderer>
+								<fx:Component>
+									<component:ProgressBarItemRenderer width="80%" height="10"
+																	   valuePropertyName="conflictingRecordCompletionPercent">
+									</component:ProgressBarItemRenderer>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:AdvancedDataGridColumn>
+						-->
+						<mx:AdvancedDataGridColumn dataField="conflictingRecordErrors"
+												   width="50"
+												   headerText="{Message.get('dataImport.recordList.errors')}"
+												   sortCompareFunction="{function(o1:Object, o2:Object):int {
+												   		return UIUtil.gridColumnSortCompareFunction('conflictingRecord.errors', o1, o2);
+												   }}" />
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
+						<!--
 						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.creationDate')}"
@@ -184,6 +232,7 @@
 													   return UIUtil.gridColumnSortCompareFunction('record.creationDate', o1, o2);
 												   }}"
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
+						-->
 						<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
@@ -193,23 +242,48 @@
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
 							<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
-													   width="30"
+													   width="25"
 													   headerText="{Message.get('dataImport.recordList.entryDataPresent.abbreviation')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 							<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
-													   width="30"
+													   width="25"
 													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent.abbreviation')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 							<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
-													   width="30"
+													   width="25"
 													   headerText="{Message.get('dataImport.recordList.analysisDataPresent.abbreviation')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						</mx:AdvancedDataGridColumnGroup>
-						<mx:AdvancedDataGridColumn dataField="recordCompletionPercent"
-												   width="60"
-												   headerText="{Message.get('dataImport.recordList.recordCompletion')}" />
+						<mx:AdvancedDataGridColumn dataField="recordErrors"
+												   width="50"
+												   headerText="{Message.get('dataImport.recordList.errors')}"
+												   sortCompareFunction="{function(o1:Object, o2:Object):int {
+												   		return UIUtil.gridColumnSortCompareFunction('record.errors', o1, o2);
+												   }}" />
+						<mx:AdvancedDataGridColumn dataField="completionDifferencePercent"
+												   width="100"
+												   headerText="{Message.get('dataImport.recordList.completionDifference')}">
+							<mx:itemRenderer>
+								<fx:Component>
+									<component:ProgressBarItemRenderer width="80%" height="10"
+																	   valuePropertyName="completionDifferencePercent" toolTipFunction="tooltipFunction">
+										<fx:Script>
+											<![CDATA[
+												import org.openforis.collect.i18n.Message;
+												
+												private function tooltipFunction(data:Object):String {
+													return Message.get('dataImport.recordList.completionDifference.tooltip', 
+														[data.recordFilledAttributesCount, data.conflictingRecordFilledAttributesCount]);
+												}
+											]]>
+										</fx:Script>
+									</component:ProgressBarItemRenderer>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:AdvancedDataGridColumn>
+
 						<mx:AdvancedDataGridColumn dataField="warnings" 
-												   headerText="{Message.get('dataImport.recordList.warnigns')}"
+												   headerText="{Message.get('dataImport.recordList.importWarnings.abbreviation')}"
 												   width="50"
 												   >
 							<mx:itemRenderer>
@@ -233,6 +307,10 @@
 							</mx:itemRenderer>
 						</mx:AdvancedDataGridColumn>
 					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumn dataField="importabilityLevel"
+											   width="60"
+											   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGrid3StateColumnItemRenderer"
+											   headerText="{Message.get('dataImport.recordList.importabilityLevel')}" />
 					<mx:AdvancedDataGridColumn dataField="selected" 
 											   width="90"
 											   editable="true"
@@ -252,10 +330,15 @@
 									</fx:Script>
 									<mx:Label text="{Message.get('dataImport.recordConflicts.replace')}" />
 									<mx:HBox>
-										<mx:Label text="{Message.get('dataImport.recordConflicts.replace.all')}" />
+										<mx:Label text="{Message.get('dataImport.recordConflicts.select.all')}" />
 										<mx:CheckBox selected="{outerDocument.allConflictingRecordsSelected}"
 													click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
 															new DataImportEvent(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS))}" />
+									</mx:HBox>
+									<mx:HBox>
+										<mx:Label text="{Message.get('dataImport.recordConflicts.select.onlyNewer')}" />
+										<mx:CheckBox click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+													 new DataImportEvent(DataImportEvent.SELECT_ONLY_NEWER_CONFLICTING_RECORDS))}" />
 									</mx:HBox>
 								</mx:VBox>
 							</fx:Component>

@@ -8,6 +8,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
+import org.openforis.collect.utils.Dates;
 
 /**
  * 
@@ -83,8 +84,62 @@ public class DataImportSummaryItem {
 		return record.getCompletionPercent();
 	}
 
+	public int getRecordFilledAttributesCount() {
+		return record == null ? 0 : record.getFilledAttributesCount();
+	}
+	
 	public int getConflictingRecordCompletionPercent() {
 		return conflictingRecord == null ? -1 : conflictingRecord.getCompletionPercent();
 	}
 
+	public int getConflictingRecordFilledAttributesCount() {
+		return conflictingRecord == null ? -1 : conflictingRecord.getFilledAttributesCount();
+	}
+	
+	public int calculateCompletionDifferencePercent() {
+		if (conflictingRecord == null || record.getFilledAttributesCount() == 0) {
+			return 100;
+		}
+		double result = (double) (100 * 
+					(record.getFilledAttributesCount() - conflictingRecord.getFilledAttributesCount())
+						/ record.getFilledAttributesCount() );
+		return Double.valueOf(Math.ceil(result)).intValue();
+	}
+
+	/**
+	 * Level of "importability".
+	 * -1 - there can be a problem: the record that is being imported is older, less complete or with more errors than the existing one
+	 * 0 - the record being imported is the same as the existing one
+	 * 1 - the record is new or contains more filled attributes than the existing one
+	 * @return
+	 */
+	public int calculateImportabilityLevel() {
+		if (conflictingRecord == null) {
+			//new
+			return 1;
+		} else {
+			int modifiedDateCompare = Dates.compareUpToSecondsOnly(record.getModifiedDate(), conflictingRecord.getModifiedDate());
+			if (modifiedDateCompare >= 0) {
+				int differencePercent = calculateCompletionDifferencePercent();
+				if (modifiedDateCompare == 0 && differencePercent == 0) {
+					//same
+					return 0;
+				} else {
+					//newer or more complete
+					if (differencePercent > 0) {
+						//more complete
+						return 1;
+					} else {
+						//less complete
+						return -1;
+					}
+				}
+			} else {
+				//older
+				return -1;
+			}
+		} 
+		
+	}
+	
 }
