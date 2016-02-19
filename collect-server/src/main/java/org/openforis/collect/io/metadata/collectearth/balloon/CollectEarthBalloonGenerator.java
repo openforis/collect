@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.openforis.collect.Collect;
 import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
@@ -58,8 +57,7 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class CollectEarthBalloonGenerator {
 	
 	public static final String EXTRA_HIDDEN_PREFIX = "EXTRA_";
-	private static final Object EXTRA_HIDDEN_FIELD_CLASS = "extra";
-	private static final String RANDOM_NUMBER_PLACEHOLDER_REGEX = "\\$\\[randomNumber\\]";
+	private static final String EXTRA_HIDDEN_FIELD_CLASS = "extra";
 
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
@@ -74,6 +72,7 @@ public class CollectEarthBalloonGenerator {
 	private static final String PLACEHOLDER_PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";//$NON-NLS-1$
 	private static final String PLACEHOLDER_EXTRA_ID_ATTRIBUTES = "PLACEHOLDER_EXTRA_ID_ATTRIBUTES";//$NON-NLS-1$
 	private static final String PLACEHOLDER_UI_LANGUAGE = "PLACEHOLDER_UI_LANGUAGE";
+	private static final String PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST = "PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST";
 
 	private CollectSurvey survey;
 	private String language;
@@ -92,7 +91,6 @@ public class CollectEarthBalloonGenerator {
 
 	public String generateHTML() throws IOException {
 		String result = getHTMLTemplate();
-		result = result.replaceAll(RANDOM_NUMBER_PLACEHOLDER_REGEX, Collect.VERSION.toString());
 		result = addHiddenFields(result);
 		result = fillWithSurveyDefinitionFields(result);
 		result = replaceButtonLocalizationText(result);
@@ -110,6 +108,10 @@ public class CollectEarthBalloonGenerator {
 		
 		// Added to handle multiple id attributes within a survey
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_EXTRA_ID_ATTRIBUTES,  getIdAttributesSurvey() ); //$NON-NLS-1$
+		
+		// Added to handle multiple id attributes within a survey
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST,  getIdPlaceholdersSurvey() ); //$NON-NLS-1$
+
 		
 		return htmlForBalloon;
 	}
@@ -130,6 +132,25 @@ public class CollectEarthBalloonGenerator {
 		return jsArrayKeys;		
 		
 	}
+	
+	private String getIdPlaceholdersSurvey() {
+		
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		StringBuilder sb = new StringBuilder();
+		for (AttributeDefinition def : keyAttributeDefinitions) {
+			sb.append(def.getName()).
+			append("=")
+			.append("$[")
+			.append(EXTRA_HIDDEN_PREFIX)
+			.append(def.getName())
+			.append("]")
+			.append("&"); 
+		}
+		// remove the last & character
+		return (String) sb.subSequence(0, sb.length() -1);
+	}
+	
+	
 
 	private String getHTMLTemplate() throws IOException {
 		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
@@ -173,7 +194,7 @@ public class CollectEarthBalloonGenerator {
 			sb.append(name);
 			sb.append("\" name=\""); //$NON-NLS-1$
 			sb.append(name);
-			sb.append("\" value=\"$[" + EXTRA_HIDDEN_PREFIX); //$NON-NLS-1$
+			sb.append("\" value=\"$[").append( EXTRA_HIDDEN_PREFIX); //$NON-NLS-1$
 			sb.append(def.getName());
 			sb.append("]\""); //$NON-NLS-1$
 			sb.append(" class=\""); //$NON-NLS-1$

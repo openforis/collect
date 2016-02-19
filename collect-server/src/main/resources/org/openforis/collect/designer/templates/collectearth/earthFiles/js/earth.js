@@ -2,7 +2,6 @@ var SEPARATOR_MULTIPLE_PARAMETERS = "==="; //used to separate multiple attribute
 var SEPARATOR_MULTIPLE_VALUES = ";";
 var DATE_FORMAT = 'MM/DD/YYYY';
 var TIME_FORMAT = 'HH:ss';
-var SUBMIT_LABEL = "Submit and validate";
 var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
 
