@@ -51,8 +51,18 @@ public class DataImportSummaryItemProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
+	public int getRecordTotalErrors() {
+		return item.getRecord().getTotalErrors();
+	}
+	
+	@ExternalizedProperty
 	public int getRecordErrors() {
 		return item.getRecord().getErrors();
+	}
+	
+	@ExternalizedProperty
+	public int getRecordMissingErrors() {
+		return item.getRecord().getMissingErrors();
 	}
 	
 	@ExternalizedProperty
@@ -71,8 +81,33 @@ public class DataImportSummaryItemProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
+	public int getConflictingRecordTotalErrors() {
+		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
+		if (conflictingRecord == null) {
+			return -1;
+		} else {
+			return conflictingRecord.getTotalErrors();
+		}
+	}
+	
+	@ExternalizedProperty
 	public int getConflictingRecordErrors() {
-		return item.getConflictingRecord().getErrors();
+		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
+		if (conflictingRecord == null) {
+			return -1;
+		} else {
+			return conflictingRecord.getErrors();
+		}
+	}
+	
+	@ExternalizedProperty
+	public int getConflictingRecordMissingErrors() {
+		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
+		if (conflictingRecord == null) {
+			return -1;
+		} else {
+			return conflictingRecord.getMissingErrors();
+		}
 	}
 	
 	@ExternalizedProperty
@@ -162,8 +197,8 @@ public class DataImportSummaryItemProxy implements Proxy {
 	}
 	
 	private boolean isConflictingRecordAfterStep(Step step) {
-		return item.getConflictingRecord().getStep().afterEqual(step);
+		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
+		return conflictingRecord != null && conflictingRecord.getStep().afterEqual(step);
 	}
 
-	
 }

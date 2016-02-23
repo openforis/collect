@@ -102,7 +102,7 @@ public class DataImportSummaryItem {
 		}
 		double result = (double) (100 * 
 					(record.getFilledAttributesCount() - conflictingRecord.getFilledAttributesCount())
-						/ record.getFilledAttributesCount() );
+						/ conflictingRecord.getFilledAttributesCount() );
 		return Double.valueOf(Math.ceil(result)).intValue();
 	}
 
@@ -122,15 +122,14 @@ public class DataImportSummaryItem {
 			if (modifiedDateCompare >= 0) {
 				int differencePercent = calculateCompletionDifferencePercent();
 				if (modifiedDateCompare == 0 && differencePercent == 0) {
-					//same
+					//same date and (probably) same data
 					return 0;
 				} else {
-					//newer or more complete
-					if (differencePercent > 0) {
-						//more complete
+					if (differencePercent >= 0) {
+						//newer and more complete
 						return 1;
 					} else {
-						//less complete
+						//newer but less complete
 						return -1;
 					}
 				}

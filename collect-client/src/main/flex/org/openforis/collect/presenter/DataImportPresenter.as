@@ -68,6 +68,7 @@ package org.openforis.collect.presenter {
 		private var _getCurrentJobResponder:IResponder;
 		private var _firstOpen:Boolean;
 		private var _allConflictingRecordsSelected:Boolean;
+		private var _allNewerConflictingRecordsSelected:Boolean;
 		
 		public function DataImportPresenter(view:DataImportView) {
 			super(view);
@@ -453,13 +454,38 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function selectOnlyNewerConflictingRecords(event:DataImportEvent):void {
-			//TODO
+			var newerConflictingRecords:IList = getNewerConflictingRecords();
+			if (newerConflictingRecords.length == 0) {
+				//DO NOTHING
+				view.allNewerConflictingRecordsSelected = false;
+			} else {
+				_allNewerConflictingRecordsSelected = ! _allNewerConflictingRecordsSelected;
+				setItemsSelected(newerConflictingRecords, _allNewerConflictingRecordsSelected);
+				afterConflictingRecordSelectionChanged();
+			}
+		}
+		
+		private function getNewerConflictingRecords():IList {
+			var result:IList = new ArrayCollection();
+			for each (var item:DataImportSummaryItemProxy in _summary.conflictingRecords) {
+				if (1 == item.importabilityLevel) {
+					result.addItem(item);
+				}
+			}
+			return result;
 		}
 		
 		protected function conflictingRecordsSelectionChange(event:DataImportEvent):void {
-			view.selectedConflictingRecordsCount = countSelectedItems(_summary.conflictingRecords);
+			afterConflictingRecordSelectionChanged();
+		}
+		
+		private function afterConflictingRecordSelectionChanged():void {
 			_allConflictingRecordsSelected = isAllItemsSelected(_summary.conflictingRecords);
 			view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
+			_allNewerConflictingRecordsSelected = isAllItemsSelected(getNewerConflictingRecords());
+			view.allNewerConflictingRecordsSelected = _allNewerConflictingRecordsSelected;
+			
+			view.selectedConflictingRecordsCount = countSelectedItems(_summary.conflictingRecords);
 		}
 
 		protected function recordsToImportSelectionChange(event:DataImportEvent):void {

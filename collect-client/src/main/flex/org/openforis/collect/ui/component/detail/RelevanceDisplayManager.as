@@ -69,7 +69,7 @@ package org.openforis.collect.ui.component.detail
 					return result;
 				} else {
 					//hide table columns when all the cells are not relevant and empty
-					var allNodesEmptyAndNotRelevant:Boolean = allNodesEmptyAndNotRelevant(nodes);
+					var allNodesEmptyAndNotRelevant:Boolean = isAllNodesEmptyAndNotRelevant(nodes);
 					return allNodesEmptyAndNotRelevant;
 				}
 			} else {
@@ -77,7 +77,7 @@ package org.openforis.collect.ui.component.detail
 			}
 		}
 		
-		private function allNodesEmptyAndNotRelevant(nodes:IList):Boolean {
+		private function isAllNodesEmptyAndNotRelevant(nodes:IList):Boolean {
 			for each (var node:NodeProxy in nodes) {
 				if ( node.relevant || (node.userSpecified && ! node.empty)) {
 					return false;

@@ -128,6 +128,11 @@ public class RecordSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
+	public Integer getTotalErrors() {
+		return summary.getTotalErrors();
+	}
+	
+	@ExternalizedProperty
 	public Integer getErrors() {
 		return summary.getErrors();
 	}

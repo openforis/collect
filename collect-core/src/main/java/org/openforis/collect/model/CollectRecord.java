@@ -321,6 +321,10 @@ public class CollectRecord extends Record {
 		this.missing = missing;
 	}
 
+	public Integer getTotalErrors() {
+		return getErrors() + getMissingErrors();
+	}
+	
 	public Integer getErrors() {
 		if(errors == null) {
 			errors = validationCache.getTotalAttributeErrors() +

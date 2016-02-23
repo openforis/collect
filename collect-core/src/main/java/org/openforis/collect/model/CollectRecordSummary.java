@@ -26,6 +26,7 @@ public class CollectRecordSummary {
 	private State state;
 	private Step step;
 	private CollectSurvey survey;
+	private Integer totalErrors;
 
 	private ModelVersion version;
 	private User owner;
@@ -38,6 +39,7 @@ public class CollectRecordSummary {
 		result.setCreatedBy(record.getCreatedBy());
 		result.setCreationDate(record.getCreationDate());
 		result.setEntityCounts(record.getEntityCounts());
+		result.setTotalErrors(record.getTotalErrors());
 		result.setErrors(record.getErrors());
 		result.setFilledAttributesCount(record.countTotalFilledAttributes());
 		result.setId(record.getId());
@@ -206,5 +208,13 @@ public class CollectRecordSummary {
 
 	public void setFilledAttributesCount(int filledAttributesCount) {
 		this.filledAttributesCount = filledAttributesCount;
+	}
+
+	public Integer getTotalErrors() {
+		return totalErrors;
+	}
+
+	public void setTotalErrors(Integer totalErrors) {
+		this.totalErrors = totalErrors;
 	}
 }

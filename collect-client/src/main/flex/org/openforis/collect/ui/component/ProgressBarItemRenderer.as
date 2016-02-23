@@ -8,7 +8,7 @@ package org.openforis.collect.ui.component
 	
 	public class ProgressBarItemRenderer extends HBox {
 		
-		private var pb:ProgressBar;
+		protected var progressBar:ProgressBar;
 		private var _maximum:int = 100;
 		private var _toolTipFunction:Function = null;
 		private var _valuePropertyName:String = "value";
@@ -17,39 +17,39 @@ package org.openforis.collect.ui.component
 			this.setStyle("verticalAlign","middle");
 			this.minWidth = 0;
 			this.minHeight = 0;
-			this.pb = createProgressBar();
+			this.progressBar = createProgressBar();
 			//Add ProgressBar as child
-			addChild(pb);
+			addChild(progressBar);
 		}
 		
 		private function createProgressBar():ProgressBar {
-			var pb:ProgressBar = new ProgressBar();
+			var progressBar:ProgressBar = new ProgressBar();
 			//Set some layout things
-			pb.mode = "manual";
-			pb.minWidth = 20;
-			pb.minHeight = 5;
-			pb.percentWidth = 100;
-			pb.percentHeight = 100;
-			pb.labelPlacement = "center";
-			pb.label = "";
-			return pb;
+			progressBar.mode = "manual";
+			progressBar.minWidth = 20;
+			progressBar.minHeight = 5;
+			progressBar.percentWidth = 100;
+			progressBar.percentHeight = 100;
+			progressBar.labelPlacement = "center";
+			progressBar.label = "";
+			return progressBar;
 		}
-		
-		override public function set data(value:Object):void {
-			super.data = value;
-		}   
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
 			var value:Number = ObjectUtil.getValue(data, _valuePropertyName);
-			pb.setProgress(value, maximum);
+			setProgress(value);
 			if (_toolTipFunction != null) {
-				pb.toolTip = _toolTipFunction(data);
+				progressBar.toolTip = _toolTipFunction(data);
 			} else {
-				pb.toolTip = pb.value + "%";
+				progressBar.toolTip = progressBar.value + "%";
 			}
 		}
 		
+		protected function setProgress(value:Number):void {
+			progressBar.setProgress(value, maximum);
+		}
+
 		public function get valuePropertyName():String {
 			return _valuePropertyName;
 		}
