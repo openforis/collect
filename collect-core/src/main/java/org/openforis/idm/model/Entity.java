@@ -34,18 +34,18 @@ public class Entity extends Node<EntityDefinition> {
 	private static final long serialVersionUID = 1L;
 	
 	List<Node<?>> children;
-	Map<Integer, List<Node<?>>> childrenByDefinitionId;
+	Map<NodeDefinition, List<Node<?>>> childrenByDefinition;
 	private ValidationState derivedStateCache;
-	Map<Integer, State> childStates;
+	Map<NodeDefinition, State> childStates;
 	
 	public Entity(EntityDefinition definition) {
 		super(definition);
 		List<NodeDefinition> childDefs = definition.getChildDefinitions();
 		int numChildDefs = childDefs.size();
 		this.children = new ArrayList<Node<?>>();
-		this.childrenByDefinitionId = new HashMap<Integer, List<Node<?>>>(numChildDefs);
+		this.childrenByDefinition = new HashMap<NodeDefinition, List<Node<?>>>(numChildDefs);
 		this.derivedStateCache = new ValidationState(numChildDefs);
-		this.childStates = new HashMap<Integer, State>(numChildDefs);
+		this.childStates = new HashMap<NodeDefinition, State>(numChildDefs);
 	}
 
 	@Override
@@ -74,11 +74,10 @@ public class Entity extends Node<EntityDefinition> {
 	}
 		
 	public State getChildState(NodeDefinition childDef) {
-		int childDefId = childDef.getId();
-		State state = childStates.get(childDefId);
+		State state = childStates.get(childDef);
 		if (state == null) {
 			state = new State();
-			childStates.put(childDefId, state);
+			childStates.put(childDef, state);
 		}
 		return state;
 	}
@@ -102,7 +101,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public void setChildState(NodeDefinition childDef, State state) {
-		childStates.put(childDef.getId(), state);
+		childStates.put(childDef, state);
 	}
 		
 	
@@ -148,7 +147,7 @@ public class Entity extends Node<EntityDefinition> {
 	
 	@SuppressWarnings("unchecked")
 	public <N extends Node<? extends NodeDefinition>> N getChild(NodeDefinition nodeDef, int index) {
-		List<Node<?>> list = childrenByDefinitionId.get(nodeDef.getId());
+		List<Node<?>> list = childrenByDefinition.get(nodeDef);
 		if (list == null || index >= list.size()) {
 			return null;
 		} else {
@@ -307,7 +306,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public int getCount(NodeDefinition childDef) {
-		List<Node<?>> list = childrenByDefinitionId.get(childDef.getId());
+		List<Node<?>> list = childrenByDefinition.get(childDef);
 		return list == null ? 0 : list.size();
 	}
 	
@@ -318,7 +317,7 @@ public class Entity extends Node<EntityDefinition> {
 	
 	public int getNonEmptyCount(NodeDefinition childDef) {
 		int count = 0;
-		List<Node<?>> list = childrenByDefinitionId.get(childDef.getId());
+		List<Node<?>> list = childrenByDefinition.get(childDef);
 		if(list != null && list.size() > 0) {
 			for (Node<?> node : list) {
 				if(! node.isEmpty()) {
@@ -358,7 +357,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public void move(NodeDefinition childDef, int oldIndex, int newIndex) {
-		List<Node<?>> list = childrenByDefinitionId.get(childDef.getId());
+		List<Node<?>> list = childrenByDefinition.get(childDef);
 		if (list != null) {
 			Node<?> obj = list.remove(oldIndex);
 			decreaseNodeIndexes(list, oldIndex);
@@ -373,7 +372,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public Node<? extends NodeDefinition> remove(NodeDefinition childDef, int index) {
-		List<Node<?>> list = childrenByDefinitionId.get(childDef.getId());
+		List<Node<?>> list = childrenByDefinition.get(childDef);
 		if (list == null) {
 			return null;
 		} else {
@@ -407,13 +406,12 @@ public class Entity extends Node<EntityDefinition> {
 	 */
 	private <T extends Node<?>> T addInternal(T child, Integer idx) {
 		NodeDefinition def = child.getDefinition();
-		int defId = def.getId();
 
 		// Get or create list containing children
-		List<Node<?>> children = childrenByDefinitionId.get(defId);
+		List<Node<?>> children = childrenByDefinition.get(def);
 		if (children == null) {
 			children = new ArrayList<Node<?>>();
-			childrenByDefinitionId.put(defId, children);
+			childrenByDefinition.put(def, children);
 		}
 		// Add item
 		if (idx == null) {
@@ -472,7 +470,7 @@ public class Entity extends Node<EntityDefinition> {
 		List<Node<?>> result = new ArrayList<Node<?>>();
 		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
 		for (NodeDefinition defn : definitions) {
-			List<Node<?>> tempChildren = childrenByDefinitionId.get(defn.getId());
+			List<Node<?>> tempChildren = childrenByDefinition.get(defn);
 			if (tempChildren != null) {
 				result.addAll(tempChildren);
 			}
@@ -481,7 +479,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public List<Node<? extends NodeDefinition>> getChildren(NodeDefinition childDef) {
-		List<Node<?>> children = childrenByDefinitionId.get(childDef.getId());
+		List<Node<?>> children = childrenByDefinition.get(childDef);
 		return CollectionUtils.unmodifiableList(children);
 	}
 
@@ -512,7 +510,7 @@ public class Entity extends Node<EntityDefinition> {
 		sw.append(":\n");
 		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
 		for (NodeDefinition defn : definitions) {
-			List<Node<?>> children = childrenByDefinitionId.get(defn.getId());
+			List<Node<?>> children = childrenByDefinition.get(defn);
 			if (children != null) {
 				for (Node<?> child : children) {
 					child.write(sw, indent + 1);
@@ -541,7 +539,7 @@ public class Entity extends Node<EntityDefinition> {
 					EntityDefinition defn = entity.getDefinition();
 					List<NodeDefinition> childDefns = defn.getChildDefinitions();
 					for (NodeDefinition childDefn : childDefns) {
-						List<Node<?>> children = entity.childrenByDefinitionId.get(childDefn.getId());
+						List<Node<?>> children = entity.childrenByDefinition.get(childDefn);
 						if (children != null && ! children.isEmpty()) {
 							stack.push(children);
 						}
@@ -594,11 +592,11 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public boolean isRelevant(NodeDefinition childDef) {
-		return derivedStateCache.isRelevant(childDef.getId());
+		return derivedStateCache.isRelevant(childDef);
 	}
 	
 	public Boolean getRelevance(NodeDefinition childDef) {
-		return derivedStateCache.getRelevance(childDef.getId());
+		return derivedStateCache.getRelevance(childDef);
 	}
 
 	public void setRelevant(String childName, boolean relevant) {
@@ -606,7 +604,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public void setRelevant(NodeDefinition childDef, boolean relevant) {
-		derivedStateCache.setRelevant(childDef.getId(), relevant);
+		derivedStateCache.setRelevant(childDef, relevant);
 	}
 	
 	public boolean isRequired(String childName) {
@@ -620,20 +618,20 @@ public class Entity extends Node<EntityDefinition> {
 	
 	public Integer getMinCount(NodeDefinition defn) {
 		Integer fixedCount = defn.getFixedMinCount();
-		return fixedCount == null ? derivedStateCache.getMinCount(defn.getId()): fixedCount;
+		return fixedCount == null ? derivedStateCache.getMinCount(defn): fixedCount;
 	}
 	
 	public void setMinCount(NodeDefinition childDefn, int count) {
-		derivedStateCache.setMinCount(childDefn.getId(), count);
+		derivedStateCache.setMinCount(childDefn, count);
 	}
 
 	public Integer getMaxCount(NodeDefinition defn) {
 		Integer fixedCount = defn.getFixedMaxCount();
-		return fixedCount == null ? derivedStateCache.getMaxCount(defn.getId()): fixedCount;
+		return fixedCount == null ? derivedStateCache.getMaxCount(defn): fixedCount;
 	}
 	
 	public void setMaxCount(NodeDefinition childDefn, int count) {
-		derivedStateCache.setMaxCount(childDefn.getId(), count);
+		derivedStateCache.setMaxCount(childDefn, count);
 	}
 
 	public ValidationResultFlag getMinCountValidationResult(String childName) {
@@ -641,7 +639,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public ValidationResultFlag getMinCountValidationResult(NodeDefinition childDef) {
-		return derivedStateCache.getMinCountValidationResult(childDef.getId());
+		return derivedStateCache.getMinCountValidationResult(childDef);
 	}
 	
 	public void setMinCountValidationResult(String childName, ValidationResultFlag value) {
@@ -649,7 +647,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public void setMinCountValidationResult(NodeDefinition childDef, ValidationResultFlag value) {
-		derivedStateCache.setMinCountValidationResult(childDef.getId(), value);
+		derivedStateCache.setMinCountValidationResult(childDef, value);
 	}
 	
 	public ValidationResultFlag getMaxCountValidationResult(String childName) {
@@ -657,7 +655,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public ValidationResultFlag getMaxCountValidationResult(NodeDefinition childDef) {
-		return derivedStateCache.getMaxCountValidationResult(childDef.getId());
+		return derivedStateCache.getMaxCountValidationResult(childDef);
 	}
 	
 	public void setMaxCountValidationResult(String childName, ValidationResultFlag value) {
@@ -665,7 +663,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public void setMaxCountValidationResult(NodeDefinition childDef, ValidationResultFlag value) {
-		derivedStateCache.setMaxCountValidationResult(childDef.getId(), value);
+		derivedStateCache.setMaxCountValidationResult(childDef, value);
 	}
 	
 	/**
@@ -701,7 +699,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public void clearChildStates() {
-		this.childStates = new HashMap<Integer, State>();
+		this.childStates.clear();
 	}
 
 	@Override
@@ -717,20 +715,20 @@ public class Entity extends Node<EntityDefinition> {
 		if (! isChildStatesEquals(other) ) {
 			return false;
 		}
-		if (childrenByDefinitionId == null && other.childrenByDefinitionId != null || 
-				childrenByDefinitionId != null && other.childrenByDefinitionId == null) {
+		if (childrenByDefinition == null && other.childrenByDefinition != null || 
+				childrenByDefinition != null && other.childrenByDefinition == null) {
 			return false;
 		} else {
 			//custom check
 			removeEmptyChildren();
 			other.removeEmptyChildren();
-			if ( childrenByDefinitionId.size() != other.childrenByDefinitionId.size() ) {
+			if ( childrenByDefinition.size() != other.childrenByDefinition.size() ) {
 				return false;
 			}
-			Set<Integer> childDefIds = childrenByDefinitionId.keySet();
-			for (Integer childDefId : childDefIds) {
-				List<Node<?>> children = childrenByDefinitionId.get(childDefId);
-				List<Node<?>> otherChildren = other.childrenByDefinitionId.get(childDefId);
+			Set<NodeDefinition> childDefs = childrenByDefinition.keySet();
+			for (NodeDefinition childDef : childDefs) {
+				List<Node<?>> children = childrenByDefinition.get(childDef);
+				List<Node<?>> otherChildren = other.childrenByDefinition.get(childDef);
 				if ( children.size() != otherChildren.size() ) {
 					return false;
 				}
@@ -763,10 +761,10 @@ public class Entity extends Node<EntityDefinition> {
 	
 	protected void removeEmptyChildStates() {
 		if ( childStates != null ) {
-			Set<Entry<Integer, State>> entrySet = childStates.entrySet();
-			Iterator<Entry<Integer, State>> iterator = entrySet.iterator();
+			Set<Entry<NodeDefinition, State>> entrySet = childStates.entrySet();
+			Iterator<Entry<NodeDefinition, State>> iterator = entrySet.iterator();
 			while ( iterator.hasNext() ) {
-				Entry<Integer, State> entry = iterator.next();
+				Entry<NodeDefinition, State> entry = iterator.next();
 				State childState = entry.getValue();
 				if ( childState.intValue() == 0 ) {
 					iterator.remove();
@@ -776,10 +774,10 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	protected void removeEmptyChildren() {
-		Set<Entry<Integer, List<Node<?>>>> entrySet = childrenByDefinitionId.entrySet();
-		Iterator<Entry<Integer, List<Node<?>>>> iterator = entrySet.iterator();
+		Set<Entry<NodeDefinition, List<Node<?>>>> entrySet = childrenByDefinition.entrySet();
+		Iterator<Entry<NodeDefinition, List<Node<?>>>> iterator = entrySet.iterator();
 		while ( iterator.hasNext() ) {
-			Entry<Integer, List<Node<?>>> entry = iterator.next();
+			Entry<NodeDefinition, List<Node<?>>> entry = iterator.next();
 			List<Node<?>> nodes = entry.getValue();
 			if ( nodes == null || nodes.isEmpty()) {
 				iterator.remove();
@@ -790,65 +788,65 @@ public class Entity extends Node<EntityDefinition> {
 
 	private static class ValidationState {
 		/** Set of children dynamic min count */
-		private Map<Integer, Integer> minCountByChildDefinition;
+		private Map<NodeDefinition, Integer> minCountByChildDefinition;
 		/** Set of children dynamic max count */
-		private Map<Integer, Integer> maxCountByChildDefinition;
+		private Map<NodeDefinition, Integer> maxCountByChildDefinition;
 		/** Set of children relevance states */
-		private Map<Integer, Boolean> relevanceByChildDefinition;
+		private Map<NodeDefinition, Boolean> relevanceByChildDefinition;
 		
-		private Map<Integer, ValidationResultFlag> minCountValidationResultByChildDefinition;
-		private Map<Integer, ValidationResultFlag> maxCountValidationResultByChildDefinition;
+		private Map<NodeDefinition, ValidationResultFlag> minCountValidationResultByChildDefinition;
+		private Map<NodeDefinition, ValidationResultFlag> maxCountValidationResultByChildDefinition;
 
 		public ValidationState(int numChildren) {
-			minCountByChildDefinition = new HashMap<Integer, Integer>(numChildren);
-			maxCountByChildDefinition = new HashMap<Integer, Integer>(numChildren);
-			relevanceByChildDefinition = new HashMap<Integer, Boolean>(numChildren);
-			minCountValidationResultByChildDefinition = new HashMap<Integer, ValidationResultFlag>(numChildren);
-			maxCountValidationResultByChildDefinition = new HashMap<Integer, ValidationResultFlag>(numChildren);
+			minCountByChildDefinition = new HashMap<NodeDefinition, Integer>(numChildren);
+			maxCountByChildDefinition = new HashMap<NodeDefinition, Integer>(numChildren);
+			relevanceByChildDefinition = new HashMap<NodeDefinition, Boolean>(numChildren);
+			minCountValidationResultByChildDefinition = new HashMap<NodeDefinition, ValidationResultFlag>(numChildren);
+			maxCountValidationResultByChildDefinition = new HashMap<NodeDefinition, ValidationResultFlag>(numChildren);
 		}
 
-		private Integer getMinCount(int childDefinitionId) {
-			return minCountByChildDefinition.get(childDefinitionId);
+		private Integer getMinCount(NodeDefinition childDefinition) {
+			return minCountByChildDefinition.get(childDefinition);
 		}
 		
-		private void setMinCount(int childDefinitionId, int count) {
-			minCountByChildDefinition.put(childDefinitionId, count);
+		private void setMinCount(NodeDefinition childDefinition, int count) {
+			minCountByChildDefinition.put(childDefinition, count);
 		}
 		
-		private Integer getMaxCount(int childDefinitionId) {
-			return maxCountByChildDefinition.get(childDefinitionId);
+		private Integer getMaxCount(NodeDefinition childDefinition) {
+			return maxCountByChildDefinition.get(childDefinition);
 		}
 		
-		private void setMaxCount(int childDefinitionId, Integer count) {
-			maxCountByChildDefinition.put(childDefinitionId, count);
+		private void setMaxCount(NodeDefinition childDefinition, Integer count) {
+			maxCountByChildDefinition.put(childDefinition, count);
 		}
 		
-		private boolean isRelevant(int childDefinitionId) {
-			Boolean value = relevanceByChildDefinition.get(childDefinitionId);
+		private boolean isRelevant(NodeDefinition childDefinition) {
+			Boolean value = relevanceByChildDefinition.get(childDefinition);
 			return value == null ? true: value;
 		}
 		
-		private Boolean getRelevance(int childDefinitionId) {
-			return relevanceByChildDefinition.get(childDefinitionId);
+		private Boolean getRelevance(NodeDefinition childDefinition) {
+			return relevanceByChildDefinition.get(childDefinition);
 		}
 
-		private void setRelevant(int childDefinitionId, boolean flag) {
-			relevanceByChildDefinition.put(childDefinitionId, flag);
+		private void setRelevant(NodeDefinition childDefinition, boolean flag) {
+			relevanceByChildDefinition.put(childDefinition, flag);
 		}
 		
-		private ValidationResultFlag getMinCountValidationResult(int childDefinitionId) {
-			return minCountValidationResultByChildDefinition.get(childDefinitionId);
+		private ValidationResultFlag getMinCountValidationResult(NodeDefinition childDefinition) {
+			return minCountValidationResultByChildDefinition.get(childDefinition);
 		}
 
-		private ValidationResultFlag setMinCountValidationResult(int childDefinitionId, ValidationResultFlag value) {
-			return minCountValidationResultByChildDefinition.put(childDefinitionId, value);
+		private ValidationResultFlag setMinCountValidationResult(NodeDefinition childDefinition, ValidationResultFlag value) {
+			return minCountValidationResultByChildDefinition.put(childDefinition, value);
 		}
 
-		private ValidationResultFlag getMaxCountValidationResult(int childDefinitionId) {
-			return maxCountValidationResultByChildDefinition.get(childDefinitionId);
+		private ValidationResultFlag getMaxCountValidationResult(NodeDefinition childDefinition) {
+			return maxCountValidationResultByChildDefinition.get(childDefinition);
 		}
 
-		private ValidationResultFlag setMaxCountValidationResult(int childDefinitionId, ValidationResultFlag value) {
+		private ValidationResultFlag setMaxCountValidationResult(NodeDefinition childDefinitionId, ValidationResultFlag value) {
 			return maxCountValidationResultByChildDefinition.put(childDefinitionId, value);
 		}
 

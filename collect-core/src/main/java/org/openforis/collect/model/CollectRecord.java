@@ -367,8 +367,8 @@ public class CollectRecord extends Record {
 		return true;
 	}
 	
-	public boolean isMissingApproved(Entity parentEntity, String childName){
-		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
+	public boolean isMissingApproved(Entity parentEntity, NodeDefinition childDef){
+		org.openforis.idm.model.State childState = parentEntity.getChildState(childDef);
 		return childState.get(APPROVED_MISSING_POSITION);
 	} 
 	
@@ -469,8 +469,8 @@ public class CollectRecord extends Record {
 		skipped = null;
 	}
 	
-	public void updateMinCountsValidationCache(Entity entity, String childName, ValidationResultFlag flag) {
-		validationCache.updateMinCountInfo(entity.getInternalId(), childName, flag);
+	public void updateMinCountsValidationCache(Entity entity, NodeDefinition childDef, ValidationResultFlag flag) {
+		validationCache.updateMinCountInfo(entity.getInternalId(), childDef, flag);
 		this.missing = null;
 		this.missingErrors = null;
 		this.missingWarnings = null;
@@ -478,8 +478,8 @@ public class CollectRecord extends Record {
 		this.warnings = null;
 	}
 
-	public void updateMaxCountsValidationCache(Entity entity, String childName, ValidationResultFlag flag) {
-		validationCache.updateMaxCountInfo(entity.getInternalId(), childName, flag);
+	public void updateMaxCountsValidationCache(Entity entity, NodeDefinition childDef, ValidationResultFlag flag) {
+		validationCache.updateMaxCountInfo(entity.getInternalId(), childDef, flag);
 		this.errors = null;
 		this.warnings = null;
 	}
