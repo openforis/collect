@@ -173,51 +173,51 @@ class SurveyDependencies {
 	}
 
 	Set<NodePathPointer> getCalculatedValueDependencies(NodeDefinition definition) {
-		return calculatedValueDependencies.getDependencySet(definition.getPath());
+		return calculatedValueDependencies.getDependencySet(definition);
 	}
 	
 	Set<NodePathPointer> getCalculatedValueSources(NodeDefinition definition) {
-		return calculatedValueDependencies.getSources(definition.getPath());
+		return calculatedValueDependencies.getSources(definition);
 	}
 	
 	Set<NodePathPointer> getMinCountDependencies(NodeDefinition definition) {
-		return minCountDependencies.getDependencySet(definition.getPath());
+		return minCountDependencies.getDependencySet(definition);
 	}
 	
 	Set<NodePathPointer> getMinCountSources(NodeDefinition definition) {
-		return minCountDependencies.getSources(definition.getPath());
+		return minCountDependencies.getSources(definition);
 	}
 	
 	Set<NodePathPointer> getMaxCountDependencies(NodeDefinition definition) {
-		return maxCountDependencies.getDependencySet(definition.getPath());
+		return maxCountDependencies.getDependencySet(definition);
 	}
 	
 	Set<NodePathPointer> getMaxCountSources(NodeDefinition definition) {
-		return maxCountDependencies.getSources(definition.getPath());
+		return maxCountDependencies.getSources(definition);
 	}
 	
 	Set<NodePathPointer> getRelevanceDependencies(NodeDefinition definition) {
-		return relevanceDependencies.getDependencySet(definition.getPath());
+		return relevanceDependencies.getDependencySet(definition);
 	}
 	
 	Set<NodePathPointer> getRelevanceSources(NodeDefinition definition) {
-		return relevanceDependencies.getSources(definition.getPath());
+		return relevanceDependencies.getSources(definition);
 	}
 
 	Set<NodePathPointer> getValidationDependencies(NodeDefinition definition) {
-		return validationDependencies.getDependencySet(definition.getPath());
+		return validationDependencies.getDependencySet(definition);
 	}
 	
 	Set<NodePathPointer> getValidationSources(NodeDefinition definition) {
-		return validationDependencies.getSources(definition.getPath());
+		return validationDependencies.getSources(definition);
 	}
 	
 	Set<NodePathPointer> getRelatedCodeDependencies(CodeAttributeDefinition definition) {
-		return parentCodeDependencies.getDependencySet(definition.getPath());
+		return parentCodeDependencies.getDependencySet(definition);
 	}
 	
 	Set<NodePathPointer> getRelatedCodeSources(CodeAttributeDefinition definition) {
-		return parentCodeDependencies.getSources(definition.getPath());
+		return parentCodeDependencies.getSources(definition);
 	}
 
 }

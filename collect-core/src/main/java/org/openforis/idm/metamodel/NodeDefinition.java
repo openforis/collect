@@ -288,7 +288,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		if ( parentDefinition != null ) {
 			sb.append(parentDefinition.getPath());
 		}
-		sb.append('/');
+		sb.append(Path.SEPARATOR);
 		sb.append(getName());
 		this.path = sb.toString();
 	}
