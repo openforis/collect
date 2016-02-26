@@ -117,7 +117,7 @@
 				 styleName="infoMessageBig"
 				 textAlign="center" />
 
-		<s:CheckBox id="completeSummaryCheckBox" selected="false" 
+		<s:CheckBox id="completeSummaryCheckBox" selected="true" 
 					label="{Message.get('dataImport.completeSummary')}" />
 		
 		<s:Button id="uploadButton" 
