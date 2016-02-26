@@ -37,13 +37,21 @@ package org.openforis.collect.ui.component
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
-			var value:Number = ObjectUtil.getValue(data, _valuePropertyName);
-			setProgress(value);
-			if (_toolTipFunction != null) {
-				progressBar.toolTip = _toolTipFunction(data);
+			var progress:Number;
+			var toolTip:String;
+			if (data == null) {
+				progress = 0;
+				toolTip = null;
 			} else {
-				progressBar.toolTip = progressBar.value + "%";
+				progress = ObjectUtil.getValue(data, _valuePropertyName);
+				if (_toolTipFunction != null) {
+					toolTip = _toolTipFunction(data);
+				} else {
+					toolTip = progressBar.value + "%";
+				}
 			}
+			setProgress(progress);
+			progressBar.toolTip = toolTip;
 		}
 		
 		protected function setProgress(value:Number):void {
