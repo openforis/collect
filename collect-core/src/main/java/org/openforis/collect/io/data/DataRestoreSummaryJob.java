@@ -22,9 +22,11 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 
 	//input
 	private Predicate<CollectRecord> includeRecordPredicate;
+	private boolean completeSummary;
 	
 	//output
 	private DataImportSummary summary;
+
 
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -39,6 +41,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
 			t.setRecordProvider(recordProvider);
+			t.setCompleteSummary(completeSummary);
 			t.setOldFormat(oldBackupFormat);
 			t.setSurvey(publishedSurvey);
 			t.setIncludeRecordPredicate(includeRecordPredicate);
@@ -82,6 +85,20 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	
 	public DataImportSummary getSummary() {
 		return summary;
+	}
+	
+	public boolean isCompleteSummary() {
+		return completeSummary;
+	}
+	
+	public void setCompleteSummary(boolean completeSummary) {
+		this.completeSummary = completeSummary;
+		super.setValidateRecords(completeSummary);
+	}
+	
+	@Override
+	public void setValidateRecords(boolean validateRecords) {
+		throw new UnsupportedOperationException();
 	}
 
 }

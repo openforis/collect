@@ -20,10 +20,10 @@ import org.openforis.idm.model.Node;
  *
  */
 public class RecordValidationCache {
-	private Map<Integer, Set<String>> minCountErrorChildNamesByEntityId;
-	private Map<Integer, Set<String>> minCountWarningChildNamesByEntityId;
-	private Map<Integer, Set<String>> maxCountErrorChildNamesByEntityId;
-	private Map<Integer, Set<String>> maxCountWarningChildNamesByEntityId;
+	private Map<Integer, Set<NodeDefinition>> minCountErrorNodeDefinitionsByEntityId;
+	private Map<Integer, Set<NodeDefinition>> minCountWarningNodeDefinitionsByEntityId;
+	private Map<Integer, Set<NodeDefinition>> maxCountErrorNodeDefinitionsByEntityId;
+	private Map<Integer, Set<NodeDefinition>> maxCountWarningNodeDefinitionsByEntityId;
 	private Map<Integer, Integer> errorCountByAttributeId;
 	private Map<Integer, Integer> warningCountByAttributeId;
 	private Map<Integer, ValidationResults> validationResultsByAttributeId;
@@ -32,10 +32,10 @@ public class RecordValidationCache {
 
 	public RecordValidationCache(CollectRecord record) {
 		this.record = record;
-		this.minCountErrorChildNamesByEntityId = new HashMap<Integer, Set<String>>();
-		this.minCountWarningChildNamesByEntityId = new HashMap<Integer, Set<String>>();
-		this.maxCountErrorChildNamesByEntityId = new HashMap<Integer, Set<String>>();
-		this.maxCountWarningChildNamesByEntityId = new HashMap<Integer, Set<String>>();
+		this.minCountErrorNodeDefinitionsByEntityId = new HashMap<Integer, Set<NodeDefinition>>();
+		this.minCountWarningNodeDefinitionsByEntityId = new HashMap<Integer, Set<NodeDefinition>>();
+		this.maxCountErrorNodeDefinitionsByEntityId = new HashMap<Integer, Set<NodeDefinition>>();
+		this.maxCountWarningNodeDefinitionsByEntityId = new HashMap<Integer, Set<NodeDefinition>>();
 		this.errorCountByAttributeId = new HashMap<Integer, Integer>();
 		this.warningCountByAttributeId = new HashMap<Integer, Integer>();
 		this.validationResultsByAttributeId = new HashMap<Integer, ValidationResults>();
@@ -47,15 +47,15 @@ public class RecordValidationCache {
 	}
 
 	public int getTotalMinCountWarnings() {
-		return countTotalValues(minCountWarningChildNamesByEntityId);
+		return countTotalValues(minCountWarningNodeDefinitionsByEntityId);
 	}
 
 	public int getTotalMissingMinCountErrors() {
-		return getTotalMissingCount(minCountErrorChildNamesByEntityId);
+		return getTotalMissingCount(minCountErrorNodeDefinitionsByEntityId);
 	}
 
 	public int getTotalMissingMinCountWarnings() {
-		return getTotalMissingCount(minCountWarningChildNamesByEntityId);
+		return getTotalMissingCount(minCountWarningNodeDefinitionsByEntityId);
 	}
 
 	public int getTotalAttributeErrors() {
@@ -67,74 +67,73 @@ public class RecordValidationCache {
 	}
 
 	public int getTotalMaxCountErrors() {
-		return countTotalValues(maxCountErrorChildNamesByEntityId);
+		return countTotalValues(maxCountErrorNodeDefinitionsByEntityId);
 	}
 
 	public int getTotalMaxCountWarnings() {
-		return countTotalValues(maxCountWarningChildNamesByEntityId);
+		return countTotalValues(maxCountWarningNodeDefinitionsByEntityId);
 	}
 
-	public void updateMinCountInfo(Integer entityId, String childName,
+	public void updateMinCountInfo(Integer entityId, NodeDefinition childDef,
 			ValidationResultFlag flag) {
-		removeMinCountError(entityId, childName);
-		removeMinCountWarning(entityId, childName);
+		removeMinCountError(entityId, childDef);
+		removeMinCountWarning(entityId, childDef);
 		switch (flag) {
 		case ERROR:
-			addMinCountError(entityId, childName);
+			addMinCountError(entityId, childDef);
 			break;
 		case WARNING:
-			addMinCountWarning(entityId, childName);
+			addMinCountWarning(entityId, childDef);
 			break;
 		default:
 		}
 	}
 	
-	public void updateMaxCountInfo(Integer entityId, String childName,
+	public void updateMaxCountInfo(Integer entityId, NodeDefinition childDef,
 			ValidationResultFlag flag) {
-		removeMaxCountError(entityId, childName);
-		removeMaxCountWarning(entityId, childName);
+		removeMaxCountError(entityId, childDef);
+		removeMaxCountWarning(entityId, childDef);
 		switch (flag) {
 		case ERROR:
-			addMaxCountError(entityId, childName);
+			addMaxCountError(entityId, childDef);
 			break;
 		case WARNING:
-			addMaxCountWarning(entityId, childName);
+			addMaxCountWarning(entityId, childDef);
 			break;
 		default:
 		}
 	}
 
-	public void addMinCountError(Integer entityId, String childName) {
-		addValueToEntityCache(minCountErrorChildNamesByEntityId, entityId, childName);
+	public void addMinCountError(Integer entityId, NodeDefinition childDef) {
+		addValueToEntityCache(minCountErrorNodeDefinitionsByEntityId, entityId, childDef);
 	}
 	
-	public void removeMinCountError(Integer entityId, String childName) {
-		removeChildNameFromEntityCache(minCountErrorChildNamesByEntityId, entityId, childName);
+	public void removeMinCountError(Integer entityId, NodeDefinition childDef) {
+		removeChildDefinitionFromEntityCache(minCountErrorNodeDefinitionsByEntityId, entityId, childDef);
 	}
 	
-	public void addMinCountWarning(Integer entityId, String childName) {
-		addValueToEntityCache(minCountWarningChildNamesByEntityId, entityId, childName);
+	public void addMinCountWarning(Integer entityId, NodeDefinition childDef) {
+		addValueToEntityCache(minCountWarningNodeDefinitionsByEntityId, entityId, childDef);
 	}
 	
-	public void removeMinCountWarning(Integer entityId, String childName) {
-		removeChildNameFromEntityCache(minCountWarningChildNamesByEntityId, entityId, childName);
+	public void removeMinCountWarning(Integer entityId, NodeDefinition childDef) {
+		removeChildDefinitionFromEntityCache(minCountWarningNodeDefinitionsByEntityId, entityId, childDef);
 	}
 	
-	public void addMaxCountError(Integer entityId, String childName) {
-		addValueToEntityCache(maxCountErrorChildNamesByEntityId, entityId, childName);
+	public void addMaxCountError(Integer entityId, NodeDefinition childDef) {
+		addValueToEntityCache(maxCountErrorNodeDefinitionsByEntityId, entityId, childDef);
 	}
 	
-	public void removeMaxCountError(int entityId, String childName) {
-		removeChildNameFromEntityCache(maxCountErrorChildNamesByEntityId, entityId, childName);
+	public void removeMaxCountError(int entityId, NodeDefinition childDef) {
+		removeChildDefinitionFromEntityCache(maxCountErrorNodeDefinitionsByEntityId, entityId, childDef);
 	}
 
-	public void addMaxCountWarning(Integer entityId, String childName) {
-		addValueToEntityCache(maxCountWarningChildNamesByEntityId, entityId, childName);
+	public void addMaxCountWarning(Integer entityId, NodeDefinition childDef) {
+		addValueToEntityCache(maxCountWarningNodeDefinitionsByEntityId, entityId, childDef);
 	}
 	
-	public void removeMaxCountWarning(int entityId,
-			String childName) {
-		removeChildNameFromEntityCache(maxCountWarningChildNamesByEntityId, entityId, childName);
+	public void removeMaxCountWarning(int entityId, NodeDefinition childDef) {
+		removeChildDefinitionFromEntityCache(maxCountWarningNodeDefinitionsByEntityId, entityId, childDef);
 	}
 
 	public void setAttributeErrorCount(Integer attributeId, int errorCounts) {
@@ -158,38 +157,38 @@ public class RecordValidationCache {
 		return CollectionUtils.unmodifiableMap(validationResultsByAttributeId);
 	}
 	
-	public Set<String> getMinCountErrorChildNames(int entityId) {
-		return CollectionUtils.unmodifiableSet(minCountErrorChildNamesByEntityId.get(entityId));
+	public Set<NodeDefinition> getMinCountErrorChildDefinitions(int entityId) {
+		return CollectionUtils.unmodifiableSet(minCountErrorNodeDefinitionsByEntityId.get(entityId));
 	}
 	
-	public Set<String> getMaxCountErrorChildNames(int entityId) {
-		return CollectionUtils.unmodifiableSet(maxCountErrorChildNamesByEntityId.get(entityId));
+	public Set<NodeDefinition> getMaxCountErrorChildDefinitions(int entityId) {
+		return CollectionUtils.unmodifiableSet(maxCountErrorNodeDefinitionsByEntityId.get(entityId));
 	}
 	
-	public Set<String> getMinCountWarningChildNames(int entityId) {
-		return CollectionUtils.unmodifiableSet(minCountWarningChildNamesByEntityId.get(entityId));
+	public Set<NodeDefinition> getMinCountWarningChildDefinitions(int entityId) {
+		return CollectionUtils.unmodifiableSet(minCountWarningNodeDefinitionsByEntityId.get(entityId));
 	}
 	
-	public Set<String> getMaxCountWarningChildNames(int entityId) {
-		return CollectionUtils.unmodifiableSet(maxCountWarningChildNamesByEntityId.get(entityId));
+	public Set<NodeDefinition> getMaxCountWarningChildDefinitions(int entityId) {
+		return CollectionUtils.unmodifiableSet(maxCountWarningNodeDefinitionsByEntityId.get(entityId));
 	}
 	
-	public Set<String> getCardinalityFailedChildNames(int entityId, ValidationResultFlag severity, boolean minCount) {
+	public Set<NodeDefinition> getCardinalityFailedChildDefinitions(int entityId, ValidationResultFlag severity, boolean minCount) {
 		if ( minCount ) {
 			switch(severity) {
 			case ERROR:
-				return getMinCountErrorChildNames(entityId);
+				return getMinCountErrorChildDefinitions(entityId);
 			case WARNING:
-				return getMinCountWarningChildNames(entityId);
+				return getMinCountWarningChildDefinitions(entityId);
 			default:
 				return Collections.emptySet();
 			}
 		} else {
 			switch(severity) {
 			case ERROR:
-				return getMaxCountErrorChildNames(entityId);
+				return getMaxCountErrorChildDefinitions(entityId);
 			case WARNING:
-				return getMaxCountWarningChildNames(entityId);
+				return getMaxCountWarningChildDefinitions(entityId);
 			default:
 				return Collections.emptySet();
 			}
@@ -204,10 +203,10 @@ public class RecordValidationCache {
 			warningCountByAttributeId.remove(nodeId);
 			validationResultsByAttributeId.remove(nodeId);
 		} else {
-			minCountErrorChildNamesByEntityId.remove(nodeId);
-			maxCountErrorChildNamesByEntityId.remove(nodeId);
-			minCountWarningChildNamesByEntityId.remove(nodeId);
-			maxCountWarningChildNamesByEntityId.remove(nodeId);
+			minCountErrorNodeDefinitionsByEntityId.remove(nodeId);
+			maxCountErrorNodeDefinitionsByEntityId.remove(nodeId);
+			minCountWarningNodeDefinitionsByEntityId.remove(nodeId);
+			maxCountWarningNodeDefinitionsByEntityId.remove(nodeId);
 		}
 	}
 
@@ -215,39 +214,38 @@ public class RecordValidationCache {
 		skippedNodeIds.add(attributeId);		
 	}
 
-	protected Set<String> removeChildNameFromEntityCache(Map<Integer, Set<String>> childNamesByEntityId, int entityId, String childName) {
-		Set<String> set = childNamesByEntityId.get(entityId);
+	protected Set<NodeDefinition> removeChildDefinitionFromEntityCache(Map<Integer, Set<NodeDefinition>> childDefinitionsByEntityId, int entityId, NodeDefinition childDef) {
+		Set<NodeDefinition> set = childDefinitionsByEntityId.get(entityId);
 		if(set != null) {
-			set.remove(childName);
+			set.remove(childDef);
 		}
 		return set;
 	}
 	
-	protected void addValueToEntityCache(Map<Integer, Set<String>> childNamesByEntityId, int entityId, String childName) {
-		Set<String> set = childNamesByEntityId.get(entityId);
+	protected void addValueToEntityCache(Map<Integer, Set<NodeDefinition>> childDefinitionsByEntityId, int entityId, NodeDefinition childDef) {
+		Set<NodeDefinition> set = childDefinitionsByEntityId.get(entityId);
 		if ( set == null ) {
-			set = new HashSet<String>();
-			childNamesByEntityId.put(entityId, set);
+			set = new HashSet<NodeDefinition>();
+			childDefinitionsByEntityId.put(entityId, set);
 		}
-		set.add(childName);
+		set.add(childDef);
 	}
 
-	protected int countTotalValues(Map<Integer, Set<String>> map) {
+	protected int countTotalValues(Map<Integer, Set<NodeDefinition>> map) {
 		int count = 0;
-		for (Set<String> set : map.values()) {
+		for (Set<NodeDefinition> set : map.values()) {
 			count += set.size();
 		}
 		return count;
 	}
 	
-	protected int getTotalMissingCount(Map<Integer, Set<String>> minCounts) {
+	protected int getTotalMissingCount(Map<Integer, Set<NodeDefinition>> nodeDefsByEntityId) {
 		int result = 0;
-		Set<Integer> keySet = minCounts.keySet();
+		Set<Integer> keySet = nodeDefsByEntityId.keySet();
 		for (Integer id : keySet) {
 			Entity entity = (Entity) record.getNodeByInternalId(id);
-			Set<String> set = minCounts.get(id);
-			for (String childName : set) {
-				NodeDefinition childDef = entity.getDefinition().getChildDefinition(childName);
+			Set<NodeDefinition> nodeDefs = nodeDefsByEntityId.get(id);
+			for (NodeDefinition childDef : nodeDefs) {
 				int missingCount = entity.getMissingCount(childDef);
 				result += missingCount;
 			}

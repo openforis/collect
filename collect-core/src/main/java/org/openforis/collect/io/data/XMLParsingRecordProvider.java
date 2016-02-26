@@ -37,7 +37,8 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 	private final File file;
 	private final CollectSurvey packagedSurvey;
 	private final CollectSurvey existingSurvey;
-	private final boolean validateRecords;
+	private boolean validateRecords;
+	private boolean ignoreDuplicateRecordKeyValidationErrors;
 	
 	//internal
 	private NewBackupFileExtractor backupFileExtractor;
@@ -46,11 +47,12 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 	private RecordUserLoader recordUserLoader;
 	
 	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, 
-			CollectSurvey existingSurvey, UserManager userManager, boolean validateRecords) {
+			CollectSurvey existingSurvey, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		this.file = file;
 		this.packagedSurvey = packagedSurvey;
 		this.existingSurvey = existingSurvey;
 		this.validateRecords = validateRecords;
+		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 		this.recordUserLoader = new RecordUserLoader(userManager);
 	}
 	
@@ -65,6 +67,7 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 		this.backupFileExtractor.init(progressListener);
 		this.dataUnmarshaller = new DataUnmarshaller(existingSurvey == null ? packagedSurvey : existingSurvey, packagedSurvey);
 		this.dataUnmarshaller.setRecordValidationEnabled(validateRecords);
+		this.dataUnmarshaller.setIgnoreDuplicateRecordKeyValidationErrors(ignoreDuplicateRecordKeyValidationErrors);
 		this.recordUpdater = new RecordUpdater();
 		this.recordUpdater.setValidateAfterUpdate(validateRecords);
 	}
@@ -89,23 +92,25 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 			return null;
 		}
 		InputStreamReader reader = OpenForisIOUtils.toReader(entryIS);
-		ParseRecordResult parseRecordResult = parseRecord(reader);
+		ParseRecordResult parseRecordResult = parseRecord(reader, step);
+		if (parseRecordResult.isSuccess()) {
+			CollectRecord record = parseRecordResult.getRecord();
+			recordUserLoader.adjustUserReferences(record);
+			recordUpdater.initializeRecord(record);
+		}
 		return parseRecordResult;
 	}
 	
 	@Override
 	public CollectRecord provideRecord(int entryId, Step step) throws IOException, RecordParsingException {
-		ParseRecordResult parseRecordResult = provideRecordParsingResult(entryId, step);
-		if (parseRecordResult == null) {
+		ParseRecordResult parseResult = provideRecordParsingResult(entryId, step);
+		if (parseResult == null) {
 			return null;
 		}
-		if (parseRecordResult.isSuccess()) {
-			CollectRecord record = parseRecordResult.getRecord();
-			recordUserLoader.adjustUserReferences(record);
-			recordUpdater.initializeRecord(record);
-			return record;
+		if (parseResult.isSuccess()) {
+			return parseResult.getRecord();
 		} else {
-			throw new RecordParsingException(parseRecordResult, step);
+			throw new RecordParsingException(parseResult, step);
 		}
 	}
 
@@ -131,9 +136,23 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 		IOUtils.closeQuietly(backupFileExtractor);
 	}
 	
-	private ParseRecordResult parseRecord(Reader reader) throws IOException {
+	private ParseRecordResult parseRecord(Reader reader, Step step) throws IOException {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
+		if (result.isSuccess()) {
+			result.getRecord().setStep(step);
+		}
 		return result;
+	}
+	
+	public boolean isValidateRecords() {
+		return validateRecords;
+	}
+	
+	public void setValidateRecords(boolean validateRecords) {
+		this.validateRecords = validateRecords;
+		if (dataUnmarshaller != null) {
+			dataUnmarshaller.setRecordValidationEnabled(validateRecords);
+		}
 	}
 	
 	public static class RecordUserLoader {

@@ -115,7 +115,7 @@ public class DynamicTableDao extends JooqDaoSupport {
 				}
 				select.where(condition);
 			} else {
-				logger.warn("Filter not applied: " + filter);
+				log.warn("Filter not applied: " + filter);
 			}
 		}
 	}
@@ -128,7 +128,7 @@ public class DynamicTableDao extends JooqDaoSupport {
 				if ( tableField != null ) {
 					select.where(tableField.isNotNull().and(((Field<String>) tableField).notEqual("")));
 				} else {
-					logger.warn("Not null filter not applied on column: " + colName);
+					log.warn("Not null filter not applied on column: " + colName);
 				}
 			}
 		}

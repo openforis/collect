@@ -141,11 +141,15 @@ public class ValidationMessageBuilder {
 	}
 
 	public String getMinCountValidationMessage(Entity parentEntity, String childName, Locale locale) {
-		String surveyDefaultLanguage = parentEntity.getSurvey().getDefaultLanguage();
 		NodeDefinition childDef = parentEntity.getDefinition().getChildDefinition(childName);
+		return getMinCountValidationMessage(parentEntity, childDef, locale);
+	}
+	
+	public String getMinCountValidationMessage(Entity parentEntity, NodeDefinition childDef, Locale locale) {
+		String surveyDefaultLanguage = parentEntity.getSurvey().getDefaultLanguage();
 		String message;
 		if (childDef.isMultiple()) {
-			int effectiveMinCount = parentEntity.getMinCount(childName);
+			int effectiveMinCount = parentEntity.getMinCount(childDef);
 			Object[] args = new Integer[]{effectiveMinCount};
 			message = getMessage(surveyDefaultLanguage, locale, "validation.minCount", args);
 		} else {

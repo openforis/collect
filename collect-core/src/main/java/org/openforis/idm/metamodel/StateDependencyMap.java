@@ -27,17 +27,17 @@ class StateDependencyMap {
 	private static final Log LOG = LogFactory.getLog(StateDependencyMap.class);
 	
 	private ExpressionEvaluator expressionEvaluator;
-	private Map<String, Set<NodePathPointer>> dependentsBySource;
-	private Map<String, Set<NodePathPointer>> sourcesByDependent;
+	private Map<NodeDefinition, Set<NodePathPointer>> dependentsBySource;
+	private Map<NodeDefinition, Set<NodePathPointer>> sourcesByDependent;
 
 	StateDependencyMap(ExpressionEvaluator expressionEvaluator) {
 		this.expressionEvaluator = expressionEvaluator;
-		this.dependentsBySource = new HashMap<String, Set<NodePathPointer>>();
-		this.sourcesByDependent = new HashMap<String, Set<NodePathPointer>>();
+		this.dependentsBySource = new HashMap<NodeDefinition, Set<NodePathPointer>>();
+		this.sourcesByDependent = new HashMap<NodeDefinition, Set<NodePathPointer>>();
 	}
 	
-	Set<NodePathPointer> getDependencySet(String path){
-		Set<NodePathPointer> set = dependentsBySource.get(path);
+	Set<NodePathPointer> getDependencySet(NodeDefinition def){
+		Set<NodePathPointer> set = dependentsBySource.get(def);
 		if(set == null){
 			return Collections.emptySet();
 		} else {
@@ -45,8 +45,8 @@ class StateDependencyMap {
 		}
 	}
 	
-	Set<NodePathPointer> getSources(String dependentPath) {
-		Set<NodePathPointer> set = sourcesByDependent.get(dependentPath);
+	Set<NodePathPointer> getSources(NodeDefinition def) {
+		Set<NodePathPointer> set = sourcesByDependent.get(def);
 		if(set == null){
 			return Collections.emptySet();
 		} else {
@@ -54,26 +54,25 @@ class StateDependencyMap {
 		}
 	}
 	
-	private void addDependency(String path, NodePathPointer value){
-		Set<NodePathPointer> set = dependentsBySource.get(path);
+	private void addDependency(NodeDefinition def, NodePathPointer value){
+		Set<NodePathPointer> set = dependentsBySource.get(def);
 		if(set == null){
 			set = new HashSet<NodePathPointer>();
-			dependentsBySource.put(path, set);
+			dependentsBySource.put(def, set);
 		}
 		set.add(value);
 	}
 	
-	void addDependency(NodeDefinition sourceNode, String pathToDependentParent, NodeDefinition dependentNodeDef) {
+	void addDependency(NodeDefinition sourceNodeDef, String pathToDependentParent, NodeDefinition dependentNodeDef) {
 		NodePathPointer nodePointer = new NodePathPointer(pathToDependentParent, dependentNodeDef);
-		addDependency(sourceNode.getPath(), nodePointer);
+		addDependency(sourceNodeDef, nodePointer);
 	}
 		
 	void addSource(NodeDefinition context, String dependentParentEntityPath, NodeDefinition dependentNodeDef) {
-		String path = context.getPath();
-		Set<NodePathPointer> set = sourcesByDependent.get(path);
+		Set<NodePathPointer> set = sourcesByDependent.get(context);
 		if(set == null){
 			set = new HashSet<NodePathPointer>();
-			sourcesByDependent.put(path, set);
+			sourcesByDependent.put(context, set);
 		}
 		set.add(new NodePathPointer(dependentParentEntityPath, dependentNodeDef));
 	}

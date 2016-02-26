@@ -411,3 +411,11 @@ mx|PopUpMenuButton.userPopUpMenu {
 	popUpIcon: Embed(source='assets/images/user_16x16.png');
 	color: #000;
 }
+
+component|DifferenceProgressBarItemRenderer mx|ProgressBar.positive {
+	barColor: #0A0;
+}
+
+component|DifferenceProgressBarItemRenderer mx|ProgressBar.negative {
+	barColor: #A00;
+}

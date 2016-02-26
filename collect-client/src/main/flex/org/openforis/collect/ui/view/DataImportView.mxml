@@ -8,6 +8,11 @@
 	<s:layout>
 		<s:VerticalLayout horizontalAlign="center" />
 	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import org.openforis.collect.ui.Images;
+		]]>
+	</fx:Script>
 	
 	<fx:Script>
 		<![CDATA[
@@ -31,6 +36,7 @@
 			private var _presenter:DataImportPresenter;
 			
 			private var _allConflictingRecordsSelected:Boolean;
+			private var _allNewerConflictingRecordsSelected:Boolean;
 			private var _dataImportErrors:IList = null;
 			private var _selectedConflictingRecordsCount:int;
 			private var _selectedRecordsToImportCount:int;
@@ -49,6 +55,15 @@
 				_allConflictingRecordsSelected = value;
 			}
 			 
+			[Bindable]
+			public function get allNewerConflictingRecordsSelected():Boolean {
+				return _allNewerConflictingRecordsSelected;
+			}
+			
+			public function set allNewerConflictingRecordsSelected(value:Boolean):void {
+				_allNewerConflictingRecordsSelected = value;
+			}
+			
 			[Bindable]
 			public function get dataImportErrors():IList {
 				return _dataImportErrors;
@@ -97,15 +112,21 @@
 			  height="100%" width="100%"
 			  gap="30"
 			  >
+		
 		<s:Label text="{Message.get('dataImport.introduction')}"
 				 styleName="infoMessageBig"
 				 textAlign="center" />
+
+		<s:CheckBox id="completeSummaryCheckBox" selected="true" 
+					label="{Message.get('dataImport.completeSummary')}" />
+		
 		<s:Button id="uploadButton" 
 				  label="{Message.get('dataImport.selectFileToUpload')}"
 				  includeIn="default"
 				  useHandCursor="true"
 				  buttonMode="true"
 				  />
+
 	</s:VGroup>
 
 	<component:LoadingContent includeIn="loading"
@@ -151,13 +172,6 @@
 											   headerText="{Message.get('dataImport.recordList.key')}"
 											   width="100" />
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
-						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
-												   width="110"
-												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
-												   sortCompareFunction="{function(o1:Object, o2:Object):int {
-												   		return UIUtil.gridColumnSortCompareFunction('conflictingRecord.creationDate', o1, o2);
-												   }}"
-												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
@@ -165,22 +179,33 @@
 												   		return UIUtil.gridColumnSortCompareFunction('conflictingRecord.modifiedDate', o1, o2);
 												   }}"
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
-						<mx:AdvancedDataGridColumn dataField="conflictingRecord.step"
-												   width="60"
-												   headerText="{Message.get('dataImport.recordList.step')}" 
+						<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}"
+														sortCompareFunction="{function(o1:Object, o2:Object):int {
+															return UIUtil.gridColumnSortCompareFunction('conflictingRecord.stepNumber', o1, o2);
+														}}">
+							<mx:AdvancedDataGridColumn dataField="conflictingRecordEntryDataPresent" 
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.entryDataPresent.abbreviation')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+							<mx:AdvancedDataGridColumn dataField="conflictingRecordCleansingDataPresent" 
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent.abbreviation')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+							<mx:AdvancedDataGridColumn dataField="conflictingRecordAnalysisDataPresent" 
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.analysisDataPresent.abbreviation')}"
+													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
+						</mx:AdvancedDataGridColumnGroup>
+						<mx:AdvancedDataGridColumn dataField="conflictingRecordTotalErrors"
+												   width="50"
+												   headerText="{Message.get('dataImport.recordList.errors')}"
 												   sortCompareFunction="{function(o1:Object, o2:Object):int {
-													   return UIUtil.gridColumnSortCompareFunction('conflictingRecord.step', o1, o2);
+												   		return UIUtil.gridColumnSortCompareFunction('conflictingRecord.totalErrors', o1, o2);
 												   }}"
-												   labelFunction="{UIUtil.gridColumnStepLabelFunction}" />
+												   visible="{completeSummaryCheckBox.selected}"
+												   />
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
-						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
-												   width="110"
-												   headerText="{Message.get('dataImport.recordList.creationDate')}"
-												   sortCompareFunction="{function(o1:Object, o2:Object):int {
-													   return UIUtil.gridColumnSortCompareFunction('record.creationDate', o1, o2);
-												   }}"
-												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
@@ -190,20 +215,51 @@
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
 							<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
-													   width="60"
-													   headerText="{Message.get('dataImport.recordList.entryDataPresent')}"
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.entryDataPresent.abbreviation')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 							<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
-													   width="60"
-													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent')}"
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent.abbreviation')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 							<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
-													   width="60"
-													   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
+													   width="25"
+													   headerText="{Message.get('dataImport.recordList.analysisDataPresent.abbreviation')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						</mx:AdvancedDataGridColumnGroup>
+						<mx:AdvancedDataGridColumn dataField="recordTotalErrors"
+												   width="50"
+												   headerText="{Message.get('dataImport.recordList.errors')}"
+												   sortCompareFunction="{function(o1:Object, o2:Object):int {
+												   		return UIUtil.gridColumnSortCompareFunction('record.totalErrors', o1, o2);
+												   }}"
+												   visible="{completeSummaryCheckBox.selected}" />
+						<mx:AdvancedDataGridColumn dataField="completionDifferencePercent"
+												   width="100"
+												   headerText="{Message.get('dataImport.recordList.completionDifference')}"
+												   visible="{completeSummaryCheckBox.selected}">
+							<mx:itemRenderer>
+								<fx:Component>
+									<component:DifferenceProgressBarItemRenderer width="80%" height="10"
+												   valuePropertyName="completionDifferencePercent" toolTipFunction="tooltipFunction">
+										<fx:Script>
+											<![CDATA[
+												import org.openforis.collect.i18n.Message;
+												
+												private function tooltipFunction(data:Object):String {
+													return Message.get('dataImport.recordList.completionDifference.tooltip', 
+														[data.recordFilledAttributesCount, data.conflictingRecordFilledAttributesCount, 
+															data.completionDifferencePercent]);
+												}
+											]]>
+										</fx:Script>
+									</component:DifferenceProgressBarItemRenderer>
+								</fx:Component>
+							</mx:itemRenderer>
+						</mx:AdvancedDataGridColumn>
+
 						<mx:AdvancedDataGridColumn dataField="warnings" 
-												   headerText="{Message.get('dataImport.recordList.warnigns')}"
+												   headerText="{Message.get('dataImport.recordList.importWarnings.abbreviation')}"
 												   width="50"
 												   >
 							<mx:itemRenderer>
@@ -227,8 +283,13 @@
 							</mx:itemRenderer>
 						</mx:AdvancedDataGridColumn>
 					</mx:AdvancedDataGridColumnGroup>
+					<mx:AdvancedDataGridColumn dataField="importabilityLevel"
+											   width="80"
+											   itemRenderer="org.openforis.collect.ui.component.ImportabilityColumnItemRenderer"
+											   headerText="{Message.get('dataImport.recordList.importabilityLevel')}"
+											   visible="{completeSummaryCheckBox.selected}" />
 					<mx:AdvancedDataGridColumn dataField="selected" 
-											   width="90"
+											   width="110"
 											   editable="true"
 											   rendererIsEditor="true"
 											   >
@@ -246,10 +307,16 @@
 									</fx:Script>
 									<mx:Label text="{Message.get('dataImport.recordConflicts.replace')}" />
 									<mx:HBox>
-										<mx:Label text="{Message.get('dataImport.recordConflicts.replace.all')}" />
+										<mx:Label text="{Message.get('dataImport.recordConflicts.select.all')}" />
 										<mx:CheckBox selected="{outerDocument.allConflictingRecordsSelected}"
 													click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
 															new DataImportEvent(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS))}" />
+									</mx:HBox>
+									<mx:HBox visible="{outerDocument.completeSummaryCheckBox.selected}">
+										<mx:Label text="{Message.get('dataImport.recordConflicts.select.onlyNewer')}" />
+										<mx:CheckBox selected="{outerDocument.allNewerConflictingRecordsSelected}"
+													 click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+													 new DataImportEvent(DataImportEvent.SELECT_ONLY_NEWER_CONFLICTING_RECORDS))}" />
 									</mx:HBox>
 								</mx:VBox>
 							</fx:Component>
@@ -310,16 +377,16 @@
 											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
 						<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
-												   width="60"
-												   headerText="{Message.get('dataImport.recordList.entryDataPresent')}"
+												   width="30"
+												   headerText="{Message.get('dataImport.recordList.entryDataPresent.abbreviation')}"
 												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
-												   width="60"
-												   headerText="{Message.get('dataImport.recordList.cleansingDataPresent')}"
+												   width="30"
+												   headerText="{Message.get('dataImport.recordList.cleansingDataPresent.abbreviation')}"
 												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
-												   width="60"
-												   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
+												   width="30"
+												   headerText="{Message.get('dataImport.recordList.analysisDataPresent.abbreviation')}"
 												   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumn dataField="warnings" 
@@ -445,9 +512,6 @@
 						labelPlacement="center"
 						width="80%"
 						/>
-		
-		<!--<s:Label id="progressLabel"
-				 styleName="formLabel" />-->
 		
 		<s:Button id="cancelButton"
 				  label="{Message.get('global.cancel')}"

@@ -130,11 +130,11 @@ public class RecordValidationReportGenerator {
 			Entity entity) {
 		List<RecordValidationReportItem> result = new ArrayList<RecordValidationReportItem>();
 		Integer entityId = entity.getInternalId();
-		Set<String> minCountWarningChildNames = validationCache.getMinCountWarningChildNames(entityId);
-		for (String childName : minCountWarningChildNames) {
-			if ( record.isMissingApproved(entity, childName) ) {
+		Set<NodeDefinition> minCountWarningChildDefs = validationCache.getMinCountWarningChildDefinitions(entityId);
+		for (NodeDefinition childDef : minCountWarningChildDefs) {
+			if ( record.isMissingApproved(entity, childDef) ) {
 				RecordValidationReportItem item = createCardinalityValidationItem(
-						locale, entity, childName, ValidationResultFlag.ERROR, true);
+						locale, entity, childDef, ValidationResultFlag.ERROR, true);
 				result.add(item);
 			}
 		}
@@ -144,9 +144,9 @@ public class RecordValidationReportGenerator {
 	private List<RecordValidationReportItem> createCardinalityValidationItems(Locale locale, Entity entity, ValidationResultFlag flag, boolean minCount) {
 		List<RecordValidationReportItem> result = new ArrayList<RecordValidationReportItem>();
 		Integer entityId = entity.getInternalId();
-		Set<String> childNames = validationCache.getCardinalityFailedChildNames(entityId, flag, minCount);
-		for (String childName : childNames) {
-			RecordValidationReportItem item = createCardinalityValidationItem(locale, entity, childName, flag, minCount);
+		Set<NodeDefinition> childDefs = validationCache.getCardinalityFailedChildDefinitions(entityId, flag, minCount);
+		for (NodeDefinition childDef : childDefs) {
+			RecordValidationReportItem item = createCardinalityValidationItem(locale, entity, childDef, flag, minCount);
 			result.add(item);
 		}
 		return result;
@@ -154,7 +154,8 @@ public class RecordValidationReportGenerator {
 	
 	private RecordValidationReportItem createCardinalityValidationItem(
 			final Locale locale, Entity entity,
-			String childName, ValidationResultFlag flag, boolean minCount) {
+			NodeDefinition childDef, ValidationResultFlag flag, boolean minCount) {
+		String childName = childDef.getName();
 		String path = getPath(entity) + "/" + childName;
 		String prettyFormatPath = messageBuilder.getPrettyFormatPath(entity, childName, locale);
 		String message = minCount ? messageBuilder.getMinCountValidationMessage(entity, childName, locale):

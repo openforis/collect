@@ -16,12 +16,12 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -42,7 +42,8 @@ public class DataRestoreSummaryTask extends Task {
 	//input
 	private CollectSurvey survey;
 	private boolean oldFormat;
-	
+	private boolean completeSummary;
+
 	/**
 	 * If specified, it will be used to filter the records to include in the summary
 	 */
@@ -58,20 +59,14 @@ public class DataRestoreSummaryTask extends Task {
 			put(step, 0);
 		}
 	}};
-	private final Map<Integer, CollectRecord> recordSummaryByEntryId = new HashMap<Integer, CollectRecord>();
+	private final Map<Integer, CollectRecordSummary> recordSummaryByEntryId = new HashMap<Integer, CollectRecordSummary>();
 	private final Map<Integer, Set<Step>> stepsByEntryId = new HashMap<Integer, Set<Step>>();
 	private final Map<String, List<NodeUnmarshallingError>> errorsByEntryName = new HashMap<String, List<NodeUnmarshallingError>>();
-	private final Map<Integer, CollectRecord> conflictingRecordByEntryId = new HashMap<Integer, CollectRecord>();
+	private final Map<Integer, CollectRecordSummary> conflictingRecordByEntryId = new HashMap<Integer, CollectRecordSummary>();
 	private final Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warningsByEntryId = new HashMap<Integer, Map<Step,List<NodeUnmarshallingError>>>();
 	
 	//output
 	private DataImportSummary summary;
-	
-	@Override
-	protected void createInternalVariables() throws Throwable {
-		super.createInternalVariables();
-//		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, false);
-	}
 	
 	@Override
 	protected long countTotalItems() {
@@ -128,12 +123,12 @@ public class DataRestoreSummaryTask extends Task {
 			int entryId, Step step,
 			ParseRecordResult parseRecordResult) {
 		CollectRecord parsedRecord = parseRecordResult.getRecord();
-		CollectRecord recordSummary = createRecordSummary(parsedRecord);
+		CollectRecordSummary recordSummary = CollectRecordSummary.fromRecord(parsedRecord);
 		recordSummaryByEntryId.put(entryId, recordSummary);
 		
 		addStepPerEntry(entryId, step);
 		
-		CollectRecord oldRecord = findAlreadyExistingRecordSummary(parsedRecord);
+		CollectRecordSummary oldRecord = findAlreadyExistingRecordSummary(parsedRecord);
 		if ( oldRecord != null ) {
 			conflictingRecordByEntryId.put(entryId, oldRecord);
 		}
@@ -182,7 +177,7 @@ public class DataRestoreSummaryTask extends Task {
 	private List<Integer> findIncompleteEntryIds() {
 		List<Integer> result = new ArrayList<Integer>();
 		for (Integer entryId: recordSummaryByEntryId.keySet()) {
-			CollectRecord conflictingRecord = conflictingRecordByEntryId.get(entryId);
+			CollectRecordSummary conflictingRecord = conflictingRecordByEntryId.get(entryId);
 			if (conflictingRecord != null) {
 				Step lastStep = getLastStep(entryId);
 				if (conflictingRecord.getStep().after(lastStep)) {
@@ -210,7 +205,7 @@ public class DataRestoreSummaryTask extends Task {
 
 		List<Integer> incompleteEntryIds = findIncompleteEntryIds();
 		for (Integer entryId : incompleteEntryIds) {
-			CollectRecord conflictingRecordSummary = conflictingRecordByEntryId.get(entryId);
+			CollectRecordSummary conflictingRecordSummary = conflictingRecordByEntryId.get(entryId);
 			Step missingStep = conflictingRecordSummary.getStep();
 			Set<Step> steps = stepsByEntryId.get(entryId);
 			for (Step step : steps) {
@@ -232,8 +227,8 @@ public class DataRestoreSummaryTask extends Task {
 		for (Integer entryId: entryIds) {
 			if ( ! conflictingRecordByEntryId.containsKey(entryId) && ! incompleteEntryIds.contains(entryId)) {
 				Set<Step> steps = stepsByEntryId.get(entryId);
-				CollectRecord record = recordSummaryByEntryId.get(entryId);
-				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, new ArrayList<Step>(steps));
+				CollectRecordSummary recordSummary = recordSummaryByEntryId.get(entryId);
+				DataImportSummaryItem item = new DataImportSummaryItem(entryId, recordSummary, new ArrayList<Step>(steps));
 				item.setWarnings(warningsByEntryId.get(entryId));
 				recordsToImport.add(item);
 			}
@@ -247,10 +242,10 @@ public class DataRestoreSummaryTask extends Task {
 		Set<Integer> conflictingEntryIds = conflictingRecordByEntryId.keySet();
 		for (Integer entryId: conflictingEntryIds) {
 			if ( ! incompleteEntryIds.contains(entryId)) {
-				CollectRecord record = recordSummaryByEntryId.get(entryId);
-				CollectRecord conflictingRecord = conflictingRecordByEntryId.get(entryId);
+				CollectRecordSummary recordSummary = recordSummaryByEntryId.get(entryId);
+				CollectRecordSummary conflictingRecord = conflictingRecordByEntryId.get(entryId);
 				Set<Step> steps = stepsByEntryId.get(entryId);
-				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, new ArrayList<Step>(steps), conflictingRecord);
+				DataImportSummaryItem item = new DataImportSummaryItem(entryId, recordSummary, new ArrayList<Step>(steps), conflictingRecord);
 				item.setWarnings(warningsByEntryId.get(entryId));
 				conflictingRecordItems.add(item);
 			}
@@ -258,41 +253,23 @@ public class DataRestoreSummaryTask extends Task {
 		return conflictingRecordItems;
 	}
 
-	private CollectRecord findAlreadyExistingRecordSummary(CollectRecord parsedRecord) {
+	private CollectRecordSummary findAlreadyExistingRecordSummary(CollectRecord parsedRecord) {
 		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
 		Entity rootEntity = parsedRecord.getRootEntity();
 		String rootEntityName = rootEntity.getName();
-		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[0]));
+		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[keyValues.size()]));
 		if ( oldRecords == null || oldRecords.isEmpty() ) {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {
-			return oldRecords.get(0);
+			CollectRecord summary = oldRecords.get(0);
+			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), completeSummary);
+			return CollectRecordSummary.fromRecord(record);
 		} else {
 			throw new IllegalStateException(String.format("Multiple records found in survey %s with key(s): %s", survey.getName(), keyValues));
 		}
 	}
 
-	private CollectRecord createRecordSummary(CollectRecord record) {
-		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		ModelVersion version = record.getVersion();
-		String versionName = version != null ? version.getName(): null;
-		CollectRecord result = new CollectRecord(survey, versionName);
-		result.setCreatedBy(record.getCreatedBy());
-		result.setCreationDate(record.getCreationDate());
-		result.setEntityCounts(record.getEntityCounts());
-		result.setErrors(record.getErrors());
-		result.setId(record.getId());
-		result.setMissing(record.getMissing());
-		result.setModifiedBy(record.getModifiedBy());
-		result.setModifiedDate(record.getModifiedDate());
-		result.setRootEntityKeyValues(record.getRootEntityKeyValues());
-		result.setSkipped(record.getSkipped());
-		result.setState(record.getState());
-		result.setStep(record.getStep());
-		return result;
-	}
-	
 	private String getEntryName(int entryId, Step step) {
 		BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId, oldFormat);
 		String entryName = recordEntry.getName();
@@ -351,5 +328,13 @@ public class DataRestoreSummaryTask extends Task {
 	public void setRecordProvider(RecordProvider recordProvider) {
 		this.recordProvider = recordProvider;
 	}
-	
+
+	public boolean isCompleteSummary() {
+		return completeSummary;
+	}
+
+	public void setCompleteSummary(boolean completeSummary) {
+		this.completeSummary = completeSummary;
+	}
+
 }

@@ -8,15 +8,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jooq.exception.DataAccessException;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 /**
  * @author G. Miceli
  * @author M. Togna
  * @author S. Ricci
  */
-public abstract class JooqDaoSupport extends JdbcDaoSupport {
-	private final Log log = LogFactory.getLog(getClass());
+public abstract class JooqDaoSupport {
+	protected final Log log = LogFactory.getLog(getClass());
 
 	private static final String CONSTRAINT_VIOLATION_CODE = "23";
 	private static final String CONSTRAINT_VIOLATION_MESSAGE = "constraint violation";

@@ -128,7 +128,7 @@ public class RecordUpdater {
 	 * @return Changes applied to the record 
 	 */
 	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
-		Entity entity = performEntityAdd(parentEntity, entityName);
+		Entity entity = performEntityAdd(parentEntity, entityName, null);
 		
 		setMissingValueApproved(parentEntity, entityName, false);
 
@@ -165,7 +165,9 @@ public class RecordUpdater {
 		
 		setMissingValueApproved(parentEntity, attributeName, false);
 		
-		applyInitialValue(attribute, true);
+		if (value == null) {
+			applyInitialValue(attribute, true);
+		}
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addAttributeAddChange(attribute);
@@ -663,14 +665,18 @@ public class RecordUpdater {
 		return attribute;
 	}
 	
-	private Entity performEntityAdd(Entity parentEntity, String nodeName) {
-		return performEntityAdd(parentEntity, nodeName, null);
+	private Entity performEntityAdd(Entity parentEntity, EntityDefinition defn) {
+		return performEntityAdd(parentEntity, defn, null);
 	}
 	
 	private Entity performEntityAdd(Entity parentEntity, String name, Integer idx) {
-		ModelVersion version = parentEntity.getRecord().getVersion();
 		EntityDefinition parentDefn = parentEntity.getDefinition();
 		EntityDefinition defn = parentDefn.getChildDefinition(name, EntityDefinition.class);
+		return performEntityAdd(parentEntity, defn, idx);
+	}
+	
+	private Entity performEntityAdd(Entity parentEntity, EntityDefinition defn, Integer idx) {
+		ModelVersion version = parentEntity.getRecord().getVersion();
 		Entity entity = (Entity) defn.createNode();
 		if ( idx != null ) {
 			parentEntity.add(entity, idx);
@@ -791,7 +797,6 @@ public class RecordUpdater {
 	}
 
 	private int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
-		String childName = childDefn.getName();
 		UIOptions uiOptions = getUIOptions(entity.getSurvey());
 		int count = 0;
 		boolean multipleEntityFormLayout = childDefn instanceof EntityDefinition && childDefn.isMultiple() && 
@@ -802,7 +807,7 @@ public class RecordUpdater {
 					Node<?> createdNode = childDefn.createNode();
 					entity.add(createdNode);
 				} else if(childDefn instanceof EntityDefinition ) {
-					Entity childEntity = performEntityAdd(entity, childName);
+					Entity childEntity = performEntityAdd(entity, (EntityDefinition) childDefn);
 					addEmptyNodes(childEntity);
 				}
 				count ++;
@@ -878,7 +883,6 @@ public class RecordUpdater {
 		ModelVersion version = record.getVersion();
 		CodeAttributeDefinition enumeratingCodeDefn = enumerableEntityDefn.getEnumeratingKeyCodeAttribute(version);
 		if(enumeratingCodeDefn != null) {
-			String enumeratedEntityName = enumerableEntityDefn.getName();
 			CodeList list = enumeratingCodeDefn.getList();
 			Survey survey = record.getSurvey();
 			CodeListService codeListService = survey.getContext().getCodeListService();
@@ -889,7 +893,7 @@ public class RecordUpdater {
 					String code = item.getCode();
 					Entity enumeratedEntity = parentEntity.getEnumeratedEntity(enumerableEntityDefn, enumeratingCodeDefn, code);
 					if( enumeratedEntity == null ) {
-						Entity addedEntity = performEntityAdd(parentEntity, enumeratedEntityName, i);
+						Entity addedEntity = performEntityAdd(parentEntity, enumerableEntityDefn, i);
 						addEmptyNodes(addedEntity);
 						//set the value of the key CodeAttribute
 						CodeAttribute addedCode = (CodeAttribute) addedEntity.getChild(enumeratingCodeDefn, 0);

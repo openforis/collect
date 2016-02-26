@@ -142,8 +142,8 @@ public class RecordManager {
 		return recordDao.createInsertQuery(record);
 	}
 	
-	public RecordStoreQuery createUpdateQuery(CollectRecord record) {
-		return recordDao.createUpdateQuery(record);	
+	public RecordStoreQuery createUpdateQuery(CollectRecord record, Step step) {
+		return recordDao.createUpdateQuery(record, step);	
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
@@ -164,11 +164,12 @@ public class RecordManager {
 			List<RecordStepOperation> operations = recordOperations.getOperations();
 			for (RecordStepOperation operation : operations) {
 				CollectRecord record = operation.getRecord();
+				record.setStep(operation.getStep());
 				if (operation.isInsert()) {
 					recordOperations.initializeRecordId(nextId ++);
 					queries.add(createInsertQuery(record));
 				} else {
-					queries.add(createUpdateQuery(record));
+					queries.add(createUpdateQuery(record, operation.getStep()));
 				}
 				if (consumer != null) {
 					consumer.consume(operation);

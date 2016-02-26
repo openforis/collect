@@ -40,8 +40,9 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function startSummaryCreation(responder:IResponder, filePath:String, selectedSurveyUri:String, overwriteAll:Boolean = false):void {
-			var token:AsyncToken = this._startSummaryCreationOperation.send(filePath, selectedSurveyUri, overwriteAll);
+		public function startSummaryCreation(responder:IResponder, filePath:String, selectedSurveyUri:String, overwriteAll:Boolean = false, 
+				completeSummary:Boolean = false):void {
+			var token:AsyncToken = this._startSummaryCreationOperation.send(filePath, selectedSurveyUri, overwriteAll, completeSummary);
 			token.addResponder(responder);
 		}
 		

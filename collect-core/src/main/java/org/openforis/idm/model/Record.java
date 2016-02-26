@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -37,6 +38,7 @@ public class Record implements DeepComparable {
 	private Entity rootEntity;
 
 	boolean enableValidationDependencyGraphs;
+	boolean ignoreDuplicateRecordKeyValidationErrors;
 	NodeDependencyGraph calculatedAttributeDependencies;
 	RelevanceDependencyGraph relevanceDependencies;
 	MinCountDependencyGraph minCountDependencies;
@@ -51,6 +53,10 @@ public class Record implements DeepComparable {
 	}
 	
 	public Record(Survey survey, String version, boolean enableValidationDependencyGraphs) {
+		this(survey, version, enableValidationDependencyGraphs, false);
+	}
+	
+	public Record(Survey survey, String version, boolean enableValidationDependencyGraphs, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		if (survey == null) {
 			throw new IllegalArgumentException("Survey required");
 		}
@@ -67,6 +73,7 @@ public class Record implements DeepComparable {
 			}
 		}
 		this.enableValidationDependencyGraphs = enableValidationDependencyGraphs;
+		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 		reset();
 	}
 
@@ -321,7 +328,62 @@ public class Record implements DeepComparable {
 	
 	public CodeAttribute determineParentCodeAttribute(CodeAttribute codeAttr) {
 		CodeAttribute result = codeAttributeDependencies.parentCodeAttribute(codeAttr);
-		return result;
+		return result; 
+	}
+	
+	public boolean isIgnoreDuplicateRecordKeyValidationErrors() {
+		return ignoreDuplicateRecordKeyValidationErrors;
+	}
+	
+	/**
+	 * Returns the percentage of all filled relevant attributes among the required ones
+	 */
+	public int calculateCompletionPercent() {
+		if (getRootEntity() == null) {
+			return -1;
+		}
+		int totalRequiredAttributes = 0;
+		int filledAttributes = 0;
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.push(getRootEntity());
+		while (! stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			if (node.isRelevant()) {
+				if (node instanceof Attribute) {
+					if (node.isRequired()) {
+						totalRequiredAttributes ++;
+						if (! node.isEmpty()) {
+							filledAttributes ++;
+						}
+					}
+				} else {
+					stack.addAll(((Entity) node).getChildren());
+				}
+			}
+		}
+		return Double.valueOf(Math.floor((double) (100 * filledAttributes / totalRequiredAttributes))).intValue();
+	}
+	
+	public int countTotalFilledAttributes() {
+		if (getRootEntity() == null) {
+			return -1;
+		}
+		int total = 0;
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.push(getRootEntity());
+		while (! stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			if (node.isRelevant()) {
+				if (node instanceof Attribute) {
+					if (! node.isEmpty()) {
+						total ++;
+					}
+				} else {
+					stack.addAll(((Entity) node).getChildren());
+				}
+			}
+		}
+		return total;
 	}
 	
 	@Override

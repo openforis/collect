@@ -33,6 +33,7 @@ import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
@@ -317,7 +318,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			CollectRecord record = packagedRecords.get(entryId);
 			if ( ! conflictingPackagedRecords.containsKey(entryId)) {
 				List<Step> steps = packagedStepsPerRecord.get(entryId);
-				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps);
+				DataImportSummaryItem item = new DataImportSummaryItem(entryId, CollectRecordSummary.fromRecord(record), steps);
 				item.setWarnings(warnings.get(entryId));
 				recordsToImport.add(item);
 			}
@@ -328,7 +329,8 @@ public class XMLDataImportProcess implements Callable<Void> {
 			CollectRecord record = packagedRecords.get(entryId);
 			CollectRecord conflictingRecord = conflictingPackagedRecords.get(entryId);
 			List<Step> steps = packagedStepsPerRecord.get(entryId);
-			DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps, conflictingRecord);
+			DataImportSummaryItem item = new DataImportSummaryItem(entryId, CollectRecordSummary.fromRecord(record),
+					steps, CollectRecordSummary.fromRecord(conflictingRecord));
 			item.setWarnings(warnings.get(entryId));
 			conflictingRecordItems.add(item);
 		}
@@ -419,7 +421,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 							if ( includesRecordFiles ) {
 								recordFileManager.deleteAllFiles(parsedRecord);
 							}
-							query = recordManager.createUpdateQuery(parsedRecord);
+							query = recordManager.createUpdateQuery(parsedRecord, parsedRecord.getStep());
 						} else {
 							parsedRecord.setId(nextRecordId ++);
 							query = recordManager.createInsertQuery(parsedRecord);
@@ -427,7 +429,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 						lastProcessedRecord = parsedRecord;
 					} else {
 						replaceData(parsedRecord, lastProcessedRecord);
-						query = recordManager.createUpdateQuery(lastProcessedRecord);
+						query = recordManager.createUpdateQuery(lastProcessedRecord, lastProcessedRecord.getStep());
 					}
 					appendQuery(query);
 //					if ( parseRecordResult.hasWarnings() ) {
@@ -442,7 +444,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep, validateRecords);
 			originalRecord.setStep(originalRecordStep);
 			afterRecordUpdate(originalRecord);
-			appendQuery(recordManager.createUpdateQuery(originalRecord));
+			appendQuery(recordManager.createUpdateQuery(originalRecord, originalRecord.getStep()));
 		}
 		if ( includesRecordFiles ) {
 			importRecordFiles(lastProcessedRecord);

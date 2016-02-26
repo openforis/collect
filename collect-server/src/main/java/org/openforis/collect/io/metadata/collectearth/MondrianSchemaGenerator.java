@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import static org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil.*;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.CodeValueFKColumn;
@@ -226,7 +226,7 @@ public class MondrianSchemaGenerator {
 			for (String aggregator : MEASURE_AGGREGATORS) {
 				Measure measure = new Measure(attrName + "_" + aggregator);
 				measure.column = attrName;
-				measure.caption = StringEscapeUtils.escapeHtml4(
+				measure.caption = escapeMondrianUnicode(
 						String.format("%s.%s [%s] %s", cube.name, extractLabel(attrDef), attrName, aggregator));
 				measure.aggregator = aggregator;
 				measure.datatype = NUMERIC_DATATYPE;
@@ -348,7 +348,7 @@ public class MondrianSchemaGenerator {
 		} else {
 			measure.column = rdbSchema.getDataTable(entityDef).getPrimaryKeyColumn().getName();
 		}
-		measure.caption = StringEscapeUtils.escapeHtml4(extractLabel(entityDef) + " Count");
+		measure.caption = escapeMondrianUnicode(extractLabel(entityDef) + " Count");
 		measure.aggregator = "distinct count";
 		measure.datatype = INTEGER_DATATYPE;
 		cube.measures.add(measure);
@@ -487,7 +487,7 @@ public class MondrianSchemaGenerator {
 		if (attrLabel == null) {
 			attrLabel = nodeDef.getName();
 		}
-		return attrLabel;
+		return escapeMondrianUnicode(attrLabel);
 	}
 
 	private boolean canBeMeasured(AttributeDefinition def) {
@@ -503,7 +503,7 @@ public class MondrianSchemaGenerator {
 
 		public MondrianSchemaObject(String name) {
 			super();
-			this.name = StringEscapeUtils.escapeHtml4(name);
+			this.name = escapeMondrianUnicode(name);
 		}
 
 	}

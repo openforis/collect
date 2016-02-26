@@ -121,7 +121,7 @@
 
 <body>
 
-	<div id="dialogSuccess">
+	<div id="dialogSuccess" style="display: none">
 		<table>
 			<tr>
 				<td valign="top">
@@ -136,8 +136,16 @@
 		</table>
 	</div>
 
-	<div id="contentDiv"  style="height:600px;width:100%;">
-		<div id="scrollingDiv" style="overflow :visible;" class="earthDiv">
+	<div id="loadingPanel">
+		<span>Loading...</span>
+	</div>
+	
+	<div id="collectEarthNotRunningPanel" style="display: none">
+		<span>PLACEHOLDER_COLLECT_NOT_RUNNING</span>
+	</div>
+	
+	<div id="contentDiv"  style="display: none;">
+		<div id="scrollingDiv" style="overflow: visible;" class="earthDiv">
 			<form id="formAll" class="form-horizontal" action="$[host]save-data-expanded">
 			<!-- <form id="formAll" class="form-horizontal" action="http://127.0.0.1:8028/earth/save-data-expanded"> -->
 								
@@ -164,6 +172,6 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 			</form>
 		</div>
 	</div>
-	<iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/ancillaryWindows?PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST" height="0" width="0"></iframe>
+	<iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/openAuxiliaryWindows?latLongCoordinates=$[latitude],$[longitude]" height="0" width="0"></iframe>
 </body>
 </html>

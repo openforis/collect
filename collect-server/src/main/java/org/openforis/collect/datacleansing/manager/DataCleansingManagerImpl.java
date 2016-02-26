@@ -89,19 +89,19 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	
 	@Transactional
 	@Override
-	public void saveMetadata(CollectSurvey survey, DataCleansingMetadata metadata) {
-		saveItems(dataTypeManager, survey, metadata.getDataQueryTypes());
-		saveItems(dataQueryManager, survey, metadata.getDataQueries());
-		saveItems(dataQueryGroupManager, survey, metadata.getDataQueryGroups());
-		saveItems(dataCleansingStepManager, survey, metadata.getCleansingSteps());
-		saveItems(dataCleansingChainManager, survey, metadata.getCleansingChains());
+	public void saveMetadata(CollectSurvey survey, DataCleansingMetadata metadata, boolean skipErrors) {
+		saveItems(dataTypeManager, survey, metadata.getDataQueryTypes(), skipErrors);
+		saveItems(dataQueryManager, survey, metadata.getDataQueries(), skipErrors);
+		saveItems(dataQueryGroupManager, survey, metadata.getDataQueryGroups(), skipErrors);
+		saveItems(dataCleansingStepManager, survey, metadata.getCleansingSteps(), skipErrors);
+		saveItems(dataCleansingChainManager, survey, metadata.getCleansingChains(), skipErrors);
 	}
 	
 	@Transactional
 	@Override
 	public void moveMetadata(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
 		DataCleansingMetadata temporaryMetadata = loadMetadata(fromSurvey);
-		saveMetadata(toSurvey, temporaryMetadata);
+		saveMetadata(toSurvey, temporaryMetadata, false);
 		deleteMetadata(fromSurvey);
 	}
 	
@@ -122,11 +122,11 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	public void duplicateMetadata(CollectSurvey fromSurvey,
 			CollectSurvey toSurvey) {
 		DataCleansingMetadata metadata = loadMetadata(fromSurvey);
-		saveMetadata(toSurvey, metadata);
+		saveMetadata(toSurvey, metadata, false);
 	}
 	
 	private <T extends PersistedSurveyObject> void saveItems(AbstractSurveyObjectManager<T, ?> manager, 
-			CollectSurvey survey, List<T> items) {
+			CollectSurvey survey, List<T> items, boolean skipErrors) {
 		List<T> oldItems = manager.loadBySurvey(survey);
 		for (T item : items) {
 			item.replaceSurvey(survey);
@@ -136,7 +136,13 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 				item.setId(null);
 				manager.save(item);
 			} else {
-				BeanUtils.copyProperties(item, oldItem, ID_PROPERTY_NAME, UUID_PROPERTY_NAME);
+				try {
+					BeanUtils.copyProperties(item, oldItem, ID_PROPERTY_NAME, UUID_PROPERTY_NAME);
+				} catch (Exception e) {
+					if (! skipErrors) {
+						throw new RuntimeException("Error saving data cleansing items", e);
+					}
+				}
 				manager.save(oldItem);
 				item.setId(oldItem.getId());
 			}

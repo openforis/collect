@@ -31,7 +31,7 @@ public class CollectLocalRDBStorageManager extends BaseStorageManager {
 	}
 
 	protected void initStorageDirectory() {
-		super.initStorageDirectory(ConfigurationItem.LOCAL_RDB_PATH);
+		super.initStorageDirectory(ConfigurationItem.RDB_PATH);
 	}
 
 	public boolean existsRDBFile(String surveyName, RecordStep step) {

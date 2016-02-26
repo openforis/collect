@@ -126,7 +126,7 @@ public class CollectValidator extends Validator {
 	public ValidationResultFlag validateMinCount(Entity entity, NodeDefinition childDef) {
 		ValidationResultFlag flag = super.validateMinCount(entity, childDef);
 		CollectRecord record = (CollectRecord) entity.getRecord();
-		record.updateMinCountsValidationCache(entity, childDef.getName(), flag);
+		record.updateMinCountsValidationCache(entity, childDef, flag);
 		return flag;
 	}
 	
@@ -134,7 +134,7 @@ public class CollectValidator extends Validator {
 	public ValidationResultFlag validateMaxCount(Entity entity, NodeDefinition childDef) {
 		ValidationResultFlag flag = super.validateMaxCount(entity, childDef);
 		CollectRecord record = (CollectRecord) entity.getRecord();
-		record.updateMaxCountsValidationCache(entity, childDef.getName(), flag);
+		record.updateMaxCountsValidationCache(entity, childDef, flag);
 		return flag;
 	}
 	

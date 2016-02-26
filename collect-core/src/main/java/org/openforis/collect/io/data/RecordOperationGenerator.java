@@ -89,10 +89,10 @@ public class RecordOperationGenerator {
 			record.setStep(previousStep);
 			switch (previousStep) {
 			case ENTRY:
-				operations.addInsert(record, step);
+				operations.addInsert(record, previousStep);
 				break;
 			default:
-				operations.addUpdate(record, step);
+				operations.addUpdate(record, previousStep);
 			}
 		}
 	}

@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
+import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
@@ -256,7 +257,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	}
 
 	/**
-	 * Goes though the attributes on the survey finding those that are marked as being key attributes or that are coming "From CSV" meaning that the popup-up will not show the attributes and they will be kept as hidden inputs
+	 * Goes though the attributes on the survey finding those that are marked as coming "From CSV" meaning that the popup-up will not show the attributes and they will be kept as hidden inputs
 	 * @param survey
 	 * @return The list of attributes that are marked as coming "From CSV" or that are key attributes
 	 */
@@ -267,9 +268,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			public void visit(NodeDefinition def) {
 				if (def instanceof AttributeDefinition) {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
-					if (annotations.isFromCollectEarthCSV(attrDef)
-														
-					) {
+					if (annotations.isFromCollectEarthCSV(attrDef) && !attrDef.isKey()) {
 						fromCsvAttributes.add(attrDef);
 					}					
 				}
@@ -370,6 +369,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private File generateCube(CollectSurvey survey, String language) throws IOException {
 		MondrianSchemaGenerator cubeGenerator = new MondrianSchemaGenerator(survey, language, SAIKU_SCHEMA_PLACEHOLDER, new RelationalSchemaContext().getRdbConfig());
 		String xmlSchema = cubeGenerator.generateXMLSchema();
+		
+		// Replace the TOKENs inside the labels if dimensions/levels with the corresponding ampersand
+		// XStream replaces thh ampersands by default, since we are using unicode codes we don't want that behavior
+		xmlSchema = xmlSchema.replaceAll( HtmlUnicodeEscaperUtil.MONDRIAN_START_UNICODE, "&");
+		
 		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
 	}
 
