@@ -188,9 +188,13 @@ public class CollectRecord extends Record {
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName) {
 		this(survey, versionName, rootEntityName, true);
 	}
-
+	
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs) {
-		super(survey, versionName, enableValidationDependencyGraphs);
+		this(survey, versionName, rootEntityName, enableValidationDependencyGraphs, false);
+	}
+
+	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
+		super(survey, versionName, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
 		this.step = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
@@ -489,10 +493,8 @@ public class CollectRecord extends Record {
 		
 		removeValidationCache(attribute);
 		
-		int errorCounts = validationResults.getErrors().size();
-		int warningCounts = validationResults.getWarnings().size();
-		validationCache.setAttributeErrorCount(attributeId, errorCounts);
-		validationCache.setAttributeWarningCount(attributeId, warningCounts);
+		validationCache.setAttributeErrorCount(attributeId, validationResults.countErrors());
+		validationCache.setAttributeWarningCount(attributeId, validationResults.countWarnings());
 		validationCache.setAttributeValidationResults(attributeId, validationResults);
 		
 		errors = null;

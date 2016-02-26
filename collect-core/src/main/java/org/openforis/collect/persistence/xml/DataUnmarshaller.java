@@ -128,6 +128,10 @@ public class DataUnmarshaller {
 		this.dataHandler.recordValidationEnabled = enabled;
 	}
 	
+	public void setIgnoreDuplicateRecordKeyValidationErrors(boolean ignoreDuplicateRecordKeyValidationErrors) {
+		this.dataHandler.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
+	}
+	
 	public class DataHandler extends DefaultHandler {
 		
 		private static final String ATTRIBUTE_VERSION = "version";
@@ -151,16 +155,23 @@ public class DataUnmarshaller {
 		private CollectSurvey publishedSurvey;
 		private int ignoreLevels;
 		private boolean recordValidationEnabled;
+		private boolean ignoreDuplicateRecordKeyValidationErrors;
 		
 		public DataHandler(CollectSurvey survey) {
 			this(survey, survey, true);
 		}
 
 		public DataHandler(CollectSurvey publishedSurvey, CollectSurvey recordSurvey, boolean recordValidationEnabled) {
+			this(publishedSurvey, recordSurvey, recordValidationEnabled, false);
+		}
+		
+		public DataHandler(CollectSurvey publishedSurvey, CollectSurvey recordSurvey, boolean recordValidationEnabled,
+				boolean ignoreDuplicateRecordKeyValidationErrors) {
 			super();
 			this.publishedSurvey = publishedSurvey;
 			this.recordSurvey = recordSurvey;
 			this.recordValidationEnabled = recordValidationEnabled;
+			this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 		}
 
 		@Override
@@ -219,7 +230,7 @@ public class DataUnmarshaller {
 
 		public void startRecord(String localName, Attributes attributes) {
 			String versionName = extractVersionName(attributes);
-			record = new CollectRecord(publishedSurvey, versionName, localName, recordValidationEnabled);
+			record = new CollectRecord(publishedSurvey, versionName, localName, recordValidationEnabled, ignoreDuplicateRecordKeyValidationErrors);
 			String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
 			State state = State.fromCode(stateAttr);
 			record.setState(state);

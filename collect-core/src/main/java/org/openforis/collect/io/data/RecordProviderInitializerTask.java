@@ -26,7 +26,8 @@ public class RecordProviderInitializerTask extends Task {
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
-		output = new XMLParsingRecordProvider(input.file, input.packagedSurvey, input.existingSurvey, input.userManager, input.validateRecords);
+		output = new XMLParsingRecordProvider(input.file, input.packagedSurvey, input.existingSurvey, input.userManager,
+				input.validateRecords, true);
 	}
 	
 	@Override

@@ -38,6 +38,7 @@ public class Record implements DeepComparable {
 	private Entity rootEntity;
 
 	boolean enableValidationDependencyGraphs;
+	boolean ignoreDuplicateRecordKeyValidationErrors;
 	NodeDependencyGraph calculatedAttributeDependencies;
 	RelevanceDependencyGraph relevanceDependencies;
 	MinCountDependencyGraph minCountDependencies;
@@ -52,6 +53,10 @@ public class Record implements DeepComparable {
 	}
 	
 	public Record(Survey survey, String version, boolean enableValidationDependencyGraphs) {
+		this(survey, version, enableValidationDependencyGraphs, false);
+	}
+	
+	public Record(Survey survey, String version, boolean enableValidationDependencyGraphs, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		if (survey == null) {
 			throw new IllegalArgumentException("Survey required");
 		}
@@ -68,6 +73,7 @@ public class Record implements DeepComparable {
 			}
 		}
 		this.enableValidationDependencyGraphs = enableValidationDependencyGraphs;
+		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 		reset();
 	}
 
@@ -322,7 +328,11 @@ public class Record implements DeepComparable {
 	
 	public CodeAttribute determineParentCodeAttribute(CodeAttribute codeAttr) {
 		CodeAttribute result = codeAttributeDependencies.parentCodeAttribute(codeAttr);
-		return result;
+		return result; 
+	}
+	
+	public boolean isIgnoreDuplicateRecordKeyValidationErrors() {
+		return ignoreDuplicateRecordKeyValidationErrors;
 	}
 	
 	/**

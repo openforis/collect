@@ -38,6 +38,7 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 	private final CollectSurvey packagedSurvey;
 	private final CollectSurvey existingSurvey;
 	private boolean validateRecords;
+	private boolean ignoreDuplicateRecordKeyValidationErrors;
 	
 	//internal
 	private NewBackupFileExtractor backupFileExtractor;
@@ -46,11 +47,12 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 	private RecordUserLoader recordUserLoader;
 	
 	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, 
-			CollectSurvey existingSurvey, UserManager userManager, boolean validateRecords) {
+			CollectSurvey existingSurvey, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		this.file = file;
 		this.packagedSurvey = packagedSurvey;
 		this.existingSurvey = existingSurvey;
 		this.validateRecords = validateRecords;
+		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 		this.recordUserLoader = new RecordUserLoader(userManager);
 	}
 	
@@ -65,6 +67,7 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 		this.backupFileExtractor.init(progressListener);
 		this.dataUnmarshaller = new DataUnmarshaller(existingSurvey == null ? packagedSurvey : existingSurvey, packagedSurvey);
 		this.dataUnmarshaller.setRecordValidationEnabled(validateRecords);
+		this.dataUnmarshaller.setIgnoreDuplicateRecordKeyValidationErrors(ignoreDuplicateRecordKeyValidationErrors);
 		this.recordUpdater = new RecordUpdater();
 		this.recordUpdater.setValidateAfterUpdate(validateRecords);
 	}
