@@ -81,23 +81,51 @@ package org.openforis.collect.metamodel.proxy {
 			}
 		}
 		
+		public function traverseBFSSingleEntities(funct:Function):void {
+			var queue:Queue = new Queue();
+			queue.pushAll(childDefinitions.toArray());
+			while ( ! queue.isEmpty() ) {
+				var nodeDef:NodeDefinitionProxy = queue.pop();
+				funct(nodeDef);
+				if ( nodeDef is EntityDefinitionProxy && ! (nodeDef.multiple)) {
+					queue.pushAll(EntityDefinitionProxy(nodeDef).childDefinitions.toArray());
+				}
+			}
+		}
+		
+		public function traverseBFS(funct:Function):void {
+			var queue:Queue = new Queue();
+			queue.pushAll(childDefinitions.toArray());
+			while ( ! queue.isEmpty() ) {
+				var nodeDef:NodeDefinitionProxy = queue.pop();
+				funct(nodeDef);
+				if ( nodeDef is EntityDefinitionProxy) {
+					queue.pushAll(EntityDefinitionProxy(nodeDef).childDefinitions.toArray());
+				}
+			}
+		}
+		
 		/**
 		 * Returns all the key attribute definitions of this entity
 		 * (it looks for key attribute defitions even in nested single entities)
 		 */
 		public function get keyAttributeDefinitions():IList {
 			var result:ArrayCollection = new ArrayCollection();
-			var queue:Queue = new Queue();
-			queue.pushAll(childDefinitions.toArray());
-			while ( ! queue.isEmpty() ) {
-				var nodeDef:NodeDefinitionProxy = queue.pop();
-				if ( nodeDef is AttributeDefinitionProxy && AttributeDefinitionProxy(nodeDef).key ) {
-					result.addItem(nodeDef);
-				} else if ( nodeDef is EntityDefinitionProxy && ! (nodeDef.multiple) ) {
-					var singleEntity:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
-					queue.pushAll(singleEntity.childDefinitions.toArray());
+			traverseBFSSingleEntities(function(defn:NodeDefinitionProxy):void {
+				if ( defn is AttributeDefinitionProxy && AttributeDefinitionProxy(defn).key ) {
+					result.addItem(defn);
 				}
-			}
+			});
+			return result;
+		}
+		
+		public function get countableDefinitions():IList {
+			var result:ArrayCollection = new ArrayCollection();
+			traverseBFS(function(defn:NodeDefinitionProxy):void {
+				if (defn is EntityDefinitionProxy && EntityDefinitionProxy(defn).countInSummaryList) {
+					result.addItem(defn);
+				}
+			});
 			return result;
 		}
 		
