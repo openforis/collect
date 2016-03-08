@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.openforis.idm.metamodel.AttributeDefinition;
 
 /**
@@ -62,4 +63,12 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 	protected abstract List<String> generateSingleAttributeColumnHeadings();
 
 	protected abstract List<String> generateAttributeColumnHeadings(int i);
+	
+	@Override
+	public String toString() {
+		return new ToStringBuilder(null)
+			.append("Attribute", getAttributeName())
+			.append("Column headings", getColumnHeadings())
+			.build();
+	}
 }
