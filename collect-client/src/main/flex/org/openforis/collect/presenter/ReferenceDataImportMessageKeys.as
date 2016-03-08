@@ -9,6 +9,9 @@ package org.openforis.collect.presenter
 		public function get COMPLETED():String {
 			return "referenceDataImport.completed";
 		}
+		public function get COMPLETED_IN_PERCENTAGE():String {
+			return "referenceDataImport.completed.percentage";
+		}
 		public function get IMPORTING_PROGRESS_LABEL():String {
 			return "referenceDataImport.importingProgressLabel";
 		}
