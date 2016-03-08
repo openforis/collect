@@ -166,13 +166,14 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
 		p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
 		p.put("inner_point_side", "2");
-		p.put("open_bing_maps", "true");
-		p.put("open_earth_engine", "true");
-		p.put("open_here_maps", "true");
-		p.put("open_gee_playground", "true");
 		p.put("db_driver", "SQLITE");
 		p.put("use_browser", "chrome");
 		p.put("ui_language", language);
+		p.put("bing_maps_key", getBingMapsKey(survey));
+		p.put("open_bing_maps", isBingMapsEnabled(survey));
+		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
+		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
+		p.put("open_street_view", isStreetViewEnabled(survey));
 
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
@@ -180,6 +181,31 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return file;
 	}
 
+	private String getBingMapsKey(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.getBingMapsKey();
+	}
+	
+	private String isBingMapsEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isBingMapsEnabled()?"true":"false";
+	}
+	
+	private String isGEEExplorerEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isGEEExplorerEnabled()?"true":"false";
+	}
+	
+	private String isGEECodeEditorEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isGEECodeEditorEnabled()?"true":"false";
+	}
+	
+	private String isStreetViewEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isStreetViewEnabled()?"true":"false";
+	}
+	
 	private int calculateFrameDistance(CollectSurvey survey) {
 		CollectAnnotations annotations = survey.getAnnotations();
 		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR);
