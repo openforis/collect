@@ -31,6 +31,8 @@ public interface UIOptionsConstants {
 	String VISIBLE_FIELDS = "visibleFields";
 	String SHOW_ALLOWED_VALUES_PREVIEW = "showAllowedValuesPreview";
 	String SHOW_CODE = "showCode";
+	String SHOW_FAMILY = "showFamily";
+	String INCLUDE_UNIQUE_VERNACULAR_NAME = "includeUniqueVernacularName";
 	String HIDE = "hide";
 	String COLUMN = "column";
 	String COLUMN_SPAN = "columnSpan";

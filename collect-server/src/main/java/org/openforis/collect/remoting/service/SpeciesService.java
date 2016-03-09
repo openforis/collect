@@ -14,6 +14,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.model.proxy.TaxonomyProxy;
+import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -103,16 +104,14 @@ public class SpeciesService {
 	public List<TaxonOccurrenceProxy> findByCode(String taxonomyName, String searchString, int maxResults) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
 		List<TaxonOccurrence> list = speciesManager.findByCode(taxonomy.getId(), searchString, maxResults);
-		List<TaxonOccurrenceProxy> result = TaxonOccurrenceProxy.fromList(list);
-		return result;
+		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByScientificName(String taxonomyName, String searchString, int maxResults) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByScientificName(taxonomy.getId(), searchString, maxResults);
-		List<TaxonOccurrenceProxy> result = TaxonOccurrenceProxy.fromList(list);
-		return result;
+		List<TaxonOccurrence> list = speciesManager.findByScientificName(taxonomy.getId(), searchString, maxResults, true, true);
+		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
@@ -122,10 +121,9 @@ public class SpeciesService {
 		Node<? extends NodeDefinition> attr = activeRecord.getNodeByInternalId(nodeId);
 		if ( attr instanceof TaxonAttribute ) {
 			List<TaxonOccurrence> list = speciesManager.findByVernacularName(taxonomy.getId(), (TaxonAttribute) attr, searchString, maxResults);
-			List<TaxonOccurrenceProxy> result = TaxonOccurrenceProxy.fromList(list);
-			return result;
+			return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 		} else {
-			throw new IllegalArgumentException("TaxonAttribute expected");
+			throw new IllegalArgumentException("TaxonAttribute expected, found: " + attr.getClass().getName());
 		}
 	}
 	

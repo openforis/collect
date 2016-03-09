@@ -4,7 +4,8 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				  inputFields="{[codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageAutocomplete, languageVarietyTextInput]}" 
+				  inputFields="{[codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageAutocomplete, languageVarietyTextInput,
+				  	familyCodeTextInput, familyScientificNameTextInput]}" 
 				  xmlns:component="org.openforis.collect.ui.component.*"
 				  >
 	<fx:Script>
@@ -34,6 +35,28 @@
 	</detail:states>
 	
 	<s:HGroup includeIn="horizontal" gap="{UIBuilder.COMPOSITE_ATTRIBUTE_H_GAP}">
+		<input:StringInputField id="familyCodeTextInput" 
+								includeIn="horizontal"
+								attributeDefinition="{attributeDefinition}"
+								parentEntity="{parentEntity}"
+								attribute="{attribute}"
+								fieldIndex="5"
+								visible="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
+								includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
+								width="{CODE_WIDTH}" 
+								maxChars="32" 
+								/>
+		<input:StringInputField id="familyScientificNameTextInput" 
+								includeIn="horizontal"
+								attributeDefinition="{attributeDefinition}"
+								parentEntity="{parentEntity}"
+								attribute="{attribute}"
+								fieldIndex="6"								
+								visible="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
+								includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
+								width="{SCIENTIFIC_NAME_WIDTH}" 
+								maxChars="255" 
+								/>
 		<input:StringInputField id="codeTextInput" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"

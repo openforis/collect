@@ -55,5 +55,15 @@ public class TaxonAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	public boolean isLanguageVarietyVisible() {
 		return isFieldVisible(TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME);
 	}
+	
+	@ExternalizedProperty
+	public boolean isShowFamily() {
+		return getAnnotations().isShowFamily(attributeDefn);
+	}
+
+	@ExternalizedProperty
+	public boolean isIncludeUniqueVernacularName() {
+		return getAnnotations().isIncludeUniqueVernacularName(attributeDefn);
+	}
 
 }

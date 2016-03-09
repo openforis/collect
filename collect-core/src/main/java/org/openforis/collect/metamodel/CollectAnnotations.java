@@ -14,6 +14,7 @@ import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.Annotatable;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
@@ -55,6 +56,8 @@ public class CollectAnnotations {
 		CODE_ATTRIBUTE_LAYOUT_DIRECTION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DIRECTION), "vertical"),
 		CODE_ATTRIBUTE_LAYOUT_TYPE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT_TYPE), CodeAttributeLayoutType.TEXT),
 		CODE_ATTRIBUTE_SHOW_CODE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_CODE), true),
+		TAXON_ATTRIBUTE_SHOW_FAMILY(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_FAMILY), true),
+		TAXON_ATTRIBUTE_INCLUDE_UNIQUE_VERNACULAR_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.INCLUDE_UNIQUE_VERNACULAR_NAME), true),
 		WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.WIDTH)),
 		LABEL_WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_WIDTH)),
 		LABEL_ORIENTATION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_ORIENTATION), Orientation.HORIZONTAL),
@@ -157,6 +160,22 @@ public class CollectAnnotations {
 	
 	public void setEditable(AttributeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.EDITABLE, value);
+	}
+	
+	public boolean isShowFamily(TaxonAttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.TAXON_ATTRIBUTE_SHOW_FAMILY);
+	}
+	
+	public void setShowFamily(TaxonAttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.TAXON_ATTRIBUTE_SHOW_FAMILY, value);
+	}
+	
+	public boolean isIncludeUniqueVernacularName(TaxonAttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.TAXON_ATTRIBUTE_INCLUDE_UNIQUE_VERNACULAR_NAME);
+	}
+	
+	public void setIncludeUniqueVernacularName(TaxonAttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.TAXON_ATTRIBUTE_INCLUDE_UNIQUE_VERNACULAR_NAME, value);
 	}
 	
 	public boolean isFromCollectEarthCSV(AttributeDefinition defn) {
