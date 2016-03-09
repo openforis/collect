@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.List;
+
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Node;
@@ -57,6 +59,15 @@ public class DateAttributeDefinition extends AttributeDefinition {
 		} else {
 			return Date.parse((String) val);
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) new Date(
+				Integer.parseInt(fieldValues.get(0)), 
+				Integer.parseInt(fieldValues.get(1)), 
+				Integer.parseInt(fieldValues.get(2)));
 	}
 	
 	@Override

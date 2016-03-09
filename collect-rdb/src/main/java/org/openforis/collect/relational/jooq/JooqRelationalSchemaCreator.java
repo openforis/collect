@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jooq.Condition;
+import org.jooq.CreateIndexFinalStep;
 import org.jooq.CreateTableAsStep;
 import org.jooq.DataType;
 import org.jooq.Field;
@@ -132,10 +133,10 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			if (table instanceof CodeTable) {
 				org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
 				CodeListCodeColumn codeColumn = ((CodeTable) table).getCodeColumn();
-				dsl.createIndex(table.getName() + "_code_idx")
+				CreateIndexFinalStep createIndexStep = dsl.createIndex(table.getName() + "_code_idx")
 					.unique()
-					.on(jooqTable, field(codeColumn.getName()))
-					.execute();
+					.on(jooqTable, field(codeColumn.getName()));
+				createIndexStep.execute();
 			}
 		}
 	}

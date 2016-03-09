@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.List;
+
 import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.Node;
@@ -79,6 +81,12 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 		} else {
 			return createValue(val.toString());
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) createValue(fieldValues.get(0));
 	}
 	
 	@Override

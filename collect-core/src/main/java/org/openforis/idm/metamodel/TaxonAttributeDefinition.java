@@ -83,8 +83,15 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 		} else if (val instanceof String) {
 			return createValue((String) val);
 		} else {
-		throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException();
+		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) new TaxonOccurrence(Integer.parseInt(fieldValues.get(0)), fieldValues.get(1), fieldValues.get(2),
+				fieldValues.get(3), fieldValues.get(4), fieldValues.get(5));
 	}
 	
 	@Override

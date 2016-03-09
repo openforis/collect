@@ -157,6 +157,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	public abstract <V extends Value> V createValue(Object val);
 	
 	public abstract <V extends Value> V createValue(String string);
+	
+	public abstract <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues);
 
 //	public Set<NodePathPointer> getCheckDependencyPaths() {
 //		Survey survey = getSurvey();

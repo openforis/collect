@@ -1,6 +1,7 @@
 package org.openforis.idm.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -16,6 +17,10 @@ public final class BooleanValue extends AbstractValue {
 	public static final String VALUE_FIELD = "value";
 	
 	private Boolean value;
+	
+	public BooleanValue(List<String> fieldValues) {
+		this(fieldValues == null || fieldValues.isEmpty() ? null : fieldValues.get(0));
+	}
 	
 	public BooleanValue(Boolean value) {
 		this.value = value;

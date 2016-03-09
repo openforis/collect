@@ -4,6 +4,7 @@
 package org.openforis.idm.metamodel;
 
 import java.util.Date;
+import java.util.List;
 
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Time;
@@ -57,6 +58,12 @@ public class TimeAttributeDefinition extends AttributeDefinition {
 		} else {
 			return Time.parseTime(val.toString());
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) new Time(Integer.parseInt(fieldValues.get(0)), Integer.parseInt(fieldValues.get(1)));
 	}
 	
 	@Override

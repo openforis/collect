@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.List;
+
 import org.openforis.idm.model.BooleanAttribute;
 import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Node;
@@ -50,6 +52,12 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 	@Override
 	public BooleanValue createValue(String string) {
 		return new BooleanValue(string);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) createValue(fieldValues.get(0));
 	}
 	
 	@SuppressWarnings("unchecked")

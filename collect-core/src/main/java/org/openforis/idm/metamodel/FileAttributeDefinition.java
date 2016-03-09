@@ -40,7 +40,7 @@ public class FileAttributeDefinition extends AttributeDefinition {
 		this.maxSize = obj.maxSize;
 		this.extensions = CollectionUtils.clone(obj.extensions);
 	}
-
+	
 	public Integer getMaxSize() {
 		return this.maxSize;
 	}
@@ -107,6 +107,12 @@ public class FileAttributeDefinition extends AttributeDefinition {
 		} else {
 			throw new UnsupportedOperationException();
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) new File(fieldValues.get(0), Long.parseLong(fieldValues.get(1)));
 	}
 	
 	@Override

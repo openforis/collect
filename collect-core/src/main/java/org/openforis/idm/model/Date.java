@@ -28,7 +28,7 @@ public final class Date extends AbstractValue {
 	private final Integer day;
 	private final Integer month;
 	private final Integer year;
-	
+
 	public Date(Integer year, Integer month, Integer day) {
 		this.year = year;
 		this.month = month;

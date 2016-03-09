@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.IntegerRangeAttribute;
@@ -69,6 +71,19 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		throw new RuntimeException("Invalid range type " + getType());
 	}
 	
+	public NumericRange<? extends Number> createValue(String from, String to) {
+		if ( StringUtils.isBlank(from) && StringUtils.isBlank(to) ) {
+			return null;
+		} 
+		Unit unit = getDefaultUnit();
+		if (isInteger()) {
+			return new IntegerRange(Integer.parseInt(from), Integer.parseInt(to), unit);
+		} else if (isReal()) {
+			return new RealRange(Double.parseDouble(from), Double.parseDouble(to), unit);
+		}
+		throw new RuntimeException("Invalid range type " + getType());
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public NumericRange<? extends Number> createValue(Object val) {
@@ -77,6 +92,12 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		} else {
 			return createValue(val.toString());
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) createValue(fieldValues.get(0), fieldValues.get(1));
 	}
 	
 	@Override

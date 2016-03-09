@@ -19,15 +19,14 @@ public final class Code extends AbstractValue {
 	private final String qualifier;
 
 	public Code(String code) {
-		this.code = code;
-		this.qualifier = null;
+		this(code, null);
 	}
 
 	public Code(String code, String qualifier) {
 		this.code = code;
 		this.qualifier = qualifier;
 	}
-
+	
 	public int compareTo(Value o) {
 		if ( o instanceof Code ) {
 			CompareToBuilder compareToBuilder = new CompareToBuilder();

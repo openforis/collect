@@ -24,11 +24,11 @@ import org.openforis.collect.io.data.csv.AutomaticColumnProvider;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.csv.ColumnProvider;
 import org.openforis.collect.io.data.csv.ColumnProviderChain;
+import org.openforis.collect.io.data.csv.ColumnProviders;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
 import org.openforis.collect.io.data.csv.NodePositionColumnProvider;
 import org.openforis.collect.io.data.csv.PivotExpressionColumnProvider;
-import org.openforis.collect.io.data.csv.SingleFieldAttributeColumnProvider;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
@@ -253,8 +253,9 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			//include only key attributes
 			List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
 			for (AttributeDefinition keyDefn : keyAttrDefns) {
-				String columnName = calculateAncestorKeyColumnName(keyDefn, false);
-				SingleFieldAttributeColumnProvider keyColumnProvider = new SingleFieldAttributeColumnProvider(configuration, keyDefn, columnName);
+//				String columnName = calculateAncestorKeyColumnName(keyDefn, false);
+//				SingleFieldAttributeColumnProvider keyColumnProvider = new SingleFieldAttributeColumnProvider(configuration, keyDefn, columnName);
+				ColumnProvider keyColumnProvider = ColumnProviders.createAttributeProvider(configuration, keyDefn);
 				providers.add(keyColumnProvider);
 			}
 			if ( isPositionColumnRequired(entityDefn) ) {
@@ -272,8 +273,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	
 	private ColumnProvider createPositionColumnProvider(EntityDefinition entityDefn) {
 		String columnName = calculatePositionColumnName(entityDefn);
-		NodePositionColumnProvider columnProvider = new NodePositionColumnProvider(columnName);
-		return columnProvider;
+		return new NodePositionColumnProvider(columnName);
 	}
 	
 	private String calculateAncestorKeyColumnName(AttributeDefinition attrDefn, boolean includeAllAncestors) {
