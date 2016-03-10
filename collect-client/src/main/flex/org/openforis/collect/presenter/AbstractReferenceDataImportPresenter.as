@@ -342,7 +342,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateViewProcessComplete():void {
-			AlertUtil.showMessage(_messageKeys.COMPLETED, [_state.processed, _state.total]);
+			var messageKey:String = _state.total == 100 ? _messageKeys.COMPLETED_IN_PERCENTAGE : _messageKeys.COMPLETED; 
+			AlertUtil.showMessage(messageKey, [_state.processed, _state.total]);
 			backToDefaultView();
 			_recordsOffset = 0;
 			loadSummaries();

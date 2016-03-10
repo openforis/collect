@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.CollectCreateIndexStep;
 import org.jooq.Condition;
 import org.jooq.CreateTableAsStep;
 import org.jooq.DataType;
@@ -30,6 +31,7 @@ import org.openforis.collect.relational.model.PrimaryKeyConstraint;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
 
 /**
  * 
@@ -132,8 +134,12 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			if (table instanceof CodeTable) {
 				org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
 				CodeListCodeColumn codeColumn = ((CodeTable) table).getCodeColumn();
-				dsl.createIndex(table.getName() + "_code_idx")
-					.unique()
+				Integer levelIdx = ((CodeTable) table).getLevelIdx();
+				CollectCreateIndexStep createIndexStep = dsl.createIndex(table.getName() + "_code_idx");
+				if (levelIdx == null || levelIdx == 0 || ((CodeTable) table).getCodeList().getCodeScope() == CodeScope.SCHEME) {
+					createIndexStep.unique();
+				}
+				createIndexStep
 					.on(jooqTable, field(codeColumn.getName()))
 					.execute();
 			}

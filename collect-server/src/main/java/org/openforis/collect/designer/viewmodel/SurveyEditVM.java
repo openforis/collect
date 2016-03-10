@@ -382,12 +382,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 		job.setRecordFilter(recordFilter);
 		job.setAlwaysGenerateZipFile(true);
 		jobManager.start(job, false);
-		File outputFile = job.getOutputFile();
-		String dateStr = Dates.formatLocalDateTime(new Date());
-		String fileName = String.format(DATA_IMPORT_TEMPLATE_FILE_NAME_PATTERN, survey.getName(), dateStr, "zip");
-		String contentType = URLConnection.guessContentTypeFromName(fileName);
-		FileInputStream is = new FileInputStream(outputFile);
-		Filedownload.save(is, contentType, fileName);
+		if (job.isCompleted()) {
+			File outputFile = job.getOutputFile();
+			String dateStr = Dates.formatLocalDateTime(new Date());
+			String fileName = String.format(DATA_IMPORT_TEMPLATE_FILE_NAME_PATTERN, survey.getName(), dateStr, "zip");
+			String contentType = URLConnection.guessContentTypeFromName(fileName);
+			FileInputStream is = new FileInputStream(outputFile);
+			Filedownload.save(is, contentType, fileName);
+		} else {
+			throw new RuntimeException("Error generating the CSV data export template: " + job.getErrorMessage(), 
+					job.getLastException());
+		}
 	}
 	
 	@GlobalCommand

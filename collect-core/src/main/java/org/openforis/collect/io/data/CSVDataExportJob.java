@@ -207,8 +207,10 @@ public class CSVDataExportJob extends Job {
 			EntityDefinition ancestorDefn = (EntityDefinition) entityDefn.getParentDefinition();
 			int depth = 1;
 			while ( ancestorDefn != null ) {
-				ColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(ancestorDefn, depth);
-				columnProviders.add(0, parentKeysColumnsProvider);
+				if (ancestorDefn.isMultiple()) {
+					ColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(ancestorDefn, depth);
+					columnProviders.add(0, parentKeysColumnsProvider);
+				}
 				ancestorDefn = ancestorDefn.getParentEntityDefinition();
 				depth++;
 			}
@@ -256,7 +258,6 @@ public class CSVDataExportJob extends Job {
 		private String calculatePositionColumnName(EntityDefinition nodeDefn) {
 			return "_" + nodeDefn.getName() + "_position";
 		}
-		
 	}
 	
 	public static class EntryNameGenerator {

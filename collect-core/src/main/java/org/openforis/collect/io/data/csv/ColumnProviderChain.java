@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.openforis.idm.model.Node;
 
 /**
@@ -65,10 +66,14 @@ public class ColumnProviderChain extends BasicColumnProvider {
 	}
 	
 	protected List<String> emptyValues() {
-		ArrayList<String> v = new ArrayList<String>();
-		for (int i = 0; i < getColumnHeadings().size(); i++) {
-			v.add("");
-		}
-		return v;
+		return Collections.nCopies(headings.size(), "");
+	}
+	
+	@Override
+	public String toString() {
+		return new ToStringBuilder(null)
+				.append("Column provider chain")
+				.append("providers: " + getColumnProviders())
+				.build();
 	}
 }
