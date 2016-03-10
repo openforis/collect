@@ -41,6 +41,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -174,11 +175,20 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
 		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
 		p.put("open_street_view", isStreetViewEnabled(survey));
+		p.put("coordinates_reference_system", getSRSUsed(survey));
 
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
 		p.store(writer, null);
 		return file;
+	}
+
+	private String getSRSUsed(CollectSurvey survey) {
+		List<SpatialReferenceSystem> spatialReferenceSystems = survey.getSpatialReferenceSystems();
+		if( spatialReferenceSystems == null || spatialReferenceSystems.size() != 1 ){
+			throw new IllegalArgumentException("Yoy must use one single Spatial Reference System in your survey");
+		}
+		return spatialReferenceSystems.get(0).getId();
 	}
 
 	private String getBingMapsKey(CollectSurvey survey){
