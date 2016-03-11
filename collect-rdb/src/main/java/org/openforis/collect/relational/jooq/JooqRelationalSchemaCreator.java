@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.jooq.CollectCreateIndexStep;
 import org.jooq.Condition;
-import org.jooq.CreateIndexFinalStep;
 import org.jooq.CreateTableAsStep;
 import org.jooq.DataType;
 import org.jooq.Field;
