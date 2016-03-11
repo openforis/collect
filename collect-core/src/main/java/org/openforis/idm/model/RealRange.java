@@ -13,6 +13,7 @@ import org.openforis.idm.metamodel.Unit;
 public final class RealRange extends NumericRange<Double> {
 
 	private static final Pattern PATTERN = Pattern.compile("(-?\\d+(\\.\\d+)?)(-(-?\\d+(\\.\\d+)?))?");
+	private static final String INTERNAL_STRING_FORMAT = "%f - %f";
 
 	public RealRange(Double value, Unit unit) {
 		super(value, value, unit);
@@ -45,10 +46,14 @@ public final class RealRange extends NumericRange<Double> {
 			}
 		}
 	}
-	
+
 	@Override
 	public String toPrettyFormatString() {
-		return String.format("%f - %f", getFrom(), getTo());
+		return toInternalString();
 	}
 	
+	@Override
+	public String toInternalString() {
+		return String.format(INTERNAL_STRING_FORMAT, getFrom(), getTo());
+	}
 }

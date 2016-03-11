@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.lang.Numbers;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
@@ -83,8 +84,15 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 		} else if (val instanceof String) {
 			return createValue((String) val);
 		} else {
-		throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException();
+		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) new TaxonOccurrence(Numbers.toIntegerObject(fieldValues.get(0)), fieldValues.get(1), fieldValues.get(2),
+				fieldValues.get(3), fieldValues.get(4), fieldValues.get(5));
 	}
 	
 	@Override

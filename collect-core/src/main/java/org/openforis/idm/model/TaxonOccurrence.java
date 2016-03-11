@@ -113,6 +113,11 @@ public final class TaxonOccurrence extends AbstractValue {
 
 	@Override
 	public String toPrettyFormatString() {
+		return toInternalString();
+	}
+	
+	@Override
+	public String toInternalString() {
 		if (StringUtils.isNotBlank(vernacularName)) {
 			return String.format("%s - %s - %s[%s]", code, scientificName, vernacularName, languageCode);
 		} else {

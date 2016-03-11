@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.List;
+
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
@@ -63,6 +65,12 @@ public class TextAttributeDefinition extends AttributeDefinition {
 		return val == null ? null : createValue(val.toString());
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) createValue(fieldValues.get(0));
+	}
+	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
 		return fieldDefinitionByName;
@@ -76,6 +84,11 @@ public class TextAttributeDefinition extends AttributeDefinition {
 	@Override
 	public String getMainFieldName() {
 		return VALUE_FIELD;
+	}
+	
+	@Override
+	public boolean isSingleFieldKeyAttribute() {
+		return true;
 	}
 	
 	@Override
