@@ -5,6 +5,7 @@ package org.openforis.idm.metamodel;
 
 import java.util.List;
 
+import org.openforis.commons.lang.Numbers;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Node;
@@ -66,8 +67,8 @@ public class CoordinateAttributeDefinition extends AttributeDefinition  {
 			return null;
 		} else if (fieldValues.size() == 3) {
 			return (V) new Coordinate(
-					Double.parseDouble(fieldValues.get(0)),
-					Double.parseDouble(fieldValues.get(1)),
+					Numbers.toDoubleObject(fieldValues.get(0)),
+					Numbers.toDoubleObject(fieldValues.get(1)),
 					fieldValues.get(2));
 		} else {
 			throw new IllegalArgumentException("Excpected " + 3 + " field values maximum, found: " + fieldValues.size());

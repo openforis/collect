@@ -88,6 +88,11 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
+	public boolean isSingleFieldKeyAttribute() {
+		return true;
+	}
+	
+	@Override
 	public Class<? extends Value> getValueType() {
 		return BooleanValue.class;
 	}

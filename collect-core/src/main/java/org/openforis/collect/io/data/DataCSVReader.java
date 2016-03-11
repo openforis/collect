@@ -26,15 +26,11 @@ import org.openforis.collect.io.metadata.parsing.CSVLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
-import org.openforis.idm.model.Value;
+import org.openforis.idm.model.AbstractValue;
 
 /**
  * @author S. Ricci
@@ -79,30 +75,20 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	protected static List<String> getKeyAttributeColumnNames(
 			EntityDefinition parentEntityDefinition,
 			AttributeDefinition keyAttrDefn) {
-		String prefix = "";
-		NodeDefinition parentDefn = keyAttrDefn.getParentDefinition();
-		if ( parentDefn != parentEntityDefinition ) {
-			prefix += parentDefn.getName() + "_";
-		}
-		if (isSingleFieldKeyDefinition(keyAttrDefn)) {
+		EntityDefinition parentDefn = keyAttrDefn.getParentEntityDefinition();
+		String prefix = parentDefn == parentEntityDefinition ? "" : parentDefn.getName() + "_";
+		if (keyAttrDefn.isSingleFieldKeyAttribute()) {
 			return Arrays.asList(prefix + keyAttrDefn.getName());
 		} else {
 			List<String> fieldNames = keyAttrDefn.getFieldNames();
 			List<String> result = new ArrayList<String>(fieldNames.size());
 			for (String fieldName : fieldNames) {
-				result.add(prefix + fieldName);
+				result.add(prefix + keyAttrDefn.getName() + "_" + fieldName);
 			}
 			return result;
 		}
 	}
 	
-	private static boolean isSingleFieldKeyDefinition(AttributeDefinition keyAttrDefn) {
-		return keyAttrDefn instanceof BooleanAttributeDefinition 
-				|| keyAttrDefn instanceof CodeAttributeDefinition
-				|| keyAttrDefn instanceof NumberAttributeDefinition
-				|| keyAttrDefn instanceof TextAttributeDefinition;
-	}
-
 	protected static String getPositionColumnName(EntityDefinition defn) {
 		return String.format(POSITION_COLUMN_FORMAT, defn.getName());
 	}
@@ -277,7 +263,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 
 		private String extractValue(AttributeDefinition keyDefn) throws ParsingException {
 			List<String> keyAttrColNames = getKeyAttributeColumnNames(parentEntityDefinition, keyDefn);
-			if (isSingleFieldKeyDefinition(keyDefn)) {
+			if (keyDefn.isSingleFieldKeyAttribute()) {
 				return getColumnValue(keyAttrColNames.get(0), false, String.class);
 			} else {
 				List<String> fieldValues = new ArrayList<String>(keyAttrColNames.size());
@@ -286,8 +272,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 					String fieldValue = getColumnValue(keyAttrColName, false, String.class);
 					fieldValues.add(fieldValue);
 				}
-				Value value = keyDefn.createValue(fieldValues);
-				return value.toString();
+				AbstractValue value = keyDefn.createValueFromFieldStringValues(fieldValues);
+				return value == null ? null : value.toInternalString();
 			}
 		}
 

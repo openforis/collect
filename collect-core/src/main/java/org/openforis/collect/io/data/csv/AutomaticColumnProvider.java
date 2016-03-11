@@ -56,7 +56,6 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	}
 	
 	private static void createEntityProviders(CSVExportConfiguration config, EntityDefinition defn, List<ColumnProvider> cols) {
-		String name = defn.getName();
 		if ( defn.isMultiple() ) {
 			if ( defn.isEnumerable() && config.isIncludeEnumeratedEntities() ) {
 				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(config, defn);
@@ -65,8 +64,9 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		} else {
 			ColumnProvider p = new AutomaticColumnProvider(config, defn);
 			List<ColumnProvider> childCols = Arrays.asList(p);
-			String pivotExpression = name;
-			String headingPrefix = name + "_";
+			String entityName = defn.getName();
+			String pivotExpression = entityName;
+			String headingPrefix = entityName + "_";
 			PivotExpressionColumnProvider col = new PivotExpressionColumnProvider(config, pivotExpression, headingPrefix, childCols);
 			cols.add(col);
 		}

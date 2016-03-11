@@ -163,6 +163,11 @@ public final class Time extends AbstractValue {
 	}
 	
 	@Override
+	public String toInternalString() {
+		return toXmlTime();
+	}
+	
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

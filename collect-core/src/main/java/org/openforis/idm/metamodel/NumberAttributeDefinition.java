@@ -123,6 +123,11 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 		return VALUE_FIELD;
 	}
 	
+	@Override
+	public boolean isSingleFieldKeyAttribute() {
+		return true;
+	}
+	
 	public FieldDefinition<?> getValueFieldDefinition() {
 		switch(getType()) {
 		case INTEGER:

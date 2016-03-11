@@ -6,6 +6,7 @@ package org.openforis.idm.metamodel;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.lang.Numbers;
 import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.IntegerRangeAttribute;
 import org.openforis.idm.model.Node;
@@ -77,9 +78,9 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		} 
 		Unit unit = getDefaultUnit();
 		if (isInteger()) {
-			return new IntegerRange(Integer.parseInt(from), Integer.parseInt(to), unit);
+			return new IntegerRange(Numbers.toIntegerObject(from), Numbers.toIntegerObject(to), unit);
 		} else if (isReal()) {
-			return new RealRange(Double.parseDouble(from), Double.parseDouble(to), unit);
+			return new RealRange(Numbers.toDoubleObject(from), Numbers.toDoubleObject(to), unit);
 		}
 		throw new RuntimeException("Invalid range type " + getType());
 	}

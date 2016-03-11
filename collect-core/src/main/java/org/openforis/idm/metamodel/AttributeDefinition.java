@@ -84,6 +84,10 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		return referencingAttributes;
 	}
 	
+	public boolean isSingleFieldKeyAttribute() {
+		return false;
+	}
+	
 	@Override
 	public boolean isCalculated() {
 		return calculated;

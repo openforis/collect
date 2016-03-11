@@ -47,9 +47,4 @@ public class CoordinateAttribute extends Attribute<CoordinateAttributeDefinition
 		getSrsIdField().setValue(srsId);
 	}
 	
-	@Override
-	public String extractTextValue() {
-		Coordinate coordinate = getValue();
-		return coordinate != null && coordinate.isComplete() ? coordinate.toString() : null;
-	}
 }

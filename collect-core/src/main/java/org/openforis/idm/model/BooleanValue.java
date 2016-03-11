@@ -61,6 +61,11 @@ public final class BooleanValue extends AbstractValue {
 
 	@Override
 	public String toPrettyFormatString() {
+		return toInternalString();
+	}
+	
+	@Override
+	public String toInternalString() {
 		return value == null ? null: value.toString();
 	}
 	

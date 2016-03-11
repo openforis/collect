@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.jooq.tools.StringUtils;
 
 
 /**
@@ -50,6 +51,11 @@ public final class Code extends AbstractValue {
 	@Override
 	public String toPrettyFormatString() {
 		return code == null ? null: code + (qualifier == null ? "": ": " + qualifier);
+	}
+	
+	@Override
+	public String toInternalString() {
+		return StringUtils.defaultIfBlank(code, null);
 	}
 	
 	public String getCode() {

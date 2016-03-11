@@ -87,6 +87,11 @@ public class TextAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
+	public boolean isSingleFieldKeyAttribute() {
+		return true;
+	}
+	
+	@Override
 	public Class<? extends Value> getValueType() {
 		return TextValue.class;
 	}
