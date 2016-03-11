@@ -63,6 +63,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
+import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -489,7 +490,12 @@ public class CSVDataImportJob extends Job {
 			for ( int i = 0; i < keyAttributeDefinitions.size(); i ++ ) {
 				AttributeDefinition keyDefn = keyAttributeDefinitions.get(i);
 				Attribute<?, ?> keyAttr = (Attribute<?, ?>) record.findNodeByPath(keyDefn.getPath() ); //for record key attributes, absolute path must be equal to relative path
-				setValueInField(keyAttr, keyDefn.getMainFieldName(), recordKeyValues[i], line.getLineNumber(), null);
+				String value = recordKeyValues[i];
+				if (keyDefn.isSingleFieldKeyAttribute()) {
+					setValueInField(keyAttr, keyDefn.getMainFieldName(), value, line.getLineNumber(), null);
+				} else {
+					setValueInAttribute(keyAttr, value, line.getLineNumber(), null);
+				}
 			}
 		}
 
@@ -623,6 +629,14 @@ public class CSVDataImportJob extends Job {
 			}
 		}
 		
+		private <V extends Value> void setValueInAttribute(Attribute<?, V> keyAttr, String value, long row, String colName) {
+			V val = keyAttr.getDefinition().createValue(value);
+			NodeChangeSet changes = recordUpdater.updateAttribute(keyAttr, val);
+			if (nodeChangeBatchProcessor != null) {
+				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			}
+		}
+		
 		private void setValueInField(Attribute<?, ?> attr, String fieldName, String value, long row, String colName) {
 			if ( attr instanceof NumberAttribute && 
 					(fieldName.equals(NumberAttributeDefinition.UNIT_FIELD) ||
@@ -719,16 +733,14 @@ public class CSVDataImportJob extends Job {
 				recordManager.save(record);
 				record.setStep(Step.ANALYSIS);
 			}
-			recordManager.saveAndRun(record, new Runnable() {
-				public void run() {
-					if (nodeChangeBatchProcessor != null) {
-						nodeChangeBatchProcessor.process(record);
-					}
-				}
-			});
+			performRecordSave(record);
+		}
+
+		private void insertRecord(final CollectRecord record) throws RecordPersistenceException {
+			performRecordSave(record);
 		}
 		
-		private void insertRecord(final CollectRecord record) throws RecordPersistenceException {
+		private void performRecordSave(final CollectRecord record) {
 			recordManager.saveAndRun(record, new Runnable() {
 				public void run() {
 					if (nodeChangeBatchProcessor != null) {
@@ -871,7 +883,7 @@ public class CSVDataImportJob extends Job {
 			setValuesInAttributes(entity, keyValuesByField, colNamesByField, row);
 		}
 		
-				public CSVDataImportInput getInput() {
+		public CSVDataImportInput getInput() {
 			return input;
 		}
 		

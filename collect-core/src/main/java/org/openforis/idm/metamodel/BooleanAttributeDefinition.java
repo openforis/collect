@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.List;
+
 import org.openforis.idm.model.BooleanAttribute;
 import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Node;
@@ -54,6 +56,12 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) createValue(fieldValues.get(0));
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public BooleanValue createValue(Object val) {
 		if (val == null) {
 			return null;
@@ -77,6 +85,11 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 	@Override
 	public String getMainFieldName() {
 		return VALUE_FIELD;
+	}
+	
+	@Override
+	public boolean isSingleFieldKeyAttribute() {
+		return true;
 	}
 	
 	@Override

@@ -308,6 +308,20 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		if (fieldValues == null || fieldValues.isEmpty()) {
+			return null;
+		} else if (fieldValues.size() == 1) {
+			return (V) new Code(fieldValues.get(0));
+		} else if (fieldValues.size() == 2) {
+			return (V) new Code(fieldValues.get(0), fieldValues.get(1));
+		} else {
+			throw new IllegalArgumentException("Excpected " + 2 + " field values maximum, found: " + fieldValues.size());
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public Code createValue(Object val) {
 		return val == null ? null : new Code((String) val);
 	}
@@ -325,6 +339,11 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	@Override
 	public String getMainFieldName() {
 		return CODE_FIELD;
+	}
+	
+	@Override
+	public boolean isSingleFieldKeyAttribute() {
+		return true;
 	}
 	
 	@Override

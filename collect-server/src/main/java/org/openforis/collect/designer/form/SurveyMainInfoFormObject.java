@@ -17,6 +17,11 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String projectName;
 	private String collectEarthSamplePoints;
 	private String collectEarthPlotArea;
+	private String bingMapsKey;
+	private boolean openBingMaps;
+	private boolean openGEEExplorer;
+	private boolean openGEECodeEditor;
+	private boolean openStreetView;
 	
 	@Override
 	public void loadFrom(CollectSurvey source, String languageCode) {
@@ -27,6 +32,11 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		CollectAnnotations annotations = source.getAnnotations();
 		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
+		bingMapsKey = annotations.getBingMapsKey();
+		openBingMaps = annotations.isBingMapsEnabled();
+		openStreetView = annotations.isStreetViewEnabled();
+		openGEEExplorer = annotations.isGEEExplorerEnabled();
+		openGEECodeEditor = annotations.isGEECodeEditorEnabled();
 	}
 
 	protected String toListitemValue(Double number) {
@@ -43,6 +53,11 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		CollectAnnotations annotations = dest.getAnnotations();
 		annotations.setCollectEarthPlotArea(fromListitemValueToDouble(collectEarthPlotArea));
 		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
+		annotations.setBingMapsKey(bingMapsKey);
+		annotations.setBingMapsEnabled( openBingMaps );
+		annotations.setStreetViewEnabled( openStreetView );
+		annotations.setGEECodeEditorEnabled( openGEECodeEditor );
+		annotations.setGEEExplorerEnabled(openGEEExplorer );
 	}
 
 	protected double fromListitemValueToDouble(String value) {
@@ -100,6 +115,46 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	
 	public void setCollectEarthPlotArea(String collectEarthPlotArea) {
 		this.collectEarthPlotArea = collectEarthPlotArea;
+	}
+
+	public String getBingMapsKey() {
+		return bingMapsKey;
+	}
+
+	public void setBingMapsKey(String bingMapsKey) {
+		this.bingMapsKey = bingMapsKey;
+	}
+
+	public boolean isOpenBingMaps() {
+		return openBingMaps;
+	}
+
+	public void setOpenBingMaps(boolean openBingMaps) {
+		this.openBingMaps = openBingMaps;
+	}
+
+	public boolean isOpenGEEExplorer() {
+		return openGEEExplorer;
+	}
+
+	public void setOpenGEEExplorer(boolean openGEEExplorer) {
+		this.openGEEExplorer = openGEEExplorer;
+	}
+
+	public boolean isOpenGEECodeEditor() {
+		return openGEECodeEditor;
+	}
+
+	public void setOpenGEECodeEditor(boolean openGEECodeEditor) {
+		this.openGEECodeEditor = openGEECodeEditor;
+	}
+
+	public boolean isOpenStreetView() {
+		return openStreetView;
+	}
+
+	public void setOpenStreetView(boolean openStreetView) {
+		this.openStreetView = openStreetView;
 	}
 
 }

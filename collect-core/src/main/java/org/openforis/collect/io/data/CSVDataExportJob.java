@@ -17,17 +17,16 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.io.data.csv.AutomaticColumnProvider;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.csv.ColumnProvider;
 import org.openforis.collect.io.data.csv.ColumnProviderChain;
+import org.openforis.collect.io.data.csv.ColumnProviders;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
 import org.openforis.collect.io.data.csv.NodePositionColumnProvider;
 import org.openforis.collect.io.data.csv.PivotExpressionColumnProvider;
-import org.openforis.collect.io.data.csv.SingleFieldAttributeColumnProvider;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -205,37 +204,38 @@ public class CSVDataExportJob extends Job {
 		private List<ColumnProvider> createAncestorsColumnsProvider(EntityDefinition entityDefn) {
 			List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
 			EntityDefinition ancestorDefn = (EntityDefinition) entityDefn.getParentDefinition();
-			int depth = 1;
 			while ( ancestorDefn != null ) {
-				ColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(ancestorDefn, depth);
-				columnProviders.add(0, parentKeysColumnsProvider);
+				if (ancestorDefn.isMultiple()) {
+					ColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(entityDefn, ancestorDefn);
+					columnProviders.add(0, parentKeysColumnsProvider);
+				}
 				ancestorDefn = ancestorDefn.getParentEntityDefinition();
-				depth++;
 			}
 			return columnProviders;
 		}
 		
-		private ColumnProvider createAncestorColumnProvider(EntityDefinition entityDefn, int depth) {
+		private ColumnProvider createAncestorColumnProvider(EntityDefinition contextEntity, EntityDefinition ancestorEntityDefn) {
 			List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
-			String pivotExpression = StringUtils.repeat("parent()", "/", depth);
 			if ( configuration.isIncludeAllAncestorAttributes() ) {
-				AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(configuration, entityDefn.getName() + "_", entityDefn);
+				AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(configuration, ancestorEntityDefn.getName() + "_", ancestorEntityDefn);
 				providers.add(0, ancestorEntityColumnProvider);
 			} else {
 				//include only key attributes
-				List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
+				List<AttributeDefinition> keyAttrDefns = ancestorEntityDefn.getKeyAttributeDefinitions();
 				for (AttributeDefinition keyDefn : keyAttrDefns) {
-					String columnName = calculateAncestorKeyColumnName(keyDefn, false);
-					SingleFieldAttributeColumnProvider keyColumnProvider = new SingleFieldAttributeColumnProvider(configuration, keyDefn, columnName);
-					providers.add(keyColumnProvider);
+					String relativePath = contextEntity.getRelativePath(ancestorEntityDefn);
+					
+					ColumnProvider keyColumnProvider = ColumnProviders.createAttributeProvider(configuration, keyDefn);
+					String headingPrefix = keyDefn.getParentEntityDefinition().getName() + "_";
+					PivotExpressionColumnProvider columnProvider = new PivotExpressionColumnProvider(configuration, relativePath, headingPrefix, keyColumnProvider);
+					providers.add(columnProvider);
 				}
-				if ( isPositionColumnRequired(entityDefn) ) {
-					ColumnProvider positionColumnProvider = createPositionColumnProvider(entityDefn);
+				if ( isPositionColumnRequired(ancestorEntityDefn) ) {
+					ColumnProvider positionColumnProvider = createPositionColumnProvider(ancestorEntityDefn);
 					providers.add(positionColumnProvider);
 				}
 			}
-			ColumnProvider result = new PivotExpressionColumnProvider(configuration, pivotExpression, providers.toArray(new ColumnProvider[0]));
-			return result;
+			return new ColumnProviderChain(configuration, providers);
 		}
 		
 		private boolean isPositionColumnRequired(EntityDefinition entityDefn) {
@@ -248,15 +248,9 @@ public class CSVDataExportJob extends Job {
 			return columnProvider;
 		}
 		
-		private String calculateAncestorKeyColumnName(AttributeDefinition attrDefn, boolean includeAllAncestors) {
-			EntityDefinition parent = attrDefn.getParentEntityDefinition();
-			return parent.getName() + "_" + attrDefn.getName();
-		}
-		
 		private String calculatePositionColumnName(EntityDefinition nodeDefn) {
 			return "_" + nodeDefn.getName() + "_position";
 		}
-		
 	}
 	
 	public static class EntryNameGenerator {

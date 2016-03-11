@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.jooq.tools.StringUtils;
 
 
 /**
@@ -19,15 +20,14 @@ public final class Code extends AbstractValue {
 	private final String qualifier;
 
 	public Code(String code) {
-		this.code = code;
-		this.qualifier = null;
+		this(code, null);
 	}
 
 	public Code(String code, String qualifier) {
 		this.code = code;
 		this.qualifier = qualifier;
 	}
-
+	
 	public int compareTo(Value o) {
 		if ( o instanceof Code ) {
 			CompareToBuilder compareToBuilder = new CompareToBuilder();
@@ -51,6 +51,11 @@ public final class Code extends AbstractValue {
 	@Override
 	public String toPrettyFormatString() {
 		return code == null ? null: code + (qualifier == null ? "": ": " + qualifier);
+	}
+	
+	@Override
+	public String toInternalString() {
+		return StringUtils.defaultIfBlank(code, null);
 	}
 	
 	public String getCode() {

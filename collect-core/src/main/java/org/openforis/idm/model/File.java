@@ -43,6 +43,11 @@ public final class File extends AbstractValue {
 	
 	@Override
 	public String toPrettyFormatString() {
+		return toInternalString();
+	}
+	
+	@Override
+	public String toInternalString() {
 		return filename;
 	}
 	

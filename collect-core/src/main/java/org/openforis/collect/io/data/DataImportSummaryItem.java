@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
@@ -118,7 +119,9 @@ public class DataImportSummaryItem {
 			//new
 			return 1;
 		} else {
-			int modifiedDateCompare = Dates.compareUpToSecondsOnly(record.getModifiedDate(), conflictingRecord.getModifiedDate());
+			int modifiedDateCompare = Dates.compareUpToSecondsOnly(
+					ObjectUtils.defaultIfNull(record.getModifiedDate(), record.getCreationDate()), 
+					ObjectUtils.defaultIfNull(conflictingRecord.getModifiedDate(), conflictingRecord.getCreationDate()));
 			if (modifiedDateCompare >= 0) {
 				int differencePercent = calculateCompletionDifferencePercent();
 				if (modifiedDateCompare == 0 && differencePercent == 0) {

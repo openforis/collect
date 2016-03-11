@@ -15,4 +15,6 @@ public abstract class AbstractValue implements Value {
 
 	public abstract String toPrettyFormatString();
 	
+	public abstract String toInternalString();
+	
 }

@@ -64,7 +64,12 @@ public class CollectAnnotations {
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
 		COLLECT_EARTH_INCLUDE_IN_HEADER(new QName(COLLECT_EARTH_NAMESPACE_URI, "includeinheader"), false),
 		COLLECT_EARTH_PLOT_AREA(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotarea"), 1d),
-		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25) //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
+		COLLECT_EARTH_BING_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "bingKey"), "GENERATE YOUR OWN BING MAPS KEY AT https://www.bingmapsportal.com"),
+		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
+		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false), 
+		COLLECT_EARTH_OPEN_GEE_EXPLORER(new QName(COLLECT_EARTH_NAMESPACE_URI, "openExplorer"), true), 
+		COLLECT_EARTH_OPEN_GEE_CODE_EDITOR(new QName(COLLECT_EARTH_NAMESPACE_URI, "openCodeEditor"), true), 
+		COLLECT_EARTH_OPEN_STREET_VIEW(new QName(COLLECT_EARTH_NAMESPACE_URI, "openStreetView"), false)
 		;
 		
 		private QName qName;
@@ -177,7 +182,51 @@ public class CollectAnnotations {
 	public void setCollectEarthPlotArea(Double value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLOT_AREA, value);
 	}
+	
+	public String getBingMapsKey() {
+		String bingMapsKey = survey.getAnnotation(Annotation.COLLECT_EARTH_BING_KEY.getQName());
+		if (StringUtils.isBlank(bingMapsKey)) {
+			bingMapsKey = Annotation.COLLECT_EARTH_BING_KEY.getDefaultValue();
+		}
+		return bingMapsKey;
+	}
+	
+	public void setBingMapsKey(String value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_BING_KEY, value);
+	}
+	
+	public boolean isBingMapsEnabled() {
+		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS);
+	}
+	
+	public void setBingMapsEnabled( boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS, value);
+	}
+	
+	public boolean isGEEExplorerEnabled() {
+		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_EXPLORER);
+	}
+	
+	public void setGEEExplorerEnabled( boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_EXPLORER, value);
+	}
+	
+	public boolean isGEECodeEditorEnabled() {
+		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR);
+	}
+	
+	public void setGEECodeEditorEnabled( boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR, value);
+	}
 
+	public boolean isStreetViewEnabled() {
+		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_STREET_VIEW);
+	}
+	
+	public void setStreetViewEnabled( boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_STREET_VIEW, value);
+	}
+	
 	public int getCollectEarthSamplePoints() {
 		return getAnnotationIntegerValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS);
 	}
