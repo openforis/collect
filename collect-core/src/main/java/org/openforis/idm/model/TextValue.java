@@ -37,6 +37,11 @@ public final class TextValue extends AbstractValue {
 	
 	@Override
 	public String toPrettyFormatString() {
+		return toInternalString();
+	}
+	
+	@Override
+	public String toInternalString() {
 		return value;
 	}
 	

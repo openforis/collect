@@ -401,8 +401,10 @@ public class CollectRecord extends Record {
 					//TODO throw error in this case?
 					values.add(null);
 				} else {
-					String keyValue = keyNode.extractTextValue();
-					values.add(keyValue);
+					if (keyNode.isFilled()) {
+						String keyValue = keyNode.extractTextValue();
+						values.add(keyValue);
+					}
 				}
 			}
 			rootEntityKeyValues = values;

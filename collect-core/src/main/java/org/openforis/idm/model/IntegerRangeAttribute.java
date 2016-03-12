@@ -10,7 +10,6 @@ import org.openforis.idm.metamodel.Unit;
 public class IntegerRangeAttribute extends NumericRangeAttribute<IntegerRange, Integer> {
 
 	private static final long serialVersionUID = 1L;
-	private static final String TEXT_VALUE_FORMAT = "%d - %d";
 
 	public IntegerRangeAttribute(RangeAttributeDefinition definition) {
 		super(definition);
@@ -24,9 +23,4 @@ public class IntegerRangeAttribute extends NumericRangeAttribute<IntegerRange, I
 		return new IntegerRange(from, to, unit);
 	}
 	
-	@Override
-	public String extractTextValue() {
-		return String.format(TEXT_VALUE_FORMAT, this.getFrom(), this.getTo());
-	}
-
 }

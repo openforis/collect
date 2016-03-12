@@ -97,6 +97,11 @@ public final class Coordinate extends AbstractValue {
 	public String toString() {
 		return toPrettyFormatString();
 	}
+	
+	@Override
+	public String toInternalString() {
+		return toPrettyFormatString();
+	}
 
 	@Override
 	public int hashCode() {

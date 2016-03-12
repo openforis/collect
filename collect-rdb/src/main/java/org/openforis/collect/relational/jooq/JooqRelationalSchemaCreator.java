@@ -135,8 +135,10 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 				org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
 				CodeListCodeColumn codeColumn = ((CodeTable) table).getCodeColumn();
 				Integer levelIdx = ((CodeTable) table).getLevelIdx();
+				
 				CollectCreateIndexStep createIndexStep = dsl.createIndex(table.getName() + "_code_idx");
 				if (levelIdx == null || levelIdx == 0 || ((CodeTable) table).getCodeList().getCodeScope() == CodeScope.SCHEME) {
+					//unique index only for first level or when the code scope is 'scheme'
 					createIndexStep.unique();
 				}
 				createIndexStep
