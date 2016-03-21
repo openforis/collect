@@ -32,6 +32,7 @@ public class Resources {
 	
 	public enum Component {
 		SELECT_LANGUAGE_POP_UP("survey_edit/select_language_popup.zul"),
+		SURVEY_FILE_POPUP("survey_edit/survey_file.zul"), 
 		COLLECT_EARTH_PREVIEW_POPUP("survey_edit/collect_earth_preview_popup.zul"),
 		PREVIEW_PREFERENCES_POP_UP("survey_edit/preview_preferences_popup.zul"),
 		PREVIEW_POP_UP("survey_edit/preview_popup.zul"),

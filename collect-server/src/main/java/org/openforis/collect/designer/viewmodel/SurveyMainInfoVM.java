@@ -3,17 +3,25 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveyFile;
+import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.zkoss.bind.Binder;
+import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Window;
 
 /**
  * 
@@ -24,6 +32,12 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	
 	@WireVariable
 	private SurveyManager surveyManager;
+	
+	private boolean editingNewSurveyFile;
+	private SurveyFile editedSurveyFile;
+	private SurveyFile selectedSurveyFile;
+
+	private Window surveyFilePopUp;
 	
 	@Init(superclass=false)
 	public void init(@ContextParam(ContextType.BINDER) Binder binder) {
@@ -63,6 +77,7 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	@Override
 	protected void moveSelectedItemInSurvey(int indexTo) {}
 
+	
 	public SurveyManager getSurveyManager() {
 		return surveyManager;
 	}
@@ -70,4 +85,60 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	public Integer getEditedSurveyPublishedId() {
 		return getSessionStatus().getPublishedSurveyId();
 	}
+	
+	public String getSurveyFileTypeLabel(SurveyFile surveyFile) {
+		SurveyFileType type = surveyFile.getType();
+		return Labels.getLabel("survey.survey_file.type." + type.name());
+	}
+	
+	public String getSurveyFileName(SurveyFile surveyFile) {
+		return surveyFile.getFilename();
+	}
+	
+	public List<SurveyFile> getSurveyFiles() {
+		return survey == null ? null : surveyManager.loadSurveyFiles(survey);
+	}
+	
+	@Command
+	public void addSurveyFile() {
+		editedSurveyFile = new SurveyFile(survey);
+		editingNewSurveyFile = true;
+		openSurveyFileEditPopUp();
+	}
+	
+	@Command
+	public void editSelectedSurveyFile() {
+		if (selectedSurveyFile == null) {
+			return;
+		}
+	}
+	
+	private void openSurveyFileEditPopUp() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("newItem", editingNewSurveyFile);
+		args.put("surveyFile", editedSurveyFile);
+		surveyFilePopUp = openPopUp(Resources.Component.SURVEY_FILE_POPUP.getLocation(), true, args);
+	}
+	
+	private void closeSurveyFileEditPopUp(Binder binder) {
+		closePopUp(surveyFilePopUp);
+		surveyFilePopUp = null;
+		validateForm(binder);
+	}
+	
+	@Command
+	public void deleteSelectedSurveyFile() {
+		if (selectedSurveyFile == null) {
+			return;
+		}
+	}
+	
+	public SurveyFile getSelectedSurveyFile() {
+		return selectedSurveyFile;
+	}
+
+	public void setSelectedSurveyFile(SurveyFile selectedSurveyFile) {
+		this.selectedSurveyFile = selectedSurveyFile;
+	}
+	
 }

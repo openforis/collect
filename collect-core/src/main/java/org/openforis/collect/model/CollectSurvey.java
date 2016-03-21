@@ -14,7 +14,9 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
+import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.CodeList;
@@ -37,6 +39,7 @@ public class CollectSurvey extends Survey {
 	private Version collectVersion;
 	private SurveyTarget target;
 	private Integer publishedId;
+	private List<SurveyFile> files;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -46,6 +49,7 @@ public class CollectSurvey extends Survey {
 		this.temporary = false;
 		this.target = SurveyTarget.COLLECT_DESKTOP;
 		this.collectVersion = VERSION;
+		this.files = new ArrayList<SurveyFile>();
 		this.annotations = new CollectAnnotations(this);
 	}
 
@@ -128,6 +132,45 @@ public class CollectSurvey extends Survey {
 			}
 		}
 		return codeLists;
+	}
+
+	public void addFile(SurveyFile file) {
+		files.add(file);
+	}
+	
+	public List<SurveyFile> getFiles(SurveyFileType type) {
+		List<SurveyFile> result = new ArrayList<SurveyFile>();
+		for (SurveyFile surveyFile : files) {
+			if (surveyFile.getType() == type) {
+				result.add(surveyFile);
+			}
+		}
+		return result;
+	}
+	
+	public SurveyFile getFile(String filename) {
+		for (SurveyFile surveyFile : files) {
+			if (filename.equals(surveyFile.getFilename())) {
+				return surveyFile;
+			}
+		}
+		return null;
+	}
+	
+	public boolean removeFile(String filename) {
+		Iterator<SurveyFile> iterator = files.iterator();
+		while(iterator.hasNext()) {
+			SurveyFile surveyFile = iterator.next();
+			if (filename.equals(surveyFile.getFilename())) {
+				iterator.remove();
+				return true;
+			}
+		}
+		return false;
+	}
+		
+	public List<SurveyFile> getFiles() {
+		return CollectionUtils.unmodifiableList(files);
 	}
 	
 	public CollectAnnotations getAnnotations() {
