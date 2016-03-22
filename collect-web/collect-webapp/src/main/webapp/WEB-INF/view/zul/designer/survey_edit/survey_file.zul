@@ -8,6 +8,7 @@
     width="600px" border="normal" position="center" closable="true"
     sclass="form"
     apply="org.zkoss.bind.BindComposer"
+    onClose="@command('close')"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyFileVM')"
     validationMessages="@id('vmsgs')"
     form="@id('fx') 
@@ -37,8 +38,8 @@
                 label="${labels.survey.file.type.generic}"
                 value="GENERIC" />
               <listitem
-                label="${labels.survey.file.type.area_per_attribute}"
-                value="AREA_PER_ATTRIBUTE" />
+                label="${labels.survey.file.type.collect_earth_area_per_attribute}"
+                value="COLLECT_EARTH_AREA_PER_ATTRIBUTE" />
           </listbox>
         </row>
         <row>
@@ -59,7 +60,7 @@
         		<label value="${labels.survey.file.filename}:" />
           	</fieldErrorHandler>
         	<fieldErrorHandler message="@load(vmsgs['filename'])">
-            	<textbox width="150px" value="@bind(fx.filename)"
+            	<textbox width="300px" value="@bind(fx.filename)"
                 	onChange="@command('applyChanges')" />
        		</fieldErrorHandler>
         </row>

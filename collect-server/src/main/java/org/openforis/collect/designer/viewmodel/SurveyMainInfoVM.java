@@ -3,8 +3,10 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.openforis.collect.designer.form.FormObject;
@@ -18,9 +20,11 @@ import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Window;
 
 /**
@@ -88,7 +92,7 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	
 	public String getSurveyFileTypeLabel(SurveyFile surveyFile) {
 		SurveyFileType type = surveyFile.getType();
-		return Labels.getLabel("survey.survey_file.type." + type.name());
+		return Labels.getLabel("survey.file.type." + type.name().toLowerCase(Locale.ENGLISH));
 	}
 	
 	public String getSurveyFileName(SurveyFile surveyFile) {
@@ -111,6 +115,23 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 		if (selectedSurveyFile == null) {
 			return;
 		}
+		editedSurveyFile = selectedSurveyFile;
+		editingNewSurveyFile = false;
+		openSurveyFileEditPopUp();
+	}
+	
+	@Command
+	public void downloadSelectedSurveyFile() {
+		byte[] content = surveyManager.loadSurveyFileContent(selectedSurveyFile);
+		String fileName = selectedSurveyFile.getFilename();
+		String contentType = URLConnection.guessContentTypeFromName(fileName);
+		Filedownload.save(content, contentType, fileName);
+	}
+	
+	@GlobalCommand
+	public void applyChangesToEditedSurveyFile(@ContextParam(ContextType.BINDER) Binder binder) {
+		closeSurveyFileEditPopUp(binder);
+		notifyChange("surveyFiles");
 	}
 	
 	private void openSurveyFileEditPopUp() {
@@ -120,7 +141,8 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 		surveyFilePopUp = openPopUp(Resources.Component.SURVEY_FILE_POPUP.getLocation(), true, args);
 	}
 	
-	private void closeSurveyFileEditPopUp(Binder binder) {
+	@GlobalCommand
+	public void closeSurveyFileEditPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
 		closePopUp(surveyFilePopUp);
 		surveyFilePopUp = null;
 		validateForm(binder);
@@ -131,6 +153,7 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 		if (selectedSurveyFile == null) {
 			return;
 		}
+		surveyManager.deleteSurveyFile(selectedSurveyFile);
 	}
 	
 	public SurveyFile getSelectedSurveyFile() {

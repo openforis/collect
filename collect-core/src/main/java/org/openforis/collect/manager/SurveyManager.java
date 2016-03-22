@@ -934,7 +934,6 @@ public class SurveyManager {
 	public void addSurveyFile(CollectSurvey survey, SurveyFile file, File content) {
 		try {
 			surveyFileDao.insert(file);
-			survey.addFile(file);
 			byte[] contentBytes = FileUtils.readFileToByteArray(content);
 			surveyFileDao.updateContent(file, contentBytes);
 		} catch(Exception e) {
@@ -946,15 +945,25 @@ public class SurveyManager {
 	public void updateSurveyFile(CollectSurvey survey, SurveyFile file, File content) {
 		try {
 			surveyFileDao.update(file);
-			byte[] contentBytes = FileUtils.readFileToByteArray(content);
-			surveyFileDao.updateContent(file, contentBytes);
+			if (content != null) {
+				byte[] contentBytes = FileUtils.readFileToByteArray(content);
+				surveyFileDao.updateContent(file, contentBytes);
+			}
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	public byte[] loadSurveyFileContent(SurveyFile surveyFile) {
+		return surveyFileDao.loadContent(surveyFile);
+	}
+
 	public List<SurveyFile> loadSurveyFiles(CollectSurvey survey) {
 		return surveyFileDao.loadBySurvey(survey);
+	}
+	
+	public void deleteSurveyFile(SurveyFile surveyFile) {
+		surveyFileDao.delete(surveyFile.getId());
 	}
 	
 	protected ProcessStatus getRecordValidationProcessStatus(int surveyId) {
@@ -1026,5 +1035,5 @@ public class SurveyManager {
 	public void setSurveySerializer(CollectSurveyIdmlBinder surveySerializer) {
 		this.surveySerializer = surveySerializer;
 	}
-	
+
 }

@@ -18,8 +18,8 @@ import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
-import org.openforis.collect.persistence.jooq.MappingDSLContext;
-import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
+import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
+import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord;
 
 /**
@@ -27,12 +27,12 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord
  * @author S. Ricci
  *
  */
-public class SurveyFileDao extends MappingJooqDaoSupport<SurveyFile, SurveyFileDao.SurveyFileDSLContext> {
+public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile, SurveyFileDao.SurveyFileDSLContext> {
 	
 	public SurveyFileDao() {
 		super(SurveyFileDSLContext.class);
 	}
-
+	
 	public byte[] loadContent(SurveyFile item) {
 		SurveyFileDSLContext dsl = dsl();
 		ResultQuery<?> selectQuery = dsl.selectByIdQuery(item.getId());
@@ -44,6 +44,7 @@ public class SurveyFileDao extends MappingJooqDaoSupport<SurveyFile, SurveyFileD
 		}
 	}
 	
+	@Override
 	public List<SurveyFile> loadBySurvey(CollectSurvey survey) {
 		SurveyFileDSLContext dsl = dsl(survey);
 		Select<OfcSurveyFileRecord> select = 
@@ -115,18 +116,16 @@ public class SurveyFileDao extends MappingJooqDaoSupport<SurveyFile, SurveyFileD
 		return result == null ? 0: result.intValue();
 	}
 	
-	private SurveyFileDSLContext dsl(CollectSurvey survey) {
-		return new SurveyFileDSLContext(getConfiguration(), survey);
-	}
-
-	public static class SurveyFileDSLContext extends MappingDSLContext<SurveyFile> {
+	public static class SurveyFileDSLContext extends SurveyObjectMappingDSLContext<SurveyFile> {
 
 		private static final long serialVersionUID = 1L;
 		
-		private CollectSurvey survey;
+		public SurveyFileDSLContext(Configuration config) {
+			this(config, null);
+		}
 		
 		public SurveyFileDSLContext(Configuration config, CollectSurvey survey) {
-			super(config, OFC_SURVEY_FILE.ID, OFC_SURVEY_FILE_ID_SEQ, SurveyFile.class);
+			super(config, OFC_SURVEY_FILE.ID, OFC_SURVEY_FILE_ID_SEQ, SurveyFile.class, survey);
 			this.survey = survey;
 		}
 		
@@ -147,15 +146,17 @@ public class SurveyFileDao extends MappingJooqDaoSupport<SurveyFile, SurveyFileD
 		
 		@Override
 		protected void fromObject(SurveyFile o, StoreQuery<?> q) {
+			super.fromObject(o, q);
 			q.addValue(OFC_SURVEY_FILE.SURVEY_ID, o.getSurvey().getId());
 			q.addValue(OFC_SURVEY_FILE.FILENAME, o.getFilename());
-			q.addValue(OFC_SURVEY_FILE.TYPE, o.getType().name());
+			q.addValue(OFC_SURVEY_FILE.TYPE, o.getType().getCode());
 		}
 		
 		@Override
 		protected void fromRecord(Record r, SurveyFile o) {
+			super.fromRecord(r, o);
 			o.setFilename(r.getValue(OFC_SURVEY_FILE.FILENAME));
-			o.setType(SurveyFileType.valueOf(r.getValue(OFC_SURVEY_FILE.TYPE)));
+			o.setType(SurveyFileType.fromCode(r.getValue(OFC_SURVEY_FILE.TYPE)));
 		}
 
 	}

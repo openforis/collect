@@ -9,9 +9,9 @@ import org.zkoss.bind.ValidationContext;
  * @author S. Ricci
  *
  */
-public abstract class SurveyFileFormValidator extends FormValidator {
+public class SurveyFileFormValidator extends FormValidator {
 	
-	protected static final String FILENAME_FIELD = "filename";
+	private static final String FILENAME_FIELD = "filename";
 	private static final Pattern VALID_FILENAME_PATTERN = Pattern.compile("^[\\w-_]+\\.[\\w-_]+$");
 
 	@Override

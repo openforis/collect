@@ -5,11 +5,14 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyFileFormObject;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.commons.io.OpenForisIOUtils;
@@ -31,12 +34,17 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 
 	private static final String APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND = "applyChangesToEditedSurveyFile";
+	private static final String CLOSE_SURVEY_FILE_EDIT_POPUP_GLOBAL_COMMAND = "closeSurveyFileEditPopUp";
+
+	private static final String FILENAME_FIELD = "filename";
 	
 	@WireVariable
 	private SurveyManager surveyManager;
 	
 	private File uploadedFile;
 	private String uploadedFileName;
+
+	private Map<String, String> form = new HashMap<String, String>();
 
 	public SurveyFileVM() {
 		setCommitChangesOnApply(false);
@@ -72,16 +80,20 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 
 	@Override
 	protected void addNewItemToSurvey() {
-		survey.addFile(editedItem);
+		surveyManager.addSurveyFile(survey, editedItem, uploadedFile);
 	}
 
 	@Override
 	protected void deleteItemFromSurvey(SurveyFile item) {
-		survey.removeFile(item.getFilename());
 	}
 	
 	@Override
 	protected void moveSelectedItemInSurvey(int indexTo) {
+	}
+	
+	@Command
+	public void close() {
+		BindUtils.postGlobalCommand(null, null, CLOSE_SURVEY_FILE_EDIT_POPUP_GLOBAL_COMMAND, null);
 	}
 	
 	@Override
@@ -89,33 +101,51 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
 		dispatchApplyChangesCommand(binder);
 		if ( checkCanLeaveForm() ) {
-			super.commitChanges(binder);
-			if (newItem) {
-				surveyManager.addSurveyFile(survey, editedItem, uploadedFile);
+			if (newItem && uploadedFile == null) {
+				MessageUtil.showError("global.file_not_selected");
 			} else {
-				surveyManager.updateSurveyFile(survey, editedItem, uploadedFile);
+				boolean wasNewItem = newItem;
+				super.commitChanges(binder);
+				if (! wasNewItem) {
+					surveyManager.updateSurveyFile(survey, editedItem, uploadedFile);
+				}
+				BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND, null);
 			}
-			BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND, null);
 		}
 	}
 	
 	@Command
-	public void fileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
+	public void fileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event,
+			@ContextParam(ContextType.BINDER) Binder binder) {
  		Media media = event.getMedia();
 		String fileName = media.getName();
 		File tempFile;
 		if (media.isBinary()) {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), FilenameUtils.getExtension(fileName));
+			tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), FilenameUtils.getExtension(fileName));
 		} else {
 			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), FilenameUtils.getExtension(fileName));
 		}
 		this.uploadedFile = tempFile;
 		this.uploadedFileName = fileName;
 		notifyChange("uploadedFileName");
+		updateForm(binder);
 	}
 	
+	private void updateForm(Binder binder) {
+		SurveyFileFormObject formObject = (SurveyFileFormObject) getFormObject();
+		formObject.setFilename(uploadedFileName);
+		notifyChange("formObject");
+	}
+
 	public String getUploadedFileName() {
 		return uploadedFileName;
 	}
 	
+	public Map<String, String> getForm() {
+		return form ;
+	}
+	
+	public void setForm(Map<String, String> form) {
+		this.form = form;
+	}
 }
