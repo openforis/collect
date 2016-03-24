@@ -135,7 +135,6 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	@Command
 	public void typeChanged(@ContextParam(ContextType.BINDER) Binder binder) {
 		updateForm(binder);
-		dispatchApplyChangesCommand(binder);
 	}
 	
 	private void updateForm(Binder binder) {
@@ -152,7 +151,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 					: uploadedFileName;
 		}
 		setValueOnFormField(tempForm, SurveyFileFormObject.FILENAME_FIELD_NAME, filename);
-		notifyChange("fx");
+		dispatchApplyChangesCommand(binder);
 	}
 
 	public String getUploadedFileName() {
