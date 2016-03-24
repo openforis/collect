@@ -159,6 +159,7 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 			@Override
 			public void onOk() {
 				surveyManager.deleteSurveyFile(selectedSurveyFile);
+				notifyChange("surveyFiles");
 			}
 		}, "survey.file.delete.confirm", new String[]{selectedSurveyFile.getFilename()});
 	}

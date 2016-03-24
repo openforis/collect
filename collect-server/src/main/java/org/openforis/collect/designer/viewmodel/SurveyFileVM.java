@@ -134,8 +134,8 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	
 	@Command
 	public void typeChanged(@ContextParam(ContextType.BINDER) Binder binder) {
-		dispatchApplyChangesCommand(binder);
 		updateForm(binder);
+		dispatchApplyChangesCommand(binder);
 	}
 	
 	private void updateForm(Binder binder) {
