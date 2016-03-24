@@ -29,6 +29,7 @@ import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.model.SurveyFile;
+import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.Zip4jFiles;
@@ -167,7 +168,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("balloon", "${project_path}/balloon.html");
 		p.put("metadata_file", "${project_path}/placemark.idm.xml");
 		p.put("template", "${project_path}/kml_template.fmt");
-		p.put("csv", "${project_path}/test_plots.ced");
+		p.put("csv", "${project_path}/" + determineSelectedGridFileName(survey));
 		p.put("sample_shape", "SQUARE");
 		p.put("distance_between_sample_points", String.valueOf(calculateDistanceBetweenSamplePoints(survey)));
 		p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
@@ -186,6 +187,16 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		FileWriter writer = new FileWriter(file);
 		p.store(writer, null);
 		return file;
+	}
+
+	private String determineSelectedGridFileName(CollectSurvey survey) {
+		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);
+		for (SurveyFile surveyFile : surveyFiles) {
+			if (surveyFile.getType() == SurveyFileType.COLLECT_EARTH_GRID) {
+				return GRID_FOLDER_NAME + "/" + surveyFile.getFilename();
+			}
+		}
+		return "test_plots.ced";
 	}
 
 	private String getBingMapsKey(CollectSurvey survey){
