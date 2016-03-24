@@ -966,6 +966,10 @@ public class SurveyManager {
 		surveyFileDao.delete(surveyFile.getId());
 	}
 	
+	public void deleteSurveyFiles(CollectSurvey survey) {
+		surveyFileDao.deleteBySurvey(survey.getId());
+	}
+	
 	protected ProcessStatus getRecordValidationProcessStatus(int surveyId) {
 		ProcessStatus status = recordValidationStatusBySurvey.get(surveyId);
 		return status;

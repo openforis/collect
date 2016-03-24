@@ -15,6 +15,7 @@ import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.metadata.CodeListImagesImportTask;
 import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
+import org.openforis.collect.io.metadata.SurveyFilesImportTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupImportTask;
 import org.openforis.collect.manager.CodeListManager;
@@ -106,6 +107,10 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		if (backupFileExtractor.containsEntry(SurveyBackupJob.DATA_CLEANSING_METADATA_ENTRY_NAME)) {
 			addDataCleansingImportTask();
 		}
+		//add survey files import task
+		if ( backupFileExtractor.containsEntriesInPath(SurveyBackupJob.SURVEY_FILES_FOLDER) ) {
+			addSurveyFilesImportTask();
+		}
 	}
 
 	@Override
@@ -146,6 +151,10 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			SpeciesBackupImportTask t = (SpeciesBackupImportTask) task;
 			t.setSpeciesManager(speciesManager);
 			t.setSurvey(survey);
+		} else if ( task instanceof SurveyFilesImportTask ) {
+			SurveyFilesImportTask t = (SurveyFilesImportTask) task;
+			t.setSurvey(survey);
+			t.setBackupFileExtractor(backupFileExtractor);
 		} else if (task instanceof DataCleansingImportTask) {
 			DataCleansingImportTask t = (DataCleansingImportTask) task;
 			t.setSurvey(survey);
@@ -207,6 +216,11 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		} catch (BeansException e) {
 			//do nothing
 		}
+	}
+
+	private void addSurveyFilesImportTask() {
+		SurveyFilesImportTask task = applicationContext.getBean(SurveyFilesImportTask.class);
+		addTask(task);
 	}
 
 	@Override

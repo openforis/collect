@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
+import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -153,7 +155,12 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 		if (selectedSurveyFile == null) {
 			return;
 		}
-		surveyManager.deleteSurveyFile(selectedSurveyFile);
+		MessageUtil.showConfirm(new ConfirmHandler() {
+			@Override
+			public void onOk() {
+				surveyManager.deleteSurveyFile(selectedSurveyFile);
+			}
+		}, "survey.file.delete.confirm", new String[]{selectedSurveyFile.getFilename()});
 	}
 	
 	public SurveyFile getSelectedSurveyFile() {

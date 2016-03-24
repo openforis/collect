@@ -10,6 +10,10 @@ import org.openforis.collect.model.SurveyFile.SurveyFileType;
  */
 public class SurveyFileFormObject extends FormObject<SurveyFile> {
 	
+	public static final String FILENAME_FIELD_NAME = "filename";
+	public static final String UPLOADED_FILE_NAME_FIELD = "uploadedFileName";
+	public static final String TYPE_FIELD_NAME = "type";
+
 	private String type;
 	private String filename;
 

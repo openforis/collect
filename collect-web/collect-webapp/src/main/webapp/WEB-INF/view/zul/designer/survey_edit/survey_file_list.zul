@@ -21,7 +21,7 @@
       <menuitem tooltiptext="${labels.global.add_item}"
         image="/assets/images/add-small.png"
         onClick="@command('addSurveyFile')" class="icon-button" />
-      <menuitem tooltiptext="${labels.global.global.download}"
+      <menuitem tooltiptext="${labels.global.download}"
         image="/assets/images/download-small.png"
         disabled="@load(empty vm.selectedSurveyFile)"
         onClick="@command('downloadSelectedSurveyFile')" class="icon-button" />

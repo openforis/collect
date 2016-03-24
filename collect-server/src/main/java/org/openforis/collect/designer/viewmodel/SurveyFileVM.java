@@ -12,12 +12,15 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyFileFormObject;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.SurveyFile;
+import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
+import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -35,8 +38,6 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 
 	private static final String APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND = "applyChangesToEditedSurveyFile";
 	private static final String CLOSE_SURVEY_FILE_EDIT_POPUP_GLOBAL_COMMAND = "closeSurveyFileEditPopUp";
-
-	private static final String FILENAME_FIELD = "filename";
 	
 	@WireVariable
 	private SurveyManager surveyManager;
@@ -127,14 +128,31 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		}
 		this.uploadedFile = tempFile;
 		this.uploadedFileName = fileName;
-		notifyChange("uploadedFileName");
+		notifyChange(SurveyFileFormObject.UPLOADED_FILE_NAME_FIELD);
+		updateForm(binder);
+	}
+	
+	@Command
+	public void typeChanged(@ContextParam(ContextType.BINDER) Binder binder) {
+		dispatchApplyChangesCommand(binder);
 		updateForm(binder);
 	}
 	
 	private void updateForm(Binder binder) {
-		SurveyFileFormObject formObject = (SurveyFileFormObject) getFormObject();
-		formObject.setFilename(uploadedFileName);
-		notifyChange("formObject");
+		SimpleForm tempForm = ComponentUtil.getForm(binder.getView());
+		String typeName = (String) tempForm.getField("type");
+		SurveyFileType type = SurveyFileType.valueOf(typeName);
+		String filename;
+		switch(type) {
+		case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
+			filename = SurveyFile.COLLECT_EARTH_AREA_PER_ATTRIBUTE_FILENAME;
+			break;
+		default:
+			filename = uploadedFileName == null ? (String) tempForm.getField(SurveyFileFormObject.FILENAME_FIELD_NAME)
+					: uploadedFileName;
+		}
+		setValueOnFormField(tempForm, SurveyFileFormObject.FILENAME_FIELD_NAME, filename);
+		notifyChange("fx");
 	}
 
 	public String getUploadedFileName() {
@@ -147,5 +165,9 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	
 	public void setForm(Map<String, String> form) {
 		this.form = form;
+	}
+	
+	public SurveyManager getSurveyManager() {
+		return surveyManager;
 	}
 }

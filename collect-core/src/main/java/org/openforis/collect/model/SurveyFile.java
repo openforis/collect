@@ -10,9 +10,12 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
 public class SurveyFile extends PersistedSurveyObject {
 	
 	private static final long serialVersionUID = 1L;
+	
+	public static final String COLLECT_EARTH_AREA_PER_ATTRIBUTE_FILENAME = "area_per_attribute.csv";
 
 	public enum SurveyFileType {
 		COLLECT_EARTH_AREA_PER_ATTRIBUTE("ce_area"),
+		COLLECT_EARTH_GRID("ce_grid"),
 		GENERIC("generic");
 		
 		public static SurveyFileType fromCode(String code) {
