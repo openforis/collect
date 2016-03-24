@@ -83,6 +83,10 @@ public final class Coordinate extends AbstractValue {
 	public String getSrsId() {
 		return srsId;
 	}
+	
+	public void setSrsId( String srsId) {
+		this.srsId = srsId;
+	}
 
 	@Override
 	public String toPrettyFormatString() {
