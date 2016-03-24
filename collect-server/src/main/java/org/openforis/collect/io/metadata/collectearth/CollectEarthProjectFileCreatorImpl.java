@@ -24,9 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
+import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.Zip4jFiles;
@@ -68,9 +70,12 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	private static final double HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR = 10000d;
 	private static final String README_FILE = "README.txt";
+	private static final String GRID_FOLDER_NAME = "grid";
+	
+	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
 		
 	private CodeListManager codeListManager;
-	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
+	private SurveyManager surveyManager;
 	
 	@Override
 	public File create(CollectSurvey survey, String language) throws Exception {
@@ -106,6 +111,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		Zip4jFiles.addFile(zipFile, testPlotsCSVFile, TEST_PLOTS_FILE_NAME, zipParameters);
 		
 		addCodeListImages(zipFile, survey, zipParameters);
+		
+		includeSurveyFiles(zipFile, survey, zipParameters);
 		
 		includeEarthFiles(zipFile, zipParameters);
 		
@@ -434,7 +441,24 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 				EARTH_FILES_FOLDER_NAME, "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
 		return zipImageFileName;
 	}
-
+	
+	private void includeSurveyFiles(ZipFile zipFile, CollectSurvey survey, ZipParameters zipParameters) throws FileNotFoundException, IOException, ZipException {
+		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);
+		for (SurveyFile surveyFile : surveyFiles) {
+			byte[] content = surveyManager.loadSurveyFileContent(surveyFile);
+			File tempSurveyFile = copyToTempFile(content, surveyFile.getFilename());
+			String namePrefix;
+			switch(surveyFile.getType()) {
+			case COLLECT_EARTH_GRID:
+				namePrefix = GRID_FOLDER_NAME + "/";
+				break;
+			default:
+				namePrefix = "";
+			}
+			Zip4jFiles.addFile(zipFile, tempSurveyFile, namePrefix + surveyFile.getFilename(), zipParameters);
+		}
+	}
+	
 	private File copyToTempFile(byte[] content, String fileName) throws IOException, FileNotFoundException {
 		File imageFile = File.createTempFile("collect-earth-project-file-creator", fileName);
 		FileOutputStream fos = new FileOutputStream(imageFile);
@@ -445,5 +469,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 
 	public void setCodeListManager(CodeListManager codeListManager) {
 		this.codeListManager = codeListManager;
+	}
+	
+	public void setSurveyManager(SurveyManager surveyManager) {
+		this.surveyManager = surveyManager;
 	}
 }

@@ -88,7 +88,7 @@ public class SurveyFileFormValidator extends FormValidator {
 				}
 			default:
 				if (RESERVED_FILENAMES.contains(filename)) {
-					addInvalidMessage(ctx, FILENAME_FIELD_NAME, "survey.file.error.reserved_filename");
+					addInvalidMessage(ctx, FILENAME_FIELD_NAME, Labels.getLabel("survey.file.error.reserved_filename"));
 					return false;
 				} else {
 					return true;
@@ -116,7 +116,7 @@ public class SurveyFileFormValidator extends FormValidator {
 		SurveyFileVM vm = (SurveyFileVM) getVM(ctx);
 		CollectSurvey survey = vm.getSurvey();
 		SurveyManager surveyManager = getSurveyManager(ctx);
-		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFiles(survey);
+		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);
 		SurveyFile editedSurveyFile = vm.getEditedItem();
 		for (SurveyFile surveyFile : surveyFiles) {
 			if (! surveyFile.getId().equals(editedSurveyFile.getId())) {

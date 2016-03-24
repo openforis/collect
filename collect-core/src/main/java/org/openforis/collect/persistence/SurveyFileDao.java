@@ -29,6 +29,14 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord
  */
 public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile, SurveyFileDao.SurveyFileDSLContext> {
 	
+	private static final Field<?>[] ALL_FIELDS = new Field<?>[] {
+		OFC_SURVEY_FILE.ID,
+		OFC_SURVEY_FILE.SURVEY_ID, 
+		OFC_SURVEY_FILE.TYPE,
+		OFC_SURVEY_FILE.FILENAME, 
+		OFC_SURVEY_FILE.CONTENT
+	};
+	
 	public SurveyFileDao() {
 		super(SurveyFileDSLContext.class);
 	}
@@ -78,7 +86,7 @@ public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile,
 			.from(OFC_SURVEY_FILE)
 			.where(OFC_SURVEY_FILE.SURVEY_ID.equal(fromSurveyId))
 			.orderBy(OFC_SURVEY_FILE.ID);
-		Insert<OfcSurveyFileRecord> insert = dsl.insertInto(OFC_SURVEY_FILE, selectFields).select(select);
+		Insert<OfcSurveyFileRecord> insert = dsl.insertInto(OFC_SURVEY_FILE, ALL_FIELDS).select(select);
 		insert.execute();
 		restartIdSequence(dsl);
 	}

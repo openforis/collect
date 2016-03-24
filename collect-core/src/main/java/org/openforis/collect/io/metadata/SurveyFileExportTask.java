@@ -29,13 +29,13 @@ public class SurveyFileExportTask extends Task {
 
 	@Override
 	protected long countTotalItems() {
-		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFiles(survey);
+		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);
 		return surveyFiles.size();
 	}
 
 	@Override
 	protected void execute() throws Throwable {
-		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFiles(survey);
+		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);
 		for (SurveyFile surveyFile : surveyFiles) {
 			exportSurveyFile(surveyFile);
 			incrementProcessedItems();

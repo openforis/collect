@@ -958,7 +958,7 @@ public class SurveyManager {
 		return surveyFileDao.loadContent(surveyFile);
 	}
 
-	public List<SurveyFile> loadSurveyFiles(CollectSurvey survey) {
+	public List<SurveyFile> loadSurveyFileSummaries(CollectSurvey survey) {
 		return surveyFileDao.loadBySurvey(survey);
 	}
 	

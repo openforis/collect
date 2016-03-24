@@ -102,7 +102,7 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	}
 	
 	public List<SurveyFile> getSurveyFiles() {
-		return survey == null ? null : surveyManager.loadSurveyFiles(survey);
+		return survey == null ? null : surveyManager.loadSurveyFileSummaries(survey);
 	}
 	
 	@Command
