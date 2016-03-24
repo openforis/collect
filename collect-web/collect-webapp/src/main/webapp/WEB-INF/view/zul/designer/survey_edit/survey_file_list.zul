@@ -2,11 +2,11 @@
   <vlayout>
     <listbox id="checksList" model="@load(vm.surveyFiles)"
       selectedItem="@bind(vm.selectedSurveyFile)"
-      width="600px"
+      width="900px"
       rows="3">
       <listhead>
         <listheader label="${labels.survey.file.type.$}" width="200px" />
-        <listheader label="${labels.survey.file.filename}" width="400px" />
+        <listheader label="${labels.survey.file.filename}" />
       </listhead>
       <template name="model">
         <listitem>
