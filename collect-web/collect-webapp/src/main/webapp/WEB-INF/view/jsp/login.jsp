@@ -8,12 +8,25 @@
   	<meta http-equiv="Pragma" content="no-cache">
   	<script type="text/javascript" src="script/jquery-1.6.2.min.js"></script>
     <script type="text/javascript" src="script/sessionping.js"></script>
+    <script type="text/javascript" src="js/jquery/jquery-i18n-properties/1.2.0/jquery.i18n.properties.js"></script>
+    <script type="text/javascript" src="js/openforis/of.js"></script>
+    <script type="text/javascript" src="js/openforis/of-i18n.js"></script>
+    
 <!--     <script type="text/javascript" src="script/js.cookie-2.0.3.min.js"></script> -->
 <!--     <script type="text/javascript" src="script/of_collect_cookie.js"></script> -->
 	<script type="text/javascript">
 		$(function() {
 			var DOWNLOAD_LOGO_URL = "downloadLogo.htm";
+
+			jQuery.i18n.properties({
+			    name:'messages', 
+			    path:'assets/bundle/', 
+			    mode:'both', // We specified mode: 'both' so translated values will be available as JS vars/functions and as a map
+			    checkAvailableLanguages: true
+			});
 			
+			OF.i18n.initializeAll();
+
 			loadImages(DOWNLOAD_LOGO_URL);
  			
 			checkDefaultPasswordActive();
@@ -68,15 +81,16 @@
 		<div id="internalContainer">
 			<div>
 	    		<c:if test="${not empty param.session_expired}">
-			      <div class="warn">
-			        Your session has expired.<br/>
-			      </div>
+			      <div class="warn" data-i18n="collect.login.session_expired"></div>
+			      <br/>
 			    </c:if>
 			    <c:if test="${param.login_error == 1}">
 			      <div class="error">
-			        Your login attempt was not successful, try again.<br/><br/>
-			        Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/>.
-			      </div>
+			      	<span data-i18n="collect.login.unsuccessfull_login"></span>
+			      	<br/><br/>
+			      	<span data-i18n="collect.login.unsuccessfull_login_reason"></span>
+			        <span>: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/>.</span>
+			       </div>
 			    </c:if>
 	    	</div>
 	    	
@@ -88,21 +102,25 @@
 				<table class="login" width="100%" align="center" style="vertical-align: top; height: 100">
 					<c:if test="${param.logout != null}">
 						<tr>
-							<td>You have been logged out.</td>
+							<td data-i18n="collect.login.logged_out"></td>
 						</tr>
 					</c:if>
 					<tr>
-						<td colspan="2" align="center"><strong style="font-size: 13px;">Please Log In</strong></td>
+						<td colspan="2" align="center"><strong style="font-size: 13px;" data-i18n="collect.login.please_login"></strong></td>
 					</tr>
 					<tr>
-						<td width="50%" align="right">User:</td>
+						<td width="50%" align="right">
+							<span data-i18n="collect.login.username"></span>:
+						</td>
 						<td width="50%" align="left">
 							<input type='text' name='username'
 								value='<c:if test="${param.login_error == 1}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>' />
 						</td>
 					</tr>
 					<tr>
-						<td width="50%" align="right">Password:</td>
+						<td width="50%" align="right">
+							<span data-i18n="collect.login.password"></span>:
+						</td>
 						<td width="50%" align="left">
 							<input type='password' name='password'>
 						</td>
@@ -110,14 +128,14 @@
 					<!-- tr><td><input type="checkbox" name="_spring_security_remember_me"></td><td>Don't ask for my password for two weeks</td></tr-->
 					<tr>
 						<td colspan='2' width="100%" style="text-align: center;">
-							<button type="submit" class="button">Login</button> 
+							<button type="submit" class="button" data-i18n="collect.login.login"></button> 
 						</td>
 					</tr>
 					<tr><td></td></tr>
 					<tr><td></td></tr>
 					<tr id="defaultPasswordActiveContainer">
 						<td colspan="2" align="center" style="font-size: 10px;">
-							<i>*Default user/password : <b>admin</b>/<b>admin</b></i>
+							<i><span>*</span><span data-i18n="collect.login.default_user_message"></span></i>
 						</td>
 					</tr>
 				</table>
@@ -126,7 +144,7 @@
 		<!-- FOOTER -->
 		<div id="footer">
 			<img id="footerImg" alt="Loading..." />
-			<label>Application version: <%= org.openforis.collect.Collect.VERSION %></label>
+			<label data-i18n="collect.global.application_version"></label><label>: <%= org.openforis.collect.Collect.VERSION %></label>
 		</div>
   	</div>
   </body>
