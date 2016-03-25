@@ -80,5 +80,14 @@
 			<unpack>false</unpack>
 			<outputFileNameMapping>collect.war</outputFileNameMapping>
 		</dependencySet>
+		<!-- Add Saiku webapp -->
+		<dependencySet>
+			<outputDirectory>${output.directory}/tomcat/webapps</outputDirectory>
+			<includes>
+				<include>meteorite.bi:saiku-webapp-full</include>
+			</includes>
+			<unpack>false</unpack>
+			<outputFileNameMapping>saiku.war</outputFileNameMapping>
+		</dependencySet>
 	</dependencySets>
 </assembly>
