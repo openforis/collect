@@ -127,7 +127,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), FilenameUtils.getExtension(fileName));
 		}
 		this.uploadedFile = tempFile;
-		this.uploadedFileName = fileName;
+		this.uploadedFileName = normalizeFilename(fileName);
 		notifyChange(SurveyFileFormObject.UPLOADED_FILE_NAME_FIELD);
 		updateForm(binder);
 	}
@@ -152,6 +152,10 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		}
 		setValueOnFormField(tempForm, SurveyFileFormObject.FILENAME_FIELD_NAME, filename);
 		dispatchApplyChangesCommand(binder);
+	}
+
+	private String normalizeFilename(String filename) {
+		return filename.replaceAll("[^\\w-.]", "_");
 	}
 
 	public String getUploadedFileName() {
