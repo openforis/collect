@@ -98,6 +98,43 @@ public class BackupFileExtractor implements Closeable {
 		return result;
 	}
 	
+	public List<String> listDirectoriesInPath(String path) {
+		if ( ! path.endsWith(SurveyBackupJob.ZIP_FOLDER_SEPARATOR) ) {
+			path += SurveyBackupJob.ZIP_FOLDER_SEPARATOR;
+		}
+		List<String> result = new ArrayList<String>();
+		Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+		while ( zipEntries.hasMoreElements() ) {
+			ZipEntry zipEntry = zipEntries.nextElement();
+			String name = zipEntry.getName();
+			if (name.startsWith(path)) {
+				String directoryName = extractFirstLevelDirectoryName(path, zipEntry);
+				if (directoryName != null) {
+					result.add(directoryName);
+				}
+			}
+		}
+		return result;
+	}
+	
+	private String extractFirstLevelDirectoryName(String startFromPath, ZipEntry zipEntry) {
+		String[] directorySeparators = new String[]{"\\", "/"};
+		String nameEndPart = zipEntry.getName().substring(startFromPath.length());
+		int indexOfFolderSeparator = -1;
+		for (String directorySeparator : directorySeparators) {
+			indexOfFolderSeparator = nameEndPart.indexOf(directorySeparator);
+			if (indexOfFolderSeparator > 0) {
+				return nameEndPart.substring(0, indexOfFolderSeparator);
+			}
+		}
+		return null;
+	}
+	
+	public int countEntriesInPath(String path) {
+		List<String> entries = listEntriesInPath(path);
+		return entries.size();
+	}
+
 	public List<String> listSpeciesEntryNames() {
 		List<String> entries = listEntriesInPath(SurveyBackupJob.SPECIES_FOLDER);
 		return entries;

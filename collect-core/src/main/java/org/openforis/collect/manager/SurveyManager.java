@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,10 +34,12 @@ import org.openforis.collect.manager.validation.RecordValidationProcess;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
+import org.openforis.collect.persistence.SurveyFileDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
@@ -69,6 +72,8 @@ public class SurveyManager {
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private SpeciesManager speciesManager;
+	@Autowired
+	private SurveyFileDao surveyFileDao;
 	@Autowired
 	private SurveyDao surveyDao;
 	@Autowired
@@ -744,6 +749,8 @@ public class SurveyManager {
 		samplingDesignManager.copySamplingDesign(fromSurveyId, toSurveyId);
 		speciesManager.copyTaxonomy(fromSurveyId, toSurveyId);
 		codeListManager.copyCodeLists(fromSurvey, toSurvey);
+		surveyFileDao.copyItems(fromSurvey.getId(), toSurvey.getId());
+		
 		if (dataCleansingManager != null) {
 			dataCleansingManager.duplicateMetadata(fromSurvey, toSurvey);
 		}
@@ -783,6 +790,9 @@ public class SurveyManager {
 			samplingDesignManager.moveSamplingDesign(temporarySurveyId, newSurveyId);
 			speciesManager.moveTaxonomies(temporarySurveyId, newSurveyId);
 			codeListManager.moveCodeLists(temporarySurveyId, newSurveyId);
+			surveyFileDao.deleteBySurvey(newSurveyId);
+			surveyFileDao.moveItems(temporarySurveyId, newSurveyId);
+			
 			surveyDao.delete(temporarySurveyId);
 			CollectSurvey oldPublishedSurvey = getById(oldPublishedSurveyId);
 			if (oldPublishedSurvey != null) {
@@ -873,6 +883,8 @@ public class SurveyManager {
 		speciesManager.deleteTaxonomiesBySurvey(id);
 		samplingDesignManager.deleteBySurvey(id);
 		codeListManager.deleteAllItemsBySurvey(id, temporary);
+		surveyFileDao.deleteBySurvey(id);
+		
 		if (dataCleansingManager != null) {
 			CollectSurvey survey = loadSurvey(id);
 			dataCleansingManager.deleteMetadata(survey);
@@ -917,6 +929,46 @@ public class SurveyManager {
 
 	}
 
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
+	public void addSurveyFile(CollectSurvey survey, SurveyFile file, File content) {
+		try {
+			surveyFileDao.insert(file);
+			byte[] contentBytes = FileUtils.readFileToByteArray(content);
+			surveyFileDao.updateContent(file, contentBytes);
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
+	public void updateSurveyFile(CollectSurvey survey, SurveyFile file, File content) {
+		try {
+			surveyFileDao.update(file);
+			if (content != null) {
+				byte[] contentBytes = FileUtils.readFileToByteArray(content);
+				surveyFileDao.updateContent(file, contentBytes);
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public byte[] loadSurveyFileContent(SurveyFile surveyFile) {
+		return surveyFileDao.loadContent(surveyFile);
+	}
+
+	public List<SurveyFile> loadSurveyFileSummaries(CollectSurvey survey) {
+		return surveyFileDao.loadBySurvey(survey);
+	}
+	
+	public void deleteSurveyFile(SurveyFile surveyFile) {
+		surveyFileDao.delete(surveyFile.getId());
+	}
+	
+	public void deleteSurveyFiles(CollectSurvey survey) {
+		surveyFileDao.deleteBySurvey(survey.getId());
+	}
+	
 	protected ProcessStatus getRecordValidationProcessStatus(int surveyId) {
 		ProcessStatus status = recordValidationStatusBySurvey.get(surveyId);
 		return status;
@@ -986,5 +1038,5 @@ public class SurveyManager {
 	public void setSurveySerializer(CollectSurveyIdmlBinder surveySerializer) {
 		this.surveySerializer = surveySerializer;
 	}
-	
+
 }

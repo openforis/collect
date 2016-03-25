@@ -1374,7 +1374,7 @@ For more information or questions post a question in the forum : www.openforis.o
         <compare flag="error" lt="2016" gt="1994" />
       </number>
       <code id="10" name="land_use_subdivision" relevant="boolean(land_use_category)" required="true" ui:layoutType="dropdown" list="land_use" parent="land_use_category">
-        <label type="instance">Land Use Sub-Division</label>
+        <label type="instance">Current Land Use Sub-Division</label>
       </code>
       <boolean id="11" name="land_use_subdivision_accuracy" relevant="land_use_category!='noData'" required="true">
         <label type="instance">Land Use Sub-Division - Confidence</label>
@@ -1383,7 +1383,7 @@ For more information or questions post a question in the forum : www.openforis.o
         <label type="instance">Has the Sub-Division changed?</label>
       </boolean>
       <code id="1068" name="calculated_initial_land_use" ui:hide="true" ui:tab="plot_tab" calculated="true" list="land_use">
-        <label type="instance">Initial Land Use</label>
+        <label type="instance">Initial Land Use Sub-Division</label>
         <default value="forest" if="land_use_subcategory='FLtoFL' or land_use_subcategory='FLtoCL' or land_use_subcategory='FLtoGL' or land_use_subcategory='FLtoOT' or land_use_subcategory='FLtoWL' or land_use_subcategory='FLtoSL'" />
         <default value="cropland" if="land_use_subcategory='CLtoFL' or land_use_subcategory='CLtoCL' or land_use_subcategory='CLtoGL' or land_use_subcategory='CLtoOT' or land_use_subcategory='CLtoWL' or land_use_subcategory='CLtoSL'" />
         <default value="grassland" if="land_use_subcategory='GLtoFL' or land_use_subcategory='GLtoCL' or land_use_subcategory='GLtoGL' or land_use_subcategory='GLtoOT' or land_use_subcategory='GLtoWL' or land_use_subcategory='GLtoSL'" />

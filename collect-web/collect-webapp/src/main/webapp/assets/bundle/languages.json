@@ -1,3 +1,6 @@
 {
-	//"languages": ["en_US"]
+	"languages": [
+		"en", 
+		//"es"
+	]
 }

@@ -25,9 +25,12 @@ import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
+import org.openforis.collect.model.SurveyFile;
+import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.Zip4jFiles;
@@ -42,6 +45,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -70,9 +74,12 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final double HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR = 10000d;
 	private static final String README_FILE = "README.txt";
 	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
+	private static final String GRID_FOLDER_NAME = "grid";
 	
-	private CodeListManager codeListManager;
 	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
+		
+	private CodeListManager codeListManager;
+	private SurveyManager surveyManager;
 	
 	@Override
 	public File create(CollectSurvey survey, String language) throws Exception {
@@ -108,6 +115,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		Zip4jFiles.addFile(zipFile, testPlotsCSVFile, TEST_PLOTS_FILE_NAME, zipParameters);
 		
 		addCodeListImages(zipFile, survey, zipParameters);
+		
+		includeSurveyFiles(zipFile, survey, zipParameters);
 		
 		includeEarthFiles(zipFile, zipParameters);
 		
@@ -162,7 +171,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("balloon", "${project_path}/balloon.html");
 		p.put("metadata_file", "${project_path}/placemark.idm.xml");
 		p.put("template", "${project_path}/kml_template.fmt");
-		p.put("csv", "${project_path}/test_plots.ced");
+		p.put("csv", "${project_path}/" + determineSelectedGridFileName(survey));
 		p.put("sample_shape", "SQUARE");
 		p.put("distance_between_sample_points", String.valueOf(calculateDistanceBetweenSamplePoints(survey)));
 		p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
@@ -176,11 +185,30 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
 		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
 		p.put("open_street_view", isStreetViewEnabled(survey));
+		p.put("coordinates_reference_system", getSRSUsed(survey));
 
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
 		p.store(writer, null);
 		return file;
+	}
+
+	private String determineSelectedGridFileName(CollectSurvey survey) {
+		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);
+		for (SurveyFile surveyFile : surveyFiles) {
+			if (surveyFile.getType() == SurveyFileType.COLLECT_EARTH_GRID) {
+				return GRID_FOLDER_NAME + "/" + surveyFile.getFilename();
+			}
+		}
+		return "test_plots.ced";
+	}
+
+	private String getSRSUsed(CollectSurvey survey) {
+		List<SpatialReferenceSystem> spatialReferenceSystems = survey.getSpatialReferenceSystems();
+		if( spatialReferenceSystems == null || spatialReferenceSystems.size() != 1 ){
+			throw new IllegalArgumentException("Yoy must use one single Spatial Reference System in your survey");
+		}
+		return spatialReferenceSystems.get(0).getId();
 	}
 
 	private String getBingMapsKey(CollectSurvey survey){
@@ -436,7 +464,24 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 				EARTH_FILES_FOLDER_NAME, "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
 		return zipImageFileName;
 	}
-
+	
+	private void includeSurveyFiles(ZipFile zipFile, CollectSurvey survey, ZipParameters zipParameters) throws FileNotFoundException, IOException, ZipException {
+		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);
+		for (SurveyFile surveyFile : surveyFiles) {
+			byte[] content = surveyManager.loadSurveyFileContent(surveyFile);
+			File tempSurveyFile = copyToTempFile(content, surveyFile.getFilename());
+			String namePrefix;
+			switch(surveyFile.getType()) {
+			case COLLECT_EARTH_GRID:
+				namePrefix = GRID_FOLDER_NAME + "/";
+				break;
+			default:
+				namePrefix = "";
+			}
+			Zip4jFiles.addFile(zipFile, tempSurveyFile, namePrefix + surveyFile.getFilename(), zipParameters);
+		}
+	}
+	
 	private File copyToTempFile(byte[] content, String fileName) throws IOException, FileNotFoundException {
 		File imageFile = File.createTempFile("collect-earth-project-file-creator", fileName);
 		FileOutputStream fos = new FileOutputStream(imageFile);
@@ -447,5 +492,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 
 	public void setCodeListManager(CodeListManager codeListManager) {
 		this.codeListManager = codeListManager;
+	}
+	
+	public void setSurveyManager(SurveyManager surveyManager) {
+		this.surveyManager = surveyManager;
 	}
 }

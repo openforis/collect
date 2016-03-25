@@ -226,7 +226,9 @@ public class SurveySelectVM extends BaseVM {
 	private void exportCollectEarthSurvey(final CollectSurvey survey,
 			final SurveyExportParametersFormObject parameters) {
 		try {
-			((CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR).setCodeListManager(codeListManager);
+			CollectEarthProjectFileCreatorImpl creatorImpl = (CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR;
+			creatorImpl.setCodeListManager(codeListManager);
+			creatorImpl.setSurveyManager(surveyManager);
 			String languageCode = parameters.getLanguageCode();
 			File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey, languageCode);
 			String contentType = URLConnection.guessContentTypeFromName(file.getName());

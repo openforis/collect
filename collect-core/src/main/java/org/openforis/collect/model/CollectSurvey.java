@@ -129,7 +129,7 @@ public class CollectSurvey extends Survey {
 		}
 		return codeLists;
 	}
-	
+
 	public CollectAnnotations getAnnotations() {
 		return annotations;
 	}
