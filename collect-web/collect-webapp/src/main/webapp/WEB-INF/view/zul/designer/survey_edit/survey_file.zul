@@ -39,10 +39,10 @@
 	              <listitem selected="true"
 	                label="${labels.survey.file.type.generic}"
 	                value="GENERIC" />
-	              <listitem
+	              <listitem visible="@load(vm.collectEarthSurvey)"
 	                label="${labels.survey.file.type.collect_earth_area_per_attribute}"
 	                value="COLLECT_EARTH_AREA_PER_ATTRIBUTE" />
-	              <listitem
+	              <listitem visible="@load(vm.collectEarthSurvey)"
 	                label="${labels.survey.file.type.collect_earth_grid}"
 	                value="COLLECT_EARTH_GRID" />
 	          </listbox>
