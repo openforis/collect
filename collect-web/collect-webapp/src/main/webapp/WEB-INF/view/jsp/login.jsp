@@ -144,7 +144,9 @@
 		<!-- FOOTER -->
 		<div id="footer">
 			<img id="footerImg" alt="Loading..." />
-			<label data-i18n="collect.global.application_version"></label><label>: <%= org.openforis.collect.Collect.VERSION %></label>
+			<label>
+				<span data-i18n="collect.global.application_version"></span><span>: <%= org.openforis.collect.Collect.VERSION %></span>
+			</label>
 		</div>
   	</div>
   </body>
