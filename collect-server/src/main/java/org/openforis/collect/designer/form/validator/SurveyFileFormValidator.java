@@ -31,7 +31,7 @@ public class SurveyFileFormValidator extends FormValidator {
 	private static final Pattern VALID_FILENAME_PATTERN = Pattern.compile("^[\\w-]+\\.[\\w-]+$");
 
 	private static final Set<String> RESERVED_FILENAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			SurveyFile.COLLECT_EARTH_AREA_PER_ATTRIBUTE_FILENAME, "balloon.html", "collectEarthCubes.xml.fmt", "kml_template.fmt", "placemark.idm.xml",
+			SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE.getFixedFilename(), "balloon.html", "collectEarthCubes.xml.fmt", "kml_template.fmt", "placemark.idm.xml",
 			"project_definition.properties", "README.txt", "test_plots.ced", "earthFiles",
 			"data", "files", "sampling_design", "species", "idml.xml", "info.properties")));
 
@@ -50,9 +50,12 @@ public class SurveyFileFormValidator extends FormValidator {
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		switch (type) {
 		case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
-			if (containsFileWithType(otherSurveyFiles, SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE)) {
+		case COLLECT_EARTH_EE_SCRIPT:
+			if (containsFileWithType(otherSurveyFiles, type)) {
 				addInvalidMessage(ctx, TYPE_FIELD_NAME, Labels.getLabel("survey.file.error.type_already_defined"));
 				return false;
+			} else {
+				return true;
 			}
 		default:
 			return true;
@@ -78,11 +81,12 @@ public class SurveyFileFormValidator extends FormValidator {
 			SurveyFileType type = SurveyFileType.valueOf(typeName);
 			switch (type) {
 			case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
-				if (SurveyFile.COLLECT_EARTH_AREA_PER_ATTRIBUTE_FILENAME.equals(filename)) {
+				String expectedFileName = SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE.getFixedFilename();
+				if (expectedFileName.equals(filename)) {
 					return true;
 				} else {
 					String message = Labels.getLabel("survey.file.error.unexpected_filename",
-							new String[] { SurveyFile.COLLECT_EARTH_AREA_PER_ATTRIBUTE_FILENAME });
+							new String[] { expectedFileName });
 					addInvalidMessage(ctx, message);
 					return false;
 				}
