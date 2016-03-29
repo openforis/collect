@@ -42,7 +42,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  * @author A. Sanchez-Paus Diaz
  *
  */
-public class MondrianSchemaGenerator {
+public class NewMondrianSchemaGenerator {
 
 	private static final String BOOLEAN_DATATYPE = "Boolean";
 	private static final String INTEGER_DATATYPE = "Integer";
@@ -57,11 +57,11 @@ public class MondrianSchemaGenerator {
 	private String dbSchemaName;
 	private RelationalSchema rdbSchema;
 
-	public MondrianSchemaGenerator(CollectSurvey survey, String language, String dbSchemaName) {
+	public NewMondrianSchemaGenerator(CollectSurvey survey, String language, String dbSchemaName) {
 		this(survey, language, dbSchemaName, RelationalSchemaConfig.createDefault());
 	}
 
-	public MondrianSchemaGenerator(CollectSurvey survey, String language, String dbSchemaName,
+	public NewMondrianSchemaGenerator(CollectSurvey survey, String language, String dbSchemaName,
 			RelationalSchemaConfig rdbConfig) {
 		this.survey = survey;
 		this.language = language;
@@ -72,9 +72,9 @@ public class MondrianSchemaGenerator {
 	}
 
 	public String generateXMLSchema() {
-		MondrianSchemaGenerator.Schema mondrianSchema = generateSchema();
+		NewMondrianSchemaGenerator.Schema mondrianSchema = generateSchema();
 		XStream xStream = new XStream();
-		xStream.processAnnotations(MondrianSchemaGenerator.Schema.class);
+		xStream.processAnnotations(NewMondrianSchemaGenerator.Schema.class);
 		String xmlSchema = xStream.toXML(mondrianSchema);
 		return xmlSchema;
 	}
@@ -227,7 +227,7 @@ public class MondrianSchemaGenerator {
 				Measure measure = new Measure(attrName + "_" + aggregator);
 				measure.column = attrName;
 				measure.caption = escapeMondrianUnicode(
-						String.format("%s.%s [%s] %s", cube.name, extractLabel(attrDef), attrName, aggregator));
+						String.format("%s [%s] %s", extractLabel(attrDef), attrName, aggregator));
 				measure.aggregator = aggregator;
 				measure.datatype = NUMERIC_DATATYPE;
 				measure.formatString = "#.##";
@@ -359,8 +359,13 @@ public class MondrianSchemaGenerator {
 		Dimension dimension = new Dimension(determineDimensionName(attrDef));
 //		dimension.caption = String.format("%s.%s [%s]",
 //				extractLabel(attrDef.getNearestAncestorMultipleEntity()), extractLabel(attrDef), attrDef.getName());
-		dimension.caption = String.format("%s %s",
-				extractLabel(attrDef.getNearestAncestorMultipleEntity()), extractLabel(attrDef));
+		EntityDefinition ancestorMultipleEntity = attrDef.getNearestAncestorMultipleEntity();
+		if (ancestorMultipleEntity.isRoot()) {
+			dimension.caption = extractLabel(attrDef);
+		} else {
+			dimension.caption = String.format("%s %s",
+					extractLabel(ancestorMultipleEntity), extractLabel(attrDef));
+		}
 
 		Hierarchy hierarchy = dimension.hierarchy;
 		hierarchy.table = new Table(dbSchemaName, cube.tables.get(0).name);

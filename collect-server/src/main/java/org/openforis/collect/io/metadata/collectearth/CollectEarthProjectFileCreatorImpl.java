@@ -14,14 +14,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Stack;
 
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.manager.CodeListManager;
@@ -52,6 +46,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
+
 /**
  * 
  * @author S. Ricci
@@ -73,7 +72,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	private static final double HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR = 10000d;
 	private static final String README_FILE = "README.txt";
-	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
+//	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
 	private static final String GRID_FOLDER_NAME = "grid";
 	
 	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
@@ -421,7 +420,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	}
 	
 	private File generateCube(CollectSurvey survey, String language) throws IOException {
-		MondrianSchemaGenerator cubeGenerator = new MondrianSchemaGenerator(survey, language, SAIKU_SCHEMA_PLACEHOLDER, new RelationalSchemaContext().getRdbConfig());
+		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey, language);
 		String xmlSchema = cubeGenerator.generateXMLSchema();
 		
 		// Replace the TOKENs inside the labels if dimensions/levels with the corresponding ampersand

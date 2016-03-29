@@ -35,7 +35,7 @@ import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.event.TaxonAttributeUpdatedEvent;
 import org.openforis.collect.event.TextAttributeUpdatedEvent;
 import org.openforis.collect.event.TimeAttributeUpdatedEvent;
-import org.openforis.collect.io.metadata.collectearth.MondrianSchemaGenerator;
+import org.openforis.collect.io.metadata.collectearth.NewMondrianSchemaGenerator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
@@ -331,7 +331,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		try {
 			boolean schemaLess = true; //TODO
 			String schemaName = schemaLess ? "" : survey.getName();
-			MondrianSchemaGenerator schemaGenerator = new MondrianSchemaGenerator(survey, survey.getDefaultLanguage(), 
+			NewMondrianSchemaGenerator schemaGenerator = new NewMondrianSchemaGenerator(survey, survey.getDefaultLanguage(), 
 					schemaName, rdbConfig);
 			String mondrianSchema = schemaGenerator.generateXMLSchema();
 			mondrianSchemaDefinitionBySurvey.put(survey.getName(), mondrianSchema);
