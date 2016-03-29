@@ -17,6 +17,7 @@
 		<module>collect-autoupdater</module>
 		<module>collect-installer</module>
 		<module>collect-updater</module>
+		<module>collect-saiku-installer</module>
 	</modules>
 
 	<properties>
@@ -135,7 +136,7 @@
 				<version>2.5.1</version>
 				<configuration>
 					<!-- During release:perform, enable these profiles -->
-					<releaseProfiles>assembly,autoupdater,installer,updater,publishupdater</releaseProfiles>
+					<releaseProfiles>assembly,autoupdater,installer,saikuinstaller,updater,publishupdater</releaseProfiles>
 				</configuration>
 	    	</plugin>
 <!-- 	    	<plugin> -->
