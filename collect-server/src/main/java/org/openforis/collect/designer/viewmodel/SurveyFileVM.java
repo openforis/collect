@@ -141,14 +141,13 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		SimpleForm tempForm = ComponentUtil.getForm(binder.getView());
 		String typeName = (String) tempForm.getField("type");
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
-		String filename;
-		switch(type) {
-		case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
-			filename = SurveyFile.COLLECT_EARTH_AREA_PER_ATTRIBUTE_FILENAME;
-			break;
-		default:
-			filename = uploadedFileName == null ? (String) tempForm.getField(SurveyFileFormObject.FILENAME_FIELD_NAME)
-					: uploadedFileName;
+		String filename = type.getFixedFilename();
+		if (filename == null) {
+			if (uploadedFile == null) {
+				filename = (String) tempForm.getField(SurveyFileFormObject.FILENAME_FIELD_NAME);
+			} else {
+				filename = uploadedFileName;
+			}
 		}
 		setValueOnFormField(tempForm, SurveyFileFormObject.FILENAME_FIELD_NAME, filename);
 		dispatchApplyChangesCommand(binder);

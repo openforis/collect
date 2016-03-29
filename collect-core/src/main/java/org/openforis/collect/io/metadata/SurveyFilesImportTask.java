@@ -1,10 +1,13 @@
 package org.openforis.collect.io.metadata;
 
+import static org.openforis.collect.io.SurveyBackupJob.SURVEY_FILES_FOLDER;
+import static org.openforis.collect.io.SurveyBackupJob.ZIP_FOLDER_SEPARATOR;
+
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.io.BackupFileExtractor;
-import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveyFile;
@@ -29,7 +32,7 @@ public class SurveyFilesImportTask extends Task {
 	@Override
 	protected long countTotalItems() {
 		int total = 0;
-		List<String> types = backupFileExtractor.listEntriesInPath(SurveyBackupJob.SURVEY_FILES_FOLDER);
+		List<String> types = backupFileExtractor.listEntriesInPath(SURVEY_FILES_FOLDER);
 		for (String typeCode : types) {
 			total += backupFileExtractor.countEntriesInPath(determineSurveyFilesPath(typeCode));
 		}
@@ -39,13 +42,16 @@ public class SurveyFilesImportTask extends Task {
 	@Override
 	protected void execute() throws Throwable {
 		surveyManager.deleteSurveyFiles(survey);
-		List<String> types = backupFileExtractor.listDirectoriesInPath(SurveyBackupJob.SURVEY_FILES_FOLDER);
+		List<String> types = backupFileExtractor.listDirectoriesInPath(SURVEY_FILES_FOLDER);
 		for (String typeCode : types) {
 			SurveyFileType type = SurveyFileType.fromCode(typeCode);
-			List<File> files = backupFileExtractor.extractFilesInPath(determineSurveyFilesPath(typeCode));
-			for (File file : files) {
+			String surveyFilesPath = determineSurveyFilesPath(typeCode);
+			List<String> entryNames = backupFileExtractor.listEntriesInPath(surveyFilesPath);
+			for (String entryName : entryNames) {
+				File file = backupFileExtractor.extract(entryName);
+				String fileName = FilenameUtils.getName(entryName);
 				SurveyFile surveyFile = new SurveyFile(survey);
-				surveyFile.setFilename(file.getName());
+				surveyFile.setFilename(fileName);
 				surveyFile.setType(type);
 				surveyManager.addSurveyFile(survey, surveyFile, file);
 			}
@@ -53,7 +59,7 @@ public class SurveyFilesImportTask extends Task {
 	}
 
 	private String determineSurveyFilesPath(String typeCode) {
-		return SurveyBackupJob.SURVEY_FILES_FOLDER + "/" + typeCode;
+		return SURVEY_FILES_FOLDER + ZIP_FOLDER_SEPARATOR + typeCode;
 	}
 	
 	public void setSurvey(CollectSurvey survey) {
