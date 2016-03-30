@@ -18,6 +18,12 @@ public class Dates {
 	private static final String DATE_TIME_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	private static final String DATE_FORMAT 		= "yyyy-MM-dd";
 
+	public static Date millisToDate(long millis) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(millis);
+		return cal.getTime();
+	}
+	
 	public static Date parseDateTime(String dateTime) {
 		if ( StringUtils.isBlank(dateTime) ) {
 			return null;
