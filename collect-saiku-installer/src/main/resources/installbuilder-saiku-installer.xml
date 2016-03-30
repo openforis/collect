@@ -25,9 +25,9 @@
 			<show>1</show>
 			<folderList>
 				<folder>
-					<name>${collectinstalldir}/webapps</name>
+					<name>webapps</name>
 					<description>Tomcat Webapps</description>
-					<destination>tomcat/webapps</destination>
+					<destination>${collectinstalldir}/tomcat/webapps</destination>
 					<platforms>all</platforms>
 					<distributionFileList>
 						<distributionFile>
