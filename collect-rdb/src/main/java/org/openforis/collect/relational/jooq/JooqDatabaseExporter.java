@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.jooq;
 
+
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.name;
 import static org.jooq.impl.DSL.table;
@@ -180,7 +181,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 	private List<Field<?>> toFields(List<? extends Column<?>> columns) {
 		List<Field<?>> ancestorColumns = new ArrayList<Field<?>>(columns.size());
 		for (Column<?> column : columns) {
-			ancestorColumns.add(field(column.getName(), dsl.getDataType(column.getType().getJavaType())));
+			ancestorColumns.add(field(name(column.getName()), dsl.getDataType(column.getType().getJavaType())));
 		}
 		return ancestorColumns;
 	}
