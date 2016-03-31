@@ -178,7 +178,8 @@ public class NewMondrianSchemaGenerator {
 
 	private Cube generateCube() {
 		final EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
-		final Cube cube = new Cube("Collect Data - " + rootEntityDef.getLabel(NodeLabel.Type.INSTANCE, language));
+		final Cube cube = new Cube("Collect Data - " + rootEntityDef.getFailSafeLabel(language, 
+				NodeLabel.Type.REPORTING, NodeLabel.Type.INSTANCE));
 
 		Table table = new Table(dbSchemaName, rootEntityDef.getName());
 		cube.tables.add(table);
@@ -443,7 +444,7 @@ public class NewMondrianSchemaGenerator {
 		} else if (nodeDef instanceof BooleanAttributeDefinition) {
 			level.type = BOOLEAN_DATATYPE;
 		} else if (nodeDef instanceof CodeAttributeDefinition) {
-			level.type = INTEGER_DATATYPE;
+			level.type = level.type = ((CodeAttributeDefinition) nodeDef).getList().isExternal() ? STRING_DATATYPE : INTEGER_DATATYPE;
 		} else {
 			level.type = STRING_DATATYPE;
 		}
@@ -454,7 +455,6 @@ public class NewMondrianSchemaGenerator {
 			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
 			level.nameColumn = codeTableName.substring(0,
 					codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + language;
-			level.type = INTEGER_DATATYPE;
 		} else {
 			level.column = attrName;
 		}
@@ -488,7 +488,8 @@ public class NewMondrianSchemaGenerator {
 	}
 
 	private String extractLabel(NodeDefinition nodeDef) {
-		String attrLabel = nodeDef.getLabel(NodeLabel.Type.INSTANCE, language);
+		String attrLabel = nodeDef.getFailSafeLabel(language, 
+				NodeLabel.Type.REPORTING, NodeLabel.Type.INSTANCE);
 		if (attrLabel == null) {
 			attrLabel = nodeDef.getName();
 		}
@@ -496,8 +497,10 @@ public class NewMondrianSchemaGenerator {
 	}
 
 	private boolean canBeMeasured(AttributeDefinition def) {
-		return def instanceof CodeAttributeDefinition || def instanceof DateAttributeDefinition
-				|| def instanceof NumberAttributeDefinition || def instanceof TextAttributeDefinition
+		return def instanceof CodeAttributeDefinition 
+				|| def instanceof DateAttributeDefinition
+				|| def instanceof NumberAttributeDefinition 
+				|| def instanceof TextAttributeDefinition
 				|| def instanceof TimeAttributeDefinition;
 	}
 

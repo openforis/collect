@@ -16,6 +16,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.event.AttributeCreatedEvent;
 import org.openforis.collect.event.AttributeEvent;
 import org.openforis.collect.event.AttributeUpdatedEvent;
@@ -211,6 +212,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			processedRecords++;
 			recordInsertProcessListener.progressMade(new Progress(processedRecords, summaries.size()));
 		}
+		IOUtils.closeQuietly(databaseUpdater);
 		processProgressListener.stepCompleted();
 	}
 

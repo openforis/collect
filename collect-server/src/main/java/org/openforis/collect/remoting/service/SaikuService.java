@@ -29,6 +29,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SaikuService {
 
+	private static final String SAIKU_URL_FORMAT = "%s://%s:%s/%s";
+	private static final String DEV_LOCAL_ADDRESS = "127.0.0.1";
+	private static final String DEV_REQUEST_LOCAL_ADDRESS = "0:0:0:0:0:0:0:1";
+	
 	@Autowired
 	private ReportingRepositories reportingRepositories;
 	@Autowired
@@ -65,8 +69,12 @@ public class SaikuService {
 	private String getSaikuUrl() {
 		HttpGraniteContext graniteContext = (HttpGraniteContext) GraniteContext.getCurrentInstance();
 		HttpServletRequest request = graniteContext.getRequest();
-		String protocol = "http";
-		String url = String.format("%s://%s:%s/%s", protocol, request.getLocalAddr(), request.getLocalPort(), SaikuConfiguration.getInstance().getContextPath());
+		String protocol = request.isSecure() ? "https" : "http";
+		String localAddr = request.getLocalAddr();
+		if (DEV_REQUEST_LOCAL_ADDRESS.equals(localAddr)) {
+			localAddr = DEV_LOCAL_ADDRESS;
+		}
+		String url = String.format(SAIKU_URL_FORMAT, protocol, localAddr, request.getLocalPort(), SaikuConfiguration.getInstance().getContextPath());
 		return url;
 	}
 
