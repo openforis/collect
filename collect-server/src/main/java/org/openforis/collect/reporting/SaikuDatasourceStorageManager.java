@@ -64,8 +64,12 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 		try {
 			File rdbFile = rdbStorageManager.getRDBFile(surveyName, recordStep);
 			File mondrianSchemaFile = mondrianSchemaStorageManager.getSchemaFile(surveyName);
-			String content = String.format(DATASOURCE_CONTENT_FORMAT, surveyName, recordStep.name().toLowerCase(Locale.ENGLISH), 
-					"jdbc:sqlite:" + rdbFile.getAbsolutePath(), mondrianSchemaFile.getAbsolutePath());
+			String content = String.format(DATASOURCE_CONTENT_FORMAT
+					, surveyName
+					, recordStep.name().toLowerCase(Locale.ENGLISH)
+					, "jdbc:sqlite:" + formatPath(rdbFile.getAbsolutePath())
+					, formatPath(mondrianSchemaFile.getAbsolutePath())
+			);
 			File file = getDatasourceFile(surveyName, recordStep);
 			FileUtils.write(file, content);
 		} catch (Exception e) {
@@ -77,5 +81,12 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 		File file = getDatasourceFile(surveyName, recordStep);
 		return file.delete();
 	}
-
+	
+	/**
+	 * Formats a file path to be compatible with Saiku datasource file path format
+	 */
+	private static String formatPath(String path) {
+		return path.replaceAll("\\\\", "/");
+	}
+	
 }
