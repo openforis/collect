@@ -51,7 +51,11 @@
 			}
 			
 			private function launchSaikuClickHandler(event:MouseEvent):void {
-				navigateToURL(new URLRequest(ApplicationConstants.ROOT_URL + "saiku"), "collect_saiku");
+				var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					var url:String = event.result;
+					navigateToURL(new URLRequest(url), "collect_saiku");
+				}, null);
+				ClientFactory.saikuClient.getSaikuUrl(responder);
 			}
 			
 			private function surveyChangeHandler(event:Event):void {

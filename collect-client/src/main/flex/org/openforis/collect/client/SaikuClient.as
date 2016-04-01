@@ -13,6 +13,7 @@ package org.openforis.collect.client {
 	public class SaikuClient extends AbstractClient {
 		
 		private var _isSaikuAvailableOperation:Operation;
+		private var _getSaikuUrlOperation:Operation;
 		private var _loadInfoOperation:Operation;
 		private var _generateRdbOperation:Operation;
 
@@ -20,12 +21,18 @@ package org.openforis.collect.client {
 			super("saikuService");
 			
 			_isSaikuAvailableOperation = getOperation("isSaikuAvailable", CONCURRENCY_LAST, false);
+			_getSaikuUrlOperation = getOperation("getSaikuUrl", CONCURRENCY_MULTIPLE, false);
 			_loadInfoOperation = getOperation("loadInfo", CONCURRENCY_MULTIPLE, false);
 			_generateRdbOperation = getOperation("generateRdb");
 		}
 		
 		public function isSaikuAvailable(responder:IResponder):void {
 			var token:AsyncToken = this._isSaikuAvailableOperation.send();
+			token.addResponder(responder);
+		}
+
+		public function getSaikuUrl(responder:IResponder):void {
+			var token:AsyncToken = this._getSaikuUrlOperation.send();
 			token.addResponder(responder);
 		}
 

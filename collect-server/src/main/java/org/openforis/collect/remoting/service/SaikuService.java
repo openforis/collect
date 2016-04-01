@@ -41,6 +41,8 @@ public class SaikuService {
 	private SurveyManager surveyManager;
 	@Autowired
 	private CollectJobManager jobManager;
+	@Autowired
+	private SaikuConfiguration saikuConfiguration;
 	
 	public boolean isSaikuAvailable() {
 		String url = getSaikuUrl();
@@ -72,7 +74,7 @@ public class SaikuService {
 		return new JobProxy(job);
 	}
 
-	private String getSaikuUrl() {
+	public String getSaikuUrl() {
 		HttpGraniteContext graniteContext = (HttpGraniteContext) GraniteContext.getCurrentInstance();
 		HttpServletRequest request = graniteContext.getRequest();
 		String protocol = request.isSecure() ? "https" : "http";
@@ -80,7 +82,7 @@ public class SaikuService {
 		if (DEV_REQUEST_LOCAL_ADDRESS.equals(localAddr)) {
 			localAddr = DEV_LOCAL_ADDRESS;
 		}
-		String url = String.format(SAIKU_URL_FORMAT, protocol, localAddr, request.getLocalPort(), SaikuConfiguration.getInstance().getContextPath());
+		String url = String.format(SAIKU_URL_FORMAT, protocol, localAddr, request.getLocalPort(), saikuConfiguration.getContextPath());
 		return url;
 	}
 

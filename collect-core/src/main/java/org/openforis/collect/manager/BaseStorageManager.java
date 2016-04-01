@@ -172,4 +172,8 @@ public abstract class BaseStorageManager implements Serializable {
 			return new File(rootDir, defaultSubFolder);
 		}
 	}
+	
+	protected void setDefaultSubFolder(String defaultSubFolder) {
+		this.defaultSubFolder = defaultSubFolder;
+	}
 }

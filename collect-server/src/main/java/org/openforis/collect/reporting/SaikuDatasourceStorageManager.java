@@ -34,9 +34,8 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 			+ "username=dbuser\r\n"
 			+ "password=password";
 	
-	public SaikuDatasourceStorageManager() {
-		super(getCatalinaBaseWebappsFolderPath(), SaikuConfiguration.getInstance().getContextPath());
-	}
+	@Autowired
+	private SaikuConfiguration saikuConfiguration;
 	
 	@Autowired
 	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
@@ -45,6 +44,8 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 	
 	@PostConstruct
 	public void init() {
+		this.setDefaultRootStoragePath(getCatalinaBaseWebappsFolderPath());
+		this.setDefaultSubFolder(saikuConfiguration.getContextPath());
 		super.initStorageDirectory(ConfigurationItem.SAIKU_BASE_DIR, false);
 	}
 
