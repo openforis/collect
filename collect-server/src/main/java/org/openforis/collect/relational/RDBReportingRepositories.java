@@ -54,6 +54,7 @@ import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.collect.reporting.MondrianSchemaStorageManager;
 import org.openforis.collect.reporting.ReportingRepositories;
+import org.openforis.collect.reporting.ReportingRepositoryInfo;
 import org.openforis.collect.reporting.SaikuDatasourceStorageManager;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.ProcessProgressListener;
@@ -265,8 +266,18 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	}
 	
 	@Override
-	public Date getLastUpdateTime(String surveyName) {
-		return localRDBStorageManager.getRDBFileDate(surveyName, RecordStep.ENTRY);
+	public ReportingRepositoryInfo getInfo(String surveyName) {
+		Date rdbFileDate = localRDBStorageManager.getRDBFileDate(surveyName, RecordStep.ENTRY);
+		if (rdbFileDate == null) {
+			return null;
+		} else {
+			ReportingRepositoryInfo info = new ReportingRepositoryInfo();
+			info.setLastUpdate(rdbFileDate);
+			RecordFilter filter = new RecordFilter(surveyManager.get(surveyName));
+			filter.setModifiedSince(rdbFileDate);
+			info.setUpdatedRecordsSinceLastUpdate(recordManager.countRecords(filter));
+			return info;
+		}
 	}
 
 	private RelationalSchema getOrInitializeRelationalSchemaDefinition(

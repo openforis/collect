@@ -84,6 +84,7 @@ package org.openforis.collect.presenter {
 		private function checkSaikuAvailability():void {
 			var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
 				SAIKU_MENU_ITEM.enabled = event.result == true;
+				SAIKU_MENU_ITEM.toolTip = event.result ? "": Message.get("saiku.module_not_available");
 				view.functionList.dataProvider = createFunctionsList();
 			}, faultHandler);
 			ClientFactory.saikuClient.isSaikuAvailable(responder);

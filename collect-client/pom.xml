@@ -131,6 +131,7 @@
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.speciesimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.samplingdesignimport.proxy.*</includeClass>
+                                <includeClass>org.openforis.collect.reporting.proxy.*</includeClass>
 							</includeJavaClasses>
 						</configuration>
 					</execution>

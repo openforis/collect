@@ -13,14 +13,14 @@ package org.openforis.collect.client {
 	public class SaikuClient extends AbstractClient {
 		
 		private var _isSaikuAvailableOperation:Operation;
+		private var _loadInfoOperation:Operation;
 		private var _generateRdbOperation:Operation;
-		private var _loadLastUpdateTimeOperation:Operation;
 
 		public function SaikuClient() {
 			super("saikuService");
 			
 			_isSaikuAvailableOperation = getOperation("isSaikuAvailable", CONCURRENCY_LAST, false);
-			_loadLastUpdateTimeOperation = getOperation("loadLastUpdateTime", CONCURRENCY_MULTIPLE, false);
+			_loadInfoOperation = getOperation("loadInfo", CONCURRENCY_MULTIPLE, false);
 			_generateRdbOperation = getOperation("generateRdb");
 		}
 		
@@ -29,8 +29,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 
-		public function loadLastUpdateTime(responder:IResponder, surveyName:String):void {
-			var token:AsyncToken = this._loadLastUpdateTimeOperation.send(surveyName);
+		public function loadInfo(responder:IResponder, surveyName:String):void {
+			var token:AsyncToken = this._loadInfoOperation.send(surveyName);
 			token.addResponder(responder);
 		}
 

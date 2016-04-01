@@ -108,6 +108,7 @@
 							</s:layout>
 							<s:Image source="{data.icon}" width="48" height="48" />
 							<s:Label enabled="{data.enabled}" styleName="functionLabel" 
+									 toolTip="{data.toolTip}"
 									 text="{data.label}" />
 						</s:ItemRenderer>
 					</fx:Component>

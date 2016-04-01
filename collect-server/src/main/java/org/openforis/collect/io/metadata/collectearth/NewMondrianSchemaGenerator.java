@@ -1,11 +1,12 @@
 package org.openforis.collect.io.metadata.collectearth;
 
+import static org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil.escapeMondrianUnicode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil.*;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.CodeValueFKColumn;
@@ -21,7 +22,6 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
@@ -175,52 +175,7 @@ public class NewMondrianSchemaGenerator {
 		}
 		return cube;
 	}
-
-	private Cube generateCube() {
-		final EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
-		final Cube cube = new Cube("Collect Data - " + rootEntityDef.getFailSafeLabel(language, 
-				NodeLabel.Type.REPORTING, NodeLabel.Type.INSTANCE));
-
-		Table table = new Table(dbSchemaName, rootEntityDef.getName());
-		cube.tables.add(table);
-
-		addCountMeasure(cube, rootEntityDef);
-
-		rootEntityDef.traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition nodeDef) {
-				// if (nodeDef instanceof EntityDefinition &&
-				// (((EntityDefinition) nodeDef).isRoot() ||
-				// nodeDef.isMultiple())) {
-				// Table table = new Table(dbSchemaName, nodeDef.getName());
-				// cube.tables.add(table);
-				// }
-				EntityDefinition parentDef = nodeDef.getParentEntityDefinition();
-				if (nodeDef instanceof AttributeDefinition) {
-					AttributeDefinition attrDef = (AttributeDefinition) nodeDef;
-					if (parentDef.isRoot()) {
-						addAttributeMeasuresAndDimension(cube, attrDef);
-					} else {
-						addNestedAttributeDimension(cube, attrDef);
-					}
-				}
-			}
-		}, TraversalType.BFS);
-
-		// add predefined dimensions
-		// DEPRECATED 07/08/2015 : From now on all the operations to calculate
-		// the aspect,elevation,slope and initial land use class are made
-		// through Calculated Members
-		// cube.dimensions.addAll(generatePredefinedDimensions());
-		// add predefined measures
-
-		// Add the measures AFTER the 1st measure, which should be Plot Count
-		// Only for Collect Earth surveys
-		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
-			cube.measures.addAll(1, generateEarthSpecificMeasures());
-		}
-		return cube;
-	}
-
+	
 	private void addAttributeMeasuresAndDimension(Cube cube, AttributeDefinition attrDef) {
 		if (attrDef instanceof NumberAttributeDefinition) {
 			String attrName = attrDef.getName();
@@ -259,7 +214,7 @@ public class NewMondrianSchemaGenerator {
 			if (attrDef instanceof CodeAttributeDefinition) {
 				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attrDef;
 				CodeList codeList = codeAttrDef.getList();
-				if (!codeList.isExternal()) {
+				if (! codeList.isExternal()) {
 					hierarchy.primaryKey = rootEntityIdColumnName;
 					hierarchy.primaryKeyTable = parentEntityName;
 					Join join = new Join(null);
@@ -317,31 +272,6 @@ public class NewMondrianSchemaGenerator {
 		return measures;
 	}
 
-	/*
-	 * private List<Dimension> generatePredefinedDimensions() { List<Dimension>
-	 * dimensions = new ArrayList<Dimension>(); //Slope category { Dimension d =
-	 * new Dimension("Slope category"); d.foreignKey = "slope_id";
-	 * d.highCardinality = "false"; Hierarchy h = new Hierarchy(); h.table = new
-	 * Table("slope_category"); Level l = new Level("Slope_category"); l.table =
-	 * "slope_category"; l.column = "slope_id"; l.nameColumn = "slope_caption";
-	 * l.type = "String"; l.levelType = "Regular"; l.uniqueMembers = "false";
-	 * h.levels.add(l); d.hierarchy = h; dimensions.add(d); } //Initial Land Use
-	 * { Dimension d = new Dimension("Initial Land Use"); d.foreignKey =
-	 * "dynamics_id"; d.highCardinality = "false"; Hierarchy h = new
-	 * Hierarchy(); h.table = new Table("dynamics_category"); Level l = new
-	 * Level("Initial_land_use"); l.table = "dynamics_category"; l.column =
-	 * "dynamics_id"; l.nameColumn = "dynamics_caption"; l.type = "String";
-	 * l.levelType = "Regular"; l.uniqueMembers = "false"; l.hideMemberIf =
-	 * "Never"; h.levels.add(l); d.hierarchy = h; dimensions.add(d); }
-	 * //Elevation Range { Dimension d = new Dimension("Elevation range");
-	 * d.foreignKey = "elevation_id"; d.highCardinality = "false"; Hierarchy h =
-	 * new Hierarchy(); h.table = new Table("elevation_category"); Level l = new
-	 * Level("Elevation_range"); l.table = "elevation_category"; l.column =
-	 * "elevation_id"; l.nameColumn = "elevation_caption"; l.type = "String";
-	 * l.levelType = "Regular"; l.uniqueMembers = "false"; l.hideMemberIf =
-	 * "Never"; h.levels.add(l); d.hierarchy = h; dimensions.add(d); } return
-	 * dimensions; }
-	 */
 	private void addCountMeasure(Cube cube, EntityDefinition entityDef) {
 		Measure measure = new Measure(entityDef.getName() + "_count");
 		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
@@ -358,8 +288,6 @@ public class NewMondrianSchemaGenerator {
 	private Dimension generateDimension(Cube cube, AttributeDefinition attrDef) {
 		String attrName = attrDef.getName();
 		Dimension dimension = new Dimension(determineDimensionName(attrDef));
-//		dimension.caption = String.format("%s.%s [%s]",
-//				extractLabel(attrDef.getNearestAncestorMultipleEntity()), extractLabel(attrDef), attrDef.getName());
 		EntityDefinition ancestorMultipleEntity = attrDef.getNearestAncestorMultipleEntity();
 		if (ancestorMultipleEntity.isRoot()) {
 			dimension.caption = extractLabel(attrDef);
@@ -374,7 +302,7 @@ public class NewMondrianSchemaGenerator {
 		if (attrDef instanceof CodeAttributeDefinition) {
 			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attrDef;
 
-			if (!codeAttrDef.getList().isExternal()) {
+			if (! codeAttrDef.getList().isExternal()) {
 				EntityDefinition rootEntityDef = attrDef.getRootEntity();
 
 				String entityName = attrName;
@@ -382,6 +310,7 @@ public class NewMondrianSchemaGenerator {
 				if (attrDef.isMultiple()) {
 					String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
 					dimension.foreignKey = rootEntityIdColumnName;
+					hierarchy.table = new Table(dbSchemaName, entityName);
 					hierarchy.primaryKey = rootEntityIdColumnName;
 					hierarchy.primaryKeyTable = entityName;
 
@@ -476,15 +405,12 @@ public class NewMondrianSchemaGenerator {
 	}
 	
 	private String determineLevelName(NodeDefinition attrDef, String subLevelName) {
-		String result = extractLabel(attrDef.getNearestAncestorMultipleEntity()) + " " + extractLabel(attrDef);
+		EntityDefinition nearestAncestorMultipleEntity = attrDef.getNearestAncestorMultipleEntity();
+		String result =  extractLabel(nearestAncestorMultipleEntity) + " " + extractLabel(attrDef);
 		if (subLevelName != null) {
 			result += " - " + subLevelName;
 		}
 		return result;
-	}
-
-	private String adaptPathToName(String path) {
-		return path.substring(1).replaceAll("/", "_");
 	}
 
 	private String extractLabel(NodeDefinition nodeDef) {

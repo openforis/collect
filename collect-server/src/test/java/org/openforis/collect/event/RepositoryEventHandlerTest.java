@@ -3,12 +3,12 @@ package org.openforis.collect.event;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.reporting.ReportingRepositories;
+import org.openforis.collect.reporting.ReportingRepositoryInfo;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.rmb.KeepAlive;
 
@@ -103,6 +103,7 @@ public class RepositoryEventHandlerTest {
 		int createRepositoriesCalls;
 		int updateRepositoriesCalls;
 		int deleteRepositoriesCalls;
+		int getInfoCalls;
 		int getRepositoryPathFails;
 		int getRepositoryPathsFails;
 		int createRepositoryFails;
@@ -110,10 +111,9 @@ public class RepositoryEventHandlerTest {
 		int updateRepositoriesFails;
 		int deleteRepositoriesFails;
 		int processFails;
-		int getLastUpdateTimeFails;
 		int getRepositoryPathCalls;
 		int getRepositoryPathsCalls;
-		int getLastUpdateTimeCalls;
+		int getInfoFails;
 		
 		@Override
 		public void createRepository(String surveyName, RecordStep recordStep, ProgressListener progressListener) {
@@ -181,10 +181,10 @@ public class RepositoryEventHandlerTest {
 		}
 		
 		@Override
-		public Date getLastUpdateTime(String surveyName) {
-			getLastUpdateTimeCalls ++;
-			if (getLastUpdateTimeFails > 0) {
-				getLastUpdateTimeFails --;
+		public ReportingRepositoryInfo getInfo(String surveyName) {
+			getInfoCalls ++;
+			if (getInfoFails > 0) {
+				getInfoFails --;
 				throw new RuntimeException("getLastUpdateTimeCa failed");
 			}
 			return null;
@@ -198,7 +198,7 @@ public class RepositoryEventHandlerTest {
 			createRepositoriesCalls = 0;
 			updateRepositoriesCalls = 0;
 			deleteRepositoriesCalls = 0;
-			getLastUpdateTimeCalls = 0;
+			getInfoCalls = 0;
 			processFails = 0;
 			getRepositoryPathFails = 0;
 			getRepositoryPathsFails = 0;
@@ -206,7 +206,7 @@ public class RepositoryEventHandlerTest {
 			createRepositoriesFails = 0;
 			deleteRepositoriesFails = 0;
 			updateRepositoriesFails = 0;
-			getLastUpdateTimeFails = 0;
+			getInfoFails = 0;
 		}
 
 	}

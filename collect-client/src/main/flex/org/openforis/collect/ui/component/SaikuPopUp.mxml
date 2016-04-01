@@ -11,40 +11,31 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import com.shortybmc.utils.StringUtils;
-			
-			import org.openforis.collect.concurrency.CollectJobStatusPopUp;
-			
-			import flash.net.navigateToURL;
-			
 			import mx.events.FlexEvent;
 			import mx.rpc.AsyncResponder;
-			import mx.rpc.IResponder;
-			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.client.ClientFactory;
+			import org.openforis.collect.concurrency.CollectJobStatusPopUp;
+			import org.openforis.collect.event.CollectJobEvent;
+			import org.openforis.collect.event.EventDispatcherFactory;
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.Configuration$ConfigurationItem;
-			import org.openforis.collect.model.LogoPosition;
-			import org.openforis.collect.model.proxy.ConfigurationProxy;
 			import org.openforis.collect.presenter.JobMonitor;
-			import org.openforis.collect.ui.Images;
-			import org.openforis.collect.util.AlertUtil;
+			import org.openforis.collect.reporting.proxy.ReportingRepositoryInfoProxy;
 			import org.openforis.collect.util.ApplicationConstants;
 			import org.openforis.collect.util.DateUtil;
-			import org.openforis.collect.util.StringUtil;
 			import org.openforis.concurrency.proxy.JobProxy;
 			
 			private var _initialized:Boolean;
-			
-			private var textInputToConfigurationItem:Dictionary;
+			private var rdbGenerationJobId:String = null;
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
 				_initialized = true;
 				
+				EventDispatcherFactory.getEventDispatcher().addEventListener(CollectJobEvent.COLLECT_JOB_END, jobEndHandler);
+
 				init();
 			}
 			
@@ -53,8 +44,14 @@
 				surveyList.dataProvider = Application.surveySummaries;
 			}
 			
+			private function jobEndHandler(event:CollectJobEvent):void {
+				if (event.job.id == rdbGenerationJobId) {
+					updateSurveyRdbInfo();
+				}
+			}
+			
 			private function launchSaikuClickHandler(event:MouseEvent):void {
-				navigateToURL(new URLRequest(ApplicationConstants.ROOT_URL + "saiku"), "_blank");
+				navigateToURL(new URLRequest(ApplicationConstants.ROOT_URL + "saiku"), "collect_saiku");
 			}
 			
 			private function surveyChangeHandler(event:Event):void {
@@ -62,20 +59,24 @@
 			}
 			
 			private function updateSurveyRdbInfo():void {
-				rdbLastUpdateTimestampLabel.text = "Loading...";
+				if (surveyList.selectedItem == null) {
+					return;
+				}
+				rdbLastUpdateTimestampLabel.text = Message.get("global.loading_short");
+				updatedRecordsSinceLastUpdateLabel.text = Message.get("global.loading_short");
 				var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
-					var date:Date = event.result;
-					if (date != null) {
-						rdbLastUpdateTimestampLabel.text = DateUtil.format(date);
-					}
+					var info:ReportingRepositoryInfoProxy = event.result;
+					rdbLastUpdateTimestampLabel.text = info == null ? "---" : DateUtil.format(info.lastUpdate);
+					updatedRecordsSinceLastUpdateLabel.text = info == null ? "---" : info.updatedRecordsSinceLastUpdate;
 				}, null);
-				ClientFactory.saikuClient.loadLastUpdateTime(responder, surveyList.selectedItem.name);
+				ClientFactory.saikuClient.loadInfo(responder, surveyList.selectedItem.name);
 			}
 			
 			private function generateRdbClickHandler(event:MouseEvent):void {
 				var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
 					var job:JobProxy = event.result;
-					var jobMonitor:JobMonitor = new JobMonitor(job.id);
+					rdbGenerationJobId = job.id;
+					var jobMonitor:JobMonitor = new JobMonitor(rdbGenerationJobId);
 					CollectJobStatusPopUp.openPopUp();
 					jobMonitor.start();
 				}, null);
@@ -86,7 +87,7 @@
 	</fx:Script>
 	
 	<component:layout>
-		<s:BasicLayout />
+		<s:VerticalLayout paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
 	</component:layout>
 
 	<component:states>
@@ -100,7 +101,7 @@
 		<container:FieldSet legend="{Message.get('saiku.relational_database')}" width="100%">
 			<s:Form width="100%" height="100%" includeIn="loadComplete" >
 				<s:FormItem label="{Message.get('saiku.generate_rdb_for_survey')}">
-					<s:DropDownList id="surveyList" labelField="name" width="300"
+					<s:DropDownList id="surveyList" labelField="name" width="250"
 						change="surveyChangeHandler(event)" />
 				</s:FormItem>
 				<s:FormItem label="{Message.get('saiku.rdb_last_update_time')}:">
@@ -108,6 +109,12 @@
 						<s:HorizontalLayout />
 					</s:layout>
 					<s:Label id="rdbLastUpdateTimestampLabel" text="..." width="200" />
+				</s:FormItem>
+				<s:FormItem label="{Message.get('saiku.updated_records_since_last_rdb_generation')}:">
+					<s:layout>
+						<s:HorizontalLayout />
+					</s:layout>
+					<s:Label id="updatedRecordsSinceLastUpdateLabel" text="..." width="200" />
 					<s:Button id="generateRdbBtn" label="{Message.get('saiku.generate')}"
 							  click="generateRdbClickHandler(event)"/>
 				</s:FormItem>
