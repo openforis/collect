@@ -14,6 +14,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.reporting.ReportingRepositories;
 import org.openforis.collect.reporting.SaikuConfiguration;
+import org.openforis.collect.reporting.proxy.ReportingRepositoryInfoProxy;
 import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.concurrency.Task;
@@ -43,6 +44,10 @@ public class SaikuService {
 	public boolean isSaikuAvailable() {
 		String url = getSaikuUrl();
 		return testUrl(url);
+	}
+	
+	public ReportingRepositoryInfoProxy loadLastUpdateTime(String surveyName) {
+		return new ReportingRepositoryInfoProxy(reportingRepositories.getInfo(surveyName));
 	}
 	
 	public JobProxy generateRdb(final String surveyName) {

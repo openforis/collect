@@ -263,6 +263,11 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		String path = rdbFile.getAbsolutePath();
 		return path;
 	}
+	
+	@Override
+	public Date getLastUpdateTime(String surveyName) {
+		return localRDBStorageManager.getRDBFileDate(surveyName, RecordStep.ENTRY);
+	}
 
 	private RelationalSchema getOrInitializeRelationalSchemaDefinition(
 			final String surveyName) {

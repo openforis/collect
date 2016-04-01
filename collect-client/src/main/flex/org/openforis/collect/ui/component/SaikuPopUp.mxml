@@ -33,6 +33,7 @@
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.util.AlertUtil;
 			import org.openforis.collect.util.ApplicationConstants;
+			import org.openforis.collect.util.DateUtil;
 			import org.openforis.collect.util.StringUtil;
 			import org.openforis.concurrency.proxy.JobProxy;
 			
@@ -56,7 +57,22 @@
 				navigateToURL(new URLRequest(ApplicationConstants.ROOT_URL + "saiku"), "_blank");
 			}
 			
-			protected function generateRdbClickHandler(event:MouseEvent):void {
+			private function surveyChangeHandler(event:Event):void {
+				updateSurveyRdbInfo();
+			}
+			
+			private function updateSurveyRdbInfo():void {
+				rdbLastUpdateTimestampLabel.text = "Loading...";
+				var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					var date:Date = event.result;
+					if (date != null) {
+						rdbLastUpdateTimestampLabel.text = DateUtil.format(date);
+					}
+				}, null);
+				ClientFactory.saikuClient.loadLastUpdateTime(responder, surveyList.selectedItem.name);
+			}
+			
+			private function generateRdbClickHandler(event:MouseEvent):void {
 				var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
 					var job:JobProxy = event.result;
 					var jobMonitor:JobMonitor = new JobMonitor(job.id);
@@ -80,20 +96,24 @@
 	
 	<component:LoadingContent includeIn="loading" />
 	
-	<s:Form width="100%" height="100%" includeIn="loadComplete" >
-		<s:VGroup gap="30" horizontalAlign="center" width="100%">
-			<s:FormItem label="{Message.get('saiku.generate_rdb_for_survey')}">
-				<s:layout>
-					<s:HorizontalLayout />
-				</s:layout>
-				<s:DropDownList id="surveyList" labelField="name" width="300" />
-				<s:Button id="generateRdbBtn" label="{Message.get('saiku.generate')}"
-						  click="generateRdbClickHandler(event)"/>
-			</s:FormItem>
-			
-			<s:Button id="launchSaikuBtn" click="launchSaikuClickHandler(event)" label="{Message.get('saiku.launch')}" />
-			
-		</s:VGroup>
-	</s:Form>
+	<s:VGroup gap="30" horizontalAlign="center" width="100%">
+		<container:FieldSet legend="{Message.get('saiku.relational_database')}" width="100%">
+			<s:Form width="100%" height="100%" includeIn="loadComplete" >
+				<s:FormItem label="{Message.get('saiku.generate_rdb_for_survey')}">
+					<s:DropDownList id="surveyList" labelField="name" width="300"
+						change="surveyChangeHandler(event)" />
+				</s:FormItem>
+				<s:FormItem label="{Message.get('saiku.rdb_last_update_time')}:">
+					<s:layout>
+						<s:HorizontalLayout />
+					</s:layout>
+					<s:Label id="rdbLastUpdateTimestampLabel" text="..." width="200" />
+					<s:Button id="generateRdbBtn" label="{Message.get('saiku.generate')}"
+							  click="generateRdbClickHandler(event)"/>
+				</s:FormItem>
+			</s:Form>
+		</container:FieldSet>
+		<s:Button id="launchSaikuBtn" click="launchSaikuClickHandler(event)" label="{Message.get('saiku.launch')}" />
+	</s:VGroup>
 
 </component:PopUp>
