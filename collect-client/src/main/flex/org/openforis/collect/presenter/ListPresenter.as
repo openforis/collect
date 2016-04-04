@@ -14,6 +14,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.core.FlexGlobals;
+	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	import mx.events.MenuEvent;
@@ -21,6 +22,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
+	import mx.utils.ObjectUtil;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
@@ -35,6 +37,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.model.CollectRecord$State;
 	import org.openforis.collect.model.CollectRecord$Step;
+	import org.openforis.collect.model.proxy.RecordFilterProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.remoting.service.concurrency.proxy.SurveyLockingJobProxy;
@@ -80,7 +83,7 @@ package org.openforis.collect.presenter {
 		/**
 		 * The current filter applied on root entity key fields. 
 		 * */
-		private var currentKeyValuesFilter:Array = null;
+		private var currentFilter:RecordFilterProxy = null;
 		
 		/**
 		 * Max number of records that can be loaded for a single page.
@@ -311,7 +314,7 @@ package org.openforis.collect.presenter {
 		protected function openFilterPopUpButtonClickHandler(event:Event):void {
 			if ( _filterPopUp != null ) {
 				closeFilterPopUp();
-			} else if ( currentKeyValuesFilter == null ) {
+			} else if ( currentFilter == null ) {
 				openFilterPopUp();
 			} else {
 				resetCurrentFilter();
@@ -349,10 +352,16 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function stageClickHandler(event:MouseEvent):void {
-			if ( event.target != view.openFilterPopUpButton &&  _filterPopUp != null && 
-				! _filterPopUp.hitTestPoint( event.stageX, event.stageY ) ) {
+			if ( _filterPopUp != null 
+				&& event.target != view.openFilterPopUpButton
+				&& ! hitsTarget(event, _filterPopUp.modifiedSinceDateField.dropdown)
+				&& ! hitsTarget(event, _filterPopUp)) {
 				closeFilterPopUp();
 			}
+		}
+		
+		private function hitsTarget(event:MouseEvent, target:UIComponent):Boolean {
+			return target != null && target.hitTestPoint( event.stageX, event.stageY );
 		}
 		
 		protected function closeFilterPopUp():void {
@@ -360,12 +369,12 @@ package org.openforis.collect.presenter {
 				PopUpManager.removePopUp(_filterPopUp);
 				_filterPopUp = null;
 			}
-			view.openFilterPopUpButton.selected = currentKeyValuesFilter != null;
+			view.openFilterPopUpButton.selected = currentFilter != null;
 		}
 		
 		protected function filterPopUpCloseHandler(event:Event = null):void {
-			var oldFilter:Array = currentKeyValuesFilter;
-			currentKeyValuesFilter = null;
+			var oldFilter:RecordFilterProxy = currentFilter;
+			currentFilter = null;
 			if(oldFilter != null) {
 				loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
 			}
@@ -373,20 +382,16 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function filterPopUpApplyHandler(event:Event):void {
-			var filter:Array = new Array();
-			var empty:Boolean = true;
+			var filter:RecordFilterProxy = new RecordFilterProxy();
+			var keyValues:ArrayCollection = new ArrayCollection();
 			for each (var textInput:TextInput in _filterPopUp.textInput) {
 				var key:String = StringUtil.trim(textInput.text).toUpperCase();
-				filter.push(key);
-				if ( key != "" ) {
-					empty = false;
-				}
+				keyValues.addItem(key);
 			}
-			if ( ! empty ) {
-				currentKeyValuesFilter = filter;
-			} else {
-				currentKeyValuesFilter = null;
-			}
+			filter.keyValues = keyValues;
+			filter.rootEntityId = Application.activeRootEntity.id;
+			filter.modifiedSince = _filterPopUp.modifiedSinceDateField.selectedDate;
+			currentFilter = filter.isEmpty() ? null : filter;
 			loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
 			closeFilterPopUp();
 		}
@@ -414,7 +419,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function resetCurrentFilter():void {
-			currentKeyValuesFilter = null;
+			currentFilter = null;
 			view.openFilterPopUpButton.selected = false;
 		}
 		
@@ -434,10 +439,10 @@ package org.openforis.collect.presenter {
 			view.paginationBar.currentState = PaginationBar.LOADING_STATE;
 			
 			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
-			var rootEntityName:String = Application.activeRootEntity.name;
-
-			_dataClient.loadRecordSummaries(responder, rootEntityName, 
-				offset, recordsPerPage, currentSortFields, currentKeyValuesFilter);
+			var filter = currentFilter == null ? new RecordFilterProxy(): ObjectUtil.clone(currentFilter) as RecordFilterProxy;
+			filter.offset = offset;
+			filter.maxNumberOfRecords = recordsPerPage;
+			_dataClient.loadRecordSummaries(responder, filter, currentSortFields);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
@@ -449,7 +454,7 @@ package org.openforis.collect.presenter {
 			
 			view.paginationBar.totalRecords = result.count;
 			
-			if(result.totalCount == 0 && currentKeyValuesFilter != null) {
+			if(result.totalCount == 0 && currentFilter != null) {
 				AlertUtil.showMessage("list.filter.noRecordsFound");
 			}
 		}

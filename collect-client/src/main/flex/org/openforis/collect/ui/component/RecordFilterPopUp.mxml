@@ -63,6 +63,10 @@
 								 />
 			</mx:HBox>
 		</mx:Repeater>
+		<mx:HBox>
+			<s:Label text="{Message.get('list.filter.modified_since')}" width="120" />
+			<mx:DateField id="modifiedSinceDateField" formatString="DD/MM/YYYY" />
+		</mx:HBox>
 	</mx:VBox>
 	
 	<s:HGroup id="buttonBar" width="100%" 

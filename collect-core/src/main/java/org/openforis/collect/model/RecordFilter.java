@@ -136,5 +136,5 @@ public class RecordFilter {
 	public void setCaseSensitiveKeyValues(boolean caseSensitiveKeyValues) {
 		this.caseSensitiveKeyValues = caseSensitiveKeyValues;
 	}
-
+	
 }

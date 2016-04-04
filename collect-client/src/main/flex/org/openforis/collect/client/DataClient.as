@@ -10,6 +10,7 @@ package org.openforis.collect.client {
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.RecordFilterProxy;
 	
 	/**
 	 * 
@@ -75,8 +76,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function loadRecordSummaries(responder:IResponder, rootEntityName:String, offset:int, maxNumberOfRecords:int, sortFields:IList=null, keyValues:Array = null):void {
-			var token:AsyncToken = this._loadRecordSummariesOperation.send(rootEntityName, offset, maxNumberOfRecords, sortFields, keyValues);
+		public function loadRecordSummaries(responder:IResponder, filter:RecordFilterProxy, sortFields:IList=null):void {
+			var token:AsyncToken = this._loadRecordSummariesOperation.send(filter, sortFields);
 			token.addResponder(responder);
 		}
 		

@@ -62,6 +62,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.RecordFilterProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.RecordSummaryProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
