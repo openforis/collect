@@ -22,6 +22,7 @@ public class Configuration implements Cloneable {
 		, REMOTE_CLONE_URL("remote_clone", "Remote Collect clone address")
 		, REMOTE_RESTORE_KEY("remote_clone_restore_key", "Remote Collect clone allowed key")
 		, SAIKU_BASE_DIR("saiku_base_dir", "Saiku base dir")
+		, SAIKU_CONTEXT("saiku_context", "Saiku context")
 		;
 		private String key;
 		private String label;

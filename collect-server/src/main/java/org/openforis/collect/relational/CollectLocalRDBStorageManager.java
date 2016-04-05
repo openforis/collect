@@ -1,12 +1,14 @@
 package org.openforis.collect.relational;
 
 import java.io.File;
+import java.util.Date;
 
 import javax.annotation.PostConstruct;
 
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.BaseStorageManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
+import org.openforis.collect.utils.Dates;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,6 +39,15 @@ public class CollectLocalRDBStorageManager extends BaseStorageManager {
 	public boolean existsRDBFile(String surveyName, RecordStep step) {
 		File rdbFile = getRDBFile(surveyName, step);
 		return rdbFile.exists() && rdbFile.length() > 0;
+	}
+	
+	public Date getRDBFileDate(String surveyName, RecordStep step) {
+		File rdbFile = getRDBFile(surveyName, step);
+		if (rdbFile.exists()) {
+			return Dates.millisToDate(rdbFile.lastModified());
+		} else {
+			return null;
+		}
 	}
 	
 	public File getRDBFile(String surveyName, RecordStep step) {

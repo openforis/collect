@@ -28,11 +28,14 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 
 	private static final String DATASOURCE_CONTENT_FORMAT = 
 			  "type=OLAP\r\n"
-			+ "name=%s\r\n"
+			+ "name=%s_%s\r\n"
 			+ "driver=mondrian.olap4j.MondrianOlap4jDriver\r\n"
 			+ "location=jdbc:mondrian:Jdbc=%s;Catalog=%s;JdbcDrivers=org.sqlite.JDBC\r\n"
 			+ "username=dbuser\r\n"
 			+ "password=password";
+	
+	@Autowired
+	private SaikuConfiguration saikuConfiguration;
 	
 	@Autowired
 	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
@@ -41,6 +44,8 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 	
 	@PostConstruct
 	public void init() {
+		this.setDefaultRootStoragePath(getCatalinaBaseWebappsFolderPath());
+		this.setDefaultSubFolder(saikuConfiguration.getContextPath());
 		super.initStorageDirectory(ConfigurationItem.SAIKU_BASE_DIR, false);
 	}
 
@@ -60,7 +65,12 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 		try {
 			File rdbFile = rdbStorageManager.getRDBFile(surveyName, recordStep);
 			File mondrianSchemaFile = mondrianSchemaStorageManager.getSchemaFile(surveyName);
-			String content = String.format(DATASOURCE_CONTENT_FORMAT, surveyName, "jdbc:sqlite:" + rdbFile.getAbsolutePath(), mondrianSchemaFile.getAbsolutePath());
+			String content = String.format(DATASOURCE_CONTENT_FORMAT
+					, surveyName
+					, recordStep.name().toLowerCase(Locale.ENGLISH)
+					, "jdbc:sqlite:" + formatPath(rdbFile.getAbsolutePath())
+					, formatPath(mondrianSchemaFile.getAbsolutePath())
+			);
 			File file = getDatasourceFile(surveyName, recordStep);
 			FileUtils.write(file, content);
 		} catch (Exception e) {
@@ -72,5 +82,12 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 		File file = getDatasourceFile(surveyName, recordStep);
 		return file.delete();
 	}
-
+	
+	/**
+	 * Formats a file path to be compatible with Saiku datasource file path format
+	 */
+	private static String formatPath(String path) {
+		return path.replaceAll("\\\\", "/");
+	}
+	
 }

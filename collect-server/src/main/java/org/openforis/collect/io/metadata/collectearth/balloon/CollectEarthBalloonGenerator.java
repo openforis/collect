@@ -58,7 +58,6 @@ public class CollectEarthBalloonGenerator {
 	
 	public static final String EXTRA_HIDDEN_PREFIX = "EXTRA_";
 	private static final String EXTRA_HIDDEN_FIELD_CLASS = "extra";
-
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	
@@ -194,7 +193,8 @@ public class CollectEarthBalloonGenerator {
 			sb.append(name);
 			sb.append("\" name=\""); //$NON-NLS-1$
 			sb.append(name);
-			sb.append("\" value=\"$[").append( EXTRA_HIDDEN_PREFIX); //$NON-NLS-1$
+			sb.append("\" value=\"$["); //$NON-NLS-1$
+			sb.append( EXTRA_HIDDEN_PREFIX);
 			sb.append(def.getName());
 			sb.append("]\""); //$NON-NLS-1$
 			sb.append(" class=\""); //$NON-NLS-1$
@@ -243,7 +243,7 @@ public class CollectEarthBalloonGenerator {
 		UIOptions uiOptions = survey.getUIOptions();
 		UIConfiguration uiConfiguration = survey.getUIConfiguration();
 		if (uiConfiguration == null) {
-			throw new IllegalStateException("Error unmarshalling the survey"); //$NON-NLS-1$
+			throw new IllegalStateException("Error unmarshalling the survey - no UI configruration!"); //$NON-NLS-1$
 		}
 		if (uiConfiguration.getFormSets().isEmpty()) {
 			//no ui configuration defined
@@ -419,15 +419,18 @@ public class CollectEarthBalloonGenerator {
 		
 		CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label);
 		for (NodeDefinition child : def.getChildDefinitions()) {
-			String heading = child.getLabel(Type.INSTANCE, language);
-			if (heading == null && ! isDefaultLanguage()) {
-				heading = child.getLabel(Type.INSTANCE);
+			if (! uiOptions.isHidden(child)) {
+				String heading = child.getLabel(Type.INSTANCE, language);
+				if (heading == null && ! isDefaultLanguage()) {
+					heading = child.getLabel(Type.INSTANCE);
+				}
+				if (heading == null) {
+					heading = child.getName();
+				}
+				ceTable.addHeading(heading);
 			}
-			if (heading == null) {
-				heading = child.getName();
-			}
-			ceTable.addHeading(heading);
 		}
+		
 		CodeAttributeDefinition enumeratingCodeAttribute = def.getEnumeratingKeyCodeAttribute();
 		CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
 		List<CodeListItem> codeItems = codeListService.loadRootItems(enumeratingCodeAttribute.getList());

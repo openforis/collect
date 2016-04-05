@@ -60,10 +60,9 @@
 			
 			<s:Label id="titleLabel" styleName="listTitle" verticalCenter="0" horizontalCenter="0" />
 			
-			<s:ToggleButton id="openFilterPopUpButton"
+			<s:Button id="openFilterPopUpButton"
 					  		toolTip="{Message.get('list.filter')}"
-							label="{Message.get(openFilterPopUpButton.selected ? 'list.filterOn': 'list.filterOff')}"
-					  		right="0"
+							right="0"
 							height="20"
 							styleName="filter"
 					  		/>

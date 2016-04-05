@@ -255,6 +255,27 @@ public class EntityDefinition extends NodeDefinition {
 			}
 		}
 	}
+	
+	/**
+	 * Returns attributes inside current entity and in nested single entities
+	 */
+	public List<AttributeDefinition> getNestedAttributes() {
+		final List<AttributeDefinition> result = new ArrayList<AttributeDefinition>();
+		Stack<EntityDefinition> stack = new Stack<EntityDefinition>();
+		stack.add(this);
+		while (! stack.isEmpty()) {
+			EntityDefinition entityDef = stack.pop();
+			List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
+			for (NodeDefinition nodeDef : childDefinitions) {
+				if (nodeDef instanceof AttributeDefinition) {
+					result.add((AttributeDefinition) nodeDef);
+				} else if (! nodeDef.isMultiple()) {
+					stack.push((EntityDefinition) nodeDef);
+				}
+			}
+		}
+		return result;
+	}
 
 	@Override
 	public Node<?> createNode() {

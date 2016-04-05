@@ -5,9 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
-import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
-import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -67,18 +66,9 @@ public class MondrianCubeGenerator {
 	}
 
 	private Cube generateCube() {
-		
+		Cube cube = new Cube("Collect Earth Plot");
 		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
 		Table table = new Table(rootEntityDef.getName());
-		
-		String cubeLabel = survey.getProjectName(language);
-		if( cubeLabel == null ){
-			cubeLabel = survey.getProjectName(null);	
-		}
-		
-		cubeLabel = HtmlUnicodeEscaperUtil.escapeMondrianUnicode( cubeLabel );
-		
-		Cube cube = new Cube("Collect Data - " + cubeLabel );
 		cube.table = table;
 		
 		List<NodeDefinition> children = rootEntityDef.getChildDefinitions();
@@ -90,7 +80,7 @@ public class MondrianCubeGenerator {
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
 					measure.column = "_" + rootEntityDef.getName() + "_" + nodeName;
-					measure.caption = HtmlUnicodeEscaperUtil.escapeMondrianUnicode( extractLabel(rootEntityDef) + " Count" );
+					measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(rootEntityDef) + " Count" );
 					measure.aggregator = "distinct count";
 					measure.datatype = "Integer";
 					cube.measures.add(measure);
@@ -98,7 +88,7 @@ public class MondrianCubeGenerator {
 					for (String aggregator : MEASURE_AGGREGATORS) {
 						Measure measure = new Measure(nodeName + "_" + aggregator);
 						measure.column = nodeName;
-						measure.caption = HtmlUnicodeEscaperUtil.escapeMondrianUnicode( extractLabel(nodeDef) + " " + aggregator );
+						measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(nodeDef) + " " + aggregator );
 						measure.aggregator = aggregator;
 						measure.datatype = "Numeric";
 						measure.formatString = "#.##";
@@ -157,11 +147,8 @@ public class MondrianCubeGenerator {
 //		cube.dimensions.addAll(generatePredefinedDimensions());
 		//add predefined measures
 		
-		// Add the measures AFTER the 1st measure, which should be Plot Count
-		// Only for Collect Earth surveys
-		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
-			cube.measures.addAll(1, generateEarthSpecificMeasures());
-		}
+		// Add the measures AFTER the 1st measure, which shouyld be Plot Count
+		cube.measures.addAll(1, generatePredefinedMeasures());
 		return cube;
 	}
 
@@ -170,7 +157,7 @@ public class MondrianCubeGenerator {
 	}
 	
 	
-	private List<Measure> generateEarthSpecificMeasures() {
+	private List<Measure> generatePredefinedMeasures() {
 		List<Measure> measures = new ArrayList<Measure>();
 		//Expansion factor - Area
 		{
@@ -359,6 +346,7 @@ public class MondrianCubeGenerator {
 			level.table = codeTableName;
 			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
 			level.nameColumn = codeTableName.substring(0, codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + language ;
+			level.type = "Integer";
 		} else {
 			level.column = attrName;
 		}
@@ -366,13 +354,11 @@ public class MondrianCubeGenerator {
 	}
 
 	private String extractLabel(NodeDefinition nodeDef) {
-		String label = nodeDef.getFailSafeLabel(language, 
-				NodeLabel.Type.REPORTING, 
-				NodeLabel.Type.INSTANCE);
-		
-		label = HtmlUnicodeEscaperUtil.escapeMondrianUnicode( label);
-		
-		return label;
+		String attrLabel = nodeDef.getLabel(NodeLabel.Type.INSTANCE, language);
+		if (attrLabel == null) {
+			attrLabel = nodeDef.getName();
+		}
+		return attrLabel;
 	}
 	
 
@@ -383,7 +369,7 @@ public class MondrianCubeGenerator {
 
 		public MondrianSchemaObject(String name) {
 			super();
-			this.name = HtmlUnicodeEscaperUtil.escapeMondrianUnicode(name);
+			this.name = StringEscapeUtils.escapeHtml4(name);
 		}
 		
 	}

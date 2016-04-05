@@ -5,7 +5,6 @@ import static org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG
 
 import java.util.Set;
 
-import org.jooq.Record;
 import org.jooq.Result;
 import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.Configuration.ConfigurationItem;

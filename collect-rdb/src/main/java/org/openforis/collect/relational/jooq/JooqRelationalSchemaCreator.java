@@ -9,10 +9,12 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.CollectCreateIndexStep;
 import org.jooq.Condition;
 import org.jooq.CreateTableAsStep;
 import org.jooq.DataType;
 import org.jooq.Field;
+import org.jooq.Name;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.Select;
@@ -30,6 +32,7 @@ import org.openforis.collect.relational.model.PrimaryKeyConstraint;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
 
 /**
  * 
@@ -121,7 +124,13 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			currentTable = parentTable;
 		}
 		Select<?> select = dsl.select(fields).from(tables).where(conditions);
-		dsl.createView(DSL.table(name(schema.getName(), dataTable.getName() + "_view")), 
+		Name name;
+		if (dsl.isSchemaLess()) {
+			name = name(dataTable.getName() + "_view");
+		} else {
+			name = name(schema.getName(), dataTable.getName() + "_view");
+		}
+		dsl.createView(DSL.table(name), 
 				fields.toArray(new Field[fields.size()]))
 			.as(select)
 			.execute();
@@ -132,8 +141,14 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			if (table instanceof CodeTable) {
 				org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
 				CodeListCodeColumn codeColumn = ((CodeTable) table).getCodeColumn();
-				dsl.createIndex(table.getName() + "_code_idx")
-					.unique()
+				Integer levelIdx = ((CodeTable) table).getLevelIdx();
+				
+				CollectCreateIndexStep createIndexStep = dsl.createIndex(table.getName() + "_code_idx");
+				if (levelIdx == null || levelIdx == 0 || ((CodeTable) table).getCodeList().getCodeScope() == CodeScope.SCHEME) {
+					//unique index only for first level or when the code scope is 'scheme'
+					createIndexStep.unique();
+				}
+				createIndexStep
 					.on(jooqTable, field(codeColumn.getName()))
 					.execute();
 			}

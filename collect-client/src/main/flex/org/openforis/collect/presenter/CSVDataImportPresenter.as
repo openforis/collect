@@ -216,6 +216,8 @@ package org.openforis.collect.presenter
 				insertNewRecords = true;
 				var version:ModelVersionProxy = view.formVersionDropDownList.selectedItem;
 				newRecordModelVersion = version == null ? null: version.name;
+				var selectedStepItem:* = view.stepDropDownList.selectedItem;				
+				selectedStep = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
 				break;
 			default:
 				//update existing records
@@ -224,7 +226,8 @@ package org.openforis.collect.presenter
 				var selectedStepItem:* = view.stepDropDownList.selectedItem;
 				selectedStep = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
 			}
-			_importClient.start(responder, _uploadedTempFileName, entityId, selectedStep, transactional, validateRecords, insertNewRecords, newRecordModelVersion, deleteExistingEntities);
+			_importClient.start(responder, _uploadedTempFileName, entityId, selectedStep, transactional, validateRecords, 
+					insertNewRecords, newRecordModelVersion, deleteExistingEntities);
 		}
 		
 		override protected function performImportCancel():void {

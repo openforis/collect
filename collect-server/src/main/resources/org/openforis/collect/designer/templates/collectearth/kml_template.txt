@@ -116,10 +116,10 @@ ${html_for_balloon}
 		<name>${placemark.placemarkId}</name>
 		<ExtendedData>
 		      <Data name="longitude">
-		        <value>${placemark.coord.longitude}</value>
+		        <value><#if placemark.originalLongitude??>${placemark.originalLongitude}<#else>${placemark.coord.longitude}</#if></value>
 		      </Data>
 		      <Data name="latitude">
-		        <value>${placemark.coord.latitude}</value>
+		        <value><#if placemark.originalLatitude??>${placemark.originalLatitude}<#else>${placemark.coord.latitude}</#if></value>
 		      </Data>
 		      <Data name="next_id">
 		        <value>${placemark.nextPlacemarkId}</value>

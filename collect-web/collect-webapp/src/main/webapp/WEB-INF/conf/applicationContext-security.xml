@@ -27,6 +27,7 @@
 		<intercept-url access="permitAll" pattern="/assets/**" />
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
+		<intercept-url access="permitAll" pattern="/js/**" />
 		<intercept-url access="permitAll" pattern="/script/**" />
 		<intercept-url access="permitAll" pattern="/default-password-active.json" />
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
@@ -49,6 +50,7 @@
 		<intercept-url access="hasRole('ADMIN')" pattern="/importSurvey.htm" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/logoUpload" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/rdbpublish" />
+		<intercept-url access="hasRole('ADMIN')" pattern="/saiku/**/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/export/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/import/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/species/export/*" />

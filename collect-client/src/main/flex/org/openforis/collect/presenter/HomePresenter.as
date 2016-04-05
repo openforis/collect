@@ -4,8 +4,11 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
+	import mx.rpc.AsyncResponder;
+	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.UserProxy;
@@ -13,6 +16,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.BackupRestorePopUp;
 	import org.openforis.collect.ui.component.BackupView;
 	import org.openforis.collect.ui.component.ConfigurationPopUp;
+	import org.openforis.collect.ui.component.SaikuPopUp;
 	import org.openforis.collect.ui.component.user.UserManagementPopUp;
 	import org.openforis.collect.ui.view.HomePageView;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -29,27 +33,38 @@ package org.openforis.collect.presenter {
 
 		private static const DATA_MANAGEMENT_MENU_ITEM:Object = {
 			label: Message.get('home.dataManagement'), 
-			icon: Images.DATA_MANAGEMENT};
+			icon: Images.DATA_MANAGEMENT,
+			enabled: true};
 		
 		private static const USERS_MANAGEMENT_MENU_ITEM:Object = {
 			label: Message.get('home.userAccounts'),
-			icon: Images.USER_MANAGEMENT};
+			icon: Images.USER_MANAGEMENT,
+			enabled: true};
 		
 		private static const DESIGNER_MENU_ITEM:Object = {
 			label: Message.get('home.surveyDesigner'),
-			icon: Images.DATABASE_DESIGNER};
+			icon: Images.DATABASE_DESIGNER,
+			enabled: true};
 
 		private static const DATA_CLEANSING_MENU_ITEM:Object = {
 			label: Message.get('home.dataCleansing'),
-			icon: Images.DATA_CLEANSING};
+			icon: Images.DATA_CLEANSING,
+			enabled: true};
 		
+		private static const SAIKU_MENU_ITEM:Object = {
+			label: Message.get('home.saiku'),
+			icon: Images.SAIKU,
+			enabled: false};
+
 		private static const BACKUP_RESTORE_MENU_ITEM:Object = {
 			label: Message.get('home.backup_restore'),
-				icon: Images.BACKUP};
+			icon: Images.BACKUP,
+			enabled: true};
 
 		private static const CONFIGURATION_MENU_ITEM:Object = {
 			label: Message.get('home.configuration'),
-			icon: Images.CONFIGURATION};
+			icon: Images.CONFIGURATION,
+			enabled: true};
 
 		public function HomePresenter(view:HomePageView) {
 			super(view);
@@ -62,6 +77,17 @@ package org.openforis.collect.presenter {
 		override public function init():void {
 			super.init();
 			view.functionList.dataProvider = createFunctionsList();
+
+			checkSaikuAvailability();
+		}
+
+		private function checkSaikuAvailability():void {
+			var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+				SAIKU_MENU_ITEM.enabled = event.result == true;
+				SAIKU_MENU_ITEM.toolTip = event.result ? "": Message.get("saiku.module_not_available");
+				view.functionList.dataProvider = createFunctionsList();
+			}, faultHandler);
+			ClientFactory.saikuClient.isSaikuAvailable(responder);
 		}
 		
 		override protected function initEventListeners():void {
@@ -77,6 +103,7 @@ package org.openforis.collect.presenter {
 				result.addItem(DESIGNER_MENU_ITEM);
 				result.addItem(BACKUP_RESTORE_MENU_ITEM);
 				result.addItem(DATA_CLEANSING_MENU_ITEM);
+				result.addItem(SAIKU_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
 				result.addItem(CONFIGURATION_MENU_ITEM);
 			}
@@ -96,6 +123,9 @@ package org.openforis.collect.presenter {
 					break;
 				case DATA_CLEANSING_MENU_ITEM:
 					navigateToURL(new URLRequest(ApplicationConstants.DATA_CLEANSING_URL), "_self");
+					break;
+				case SAIKU_MENU_ITEM:
+					PopUpUtil.createPopUp(SaikuPopUp, true);
 					break;
 				case BACKUP_RESTORE_MENU_ITEM:
 					PopUpUtil.createPopUp(BackupRestorePopUp, true);

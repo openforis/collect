@@ -305,16 +305,15 @@ public class RecordManager {
 		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, keyValues);
 		return summaries;
 	}
-
+	
 	public List<CollectRecord> loadSummaries(RecordFilter filter) {
 		return loadSummaries(filter, null);
 	}
 	
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
-		List<CollectRecord> recordSummaries = recordDao.loadSummaries(filter, sortFields);
-		return recordSummaries;
+		return recordDao.loadSummaries(filter, sortFields);
 	}
-	
+
 	@Transactional(readOnly=true)
 	public Iterator<CollectRecord> iterateSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		return recordDao.iterateSummaries(filter, sortFields);

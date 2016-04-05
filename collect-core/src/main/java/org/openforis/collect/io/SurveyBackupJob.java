@@ -17,6 +17,7 @@ import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
 import org.openforis.collect.io.metadata.CodeListImagesExportTask;
 import org.openforis.collect.io.metadata.CollectMobileBackupConvertTask;
 import org.openforis.collect.io.metadata.IdmlExportTask;
+import org.openforis.collect.io.metadata.SurveyFileExportTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupExportTask;
 import org.openforis.collect.manager.CodeListManager;
@@ -59,7 +60,8 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	public static final String DATA_FOLDER = "data";
 	public static final String CODE_LIST_IMAGES_FOLDER = "code_list_images";
 	public static final String UPLOADED_FILES_FOLDER = "upload";
-	
+	public static final String SURVEY_FILES_FOLDER = "files";
+
 	public enum OutputFormat {
 		DESKTOP("collect"), 
 		DESKTOP_FULL("collect-backup"),
@@ -145,6 +147,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		addSamplingDesignExportTask();
 		addSpeciesExportTask();
 		addCleansingExportTask();
+		addSurveyFileExportTask();
 		if ( includeData && ! survey.isTemporary() ) {
 			addDataExportTask();
 			if ( includeRecordFiles ) {
@@ -274,6 +277,13 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		} catch (BeansException e) {
 			//do nothing
 		}
+	}
+	
+	private void addSurveyFileExportTask() {
+		SurveyFileExportTask task = applicationContext.getBean(SurveyFileExportTask.class);
+		task.setSurvey(survey);
+		task.setZipOutputStream(zipOutputStream);
+		addTask(task);
 	}
 	
 	@Override

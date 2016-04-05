@@ -38,9 +38,14 @@ public abstract class NumberValue<T extends Number> extends AbstractValue {
 
 	@Override
 	public String toPrettyFormatString() {
-		return getValue() == null ? null: getValue().toString();
+		return toInternalString();
 	}
 
+	@Override
+	public String toInternalString() {
+		return getValue() == null ? null: getValue().toString();
+	}
+	
 	@Override
 	@SuppressWarnings("serial")
 	public Map<String, Object> toMap() {

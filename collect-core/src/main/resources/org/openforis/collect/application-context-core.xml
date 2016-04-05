@@ -97,6 +97,10 @@
 		<property name="dsl" ref="dsl" />
 	</bean>
 
+	<bean id="surveyFileDao" class="org.openforis.collect.persistence.SurveyFileDao">
+		<property name="dsl" ref="dsl" />
+	</bean>
+
 	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDao">
   		<property name="dsl" ref="dsl" />
 	</bean>

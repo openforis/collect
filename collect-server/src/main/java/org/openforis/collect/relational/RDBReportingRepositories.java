@@ -16,6 +16,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.event.AttributeCreatedEvent;
 import org.openforis.collect.event.AttributeEvent;
 import org.openforis.collect.event.AttributeUpdatedEvent;
@@ -35,6 +36,7 @@ import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.event.TaxonAttributeUpdatedEvent;
 import org.openforis.collect.event.TextAttributeUpdatedEvent;
 import org.openforis.collect.event.TimeAttributeUpdatedEvent;
+import org.openforis.collect.io.metadata.collectearth.NewMondrianSchemaGenerator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
@@ -50,13 +52,14 @@ import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
-import org.openforis.collect.reporting.MondrianSchemaGenerator;
 import org.openforis.collect.reporting.MondrianSchemaStorageManager;
 import org.openforis.collect.reporting.ReportingRepositories;
+import org.openforis.collect.reporting.ReportingRepositoryInfo;
 import org.openforis.collect.reporting.SaikuDatasourceStorageManager;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.ProcessProgressListener;
 import org.openforis.concurrency.ProcessStepProgressListener;
+import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -115,11 +118,11 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	@Override
 	public void createRepositories(String surveyName, ProgressListener progressListener) {
 		initializeRelationalSchemaDefinition(surveyName);
-		ProcessProgressListener totalProgressListener = new ProcessProgressListener(RecordStep.values().length);
+		ProcessProgressListener processProgressListener = new ProcessProgressListener(RecordStep.values().length);
 		for (RecordStep step : RecordStep.values()) {
 			try {
-				createRepository(surveyName, step, new ProcessStepProgressListener(totalProgressListener, progressListener));
-				totalProgressListener.stepCompleted();
+				createRepository(surveyName, step, new ProcessStepProgressListener(processProgressListener, progressListener));
+				processProgressListener.stepCompleted();
 			} catch(CollectRdbException e) {
 				LOG.error("Error generating RDB for survey " + surveyName, e);
 			}
@@ -133,6 +136,9 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
 		
 		updateMondrianSchemaFile(surveyName);
+		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
+			writeSaikuDatasource(surveyName, recordStep);
+		}
 		
 		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
 		
@@ -154,9 +160,13 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private void writeSaikuDatasources(String surveyName) {
 		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
 			for (RecordStep recordStep : RecordStep.values()) {
-				saikuDatasourceStorageManager.writeDatasourceFile(surveyName, recordStep);
+				writeSaikuDatasource(surveyName, recordStep);
 			}
 		}
+	}
+
+	private void writeSaikuDatasource(String surveyName, RecordStep recordStep) {
+		saikuDatasourceStorageManager.writeDatasourceFile(surveyName, recordStep);
 	}
 	
 	private void deleteSaikuDatasources(String surveyName) {
@@ -181,17 +191,30 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private void insertRecords(String surveyName, RecordStep recordStep, 
 			RelationalSchema targetSchema, Connection targetConn,
 			ProgressListener progressListener) throws CollectRdbException {
+		ProcessProgressListener processProgressListener = new ProcessProgressListener(2);
 		CollectSurvey survey = surveyManager.get(surveyName);
 		DatabaseExporter databaseUpdater = createRDBUpdater(targetSchema, targetConn);
-		databaseUpdater.insertReferenceData(progressListener);
+		
+		databaseUpdater.insertReferenceData(new ProcessStepProgressListener(processProgressListener, progressListener));
+		processProgressListener.stepCompleted();
+		
 		RecordFilter recordFilter = new RecordFilter(survey);
 		Step step = Step.fromRecordStep(recordStep);
 		recordFilter.setStepGreaterOrEqual(step);
 		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
+		
+		ProcessStepProgressListener recordInsertProcessListener = new ProcessStepProgressListener(processProgressListener, progressListener);
+		recordInsertProcessListener.progressMade(new Progress(0, summaries.size()));
+		
+		long processedRecords = 0;
 		for (CollectRecord summary : summaries) {
 			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
-			databaseUpdater.insertRecordData(record, progressListener);
+			databaseUpdater.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
+			processedRecords++;
+			recordInsertProcessListener.progressMade(new Progress(processedRecords, summaries.size()));
 		}
+		IOUtils.closeQuietly(databaseUpdater);
+		processProgressListener.stepCompleted();
 	}
 
 	@Override
@@ -240,6 +263,21 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		File rdbFile = localRDBStorageManager.getRDBFile(surveyName, recordStep);
 		String path = rdbFile.getAbsolutePath();
 		return path;
+	}
+	
+	@Override
+	public ReportingRepositoryInfo getInfo(String surveyName) {
+		Date rdbFileDate = localRDBStorageManager.getRDBFileDate(surveyName, RecordStep.ENTRY);
+		if (rdbFileDate == null) {
+			return null;
+		} else {
+			ReportingRepositoryInfo info = new ReportingRepositoryInfo();
+			info.setLastUpdate(rdbFileDate);
+			RecordFilter filter = new RecordFilter(surveyManager.get(surveyName));
+			filter.setModifiedSince(rdbFileDate);
+			info.setUpdatedRecordsSinceLastUpdate(recordManager.countRecords(filter));
+			return info;
+		}
 	}
 
 	private RelationalSchema getOrInitializeRelationalSchemaDefinition(
@@ -309,7 +347,10 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	
 	private void initializeMondrianSchemaDefinition(CollectSurvey survey) {
 		try {
-			MondrianSchemaGenerator schemaGenerator = new MondrianSchemaGenerator(survey);
+			boolean schemaLess = true; //TODO
+			String schemaName = schemaLess ? "" : survey.getName();
+			NewMondrianSchemaGenerator schemaGenerator = new NewMondrianSchemaGenerator(survey, survey.getDefaultLanguage(), 
+					schemaName, rdbConfig);
 			String mondrianSchema = schemaGenerator.generateXMLSchema();
 			mondrianSchemaDefinitionBySurvey.put(survey.getName(), mondrianSchema);
 		} catch(CollectRdbException e) {
@@ -495,5 +536,4 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 
 	}
-
 }

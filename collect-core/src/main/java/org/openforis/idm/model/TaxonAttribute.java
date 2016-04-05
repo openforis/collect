@@ -141,11 +141,6 @@ public class TaxonAttribute extends Attribute<TaxonAttributeDefinition, TaxonOcc
 		}
 	}
 	
-	@Override
-	public String extractTextValue() {
-		return getCode();
-	}
-	
 	public static class LanguageCodeNotSupportedException extends RuntimeException {
 
 		private static final long serialVersionUID = 1L;

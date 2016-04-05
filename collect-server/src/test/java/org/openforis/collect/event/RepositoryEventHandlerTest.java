@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.reporting.ReportingRepositories;
+import org.openforis.collect.reporting.ReportingRepositoryInfo;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.rmb.KeepAlive;
 
@@ -102,6 +103,7 @@ public class RepositoryEventHandlerTest {
 		int createRepositoriesCalls;
 		int updateRepositoriesCalls;
 		int deleteRepositoriesCalls;
+		int getInfoCalls;
 		int getRepositoryPathFails;
 		int getRepositoryPathsFails;
 		int createRepositoryFails;
@@ -111,6 +113,7 @@ public class RepositoryEventHandlerTest {
 		int processFails;
 		int getRepositoryPathCalls;
 		int getRepositoryPathsCalls;
+		int getInfoFails;
 		
 		@Override
 		public void createRepository(String surveyName, RecordStep recordStep, ProgressListener progressListener) {
@@ -172,10 +175,21 @@ public class RepositoryEventHandlerTest {
 			getRepositoryPathCalls ++;
 			if (getRepositoryPathFails > 0) {
 				getRepositoryPathFails --;
-				throw new RuntimeException("getRepositoryPathCalls failed");
+				throw new RuntimeException("getRepositoryPath failed");
 			}
 			return null;
 		}
+		
+		@Override
+		public ReportingRepositoryInfo getInfo(String surveyName) {
+			getInfoCalls ++;
+			if (getInfoFails > 0) {
+				getInfoFails --;
+				throw new RuntimeException("getLastUpdateTimeCa failed");
+			}
+			return null;
+		}
+		
 		public void reset() {
 			processCalls = 0;
 			getRepositoryPathCalls = 0;
@@ -184,6 +198,7 @@ public class RepositoryEventHandlerTest {
 			createRepositoriesCalls = 0;
 			updateRepositoriesCalls = 0;
 			deleteRepositoriesCalls = 0;
+			getInfoCalls = 0;
 			processFails = 0;
 			getRepositoryPathFails = 0;
 			getRepositoryPathsFails = 0;
@@ -191,6 +206,7 @@ public class RepositoryEventHandlerTest {
 			createRepositoriesFails = 0;
 			deleteRepositoriesFails = 0;
 			updateRepositoriesFails = 0;
+			getInfoFails = 0;
 		}
 
 	}
