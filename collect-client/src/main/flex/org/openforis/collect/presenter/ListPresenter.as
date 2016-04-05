@@ -3,6 +3,8 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
+	import com.adobe.serialization.json.JSON;
+	
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -13,6 +15,8 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.controls.Alert;
+	import mx.controls.TextInput;
 	import mx.core.FlexGlobals;
 	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
@@ -23,6 +27,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.ObjectUtil;
+	import mx.utils.URLUtil;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
@@ -48,7 +53,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.SelectVersionPopUp;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
-	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -80,10 +84,14 @@ package org.openforis.collect.presenter {
 		 * The current sortField
 		 */
 		private var currentSortFields:IList;
+		
+		private var filterEnabled:Boolean = false;
 		/**
-		 * The current filter applied on root entity key fields. 
+		 * The current filter applied on record list. 
 		 * */
 		private var currentFilter:RecordFilterProxy = null;
+		
+		private var filterErrorAlert:Alert = null;
 		
 		/**
 		 * Max number of records that can be loaded for a single page.
@@ -193,9 +201,16 @@ package org.openforis.collect.presenter {
 				var url:String = ApplicationConstants.VALIDATION_REPORT_URL;
 				var req:URLRequest = new URLRequest(url);
 				var params:URLVariables = new URLVariables();
-				params.s = Application.activeSurvey.name;
-				params.r = Application.activeRootEntity.name;
+				params.surveyName = Application.activeSurvey.name;
+				params.rootEntityId = Application.activeRootEntity.id;
 				params.locale = Application.localeString;
+				var filter:RecordFilterProxy = (! filterEnabled || currentFilter == null) ? new RecordFilterProxy(): RecordFilterProxy(ObjectUtil.clone(currentFilter));
+				if (CollectionUtil.isNotEmpty(filter.keyValues)) {
+					params.recordKeys = filter.keyValues;
+				}
+				if (filter.modifiedSince != null) {
+					params.modifiedSince = filter.modifiedSince;
+				}
 				req.data = params;
 				navigateToURL(req, "_new");
 				break;
@@ -314,11 +329,8 @@ package org.openforis.collect.presenter {
 		protected function openFilterPopUpButtonClickHandler(event:Event):void {
 			if ( _filterPopUp != null ) {
 				closeFilterPopUp();
-			} else if ( currentFilter == null ) {
-				openFilterPopUp();
 			} else {
-				resetCurrentFilter();
-				loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
+				openFilterPopUp();
 			}
 		}
 		
@@ -332,6 +344,7 @@ package org.openforis.collect.presenter {
 			_filterPopUp.fieldsRp.addEventListener(FlexEvent.REPEAT_END, function(event:FlexEvent):void {
 				var firstTextInput:TextInput = _filterPopUp.textInput[0];
 				firstTextInput.setFocus();
+				fillFilterPopUpForm();
 			});
 
 			var schema:SchemaProxy = Application.activeSurvey.schema;
@@ -355,7 +368,9 @@ package org.openforis.collect.presenter {
 			if ( _filterPopUp != null 
 				&& event.target != view.openFilterPopUpButton
 				&& ! hitsTarget(event, _filterPopUp.modifiedSinceDateField.dropdown)
-				&& ! hitsTarget(event, _filterPopUp)) {
+				&& ! hitsTarget(event, _filterPopUp)
+				&& ! (filterErrorAlert != null && hitsTarget(event, filterErrorAlert))
+			) {
 				closeFilterPopUp();
 			}
 		}
@@ -364,36 +379,66 @@ package org.openforis.collect.presenter {
 			return target != null && target.hitTestPoint( event.stageX, event.stageY );
 		}
 		
+		private function extractFilterFromPopUpForm():RecordFilterProxy {
+			var filter:RecordFilterProxy = new RecordFilterProxy();
+			filter.keyValues = new ArrayCollection();
+			for each (var textInput:TextInput in _filterPopUp.textInput) {
+				var key:String = StringUtil.trim(textInput.text).toUpperCase();
+				filter.keyValues.addItem(key);
+			}
+			filter.rootEntityId = Application.activeRootEntity.id;
+			filter.modifiedSince = _filterPopUp.modifiedSinceDateField.selectedDate;
+			return filter;
+		}
+		
+		private function fillFilterPopUpForm():void {
+			_filterPopUp.enabledCheckBox.selected = filterEnabled;
+			var filter:RecordFilterProxy;
+			if (currentFilter == null) {
+				filter = new RecordFilterProxy();
+				filter.keyValues = new ArrayCollection();
+				CollectionUtil.fill(filter.keyValues, null, _filterPopUp.textInput.length);
+			} else {
+				filter = currentFilter;
+			}
+			for(var idx:int = 0; idx < _filterPopUp.textInput.length && idx < filter.keyValues.length; idx++) {
+				var textInput:TextInput = _filterPopUp.textInput[idx];
+				var keyValue:String = filter.keyValues.getItemAt(idx) as String;
+				textInput.text = keyValue;
+			}
+			_filterPopUp.modifiedSinceDateField.selectedDate = filter.modifiedSince;
+		}
+
 		protected function closeFilterPopUp():void {
 			if ( _filterPopUp != null ) {
 				PopUpManager.removePopUp(_filterPopUp);
 				_filterPopUp = null;
+				filterErrorAlert = null;
 			}
-			view.openFilterPopUpButton.selected = currentFilter != null;
 		}
 		
 		protected function filterPopUpCloseHandler(event:Event = null):void {
-			var oldFilter:RecordFilterProxy = currentFilter;
-			currentFilter = null;
-			if(oldFilter != null) {
-				loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
-			}
 			closeFilterPopUp();
 		}
 		
 		protected function filterPopUpApplyHandler(event:Event):void {
-			var filter:RecordFilterProxy = new RecordFilterProxy();
-			var keyValues:ArrayCollection = new ArrayCollection();
-			for each (var textInput:TextInput in _filterPopUp.textInput) {
-				var key:String = StringUtil.trim(textInput.text).toUpperCase();
-				keyValues.addItem(key);
+			if (_filterPopUp.enabledCheckBox.selected) {
+				var filter:RecordFilterProxy = extractFilterFromPopUpForm();
+				if (filter.isEmpty()) {
+					filterErrorAlert = AlertUtil.showError("list.filter.error.empty_parameters");
+				} else {
+					filterEnabled = true;
+					currentFilter = filter;
+					view.openFilterPopUpButton.label = Message.get('list.filterOn');
+					loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
+					closeFilterPopUp();
+				}
+			} else {
+				filterEnabled = false;
+				view.openFilterPopUpButton.label = Message.get('list.filterOff');
+				loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
+				closeFilterPopUp();
 			}
-			filter.keyValues = keyValues;
-			filter.rootEntityId = Application.activeRootEntity.id;
-			filter.modifiedSince = _filterPopUp.modifiedSinceDateField.selectedDate;
-			currentFilter = filter.isEmpty() ? null : filter;
-			loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
-			closeFilterPopUp();
 		}
 		
 		/**
@@ -420,7 +465,7 @@ package org.openforis.collect.presenter {
 		
 		protected function resetCurrentFilter():void {
 			currentFilter = null;
-			view.openFilterPopUpButton.selected = false;
+			view.openFilterPopUpButton.label = Message.get('list.filterOff');
 		}
 		
 		protected function updateDataGrid():void {
@@ -439,7 +484,7 @@ package org.openforis.collect.presenter {
 			view.paginationBar.currentState = PaginationBar.LOADING_STATE;
 			
 			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
-			var filter = currentFilter == null ? new RecordFilterProxy(): ObjectUtil.clone(currentFilter) as RecordFilterProxy;
+			var filter:RecordFilterProxy = (! filterEnabled || currentFilter == null) ? new RecordFilterProxy(): ObjectUtil.clone(currentFilter) as RecordFilterProxy;
 			filter.offset = offset;
 			filter.maxNumberOfRecords = recordsPerPage;
 			_dataClient.loadRecordSummaries(responder, filter, currentSortFields);

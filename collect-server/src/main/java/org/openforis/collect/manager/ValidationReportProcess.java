@@ -13,7 +13,7 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordValidationReportGenerator;
 import org.openforis.collect.model.RecordValidationReportItem;
 import org.openforis.collect.model.User;
@@ -35,8 +35,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	private OutputStream outputStream;
 	private RecordManager recordManager;
 	private ReportType reportType;
-	private CollectSurvey survey;
-	private String rootEntityName;
+	private RecordFilter recordFilter;
 	private boolean includeConfirmedErrors;
 	private Locale locale;
 
@@ -52,8 +51,8 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 			MessageSource messageSource,
 			ReportType reportType, 
 			User user, String sessionId, 
-			CollectSurvey survey, String rootEntityName, boolean includeConfirmedErrors) {
-		this(outputStream, recordManager, messageSource, reportType, user, sessionId, survey, rootEntityName, includeConfirmedErrors, Locale.ENGLISH);
+			RecordFilter recordFilter, boolean includeConfirmedErrors) {
+		this(outputStream, recordManager, messageSource, reportType, user, sessionId, recordFilter, includeConfirmedErrors, Locale.ENGLISH);
 	}
 	
 	public ValidationReportProcess(OutputStream outputStream,
@@ -61,13 +60,12 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 			MessageSource messageSource,
 			ReportType reportType, 
 			User user, String sessionId, 
-			CollectSurvey survey, String rootEntityName, boolean includeConfirmedErrors, Locale locale) {
+			RecordFilter recordFilter, boolean includeConfirmedErrors, Locale locale) {
 		super();
 		this.outputStream = outputStream;
 		this.recordManager = recordManager;
 		this.reportType = reportType;
-		this.survey = survey;
-		this.rootEntityName = rootEntityName;
+		this.recordFilter = recordFilter;
 		this.includeConfirmedErrors = includeConfirmedErrors;
 		this.validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
 		this.locale = locale;
@@ -81,7 +79,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	@Override
 	public void startProcessing() throws Exception {
 		super.startProcessing();
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, (String) null);
+		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
 		if ( summaries != null ) {
 			status.setTotal(summaries.size());
 			try {
@@ -93,7 +91,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 					if ( status.isRunning() ) {
 						Step step = summary.getStep();
 						Integer recordId = summary.getId();
-						CollectRecord record = recordManager.load(survey, recordId, step);
+						CollectRecord record = recordManager.load(recordFilter.getSurvey(), recordId, step);
 						writeValidationReport(record);
 						status.incrementProcessed();
 						//long elapsedMillis = System.currentTimeMillis() - start;

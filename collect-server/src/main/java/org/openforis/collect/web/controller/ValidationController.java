@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletOutputStream;
@@ -17,9 +18,11 @@ import org.openforis.collect.manager.ValidationReportProcess.ReportType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.collect.spring.SpringMessageSource;
+import org.openforis.collect.utils.Dates;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -86,26 +89,35 @@ public class ValidationController extends BasicController {
 	}
 	
 	@RequestMapping(value = "/validationReport", method = RequestMethod.GET)
-	public void validationReport(HttpServletRequest request, HttpServletResponse response, 
-			@RequestParam(required=true) String s, @RequestParam(required=true) String r, @RequestParam(required=false, defaultValue="en_US") String locale) throws IOException {
+	public void validationReport(HttpServletRequest request, HttpServletResponse response
+			, @RequestParam(required=false) String surveyName
+			, @RequestParam(required=false) Integer rootEntityId
+			, @RequestParam(required=false, defaultValue="en_US") String locale
+			, String[] recordKeys
+			, @RequestParam(required=false) Date modifiedSince
+			) throws IOException {
 		ServletOutputStream outputStream = response.getOutputStream();
 		try {
-			if ( s == null || r == null || locale == null) {
-				outputStream.println("Wrong parameters: please specify 's' (survey), 'r' (root entity name) and 'locale' string rappresentation of locale");
+			if ( surveyName == null || rootEntityId == null || locale == null) {
+				outputStream.println("Wrong parameters: please specify 'surveyName' (name of the survey), 'rootEntityId' (root entity id) and 'locale' string rappresentation of locale");
 				return;
 			}
-			CollectSurvey survey = surveyManager.get(s);
+			CollectSurvey survey = surveyManager.get(surveyName);
 			if ( survey == null ) {
 				print(outputStream, "Survey not found");
 				return;
 			}
 			response.setContentType("text/csv");
-			response.setHeader("Content-Disposition", "attachment; fileName=validation_report.csv");
+			String outputFileName = String.format("%s_validation_report_%s.csv", surveyName, Dates.formatDateTime(new Date()));
+			response.setHeader("Content-Disposition", "attachment; fileName=" + outputFileName);
 			SessionState sessionState = getSessionState(request);
 			User user = sessionState.getUser();
 			String sessionId = sessionState.getSessionId();
+			RecordFilter recordFilter = new RecordFilter(survey, rootEntityId);
+			recordFilter.setKeyValues(recordKeys);
+			recordFilter.setModifiedSince(modifiedSince);
 			ValidationReportProcess process = new ValidationReportProcess(outputStream, recordManager, messageContextHolder, 
-					ReportType.CSV, user, sessionId, survey, r, true, LocaleUtils.toLocale(locale));
+					ReportType.CSV, user, sessionId, recordFilter, true, LocaleUtils.toLocale(locale));
 			process.init();
 			process.call();
 		} catch (Exception e) {

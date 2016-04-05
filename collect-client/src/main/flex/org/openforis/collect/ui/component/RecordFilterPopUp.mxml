@@ -52,20 +52,27 @@
 	</fx:Script>
 	
 	<mx:VBox>
+		<mx:HBox>
+			<s:Label text="{Message.get('list.filter.enabled')}" styleName="bold" width="120" />
+			<s:CheckBox id="enabledCheckBox" />
+		</mx:HBox>
 		<mx:Repeater id="fieldsRp" dataProvider="{fields}">
 			<mx:HBox>
 				<detail:FormItemLabel nodeDefinition="{fieldsRp.currentItem as NodeDefinitionProxy}"
 									  width="120"
 									  />
-				<input:TextInput id="textInput" 
+				<mx:TextInput id="textInput"
 								 width="80" 
 								 enter="textInputEnterHandler(event)"
+								 enabled="{enabledCheckBox.selected}"
 								 />
 			</mx:HBox>
 		</mx:Repeater>
 		<mx:HBox>
-			<s:Label text="{Message.get('list.filter.modified_since')}" width="120" />
-			<mx:DateField id="modifiedSinceDateField" formatString="DD/MM/YYYY" />
+			<s:Label text="{Message.get('list.filter.modified_since')}" styleName="bold" width="120" />
+			<mx:DateField id="modifiedSinceDateField" formatString="DD/MM/YYYY" 
+						  yearNavigationEnabled="true"
+						  enabled="{enabledCheckBox.selected}" />
 		</mx:HBox>
 	</mx:VBox>
 	
