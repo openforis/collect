@@ -28,8 +28,8 @@ public class DDLCreator {
 			for (Column<?> column : table.getColumns()) {
 				org.apache.ddlutils.model.Column ddlColumn = new org.apache.ddlutils.model.Column();
 				ddlColumn.setName(column.getName());
-				ddlColumn.setType(column.getTypeName());
-				ddlColumn.setTypeCode(column.getType());
+				ddlColumn.setType(column.getType().getName());
+				ddlColumn.setTypeCode(column.getType().getCode());
 				ddlColumn.setSizeAndScale(column.getLength() == null ? 0: column.getLength(), 0);
 				ddlTable.addColumn(ddlColumn);
 			}

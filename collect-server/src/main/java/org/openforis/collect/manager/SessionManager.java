@@ -55,8 +55,10 @@ public class SessionManager {
 	}
 
 	public SessionState getSessionState() {
-		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-		if (sessionState == null) {
+		SessionState sessionState = null;
+		try {
+			sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
+		} catch(IllegalStateException e) {
 			throw new InvalidSessionException();
 		}
 		if (sessionState.getUser() == null) {
@@ -167,7 +169,7 @@ public class SessionManager {
 			}
 		}
 		if ( result == null ) {
-			throw new IllegalStateException("Error getting session attribute: " + attributeName);
+			throw new InvalidSessionException("Error getting session attribute: " + attributeName);
 		} else {
 			return result;
 		}

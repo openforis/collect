@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.lang.Numbers;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePathPointer;
 import org.openforis.idm.path.InvalidPathException;
@@ -24,6 +25,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 
 	private static final Pattern MIN_COUNT_FROM_REQUIRED_EXPRESSION_PATTERN = Pattern.compile("number\\((.+)\\)");
 	private static final String MIN_COUNT_FROM_REQUIRED_EXPRESSION_FORMAT = "number(%s)";
+	private static final String ALWAYS_REQUIRED_MIN_COUNT_EXPRESSION = "1";
 
 	private static final long serialVersionUID = 1L;
 
@@ -127,6 +129,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		}
 	}
 	
+	public void setLabels(List<NodeLabel> labels) {
+		if (labels == null) {
+			this.labels = null;
+		}
+		this.labels = new NodeLabelMap();
+		for (NodeLabel nodeLabel : labels) {
+			addLabel(nodeLabel);
+		}
+	}
+	
 	/**
 	 * Return the label of the specified type in the default language
 	 */
@@ -140,6 +152,20 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	 */
 	public String getLabel(NodeLabel.Type type, String language) {
 		return labels == null ? null: labels.getText(type, language);
+	}
+
+	public String getFailSafeLabel(NodeLabel.Type... types) {
+		return getFailSafeLabel(getSurvey().getDefaultLanguage(), types);
+	}
+	
+	public String getFailSafeLabel(String language, NodeLabel.Type... types) {
+		for (NodeLabel.Type type : types) {
+			String label = getLabel(type, language);
+			if (label != null) {
+				return label;
+			}
+		}
+		return name;
 	}
 	
 	public void setLabel(NodeLabel.Type type, String language, String text) {
@@ -167,6 +193,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 			return Collections.emptyList();
 		} else {
 			return this.prompts.values();
+		}
+	}
+	
+	public void setPrompts(List<Prompt> prompts) {
+		if (prompts == null) {
+			this.prompts = null;
+		}
+		this.prompts = new PromptMap();
+		for (Prompt prompt : prompts) {
+			addPrompt(prompt);
 		}
 	}
 	
@@ -199,6 +235,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 			return Collections.emptyList();
 		} else {
 			return this.descriptions.values();
+		}
+	}
+	
+	public void setDescriptions(List<LanguageSpecificText> descriptions) {
+		if (descriptions == null) {
+			this.descriptions = null;
+		}
+		this.descriptions = new LanguageSpecificTextMap();
+		for (LanguageSpecificText description : descriptions) {
+			addDescription(description);
 		}
 	}
 	
@@ -244,7 +290,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		if ( parentDefinition != null ) {
 			sb.append(parentDefinition.getPath());
 		}
-		sb.append('/');
+		sb.append(Path.SEPARATOR);
 		sb.append(getName());
 		this.path = sb.toString();
 	}
@@ -338,8 +384,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	}
 
 	public String getRelativePath(NodeDefinition target) {
-		String result = Path.getRelativePath(getPath(), target.getPath());
-		return result;
+		return Path.getRelativePath(getPath(), target.getPath());
 	}
 
 	public Set<NodePathPointer> getRelevantExpressionDependencies() {
@@ -457,7 +502,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	}
 	
 	public void setAlwaysRequired() {
-		setMinCountExpression("1");
+		setMinCountExpression(ALWAYS_REQUIRED_MIN_COUNT_EXPRESSION);
 	}
 	
 	public Integer getFixedMinCount() {
@@ -472,7 +517,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		if (StringUtils.isBlank(maxCountExpression)) {
 			fixedMaxCount = null;
 		} else {
-			fixedMaxCount = extractInteger(maxCountExpression);
+			fixedMaxCount = Numbers.toIntegerObject(maxCountExpression);
 		}
 	}
 
@@ -480,20 +525,12 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		if (StringUtils.isBlank(minCountExpression)) {
 			alwaysRequired = false;
 			fixedMinCount = null;
-		} else if ("1".equals(minCountExpression)) {
+		} else if (ALWAYS_REQUIRED_MIN_COUNT_EXPRESSION.equals(minCountExpression)) {
 			alwaysRequired = true;
 			fixedMinCount = 1;
 		} else {
 			alwaysRequired = false;
-			fixedMinCount = extractInteger(minCountExpression);
-		}
-	}
-
-	private Integer extractInteger(String expression) {
-		try {
-			return Integer.parseInt(expression);
-		} catch(NumberFormatException e) {
-			return null;
+			fixedMinCount = Numbers.toIntegerObject(minCountExpression);
 		}
 	}
 

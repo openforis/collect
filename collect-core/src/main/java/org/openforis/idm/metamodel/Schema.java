@@ -38,6 +38,10 @@ public class Schema extends SurveyObject {
 	public NodeDefinition getDefinitionById(int id) {
 		return definitionsById.get(id);
 	}
+	
+	public boolean containsDefinitionWithId(int id) {
+		return definitionsById.containsKey(id);
+	}
 
 	public List<EntityDefinition> getRootEntityDefinitions() {
 		return CollectionUtils.unmodifiableList(rootEntityDefinitions);

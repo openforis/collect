@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
+import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 
 /**
  * 

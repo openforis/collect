@@ -18,6 +18,7 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
 import org.openforis.collect.manager.codelistimport.CodeListImportStatus;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.CodeList;
@@ -44,7 +45,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 	private CollectSurvey survey;
 	
 	@Before
-	public void init() throws IdmlParseException, IOException, SurveyStoreException {
+	public void init() throws IdmlParseException, IOException, SurveyStoreException, SurveyValidationException {
 		survey = loadSurvey();
 		surveyManager.save(survey);
 	}

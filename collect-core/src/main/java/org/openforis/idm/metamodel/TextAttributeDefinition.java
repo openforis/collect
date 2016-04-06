@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.List;
+
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
@@ -17,6 +19,7 @@ public class TextAttributeDefinition extends AttributeDefinition {
 	private static final long serialVersionUID = 1L;
 	
 	public static final String VALUE_FIELD = "value";
+	public static final Type DEFAULT_TYPE = Type.SHORT;
 	
 	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
 		new FieldDefinition<String>(VALUE_FIELD, "v", null, String.class, this)
@@ -26,7 +29,7 @@ public class TextAttributeDefinition extends AttributeDefinition {
 		SHORT, MEMO
 	}
 	
-	private Type type;
+	private Type type = DEFAULT_TYPE;
 	
 	protected TextAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
@@ -62,6 +65,12 @@ public class TextAttributeDefinition extends AttributeDefinition {
 		return val == null ? null : createValue(val.toString());
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) createValue(fieldValues.get(0));
+	}
+	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
 		return fieldDefinitionByName;
@@ -75,6 +84,11 @@ public class TextAttributeDefinition extends AttributeDefinition {
 	@Override
 	public String getMainFieldName() {
 		return VALUE_FIELD;
+	}
+	
+	@Override
+	public boolean isSingleFieldKeyAttribute() {
+		return true;
 	}
 	
 	@Override

@@ -20,10 +20,13 @@ import org.openforis.collect.datacleansing.form.DataQueryResultItemForm;
 import org.openforis.collect.datacleansing.form.validation.DataQueryValidator;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
+import org.openforis.collect.io.data.CSVDataExportJob;
+import org.openforis.collect.io.data.DescendantNodeFilter;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
@@ -60,10 +63,13 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	private CollectJobManager collectJobManager;
 	@Autowired
 	private DataQueryValidator validator;
+//	@Autowired
+//	private ApplicationContext appContext;
 	
-	private CSVWriterDataQueryResultItemProcessor csvExportItemProcessor;
-	private DataQueryExecutorJob exportJob;
+//	private CSVWriterDataQueryResultItemProcessor csvExportItemProcessor;
+//	private DataQueryExecutorJob exportJob;
 	private DataQueryExecutorJob testJob;
+	private CSVDataExportJob exportJob;
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -93,11 +99,24 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataQuery query = new DataQuery(survey);
 		form.copyTo(query);
+		
+		exportJob = collectJobManager.createJob(CSVDataExportJob.class);
+		exportJob.setOutputFile(File.createTempFile("data-query-export", ".csv"));
+		RecordFilter recordFilter = new RecordFilter(survey);
+		exportJob.setRecordFilter(recordFilter);
+		recordFilter.setStepGreaterOrEqual(recordStep);
+		exportJob.setEntityId(query.getEntityDefinitionId());
+		exportJob.setAlwaysGenerateZipFile(false);
+		exportJob.setNodeFilter(new DescendantNodeFilter(query.getAttributeDefinition(), query.getConditions()));
+		collectJobManager.start(exportJob);
+		
+		/*
 		csvExportItemProcessor = new CSVWriterDataQueryResultItemProcessor(query);
 		csvExportItemProcessor.init();
 		exportJob = collectJobManager.createJob(DataQueryExecutorJob.class);
 		exportJob.setInput(new DataQueryExecutorJobInput(query, recordStep, csvExportItemProcessor));
 		collectJobManager.start(exportJob);
+		*/
 		Response response = new Response();
 		return response;
 	}
@@ -121,7 +140,8 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	
 	@RequestMapping(value="result.csv", method = RequestMethod.GET)
 	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
-		File file = csvExportItemProcessor.getOutputFile();
+//		File file = csvExportItemProcessor.getOutputFile();
+		File file = exportJob.getOutputFile();
 		Controllers.writeFileToResponse(file, "text/csv", response, "collect-query.csv");
 	}
 	

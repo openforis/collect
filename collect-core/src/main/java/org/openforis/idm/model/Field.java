@@ -71,7 +71,13 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 	}
 
 	public boolean hasValue() {
-		return value != null && ! value.toString().trim().isEmpty();
+		if (value == null) {
+			return false;
+		} else if (Number.class.isAssignableFrom(valueType)) {
+			return true;
+		} else {
+			return ! value.toString().trim().isEmpty();
+		}
 	}
 
 	public boolean hasData() {

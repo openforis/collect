@@ -36,6 +36,15 @@ public class State {
 		return getInternal(position);
 	}
 
+	public boolean isEmpty() {
+		for (int i = 0; i < N_BITS; i++) {
+			if (getInternal(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public int intValue() {
 		int value = 0;
 		for (int i = 0; i < N_BITS; i++) {

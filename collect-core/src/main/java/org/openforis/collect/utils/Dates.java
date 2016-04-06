@@ -18,6 +18,12 @@ public class Dates {
 	private static final String DATE_TIME_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	private static final String DATE_FORMAT 		= "yyyy-MM-dd";
 
+	public static Date millisToDate(long millis) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(millis);
+		return cal.getTime();
+	}
+	
 	public static Date parseDateTime(String dateTime) {
 		if ( StringUtils.isBlank(dateTime) ) {
 			return null;
@@ -102,6 +108,12 @@ public class Dates {
 		return dt1.compareTo(dt2);
 	}
 
+	public static int compareUpToSecondsOnly(Date date1, Date date2) {
+		Date dt1 = toOnlyDateAndTimeToSeconds(date1);
+		Date dt2 = toOnlyDateAndTimeToSeconds(date2);
+		return dt1.compareTo(dt2);
+	}
+
 	public static Date toOnlyDate(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
@@ -116,6 +128,13 @@ public class Dates {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+
+	public static Date toOnlyDateAndTimeToSeconds(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
 	}

@@ -1,13 +1,18 @@
 package org.openforis.collect.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
 
 /**
  * Change related to an Entity of a Record.
@@ -87,7 +92,26 @@ public class EntityChange extends NodeChange<Entity> {
 	public void setMaxCountValidation(String childName, ValidationResultFlag maxCountValid) {
 		maxCountValidationByChildName.put(childName, maxCountValid);
 	}
-
+	
+	public Set<Node<?>> extractChangedNodes() {
+		Set<Node<?>> result = new HashSet<Node<?>>();
+		result.addAll(extractNodes(getChildrenMaxCountValidation().keySet()));
+		result.addAll(extractNodes(getChildrenMinCountValidation().keySet()));
+		result.addAll(extractNodes(getChildrenRelevance().keySet()));
+		return result;
+	}
+	
+	private Set<Node<?>> extractNodes(Set<String> childNames) {
+		Set<Node<?>> result = new HashSet<Node<?>>();
+		for (String childName : childNames) {
+			NodeDefinition childDef = getNode().getDefinition().getChildDefinition(childName);
+			if (childDef instanceof AttributeDefinition) {
+				result.addAll(node.getChildren(childDef));
+			}
+		}
+		return result;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

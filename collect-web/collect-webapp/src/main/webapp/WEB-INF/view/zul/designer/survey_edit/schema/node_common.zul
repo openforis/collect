@@ -297,6 +297,36 @@
 	      			</fieldErrorHandler>
 	      		</row>
       			<row>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['abbreviatedLabel'])">
+	      				<label
+	      					use="org.openforis.collect.designer.component.FieldLabel"
+	      					value="${labels.survey.schema.node.abbreviated_label}"
+	      					languageCode="@load(vm.currentLanguageCode)" />
+	      			</fieldErrorHandler>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['abbreviatedLabel'])">
+	      				<textbox width="250px"
+	      					value="@bind(fx.abbreviatedLabel)"
+	      					onChange="@command('applyChanges')" />
+	      			</fieldErrorHandler>
+	      		</row>
+	      		<row>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['reportingLabel'])">
+	      				<label
+	      					use="org.openforis.collect.designer.component.FieldLabel"
+	      					value="${labels.survey.schema.node.reporting_label}"
+	      					languageCode="@load(vm.currentLanguageCode)" />
+	      			</fieldErrorHandler>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['reportingLabel'])">
+	      				<textbox width="250px"
+	      					value="@bind(fx.reportingLabel)"
+	      					onChange="@command('applyChanges')" />
+	      			</fieldErrorHandler>
+	      		</row>
+      			<row>
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['interviewPromptLabel'])">
 		  				<label

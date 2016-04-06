@@ -464,8 +464,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public List<NodeDefinition> getNodesPerTab(UITab tab, boolean includeDescendants) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		UITabSet tabSet = tab.getRootTabSet();
-		EntityDefinition rootEntity = getRootEntityDefinition(tabSet);
 		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
+		EntityDefinition rootEntity = getRootEntityDefinition(tabSet);
 		queue.addAll(rootEntity.getChildDefinitions());
 		while ( ! queue.isEmpty() ) {
 			NodeDefinition defn = queue.remove();
@@ -556,7 +556,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 				return Layout.FORM;
 			}
 		}
-		return layoutValue != null ? Layout.valueOf(layoutValue.toUpperCase()): null;
+		return layoutValue == null ? null : Layout.valueOf(layoutValue.toUpperCase());
 	}
 
 	public void setLayout(EntityDefinition entityDefn, Layout layout) {

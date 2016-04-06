@@ -100,6 +100,7 @@ public class CEComponentHTMLFormatter {
 	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset"); //$NON-NLS-1$
 		fieldSetBuilder.e("legend").t( comp.getLabelOrName()); //$NON-NLS-1$
+		
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
 				createBuilder((CEField) child, true, fieldSetBuilder);
@@ -112,15 +113,13 @@ public class CEComponentHTMLFormatter {
 	
 	private XMLBuilder createBuilder(CEAncillaryFields comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder informationFieldsBuilder =  parentBuilder.e("div").attr("class", "ancillay-data" ); //$NON-NLS-1$
-		informationFieldsBuilder.e("span").t( comp.getLabelOrName() ); //$NON-NLS-1$
-		informationFieldsBuilder.e("br");
+		//informationFieldsBuilder.e("span").t( comp.getLabelOrName() ); //$NON-NLS-1$
+		//informationFieldsBuilder.e("br");
 		boolean firstChild = true;
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
-
-				informationFieldsBuilder.e("span" ).t( (firstChild?" ":", ") + child.getLabelOrName() + ": $[" + child.getName()+ "]" );
+				informationFieldsBuilder.e("span" ).t( (firstChild?" ":", ") + child.getLabelOrName() + ": $["+  CollectEarthBalloonGenerator.EXTRA_HIDDEN_PREFIX + child.getName()+ "]" );
 				firstChild = false;
-				
 			} else {
 				throw new IllegalArgumentException("Only attribute fields supported inside single entity"); //$NON-NLS-1$
 			}
@@ -148,90 +147,118 @@ public class CEComponentHTMLFormatter {
 				.a("class", "col-sm-8"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		if (comp instanceof CECodeField) {
-			switch(((CEField) comp).getType()) {
-			case CODE_BUTTON_GROUP:
-				buildCodeButtonGroup(formControlContainer, (CECodeField) comp);
-				break;
-			case CODE_SELECT:
-				buildCodeSelect(formControlContainer, (CECodeField) comp);
-				break;
-			case CODE_RANGE:
-				buildCodeRange(formControlContainer, (CERangeField) comp);
-				break;
-			default:
-				break;
-			}
-		} else if (comp instanceof CEEnumeratingCodeField) {
-			// skip it
-		} else if (comp instanceof CEField) {
-			switch (((CEField) comp).getType()) {
-			case SHORT_TEXT:
+			if (comp.isReadOnly()) {
 				formControlContainer.e("input") //$NON-NLS-1$
 					.a("id", elId) //$NON-NLS-1$
 					.a("name", elId) //$NON-NLS-1$
 					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
+			} else {
+				switch(((CEField) comp).getType()) {
+				case CODE_BUTTON_GROUP:
+					buildCodeButtonGroup(formControlContainer, (CECodeField) comp);
+					break;
+				case CODE_SELECT:
+					buildCodeSelect(formControlContainer, (CECodeField) comp);
+					break;
+				case CODE_RANGE:
+					buildCodeRange(formControlContainer, (CERangeField) comp);
+					break;
+				default:
+					break;
+				}
+			}
+		} else if (comp instanceof CEEnumeratingCodeField) {
+			// skip it
+		} else if (comp instanceof CEField) {
+			XMLBuilder fieldBuilder;
+			switch (((CEField) comp).getType()) {
+			case SHORT_TEXT:
+				fieldBuilder = formControlContainer.e("input") //$NON-NLS-1$
+					.a("id", elId) //$NON-NLS-1$
+					.a("name", elId) //$NON-NLS-1$
+					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("class", "form-control"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (comp.isReadOnly()) {
+					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 				break;
 			case LONG_TEXT:
-				formControlContainer.e("textarea") //$NON-NLS-1$
+				fieldBuilder = formControlContainer.e("textarea") //$NON-NLS-1$
 					.a("id", elId) //$NON-NLS-1$
 					.a("rows", "3") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("name", elId) //$NON-NLS-1$
 					.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
 					.t(" "); //$NON-NLS-1$
+				if (comp.isReadOnly()) {
+					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 				break;
 			case INTEGER:
 			case REAL:
-				formControlContainer.e("input") //$NON-NLS-1$
+				fieldBuilder = formControlContainer.e("input") //$NON-NLS-1$
 					.a("id", elId) //$NON-NLS-1$
 					.a("name", elId) //$NON-NLS-1$
 					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("value", "0") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("class", "form-control numeric"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (comp.isReadOnly()) {
+					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 				break;
 			case BOOLEAN:
-//				formControlContainer.e("input")
-//					.a("id", elId)
-//					.a("name", elId)
-//					.a("type", "checkbox")
-//					.a("class", "form-control numeric");
-				XMLBuilder container = formControlContainer
-					.e("div") //$NON-NLS-1$
-					.a("class", "boolean-group") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("data-toggle", "buttons-radio"); //$NON-NLS-1$ //$NON-NLS-2$
-				container.e("input") //$NON-NLS-1$
-					.a("id", elId) //$NON-NLS-1$
-					.a("name", elId) //$NON-NLS-1$
-					.a("type", "hidden") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("data-field-type", comp.getType().name()); //$NON-NLS-1$
-				container.e("button") //$NON-NLS-1$
-					.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("value", "true") //$NON-NLS-1$ //$NON-NLS-2$
-					.t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.0", language)) ); //$NON-NLS-1$
-				container.e("button") //$NON-NLS-1$
-					.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("value", "false") //$NON-NLS-1$ //$NON-NLS-2$
-					.t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.88", language) )); //$NON-NLS-1$
+				if (comp.isReadOnly()) {
+					fieldBuilder = formControlContainer.e("input") //$NON-NLS-1$
+						.a("id", elId) //$NON-NLS-1$
+						.a("name", elId) //$NON-NLS-1$
+						.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
+						.a("disabled", "disabled");
+				} else {
+					XMLBuilder containerBuilder = formControlContainer
+						.e("div") //$NON-NLS-1$
+						.a("class", "boolean-group") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("data-toggle", "buttons-radio"); //$NON-NLS-1$ //$NON-NLS-2$
+					containerBuilder.e("input") //$NON-NLS-1$
+						.a("id", elId) //$NON-NLS-1$
+						.a("name", elId) //$NON-NLS-1$
+						.a("type", "hidden") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("data-field-type", comp.getType().name()); //$NON-NLS-1$
+					containerBuilder.e("button") //$NON-NLS-1$
+						.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("value", "true") //$NON-NLS-1$ //$NON-NLS-2$
+						.t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.0", language)) ); //$NON-NLS-1$
+					containerBuilder.e("button") //$NON-NLS-1$
+						.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("value", "false") //$NON-NLS-1$ //$NON-NLS-2$
+						.t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.88", language) )); //$NON-NLS-1$
+				}
 				break;
 			case COORDINATE:
 				break;
 			case DATE:
 			case TIME:
-				formControlContainer.e("div") //$NON-NLS-1$
-					.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				XMLBuilder groupContainerBuilder = formControlContainer
+				.e("div") //$NON-NLS-1$
+					.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				XMLBuilder inputFieldBuilder = groupContainerBuilder
 					.e("input") //$NON-NLS-1$
 						.a("id", elId) //$NON-NLS-1$
 						.a("name", elId) //$NON-NLS-1$
-						.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
-						.up()
-					.e("span") //$NON-NLS-1$
+						.a("class", "form-control"); //$NON-NLS-1$ //$NON-NLS-2$
+				groupContainerBuilder.e("span") //$NON-NLS-1$
 						.a("class", "input-group-addon") //$NON-NLS-1$ //$NON-NLS-2$
 						.e("span") //$NON-NLS-1$
 							.a("class", "glyphicon glyphicon-time") //$NON-NLS-1$ //$NON-NLS-2$
-					;
+				;
+				if (comp.isReadOnly()) {
+					inputFieldBuilder.a("disabled", "disabled");
+				}
 				break;
 			default:
 				break;

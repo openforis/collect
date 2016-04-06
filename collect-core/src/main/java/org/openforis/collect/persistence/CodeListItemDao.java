@@ -3,7 +3,6 @@ package org.openforis.collect.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_CODE_LIST_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE_LIST;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
 import org.jooq.Condition;
+import org.jooq.Configuration;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Field;
 import org.jooq.Insert;
@@ -37,12 +37,10 @@ import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyObject;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@Transactional
 public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem, CodeListItemDao.JooqDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
@@ -654,8 +652,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	protected JooqDSLContext dsl(CodeList codeList) {
-		Connection connection = getConnection();
-		return new JooqDSLContext(connection, codeList);
+		return new JooqDSLContext(getConfiguration(), codeList);
 	}
 	
 	public int nextSystemId() {
@@ -677,8 +674,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		
 		private CodeList codeList;
 		
-		public JooqDSLContext(Connection connection, CodeList codeList) {
-			super(connection, OFC_CODE_LIST.ID, OFC_CODE_LIST_ID_SEQ, PersistedCodeListItem.class);
+		public JooqDSLContext(Configuration config, CodeList codeList) {
+			super(config, OFC_CODE_LIST.ID, OFC_CODE_LIST_ID_SEQ, PersistedCodeListItem.class);
 			this.codeList = codeList;
 		}
 		

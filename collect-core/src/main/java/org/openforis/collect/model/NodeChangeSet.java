@@ -4,6 +4,7 @@
 package org.openforis.collect.model;
 
 import java.util.List;
+import java.util.Set;
 
 import org.openforis.idm.model.Node;
 
@@ -19,14 +20,16 @@ public interface NodeChangeSet {
 	 * List of changes. Then have to be in order (for example after a node insert there can be nested node changes).
 	 * @return
 	 */
-	public List<NodeChange<?>> getChanges();
+	List<NodeChange<?>> getChanges();
 
-	public NodeChange<?> getChange(Node<?> node);
+	Set<Node<?>> getChangedNodes();
 
-	public NodeChange<?> getChange(int nodeId);
+	NodeChange<?> getChange(Node<?> node);
+
+	NodeChange<?> getChange(int nodeId);
 	
-	public boolean isEmpty();
+	boolean isEmpty();
 	
-	public int size();
+	int size();
 
 }

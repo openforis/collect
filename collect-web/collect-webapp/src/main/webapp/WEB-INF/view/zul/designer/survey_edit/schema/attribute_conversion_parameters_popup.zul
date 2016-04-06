@@ -1,0 +1,44 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<window title="${labels.survey.schema.attribute.conversion_popup.title}" 
+		width="300px"
+		border="normal" 
+		position="center" 
+		closable="true"
+		apply="org.zkoss.bind.BindComposer"
+		form="@id('fx') @load(vm.form) @save(vm.form, before='convert')" 
+		validationMessages="@id('vmsgs')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.AttributeConversionVM')">
+
+		<grid>
+			<columns>
+				<column width="100px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.schema.attribute.conversion.attribute}:" />
+					<label width="300px" value="@load(vm.attributeDefinition.name)" />
+				</row>
+				<row>
+					<label value="${labels.survey.schema.attribute.conversion.from_type}:" />
+					<label width="300px" value="@load(vm.originalAttributeTypeLabel)" />
+				</row>
+				<row>
+					<label value="${labels.survey.schema.attribute.conversion.to_type}:" />
+					<listbox model="@load(vm.attributeTypes)" mold="select" 
+						selectedItem="@bind(fx.type)">
+   						<template name="model">
+   							<listitem label="${each}" />
+   						</template>
+   					</listbox>
+				</row>
+			</rows>
+		</grid>
+
+		<box width="100%" align="center">
+			<button id="okBtn" label="${labels.survey.schema.convert_node}"
+				onClick="@command('convert')" />
+		</box>
+	</window>
+</zk>

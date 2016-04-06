@@ -68,6 +68,7 @@ package org.openforis.collect.presenter {
 		private var _getCurrentJobResponder:IResponder;
 		private var _firstOpen:Boolean;
 		private var _allConflictingRecordsSelected:Boolean;
+		private var _allNewerConflictingRecordsSelected:Boolean;
 		
 		public function DataImportPresenter(view:DataImportView) {
 			super(view);
@@ -112,6 +113,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS, selectAllConflictingRecords);
+			eventDispatcher.addEventListener(DataImportEvent.SELECT_ONLY_NEWER_CONFLICTING_RECORDS, selectOnlyNewerConflictingRecords);
 			eventDispatcher.addEventListener(DataImportEvent.CONFLICTING_RECORDS_SELECTION_CHANGE, conflictingRecordsSelectionChange);
 			eventDispatcher.addEventListener(DataImportEvent.RECORDS_TO_IMPORT_SELECTION_CHANGE, recordsToImportSelectionChange);
 		}
@@ -121,6 +123,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.removeEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 			eventDispatcher.removeEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
 			eventDispatcher.removeEventListener(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS, selectAllConflictingRecords);
+			eventDispatcher.removeEventListener(DataImportEvent.SELECT_ONLY_NEWER_CONFLICTING_RECORDS, selectOnlyNewerConflictingRecords);
 			eventDispatcher.removeEventListener(DataImportEvent.CONFLICTING_RECORDS_SELECTION_CHANGE, conflictingRecordsSelectionChange);
 			eventDispatcher.removeEventListener(DataImportEvent.RECORDS_TO_IMPORT_SELECTION_CHANGE, recordsToImportSelectionChange);
 		}
@@ -172,7 +175,8 @@ package org.openforis.collect.presenter {
 			var responder:AsyncResponder = new AsyncResponder(startSummaryCreationResultHandler, faultHandler);
 			var activeSurvey:SurveyProxy = Application.activeSurvey;
 			var selectedSurveyUri:String = activeSurvey == null ? null: activeSurvey.uri;
-			_dataImportClient.startSummaryCreation(responder, filePath, selectedSurveyUri);
+			var completeSummary:Boolean = view.completeSummaryCheckBox.selected;
+			_dataImportClient.startSummaryCreation(responder, filePath, selectedSurveyUri, false, completeSummary);
 			startProgressTimer();
 		}
 		
@@ -227,8 +231,9 @@ package org.openforis.collect.presenter {
 					return;
 				}
 				var validateRecords:Boolean = view.validateRecordsCheckBox.selected;
+				var processInTransaction:Boolean = view.processInTransactionCheckBox.selected;
 				var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
-				_dataImportClient.startImport(responder, entryIdsToImport, validateRecords);
+				_dataImportClient.startImport(responder, entryIdsToImport, validateRecords, processInTransaction);
 				view.progressBar.setProgress(0, 0);
 				view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 			}
@@ -440,14 +445,47 @@ package org.openforis.collect.presenter {
 		protected function selectAllConflictingRecords(event:DataImportEvent):void {
 			_allConflictingRecordsSelected = ! _allConflictingRecordsSelected;
 			view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
-			view.selectedConflictingRecordsCount = _summary.conflictingRecords.length;
+			if (_allConflictingRecordsSelected) {
+				view.selectedConflictingRecordsCount = _summary.conflictingRecords.length;
+			} else {
+				view.selectedConflictingRecordsCount = 0;
+			}
 			setItemsSelected(_summary.conflictingRecords, _allConflictingRecordsSelected);
 		}
 		
+		protected function selectOnlyNewerConflictingRecords(event:DataImportEvent):void {
+			var newerConflictingRecords:IList = getNewerConflictingRecords();
+			if (newerConflictingRecords.length == 0) {
+				//DO NOTHING
+				view.allNewerConflictingRecordsSelected = false;
+			} else {
+				_allNewerConflictingRecordsSelected = ! _allNewerConflictingRecordsSelected;
+				setItemsSelected(newerConflictingRecords, _allNewerConflictingRecordsSelected);
+				afterConflictingRecordSelectionChanged();
+			}
+		}
+		
+		private function getNewerConflictingRecords():IList {
+			var result:IList = new ArrayCollection();
+			for each (var item:DataImportSummaryItemProxy in _summary.conflictingRecords) {
+				if (1 == item.importabilityLevel) {
+					result.addItem(item);
+				}
+			}
+			return result;
+		}
+		
 		protected function conflictingRecordsSelectionChange(event:DataImportEvent):void {
-			view.selectedConflictingRecordsCount = countSelectedItems(_summary.conflictingRecords);
+			afterConflictingRecordSelectionChanged();
+		}
+		
+		private function afterConflictingRecordSelectionChanged():void {
 			_allConflictingRecordsSelected = isAllItemsSelected(_summary.conflictingRecords);
 			view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
+			_allNewerConflictingRecordsSelected = isAllItemsSelected(getNewerConflictingRecords());
+			view.allNewerConflictingRecordsSelected = _allNewerConflictingRecordsSelected;
+			
+			view.selectedConflictingRecordsCount = countSelectedItems(_summary.conflictingRecords);
 		}
 
 		protected function recordsToImportSelectionChange(event:DataImportEvent):void {

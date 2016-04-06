@@ -78,7 +78,7 @@ public class DataBackupTask extends Task {
 					if ( isRunning() ) {
 						if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
 							backup(summary, step);
-							incrementItemsProcessed();
+							incrementProcessedItems();
 						}
 					} else {
 						break;

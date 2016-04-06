@@ -3,8 +3,7 @@
  */
 package org.openforis.collect.persistence.jooq;
 
-import java.sql.Connection;
-
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.Sequence;
 import org.jooq.StoreQuery;
@@ -22,11 +21,11 @@ public abstract class SurveyObjectMappingDSLContext<T extends PersistedSurveyObj
 	
 	protected CollectSurvey survey;
 
-	public SurveyObjectMappingDSLContext(Connection conn,
+	public SurveyObjectMappingDSLContext(Configuration config,
 			TableField<?, Integer> idField,
 			Sequence<? extends Number> idSequence, 
 			Class<T> clazz, CollectSurvey survey) {
-		super(conn, idField, idSequence, clazz);
+		super(config, idField, idSequence, clazz);
 		this.survey = survey;
 	}
 

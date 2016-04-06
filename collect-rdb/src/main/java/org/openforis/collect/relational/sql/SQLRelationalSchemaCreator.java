@@ -41,6 +41,15 @@ public class SQLRelationalSchemaCreator implements RelationalSchemaCreator {
 		}
 		return rdbDialect;
 	}
-	
 
+	@Override
+	public void addConstraints(RelationalSchema schema, Connection conn) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addIndexes(RelationalSchema schema, Connection conn) {
+		throw new UnsupportedOperationException();
+	}
+	
 }

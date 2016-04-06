@@ -95,7 +95,7 @@ public class DataCleansingChainExectutorTask extends Task {
 			if (recordNodesProcessed) {
 				cleansedRecords ++;
 			}
-			incrementItemsProcessed();
+			incrementProcessedItems();
 		}
 	}
 

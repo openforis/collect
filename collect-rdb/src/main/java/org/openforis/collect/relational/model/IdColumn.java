@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.relational.model;
 
-import java.sql.Types;
+import org.openforis.collect.relational.sql.RDBJdbcType;
 
 /**
  * @author S. Ricci
@@ -16,7 +16,7 @@ public abstract class IdColumn<T> extends AbstractColumn<T> {
 	}
 	
 	IdColumn(String name, boolean nullable) {
-		super(name, Types.BIGINT, "bigint", null, nullable);
+		super(name, RDBJdbcType.BIGINT, null, nullable);
 	}
 	
 }

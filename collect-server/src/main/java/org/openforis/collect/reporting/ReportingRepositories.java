@@ -1,5 +1,6 @@
 package org.openforis.collect.reporting;
 
+import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.event.RecordStep;
@@ -22,4 +23,5 @@ public interface ReportingRepositories {
 
 	String getRepositoryPath(String surveyName, RecordStep recordStep);
 	
+	ReportingRepositoryInfo getInfo(String surveyName);
 }

@@ -64,7 +64,7 @@ Collect.Grids.createDuplicateColumn = function(onClickFunction, context) {
 
 Collect.Grids.getDuplicateColumnIconTemplate = function(label) {
 	var content = OF.Strings.escapeHtml(label ? label: "");
-	return '<span title="Duplicate" class="glyphicon glyphicon-duplicate duplicate-icon">' + content + '</span>';
+	return '<span title="Duplicate" class="glyphicon glyphicon-repeat duplicate-icon">' + content + '</span>';
 };
 
 

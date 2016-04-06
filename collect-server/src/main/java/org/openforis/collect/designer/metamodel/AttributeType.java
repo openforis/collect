@@ -1,4 +1,4 @@
-package org.openforis.collect.designer.model;
+package org.openforis.collect.designer.metamodel;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -49,6 +49,15 @@ public enum AttributeType {
 		} else {
 			throw new IllegalArgumentException("Standard not supported for " + type.getClass().getSimpleName());
 		}
+	}
+	
+	public static AttributeType fromLabel(String label) {
+		for (AttributeType attributeType : values()) {
+			if (attributeType.getLabel().equals(label)) {
+				return attributeType;
+			}
+		}
+		return null;
 	}
 	
 	public String getLabel() {

@@ -31,7 +31,7 @@ public class DataRestoreServiceImpl implements DataRestoreService {
 		String surveyUri = extractSurveyUri(backupFile);
 		checkValidSurvey(surveyName, surveyUri);
 		
-		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+		DataRestoreJob job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
 		job.setStoreRestoredFile(true);
 		job.setPublishedSurvey(survey);
 		job.setFile(backupFile);

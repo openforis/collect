@@ -10,6 +10,7 @@ import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.zkoss.bind.Binder;
+import org.zkoss.bind.SimpleForm;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -25,6 +26,7 @@ public class ComponentUtil {
 	
 	public static final String COMPOSER_ID = "$composer";
 	private static final String BINDER_ID = "$BINDER$";
+	private static final String FORM_ID_ATTRIBUTE = "$FORM_ID$";
 
 	/**
 	 * Returns the component handled by the current {@link Execution} object
@@ -46,6 +48,14 @@ public class ComponentUtil {
 	public static Binder getBinder(Component component) {
 		Binder binder = (Binder) component.getAttribute(BINDER_ID);
 		return binder;
+	}
+	
+	public static SimpleForm getForm(Component view) {
+		String formId = (String) view.getAttribute(FORM_ID_ATTRIBUTE);
+		if (formId == null) {
+			return null;
+		}
+		return (SimpleForm) view.getAttribute(formId);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -76,6 +86,18 @@ public class ComponentUtil {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T getClosest(Component from, Class<T> type) {
+		Component currentParent = from.getParent();
+		while ( currentParent != null ) {
+			if (type.isAssignableFrom(currentParent.getClass())) {
+				return (T) currentParent;
+			}
+			currentParent = currentParent.getParent();
+		}
+		return null;
+	}
+	
 	public static void addClass(HtmlBasedComponent component, String className) {
 		String oldSclass = component.getSclass();
 		if ( oldSclass == null ) {

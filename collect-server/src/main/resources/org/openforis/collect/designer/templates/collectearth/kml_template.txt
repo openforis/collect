@@ -63,13 +63,13 @@ ${html_for_balloon}
 			<listItemType>checkHideChildren</listItemType>
 			<ItemIcon id="icon_${placemark.placemarkId}">
 			   <state>open</state>
-			   <href>${host}placemarkIcon?collect_text_id=${placemark.placemarkId}&amp;listView=true<#if randomNumber??>&amp;forceUpdate=${randomNumber}</#if></href>
+			   <href>${host}placemarkIconExtd?id=${placemark.placemarkId}&amp;listView=true<#if randomNumber??>&amp;forceUpdate=${randomNumber}</#if></href>
 			</ItemIcon>
 		</ListStyle>
 	</Style>
 
+	<#if placemark.region?? >
 	<Folder >
-
 		<Region>
 			<LatLonAltBox>
 				<south>${placemark.region.south}</south>
@@ -87,6 +87,7 @@ ${html_for_balloon}
 			</Lod>
 		</Region>
 	</Folder>
+	</#if>
 	
 	<LookAt>
       <longitude>${placemark.coord.longitude}</longitude>
@@ -115,10 +116,10 @@ ${html_for_balloon}
 		<name>${placemark.placemarkId}</name>
 		<ExtendedData>
 		      <Data name="longitude">
-		        <value>${placemark.coord.longitude}</value>
+		        <value><#if placemark.originalLongitude??>${placemark.originalLongitude}<#else>${placemark.coord.longitude}</#if></value>
 		      </Data>
 		      <Data name="latitude">
-		        <value>${placemark.coord.latitude}</value>
+		        <value><#if placemark.originalLatitude??>${placemark.originalLatitude}<#else>${placemark.coord.latitude}</#if></value>
 		      </Data>
 		      <Data name="next_id">
 		        <value>${placemark.nextPlacemarkId}</value>
@@ -155,6 +156,13 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 	    
 		<styleUrl>#placemark-balloon-style</styleUrl>
    
+   		<#if placemark.kmlPolygon?? >
+   		
+   		<#-- If there was a polygon set for the placemark use it here!  -->
+   		${placemark.kmlPolygon}
+   		
+   		<#else>   
+        
         <Polygon id="poly_${placemark.placemarkId}">
         	<outerBoundaryIs>
 				<LinearRing>
@@ -183,6 +191,8 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 		      </#list>  
 		       </innerBoundaryIs>
    		</Polygon>
+   		
+   		</#if>
 	</Placemark>
 	
 	</Folder>

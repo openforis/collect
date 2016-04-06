@@ -5,7 +5,6 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep
 import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStepValue.OFC_DATA_CLEANSING_STEP_VALUE;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DATA_QUERY;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.jooq.BatchBindStep;
+import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.InsertValuesStepN;
@@ -142,12 +142,12 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 
 		private static final long serialVersionUID = 1L;
 		
-		public JooqDSLContext(Connection connection) {
-			this(connection, null);
+		public JooqDSLContext(Configuration config) {
+			this(config, null);
 		}
 		
-		public JooqDSLContext(Connection connection, CollectSurvey survey) {
-			super(connection, OFC_DATA_CLEANSING_STEP.ID, OFC_DATA_CLEANSING_STEP_ID_SEQ, DataCleansingStep.class, survey);
+		public JooqDSLContext(Configuration config, CollectSurvey survey) {
+			super(config, OFC_DATA_CLEANSING_STEP.ID, OFC_DATA_CLEANSING_STEP_ID_SEQ, DataCleansingStep.class, survey);
 		}
 		
 		@Override

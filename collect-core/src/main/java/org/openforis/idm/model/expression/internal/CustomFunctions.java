@@ -45,15 +45,15 @@ public abstract class CustomFunctions implements Functions {
 		return function.getReferencedPaths();
 	}
 
-	protected final void register(String name, Collection<Integer> parameterCounts, CustomFunction function) {
-		for (Integer parameterCount : parameterCounts) {
-			register(name, parameterCount, function);
-		}
-	}
-
-	protected final void register(String name, int parameterCount, CustomFunction function) {
+	private final void register(String name, int parameterCount, CustomFunction function) {
 		functions.put(new FunctionKey(name, parameterCount), function);
 		functionNames.add(name);
+	}
+	
+	protected final void register(String name, CustomFunction function) {
+		for (Integer parameterCount : function.getSupportedArgumentCounts()) {
+			register(name, parameterCount, function);
+		}
 	}
 
 	private static class FunctionKey {

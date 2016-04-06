@@ -55,4 +55,28 @@
 			<include src="survey_edit/schema/check/list.zul" />
 		</groupbox>
 	</fieldErrorHandler>
+	
+	<fieldErrorHandler message="@load(vmsgs['referencedAttributePath'])">
+		<groupbox width="100%" closable="false">
+	      <caption label="${labels.survey.schema.attribute.referenced_attribute}"/>
+	      <grid class="inner">
+	      	<columns>
+	      		<column />
+	      	</columns>
+	      	<rows>
+	      		<row>
+		    		<cell>
+	    				<textbox width="500px"
+	    					value="@bind(fx.referencedAttributePath)"
+	    					readonly="true" />
+	    				<button sclass="icon"
+	    					tooltiptext="${labels.survey.schema.attribute.select_referenced_attribute}"
+	    					onClick="@command('openReferencedAttributeSelector')"
+	    					image="/assets/images/tree-small.png" />
+		    		</cell>
+	      		</row>
+	      	</rows>
+	      </grid>
+	    </groupbox>
+	</fieldErrorHandler>
 </zk>

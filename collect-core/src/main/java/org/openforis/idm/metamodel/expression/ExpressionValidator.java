@@ -127,7 +127,7 @@ public class ExpressionValidator {
 	}
 	
 	private ExpressionValidationResult validateSyntax(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, AbstractExpression expression) {
-		ExpressionValidationResult result = validateFunctionNames(expression);
+		ExpressionValidationResult result = expression.validate(contextNodeDef);
 		if (result.isError()) {
 			return result;
 		}
@@ -135,23 +135,6 @@ public class ExpressionValidator {
 		return result;
 	}
 	
-	public ExpressionValidationResult validateFunctionNames(AbstractExpression expression) {
-		Set<String> names = expression.getFunctionNames();
-		boolean valid = true;
-		for (String name : names) {
-			valid = valid && isFunctionNameValid(expression, name);
-			if (! valid) {
-				String message = String.format("function '%s' does not exist", name);
-				String functionNames = expressionFactory.getFullFunctionNames().toString();
-				String detailedMessage = String.format("function '%s' does not exist\n Possible function names:\n%s", name, functionNames);
-				ExpressionValidationResult validationResult = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
-				validationResult.setDetailedMessage(detailedMessage);
-				return validationResult;
-			}
-		}
-		return new ExpressionValidationResult();
-	}
-
 	public boolean isFunctionNameValid(AbstractExpression expression, String name) {
 		Matcher matcher = FUNCTION_NAME_PATTERN.matcher(name);
 		boolean valid;
@@ -260,12 +243,24 @@ public class ExpressionValidator {
 			return flag;
 		}
 		
+		public void setFlag(ExpressionValidationResultFlag flag) {
+			this.flag = flag;
+		}
+		
 		public String getMessage() {
 			return message;
 		}
 		
+		public void setMessage(String message) {
+			this.message = message;
+		}
+		
 		public String[] getMessageArgs() {
 			return messageArgs;
+		}
+		
+		public void setMessageArgs(String[] messageArgs) {
+			this.messageArgs = messageArgs;
 		}
 		
 		public String getDetailedMessage() {

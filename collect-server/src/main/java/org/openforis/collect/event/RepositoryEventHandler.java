@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.relational.event.InitializeRDBEvent;
 import org.openforis.collect.reporting.ReportingRepositories;
+import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.rmb.KeepAlive;
 import org.openforis.rmb.KeepAliveMessageHandler;
@@ -92,8 +93,8 @@ public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 
 	private ProgressListener createProgressListener(final KeepAlive keepAlive) {
 		ProgressListener keepAliveListener = new ProgressListener() {
-			public void progressMade() {
-				keepAlive.send();	
+			public void progressMade(Progress progress) {
+				keepAlive.send();
 			}
 		};
 		return keepAliveListener;

@@ -1,8 +1,8 @@
 package org.openforis.collect.persistence.jooq;
 
-import java.sql.Connection;
 import java.util.List;
 
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.ResultQuery;
@@ -21,14 +21,15 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 	}
 	
 	protected C dsl() {
-		Connection conn = getConnection();
 		try {
-			return jooqFactoryClass.getConstructor(Connection.class).newInstance(conn);
-		} catch (NoSuchMethodException e) {
-			throw new UnsupportedOperationException("Missing constructor "+jooqFactoryClass.getName()+"(java.sql.Connection)");
+			return jooqFactoryClass.getConstructor(Configuration.class).newInstance(getConfiguration());
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to create "+jooqFactoryClass, e);
 		}
+	}
+
+	protected Configuration getConfiguration() {
+		return super.dsl().configuration();
 	}
 	
 	public List<E> findStartingWith(TableField<?,String> field, String searchString, int maxResults) {

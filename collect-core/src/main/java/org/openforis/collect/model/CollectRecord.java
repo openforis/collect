@@ -188,9 +188,13 @@ public class CollectRecord extends Record {
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName) {
 		this(survey, versionName, rootEntityName, true);
 	}
-
+	
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs) {
-		super(survey, versionName, enableValidationDependencyGraphs);
+		this(survey, versionName, rootEntityName, enableValidationDependencyGraphs, false);
+	}
+
+	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
+		super(survey, versionName, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
 		this.step = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
@@ -321,6 +325,10 @@ public class CollectRecord extends Record {
 		this.missing = missing;
 	}
 
+	public Integer getTotalErrors() {
+		return getErrors() + getMissingErrors();
+	}
+	
 	public Integer getErrors() {
 		if(errors == null) {
 			errors = validationCache.getTotalAttributeErrors() +
@@ -355,26 +363,22 @@ public class CollectRecord extends Record {
 	}
 	
 	public boolean isErrorConfirmed(Attribute<?,?> attribute){
-		int fieldCount = attribute.getFieldCount();		
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
-			if( !field.getState().get(CONFIRMED_ERROR_POSITION) ){
+		for (Field<?> field : attribute.getFields()) {
+			if (!field.getState().get(CONFIRMED_ERROR_POSITION)) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
-	public boolean isMissingApproved(Entity parentEntity, String childName){
-		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
+	public boolean isMissingApproved(Entity parentEntity, NodeDefinition childDef){
+		org.openforis.idm.model.State childState = parentEntity.getChildState(childDef);
 		return childState.get(APPROVED_MISSING_POSITION);
 	} 
 	
 	public boolean isDefaultValueApplied(Attribute<?, ?> attribute) {
-		int fieldCount = attribute.getFieldCount();		
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
-			if( !field.getState().get(DEFAULT_APPLIED_POSITION) ){
+		for (Field<?> field : attribute.getFields()) {
+			if (!field.getState().get(DEFAULT_APPLIED_POSITION)) {
 				return false;
 			}
 		}
@@ -397,8 +401,10 @@ public class CollectRecord extends Record {
 					//TODO throw error in this case?
 					values.add(null);
 				} else {
-					String keyValue = keyNode.extractTextValue();
-					values.add(keyValue);
+					if (keyNode.isFilled()) {
+						String keyValue = keyNode.extractTextValue();
+						values.add(keyValue);
+					}
 				}
 			}
 			rootEntityKeyValues = values;
@@ -469,8 +475,8 @@ public class CollectRecord extends Record {
 		skipped = null;
 	}
 	
-	public void updateMinCountsValidationCache(Entity entity, String childName, ValidationResultFlag flag) {
-		validationCache.updateMinCountInfo(entity.getInternalId(), childName, flag);
+	public void updateMinCountsValidationCache(Entity entity, NodeDefinition childDef, ValidationResultFlag flag) {
+		validationCache.updateMinCountInfo(entity.getInternalId(), childDef, flag);
 		this.missing = null;
 		this.missingErrors = null;
 		this.missingWarnings = null;
@@ -478,8 +484,8 @@ public class CollectRecord extends Record {
 		this.warnings = null;
 	}
 
-	public void updateMaxCountsValidationCache(Entity entity, String childName, ValidationResultFlag flag) {
-		validationCache.updateMaxCountInfo(entity.getInternalId(), childName, flag);
+	public void updateMaxCountsValidationCache(Entity entity, NodeDefinition childDef, ValidationResultFlag flag) {
+		validationCache.updateMaxCountInfo(entity.getInternalId(), childDef, flag);
 		this.errors = null;
 		this.warnings = null;
 	}
@@ -487,12 +493,10 @@ public class CollectRecord extends Record {
 	public void updateAttributeValidationCache(Attribute<?, ?> attribute, ValidationResults validationResults) {
 		Integer attributeId = attribute.getInternalId();
 		
-		removeValidationCache(attributeId);
+		removeValidationCache(attribute);
 		
-		int errorCounts = validationResults.getErrors().size();
-		int warningCounts = validationResults.getWarnings().size();
-		validationCache.setAttributeErrorCount(attributeId, errorCounts);
-		validationCache.setAttributeWarningCount(attributeId, warningCounts);
+		validationCache.setAttributeErrorCount(attributeId, validationResults.countErrors());
+		validationCache.setAttributeWarningCount(attributeId, validationResults.countWarnings());
 		validationCache.setAttributeValidationResults(attributeId, validationResults);
 		
 		errors = null;
@@ -503,7 +507,6 @@ public class CollectRecord extends Record {
 		Node<?> node = this.getNodeByInternalId(nodeId);
 		removeValidationCache(node);
 	}
-	
 	
 	private void removeValidationCache(Node<?> node) {
 		validationCache.remove(node);

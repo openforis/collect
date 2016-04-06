@@ -2,7 +2,6 @@ var SEPARATOR_MULTIPLE_PARAMETERS = "==="; //used to separate multiple attribute
 var SEPARATOR_MULTIPLE_VALUES = ";";
 var DATE_FORMAT = 'MM/DD/YYYY';
 var TIME_FORMAT = 'HH:ss';
-var SUBMIT_LABEL = "Submit and validate";
 var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
 
@@ -245,7 +244,7 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 	$.each(inputFieldInfoByParameterName, function(fieldName, info) {
 		var el = findById(fieldName);
 		if (el.length == 1) {
-			var parentCodeFieldId = el.data("parentCodeFieldId");
+			var parentCodeFieldId = el.data("parentIdFieldId");
 			var hasParentCode = parentCodeFieldId && parentCodeFieldId != "";
 			if (hasParentCode) {
 				switch (el.data("fieldType")) {
@@ -261,10 +260,10 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 					break;
 				case "CODE_BUTTON_GROUP":
 					var parentCodeInfo = inputFieldInfoByParameterName[parentCodeFieldId];
-					var parentCodeValue = parentCodeInfo.value;
+					var parentCodeId = parentCodeInfo.codeItemId;
 					var groupContainer = el.closest(".code-items-group");
 					
-					var validItemsContainer = groupContainer.find(".code-items[data-parent-code='" + parentCodeValue + "']");
+					var validItemsContainer = groupContainer.find(".code-items[data-parent-id='" + parentCodeId + "']");
 					if (validItemsContainer.is(':hidden')) {
 						var itemsContainers = groupContainer.find(".code-items");
 						itemsContainers.hide();
@@ -589,7 +588,7 @@ var fillDataWithJson = function(inputFieldInfoByParameterName) {
 		// value
 		// being
 		// 0;collect_code_deforestation_reason=burnt
-		var inputField = $("*[name=\'" + key + "\']");
+		var inputField = findById(key);
 		if (inputField.length == 1) {
 			setValueInInputField(inputField, value);
 		}
@@ -622,14 +621,13 @@ var setValueInInputField = function(inputField, value) {
 			// deselect all code item buttons
 			itemsGroup.find(".code-item").removeClass('active');
 			if (value != null && value != "") {
-				// select code item button with value equals to the specified
-				// one
+				// select code item button with value equals to the specified one
 				var activeCodeItemsContainer = itemsGroup
 						.find(".code-items:visible");
 				var splitted = value.split(SEPARATOR_MULTIPLE_PARAMETERS);
 				splitted
 						.forEach(function(value, index) {
-							var button = activeCodeItemsContainer.find(".code-item[value=" + value + "]");
+							var button = activeCodeItemsContainer.find(".code-item[value=" + escapeRegExp(value) + "]");
 							button.addClass('active');
 						});
 			}
@@ -718,6 +716,10 @@ var serializeForm = function(formId) {
 	return result;
 };
 */
+
+function escapeRegExp(string){
+	return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+};
 
 var enableSelect = function(selectName, enable) { // #elementsCover
 	$(selectName).prop('disabled', !enable);

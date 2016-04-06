@@ -9,7 +9,9 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -64,7 +66,7 @@ public class SurveyValidator {
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
-	private static final String IDML_XSD_3_1_3_FILE_NAME = "idml3.1.3.xsd";
+	private static final String IDML_XSD_3_1_4_FILE_NAME = "idml3.1.4.xsd";
 	private static final String IDML_UI_XSD_FILE_NAME = "idml3-ui.xsd";
 
 	private static final String[] SURVEY_XSD_3_0_FILE_NAMES = new String[] {
@@ -75,7 +77,7 @@ public class SurveyValidator {
 	
 	private static final String[] SURVEY_LATEST_VERSION_XSD_FILE_NAMES = new String[] {
 		XML_XSD_FILE_NAME, 
-		IDML_XSD_3_1_3_FILE_NAME,
+		IDML_XSD_3_1_4_FILE_NAME,
 		IDML_UI_XSD_FILE_NAME 
 	};
 	
@@ -245,6 +247,10 @@ public class SurveyValidator {
 				results.add(result);
 			}
 		}
+		SurveyValidationResult referencedAttributeValidationResult = validateReferencedKeyAttribute(attrDef);
+		if (referencedAttributeValidationResult.getFlag() != Flag.OK) {
+			results.add(referencedAttributeValidationResult);
+		}
 		return results;
 	}
 
@@ -266,6 +272,23 @@ public class SurveyValidator {
 					"survey.validation.attribute.key_attribute_cannot_be_multiple");
 		}
 		return null;
+	}
+	
+	public SurveyValidationResult validateReferencedKeyAttribute(AttributeDefinition attrDef) {
+		return validateReferencedKeyAttribute(attrDef, attrDef.getReferencedAttribute());
+	}
+
+	public SurveyValidationResult validateReferencedKeyAttribute(AttributeDefinition attrDef,
+			AttributeDefinition referencedAttribute) {
+		if (referencedAttribute != null) {
+			ReferenceableKeyAttributeHelper referenceableKeyAttributeHelper = new ReferenceableKeyAttributeHelper(attrDef);
+			Set<AttributeDefinition> referenceableAttributes = referenceableKeyAttributeHelper.determineReferenceableAttributes();
+			if (! referenceableAttributes.contains(referencedAttribute)) {
+				return new SurveyValidationResult(attrDef.getPath(), 
+						"survey.validation.attribute.invalid_referenced_key_attribute");
+			}
+		}
+		return new SurveyValidationResult();
 	}
 
 	private List<SurveyValidationResult> validateExpressions(NodeDefinition node) {
@@ -588,6 +611,15 @@ public class SurveyValidator {
 		return null;
 	}
 	
+	
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
+	}
+	
+	public void setExpressionValidator(ExpressionValidator expressionValidator) {
+		this.expressionValidator = expressionValidator;
+	}
+
 	public static class SurveyValidationResults implements Serializable {
 
 		private static final long serialVersionUID = 1L;
@@ -661,6 +693,10 @@ public class SurveyValidator {
 		private String messageKey;
 		private String[] messageArgs;
 
+		public SurveyValidationResult() {
+			this.flag = Flag.OK;
+		}
+		
 		public SurveyValidationResult(String path, String messageKey, String... messageArgs) {
 			this(Flag.ERROR, path, messageKey, messageArgs);
 		}
@@ -708,12 +744,64 @@ public class SurveyValidator {
 		
 	}
 	
-	public void setCodeListManager(CodeListManager codeListManager) {
-		this.codeListManager = codeListManager;
+	public static class ReferenceableKeyAttributeHelper {
+		
+		private final AttributeDefinition attributeDef;
+
+		public ReferenceableKeyAttributeHelper(AttributeDefinition attributeDef) {
+			super();
+			this.attributeDef = attributeDef;
+		}
+		
+		public Set<AttributeDefinition> determineReferenceableAttributes() {
+			final Set<AttributeDefinition> referenceableAttributes = new HashSet<AttributeDefinition>();
+			Set<EntityDefinition> referenceableEntityDefinitions = determineReferenceableEntities();
+			for (EntityDefinition entityDef : referenceableEntityDefinitions) {
+				List<AttributeDefinition> keyDefs = entityDef.getKeyAttributeDefinitions();
+				AttributeDefinition keyDef = keyDefs.get(0);
+				referenceableAttributes.add(keyDef);
+			}
+			return referenceableAttributes;
+		}
+
+		public Set<EntityDefinition> determineReferenceableEntities() {
+			final Set<EntityDefinition> result = new HashSet<EntityDefinition>();
+			final Set<EntityDefinition> descendantEntityDefinitions = getDescendantEntityDefinitions();
+			attributeDef.getRootEntity().traverse(new NodeDefinitionVisitor() {
+				public void visit(NodeDefinition def) {
+					if (def instanceof EntityDefinition && ! descendantEntityDefinitions.contains(def)
+							&& determineIsReferenceable((EntityDefinition) def) ) {
+						result.add((EntityDefinition) def);
+					}
+				}
+			});
+			return result;
+		}
+
+		public boolean determineIsReferenceable(EntityDefinition def) {
+			if (def.isMultiple() && ! ((EntityDefinition) def).isRoot()) {
+				List<AttributeDefinition> keyDefs = ((EntityDefinition) def).getKeyAttributeDefinitions();
+				if (keyDefs.size() == 1) {
+					AttributeDefinition keyDef = keyDefs.get(0);
+					if (keyDef.getClass().isAssignableFrom(attributeDef.getClass())) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		
+		private Set<EntityDefinition> getDescendantEntityDefinitions() {
+			final Set<EntityDefinition> result = new HashSet<EntityDefinition>();
+			attributeDef.getParentEntityDefinition().traverse(new NodeDefinitionVisitor() {
+				public void visit(NodeDefinition def) {
+					if (def instanceof EntityDefinition) {
+						result.add((EntityDefinition) def);
+					}
+				}
+			});
+			return result;
+		}
+		
 	}
-	
-	public void setExpressionValidator(ExpressionValidator expressionValidator) {
-		this.expressionValidator = expressionValidator;
-	}
-	
 }

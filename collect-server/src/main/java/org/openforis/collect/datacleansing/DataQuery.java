@@ -73,6 +73,9 @@ public class DataQuery extends PersistedSurveyObject {
 	
 	public AttributeDefinition getAttributeDefinition() {
 		NodeDefinition def = getSurvey().getSchema().getDefinitionById(attributeDefinitionId);
+		if (def == null) {
+			throw new IllegalStateException(String.format("Definition with id %d not found in the schema", attributeDefinitionId));
+		}
 		return (AttributeDefinition) def;
 	}
 	

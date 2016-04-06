@@ -5,7 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.form.SurveyObjectFormObject;
-import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;

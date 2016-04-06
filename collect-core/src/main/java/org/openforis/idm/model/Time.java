@@ -105,7 +105,7 @@ public final class Time extends AbstractValue {
 		} else {
 			GregorianCalendar cal = new GregorianCalendar();
 			cal.clear();
-			cal.setLenient(false);
+			cal.setLenient(true);
 			boolean pm = hour > 12 || (hour == 12 && minute > 0);
 			int calHour = pm ? hour - 12: hour;
 			cal.set(Calendar.AM_PM, pm ? Calendar.PM: Calendar.AM);
@@ -160,6 +160,11 @@ public final class Time extends AbstractValue {
 	@Override
 	public String toPrettyFormatString() {
 		return String.format(PRETTY_FORMAT, hour, minute);
+	}
+	
+	@Override
+	public String toInternalString() {
+		return toXmlTime();
 	}
 	
 	@Override

@@ -47,7 +47,8 @@ public final class Coordinate extends AbstractValue {
 			Coordinate coordinate = new Coordinate(x, y, srsId);
 			return coordinate;
 		} else {
-			throw new IllegalArgumentException("Unable to convert " + string + " to a valid coordinate");
+			//throw new IllegalArgumentException("Unable to convert " + string + " to a valid coordinate");
+			return null;
 		}
 	}
 	
@@ -82,6 +83,10 @@ public final class Coordinate extends AbstractValue {
 	public String getSrsId() {
 		return srsId;
 	}
+	
+	public void setSrsId( String srsId) {
+		this.srsId = srsId;
+	}
 
 	@Override
 	public String toPrettyFormatString() {
@@ -90,6 +95,11 @@ public final class Coordinate extends AbstractValue {
 
 	@Override
 	public String toString() {
+		return toPrettyFormatString();
+	}
+	
+	@Override
+	public String toInternalString() {
 		return toPrettyFormatString();
 	}
 

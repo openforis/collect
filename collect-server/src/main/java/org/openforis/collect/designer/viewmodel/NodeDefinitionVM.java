@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
-import org.openforis.collect.designer.model.AttributeType;
-import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
@@ -44,6 +44,8 @@ import org.zkoss.zk.ui.Path;
 public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyObjectBaseVM<T> {
 
 	protected static final String FORM_CONTAINER_ID = "nodeFormContainer";
+	private static final String NAME_FIELD_NAME = "name";
+	private static final String INSTANCE_LABEL_FIELD_NAME = "instanceLabel";
 
 	protected Form tempFormObject;
 	protected EntityDefinition parentEntity;
@@ -116,8 +118,19 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	public void nameChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("name") String name) {
 		name = adjustInternalName(name);
+		setTempFormObjectFieldValue(NAME_FIELD_NAME, name);
 		((NodeDefinitionFormObject<?>) formObject).setName(name);
+
+		//suggest label
+		String singleInstanceLabel = getFormFieldValue(tempFormObject, INSTANCE_LABEL_FIELD_NAME);
+		if (StringUtils.isBlank(singleInstanceLabel) && StringUtils.isNotBlank(name)) {
+			singleInstanceLabel = suggestLabel(name);
+			setTempFormObjectFieldValue(INSTANCE_LABEL_FIELD_NAME, singleInstanceLabel);
+			((NodeDefinitionFormObject<?>) formObject).setInstanceLabel(singleInstanceLabel);
+		}
 		dispatchApplyChangesCommand(binder);
+		
+		//notify name change
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", editedItem);
 		args.put("name", name);
@@ -130,17 +143,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		dispatchApplyChangesCommand(binder);
 		
 		((NodeDefinitionFormObject<?>) formObject).setInstanceLabel(value);
-		String name = getFormFieldValue(tempFormObject, "name");
+		String name = getFormFieldValue(tempFormObject, NAME_FIELD_NAME);
 		if ( StringUtils.isBlank(name) && StringUtils.isNotBlank(value) ) {
 			name = suggestInternalName(value);
 			nameChanged(binder, name);
 		}
-	}
-	
-	protected String adjustInternalName(String name) {
-		String result = super.adjustInternalName(name);
-		setTempFormObjectFieldValue("name", result);
-		return result;
 	}
 	
 	protected String getInstanceLabel(NodeDefinition nodeDefn) {

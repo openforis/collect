@@ -82,7 +82,7 @@ public class SurveyObjectsGenerator {
 			Set<String> labelLanguages = new HashSet<String>(survey.getLanguages());
 			labelLanguages.add("en");
 
-			SpatialReferenceSystem srs = coordinateOperations.fetchSRS("EPSG:4326", labelLanguages);
+			SpatialReferenceSystem srs = coordinateOperations.fetchSRS(CoordinateOperations.WGS84_SRS_ID, labelLanguages);
 			survey.addSpatialReferenceSystem(srs);
 		}
 		return;

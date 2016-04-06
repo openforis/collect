@@ -5,8 +5,10 @@ package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.lang.Objects;
@@ -27,6 +29,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	private List<Check<?>> checks;
 	private List<AttributeDefault> attributeDefaults;
 	private boolean calculated;
+	private Integer referencedAttributeId;
+	private AttributeDefinition referencedAttribute;
 	/**
 	 * Custom field labels
 	 */
@@ -43,6 +47,45 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		this.calculated = attrDef.calculated;
 		this.checks = Objects.clone(attrDef.checks);
 		this.attributeDefaults = Objects.clone(attrDef.attributeDefaults);
+	}
+	
+	@Override
+	protected void init() {
+		super.init();
+		if (referencedAttributeId != null) {
+			referencedAttribute = (AttributeDefinition) getSchema().getDefinitionById(referencedAttributeId);
+		}
+	}
+	
+	@Override
+	void detach() {
+		clearReferenceFromAttributes();
+		super.detach();
+	}
+	
+	public Set<AttributeDefinition> getReferencingAttributes() {
+		final Set<AttributeDefinition> result = new HashSet<AttributeDefinition>();
+		getSchema().traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if (def instanceof AttributeDefinition 
+						&& ((AttributeDefinition) def).getReferencedAttribute() == AttributeDefinition.this) {
+					result.add((AttributeDefinition) def);
+				}
+			}
+		});
+		return result;
+	}
+	
+	public Set<AttributeDefinition> clearReferenceFromAttributes() {
+		Set<AttributeDefinition> referencingAttributes = getReferencingAttributes();
+		for (AttributeDefinition referencingAttribute : referencingAttributes) {
+			referencingAttribute.clearReferencedAttribute();
+		}
+		return referencingAttributes;
+	}
+	
+	public boolean isSingleFieldKeyAttribute() {
+		return false;
 	}
 	
 	@Override
@@ -86,6 +129,14 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		attributeDefaults.add(def);
 	}
 	
+	public void setAttributeDefaults(List<AttributeDefault> attributeDefaults) {
+		if (attributeDefaults == null) {
+			this.attributeDefaults = null;
+		} else {
+			this.attributeDefaults = new ArrayList<AttributeDefault>(attributeDefaults);
+		}
+	}
+	
 	public void removeAllAttributeDefaults() {
 		if ( attributeDefaults != null ) {
 			attributeDefaults.clear();
@@ -110,6 +161,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	public abstract <V extends Value> V createValue(Object val);
 	
 	public abstract <V extends Value> V createValue(String string);
+	
+	public abstract <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues);
 
 //	public Set<NodePathPointer> getCheckDependencyPaths() {
 //		Survey survey = getSurvey();
@@ -169,6 +222,27 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		if (fieldLabels != null ) {
 			fieldLabels.remove(field, language);
 		}
+	}
+	
+	public boolean hasField(String fieldName) {
+		return getFieldDefinitionMap().containsKey(fieldName);
+	}
+	
+	public void setReferencedAttributeId(Integer referencedAttributeId) {
+		this.referencedAttributeId = referencedAttributeId;
+	}
+	
+	public AttributeDefinition getReferencedAttribute() {
+		return referencedAttribute;
+	}
+	
+	public void setReferencedAttribute(AttributeDefinition referencedAttribute) {
+		this.referencedAttribute = referencedAttribute;
+		this.referencedAttributeId = referencedAttribute == null ? null : referencedAttribute.getId();
+	}
+	
+	public void clearReferencedAttribute() {
+		setReferencedAttribute(null);
 	}
 	
 	public abstract boolean hasMainField();
@@ -264,4 +338,5 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		}
 		
 	}
+
 }

@@ -26,10 +26,18 @@ public class ValidationResults {
 		warnings = new ArrayList<ValidationResult>();
 	}
 
+	public int countErrors() {
+		return errors.size();
+	}
+	
 	public List<ValidationResult> getErrors() {
 		return CollectionUtils.unmodifiableList(errors);
 	}
 
+	public int countWarnings() {
+		return warnings.size();
+	}
+	
 	public List<ValidationResult> getWarnings() {
 		return CollectionUtils.unmodifiableList(warnings);
 	}

@@ -111,37 +111,31 @@ package org.openforis.collect.ui {
 			var columns:IList = new ArrayList();
 			var column:GridColumn;
 			//key attributes columns
-			var position:int = 1;
 			var survey:SurveyProxy = rootEntity.survey;
 			var schema:SchemaProxy = survey.schema;
+			var headerText:String, dataField:String, width:Number, labelFunction:Function, i:int;
+			
 			var keyAttributeDefs:IList = schema.getKeyAttributeDefinitions(rootEntity);
-			var headerText:String, dataField:String, width:Number, labelFunction:Function;
-			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
+			for (i = 0; i < keyAttributeDefs.length; i++) {
+				var keyAttributeDef:AttributeDefinitionProxy = AttributeDefinitionProxy(keyAttributeDefs.getItemAt(i)); 
 				headerText = keyAttributeDef.getInstanceOrHeadingLabelText();
-				dataField = "key" + position;
+				dataField = "key"+ (i + 1);
 				width = NaN;
 				labelFunction = RecordSummaryDataGrid.keyLabelFunction;
 				column = getGridColumn(headerText, dataField, width, labelFunction, true);
 				columns.addItem(column);
-				position ++;
 			}
 			//count entity columns
-			var firstLevelDefs:IList = rootEntity.childDefinitions;
-			position = 1;
-			for each(var nodeDef:NodeDefinitionProxy in firstLevelDefs) {
-				if(nodeDef is EntityDefinitionProxy) {
-					var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
-					if(entityDef.countInSummaryList) {
-						//headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
-						headerText = entityDef.getHeadingOrInstanceLabelText();
-						dataField = "count" + position;
-						width = 80;
-						labelFunction = RecordSummaryDataGrid.entityCountLabelFunction;
-						column = getGridColumn(headerText, dataField, width, labelFunction, true);
-						columns.addItem(column);
-						position ++;
-					}
-				}
+			var countableDefs:IList = rootEntity.countableDefinitions;
+			for (i = 0; i < countableDefs.length; i++) {
+				var countableDef:EntityDefinitionProxy = EntityDefinitionProxy(countableDefs.getItemAt(i));
+				//headerText = Message.get("list.headerCount", [entityDef.getLabelText()]);
+				headerText = countableDef.getHeadingOrInstanceLabelText();
+				dataField = "count" + (i + 1);
+				width = 80;
+				labelFunction = RecordSummaryDataGrid.entityCountLabelFunction;
+				column = getGridColumn(headerText, dataField, width, labelFunction, true);
+				columns.addItem(column);
 			}
 			//errors count column
 			column = getGridColumn(Message.get("list.errors"), "errors", 80, RecordSummaryDataGrid.errorsCountLabelFunction, false, new ClassFactory(RecordSummaryErrorsColumnItemRenderer));
@@ -176,7 +170,7 @@ package org.openforis.collect.ui {
 				formItem = new CodeAttributeFormItem();
 			} else if(def.multiple) {
 				formItem = new MultipleAttributeFormItem();
-				MultipleAttributeFormItem(formItem).showLabel = false;
+				MultipleAttributeFormItem(formItem).showLabel = (parentLayout != UIUtil.LAYOUT_TABLE);
 			} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
 				formItem = new CompositeAttributeFormItem();
 			} else {

@@ -1,12 +1,13 @@
 package org.openforis.idm.path;
 
+import static org.openforis.idm.path.Path.PARENT_ALIASES;
+import static org.openforis.idm.path.Path.THIS_ALIASES;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.openforis.idm.path.Path.*;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -14,7 +15,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 
@@ -112,13 +112,11 @@ public class PathElement implements Axis {
 
 	private List<Node<?>> evaluateInternal(Attribute<?, ?> parentAttribute) {
 		if ( index == null || index == 1) {					// /cluster[0]/plot[2]/location[1]/x[1]
-			List<Node<?>> results = new ArrayList<Node<?>>(1);
-			Field<?> field = parentAttribute.getField(name);
-			if ( field == null ) {
+			if (parentAttribute.getDefinition().hasField(name)) {
+				return Collections.<Node<?>>singletonList(parentAttribute.getField(name));
+			} else {
 				return null;
 			}
-			results.add(field);
-			return Collections.unmodifiableList(results);
 		} else {								// /cluster[1]/plot[2]/location[1]/x[2] NO 
 			throw new IllegalArgumentException("Index "+index+" out of bound; fields are always single");
 		}

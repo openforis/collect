@@ -64,9 +64,8 @@ public class RecordOperationGenerator {
 		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
 		Entity rootEntity = parsedRecord.getRootEntity();
-		String rootEntityName = rootEntity.getName();
 		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey,
-				rootEntityName, keyValues.toArray(new String[0]));
+				rootEntity.getName(), keyValues.toArray(new String[keyValues.size()]));
 		if (oldRecords == null || oldRecords.isEmpty()) {
 			return null;
 		} else if (oldRecords.size() == 1) {
@@ -90,10 +89,10 @@ public class RecordOperationGenerator {
 			record.setStep(previousStep);
 			switch (previousStep) {
 			case ENTRY:
-				operations.addInsert(record, step);
+				operations.addInsert(record, previousStep);
 				break;
 			default:
-				operations.addUpdate(record, step);
+				operations.addUpdate(record, previousStep);
 			}
 		}
 	}

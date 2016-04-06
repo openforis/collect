@@ -70,7 +70,7 @@ public class RecordFileBackupTask extends Task {
 				if ( isRunning() ) {
 					try {
 						backup(summary);
-						incrementItemsProcessed();
+						incrementProcessedItems();
 					} catch(Exception e) {
 						log.error(String.format("Error backing up record files for record with id %d and keys %s", 
 								summary.getId(), summary.getRootEntityKeyValues().toString()));
@@ -101,7 +101,7 @@ public class RecordFileBackupTask extends Task {
 	
 	private void backup(CollectRecord summary) throws RecordFileException, IOException {
 		Integer id = summary.getId();
-		CollectRecord record = recordManager.load(survey, id, summary.getStep());
+		CollectRecord record = recordManager.load(survey, id, summary.getStep(), false);
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		for (FileAttribute fileAttribute : fileAttributes) {
 			if ( ! fileAttribute.isEmpty() ) {

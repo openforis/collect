@@ -61,13 +61,15 @@
  	var SUBMIT_LABEL = "PLACEHOLDER_FINISH";
     var NEXT_LABEL = "PLACEHOLDER_NEXT";
     var PREVIOUS_LABEL = "PLACEHOLDER_PREVIOUS";
-    var SUBMIT_LABEL = "PLACEHOLDER_FINISH";
-    var NEXT_LABEL = "PLACEHOLDER_NEXT";
-    var PREVIOUS_LABEL = "PLACEHOLDER_PREVIOUS";
     
     var COLLECT_NOT_RUNNING = "PLACEHOLDER_COLLECT_NOT_RUNNING";
     var PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";
     
+    
+    // By default all Collect Earth surveys are defined as having at least the id attribute "id" which is stored by the balloon as collect_text_id
+    // If more id attributes are present in the survey then their names ( using the protocoal for the transmission e.g. "collect_code_year") will be specified in this list :
+    // the value of this variable should be something like ['collect_text_id'] or ['collect_text_id','collect_code_measurement']
+    var EXTRA_ID_ATTRIBUTES = PLACEHOLDER_EXTRA_ID_ATTRIBUTES;
     
     
 	</script>
@@ -138,30 +140,18 @@
 		<div id="scrollingDiv" style="overflow :visible;" class="earthDiv">
 			<form id="formAll" class="form-horizontal" action="$[host]save-data-expanded">
 			<!-- <form id="formAll" class="form-horizontal" action="http://127.0.0.1:8028/earth/save-data-expanded"> -->
-			
-				<input type="hidden" id="collect_text_id"
-					name="collect_text_id" value="$[id]" />
-					
+								
 				<input type="hidden" id="collect_coord_location" 
-					name="collect_coord_location" value="$[latitude],$[longitude]" />
+					name="collect_coord_location" value="$[latitude],$[longitude]"
+					class="extra" />
 				
 				<input type="hidden" id="collect_text_plot_file" 
-					name="collect_text_plot_file" value="$[plot_file]" />
+					name="collect_text_plot_file" value="$[plot_file]"
+					class="extra" />
 
 				<input type="hidden" id="collect_boolean_actively_saved"
 					name="collect_boolean_actively_saved" value="false" />
 					
-				<!-- NOT NECESSARY // FILLED BY THE SCRIPT!
-				<input type="hidden" id="collect_integer_elevation"
-					name="collect_integer_elevation" value="$[elevation]" />
-
-				<input type="hidden" id="collect_integer_slope"
-					name="collect_real_slope" value="$[slope]" />
-
-				<input type="hidden" id="collect_integer_aspect"
-					name="collect_real_aspect" value="$[aspect]" />
-				-->
-
 <!-- DO NOT REMOVE THIS LINE - IT GENERATES THE EXTRA FIELDS FROM THE CSV-BALLOON INTEGRATION -->
 <!-- START OF EXTRA CSV DATA -->
 PLACEHOLDER_FOR_EXTRA_CSV_DATA
@@ -174,6 +164,6 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 			</form>
 		</div>
 	</div>
-	<iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/openAuxiliaryWindows?latLongCoordinates=$[latitude],$[longitude]" height="0" width="0"></iframe>
+	<iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/ancillaryWindows?PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST" height="0" width="0"></iframe>
 </body>
 </html>

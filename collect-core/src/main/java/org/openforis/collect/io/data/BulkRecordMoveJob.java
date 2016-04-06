@@ -86,7 +86,7 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 					recordManager.demote(survey, summary.getId(), summary.getStep(), adminUser, recordCallback);
 				}
 				
-				incrementItemsProcessed();
+				incrementProcessedItems();
 			}
 		}
 		

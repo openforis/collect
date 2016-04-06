@@ -35,9 +35,8 @@ public class ModelLocationPath extends LocationPath {
 		return value;
 	}
 
-	// @Override
-	// public Iterator<?> iterate(EvalContext context) {
-	// Iterator<?> iterator = super.iterate(context);
-	// return iterator;
-	// }
+	@Override
+	public Step[] getSteps() {
+		return super.getSteps();
+	}
 }

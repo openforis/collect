@@ -238,7 +238,9 @@ public class SurveySelectVM extends BaseVM {
 	private void exportCollectEarthSurvey(final CollectSurvey survey,
 			final SurveyExportParametersFormObject parameters) {
 		try {
-			((CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR).setCodeListManager(codeListManager);
+			CollectEarthProjectFileCreatorImpl creatorImpl = (CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR;
+			creatorImpl.setCodeListManager(codeListManager);
+			creatorImpl.setSurveyManager(surveyManager);
 			String languageCode = parameters.getLanguageCode();
 			File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey, languageCode);
 			String contentType = URLConnection.guessContentTypeFromName(file.getName());
@@ -489,7 +491,7 @@ public class SurveySelectVM extends BaseVM {
 			});
 		}
 	}
-		
+
 	protected void performSurveyPublishing(CollectSurvey survey) {
 		try {
 			surveyManager.publish(survey);
@@ -573,25 +575,29 @@ public class SurveySelectVM extends BaseVM {
 			//skip survey list update
 			return;
 		}
-		List<SurveySummary> newSummaries = surveyManager.loadCombinedSummaries(null, true);
-		if (summaries == null) {
-			summaries = newSummaries;
-		} else {
-			for (SurveySummary newSummary : newSummaries) {
-				SurveySummary oldSummary = findSummary(newSummary.getId(), newSummary.isPublished(), newSummary.isTemporary());
-				if (oldSummary == null) {
-					// TODO handle this??
-				} else {
-					oldSummary.setRecordValidationProcessStatus(newSummary
-							.getRecordValidationProcessStatus());
-					BindUtils.postNotifyChange(null, null, oldSummary,
-							"recordValidationProgressStatus");
-					BindUtils.postNotifyChange(null, null, oldSummary,
-							"recordValidationInProgress");
-					BindUtils.postNotifyChange(null, null, oldSummary,
-							"recordValidationProgressPercent");
+		try {
+			List<SurveySummary> newSummaries = surveyManager.loadCombinedSummaries(null, true);
+			if (summaries == null) {
+				summaries = newSummaries;
+			} else {
+				for (SurveySummary newSummary : newSummaries) {
+					SurveySummary oldSummary = findSummary(newSummary.getId(), newSummary.isPublished(), newSummary.isTemporary());
+					if (oldSummary == null) {
+						// TODO handle this??
+					} else {
+						oldSummary.setRecordValidationProcessStatus(newSummary
+								.getRecordValidationProcessStatus());
+						BindUtils.postNotifyChange(null, null, oldSummary,
+								"recordValidationProgressStatus");
+						BindUtils.postNotifyChange(null, null, oldSummary,
+								"recordValidationInProgress");
+						BindUtils.postNotifyChange(null, null, oldSummary,
+								"recordValidationProgressPercent");
+					}
 				}
 			}
+		} catch (Exception e) {
+			return;
 		}
 	}
 

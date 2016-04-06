@@ -37,7 +37,7 @@
 	
 	<bean id="recordSessionManager" class="org.openforis.collect.manager.RecordSessionManager"
 		scope="session" />
-	
+		
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
@@ -144,6 +144,8 @@
 		<constructor-arg ref="surveyManager" />
 		<constructor-arg ref="recordManager" />
 		<constructor-arg ref="collectLocalRDBStorageManager" />
+		<constructor-arg ref="mondrianSchemaStorageManager" />
+		<constructor-arg ref="saikuDatasourceStorageManager" />
 	</bean>
 	
 	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
@@ -154,9 +156,9 @@
 		<constructor-arg ref="eventQueue" />
 	</bean>
 
-	<bean id="recordEventBatchPublisher" class="org.openforis.collect.io.data.RecordEventBatchPublisher"
-		scope="prototype">
-		<constructor-arg ref="eventQueue" />
-	</bean>
+<!-- 	<bean id="recordEventBatchPublisher" class="org.openforis.collect.io.data.RecordEventBatchPublisher" -->
+<!-- 		scope="prototype"> -->
+<!-- 		<constructor-arg ref="eventQueue" /> -->
+<!-- 	</bean> -->
 	
 </beans>

@@ -38,7 +38,7 @@ public class JsonDataCleansingImportTask extends Task implements DataCleansingIm
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		DataCleansingMetadataView metadataView = objectMapper.readValue(inputFile, DataCleansingMetadataView.class);
 		DataCleansingMetadata metadata = metadataView.toMetadata(survey);
-		dataCleansingManager.saveMetadata(survey, metadata);
+		dataCleansingManager.saveMetadata(survey, metadata, true); //TODO handle exceptions
 	}
 
 	@Override

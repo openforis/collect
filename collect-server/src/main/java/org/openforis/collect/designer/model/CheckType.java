@@ -1,5 +1,10 @@
 package org.openforis.collect.designer.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
 import org.openforis.idm.metamodel.validation.CustomCheck;
@@ -48,6 +53,17 @@ public enum CheckType {
 		default:
 			throw new IllegalArgumentException("Check type not supported: " + type);
 		}
+	}
+	
+	public static List<CheckType> compatibleValues(AttributeType attributeType) {
+		List<CheckType> list = new ArrayList<CheckType>(Arrays.asList(values()));
+		if (attributeType != AttributeType.COORDINATE) {
+			list.remove(CheckType.DISTANCE);
+		}
+		if (attributeType != AttributeType.TEXT) {
+			list.remove(CheckType.PATTERN);
+		}
+		return list;
 	}
 	
 	public String getLabel() {

@@ -32,6 +32,7 @@ public class Resources {
 	
 	public enum Component {
 		SELECT_LANGUAGE_POP_UP("survey_edit/select_language_popup.zul"),
+		SURVEY_FILE_POPUP("survey_edit/survey_file.zul"), 
 		COLLECT_EARTH_PREVIEW_POPUP("survey_edit/collect_earth_preview_popup.zul"),
 		PREVIEW_PREFERENCES_POP_UP("survey_edit/preview_preferences_popup.zul"),
 		PREVIEW_POP_UP("survey_edit/preview_popup.zul"),
@@ -63,7 +64,9 @@ public class Resources {
 		DATA_EXPORT_ERRORS_POPUP("component/data_export_errors_popup.zul"),
 		SURVEY_CLONE_PARAMETERS_POPUP("component/survey_clone_parameters_popup.zul"),
 		NODE_EDIT_POPUP("survey_edit/schema/node_popup.zul"),
-		SCHEMA_TREE_POPUP("survey_edit/schema/schema_tree_popup.zul");
+		SCHEMA_TREE_POPUP("survey_edit/schema/schema_tree_popup.zul"),
+		SCHEMA_ATTRIBUTES_IMPORT_POP_UP("survey_edit/schema_attributes_import_popup.zul"),
+		ATTRIBUTE_CONVERSION_PARAMETERS_POPUP("survey_edit/schema/attribute_conversion_parameters_popup.zul");
 		
 		private String location;
 		

@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.datacleansing.DataCleansingStepValue.UpdateType;
 import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -25,7 +26,7 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 	protected CollectSurvey survey;
 	
 	@Before
-	public void init() throws SurveyImportException, IdmlParseException {
+	public void init() throws SurveyImportException, IdmlParseException, SurveyValidationException {
 		survey = importModel();
 	}
 	

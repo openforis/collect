@@ -14,6 +14,7 @@ public final class IntegerRange extends NumericRange<Integer> {
 
 	private static final String REGEX = "(-?\\d+)(-(-?\\d+))?";
 	private static final Pattern PATTERN = Pattern.compile(REGEX);
+	private static final String INTERNAL_STRING_FORMAT = "%d - %d";
 
 	public IntegerRange(Integer value, Unit unit) {
 		super(value, value, unit);
@@ -45,6 +46,12 @@ public final class IntegerRange extends NumericRange<Integer> {
 	
 	@Override
 	public String toPrettyFormatString() {
-		return String.format("%d - %d", getFrom(), getTo());
+		return toInternalString();
 	}
+	
+	@Override
+	public String toInternalString() {
+		return String.format(INTERNAL_STRING_FORMAT, getFrom(), getTo());
+	}
+	
 }

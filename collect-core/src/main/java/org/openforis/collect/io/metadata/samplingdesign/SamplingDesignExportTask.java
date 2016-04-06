@@ -56,7 +56,7 @@ public class SamplingDesignExportTask extends Task {
 			List<SamplingDesignItem> items = summaries.getRecords();
 			for (SamplingDesignItem item : items) {
 				writeSummary(writer, item);
-				incrementItemsProcessed();
+				incrementProcessedItems();
 			}
 			writer.flush();
 		}

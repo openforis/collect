@@ -31,8 +31,7 @@ public class CollectMinCountValidator extends MinCountValidator {
 		
 		// you can approve missing values in entry phase as well
 		if ( resultFlag == ValidationResultFlag.ERROR ) {
-			String childName = getNodeDefinition().getName();
-			if (  record.getStep() == Step.CLEANSING && record.isMissingApproved(entity, childName) ){
+			if (record.getStep() == Step.CLEANSING && record.isMissingApproved(entity, getNodeDefinition())) {
 				resultFlag = ValidationResultFlag.WARNING;
 			}
 		}

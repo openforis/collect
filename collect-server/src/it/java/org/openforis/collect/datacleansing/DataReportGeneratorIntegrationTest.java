@@ -17,6 +17,7 @@ import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.datacleansing.manager.DataQueryTypeManager;
 import org.openforis.collect.datacleansing.manager.DataReportManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordUpdater;
@@ -52,7 +53,7 @@ public class DataReportGeneratorIntegrationTest extends DataCleansingIntegration
 	private RecordUpdater updater;
 	
 	@Override
-	public void init() throws SurveyImportException, IdmlParseException {
+	public void init() throws SurveyImportException, IdmlParseException, SurveyValidationException {
 		super.init();
 		updater = new RecordUpdater();
 		initRecords();

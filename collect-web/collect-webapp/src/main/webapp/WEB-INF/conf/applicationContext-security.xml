@@ -12,10 +12,10 @@
         ">
 
 	<!-- Enables Method Security and Expression-based access control -->
-	<global-method-security pre-post-annotations="enabled" secured-annotations="enabled" access-decision-manager-ref="methodAccessDecisionManager" >
-		<expression-handler ref="expressionHandler"  />
-		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER"/>
-	</global-method-security>
+<!-- 	<global-method-security pre-post-annotations="enabled" secured-annotations="enabled" access-decision-manager-ref="methodAccessDecisionManager" > -->
+<!-- 		<expression-handler ref="expressionHandler"  /> -->
+<!-- 		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER" /> -->
+<!-- 	</global-method-security> -->
 	
 	<http access-decision-manager-ref="accessDecisionManager">
 		<csrf disabled="true"/>
@@ -27,6 +27,7 @@
 		<intercept-url access="permitAll" pattern="/assets/**" />
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
+		<intercept-url access="permitAll" pattern="/js/**" />
 		<intercept-url access="permitAll" pattern="/script/**" />
 		<intercept-url access="permitAll" pattern="/default-password-active.json" />
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
@@ -49,6 +50,7 @@
 		<intercept-url access="hasRole('ADMIN')" pattern="/importSurvey.htm" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/logoUpload" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/rdbpublish" />
+		<intercept-url access="hasRole('ADMIN')" pattern="/saiku/**/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/export/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/import/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/species/export/*" />
@@ -56,7 +58,6 @@
 		<intercept-url access="hasRole('ADMIN')" pattern="/speciesImport" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/surveys" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/validateAllRecords.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/validationReport" />
 		
 		<intercept-url access="hasRole('USER')" pattern="/**" />
 

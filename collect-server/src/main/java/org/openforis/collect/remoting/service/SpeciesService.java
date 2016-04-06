@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
 import org.openforis.collect.model.CollectRecord;
@@ -14,6 +15,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 import org.openforis.collect.model.proxy.TaxonomyProxy;
+import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -100,32 +102,32 @@ public class SpeciesService {
 	}
 
 	@Secured("ROLE_ENTRY")
-	public List<TaxonOccurrenceProxy> findByCode(String taxonomyName, String searchString, int maxResults) {
+	public List<TaxonOccurrenceProxy> findByCode(String taxonomyName, String searchString, int maxResults, TaxonSearchParameters parameters) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
 		List<TaxonOccurrence> list = speciesManager.findByCode(taxonomy.getId(), searchString, maxResults);
-		List<TaxonOccurrenceProxy> result = TaxonOccurrenceProxy.fromList(list);
-		return result;
+		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
-	public List<TaxonOccurrenceProxy> findByScientificName(String taxonomyName, String searchString, int maxResults) {
+	public List<TaxonOccurrenceProxy> findByScientificName(String taxonomyName, String searchString, int maxResults, 
+			TaxonSearchParameters parameters) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByScientificName(taxonomy.getId(), searchString, maxResults);
-		List<TaxonOccurrenceProxy> result = TaxonOccurrenceProxy.fromList(list);
-		return result;
+		List<TaxonOccurrence> list = speciesManager.findByScientificName(taxonomy.getId(), searchString, maxResults, parameters);
+		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
-	public List<TaxonOccurrenceProxy> findByVernacularName(String taxonomyName, int nodeId, String searchString, int maxResults) {
+	public List<TaxonOccurrenceProxy> findByVernacularName(String taxonomyName, int nodeId, String searchString, int maxResults, 
+			TaxonSearchParameters parameters) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
 		CollectRecord activeRecord = sessionManager.getActiveRecord();
 		Node<? extends NodeDefinition> attr = activeRecord.getNodeByInternalId(nodeId);
 		if ( attr instanceof TaxonAttribute ) {
-			List<TaxonOccurrence> list = speciesManager.findByVernacularName(taxonomy.getId(), (TaxonAttribute) attr, searchString, maxResults);
-			List<TaxonOccurrenceProxy> result = TaxonOccurrenceProxy.fromList(list);
-			return result;
+			List<TaxonOccurrence> list = speciesManager.findByVernacularName(taxonomy.getId(), (TaxonAttribute) attr, searchString, 
+					maxResults, parameters);
+			return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 		} else {
-			throw new IllegalArgumentException("TaxonAttribute expected");
+			throw new IllegalArgumentException("TaxonAttribute expected, found: " + attr.getClass().getName());
 		}
 	}
 	

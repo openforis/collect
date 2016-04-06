@@ -7,12 +7,16 @@ OF.UI.Forms.Validation = function() {};
  */
 OF.UI.Forms.Validation.removeErrors = function ($form) {
 	$form.find('.form-group').each(function() {
-		var $this = $(this);
-		$this.removeClass('has-error');
-		if ($this.data("tooltip")) {
-			$this.tooltip('destroy');
-		}
+		OF.UI.Forms.Validation.removeErrorFromElement($(this));
 	});
+};
+
+OF.UI.Forms.Validation.removeErrorFromElement = function ($el) {
+	$el.removeClass('has-error');
+	var tooltip = OF.UI.Forms.Validation._getErrorTooltip($el);
+	if (tooltip) {
+		$el.tooltip('destroy');
+	}
 };
 
 /**
@@ -21,56 +25,65 @@ OF.UI.Forms.Validation.removeErrors = function ($form) {
  * @param $form
  * @param errors
  */
-OF.UI.Forms.Validation.updateErrors = function (form, errors) {
-	function findError(fieldName) {
-		for (var i=0; i < errors.length; i++) {
-			var error = errors[i];
-			if (error.field == fieldName) {
-				return error;
-			}
-		}
-		return null;
-	}
-	
+OF.UI.Forms.Validation.updateErrors = function (form, errors, considerOnlyVisitedFields) {
 	form.find('.form-group').each(function() {
-		var formGroup = $(this);
-		var inputField = formGroup.find(".form-control");
-		if (inputField.length == 1) {
-			var oldTooltip = formGroup.data("tooltip");
-			var error = findError(inputField.attr("name"));
-			if (error == null) {
-				formGroup.removeClass('has-error');
-				if (oldTooltip) {
-					formGroup.tooltip('destroy');
-				}
-			} else {
-				formGroup.addClass('has-error');
-				var tooltipTitle = OF.UI.Forms.Validation._createErrorTooltipTitle(inputField, error);
-				if (oldTooltip) {
-					oldTooltip.options.title = tooltipTitle;
-				} else {
-					OF.UI.Forms.Validation.createErrorTooltipWithTitle(formGroup, tooltipTitle);
-				}
-			}
-		}
+		OF.UI.Forms.Validation.updateErrorInFormGroup($(this), errors, considerOnlyVisitedFields);
 	});
-	/*
-	OF.UI.Forms.Validation.removeErrors( form );
-	
-	$.each( errors, function( i, error ){
-		var fieldName = error.field;
-		var field = form.find( '[name="'+ fieldName + '"]' );
-		if ( field != null ) {
-			var formGroup = field.closest( '.form-group' );
-			if ( !formGroup.hasClass('has-error') ){
-				formGroup.addClass('has-error');
-	
-				OF.UI.Forms.Validation.createErrorTooltip(formGroup, error);
-			}
-		}
-	});
-	*/
 };
+
+OF.UI.Forms.Validation.findError = function(errors, fieldName) {
+	for (var i=0; i < errors.length; i++) {
+		var error = errors[i];
+		if (error.field == fieldName) {
+			return error;
+		}
+	}
+	return null;
+};
+
+OF.UI.Forms.Validation.updateErrorMessageInFields = function ($form, fieldNames, errors) {
+	$form.find('.form-group').each(function(idx, formGroup) {
+		var $formGroup = $(formGroup);
+		var inputField = $formGroup.find(".form-control");
+		if (inputField.length == 1) {
+			var inputFieldName = inputField.attr("name");
+			if (OF.Arrays.contains(fieldNames, inputFieldName)) {
+				OF.UI.Forms.Validation.updateErrorInFormGroup($formGroup, errors);
+			}
+		}
+	});
+};
+
+OF.UI.Forms.Validation.updateErrorInFormGroup = function(formGroup, errors, considerOnlyVisitedFields) {
+	var inputField = formGroup.find(".form-control");
+	if (inputField.length == 1) {
+		var oldTooltip = OF.UI.Forms.Validation._getErrorTooltip(formGroup);
+		var fieldName = inputField.attr("name");
+		var error = OF.UI.Forms.Validation.findError(errors, fieldName);
+		if (error == null || error.defaultMessage == null) {
+			formGroup.removeClass('has-error');
+			if (oldTooltip) {
+				formGroup.tooltip('destroy');
+			}
+		} else if (! considerOnlyVisitedFields || inputField.data("visited")) {
+			formGroup.addClass('has-error');
+			var tooltipTitle = OF.UI.Forms.Validation._createErrorTooltipTitle(inputField, error);
+			if (oldTooltip) {
+				oldTooltip.options.title = tooltipTitle;
+			} else {
+				OF.UI.Forms.Validation.createErrorTooltipWithTitle(formGroup, tooltipTitle);
+			}
+		}
+	}
+};
+
+OF.UI.Forms.Validation._getErrorTooltip = function(formGroup) {
+	var tooltip = formGroup.data("tooltip");
+	if (tooltip == null) {
+		tooltip = formGroup.data("bs.tooltip");
+	}
+	return tooltip;
+}
 
 /**
  * Returns the message associated to the error with the specified field name.
@@ -92,14 +105,16 @@ OF.UI.Forms.Validation.getFieldErrorMessage = function (errors, fieldName) {
  */
 OF.UI.Forms.Validation.getFormErrorMessage = function ($form, errors) {
 	var genericErrorMessage = OF.UI.Forms.Validation.getFieldErrorMessage(errors);
-	var errorMessage;
+	var errorMessage = "";
 	if ( genericErrorMessage == null ) {
-		var firstError = errors[0];
-		var fieldName = firstError.field;
-		var fieldErrorMessage = firstError.defaultMessage;
-		var field = $form.find( '[name="' + fieldName + '"]' );
-		var fieldLabel = OF.UI.Forms.getFieldLabel(field);
-		errorMessage =  fieldLabel + " " + fieldErrorMessage;
+		for (var i=0; i < errors.length; i++) {
+			var error = errors[i];
+			var fieldName = error.field;
+			var fieldErrorMessage = error.defaultMessage;
+			var field = $form.find( '[name="' + fieldName + '"]' );
+			var fieldLabel = OF.UI.Forms.getFieldLabel(field);
+			errorMessage += fieldLabel + " " + fieldErrorMessage + "<br/>";
+		}
 	} else {
 		errorMessage = genericErrorMessage;
 	}
@@ -128,6 +143,7 @@ OF.UI.Forms.Validation.createErrorTooltipWithTitle = function ($field, title) {
 	$targetField.tooltip({
 		title: title,
 		container: container,
+		//trigger: "focus",
 		template: '<div class="tooltip error"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
 	});
 };
@@ -144,6 +160,6 @@ OF.UI.Forms.Validation._createErrorTooltipTitle = function($field, error, fieldL
 	} else {
 		errorMessage = "error";
 	}
-	var message = fieldLabel + " " + errorMessage;
+	var message = fieldLabel + " - " + errorMessage;
 	return message;
 };

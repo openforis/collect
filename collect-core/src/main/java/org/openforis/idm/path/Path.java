@@ -160,76 +160,33 @@ public final class Path implements Axis, Iterable<PathElement> {
 	}
 
 	public static String getAbsolutePath(String path) {
-		return path.replaceAll("\\[[^\\[]+\\]", "");
+		return PathUtils.absolutePath(path);
 	}
 	
-	public static String getRelativePath(String source, String destination) {
-		char[] sourceChars = source.toCharArray();
-		char[] destChars = destination.toCharArray();
-
-		int commonPathElementsCount = 0;
-		int commonPartIndex = -1;
-		int nextCharIndex = 0;
-		while (nextCharIndex < sourceChars.length && nextCharIndex < destChars.length) {
-			if (sourceChars[nextCharIndex] == destChars[nextCharIndex]) {
-				if (sourceChars[nextCharIndex] == SEPARATOR) {
-					commonPathElementsCount ++;
-				}
-				commonPartIndex ++;
-				nextCharIndex ++;
-			} else {
-				break;
-			}
-		}
-		int sourcePathElementsCount = countOccurrences(sourceChars, SEPARATOR);
-		
-		StringBuilder pathBuilder = new StringBuilder();
-		
-		append(pathBuilder, PARENT_FUNCTION, SEPARATOR, sourcePathElementsCount - commonPathElementsCount);
-
-		int destLastPartIdx = commonPartIndex + 2;
-		if (destChars.length > destLastPartIdx) {
-			pathBuilder.append(Arrays.copyOfRange(destChars, destLastPartIdx, destChars.length));
-		}
-
-		if ( pathBuilder.length() == 0 ) {
-			return THIS_FUNCTION;
-		} else {
-			return pathBuilder.toString();
-		}
+	public static String getRelativePath(String source, String dest) {
+		return PathUtils.relativePath(source, dest);
 	}
 
-	private static void append(StringBuilder pathBuilder, String value,
+	private static void append(StringBuilder sb, String value,
 			char separator, int count) {
 		for (int i = 0; i < count; i++) {
-			pathBuilder.append(value);
+			sb.append(value);
 			if (i < count - 1) {
-				pathBuilder.append(separator);
+				sb.append(separator);
 			}
 		}
 	}
 
-	private static int countOccurrences(char[] sourceChars, char value) {
+	private static int countOccurrences(String source, char value) {
 		int count = 0;
-		for (int i = 0; i < sourceChars.length; i++) {
-			if (sourceChars[i] == value) {
+		for (int i = 0; i < source.length(); i++) {
+			if (source.charAt(i) == value) {
 				count++;
 			}
 		}
 		return count;
 	}
 
-//	private static void appendToPath(StringBuilder pathBuilder, String value, int count) {
-//		if (count > 0) {
-//			for (int i = 0; i < count; i++) {
-//				if (pathBuilder.length() > 0) {
-//					pathBuilder.append(SEPARATOR_CHAR);
-//				}
-//				pathBuilder.append(value);
-//			}
-//		}
-//	}
-	
 	public static String removeThisVariableToken(String path) {
 		return path.replaceAll(Pattern.quote(THIS_VARIABLE) + SEPARATOR, "");
 	}
@@ -336,6 +293,83 @@ public final class Path implements Axis, Iterable<PathElement> {
 		} else if (!parentPath.equals(other.parentPath))
 			return false;
 		return true;
+	}
+	
+	private static class PathUtils {
+		
+		private static final String RELATIVE_PATH_CONTENT_REGEX = "\\[[^\\[]+\\]";
+
+		static String absolutePath(String path) {
+			return path.replaceAll(RELATIVE_PATH_CONTENT_REGEX, "");
+		}
+		
+		static String relativePath(String source, String dest) {
+			if (source.equals(dest)) {
+				return THIS_FUNCTION;
+			}
+			String commonPath = calculateCommonPath(source, dest);
+
+			int sourcePathElementsCount = countOccurrences(source, SEPARATOR);
+			int commonPathElementsCount = countOccurrences(commonPath, SEPARATOR);
+			
+			StringBuilder pathBuilder = new StringBuilder();
+			
+			int innerSourceLevels = sourcePathElementsCount - commonPathElementsCount;
+			if (innerSourceLevels > 0) {
+				append(pathBuilder, PARENT_FUNCTION, SEPARATOR, innerSourceLevels);
+			}
+			int destLastPartIdx = commonPath.length() + 1;
+			if (destLastPartIdx < dest.length()) {
+				if (pathBuilder.length() > 0) {
+					pathBuilder.append(SEPARATOR);
+				}
+				pathBuilder.append(dest.substring(destLastPartIdx));
+			}
+
+			if ( pathBuilder.length() == 0 ) {
+				return THIS_FUNCTION;
+			} else {
+				return pathBuilder.toString();
+			}
+		}
+
+		static String calculateCommonPath(String source, String dest) {
+			String commonPrefix = longestCommonPrefix(source, dest);
+			if (source.length() > commonPrefix.length() && source.charAt(commonPrefix.length()) != SEPARATOR || 
+					dest.length() > commonPrefix.length() && dest.charAt(commonPrefix.length()) != SEPARATOR) {
+				return commonPrefix.substring(0, commonPrefix.lastIndexOf(SEPARATOR));
+			} else {
+				return commonPrefix;
+			}
+		}
+
+		static String longestCommonPrefix(String... values) {
+			if (values == null || values.length == 0) {
+				return "";
+			}
+		    int minLength = Integer.MAX_VALUE;
+		    for(String str: values){
+		        if(minLength > str.length()) {
+		            minLength = str.length();
+		        }
+		    }
+		    if(minLength == 0) {
+		    	return "";
+		    }
+			for (int j = 0; j < minLength; j++) {
+				char prev = '0';
+				for (int valueIndex = 0; valueIndex < values.length; valueIndex++) {
+					if (valueIndex == 0) {
+						prev = values[valueIndex].charAt(j);
+						continue;
+					}
+					if (values[valueIndex].charAt(j) != prev) {
+						return values[valueIndex].substring(0, j);
+					}
+				}
+			}
+			return values[0].substring(0, minLength);
+		}
 	}
 	
 }

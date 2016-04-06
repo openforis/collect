@@ -43,6 +43,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -50,7 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
-@Transactional
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class CodeListManager {
 	
 	@Autowired(required=false)
@@ -58,6 +59,7 @@ public class CodeListManager {
 	@Autowired(required=false)
 	private CodeListItemDao codeListItemDao;
 	
+	@Transactional
 	public void importCodeLists(CollectSurvey survey, InputStream is) throws CodeListImportException {
 		int nextSystemId = codeListItemDao.nextSystemId();
 		CollectCodeListService service = new CollectCodeListService();
@@ -70,6 +72,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void importCodeLists(CollectSurvey survey, File file) throws CodeListImportException {
 		FileInputStream is = null;
 		try {
@@ -235,6 +238,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void removeLevel(CodeList list, int level) {
 		boolean persistedSurvey = list.getSurvey().getId() != null;
 		if ( list.isExternal() ) {
@@ -448,6 +452,7 @@ public class CodeListManager {
 		codeListItemDao.copyItems(fromSurvey.getId(), toSurvey.getId());
 	}
 	
+	@Transactional
 	public void save(PersistedCodeListItem item) {
 		if ( item.getSystemId() == null ) {
 			codeListItemDao.insert(item);
@@ -456,10 +461,12 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void save(List<PersistedCodeListItem> items) {
 		codeListItemDao.insert(items);
 	}
 	
+	@Transactional
 	public void saveItemsAndDescendants(List<CodeListItem> items) {
 		List<PersistedCodeListItem> persistedItems = createPersistedItems(items, codeListItemDao.nextSystemId(), null);
 		save(persistedItems);
@@ -491,6 +498,7 @@ public class CodeListManager {
 		survey.removeCodeList(codeList);
 	}
 
+	@Transactional
 	public void delete(CodeListItem item) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {
@@ -509,6 +517,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void deleteAllItems(CodeList list) {
 		if ( list.isExternal()) {
 			throw new UnsupportedOperationException();
@@ -519,14 +528,17 @@ public class CodeListManager {
 		}
 	}
 
+	@Transactional
 	public void deleteAllItemsBySurvey(int surveyId, boolean work) {
 		codeListItemDao.deleteBySurvey(surveyId, work);
 	}
 
+	@Transactional
 	public void deleteInvalidCodeListReferenceItems(CollectSurvey survey) {
 		codeListItemDao.deleteInvalidCodeListReferenceItems(survey);
 	}
 	
+	@Transactional
 	public void removeVersioningReference(CollectSurvey survey, ModelVersion version) {
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList codeList : codeLists) {
@@ -540,6 +552,7 @@ public class CodeListManager {
 		}
 	}
 
+	@Transactional
 	public void deleteUnusedCodeLists(CollectSurvey survey) {
 		Set<CodeList> unusedCodeLists = getUnusedCodeLists(survey);
 		for (CodeList codeList : unusedCodeLists) {
@@ -547,6 +560,7 @@ public class CodeListManager {
 		}
 	}
 	
+	@Transactional
 	public void shiftItem(CodeListItem item, int indexTo) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {
@@ -588,6 +602,7 @@ public class CodeListManager {
 		return attrDefnUsingCodeList != null;
 	}
 	
+	@Transactional
 	public void persistCodeListItems(CodeList list) {
 		List<CodeListItem> items = list.getItems();
 		
@@ -596,6 +611,7 @@ public class CodeListManager {
 		list.removeAllItems();
 	}
 	
+	@Transactional
 	public void updateSurveyLanguages(CollectSurvey survey, List<String> newLanguageCodes) {
 		List<String> oldLanguageCodes = survey.getLanguages();
 		List<Integer> removedLanguageCodePositions = new ArrayList<Integer>();
@@ -622,10 +638,12 @@ public class CodeListManager {
 		return codeListItemDao.loadImageContent(item);
 	}
 
+	@Transactional
 	public void saveImageContent(PersistedCodeListItem item, FileWrapper fileWrapper) {
 		codeListItemDao.saveImageContent(item, fileWrapper);
 	}
 	
+	@Transactional
 	public void deleteImageContent(PersistedCodeListItem item) {
 		codeListItemDao.deleteImageContent(item);
 	}
@@ -642,6 +660,5 @@ public class CodeListManager {
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
 	}
-
 
 }

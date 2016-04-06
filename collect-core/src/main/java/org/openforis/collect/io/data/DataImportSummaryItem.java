@@ -4,9 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
+import org.openforis.collect.model.CollectRecordSummary;
+import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
+import org.openforis.collect.utils.Dates;
 
 /**
  * 
@@ -16,23 +19,24 @@ import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 public class DataImportSummaryItem {
 
 	private int entryId;
-	private CollectRecord record;
-	private CollectRecord conflictingRecord;
+	private CollectRecordSummary record;
+	private CollectRecordSummary conflictingRecord;
 	private List<Step> steps;
+	
 	/**
 	 * Map containing the warnings for each step (if any).
 	 * The warnings are stored in a Map where the node path is the key of the warning.
 	 */
 	private Map<Step, List<NodeUnmarshallingError>> warnings;
 
-	public DataImportSummaryItem(int entryId, CollectRecord record, List<Step> steps) {
+	public DataImportSummaryItem(int entryId, CollectRecordSummary record, List<Step> steps) {
 		this.entryId = entryId;
 		this.record = record;
 		this.steps = steps;
 		this.warnings = new HashMap<CollectRecord.Step, List<NodeUnmarshallingError>>();
 	}
 	
-	public DataImportSummaryItem(int entryId, CollectRecord record, List<Step> steps, CollectRecord conflictingRecord) {
+	public DataImportSummaryItem(int entryId, CollectRecordSummary record, List<Step> steps, CollectRecordSummary conflictingRecord) {
 		this(entryId, record, steps);
 		this.conflictingRecord = conflictingRecord;
 	}
@@ -45,19 +49,19 @@ public class DataImportSummaryItem {
 		this.entryId = entryId;
 	}
 
-	public CollectRecord getRecord() {
+	public CollectRecordSummary getRecord() {
 		return record;
 	}
 
-	public void setRecord(CollectRecord record) {
+	public void setRecord(CollectRecordSummary record) {
 		this.record = record;
 	}
 
-	public CollectRecord getConflictingRecord() {
+	public CollectRecordSummary getConflictingRecord() {
 		return conflictingRecord;
 	}
 
-	public void setConflictingRecord(CollectRecord conflictingRecord) {
+	public void setConflictingRecord(CollectRecordSummary conflictingRecord) {
 		this.conflictingRecord = conflictingRecord;
 	}
 
@@ -76,4 +80,68 @@ public class DataImportSummaryItem {
 	public void setWarnings(Map<Step, List<NodeUnmarshallingError>> warnings) {
 		this.warnings = warnings;
 	}
+	
+	public int getRecordCompletionPercent() {
+		return record.getCompletionPercent();
+	}
+
+	public int getRecordFilledAttributesCount() {
+		return record == null ? 0 : record.getFilledAttributesCount();
+	}
+	
+	public int getConflictingRecordCompletionPercent() {
+		return conflictingRecord == null ? -1 : conflictingRecord.getCompletionPercent();
+	}
+
+	public int getConflictingRecordFilledAttributesCount() {
+		return conflictingRecord == null ? -1 : conflictingRecord.getFilledAttributesCount();
+	}
+	
+	public int calculateCompletionDifferencePercent() {
+		if (conflictingRecord == null || record.getFilledAttributesCount() == 0) {
+			return 100;
+		}
+		double result = (double) (100 * 
+					(record.getFilledAttributesCount() - conflictingRecord.getFilledAttributesCount())
+						/ conflictingRecord.getFilledAttributesCount() );
+		return Double.valueOf(Math.ceil(result)).intValue();
+	}
+
+	/**
+	 * Level of "importability".
+	 * -1 - there can be a problem: the record that is being imported is older, less complete or with more errors than the existing one
+	 * 0 - the record being imported is the same as the existing one
+	 * 1 - the record is new or contains more filled attributes than the existing one
+	 * @return
+	 */
+	public int calculateImportabilityLevel() {
+		if (conflictingRecord == null) {
+			//new
+			return 1;
+		} else {
+			int modifiedDateCompare = Dates.compareUpToSecondsOnly(
+					ObjectUtils.defaultIfNull(record.getModifiedDate(), record.getCreationDate()), 
+					ObjectUtils.defaultIfNull(conflictingRecord.getModifiedDate(), conflictingRecord.getCreationDate()));
+			if (modifiedDateCompare >= 0) {
+				int differencePercent = calculateCompletionDifferencePercent();
+				if (modifiedDateCompare == 0 && differencePercent == 0) {
+					//same date and (probably) same data
+					return 0;
+				} else {
+					if (differencePercent >= 0) {
+						//newer and more complete
+						return 1;
+					} else {
+						//newer but less complete
+						return -1;
+					}
+				}
+			} else {
+				//older
+				return -1;
+			}
+		} 
+		
+	}
+	
 }

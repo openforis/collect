@@ -15,6 +15,8 @@ import org.openforis.idm.model.Coordinate;
  */
 public interface CoordinateOperations {
 
+	public  static final String WGS84_SRS_ID = "EPSG:4326";
+
 	void validateWKT(String wkt) throws Exception;
 	
 	void parseSRS(List<SpatialReferenceSystem> srss);
@@ -35,4 +37,5 @@ public interface CoordinateOperations {
 	Set<String> getAvailableSRSs();
 	
 	Coordinate convertToWgs84(Coordinate coordinate);
+	
 }

@@ -7,79 +7,110 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.zip.ZipException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.NewBackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordUpdater;
-import org.openforis.collect.persistence.xml.DataHandler;
+import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.commons.io.OpenForisIOUtils;
+import org.openforis.concurrency.ProgressListener;
 
 public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 
 	private final File file;
 	private final CollectSurvey packagedSurvey;
 	private final CollectSurvey existingSurvey;
-	private final UserManager userManager;
-	private final boolean validateRecords;
+	private boolean validateRecords;
+	private boolean ignoreDuplicateRecordKeyValidationErrors;
 	
 	//internal
 	private NewBackupFileExtractor backupFileExtractor;
 	private DataUnmarshaller dataUnmarshaller;
 	private RecordUpdater recordUpdater;
+	private RecordUserLoader recordUserLoader;
 	
 	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, 
-			CollectSurvey existingSurvey, UserManager userManager, boolean validateRecords) {
+			CollectSurvey existingSurvey, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		this.file = file;
 		this.packagedSurvey = packagedSurvey;
 		this.existingSurvey = existingSurvey;
-		this.userManager = userManager;
 		this.validateRecords = validateRecords;
-	}
-	
-	public void init() throws ZipException, IOException {
-		this.backupFileExtractor = new NewBackupFileExtractor(file);
-		this.dataUnmarshaller = initDataUnmarshaller();
-		this.recordUpdater = new RecordUpdater();
+		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
+		this.recordUserLoader = new RecordUserLoader(userManager);
 	}
 	
 	@Override
+	public void init() throws Exception {
+		init(null);
+	}
+	
+	@Override
+	public void init(ProgressListener progressListener) throws Exception {
+		this.backupFileExtractor = new NewBackupFileExtractor(file);
+		this.backupFileExtractor.init(progressListener);
+		this.dataUnmarshaller = new DataUnmarshaller(existingSurvey == null ? packagedSurvey : existingSurvey, packagedSurvey);
+		this.dataUnmarshaller.setRecordValidationEnabled(validateRecords);
+		this.dataUnmarshaller.setIgnoreDuplicateRecordKeyValidationErrors(ignoreDuplicateRecordKeyValidationErrors);
+		this.recordUpdater = new RecordUpdater();
+		this.recordUpdater.setValidateAfterUpdate(validateRecords);
+	}
+	
+	@Override
+	public String getEntryName(int entryId, Step step) {
+		if ( backupFileExtractor.isOldFormat() ) {
+			return step.getStepNumber() + "/" + entryId + ".xml";
+		} else {
+			BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId);
+			String entryName = recordEntry.getName();
+			return entryName;
+		}
+	}
+
+	@Override
 	public ParseRecordResult provideRecordParsingResult(int entryId, Step step)
 			throws IOException {
-		String entryName = getBackupEntryName(entryId, step);
+		String entryName = getEntryName(entryId, step);
 		InputStream entryIS = backupFileExtractor.findEntryInputStream(entryName);
 		if (entryIS == null) {
 			return null;
 		}
 		InputStreamReader reader = OpenForisIOUtils.toReader(entryIS);
-		ParseRecordResult parseRecordResult = parseRecord(reader);
+		ParseRecordResult parseRecordResult = parseRecord(reader, step);
+		if (parseRecordResult.isSuccess()) {
+			CollectRecord record = parseRecordResult.getRecord();
+			recordUserLoader.adjustUserReferences(record);
+			recordUpdater.initializeRecord(record);
+		}
 		return parseRecordResult;
 	}
 	
 	@Override
 	public CollectRecord provideRecord(int entryId, Step step) throws IOException, RecordParsingException {
-		ParseRecordResult parseRecordResult = provideRecordParsingResult(entryId, step);
-		if (parseRecordResult == null) {
+		ParseRecordResult parseResult = provideRecordParsingResult(entryId, step);
+		if (parseResult == null) {
 			return null;
 		}
-		if (parseRecordResult.isSuccess()) {
-			CollectRecord record = parseRecordResult.getRecord();
-			recordUpdater.initializeRecord(record, validateRecords);
-			return record;
+		if (parseResult.isSuccess()) {
+			return parseResult.getRecord();
 		} else {
-			throw new RecordParsingException(parseRecordResult, step);
+			throw new RecordParsingException(parseResult, step);
 		}
 	}
 
@@ -105,26 +136,71 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 		IOUtils.closeQuietly(backupFileExtractor);
 	}
 	
-	private ParseRecordResult parseRecord(Reader reader) throws IOException {
+	private ParseRecordResult parseRecord(Reader reader, Step step) throws IOException {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
+		if (result.isSuccess()) {
+			result.getRecord().setStep(step);
+		}
 		return result;
 	}
 	
-	private DataUnmarshaller initDataUnmarshaller() {
-		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
-		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey, validateRecords);
-		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
-		return dataUnmarshaller;
+	public boolean isValidateRecords() {
+		return validateRecords;
 	}
 	
-	protected String getBackupEntryName(int entryId, Step step) {
-		if ( backupFileExtractor.isOldFormat() ) {
-			return step.getStepNumber() + "/" + entryId + ".xml";
-		} else {
-			BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId);
-			String entryName = recordEntry.getName();
-			return entryName;
+	public void setValidateRecords(boolean validateRecords) {
+		this.validateRecords = validateRecords;
+		if (dataUnmarshaller != null) {
+			dataUnmarshaller.setRecordValidationEnabled(validateRecords);
 		}
 	}
 	
+	public static class RecordUserLoader {
+		
+		private static final String NEW_USER_PASSWORD = "password";
+		
+		private final UserManager userManager;
+		private Map<String, User> usersByName;
+		
+		public RecordUserLoader(UserManager userManager) {
+			super();
+			this.userManager = userManager;
+			this.usersByName = new HashMap<String, User>();
+		}
+
+		public void adjustUserReferences(CollectRecord record) {
+			User createdBy = record.getCreatedBy();
+			if (createdBy != null) {
+				User user = loadOrCreateAndInsertUser(createdBy.getName());
+				record.setCreatedBy(user);
+			}
+			User modifiedBy = record.getModifiedBy();
+			if (modifiedBy != null) {
+				User user = loadOrCreateAndInsertUser(modifiedBy.getName());
+				record.setModifiedBy(user);
+			}
+		}
+	
+		private User loadOrCreateAndInsertUser(String name) {
+			User user;
+			if ( StringUtils.isBlank(name) || userManager == null ) {
+				return null;
+			} else if ( usersByName.containsKey(name) ) {
+				return usersByName.get(name);
+			} else {
+				user = userManager.loadByUserName(name);
+				if ( user == null ) {
+					//create a user with data entry role and password equal to the user name
+					try {
+						user = userManager.insertUser(name, NEW_USER_PASSWORD, UserRole.ENTRY);
+					} catch (UserPersistenceException e) {
+						throw new RuntimeException("Error creating new user with username '" + name + "'", e);
+					}
+				}
+				usersByName.put(name, user);
+				return user;
+			}
+		}
+	}
+
 }

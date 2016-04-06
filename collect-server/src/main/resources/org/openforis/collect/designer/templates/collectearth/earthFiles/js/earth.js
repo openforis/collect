@@ -2,7 +2,6 @@ var SEPARATOR_MULTIPLE_PARAMETERS = "==="; //used to separate multiple attribute
 var SEPARATOR_MULTIPLE_VALUES = ";";
 var DATE_FORMAT = 'MM/DD/YYYY';
 var TIME_FORMAT = 'HH:ss';
-
 var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
 
@@ -160,7 +159,7 @@ var submitForm = function(submitCounter) {
 		timeout : 10000,
 		beforeSend : function() {
 			$.blockUI({
-				message : 'Submitting data..'
+				message : 'Sumitting data..'
 			});
 		}
 	})
@@ -180,7 +179,7 @@ var submitForm = function(submitCounter) {
 				submitCounter = 0;
 			}
 			
-			if (submitCounter < 10) {
+			if (submitCounter < 5) {
 				submitForm(submitCounter + 1);
 			} else {
 				showErrorMessage("Cannot save the data, the Collect Earth server is not running!");
@@ -261,17 +260,15 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 					break;
 				case "CODE_BUTTON_GROUP":
 					var parentCodeInfo = inputFieldInfoByParameterName[parentCodeFieldId];
-					var parentCodeItemId = parentCodeInfo.codeItemId;
+					var parentCodeId = parentCodeInfo.codeItemId;
 					var groupContainer = el.closest(".code-items-group");
 					
-					var itemsContainers = groupContainer.find(".code-items");
-					//itemsContainers.hide();
-					itemsContainers.css( "display", "none")
-
-					var validItemsContainer = groupContainer.find(".code-items[data-parent-id='" + parentCodeItemId + "']");
-					if (validItemsContainer.length > 0 && validItemsContainer.is(':hidden')) {
-						//validItemsContainer.show();
-						validItemsContainer.css( "display", "block")
+					var validItemsContainer = groupContainer.find(".code-items[data-parent-id='" + parentCodeId + "']");
+					if (validItemsContainer.is(':hidden')) {
+						var itemsContainers = groupContainer.find(".code-items");
+						itemsContainers.hide();
+						
+						validItemsContainer.show();
 					}
 					break;
 				}
@@ -417,8 +414,6 @@ var initCodeButtonGroups = function() {
 		inputField.val(value);
 
 		ajaxDataUpdate();
-		
-		return false;
 	});
 };
 
@@ -430,7 +425,6 @@ var initBooleanButtons = function() {
 			var btn = $(this);
 			hiddenField.val(btn.val());
 			ajaxDataUpdate();
-			return false;
 		});
 	});
 };
@@ -460,10 +454,7 @@ var initSteps = function() {
 		autoFocus : true,
 		titleTemplate : "#title#",
 		labels : {
-			// These values come from the balloon.html file as they need to be localized (spanish,english,portuguese and french)
-			finish : SUBMIT_LABEL,
-		    next: NEXT_LABEL,
-		    previous: PREVIOUS_LABEL
+			finish : SUBMIT_LABEL
 		},
 		onStepChanged : function(event, currentIndex, priorIndex) {
 			var stepHeading = $($form.find(".steps .steps ul li")[currentIndex]);
@@ -505,7 +496,7 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 			checkCount = checkCount + 1;
 			checkIfPlacemarkAlreadyFilled(checkCount);
 		} else {
-			showErrorMessage(COLLECT_NOT_RUNNING);
+			showErrorMessage("The Collect Earth server is not running!");
 		}
 	})
 	.done(function(json) {
@@ -514,7 +505,7 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 			if (json.activelySaved
 					&& json.inputFieldInfoByParameterName.collect_text_id.value != 'testPlacemark') { // 
 	
-				showErrorMessage(PLACEMARK_ALREADY_FILLED);
+				showErrorMessage("The data for this placemark has already been filled");
 	
 				if (json.skipFilled) {
 					forceWindowCloseAfterDialogCloses($("#dialogSuccess"));
@@ -597,7 +588,7 @@ var fillDataWithJson = function(inputFieldInfoByParameterName) {
 		// value
 		// being
 		// 0;collect_code_deforestation_reason=burnt
-		var inputField = $("*[name=\'" + key + "\']");
+		var inputField = findById(key);
 		if (inputField.length == 1) {
 			setValueInInputField(inputField, value);
 		}
@@ -630,14 +621,13 @@ var setValueInInputField = function(inputField, value) {
 			// deselect all code item buttons
 			itemsGroup.find(".code-item").removeClass('active');
 			if (value != null && value != "") {
-				// select code item button with value equals to the specified
-				// one
+				// select code item button with value equals to the specified one
 				var activeCodeItemsContainer = itemsGroup
 						.find(".code-items:visible");
 				var splitted = value.split(SEPARATOR_MULTIPLE_PARAMETERS);
 				splitted
 						.forEach(function(value, index) {
-							var button = activeCodeItemsContainer.find(".code-item[value=" + value + "]");
+							var button = activeCodeItemsContainer.find(".code-item[value=" + escapeRegExp(value) + "]");
 							button.addClass('active');
 						});
 			}
@@ -726,6 +716,10 @@ var serializeForm = function(formId) {
 	return result;
 };
 */
+
+function escapeRegExp(string){
+	return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+};
 
 var enableSelect = function(selectName, enable) { // #elementsCover
 	$(selectName).prop('disabled', !enable);

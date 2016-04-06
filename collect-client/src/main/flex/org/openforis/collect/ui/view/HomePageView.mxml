@@ -99,7 +99,7 @@
 				</s:layout>
 				<s:itemRenderer>
 					<fx:Component>
-						<s:ItemRenderer width="100%">
+						<s:ItemRenderer width="100%" enabled="{data.enabled}">
 							<s:layout>
 								<s:HorizontalLayout paddingBottom="5" 
 													paddingLeft="5" 
@@ -107,7 +107,8 @@
 													paddingTop="5" />
 							</s:layout>
 							<s:Image source="{data.icon}" width="48" height="48" />
-							<s:Label styleName="functionLabel" 
+							<s:Label enabled="{data.enabled}" styleName="functionLabel" 
+									 toolTip="{data.toolTip}"
 									 text="{data.label}" />
 						</s:ItemRenderer>
 					</fx:Component>

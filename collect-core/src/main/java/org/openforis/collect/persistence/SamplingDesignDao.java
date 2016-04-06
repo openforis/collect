@@ -3,7 +3,6 @@ package org.openforis.collect.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SAMPLING_DESIGN_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OFC_SAMPLING_DESIGN;
 
-import java.sql.Connection;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
@@ -15,6 +14,7 @@ import java.util.Locale;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.BatchBindStep;
+import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
@@ -28,13 +28,12 @@ import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.Coordinate;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@Transactional
 public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem, SamplingDesignDao.SamplingDesignDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
@@ -211,8 +210,8 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		private static final String LOCATION_POINT_FORMAT = "#.#######";
 		private static final String LOCATION_PATTERN = "SRID={0};POINT({1} {2})";
 
-		public SamplingDesignDSLContext(Connection connection) {
-			super(connection, OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ, SamplingDesignItem.class);
+		public SamplingDesignDSLContext(Configuration config) {
+			super(config, OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ, SamplingDesignItem.class);
 		}
 
 		@Override
@@ -233,11 +232,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 					break;
 				}
 			}
-			for (int i = 0; i < INFO_FIELDS.length; i++) {
-				Field<String> field = INFO_FIELDS[i];
-				String value = r.getValue(field);
-				s.addInfoAttribute(value);
-			}
+			s.setInfoAttributes(extractFields(r, INFO_FIELDS));
 		}
 
 		@Override
@@ -246,20 +241,29 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			q.addValue(OFC_SAMPLING_DESIGN.ID, s.getId());
 			q.addValue(OFC_SAMPLING_DESIGN.SURVEY_ID, s.getSurveyId());
 			q.addValue(OFC_SAMPLING_DESIGN.LOCATION, extractLocation(s));
-			String[] levelCodeValues = extractLevelCodeValues(s);
-			for ( int i = 0; i < levelCodeValues.length; i++ ) {
-				String value = levelCodeValues[i];
-				Field<String> field = LEVEL_CODE_FIELDS[i];
-				q.addValue(field, value);
-			}
-			List<String> infoValues = s.getInfoAttributes();
-			for ( int i = 0; i < infoValues.size(); i++ ) {
-				String value = infoValues.get(i);
-				Field<String> field = INFO_FIELDS[i];
+			List<String> levelCodes = s.getLevelCodes();
+			addFieldValues(q, LEVEL_CODE_FIELDS, levelCodes);
+			addFieldValues(q, INFO_FIELDS, s.getInfoAttributes());
+		}
+
+		private void addFieldValues(StoreQuery<?> q, TableField<?, Object>[] fields, List<String> values) {
+			for ( int i = 0; i < values.size(); i++ ) {
+				String value = values.get(i);
+				Field<Object> field = fields[i];
 				q.addValue(field, value);
 			}
 		}
-
+		
+		private <T extends Object> List<T> extractFields(Record r, TableField<?, T>[] fields) {
+			List<T> result = new ArrayList<T>(fields.length);
+			for (int i = 0; i < fields.length; i++) {
+				Field<T> field = fields[i];
+				T value = r.getValue(field);
+				result.add(value);
+			}
+			return result;
+		}
+		
 		protected Insert<OfcSamplingDesignRecord> createInsertStatement() {
 			Object[] valuesPlaceholders = new String[FIELDS.length];
 			Arrays.fill(valuesPlaceholders, "?");
@@ -268,40 +272,18 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		
 		@SuppressWarnings("unchecked")
 		protected Object[] extractValues(SamplingDesignItem item) {
-			List<Object> values = new ArrayList<Object>();
+			List<Object> values = new ArrayList<Object>(3 + LEVEL_CODE_FIELDS.length + INFO_FIELDS.length);
 			values.addAll(Arrays.asList(
 				item.getId(), 
 				item.getSurveyId(),
 				extractLocation(item)
 			));
 			//add level codes
-			Object[] levelCodeValues = extractLevelCodeValues(item);
-			values.addAll(Arrays.asList(levelCodeValues));
-			
+			values.addAll(CollectionUtils.copyAndFillWithNulls(item.getLevelCodes(), LEVEL_CODE_FIELDS.length));
 			//add info
-			Object[] infos = new Object[INFO_FIELDS.length];
-			Arrays.fill(infos, null);
-			List<String> itemInfos = item.getInfoAttributes();
-			for (int i = 0; i < itemInfos.size(); i++) {
-				String info = itemInfos.get(i);
-				infos[i] = info;
-			}
-			values.addAll(Arrays.asList(infos));
-			Object[] result = values.toArray(new Object[0]);
-			return result;
-		}
-
-		protected String[] extractLevelCodeValues(SamplingDesignItem item) {
-			List<String> levelCodes = item.getLevelCodes();
-			if ( levelCodes.size() > LEVEL_CODE_FIELDS.length ) {
-				throw new IllegalArgumentException("Only " + LEVEL_CODE_FIELDS.length + " code levels are supported");
-			}
-			String[] result = new String[LEVEL_CODE_FIELDS.length];
-			for ( int i = 0; i < LEVEL_CODE_FIELDS.length; i++ ) {
-				String value = i < levelCodes.size() ? levelCodes.get(i): null;
-				result[i] = value;
-			}
-			return result;
+			values.addAll(CollectionUtils.copyAndFillWithNulls(item.getInfoAttributes(), INFO_FIELDS.length));
+			
+			return values.toArray(new Object[values.size()]);
 		}
 
 		@Override
@@ -314,7 +296,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			return t.getId();
 		}
 		
-		public String extractLocation(SamplingDesignItem i) {
+		private String extractLocation(SamplingDesignItem i) {
 			if ( i.getSrsId() == null || i.getX() == null || i.getY() == null ) {
 				return null;
 			} else {

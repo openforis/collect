@@ -36,7 +36,6 @@ Collect.prototype.initI18n = function() {
 	    name:'messages', 
 	    path:'assets/bundle/', 
 	    mode:'both', // We specified mode: 'both' so translated values will be available as JS vars/functions and as a map
-	    language:'en_US'
 	});
 	
 	OF.i18n.initializeAll();

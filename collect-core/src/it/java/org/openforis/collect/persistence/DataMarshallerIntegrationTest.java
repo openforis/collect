@@ -24,7 +24,6 @@ import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
-import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
@@ -80,8 +79,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	private ParseRecordResult parseRecord(CollectSurvey survey, String xml) throws IOException, DataUnmarshallerException {
-		DataHandler dataHandler = new DataHandler(userManager, survey);
-		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(dataHandler);
+		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(survey);
 		StringReader reader = new StringReader(xml);
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		return result;

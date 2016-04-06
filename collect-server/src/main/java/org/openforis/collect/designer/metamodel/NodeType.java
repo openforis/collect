@@ -1,4 +1,4 @@
-package org.openforis.collect.designer.model;
+package org.openforis.collect.designer.metamodel;
 
 import java.util.Locale;
 
@@ -70,44 +70,93 @@ public enum NodeType {
 		}
 	}
 	
-	public static NodeDefinition createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType) {
-		NodeDefinition result;
+	public static <T extends NodeDefinition> T createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType) {
+		return createNodeDefinition(survey, nodeType, attrType, null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T extends NodeDefinition> T createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType, Integer id) {
+		T result;
 		Schema schema = survey.getSchema();
 		switch(nodeType) {
 		case ENTITY:
-			result = schema.createEntityDefinition();
+			if (id == null) {
+				result = (T) schema.createEntityDefinition();
+			} else {
+				result = (T) schema.createEntityDefinition(id);
+			}
 			break;
 		case ATTRIBUTE:
 			switch(attrType) {
 			case BOOLEAN:
-				result = schema.createBooleanAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createBooleanAttributeDefinition();
+				} else {
+					result = (T) schema.createBooleanAttributeDefinition(id);
+				}
 				break;
 			case CODE:
-				result = schema.createCodeAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createCodeAttributeDefinition();
+				} else {
+					result = (T) schema.createCodeAttributeDefinition(id);
+				}
 				break;
 			case COORDINATE:
-				result = schema.createCoordinateAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createCoordinateAttributeDefinition();
+				} else {
+					result = (T) schema.createCoordinateAttributeDefinition(id);
+				}
 				break;
 			case DATE:
-				result = schema.createDateAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createDateAttributeDefinition();
+				} else {
+					result = (T) schema.createDateAttributeDefinition(id);
+				}
 				break;
 			case FILE:
-				result = schema.createFileAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createFileAttributeDefinition();
+				} else {
+					result = (T) schema.createFileAttributeDefinition(id);
+				}
 				break;
 			case NUMBER:
-				result = schema.createNumberAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createNumberAttributeDefinition();
+				} else {
+					result = (T) schema.createNumberAttributeDefinition(id);
+				}
 				break;
 			case RANGE:
-				result = schema.createRangeAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createRangeAttributeDefinition();
+				} else {
+					result = (T) schema.createRangeAttributeDefinition(id);
+				}
 				break;
 			case TAXON:
-				result = schema.createTaxonAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createTaxonAttributeDefinition();
+				} else {
+					result = (T) schema.createTaxonAttributeDefinition(id);
+				}
 				break;
 			case TEXT:
-				result = schema.createTextAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createTextAttributeDefinition();
+				} else {
+					result = (T) schema.createTextAttributeDefinition(id);
+				}
 				break;
 			case TIME:
-				result = schema.createTimeAttributeDefinition();
+				if (id == null) {
+					result = (T) schema.createTimeAttributeDefinition();
+				} else {
+					result = (T) schema.createTimeAttributeDefinition(id);
+				}
 				break;
 			default:
 				throw new IllegalStateException("Attribute type not supported: " + attrType);

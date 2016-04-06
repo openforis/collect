@@ -23,6 +23,7 @@ public abstract class BaseStorageManager implements Serializable {
 
 	private static final String DEFAULT_BASE_DATA_SUBDIR = "data";
 	private static final String DEFAULT_BASE_TEMP_SUBDIR = "temp";
+	private static final String DEFAULT_BASE_WEBAPPS_SUBDIR = "webapps";
 
 	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 	private static final String CATALINA_BASE = "catalina.base";
@@ -48,40 +49,60 @@ public abstract class BaseStorageManager implements Serializable {
 	private String defaultSubFolder;
 	
 	public BaseStorageManager() {
-		defaultRootStoragePath = null;
-		storageDirectory = null;
+		this(null, null);
 	}
 	
 	public BaseStorageManager(String defaultSubFolder) {
+		this(null, defaultSubFolder);
+	}
+	
+	public BaseStorageManager(String defaultRootStoragePath, String defaultSubFolder) {
+		this.defaultRootStoragePath = defaultRootStoragePath;
 		this.defaultSubFolder = defaultSubFolder;
 	}
 	
-	protected File getTempFolder() {
+	protected static File getTempFolder() {
 		return getReadableSysPropLocation(JAVA_IO_TMPDIR, null);
 	}
 	
-	protected File getCatalinaBaseDataFolder() {
+	protected static File getCatalinaBaseDataFolder() {
 		return getReadableSysPropLocation(CATALINA_BASE, DEFAULT_BASE_DATA_SUBDIR);
 	}
 	
-	protected File getCatalinaBaseTempFolder() {
+	protected static File getCatalinaBaseTempFolder() {
 		return getReadableSysPropLocation(CATALINA_BASE, DEFAULT_BASE_TEMP_SUBDIR);
 	}
 
-	protected File getReadableSysPropLocation(String sysProp, String subDir) {
+	protected static File getCatalinaBaseWebappsFolder() {
+		return getReadableSysPropLocation(CATALINA_BASE, DEFAULT_BASE_WEBAPPS_SUBDIR);
+	}
+	
+	protected static String getCatalinaBaseWebappsFolderPath() {
+		return getSysPropPath(CATALINA_BASE, DEFAULT_BASE_WEBAPPS_SUBDIR);
+	}
+	
+	protected static String getSysPropPath(String sysProp, String subDir) {
 		String base = System.getProperty(sysProp);
-		if ( base != null ) {
-			String path = base;
-			if ( subDir != null ) {
-				path = path + File.separator + subDir;
-			}
-			return getLocationIfAccessible(path);
-		} else {
+		if ( base == null ) {
 			return null;
+		}
+		String path = base;
+		if ( subDir != null ) {
+			path = path + File.separator + subDir;
+		}
+		return path;
+	}
+	
+	protected static File getReadableSysPropLocation(String sysProp, String subDir) {
+		String path = getSysPropPath(sysProp, subDir);
+		if (path == null) {
+			return null;
+		} else {
+			return getLocationIfAccessible(path);
 		}
 	}
 
-	protected File getLocationIfAccessible(String path) {
+	protected static File getLocationIfAccessible(String path) {
 		File result = new File(path);
 		if ( (result.exists() || result.mkdirs()) && result.canWrite() ) {
 			return result;
@@ -91,6 +112,10 @@ public abstract class BaseStorageManager implements Serializable {
 	}
 	
 	protected void initStorageDirectory(ConfigurationItem configurationItem) {
+		initStorageDirectory(configurationItem, true);
+	}
+	
+	protected boolean initStorageDirectory(ConfigurationItem configurationItem, boolean createIfNotExists) {
 		Configuration configuration = configurationManager.getConfiguration();
 		
 		String customStoragePath = configuration.get(configurationItem);
@@ -100,11 +125,21 @@ public abstract class BaseStorageManager implements Serializable {
 		} else {
 			storageDirectory = new File(customStoragePath);
 		}
-		storageDirectory.mkdirs();
-		
-		if ( LOG.isInfoEnabled() ) {
-			LOG.info(String.format("Using %s directory: %s", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
+		boolean result = storageDirectory.exists();
+		if (! result) {
+			if (createIfNotExists) {
+				result = storageDirectory.mkdirs();
+			}
 		}
+		
+		if (LOG.isInfoEnabled() ) {
+			if (result) {
+				LOG.info(String.format("Using %s directory: %s", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
+			} else {
+				LOG.info(String.format("%s directory %s does not exist or it's not accessible", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
+			}
+		}
+		return result;
 	}
 
 	protected File getDefaultStorageRootDirectory() {
@@ -136,5 +171,9 @@ public abstract class BaseStorageManager implements Serializable {
 		} else {
 			return new File(rootDir, defaultSubFolder);
 		}
+	}
+	
+	protected void setDefaultSubFolder(String defaultSubFolder) {
+		this.defaultSubFolder = defaultSubFolder;
 	}
 }

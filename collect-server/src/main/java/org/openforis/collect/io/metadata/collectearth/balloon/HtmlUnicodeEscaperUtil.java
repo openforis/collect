@@ -10,9 +10,12 @@ import org.apache.commons.lang3.text.translate.LookupTranslator;
 
 public class HtmlUnicodeEscaperUtil extends CodePointTranslator  {
 
-    private final int below;
+    public static final String MONDRIAN_START_UNICODE = "REPLACE_START_UNICODE";
+	private final int below;
     private final int above;
     private final boolean between;
+    private final String endWith;
+	private final String startWith;
 
     
     // Escapes both the HTML tags and the UTF-8 characters that can be problematic in a Google Earth Balloon (like for Lao language)
@@ -21,22 +24,33 @@ public class HtmlUnicodeEscaperUtil extends CodePointTranslator  {
     	return escapeHtmlUnicode( stringToEscape );
     }
     
-    private static final CharSequenceTranslator ESCAPE_UNICODE = 
+    private static final CharSequenceTranslator ESCAPE_UNICODE_BALLOON = 
             new LookupTranslator().with(
-            		HtmlUnicodeEscaperUtil.outsideOf(32, 0x7f) 
+            		HtmlUnicodeEscaperUtil.outsideOf(32, 0x7f, "&", "") 
           );
+    
+    private static final CharSequenceTranslator ESCAPE_UNICODE_MONDRIAN = 
+            new LookupTranslator().with(
+            		HtmlUnicodeEscaperUtil.outsideOf(32, 0x7f, MONDRIAN_START_UNICODE, ";") 
+          );
+
     
     
     /**
      * <p>Constructs a <code>UnicodeEscaper</code> for all characters. </p>
      */
     private HtmlUnicodeEscaperUtil(){
-        this(0, Integer.MAX_VALUE, true);
+        this(0, Integer.MAX_VALUE, true, "&", "");
     }
 
     public static final String escapeHtmlUnicode(String input) {
-        return ESCAPE_UNICODE.translate(input);
+        return ESCAPE_UNICODE_BALLOON.translate(input);
     }
+    
+    public static final String escapeMondrianUnicode(String input) {
+        return ESCAPE_UNICODE_MONDRIAN.translate(input);
+    }
+    
     /**
      * <p>Constructs a <code>UnicodeEscaper</code> for the specified range. This is
      * the underlying method for the other constructors/builders. The <code>below</code>
@@ -46,32 +60,18 @@ public class HtmlUnicodeEscaperUtil extends CodePointTranslator  {
      * @param below int value representing the lowest codepoint boundary
      * @param above int value representing the highest codepoint boundary
      * @param between whether to escape between the boundaries or outside them
+     * @param endWith2 
+     * @param startWith 
      */
-    private HtmlUnicodeEscaperUtil(int below, int above, boolean between) {
+    private HtmlUnicodeEscaperUtil(int below, int above, boolean between, String startWith, String endWith) {
         this.below = below;
         this.above = above;
         this.between = between;
+		this.startWith = startWith;
+		this.endWith = endWith;
+        
     }
 
-    /**
-     * <p>Constructs a <code>UnicodeEscaper</code> below the specified value (exclusive). </p>
-     *
-     * @param codepoint below which to escape
-     * @return the newly created {@code UnicodeEscaper} instance
-     */
-    private static HtmlUnicodeEscaperUtil below(int codepoint) {
-        return outsideOf(codepoint, Integer.MAX_VALUE);
-    }
-
-    /**
-     * <p>Constructs a <code>UnicodeEscaper</code> above the specified value (exclusive). </p>
-     *
-     * @param codepoint above which to escape
-     * @return the newly created {@code UnicodeEscaper} instance
-     */
-    private static HtmlUnicodeEscaperUtil above(int codepoint) {
-        return outsideOf(0, codepoint);
-    }
 
     /**
      * <p>Constructs a <code>UnicodeEscaper</code> outside of the specified values (exclusive). </p>
@@ -80,20 +80,10 @@ public class HtmlUnicodeEscaperUtil extends CodePointTranslator  {
      * @param codepointHigh above which to escape
      * @return the newly created {@code UnicodeEscaper} instance
      */
-    private static HtmlUnicodeEscaperUtil outsideOf(int codepointLow, int codepointHigh) {
-        return new HtmlUnicodeEscaperUtil(codepointLow, codepointHigh, false);
+    private static HtmlUnicodeEscaperUtil outsideOf(int codepointLow, int codepointHigh, String startWith, String endWith ) {
+        return new HtmlUnicodeEscaperUtil(codepointLow, codepointHigh, false, startWith, endWith);
     }
 
-    /**
-     * <p>Constructs a <code>UnicodeEscaper</code> between the specified values (inclusive). </p>
-     *
-     * @param codepointLow above which to escape
-     * @param codepointHigh below which to escape
-     * @return the newly created {@code UnicodeEscaper} instance
-     */
-    private static HtmlUnicodeEscaperUtil between(int codepointLow, int codepointHigh) {
-        return new HtmlUnicodeEscaperUtil(codepointLow, codepointHigh, true);
-    }
 
     /**
      * {@inheritDoc}
@@ -113,15 +103,15 @@ public class HtmlUnicodeEscaperUtil extends CodePointTranslator  {
         if (codepoint > 0xffff) {
             // TODO: Figure out what to do. Output as two Unicodes?
             //       Does this make this a Java-specific output class?
-            out.write("&#x" + hex(codepoint));
+            out.write( startWith + "#x" + hex(codepoint) + endWith);
         } else if (codepoint > 0xfff) {
-            out.write("&#x" + hex(codepoint));
+            out.write( startWith + "#x" + hex(codepoint) + endWith);
         } else if (codepoint > 0xff) {
-            out.write("&#x0" + hex(codepoint));
+            out.write( startWith + "#x0" + hex(codepoint) + endWith);
         } else if (codepoint > 0xf) {
-            out.write("&#x00" + hex(codepoint));
+            out.write( startWith + "#x00" + hex(codepoint) + endWith);
         } else {
-            out.write("&#x000" + hex(codepoint));
+            out.write( startWith + "#x000" + hex(codepoint) + endWith);
         }
         return true;
     }

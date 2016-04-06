@@ -1,8 +1,11 @@
 package org.openforis.collect.model;
 
+
 import static org.openforis.collect.model.CollectRecord.APPROVED_MISSING_POSITION;
 import static org.openforis.collect.model.CollectRecord.CONFIRMED_ERROR_POSITION;
 import static org.openforis.collect.model.CollectRecord.DEFAULT_APPLIED_POSITION;
+import static org.openforis.idm.model.NodePointers.nodesToPointers;
+import static org.openforis.idm.model.NodePointers.pointersToNodes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,75 +59,48 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  */
 public class RecordUpdater {
 	
+	private boolean validateAfterUpdate = true;
+	private boolean clearNotRelevantAttributes = false;
+	private boolean clearDependentCodeAttributes = false;
+	private boolean addEmptyMultipleEntitiesWhenAddingNewEntities = true;
+	
 	/**
 	 * Updates an attribute with a new value
 	 */
 	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value) {
-		return updateAttribute(attribute, value, false);
-	}
-	
-	/**
-	 * Updates an attribute with a new value
-	 */
-	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value, boolean clearChildCodeAttributes) {
-		return updateAttribute(attribute, value, clearChildCodeAttributes, true);
-	}
-	
-	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value, boolean clearChildCodeAttributes, boolean validate) {
 		beforeAttributeUpdate(attribute);
 		attribute.setValue(value);
-		return afterAttributeUpdate(attribute, clearChildCodeAttributes);
-	}
-	
-	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol) {
-		return updateAttribute(attribute, symbol, false);
+		return afterAttributeUpdate(attribute);
 	}
 	
 	/**
 	 * Updates an attribute and sets the specified FieldSymbol on every field
 	 */
-	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol, boolean clearDependentCodeAttributes) {
+	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol) {
 		beforeAttributeUpdate(attribute);
 		attribute.clearValue();
 		setSymbolOnFields(attribute, symbol);
-		return afterAttributeUpdate(attribute, clearDependentCodeAttributes);
-	}
-	
-	public <V> NodeChangeSet updateField(Field<V> field, V value) {
-		return updateField(field, value, false);
+		return afterAttributeUpdate(attribute);
 	}
 	
 	/**
 	 * Updates a field with a new value.
 	 * The value will be parsed according to field data type.
-	 * @param clearDependentCodeAttributes 
 	 */
-	public <V> NodeChangeSet updateField(Field<V> field, V value, boolean clearDependentCodeAttributes) {
-		return updateField(field, value, clearDependentCodeAttributes, true);
-	}
-	
-	public <V> NodeChangeSet updateField(Field<V> field, V value, boolean clearDependentCodeAttributes, boolean validate) {
+	public <V> NodeChangeSet updateField(Field<V> field, V value) {
 		Attribute<?, ?> attribute = field.getAttribute();
 		beforeAttributeUpdate(attribute);
 		
 		field.setValue(value);
 		
-		return afterAttributeUpdate(attribute, clearDependentCodeAttributes, validate);
+		return afterAttributeUpdate(attribute);
 	}
 
-	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol) {
-		return updateField(field, symbol, false);
-	}
-	
 	/**
 	 * Updates a field with a new symbol.
 	 * @param clearChildCodeAttributes 
 	 */
-	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol, boolean clearChildCodeAttributes) {
-		return updateField(field, symbol, clearChildCodeAttributes, true);
-	}
-	
-	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol, boolean clearChildCodeAttributes, boolean validate) {
+	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol) {
 		Attribute<?, ?> attribute = field.getAttribute();
 
 		beforeAttributeUpdate(attribute);
@@ -132,7 +108,7 @@ public class RecordUpdater {
 		field.setValue(null);
 		setFieldSymbol(field, symbol);
 		
-		return afterAttributeUpdate(attribute, clearChildCodeAttributes, validate);
+		return afterAttributeUpdate(attribute);
 	}
 	
 	public NodeChangeSet addNode(Entity parentEntity, String nodeName) {
@@ -152,15 +128,11 @@ public class RecordUpdater {
 	 * @return Changes applied to the record 
 	 */
 	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
-		return addEntity(parentEntity, entityName, true);
-	}
-	
-	public NodeChangeSet addEntity(Entity parentEntity, String entityName, boolean addEmptyMultipleEntities) {
-		Entity entity = performEntityAdd(parentEntity, entityName);
+		Entity entity = performEntityAdd(parentEntity, entityName, null);
 		
 		setMissingValueApproved(parentEntity, entityName, false);
 
-		NodeChangeMap changeMap = initializeEntity(entity, true, addEmptyMultipleEntities, true);
+		NodeChangeMap changeMap = initializeEntity(entity, true);
 		return changeMap;
 	}
 
@@ -189,25 +161,18 @@ public class RecordUpdater {
 									  Value value, 
 									  FieldSymbol symbol, 
 									  String remarks) {
-		return addAttribute(parentEntity, attributeName, value, symbol, remarks, true);
-	}
-	
-	public NodeChangeSet addAttribute(Entity parentEntity, 
-			  String attributeName, 
-			  Value value, 
-			  FieldSymbol symbol, 
-			  String remarks,
-			  boolean validate) {
 		Attribute<?, ?> attribute = performAttributeAdd(parentEntity, attributeName, value, symbol, remarks);
 		
 		setMissingValueApproved(parentEntity, attributeName, false);
 		
-		applyInitialValue(attribute, true);
+		if (value == null) {
+			applyInitialValue(attribute, true);
+		}
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addAttributeAddChange(attribute);
 		
-		return afterAttributeInsertOrUpdate(changeMap, attribute, false, validate);
+		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 
 	/**
@@ -258,121 +223,134 @@ public class RecordUpdater {
 	 */
 	public NodeChangeSet applyDefaultValue(Attribute<?, ?> attribute) {
 		performDefaultValueApply(attribute);
-		return afterAttributeUpdate(attribute, false);
+		return afterAttributeUpdate(attribute);
 	}
 
 	private void beforeAttributeUpdate(Attribute<?, ?> attribute) {
-		beforeAttributeUpdate(attribute, false);
-	}
-	
-	private void beforeAttributeUpdate(Attribute<?, ?> attribute, boolean clearChildCodeAttributes) {
 		Entity parentEntity = attribute.getParent();
 		setErrorConfirmed(attribute, false);
 		setMissingValueApproved(parentEntity, attribute.getName(), false);
 		setDefaultValueApplied(attribute, false);
 	}
 
-	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute, boolean clearDependentCodeAttributes) {
-		return afterAttributeUpdate(attribute, clearDependentCodeAttributes, true);
-	}
-	
-	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute, boolean clearDependentCodeAttributes, boolean validate) {
+	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute) {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addValueChange(attribute);
-		return afterAttributeInsertOrUpdate(changeMap, attribute, clearDependentCodeAttributes, validate);
+		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 	
-	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute, boolean clearDependentCodeAttributes, boolean validate) {
+	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute) {
 		attribute.updateSummaryInfo();
 
 		Record record = attribute.getRecord();
 		NodePointer attributeNodePointer = new NodePointer(attribute);
 		
+		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
+		
 		// calculated attributes
 		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(attribute);
+		updatedAttributes.addAll(updatedCalculatedAttributes);
 		changeMap.addValueChanges(updatedCalculatedAttributes);
 		
 		// dependent code attributes
-		Set<CodeAttribute> updatedCodeAttributes = new HashSet<CodeAttribute>();
 		if (attribute instanceof CodeAttribute && clearDependentCodeAttributes) {
-			updatedCodeAttributes.addAll(clearDependentCodeAttributes(attribute));
+			Set<CodeAttribute> updatedCodeAttributes = clearDependentCodeAttributes(attribute);
+			updatedAttributes.addAll(updatedCodeAttributes);
+			changeMap.addValueChanges(updatedCodeAttributes);
 		}
-		changeMap.addValueChanges(updatedCodeAttributes);
 		
-		if (validate) {
-		// relevance
-		Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
-		nodesToCheckRelevanceFor.add(attribute);
-		nodesToCheckRelevanceFor.addAll(updatedCodeAttributes);
-		
-		List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
-		RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
-		Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
-		changeMap.addRelevanceChanges(updatedRelevancePointers);
-		
-		// min count
-		Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
-		pointersToCheckMinCountFor.add(attributeNodePointer);
-		pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
-		pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCodeAttributes));
-		
-		Collection<NodePointer> minCountPointersToUpdate = record.determineMinCountDependentNodes(pointersToCheckMinCountFor);
-		Collection<NodePointer> updatedMinCountPointers = updateMinCount(minCountPointersToUpdate);
-		changeMap.addMinCountChanges(updatedMinCountPointers);
-		
-		// max count
-		Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
-		pointersToCheckMaxCountFor.add(attributeNodePointer);
-		pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
-		pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCodeAttributes));
-		
-		Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
-		Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
-		changeMap.addMaxCountChanges(updatedMaxCountPointers);
-		
-		Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
-		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
-
-		// validate cardinality
-		List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(attribute);
-		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(
-				updatedMinCountPointers.size() + 
-				updatedMaxCountPointers.size() + 
-				updatedRelevancePointers.size() + 
-				ancestorsAndSelfPointers.size());
-		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
-		pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
-		pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
-		
-		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
-		pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
-		validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
-		
-		// validate attributes
-		Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(updatedCalculatedAttributes);
-		nodesToCheckValidationFor.add(attribute);
-		nodesToCheckValidationFor.addAll(updatedCodeAttributes);
-		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
-		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
-		
-		Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
-
-		validateAttributes(record, attributesToRevalidate, changeMap);
+		if (validateAfterUpdate) {
+			// relevance
+			Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedAttributes);
+			nodesToCheckRelevanceFor.add(attribute);
+			
+			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
+			RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
+			Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
+			changeMap.addRelevanceChanges(updatedRelevancePointers);
+			
+			if (clearNotRelevantAttributes) {
+				Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
+				Set<Attribute<?, ?>> noMoreRelevantAttributes = retainNotRelevantAttributes(updatedRelevanceNodes);
+				Set<Attribute<?, ?>> clearedAttributes = clearUserSpecifiedAttributes(noMoreRelevantAttributes);
+				updatedAttributes.addAll(clearedAttributes);
+				changeMap.addValueChanges(clearedAttributes);
+			}
+			
+			// min count
+			Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
+			pointersToCheckMinCountFor.add(attributeNodePointer);
+			pointersToCheckMinCountFor.addAll(nodesToPointers(updatedAttributes));
+			
+			Collection<NodePointer> minCountPointersToUpdate = record.determineMinCountDependentNodes(pointersToCheckMinCountFor);
+			Collection<NodePointer> updatedMinCountPointers = updateMinCount(minCountPointersToUpdate);
+			changeMap.addMinCountChanges(updatedMinCountPointers);
+			
+			// max count
+			Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
+			pointersToCheckMaxCountFor.add(attributeNodePointer);
+			pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedAttributes));
+			
+			Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
+			Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
+			changeMap.addMaxCountChanges(updatedMaxCountPointers);
+			
+			Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
+			updatedCardinalityPointers.addAll(updatedMaxCountPointers);
+	
+			// validate cardinality
+			List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(attribute);
+			Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(
+					updatedMinCountPointers.size() + 
+					updatedMaxCountPointers.size() + 
+					updatedRelevancePointers.size() + 
+					ancestorsAndSelfPointers.size());
+			pointersToValidateCardinalityFor.addAll(nodesToPointers(updatedAttributes));
+			pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
+			pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
+			pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
+			
+			// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
+			pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
+			validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
+			
+			// validate attributes
+			Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(updatedAttributes);
+			nodesToCheckValidationFor.add(attribute);
+			nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
+			nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
+			
+			Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
+	
+			validateAttributes(record, attributesToRevalidate, changeMap);
 		}
 		return changeMap;
 	}
 
 	private Set<CodeAttribute> clearDependentCodeAttributes(Attribute<?, ?> attribute) {
-		Set<CodeAttribute> updatedCodeAttributes = new HashSet<CodeAttribute>();
-		Set<CodeAttribute> dependentCodeAttributes = ((CodeAttribute) attribute).getDependentCodeAttributes();
-		for (CodeAttribute dependendAttr : dependentCodeAttributes) {
-			if (! dependendAttr.isEmpty()) {
-				dependendAttr.clearValue();
-				dependendAttr.updateSummaryInfo();
-				updatedCodeAttributes.add(dependendAttr);
+		return clearUserSpecifiedAttributes(((CodeAttribute) attribute).getDependentCodeAttributes());
+	}
+
+	private <A extends Attribute<?, ?>> Set<A> clearUserSpecifiedAttributes(Set<A> attributes) {
+		Set<A> updatedAttributes = new HashSet<A>();
+		for (A attr : attributes) {
+			if (attr.isUserSpecified() && ! attr.isEmpty()) {
+				attr.clearValue();
+				attr.updateSummaryInfo();
+				updatedAttributes.add(attr);
 			}
 		}
-		return updatedCodeAttributes;
+		return updatedAttributes;
+	}
+
+	private Set<Attribute<?, ?>> retainNotRelevantAttributes(Set<Node<?>> nodes) {
+		Set<Attribute<?, ?>> result = new HashSet<Attribute<?,?>>();
+		for (Node<?> node : nodes) {
+			if (node instanceof Attribute && ! node.isRelevant()) {
+				result.add((Attribute<?, ?>) node);
+			}
+		}
+		return result;
 	}
 
 	private void validateAttributes(Record record, Set<Attribute<?, ?>> attributes, NodeChangeMap changeMap) {
@@ -426,6 +404,7 @@ public class RecordUpdater {
 		return updatedPointers;
 	}
 
+	@SuppressWarnings("deprecation")
 	private Collection<NodePointer> updateMaxCount(Collection<NodePointer> nodePointers) {
 		List<NodePointer> updatedPointers = new ArrayList<NodePointer>();
 		for (NodePointer nodePointer : nodePointers) {
@@ -477,10 +456,6 @@ public class RecordUpdater {
 	 * @return
 	 */
 	public NodeChangeSet deleteNode(Node<?> node) {
-		return deleteNode(node, true);
-	}
-	
-	public NodeChangeSet deleteNode(Node<?> node, boolean validate) {
 		Record record = node.getRecord();
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
@@ -495,79 +470,79 @@ public class RecordUpdater {
 		List<Attribute<?, ?>> dependentCalculatedAttributes = record.determineCalculatedAttributes(nodesToBeDeleted);
 		dependentCalculatedAttributes.removeAll(nodesToBeDeleted);
 		
-		if (validate) {
-		// relevance
-		List<NodePointer> relevanceDependenciesToDeleted = record.determineRelevanceDependentNodes(nodesToBeDeleted);
-
-		// min/max
-		Collection<NodePointer> preDeletionMinMaxDependenciesToCheck = new HashSet<NodePointer>(pointersToBeDeleted);
-		preDeletionMinMaxDependenciesToCheck.addAll(getAncestorsAndSelfPointers(node));
-		Collection<NodePointer> minCountDependenciesToDelete = record.determineMinCountDependentNodes(preDeletionMinMaxDependenciesToCheck);
-		Collection<NodePointer> maxCountDependenciesToDelete = record.determineMaxCountDependentNodes(preDeletionMinMaxDependenciesToCheck);
-		
-		// validation
-		Set<Attribute<?, ?>> validationDependenciesToDeleted = record.determineValidationDependentNodes(nodesToBeDeleted);
-		validationDependenciesToDeleted.removeAll(nodesToBeDeleted);
-		
-		List<Integer> ancestorIds = node.getAncestorIds();
-		
-		performNodeDeletion(node);
-
-		changeMap.addNodeDeleteChange(record.getId(), ((CollectRecord) record).getStep(), ancestorIds, node);
-
-		// calculated attributes
-		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
-		changeMap.addValueChanges(updatedCalculatedAttributes);
-		
-		// relevance
-		Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
-		nodesToCheckRelevanceFor.addAll(pointersToNodes(relevanceDependenciesToDeleted));
-		
-		List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
-		//check relevance update with detached entity in node pointer
-		RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
-		Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
-		changeMap.addRelevanceChanges(updatedRelevancePointers);
-		
-		// min count
-		Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
-		pointersToCheckMinCountFor.addAll(minCountDependenciesToDelete);
-		pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
-		
-		Collection<NodePointer> minCountPointersToUpdate = record.determineMinCountDependentNodes(pointersToCheckMinCountFor);
-		Collection<NodePointer> updatedMinCountPointers = updateMinCount(minCountPointersToUpdate);
-		changeMap.addMinCountChanges(updatedMinCountPointers);
-		
-		// max count
-		Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
-		pointersToCheckMaxCountFor.addAll(maxCountDependenciesToDelete);
-		pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
-		
-		Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
-		Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
-		changeMap.addMinCountChanges(updatedMaxCountPointers);
-		
-		Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
-		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
-
-		// validate cardinality
-		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(updatedMinCountPointers.size() + updatedMaxCountPointers.size());
-		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
-		pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
-		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
-		pointersToValidateCardinalityFor.add(nodePointer);
-		pointersToValidateCardinalityFor.addAll(ancestorPointers);
-		validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
-		
-		// validate attributes
-		Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(validationDependenciesToDeleted);
-		nodesToCheckValidationFor.addAll(updatedCalculatedAttributes);
-		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
-		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
-		
-		Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
-
-		validateAttributes(record, attributesToRevalidate, changeMap);
+		if (validateAfterUpdate) {
+			// relevance
+			List<NodePointer> relevanceDependenciesToDeleted = record.determineRelevanceDependentNodes(nodesToBeDeleted);
+	
+			// min/max
+			Collection<NodePointer> preDeletionMinMaxDependenciesToCheck = new HashSet<NodePointer>(pointersToBeDeleted);
+			preDeletionMinMaxDependenciesToCheck.addAll(getAncestorsAndSelfPointers(node));
+			Collection<NodePointer> minCountDependenciesToDelete = record.determineMinCountDependentNodes(preDeletionMinMaxDependenciesToCheck);
+			Collection<NodePointer> maxCountDependenciesToDelete = record.determineMaxCountDependentNodes(preDeletionMinMaxDependenciesToCheck);
+			
+			// validation
+			Set<Attribute<?, ?>> validationDependenciesToDeleted = record.determineValidationDependentNodes(nodesToBeDeleted);
+			validationDependenciesToDeleted.removeAll(nodesToBeDeleted);
+			
+			List<Integer> ancestorIds = node.getAncestorIds();
+			
+			performNodeDeletion(node);
+	
+			changeMap.addNodeDeleteChange(record.getId(), ((CollectRecord) record).getStep(), ancestorIds, node);
+	
+			// calculated attributes
+			List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
+			changeMap.addValueChanges(updatedCalculatedAttributes);
+			
+			// relevance
+			Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
+			nodesToCheckRelevanceFor.addAll(pointersToNodes(relevanceDependenciesToDeleted));
+			
+			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
+			//check relevance update with detached entity in node pointer
+			RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
+			Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
+			changeMap.addRelevanceChanges(updatedRelevancePointers);
+			
+			// min count
+			Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
+			pointersToCheckMinCountFor.addAll(minCountDependenciesToDelete);
+			pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
+			
+			Collection<NodePointer> minCountPointersToUpdate = record.determineMinCountDependentNodes(pointersToCheckMinCountFor);
+			Collection<NodePointer> updatedMinCountPointers = updateMinCount(minCountPointersToUpdate);
+			changeMap.addMinCountChanges(updatedMinCountPointers);
+			
+			// max count
+			Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
+			pointersToCheckMaxCountFor.addAll(maxCountDependenciesToDelete);
+			pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
+			
+			Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
+			Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
+			changeMap.addMinCountChanges(updatedMaxCountPointers);
+			
+			Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
+			updatedCardinalityPointers.addAll(updatedMaxCountPointers);
+	
+			// validate cardinality
+			Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(updatedMinCountPointers.size() + updatedMaxCountPointers.size());
+			pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
+			pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
+			// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
+			pointersToValidateCardinalityFor.add(nodePointer);
+			pointersToValidateCardinalityFor.addAll(ancestorPointers);
+			validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
+			
+			// validate attributes
+			Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(validationDependenciesToDeleted);
+			nodesToCheckValidationFor.addAll(updatedCalculatedAttributes);
+			nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
+			nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
+			
+			Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
+	
+			validateAttributes(record, attributesToRevalidate, changeMap);
 		} else {
 			// calculated attributes
 			List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
@@ -614,9 +589,7 @@ public class RecordUpdater {
 	}
 	
 	private void setErrorConfirmed(Attribute<?,?> attribute, boolean confirmed){
-		int fieldCount = attribute.getFieldCount();
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
+		for (Field<?> field : attribute.getFields()) {
 			field.getState().set(CONFIRMED_ERROR_POSITION, confirmed);
 		}
 	}
@@ -627,10 +600,7 @@ public class RecordUpdater {
 	}
 	
 	private void setDefaultValueApplied(Attribute<?, ?> attribute, boolean applied) {
-		int fieldCount = attribute.getFieldCount();
-		
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
+		for (Field<?> field : attribute.getFields()) {
 			field.getState().set(DEFAULT_APPLIED_POSITION, applied);
 		}
 	}
@@ -695,14 +665,18 @@ public class RecordUpdater {
 		return attribute;
 	}
 	
-	private Entity performEntityAdd(Entity parentEntity, String nodeName) {
-		return performEntityAdd(parentEntity, nodeName, null);
+	private Entity performEntityAdd(Entity parentEntity, EntityDefinition defn) {
+		return performEntityAdd(parentEntity, defn, null);
 	}
 	
 	private Entity performEntityAdd(Entity parentEntity, String name, Integer idx) {
-		ModelVersion version = parentEntity.getRecord().getVersion();
 		EntityDefinition parentDefn = parentEntity.getDefinition();
 		EntityDefinition defn = parentDefn.getChildDefinition(name, EntityDefinition.class);
+		return performEntityAdd(parentEntity, defn, idx);
+	}
+	
+	private Entity performEntityAdd(Entity parentEntity, EntityDefinition defn, Integer idx) {
+		ModelVersion version = parentEntity.getRecord().getVersion();
 		Entity entity = (Entity) defn.createNode();
 		if ( idx != null ) {
 			parentEntity.add(entity, idx);
@@ -717,30 +691,18 @@ public class RecordUpdater {
 	}
 
 	public NodeChangeSet initializeRecord(Record record) {
-		return initializeRecord(record, true);
-	}
-	
-	public NodeChangeSet initializeRecord(Record record, boolean validate) {
-		return initializeRecord(record, validate, true);
-	}
-	
-	public NodeChangeSet initializeRecord(Record record, boolean validate, boolean addEmptyMultipleEntities) {
-		return initializeEntity(record.getRootEntity(), validate, addEmptyMultipleEntities, false);
+		return initializeEntity(record.getRootEntity(), false);
 	}
 	
 	public NodeChangeSet initializeNewRecord(Record record) {
-		return initializeEntity(record.getRootEntity(), true, true, true);
+		return initializeEntity(record.getRootEntity(), true);
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity) {
-		return initializeEntity(entity, true);
+		return initializeEntity(entity, false);
 	}
 	
-	protected NodeChangeMap initializeEntity(Entity entity, boolean validate) {
-		return initializeEntity(entity, validate, true, false);
-	}
-	
-	protected NodeChangeMap initializeEntity(Entity entity, boolean validate, boolean addEmptyMultipleEntities, boolean newEntity) {
+	protected NodeChangeMap initializeEntity(Entity entity, boolean newEntity) {
 		Record record = entity.getRecord();
 		
 		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
@@ -754,7 +716,7 @@ public class RecordUpdater {
 		updateMinCount(entityDescendantPointers);
 		updateMaxCount(entityDescendantPointers);
 
-		addEmptyNodes(entity, addEmptyMultipleEntities);
+		addEmptyNodes(entity);
 		
 		applyInitialValues(entity, newEntity);
 		
@@ -763,7 +725,7 @@ public class RecordUpdater {
 		List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
 		changeMap.addValueChanges(calculatedAttributes);
 		
-		if (validate) {
+		if (validateAfterUpdate) {
 			//min/max count
 			entityDescendantPointers = getDescendantNodePointers(entity);
 			
@@ -808,10 +770,6 @@ public class RecordUpdater {
 	}
 
 	private void addEmptyNodes(Entity entity) {
-		addEmptyNodes(entity, true);
-	}
-	
-	private void addEmptyNodes(Entity entity, boolean addEmptyMultipleEntities) {
 		Record record = entity.getRecord();
 		ModelVersion version = record.getVersion();
 		addEmptyEnumeratedEntities(entity);
@@ -819,27 +777,26 @@ public class RecordUpdater {
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitionsInVersion(version);
 		for (NodeDefinition childDefn : childDefinitions) {
 			if(entity.getCount(childDefn) == 0) {
-				if (addEmptyMultipleEntities || ! (childDefn instanceof EntityDefinition && childDefn.isMultiple())) {
+				if (addEmptyMultipleEntitiesWhenAddingNewEntities || ! (childDefn instanceof EntityDefinition && childDefn.isMultiple())) {
 					int toBeInserted = entity.getMinCount(childDefn);
 					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
 						//insert at least one node
 						toBeInserted = 1;
 					}
-					addEmptyChildren(entity, childDefn, toBeInserted, addEmptyMultipleEntities);
+					addEmptyChildren(entity, childDefn, toBeInserted);
 				}
 			} else {
 				List<Node<?>> children = entity.getChildren(childDefn);
 				for (Node<?> child : children) {
 					if(child instanceof Entity) {
-						addEmptyNodes((Entity) child, addEmptyMultipleEntities);
+						addEmptyNodes((Entity) child);
 					}
 				}
 			}
 		}
 	}
 
-	private int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted, boolean addEmptyMultipleEntities) {
-		String childName = childDefn.getName();
+	private int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
 		UIOptions uiOptions = getUIOptions(entity.getSurvey());
 		int count = 0;
 		boolean multipleEntityFormLayout = childDefn instanceof EntityDefinition && childDefn.isMultiple() && 
@@ -850,8 +807,8 @@ public class RecordUpdater {
 					Node<?> createdNode = childDefn.createNode();
 					entity.add(createdNode);
 				} else if(childDefn instanceof EntityDefinition ) {
-					Entity childEntity = performEntityAdd(entity, childName);
-					addEmptyNodes(childEntity, addEmptyMultipleEntities);
+					Entity childEntity = performEntityAdd(entity, (EntityDefinition) childDefn);
+					addEmptyNodes(childEntity);
 				}
 				count ++;
 			}
@@ -926,7 +883,6 @@ public class RecordUpdater {
 		ModelVersion version = record.getVersion();
 		CodeAttributeDefinition enumeratingCodeDefn = enumerableEntityDefn.getEnumeratingKeyCodeAttribute(version);
 		if(enumeratingCodeDefn != null) {
-			String enumeratedEntityName = enumerableEntityDefn.getName();
 			CodeList list = enumeratingCodeDefn.getList();
 			Survey survey = record.getSurvey();
 			CodeListService codeListService = survey.getContext().getCodeListService();
@@ -937,7 +893,7 @@ public class RecordUpdater {
 					String code = item.getCode();
 					Entity enumeratedEntity = parentEntity.getEnumeratedEntity(enumerableEntityDefn, enumeratingCodeDefn, code);
 					if( enumeratedEntity == null ) {
-						Entity addedEntity = performEntityAdd(parentEntity, enumeratedEntityName, i);
+						Entity addedEntity = performEntityAdd(parentEntity, enumerableEntityDefn, i);
 						addEmptyNodes(addedEntity);
 						//set the value of the key CodeAttribute
 						CodeAttribute addedCode = (CodeAttribute) addedEntity.getChild(enumeratingCodeDefn, 0);
@@ -1058,22 +1014,23 @@ public class RecordUpdater {
 		return pointers;
 	}
 
-	private Collection<Node<?>> pointersToNodes(Collection<NodePointer> nodePointers) {
-		Set<Node<?>> result = new HashSet<Node<?>>();
-		for (NodePointer nodePointer : nodePointers) {
-			result.addAll(nodePointer.getNodes());
-		}
-		return result;
+	public void setValidateAfterUpdate(boolean validateAfterUpdate) {
+		this.validateAfterUpdate = validateAfterUpdate;
 	}
 	
-	private Set<NodePointer> nodesToPointers(Collection<? extends Node<?>> nodes) {
-		Set<NodePointer> result = new HashSet<NodePointer>();
-		for (Node<?> n : nodes) {
-			result.add(new NodePointer(n));
-		}
-		return result;
+	public void setClearNotRelevantAttributes(boolean clearNotRelevantAttributes) {
+		this.clearNotRelevantAttributes = clearNotRelevantAttributes;
 	}
-
+	
+	public void setClearDependentCodeAttributes(boolean clearDependentCodeAttributes) {
+		this.clearDependentCodeAttributes = clearDependentCodeAttributes;
+	}
+	
+	public void setAddEmptyMultipleEntitiesWhenAddingNewEntities(
+			boolean addEmptyMultipleEntitiesWhenAddingNewEntities) {
+		this.addEmptyMultipleEntitiesWhenAddingNewEntities = addEmptyMultipleEntitiesWhenAddingNewEntities;
+	}
+	
 	private static class RelevanceUpdater {
 		private final List<NodePointer> pointersToUpdate;
 		private final Set<NodePointer> updatedNodePointers;

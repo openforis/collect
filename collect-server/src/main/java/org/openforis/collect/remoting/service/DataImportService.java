@@ -10,6 +10,9 @@ import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreSummaryJob;
+import org.openforis.collect.io.data.RecordProvider;
+import org.openforis.collect.io.data.TransactionalDataRestoreJob;
+import org.openforis.collect.io.data.XMLParsingRecordProvider;
 import org.openforis.collect.io.data.proxy.DataRestoreJobProxy;
 import org.openforis.collect.io.data.proxy.DataRestoreSummaryJobProxy;
 import org.openforis.collect.io.exception.DataImportExeption;
@@ -44,7 +47,8 @@ public class DataImportService {
 	private DataRestoreJob dataRestoreJob;
 	
 	@Secured("ROLE_ADMIN")
-	public JobProxy startSummaryCreation(String filePath, String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
+	public JobProxy startSummaryCreation(String filePath, String selectedSurveyUri, boolean overwriteAll,
+			boolean completeSummary) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
 			log.info("Starting data import summary creation");
 			
@@ -55,6 +59,7 @@ public class DataImportService {
 			CollectSurvey survey = surveyManager.getByUri(selectedSurveyUri);
 
 			DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
+			job.setCompleteSummary(completeSummary);
 			job.setFile(packagedFile);
 			job.setPublishedSurvey(survey);
 
@@ -69,12 +74,20 @@ public class DataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public JobProxy startImport(List<Integer> entryIdsToImport, boolean validateRecords) throws Exception {
+	public JobProxy startImport(List<Integer> entryIdsToImport, boolean validateRecords, boolean processInTransaction) throws Exception {
 		if ( dataRestoreJob == null || ! dataRestoreJob.isRunning() ) {
 			log.info("Starting data restore");
 
-			DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+			DataRestoreJob job;
+			if (processInTransaction) {
+				job = jobManager.createJob(TransactionalDataRestoreJob.JOB_NAME, TransactionalDataRestoreJob.class);				
+			} else {
+				job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
+			}
 			job.setFile(packagedFile);
+			RecordProvider recordProvider = summaryJob.getRecordProvider();
+			job.setRecordProvider(recordProvider);
+			((XMLParsingRecordProvider) recordProvider).setValidateRecords(validateRecords);
 			job.setPackagedSurvey(summaryJob.getPackagedSurvey());
 			job.setPublishedSurvey(summaryJob.getPublishedSurvey());
 			job.setEntryIdsToImport(entryIdsToImport);

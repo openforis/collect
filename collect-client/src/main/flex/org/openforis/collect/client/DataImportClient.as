@@ -40,13 +40,14 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function startSummaryCreation(responder:IResponder, filePath:String, selectedSurveyUri:String, overwriteAll:Boolean = false):void {
-			var token:AsyncToken = this._startSummaryCreationOperation.send(filePath, selectedSurveyUri, overwriteAll);
+		public function startSummaryCreation(responder:IResponder, filePath:String, selectedSurveyUri:String, overwriteAll:Boolean = false, 
+				completeSummary:Boolean = false):void {
+			var token:AsyncToken = this._startSummaryCreationOperation.send(filePath, selectedSurveyUri, overwriteAll, completeSummary);
 			token.addResponder(responder);
 		}
 		
-		public function startImport(responder:IResponder, entryIdsToImport:IList, validateRecords:Boolean = true):void {
-			var token:AsyncToken = this._startImportOperation.send(entryIdsToImport, validateRecords);
+		public function startImport(responder:IResponder, entryIdsToImport:IList, validateRecords:Boolean = true, processInTransaction:Boolean = true):void {
+			var token:AsyncToken = this._startImportOperation.send(entryIdsToImport, validateRecords, processInTransaction);
 			token.addResponder(responder);
 		}
 

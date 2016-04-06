@@ -102,6 +102,7 @@ public interface IdmlConstants {
 	static String QUALIFIERS = "qualifiers";
 	static String EXTENSIONS = "extensions";
 	static String MAX_SIZE = "maxSize";
+	static String REFERENCED_ATTRIBUTE = "referencedAttribute";
 	
 	// Checks
 	static String FLAG = "flag";

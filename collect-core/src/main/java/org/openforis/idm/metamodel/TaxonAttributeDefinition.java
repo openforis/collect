@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.lang.Numbers;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
@@ -29,6 +30,8 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	public static final String VERNACULAR_NAME_FIELD_NAME = "vernacular_name";
 	public static final String LANGUAGE_CODE_FIELD_NAME = "language_code";
 	public static final String LANGUAGE_VARIETY_FIELD_NAME = "language_variety";
+	public static final String FAMILY_CODE_FIELD_NAME = "family_code";
+	public static final String FAMILY_SCIENTIFIC_NAME_FIELD_NAME = "family_scientific_name";
 	
 	public static final String QUALIFIER_SEPARATOR = ",";
 
@@ -44,13 +47,19 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 			new FieldDefinition<String>(LANGUAGE_CODE_FIELD_NAME, "l", "lang", String.class, this);
 	private final FieldDefinition<String> languageVarietyFieldDefinition = 
 			new FieldDefinition<String>(LANGUAGE_VARIETY_FIELD_NAME, "lv", "lang_var", String.class, this);
+	private final FieldDefinition<String> familyCodeFieldDefinition = 
+			new FieldDefinition<String>(FAMILY_CODE_FIELD_NAME, "fc", "fam_code", String.class, this);
+	private final FieldDefinition<String> familyScientificNameFieldDefinition = 
+			new FieldDefinition<String>(FAMILY_SCIENTIFIC_NAME_FIELD_NAME, "fn", "fam_name", String.class, this);
 	
 	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
 		codeFieldDefinition, 
 		scientificNameFieldDefinition, 
 		vernacularNameFieldDefinition,
 		languageCodeFieldDefinition,
-		languageVarietyFieldDefinition
+		languageVarietyFieldDefinition,
+		familyCodeFieldDefinition,
+		familyScientificNameFieldDefinition
 	);
 	
 	private String taxonomy;
@@ -83,8 +92,15 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 		} else if (val instanceof String) {
 			return createValue((String) val);
 		} else {
-		throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException();
+		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+		return (V) new TaxonOccurrence(Numbers.toIntegerObject(fieldValues.get(0)), fieldValues.get(1), fieldValues.get(2),
+				fieldValues.get(3), fieldValues.get(4), fieldValues.get(5));
 	}
 	
 	@Override
@@ -169,6 +185,14 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	
 	public FieldDefinition<String> getLanguageVarietyFieldDefinition() {
 		return languageVarietyFieldDefinition;
+	}
+	
+	public FieldDefinition<String> getFamilyCodeFieldDefinition() {
+		return familyCodeFieldDefinition;
+	}
+	
+	public FieldDefinition<String> getFamilyScientificNameFieldDefinition() {
+		return familyScientificNameFieldDefinition;
 	}
 
 	@Override

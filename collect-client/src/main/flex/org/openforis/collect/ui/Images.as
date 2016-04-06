@@ -32,6 +32,9 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/data_cleansing.png")]
 		public static const DATA_CLEANSING:Class;
 
+		[Embed("/assets/images/saiku.png")]
+		public static const SAIKU:Class;
+
 		[Embed("/assets/images/backup.png")]
 		public static const BACKUP:Class;
 		
@@ -128,5 +131,16 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/user_16x16.png")]
 		public static const USER_SMALL:Class;
 		
+		[Embed("/assets/images/green-circle-16x16.png")]
+		public static const GREEN_CIRCLE_SMALL:Class;
+		
+		[Embed("/assets/images/grey-circle-16x16.png")]
+		public static const GREY_CIRCLE_SMALL:Class;
+		
+		[Embed("/assets/images/red-circle-16x16.png")]
+		public static const RED_CIRCLE_SMALL:Class;
+	
+		[Embed("/assets/images/equal-black-16x16.png")]
+		public static const EQUAL_SMALL:Class;	
 	}
 }

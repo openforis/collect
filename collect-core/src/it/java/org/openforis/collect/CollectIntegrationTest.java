@@ -6,9 +6,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
-import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +23,17 @@ public abstract class CollectIntegrationTest extends CollectTest {
 	@Autowired
 	protected CollectSurveyContext collectSurveyContext;
 	@Autowired
-	protected SurveyDao surveyDao;
-	@Autowired
 	protected SurveyManager surveyManager;
 	
-	protected CollectSurvey loadSurvey() throws IdmlParseException {
+	protected CollectSurvey loadSurvey() throws IdmlParseException, SurveyValidationException {
 		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
-		CollectSurvey survey = surveyDao.unmarshalIdml(is);
+		CollectSurvey survey = surveyManager.unmarshalSurvey(is);
 		survey.setName("archenland1");
 		return survey;
 	}
 
 	@SuppressWarnings("deprecation")
-	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException {
+	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException, SurveyValidationException {
 		CollectSurvey survey = (CollectSurvey) loadSurvey();
 		surveyManager.importModel(survey);
 		return survey;

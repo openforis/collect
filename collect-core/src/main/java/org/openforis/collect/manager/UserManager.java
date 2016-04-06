@@ -15,12 +15,14 @@ import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
  * @author S. Ricci
  */
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class UserManager {
 
 	public static final String ADMIN_USER_NAME = "admin";
@@ -33,18 +35,14 @@ public class UserManager {
 	@Autowired
 	private RecordDao recordDao;
 	
-
-	@Transactional
 	public int getUserId(String username) {
 		return userDao.getUserId(username);
 	}
 
-	@Transactional
 	public User loadById(int userId) {
 		return userDao.loadById(userId);
 	}
 
-	@Transactional
 	public User loadByUserName(String userName, Boolean enabled) {
 		return userDao.loadByUserName(userName, enabled);
 	}

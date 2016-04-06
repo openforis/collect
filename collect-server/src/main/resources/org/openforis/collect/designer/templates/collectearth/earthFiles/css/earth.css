@@ -114,10 +114,6 @@ hr {
 	text-shadow: 0px 0px 6px rgba(0, 0, 0, 1);
 }
 
-.earthDiv {
-	width: 400px;
-}
-
 .btn-lg {
 	padding: 10px 16px;
 	font-size: 18px;
@@ -241,6 +237,19 @@ a.btn-finish:active {
 	white-space: normal;
 	height: 27px;
 	font-size: 12px;
+}
+
+#loadingPanel, 
+#collectEarthNotRunningPanel {
+}
+
+#contentDiv {
+	height: 600px;
+	width: 100%;
+}
+
+.earthDiv {
+	width: 400px;
 }
 
 div.content{

@@ -3,12 +3,14 @@
  */
 package org.openforis.collect.io.data;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
@@ -28,9 +30,11 @@ import org.springframework.stereotype.Component;
  * @author S. Ricci
  *
  */
-@Component
+@Component(value=DataRestoreJob.JOB_NAME)
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataRestoreJob extends DataRestoreBaseJob {
+	
+	public static final String JOB_NAME = "dataRestoreJob";
 	
 	@Autowired
 	private RecordFileManager recordFileManager;
@@ -49,7 +53,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	//output
 	private List<RecordImportError> errors;
 		
-	private boolean validateRecords;
+	private boolean deleteAllRecordsBeforeRestore = false;
 
 	@Override
 	public void createInternalVariables() throws Throwable {
@@ -66,6 +70,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			}
 			addTask(new StoreBackupFileTask());
 		}
+		if (deleteAllRecordsBeforeRestore) {
+			addTask(new DeleteRecordsTask());
+		}
 		addTask(DataRestoreTask.class);
 		if ( restoreUploadedFiles && isUploadedFilesIncluded() ) {
 			addTask(RecordFileRestoreTask.class);
@@ -79,7 +86,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		Date lastBackupDate = backupStorageManager.getLastBackupDate(surveyName);
 		RecordFilter recordFilter = new RecordFilter(publishedSurvey);
 		recordFilter.setModifiedSince(lastBackupDate);
-		return recordManager.countRecords(recordFilter) > 0 || publishedSurvey.getModifiedDate().after(lastBackupDate);
+		return recordManager.countRecords(recordFilter) > 0 || 
+				(lastBackupDate != null && publishedSurvey.getModifiedDate().after(lastBackupDate));
 	}
 
 	private boolean isUploadedFilesIncluded() throws IOException {
@@ -101,17 +109,14 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			DataRestoreTask t = (DataRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
-			t.setFile(file);
-			t.setPackagedSurvey(packagedSurvey);
-			t.setExistingSurvey(publishedSurvey);
+			t.setRecordProvider(recordProvider);
 			t.setOverwriteAll(overwriteAll);
 			t.setEntryIdsToImport(entryIdsToImport);
-			t.setValidateRecords(validateRecords);
 		} else if ( task instanceof RecordFileRestoreTask ) {
 			RecordFileRestoreTask t = (RecordFileRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setRecordFileManager(recordFileManager);
-			t.setZipFile(zipFile);
+			t.setFile(file);
 			t.setOldBackupFormat(oldBackupFormat);
 			t.setOverwriteAll(overwriteAll);
 			t.setEntryIdsToImport(entryIdsToImport);
@@ -133,6 +138,14 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		super.onCompleted();
 		if (storeRestoredFile) {
 			restoredBackupStorageManager.moveToFinalFolder(surveyName, tempFile);
+		}
+	}
+	
+	@Override
+	protected void onEnd() {
+		super.onEnd();
+		if (recordProvider instanceof Closeable) {
+			IOUtils.closeQuietly((Closeable) recordProvider);
 		}
 	}
 
@@ -196,16 +209,21 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		return errors;
 	}
 
-	public void setValidateRecords(boolean validateRecords) {
-		this.validateRecords = validateRecords;
+	public void setDeleteAllRecordsBeforeRestore(boolean deleteAllRecords) {
+		this.deleteAllRecordsBeforeRestore = deleteAllRecords;
 	}
 
 	private class StoreBackupFileTask extends Task {
-		@Override
 		protected void execute() throws Throwable {
 			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
 		}
 		
+	}
+	
+	private class DeleteRecordsTask extends Task {
+		protected void execute() throws Throwable {
+			recordManager.deleteBySurvey(publishedSurvey.getId());
+		}
 	}
 
 }

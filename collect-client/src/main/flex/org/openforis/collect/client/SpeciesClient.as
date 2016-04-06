@@ -4,6 +4,7 @@ package org.openforis.collect.client {
 	import mx.rpc.remoting.Operation;
 	
 	import org.openforis.collect.model.proxy.TaxonomyProxy;
+	import org.openforis.collect.manager.TaxonSearchParameters;
 	
 	/**
 	 * 
@@ -59,18 +60,21 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function findByCode(responder:IResponder, taxonomy:String, value:String, maxResults:int):void {
-			var token:AsyncToken = this._findByCodeOperation.send(taxonomy, value, maxResults);
+		public function findByCode(responder:IResponder, taxonomy:String, value:String, maxResults:int, 
+				parameters:TaxonSearchParameters):void {
+			var token:AsyncToken = this._findByCodeOperation.send(taxonomy, value, maxResults, parameters);
 			token.addResponder(responder);
 		}
 		
-		public function findByScientificName(responder:IResponder, taxonomy:String, value:String, maxResults:int):void {
-			var token:AsyncToken = this._findByScientificNameOperation.send(taxonomy, value, maxResults);
+		public function findByScientificName(responder:IResponder, taxonomy:String, value:String, maxResults:int, 
+				parameters:TaxonSearchParameters):void {
+			var token:AsyncToken = this._findByScientificNameOperation.send(taxonomy, value, maxResults, parameters);
 			token.addResponder(responder);
 		}
 		
-		public function findByVernacularName(responder:IResponder, taxonomy:String, nodeId:int, value:String, maxResults:int):void {
-			var token:AsyncToken = this._findByVernacularNameOperation.send(taxonomy, nodeId, value, maxResults);
+		public function findByVernacularName(responder:IResponder, taxonomy:String, nodeId:int, value:String, 
+				maxResults:int, parameters:TaxonSearchParameters):void {
+			var token:AsyncToken = this._findByVernacularNameOperation.send(taxonomy, nodeId, value, maxResults, parameters);
 			token.addResponder(responder);
 		}
 

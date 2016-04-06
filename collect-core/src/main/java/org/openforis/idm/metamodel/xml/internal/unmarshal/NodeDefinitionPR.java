@@ -1,10 +1,26 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DEPRECATED;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.ID;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.LABEL;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.MAX_COUNT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.MIN_COUNT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.MULTIPLE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.NAME;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.PROMPT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.RELEVANT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.REQUIRED;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.REQUIRED_IF;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.SINCE;
+
 import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -14,12 +30,13 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
-
 /**
  * @author G. Miceli
  */
 abstract class NodeDefinitionPR extends IdmlPullReader {
+	private static final NodeLabel.Type DEFAULT_LABEL_TYPE = NodeLabel.Type.INSTANCE;
+	private static final Log LOG = LogFactory.getLog(NodeDefinitionPR.class);
+	
 	private NodeDefinition definition;
 	private EntityDefinition parentDefinition;
 	private Schema schema;
@@ -140,18 +157,27 @@ abstract class NodeDefinitionPR extends IdmlPullReader {
 	}
 	
 	protected class LabelPR extends LanguageSpecificTextPR {
+
 		public LabelPR() {
 			super(LABEL);
 		}
 		
 		@Override
 		protected void processText(String lang, String typeStr, String text) throws XmlParseException {
+			NodeLabel.Type type = extractLabelType(typeStr);
+			NodeLabel label = new NodeLabel(type, lang, text);
+			definition.addLabel(label);
+		}
+		
+		private NodeLabel.Type extractLabelType(String name) {
+			if (name == null) {
+				return DEFAULT_LABEL_TYPE;
+			}
 			try { 
-				NodeLabel.Type type = typeStr == null ? NodeLabel.Type.INSTANCE : NodeLabel.Type.valueOf(typeStr.toUpperCase()); 
-				NodeLabel label = new NodeLabel(type, lang, text);
-				definition.addLabel(label);
+				return NodeLabel.Type.valueOf(name.toUpperCase());
 			} catch (IllegalArgumentException e) {
-				throw new XmlParseException(getParser(), "invalid type "+typeStr);
+				LOG.error("Invalid label type: " + name);
+				return DEFAULT_LABEL_TYPE;
 			}
 		}
 	}
@@ -168,7 +194,7 @@ abstract class NodeDefinitionPR extends IdmlPullReader {
 				Prompt p = new Prompt(type, lang, text);
 				definition.addPrompt(p);
 			} catch (IllegalArgumentException e) {
-				throw new XmlParseException(getParser(), "invalid type "+typeStr);
+				LOG.error("Invalid prompt type: " + typeStr);
 			}
 		}
 	}

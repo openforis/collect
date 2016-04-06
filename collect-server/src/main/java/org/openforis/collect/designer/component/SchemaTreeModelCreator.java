@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openforis.collect.designer.component.BasicTreeModel.AbstractNode;
@@ -22,21 +23,25 @@ public class SchemaTreeModelCreator extends SurveyObjectTreeModelCreator {
 	
 	public SchemaTreeModelCreator(ModelVersion version,
 			Predicate<SurveyObject> includeNodePredicate,
-			boolean includeEmptyNodes, String labelLanguage) {
-		this(version, null, includeNodePredicate, includeEmptyNodes, labelLanguage);
+			boolean includeRootEntity, boolean includeEmptyNodes, String labelLanguage) {
+		this(version, null, includeNodePredicate, includeRootEntity, includeEmptyNodes, labelLanguage);
 	}
 
 	public SchemaTreeModelCreator(ModelVersion version,
 			Predicate<SurveyObject> disabledNodePredicate,
 			Predicate<SurveyObject> includeNodePredicate,
-			boolean includeEmptyNodes, String labelLanguage) {
-		super(version, disabledNodePredicate, includeNodePredicate, includeEmptyNodes, labelLanguage);
+			boolean includeRootEntity, boolean includeEmptyNodes, String labelLanguage) {
+		super(version, disabledNodePredicate, includeNodePredicate, includeRootEntity, includeEmptyNodes, labelLanguage);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected List<AbstractNode<SchemaNodeData>> createFirstLevelNodes(EntityDefinition rootEntity) {
-		List<AbstractNode<SchemaNodeData>> result = createChildNodes(rootEntity);
-		return result;
+		if (includeRootEntity) {
+			return Arrays.<AbstractNode<SchemaNodeData>>asList(createChildNode(rootEntity));
+		} else {
+			return createChildNodes(rootEntity);
+		}
 	}
 
 	@Override
@@ -45,9 +50,8 @@ public class SchemaTreeModelCreator extends SurveyObjectTreeModelCreator {
 		if ( surveyObject instanceof EntityDefinition ) {
 			List<NodeDefinition> childDefinitions = ((EntityDefinition) surveyObject).getChildDefinitions();
 			for (NodeDefinition nodeDefn : childDefinitions) {
-				if ( version == null || version.isApplicable(nodeDefn) ) {
-					SchemaNodeData data = new SchemaNodeData(nodeDefn, nodeDefn.getName(), false, false);
-					SchemaTreeNode childNode = (SchemaTreeNode) createNode(data, false);
+				SchemaTreeNode childNode = createChildNode(nodeDefn);
+				if (childNode != null) {
 					childNodes.add(childNode);
 				}
 			}
@@ -56,6 +60,16 @@ public class SchemaTreeModelCreator extends SurveyObjectTreeModelCreator {
 			childNodes = null;
 		}
 		return childNodes;
+	}
+	
+	private SchemaTreeNode createChildNode(NodeDefinition nodeDefn) {
+		if ( version == null || version.isApplicable(nodeDefn) ) {
+			SchemaNodeData data = new SchemaNodeData(nodeDefn, nodeDefn.getName(), false, false);
+			SchemaTreeNode childNode = (SchemaTreeNode) createNode(data, false);
+			return childNode;
+		} else {
+			return null;
+		}
 	}
 
 }

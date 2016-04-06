@@ -111,19 +111,24 @@ abstract class AbstractTable<T> implements Table<T>  {
 	}
 	
 	public EntityDefinition getReferencedEntityDefinition(DataAncestorFKColumn fkColumn) {
+		DataTable referencedTable = getReferencedTable(fkColumn);
+		EntityDefinition referencedEntityDef = (EntityDefinition) referencedTable.getNodeDefinition();
+		return referencedEntityDef;
+	}
+	
+	public DataTable getReferencedTable(Column<?> fkColumn) {
 		List<ReferentialConstraint> constraints = getReferentialConstraintsByColumn(fkColumn);
 		for (ReferentialConstraint constraint : constraints) {
 			UniquenessConstraint referencedKey = constraint.getReferencedKey();
 			if (referencedKey instanceof PrimaryKeyConstraint) {
 				DataTable referencedTable = (DataTable) referencedKey.getTable();
-				EntityDefinition referencedEntityDef = (EntityDefinition) referencedTable.getNodeDefinition();
-				return referencedEntityDef;
+				return referencedTable;
 			}
 		}
-		throw new IllegalArgumentException(String.format("Referenced EntityDefinition not found for column %s in table %s", 
+		throw new IllegalArgumentException(String.format("Referenced table not found for column %s in table %s", 
 				fkColumn.getName(), getName()));
 	}
-
+	
 	public boolean containsColumn(String name) {
 		return columns.containsKey(name);
 	}

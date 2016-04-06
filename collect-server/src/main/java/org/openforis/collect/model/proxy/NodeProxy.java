@@ -91,6 +91,11 @@ public class NodeProxy implements Proxy {
 		}
 	}
 	
+	@ExternalizedProperty
+	public boolean isUserSpecified() {
+		return node.isUserSpecified();
+	}
+	
 	protected MessageSource getMessageSource() {
 		Class<SpringMessageSource> type = SpringMessageSource.class;
 		return getContextBean(type);

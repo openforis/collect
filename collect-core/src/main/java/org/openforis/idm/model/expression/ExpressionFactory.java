@@ -25,9 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.expression.internal.CustomFunction;
 import org.openforis.idm.model.expression.internal.CustomFunctions;
 import org.openforis.idm.model.expression.internal.IDMFunctions;
 import org.openforis.idm.model.expression.internal.MathFunctions;
+import org.openforis.idm.model.expression.internal.ModelExtensionFunction;
 import org.openforis.idm.model.expression.internal.ModelJXPathCompiledExpression;
 import org.openforis.idm.model.expression.internal.ModelJXPathContext;
 import org.openforis.idm.model.expression.internal.ModelNodePointerFactory;
@@ -48,10 +50,13 @@ public class ExpressionFactory {
 	public static final String REGEX_PREFIX = "regex";
 	public static final String UTIL_PREFIX = "util";
 
-	private static final Set<String> CORE_FUNCTION_NAMES = new HashSet<String>(asList(
-			"boolean", "not", "true", "false", // boolean values functions
-			"number", "round", "floor", "ceiling", "format-number", // math functions
-			"string", "concat", "substring", "string-length", "normalize-space", "contains", "starts-with", "ends-with", // string functions
+	private static final Set<String> CORE_FUNCTION_NAMES = new HashSet<String>(asList("boolean", "not", "true", "false", // boolean
+																															// values
+																															// functions
+			"number", "round", "floor", "ceiling", "format-number", // math
+																	// functions
+			"string", "concat", "substring", "string-length", "normalize-space", "contains", "starts-with", "ends-with", // string
+																															// functions
 			"count", "sum", // aggregate functions
 			"position", "last" // context functions
 	));
@@ -64,19 +69,16 @@ public class ExpressionFactory {
 	private LookupProvider lookupProvider;
 
 	public ExpressionFactory() {
-		System.setProperty(JXPathContextFactory.FACTORY_NAME_PROPERTY, "org.openforis.idm.model.expression.internal.ModelJXPathContextFactory");
+		System.setProperty(JXPathContextFactory.FACTORY_NAME_PROPERTY,
+				"org.openforis.idm.model.expression.internal.ModelJXPathContextFactory");
 
 		JXPathContextReferenceImpl.addNodePointerFactory(new ModelNodePointerFactory());
 
 		JXPathIntrospector.registerDynamicClass(Node.class, NodePropertyHandler.class);
 		JXPathIntrospector.registerDynamicClass(Record.class, RecordPropertyHandler.class);
 
-		registerFunctions(
-				new MathFunctions(MATH_PREFIX),
-				new IDMFunctions(IDM_PREFIX),
-				new RegExFunctions(REGEX_PREFIX),
-				new UtilFunctions(UTIL_PREFIX)
-		);
+		registerFunctions(new MathFunctions(MATH_PREFIX), new IDMFunctions(IDM_PREFIX),
+				new RegExFunctions(REGEX_PREFIX), new UtilFunctions(UTIL_PREFIX));
 
 		referencedPathEvaluator = new ReferencedPathEvaluator(customFunctionsByNamespace);
 	}
@@ -85,7 +87,8 @@ public class ExpressionFactory {
 		return createBooleanExpression(expression, false);
 	}
 
-	public BooleanExpression createBooleanExpression(String expression, boolean normalizeNumbers) throws InvalidExpressionException {
+	public BooleanExpression createBooleanExpression(String expression, boolean normalizeNumbers)
+			throws InvalidExpressionException {
 		ModelJXPathCompiledExpression compiledExpression = compileExpression(expression, normalizeNumbers);
 		BooleanExpression expr = new BooleanExpression(compiledExpression, jxPathContext);
 		return expr;
@@ -102,8 +105,9 @@ public class ExpressionFactory {
 		ModelPathExpression expr = new ModelPathExpression(compiledExpression, jxPathContext);
 		return expr;
 	}
-	
-	public AbsoluteModelPathExpression createAbsoluteModelPathExpression(String expression) throws InvalidExpressionException {
+
+	public AbsoluteModelPathExpression createAbsoluteModelPathExpression(String expression)
+			throws InvalidExpressionException {
 		if (!expression.startsWith(String.valueOf(Path.SEPARATOR))) {
 			throw new InvalidExpressionException("Absolute paths must start with '/'");
 		}
@@ -119,10 +123,6 @@ public class ExpressionFactory {
 		}
 	}
 
-	public LookupProvider getLookupProvider() {
-		return lookupProvider;
-	}
-
 	public boolean isValidFunction(String namespace, String functionName) {
 		boolean inDefaultNamespace = StringUtils.isBlank(namespace);
 		if (inDefaultNamespace) {
@@ -131,7 +131,7 @@ public class ExpressionFactory {
 		CustomFunctions functions = customFunctionsByNamespace.get(namespace);
 		return functions != null && functions.containsFunction(functionName);
 	}
-	
+
 	public List<String> getFullFunctionNames() {
 		List<String> result = new ArrayList<String>();
 		result.addAll(CORE_FUNCTION_NAMES);
@@ -154,6 +154,13 @@ public class ExpressionFactory {
 		jxPathContext.setLookupProvider(lookupProvider);
 	}
 
+	public CustomFunction lookupFunction(ModelExtensionFunction modelExtensionFunction) {
+		String namespace = modelExtensionFunction.getPrefix();
+		CustomFunctions customFunctions = customFunctionsByNamespace.get(namespace);
+		return (CustomFunction) customFunctions.getFunction(namespace, modelExtensionFunction.getName(),
+				modelExtensionFunction.getArguments());
+	}
+
 	private void registerFunctions(CustomFunctions... functionsLibrary) {
 		jxPathContext = (ModelJXPathContext) JXPathContext.newContext(null);
 		FunctionLibrary library = new FunctionLibrary();
@@ -161,7 +168,8 @@ public class ExpressionFactory {
 			library.addFunctions(functions);
 			String namespace = functions.getNamespace();
 			if (customFunctionsByNamespace.containsKey(namespace)) {
-				throw new IllegalStateException(String.format("Functions for namespace %s already registered", namespace));
+				throw new IllegalStateException(
+						String.format("Functions for namespace %s already registered", namespace));
 			}
 			customFunctionsByNamespace.put(namespace, functions);
 		}
@@ -172,13 +180,14 @@ public class ExpressionFactory {
 		return compileExpression(expression, false);
 	}
 
-	private ModelJXPathCompiledExpression compileExpression(String expression, boolean normalizeNumber) throws InvalidExpressionException {
+	private ModelJXPathCompiledExpression compileExpression(String expression, boolean normalizeNumber)
+			throws InvalidExpressionException {
 		ExpressionKey key = new ExpressionKey(expression, normalizeNumber);
 		ModelJXPathCompiledExpression compiled = COMPILED_EXPRESSIONS.get(key);
 		if (compiled == null) {
 			try {
 				String normalizedExpression = Path.getNormalizedPath(expression);
-				compiled = (ModelJXPathCompiledExpression) ModelJXPathContext.compile(referencedPathEvaluator, normalizedExpression, normalizeNumber);
+				compiled = ModelJXPathContext.compile(this, normalizedExpression, normalizeNumber);
 				COMPILED_EXPRESSIONS.put(key, compiled);
 			} catch (JXPathInvalidSyntaxException e) {
 				throw new InvalidExpressionException(e.getMessage());
@@ -188,23 +197,30 @@ public class ExpressionFactory {
 		return compiled;
 	}
 
+	public LookupProvider getLookupProvider() {
+		return lookupProvider;
+	}
+
+	public ReferencedPathEvaluator getReferencedPathEvaluator() {
+		return referencedPathEvaluator;
+	}
+	
 	private static class ExpressionKey {
-		
+
 		private String expression;
 		private boolean normalizeNumbers;
-		
+
 		public ExpressionKey(String expression, boolean normalizeNumbers) {
 			super();
 			this.expression = expression;
 			this.normalizeNumbers = normalizeNumbers;
 		}
-		
+
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result
-					+ ((expression == null) ? 0 : expression.hashCode());
+			result = prime * result + ((expression == null) ? 0 : expression.hashCode());
 			result = prime * result + (normalizeNumbers ? 1231 : 1237);
 			return result;
 		}
@@ -227,7 +243,7 @@ public class ExpressionFactory {
 				return false;
 			return true;
 		}
-		
+
 	}
 
 	private static class ExpressionCache extends LinkedHashMap<ExpressionKey, ModelJXPathCompiledExpression> {

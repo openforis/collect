@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+import org.openforis.collect.relational.sql.RDBJdbcType;
 
 /**
  * 
@@ -11,14 +12,8 @@ public interface Column<T> {
 
 	String getName();
 
-	/**
-	 * JDBC type from java.sql.Types
-	 * @return
-	 */
-	int getType();
+	RDBJdbcType getType();
 
-	String getTypeName();
-	
 	Integer getLength();
 
 	boolean isNullable();

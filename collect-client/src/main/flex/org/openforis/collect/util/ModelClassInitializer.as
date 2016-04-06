@@ -3,6 +3,8 @@ package org.openforis.collect.util {
 	import org.granite.collections.BasicMap;
 	import org.openforis.collect.io.data.DataExportStatus$Format;
 	import org.openforis.collect.io.data.proxy.DataExportStatusProxy;
+	import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
+	import org.openforis.collect.io.data.proxy.DataParsingErrorProxy;
 	import org.openforis.collect.io.data.proxy.RecordImportErrorProxy;
 	import org.openforis.collect.manager.process.ProcessStatus;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
@@ -60,7 +62,9 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.RecordFilterProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
+	import org.openforis.collect.model.proxy.RecordSummaryProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
@@ -108,8 +112,10 @@ package org.openforis.collect.util {
 				DataExportStatus$Format,
 				DataExportStatusProxy,
 				DataImportStateProxy,
+				DataImportStatusProxy,
 				DataImportSummaryProxy,
 				DataImportSummaryItemProxy,
+				DataParsingErrorProxy,
 				DateAttributeDefinitionProxy,
 				EntityAddChangeProxy,
 				EntityDefinitionProxy,
@@ -134,6 +140,7 @@ package org.openforis.collect.util {
 				PromptProxy$Type,
 				RangeAttributeDefinitionProxy,
 				RecordProxy,
+				RecordSummaryProxy,
 				RecordImportErrorProxy,
 				NodeAddChangeProxy,
 				NodeChangeProxy,

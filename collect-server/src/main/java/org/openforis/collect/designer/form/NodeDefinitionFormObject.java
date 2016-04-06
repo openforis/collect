@@ -1,8 +1,8 @@
 package org.openforis.collect.designer.form;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.designer.model.AttributeType;
-import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
@@ -56,6 +56,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String headingLabel;
 	private String instanceLabel;
 	private String numberLabel;
+	private String abbreviatedLabel;
+	private String reportingLabel;
 	private String interviewPromptLabel;
 	private String paperPromptLabel;
 	private String handheldPromptLabel;
@@ -67,7 +69,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Integer width;
 	private Integer labelWidth;
 	private String labelOrientation;
-
 
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
@@ -150,6 +151,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		headingLabel = source.getLabel(Type.HEADING, language);
 		instanceLabel = source.getLabel(Type.INSTANCE, language);
 		numberLabel = source.getLabel(Type.NUMBER, language);
+		abbreviatedLabel = source.getLabel(Type.ABBREVIATED, language);
+		reportingLabel = source.getLabel(Type.REPORTING, language);
 		interviewPromptLabel = source.getPrompt(Prompt.Type.INTERVIEW, language);
 		paperPromptLabel = source.getPrompt(Prompt.Type.PAPER, language);
 		handheldPromptLabel = source.getPrompt(Prompt.Type.HANDHELD, language);
@@ -188,6 +191,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		dest.setLabel(Type.HEADING, languageCode, headingLabel);
 		dest.setLabel(Type.INSTANCE, languageCode, instanceLabel);
 		dest.setLabel(Type.NUMBER, languageCode, numberLabel);
+		dest.setLabel(Type.ABBREVIATED, languageCode, abbreviatedLabel);
+		dest.setLabel(Type.REPORTING, languageCode, reportingLabel);
 		dest.setPrompt(Prompt.Type.HANDHELD, languageCode, handheldPromptLabel);
 		dest.setPrompt(Prompt.Type.INTERVIEW, languageCode, interviewPromptLabel);
 		dest.setPrompt(Prompt.Type.PAPER, languageCode, paperPromptLabel);
@@ -337,6 +342,22 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setNumberLabel(String numberLabel) {
 		this.numberLabel = numberLabel;
+	}
+	
+	public String getAbbreviatedLabel() {
+		return abbreviatedLabel;
+	}
+	
+	public void setAbbreviatedLabel(String abbreviatedLabel) {
+		this.abbreviatedLabel = abbreviatedLabel;
+	}
+	
+	public String getReportingLabel() {
+		return reportingLabel;
+	}
+	
+	public void setReportingLabel(String reportingLabel) {
+		this.reportingLabel = reportingLabel;
 	}
 	
 	public String getDescription() {

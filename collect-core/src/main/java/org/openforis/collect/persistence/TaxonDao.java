@@ -3,11 +3,11 @@ package org.openforis.collect.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;
 
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jooq.BatchBindStep;
+import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
@@ -23,13 +23,11 @@ import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonRecord;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  * @author S. Ricci
  */
-@Transactional
 public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLContext> {
 	
 	protected static Field<?>[] TAXON_FIELDS = {
@@ -193,8 +191,8 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 
 		private static final long serialVersionUID = 1L;
 
-		public TaxonDSLContext(Connection connection) {
-			super(connection, OFC_TAXON.ID, OFC_TAXON_ID_SEQ, Taxon.class);
+		public TaxonDSLContext(Configuration config) {
+			super(config, OFC_TAXON.ID, OFC_TAXON_ID_SEQ, Taxon.class);
 		}
 
 		@Override

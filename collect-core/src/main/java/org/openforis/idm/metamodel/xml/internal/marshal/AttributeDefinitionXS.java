@@ -20,6 +20,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.MAX;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.MESSAGE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.MIN;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.PATTERN;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.REFERENCED_ATTRIBUTE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.REGEX;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.TO;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.UNIQUE;
@@ -63,6 +64,9 @@ abstract class AttributeDefinitionXS<T extends AttributeDefinition> extends Node
 		super.attributes(defn);
 		attribute(KEY, defn.isKey(), false);
 		attribute(CALCULATED, defn.isCalculated(), false);
+		if (defn.getReferencedAttribute() != null) {
+			attribute(REFERENCED_ATTRIBUTE, defn.getReferencedAttribute().getId());
+		}
 	}
 	
 	private class DefaultXS extends XmlSerializerSupport<AttributeDefault, AttributeDefinition> {

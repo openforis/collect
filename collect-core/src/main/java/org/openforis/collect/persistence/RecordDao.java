@@ -5,15 +5,18 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ
 import static org.openforis.collect.persistence.jooq.Tables.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.Tables.OFC_USER;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Batch;
+import org.jooq.Configuration;
+import org.jooq.Cursor;
+import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.InsertQuery;
 import org.jooq.JoinType;
@@ -44,7 +47,6 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.ModelSerializer;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
@@ -52,7 +54,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 @SuppressWarnings("rawtypes")
-@Transactional
 public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLContext> {
 	
 	private static final TableField[] KEY_FIELDS = 
@@ -98,7 +99,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	}
 
 	private RecordDSLContext createDSLContext(CollectSurvey survey) {
-		return new RecordDSLContext(getConnection(), survey);
+		return new RecordDSLContext(getConfiguration(), survey);
 	}
 
 	private RecordDSLContext createDSLContext(CollectSurvey survey, int step) {
@@ -106,7 +107,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	}
 
 	private RecordDSLContext createDSLContext(CollectSurvey survey, int step, boolean recordToBeUpdated) {
-		return new RecordDSLContext(getConnection(), survey, step, recordToBeUpdated);
+		return new RecordDSLContext(getConfiguration(), survey, step, recordToBeUpdated);
 	}
 	
 	@Deprecated
@@ -118,7 +119,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 	}
 
-	@Transactional
 	public boolean hasAssociatedRecords(int userId) {
 		SelectQuery q = dsl().selectCountQuery();
 		q.addConditions(OFC_RECORD.CREATED_BY_ID.equal(userId)
@@ -128,22 +128,18 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return count > 0;
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
 		return loadSummaries(survey, rootEntity, (String[]) null);
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
 		return loadSummaries(survey, rootEntity, step, null, null, null, null);
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
 		return loadSummaries(survey, rootEntity, true, keyValues);
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, boolean caseSensitiveKeys, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
@@ -154,7 +150,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return loadSummaries(filter, null);
 	}
 	
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
 		return loadSummaries(survey, rootEntity, (Step) null, (Date) null, offset, maxRecords, sortFields, keyValues);
@@ -164,7 +159,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return loadSummaries(survey, rootEntity, (Step) null, modifiedSince, (Integer) null, (Integer) null, (List<RecordSummarySortField>) null, (String[]) null);
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, Date modifiedSince, Integer offset, Integer maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
 		Schema schema = survey.getSchema();
@@ -179,11 +173,30 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return loadSummaries(filter, sortFields);
 	}
 	
-	@Transactional
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		CollectSurvey survey = filter.getSurvey();
 		
 		RecordDSLContext jf = createDSLContext(survey);
+		SelectQuery<Record> q = createQuery(jf, filter, sortFields);
+
+		//fetch results
+		Result<Record> result = q.fetch();
+		
+		return jf.fromResult(result);
+	}
+
+	public Iterator<CollectRecord> iterateSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
+		CollectSurvey survey = filter.getSurvey();
+		
+		RecordDSLContext jf = createDSLContext(survey);
+		SelectQuery<Record> q = createQuery(jf, filter, sortFields);
+
+		Cursor<Record> it = q.fetchLazy();
+		return new RecordIterator(jf, it);
+	}
+
+	private SelectQuery<Record> createQuery(DSLContext jf, RecordFilter filter,
+			List<RecordSummarySortField> sortFields) {
 		SelectQuery<Record> q = jf.selectQuery();	
 		
 		q.addSelect(SUMMARY_FIELDS);
@@ -203,13 +216,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 		//always order by ID to avoid pagination issues
 		q.addOrderBy(OFC_RECORD.ID);
-
-		//fetch results
-		Result<Record> result = q.fetch();
-		
-		return jf.fromResult(result);
+		return q;
 	}
-
+	
 	private void addFilterConditions(SelectQuery<?> q, RecordFilter filter) {
 		CollectSurvey survey = filter.getSurvey();
 		//survey
@@ -277,7 +286,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return result;
 	}
 
-	@Transactional
 	public int countRecords(CollectSurvey survey, int rootDefinitionId, String... keyValues) {
 		RecordFilter filter = new RecordFilter(survey, rootDefinitionId);
 		filter.setKeyValues(keyValues);
@@ -364,13 +372,13 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 
 	@Override
 	public void update(CollectRecord record) {
-		createUpdateQuery(record).getInternalQuery().execute();
+		createUpdateQuery(record, record.getStep()).getInternalQuery().execute();
 	}
 	
-	public RecordStoreQuery createUpdateQuery(CollectRecord record) {
+	public RecordStoreQuery createUpdateQuery(CollectRecord record, Step step) {
 		Survey survey = record.getSurvey();
-		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey);
-		UpdateQuery q = dsl.updateQuery(record);
+		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey, step.getStepNumber());
+		UpdateQuery q = dsl.updateQuery(record, step);
 		return new RecordStoreQuery(q);
 	}
 
@@ -381,8 +389,8 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	
 	public RecordStoreQuery createInsertQuery(CollectRecord record) {
 		Survey survey = record.getSurvey();
-		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey);
-		InsertQuery q = dsl.insertQuery(record);
+		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey, Step.ENTRY.getStepNumber());
+		InsertQuery q = dsl.insertQuery(record, Step.ENTRY);
 		return new RecordStoreQuery(q);
 	}
 	
@@ -408,7 +416,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		super.delete(id);
 	}
 
-	@Transactional
 	public void assignOwner(int recordId, Integer ownerId) {
 		dsl().update(OFC_RECORD)
 			.set(OFC_RECORD.OWNER_ID, ownerId)
@@ -431,27 +438,39 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		private Field<byte[]> dataAlias;
 		private ModelSerializer modelSerializer;
 		
-		public RecordDSLContext(Connection conn) {
-			this(conn, null);
+		public RecordDSLContext(Configuration config) {
+			this(config, null);
 		}
 
-		public RecordDSLContext(Connection conn, CollectSurvey survey) {
-			this(conn, survey, null);
+		public RecordDSLContext(Configuration config, CollectSurvey survey) {
+			this(config, survey, null);
 		}
 		
-		public RecordDSLContext(Connection conn, CollectSurvey survey, Integer step) {
-			this(conn, survey, step, true);
+		public RecordDSLContext(Configuration config, CollectSurvey survey, Integer step) {
+			this(config, survey, step, true);
 		}
 		
-		public RecordDSLContext(Connection conn, CollectSurvey survey, Integer step, boolean recordToBeUpdated) {
-			super(conn, OFC_RECORD.ID, OFC_RECORD_ID_SEQ, CollectRecord.class);
+		public RecordDSLContext(Configuration config, CollectSurvey survey, Integer step, boolean recordToBeUpdated) {
+			super(config, OFC_RECORD.ID, OFC_RECORD_ID_SEQ, CollectRecord.class);
 			this.survey = survey;
 			this.recordToBeUpdated = recordToBeUpdated;
 			if ( step != null && (step < 1 || step > 3) ) {
 				throw new IllegalArgumentException("Invalid step "+step);
 			}
 			this.dataAlias = step == null ? null: (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as("DATA");
-			this.modelSerializer = new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
+			this.modelSerializer = step == null ? null : new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
+		}
+
+		public UpdateQuery updateQuery(CollectRecord record, Step step) {
+			UpdateQuery<?> query = updateQuery(record);
+			query.addValue(OFC_RECORD.STEP, step.getStepNumber());
+			return query;
+		}
+		
+		public InsertQuery insertQuery(CollectRecord record, Step step) {
+			InsertQuery<?> query = insertQuery(record);
+			query.addValue(OFC_RECORD.STEP, step.getStepNumber());
+			return query;
 		}
 
 		public SelectQuery selectRecordQuery(int id) {
@@ -597,14 +616,13 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			
 			// store data
 			byte[] data;
-			ModelSerializer modelSerializer = getSerializer();
 			switch (record.getStep()) {
 			case ENTRY:
-				data = modelSerializer.toByteArray(rootEntity);
+				data = getSerializer().toByteArray(rootEntity);
 				q.addValue(OFC_RECORD.DATA1, data);
 				break;
 			case CLEANSING:
-				data = modelSerializer.toByteArray(rootEntity);
+				data = getSerializer().toByteArray(rootEntity);
 				q.addValue(OFC_RECORD.DATA2, data);
 				break;
 			case ANALYSIS:
@@ -642,6 +660,35 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		
 		public Query getInternalQuery() {
 			return internalQuery;
+		}
+		
+	}
+	
+	private static class RecordIterator implements Iterator<CollectRecord> {
+
+		private RecordDSLContext jf;
+		private Cursor<Record> internalIterator;
+		
+		public RecordIterator(RecordDSLContext jf, Cursor<Record> it) {
+			super();
+			this.jf = jf;
+			this.internalIterator = it;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return internalIterator.hasNext();
+		}
+
+		@Override
+		public CollectRecord next() {
+			Record r = internalIterator.fetchOne();
+			return jf.fromRecord(r);
+		}
+		
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
 		}
 		
 	}

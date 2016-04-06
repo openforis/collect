@@ -9,11 +9,14 @@ import org.openforis.collect.model.ApplicationInfo;
 import org.openforis.collect.persistence.ApplicationInfoDao;
 import org.openforis.commons.versioning.Version;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  *
  */
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class DatabaseVersionManager {
 
 	private static final String[] MIGRATION_REQUIRED_VERSIONS = new String[]{

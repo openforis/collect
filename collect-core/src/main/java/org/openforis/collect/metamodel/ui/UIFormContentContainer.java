@@ -1,7 +1,6 @@
 package org.openforis.collect.metamodel.ui;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
@@ -93,10 +92,12 @@ public abstract class UIFormContentContainer extends UIModelObject {
 		getUIConfiguration().detachItem(form);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void traverse(FormComponentVisitor visitor) {
 		Stack<UIModelObject> stack = new Stack<UIModelObject>();
-		stack.addAll((Collection<? extends UIModelObject>) getChildren());
+		List<UIFormComponent> children = getChildren();
+		for (UIFormComponent child : children) {
+			stack.push((UIModelObject) child);
+		}
 		stack.addAll(getForms());
 		while (! stack.isEmpty()) {
 			UIModelObject component = stack.pop();

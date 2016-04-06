@@ -53,6 +53,14 @@ public class IDMDistanceFunctionTest extends AbstractExpressionTest {
 		Assert.assertEquals(Double.valueOf(10.2010d), round((Double) distance, 6));
 	}
 
+	@Test
+	public void testLatlong() throws InvalidExpressionException {
+		String expr = ExpressionFactory.IDM_PREFIX + ":latlong(vehicle_location)";
+		EntityBuilder.addValue(cluster, "vehicle_location",  new Coordinate(-721008.49d, 14741405.45d, "EPSG:21035"));
+		Object object = evaluateExpression(expr);
+		Assert.assertEquals(new Coordinate(12.302697080672786d, 41.87118824208946d, "EPSG:4326"), object);
+	}
+	
 	private Double round(double value, int precision) {
 		BigDecimal bd = new BigDecimal(value);
 		return bd.round(new MathContext(precision)).doubleValue();

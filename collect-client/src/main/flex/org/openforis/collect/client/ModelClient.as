@@ -18,7 +18,7 @@ package org.openforis.collect.client {
 			
 			this._getSurveysOperation = getOperation("getSurveySummaries");
 			this._getRootEntitiesSummariesOperation = getOperation("getRootEntitiesSummaries");
-			_isActiveSurveyRecordsLockedOperation = getOperation("isActiveSurveyRecordsLocked");
+			this._isActiveSurveyRecordsLockedOperation = getOperation("isActiveSurveyRecordsLocked", CONCURRENCY_MULTIPLE);
 		}
 		
 		public function getSurveySummaries(responder:IResponder):void {

@@ -74,6 +74,10 @@ public class ProcessStatus {
 		return step;
 	}
 	
+	public void setStep(Step step) {
+		this.step = step;
+	}
+	
 	public long getTotal() {
 		return total;
 	}
@@ -84,6 +88,10 @@ public class ProcessStatus {
 
 	public long getProcessed() {
 		return processed;
+	}
+	
+	public void setProcessed(long processed) {
+		this.processed = processed;
 	}
 	
 	public String getErrorMessage() {

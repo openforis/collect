@@ -55,16 +55,16 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 	}
 
 	private Object getAttributeProperty(Attribute<?, ?> attr, String propertyName) {
-		Field<?> field = attr.getField(propertyName);
-		if (field == null) {
+		if (attr.getDefinition().hasField(propertyName)) {
+			Field<?> field = attr.getField(propertyName);
+			return field.getValue();
+		} else {
 			try {
 				Object prop = PropertyUtils.getProperty(attr, propertyName);
 				return prop;
 			} catch (Exception e) {
 				return null;
 			}
-		} else {
-			return field.getValue();
 		}
 	}
 

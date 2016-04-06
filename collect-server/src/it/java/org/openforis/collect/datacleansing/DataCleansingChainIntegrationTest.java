@@ -21,6 +21,7 @@ import org.openforis.collect.datacleansing.manager.DataCleansingChainManager;
 import org.openforis.collect.datacleansing.manager.DataCleansingStepManager;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -57,7 +58,7 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 	private CollectSurvey survey;
 	
 	@Before
-	public void init() throws SurveyImportException, IdmlParseException {
+	public void init() throws SurveyImportException, IdmlParseException, SurveyValidationException {
 		updater = new RecordUpdater();
 		survey = importModel();
 		initRecords();

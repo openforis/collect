@@ -62,8 +62,8 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 				return null;
 			}
 		} else {
-			List<UITab> assignableTabs = uiOptions.getTabsAssignableToChildren(parentEntity);
 			if (StringUtils.isNotBlank(tabName) ) {
+				List<UITab> assignableTabs = uiOptions.getTabsAssignableToChildren(parentEntity);
 				for (UITab tab : assignableTabs) {
 					if ( tab.getName().equals(tabName) ) {
 						return tab;

@@ -28,6 +28,23 @@
           </listbox>
         </fieldErrorHandler>
       </row>
+      <row spans="2,">
+	        <hbox>
+  			<!--
+	        <label value="${labels.survey.schema.attribute.taxon.show_family}:" />
+		        <fieldErrorHandler message="@load(vmsgs['showFamily'])">
+		          <checkbox checked="@bind(fx.showFamily)"
+		    				onCheck="@command('applyChanges')" />
+		        </fieldErrorHandler>
+		        <space spacing="100px" />
+			-->
+		        <label value="${labels.survey.schema.attribute.taxon.include_unique_vernacular_name}:" />
+		        <fieldErrorHandler message="@load(vmsgs['includeUniqueVernacularName'])">
+		          <checkbox checked="@bind(fx.includeUniqueVernacularName)"
+		    				onCheck="@command('applyChanges')" />
+		        </fieldErrorHandler>
+		   </hbox>
+		</row>
     </rows>
   </grid>
 </zk>

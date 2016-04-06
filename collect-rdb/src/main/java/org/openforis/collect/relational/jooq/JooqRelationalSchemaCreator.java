@@ -7,27 +7,39 @@ import static org.jooq.impl.DSL.table;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import org.jooq.CollectCreateIndexStep;
+import org.jooq.Condition;
 import org.jooq.CreateTableAsStep;
-import org.jooq.CreateTableColumnStep;
 import org.jooq.DataType;
 import org.jooq.Field;
+import org.jooq.Name;
 import org.jooq.Query;
 import org.jooq.Record;
-import org.jooq.impl.DefaultDataType;
+import org.jooq.Select;
+import org.jooq.TableLike;
+import org.jooq.impl.DSL;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.RelationalSchemaCreator;
-import org.openforis.collect.relational.model.CodeValueFKColumn;
+import org.openforis.collect.relational.model.CodeListCodeColumn;
+import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.DataAncestorFKColumn;
 import org.openforis.collect.relational.model.DataTable;
-import org.openforis.collect.relational.model.PrimaryKeyColumn;
+import org.openforis.collect.relational.model.PrimaryKeyConstraint;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
 
+/**
+ * 
+ * @author S. Ricci
+ * @author A. SanchezPaus Diaz
+ *
+ */
 public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 
 	@Override
@@ -36,69 +48,155 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 		CollectDSLContext dsl = new CollectDSLContext(conn);
 		
 		for (Table<?> table : schema.getTables()) {
-			org.jooq.Table<Record> jooqTable = createJooqTable(schema, table, ! dsl.isSchemaLess());
+			org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
 			CreateTableAsStep<Record> createTableStep = dsl.createTable(jooqTable);
 			Query createTableFinalQuery = (Query) createTableStep;
 			for (Column<?> column : table.getColumns()) {
-				DataType<?> dataType = DefaultDataType.getDataType(dsl.getDialect(), column.getTypeName());
+				DataType<?> dataType = dsl.getDataType(column.getType().getJavaType());
 				Integer length = column.getLength();
 				if (length != null) {
 					dataType.length(length);
 				}
-				CreateTableColumnStep columnStep = createTableStep.column(column.getName(), dataType);
-				
-				if (column instanceof PrimaryKeyColumn) {
-					//TODO use Jooq to add primary key constraint at table creation time (not supported yet)
-				}
-				createTableFinalQuery = columnStep;
+				createTableFinalQuery = createTableStep.column(column.getName(), dataType);
 			}
 			createTableFinalQuery.execute();
-
-			//TODO add primary key constraint ?
-//			PrimaryKeyConstraint pkConstraint = table.getPrimaryKeyConstraint();
-//			String pkColumnName = pkConstraint.getPrimaryKeyColumn().getName();
-//			dsl.alterTable(jooqTable).add(
-//					constraint(table.getName() + "_pk").primaryKey(pkColumnName)
-//				).execute();
-			
-			Column<?> pkColumn = table.getPrimaryKeyConstraint().getPrimaryKeyColumn();
-			dsl.createIndex(table.getName() + "_pk")
-				.on(jooqTable, field(pkColumn.getName()))
-				.execute();
-
-			if (table instanceof DataTable) {
-				int count = 1;
-				List<Column<?>> codeValueFKColumns = getCodeValueFKColumns(table);
-				for (Column<?> column : codeValueFKColumns) {
-					createIndex(dsl, count++, schema, table, Arrays.<Column<?>>asList(column));
-				}
-				if (codeValueFKColumns.size() > 1) {
-					createIndex(dsl, count++, schema, table, codeValueFKColumns);
-				}
-			}
 		}
-		if(dsl.isForeignKeySupported()) {
+		
+		createDataTableViews(schema, conn);
+	}
+	
+	@Override
+	public void addConstraints(RelationalSchema schema, Connection conn) {
+		CollectDSLContext dsl = new CollectDSLContext(conn);
+		
+		if (dsl.isSQLite()) {
+			//cannot add PK constraints after table creation
+		} else {
+			addPKConstraints(schema, dsl);
+		}
+		if (dsl.isForeignKeySupported()) {
 			createForeignKeys(schema, dsl);
 		}
 	}
 
-	private void createIndex(CollectDSLContext dsl, int indexNum, RelationalSchema schema, 
-			Table<?> table, List<Column<?>> columns) {
-		org.jooq.Table<Record> jooqTable = createJooqTable(schema, table, ! dsl.isSchemaLess());
-		String name = String.format("%s_%d_idx", table.getName(), indexNum);
-		dsl.createIndex(name)
-			.on(jooqTable, toJooqFields(columns))
-			.execute();
+	@Override
+	public void addIndexes(RelationalSchema schema, Connection conn) {
+		CollectDSLContext dsl = new CollectDSLContext(conn);
+		if ( dsl.isSQLite()) {
+			addCodeListsCodeIndexes(schema, dsl);
+			addPKIndexes(schema, dsl);
+			addFKIndexes(schema, dsl);
+		} else {
+			//for other DBMS, indexes are already created together with PK and FK constraints
+		}
 	}
 
-	private List<Column<?>> getCodeValueFKColumns(Table<?> table) {
-		List<Column<?>> columns = new ArrayList<Column<?>>();
-		for (Column<?> column : table.getColumns()) {
-			if (column instanceof CodeValueFKColumn) {
-				columns.add(column);
+	private void createDataTableViews(RelationalSchema schema, Connection conn) {
+		List<DataTable> dataTables = schema.getDataTables();
+		for (DataTable dataTable : dataTables) {
+			createDataTableView(schema, dataTable, conn);
+		}
+	}
+
+	private void createDataTableView(RelationalSchema schema, DataTable dataTable, Connection conn) {
+		CollectDSLContext dsl = new CollectDSLContext(conn);
+		List<Field<?>> fields = new ArrayList<Field<?>>();
+		List<TableLike<?>> tables = new ArrayList<TableLike<?>>();
+		List<Condition> conditions = new ArrayList<Condition>();
+		DataTable currentTable = dataTable;
+		while (currentTable != null) {
+			org.jooq.Table<Record> currentJooqTable = jooqTable(schema, currentTable, ! dsl.isSchemaLess());
+			tables.add(currentJooqTable);
+			List<Column<?>> columns = currentTable.getColumns();
+			for (Column<?> column : columns) {
+				if (! (column instanceof DataAncestorFKColumn)) {
+					fields.add(field(name(currentJooqTable.getName(), column.getName())));
+				}
+			}
+			//add parent table join condition
+			DataTable parentTable = currentTable.getParent();
+			if (parentTable != null) {
+				//names are duplicate, use the table name as prefix in the join condition
+				Condition parentTableJoinCondition = field(currentJooqTable.getName() + "." + currentTable.getParentFKColumn().getName())
+						.eq(field(parentTable.getName() + "." + parentTable.getPrimaryKeyColumn().getName()));
+				conditions.add(parentTableJoinCondition);
+			}
+			currentTable = parentTable;
+		}
+		Select<?> select = dsl.select(fields).from(tables).where(conditions);
+		Name name;
+		if (dsl.isSchemaLess()) {
+			name = name(dataTable.getName() + "_view");
+		} else {
+			name = name(schema.getName(), dataTable.getName() + "_view");
+		}
+		dsl.createView(DSL.table(name), 
+				fields.toArray(new Field[fields.size()]))
+			.as(select)
+			.execute();
+	}
+	
+	private void addCodeListsCodeIndexes(RelationalSchema schema, CollectDSLContext dsl) {
+		for (Table<?> table : schema.getTables()) {
+			if (table instanceof CodeTable) {
+				org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
+				CodeListCodeColumn codeColumn = ((CodeTable) table).getCodeColumn();
+				Integer levelIdx = ((CodeTable) table).getLevelIdx();
+				
+				CollectCreateIndexStep createIndexStep = dsl.createIndex(table.getName() + "_code_idx");
+				if (levelIdx == null || levelIdx == 0 || ((CodeTable) table).getCodeList().getCodeScope() == CodeScope.SCHEME) {
+					//unique index only for first level or when the code scope is 'scheme'
+					createIndexStep.unique();
+				}
+				createIndexStep
+					.on(jooqTable, field(codeColumn.getName()))
+					.execute();
 			}
 		}
-		return columns;
+	}
+
+	private void addPKConstraints(RelationalSchema schema, CollectDSLContext dsl) {
+		for (Table<?> table : schema.getTables()) {
+			org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
+			PrimaryKeyConstraint pkConstraint = table.getPrimaryKeyConstraint();
+			String pkColumnName = pkConstraint.getPrimaryKeyColumn().getName();
+			String pkConstraintName = table.getName() + "_pk";
+		
+			dsl.alterTable(jooqTable)
+				.add(constraint(pkConstraintName)
+					.primaryKey(pkColumnName))
+				.execute();
+		}
+	}
+	
+	private void addPKIndexes(RelationalSchema schema, CollectDSLContext dsl) {
+		for (Table<?> table : schema.getTables()) {
+			org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
+			//For SQLite it creates an index on the primary key, for POSTGRESQL it will alter the table to set the primary key columns
+			PrimaryKeyConstraint pkConstraint = table.getPrimaryKeyConstraint();
+			String pkColumnName = pkConstraint.getPrimaryKeyColumn().getName();
+			String pkConstraintName = table.getName() + "_pk";
+			dsl.createIndex(pkConstraintName)
+				.unique()
+				.on(jooqTable, field(pkColumnName))
+				.execute();
+		}
+	}
+	
+	private void addFKIndexes(RelationalSchema schema, CollectDSLContext dsl) {
+		for (Table<?> table : schema.getTables()) {
+			if (table instanceof DataTable) {
+				org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
+				int idxCount = 1;
+				for (ReferentialConstraint referentialConstraint : table.getReferentialContraints()) {
+					String idxName = String.format("%s_%d_idx", table.getName(), idxCount);
+					dsl.createIndex(idxName)
+						.on(jooqTable, toJooqFields(referentialConstraint.getColumns()))
+						.execute();
+					idxCount ++;
+				}
+			}
+		}
 	}
 
 	private void createForeignKeys(RelationalSchema schema, CollectDSLContext dsl) {
@@ -106,35 +204,27 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			List<ReferentialConstraint> fks = table.getReferentialContraints();
 			for (ReferentialConstraint fk : fks) {
 				Field<?>[] fields = toJooqFields(fk.getColumns());
-				String referencedTableName = fk.getReferencedKey().getTable().getName();
+				org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
+				org.jooq.Table<Record> referencedJooqTable = jooqTable(schema, fk.getReferencedKey().getTable(), ! dsl.isSchemaLess());
 				List<Column<?>> referencedColumns = fk.getReferencedKey().getColumns();
-				String[] referencedColumnNames = extractNames(referencedColumns);
-				dsl.alterTable(createJooqTable(schema, table, ! dsl.isSchemaLess()))
+				dsl.alterTable(jooqTable)
 					.add(constraint(fk.getName())
 							.foreignKey(fields)
-							.references(referencedTableName, referencedColumnNames))
+							.references(referencedJooqTable, toJooqFields(referencedColumns)))
 					.execute();
 			}
 		}
 	}
 
-	private Field<?>[] toJooqFields(List<Column<?>> fkColumns) {
-		List<Field<?>> fields = new ArrayList<Field<?>>(fkColumns.size());
-		for (Column<?> fkColumn : fkColumns) {
-			fields.add(field(fkColumn.getName()));
+	private Field<?>[] toJooqFields(List<Column<?>> columns) {
+		List<Field<?>> fields = new ArrayList<Field<?>>(columns.size());
+		for (Column<?> column : columns) {
+			fields.add(field(column.getName()));
 		}
 		return fields.toArray(new Field<?>[fields.size()]);
 	}
 
-	private String[] extractNames(List<Column<?>> columns) {
-		List<String> names = new ArrayList<String>(columns.size());
-		for (Column<?> column : columns) {
-			names.add(column.getName());
-		}
-		return names.toArray(new String[columns.size()]);
-	}
-	
-	private org.jooq.Table<Record> createJooqTable(RelationalSchema schema,
+	private org.jooq.Table<Record> jooqTable(RelationalSchema schema,
 			org.openforis.collect.relational.model.Table<?> table, boolean renderSchema) {
 		if (renderSchema) {
 			return table(name(schema.getName(), table.getName()));

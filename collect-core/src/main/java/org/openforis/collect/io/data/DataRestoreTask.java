@@ -1,12 +1,10 @@
 package org.openforis.collect.io.data;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordDeletedEvent;
@@ -20,9 +18,8 @@ import org.openforis.collect.manager.RecordManager.RecordStepOperation;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
+import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.collect.utils.Consumer;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.model.Entity;
@@ -47,10 +44,8 @@ public class DataRestoreTask extends Task {
 	private UserManager userManager;
 
 	//input
-	private File file;
+	private RecordProvider recordProvider;
 	
-	private CollectSurvey packagedSurvey;
-	private CollectSurvey existingSurvey;
 	private List<Integer> entryIdsToImport;
 	private boolean overwriteAll;
 	
@@ -60,30 +55,14 @@ public class DataRestoreTask extends Task {
 	//temporary instance variables
 	private final List<Integer> processedRecords;
 	private final RecordUpdateBuffer updateBuffer;
-	private XMLParsingRecordProvider recordProvider;
 
-	private boolean validateRecords;
-	
 	public DataRestoreTask() {
 		super();
 		this.processedRecords = new ArrayList<Integer>();
 		this.updateBuffer = new RecordUpdateBuffer();
 		this.errors = new ArrayList<RecordImportError>();
-		this.validateRecords = true;
 	}
 
-	@Override
-	protected void createInternalVariables() throws Throwable {
-		super.createInternalVariables();
-		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, validateRecords);
-	}
-	
-	@Override
-	protected void initializeInternalVariables() throws Throwable {
-		super.initializeInternalVariables();
-		this.recordProvider.init();
-	}
-	
 	@Override
 	protected long countTotalItems() {
 		List<Integer> idsToImport = calculateEntryIdsToImport();
@@ -107,18 +86,12 @@ public class DataRestoreTask extends Task {
 			if ( isRunning() && ! processedRecords.contains(entryId) ) {
 				importEntries(entryId);
 				processedRecords.add(entryId);
-				incrementItemsProcessed();
+				incrementProcessedItems();
 			} else {
 				break;
 			}
 		}
 		updateBuffer.flush();
-	}
-	
-	@Override
-	protected void onEnd() {
-		super.onEnd();
-		IOUtils.closeQuietly(recordProvider);
 	}
 	
 	private void importEntries(int entryId) throws IOException, MissingStepsException {
@@ -137,14 +110,14 @@ public class DataRestoreTask extends Task {
 
 	private void reportMissingStepsErrors(int entryId, MissingStepsException e) {
 		Step originalStep = e.getOperations().getOriginalStep();
-		String entryName = recordProvider.getBackupEntryName(entryId, originalStep);
+		String entryName = recordProvider.getEntryName(entryId, originalStep);
 		errors.add(new RecordImportError(entryId, entryName, originalStep, 
 				"Missing data for step", Level.ERROR));
 	}
 
 	private void reportRecordParsingErrors(int entryId, RecordParsingException e) {
 		Step recordStep = e.getRecordStep();
-		String entryName = recordProvider.getBackupEntryName(entryId, recordStep);
+		String entryName = recordProvider.getEntryName(entryId, recordStep);
 		ParseRecordResult parseResult = e.getParseRecordResult();
 		for (NodeUnmarshallingError failure : parseResult.getFailures()) {
 			errors.add(new RecordImportError(entryId, entryName, recordStep, 
@@ -172,26 +145,6 @@ public class DataRestoreTask extends Task {
 		this.userManager = userManager;
 	}
 
-	public void setFile(File file) {
-		this.file = file;
-	}
-
-	public CollectSurvey getPackagedSurvey() {
-		return packagedSurvey;
-	}
-	
-	public void setPackagedSurvey(CollectSurvey packagedSurvey) {
-		this.packagedSurvey = packagedSurvey;
-	}
-	
-	public CollectSurvey getExistingSurvey() {
-		return existingSurvey;
-	}
-	
-	public void setExistingSurvey(CollectSurvey existingSurvey) {
-		this.existingSurvey = existingSurvey;
-	}
-	
 	public boolean isOverwriteAll() {
 		return overwriteAll;
 	}
@@ -211,9 +164,9 @@ public class DataRestoreTask extends Task {
 	public List<RecordImportError> getErrors() {
 		return errors;
 	}
-
-	public void setValidateRecords(boolean validateRecords) {
-		this.validateRecords = validateRecords;
+	
+	public void setRecordProvider(RecordProvider recordProvider) {
+		this.recordProvider = recordProvider;
 	}
 
 	private class RecordUpdateBuffer {
@@ -230,7 +183,11 @@ public class DataRestoreTask extends Task {
 		}
 
 		void flush() {
-			recordManager.executeRecordOperations(operations, new EventPublisher());
+			if (eventQueue.isEnabled()) {
+				recordManager.executeRecordOperations(operations, new EventPublisher());
+			} else {
+				recordManager.executeRecordOperations(operations);
+			}
 			operations.clear();
 		}
 	}
@@ -255,11 +212,9 @@ public class DataRestoreTask extends Task {
 						String.valueOf(rootEntity.getDefinition().getId()), 
 						String.valueOf(rootEntity.getInternalId()), new Date(), userName));
 			}
-			if (eventQueue.isEnabled()) {
-				eventQueue.publish(new RecordTransaction(surveyName, 
-						recordId, recordStep, events));
-			}
+			eventQueue.publish(new RecordTransaction(surveyName, 
+					recordId, recordStep, events));
 		}
 	}
-
+	
 }

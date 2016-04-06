@@ -14,6 +14,7 @@ package org.openforis.collect.event
 		public static const SHOW_IMPORT_WARNINGS:String = "showImportWarnings";
 		public static const SHOW_SKIPPED_FILE_ERRORS:String = "showSkippedFileErrors";
 		public static const SELECT_ALL_CONFLICTING_RECORDS:String = "selectAllConflictingRecords";
+		public static const SELECT_ONLY_NEWER_CONFLICTING_RECORDS:String = "selectOnlyNewerConflictingRecords";
 		public  static const CONFLICTING_RECORDS_SELECTION_CHANGE:String = "conflictingRecordsSelectionChange";
 		public  static const RECORDS_TO_IMPORT_SELECTION_CHANGE:String = "recordsToImportSelectionChange";
 		

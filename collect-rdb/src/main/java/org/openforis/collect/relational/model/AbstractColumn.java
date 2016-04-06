@@ -1,5 +1,7 @@
 package org.openforis.collect.relational.model;
 
+import org.openforis.collect.relational.sql.RDBJdbcType;
+
 /**
  * 
  * @author G. Miceli
@@ -8,15 +10,13 @@ package org.openforis.collect.relational.model;
 abstract class AbstractColumn<T> implements Column<T> {
 
 	private String name;
-	private int type;
-	private String typeName;
+	private RDBJdbcType type;
 	private Integer length;
 	private boolean nullable;
 
-	AbstractColumn(String name, int type, String typeName, Integer length, boolean nullable) {
+	AbstractColumn(String name, RDBJdbcType type, Integer length, boolean nullable) {
 		this.name = name;
 		this.type = type;
-		this.typeName = typeName;
 		this.length = length;
 		this.nullable = nullable;
 	}
@@ -27,15 +27,10 @@ abstract class AbstractColumn<T> implements Column<T> {
 	}
 
 	@Override
-	public int getType() {
+	public RDBJdbcType getType() {
 		return type;
 	}
 
-	@Override
-	public String getTypeName() {
-		return typeName;
-	}
-	
 	@Override
 	public Integer getLength() {
 		return length;

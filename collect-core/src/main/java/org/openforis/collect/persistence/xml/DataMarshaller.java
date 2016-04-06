@@ -141,11 +141,11 @@ public class DataMarshaller {
 		EntityDefinition defn = entity.getDefinition();
 		List<NodeDefinition> childDefns = defn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefns) {
-			String childName = childDefn.getName();
-			if (entity.getCount(childName) == 0 ) {
+			if (entity.getCount(childDefn) == 0 ) {
 				State childState = entity.getChildState(childDefn);
 				int childStateInt = childState.intValue();
 				if (childStateInt > 0) {
+					String childName = childDefn.getName();
 					serializer.startTag(null, childName);
 					serializer.attribute(null, STATE_ATTRIBUTE, Integer.toString(childStateInt));
 					serializer.endTag(null, childName);

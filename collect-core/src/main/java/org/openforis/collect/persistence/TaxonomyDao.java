@@ -3,9 +3,9 @@ package org.openforis.collect.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_TAXONOMY_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY;
 
-import java.sql.Connection;
 import java.util.List;
 
+import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.StoreQuery;
@@ -13,24 +13,20 @@ import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  */
-@Transactional
 public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, TaxonomyDao.TaxonomyDSLContext> {
 
 	public TaxonomyDao() {
 		super(TaxonomyDao.TaxonomyDSLContext.class);
 	}
 	
-	@Transactional
 	public CollectTaxonomy load(int surveyId, String name) {
 		return loadBySurvey(surveyId, name, false);
 	}
 
-	@Transactional
 	public CollectTaxonomy loadBySurveyWork(int surveyId, String name) {
 		return loadBySurvey(surveyId, name, true);
 	}
@@ -85,8 +81,8 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 
 		private static final long serialVersionUID = 1L;
 
-		public TaxonomyDSLContext(Connection connection) {
-			super(connection, OFC_TAXONOMY.ID, OFC_TAXONOMY_ID_SEQ, CollectTaxonomy.class);
+		public TaxonomyDSLContext(Configuration config) {
+			super(config, OFC_TAXONOMY.ID, OFC_TAXONOMY_ID_SEQ, CollectTaxonomy.class);
 		}
 
 		@Override

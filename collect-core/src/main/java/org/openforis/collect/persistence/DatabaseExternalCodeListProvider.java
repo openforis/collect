@@ -25,12 +25,15 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author M. Togna
  * @author S. Ricci
  * 
  */
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class DatabaseExternalCodeListProvider implements
 		ExternalCodeListProvider {
 

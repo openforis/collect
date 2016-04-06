@@ -75,6 +75,11 @@
          </hlayout>
     </hlayout>
     
+    <groupbox width="100%" closable="false" class="tableFieldSet">
+      <caption label="${labels.survey.files}"/>
+      <include src="survey_edit/survey_file_list.zul" />
+    </groupbox>
+    
 	 <groupbox width="100%" closable="false"
 	 	visible="@load(vm.collectEarthSurvey)">
       <caption label="${labels.survey.collect_earth.plot_layout.$}"/>
@@ -92,7 +97,7 @@
 				</listbox>
             </fieldErrorHandler>
             <space width="100px" />
-            <label value="${labels.survey.collect_earth.plot_layout.sample_points}:" />
+            <label value="${labels.survey.collect_earth.plot_layout.sample_points}:"  />
             <fieldErrorHandler message="@load(vmsgs['collectEarthSamplePoints'])">
             	<listbox mold="select" rows="1" 
 					selectedItem="@load(fx.collectEarthSamplePoints) @save(fx.collectEarthSamplePoints)"
@@ -105,6 +110,67 @@
 				</listbox>
             </fieldErrorHandler>
       </hlayout>
+      </groupbox>
+      
+      <groupbox width="100%" closable="false"
+	 	visible="@load(vm.collectEarthSurvey)">
+        <caption label="${labels.survey.collect_earth.other_settings.$}"/>
+        <hlayout style="padding: 10px">
+
+         <fieldErrorHandler message="@load(vmsgs['bingMapsKey'])">
+	            <label
+					use="org.openforis.collect.designer.component.FieldLabel"
+	 				value="${labels.survey.collect_earth.other_settings.bing_maps}"  />
+	        </fieldErrorHandler>
+            <fieldErrorHandler message="@load(vmsgs['bingMapsKey'])">
+              <textbox width="350px" value="@bind(fx.bingMapsKey)"
+                onChange="@command('applyChanges')" />
+            </fieldErrorHandler>
+            
+		<button sclass="icon" 
+		      tooltiptext="${labels.survey.collect_earth.other_settings.bing_maps_tooltip}"
+		      href="http://www.bingmapsportal.com" target="_blank"
+		      image="/assets/images/info-small.png" />
+		 </hlayout>
+		 
+		 
+		  <hlayout style="padding: 10px">
+			
+            <fieldErrorHandler message="@load(vmsgs['openBingMaps'])">
+		 		<label value="${labels.survey.collect_earth.other_settings.open_bing_maps}:" />  					
+	  					<checkbox
+	  						checked="@load(fx.openBingMaps eq true) @save(fx.openBingMaps)"
+	  						onCheck="@command('applyChanges')" />
+	  		</fieldErrorHandler>
+	  		
+	  		<space width="50px" />
+	  		
+	  		 <fieldErrorHandler message="@load(vmsgs['openGEEExplorer'])">
+		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />  					
+	  					<checkbox
+	  						checked="@load(fx.openGEEExplorer eq true) @save(fx.openGEEExplorer)"
+	  						onCheck="@command('applyChanges')" />
+	  		</fieldErrorHandler>
+	  		
+	  		<space width="50px" />
+	  		
+	  		 <fieldErrorHandler message="@load(vmsgs['openGEECodeEditor'])">
+		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_code_editor}:" />  					
+	  					<checkbox
+	  						checked="@load(fx.openGEECodeEditor eq true) @save(fx.openGEECodeEditor)"
+	  						onCheck="@command('applyChanges')" />
+	  		</fieldErrorHandler>
+	  		
+	  		<space width="50px" />
+	  		
+	  		 <fieldErrorHandler message="@load(vmsgs['openStreetView'])">
+		 		<label value="${labels.survey.collect_earth.other_settings.open_street_view}:" />  					
+	  					<checkbox
+	  						checked="@load(fx.openStreetView eq true) @save(fx.openStreetView)"
+	  						onCheck="@command('applyChanges')" />
+	  		</fieldErrorHandler>
+	  	   </hlayout>
+            
      </groupbox>
   </div>
 

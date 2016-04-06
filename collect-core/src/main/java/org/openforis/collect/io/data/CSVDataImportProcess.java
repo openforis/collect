@@ -88,7 +88,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private RecordManager recordManager;
 	@Autowired
 	private UserManager userManager;
-	@Autowired
+	@Autowired(required=false)
 	private NodeChangeBatchProcessor nodeChangeBatchProcessor;
 	
 	//parameters
@@ -122,7 +122,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	public CSVDataImportProcess() {
 		settings = new CSVDataImportSettings();
 		deletedEntitiesRecordKeys = new HashSet<RecordStepKey>();
-		recordUpdater = new RecordUpdater();
 	}
 	
 	@Override
@@ -130,6 +129,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		super.init();
 		validateParameters();
 		adminUser = userManager.loadAdminUser();
+		recordUpdater = new RecordUpdater();
+		recordUpdater.setValidateAfterUpdate(settings.recordValidationEnabled);
 	}
 	
 	@Override
@@ -213,7 +214,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			EntityDefinition rootEntityDefn = survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId);
 			CollectRecord record = recordManager.instantiateRecord(survey, rootEntityDefn.getName(), adminUser, settings.getNewRecordVersionName(), Step.ENTRY);
 			NodeChangeSet changes = recordManager.initializeRecord(record);
-			nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			if (nodeChangeBatchProcessor != null) {
+				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			}
 			setRecordKeys(line, record);
 			setValuesInRecord(line, record, Step.ENTRY);
 			insertRecord(record);
@@ -269,8 +272,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		String parentEntitiesPath = getParentEntityDefinition().getPath();
 		List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
 		for (Entity entity : entitiesToBeDeleted) {
-			NodeChangeSet changes = recordUpdater.deleteNode(entity, settings.recordValidationEnabled);
-			nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			NodeChangeSet changes = recordUpdater.deleteNode(entity);
+			if (nodeChangeBatchProcessor != null) {
+				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			}
 		}
 	}
 
@@ -371,8 +376,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				int tot = attributes.size();
 				for (int i = 0; i < tot; i++) {
 					Node<?> node = attributes.get(0);
-					NodeChangeSet changes = recordUpdater.deleteNode(node, settings.recordValidationEnabled);
-					nodeChangeBatchProcessor.add(changes, adminUser.getName());
+					NodeChangeSet changes = recordUpdater.deleteNode(node);
+					if (nodeChangeBatchProcessor != null) {
+						nodeChangeBatchProcessor.add(changes, adminUser.getName());
+					}
 				}
 			}
 		}
@@ -421,8 +428,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			@SuppressWarnings("unchecked")
 			Field<Object> field = (Field<Object>) attr.getField(fieldName);
 			Object fieldValue = field.parseValue(value);
-			NodeChangeSet changes = recordUpdater.updateField(field, fieldValue, false, settings.recordValidationEnabled);
-			nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			NodeChangeSet changes = recordUpdater.updateField(field, fieldValue);
+			if (nodeChangeBatchProcessor != null) {
+				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			}
 		}
 	}
 
@@ -442,8 +451,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 		if ( valid ) {
 			Field<String> field = ((CoordinateAttribute) attr).getSrsIdField();
-			NodeChangeSet changes = recordUpdater.updateField(field, value, false, settings.recordValidationEnabled);
-			nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			NodeChangeSet changes = recordUpdater.updateField(field, value);
+			if (nodeChangeBatchProcessor != null) {
+				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			}
 		}
 	}
 
@@ -461,8 +472,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				status.addParsingError(parsingError);
 			} else {
 				Field<Integer> field = ((NumberAttribute<?, ?>) attr).getUnitField();
-				NodeChangeSet changes = recordUpdater.updateField(field, unit.getId(), false, settings.recordValidationEnabled);
-				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+				NodeChangeSet changes = recordUpdater.updateField(field, unit.getId());
+				if (nodeChangeBatchProcessor != null) {
+					nodeChangeBatchProcessor.add(changes, adminUser.getName());
+				}
 			}
 		}
 	}
@@ -502,7 +515,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 		recordManager.saveAndRun(record, new Runnable() {
 			public void run() {
-				nodeChangeBatchProcessor.process(record);
+				if (nodeChangeBatchProcessor != null) {
+					nodeChangeBatchProcessor.process(record);
+				}
 			}
 		});
 	}
@@ -510,7 +525,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private void insertRecord(final CollectRecord record) throws RecordPersistenceException {
 		recordManager.saveAndRun(record, new Runnable() {
 			public void run() {
-				nodeChangeBatchProcessor.process(record);
+				if (nodeChangeBatchProcessor != null) {
+					nodeChangeBatchProcessor.process(record);
+				}
 			}
 		});
 	}

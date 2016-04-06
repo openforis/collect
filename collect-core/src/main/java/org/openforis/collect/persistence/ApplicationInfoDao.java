@@ -6,12 +6,13 @@ import static org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo.O
 import org.jooq.DSLContext;
 import org.openforis.collect.model.ApplicationInfo;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@Transactional
+@Transactional(propagation=Propagation.SUPPORTS)
 public class ApplicationInfoDao extends JooqDaoSupport {
 	
 	public ApplicationInfoDao() {

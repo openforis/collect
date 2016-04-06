@@ -9,6 +9,7 @@ import java.util.Map;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.UITreeModelCreator;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -38,21 +39,26 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 
 	private Predicate<SurveyObject> selectableNodePredicate;
 	private Predicate<SurveyObject> disabledNodePredicate;
+
+	private boolean allowEmptySelection;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("rootEntity") EntityDefinition rootEntity, 
 			@ExecutionArgParam("version") ModelVersion version,
 			@ExecutionArgParam("includedNodePredicate") Predicate<SurveyObject> includedNodePredicate,
+			@ExecutionArgParam("includeRootEntity") boolean includeRootEntity,
 			@ExecutionArgParam("includeEmptyNodes") boolean includeEmtptyNodes,
 			@ExecutionArgParam("disabledNodePredicate") Predicate<SurveyObject> disabledNodePredicate,
 			@ExecutionArgParam("selectableNodePredicate") Predicate<SurveyObject> selectableNodePredicate,
-			@ExecutionArgParam("selection") SurveyObject selection) {
+			@ExecutionArgParam("selection") SurveyObject selection,
+			@ExecutionArgParam("allowEmptySelection") boolean allowEmptySelection) {
 		super.init();
-		SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(version, disabledNodePredicate, includedNodePredicate, includeEmtptyNodes, currentLanguageCode);
+		SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(version, disabledNodePredicate, includedNodePredicate, includeRootEntity, includeEmtptyNodes, currentLanguageCode);
 		this.treeModel = modelCreator.createModel(rootEntity);
 		this.treeModel.openAllItems();
 		this.selectableNodePredicate = selectableNodePredicate;
 		this.disabledNodePredicate = disabledNodePredicate;
+		this.allowEmptySelection = allowEmptySelection;
 		if ( selection != null ) {
 			this.selectedNode = selection;
 			this.treeModel.select(selection);
@@ -61,8 +67,9 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	}
 	
 	public static Window openPopup(String title, EntityDefinition rootEntity, ModelVersion version,  
-			Predicate<SurveyObject> includedNodePredicate, boolean includeEmptyNodes, Predicate<SurveyObject> disabledNodePredicate,
-			Predicate<SurveyObject> selectableNodePredicate, SurveyObject selection) {
+			Predicate<SurveyObject> includedNodePredicate, boolean includeRootEntity, boolean includeEmptyNodes, 
+			Predicate<SurveyObject> disabledNodePredicate, Predicate<SurveyObject> selectableNodePredicate, 
+			SurveyObject selection, boolean allowEmptySelection) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("rootEntity", rootEntity);
 		args.put("version", version);
@@ -71,24 +78,21 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 		args.put("includedNodePredicate", includedNodePredicate);
 		args.put("selectableNodePredicate", selectableNodePredicate);
 		args.put("selection", selection);
+		args.put("includeRootEntity", includeRootEntity);
 		args.put("includeEmptyNodes", includeEmptyNodes);
-		
+		args.put("allowEmptySelection", allowEmptySelection);
 		return openPopUp(Resources.Component.SCHEMA_TREE_POPUP.getLocation(), true, args);
 	}
 	
 	@Command
 	public void apply(@BindingParam("selectedSurveyObject") SurveyObject selectedSurveyObject, 
 			@ContextParam(ContextType.VIEW) Component view) {
-		if ( selectedSurveyObject == null || 
-				( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
+		if (selectedSurveyObject == null && ! allowEmptySelection) {
+			MessageUtil.showWarning("survey.schema.tree.popup.select_a_node");
+		} else if(selectedSurveyObject == null || ( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
 				&& ( selectableNodePredicate == null || selectableNodePredicate.evaluate(selectedSurveyObject) ) ) {
 			Events.postEvent(new NodeSelectedEvent(view, selectedSurveyObject));
 		}
-	}
-	
-	@Command
-	public void cancel(@ContextParam(ContextType.VIEW) Component view) {
-		Events.postEvent("onClose", view, null);
 	}
 	
 	@Command

@@ -181,8 +181,8 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			};
 			final Window parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title,
 					editedItem.getRootEntity(), null, includedNodePredicate,
-					false, disabledNodePredicate, null,
-					parentCodeAttributeDefinition);
+					false, false, disabledNodePredicate, null,
+					parentCodeAttributeDefinition, true);
 			parentSelectorPopUp.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 				public void onEvent(NodeSelectedEvent event) throws Exception {
 					CodeAttributeDefinition parentAttrDefn = (CodeAttributeDefinition) event.getSelectedItem();

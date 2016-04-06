@@ -2,6 +2,7 @@ package org.openforis.idm.model;
 
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 
 /**
@@ -40,7 +41,17 @@ public class TaxonAttribute extends Attribute<TaxonAttributeDefinition, TaxonOcc
 	public Field<String> getLanguageVarietyField() {
 		return (Field<String>) getField(4);
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public Field<String> getFamilyCodeField() {
+		return (Field<String>) getField(5);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Field<String> getFamilyScientificNameField() {
+		return (Field<String>) getField(6);
+	}
+	
 	public String getCode() {
 		return getCodeField().getValue();
 	}
@@ -73,6 +84,22 @@ public class TaxonAttribute extends Attribute<TaxonAttributeDefinition, TaxonOcc
 		checkValidLanguageCode(code);
 		getLanguageCodeField().setValue(code);
 	}
+	
+	public String getFamilyCode() {
+		return getFamilyCodeField().getValue();
+	}
+	
+	public void setFamilyCode(String code) {
+		getFamilyCodeField().setValue(code);
+	}
+	
+	public String getFamilyScientificName() {
+		return getFamilyScientificNameField().getValue();
+	}
+	
+	public void setFamilyScientificName(String familyName) {
+		getFamilyScientificNameField().setValue(familyName);
+	}
 
 	private void checkValidLanguageCode(String code) {
 		if ( code != null && ! Languages.exists(Standard.ISO_639_3, code) ) {
@@ -100,23 +127,18 @@ public class TaxonAttribute extends Attribute<TaxonAttributeDefinition, TaxonOcc
 
 	@Override
 	protected void setValueInFields(TaxonOccurrence value) {
-		String code = value.getCode();
-		String scientificName = value.getScientificName();
-		String vernacularName = value.getVernacularName();
-		String languageCode = value.getLanguageCode();
-		String languageVariety = value.getLanguageVariety();
-		checkValidLanguageCode(languageCode);
+		checkValidLanguageCode(value.getLanguageCode());
 
-		getCodeField().setValue(code);
-		getScientificNameField().setValue(scientificName);
-		getVernacularNameField().setValue(vernacularName);
-		getLanguageCodeField().setValue(languageCode);
-		getLanguageVarietyField().setValue(languageVariety);
-	}
-	
-	@Override
-	public String extractTextValue() {
-		return getCode();
+		setCode(value.getCode());
+		setScientificName(value.getScientificName());
+		setVernacularName(value.getVernacularName());
+		setLanguageCode(value.getLanguageCode());
+		setLanguageVariety(value.getLanguageVariety());
+		TaxonOccurrence familyAncestor = value.getAncestorTaxon(TaxonRank.FAMILY);
+		if (familyAncestor != null) {
+			setFamilyCode(familyAncestor.getCode());
+			setFamilyScientificName(familyAncestor.getScientificName());
+		}
 	}
 	
 	public static class LanguageCodeNotSupportedException extends RuntimeException {
