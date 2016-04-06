@@ -601,7 +601,6 @@ public class SurveyManager {
 		return survey;
 	}
 	
-	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		if ( includeDetails ) {
