@@ -89,4 +89,12 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		this.includeUniqueVernacularName = includeUniqueVernacularName;
 	}
 	
+	public Boolean getShowFamily() {
+		return showFamily;
+	}
+	
+	public void setShowFamily(Boolean showFamily) {
+		this.showFamily = showFamily;
+	}
+	
 }

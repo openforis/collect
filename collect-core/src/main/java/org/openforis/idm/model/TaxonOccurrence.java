@@ -59,12 +59,23 @@ public final class TaxonOccurrence extends AbstractValue {
 	public TaxonOccurrence(TaxonOccurrence o) {
 		this(o.code, o.scientificName, o.vernacularName,
 				o.languageCode, o.languageVariety);
+		this.taxonId = o.taxonId;
+		this.taxonRank = o.taxonRank;
+	}
+	
+	public TaxonOccurrence(Taxon taxon) {
+		this(taxon, (TaxonVernacularName) null);
 	}
 	
 	public TaxonOccurrence(Taxon taxon, TaxonVernacularName vernacularName) {
-		this(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName(), 
-					vernacularName.getVernacularName(), vernacularName.getLanguageCode(),
-					vernacularName.getLanguageVariety());
+		this(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName());
+		taxonRank = taxon.getTaxonRank();
+		
+		if (vernacularName != null) {
+			this.vernacularName = vernacularName.getVernacularName();
+			this.languageCode = vernacularName.getLanguageCode();
+			this.languageVariety = vernacularName.getLanguageVariety();
+		}
 	}
 	
 	public TaxonOccurrence(Integer taxonId, String code, String scientificName, String vernacularName, 

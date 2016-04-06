@@ -178,8 +178,10 @@ package org.openforis.collect.presenter {
 			result.addItem(EXPORT_DATA_MENU_ITEM);
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(IMPORT_DATA_MENU_ITEM);
-				result.addItem({type: "separator"});
-				result.addItem(VALIDATION_REPORT_MENU_ITEM);
+			}
+			result.addItem({type: "separator"});
+			result.addItem(VALIDATION_REPORT_MENU_ITEM);
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem({type: "separator"});
 				result.addItem(PROMOTE_ENTRY_RECORDS_MENU_ITEM);
 				result.addItem(PROMOTE_CLEANSING_RECORDS_MENU_ITEM);

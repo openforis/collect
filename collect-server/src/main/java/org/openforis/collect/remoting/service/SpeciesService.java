@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
 import org.openforis.collect.model.CollectRecord;
@@ -101,26 +102,29 @@ public class SpeciesService {
 	}
 
 	@Secured("ROLE_ENTRY")
-	public List<TaxonOccurrenceProxy> findByCode(String taxonomyName, String searchString, int maxResults) {
+	public List<TaxonOccurrenceProxy> findByCode(String taxonomyName, String searchString, int maxResults, TaxonSearchParameters parameters) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
 		List<TaxonOccurrence> list = speciesManager.findByCode(taxonomy.getId(), searchString, maxResults);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
-	public List<TaxonOccurrenceProxy> findByScientificName(String taxonomyName, String searchString, int maxResults) {
+	public List<TaxonOccurrenceProxy> findByScientificName(String taxonomyName, String searchString, int maxResults, 
+			TaxonSearchParameters parameters) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByScientificName(taxonomy.getId(), searchString, maxResults, true, true);
+		List<TaxonOccurrence> list = speciesManager.findByScientificName(taxonomy.getId(), searchString, maxResults, parameters);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
-	public List<TaxonOccurrenceProxy> findByVernacularName(String taxonomyName, int nodeId, String searchString, int maxResults) {
+	public List<TaxonOccurrenceProxy> findByVernacularName(String taxonomyName, int nodeId, String searchString, int maxResults, 
+			TaxonSearchParameters parameters) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
 		CollectRecord activeRecord = sessionManager.getActiveRecord();
 		Node<? extends NodeDefinition> attr = activeRecord.getNodeByInternalId(nodeId);
 		if ( attr instanceof TaxonAttribute ) {
-			List<TaxonOccurrence> list = speciesManager.findByVernacularName(taxonomy.getId(), (TaxonAttribute) attr, searchString, maxResults);
+			List<TaxonOccurrence> list = speciesManager.findByVernacularName(taxonomy.getId(), (TaxonAttribute) attr, searchString, 
+					maxResults, parameters);
 			return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 		} else {
 			throw new IllegalArgumentException("TaxonAttribute expected, found: " + attr.getClass().getName());
