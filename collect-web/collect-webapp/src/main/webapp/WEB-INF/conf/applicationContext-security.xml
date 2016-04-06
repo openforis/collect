@@ -58,7 +58,6 @@
 		<intercept-url access="hasRole('ADMIN')" pattern="/speciesImport" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/surveys" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/validateAllRecords.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/validationReport" />
 		
 		<intercept-url access="hasRole('USER')" pattern="/**" />
 
