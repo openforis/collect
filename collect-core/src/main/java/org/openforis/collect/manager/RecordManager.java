@@ -406,14 +406,14 @@ public class RecordManager {
 		return record;
 	}
 
-	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectRecord promote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPromoteException, MissingRecordKeyException {
 		CollectRecord record = load(survey, recordId, currentStep);
 		performPromote(record, user);
 		return record;
 	}
 	
-	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void promote(CollectSurvey survey, int recordId, Step currentStep, User user, RecordCallback callback) throws RecordPromoteException, MissingRecordKeyException {
 		CollectRecord record = promote(survey, recordId, currentStep, user);
 		callback.run(record);
@@ -422,7 +422,7 @@ public class RecordManager {
 	/**
 	 * Saves a record and promotes it to the next phase
 	 */
-	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void promote(CollectRecord record, User user) throws RecordPromoteException, MissingRecordKeyException {
 		Integer errors = record.getErrors();
 		Integer skipped = record.getSkipped();
@@ -472,7 +472,7 @@ public class RecordManager {
 		recordDao.update( record );
 	}
 
-	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectRecord demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
 		CollectRecord record = recordDao.load( survey, recordId, prevStep.getStepNumber() );
@@ -486,13 +486,13 @@ public class RecordManager {
 		return record;
 	}
 
-	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user, RecordCallback callback) throws RecordPersistenceException {
 		CollectRecord record = demote(survey, recordId, currentStep, user);
 		callback.run(record);
 	}
 	
-	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void validateAndSave(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
 			lockManager.isLockAllowed(user, recordId, sessionId, true);
