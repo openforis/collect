@@ -69,6 +69,8 @@ import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.Window;
 
+import static com.google.common.net.MediaType.*;
+
 /**
  * 
  * @author S. Ricci
@@ -174,13 +176,13 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	@Command
-	public void printSelectedSurveyForms() throws IOException {
-		SurveyFormPrinter printer = new SurveyFormPrinter();
+	public void generateSelectedSurveyPaperForms() throws IOException {
 		CollectSurvey survey = loadSelectedSurvey();
 		File tempFile = File.createTempFile("of-collect-survey-forms", ".doc");
 		FileOutputStream out = new FileOutputStream(tempFile);
-		printer.print(survey, out);
-		Filedownload.save(tempFile, "application/msword");
+		SurveyFormPrinter printer = new SurveyFormPrinter(codeListManager);
+		printer.print(out, survey);
+		Filedownload.save(tempFile, MICROSOFT_WORD.toString());
 	}
 
 	@GlobalCommand

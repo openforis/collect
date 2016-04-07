@@ -142,8 +142,8 @@
 							onClick="@command('validateAllRecords')" />
 						
 						<menuitem
-							label="${labels.survey.print_selected_survey}"
-							onClick="@command('printSelectedSurveyForms')" />
+							label="${labels.survey.generate_paper_forms}"
+							onClick="@command('generateSelectedSurveyPaperForms')" />
 							
 						<menuitem
 							visible="@load(vm.selectedSurvey.recordValidationInProgress)"
