@@ -16,6 +16,7 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.apache.xmlbeans.XmlCursor;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.metamodel.ui.UIColumn;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
@@ -29,6 +30,7 @@ import org.openforis.collect.metamodel.ui.UITable;
 import org.openforis.collect.metamodel.ui.UITableHeadingComponent;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -244,6 +246,19 @@ public class SurveyFormPrinter {
 			return getRootRenderer().doc;
 		}
 		
+		protected XWPFTable insertNestedTable(XWPFTableCell cell) {
+			XWPFParagraph paragraph = cell.getParagraphs().get(0);
+			XmlCursor cursor = paragraph.getCTP().newCursor();
+			XWPFTable table = cell.insertNewTbl(cursor);
+			CTTbl ctTbl = table.getCTTbl();
+			CTTblPr ctTblPr = ctTbl.addNewTblPr();
+			CTTblWidth ctTblWidth = CTTblWidth.Factory.newInstance();
+			ctTblWidth.setW(BigInteger.valueOf(5000));
+			ctTblWidth.setType(STTblWidth.PCT);
+			ctTblPr.setTblW(ctTblWidth);
+			return table;
+		}
+		
 	}
 	
 	private class FieldPaperFormRenderer extends UIObjectPaperFormRenderer {
@@ -263,41 +278,42 @@ public class SurveyFormPrinter {
 			AttributeDefinition def = field.getAttributeDefinition();
 			labelCell.setText(getLabelOrName(def, getRootRenderer().survey.getDefaultLanguage()));
 			XWPFTableCell contentCell = row.getCell(1);
+			XWPFParagraph contentParagraph = contentCell.getParagraphs().get(0);
+			XmlCursor cursor = contentParagraph.getCTP().newCursor();
+			
 			AttributeDefinition attrDef = field.getAttributeDefinition();
-			if (attrDef instanceof TextAttributeDefinition
+			if (attrDef instanceof BooleanAttributeDefinition) {
+				
+			} else if (attrDef instanceof TextAttributeDefinition
 					|| attrDef instanceof NumberAttributeDefinition) {
-				XWPFParagraph paragraph = contentCell.getParagraphs().get(0);
-				XWPFRun run = paragraph.createRun();
+				XWPFRun run = contentParagraph.createRun();
 				run.setText("           ");
-				paragraph.setBorderBottom(Borders.SINGLE);
-				paragraph.setBorderLeft(Borders.SINGLE);
-				paragraph.setBorderRight(Borders.SINGLE);
-				paragraph.setBorderTop(Borders.SINGLE);
+				contentParagraph.setBorderBottom(Borders.SINGLE);
+				contentParagraph.setBorderLeft(Borders.SINGLE);
+				contentParagraph.setBorderRight(Borders.SINGLE);
+				contentParagraph.setBorderTop(Borders.SINGLE);
 			} else if (attrDef instanceof DateAttributeDefinition) {
+				XWPFTable table = insertNestedTable(contentCell);
+				XWPFTableRow row1 = table.createRow();
 				{
-					XWPFTable table = getDocument().createTable(1, 5);
-					XWPFTableRow row1 = table.getRow(0);
-					{
-						XWPFTableCell cell = row1.getCell(0);
-						cell.addParagraph().createRun().setText("  ");
-					}
-					{
-						XWPFTableCell cell = row1.getCell(1);
-						cell.addParagraph().createRun().setText("/");
-					}
-					{
-						XWPFTableCell cell = row1.getCell(2);
-						cell.addParagraph().createRun().setText("  ");
-					}
-					{
-						XWPFTableCell cell = row1.getCell(3);
-						cell.addParagraph().createRun().setText("/");
-					}
-					{
-						XWPFTableCell cell = row1.getCell(4);
-						cell.addParagraph().createRun().setText("    ");
-					}
-					contentCell.insertTable(0, table);
+					XWPFTableCell cell = row1.createCell();
+					cell.setText("  ");
+				}
+				{
+					XWPFTableCell cell = row1.createCell();
+					cell.setText("/");
+				}
+				{
+					XWPFTableCell cell = row1.createCell();
+					cell.setText("  ");
+				}
+				{
+					XWPFTableCell cell = row1.createCell();
+					cell.setText("/");
+				}
+				{
+					XWPFTableCell cell = row1.createCell();
+					cell.setText("    ");
 				}
 			} else if (attrDef instanceof CodeAttributeDefinition) {
 				CodeList list = ((CodeAttributeDefinition) attrDef).getList();
@@ -341,32 +357,24 @@ public class SurveyFormPrinter {
 			EntityDefinition entityDef = table.getEntityDefinition();
 			labelCell.setText(getLabelOrName(entityDef, getRootRenderer().survey.getDefaultLanguage()));
 			
-			XWPFTable nestedTable = getRootRenderer().doc.createTable();
-			XWPFTableRow headerRow = nestedTable.getRow(0);
-			int pos = 0;
+			XWPFTableCell contentCell = contentRow.getCell(1);
+			XWPFTable nestedTable = insertNestedTable(contentCell);
+			
+			XWPFTableRow headerRow = nestedTable.createRow();
 			List<UITableHeadingComponent> headingComponents = table.getHeadingComponents();
 			for (UITableHeadingComponent headingComponent : headingComponents) {
-				if (pos > 0) {
-					headerRow.createCell();
-				}
-				XWPFTableCell cell = headerRow.getCell(pos);
+				XWPFTableCell cell = headerRow.createCell();
 				if (headingComponent instanceof UIColumn) {
 					AttributeDefinition attrDef = ((UIColumn) headingComponent).getAttributeDefinition();
 					cell.setText(getLabelOrName(attrDef, getRootRenderer().language));
 				}
-				pos ++;
 			}
 			addRows(nestedTable, 10, table.getHeadingComponents().size());
-			
-			labelCell.insertTable(0, nestedTable);
-			
-//			XWPFTableCell contentCell = row.getCell(1);
 		}
 
-		private void addRows(XWPFTable table, int rowsCount, int cellsCount) {
-			for (int i=0; i < rowsCount; i++) {
-				XWPFTableRow row = table.createRow();
-				POIUtils.addCells(row, cellsCount - 1);
+		private void addRows(XWPFTable table, int rows, int cellsCount) {
+			for (int i=0; i < rows; i++) {
+				table.createRow();
 			}
 		}
 	}
@@ -483,13 +491,24 @@ public class SurveyFormPrinter {
 		
 		@Override
 		public void render() throws IOException {
-			XWPFTable table = parentRenderer.getRootRenderer().doc.createTable();
-			XWPFTableRow row = table.createRow();
+			XWPFTable table = createContentTable();
+			XWPFTableRow row = table.getRow(0);
 			XWPFTableCell cell = row.getCell(0);
 			XWPFParagraph header = cell.addParagraph();
 			XWPFRun run = header.createRun();
 			run.setText(getNullSafeLabel(formSection.getEntityDefinition()));
 			super.render();
+		}
+
+		private XWPFTable createContentTable() {
+			XWPFTable table = getDocument().createTable();
+			CTTbl ctTbl = table.getCTTbl();
+			CTTblPr tblPr = ctTbl.getTblPr();
+			tblPr.unsetTblBorders();
+			CTTblWidth tblW = tblPr.getTblW();
+			tblW.setW(BigInteger.valueOf(5000));
+			tblW.setType(STTblWidth.PCT);
+			return table;
 		}
 
 		private String getNullSafeLabel(EntityDefinition entityDef) {
@@ -500,7 +519,6 @@ public class SurveyFormPrinter {
 				return label;
 			}
 		}
-		
 	}
 
 	private static class POIUtils {
