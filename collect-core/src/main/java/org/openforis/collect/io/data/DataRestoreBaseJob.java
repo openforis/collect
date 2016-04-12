@@ -11,6 +11,7 @@ import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.SurveyRestoreJob;
 import org.openforis.collect.io.data.RecordProviderInitializerTask.Input;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
@@ -29,6 +30,8 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected SurveyManager surveyManager;
 	@Autowired
 	protected RecordManager recordManager;
+	@Autowired
+	protected RecordFileManager recordFileManager;
 	@Autowired
 	protected UserManager userManager;
 	
@@ -163,6 +166,10 @@ public abstract class DataRestoreBaseJob extends Job {
 	
 	public void setSurveyManager(SurveyManager surveyManager) {
 		this.surveyManager = surveyManager;
+	}
+	
+	public void setRecordFileManager(RecordFileManager recordFileManager) {
+		this.recordFileManager = recordFileManager;
 	}
 	
 	public File getFile() {

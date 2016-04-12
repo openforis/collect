@@ -77,9 +77,8 @@ public class SessionRecordFileManager implements Serializable {
 	
 	protected boolean moveTempFilesToRepository(CollectRecord record) throws RecordFileException {
 		try {
-			Set<Entry<Integer,String>> entrySet = nodeIdToTempFilePath.entrySet();
 			boolean result = false;
-			for (Entry<Integer, String> entry : entrySet) {
+			for (Entry<Integer, String> entry : nodeIdToTempFilePath.entrySet()) {
 				int nodeId = entry.getKey();
 				String fileName = entry.getValue();
 				java.io.File tempFile = new java.io.File(fileName);

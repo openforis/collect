@@ -39,6 +39,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 		if ( task instanceof DataRestoreSummaryTask ) {
 			DataRestoreSummaryTask t = (DataRestoreSummaryTask) task;
 			t.setRecordManager(recordManager);
+			t.setRecordFileManager(recordFileManager);
 			t.setUserManager(userManager);
 			t.setRecordProvider(recordProvider);
 			t.setCompleteSummary(completeSummary);

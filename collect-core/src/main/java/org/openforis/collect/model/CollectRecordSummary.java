@@ -1,5 +1,6 @@
 package org.openforis.collect.model;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class CollectRecordSummary {
 
 	private ModelVersion version;
 	private User owner;
+	private List<File> files;
 
 	public static CollectRecordSummary fromRecord(CollectRecord record) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
@@ -216,5 +218,13 @@ public class CollectRecordSummary {
 
 	public void setTotalErrors(Integer totalErrors) {
 		this.totalErrors = totalErrors;
+	}
+	
+	public List<File> getFiles() {
+		return files;
+	}
+	
+	public void setFiles(List<File> files) {
+		this.files = files;
 	}
 }

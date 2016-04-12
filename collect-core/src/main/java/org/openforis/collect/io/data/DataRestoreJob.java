@@ -19,6 +19,8 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +39,6 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	public static final String JOB_NAME = "dataRestoreJob";
 	
 	@Autowired
-	private RecordFileManager recordFileManager;
-	@Autowired
 	protected RestoredBackupStorageManager restoredBackupStorageManager;
 	@Autowired
 	protected BackupStorageManager backupStorageManager;
@@ -49,11 +49,13 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private List<Integer> entryIdsToImport; //ignored when overwriteAll is true
 	private boolean storeRestoredFile;
 	private File tempFile;
+	private boolean deleteAllRecordsBeforeRestore = false;
 	
 	//output
 	private List<RecordImportError> errors;
-		
-	private boolean deleteAllRecordsBeforeRestore = false;
+	
+	//transient variables
+	private transient List<File> recordFilesToBeDeleted;
 
 	@Override
 	public void createInternalVariables() throws Throwable {
@@ -70,10 +72,17 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			}
 			addTask(new StoreBackupFileTask());
 		}
+		if ( restoreUploadedFiles && recordFilesToBeDeleted == null ) {
+			addTask(new RecordFileEnumeratorTask());
+		}
 		if (deleteAllRecordsBeforeRestore) {
 			addTask(new DeleteRecordsTask());
 		}
 		addTask(DataRestoreTask.class);
+		
+		if (restoreUploadedFiles) {
+			addTask(new RecordFileDeleteTask());
+		}
 		if ( restoreUploadedFiles && isUploadedFilesIncluded() ) {
 			addTask(RecordFileRestoreTask.class);
 		}
@@ -128,7 +137,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	@Override
 	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
-		if (task instanceof DataRestoreTask) {
+		if (task instanceof RecordFileEnumeratorTask) {
+			this.recordFilesToBeDeleted = ((RecordFileEnumeratorTask) task).getResult();
+		} else if (task instanceof DataRestoreTask) {
 			this.errors.addAll(((DataRestoreTask) task).getErrors());
 		}
 	}
@@ -161,10 +172,6 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		return recordFileManager;
 	}
 
-	public void setRecordFileManager(RecordFileManager recordFileManager) {
-		this.recordFileManager = recordFileManager;
-	}
-	
 	public UserManager getUserManager() {
 		return userManager;
 	}
@@ -213,6 +220,10 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		this.deleteAllRecordsBeforeRestore = deleteAllRecords;
 	}
 
+	public void setRecordFilesToBeDeleted(List<File> files) {
+		this.recordFilesToBeDeleted = files;
+	}
+	
 	private class StoreBackupFileTask extends Task {
 		protected void execute() throws Throwable {
 			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
@@ -223,6 +234,55 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private class DeleteRecordsTask extends Task {
 		protected void execute() throws Throwable {
 			recordManager.deleteBySurvey(publishedSurvey.getId());
+		}
+	}
+
+	private class RecordFileEnumeratorTask extends Task {
+		
+		private List<File> result;
+		
+		@Override
+		protected void initializeInternalVariables() throws Throwable {
+			super.initializeInternalVariables();
+			this.result = new ArrayList<File>();
+		}
+		
+		@Override
+		protected void execute() throws Throwable {
+			List<Integer> entryIds = calculateEntryIdsToImport();
+			for (Step step : Step.values()) {
+				for (Integer entryId : entryIds) {
+					CollectRecord record = recordProvider.provideRecord(entryId, step);
+					if (record != null) {
+						List<File> files = recordFileManager.getAllFiles(record);
+						result.addAll(files);
+					}
+				}
+			}
+		}
+		
+		private List<Integer> calculateEntryIdsToImport() {
+			if ( entryIdsToImport != null ) {
+				return entryIdsToImport;
+			} else if (overwriteAll) {
+				return recordProvider.findEntryIds();
+			} else {
+				throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
+			}
+		}
+		
+		public List<File> getResult() {
+			return result;
+		}
+	}
+	
+	private class RecordFileDeleteTask extends Task {
+		
+		@Override
+		protected void execute() throws Throwable {
+			for (File file : recordFilesToBeDeleted) {
+				file.delete();
+			}
 		}
 	}
 

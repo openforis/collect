@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
 import org.openforis.collect.io.exception.DataParsingExeption;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Component;
 public class DataRestoreSummaryTask extends Task {
 
 	private RecordManager recordManager;
+	private RecordFileManager recordFileManager;
 	private UserManager userManager;
 
 	//input
@@ -264,7 +266,9 @@ public class DataRestoreSummaryTask extends Task {
 		} else if ( oldRecords.size() == 1 ) {
 			CollectRecord summary = oldRecords.get(0);
 			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), completeSummary);
-			return CollectRecordSummary.fromRecord(record);
+			CollectRecordSummary recordSummary = CollectRecordSummary.fromRecord(record);
+			recordSummary.setFiles(recordFileManager.getAllFiles(record));
+			return recordSummary;
 		} else {
 			throw new IllegalStateException(String.format("Multiple records found in survey %s with key(s): %s", survey.getName(), keyValues));
 		}
@@ -286,6 +290,10 @@ public class DataRestoreSummaryTask extends Task {
 	
 	public void setRecordManager(RecordManager recordManager) {
 		this.recordManager = recordManager;
+	}
+	
+	public void setRecordFileManager(RecordFileManager recordFileManager) {
+		this.recordFileManager = recordFileManager;
 	}
 	
 	public UserManager getUserManager() {

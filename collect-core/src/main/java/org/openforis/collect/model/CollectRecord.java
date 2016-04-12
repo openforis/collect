@@ -401,7 +401,7 @@ public class CollectRecord extends Record {
 					//TODO throw error in this case?
 					values.add(null);
 				} else {
-					if (keyNode.isFilled()) {
+					if (! keyNode.isEmpty()) {
 						String keyValue = keyNode.extractTextValue();
 						values.add(keyValue);
 					}

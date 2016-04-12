@@ -46,21 +46,20 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 	
 	protected File parseFileAttributeValue(RecordSessionManager sessionManager, CollectRecord record,
 			Integer nodeId, Object value) {
-		File result;
-		if ( value != null ) {
+		if ( value == null ) {
+			sessionManager.prepareDeleteTempRecordFile(record, nodeId);
+			return null;
+		} else {
 			if ( value instanceof FileWrapper ) {
 				FileWrapper fileWrapper = (FileWrapper) value;
 				java.io.File tempFile = new java.io.File(fileWrapper.getFilePath());
+				sessionManager.prepareDeleteTempRecordFile(record, nodeId);
 				sessionManager.indexTempRecordFile(tempFile, nodeId);
-				result = new File(tempFile.getAbsolutePath(), tempFile.length());
+				return new File(tempFile.getAbsolutePath(), tempFile.length());
 			} else {
 				throw new IllegalArgumentException("Invalid value type: expected byte[]");
 			}
-		} else {
-			sessionManager.prepareDeleteTempRecordFile(record, nodeId);
-			result = null;
 		}
-		return result;
 	}
 	
 	protected Value parseCompositeAttributeValue(CodeListManager codeListManager,

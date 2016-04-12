@@ -1,5 +1,7 @@
 package org.openforis.collect.io.data;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,20 @@ public class DataImportSummary {
 	private String surveyName;
 	
 	public DataImportSummary() {
+	}
+	
+	public List<File> getConflictingRecordFiles() {
+		return getConflictingRecordFiles(null);
+	}
+	
+	public List<File> getConflictingRecordFiles(List<Integer> entryIds) {
+		List<File> result = new ArrayList<File>();
+		for (DataImportSummaryItem conflictingRecordItem : conflictingRecords) {
+			if (entryIds == null || entryIds.contains(conflictingRecordItem.getEntryId())) {
+				result.addAll(conflictingRecordItem.getConflictingRecord().getFiles());
+			}
+		}
+		return result;
 	}
 
 	public Map<Step, Integer> getTotalPerStep() {
