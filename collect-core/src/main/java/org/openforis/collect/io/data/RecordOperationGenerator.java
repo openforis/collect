@@ -8,8 +8,8 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordManager.RecordOperations;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.model.Entity;
 
 public class RecordOperationGenerator {
 	private final RecordProvider recordProvider;
@@ -36,7 +36,7 @@ public class RecordOperationGenerator {
 			parsedRecord.setStep(step);
 
 			if (firstStepToBeProcessed) {
-				CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
+				CollectRecordSummary oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
 				boolean newRecord = oldRecordSummary == null;
 				if (newRecord) {
 					insertRecordDataUntilStep(operations, parsedRecord, step);
@@ -59,22 +59,10 @@ public class RecordOperationGenerator {
 		return operations;
 	}
 
-	private CollectRecord findAlreadyExistingRecordSummary(
+	private CollectRecordSummary findAlreadyExistingRecordSummary(
 			CollectRecord parsedRecord) {
-		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
-		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
-		Entity rootEntity = parsedRecord.getRootEntity();
-		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey,
-				rootEntity.getName(), keyValues.toArray(new String[keyValues.size()]));
-		if (oldRecords == null || oldRecords.isEmpty()) {
-			return null;
-		} else if (oldRecords.size() == 1) {
-			return oldRecords.get(0);
-		} else {
-			throw new IllegalStateException(String.format(
-					"Multiple records found in survey %s with key(s): %s",
-					survey.getName(), keyValues));
-		}
+		return recordManager.loadUniqueRecordSummaryByKeys((CollectSurvey) parsedRecord.getSurvey(), 
+				parsedRecord.getRootEntity().getName(), parsedRecord.getRootEntityKeyValues());
 	}
 
 	private void insertRecordDataUntilStep(RecordOperations operations,

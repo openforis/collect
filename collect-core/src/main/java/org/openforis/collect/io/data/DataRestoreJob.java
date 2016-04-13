@@ -21,6 +21,7 @@ import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -252,10 +253,15 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			List<Integer> entryIds = calculateEntryIdsToImport();
 			for (Step step : Step.values()) {
 				for (Integer entryId : entryIds) {
-					CollectRecord record = recordProvider.provideRecord(entryId, step);
-					if (record != null) {
-						List<File> files = recordFileManager.getAllFiles(record);
-						result.addAll(files);
+					CollectRecord packagedRecord = recordProvider.provideRecord(entryId, step);
+					if (packagedRecord != null) {
+						int rootEntityId = packagedRecord.getRootEntity().getDefinition().getId();
+						CollectRecordSummary existingRecordSummary = recordManager.loadUniqueRecordSummaryByKeys(publishedSurvey, rootEntityId, packagedRecord.getRootEntityKeyValues());
+						if (existingRecordSummary != null) {
+							CollectRecord record = recordManager.load(publishedSurvey, existingRecordSummary.getId());
+							List<File> files = recordFileManager.getAllFiles(record);
+							result.addAll(files);
+						}
 					}
 				}
 			}
@@ -281,7 +287,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		@Override
 		protected void execute() throws Throwable {
 			for (File file : recordFilesToBeDeleted) {
-				file.delete();
+				if (file.exists() && ! file.delete()) {
+					throw new RuntimeException("Error deleting record file: " + file.getAbsolutePath());
+				}
 			}
 		}
 	}

@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.NodeChangeSet;
@@ -316,6 +317,27 @@ public class RecordManager {
 		return recordDao.loadSummaries(filter, sortFields);
 	}
 
+	public CollectRecordSummary loadUniqueRecordSummaryByKeys(CollectSurvey survey, int rootEntityId, List<String> keyValues) {
+		return loadUniqueRecordSummaryByKeys(survey, survey.getSchema().getRootEntityDefinition(rootEntityId).getName(), keyValues);
+	}
+	
+	public CollectRecordSummary loadUniqueRecordSummaryByKeys(CollectSurvey survey, String rootEntityName, List<String> keyValues) {
+		return loadUniqueRecordSummaryByKeys(survey, rootEntityName, keyValues.toArray(new String[keyValues.size()]));
+	}
+	
+	public CollectRecordSummary loadUniqueRecordSummaryByKeys(CollectSurvey survey, String rootEntityName, String... keyValues) {
+		List<CollectRecord> oldRecords = loadSummaries(survey, rootEntityName, keyValues);
+		if (oldRecords == null || oldRecords.isEmpty()) {
+			return null;
+		} else if (oldRecords.size() == 1) {
+			return CollectRecordSummary.fromRecord(oldRecords.get(0));
+		} else {
+			throw new IllegalStateException(String.format(
+					"Multiple records found in survey %s with key(s): %s",
+					survey.getName(), keyValues));
+		}
+	}
+	
 	@Transactional(readOnly=true)
 	public Iterator<CollectRecord> iterateSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		return recordDao.iterateSummaries(filter, sortFields);
