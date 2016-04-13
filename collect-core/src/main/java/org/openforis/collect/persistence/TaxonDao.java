@@ -13,6 +13,7 @@ import org.jooq.Insert;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.SortField;
 import org.jooq.StoreQuery;
@@ -65,22 +66,28 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 	}
 
 	public List<Taxon> findByCode(int taxonomyId, String searchString, int maxResults) {
-		return findStartingWith(OFC_TAXON.CODE, taxonomyId, searchString, maxResults);
+		return findStartingWith(OFC_TAXON.CODE, taxonomyId, null, searchString, maxResults);
 	}
 
+	public List<Taxon> findByCode(int taxonomyId, TaxonRank rank, String searchString, int maxResults) {
+		return findStartingWith(OFC_TAXON.CODE, taxonomyId, rank, searchString, maxResults);
+	}
+	
 	public List<Taxon> findByScientificName(int taxonomyId, String searchString, int maxResults) {
-		return findStartingWith(OFC_TAXON.SCIENTIFIC_NAME, taxonomyId, searchString, maxResults);
+		return findStartingWith(OFC_TAXON.SCIENTIFIC_NAME, taxonomyId, null, searchString, maxResults);
 	}
 
-	protected List<Taxon> findStartingWith(TableField<?,String> field, int taxonomyId, String searchString, int maxResults) {
+	protected List<Taxon> findStartingWith(TableField<?,String> field, int taxonomyId, TaxonRank rank, String searchString, int maxResults) {
 		TaxonDSLContext dsl = dsl();
 		searchString = searchString.toUpperCase() + "%";
-		Select<?> query = 
-			dsl.select()
+		SelectConditionStep<Record> query = dsl.select()
 			.from(OFC_TAXON)
 			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
-				.and(DSL.upper(field).like(searchString)))
-			.limit(maxResults);
+				.and(DSL.upper(field).like(searchString)));
+		if (rank != null) {
+			query.and(OFC_TAXON.TAXON_RANK.equal(rank.name()));
+		}
+		query.limit(maxResults);
 		Result<?> result = query.fetch();
 		List<Taxon> entities = dsl.fromResult(result);
 		return entities;
@@ -106,13 +113,11 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_TAXON);
 		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
-		//always order by SCIENTIFIC_NAME to avoid pagination issues
+
 		q.addOrderBy(sortField);
 		
-		//add limit
 		q.addLimit(offset, maxRecords);
 		
-		//fetch results
 		Result<Record> result = q.fetch();
 		
 		return dsl.fromResult(result);

@@ -51,6 +51,11 @@
 				>
 		<s:columns>
 			<s:ArrayList>
+				<s:GridColumn headerText="{Message.get('edit.taxon.familyScientificName')}" 
+							  dataField="familyScientificName" 
+							  width="{TaxonAttributeRenderer.FAMILY_SCIENTIFIC_NAME_WIDTH + 6}" 
+							  visible="{taxonAttributeDefinition.showFamily}"
+							  />
 				<s:GridColumn headerText="{Message.get('edit.taxon.code')}" 
 							  dataField="code" 
 							  width="{TaxonAttributeRenderer.CODE_WIDTH + 3}" 

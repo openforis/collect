@@ -1,6 +1,7 @@
 package org.openforis.collect.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,8 +15,10 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -121,6 +124,44 @@ public class TaxonTree {
 		return result == null ? null : result.getTaxon();
 	}
 
+	public List<Taxon> findTaxaByCodeStartingWith(final String code, final TaxonRank rank) {
+		final List<Taxon> result = new ArrayList<Taxon>();
+		breadthFirstVisit(new NodeVisitor() {
+			public void visit(Node node) {
+				Taxon taxon = node.getTaxon();
+				if (StringUtils.startsWithIgnoreCase(taxon.getCode(), code) && taxon.getTaxonRank() == rank) {
+					result.add(taxon);
+				}
+			}
+		});
+		return result;
+	}
+	
+	public List<TaxonOccurrence> findTaxonOccurrencesByCodeStartingWith(String code, TaxonRank rank, 
+			TaxonSearchParameters parameters) {
+		List<Taxon> taxa = findTaxaByCodeStartingWith(code, rank);
+		return taxaToOccurrences(taxa, parameters);
+	}
+	
+	public List<Taxon> findTaxaByScientificNameStartingWith(final String scientificName, final TaxonRank rank) {
+		final List<Taxon> result = new ArrayList<Taxon>();
+		breadthFirstVisit(new NodeVisitor() {
+			public void visit(Node node) {
+				Taxon taxon = node.getTaxon();
+				if (StringUtils.startsWithIgnoreCase(taxon.getScientificName(), scientificName) && taxon.getTaxonRank() == rank) {
+					result.add(taxon);
+				}
+			}
+		});
+		return result;
+	}
+	
+	public List<TaxonOccurrence> findTaxonOccurrencesByScientificNameStartingWith(String scientificName, TaxonRank rank, 
+			TaxonSearchParameters parameters) {
+		List<Taxon> taxa = findTaxaByScientificNameStartingWith(scientificName, rank);
+		return taxaToOccurrences(taxa, parameters);
+	}
+	
 	/**
 	 * 
 	 * Breadth-first visits nodes in the tree
@@ -148,8 +189,12 @@ public class TaxonTree {
 	 * 
 	 */
 	public void depthFirstVisit(NodeVisitor visitor) {
+		depthFirstVisit(visitor, roots.toArray(new Node[roots.size()]));
+	}
+	
+	public void depthFirstVisit(NodeVisitor visitor, Node... startFromNodes) {
 		Stack<Node> stack = new Stack<Node>();
-		addInverseOrderedItems(stack, roots);
+		addInverseOrderedItems(stack, Arrays.asList(startFromNodes));
 		while ( ! stack.isEmpty() ) {
 			Node node = stack.pop();
 			visitor.visit(node);
@@ -235,14 +280,36 @@ public class TaxonTree {
 			@Override
 			public void visit(Node node) {
 				Taxon taxon = node.getTaxon();
-				boolean generated = taxon.getTaxonId() == null && StringUtils.isBlank(taxon.getCode());
+				boolean generated = isGeneratedItem(taxon);
 				if ( taxon.getTaxonRank().compareTo(startFromRank) >= 0 && (includeGeneratedItems || ! generated)) {
-					TaxonSummary summary = createSummary(node);
-					result.add(summary);
+					result.add(createSummary(node));
 				}
 			}
+
 		});
 		return result;
+	}
+	
+	public List<Taxon> getDescendants(final Taxon rootTaxon) {
+		final List<Taxon> result = new ArrayList<Taxon>();
+		Node startingNode = getNodeBySystemId(rootTaxon.getSystemId());
+		depthFirstVisit(new NodeVisitor() {
+			public void visit(Node node) {
+				if (! node.getTaxon().equals(rootTaxon)) {
+					result.add(node.getTaxon());
+				}
+			}
+		}, startingNode);
+		return result;
+	}
+	
+	public List<TaxonOccurrence> getDescendantOccurrences(Taxon rootTaxon, TaxonSearchParameters parameters) {
+		List<Taxon> descendants = getDescendants(rootTaxon);
+		return taxaToOccurrences(descendants, parameters);
+	}
+
+	private boolean isGeneratedItem(Taxon taxon) {
+		return taxon.getTaxonId() == null && StringUtils.isBlank(taxon.getCode());
 	}
 
 	protected TaxonSummary createSummary(Node node) {
@@ -266,6 +333,54 @@ public class TaxonTree {
 		}
 		return summary;
 	}
+	
+	private List<TaxonOccurrence> taxaToOccurrences(List<Taxon> list, TaxonSearchParameters parameters) {
+		List<Node> nodes = taxaToNodes(list);
+		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>(nodes.size());
+		for (Node node : nodes) {
+			result.add(createOccurrence(node, parameters));
+		}
+		return result;
+	}
+
+	private List<Node> taxaToNodes(List<Taxon> list) {
+		List<Node> result = new ArrayList<Node>(list.size());
+		for (Taxon taxon : list) {
+			Node node = getNodeBySystemId(taxon.getSystemId());
+			result.add(node);
+		}
+		return result;
+	}
+	
+	private TaxonOccurrence createOccurrence(Node node, TaxonSearchParameters parameters) {
+		TaxonOccurrence occurrence = new TaxonOccurrence(node.getTaxon());
+		if (parameters.isIncludeUniqueVernacularName()) {
+			includeUniqueVernacularNameIfAny(node, occurrence);
+		}
+		if (parameters.isIncludeAncestorTaxons()) {
+			includeAncestorTaxons(node, occurrence);
+		}
+		return occurrence;
+	}
+	
+	private void includeAncestorTaxons(Node node, TaxonOccurrence occurrence) {
+		Node parent = node.getParent();
+		while (parent != null) {
+			occurrence.addAncestorTaxon(new TaxonOccurrence(parent.getTaxon()));
+			parent = parent.getParent();
+		}
+	}
+
+	private void includeUniqueVernacularNameIfAny(Node node, TaxonOccurrence o) {
+		List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
+		if (vernacularNames.size() == 1) {
+			TaxonVernacularName vernacularName = vernacularNames.get(0);
+			o.setVernacularName(vernacularName.getVernacularName());
+			o.setLanguageCode(vernacularName.getLanguageCode());
+			o.setLanguageVariety(vernacularName.getLanguageVariety());
+		}
+	}
+	
 	
 	public Set<String> getVernacularLanguageCodes() {
 		return CollectionUtils.unmodifiableSet(vernacularLanguageCodes);

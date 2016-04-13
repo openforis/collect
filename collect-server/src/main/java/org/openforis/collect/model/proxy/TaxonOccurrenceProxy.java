@@ -52,15 +52,24 @@ public class TaxonOccurrenceProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
-	public String getFamilyName() {
-		TaxonOccurrence familyTaxon = occurrence.getAncestorTaxon(TaxonRank.FAMILY);
-		return familyTaxon == null ? null : familyTaxon.getScientificName();
+	public String getFamilyCode() {
+		if (occurrence.getTaxonRank() == TaxonRank.FAMILY) {
+			return occurrence.getCode();
+		} else {
+			TaxonOccurrence familyTaxon = occurrence.getAncestorTaxon(TaxonRank.FAMILY);
+			return familyTaxon == null ? null : familyTaxon.getCode();
+		}
 	}
 	
 	@ExternalizedProperty
-	public String getFamilyCode() {
-		TaxonOccurrence familyTaxon = occurrence.getAncestorTaxon(TaxonRank.FAMILY);
-		return familyTaxon == null ? null : familyTaxon.getCode();
+	public String getFamilyScientificName() {
+		if (occurrence.getTaxonRank() == TaxonRank.FAMILY) {
+			return occurrence.getScientificName();
+		} else {
+			TaxonOccurrence familyTaxon = occurrence.getAncestorTaxon(TaxonRank.FAMILY);
+			return familyTaxon == null ? null : familyTaxon.getScientificName();
+		}
 	}
+	
 	
 }

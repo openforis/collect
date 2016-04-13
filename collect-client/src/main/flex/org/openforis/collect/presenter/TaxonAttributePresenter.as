@@ -40,6 +40,7 @@ package org.openforis.collect.presenter {
 		
 		private static const MAX_RESULTS:int = 400;
 		private static const MIN_CHARS_TO_START_AUTOCOMPLETE:int = 2;
+		private static const SEARCH_BY_FAMILY_SCIENTIFIC_NAME:String = "byFamilyScientificName";
 		private static const SEARCH_BY_CODE:String = "byCode";
 		private static const SEARCH_BY_SCIENTIFIC_NAME:String = "byScientificName";
 		private static const SEARCH_BY_VERNACULAR_NAME:String = "byVernacularName";
@@ -64,6 +65,11 @@ package org.openforis.collect.presenter {
 		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
+			//family scientific name text input
+			view.familyScientificNameTextInput.applyChangesOnFocusOut = false;
+			view.familyScientificNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.familyScientificNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
+			view.familyScientificNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler, false, 100);
 			//id text input
 			view.codeTextInput.applyChangesOnFocusOut = false;
 			view.codeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
@@ -112,6 +118,9 @@ package org.openforis.collect.presenter {
 				return;
 			}
 			switch(inputField) {
+				case view.familyScientificNameTextInput:
+					_lastSearchType = SEARCH_BY_FAMILY_SCIENTIFIC_NAME;
+					break;
 				case view.codeTextInput:
 					_lastSearchType = SEARCH_BY_CODE;
 					break;
@@ -127,6 +136,7 @@ package org.openforis.collect.presenter {
 			if(_lastSearchType != null) {
 				var defn:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(view.attributeDefinition)
 				var alignField:InputField = 
+					defn.showFamily ? view.familyScientificNameTextInput:	
 					defn.codeVisible ? view.codeTextInput:
 					defn.scientificNameVisible ? view.scientificNameTextInput:
 					defn.vernacularNameVisible ? view.vernacularNameTextInput:
@@ -231,6 +241,9 @@ package org.openforis.collect.presenter {
 			parameters.includeAncestorTaxons = attrDef.showFamily;
 
 			switch ( autoCompleteLastSearchType ) {
+				case SEARCH_BY_FAMILY_SCIENTIFIC_NAME:
+					client.findByFamilyScientificName(responder, taxonomy, searchText, MAX_RESULTS, parameters);
+					break;
 				case SEARCH_BY_CODE:
 					client.findByCode(responder, taxonomy, searchText, MAX_RESULTS, parameters);
 					break;
@@ -295,6 +308,10 @@ package org.openforis.collect.presenter {
 			_lastSelectedTaxon = taxonOccurrence;
 			var defn:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(view.attributeDefinition);
 			
+			if ( defn.showFamily ) {
+				//update family scientific name
+				view.familyScientificNameTextInput.text = taxonOccurrence.familyScientificName;
+			}
 			if ( defn.codeVisible ) {
 				//update code
 				view.codeTextInput.text = taxonOccurrence.code;
@@ -322,6 +339,7 @@ package org.openforis.collect.presenter {
 			//prepare request set
 			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			
+			reqSet.addRequest(view.familyScientificNameTextInput.presenter.createValueUpdateRequest());
 			reqSet.addRequest(view.codeTextInput.presenter.createValueUpdateRequest());
 			reqSet.addRequest(view.scientificNameTextInput.presenter.createValueUpdateRequest());
 			reqSet.addRequest(view.vernacularNameTextInput.presenter.createValueUpdateRequest());

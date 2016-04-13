@@ -4,8 +4,7 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*" 
 				  xmlns:detail="org.openforis.collect.ui.component.detail.*"
-				  inputFields="{[codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageAutocomplete, languageVarietyTextInput,
-				  	familyCodeTextInput, familyScientificNameTextInput]}" 
+				  inputFields="{[familyScientificNameTextInput, codeTextInput, scientificNameTextInput, vernacularNameTextInput, languageAutocomplete, languageVarietyTextInput]}" 
 				  xmlns:component="org.openforis.collect.ui.component.*"
 				  >
 	<fx:Script>
@@ -15,6 +14,7 @@
 			import org.openforis.collect.presenter.TaxonAttributePresenter;
 			import org.openforis.collect.ui.UIBuilder;
 			
+			public static const FAMILY_SCIENTIFIC_NAME_WIDTH:int = 100;
 			public static const CODE_WIDTH:int 				= 80;
 			public static const SCIENTIFIC_NAME_WIDTH:int 	= 100;
 			public static const VERNACULAR_NAME_WIDTH:int 	= 100;
@@ -35,6 +35,7 @@
 	</detail:states>
 	
 	<s:HGroup includeIn="horizontal" gap="{UIBuilder.COMPOSITE_ATTRIBUTE_H_GAP}">
+		<!--
 		<input:StringInputField id="familyCodeTextInput" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"
@@ -46,6 +47,7 @@
 								width="{CODE_WIDTH}" 
 								maxChars="32" 
 								/>
+		-->
 		<input:StringInputField id="familyScientificNameTextInput" 
 								includeIn="horizontal"
 								attributeDefinition="{attributeDefinition}"
@@ -121,6 +123,12 @@
 				 text="{attributeDefinition.getInstanceOrHeadingLabelText()}"
 				 includeIn="vertical_form" />
 		<s:VGroup>
+			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
+					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}">
+				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.familyScientificName')}"
+						 includeIn="vertical_form" />
+				<fx:Reparent target="familyScientificNameTextInput" includeIn="vertical" />
+			</s:HGroup>
 			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).codeVisible}"
 					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).codeVisible}">
 				<s:Label width="{subLabelWidth}" 

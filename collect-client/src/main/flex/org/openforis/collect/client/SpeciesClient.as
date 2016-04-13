@@ -18,6 +18,8 @@ package org.openforis.collect.client {
 		private var _isTaxonomyInUseOperation:Operation;
 		private var _saveTaxonomyOperation:Operation;
 		private var _deleteTaxonomyOperation:Operation;
+		private var _findByFamilyCodeOperation:Operation;
+		private var _findByFamilyScientificNameOperation:Operation;
 		private var _findByCodeOperation:Operation;
 		private var _findByScientificNameOperation:Operation;
 		private var _findByVernacularNameOperation:Operation;
@@ -30,6 +32,8 @@ package org.openforis.collect.client {
 			_isTaxonomyInUseOperation = getOperation("isTaxonomyInUse", CONCURRENCY_LAST);
 			_saveTaxonomyOperation = getOperation("saveTaxonomy");
 			_deleteTaxonomyOperation = getOperation("deleteTaxonomy");
+			_findByFamilyCodeOperation = getOperation("findByFamilyCode", CONCURRENCY_LAST);
+			_findByFamilyScientificNameOperation = getOperation("findByFamilyScientificName", CONCURRENCY_LAST);
 			_findByCodeOperation = getOperation("findByCode", CONCURRENCY_LAST);
 			_findByScientificNameOperation = getOperation("findByScientificName", CONCURRENCY_LAST);
 			_findByVernacularNameOperation = getOperation("findByVernacularName", CONCURRENCY_LAST);
@@ -57,6 +61,18 @@ package org.openforis.collect.client {
 		
 		public function deleteTaxonomy(responder:IResponder, taxonomy:TaxonomyProxy):void {
 			var token:AsyncToken = this._deleteTaxonomyOperation.send(taxonomy);
+			token.addResponder(responder);
+		}
+		
+		public function findByFamilyCode(responder:IResponder, taxonomy:String, value:String, maxResults:int, 
+				parameters:TaxonSearchParameters):void {
+			var token:AsyncToken = this._findByFamilyCodeOperation.send(taxonomy, value, maxResults, parameters);
+			token.addResponder(responder);
+		}
+		
+		public function findByFamilyScientificName(responder:IResponder, taxonomy:String, value:String, maxResults:int, 
+				parameters:TaxonSearchParameters):void {
+			var token:AsyncToken = this._findByFamilyScientificNameOperation.send(taxonomy, value, maxResults, parameters);
 			token.addResponder(responder);
 		}
 		

@@ -250,6 +250,10 @@ package org.openforis.collect.ui {
 					var total:int = 0;
 					var visibleFieldsCount:int = 0;
 					var taxonDefn:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(def);
+					if ( taxonDefn.showFamily ) {
+						total += TaxonAttributeRenderer.FAMILY_SCIENTIFIC_NAME_WIDTH;
+						visibleFieldsCount ++;
+					}
 					if ( taxonDefn.codeVisible ) {
 						total += TaxonAttributeRenderer.CODE_WIDTH;
 						visibleFieldsCount ++;
@@ -535,6 +539,11 @@ package org.openforis.collect.ui {
 				l = getLabel(defnLabel, 100, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 				//subheader
+				if ( taxonAttr.showFamily ) {
+					l = getLabel(Message.get('edit.taxon.familyScientificName'), TaxonAttributeRenderer.FAMILY_SCIENTIFIC_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					compositeAttributeLabelsGroup.addElement(l);
+				}
 				if ( taxonAttr.codeVisible ) {
 					l = getLabel(Message.get('edit.taxon.code'), TaxonAttributeRenderer.CODE_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
 					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;

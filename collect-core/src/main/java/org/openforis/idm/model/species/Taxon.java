@@ -166,4 +166,29 @@ public class Taxon {
 		this.parentId = parentId;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((systemId == null) ? 0 : systemId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Taxon other = (Taxon) obj;
+		if (systemId == null) {
+			if (other.systemId != null)
+				return false;
+		} else if (!systemId.equals(other.systemId))
+			return false;
+		return true;
+	}
+	
 }

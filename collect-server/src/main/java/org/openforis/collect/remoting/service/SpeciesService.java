@@ -24,6 +24,7 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -102,9 +103,24 @@ public class SpeciesService {
 	}
 
 	@Secured("ROLE_ENTRY")
+	public List<TaxonOccurrenceProxy> findByFamilyCode(String taxonomyName, String searchString, int maxResults, TaxonSearchParameters parameters) {
+		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
+		List<TaxonOccurrence> list = speciesManager.findByFamilyCode(taxonomy.getId(), searchString, maxResults, parameters);
+		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
+	}
+	
+	@Secured("ROLE_ENTRY")
+	public List<TaxonOccurrenceProxy> findByFamilyScientificName(String taxonomyName, String searchString, int maxResults, 
+			TaxonSearchParameters parameters) {
+		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
+		List<TaxonOccurrence> list = speciesManager.findByFamilyScientificName(taxonomy.getId(), searchString, maxResults, parameters);
+		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
+	}
+
+	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByCode(String taxonomyName, String searchString, int maxResults, TaxonSearchParameters parameters) {
 		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByCode(taxonomy.getId(), searchString, maxResults);
+		List<TaxonOccurrence> list = speciesManager.findByCode(taxonomy.getId(), searchString, maxResults, parameters);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
