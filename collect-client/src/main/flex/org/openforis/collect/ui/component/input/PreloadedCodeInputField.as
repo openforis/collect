@@ -35,7 +35,9 @@ package org.openforis.collect.ui.component.input
 		}
 		
 		public function labelFunction(item:Object):String {
-			if ( DropDownInputFieldPresenter.isMissingValueItem(item) ) {
+			if (item == null) {
+				return null;
+			} else if ( DropDownInputFieldPresenter.isMissingValueItem(item) ) {
 				return item.label;
 			} else {
 				var codeItem:CodeListItemProxy = CodeListItemProxy(item);
@@ -49,6 +51,26 @@ package org.openforis.collect.ui.component.input
 				}
 				var result:String = StringUtil.concat(" - ", parts);
 				return result;
+			}
+		}
+		
+		public function descriptionFunction(item:Object):String {
+			if (item == null) {
+				return null;
+			} else if ( DropDownInputFieldPresenter.isMissingValueItem(item) ) {
+				return item.description;
+			} else {
+				var codeItem:CodeListItemProxy = CodeListItemProxy(item);
+				var description:String = codeItem.getDescriptionText();
+				return description;
+			}
+		}
+
+		public function extractDescription(item:Object):String {
+			if ( DropDownInputFieldPresenter.isMissingValueItem(item) ) {
+				return item.description;
+			} else {
+				return CodeListItemProxy(item).getDescriptionText();
 			}
 		}
 		
@@ -71,18 +93,28 @@ package org.openforis.collect.ui.component.input
 				CollectionUtil.removeItem(selectedItems, selectedItem);
 			}
 			dispatchEvent(new Event("apply"));
+			dispatchEvent(new Event("selectedItemChange"));
 		}
 		
 		[Bindable(event="selectedItemsChange")]
 		public function get selectedIndex():int {
-			trace("attribute: " + attributeDefinition.name);
+			var selectedItem:Object = selectedItem();
+			return selectedItem == null ? -1 : getSelectableItemIndex(selectedItem);
+		}
+
+		[Bindable(event="selectedItemsChange")]
+		public function get selectedItem():Object {
 			if ( selectableItems != null && selectedItems != null && selectedItems.length == 1 ) {
-				var selectedItem:Object = selectedItems.getItemAt(0);
-				var index:int = getSelectableItemIndex(selectedItem);
-				return index;
+				return selectedItems.getItemAt(0);
 			} else {
-				return -1;
-			}
+				return null;
+			}	
+		}
+		
+		[ChangeEvent("selectedItemsChange")]
+		[ChangeEvent("selectedItemChange")]
+		public function get selectedItemDescription():String {
+			return descriptionFunction(selectedItem);
 		}
 		
 		private function getSelectableItemIndex(item:Object):int {
