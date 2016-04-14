@@ -53,7 +53,7 @@
 								forward="onSwitchTab=onSwitchTab" />
 						</tabs>
 						<tabpanels>
-							<tabpanel>
+							<tabpanel style="overflow:auto" >
 								<include id="mainInfoInclude"
 									src="survey_edit/info.zul" />
 							</tabpanel>
