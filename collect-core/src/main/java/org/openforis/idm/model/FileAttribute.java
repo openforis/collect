@@ -11,9 +11,6 @@ public class FileAttribute extends Attribute<FileAttributeDefinition, File> {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String OLD_FILE_NAME_FIELD_NAME = "fileName";
-	private static final String OLD_FILE_SIZE_FIELD_NAME = "fileSize";
-
 	public FileAttribute(FileAttributeDefinition definition) {
 		super(definition);
 	}
@@ -63,18 +60,6 @@ public class FileAttribute extends Attribute<FileAttributeDefinition, File> {
 	public boolean isEmpty() {
 		File f = getValue();
 		return f == null || (f.getSize() == null && StringUtils.isBlank(f.getFilename()));
-	}
-	
-	@Override
-	public Field<?> getField(String name) {
-		//backwards compatibility
-		if ( OLD_FILE_NAME_FIELD_NAME.equals(name)) {
-			return getFilenameField();
-		} else if ( OLD_FILE_SIZE_FIELD_NAME.equals(name) ) {
-			return getSizeField();
-		} else {
-			return super.getField(name);
-		}
 	}
 	
 }

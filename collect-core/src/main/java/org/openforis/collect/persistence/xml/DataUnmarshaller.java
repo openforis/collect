@@ -6,11 +6,8 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -51,6 +48,7 @@ public class DataUnmarshaller {
 	private static final Log log = LogFactory.getLog(DataUnmarshaller.class);
 
 	private DataHandler dataHandler;
+	private XMLReader reader;
 	
 	public DataUnmarshaller(CollectSurvey survey) {
 		this(survey, survey);
@@ -59,6 +57,7 @@ public class DataUnmarshaller {
 	public DataUnmarshaller(CollectSurvey publishedSurvey, CollectSurvey recordSurvey) {
 		super();
 		this.dataHandler = new DataHandler(publishedSurvey, recordSurvey, true);
+		initializeReader();
 	}
 
 	public ParseRecordResult parse(Reader reader) throws IOException {
@@ -89,7 +88,6 @@ public class DataUnmarshaller {
 	private ParseRecordResult parse(InputSource source) throws IOException {
 		ParseRecordResult result = new ParseRecordResult();
 		try {
-			XMLReader reader = createReader(dataHandler);
 			reader.parse(source);
 			List<NodeUnmarshallingError> failures = dataHandler.getFailures();
 			if ( failures.isEmpty() ) {
@@ -104,8 +102,6 @@ public class DataUnmarshaller {
 			} else {
 				result.setFailures(failures);
 			}
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
 		} catch (SAXException e) {
 			NodeUnmarshallingError error = new NodeUnmarshallingError(e.toString());
 			result.setFailures(Arrays.asList(error));
@@ -113,17 +109,21 @@ public class DataUnmarshaller {
 		return result;
 	}
 
-	protected XMLReader createReader(DataHandler handler) throws ParserConfigurationException, SAXException {
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		// create a parser
-		SAXParser parser = factory.newSAXParser();
-		// create the reader (scanner)
-		XMLReader reader = parser.getXMLReader();
-		reader.setFeature(NAMESPACES_FEATURE, true);
-		reader.setContentHandler(handler);
-		return reader;
+	private void initializeReader() {
+		try {
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			// create a parser
+			SAXParser parser;
+			parser = factory.newSAXParser();
+			// create the reader (scanner)
+			this.reader = parser.getXMLReader();
+			reader.setFeature(NAMESPACES_FEATURE, true);
+			reader.setContentHandler(dataHandler);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
-	
+
 	public void setRecordValidationEnabled(boolean enabled) {
 		this.dataHandler.recordValidationEnabled = enabled;
 	}
@@ -143,6 +143,9 @@ public class DataUnmarshaller {
 		private static final String ATTRIBUTE_SYMBOL = "symbol";
 		private static final String ATTRIBUTE_REMARKS = "remarks";
 		
+		private static final String OLD_FILE_NAME_FIELD_NAME = "fileName";
+		private static final String OLD_FILE_SIZE_FIELD_NAME = "fileSize";
+
 		private CollectRecord record;
 		protected Node<?> node;
 		protected String field;
@@ -150,7 +153,7 @@ public class DataUnmarshaller {
 		private List<NodeUnmarshallingError> failures;
 		private List<NodeUnmarshallingError> warnings;
 		private StringBuilder content;
-		protected Map<String, String> attributes;
+		protected Attributes attributes;
 		private CollectSurvey recordSurvey;
 		private CollectSurvey publishedSurvey;
 		private int ignoreLevels;
@@ -200,7 +203,7 @@ public class DataUnmarshaller {
 					startRecord(name, attributes);
 				} else {
 					this.content = new StringBuilder();
-					this.attributes = createAttributesMap(attributes);
+					this.attributes = attributes;
 					if ( node instanceof Entity ) {
 						startChildNode(name, attributes);
 					} else if ( node instanceof Attribute ) {
@@ -270,7 +273,7 @@ public class DataUnmarshaller {
 
 		public void startChildNode(String localName, Attributes attributes) {
 			Entity entity = (Entity) node;
-			NodeDefinition childDefn = getNodeDefinition(entity, localName, attributes);
+			NodeDefinition childDefn = getNodeDefinition(entity, localName);
 			if ( childDefn == null ) {
 				warn(localName, "Undefined node");
 				pushIgnore();
@@ -291,17 +294,18 @@ public class DataUnmarshaller {
 			}
 		}
 
-		private NodeDefinition getNodeDefinition(Entity parentEntity, String localName, Attributes attributes) {
-			NodeDefinition newDefn = null;
-			EntityDefinition parentEntityDefn = parentEntity.getDefinition();
+		private NodeDefinition getNodeDefinition(Entity parentEntity, String localName) {
 			Schema originalSchema = recordSurvey.getSchema();
+			EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 			EntityDefinition originlParentEntityDefn = (EntityDefinition) originalSchema.getDefinitionById(parentEntityDefn.getId());
 			NodeDefinition originalDefn = originlParentEntityDefn.getChildDefinition(localName);
-			if ( originalDefn != null ) {
+			if ( originalDefn == null ) {
+				return null;
+			} else {
 				Schema newSchema = publishedSurvey.getSchema();
-				newDefn = newSchema.getDefinitionById(originalDefn.getId());
+				NodeDefinition newDef = newSchema.getDefinitionById(originalDefn.getId());
+				return newDef;
 			}
-			return newDefn;
 		}
 		
 		protected void startAttributeField(String localName, Attributes attributes) {
@@ -378,10 +382,10 @@ public class DataUnmarshaller {
 			try {
 				if (field != null) {
 					Field<?> fld = getField();
-					if ( fld != null ) {
-						setField(fld);
-					} else {
+					if ( fld == null ) {
 						warn(field, "Can't parse field with type "+attr.getClass().getSimpleName());
+					} else {
+						setFieldData(fld);
 					}
 				}
 			} catch (NumberFormatException e) {
@@ -398,20 +402,19 @@ public class DataUnmarshaller {
 
 		private Field<?> getField() {
 			Attribute<?, ?> attr = (Attribute<?, ?>) node;
-			Field<?> fld;
-			if ( attr instanceof FileAttribute ) {
+			if (attr instanceof FileAttribute) {
+				FileAttribute fileAttr = (FileAttribute) attr;
 				//backwards compatibility
-				if ( field.equals("fileName") ) {
-					fld = ((FileAttribute) attr).getFilenameField();
-				} else if ( field.equals("fileSize") ) {
-					fld = ((FileAttribute) attr).getSizeField();
+				if ( OLD_FILE_NAME_FIELD_NAME.equals(field)) {
+					return fileAttr.getFilenameField();
+				} else if ( OLD_FILE_SIZE_FIELD_NAME.equals(field) ) {
+					return fileAttr.getSizeField();
 				} else {
-					fld = attr.getField(field);
+					return fileAttr.getField(field);
 				}
 			} else {
-				fld = attr.getField(field);
+				return attr.getField(field);
 			}
-			return fld;
 		}
 
 		protected void removeIfEmpty(Node<?> node) {
@@ -421,24 +424,16 @@ public class DataUnmarshaller {
 			}
 		}
 		
-		protected String getXmlValue() {
-			return content == null ? null : content.toString().trim();
-		}
-		
-		protected void setXmlValue(String content) {
-			this.content = new StringBuilder(content);
-		}
-		
 		protected Node<?> getNode() {
 			return node;
 		}
 		
-		protected void setField(Field<?> fld) {
-			String value = getXmlValue();
+		protected void setFieldData(Field<?> fld) {
+			String value = content == null ? null : content.toString().trim();
 			fld.setValueFromString(value);
-			String remarks = attributes.get(ATTRIBUTE_REMARKS);
+			String remarks = attributes.getValue(ATTRIBUTE_REMARKS);
 			fld.setRemarks(remarks);
-			String s = attributes.get(ATTRIBUTE_SYMBOL);
+			String s = attributes.getValue(ATTRIBUTE_SYMBOL);
 			if ( StringUtils.isNotBlank(s) ) {
 				char c = s.charAt(0);
 				FieldSymbol fs = FieldSymbol.valueOf(c);
@@ -454,13 +449,11 @@ public class DataUnmarshaller {
 		}
 
 		private Integer getNodeState() {
-			String state = attributes.get(ATTRIBUTE_STATE);
-			int stateInt = 0;
-			if ( state != null) {
-				stateInt = Integer.parseInt(state);
-				return stateInt;
-			} else {
+			String state = attributes.getValue(ATTRIBUTE_STATE);
+			if ( state == null) {
 				return null;
+			} else {
+				return Integer.parseInt(state);
 			}
 		}
 		
@@ -471,16 +464,16 @@ public class DataUnmarshaller {
 			}
 		}
 		
-		protected Map<String, String> createAttributesMap(Attributes attributes) {
-			HashMap<String, String> result = new HashMap<String, String>();
-			int length = attributes.getLength();
-			for ( int i = 0; i < length; i++) {
-				String qName = attributes.getQName(i);
-				String value = attributes.getValue(i);
-				result.put(qName, value);
-			}
-			return result;
-		}
+//		protected Map<String, String> createAttributesMap(Attributes attributes) {
+//			HashMap<String, String> result = new HashMap<String, String>();
+//			int length = attributes.getLength();
+//			for ( int i = 0; i < length; i++) {
+//				String qName = attributes.getQName(i);
+//				String value = attributes.getValue(i);
+//				result.put(qName, value);
+//			}
+//			return result;
+//		}
 
 		public CollectRecord getRecord() {
 			return record;
