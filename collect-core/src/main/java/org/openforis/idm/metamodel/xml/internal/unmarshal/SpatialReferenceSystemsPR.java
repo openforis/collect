@@ -58,7 +58,7 @@ class SpatialReferenceSystemsPR extends IdmlPullReader {
 
 			public WktPR() {
 				super(WKT, 1);
-				setTrimWhitespace(false);
+				setTrimWhitespace(true);
 			}
 
 			@Override
