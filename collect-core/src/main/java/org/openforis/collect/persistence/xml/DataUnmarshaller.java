@@ -295,15 +295,17 @@ public class DataUnmarshaller {
 		}
 
 		private NodeDefinition getNodeDefinition(Entity parentEntity, String localName) {
-			Schema originalSchema = recordSurvey.getSchema();
-			EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-			EntityDefinition originlParentEntityDefn = (EntityDefinition) originalSchema.getDefinitionById(parentEntityDefn.getId());
-			NodeDefinition originalDefn = originlParentEntityDefn.getChildDefinition(localName);
-			if ( originalDefn == null ) {
+			Schema oldSchema = recordSurvey.getSchema();
+			EntityDefinition newParentEntityDefn = parentEntity.getDefinition();
+			EntityDefinition oldParentEntityDefn = (EntityDefinition) oldSchema.getDefinitionById(newParentEntityDefn.getId());
+			NodeDefinition oldNodeDefn = oldParentEntityDefn.getChildDefinition(localName);
+			if ( oldNodeDefn == null) {
 				return null;
+			} else if (publishedSurvey == recordSurvey) {
+				return oldNodeDefn;
 			} else {
 				Schema newSchema = publishedSurvey.getSchema();
-				NodeDefinition newDef = newSchema.getDefinitionById(originalDefn.getId());
+				NodeDefinition newDef = newSchema.getDefinitionById(oldNodeDefn.getId());
 				return newDef;
 			}
 		}

@@ -71,9 +71,12 @@ public class EntityDefinition extends NodeDefinition {
 	}
 	
 	public List<NodeDefinition> getChildDefinitionsInVersion(ModelVersion version) {
+		if (version == null) {
+			return childDefinitions;
+		}
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>(childDefinitions.size());
 		for (NodeDefinition nodeDef : childDefinitions) {
-			if (version == null || version.isApplicable(nodeDef)) {
+			if (version.isApplicable(nodeDef)) {
 				result.add(nodeDef);
 			}
 		}
@@ -101,7 +104,7 @@ public class EntityDefinition extends NodeDefinition {
 			return childDef;
 		}
 	}
-
+	
 	/**
 	 * Get child definition and cast to requested type
 	 *

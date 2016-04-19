@@ -51,14 +51,15 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 	
 	private void initFields() {
+		int fieldIdx = 0;
 		List<FieldDefinition<?>> fieldsDefinitions = definition.getFieldDefinitions();
 		this.fields = new Field<?>[fieldsDefinitions.size()];
-		for (int i = 0; i < fieldsDefinitions.size(); i++) {
-			FieldDefinition<?> fieldDefn = fieldsDefinitions.get(i);
+		for (FieldDefinition<?> fieldDefn : fieldsDefinitions) {
 			Field<?> field = (Field<?>) fieldDefn.createNode();
 			field.setAttribute(this);
-			field.index = i;
-			this.fields[i] = field;
+			field.index = fieldIdx;
+			this.fields[fieldIdx] = field;
+			fieldIdx ++;
 		}
 		this.fieldList = Collections.unmodifiableList(Arrays.asList(fields));
 	}

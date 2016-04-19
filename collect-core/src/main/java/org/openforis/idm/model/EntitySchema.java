@@ -6,7 +6,6 @@ import java.util.List;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 
 import com.dyuproject.protostuff.Input;
 import com.dyuproject.protostuff.Output;
@@ -54,14 +53,18 @@ public class EntitySchema extends SchemaSupport<Entity> {
 
 	@Override
 	public void mergeFrom(Input input, Entity entity) throws IOException {
+		EntityDefinition entityDef = entity.getDefinition();
         for(int number = input.readFieldNumber(this); number > 0 ; number = input.readFieldNumber(this)) {
         	switch (number) {
         	case DEFINITION_ID_FIELD_NUMBER:
-        		Schema idmSchema = entity.getSchema();
-        		
         		// Definition id
         		int definitionId = input.readUInt32();
-        		NodeDefinition defn = idmSchema.getDefinitionById(definitionId);
+				NodeDefinition defn = null;
+				try {
+					defn = entityDef.getChildDefinition(definitionId);
+				} catch(IllegalArgumentException e) {
+					//not existing child definition
+				}
         		if ( defn == null || ( defn instanceof AttributeDefinition && ((AttributeDefinition) defn).isCalculated() ) ) {
 	        		skipNode(input);
         		} else {
@@ -78,11 +81,13 @@ public class EntitySchema extends SchemaSupport<Entity> {
         		State state = State.parseState(intState);
         		readAndCheckFieldNumber(input, CHILD_DEFINITION_ID_FIELD_NUMBER);
         		int childDefnId = input.readInt32();
-        		Schema schema = entity.getSchema();
-        		NodeDefinition childDefn = schema.getDefinitionById(childDefnId);
-        		if ( childDefn != null ) {
-        			entity.setChildState(childDefn, state);
-        		}
+				NodeDefinition childDefn = null;
+				try {
+					childDefn = entityDef.getChildDefinition(childDefnId);
+					entity.setChildState(childDefn, state);
+				} catch(IllegalArgumentException e) {
+					//not existing child definition
+				}
         		break;
         	default:
             	throw new ProtostuffException("Unexpected field number");

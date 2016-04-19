@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.Arrays;
+
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 
@@ -40,7 +42,7 @@ public final class FieldDefinition<T> extends NodeDefinition {
 	}
 	
 	public int getIndex() {
-		return ((AttributeDefinition) getParentDefinition()).getFieldDefinitions().indexOf(this);
+		return Arrays.asList(((AttributeDefinition) getParentDefinition()).getFieldDefinitions()).indexOf(this);
 	}
 	
 	@Override

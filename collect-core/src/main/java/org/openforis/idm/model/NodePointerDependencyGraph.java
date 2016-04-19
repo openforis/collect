@@ -89,9 +89,12 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 	}
 	
 	protected Set<NodePathPointer> filterByVersion(Set<NodePathPointer> pointers, ModelVersion version) {
+		if (version == null) {
+			return pointers;
+		}
 		Set<NodePathPointer> result = new HashSet<NodePathPointer>(pointers.size());
 		for (NodePathPointer pointer : pointers) {
-			if (version == null || version.isApplicable(pointer.getReferencedNodeDefinition())) {
+			if (version.isApplicable(pointer.getReferencedNodeDefinition())) {
 				result.add(pointer);
 			}
 		}

@@ -4,10 +4,13 @@
 package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.openforis.commons.collection.CollectionUtils;
@@ -176,7 +179,7 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	}
 	
 	public List<FieldDefinition<?>> getFieldDefinitions() {
-		return getFieldDefinitionMap().listValues();
+		return getFieldDefinitionMap().getFieldDefinitions();
 	}
 	
 	public FieldDefinition<?> getFieldDefinition(String name) {
@@ -304,29 +307,72 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		private static final long serialVersionUID = 1L;
 	}
 	
-	static class FieldDefinitionMap extends LinkedHashMap<String, FieldDefinition<?>> {
+	static class FieldDefinitionMap implements Map<String, FieldDefinition<?>> {
 		
-		private static final long serialVersionUID = 1L;
-
-		public FieldDefinitionMap(FieldDefinition<?>... fieldDefs) {
+		private final Map<String, FieldDefinition<?>> internalMap;
+		private final List<String> fieldNames;
+		private final List<FieldDefinition<?>> fieldDefinitions;
+		
+		FieldDefinitionMap(FieldDefinition<?>... fieldDefs) {
+			this.fieldDefinitions = Arrays.asList(fieldDefs);
+			this.fieldNames = new ArrayList<String>(fieldDefs.length);
+			this.internalMap = new LinkedHashMap<String, FieldDefinition<?>>(fieldDefs.length);
 			for (FieldDefinition<?> def : fieldDefs) {
-				super.put(def.getName(), def);
+				this.fieldNames.add(def.getName());
+				this.internalMap.put(def.getName(), def);
 			}
 		}
 		
 		public List<String> getFieldNames() {
-			return Collections.unmodifiableList(new ArrayList<String>(keySet()));
+			return fieldNames;
 		}
 
-		public List<FieldDefinition<?>> listValues() {
-			return Collections.unmodifiableList(new ArrayList<FieldDefinition<?>>(values()));
+		public List<FieldDefinition<?>> getFieldDefinitions() {
+			return fieldDefinitions;
 		}
 		
+		public int size() {
+			return internalMap.size();
+		}
+
+		public boolean isEmpty() {
+			return internalMap.isEmpty();
+		}
+
+		public boolean containsKey(Object key) {
+			return internalMap.containsKey(key);
+		}
+
+		public boolean containsValue(Object value) {
+			return internalMap.containsValue(value);
+		}
+
+		public FieldDefinition<?> get(Object key) {
+			return internalMap.get(key);
+		}
+
+		public Set<String> keySet() {
+			return internalMap.keySet();
+		}
+
+		public Collection<FieldDefinition<?>> values() {
+			return internalMap.values();
+		}
+
+		public Set<java.util.Map.Entry<String, FieldDefinition<?>>> entrySet() {
+			return internalMap.entrySet();
+		}
+
 		@Override
 		public FieldDefinition<?> put(String key, FieldDefinition<?> value) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
+		public void putAll(Map<? extends String, ? extends FieldDefinition<?>> m) {
+			throw new UnsupportedOperationException();
+		}
+		
 		@Override
 		public FieldDefinition<?> remove(Object key) {
 			throw new UnsupportedOperationException();
@@ -336,7 +382,6 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		public void clear() {
 			throw new UnsupportedOperationException();
 		}
-		
 	}
 
 }

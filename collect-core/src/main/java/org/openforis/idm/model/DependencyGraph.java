@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -117,26 +118,14 @@ public abstract class DependencyGraph<T> {
 	}
 
 	public List<T> dependenciesFor(Collection<Node<?>> nodes) {
-		Set<T> items = new HashSet<T>();
-		for (Node<?> node : nodes) {
-			items.addAll(toItems(node));
-		}
-		return dependenciesForItems(items);
+		return dependenciesForItems(itemsFromNodes(nodes));
 	}
 	
 	protected List<T> dependenciesForItems(Collection<T> items) {
-		Set<GraphNode> nodes = new HashSet<GraphNode>();
-		for (T item : items) {
-			Object id = getId(item);
-			GraphNode graphNode = graphNodeById.get(id);
-			if ( graphNode != null ) {
-				nodes.add(graphNode);
-			}
-		}
-		return getDependentNodes(nodes);
+		return getDependentNodes(nodesFromItems(items));
 	}
 
-	private List<T> getDependentNodes(Set<GraphNode> nodes) {
+	private List<T> getDependentNodes(Collection<GraphNode> nodes) {
 		Set<GraphNode> nodesToSort = new HashSet<GraphNode>(nodes);
 		for (GraphNode graphNode : nodes) {
 			nodesToSort.addAll(graphNode.getUnsortedDependents());
@@ -192,7 +181,7 @@ public abstract class DependencyGraph<T> {
 		}
 		return result;
 	}
-
+	
 	protected abstract Set<T> determineRelatedItems(T item, NodeDefinition childDef);
 
 	protected abstract Set<T> determineRelatedItems(T item,
@@ -208,6 +197,26 @@ public abstract class DependencyGraph<T> {
 		return result;
 	}
 	
+	private Collection<GraphNode> nodesFromItems(Collection<T> items) {
+		Collection<GraphNode> nodes = new ArrayList<GraphNode>(items.size());
+		for (T item : items) {
+			Object id = getId(item);
+			GraphNode graphNode = graphNodeById.get(id);
+			if ( graphNode != null ) {
+				nodes.add(graphNode);
+			}
+		}
+		return nodes;
+	}
+	
+	private Collection<T> itemsFromNodes(Collection<Node<?>> nodes) {
+		Collection<T> result = new ArrayList<T>(nodes.size());
+		for (Node<?> node : nodes) {
+			result.addAll(toItems(node));
+		}
+		return result;
+	}
+
 	protected List<T> getSortedDependentItems(Set<GraphNode> toSort) {
 		return extractItems(toSort);
 	}
@@ -235,26 +244,28 @@ public abstract class DependencyGraph<T> {
 			}
 		}
 
-		private Set<GraphNode> getUnsortedDependents() {
-			return getUnsortedDependents(new HashSet<GraphNode>());
+		private Collection<GraphNode> getUnsortedDependents() {
+			Collection<GraphNode> result = new ArrayList<GraphNode>();
+			Stack<GraphNode> stack = new Stack<GraphNode>();
+			
+			stack.addAll(this.getFirstLevelDependents());
+			
+			while (! stack.isEmpty()) {
+				GraphNode node = stack.pop();
+				if (! result.contains(node)) {
+					result.add(node);
+					stack.addAll(node.getFirstLevelDependents());
+				}
+			}
+			return result;
 		}
 		
-		private Set<GraphNode> getUnsortedDependents(Set<GraphNode> visited) {
-			if ( visited.contains(this) ) {
-				return Collections.emptySet();
-			}
-			visited.add(this);
-			
-			Set<GraphNode> result = new HashSet<GraphNode>();
-			for (GraphNode graphNode : dependents) {
-				result.add(graphNode);
-				result.addAll(graphNode.getUnsortedDependents(visited));
-			}
-			List<T> children = getChildren(item);
-			for (T child : children) {
-				GraphNode childGrapNode = graphNodeById.get(getId(child));
-				result.add(childGrapNode);
-				result.addAll(childGrapNode.getUnsortedDependents(visited));
+		private List<GraphNode> getFirstLevelDependents() {
+			List<GraphNode> result = new ArrayList<GraphNode>();
+			result.addAll(this.dependents);
+			for (T child : getChildren(this.item)) {
+				GraphNode childNode = getOrCreateGraphNode(child);
+				result.add(childNode);
 			}
 			return result;
 		}
@@ -323,20 +334,23 @@ public abstract class DependencyGraph<T> {
 	 *
 	 */
 	class GraphSorter {
-		Set<Object> permanentlyMarkedNodeIds;
-		Set<Object> temporarilyMarkedNodeIds;
-		Set<GraphNode> nodes;
-		Set<GraphNode> unmarkedNodes;
+		
 		LinkedList<T> results;
 		
+		Set<GraphNode> permanentlyMarkedNodes;
+		Set<GraphNode> temporarilyMarkedNodes;
+		Set<GraphNode> unmarkedNodes;
+		
+		private Set<GraphNode> nodes;
+
 		public GraphSorter(Set<GraphNode> nodes) {
 			this.nodes = nodes;
-			this.results = new LinkedList<T>();
-			this.permanentlyMarkedNodeIds = new LinkedHashSet<Object>(nodes.size());
-			this.temporarilyMarkedNodeIds = new LinkedHashSet<Object>(nodes.size());
+			this.permanentlyMarkedNodes = new LinkedHashSet<GraphNode>();
+			this.temporarilyMarkedNodes = new LinkedHashSet<GraphNode>();
 			this.unmarkedNodes = new LinkedHashSet<GraphNode>(this.nodes);
+			this.results = new LinkedList<T>();
 		}
-		
+
 		public List<T> sort() {
 			while (! unmarkedNodes.isEmpty()) {
 				GraphNode n = unmarkedNodes.iterator().next();
@@ -346,19 +360,18 @@ public abstract class DependencyGraph<T> {
 		}
 
 		private void visit(GraphNode n) {
-			Object nodeId = n.getItemId();
-			if ( temporarilyMarkedNodeIds.contains(nodeId) ) {
+			if ( temporarilyMarkedNodes.contains(n) ) {
 				throw new IllegalStateException(String.format("Circular dependency found in graph for node %s", n));
 			}
-			if ( ! permanentlyMarkedNodeIds.contains(nodeId) ) {
-				temporarilyMarkedNodeIds.add(nodeId);
+			if ( ! permanentlyMarkedNodes.contains(n) ) {
+				temporarilyMarkedNodes.add(n);
 				for (GraphNode m : n.sources) {
 					if (nodes.contains(m) ) {
 						visit(m);	
 					}
 				}
-				permanentlyMarkedNodeIds.add(nodeId);
-				temporarilyMarkedNodeIds.remove(nodeId);
+				permanentlyMarkedNodes.add(n);
+				temporarilyMarkedNodes.remove(n);
 				unmarkedNodes.remove(n);
 				results.add(n.item);
 			}

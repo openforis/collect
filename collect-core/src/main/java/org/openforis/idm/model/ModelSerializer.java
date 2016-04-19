@@ -72,7 +72,6 @@ public class ModelSerializer {
 		try {
 			writeTo(out, entity);
 		} finally {
-			buffer.clear();
 			out.flush();
 			out.close();
 		}
@@ -103,7 +102,6 @@ public class ModelSerializer {
 		try {
 			mergeFrom(in, entity);
 		} finally {
-			buffer.clear();
 			in.close();
 		}
 	}

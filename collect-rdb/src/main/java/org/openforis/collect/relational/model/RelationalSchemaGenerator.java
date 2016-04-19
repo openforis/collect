@@ -352,8 +352,7 @@ public class RelationalSchemaGenerator {
 	}
 
 	private void addDataColumnsForEachField(DataTable table, AttributeDefinition defn, Path relativePath) throws CollectRdbException {
-		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
-		for (FieldDefinition<?> field : fieldDefinitions) {
+		for (FieldDefinition<?> field : defn.getFieldDefinitions()) {
 			addDataColumn(table, field, relativePath);
 		}
 	}
@@ -387,9 +386,8 @@ public class RelationalSchemaGenerator {
 	}
 	
 	private void addDataColumns(DataTable table, NumericAttributeDefinition defn, Path relativePath) throws CollectRdbException {
-		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
 		boolean variableUnit = defn.isVariableUnit();
-		for (FieldDefinition<?> field : fieldDefinitions) {
+		for (FieldDefinition<?> field : defn.getFieldDefinitions()) {
 			String name = field.getName();
 			if ( variableUnit || ! 
 					(name.equals(NumberAttributeDefinition.UNIT_FIELD) || name.equals(NumberAttributeDefinition.UNIT_NAME_FIELD)) ) {

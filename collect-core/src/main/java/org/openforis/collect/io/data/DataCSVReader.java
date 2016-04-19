@@ -156,8 +156,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 						}
 					}
 				} else {
-					List<FieldDefinition<?>> fieldDefns = ((AttributeDefinition) childDefn).getFieldDefinitions();
-					for (FieldDefinition<?> fieldDefn : fieldDefns) {
+					for (FieldDefinition<?> fieldDefn : ((AttributeDefinition) childDefn).getFieldDefinitions()) {
 						if ( absoluteColName.equals(childName + ATTRIBUTE_FIELD_SEPARATOR + fieldDefn.getName() ) ) {
 							return fieldDefn;
 						}

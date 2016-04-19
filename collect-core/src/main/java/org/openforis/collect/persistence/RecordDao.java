@@ -431,6 +431,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 
 	public static class RecordDSLContext extends MappingDSLContext<CollectRecord> {
 
+		private static final String DATA_ALIAS_NAME = "DATA";
 		private static final long serialVersionUID = 1L;
 		private static final int SERIALIZATION_BUFFER_SIZE = 50000;
 		private CollectSurvey survey;
@@ -457,7 +458,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			if ( step != null && (step < 1 || step > 3) ) {
 				throw new IllegalArgumentException("Invalid step "+step);
 			}
-			this.dataAlias = step == null ? null: (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as("DATA");
+			this.dataAlias = step == null ? null: (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as(DATA_ALIAS_NAME);
 			this.modelSerializer = step == null ? null : new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
 		}
 

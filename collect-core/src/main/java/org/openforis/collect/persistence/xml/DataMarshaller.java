@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
 import org.openforis.collect.utils.Dates;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -40,9 +39,17 @@ public class DataMarshaller {
 	private static final String SYMBOL_ATTRIBUTE = "symbol";
 	private static final String REMARKS_ATTRIBUTE = "remarks";
 	
+	private static final XmlPullParserFactory PARSER_FACTORY;
+	static {
+		try {
+			PARSER_FACTORY = XmlPullParserFactory.newInstance();
+		} catch (XmlPullParserException e) {
+			throw new RuntimeException("Error inizializing pull parser factory: " + e.getMessage(), e);
+		}
+	}
+	
 	public void write(CollectRecord record, Writer out) throws IOException, XmlPullParserException {
-		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-		XmlSerializer serializer = factory.newSerializer();
+		XmlSerializer serializer = PARSER_FACTORY.newSerializer();
 		serializer.setFeature(INDENT_FEATURE, true);
 		serializer.setOutput(out);
 		//do not use UTF-8 encoding: unicode text will be escaped by the serializer instead
@@ -155,11 +162,9 @@ public class DataMarshaller {
 	}
 
 	private void writeField(XmlSerializer serializer, Attribute<?, ?> attr, int fieldIdx) throws IOException {
-		AttributeDefinition definition = attr.getDefinition();
-		List<FieldDefinition<?>> fldDefns = definition.getFieldDefinitions();
 		Field<?> fld = attr.getField(fieldIdx);
 		if ( fld.hasData() ) {
-			FieldDefinition<?> fldDefn = fldDefns.get(fieldIdx);
+			FieldDefinition<?> fldDefn = fld.getDefinition();
 			String name = fldDefn.getName();
 			serializer.startTag(null, name);
 			Object val = fld.getValue();
