@@ -20,6 +20,10 @@ public class SamplingDesignItem {
 	private Double y;
 	private List<String> infoAttributes;
 	
+	public int getLevel() {
+		return levelCodes == null ? -1 : levelCodes.size();
+	}
+	
 	public void addLevelCode(String code) {
 		if ( levelCodes == null ) {
 			levelCodes = new ArrayList<String>();

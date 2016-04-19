@@ -44,6 +44,11 @@ public class SamplingDesignItemProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
+	public int getLevel() {
+		return item.getLevel();
+	}
+	
+	@ExternalizedProperty
 	public List<String> getLevelCodes() {
 		return item.getLevelCodes();
 	}

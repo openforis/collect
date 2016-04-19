@@ -4,133 +4,124 @@ Collect.DataCleansing.MapPanelComposer = function(container) {
 };
 
 Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
-	var mapCanvas = this.container.find(".map-canvas")[0];
-	var mapOptions = {
-		//center : new google.maps.LatLng(44.5403, -78.5463),
-		center : new google.maps.LatLng(0, 0),
-		zoom : 5,
-		mapTypeId: google.maps.MapTypeId.TERRAIN
-	};
-	var map = new google.maps.Map(mapCanvas, mapOptions);
-	
-	map.data.setStyle(function(feature) {
-	    return {
-	      icon: "assets/images/bullet-blue-small.png",
-	      shape: ""
-	    };
-	});
-	//TODO
-	
-//	var kmlLayer = new google.maps.KmlLayer('http://127.0.0.1:8280/collect/geo/data/samplingpoints.kml',
-//		{
-//			suppressInfoWindows: false,
-//			map: map
-//		}
-//	);
-//	kmlLayer.setMap(map);
-//	
-//	 var kmlLayer = new google.maps.KmlLayer({
-//		    url: 'http://kml-samples.googlecode.com/svn/trunk/kml/Placemark/placemark.kml',
-//		    suppressInfoWindows: true,
-//		    map: map
-//		  });
-//	
-//	var bound = new google.maps.LatLngBounds();
-
-//	for (i = 0; i < locations.length; i++) {
-//	  bound.extend( new google.maps.LatLng(locations[i][1], locations[i][2]) );
-//
-//	}
-
-	this.map = map;
-	//TODO
-	this.loadLayers();
-
-//	collect.geoDataService.loadCoordinateValues(collect.activeSurvey.name, 3, 0, 10, function(lngLats) {
-//		lngLats.forEach(function(lngLat) {
-//			var point = new google.maps.Circle({
-//				center : new google.maps.LatLng(lngLat[1], lngLat[0]),
-//				radius : 20000,
-//				strokeColor : "#0000FF",
-//				strokeOpacity : 0.8,
-//				strokeWeight : 2,
-//				fillColor : "#0000FF",
-//				fillOpacity : 0.4
-//			});
-//			point.setMap(map);
-//		});
-//	});
-	
-};
-
-Collect.DataCleansing.MapPanelComposer.prototype.loadLayers = function() {
 	var $this = this;
-	var survey = collect.activeSurvey;
-	var surveyName = survey.name;
-	var coordinateAttrDefs = new Array();
-	survey.traverse(function(nodeDef) {
-		if (nodeDef instanceof Collect.Metamodel.AttributeDefinition && nodeDef.attributeType == "COORDINATE") {
-			coordinateAttrDefs.push(nodeDef);
-		}
-	});
-	var bounds = new google.maps.LatLngBounds();
 	
-	var rootEntityDefinitionId = survey.rootEntities[0].id;
-	collect.dataService.countRecords(survey.id, rootEntityDefinitionId, 1, function(recordCount) {
-		var blockSize = 100;
-		var maxProcessableItems = 5000;
-		var totalItems = Math.min(recordCount, maxProcessableItems);
-		var blockProcessor = new BlockProcessor(totalItems, blockSize, function(blockOffset, callback) {
-			coordinateAttrDefs.forEach(function(coordAttrDef) {
-				var layerOverlay = new LayerOverlay();
-				collect.geoDataService.loadCoordinateValues(surveyName, coordAttrDef.id, blockOffset, blockSize, function(lngLats) {
-					lngLats.forEach(function(lngLatItem) {
-						var latLng = new google.maps.LatLng(lngLatItem[1], lngLatItem[0]);
-						var point = new google.maps.Circle({
-							center : latLng,
-							radius : 20000,
-							strokeColor : "#0000FF",
-							strokeOpacity : 0.8,
-							strokeWeight : 2,
-							fillColor : "#0000FF",
-							fillOpacity : 0.4
-						});
-						layerOverlay.addOverlay(point);
-						bounds.extend(latLng);
-					});
-					layerOverlay.setMap($this.map);
-					$this.map.fitBounds(bounds);
-					callback();
-				});
-			});
-		});
-		blockProcessor.start();
+	$(window).resize(function() {
+		$this.resizeDataGrid();
 	});
-};
+	
+	this.map = L.map('map').setView([ 51.505, -0.09 ], 13);
 
-BlockProcessor = function(totalItems, blockSize, processFn) {
-	this.totalItems = totalItems;
-	this.blockSize = blockSize;
-	this.processFn = processFn;
-	this.blocks = Math.ceil(totalItems / blockSize);
-	this.currentBlockIndex = 0;
+	var satelliteTileLayer = L.tileLayer(
+		// Esri_WorldImagery
+		'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+		{
+			attribution : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, '
+					+ 'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+		}).addTo(this.map);
+
+	this.baseMaps = {
+		"Satellite" : satelliteTileLayer
+	};
+
+	this.samplingPointsLayerGroup = L.layerGroup();
+
+	this.overlayMaps = {
+		"Sampling Points" : this.samplingPointsLayerGroup
+	};
 }
 
-BlockProcessor.prototype = {
-	start: function() {
-		this.processNextBlockIfPossible();
-	},
-	processNextBlock: function() {
-		var $this = this;
-		var blockOffset = $this.currentBlockIndex * $this.blockSize;
-		$this.processFn(blockOffset, function() {
-			$this.currentBlockIndex++;
-			$this.processNextBlockIfPossible();
+Collect.DataCleansing.MapPanelComposer.prototype.resizeDataGrid = function() {
+	$("#map").height($(window).height() - 250);
+	$("#map").width($(window).width() - 50);
+}
+
+Collect.DataCleansing.MapPanelComposer.prototype.refreshDataGrid = function() {
+	var $this = this;
+	collect.geoDataService.loadSamplingPointCoordinates(collect.activeSurvey.name, 0, 10,
+		function(samplingPointItems) {
+			samplingPointItems.forEach(function(item) {
+				var circle = L
+						.circle([ item.y, item.x ],	10,
+							{
+								color : 'white',
+								fillColor : determineSamplingPointCoordinateFillColor(item.level),
+								fillOpacity : 0.5
+							});
+				circle.bindPopup("<b>Sampling Point</b>"
+						+ "<br>" + printLevelCodes(item)
+						+ "latitude: " + item.y + "<br>"
+						+ "longitude: " + item.x + "<br>");
+				$this.samplingPointsLayerGroup.addLayer(circle);
+
+				function printLevelCodes(item) {
+					var result = "";
+					for (var i = 0; i < item.levelCodes.length; i++) {
+						result += "level " + (i + 1) + ": "
+								+ item.levelCodes[i]
+								+ "<br>";
+					}
+					return result;
+				}
+			});
 		});
-	},
-	processNextBlockIfPossible: function() {
-		if (this.currentBlockIndex < this.blocks) {
-			this.processNextBlock();
+
+	var coordinateAttributes = [];
+	collect.activeSurvey.traverse(function(node) {
+		if (node instanceof Collect.Metamodel.AttributeDefinition
+				&& node.attributeType == 'COORDINATE') {
+			coordinateAttributes.push(node);
 		}
+	});
+
+	var coordinateAttributeLayers = [];
+	for (i = 0; i < coordinateAttributes.length; i++) {
+		var coordinateAttribute = coordinateAttributes[i];
+		var coordinateAttributeLayer = L.layerGroup();
+		coordinateAttributeLayers.push(coordinateAttributeLayer);
+		this.overlayMaps[coordinateAttribute.label] = coordinateAttributeLayer;
 	}
+
+	L.control.layers(this.baseMaps, this.overlayMaps).addTo(this.map);
+
+	this.map.on('overlayadd', function(e) {
+		if (OF.Arrays.contains(coordinateAttributeLayers, e.layer)) {
+			if (e.layer.getLayers().length == 0) {
+				var index = coordinateAttributeLayers.indexOf(e.layer);
+				var coordinateAttribute = coordinateAttributes[index];
+				collect.geoDataService.loadCoordinateValues(
+					collect.activeSurvey.name, 1, coordinateAttribute.id, 0,
+					10, function(coordinateValues) {
+						for (i = 0; i < coordinateValues.length; i++) {
+							var value = coordinateValues[i];
+							var circle = L.circle([ value.lat, value.lon ], 10,
+								{
+									color : 'blue',
+									fillColor : '#30f',
+									fillOpacity : 0.5
+								});
+							circle.bindPopup("<b>" + coordinateAttribute.label
+									+ "</b>" + "<br>" + "record: "
+									+ value.recordKeys + "<br>" + "latitude: "
+									+ value.lat + "<br>" + "longitude: "
+									+ value.lon + "<br>");
+							e.layer.addLayer(circle);
+						}
+				});
+			}
+		}
+	});
+
+	function determineSamplingPointCoordinateFillColor(level) {
+		var percentage = 1 - 0.2 * (level - 1);
+		var color_part_dec = percentage * 255;
+		var color_part_hex = dec2hex(color_part_dec);
+		var color = "#" + color_part_hex + color_part_hex + color_part_hex;
+	}
+
+	function dec2hex(dec) {
+		return Number(parseInt(dec, 10)).toString(16);
+	}
+
 };
+

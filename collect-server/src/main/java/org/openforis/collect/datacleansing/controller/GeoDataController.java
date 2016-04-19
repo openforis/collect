@@ -10,6 +10,7 @@ import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.LngLatAlt;
 import org.geojson.MultiPoint;
+import org.geojson.Point;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SessionManager;
@@ -21,6 +22,8 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
+import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
+import org.openforis.collect.utils.Proxies;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.model.Coordinate;
@@ -56,15 +59,20 @@ public class GeoDataController {
 	
 	@RequestMapping(value = "samplingpoints.json", method = RequestMethod.GET)
 	public @ResponseBody FeatureCollection loadSamplingPointData() {
+		CollectSurvey survey = sessionManager.getActiveSurvey();
+		return loadSamplingPointDataFeatures(survey);
+	}
+
+	private FeatureCollection loadSamplingPointDataFeatures(CollectSurvey survey) {
 		FeatureCollection featureCollection = new FeatureCollection();
 		Feature feature = new Feature();
 		feature.setProperty("letter", "o");
 		feature.setProperty("color", "blue");
 		feature.setProperty("rank", "15");
 		MultiPoint multiPoint = new MultiPoint();
-
-		CoordinateOperations coordinateOperations = getCoordinateOperations();
-		List<SamplingDesignItem> samplingDesignItems = loadSamplingDesignItems();
+		
+		CoordinateOperations coordinateOperations = getCoordinateOperations(survey);
+		List<SamplingDesignItem> samplingDesignItems = loadSamplingDesignItems(survey);
 		for (SamplingDesignItem item : samplingDesignItems) {
 			Coordinate coordinate = new Coordinate(item.getX(), item.getY(), item.getSrsId());
 			multiPoint.add(createLngLatAlt(coordinateOperations, coordinate));
@@ -78,8 +86,9 @@ public class GeoDataController {
 	public void loadSamplingPointKmlData(HttpServletResponse response) throws Exception {
 		Kml kml = KmlFactory.createKml();
 		Document doc = kml.createAndSetDocument();
-		CoordinateOperations coordinateOperations = getCoordinateOperations();
-		List<SamplingDesignItem> samplingDesignItems = loadSamplingDesignItems();
+		CollectSurvey survey = sessionManager.getActiveSurvey();
+		CoordinateOperations coordinateOperations = getCoordinateOperations(survey);
+		List<SamplingDesignItem> samplingDesignItems = loadSamplingDesignItems(survey);
 		for (SamplingDesignItem item : samplingDesignItems) {
 			Coordinate coordinate = new Coordinate(item.getX(), item.getY(), item.getSrsId());
 			LngLatAlt lngLatAlt = createLngLatAlt(coordinateOperations, coordinate);
@@ -89,9 +98,8 @@ public class GeoDataController {
 		kml.marshal(response.getOutputStream());
 	}
 
-	private List<SamplingDesignItem> loadSamplingDesignItems() {
-		CollectSurvey survey = sessionManager.getActiveSurvey();
-		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId(), 1);
+	private List<SamplingDesignItem> loadSamplingDesignItems(CollectSurvey survey) {
+		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId());
 		List<SamplingDesignItem> samplingDesignItems = samplingDesignSummaries.getRecords();
 		List<SamplingDesignItem> result = new ArrayList<SamplingDesignItem>();
 		for (SamplingDesignItem item : samplingDesignItems) {
@@ -100,8 +108,7 @@ public class GeoDataController {
 		return result;
 	}
 	
-	private CoordinateOperations getCoordinateOperations() {
-		CollectSurvey survey = sessionManager.getActiveSurvey();
+	private CoordinateOperations getCoordinateOperations(CollectSurvey survey) {
 		CollectSurveyContext surveyContext = survey.getContext();
 		return surveyContext.getCoordinateOperations();
 	}
@@ -141,19 +148,49 @@ public class GeoDataController {
 		return bounds;
 	}
 	
-	@RequestMapping(value = "{surveyName}/{coordinateAttributeId}/coordinatevalues.json", method = RequestMethod.GET)
-	public @ResponseBody List<LngLatAlt> loadCoordinateValues(
+	@RequestMapping(value = "{surveyName}/samplingpointcoordinates.json", method = RequestMethod.GET)
+	public @ResponseBody List<SamplingDesignItemProxy> loadSamplingCoordinates(
+			@PathVariable("surveyName") String surveyName, 
+			int recordOffset, int maxNumberOfRecords) {
+		CollectSurvey survey = surveyManager.get(surveyName);
+		return loadSamplingPointDataItems(survey);
+	}
+	
+	private List<SamplingDesignItemProxy> loadSamplingPointDataItems(CollectSurvey survey) {
+		return Proxies.fromList(loadSamplingDesignItems(survey), SamplingDesignItemProxy.class);
+	}
+	
+//	@RequestMapping(value = "{surveyName}/{coordinateAttributeId}/coordinatevalues.json", method = RequestMethod.GET)
+//	public @ResponseBody List<LngLatAlt> loadCoordinateValues(
+//			@PathVariable("surveyName") String surveyName, 
+//			@PathVariable("step") int stepNumber,
+//			@PathVariable("coordinateAttributeId") int coordinateAttributeId, 
+//			int recordOffset, int maxNumberOfRecords) {
+//		final List<LngLatAlt> result = new ArrayList<LngLatAlt>();
+//		CollectSurvey survey = surveyManager.get(surveyName);
+//		
+//		extractAllRecordCoordinates(survey, Step.valueOf(stepNumber), recordOffset, maxNumberOfRecords, coordinateAttributeId, new CoordinateProcessor() {
+//			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
+//				LngLatAlt lngLatAlt = new LngLatAlt(wgs84Coordinate.getX(), wgs84Coordinate.getY());
+//				result.add(lngLatAlt);
+//			}
+//		});
+//		return result;
+//	}
+	
+	@RequestMapping(value = "{surveyName}/{step}/{coordinateAttributeId}/coordinatevalues.json", method = RequestMethod.GET)
+	public @ResponseBody List<CoordinateAttributePoint> loadCoordinateValues(
 			@PathVariable("surveyName") String surveyName, 
 			@PathVariable("step") int stepNumber,
 			@PathVariable("coordinateAttributeId") int coordinateAttributeId, 
 			int recordOffset, int maxNumberOfRecords) {
-		final List<LngLatAlt> result = new ArrayList<LngLatAlt>();
+		final List<CoordinateAttributePoint> result = new ArrayList<CoordinateAttributePoint>();
 		CollectSurvey survey = surveyManager.get(surveyName);
 		
 		extractAllRecordCoordinates(survey, Step.valueOf(stepNumber), recordOffset, maxNumberOfRecords, coordinateAttributeId, new CoordinateProcessor() {
-			public void process(CollectRecord record, Coordinate wgs84Coordinate) {
-				LngLatAlt lngLatAlt = new LngLatAlt(wgs84Coordinate.getX(), wgs84Coordinate.getY());
-				result.add(lngLatAlt);
+			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
+				CoordinateAttributePoint point = new CoordinateAttributePoint(coordAttr, wgs84Coordinate);
+				result.add(point);
 			}
 		});
 		return result;
@@ -172,7 +209,7 @@ public class GeoDataController {
 		final Document kmlDoc = kml.createAndSetDocument().withName(surveyName);
 		
 		extractAllRecordCoordinates(survey, Step.valueOf(stepNumber), null, null, coordinateAttributeId, new CoordinateProcessor() {
-			public void process(CollectRecord record, Coordinate wgs84Coordinate) {
+			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				kmlDoc.createAndAddPlacemark()
 					.withName(record.getRootEntityKeyValues().toString())
 					.withOpen(Boolean.TRUE)
@@ -190,7 +227,7 @@ public class GeoDataController {
 				survey.getSchema().getDefinitionById(coordinateAttributeId);
 
 		RecordFilter filter = new RecordFilter(survey);
-		filter.setStep(step);
+		filter.setStepGreaterOrEqual(step);
 		filter.setOffset(recordOffset);
 		filter.setMaxNumberOfRecords(maxNumberOfRecords);
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
@@ -201,7 +238,7 @@ public class GeoDataController {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
 				Coordinate coordinate = coordAttr.getValue();
 				Coordinate wgs84Coord = coordinateOperations.convertToWgs84(coordinate);
-				coordinateProcessor.process(record, wgs84Coord);
+				coordinateProcessor.process(record, coordAttr, wgs84Coord);
 			}
 		}
 	}
@@ -225,8 +262,32 @@ public class GeoDataController {
 		
 	}
 	
+	public static class CoordinateAttributePoint extends Point {
+		
+		private CoordinateAttribute attribute;
+		private Coordinate latLongCoordinate;
+
+		public CoordinateAttributePoint(CoordinateAttribute attribute, Coordinate latLongCoordinate) {
+			this.attribute = attribute;
+			this.latLongCoordinate = latLongCoordinate;
+		}
+		
+		public Double getLat() {
+			return latLongCoordinate == null ? null : latLongCoordinate.getY();
+		}
+		
+		public Double getLon() {
+			return latLongCoordinate == null ? null : latLongCoordinate.getX();
+		}
+		
+		public String[] getRecordKeys() {
+			return this.attribute.getRecord().getRootEntity().getKeyValues();
+		}
+		
+	}
+	
 	private interface CoordinateProcessor {
 		
-		void process(CollectRecord record, Coordinate wgs84Coordinate);
+		void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate);
 	}
 }

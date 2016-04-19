@@ -31,13 +31,16 @@ Collect.DataCleansing.prototype.init = function() {
 	this.initDataCleansingStepPanel();
 	this.initDataCleansingChainPanel();
 	this.initDataReportPanel();
+	this.initMapPanel();
 	
-	this.panels = [this.dataQueryTypePanel, this.dataQueryPanel, 
-	               this.dataQueryGroupPanel, this.dataQueryGroupPanel, 
-	               this.dataReportPanel, this.dataCleansingStepPanel,
-	               this.dataCleansingChainPanel];
-	
-//	this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
+	this.panels = [this.dataQueryTypePanel, 
+	               this.dataQueryPanel, 
+	               this.dataQueryGroupPanel, 
+	               this.dataQueryGroupPanel, 
+	               this.dataReportPanel, 
+	               this.dataCleansingStepPanel,
+	               this.dataCleansingChainPanel,
+	               this.mapPanelComposer];
 	
 	this.initGlobalEventHandlers();
 	
@@ -105,7 +108,6 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 			panel.refreshDataGrid();
 		});
 		$("#selected-survey-label").text(Collect.SurveySelectDialogController.getPrettyShortLabel(collect.activeSurvey));
-//		$this.initMapPanel();
 		
 		$this.checkViewState();
 	});
@@ -189,6 +191,7 @@ Collect.DataCleansing.prototype.initDataCleansingChainPanel = function() {
 	this.dataCleansingChainPanel.init();
 };
 
-//Collect.DataCleansing.prototype.initMapPanel = function() {
-//	this.mapPanelComposer.init();
-//};
+Collect.DataCleansing.prototype.initMapPanel = function() {
+	this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
+	this.mapPanelComposer.init();
+};

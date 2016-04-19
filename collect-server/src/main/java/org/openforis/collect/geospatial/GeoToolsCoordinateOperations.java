@@ -219,9 +219,13 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	
 	@Override
 	public Coordinate convertToWgs84(Coordinate coordinate) {
-		Position position = toWgs84(coordinate.getX(), coordinate.getY(), coordinate.getSrsId());
-		DirectPosition directPosition = position.getDirectPosition();
-		return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), CoordinateOperations.WGS84_SRS_ID);
+		if (CoordinateOperations.WGS84_SRS_ID.equals(coordinate.getSrsId())) {
+			return coordinate;
+		} else {
+			Position position = toWgs84(coordinate.getX(), coordinate.getY(), coordinate.getSrsId());
+			DirectPosition directPosition = position.getDirectPosition();
+			return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), CoordinateOperations.WGS84_SRS_ID);
+		}
 	}
 
 	private static Position toWgs84(double x, double y, String srsId) {
