@@ -84,6 +84,10 @@ Collect.AbstractItemPanel.prototype.openItemEditDialog = function(item) {
 	dialogController.open(item);
 };
 
+Collect.AbstractItemPanel.prototype.onSurveyChanged = function() {
+	this.refreshDataGrid();
+}
+
 Collect.AbstractItemPanel.prototype.refreshDataGrid = function() {
 	if (this.dataGrid == null) {
 		this.initDataGrid();
@@ -92,6 +96,10 @@ Collect.AbstractItemPanel.prototype.refreshDataGrid = function() {
 		this.resizeDataGrid();
 	}
 };
+
+Collect.AbstractItemPanel.prototype.onPanelShow = function() {
+	this.resizeDataGrid();
+}
 
 Collect.AbstractItemPanel.prototype.resizeDataGrid = function() {
 	var $this = this;

@@ -79,18 +79,26 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 		return evaluateNumericExpression(maxDistanceExpression, thisNode);
 	}
 	
-	public Double evaluateNumericExpression(String expression, CoordinateAttribute thisNode) {
+	public Double evaluateDistanceToDestination(CoordinateAttribute thisNode) {
+		String distanceExpression = createDistanceExpression();
+		Double result = evaluateNumericExpression(distanceExpression, thisNode);
+		return result;
+	}
+	
+	private Double evaluateNumericExpression(String expression, CoordinateAttribute thisNode) {
 		Object result = evaluateValueExpression(expression, thisNode);
 		if (result == null) {
 			return null;
 		} else if (result instanceof Double) {
 			return (Double) result;
+		} else if (result instanceof Number) {
+			return Double.valueOf(((Number) result).doubleValue());
 		} else {
 			return Double.valueOf(result.toString());
 		}
 	}
 	
-	public <T extends Object> T evaluateAttributeValueExpression(String expression, CoordinateAttribute thisNode) {
+	private <T extends Object> T evaluateAttributeValueExpression(String expression, CoordinateAttribute thisNode) {
 		if (expression == null) {
 			return null;
 		}
@@ -107,7 +115,7 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 		}
 	}
 	
-	public <T extends Object> T evaluateValueExpression(String expression, CoordinateAttribute thisNode) {
+	private <T extends Object> T evaluateValueExpression(String expression, CoordinateAttribute thisNode) {
 		if (expression == null) {
 			return null;
 		}

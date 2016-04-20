@@ -5,7 +5,10 @@ package org.openforis.idm.metamodel;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.lang.Numbers;
+import org.openforis.idm.metamodel.validation.Check;
+import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Node;
@@ -93,6 +96,20 @@ public class CoordinateAttributeDefinition extends AttributeDefinition  {
 	@Override
 	public Class<? extends Value> getValueType() {
 		return Coordinate.class;
+	}
+	
+	public boolean hasSamplingPointCoordinateMaxDistanceCheck() {
+		DistanceCheck distanceCheck = extractMaxDistanceCheck();
+		return distanceCheck != null;
+	}
+	
+	public DistanceCheck extractMaxDistanceCheck() {
+		for (Check<?> check : getChecks()) {
+			if (check instanceof DistanceCheck && StringUtils.isNotBlank(((DistanceCheck) check).getMaxDistanceExpression())) {
+				return (DistanceCheck) check;
+			}
+		}
+		return null;
 	}
 	
 	public FieldDefinition<Double> getXField() {

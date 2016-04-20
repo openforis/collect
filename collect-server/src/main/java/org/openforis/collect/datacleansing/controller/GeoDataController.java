@@ -10,7 +10,6 @@ import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.LngLatAlt;
 import org.geojson.MultiPoint;
-import org.geojson.Point;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SessionManager;
@@ -26,6 +25,7 @@ import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 import org.openforis.collect.utils.Proxies;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Node;
@@ -232,7 +232,7 @@ public class GeoDataController {
 		filter.setMaxNumberOfRecords(maxNumberOfRecords);
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
 		for (CollectRecord summary : summaries) {
-			CollectRecord record = recordManager.load(survey, summary.getId());
+			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
 			List<Node<?>> nodes = record.findNodesByPath(coordAttrDef.getPath());
 			for (Node<?> node : nodes) {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
@@ -262,7 +262,7 @@ public class GeoDataController {
 		
 	}
 	
-	public static class CoordinateAttributePoint extends Point {
+	public static class CoordinateAttributePoint {
 		
 		private CoordinateAttribute attribute;
 		private Coordinate latLongCoordinate;
@@ -282,6 +282,15 @@ public class GeoDataController {
 		
 		public String[] getRecordKeys() {
 			return this.attribute.getRecord().getRootEntity().getKeyValues();
+		}
+		
+		public Double getDistanceToExpectedLocation() {
+			DistanceCheck distanceCheck = this.attribute.getDefinition().extractMaxDistanceCheck();
+			if (distanceCheck == null) {
+				return null;
+			} else {
+				return distanceCheck.evaluateDistanceToDestination(attribute);
+			}
 		}
 		
 	}

@@ -117,7 +117,7 @@ public class ExpressionEvaluator {
 		Set<NodeDefinition> referencedDefs = modelPathExpression.getReferencedNodeDefinitions(context, thisNodeDef);
 		return referencedDefs;
 	}
-
+	
 	private static boolean isNumeric(String expression) {
 		Matcher matcher = NUMBER_PATTERN.matcher(expression);
 		return matcher.matches();

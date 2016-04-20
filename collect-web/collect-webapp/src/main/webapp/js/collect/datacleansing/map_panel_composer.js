@@ -1,27 +1,35 @@
-Collect.DataCleansing.MapPanelComposer = function(container) {
-	this.container = container;
+Collect.DataCleansing.MapPanelComposer = function(panel) {
+	this.$panel = panel;
 	this.map = null;
+	this.initialized = false;
+	this.surveyDataLoaded = false;
 };
 
 Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
 	var $this = this;
 	
 	$(window).resize(function() {
-		$this.resizeDataGrid();
+		$this.resizeMapContainer();
 	});
 	
-	this.map = L.map('map').setView([ 51.505, -0.09 ], 13);
+	$this.map = L.map('map').setView([ 51.505, -0.09 ], 3);
 
 	var satelliteTileLayer = L.tileLayer(
 		// Esri_WorldImagery
 		'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 		{
-			attribution : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, '
-					+ 'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+			attribution : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
+					'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 		}).addTo(this.map);
-
+	
+	var openStreetMapTileLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+	
 	this.baseMaps = {
-		"Satellite" : satelliteTileLayer
+		"Satellite (Esri)" : satelliteTileLayer
+		, "OpenStreetMap" : openStreetMapTileLayer
 	};
 
 	this.samplingPointsLayerGroup = L.layerGroup();
@@ -29,16 +37,38 @@ Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
 	this.overlayMaps = {
 		"Sampling Points" : this.samplingPointsLayerGroup
 	};
+	
+	this.initialized = true;
 }
 
-Collect.DataCleansing.MapPanelComposer.prototype.resizeDataGrid = function() {
-	$("#map").height($(window).height() - 250);
+Collect.DataCleansing.MapPanelComposer.prototype.reset = function() {
+	this.map.remove();
+	this.init();
+}
+
+Collect.DataCleansing.MapPanelComposer.prototype.onPanelShow = function() {
+	if (this.map == null) {
+		this.resizeMapContainer();
+		this.init();
+		if (! this.surveyDataLoaded) {
+			this.onSurveyChanged();
+		}
+	}
+}
+
+Collect.DataCleansing.MapPanelComposer.prototype.resizeMapContainer = function() {
+	$("#map").height($(window).height() - 220);
 	$("#map").width($(window).width() - 50);
 }
 
-Collect.DataCleansing.MapPanelComposer.prototype.refreshDataGrid = function() {
+Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
+	if (this.initialized) {
+		this.reset();
+	} else {
+		return;
+	}
 	var $this = this;
-	collect.geoDataService.loadSamplingPointCoordinates(collect.activeSurvey.name, 0, 10,
+	collect.geoDataService.loadSamplingPointCoordinates(collect.activeSurvey.name, 0, 1000000000,
 		function(samplingPointItems) {
 			samplingPointItems.forEach(function(item) {
 				var circle = L
@@ -84,29 +114,49 @@ Collect.DataCleansing.MapPanelComposer.prototype.refreshDataGrid = function() {
 
 	L.control.layers(this.baseMaps, this.overlayMaps).addTo(this.map);
 
+	this.surveyDataLoaded = true;
+	
 	this.map.on('overlayadd', function(e) {
 		if (OF.Arrays.contains(coordinateAttributeLayers, e.layer)) {
 			if (e.layer.getLayers().length == 0) {
 				var index = coordinateAttributeLayers.indexOf(e.layer);
 				var coordinateAttribute = coordinateAttributes[index];
-				collect.geoDataService.loadCoordinateValues(
-					collect.activeSurvey.name, 1, coordinateAttribute.id, 0,
-					10, function(coordinateValues) {
-						for (i = 0; i < coordinateValues.length; i++) {
-							var value = coordinateValues[i];
-							var circle = L.circle([ value.lat, value.lon ], 10,
-								{
-									color : 'blue',
-									fillColor : '#30f',
-									fillOpacity : 0.5
-								});
-							circle.bindPopup("<b>" + coordinateAttribute.label
-									+ "</b>" + "<br>" + "record: "
-									+ value.recordKeys + "<br>" + "latitude: "
-									+ value.lat + "<br>" + "longitude: "
-									+ value.lon + "<br>");
-							e.layer.addLayer(circle);
-						}
+				
+				var step = 1;
+				var rootEntityDefinitionId = collect.activeSurvey.rootEntities[0].id;
+				collect.dataService.countRecords(collect.activeSurvey.id, rootEntityDefinitionId, step, function(recordCount) {
+					var blockSize = 500;
+					var maxProcessableItems = 1000000000;
+					var totalItems = Math.min(recordCount, maxProcessableItems);
+					var blockProcessor = new BlockProcessor(totalItems, blockSize, function(blockOffset, callback) {
+						collect.geoDataService.loadCoordinateValues(
+							collect.activeSurvey.name, step, coordinateAttribute.id, blockOffset, blockSize, function(coordinateValues) {
+								for (i = 0; i < coordinateValues.length; i++) {
+									var value = coordinateValues[i];
+									var circle = L.circle([ value.lat, value.lon ], 10, 
+										{
+											color : 'blue',
+											fillColor : '#30f',
+											fillOpacity : 0.5
+										});
+									circle.bindPopup(
+											"<b>" + coordinateAttribute.label + "</b>" 
+											+ "<br>" 
+											+ "<b>record</b>: " + value.recordKeys 
+											+ "<br>" 
+											+ "latitude: " + value.lat 
+											+ "<br>" 
+											+ "longitude: " + value.lon 
+											+ "<br>" 
+											+ (isNaN(value.distanceToExpectedLocation) ? "" : "distance to expected location: " + 
+													Math.round(value.distanceToExpectedLocation) + "m")
+											);
+									e.layer.addLayer(circle);
+								}
+								callback();
+							});
+					});
+					blockProcessor.start();
 				});
 			}
 		}
@@ -122,6 +172,32 @@ Collect.DataCleansing.MapPanelComposer.prototype.refreshDataGrid = function() {
 	function dec2hex(dec) {
 		return Number(parseInt(dec, 10)).toString(16);
 	}
+};
 
+BlockProcessor = function(totalItems, blockSize, processFn) {
+	this.totalItems = totalItems;
+	this.blockSize = blockSize;
+	this.processFn = processFn;
+	this.blocks = Math.ceil(totalItems / blockSize);
+	this.currentBlockIndex = 0;
+}
+
+BlockProcessor.prototype = {
+	start: function() {
+		this.processNextBlockIfPossible();
+	},
+	processNextBlock: function() {
+		var $this = this;
+		var blockOffset = $this.currentBlockIndex * $this.blockSize;
+		$this.processFn(blockOffset, function() {
+			$this.currentBlockIndex++;
+			$this.processNextBlockIfPossible();
+		});
+	},
+	processNextBlockIfPossible: function() {
+		if (this.currentBlockIndex < this.blocks) {
+			this.processNextBlock();
+		}
+	}
 };
 

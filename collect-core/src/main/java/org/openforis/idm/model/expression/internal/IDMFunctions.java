@@ -36,7 +36,9 @@ import org.openforis.idm.model.Time;
  */
 public class IDMFunctions extends CustomFunctions {
 	
+	public static final String SAMPLING_POINT_COORDINATE_FUNCTION_NAME = "samplingPointCoordinate";
 	public static final String LATLONG_FUNCTION_NAME = "latlong";
+	
 	private static final String LOCATION_ATTRIBUTE = "location";
 
 	private enum TimeUnit {
@@ -97,7 +99,7 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 
-		register("samplingPointCoordinate", new CustomFunction(asList(1, 2, 3)) {
+		register(SAMPLING_POINT_COORDINATE_FUNCTION_NAME, new CustomFunction(asList(1, 2, 3)) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				String[] strings = toStringArray(objects);
 				return samplingPointCoordinateLookup(expressionContext, strings);

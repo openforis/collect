@@ -51,13 +51,21 @@ Collect.DataCleansing.prototype.initView = function() {
 	var $this = this;
 	var mainNavBar = $("#survey-selected-container").find(".navbar-nav");
 	mainNavBar.on("shown.bs.tab", function(evt) {
-		$this.onTabChange();
+		var relatedPanel = $(evt.target.hash)[0];
+		setTimeout(function() {
+			$this.onTabShown(relatedPanel);
+		}, 200);
 	});
 	this.checkViewState();
 };
 
-Collect.DataCleansing.prototype.onTabChange = function() {
-	this.resizePanels();
+Collect.DataCleansing.prototype.onTabShown = function(targetPanel) {
+	var $this = this;
+	$.each($this.panels, function(idx, panel) {
+		if (panel.$panel.get(0) == targetPanel) {
+			panel.onPanelShow();
+		}
+	});
 };
 
 Collect.DataCleansing.prototype.checkViewState = function() {
@@ -91,13 +99,6 @@ Collect.DataCleansing.prototype.changeViewState = function(state) {
 	};
 };
 
-Collect.DataCleansing.prototype.resizePanels = function() {
-	var $this = this;
-	$.each($this.panels, function(idx, panel) {
-		panel.resizeDataGrid();
-	});
-};
-
 Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 	var $this = this;
 	$("#home-survey-selector-button").click(function() {
@@ -105,7 +106,7 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 	});
 	EventBus.addEventListener(Collect.SURVEY_CHANGED, function() {
 		$.each($this.panels, function(idx, panel) {
-			panel.refreshDataGrid();
+			panel.onSurveyChanged();
 		});
 		$("#selected-survey-label").text(Collect.SurveySelectDialogController.getPrettyShortLabel(collect.activeSurvey));
 		
@@ -193,5 +194,5 @@ Collect.DataCleansing.prototype.initDataCleansingChainPanel = function() {
 
 Collect.DataCleansing.prototype.initMapPanel = function() {
 	this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
-	this.mapPanelComposer.init();
+//	this.mapPanelComposer.init();
 };
