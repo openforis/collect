@@ -13,12 +13,14 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type")]
     public class NodeLabelProxy$Type extends Enum {
 
+        public static const ABBREVIATED:NodeLabelProxy$Type = new NodeLabelProxy$Type("ABBREVIATED", _);
         public static const HEADING:NodeLabelProxy$Type = new NodeLabelProxy$Type("HEADING", _);
         public static const INSTANCE:NodeLabelProxy$Type = new NodeLabelProxy$Type("INSTANCE", _);
         public static const NUMBER:NodeLabelProxy$Type = new NodeLabelProxy$Type("NUMBER", _);
+        public static const REPORTING:NodeLabelProxy$Type = new NodeLabelProxy$Type("REPORTING", _);
 
         function NodeLabelProxy$Type(value:String = null, restrictor:* = null) {
-            super((value || HEADING.name), restrictor);
+            super((value || ABBREVIATED.name), restrictor);
         }
 
         protected override function getConstants():Array {
@@ -26,11 +28,11 @@ package org.openforis.collect.metamodel.proxy {
         }
 
         public static function get constants():Array {
-            return [HEADING, INSTANCE, NUMBER];
+            return [ABBREVIATED, HEADING, INSTANCE, NUMBER, REPORTING];
         }
 
         public static function valueOf(name:String):NodeLabelProxy$Type {
-            return NodeLabelProxy$Type(HEADING.constantOf(name));
+            return NodeLabelProxy$Type(ABBREVIATED.constantOf(name));
         }
     }
 }

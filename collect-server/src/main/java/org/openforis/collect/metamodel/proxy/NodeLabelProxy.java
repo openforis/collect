@@ -16,7 +16,7 @@ import org.openforis.idm.metamodel.NodeLabel;
 public class NodeLabelProxy extends TypedLanguageSpecificTextProxy<NodeLabel.Type, NodeLabelProxy.Type> {
 
 	public enum Type {
-		HEADING, INSTANCE, NUMBER;
+		ABBREVIATED, HEADING, INSTANCE, NUMBER, REPORTING;
 	}
 
 	static List<NodeLabelProxy> fromNodeLabelList(List<NodeLabel> labels) {
