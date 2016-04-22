@@ -16,10 +16,10 @@ package org.openforis.collect.metamodel.proxy {
 		
 		public function getTab(name:String):UITabProxy {
 			var stack:Array = new Array();
-			stack.push(tabs);
+			stack.push(this.tabs);
 			while (stack.length > 0) {
-				var tabs:IList = stack.pop();
-				for each(var tab:UITabProxy in tabs) {
+				var currentTabs:IList = stack.pop();
+				for each(var tab:UITabProxy in currentTabs) {
 					if(tab.name == name) {
 						return tab;
 					}
