@@ -125,9 +125,14 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 				var step = 1;
 				var rootEntityDefinitionId = collect.activeSurvey.rootEntities[0].id;
 				collect.dataService.countRecords(collect.activeSurvey.id, rootEntityDefinitionId, step, function(recordCount) {
-					var blockSize = 500;
+					var blockSize = 200;
 					var maxProcessableItems = 1000000000;
 					var totalItems = Math.min(recordCount, maxProcessableItems);
+					
+					var jobDialog = new OF.UI.JobDialog();
+
+					var startTime = new Date().getTime();
+					
 					var blockProcessor = new BlockProcessor(totalItems, blockSize, function(blockOffset, callback) {
 						collect.geoDataService.loadCoordinateValues(
 							collect.activeSurvey.name, step, coordinateAttribute.id, blockOffset, blockSize, function(coordinateValues) {
@@ -153,9 +158,27 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 											);
 									e.layer.addLayer(circle);
 								}
+								
+								if (blockProcessor.progressPercent == 100) {
+									jobDialog.close();
+								} else {
+									var fakeProgressJob = {
+										status: "RUNNING"
+										, elapsedTime: new Date().getTime() - startTime
+										, remainingMinutes: 0
+										, progressPercent: blockProcessor.progressPercent
+									};
+									jobDialog.updateUI(fakeProgressJob);
+								}
 								callback();
 							});
 					});
+					
+					jobDialog.cancelBtn.click(function() {
+						blockProcessor.stop();
+						jobDialog.close();
+					});
+					
 					blockProcessor.start();
 				});
 			}
@@ -179,24 +202,35 @@ BlockProcessor = function(totalItems, blockSize, processFn) {
 	this.blockSize = blockSize;
 	this.processFn = processFn;
 	this.blocks = Math.ceil(totalItems / blockSize);
-	this.currentBlockIndex = 0;
+	this.nextBlockIndex = 0;
+	this.progressPercent = 0;
+	this.running = false;
 }
 
 BlockProcessor.prototype = {
 	start: function() {
+		this.running = true;
 		this.processNextBlockIfPossible();
+	},
+	stop: function() {
+		this.running = false;
 	},
 	processNextBlock: function() {
 		var $this = this;
-		var blockOffset = $this.currentBlockIndex * $this.blockSize;
+		$this.progressPercent = Math.floor((100 * ($this.nextBlockIndex + 1)) / $this.blocks);
+		var blockOffset = $this.nextBlockIndex * $this.blockSize;
 		$this.processFn(blockOffset, function() {
-			$this.currentBlockIndex++;
-			$this.processNextBlockIfPossible();
+			if ($this.running) {
+				$this.nextBlockIndex++;
+				$this.processNextBlockIfPossible();
+			}
 		});
 	},
 	processNextBlockIfPossible: function() {
-		if (this.currentBlockIndex < this.blocks) {
+		if (this.nextBlockIndex < this.blocks) {
 			this.processNextBlock();
+		} else {
+			this.running = false;
 		}
 	}
 };
