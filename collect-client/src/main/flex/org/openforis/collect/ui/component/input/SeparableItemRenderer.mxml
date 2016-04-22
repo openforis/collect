@@ -24,7 +24,7 @@
 				super.data = value;
 				separatorVisible = ObjectUtil.getValue(value, "separator");
 				text = labelFunction(value);
-				toolTipText = toolTipFunction(value);
+				toolTipText = toolTipFunction == null ? null : toolTipFunction(value);
 			}
 			
 			[Bindable]

@@ -127,7 +127,7 @@
 					  />
 		</s:Group>
 		
-		<s:Group id="buttonBar" width="100%" height="30">
+		<s:Group id="bottomButtonBar" width="100%" height="30">
 			
 			<view:Footer id="footer" width="100%" />
 			

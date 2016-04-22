@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.core.FlexGlobals;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -104,8 +105,15 @@ package org.openforis.collect.presenter {
 			var canSubmit:Boolean = !preview && user.canSubmit(activeRecord);
 			var canReject:Boolean = !preview && user.canReject(activeRecord);
 			var canSave:Boolean = !preview && Application.activeRecordEditable;
-			
-			view.topButtonBar.visible = view.topButtonBar.includeInLayout = !preview && !onlyOneRecordEdit;
+
+			var showHeader:Boolean = !(preview || onlyOneRecordEdit);
+			var showTopButtonBar:Boolean = !preview && (canSubmit || canReject);
+			var showFooter:Boolean = !preview && canSave;
+
+			FlexGlobals.topLevelApplication.header.visible = FlexGlobals.topLevelApplication.header.includeInLayout = showHeader;
+			view.topButtonBar.visible = view.topButtonBar.includeInLayout = showTopButtonBar;
+			view.bottomButtonBar.visible = view.bottomButtonBar.includeInLayout = showFooter;
+
 			view.submitButton.visible = view.submitButton.includeInLayout = canSubmit;
 			view.rejectButton.visible = view.rejectButton.includeInLayout = canReject;
 			if ( canReject ) {
@@ -265,8 +273,7 @@ package org.openforis.collect.presenter {
 			var stepLabel:String = getStepLabel(actualStep).toLowerCase();
 			AlertUtil.showMessage("edit.recordSubmitted", [rootEntityLabel, keyLabel, stepLabel], "edit.recordSubmittedTitle", [rootEntityLabel]);
 			Application.activeRecord = null;
-			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
-			eventDispatcher.dispatchEvent(uiEvent);
+			reloadRecordOrGoBackToList(r.id);
 		}
 		
 		internal function rejectRecordResultHandler(event:ResultEvent, token:Object = null):void {
@@ -278,7 +285,19 @@ package org.openforis.collect.presenter {
 			var stepLabel:String = getStepLabel(actualStep).toLowerCase();
 			AlertUtil.showMessage("edit.recordRejected", [rootEntityLabel, keyLabel, stepLabel], "edit.recordRejectedTitle", [rootEntityLabel]);
 			Application.activeRecord = null;
-			var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
+			reloadRecordOrGoBackToList(r.id);
+		}
+
+		private function reloadRecordOrGoBackToList(recordId:Number = NaN):void {
+			var uiEvent:UIEvent;
+			if (Application.onlyOneRecordEdit) {
+				uiEvent = new UIEvent(UIEvent.LOAD_RECORD_FOR_EDIT);
+				uiEvent.obj = {
+					recordId: recordId
+				};
+			} else {
+				uiEvent = new UIEvent(UIEvent.BACK_TO_LIST);
+			}
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		

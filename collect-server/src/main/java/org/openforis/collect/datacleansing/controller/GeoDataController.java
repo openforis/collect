@@ -272,6 +272,10 @@ public class GeoDataController {
 			this.latLongCoordinate = latLongCoordinate;
 		}
 		
+		public int getRecordId() {
+			return attribute.getRecord().getId();
+		}
+		
 		public Double getLat() {
 			return latLongCoordinate == null ? null : latLongCoordinate.getY();
 		}

@@ -233,6 +233,10 @@ public class RecordManager {
 		return checkout(survey, user, recordId, Step.valueOf(step), sessionId, forceUnlock);
 	}
 	
+	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
+		return checkout(survey, user, recordId, determineLastStep(survey, recordId), sessionId, forceUnlock);
+	}
+	
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
 		if(isLockingEnabled()) {
 			checkSurveyRecordValidationNotInProgress(survey);

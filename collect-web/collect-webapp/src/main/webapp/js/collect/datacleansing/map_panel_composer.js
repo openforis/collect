@@ -138,24 +138,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 							collect.activeSurvey.name, step, coordinateAttribute.id, blockOffset, blockSize, function(coordinateValues) {
 								for (i = 0; i < coordinateValues.length; i++) {
 									var value = coordinateValues[i];
-									var circle = L.circle([ value.lat, value.lon ], 10, 
-										{
-											color : 'blue',
-											fillColor : '#30f',
-											fillOpacity : 0.5
-										});
-									circle.bindPopup(
-											"<b>" + coordinateAttribute.label + "</b>" 
-											+ "<br>" 
-											+ "<b>record</b>: " + value.recordKeys 
-											+ "<br>" 
-											+ "latitude: " + value.lat 
-											+ "<br>" 
-											+ "longitude: " + value.lon 
-											+ "<br>" 
-											+ (isNaN(value.distanceToExpectedLocation) ? "" : "distance to expected location: " + 
-													Math.round(value.distanceToExpectedLocation) + "m")
-											);
+									var circle = createCoordinateAttributeCircle(value);
 									e.layer.addLayer(circle);
 								}
 								
@@ -184,6 +167,33 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 			}
 		}
 	});
+	
+	function createCoordinateAttributeCircle() {
+		var editUrl = window.open(this.contextPath + "result.csv", "_blank");
+		
+		var circle = L.circle([ value.lat, value.lon ], 10, 
+			{
+				color : 'blue',
+				fillColor : '#30f',
+				fillOpacity : 0.5
+			});
+		
+		circle.bindPopup(
+				"<b>" + coordinateAttribute.label + "</b>" 
+				+ "<br>" 
+				+ "<b>record</b>: " + value.recordKeys 
+				+ "<br>" 
+				+ "latitude: " + value.lat 
+				+ "<br>" 
+				+ "longitude: " + value.lon 
+				+ "<br>" 
+				+ (isNaN(value.distanceToExpectedLocation) ? "" : "distance to expected location: " + 
+						Math.round(value.distanceToExpectedLocation) + "m")
+				+ "<br>"
+				+ "<a href=\"javascript:void(0)\" onclick=\"editRecord(" + value.recordId + ")\">Edit</a>"
+				);
+		return circle;
+	}
 
 	function determineSamplingPointCoordinateFillColor(level) {
 		var percentage = 1 - 0.2 * (level - 1);

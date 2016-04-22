@@ -108,7 +108,9 @@ public class DataService {
 		final CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
 		Step step = stepNumber == null ? null: Step.valueOf(stepNumber);
-		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
+		CollectRecord record = step == null ?
+				recordManager.checkout(survey, user, id, sessionState.getSessionId(), forceUnlock)
+				: recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
 		Locale locale = sessionState.getLocale();
