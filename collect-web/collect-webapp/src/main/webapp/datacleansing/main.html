@@ -248,17 +248,32 @@
 						</div>
 						<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">
 							<div id="map" class="map-canvas" style="height: 600px; width: 1000px"></div>
+							
+							<div class="record-edit-modal modal fade" tabindex="-1" role="dialog" style="height: 100%">
+								<div class="modal-content" style="height: 100%">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal">×</button>
+										<h3>Edit Record</h3>
+									</div>
+									<div class="modal-body" style="height: 100%">
+										<iframe src="" width="1000" height="98%" frameborder="0"></iframe>
+									</div>
+									<div class="modal-footer">
+	<!-- 									<button class="btn" data-dismiss="modal">OK</button> -->
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="footer">
-				<img id="footerImg" alt="Loading..." />
-				<div class="appliactionVersionContainer row">
-					<label>Application version: </label>
-					<label class="applicationVersion">Loading...</label>
-				</div>
+			<img id="footerImg" alt="Loading..." />
+			<div class="appliactionVersionContainer row">
+				<label>Application version: </label>
+				<label class="applicationVersion">Loading...</label>
+			</div>
 		</div>
 	</body>
 </html>

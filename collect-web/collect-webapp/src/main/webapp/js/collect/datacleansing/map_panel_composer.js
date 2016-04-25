@@ -138,7 +138,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 							collect.activeSurvey.name, step, coordinateAttribute.id, blockOffset, blockSize, function(coordinateValues) {
 								for (i = 0; i < coordinateValues.length; i++) {
 									var value = coordinateValues[i];
-									var circle = createCoordinateAttributeCircle(value);
+									var circle = createCoordinateAttributeCircle(coordinateAttribute, value);
 									e.layer.addLayer(circle);
 								}
 								
@@ -168,10 +168,8 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 		}
 	});
 	
-	function createCoordinateAttributeCircle() {
-		var editUrl = window.open(this.contextPath + "result.csv", "_blank");
-		
-		var circle = L.circle([ value.lat, value.lon ], 10, 
+	function createCoordinateAttributeCircle(coordinateAttribute, point) {
+		var circle = L.circle([ point.lat, point.lon ], 10, 
 			{
 				color : 'blue',
 				fillColor : '#30f',
@@ -181,16 +179,16 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 		circle.bindPopup(
 				"<b>" + coordinateAttribute.label + "</b>" 
 				+ "<br>" 
-				+ "<b>record</b>: " + value.recordKeys 
+				+ "<b>record</b>: " + point.recordKeys 
 				+ "<br>" 
-				+ "latitude: " + value.lat 
+				+ "latitude: " + point.lat 
 				+ "<br>" 
-				+ "longitude: " + value.lon 
+				+ "longitude: " + point.lon 
 				+ "<br>" 
-				+ (isNaN(value.distanceToExpectedLocation) ? "" : "distance to expected location: " + 
-						Math.round(value.distanceToExpectedLocation) + "m")
+				+ (isNaN(point.distanceToExpectedLocation) ? "" : "distance to expected location: " + 
+						Math.round(point.distanceToExpectedLocation) + "m")
 				+ "<br>"
-				+ "<a href=\"javascript:void(0)\" onclick=\"editRecord(" + value.recordId + ")\">Edit</a>"
+				+ "<a href=\"javascript:void(0)\" onclick=\"Collect.DataCleansing.MapPanelComposer.openRecordEditPopUp(" + point.recordId + ")\">Edit</a>"
 				);
 		return circle;
 	}
@@ -205,6 +203,14 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 	function dec2hex(dec) {
 		return Number(parseInt(dec, 10)).toString(16);
 	}
+};
+
+Collect.DataCleansing.MapPanelComposer.openRecordEditPopUp = function(recordId) {
+	var modalContainer = $("#map-panel").find(".record-edit-modal");
+	modalContainer.on('show.bs.modal', function () {
+		modalContainer.find("iframe").attr("src", "index.htm?edit=true&surveyId=" + collect.activeSurvey.id + "&recordId=" + recordId);
+	});
+	modalContainer.modal({show:true});
 };
 
 BlockProcessor = function(totalItems, blockSize, processFn) {
