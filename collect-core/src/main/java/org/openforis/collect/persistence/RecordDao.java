@@ -208,6 +208,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 
 		addFilterConditions(q, filter);
 		
+		//add limit
+		if (filter.getOffset() != null && filter.getMaxNumberOfRecords() != null) {
+			q.addLimit(filter.getOffset(), filter.getMaxNumberOfRecords());
+		}
+		
 		//add ordering fields
 		if ( sortFields != null ) {
 			for (RecordSummarySortField sortField : sortFields) {
@@ -253,11 +258,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		//record keys
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
 			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.getKeyValues());
-		}
-		
-		//add limit
-		if (filter.getOffset() != null && filter.getMaxNumberOfRecords() != null) {
-			q.addLimit(filter.getOffset(), filter.getMaxNumberOfRecords());
 		}
 	}
 	
