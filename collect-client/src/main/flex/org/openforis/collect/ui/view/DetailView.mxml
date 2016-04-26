@@ -50,7 +50,8 @@
 						  label="{Message.get('edit.backToList')}"
 						  useHandCursor="true" 
 						  buttonMode="true" />
-				<s:Line yFrom="0" yTo="18" xFrom="1" xTo="0">
+				<s:Line yFrom="0" yTo="18" xFrom="1" xTo="0"
+						visible="{backToListButton.visible}" includeInLayout="{backToListButton.includeInLayout}">
 					<s:stroke>
 						<s:SolidColorStroke color="gray" alpha="0.8"/>
 					</s:stroke>

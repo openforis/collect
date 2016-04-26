@@ -92,12 +92,9 @@ package org.openforis.collect.presenter {
 				_rootEntityKeyTextChangeWatcher.reset(rootEntity);
 			}
 			//view.formVersionContainer.visible = version != null;
-			if ( version != null ) {
-				//view.formVersionText.text = version.getLabelText();
-				view.footer.formVersion = version.getLabelText();
-			} else {
-				view.footer.formVersion = null;
-			}
+			
+			view.footer.formVersion = version == null ? null : version.getLabelText();
+			
 			var step:CollectRecord$Step = activeRecord.step;
 			view.currentPhaseText.text = getStepLabel(step);
 			
@@ -108,12 +105,14 @@ package org.openforis.collect.presenter {
 
 			var showHeader:Boolean = !(preview || onlyOneRecordEdit);
 			var showTopButtonBar:Boolean = !preview && (canSubmit || canReject);
+			var showBackToListButton:Boolean = !(preview || onlyOneRecordEdit);
 			var showFooter:Boolean = !preview && canSave;
 
 			FlexGlobals.topLevelApplication.header.visible = FlexGlobals.topLevelApplication.header.includeInLayout = showHeader;
 			view.topButtonBar.visible = view.topButtonBar.includeInLayout = showTopButtonBar;
 			view.bottomButtonBar.visible = view.bottomButtonBar.includeInLayout = showFooter;
 
+			view.backToListButton.visible = view.backToListButton.includeInLayout = showBackToListButton;
 			view.submitButton.visible = view.submitButton.includeInLayout = canSubmit;
 			view.rejectButton.visible = view.rejectButton.includeInLayout = canReject;
 			if ( canReject ) {

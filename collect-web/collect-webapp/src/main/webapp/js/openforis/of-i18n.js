@@ -24,3 +24,8 @@ OF.i18n.prop = function(messageKey) {
 	var message = jQuery.i18n.prop(messageKey, args);
 	return message;
 }
+
+OF.i18n.currentLocale = function() {
+	var browserLang = jQuery.i18n.browserLang();
+	return browserLang.replace("-", "_");
+}

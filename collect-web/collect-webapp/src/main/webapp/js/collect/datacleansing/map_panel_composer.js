@@ -188,7 +188,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 				+ (isNaN(point.distanceToExpectedLocation) ? "" : "distance to expected location: " + 
 						Math.round(point.distanceToExpectedLocation) + "m")
 				+ "<br>"
-				+ "<a href=\"javascript:void(0)\" onclick=\"Collect.DataCleansing.MapPanelComposer.openRecordEditPopUp(" + point.recordId + ")\">Edit</a>"
+				+ "<a href=\"javascript:void(0);\" onclick=\"Collect.DataCleansing.MapPanelComposer.openRecordEditPopUp(" + point.recordId + ", '" + point.recordKeys + "')\">Edit</a>"
 				);
 		return circle;
 	}
@@ -198,6 +198,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 		var color_part_dec = percentage * 255;
 		var color_part_hex = dec2hex(color_part_dec);
 		var color = "#" + color_part_hex + color_part_hex + color_part_hex;
+		return color;
 	}
 
 	function dec2hex(dec) {
@@ -205,12 +206,45 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 	}
 };
 
-Collect.DataCleansing.MapPanelComposer.openRecordEditPopUp = function(recordId) {
-	var modalContainer = $("#map-panel").find(".record-edit-modal");
+Collect.DataCleansing.MapPanelComposer.openRecordEditPopUp = function(recordId, recordKeyString) {
+	var modalContainer = $("#record-edit-modal");
+	var modalContent = modalContainer.find(".modal-content");
+	var recordKeyLabel = modalContainer.find(".record-key-label");
+	var iframe = modalContainer.find("iframe");
+	
+	recordKeyLabel.text(recordKeyString);
+	
+	modalContent.resizable({
+		alsoRezize: ".modal-body"
+	}); 
+	modalContent.draggable();
+	
+	function setInitialRecordEditPopUpSize() {
+		iframe.prop("height", $(window).height() - 180);
+	}
+	
+	function resizeIFrame() {
+		iframe.prop("height", modalContent.height() - 100);
+	}
+	
+	$(modalContainer).on("resize", resizeIFrame);
+	
 	modalContainer.on('show.bs.modal', function () {
-		modalContainer.find("iframe").attr("src", "index.htm?edit=true&surveyId=" + collect.activeSurvey.id + "&recordId=" + recordId);
+		iframe.attr("src", "index.htm?edit=true"
+				+ "&surveyId=" + collect.activeSurvey.id 
+				+ "&recordId=" + recordId 
+				+ "&locale=" + OF.i18n.currentLocale());
+		$(this).find('.modal-body').css({
+			'max-height':'100%'
+		});
 	});
-	modalContainer.modal({show:true});
+	var options = {
+		backdrop: "static",
+		keyboard: false
+	};
+	modalContainer.modal(options);
+	
+	setInitialRecordEditPopUpSize();
 };
 
 BlockProcessor = function(totalItems, blockSize, processFn) {
