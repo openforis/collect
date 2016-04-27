@@ -65,6 +65,8 @@ public class CollectAnnotations {
 		
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
+		COLLECT_EARTH_HIDE_IN_RECORD_LIST(new QName(COLLECT_EARTH_NAMESPACE_URI, "hideinrecordlist"), false),
+		COLLECT_EARTH_SHOW_READONLY_FIELD(new QName(COLLECT_EARTH_NAMESPACE_URI, "showreadonlyfield"), false),
 		COLLECT_EARTH_INCLUDE_IN_HEADER(new QName(COLLECT_EARTH_NAMESPACE_URI, "includeinheader"), false),
 		COLLECT_EARTH_PLOT_AREA(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotarea"), 1d),
 		COLLECT_EARTH_BING_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "bingKey"), "GENERATE YOUR OWN BING MAPS KEY AT https://www.bingmapsportal.com"),
@@ -178,12 +180,28 @@ public class CollectAnnotations {
 		setAnnotationValue(defn, Annotation.TAXON_ATTRIBUTE_INCLUDE_UNIQUE_VERNACULAR_NAME, value);
 	}
 	
+	public boolean isHideKeyInCollectEarthRecordList(AttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_HIDE_IN_RECORD_LIST);
+	}
+	
+	public void setHideKeyInCollectEarthRecordList(AttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.COLLECT_EARTH_HIDE_IN_RECORD_LIST, value);
+	}
+	
 	public boolean isFromCollectEarthCSV(AttributeDefinition defn) {
 		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_FROM_CSV);
 	}
 	
 	public void setFromCollectEarthCSV(AttributeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.COLLECT_EARTH_FROM_CSV, value);
+	}
+	
+	public boolean isShowReadOnlyFieldInCollectEarth(AttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_SHOW_READONLY_FIELD);
+	}
+	
+	public void setShowReadOnlyFieldInCollectEarth(AttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.COLLECT_EARTH_SHOW_READONLY_FIELD, value);
 	}
 	
 	public boolean isIncludedInCollectEarthHeader(AttributeDefinition defn) {
@@ -326,5 +344,5 @@ public class CollectAnnotations {
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
-	
+
 }

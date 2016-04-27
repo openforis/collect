@@ -28,11 +28,22 @@
   			</row>
   			<row visible="${vm.attribute}">
 	    		<label value="${labels.survey.schema.attribute.key}:" />
-	    		<fieldErrorHandler message="@load(vmsgs['key'])">
-	    			<checkbox checked="@load(fx.key eq true) @save(fx.key)"
-	    				disabled="@load(fx.calculated)"
-	    				onCheck="@command('keyChanged', key=self.checked)" />
-	    		</fieldErrorHandler>
+	    		<hbox spacing="20px">
+		    		<fieldErrorHandler message="@load(vmsgs['key'])">
+		    			<checkbox checked="@load(fx.key eq true) @save(fx.key)"
+		    				disabled="@load(fx.calculated)"
+		    				onCheck="@command('keyChanged', key=self.checked)" />
+		    		</fieldErrorHandler>
+		    		
+		    		<hbox visible="@load(vm.collectEarthSurvey and fx.key and vm.parentEntityRoot)">
+			    		<label value="${labels.survey.schema.attribute.collect_earth.hide_key_in_record_list}:" />
+			    		<fieldErrorHandler message="@load(vmsgs['hideKeyInCollectEarthRecordList'])">
+			    			<checkbox checked="@bind(fx.hideKeyInCollectEarthRecordList)"
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
+		    		</hbox>
+		    		
+	    		</hbox>
 	    	</row>
   		</rows>
   	</grid>
@@ -527,12 +538,19 @@
 					<fieldErrorHandler message="@load(vmsgs['fromCollectEarthCSV'])">
 		    			<label value="${labels.survey.schema.attribute.collect_earth.fromcsv}:" />
 		    		</fieldErrorHandler>
-		    		<fieldErrorHandler message="@load(vmsgs['fromCsv'])">
-		    			<checkbox
-		    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" 
-		    				onCheck="@command('applyChanges')" />
-		    		</fieldErrorHandler>
-	    				
+		    		<hbox spacing="20px">
+			    		<fieldErrorHandler message="@load(vmsgs['fromCollectEarthCSV'])">
+			    			<checkbox
+			    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" 
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
+						<fieldErrorHandler message="@load(vmsgs['showReadOnlyFieldInCollectEarth'])" visible="@load(fx.fromCollectEarthCSV)">
+			    			<label value="${labels.survey.schema.attribute.collect_earth.show_readonly_field.$}:" />
+							<image popup="showReadOnlyFieldInCollectEarthInfoTooltip" style="cursor:pointer" src="/assets/images/info-small.png" />
+			    			<checkbox checked="@bind(fx.showReadOnlyFieldInCollectEarth)" 
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
+			    	</hbox>
     			</row>
     			<row>
 					<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])">
@@ -543,7 +561,6 @@
 		    				checked="@load(fx.includedInCollectEarthHeader eq true) @save(fx.includedInCollectEarthHeader)" 
 		    				onCheck="@command('applyChanges')" />
 		    		</fieldErrorHandler>
-	    				
     			</row>
     		</rows>
     	</grid>
@@ -562,6 +579,11 @@
     <popup id="columnSpanInfoTooltip" width="300px">
         <html><![CDATA[
     		${labels.survey.schema.node.layout.column_span.info}
+        ]]></html>
+    </popup>
+    <popup id="showReadOnlyFieldInCollectEarthInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.schema.attribute.collect_earth.show_readonly_field.tooltip}
         ]]></html>
     </popup>
 </zk>

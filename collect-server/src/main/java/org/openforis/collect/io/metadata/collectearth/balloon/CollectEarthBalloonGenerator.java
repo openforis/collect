@@ -168,24 +168,13 @@ public class CollectEarthBalloonGenerator {
 		
 		String dynamicFieldsHtml = htmlFormatter.format(rootComponent);
 		sb.append(dynamicFieldsHtml);
-		/*
-		List<CEComponent> children = rootComponent.getChildren();
-		for (CEComponent child : children) {
-			String childName = child.getName();
-			//only produce the input field if it was not already part of the CSV hidden input data
-			boolean includeHtmlElement = ! FIXED_ATTRIBUTE_NAMES.contains(childName) && ! nodeNamesFromCSV.contains(child.getName());
-			if (includeHtmlElement) {
-				String html = htmlFormatter.format(child);
-				sb.append(html);
-			}
-		}
-		*/
+		
 		String result = template.replace(PLACEHOLDER_FOR_DYNAMIC_FIELDS, sb.toString());
 		return result;
 	}
 	
 	private String addHiddenFields(String templateContent) {
-		List<AttributeDefinition> nodesFromCSV = getNodesFromCSVandIDs();
+		List<AttributeDefinition> nodesFromCSV = getHiddenNodeDefinitions();
 		StringBuilder sb = new StringBuilder();
 		for (AttributeDefinition def : nodesFromCSV) {
 			String name = getHtmlParameterName(def);
@@ -207,34 +196,25 @@ public class CollectEarthBalloonGenerator {
 		return result;
 	}
 	
-	private List<AttributeDefinition> getNodesFromCSVandIDs() {
+	private List<AttributeDefinition> getHiddenNodeDefinitions() {
 		final List<AttributeDefinition> nodesFromCSV = new ArrayList<AttributeDefinition>();
 		
 		final CollectAnnotations annotations = survey.getAnnotations();
 		Schema schema = survey.getSchema();
 		schema.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition definition) {
-				if (definition instanceof AttributeDefinition && 
-						(
-						annotations.isFromCollectEarthCSV((AttributeDefinition) definition)
+				if (definition instanceof AttributeDefinition) {
+					AttributeDefinition attrDef = (AttributeDefinition) definition;
+					if (annotations.isFromCollectEarthCSV(attrDef) && ! annotations.isShowReadOnlyFieldInCollectEarth(attrDef)
 						// TODO Fix how to treat surveys with multi-key combinations
 						|| 
-						( (AttributeDefinition) definition ).isKey() && definition.getParentEntityDefinition().isRoot() )
-					) {
-					nodesFromCSV.add((AttributeDefinition) definition);
+						attrDef.isKey() && definition.getParentEntityDefinition().isRoot()) {
+						nodesFromCSV.add(attrDef);
+					}
 				}
 			}
 		});
 		return nodesFromCSV;
-	}
-	
-	private List<String> getNodeNamesFromCSV() {
-		List<AttributeDefinition> nodes = getNodesFromCSVandIDs();
-		List<String> names = new ArrayList<String>(nodes.size());
-		for (AttributeDefinition def : nodes) {
-			names.add(def.getName());
-		}
-		return names;
 	}
 	
 	private CETabSet generateRootComponent() {
@@ -269,7 +249,6 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private CETab createTabComponent(EntityDefinition rootEntityDef, UIForm form, boolean main) {
-		List<String> nodeNamesFromCSV = getNodeNamesFromCSV();
 		final CollectAnnotations annotations = survey.getAnnotations();
 		String label = form.getLabel(language);
 		if (label == null && ! isDefaultLanguage()) {
@@ -282,10 +261,11 @@ public class CollectEarthBalloonGenerator {
 			if (formComponent instanceof NodeDefinitionUIComponent) {
 				NodeDefinition nodeDef = ((NodeDefinitionUIComponent) formComponent).getNodeDefinition();
 				if (formComponent instanceof UIField) {
+					AttributeDefinition attrDef = ((UIField) formComponent).getAttributeDefinition();
 					String nodeName = nodeDef.getName();
 					boolean includeInHTML = ! (
 							HIDDEN_ATTRIBUTE_NAMES.contains(nodeName) 
-							|| nodeNamesFromCSV.contains(nodeName) 
+							|| (annotations.isFromCollectEarthCSV(attrDef) && ! annotations.isShowReadOnlyFieldInCollectEarth(attrDef))
 							|| ((UIField) formComponent).isHidden()
 							|| ((UIField) formComponent).getAttributeDefinition().isKey()
 					);
@@ -352,6 +332,7 @@ public class CollectEarthBalloonGenerator {
 				comp = fieldSet;
 			}
 		} else {
+			AttributeDefinition attrDef = (AttributeDefinition) def;
 			String htmlParameterName;
 			boolean insideEnumeratedEntity = def.getParentEntityDefinition().isEnumerable();
 			if (insideEnumeratedEntity) {
@@ -374,7 +355,9 @@ public class CollectEarthBalloonGenerator {
 			} else {
 				comp = new CEField(htmlParameterName, def.getName(), label, multiple, type, key);
 			}
-			if (((AttributeDefinition) def).isCalculated()) {
+			CollectAnnotations annotations = survey.getAnnotations();
+			if (attrDef.isCalculated() || 
+					(annotations.isFromCollectEarthCSV(attrDef) && annotations.isShowReadOnlyFieldInCollectEarth(attrDef))) {
 				((CEField) comp).setReadOnly(true);
 			}
 		}

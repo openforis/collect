@@ -242,6 +242,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	@DependsOn("editedItem")
+	public boolean isParentEntityRoot() {
+		return editedItem != null && parentEntity != null && parentEntity.isRoot();
+	}
+	
+	@DependsOn("editedItem")
 	public boolean isAttribute() {
 		return editedItem != null && editedItem instanceof AttributeDefinition;
 	}

@@ -51,6 +51,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean showInUI;
 	private boolean fromCollectEarthCSV;
 	private boolean includedInCollectEarthHeader;
+	private boolean showReadOnlyFieldInCollectEarth;
+	private boolean hideKeyInCollectEarthRecordList;
 	
 	//labels
 	private String headingLabel;
@@ -62,6 +64,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String paperPromptLabel;
 	private String handheldPromptLabel;
 	private String pcPromptLabel;
+	
 	//layout
 	private String tabName;
 	private int column;
@@ -171,6 +174,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if (source instanceof AttributeDefinition) {
 			fromCollectEarthCSV = annotations.isFromCollectEarthCSV((AttributeDefinition) source);
 			includedInCollectEarthHeader =  annotations.isIncludedInCollectEarthHeader((AttributeDefinition) source);
+			showReadOnlyFieldInCollectEarth = annotations.isShowReadOnlyFieldInCollectEarth((AttributeDefinition) source);
+			hideKeyInCollectEarthRecordList = annotations.isHideKeyInCollectEarthRecordList((AttributeDefinition) source);
 		}
 		
 		if ( source instanceof Calculable ) {
@@ -241,8 +246,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		}
 		
 		if (dest instanceof AttributeDefinition) {
-			annotations.setFromCollectEarthCSV((AttributeDefinition) dest, fromCollectEarthCSV);
-			annotations.setIncludedInCollectEarthHeader((AttributeDefinition) dest, includedInCollectEarthHeader);
+			AttributeDefinition attrDef = (AttributeDefinition) dest;
+			annotations.setFromCollectEarthCSV(attrDef, fromCollectEarthCSV);
+			annotations.setIncludedInCollectEarthHeader(attrDef, includedInCollectEarthHeader);
+			annotations.setShowReadOnlyFieldInCollectEarth(attrDef, showReadOnlyFieldInCollectEarth);
+			annotations.setHideKeyInCollectEarthRecordList(attrDef, hideKeyInCollectEarthRecordList);
 		}
 		
 		//layout
@@ -524,8 +532,23 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		return includedInCollectEarthHeader;
 	}
 
-	public void setIncludedInCollectEarthHeader(boolean includedInCollectEarthHeader) {
-		this.includedInCollectEarthHeader = includedInCollectEarthHeader;
+	public void setIncludedInCollectEarthHeader(boolean showReadOnlyFieldInCollectEarth) {
+		this.includedInCollectEarthHeader = showReadOnlyFieldInCollectEarth;
 	}
 
+	public boolean isShowReadOnlyFieldInCollectEarth() {
+		return showReadOnlyFieldInCollectEarth;
+	}
+	
+	public void setShowReadOnlyFieldInCollectEarth(boolean showReadOnlyFieldInCollectEarth) {
+		this.showReadOnlyFieldInCollectEarth = showReadOnlyFieldInCollectEarth;
+	}
+	
+	public boolean isHideKeyInCollectEarthRecordList() {
+		return hideKeyInCollectEarthRecordList;
+	}
+	
+	public void setHideKeyInCollectEarthRecordList(boolean hideKeyInCollectEarthRecordList) {
+		this.hideKeyInCollectEarthRecordList = hideKeyInCollectEarthRecordList;
+	}
 }
