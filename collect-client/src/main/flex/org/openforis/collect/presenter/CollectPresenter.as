@@ -17,6 +17,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.CollectInfo;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.ModelClient;
 	import org.openforis.collect.client.SessionClient;
@@ -104,6 +105,8 @@ package org.openforis.collect.presenter {
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
 
+			updateApplicationVersionInfo();
+
 			var params:Object = FlexGlobals.topLevelApplication.parameters;
 			var preview:Boolean = params.preview == "true";
 			var edit:Boolean = params.edit == "true";
@@ -156,6 +159,15 @@ package org.openforis.collect.presenter {
 			collectJobMonitor.startProgressTimer();
 		}
 		
+		private function updateApplicationVersionInfo():void {
+			function resultHandler(event:ResultEvent, token:Object = null):void {
+				var info:CollectInfo = CollectInfo(event.result);
+				ApplicationConstants.collectInfo = info;
+				eventDispatcher.dispatchEvent(new UIEvent(UIEvent.APPLICATION_INFO_LOADED));
+			}
+			ClientFactory.collectInfoClient.getCompleteInfo(new AsyncResponder(resultHandler, faultHandler));
+		}
+
 		protected function initPreview(params:Object, localeString:String):void {
 			Application.preview = true;
 			var surveyId:int = int(params.surveyId);

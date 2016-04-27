@@ -8,6 +8,7 @@ package org.openforis.collect.client {
 	 * */
 	public class ClientFactory {
 		
+		private static var _collectInfoClient:CollectInfoClient;
 		private static var _collectJobClient:CollectJobClient;
 		private static var _codeListClient:CodeListClient;
 		private static var _codeListImportClient:CodeListImportClient;
@@ -27,6 +28,13 @@ package org.openforis.collect.client {
 		private static var _userClient:UserClient;
 		private static var _userSessionClient:UserSessionClient;
 		
+		public static function get collectInfoClient():CollectInfoClient {
+			if(_collectInfoClient == null){
+				_collectInfoClient = new CollectInfoClient();
+			}
+			return _collectInfoClient;
+		}
+
 		public static function get collectJobClient():CollectJobClient {
 			if(_collectJobClient == null){
 				_collectJobClient = new CollectJobClient();

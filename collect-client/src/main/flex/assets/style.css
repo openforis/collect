@@ -298,6 +298,10 @@ input|TextInput.readOnly, mx|TextArea.readOnly {
 	borderWeight: 1; 
 }
 
+s|Button.loading {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.LoadingButtonSkin");
+}
+
 s|Button.closeButton {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.CloseButtonSkin");
 }
@@ -310,16 +314,24 @@ s|Button.deleteButton {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.DeleteButtonSkin");
 }
 
-s|Button.errorButton {
-	skin-class: ClassReference("org.openforis.collect.ui.skin.ErrorButtonSkin");
-}
-
 s|Button.uploadButton {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.UploadButtonSkin");
 }
 
 s|Button.downloadButton {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.DownloadButtonSkin");
+}
+
+s|Button.warn {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.WarnButtonSkin");
+}
+
+s|Button.error {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.ErrorButtonSkin");
+}
+
+s|Button.checked {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.CheckedButtonSkin");
 }
 
 .dialogHeaderStyle {

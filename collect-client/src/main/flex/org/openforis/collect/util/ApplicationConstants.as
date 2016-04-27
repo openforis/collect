@@ -2,6 +2,8 @@ package org.openforis.collect.util {
 	import mx.core.FlexGlobals;
 	import mx.utils.StringUtil;
 	import mx.utils.URLUtil;
+
+	import org.openforis.collect.CollectInfo;
 	
 	/**
 	 * 
@@ -58,6 +60,8 @@ package org.openforis.collect.util {
 		private static var _PORT:uint;
 		private static var _ROOT_URL:String;
 		private static var _URL:String;
+
+		private static var _collectInfo:CollectInfo;
 		
 		{
 			setUrl("http://localhost:8080/collect/collect.swf");
@@ -139,6 +143,14 @@ package org.openforis.collect.util {
 		
 		public static function get URL():String {
 			return _URL;
+		}
+
+		public static function get collectInfo():CollectInfo {
+			return _collectInfo;
+		}
+
+		public static function set collectInfo(value:CollectInfo):void {
+			_collectInfo = value;
 		}
 
 		internal static function setUrl(applicationUrl:String):void {

@@ -47,6 +47,9 @@
 	<bean id="codeListImportService"
 		class="org.openforis.collect.remoting.service.CodeListImportService"
 		autowire="byName" init-method="init" />
+	<bean id="collectInfoService"
+		class="org.openforis.collect.remoting.service.CollectInfoService"
+		autowire="byName" />
 	<bean id="configurationService"
 		class="org.openforis.collect.remoting.service.ConfigurationService"
 		autowire="byName" init-method="init" />

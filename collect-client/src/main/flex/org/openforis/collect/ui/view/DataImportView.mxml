@@ -273,7 +273,7 @@
 											]]>
 										</fx:Script>
 										<s:Button horizontalCenter="0" verticalCenter="0"
-												  styleName="errorButton"
+												  styleName="error"
 												  useHandCursor="true" buttonMode="true"
 												  visible="{data.warnings.length &gt; 0}"
 												  click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
@@ -404,7 +404,7 @@
 										]]>
 									</fx:Script>
 									<s:Button horizontalCenter="0" verticalCenter="0"
-											  styleName="errorButton"
+											  styleName="error"
 											  useHandCursor="true" buttonMode="true"
 											  visible="{data.warnings.length &gt; 0}"
 												 click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
@@ -473,7 +473,7 @@
 											]]>
 										</fx:Script>
 										<s:Button horizontalCenter="0" verticalCenter="0"
-												  styleName="errorButton"
+												  styleName="error"
 												  useHandCursor="true" buttonMode="true"
 												  visible="{data.errors.length &gt; 0}"
 												  click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(

@@ -12,6 +12,22 @@
 	color: #eee;
 	padding-left: 2em;
 }
+
+.footer .icon.app-version-latest {
+	background-image: url("images/check-green-small.png");
+	background-repeat: no-repeat;
+}
+
+.footer .icon.app-version-not-verified {
+	background-image: url("images/warning-red-small.png");
+	background-repeat: no-repeat;
+}
+
+.footer .icon.app-version-newer-available {
+	background-image: url("images/warning-small.png");
+	background-repeat: no-repeat;
+}
+
 .error {
 	color: red;
 }
@@ -248,4 +264,9 @@ button.icon {
 
 .expression-info {
 	cursor: pointer;
+}
+
+.icon.loading {
+	background-image: url("images/loading-small.gif");
+	background-repeat: no-repeat;
 }

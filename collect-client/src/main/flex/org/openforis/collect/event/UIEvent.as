@@ -8,6 +8,8 @@ package org.openforis.collect.event {
 	 * */
 	public class UIEvent extends Event {
 		
+		public static const APPLICATION_INFO_LOADED:String = "applicationInfoLoaded";
+		
 		//?
 		public static const LOGOUT_CLICK:String = "logoutClick";
 		public static const SHOW_SURVEY_SELECTION:String = "showSurveySelection";

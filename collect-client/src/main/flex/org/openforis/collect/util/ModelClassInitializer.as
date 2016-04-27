@@ -1,6 +1,7 @@
 package org.openforis.collect.util {
 	
 	import org.granite.collections.BasicMap;
+	import org.openforis.collect.CollectInfo;
 	import org.openforis.collect.io.data.DataExportStatus$Format;
 	import org.openforis.collect.io.data.proxy.DataExportStatusProxy;
 	import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
@@ -108,6 +109,7 @@ package org.openforis.collect.util {
 				CodeListProxy,
 				CodeListProxy$CodeScope,
 				CodeListProxy$CodeType,
+				CollectInfo,
 				CoordinateAttributeDefinitionProxy,
 				DataExportStatus$Format,
 				DataExportStatusProxy,

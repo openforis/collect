@@ -142,5 +142,15 @@ package org.openforis.collect.ui {
 	
 		[Embed("/assets/images/equal-black-16x16.png")]
 		public static const EQUAL_SMALL:Class;	
+
+		[Embed("/assets/images/check-green-small.png")]
+		public static const CHECK_GREEN_SMALL:Class;	
+
+		[Embed("/assets/images/warning-small.png")]
+		public static const WARNING_SMALL:Class;	
+
+		[Embed("/assets/images/warning-red-small.png")]
+		public static const WARNING_RED_SMALL:Class;	
+
 	}
 }

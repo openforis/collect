@@ -3,8 +3,12 @@
 	import java.awt.image.*;
 	import java.io.*;
 	import javax.imageio.*;
+	import org.openforis.collect.CollectInfo;
 	import org.openforis.collect.manager.LogoManager;
+	import org.openforis.collect.remoting.service.CollectInfoService;
+	import org.openforis.commons.versioning.Version;
 	import org.zkoss.spring.*;
+	import org.zkoss.util.resource.Labels;
 
 	final String DEFAULT_LOGO = "/assets/images/default-logo.png";
 	final String DEFAULT_HEADER = "/assets/images/header.jpg";
@@ -14,6 +18,28 @@
 		loadImage(headerImage, org.openforis.collect.model.LogoPosition.HEADER, DEFAULT_HEADER);
 		loadImage(headerTopRightImage, org.openforis.collect.model.LogoPosition.TOP_RIGHT, DEFAULT_LOGO);
 		loadImage(footerImage, org.openforis.collect.model.LogoPosition.FOOTER, DEFAULT_FOOTER);
+		
+		updateLatestVersionInfo();
+	}
+	
+	void updateLatestVersionInfo() {
+		CollectInfoService infoService = (CollectInfoService) SpringUtil.getBean("collectInfoService");
+		CollectInfo info = infoService.getCompleteInfo();
+		String sClass, tooltipTextKey;
+		if (info.isLatestReleaseVersionVerified()) {
+			if (info.isLatestReleaseVersion()) {
+				sClass = "icon app-version-latest";
+				tooltipTextKey = "global.application_version.latest_release_installed";
+			} else {
+				sClass = "icon app-version-newer-available";
+				tooltipTextKey = "global.application_version.newer_release_available";
+			}
+		} else {
+			sClass = "icon app-version-not-verified";
+			tooltipTextKey = "global.application_version.cannot_verify_latest_release";
+		}
+		versionInfoBox.setClass(sClass);
+		versionInfoBox.setTooltiptext(Labels.getLabel(tooltipTextKey));
 	}
 	
 	void loadImage(Image image, org.openforis.collect.model.LogoPosition position, String defaultImageSrc) {
@@ -80,16 +106,16 @@
 				<absolutechildren hflex="true" vflex="true">
 		      		<hbox sclass="footer" hflex="true" vflex="true">
 				    	<zscript>
-				    		org.openforis.commons.versioning.Version version = org.openforis.collect.Collect.VERSION;
-				    		String appVersion = version == null ? "DEV_VERSION": version.toString();
+				    		String appVersion = org.openforis.collect.Collect.VERSION.toString();
 				    		
 				    		org.springframework.security.core.Authentication authentication = org.zkoss.spring.security.SecurityUtil.getAuthentication();
 							String loggedUsername = authentication.getName();
 						</zscript>
 		
-						<box vflex="true" pack="center">
-			   	          	<label value="${labels.global.application_version}: ${appVersion}" sclass="appVersion" />
-						</box>
+						<hbox vflex="true" pack="center" align="center">
+			   	          	<label value="${labels.global.application_version.$}: ${appVersion}" sclass="appVersion" />
+			   	          	<box id="versionInfoBox" sclass="icon loading" width="20px" height="20px" />
+						</hbox>
 		   	          	
 		   	          	<box hflex="true" />
 		   	          	
