@@ -50,12 +50,14 @@ public class ComponentUtil {
 		return binder;
 	}
 	
+	public static SimpleForm getForm(Binder binder) {
+		Component view = binder.getView();
+		return getForm(view);
+	}
+
 	public static SimpleForm getForm(Component view) {
 		String formId = (String) view.getAttribute(FORM_ID_ATTRIBUTE);
-		if (formId == null) {
-			return null;
-		}
-		return (SimpleForm) view.getAttribute(formId);
+		return formId == null ? null : (SimpleForm) view.getAttribute(formId);
 	}
 	
 	@SuppressWarnings("unchecked")

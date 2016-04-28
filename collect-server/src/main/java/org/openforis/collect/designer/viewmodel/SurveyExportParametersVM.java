@@ -102,25 +102,21 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	private void checkEnabledFields() {
 		if ( ! isIncludeDataVisible() ) {
-			setValueOnFormField(tempForm, "includeData", false);
-			BindUtils.postNotifyChange(null, null, tempForm, "includeData");
+			setFormFieldValue(tempForm, "includeData", false);
 		}
 		
 		boolean includeData = getFormFieldValue(tempForm, "includeData");
 		if ( ! includeData ) {
-			setValueOnFormField(tempForm, "includeUploadedFiles", false);
-			BindUtils.postNotifyChange(null, null, tempForm, "includeUploadedFiles");
+			setFormFieldValue(tempForm, "includeUploadedFiles", false);
 		}
 	}
 
 	private String getOutputFormatFormField() {
-		String outputFormat = getFormFieldValue(tempForm, "outputFormat");
-		return outputFormat;
+		return getFormFieldValue(tempForm, "outputFormat");
 	}
 
 	private String getTypeFormField() {
-		String type = getFormFieldValue(tempForm, "type");
-		return type;
+		return getFormFieldValue(tempForm, "type");
 	}
 	
 	public List<String> getSurveyLanguages() {
@@ -221,6 +217,5 @@ public class SurveyExportParametersVM extends BaseVM {
 			this.languageCode = languageCode;
 		}
 	}
-
 	
 }

@@ -24,7 +24,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.SurveyObject;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -33,7 +32,6 @@ import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Window;
 
@@ -46,8 +44,7 @@ import liquibase.util.StringUtils;
 public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
 	private static final String CODE_LIST_ASSIGNED_COMMAND = "codeListAssigned";
-	private static final String FORM_ID = "fx";
-
+	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") CodeAttributeDefinition attributeDefn, 
@@ -96,9 +93,8 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			}
 			@Override
 			public void onCancel() {
-				Form form = getForm(binder);
 				CodeList oldList = editedItem.getList();
-				setValueOnFormField(form, "list", oldList);
+				setFormFieldValue(binder, "list", oldList);
 			}
 		}, "survey.schema.attribute.code.confirm_change_list_on_referenced_node.message");
 		confirmParams.setOkLabelKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.ok");
@@ -117,11 +113,10 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		CodeList oldList = fo.getList();
 		fo.setParentCodeAttributeDefinition(null);
 		fo.setList(list);
-		Form form = getForm(binder);
-		setValueOnFormField(form, "list", list);
-		setValueOnFormField(form, "list.hierarchical", list != null && list.isHierarchical());
-		setValueOnFormField(form, "parentCodeAttributeDefinition.path", null);
-		setValueOnFormField(form, "hierarchicalLevel", null);
+		setFormFieldValue(binder, "list", list);
+		setFormFieldValue(binder, "list.hierarchical", list != null && list.isHierarchical());
+		setFormFieldValue(binder, "parentCodeAttributeDefinition.path", null);
+		setFormFieldValue(binder, "hierarchicalLevel", null);
 		dispatchApplyChangesCommand(binder);
 		notifyChange("dependentCodePaths");
 		
@@ -150,11 +145,6 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			}
 			validateForm(binder);
 		}
-	}
-
-	protected Form getForm(Binder binder) {
-		Component view = binder.getView();
-		return (Form) view.getAttribute(FORM_ID);
 	}
 
 	@Command

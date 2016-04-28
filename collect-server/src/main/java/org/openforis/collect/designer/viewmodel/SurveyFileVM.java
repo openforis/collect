@@ -12,7 +12,6 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyFileFormObject;
-import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.SurveyFile;
@@ -20,7 +19,6 @@ import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -138,18 +136,17 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 	
 	private void updateForm(Binder binder) {
-		SimpleForm tempForm = ComponentUtil.getForm(binder.getView());
-		String typeName = (String) tempForm.getField("type");
+		String typeName = getFormFieldValue(binder, "type");
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		String filename = type.getFixedFilename();
 		if (filename == null) {
 			if (uploadedFile == null) {
-				filename = (String) tempForm.getField(SurveyFileFormObject.FILENAME_FIELD_NAME);
+				filename = getFormFieldValue(binder, SurveyFileFormObject.FILENAME_FIELD_NAME);
 			} else {
 				filename = uploadedFileName;
 			}
 		}
-		setValueOnFormField(tempForm, SurveyFileFormObject.FILENAME_FIELD_NAME, filename);
+		setFormFieldValue(binder, SurveyFileFormObject.FILENAME_FIELD_NAME, filename);
 		dispatchApplyChangesCommand(binder);
 	}
 

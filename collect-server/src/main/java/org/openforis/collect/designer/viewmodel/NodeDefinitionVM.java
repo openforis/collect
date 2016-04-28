@@ -122,7 +122,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		((NodeDefinitionFormObject<?>) formObject).setName(name);
 
 		//suggest label
-		String singleInstanceLabel = getFormFieldValue(tempFormObject, INSTANCE_LABEL_FIELD_NAME);
+		String singleInstanceLabel = getTempFormObjectFieldValue(INSTANCE_LABEL_FIELD_NAME);
 		if (StringUtils.isBlank(singleInstanceLabel) && StringUtils.isNotBlank(name)) {
 			singleInstanceLabel = suggestLabel(name);
 			setTempFormObjectFieldValue(INSTANCE_LABEL_FIELD_NAME, singleInstanceLabel);
@@ -143,7 +143,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		dispatchApplyChangesCommand(binder);
 		
 		((NodeDefinitionFormObject<?>) formObject).setInstanceLabel(value);
-		String name = getFormFieldValue(tempFormObject, NAME_FIELD_NAME);
+		String name = getTempFormObjectFieldValue(NAME_FIELD_NAME);
 		if ( StringUtils.isBlank(name) && StringUtils.isNotBlank(value) ) {
 			name = suggestInternalName(value);
 			nameChanged(binder, name);
@@ -196,18 +196,21 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return tempFormObject;
 	}
 	
+	protected <V> V getTempFormObjectFieldValue(String field) {
+		return getFormFieldValue(tempFormObject, field);
+	}
+	
 	protected void setTempFormObjectFieldValue(String field, Object value) {
-		setValueOnFormField(tempFormObject, field, value);
-		BindUtils.postNotifyChange(null, null, tempFormObject, field);
+		setFormFieldValue(tempFormObject, field, value);
 	}
 	
 	@DependsOn("editedItem")
 	public String getNodeType() {
-		if ( editedItem != null ) {
+		if ( editedItem == null ) {
+			return null;
+		} else {
 			NodeType type = NodeType.valueOf(editedItem);
 			return type.name();
-		} else {
-			return null;
 		}
 	}
 
@@ -306,5 +309,5 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			return true;
 		}
 	}
-
+	
 }

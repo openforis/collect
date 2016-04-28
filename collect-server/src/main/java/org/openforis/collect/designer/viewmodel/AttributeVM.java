@@ -2,6 +2,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_ERROR;
 import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_WARNING;
+import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -216,14 +217,12 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	}
 	
 	protected void initAttributeDefaults() {
-		if ( editedItem != null ) {
-			attributeDefaults =  new ArrayList<AttributeDefault>(editedItem.getAttributeDefaults());
-			String field = AttributeDefinitionFormObject.ATTRIBUTE_DEFAULTS_FIELD;
-			setValueOnFormField(tempFormObject, field, attributeDefaults);
-			((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
-			BindUtils.postNotifyChange(null, null, formObject, field);
-		} else {
+		if ( editedItem == null ) {
 			attributeDefaults = null;
+		} else {
+			attributeDefaults =  new ArrayList<AttributeDefault>(editedItem.getAttributeDefaults());
+			setTempFormObjectFieldValue(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
+			((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
 		}
 		notifyChange("formObject", "tempFormObject", "attributeDefaults");
 	}

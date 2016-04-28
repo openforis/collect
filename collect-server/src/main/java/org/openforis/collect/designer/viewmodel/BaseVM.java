@@ -11,6 +11,7 @@ import java.util.ServiceLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
@@ -19,6 +20,7 @@ import org.openforis.collect.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
@@ -36,6 +38,7 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class BaseVM {
 	
+	private static final String INTERNAL_NAME_INVALID_CHARACTERS_REGEX = "[^a-z0-9_]";
 	private static final SimpleDateFormat PRETTY_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	
 	protected static final ServiceLoader<CollectEarthProjectFileCreator> COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER = 
@@ -109,21 +112,31 @@ public abstract class BaseVM {
 		return webApp.getInitParameter(name);
 	}
 	
-	protected void setValueOnFormField(Form form, String field,
+	protected <T> T getFormFieldValue(Binder binder, String field) {
+		return getFormFieldValue(ComponentUtil.getForm(binder), field);
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <T> T getFormFieldValue(Form form, String field) {
+		return (T) form.getField(field);	
+	}
+	
+	protected void setFormFieldValue(Binder binder, String field,
+			Object value) {
+		Form form = ComponentUtil.getForm(binder);
+		setFormFieldValue(form, field, value);
+	}
+	
+	protected void setFormFieldValue(Form form, String field,
 			Object value) {
 		form.setField(field, value);
 		BindUtils.postNotifyChange(null, null, form, field);
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected <T> T getFormFieldValue(Form form, String field) {
-		return (T) form.getField(field);	
-	}
-
 	protected static String adjustInternalName(String name) {
 		String result = StringUtils.trimToEmpty(name);
 		result = result.toLowerCase(Locale.ENGLISH);
-		result = result.replaceAll("[^a-z0-9_]", "_");
+		result = result.replaceAll(INTERNAL_NAME_INVALID_CHARACTERS_REGEX, "_");
 		return result;
 	}
 	

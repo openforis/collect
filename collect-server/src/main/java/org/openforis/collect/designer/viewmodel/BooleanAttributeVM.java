@@ -8,9 +8,7 @@ import org.openforis.collect.designer.form.BooleanAttributeDefinitionFormObject.
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -46,19 +44,13 @@ public class BooleanAttributeVM extends AttributeVM<BooleanAttributeDefinition> 
 	
 	protected void checkRequiredFieldValue() {
 		if ( ! isRequiredApplied() ) {
-			setValueOnFormField(tempFormObject, NodeDefinitionFormObject.REQUIRED_FIELD, false);
-			BindUtils.postNotifyChange(null, null, tempFormObject, NodeDefinitionFormObject.REQUIRED_FIELD);
+			setTempFormObjectFieldValue(NodeDefinitionFormObject.REQUIRED_FIELD, false);
 		}
 	}
 	
 	protected Type getCurrentType() {
-		Form tempFormObject = getTempFormObject();
-		String typeValue = getFormFieldValue(tempFormObject, BooleanAttributeDefinitionFormObject.TYPE_FIELD);
-		Type type = null;
-		if ( typeValue != null ) {
-			type = BooleanAttributeDefinitionFormObject.Type.valueOf(typeValue);
-		}
-		return type;
+		String typeValue = getTempFormObjectFieldValue(BooleanAttributeDefinitionFormObject.TYPE_FIELD);
+		return typeValue == null ? null : BooleanAttributeDefinitionFormObject.Type.valueOf(typeValue);
 	}
 	
 }
