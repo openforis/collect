@@ -114,7 +114,7 @@
 		
 						<hbox vflex="true" pack="center" align="center">
 			   	          	<label value="${labels.global.application_version.$}: ${appVersion}" sclass="appVersion" />
-			   	          	<box id="versionInfoBox" sclass="icon loading" width="20px" height="20px" />
+			   	          	<box id="versionInfoBox" sclass="icon loading" width="16px" height="16px" />
 						</hbox>
 		   	          	
 		   	          	<box hflex="true" />
