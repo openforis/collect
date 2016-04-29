@@ -13,6 +13,9 @@ import org.openforis.idm.metamodel.NumberAttributeDefinition;
  */
 public class NumberAttributeDefinitionFormObject<T extends NumberAttributeDefinition> extends NumericAttributeDefinitionFormObject<T> {
 
+	NumberAttributeDefinitionFormObject() {
+	}
+	
 	NumberAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}

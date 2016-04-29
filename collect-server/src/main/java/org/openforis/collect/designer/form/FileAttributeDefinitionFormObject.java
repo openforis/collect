@@ -26,6 +26,9 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	private Integer maxSize;
 	private String extensions;
 	
+	FileAttributeDefinitionFormObject() {
+	}
+	
 	FileAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}

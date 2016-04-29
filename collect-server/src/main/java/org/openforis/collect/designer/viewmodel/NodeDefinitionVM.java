@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.metamodel.AttributeType;
@@ -24,14 +25,14 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Form;
-import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.proxy.FormProxyObject;
+import org.zkoss.bind.proxy.MapProxy;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
@@ -47,7 +48,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	private static final String NAME_FIELD_NAME = "name";
 	private static final String INSTANCE_LABEL_FIELD_NAME = "instanceLabel";
 
-	protected Form tempFormObject;
+	protected MapProxy<String, Object> tempFormObject;
 	protected EntityDefinition parentEntity;
 
 	public NodeDefinitionVM() {
@@ -57,11 +58,22 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	
 	protected void initInternal(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
 		super.init();
-		tempFormObject = new SimpleForm();
 		if ( nodeDefn != null ) {
 			this.parentEntity = parentEntity;
 			this.newItem = newItem;
 			setEditedItem(nodeDefn);
+		}
+	}
+	
+	@Override
+	public void setEditedItem(T editedItem) {
+		super.setEditedItem(editedItem);
+		try {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> formObjectMap = BeanUtils.describe(formObject);
+			tempFormObject = new MapProxy<String, Object>(formObjectMap, null);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -192,7 +204,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	// GETTERS AND SETTERS
-	public Form getTempFormObject() {
+	public FormProxyObject getTempFormObject() {
 		return tempFormObject;
 	}
 	

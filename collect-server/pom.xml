@@ -16,8 +16,8 @@
 		<geotools.version>10.4</geotools.version>
 		<graniteds.version>2.3.0.GA</graniteds.version>
 		<aspectj.version>1.8.0</aspectj.version>
-		<zk.version>6.5.1.1</zk.version>
-		<zk.spring.version>3.1.1</zk.spring.version>
+		<zk.version>8.0.1.1</zk.version>
+		<zk.spring.version>3.2.0</zk.spring.version>
 	</properties>
 
 	<repositories>
