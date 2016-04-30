@@ -12,7 +12,7 @@ public class SurveyFile extends PersistedSurveyObject {
 	private static final long serialVersionUID = 1L;
 	
 	public enum SurveyFileType {
-		COLLECT_EARTH_AREA_PER_ATTRIBUTE("ce_area", "area_per_attribute.csv"),
+		COLLECT_EARTH_AREA_PER_ATTRIBUTE("ce_area", "areas_per_attribute.csv"),
 		COLLECT_EARTH_GRID("ce_grid"),
 		COLLECT_EARTH_EE_SCRIPT("ce_eescript", "eePlaygroundScript.fmt"),
 		GENERIC("generic");
