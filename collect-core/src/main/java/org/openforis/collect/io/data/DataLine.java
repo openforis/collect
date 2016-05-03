@@ -72,6 +72,12 @@ public class DataLine extends Line {
 		return columnNameByField;
 	}
 	
+	@Override
+	public String toString() {
+		return "DataLine [ancestorIdentifierByDefinitionId=" + ancestorIdentifierByDefinitionId + ", fieldValues="
+				+ fieldValues + ", columnNameByField=" + columnNameByField + "]";
+	}
+	
 	public static class FieldValueKey {
 		
 		private int attributeDefinitionId;
@@ -137,6 +143,13 @@ public class DataLine extends Line {
 			} else if (!fieldName.equals(other.fieldName))
 				return false;
 			return true;
+		}
+		
+		
+		@Override
+		public String toString() {
+			return "FieldValueKey [defId=" + attributeDefinitionId + ", pos="
+					+ attributePosition + ", field=" + fieldName + "]";
 		}
 		
 	}
@@ -241,6 +254,10 @@ public class DataLine extends Line {
 			return true;
 		}
 		
+		@Override
+		public String toString() {
+			return "EntityKeysIdentifierDefintion [keyDefs=" + Arrays.toString(keyDefinitionIds) + "]";
+		}
 	}
 	
 	
@@ -282,6 +299,11 @@ public class DataLine extends Line {
 			} else if (!definition.equals(other.definition))
 				return false;
 			return true;
+		}
+		
+		@Override
+		public String toString() {
+			return definition.toString();
 		}
 	}
 	

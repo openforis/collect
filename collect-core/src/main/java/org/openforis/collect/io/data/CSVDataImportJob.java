@@ -413,7 +413,8 @@ public class CSVDataImportJob extends Job {
 			if (recordSummary == null && input.settings.isInsertNewRecords() ) {
 				//create new record
 				EntityDefinition rootEntityDefn = getParentEntityDefinition();
-				CollectRecord record = recordManager.instantiateRecord(input.survey, rootEntityDefn.getName(), adminUser, input.settings.getNewRecordVersionName(), Step.ENTRY);
+				CollectRecord record = recordManager.instantiateRecord(input.survey, rootEntityDefn.getName(), 
+						adminUser, input.settings.getNewRecordVersionName(), Step.ENTRY);
 				NodeChangeSet changes = recordManager.initializeRecord(record);
 				if (nodeChangeBatchProcessor != null) {
 					nodeChangeBatchProcessor.add(changes, adminUser.getName());
@@ -450,7 +451,8 @@ public class CSVDataImportJob extends Job {
 					lastModifiedRecordSummary = recordSummary;
 					lastModifiedRecord = record;
 				} else {
-					dataImportStatus.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
+					dataImportStatus.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, 
+							RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
 				}
 			}
 			dataImportStatus.addProcessedRow(line.getLineNumber());

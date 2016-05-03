@@ -43,7 +43,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	private static final String POSITION_COLUMN_FORMAT = "_%s_position";
 
 	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataImport.parsingError.missing_required_columns.message";
-	
+	private static final String INVALID_NODE_POSITION_VALUE_MESSAGE_KEY = "csvDataImport.error.invalidNodePosition";
 
 	private EntityDefinition parentEntityDefinition;
 
@@ -252,6 +252,10 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				} else if ( identifierDefn instanceof EntityPositionIdentifierDefinition ) {
 					String positionColName = getPositionColumnName(entityDefn);
 					int position = getColumnValue(positionColName, true, Integer.class);
+					if (position <= 0) {
+						throw new ParsingException(new ParsingError(ErrorType.INVALID_VALUE, 
+								line.getLineNumber(), positionColName, INVALID_NODE_POSITION_VALUE_MESSAGE_KEY));
+					}
 					EntityIdentifier<?> identifier = new DataLine.EntityPositionIdentifier((EntityPositionIdentifierDefinition) identifierDefn, position);
 					line.addAncestorIdentifier(identifier);
 				} else {
@@ -279,7 +283,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		private void addFieldValues(DataLine line) throws ParsingException {
 			List<String> colNames = csvLine.getColumnNames();
 			List<String> expectedAncestorKeyColumnNames = getExpectedAncestorKeyColumnNames();
-			List<String> attrColNames = colNames.subList(expectedAncestorKeyColumnNames.size(), colNames.size());
+			List<String> attrColNames = new ArrayList<String>(colNames);
+			attrColNames.removeAll(expectedAncestorKeyColumnNames);
 			for (String colName : attrColNames) {
 				String value = getColumnValue(colName, false, String.class);
 				FieldValueKey fieldValueKey = extractFieldValueKey(colName);
