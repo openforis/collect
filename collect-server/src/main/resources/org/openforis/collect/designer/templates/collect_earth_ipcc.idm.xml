@@ -1447,7 +1447,7 @@ Using this attribute and the "Number of trees in the plot" it is possible to est
           <message xml:lang="en">The number of trees in the plot in non-forest categories should not exceed 30</message>
         </compare>
       </number>
-      <code id="1065" name="land_use_initial_subdivision" relevant="land_use_subdivision_change=true() or  (&#10;land_use_subcategory!='GLtoGL' and land_use_subcategory!='FLtoFL' and land_use_subcategory!='SLtoSL' and land_use_subcategory!='OTtoOT' and land_use_subcategory!='WLtoWL' and land_use_subcategory!='CLtoCL'&#10;)" required="true" ui:tab="plot_tab" ui:layoutType="dropdown" strict="false" list="land_use" parent="land_use_category">
+      <code id="1065" name="land_use_initial_subdivision" relevant="land_use_subdivision_change=true() or  (&#10;land_use_subcategory!='GLtoGL' and land_use_subcategory!='FLtoFL' and land_use_subcategory!='SLtoSL' and land_use_subcategory!='OTtoOT' and land_use_subcategory!='WLtoWL' and land_use_subcategory!='CLtoCL'&#10;)" required="true" ui:tab="plot_tab" ui:layoutType="dropdown" strict="false" list="land_use" parent="calculated_initial_land_use">
         <label type="instance">Previous Land Use Subdivision</label>
       </code>
       <number id="1066" name="land_use_subdivision_year_of_change" relevant="land_use_subdivision_change=true()&#10;and&#10;(land_use_subcategory='GLtoGL' or land_use_subcategory='FLtoFL' or land_use_subcategory='SLtoSL' or land_use_subcategory='OTtoOT' or land_use_subcategory='WLtoWL' or land_use_subcategory='CLtoCL')" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" type="integer">

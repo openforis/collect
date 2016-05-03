@@ -12,6 +12,9 @@ import org.openforis.idm.metamodel.EntityDefinition;
  */
 public class DateAttributeDefinitionFormObject<T extends DateAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
+	DateAttributeDefinitionFormObject() {
+	}
+	
 	DateAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}

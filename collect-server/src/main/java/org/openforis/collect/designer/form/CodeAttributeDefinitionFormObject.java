@@ -10,6 +10,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.zkoss.bind.annotation.Immutable;
 
 /**
  * @author S. Ricci
@@ -27,7 +28,10 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	private boolean showCode;
 	private String hierarchicalLevel;
 	
-	CodeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
+	public CodeAttributeDefinitionFormObject() {
+	}
+	
+	public CodeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 		strict = true;
 		allowValuesSorting = false;
@@ -59,7 +63,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		super.loadFrom(source, languageCode);
 		list = source.getList();
 		parentCodeAttributeDefinition = source.getParentCodeAttributeDefinition();
-		hierarchicalLevel = list == null ? null : source.getHierarchicalLevel();
+		hierarchicalLevel = source.getList() == null ? null : source.getHierarchicalLevel();
 		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 		
@@ -72,14 +76,16 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		showCode = uiOptions.getShowCode(source);
 	}
 	
+	@Immutable
 	public CodeList getList() {
 		return list;
 	}
-
+	
+	@Immutable
 	public void setList(CodeList list) {
 		this.list = list;
 	}
-
+	
 	public boolean isStrict() {
 		return strict;
 	}
@@ -96,6 +102,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		this.allowValuesSorting = allowValuesSorting;
 	}
 	
+	@Immutable
 	public CodeAttributeDefinition getParentCodeAttributeDefinition() {
 		return parentCodeAttributeDefinition;
 	}

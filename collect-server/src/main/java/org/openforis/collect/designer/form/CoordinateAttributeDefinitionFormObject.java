@@ -21,6 +21,9 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	private String yFieldLabel;
 	private String srsFieldLabel;
 	
+	CoordinateAttributeDefinitionFormObject() {
+	}
+	
 	CoordinateAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}

@@ -21,6 +21,9 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 	//layout
 	private String layoutType;
 
+	EntityDefinitionFormObject() {
+	}
+	
 	EntityDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}

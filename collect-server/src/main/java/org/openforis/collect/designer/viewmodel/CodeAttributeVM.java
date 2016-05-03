@@ -53,8 +53,8 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	}
 
 	@Command
-	public void onListChanged(@ContextParam(ContextType.BINDER) final Binder binder,
-			@BindingParam("list") final CodeList list) {
+	public void onListChanged(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam("list") CodeList list) {
 		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
 		CodeList oldList = fo.getList();
 		boolean listChanged = oldList != null && ! oldList.equals(list);
@@ -81,8 +81,10 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		
 		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
 		CodeList oldList = fo.getList();
-		confirmParams.setMessageArgs(new String[] {oldList.getName(), list.getName()});
-		MessageUtil.showConfirm(confirmParams);
+		if (oldList != null) {
+			confirmParams.setMessageArgs(new String[] {oldList.getName(), list.getName()});
+			MessageUtil.showConfirm(confirmParams);
+		}
 	}
 
 	private void confirmParentCodeListChange(final Binder binder, final CodeList list) {
@@ -95,6 +97,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			public void onCancel() {
 				CodeList oldList = editedItem.getList();
 				setFormFieldValue(binder, "list", oldList);
+				setTempFormObjectFieldValue("list", oldList);
 			}
 		}, "survey.schema.attribute.code.confirm_change_list_on_referenced_node.message");
 		confirmParams.setOkLabelKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.ok");
@@ -107,8 +110,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		MessageUtil.showConfirm(confirmParams);
 	}
 	
-	private void performListChange(final Binder binder,
-			final CodeList list) {
+	private void performListChange(Binder binder, CodeList list) {
 		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
 		CodeList oldList = fo.getList();
 		fo.setParentCodeAttributeDefinition(null);

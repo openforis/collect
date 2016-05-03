@@ -19,6 +19,9 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 	private String autocompleteGroup;
 	private boolean autoUppercase;
 	
+	TextAttributeDefinitionFormObject() {
+	}
+	
 	TextAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 		Type.SHORT.name();

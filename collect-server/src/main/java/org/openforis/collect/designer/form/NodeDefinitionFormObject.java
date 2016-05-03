@@ -73,6 +73,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Integer labelWidth;
 	private String labelOrientation;
 
+	NodeDefinitionFormObject() {
+	}
+	
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
 	}

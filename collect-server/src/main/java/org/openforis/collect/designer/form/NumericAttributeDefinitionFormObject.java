@@ -15,6 +15,9 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 	
 	private String type;
 	
+	NumericAttributeDefinitionFormObject() {
+	}
+	
 	NumericAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 		type = NumericAttributeDefinition.Type.INTEGER.name();
