@@ -225,8 +225,7 @@ public class SpeciesManager {
 		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.GENUS, false);
 		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
 		Collections.sort(sortedVernacularNamesLanguageCodes);
-		TaxonSummaries result = new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes);
-		return result;
+		return new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes);
 	}
 	
 	public TaxonSummaries loadFullTaxonSummaries(int taxonomyId) {
@@ -234,8 +233,7 @@ public class SpeciesManager {
 		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.FAMILY, true);
 		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
 		Collections.sort(sortedVernacularNamesLanguageCodes);
-		TaxonSummaries result = new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes);
-		return result;
+		return new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes);
 	}
 
 	public TaxonSummaries loadTaxonSummaries(int taxonomyId) {
@@ -257,8 +255,7 @@ public class SpeciesManager {
 		}
 		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(vernacularNamesLanguageCodes);
 		Collections.sort(sortedVernacularNamesLanguageCodes);
-		TaxonSummaries result = new TaxonSummaries(totalCount, items, sortedVernacularNamesLanguageCodes);
-		return result;
+		return new TaxonSummaries(totalCount, items, sortedVernacularNamesLanguageCodes);
 	}
 
 	protected TaxonSummary createSummary(Taxon taxon) {

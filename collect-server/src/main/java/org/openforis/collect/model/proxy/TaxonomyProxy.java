@@ -1,8 +1,5 @@
 package org.openforis.collect.model.proxy;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectTaxonomy;
 
@@ -27,16 +24,6 @@ public class TaxonomyProxy implements Proxy {
 		name = taxonomy.getName();
 		uri = taxonomy.getUri();
 		surveyId = taxonomy.getSurveyId();
-	}
-	
-	public static List<TaxonomyProxy> fromList(List<CollectTaxonomy> list) {
-		List<TaxonomyProxy> proxies = new ArrayList<TaxonomyProxy>();
-		if (list != null) {
-			for (CollectTaxonomy item : list) {
-				proxies.add(new TaxonomyProxy(item));
-			}
-		}
-		return proxies;
 	}
 	
 	public void copyPropertiesForUpdate(CollectTaxonomy taxonomy) {
