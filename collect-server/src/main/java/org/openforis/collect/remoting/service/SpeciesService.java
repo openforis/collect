@@ -24,7 +24,6 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
-import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -42,10 +41,8 @@ public class SpeciesService {
 	
 	@Secured("ROLE_ENTRY")
 	public List<TaxonomyProxy> loadTaxonomiesBySurvey(int surveyId, boolean work) {
-		List<CollectTaxonomy> result;
-		result = speciesManager.loadTaxonomiesBySurvey(surveyId);
-		List<TaxonomyProxy> proxies = TaxonomyProxy.fromList(result);
-		return proxies;
+		List<CollectTaxonomy> result = speciesManager.loadTaxonomiesBySurvey(surveyId);
+		return Proxies.fromList(result, TaxonomyProxy.class);
 	}
 	
 	@Secured("ROLE_ADMIN")
@@ -70,8 +67,7 @@ public class SpeciesService {
 		}
 		proxy.copyPropertiesForUpdate(taxonomy);
 		speciesManager.save(taxonomy);
-		TaxonomyProxy result = new TaxonomyProxy(taxonomy);
-		return result;
+		return new TaxonomyProxy(taxonomy);
 	}
 
 	protected void updateTaxonAttributeDefinitions(String oldName, String newName) {
