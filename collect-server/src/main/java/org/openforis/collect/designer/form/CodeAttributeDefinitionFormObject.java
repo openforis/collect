@@ -10,7 +10,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.zkoss.bind.annotation.Immutable;
 
 /**
  * @author S. Ricci
@@ -27,9 +26,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	private String layoutDirection;
 	private boolean showCode;
 	private String hierarchicalLevel;
-	
-	public CodeAttributeDefinitionFormObject() {
-	}
 	
 	public CodeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -76,12 +72,10 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		showCode = uiOptions.getShowCode(source);
 	}
 	
-	@Immutable
 	public CodeList getList() {
 		return list;
 	}
 	
-	@Immutable
 	public void setList(CodeList list) {
 		this.list = list;
 	}
@@ -102,7 +96,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		this.allowValuesSorting = allowValuesSorting;
 	}
 	
-	@Immutable
 	public CodeAttributeDefinition getParentCodeAttributeDefinition() {
 		return parentCodeAttributeDefinition;
 	}

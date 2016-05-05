@@ -13,9 +13,6 @@ import org.openforis.idm.metamodel.RangeAttributeDefinition;
  */
 public class RangeAttributeDefinitionFormObject<T extends RangeAttributeDefinition> extends NumericAttributeDefinitionFormObject<T> {
 
-	RangeAttributeDefinitionFormObject() {
-	}
-	
 	RangeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}

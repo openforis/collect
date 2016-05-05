@@ -20,9 +20,6 @@ public class BooleanAttributeDefinitionFormObject<T extends BooleanAttributeDefi
 	
 	private String typeValue;
 	
-	BooleanAttributeDefinitionFormObject() {
-	}
-	
 	BooleanAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 		typeValue = Type.THREE_STATE.name();

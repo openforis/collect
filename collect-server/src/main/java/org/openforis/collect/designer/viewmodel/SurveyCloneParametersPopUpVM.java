@@ -1,10 +1,13 @@
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.PUBLISHED;
+import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.TEMPORARY;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.openforis.collect.designer.form.validator.SurveyNameValidator;
-import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
+import org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.SurveySummary;
@@ -40,7 +43,7 @@ public class SurveyCloneParametersPopUpVM extends BaseVM {
 	public void init(@ExecutionArgParam("originalSurvey") SurveySummary originalSurvey) {
 		this.originalSurvey = originalSurvey; 
 		this.form = new HashMap<String, Object>();
-		SurveyType originalSurveyType = originalSurvey.isTemporary() ? SurveyType.TEMPORARY: SurveyType.PUBLISHED;
+		SurveyType originalSurveyType = originalSurvey.isTemporary() ? TEMPORARY: PUBLISHED;
 		this.form.put("originalType", originalSurveyType.name());
 		this.nameValidator = new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, true);
 	}

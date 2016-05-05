@@ -36,9 +36,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	private List<Check<?>> checks;
 	private String[] visibleFields;
 
-	public AttributeDefinitionFormObject() {
-	}
-	
 	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}
