@@ -42,6 +42,8 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	@Autowired
 	private DataCleansingChainManager dataCleansingChainManager;
 	@Autowired
+	private DataCleansingReportManager dataCleansingReportManager;
+	@Autowired
 	private DataReportManager dataReportManager;
 	
 	@Override
@@ -109,9 +111,13 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	@Override
 	public void deleteMetadata(CollectSurvey survey) {
 		List<AbstractSurveyObjectManager<?, ?>> managers = Arrays.<AbstractSurveyObjectManager<?, ?>>asList(
-				dataCleansingChainManager, dataCleansingStepManager, 
-				dataReportManager, dataQueryGroupManager,
-				dataQueryManager, dataTypeManager);
+				dataCleansingReportManager,
+				dataCleansingChainManager, 
+				dataCleansingStepManager, 
+				dataReportManager, 
+				dataQueryGroupManager,
+				dataQueryManager, 
+				dataTypeManager);
 		for (AbstractSurveyObjectManager<?, ?> manager : managers) {
 			manager.deleteBySurvey(survey);
 		}

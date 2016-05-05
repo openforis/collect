@@ -31,6 +31,8 @@ public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurve
 	
 	public abstract List<T> loadBySurvey(CollectSurvey survey);
 	
+	public abstract void deleteBySurvey(CollectSurvey survey);
+	
 	@Override
 	public void insert(T item) {
 		C dsl = dsl((CollectSurvey) item.getSurvey());

@@ -44,6 +44,17 @@ public class DataCleansingReportDao extends SurveyObjectMappingJooqDaoSupport<Da
 		);
 		return dsl.fromResult(select.fetch());
 	}
+	
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		dsl().delete(OFC_DATA_CLEANSING_REPORT)
+			.where(OFC_DATA_CLEANSING_REPORT.CLEANSING_CHAIN_ID.in(
+					dsl().select(OFC_DATA_CLEANSING_CHAIN.ID)
+						.from(OFC_DATA_CLEANSING_CHAIN)
+						.where(OFC_DATA_CLEANSING_CHAIN.SURVEY_ID.eq(survey.getId()))
+			)
+		).execute();
+	}
 
 	public List<DataCleansingReport> loadByCleansingChain(DataCleansingChain cleansingChain) {
 		CollectSurvey survey = (CollectSurvey) cleansingChain.getSurvey();

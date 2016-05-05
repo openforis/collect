@@ -63,6 +63,11 @@ public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile,
 		return dsl.fromResult(result);
 	}
 	
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		deleteBySurvey(survey.getId());
+	}
+	
 	public void updateContent(SurveyFile item, byte[] content) {
 		dsl().update(dsl().getTable())
 			.set(OFC_SURVEY_FILE.CONTENT, content)

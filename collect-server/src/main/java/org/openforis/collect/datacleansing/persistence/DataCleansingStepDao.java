@@ -74,6 +74,14 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 		return dsl.fromResult(result);
 	}
 	
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		JooqDSLContext dsl = dsl();
+		dsl.delete(OFC_DATA_CLEANSING_STEP)
+			.where(OFC_DATA_CLEANSING_STEP.QUERY_ID.in(createQueryIdsSelect(dsl, survey)))
+			.execute();
+	}
+	
 	public List<DataCleansingStep> loadByQuery(DataQuery query) {
 		JooqDSLContext dsl = dsl((CollectSurvey) query.getSurvey());
 		Select<OfcDataCleansingStepRecord> select = 
@@ -135,6 +143,18 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 	public void deleteStepValues(int stepId) {
 		dsl().delete(OFC_DATA_CLEANSING_STEP_VALUE)
 			.where(OFC_DATA_CLEANSING_STEP_VALUE.STEP_ID.eq(stepId))
+			.execute();
+	}
+	
+	public void deleteStepValues(CollectSurvey survey) {
+		JooqDSLContext dsl = dsl();
+		dsl.delete(OFC_DATA_CLEANSING_STEP_VALUE)
+			.where(OFC_DATA_CLEANSING_STEP_VALUE.STEP_ID.in(
+					dsl.select(OFC_DATA_CLEANSING_STEP.ID)
+						.from(OFC_DATA_CLEANSING_STEP)
+						.where(OFC_DATA_CLEANSING_STEP.QUERY_ID.in(createQueryIdsSelect(dsl, survey)))
+					)
+			)
 			.execute();
 	}
 

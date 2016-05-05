@@ -47,6 +47,12 @@ public class DataReportManager extends AbstractSurveyObjectManager<DataReport, D
 		super.delete(obj);
 	}
 	
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		dataReportItemDao.deleteBySurvey(survey);
+		super.deleteBySurvey(survey);
+	}
+	
 	public void saveItems(DataReport report, List<DataReportItem> items) {
 		dataReportItemDao.insert(report, items);
 	}

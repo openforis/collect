@@ -45,6 +45,13 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 		return dsl.fromResult(result);
 	}
 
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		dsl().delete(OFC_DATA_QUERY)
+			.where(OFC_DATA_QUERY.SURVEY_ID.eq(survey.getId()))
+			.execute();
+	}
+	
 	public List<DataQuery> loadByType(DataQueryType type) {
 		JooqDSLContext dsl = dsl((CollectSurvey) type.getSurvey());
 		Select<OfcDataQueryRecord> select = 
