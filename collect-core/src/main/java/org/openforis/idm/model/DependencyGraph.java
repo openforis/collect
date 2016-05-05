@@ -126,10 +126,7 @@ public abstract class DependencyGraph<T> {
 	}
 
 	private List<T> getDependentNodes(Collection<GraphNode> nodes) {
-		Set<GraphNode> nodesToSort = new HashSet<GraphNode>(nodes);
-		for (GraphNode graphNode : nodes) {
-			nodesToSort.addAll(graphNode.getUnsortedDependents());
-		}
+		Set<GraphNode> nodesToSort = getUnsortedDependents(nodes);
 		List<T> result = getSortedDependentItems(nodesToSort);
 		
 		Iterator<T> it = result.iterator();
@@ -141,7 +138,20 @@ public abstract class DependencyGraph<T> {
 		}
 		return result;
 	}
-
+	
+	private Set<GraphNode> getUnsortedDependents(Collection<GraphNode> startFromNodes) {
+		HashSet<GraphNode> result = new HashSet<GraphNode>();
+		Stack<GraphNode> stack = new Stack<GraphNode>();
+		stack.addAll(startFromNodes);
+		while(! stack.isEmpty()) {
+			GraphNode node = stack.pop();
+			if (result.add(node)) {
+				stack.addAll(node.getFirstLevelDependents());
+			}
+		}
+		return result;
+	}
+	
 	protected List<T> sourcesForItem(T item) {
 		return sourcesForItem(item, false);
 	}
@@ -244,22 +254,6 @@ public abstract class DependencyGraph<T> {
 			}
 		}
 
-		private Collection<GraphNode> getUnsortedDependents() {
-			Collection<GraphNode> result = new ArrayList<GraphNode>();
-			Stack<GraphNode> stack = new Stack<GraphNode>();
-			
-			stack.addAll(this.getFirstLevelDependents());
-			
-			while (! stack.isEmpty()) {
-				GraphNode node = stack.pop();
-				if (! result.contains(node)) {
-					result.add(node);
-					stack.addAll(node.getFirstLevelDependents());
-				}
-			}
-			return result;
-		}
-		
 		private List<GraphNode> getFirstLevelDependents() {
 			List<GraphNode> result = new ArrayList<GraphNode>();
 			result.addAll(this.dependents);
@@ -271,19 +265,14 @@ public abstract class DependencyGraph<T> {
 		}
 		
 		private Set<GraphNode> getUnsortedSources() {
-			return getUnsortedSources(new LinkedHashSet<GraphNode>());
-		}
-		
-		private Set<GraphNode> getUnsortedSources(Set<GraphNode> visited) {
-			if ( visited.contains(this) ) {
-				return Collections.emptySet();
-			}
-			visited.add(this);
-			
 			Set<GraphNode> result = new LinkedHashSet<GraphNode>();
-			for (GraphNode graphNode : sources) {
-				result.add(graphNode);
-				result.addAll(graphNode.getUnsortedSources(visited));
+			Stack<GraphNode> stack = new Stack<GraphNode>();
+			stack.addAll(this.sources);
+			while (! stack.isEmpty()) {
+				GraphNode node = stack.pop();
+				if (! result.add(node)) {
+					stack.addAll(node.sources);
+				}
 			}
 			return result;
 		}
