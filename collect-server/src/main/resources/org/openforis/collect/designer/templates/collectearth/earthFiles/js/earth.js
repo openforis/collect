@@ -454,7 +454,9 @@ var initSteps = function() {
 		autoFocus : true,
 		titleTemplate : "#title#",
 		labels : {
-			finish : SUBMIT_LABEL
+			finish : SUBMIT_LABEL,
+		    next: NEXT_LABEL,
+		    previous: PREVIOUS_LABEL
 		},
 		onStepChanged : function(event, currentIndex, priorIndex) {
 			var stepHeading = $($form.find(".steps .steps ul li")[currentIndex]);
