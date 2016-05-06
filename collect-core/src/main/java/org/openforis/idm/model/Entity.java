@@ -5,7 +5,6 @@ package org.openforis.idm.model;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -475,7 +474,7 @@ public class Entity extends Node<EntityDefinition> {
 				result.addAll(tempChildren);
 			}
 		}
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 	
 	public List<Node<? extends NodeDefinition>> getChildren(NodeDefinition childDef) {
@@ -520,8 +519,20 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 
-	// Pre-order depth-first traversal from here down
 	public void traverse(NodeVisitor visitor) {
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.add(this);
+		while (! stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			visitor.visit(node, node.getIndex());
+			if (node instanceof Entity) {
+				stack.addAll(((Entity) node).children);
+			}
+		}
+	}
+	
+	// Pre-order depth-first traversal from here down
+	public void dfsTraverse(NodeVisitor visitor) {
 		// Initialize stack with root entity
 		NodeStack stack = new NodeStack(this);
 		// While there are still nodes to insert
@@ -529,9 +540,10 @@ public class Entity extends Node<EntityDefinition> {
 			// Pop the next list of nodes to insert
 			List<Node<?>> nodes = stack.pop();
 			// Insert this list in order
-			for (int i = 0; i < nodes.size(); i++) {
-				Node<?> node = nodes.get(i);
-				visitor.visit(node, i);
+			Iterator<Node<?>> it = nodes.iterator();
+			while (it.hasNext()) {
+				Node<?> node = it.next();
+				visitor.visit(node, node.getIndex());
 
 				// For entities, add existing child nodes to the stack
 				if (node instanceof Entity) {
