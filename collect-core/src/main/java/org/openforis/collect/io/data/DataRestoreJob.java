@@ -126,8 +126,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			RecordFileRestoreTask t = (RecordFileRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setRecordFileManager(recordFileManager);
-			t.setFile(file);
-			t.setOldBackupFormat(oldBackupFormat);
+			t.setBackupFileExtractor(backupFileExtractor);
+			t.setRecordProvider(recordProvider);
 			t.setOverwriteAll(overwriteAll);
 			t.setEntryIdsToImport(entryIdsToImport);
 			t.setSurvey(publishedSurvey);

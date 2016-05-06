@@ -34,6 +34,8 @@ public class NewBackupFileExtractor implements Closeable {
 	private transient File tempUncompressedFolder;
 	private transient ZipFile zipFile;
 
+	private SurveyBackupInfo info;
+
 	public NewBackupFileExtractor(File file) throws ZipException, IOException {
 		this.file = file;
 	}
@@ -50,6 +52,13 @@ public class NewBackupFileExtractor implements Closeable {
 	
 	public File extractInfoFile() {
 		return extract(SurveyBackupJob.INFO_FILE_NAME);
+	}
+	
+	public SurveyBackupInfo getInfo() {
+		if (info == null) {
+			info = extractInfo();
+		}
+		return info;
 	}
 	
 	public SurveyBackupInfo extractInfo() {

@@ -68,6 +68,7 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 		this.dataUnmarshaller = new DataUnmarshaller(existingSurvey == null ? packagedSurvey : existingSurvey, packagedSurvey);
 		this.dataUnmarshaller.setRecordValidationEnabled(validateRecords);
 		this.dataUnmarshaller.setIgnoreDuplicateRecordKeyValidationErrors(ignoreDuplicateRecordKeyValidationErrors);
+		this.dataUnmarshaller.setRecordApplicationVersion(backupFileExtractor.getInfo().getCollectVersion());
 		this.recordUpdater = new RecordUpdater();
 		this.recordUpdater.setValidateAfterUpdate(validateRecords);
 	}
