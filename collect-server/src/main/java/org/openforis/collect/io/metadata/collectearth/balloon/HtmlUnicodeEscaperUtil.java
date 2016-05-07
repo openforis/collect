@@ -26,7 +26,7 @@ public class HtmlUnicodeEscaperUtil extends CodePointTranslator  {
     
     private static final CharSequenceTranslator ESCAPE_UNICODE_BALLOON = 
             new LookupTranslator().with(
-            		HtmlUnicodeEscaperUtil.outsideOf(32, 0x7f, "&", "") 
+            		HtmlUnicodeEscaperUtil.outsideOf(32, 0x7f, "&", ";") 
           );
     
     private static final CharSequenceTranslator ESCAPE_UNICODE_MONDRIAN = 
