@@ -5,6 +5,7 @@ import static org.openforis.collect.io.SurveyBackupJob.ZIP_FOLDER_SEPARATOR;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.io.BackupFileExtractor;
@@ -42,7 +43,7 @@ public class SurveyFilesImportTask extends Task {
 	@Override
 	protected void execute() throws Throwable {
 		surveyManager.deleteSurveyFiles(survey);
-		List<String> types = backupFileExtractor.listDirectoriesInPath(SURVEY_FILES_FOLDER);
+		Set<String> types = backupFileExtractor.listDirectoriesInPath(SURVEY_FILES_FOLDER);
 		for (String typeCode : types) {
 			SurveyFileType type = SurveyFileType.fromCode(typeCode);
 			String surveyFilesPath = determineSurveyFilesPath(typeCode);

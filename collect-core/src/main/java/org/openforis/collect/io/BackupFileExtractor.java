@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -98,11 +100,11 @@ public class BackupFileExtractor implements Closeable {
 		return result;
 	}
 	
-	public List<String> listDirectoriesInPath(String path) {
+	public Set<String> listDirectoriesInPath(String path) {
 		if ( ! path.endsWith(SurveyBackupJob.ZIP_FOLDER_SEPARATOR) ) {
 			path += SurveyBackupJob.ZIP_FOLDER_SEPARATOR;
 		}
-		List<String> result = new ArrayList<String>();
+		Set<String> result = new LinkedHashSet<String>();
 		Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
 		while ( zipEntries.hasMoreElements() ) {
 			ZipEntry zipEntry = zipEntries.nextElement();
