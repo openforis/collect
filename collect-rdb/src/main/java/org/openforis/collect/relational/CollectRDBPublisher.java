@@ -130,8 +130,12 @@ public class CollectRDBPublisher {
 		int count = 0;
 		while(iterator.hasNext()) {
 			CollectRecord summary = iterator.next();
-			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
-			databaseExporter.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
+			try {
+				CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
+				databaseExporter.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
+			} catch (CollectRdbException e) {
+				LOG.error( e.getMessage(), e);
+			}
 			insertRecordsProgressListener.progressMade(new Progress(++count, total));
 		}
 		databaseExporter.close();

@@ -178,7 +178,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			if (LOG.isErrorEnabled()) {
 				LOG.error(message, e);
 			}
-			throw new RuntimeException(message, e);
+			// throw new RuntimeException(message, e);
 		}
 	}
 	
