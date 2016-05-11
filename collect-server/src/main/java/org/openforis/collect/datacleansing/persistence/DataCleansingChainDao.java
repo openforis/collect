@@ -48,6 +48,13 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		Result<OfcDataCleansingChainRecord> result = select.fetch();
 		return dsl.fromResult(result);
 	}
+	
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		dsl().delete(OFC_DATA_CLEANSING_CHAIN)
+			.where(OFC_DATA_CLEANSING_CHAIN.SURVEY_ID.eq(survey.getId()))
+			.execute();
+	}
 
 	public Set<DataCleansingChain> loadChainsByStep(DataCleansingStep step) {
 		JooqDSLContext dsl = dsl((CollectSurvey) step.getSurvey());
@@ -80,6 +87,19 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		JooqDSLContext dsl = dsl((CollectSurvey) chain.getSurvey());
 		DeleteConditionStep<?> query = dsl.delete(OFC_DATA_CLEANSING_CHAIN_STEPS)
 			.where(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID.eq(chain.getId()));
+		query.execute();
+	}
+	
+	public void deleteStepAssociations(CollectSurvey survey) {
+		JooqDSLContext dsl = dsl(survey);
+		DeleteConditionStep<?> query = dsl.delete(OFC_DATA_CLEANSING_CHAIN_STEPS)
+			.where(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID.in(
+					dsl.select(OFC_DATA_CLEANSING_CHAIN.ID)
+						.from(OFC_DATA_CLEANSING_CHAIN)
+						.where(OFC_DATA_CLEANSING_CHAIN.SURVEY_ID.eq(survey.getId())
+				)
+			)
+		);
 		query.execute();
 	}
 	

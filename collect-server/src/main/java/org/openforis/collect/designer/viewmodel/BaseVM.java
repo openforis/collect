@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.designer.session.SessionStatus;
@@ -22,8 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.proxy.FormProxyObject;
-import org.zkoss.bind.proxy.MapProxy;
+import org.zkoss.bind.Form;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
@@ -119,12 +117,8 @@ public abstract class BaseVM {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected <T> T getFormFieldValue(FormProxyObject form, String field) {
-		if (form instanceof MapProxy) {
-			return (T) ((MapProxy<?, ?>) form).get(field);
-		} else {
-			throw new IllegalArgumentException("Unexpected form type: " + form.getClass().getName());
-		}
+	protected <T> T getFormFieldValue(Form form, String field) {
+		return (T) form.getField(field);
 	}
 	
 	protected void setFormFieldValue(Binder binder, String field,
@@ -132,19 +126,9 @@ public abstract class BaseVM {
 		setFormFieldValue(ComponentUtil.getForm(binder), field, value);
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected void setFormFieldValue(FormProxyObject form, String field,
-			Object value) {
-		if (form instanceof MapProxy) {
-			((MapProxy<String, Object>) form).put(field, value);
-			BindUtils.postNotifyChange(null, null, form, field);
-		} else {
-			try {
-				BeanUtils.setProperty(form, field, value);
-			} catch (Exception e) {
-				throw new IllegalArgumentException("Error setting value on field: " + field, e);
-			}
-		}
+	protected void setFormFieldValue(Form form, String field, Object value) {
+		form.setField(field, value);
+		BindUtils.postNotifyChange(null, null, form, field);
 	}
 	
 	protected static String adjustInternalName(String name) {

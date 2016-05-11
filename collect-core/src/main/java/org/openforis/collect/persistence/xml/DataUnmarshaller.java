@@ -14,6 +14,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.Collect;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -22,6 +23,7 @@ import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.collect.utils.Dates;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -31,6 +33,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.path.Path;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -49,6 +52,7 @@ public class DataUnmarshaller {
 
 	private DataHandler dataHandler;
 	private XMLReader reader;
+	private Version recordApplicationVersion = Collect.VERSION;
 	
 	public DataUnmarshaller(CollectSurvey survey) {
 		this(survey, survey);
@@ -132,6 +136,10 @@ public class DataUnmarshaller {
 		this.dataHandler.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 	}
 	
+	public void setRecordApplicationVersion(Version version) {
+		this.recordApplicationVersion = version;
+	}
+
 	public class DataHandler extends DefaultHandler {
 		
 		private static final String ATTRIBUTE_VERSION = "version";
@@ -227,13 +235,14 @@ public class DataUnmarshaller {
 			} else if ( field == null ){
 				return node.getPath();
 			} else {
-				return node.getPath() + "/" + field;			
+				return node.getPath() + Path.SEPARATOR + field;
 			}
 		}
 
 		public void startRecord(String localName, Attributes attributes) {
 			String versionName = extractVersionName(attributes);
 			record = new CollectRecord(publishedSurvey, versionName, localName, recordValidationEnabled, ignoreDuplicateRecordKeyValidationErrors);
+			record.setApplicationVersion(recordApplicationVersion);
 			String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
 			State state = State.fromCode(stateAttr);
 			record.setState(state);

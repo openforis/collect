@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
+import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -161,6 +162,7 @@ public class CollectRecord extends Record {
 		}
 	}
 	
+	private transient Version applicationVersion;
 	private transient Step step;
 	private transient State state;
 
@@ -231,6 +233,14 @@ public class CollectRecord extends Record {
 	protected void remove(Node<?> node) {
 		super.remove(node);
 		removeValidationCache(node);
+	}
+	
+	public Version getApplicationVersion() {
+		return applicationVersion;
+	}
+	
+	public void setApplicationVersion(Version applicationVersion) {
+		this.applicationVersion = applicationVersion;
 	}
 	
 	public Step getStep() {

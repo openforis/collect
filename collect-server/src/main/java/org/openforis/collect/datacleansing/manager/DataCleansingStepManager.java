@@ -48,6 +48,12 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 		}
 	}
 	
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		dao.deleteStepValues(survey);
+		super.deleteBySurvey(survey);
+	}
+	
 	public List<DataCleansingStep> loadByQuery(DataQuery query) {
 		List<DataCleansingStep> steps = dao.loadByQuery(query);
 		initializeItems(steps);

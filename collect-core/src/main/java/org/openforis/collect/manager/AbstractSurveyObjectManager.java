@@ -47,10 +47,7 @@ public abstract class AbstractSurveyObjectManager
 	}
 	
 	public void deleteBySurvey(CollectSurvey survey) {
-		List<T> items = loadBySurvey(survey);
-		for (T item : items) {
-			delete(item);
-		}
+		dao.deleteBySurvey(survey);
 	}
 	
 	protected final void initializeItems(Collection<T> items) {

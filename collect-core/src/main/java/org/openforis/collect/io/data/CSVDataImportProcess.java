@@ -34,6 +34,7 @@ import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeAddChange;
 import org.openforis.collect.model.NodeChange;
@@ -113,7 +114,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 	//transient variables
 	private RecordUpdater recordUpdater;
-	private CollectRecord lastModifiedRecordSummary;
+	private CollectRecordSummary lastModifiedRecordSummary;
 	private CollectRecord lastModifiedRecord;
 	private User adminUser;
 
@@ -220,38 +221,41 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			setRecordKeys(line, record);
 			setValuesInRecord(line, record, Step.ENTRY);
 			insertRecord(record);
-		} else if ( step == null ) {
-			CollectRecord recordSummary = loadRecordSummary(line);
-			Step originalRecordStep = recordSummary.getStep();
-			//set values in each step data
-			for (Step currentStep : Step.values()) {
-				if ( currentStep.beforeEqual(originalRecordStep) ) {
-					CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
-					setValuesInRecord(line, record, currentStep);
-					//always save record when updating multiple record steps in the same process
-					updateRecord(record, originalRecordStep, currentStep);
-				}
-			}
 		} else {
-			CollectRecord recordSummary = loadRecordSummary(line);
-			Step originalRecordStep = recordSummary.getStep();
-			if ( step.beforeEqual(originalRecordStep) ) {
-				CollectRecord record;
-				boolean recordChanged = lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() );
-				if ( recordChanged ) {
-					//record changed
-					if ( lastModifiedRecordSummary != null ) {
-						saveLastModifiedRecord();
+			CollectRecordSummary recordSummary = loadRecordSummaryIfAny(line);
+			if (recordSummary != null) {
+				if ( step == null ) {
+					Step originalRecordStep = recordSummary.getStep();
+					//set values in each step data
+					for (Step currentStep : Step.values()) {
+						if ( currentStep.beforeEqual(originalRecordStep) ) {
+							CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
+							setValuesInRecord(line, record, currentStep);
+							//always save record when updating multiple record steps in the same process
+							updateRecord(record, originalRecordStep, currentStep);
+						}
 					}
-					record = loadRecord(recordSummary.getId(), this.step);
 				} else {
-					record = lastModifiedRecord;
+					Step originalRecordStep = recordSummary.getStep();
+					if ( step.beforeEqual(originalRecordStep) ) {
+						CollectRecord record;
+						boolean recordChanged = lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() );
+						if ( recordChanged ) {
+							//record changed
+							if ( lastModifiedRecordSummary != null ) {
+								saveLastModifiedRecord();
+							}
+							record = loadRecord(recordSummary.getId(), this.step);
+						} else {
+							record = lastModifiedRecord;
+						}
+						setValuesInRecord(line, record, step);
+						lastModifiedRecordSummary = recordSummary;
+						lastModifiedRecord = record;
+					} else {
+						status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
+					}
 				}
-				setValuesInRecord(line, record, step);
-				lastModifiedRecordSummary = recordSummary;
-				lastModifiedRecord = record;
-			} else {
-				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
 			}
 		}
 		status.addProcessedRow(line.getLineNumber());
@@ -319,7 +323,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			if ( ! recordSummaries.isEmpty() ) {
 				errorMessageKey = ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY;
 			}
-		} else if ( recordSummaries.size() == 0 ) {
+		} else if ( recordSummaries.size() == 0 && settings.reportNoRecordFoundErrors) {
 			errorMessageKey = NO_RECORD_FOUND_ERROR_MESSAGE_KEY;
 		} else if ( recordSummaries.size() > 1 ) {
 			errorMessageKey = MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY;
@@ -335,12 +339,11 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 	
-	private CollectRecord loadRecordSummary(DataLine line) {
+	private CollectRecordSummary loadRecordSummaryIfAny(DataLine line) {
 		EntityDefinition parentEntityDefn = getParentEntityDefinition();
 		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
-		CollectRecord recordSummary = recordSummaries.get(0);
+		CollectRecordSummary recordSummary = recordManager.loadUniqueRecordSummaryByKeys(survey, rootEntityDefn.getName(), recordKeyValues);
 		return recordSummary;
 	}
 
@@ -877,10 +880,16 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		 */
 		private boolean deleteExistingEntities;
 		
+		/**
+		 * If true, only existing records update is allowed. 
+		 */
+		private boolean reportNoRecordFoundErrors;
+		
 		public CSVDataImportSettings() {
 			recordValidationEnabled = true;
 			insertNewRecords = false;
 			deleteExistingEntities = false;
+			reportNoRecordFoundErrors = true;
 		}
 		
 		public boolean isRecordValidationEnabled() {
@@ -921,6 +930,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		
 		public void setDeleteExistingEntities(boolean deleteExistingEntities) {
 			this.deleteExistingEntities = deleteExistingEntities;
+		}
+		
+		public boolean isReportNoRecordFoundErrors() {
+			return reportNoRecordFoundErrors;
+		}
+		
+		public void setReportNoRecordFoundErrors(boolean reportNoRecordFoundErrors) {
+			this.reportNoRecordFoundErrors = reportNoRecordFoundErrors;
 		}
 	}
 }

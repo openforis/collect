@@ -20,6 +20,7 @@ import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.DataQueryGroup;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryGroupRecord;
@@ -49,6 +50,13 @@ public class DataQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<DataQue
 		return dsl.fromResult(result);
 	}
 
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		dsl().deleteFrom(OFC_DATA_QUERY_GROUP)
+			.where(OFC_DATA_QUERY_GROUP.SURVEY_ID.eq(survey.getId()))
+			.execute();
+	}
+	
 	public Set<DataQueryGroup> loadGroupsByQuery(DataQuery query) {
 		JooqDSLContext dsl = dsl((CollectSurvey) query.getSurvey());
 		SelectConditionStep<Record1<Integer>> subselect = dsl
@@ -82,6 +90,16 @@ public class DataQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<DataQue
 			.execute();
 	}
 	
+	public void deleteQueryAssociations(CollectSurvey survey) {
+		JooqDSLContext dsl = dsl(survey);
+		dsl.delete(OFC_DATA_QUERY_GROUP_QUERY)
+			.where(OFC_DATA_QUERY_GROUP_QUERY.GROUP_ID.in(
+					DataQueryGroupDao.createDataQueryGroupIdBySurveyQuery(dsl, survey)
+				)
+			)
+			.execute();
+	}
+	
 	public void insertQueryAssociations(DataQueryGroup chain, List<Integer> queryIds) {
 		JooqDSLContext dsl = dsl((CollectSurvey) chain.getSurvey());
 		BatchBindStep batch = dsl.batch(dsl.insertInto(OFC_DATA_QUERY_GROUP_QUERY,
@@ -96,6 +114,13 @@ public class DataQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<DataQue
 		batch.execute();
 	}
 	
+	protected static SelectConditionStep<Record1<Integer>> createDataQueryGroupIdBySurveyQuery(
+			CollectDSLContext dsl, CollectSurvey survey) {
+		return dsl.select(OFC_DATA_QUERY_GROUP.ID)
+			.from(OFC_DATA_QUERY_GROUP)
+			.where(OFC_DATA_QUERY_GROUP.SURVEY_ID.eq(survey.getId()));
+	}
+
 	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataQueryGroup> {
 
 		private static final long serialVersionUID = 1L;

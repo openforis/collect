@@ -22,6 +22,7 @@ import org.openforis.collect.datacleansing.DataQueryGroup;
 import org.openforis.collect.datacleansing.DataReport;
 import org.openforis.collect.datacleansing.DataReportItem;
 import org.openforis.collect.datacleansing.DataReportItem.Status;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.PersistedObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataReportItemRecord;
@@ -56,10 +57,18 @@ public class DataReportItemDao extends MappingJooqDaoSupport<DataReportItem, Dat
 	}
 
 	public void deleteByReport(DataReport report) {
-		JooqDSLContext dsl = dsl(report);
-		dsl
-			.delete(OFC_DATA_REPORT_ITEM)
+		dsl().delete(OFC_DATA_REPORT_ITEM)
 			.where(OFC_DATA_REPORT_ITEM.REPORT_ID.eq(report.getId()))
+			.execute();
+	}
+	
+	public void deleteBySurvey(CollectSurvey survey) {
+		JooqDSLContext dsl = dsl();
+		dsl.delete(OFC_DATA_REPORT_ITEM)
+			.where(OFC_DATA_REPORT_ITEM.REPORT_ID.in(
+					DataReportDao.createDataReportIdsBySurveyQuery(dsl, survey)
+					)
+			)
 			.execute();
 	}
 
@@ -121,7 +130,7 @@ public class DataReportItemDao extends MappingJooqDaoSupport<DataReportItem, Dat
 	
 	@Override
 	protected JooqDSLContext dsl() {
-		throw new UnsupportedOperationException();
+		return dsl(null);
 	}
 	
 	protected JooqDSLContext dsl(DataReport report) {

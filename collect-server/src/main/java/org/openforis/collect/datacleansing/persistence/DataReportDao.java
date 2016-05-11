@@ -9,15 +9,19 @@ import java.util.UUID;
 
 import org.jooq.Configuration;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataQueryGroup;
 import org.openforis.collect.datacleansing.DataReport;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
+import org.openforis.collect.persistence.jooq.tables.OfcDataReport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +48,17 @@ public class DataReportDao extends SurveyObjectMappingJooqDaoSupport<DataReport,
 		);
 		return dsl.fromResult(select.fetch());
 	}
+	
+	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		JooqDSLContext dsl = dsl();
+		dsl.delete(OFC_DATA_REPORT)
+			.where(OFC_DATA_REPORT.QUERY_GROUP_ID.in(
+					DataQueryGroupDao.createDataQueryGroupIdBySurveyQuery(dsl, survey)
+				)
+			)
+			.execute();
+	}
 
 	public List<DataReport> loadByQueryGroup(DataQueryGroup queryGroup) {
 		CollectSurvey survey = (CollectSurvey) queryGroup.getSurvey();
@@ -55,6 +70,16 @@ public class DataReportDao extends SurveyObjectMappingJooqDaoSupport<DataReport,
 			);
 		Result<OfcDataReportRecord> result = select.fetch();
 		return dsl.fromResult(result);
+	}
+	
+	protected static SelectConditionStep<Record1<Integer>> createDataReportIdsBySurveyQuery(
+			CollectDSLContext dsl, CollectSurvey survey) {
+		return dsl.select(OfcDataReport.OFC_DATA_REPORT.ID)
+				.from(OfcDataReport.OFC_DATA_REPORT)
+				.where(OfcDataReport.OFC_DATA_REPORT.QUERY_GROUP_ID.in(
+						DataQueryGroupDao.createDataQueryGroupIdBySurveyQuery(dsl, survey)
+					)
+				);
 	}
 	
 	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataReport> {

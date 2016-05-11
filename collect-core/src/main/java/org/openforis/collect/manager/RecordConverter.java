@@ -2,6 +2,8 @@ package org.openforis.collect.manager;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.versioning.Version;
+import org.openforis.commons.versioning.Version.Significance;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Entity;
@@ -19,8 +21,13 @@ import org.openforis.idm.model.NumericRangeAttribute;
  */
 public class RecordConverter {
 
+	public static final Version PREVIOUS_TO_APPLICATION_VERSION_STORAGE_VERSION = new Version("3.9.0");
+	private static final Version UNIT_STORAGE_CHANGE_VERSION = PREVIOUS_TO_APPLICATION_VERSION_STORAGE_VERSION;
+
 	public void convertToLatestVersion(CollectRecord record) {
-		convertToLatestUnitStorage(record);
+		if (record.getApplicationVersion().compareTo(UNIT_STORAGE_CHANGE_VERSION, Significance.MINOR) <= 0) {
+			convertToLatestUnitStorage(record);
+		}
 	}
 	
 	/**

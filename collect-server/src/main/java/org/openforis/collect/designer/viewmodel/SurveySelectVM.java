@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.TEMPORARY;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,8 +25,8 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.designer.util.SuccessHandler;
+import org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType;
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject;
-import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
@@ -178,7 +180,7 @@ public class SurveySelectVM extends BaseVM {
 		
 		String uri = selectedSurvey.getUri();
 		final CollectSurvey survey;
-		if ( selectedSurvey.isTemporary() && SurveyType.valueOf(parameters.getType()) == SurveyType.TEMPORARY ) {
+		if ( selectedSurvey.isTemporary() && SurveyType.valueOf(parameters.getType()) == TEMPORARY ) {
 			survey = surveyManager.loadSurvey(selectedSurvey.getId());
 		} else {
 			survey = surveyManager.getByUri(uri);

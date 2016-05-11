@@ -62,6 +62,12 @@ public class DataQueryGroupManager extends AbstractSurveyObjectManager<DataQuery
 	}
 	
 	@Override
+	public void deleteBySurvey(CollectSurvey survey) {
+		dao.deleteQueryAssociations(survey);
+		super.deleteBySurvey(survey);
+	}
+	
+	@Override
 	protected void initializeItem(DataQueryGroup group) {
 		super.initializeItem(group);
 		group.removeAllQueries();

@@ -28,6 +28,7 @@ import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.jooq.UpdateQuery;
 import org.jooq.impl.DSL;
+import org.openforis.collect.manager.RecordConverter;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -556,6 +557,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 				keys.add((String) r.getValue(tableField));
 			}
 			c.setRootEntityKeyValues(keys);
+			
+			//TODO read the application version stored in the table row
+			c.setApplicationVersion(RecordConverter.PREVIOUS_TO_APPLICATION_VERSION_STORAGE_VERSION);
 		}
 
 		private User loadUser(Integer userId) {

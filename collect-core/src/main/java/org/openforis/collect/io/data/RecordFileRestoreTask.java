@@ -3,18 +3,12 @@
  */
 package org.openforis.collect.io.data;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
-import org.apache.commons.io.FilenameUtils;
-import org.openforis.collect.io.NewBackupFileExtractor;
-import org.openforis.collect.io.SurveyBackupJob;
-import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
+import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
@@ -23,7 +17,6 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.model.FileAttribute;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -43,16 +36,15 @@ public class RecordFileRestoreTask extends Task {
 	private RecordFileManager recordFileManager;
 	
 	//input
-	private File file;
 	private CollectSurvey survey;
 	private List<Integer> entryIdsToImport;
 	private boolean overwriteAll;
+	private RecordProvider recordProvider;
+	private BackupFileExtractor backupFileExtractor;
 	
 	//temporary instance variables
 	private SessionRecordFileManager sessionRecordFileManager;
 	private List<Integer> processedRecords;
-	private NewBackupFileExtractor backupFileExtractor;
-	private boolean oldBackupFormat;
 	
 	public RecordFileRestoreTask() {
 		sessionRecordFileManager = new SessionRecordFileManager();
@@ -67,8 +59,6 @@ public class RecordFileRestoreTask extends Task {
 	@Override
 	protected void execute() throws Throwable {
 		processedRecords = new ArrayList<Integer>();
-		backupFileExtractor = new NewBackupFileExtractor(file);
-		backupFileExtractor.init();
 		List<Integer> idsToImport = calculateEntryIdsToImport();
 		for (Integer entryId : idsToImport) {
 			if ( isRunning() && ! processedRecords.contains(entryId) ) {
@@ -88,22 +78,10 @@ public class RecordFileRestoreTask extends Task {
 		if ( ! overwriteAll ) {
 			throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
 		}
-		Set<Integer> result = new TreeSet<Integer>();
-		for (Step step : Step.values()) {
-			int stepNumber = step.getStepNumber();
-			String path = SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + stepNumber;
-			if ( backupFileExtractor.containsEntriesInPath(path) ) {
-				List<String> listEntriesInPath = backupFileExtractor.listFilesInFolder(path);
-				for (String entry : listEntriesInPath) {
-					String entryId = FilenameUtils.getBaseName(entry);
-					result.add(Integer.parseInt(entryId));
-				}
-			}
-		}
-		return new ArrayList<Integer>(result);
+		return recordProvider.findEntryIds();
 	}
 
-	private void importRecordFiles(int entryId) throws IOException, DataImportExeption, RecordPersistenceException {
+	private void importRecordFiles(int entryId) throws IOException, DataImportExeption, RecordPersistenceException, RecordParsingException {
 		CollectRecord lastStepBackupRecord = getLastStepBackupRecord(entryId);
 		if ( lastStepBackupRecord == null ) {
 			throw new IllegalStateException("Error parsing record for entry: " + entryId);
@@ -126,22 +104,13 @@ public class RecordFileRestoreTask extends Task {
 		}
 	}
 	
-	@SuppressWarnings("resource")
-	protected CollectRecord getLastStepBackupRecord(int entryId) throws IOException {
+	protected CollectRecord getLastStepBackupRecord(int entryId) throws IOException, RecordParsingException {
 		Step[] steps = Step.values();
 		for (int i = steps.length - 1; i >= 0; i--) {
 			Step step = steps[i];
-			BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId, oldBackupFormat);
-			BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, file, step);
-			backupDataExtractor.init();
-			ParseRecordResult parseRecordResult = backupDataExtractor.findRecord(recordEntry);
-			if ( parseRecordResult != null ) {
-				if ( parseRecordResult.isSuccess() ) {
-					return parseRecordResult.getRecord();
-				} else {
-					log().error("Error parsing record for entry: " + recordEntry.getName());
-					//TODO handle this error?
-				}
+			CollectRecord record = recordProvider.provideRecord(entryId, step);
+			if (record != null) {
+				return record;
 			}
 		}
 		return null;
@@ -185,14 +154,6 @@ public class RecordFileRestoreTask extends Task {
 		this.recordFileManager = recordFileManager;
 	}
 
-	public File getFile() {
-		return file;
-	}
-
-	public void setFile(File file) {
-		this.file = file;
-	}
-	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
@@ -209,20 +170,20 @@ public class RecordFileRestoreTask extends Task {
 		this.entryIdsToImport = entryIdsToImport;
 	}
 
-	public boolean isOldBackupFormat() {
-		return oldBackupFormat;
-	}
-	
-	public void setOldBackupFormat(boolean oldBackupFormat) {
-		this.oldBackupFormat = oldBackupFormat;
-	}
-	
 	public boolean isOverwriteAll() {
 		return overwriteAll;
 	}
 
 	public void setOverwriteAll(boolean overwriteAll) {
 		this.overwriteAll = overwriteAll;
+	}
+	
+	public void setBackupFileExtractor(BackupFileExtractor backupFileExtractor) {
+		this.backupFileExtractor = backupFileExtractor;
+	}
+	
+	public void setRecordProvider(RecordProvider recordProvider) {
+		this.recordProvider = recordProvider;
 	}
 	
 }

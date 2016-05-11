@@ -12,9 +12,6 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
  */
 public class TimeAttributeDefinitionFormObject<T extends TimeAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
-	TimeAttributeDefinitionFormObject() {
-	}
-	
 	TimeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}

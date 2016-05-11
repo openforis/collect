@@ -1,22 +1,27 @@
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat.DESKTOP;
+import static org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat.EARTH;
+import static org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat.RDB;
+import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.PUBLISHED;
+import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.TEMPORARY;
+import static org.openforis.collect.metamodel.SurveyTarget.COLLECT_EARTH;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanMap;
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
-import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
-import org.openforis.collect.metamodel.SurveyTarget;
+import org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Form;
+import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.bind.proxy.FormProxyObject;
-import org.zkoss.bind.proxy.MapProxy;
 
 /**
  * 
@@ -29,21 +34,20 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	private SurveySummary survey;
 	private SurveyExportParametersFormObject formObject;
-	private FormProxyObject tempForm;
+	private Form tempForm;
 	
 	@Init
-	@SuppressWarnings("unchecked")
 	public void init(@ExecutionArgParam("survey") SurveySummary survey) {
 		this.survey = survey;
 		this.formObject = new SurveyExportParametersFormObject();
-		String outputFormat = (survey.getTarget() == SurveyTarget.COLLECT_EARTH ? OutputFormat.EARTH : OutputFormat.DESKTOP).name();
+		String outputFormat = (survey.getTarget() == COLLECT_EARTH ? EARTH : DESKTOP).name();
 		this.formObject.setOutputFormat(outputFormat);
-		this.formObject.setType((survey.isNotLinkedToPublishedSurvey() ? SurveyType.TEMPORARY: SurveyType.PUBLISHED).name());
+		this.formObject.setType((survey.isNotLinkedToPublishedSurvey() ? TEMPORARY: PUBLISHED).name());
 		this.formObject.setRdbDialect(RdbDialect.STANDARD.name());
 		this.formObject.setRdbDateTimeFormat(DEFAULT_DATE_TIME_FORMAT);
 		this.formObject.setRdbTargetSchemaName(survey.getName());
 		this.formObject.setLanguageCode(survey.getDefaultLanguage());
-		this.tempForm = new MapProxy<String, Object>(new BeanMap(this.formObject), null);
+		this.tempForm = new SimpleForm();
 	}
 	
 	@Command
@@ -72,7 +76,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	public boolean isIncludeDataVisible() {
 		SurveyType type = SurveyType.valueOf(getTypeFormField());
 		OutputFormat outputFormat = OutputFormat.valueOf(getOutputFormatFormField());
-		return type == SurveyType.PUBLISHED && outputFormat == OutputFormat.RDB;
+		return type == PUBLISHED && outputFormat == RDB;
 	}
 
 	public SurveyExportParametersFormObject getFormObject() {
@@ -87,11 +91,11 @@ public class SurveyExportParametersVM extends BaseVM {
 		return survey;
 	}
 	
-	public Object getTempForm() {
+	public Form getTempForm() {
 		return tempForm;
 	}
 	
-	public void setTempForm(FormProxyObject tempForm) {
+	public void setTempForm(Form tempForm) {
 		this.tempForm = tempForm;
 	}
 	
@@ -120,9 +124,6 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	public static class SurveyExportParametersFormObject {
 		
-		public enum SurveyType {
-			TEMPORARY, PUBLISHED
-		}
 		public enum OutputFormat {
 			MOBILE, DESKTOP, RDB, EARTH
 		}

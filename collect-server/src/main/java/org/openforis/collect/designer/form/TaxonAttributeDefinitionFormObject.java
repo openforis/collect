@@ -25,9 +25,6 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	private Boolean includeUniqueVernacularName;
 	private Boolean showFamily;
 	
-	TaxonAttributeDefinitionFormObject() {
-	}
-	
 	TaxonAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 		includeUniqueVernacularName = (Boolean) Annotation.TAXON_ATTRIBUTE_INCLUDE_UNIQUE_VERNACULAR_NAME.getDefaultValue();
