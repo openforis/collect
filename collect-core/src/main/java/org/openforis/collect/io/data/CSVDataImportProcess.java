@@ -26,6 +26,7 @@ import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
 import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
 import org.openforis.collect.io.data.DataLine.EntityPositionIdentifier;
 import org.openforis.collect.io.data.DataLine.FieldValueKey;
+import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
@@ -131,7 +132,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		validateParameters();
 		adminUser = userManager.loadAdminUser();
 		recordUpdater = new RecordUpdater();
-		recordUpdater.setValidateAfterUpdate(settings.recordValidationEnabled);
+		recordUpdater.setValidateAfterUpdate(settings.isRecordValidationEnabled());
 	}
 	
 	@Override
@@ -262,7 +263,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private CollectRecord loadRecord(Integer recordId, Step step) {
-		CollectRecord record = recordManager.load(survey, recordId, step, settings.recordValidationEnabled);
+		CollectRecord record = recordManager.load(survey, recordId, step, settings.isRecordValidationEnabled());
 		//delete existing entities
 		RecordStepKey recordStepKey = new RecordStepKey(record.getId(), step);
 		if (settings.isDeleteExistingEntities() && ! deletedEntitiesRecordKeys.contains(recordStepKey) && ! getParentEntityDefinition().isRoot()) {
@@ -302,7 +303,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		
 		if ( step.compareTo(originalStep) < 0 ) {
 			//reset record step to the original one
-			CollectRecord record = recordManager.load(survey, lastModifiedRecordSummary.getId(), originalStep, settings.recordValidationEnabled);
+			CollectRecord record = recordManager.load(survey, lastModifiedRecordSummary.getId(), originalStep, settings.isRecordValidationEnabled());
 			record.setStep(originalStep);
 			
 			updateRecord(record, originalStep, originalStep);
@@ -323,7 +324,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			if ( ! recordSummaries.isEmpty() ) {
 				errorMessageKey = ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY;
 			}
-		} else if ( recordSummaries.size() == 0 && settings.reportNoRecordFoundErrors) {
+		} else if ( recordSummaries.isEmpty() && settings.isReportNoRecordFoundErrors()) {
 			errorMessageKey = NO_RECORD_FOUND_ERROR_MESSAGE_KEY;
 		} else if ( recordSummaries.size() > 1 ) {
 			errorMessageKey = MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY;
@@ -852,92 +853,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			if (step != other.step)
 				return false;
 			return true;
-		}
-	}
-	
-	public static class CSVDataImportSettings {
-		
-		/**
-		 * If true, records are validated after insert or update
-		 */
-		private boolean recordValidationEnabled;
-		/**
-		 * If true, only new records will be inserted and only root entities can be added
-		 */
-		private boolean insertNewRecords;
-		/**
-		 * When insertNewRecords is true, it indicates the name of the model version used during new record creation
-		 */
-		private String newRecordVersionName;
-		
-		/**
-		 * If true, the process automatically creates ancestor multiple entities if they do not exist.
-		 */
-		private boolean createAncestorEntities;
-		
-		/**
-		 * If true, the process automatically delete all entities with the specified definition id before importing the new ones.
-		 */
-		private boolean deleteExistingEntities;
-		
-		/**
-		 * If true, only existing records update is allowed. 
-		 */
-		private boolean reportNoRecordFoundErrors;
-		
-		public CSVDataImportSettings() {
-			recordValidationEnabled = true;
-			insertNewRecords = false;
-			deleteExistingEntities = false;
-			reportNoRecordFoundErrors = true;
-		}
-		
-		public boolean isRecordValidationEnabled() {
-			return recordValidationEnabled;
-		}
-		
-		public void setRecordValidationEnabled(boolean recordValidationEnabled) {
-			this.recordValidationEnabled = recordValidationEnabled;
-		}
-
-		public boolean isInsertNewRecords() {
-			return insertNewRecords;
-		}
-		
-		public void setInsertNewRecords(boolean insertNewRecords) {
-			this.insertNewRecords = insertNewRecords;
-		}
-		
-		public String getNewRecordVersionName() {
-			return newRecordVersionName;
-		}
-		
-		public void setNewRecordVersionName(String newRecordVersionName) {
-			this.newRecordVersionName = newRecordVersionName;
-		}
-		
-		public boolean isCreateAncestorEntities() {
-			return createAncestorEntities;
-		}
-		
-		public void setCreateAncestorEntities(boolean createAncestorEntities) {
-			this.createAncestorEntities = createAncestorEntities;
-		}
-		
-		public boolean isDeleteExistingEntities() {
-			return deleteExistingEntities;
-		}
-		
-		public void setDeleteExistingEntities(boolean deleteExistingEntities) {
-			this.deleteExistingEntities = deleteExistingEntities;
-		}
-		
-		public boolean isReportNoRecordFoundErrors() {
-			return reportNoRecordFoundErrors;
-		}
-		
-		public void setReportNoRecordFoundErrors(boolean reportNoRecordFoundErrors) {
-			this.reportNoRecordFoundErrors = reportNoRecordFoundErrors;
 		}
 	}
 }

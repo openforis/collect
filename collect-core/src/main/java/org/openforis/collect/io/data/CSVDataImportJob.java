@@ -27,6 +27,7 @@ import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
 import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
 import org.openforis.collect.io.data.DataLine.EntityPositionIdentifier;
 import org.openforis.collect.io.data.DataLine.FieldValueKey;
+import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
@@ -348,7 +349,7 @@ public class CSVDataImportJob extends Job {
 		protected void initializeInternalVariables() throws Throwable {
 			super.initializeInternalVariables();
 			recordUpdater = new RecordUpdater();
-			recordUpdater.setValidateAfterUpdate(input.settings.recordValidationEnabled);
+			recordUpdater.setValidateAfterUpdate(input.settings.isRecordValidationEnabled());
 			dataImportStatus = new ReferenceDataImportStatus<ParsingError>();
 			adminUser = userManager.loadAdminUser();
 			EntityDefinition parentEntityDefn = getParentEntityDefinition();
@@ -463,7 +464,7 @@ public class CSVDataImportJob extends Job {
 		}
 
 		private CollectRecord loadRecord(Integer recordId, Step step) {
-			CollectRecord record = recordManager.load(input.survey, recordId, step, input.settings.recordValidationEnabled);
+			CollectRecord record = recordManager.load(input.survey, recordId, step, input.settings.isRecordValidationEnabled());
 			//delete existing entities
 			RecordStepKey recordStepKey = new RecordStepKey(record.getId(), step);
 			if (input.settings.isDeleteExistingEntities() && ! deletedEntitiesRecordKeys.contains(recordStepKey) && ! getParentEntityDefinition().isRoot()) {
@@ -509,7 +510,7 @@ public class CSVDataImportJob extends Job {
 			if ( input.step.compareTo(originalStep) < 0 ) {
 				//reset record step to the original one
 				CollectRecord record = recordManager.load(input.survey, lastModifiedRecordSummary.getId(), 
-						originalStep, input.settings.recordValidationEnabled);
+						originalStep, input.settings.isRecordValidationEnabled());
 				record.setStep(originalStep);
 				
 				updateRecord(record, originalStep, originalStep);
@@ -898,81 +899,4 @@ public class CSVDataImportJob extends Job {
 		}
 	}
 	
-	public static class CSVDataImportSettings implements Cloneable {
-		
-		/**
-		 * If true, records are validated after insert or update
-		 */
-		private boolean recordValidationEnabled;
-		/**
-		 * If true, only new records will be inserted and only root entities can be added
-		 */
-		private boolean insertNewRecords;
-		/**
-		 * When insertNewRecords is true, it indicates the name of the model version used during new record creation
-		 */
-		private String newRecordVersionName;
-		
-		/**
-		 * If true, the process automatically creates ancestor multiple entities if they do not exist.
-		 */
-		private boolean createAncestorEntities;
-		
-		/**
-		 * If true, the process automatically delete all entities with the specified definition id before importing the new ones.
-		 */
-		private boolean deleteExistingEntities;
-		
-		public CSVDataImportSettings() {
-			recordValidationEnabled = true;
-			insertNewRecords = false;
-			deleteExistingEntities = false;
-		}
-		
-		@Override
-		protected CSVDataImportSettings clone() throws CloneNotSupportedException {
-			return (CSVDataImportSettings) super.clone();
-		}
-		
-		public boolean isRecordValidationEnabled() {
-			return recordValidationEnabled;
-		}
-		
-		public void setRecordValidationEnabled(boolean recordValidationEnabled) {
-			this.recordValidationEnabled = recordValidationEnabled;
-		}
-
-		public boolean isInsertNewRecords() {
-			return insertNewRecords;
-		}
-		
-		public void setInsertNewRecords(boolean insertNewRecords) {
-			this.insertNewRecords = insertNewRecords;
-		}
-		
-		public String getNewRecordVersionName() {
-			return newRecordVersionName;
-		}
-		
-		public void setNewRecordVersionName(String newRecordVersionName) {
-			this.newRecordVersionName = newRecordVersionName;
-		}
-		
-		public boolean isCreateAncestorEntities() {
-			return createAncestorEntities;
-		}
-		
-		public void setCreateAncestorEntities(boolean createAncestorEntities) {
-			this.createAncestorEntities = createAncestorEntities;
-		}
-		
-		public boolean isDeleteExistingEntities() {
-			return deleteExistingEntities;
-		}
-		
-		public void setDeleteExistingEntities(boolean deleteExistingEntities) {
-			this.deleteExistingEntities = deleteExistingEntities;
-		}
-		
-	}
 }

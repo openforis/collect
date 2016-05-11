@@ -16,8 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.ReferenceDataImportStatus;
-import org.openforis.collect.io.data.CSVDataImportProcess.CSVDataImportSettings;
 import org.openforis.collect.io.data.CSVDataImportProcess.ImportException;
+import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.RecordManager;
@@ -101,14 +101,14 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, boolean insertNewRecords, String newRecordVersionName, boolean createAncestorEntities) throws Exception {
-		CSVDataImportSettings settings = new CSVDataImportProcess.CSVDataImportSettings();
+		CSVDataImportSettings settings = new CSVDataImportSettings();
 		settings.setInsertNewRecords(insertNewRecords);
 		settings.setNewRecordVersionName(newRecordVersionName);
 		settings.setCreateAncestorEntities(createAncestorEntities);
 		return importCSVFile(fileName, parentEntityDefinitionId, transactional, settings);
 	}
 	
-	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, CSVDataImportProcess.CSVDataImportSettings settings) throws Exception {
+	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, CSVDataImportSettings settings) throws Exception {
 		File file = getTestFile(fileName);
 		CSVDataImportProcess process = (CSVDataImportProcess) beanFactory.getBean(
 				transactional ? "transactionalCsvDataImportProcess": "csvDataImportProcess");

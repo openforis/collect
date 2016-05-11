@@ -18,8 +18,8 @@ import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportInput;
-import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportSettings;
 import org.openforis.collect.io.data.CSVDataImportJob.DataParsingError;
+import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.RecordManager;
@@ -105,7 +105,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 	
 	public CSVDataImportJob importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, 
 			boolean insertNewRecords, String newRecordVersionName, boolean createAncestorEntities) throws Exception {
-		CSVDataImportSettings settings = new CSVDataImportJob.CSVDataImportSettings();
+		CSVDataImportSettings settings = new CSVDataImportSettings();
 		settings.setInsertNewRecords(insertNewRecords);
 		settings.setNewRecordVersionName(newRecordVersionName);
 		settings.setCreateAncestorEntities(createAncestorEntities);
