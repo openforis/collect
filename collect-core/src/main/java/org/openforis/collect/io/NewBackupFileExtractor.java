@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.poi.util.IOUtils;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
+import org.openforis.commons.versioning.Version;
 import org.openforis.concurrency.ProgressListener;
 
 /**
@@ -33,7 +34,7 @@ public class NewBackupFileExtractor implements Closeable {
 	//temporary variables
 	private transient File tempUncompressedFolder;
 	private transient ZipFile zipFile;
-
+	private Boolean oldFormat = null;
 	private SurveyBackupInfo info;
 
 	public NewBackupFileExtractor(File file) throws ZipException, IOException {
@@ -56,7 +57,12 @@ public class NewBackupFileExtractor implements Closeable {
 	
 	public SurveyBackupInfo getInfo() {
 		if (info == null) {
-			info = extractInfo();
+			if (isOldFormat()) {
+				info = new SurveyBackupInfo();
+				info.setCollectVersion(new Version("3.9.0"));
+			} else {
+				info = extractInfo();
+			}
 		}
 		return info;
 	}
@@ -141,7 +147,10 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 
 	public boolean isOldFormat() {
-		return ! containsEntry(SurveyBackupJob.INFO_FILE_NAME);
+		if (oldFormat == null) {
+			oldFormat = ! containsEntry(SurveyBackupJob.INFO_FILE_NAME);
+		}
+		return oldFormat;
 	}
 	
 	public int size() {

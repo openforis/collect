@@ -120,7 +120,7 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 		Set<Integer> result = new TreeSet<Integer>();
 		for (Step step : Step.values()) {
 			int stepNumber = step.getStepNumber();
-			String path = SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + stepNumber;
+			String path = (backupFileExtractor.isOldFormat() ? "" : SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR) + stepNumber;
 			if ( backupFileExtractor.containsEntriesInPath(path) ) {
 				List<String> listEntriesInPath = backupFileExtractor.listFilesInFolder(path);
 				for (String entry : listEntriesInPath) {
