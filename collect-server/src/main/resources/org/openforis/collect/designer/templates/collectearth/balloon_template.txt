@@ -111,6 +111,11 @@
 		      font-family: 'lo'; 
 			  src: url('$[host]generated/earthFiles/fonts/Phetsarath_OT.ttf');
 			}
+			
+			@font-face {
+		      font-family: 'mn'; 
+			  src: url('$[host]generated/earthFiles/fonts/arhangai.ttf');
+			}
 		
 			body {
 				font-family: "PLACEHOLDER_UI_LANGUAGE","Trebuchet MS", "Helvetica", "Arial", "Verdana",
