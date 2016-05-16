@@ -80,7 +80,7 @@ public class MondrianCubeGenerator {
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
 					measure.column = "_" + rootEntityDef.getName() + "_" + nodeName;
-					measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(rootEntityDef) + " Count" );
+					measure.caption = StringEscapeUtils.escapeHtml4( extractFailsafeLabel(rootEntityDef) + " Count" );
 					measure.aggregator = "distinct count";
 					measure.datatype = "Integer";
 					cube.measures.add(measure);
@@ -88,7 +88,7 @@ public class MondrianCubeGenerator {
 					for (String aggregator : MEASURE_AGGREGATORS) {
 						Measure measure = new Measure(nodeName + "_" + aggregator);
 						measure.column = nodeName;
-						measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(nodeDef) + " " + aggregator );
+						measure.caption = StringEscapeUtils.escapeHtml4( extractFailsafeLabel(nodeDef) + " " + aggregator );
 						measure.aggregator = aggregator;
 						measure.datatype = "Numeric";
 						measure.formatString = "#.##";
@@ -100,10 +100,13 @@ public class MondrianCubeGenerator {
 				String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
 				
 				String entityName = nodeName;
-				String entityLabel = extractLabel(nodeDef);
+				String entityLabel = extractFailsafeLabel(nodeDef);
 				
 				for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
-					String childLabel = entityLabel + " - " + extractLabel(childDef);
+					String childLabel = extractReportingLabel(childDef);
+					if (childLabel == null) {
+						childLabel = entityLabel + extractFailsafeLabel(childDef);
+					}
 					Dimension dimension = new Dimension(childLabel);
 					Hierarchy hierarchy = new Hierarchy(childLabel);
 					
@@ -247,7 +250,7 @@ public class MondrianCubeGenerator {
 */
 	private Dimension generateDimension(NodeDefinition nodeDef, EntityDefinition rootEntityDef ) {
 		String attrName = nodeDef.getName();
-		String attrLabel = extractLabel(nodeDef);
+		String attrLabel = extractFailsafeLabel(nodeDef);
 		Dimension dimension = new Dimension(attrLabel);
 		
 		Hierarchy hierarchy = dimension.hierarchy;
@@ -332,7 +335,7 @@ public class MondrianCubeGenerator {
 	
 	private Level generateLevel(NodeDefinition nodeDef) {
 		String attrName = nodeDef.getName();
-		String attrLabel = extractLabel(nodeDef);
+		String attrLabel = extractFailsafeLabel(nodeDef);
 		Level level = new Level(attrLabel);
 		if (nodeDef instanceof NumericAttributeDefinition) {
 			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? "Integer": "Numeric";
@@ -354,14 +357,20 @@ public class MondrianCubeGenerator {
 		return level;
 	}
 
-	private String extractLabel(NodeDefinition nodeDef) {
-		String attrLabel = nodeDef.getLabel(NodeLabel.Type.INSTANCE, language);
-		if (attrLabel == null) {
-			attrLabel = nodeDef.getName();
+	private String extractFailsafeLabel(NodeDefinition nodeDef) {
+		String label = extractReportingLabel(nodeDef);
+		if (label == null) {
+			label = nodeDef.getLabel(NodeLabel.Type.INSTANCE);
+			if (label == null) {
+				label = nodeDef.getName();
+			}
 		}
-		return attrLabel;
+		return label;
 	}
 	
+	private String extractReportingLabel(NodeDefinition nodeDef) {
+		return nodeDef.getLabel(NodeLabel.Type.REPORTING, language);
+	}
 
 	private static class MondrianSchemaObject {
 		
