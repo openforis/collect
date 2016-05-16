@@ -55,7 +55,7 @@ ${html_for_balloon}
 	<#list placemarks as placemark >
 
 <Folder id="folder_${placemark.placemarkId}">
-	<name>  ${placemark_index+1} - ID# : ${placemark.placemarkId}</name>
+	<name>  ${placemark_index+1} - ID# : <#if placemark.visiblePlacemarkId??>${placemark.visiblePlacemarkId}<#else>${placemark.placemarkId}</#if></name>
 	<description></description>
 	<open>0</open>
 	<Style>
