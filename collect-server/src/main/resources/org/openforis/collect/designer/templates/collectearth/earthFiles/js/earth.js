@@ -530,7 +530,14 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 };
 
 var getPlacemarkId = function() {
-	var id = $form.find("input[name='collect_text_id']").val();
+	var arrayLength = EXTRA_ID_ATTRIBUTES.length;
+	var id = "";
+	for (var i = 0; i < arrayLength; i++) {
+		id += $form.find("input[name='" + EXTRA_ID_ATTRIBUTES[i] + "']").val();
+		if( i < arrayLength-1){
+			id += ",";
+		}
+	}
 	return id;
 };
 
