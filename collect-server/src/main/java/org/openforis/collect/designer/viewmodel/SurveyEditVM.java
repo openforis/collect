@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -67,7 +66,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	private static final Log log = Log.lookup(SurveySelectVM.class);
 
-	private static final String TEXT_XML = "text/xml";
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	public static final String BACKGROUD_SAVE_GLOBAL_COMMAND = "backgroundSurveySave";
 	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
@@ -127,15 +125,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		}
 	}
 
-	@GlobalCommand
-	public void exportSurvey() {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		surveyManager.marshalSurvey(survey, os);
-		byte[] content = os.toByteArray();
-		String fileName = survey.getName() + ".xml";
-		Filedownload.save(content, TEXT_XML, fileName);
-	}
-	
 	@GlobalCommand
 	public void openSRSManagerPopUp() {
 		if ( checkCanLeaveForm() ) {
@@ -393,6 +382,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 			throw new RuntimeException("Error generating the CSV data export template: " + job.getErrorMessage(), 
 					job.getLastException());
 		}
+	}
+	
+	@Command
+	public void exportSurvey() throws IOException {
+		SurveyExportParametersVM.openPopUp(SurveySummary.createFromSurvey(survey));
 	}
 	
 	@GlobalCommand

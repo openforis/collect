@@ -120,6 +120,8 @@
 								<menupopup>
 									<menuitem label="${labels.survey.validate}"
 										onClick="@command('validate')" />
+									<menuitem  label="${labels.survey.export.$}"
+										onClick="@command('exportSurvey')" />
 									<menuitem  label="${labels.survey.schema.export_summary.$}"
 										onClick="@command('exportSchemaSummary')" />
 									<menuitem  label="${labels.survey.schema.attributes_import.$}"

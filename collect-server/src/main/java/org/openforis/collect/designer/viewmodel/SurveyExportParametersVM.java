@@ -1,27 +1,65 @@
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.PUBLISHED;
+import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.TEMPORARY;
 import static org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat.DESKTOP;
 import static org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat.EARTH;
 import static org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat.RDB;
-import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.PUBLISHED;
-import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.TEMPORARY;
 import static org.openforis.collect.metamodel.SurveyTarget.COLLECT_EARTH;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
+import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.designer.util.SuccessHandler;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType;
+import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
+import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
+import org.openforis.collect.io.SurveyBackupJob;
+import org.openforis.collect.io.data.DataBackupError;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreatorImpl;
+import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.relational.data.RecordIterator;
+import org.openforis.collect.relational.print.RDBPrintJob;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
-import org.zkoss.bind.BindUtils;
+import org.openforis.collect.utils.Dates;
+import org.openforis.concurrency.Job;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.springframework.http.MediaType;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
+import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.util.logging.Log;
+import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Filedownload;
+import org.zkoss.zul.Window;
 
 /**
  * 
@@ -30,15 +68,51 @@ import org.zkoss.bind.annotation.Init;
  */
 public class SurveyExportParametersVM extends BaseVM {
 	
+	private static Log LOG = Log.lookup(SurveyExportParametersVM.class);
+	
 	private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	
-	private SurveySummary survey;
+	/**
+	 * Pattern for survey export file name (SURVEYNAME_DATE.OUTPUTFORMAT)
+	 */
+	private static final String SURVEY_EXPORT_FILE_NAME_PATTERN = "%s_%s.%s";
+	
+	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = "cep";
+	private static final CollectEarthProjectFileCreator COLLECT_EARTH_PROJECT_FILE_CREATOR;
+	static {
+		Iterator<CollectEarthProjectFileCreator> it = COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER.iterator();
+		COLLECT_EARTH_PROJECT_FILE_CREATOR = it.hasNext() ? it.next(): null;
+	}
+	
+	@WireVariable
+	private SurveyManager surveyManager;
+	@WireVariable
+	private RecordManager recordManager;
+	@WireVariable
+	private CodeListManager codeListManager;
+	@WireVariable
+	private SurveyValidator surveyValidator;
+	@WireVariable
+	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	
+	private SurveySummary surveySummary;
 	private SurveyExportParametersFormObject formObject;
 	private Form tempForm;
 	
+	private RDBPrintJob rdbExportJob;
+	private SurveyBackupJob surveyBackupJob;
+	
+	private Window jobStatusPopUp;
+
+	public static void openPopUp(SurveySummary surveySummary) throws IOException {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("survey", surveySummary);
+		openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
+	}
+	
 	@Init
 	public void init(@ExecutionArgParam("survey") SurveySummary survey) {
-		this.survey = survey;
+		this.surveySummary = survey;
 		this.formObject = new SurveyExportParametersFormObject();
 		String outputFormat = (survey.getTarget() == COLLECT_EARTH ? EARTH : DESKTOP).name();
 		this.formObject.setOutputFormat(outputFormat);
@@ -67,9 +141,160 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	@Command
 	public void export() {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("parameters", formObject);
-		BindUtils.postGlobalCommand(null, null, "performSelectedSurveyExport", args);
+		rdbExportJob = null;
+		surveyBackupJob = null;
+		
+		String uri = surveySummary.getUri();
+		final CollectSurvey loadedSurvey;
+		if ( surveySummary.isTemporary() && SurveyType.valueOf(formObject.getType()) == TEMPORARY ) {
+			loadedSurvey = surveyManager.loadSurvey(surveySummary.getId());
+		} else {
+			loadedSurvey = surveyManager.getByUri(uri);
+		}
+		switch(formObject.getOutputFormatEnum()) {
+		case EARTH:
+			validateSurvey(loadedSurvey, collectEarthSurveyValidator, new SuccessHandler() {
+				public void onSuccess() {
+					exportCollectEarthSurvey(loadedSurvey, formObject);
+				}
+			}, true);
+			return;
+		case RDB:
+			startRDBSurveyExportJob(loadedSurvey, formObject);
+			break;
+		case MOBILE:
+			validateSurvey(loadedSurvey, surveyValidator, new SuccessHandler() {
+				public void onSuccess() {
+					startCollectSurveyExportJob(loadedSurvey, formObject);
+				}
+			}, true);
+			break;
+		default:
+			startCollectSurveyExportJob(loadedSurvey, formObject);
+			break;
+		}
+	}
+	
+	@GlobalCommand
+	public void jobCompleted(@BindingParam("job") Job job) {
+		boolean jobStartedByThis = isJobStartedByThis(job);
+		if ( job == surveyBackupJob ) {
+			File file = surveyBackupJob.getOutputFile();
+			CollectSurvey survey = surveyBackupJob.getSurvey();
+			String extension = surveyBackupJob.getOutputFormat().getOutputFileExtension();
+			downloadFile(file, survey, extension, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			final List<DataBackupError> dataBackupErrors = surveyBackupJob.getDataBackupErrors();
+			if (! dataBackupErrors.isEmpty()) {
+				DataExportErrorsPopUpVM.showPopUp(dataBackupErrors);
+			}
+			surveyBackupJob = null;
+		} else if ( job == rdbExportJob ) {
+			File file = rdbExportJob.getOutputFile();
+			CollectSurvey survey = rdbExportJob.getSurvey();
+			String extension = "sql";
+			downloadFile(file, survey, extension, MediaType.TEXT_PLAIN_VALUE);
+			rdbExportJob = null;
+		}
+		if (jobStartedByThis) {
+			onJobEnd(job);
+		}
+	}
+	
+	private boolean isJobStartedByThis(Job job) {
+		return job == surveyBackupJob || job == rdbExportJob;
+	}
+	
+	private void onJobEnd(Job job) {
+		if (job == surveyBackupJob) {
+			surveyBackupJob = null;
+		} else if (job == rdbExportJob) {
+			rdbExportJob = null;
+		}
+		closeJobStatusPopUp();
+	}
+	
+	private void downloadFile(File file, CollectSurvey survey, String extension, String contentType) {
+		String surveyName = survey.getName();
+		String dateStr = Dates.formatLocalDateTime(new Date());
+		String fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
+		try {
+			Filedownload.save(new FileInputStream(file), contentType, fileName);
+		} catch (FileNotFoundException e) {
+			LOG.error(e);
+			MessageUtil.showError("survey.export_survey.error", new String[]{e.getMessage()});
+		}
+	}
+	
+	private void startRDBSurveyExportJob(final CollectSurvey survey,
+			final SurveyExportParametersFormObject parameters) {
+		rdbExportJob = new RDBPrintJob();
+		rdbExportJob.setSurvey(survey);
+		rdbExportJob.setTargetSchemaName(survey.getName());
+		rdbExportJob.setRecordIterator(new RecordManagerRecordIterator(survey, Step.ANALYSIS));
+		rdbExportJob.setIncludeData(parameters.isIncludeData());
+		rdbExportJob.setDialect(parameters.getRdbDialectEnum());
+		rdbExportJob.setDateTimeFormat(parameters.getRdbDateTimeFormat());
+		rdbExportJob.setTargetSchemaName(parameters.getRdbTargetSchemaName());
+		jobManager.start(rdbExportJob, String.valueOf(survey.getId()));
+		openSurveyExportStatusPopUp(survey.getName(), rdbExportJob);
+	}
+	
+	protected void openSurveyExportStatusPopUp(String surveyName, Job job) {
+		String title = Labels.getLabel("survey.export_survey.process_status_popup.message", new String[] { surveyName });
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(title, job, true);
+	}
+
+	private void exportCollectEarthSurvey(final CollectSurvey survey,
+			final SurveyExportParametersFormObject parameters) {
+		try {
+			CollectEarthProjectFileCreatorImpl creatorImpl = (CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR;
+			creatorImpl.setCodeListManager(codeListManager);
+			creatorImpl.setSurveyManager(surveyManager);
+			String languageCode = parameters.getLanguageCode();
+			File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey, languageCode);
+			String contentType = URLConnection.guessContentTypeFromName(file.getName());
+			FileInputStream is = new FileInputStream(file);
+			String outputFileName = String.format("%s_%s_%s.%s", 
+					survey.getName(), 
+					languageCode,
+					Dates.formatLocalDateTime(survey.getModifiedDate()),
+					COLLECT_EARTH_PROJECT_FILE_EXTENSION);
+			Filedownload.save(is, contentType, outputFileName);
+		} catch(Exception e) {
+			LOG.error(e);
+			MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
+		}
+	}
+
+	protected void startCollectSurveyExportJob(CollectSurvey survey,
+			SurveyExportParametersFormObject parameters) {
+		surveyBackupJob = jobManager.createJob(SurveyBackupJob.class);
+		surveyBackupJob.setSurvey(survey);
+		surveyBackupJob.setIncludeData(parameters.isIncludeData());
+		surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
+		surveyBackupJob.setOutputFormat(org.openforis.collect.io.SurveyBackupJob.OutputFormat.valueOf(parameters.getOutputFormat()));
+		jobManager.start(surveyBackupJob, String.valueOf(survey.getId()));
+		openSurveyExportStatusPopUp(survey.getName(), surveyBackupJob);
+	}
+
+	private void validateSurvey(CollectSurvey survey, SurveyValidator validator, final SuccessHandler successHandler, boolean showWarningConfirm) {
+		SurveyValidationResults validationResults = validator.validate(survey);
+		if (validationResults.isOk()) {
+			successHandler.onSuccess();
+		} else {
+			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(validationResults, showWarningConfirm && ! validationResults.hasErrors());
+			validationResultsPopUp.addEventListener(SurveyValidationResultsVM.CONFIRM_EVENT_NAME, new EventListener<ConfirmEvent>() {
+				public void onEvent(ConfirmEvent event) throws Exception {
+					successHandler.onSuccess();
+					closePopUp(validationResultsPopUp);
+				}
+			});
+		}
+	}
+	
+	protected void closeJobStatusPopUp() {
+		closePopUp(jobStatusPopUp);
+		jobStatusPopUp = null;
 	}
 	
 	@DependsOn({"tempForm.type","tempForm.outputFormat"})
@@ -88,7 +313,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	}
 	
 	public SurveySummary getSurvey() {
-		return survey;
+		return surveySummary;
 	}
 	
 	public Form getTempForm() {
@@ -119,7 +344,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	}
 	
 	public List<String> getSurveyLanguages() {
-		return survey.getLanguages();
+		return surveySummary.getLanguages();
 	}
 	
 	public static class SurveyExportParametersFormObject {
@@ -214,4 +439,40 @@ public class SurveyExportParametersVM extends BaseVM {
 		}
 	}
 	
+	private class RecordManagerRecordIterator implements RecordIterator {
+		
+		private List<CollectRecord> summaries;
+		private int nextRecordIndex = 0;
+		private CollectSurvey survey;
+		
+		public RecordManagerRecordIterator(CollectSurvey survey, Step step) {
+			this.survey = survey;
+			this.summaries = new ArrayList<CollectRecord>();
+			for (EntityDefinition rootDef : survey.getSchema().getRootEntityDefinitions()) {
+				this.summaries.addAll(recordManager.loadSummaries(survey, rootDef.getName(), step));
+			}
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return nextRecordIndex < size();
+		}
+
+		@Override
+		public CollectRecord next() {
+			CollectRecord summary = summaries.get(nextRecordIndex++);
+			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep());
+			return record;
+		}
+
+		@Override
+		public void remove() {
+		}
+
+		@Override
+		public int size() {
+			return summaries.size();
+		}
+		
+	}
 }
