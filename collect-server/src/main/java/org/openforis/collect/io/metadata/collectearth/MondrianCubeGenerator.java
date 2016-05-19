@@ -1,5 +1,7 @@
 package org.openforis.collect.io.metadata.collectearth;
 
+import static org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil.escapeMondrianUnicode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -360,12 +362,14 @@ public class MondrianCubeGenerator {
 	private String extractFailsafeLabel(NodeDefinition nodeDef) {
 		String label = extractReportingLabel(nodeDef);
 		if (label == null) {
-			label = nodeDef.getLabel(NodeLabel.Type.INSTANCE);
+			label = nodeDef.getLabel(NodeLabel.Type.INSTANCE, language);
 			if (label == null) {
 				label = nodeDef.getName();
 			}
 		}
-		return label;
+		
+		return escapeMondrianUnicode(label); 
+		
 	}
 	
 	private String extractReportingLabel(NodeDefinition nodeDef) {
