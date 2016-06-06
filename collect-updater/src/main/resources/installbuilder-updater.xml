@@ -37,7 +37,17 @@ check_for_updates = 1</text>
 		</component>
 	</componentList>
     <preInstallationActionList>
-		<createTimeStamp>
+		<throwError>
+			<explanation>Open Foris Collect is running</explanation>
+			<text>Open Foris Collect is running. Shutdown Collect before updating it.</text>
+			<ruleList>
+				<portTest>
+					<condition>cannot_bind</condition>
+					<port>8080</port>
+				</portTest>
+			</ruleList>
+        </throwError>
+        <createTimeStamp>
 			<variable>timestamp</variable>
 			<format>%Y%m%d%H%M%S</format>
 		</createTimeStamp>
