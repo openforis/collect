@@ -231,7 +231,7 @@ var getEnumeratedEntityNestedAttributeErrorMessageLabel = function(inputField) {
 	var rowHeading = rowHeadingEl.text();
 	var attributeHeadingEl = inputField.closest("table").find("thead tr th").eq(columnIndex);
 	var attributeHeading = attributeHeadingEl.text();
-	var entityHeading = inputField.closest("section").find("legend").text();
+	var entityHeading = inputField.closest("fieldset").find("legend").text();
 	var label = entityHeading + " (" + rowHeading + ") " + attributeHeading;
 	return label;
 };
