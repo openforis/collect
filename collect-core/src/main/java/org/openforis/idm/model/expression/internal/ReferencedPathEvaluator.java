@@ -36,24 +36,24 @@ public class ReferencedPathEvaluator {
 	private Set<String> determineReferencedPaths(org.apache.commons.jxpath.ri.compiler.Path modelLocationPath) {
 		Set<String> paths = new HashSet<String>();
 		paths.add(Path.getAbsolutePath(modelLocationPath.toString()));
-		String predicateBasePath = "";
+		StringBuilder predicateBasePathSB = new StringBuilder();
 		for (Step step : modelLocationPath.getSteps()) {
 			String stepVal = step.toString();
-			predicateBasePath += Path.getAbsolutePath(stepVal) + "/";
+			predicateBasePathSB.append(Path.getAbsolutePath(stepVal)).append(Path.SEPARATOR);
 			for (Expression predicate : step.getPredicates()) {
 				Set<String> predicatePaths = determineReferencedPaths(predicate);
 				for (String predicateReferencePath : predicatePaths) {
 					if (predicateReferencePath.startsWith(Path.THIS_VARIABLE)) {
 						paths.add(predicateReferencePath);
 					} else {
-						paths.add(predicateBasePath + predicateReferencePath);
+						paths.add(predicateBasePathSB.toString() + predicateReferencePath);
 					}
 				}
 			}
 		}
 		return paths;
 	}
-
+	
 	private Set<String> determineReferencedPaths(Operation operation) {
 		Set<String> paths = new HashSet<String>();
 		if (operation instanceof ModelExtensionFunction) {

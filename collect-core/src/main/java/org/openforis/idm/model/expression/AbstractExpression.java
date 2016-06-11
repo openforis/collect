@@ -142,6 +142,9 @@ public abstract class AbstractExpression {
 
 	private NodeDefinition getChildDefinition(NodeDefinition contextNode, NodeDefinition thisNodeDef, String pathSection) throws InvalidExpressionException {
 		if (Path.NORMALIZED_PARENT_FUNCTION.equals(pathSection)) {
+			if (contextNode.getParentDefinition() == null) {
+				throw new IllegalArgumentException("cannot get parent definition from root node: " + contextNode.getName());
+			}
 			return contextNode.getParentDefinition();
 		} else if (Path.THIS_ALIASES.contains(pathSection)) {
 			return thisNodeDef;

@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.sql.RDBJdbcType;
@@ -49,7 +50,8 @@ public class DataTableDataColumnValueExtractor extends ColumnValueExtractor<Data
 	protected Node<?> extractValueNode(Node<?> context) {
 		List<Node<?>> vals = column.getRelativePath().evaluate(context);
 		if ( vals.size() > 1 ) {
-			throw new RuntimeException("Path "+ column.getRelativePath() +" returned more than one value");
+			LOG.warn(String.format("Record: %s - path %s returned more than one value", 
+					((CollectRecord) context.getRecord()).getRootEntityKeyValues(), column.getRelativePath()));
 		}
 		if ( vals.isEmpty() ) {
 			return null;

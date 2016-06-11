@@ -84,6 +84,7 @@ package org.openforis.collect.presenter {
 				eventDispatcher.dispatchEvent(new CollectJobEvent(CollectJobEvent.COLLECT_JOB_STATUS_UPDATE, _job));
 				if (_job.completed || _job.aborted || _job.failed) {
 					eventDispatcher.dispatchEvent(new CollectJobEvent(CollectJobEvent.COLLECT_JOB_END, _job));
+					stop();
 				}
 			}
 		}

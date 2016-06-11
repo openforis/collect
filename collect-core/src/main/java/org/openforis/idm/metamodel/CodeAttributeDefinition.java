@@ -267,20 +267,6 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 		return list != null && list.isHierarchical() && ! getDependentCodeAttributeDefinitions().isEmpty();
 	}
 	
-	public Integer getListLevelIndex() {
-		if ( list.isHierarchical() ) {
-			int idx = -1;
-			CodeAttributeDefinition currCode = this;
-			while ( currCode != null ) {
-				idx++;
-				currCode = currCode.getParentCodeAttributeDefinition();
-			}
-			return idx;
-		} else {
-			return null;
-		}
-	}
-
 	public String getHierarchicalLevel() {
 		Integer levelIndex = getListLevelIndex();
 		if (levelIndex == null) {
@@ -384,6 +370,20 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 				ptr = ptr.getParentCodeAttributeDefinition();
 			}
 			return level;
+		}
+	}
+	
+	public Integer getListLevelIndex() {
+		if ( list.isHierarchical() ) {
+			int idx = -1;
+			CodeAttributeDefinition currCode = this;
+			while ( currCode != null ) {
+				idx++;
+				currCode = currCode.getParentCodeAttributeDefinition();
+			}
+			return idx;
+		} else {
+			return null;
 		}
 	}
 
