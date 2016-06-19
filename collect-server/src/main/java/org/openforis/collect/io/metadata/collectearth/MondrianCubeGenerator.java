@@ -319,7 +319,7 @@ public class MondrianCubeGenerator {
 		return dimension;
 	}
 
-	private String extractCodeListTableName(CodeAttributeDefinition codeAttrDef) {
+	private String extractCodeListName(CodeAttributeDefinition codeAttrDef) {
 		StringBuffer codeListName = new StringBuffer( codeAttrDef.getList().getName() );
 		
 		int levelIdx = codeAttrDef.getLevelIndex();
@@ -332,7 +332,11 @@ public class MondrianCubeGenerator {
 				codeListName.append(currentLevel.getName());
 			}
 		}
-		return codeListName.append(rdbConfig.getCodeListTableSuffix()).toString();
+		return codeListName.toString();
+	}
+	
+	private String extractCodeListTableName(CodeAttributeDefinition codeAttrDef) {
+		return extractCodeListName(codeAttrDef) + rdbConfig.getCodeListTableSuffix();
 	}
 	
 	private List<Level> generateLevel(NodeDefinition nodeDef) {
@@ -360,7 +364,7 @@ public class MondrianCubeGenerator {
 			levelId.type = "String";	
 			levelId.table = codeTableName;
 			levelId.column = codeTableName + rdbConfig.getIdColumnSuffix();
-			levelId.nameColumn = level.column ;
+			levelId.nameColumn =  extractCodeListName(codeDef);
 			
 			levels.add(levelId);
 			
@@ -498,7 +502,7 @@ public class MondrianCubeGenerator {
 		private String visible = "true";
 		
 		@XStreamAsAttribute
-		private String hasAll = "false";
+		private String hasAll = "true";
 		
 		@XStreamImplicit
 		private List<Level> levels = new ArrayList<Level>();
