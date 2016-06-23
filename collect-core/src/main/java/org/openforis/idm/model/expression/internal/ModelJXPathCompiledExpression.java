@@ -3,6 +3,7 @@
  */
 package org.openforis.idm.model.expression.internal;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
@@ -37,15 +38,16 @@ public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
 		return validateOperations(new OperationVaildator() {
 			public ExpressionValidationResult validate(Operation operation) {
 				if (operation instanceof ModelExtensionFunction) {
-					CustomFunction customFunction = expressionFactory.lookupFunction((ModelExtensionFunction) operation);
-					if (null == customFunction) {
-						String fullName = ((ModelExtensionFunction) operation).getFullName();
-						String message = String.format("function '%s' does not exist", fullName);
+					ModelExtensionFunction modelExtensionFun = (ModelExtensionFunction) operation;
+					boolean valid = expressionFactory.isValidFunction(modelExtensionFun.getPrefix(), modelExtensionFun.getName());
+					if (valid) {
+						CustomFunction customFunction = expressionFactory.lookupFunction((ModelExtensionFunction) operation);
+						return customFunction.validateArguments(contextNodeDef, nullToEmpty(operation));
+					} else {
+						String fullName = modelExtensionFun.getPrefix() == null ? modelExtensionFun.getName() : modelExtensionFun.getFullName();
 						String functionNames = expressionFactory.getFullFunctionNames().toString();
 						String detailedMessage = String.format("function '%s' does not exist\n Possible function names:\n%s", fullName, functionNames);
-						return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message, detailedMessage);
-					} else {
-						return customFunction.validateArguments(contextNodeDef, nullToEmpty(operation));
+						return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, detailedMessage);
 					}
 				}
 				return new ExpressionValidationResult();
@@ -67,9 +69,13 @@ public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
 		while (!stack.isEmpty()) {
 			Expression expression = stack.pop();
 			if (expression instanceof Operation) {
-				ExpressionValidationResult result = operationValidator.validate((Operation) expression);
+				Operation op = (Operation) expression;
+				ExpressionValidationResult result = operationValidator.validate(op);
 				if (result.isError()) {
 					return result;
+				} else {
+					Expression[] args = op.getArguments();
+					stack.addAll(Arrays.asList(args));
 				}
 			}
 		}
