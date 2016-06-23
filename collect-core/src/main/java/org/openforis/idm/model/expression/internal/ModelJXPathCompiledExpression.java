@@ -75,7 +75,9 @@ public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
 					return result;
 				} else {
 					Expression[] args = op.getArguments();
-					stack.addAll(Arrays.asList(args));
+					if (args != null) {
+						stack.addAll(Arrays.asList(args));
+					}
 				}
 			}
 		}
