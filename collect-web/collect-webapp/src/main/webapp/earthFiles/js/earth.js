@@ -627,7 +627,7 @@ var setValueInInputField = function(inputField, value) {
 				var splitted = value.split(SEPARATOR_MULTIPLE_PARAMETERS);
 				splitted
 						.forEach(function(value, index) {
-							var button = activeCodeItemsContainer.find(".code-item[value=" + escapeRegExp(value) + "]");
+							var button = activeCodeItemsContainer.find(".code-item[value='" + escapeRegExp(value) + "']");
 							button.addClass('active');
 						});
 			}
