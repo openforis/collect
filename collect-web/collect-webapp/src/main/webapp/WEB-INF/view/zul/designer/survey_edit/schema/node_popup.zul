@@ -17,6 +17,7 @@
 					item="${arg.item}"
 					newItem="${arg.newItem}"
 					doNotCommitChangesImmediately="true"
+					style="overflow-y: auto"
 			 	/>
 			</center>
 			<south>
