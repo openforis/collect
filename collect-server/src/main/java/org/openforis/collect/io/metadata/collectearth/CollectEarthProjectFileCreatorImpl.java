@@ -176,7 +176,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
 		p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
 		p.put("inner_point_side", "2");
-		p.put("db_driver", "SQLITE");
 		p.put("use_browser", "chrome");
 		p.put("ui_language", language);
 		p.put("bing_maps_key", getBingMapsKey(survey));
