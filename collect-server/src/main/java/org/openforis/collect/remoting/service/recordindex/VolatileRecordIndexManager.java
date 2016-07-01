@@ -34,12 +34,20 @@ public class VolatileRecordIndexManager extends RecordIndexManager {
 		IndexWriter indexWriter = null;
 		try {
 			indexWriter = createIndexWriter();
-			indexWriter.deleteAll(); //temporary index is relative only to one record
+			clean(indexWriter); //temporary index is relative only to one record
 			index(indexWriter, record);
 		} catch (Exception e) {
 			throw new RecordIndexException(e);
 		} finally {
 			close(indexWriter);
+		}
+	}
+
+	private void clean(IndexWriter indexWriter) {
+		try {
+			indexWriter.deleteAll();
+		} catch (Throwable t) {
+			//DO NOTHING
 		}
 	}
 
