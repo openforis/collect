@@ -20,6 +20,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
+import org.openforis.idm.model.Node;
 
 /**
  * 
@@ -28,7 +29,9 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
  */
 public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus> {
 
-	private static final String[] VALIDATION_REPORT_HEADERS = new String[] {"Record","Phase","Field path","Field path (labels)","Error message"};
+	private static final String[] VALIDATION_REPORT_HEADERS = new String[] {
+			"Record","Phase","Attribute Schema Path",
+			"Field path","Field path (labels)","Error message"};
 
 	private static Log LOG = LogFactory.getLog(ValidationReportProcess.class);
 	
@@ -149,7 +152,9 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	protected void writeValidationReportLine(CollectRecord record, RecordValidationReportItem item) {
 		String recordKey = validationMessageBuilder.getRecordKey(record);
 		String phase = record.getStep().name();
-		String[] line = new String[]{recordKey, phase, item.getPath(), item.getPrettyFormatPath(), item.getMessage()};
+		Node<?> node = record.getNodeByInternalId(item.getNodeId());
+		String attrDefPath = node.getDefinition().getPath();
+		String[] line = new String[]{recordKey, phase, attrDefPath, item.getPath(), item.getPrettyFormatPath(), item.getMessage()};
 		switch (reportType) {
 		case CSV:
 			csvWriter.writeNext(line);
