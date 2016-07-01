@@ -135,7 +135,7 @@ public class MondrianCubeGenerator {
 							hierarchy.table = new Table(entityName);
 						}
 						
-						hierarchy.levels.add(generateLevel(childDef));
+						hierarchy.levels.addAll(generateLevel(childDef));
 						
 						dimension.hierarchy = hierarchy;
 						
@@ -313,13 +313,13 @@ public class MondrianCubeGenerator {
 			hierarchy.levels.add(level2);
 		
 		} else {
-			Level level = generateLevel(nodeDef);
-			hierarchy.levels.add(level);
+			List<Level> levels = generateLevel(nodeDef);
+			hierarchy.levels.addAll(levels);
 		}
 		return dimension;
 	}
 
-	private String extractCodeListTableName(CodeAttributeDefinition codeAttrDef) {
+	private String extractCodeListName(CodeAttributeDefinition codeAttrDef) {
 		StringBuffer codeListName = new StringBuffer( codeAttrDef.getList().getName() );
 		
 		int levelIdx = codeAttrDef.getLevelIndex();
@@ -332,13 +332,19 @@ public class MondrianCubeGenerator {
 				codeListName.append(currentLevel.getName());
 			}
 		}
-		return codeListName.append(rdbConfig.getCodeListTableSuffix()).toString();
+		return codeListName.toString();
 	}
 	
-	private Level generateLevel(NodeDefinition nodeDef) {
+	private String extractCodeListTableName(CodeAttributeDefinition codeAttrDef) {
+		return extractCodeListName(codeAttrDef) + rdbConfig.getCodeListTableSuffix();
+	}
+	
+	private List<Level> generateLevel(NodeDefinition nodeDef) {
+		List<Level> levels = new ArrayList<Level>();
 		String attrName = nodeDef.getName();
 		String attrLabel = extractFailsafeLabel(nodeDef);
 		Level level = new Level(attrLabel);
+		levels.add(level);
 		if (nodeDef instanceof NumericAttributeDefinition) {
 			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? "Integer": "Numeric";
 		} else if (nodeDef instanceof CodeAttributeDefinition) {
@@ -353,10 +359,22 @@ public class MondrianCubeGenerator {
 			level.table = codeTableName;
 			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
 			level.nameColumn = codeTableName.substring(0, codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + language ;
+			
+			Level levelId = new Level( attrLabel + " -  ID");
+			levelId.type = "String";	
+			levelId.table = codeTableName;
+			levelId.column = codeTableName + rdbConfig.getIdColumnSuffix();
+			levelId.nameColumn =  extractCodeListName(codeDef);
+			
+			levels.add(levelId);
+			
 		} else {
 			level.column = attrName;
 		}
-		return level;
+		
+		
+		
+		return levels;
 	}
 
 	private String extractFailsafeLabel(NodeDefinition nodeDef) {

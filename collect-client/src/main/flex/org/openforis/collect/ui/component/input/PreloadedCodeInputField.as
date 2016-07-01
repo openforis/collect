@@ -77,20 +77,20 @@ package org.openforis.collect.ui.component.input
 		public function selectionChangeHandler(event:UIEvent):void {
 			var selectedItem:Object = event.obj;
 			if ( ! multiple || ! multipleSelectionAllowed) {
-				for each(var itm:Object in selectedItems) {
+				for each(var itm:Object in _selectedItems) {
 					if (itm != selectedItem) {
 						//reset selection
 						if (itm.hasOwnProperty("selected")) {
 							itm.selected = false;
 						}
-						CollectionUtil.removeItem(selectedItems, itm);
+						CollectionUtil.removeItem(_selectedItems, itm);
 					}
 				}
 			}
-			if ( ! CollectionUtil.contains(selectedItems, selectedItem) && (! selectedItem.hasOwnProperty("selected") || selectedItem.selected) ) {
-				selectedItems.addItem(selectedItem);
+			if ( ! CollectionUtil.contains(_selectedItems, selectedItem) && (! selectedItem.hasOwnProperty("selected") || selectedItem.selected) ) {
+				_selectedItems.addItem(selectedItem);
 			} else {
-				CollectionUtil.removeItem(selectedItems, selectedItem);
+				CollectionUtil.removeItem(_selectedItems, selectedItem);
 			}
 			dispatchEvent(new Event("apply"));
 			dispatchEvent(new Event("selectedItemChange"));
@@ -98,14 +98,14 @@ package org.openforis.collect.ui.component.input
 		
 		[Bindable(event="selectedItemsChange")]
 		public function get selectedIndex():int {
-			var selectedItem:Object = selectedItem();
-			return selectedItem == null ? -1 : getSelectableItemIndex(selectedItem);
+			var item:Object = selectedItem;
+			return item == null ? -1 : getSelectableItemIndex(item);
 		}
 
-		[Bindable(event="selectedItemsChange")]
+		//[Bindable(event="selectedItemsChange")]
 		public function get selectedItem():Object {
-			if ( selectableItems != null && selectedItems != null && selectedItems.length == 1 ) {
-				return selectedItems.getItemAt(0);
+			if ( _selectableItems != null && _selectedItems != null && _selectedItems.length == 1 ) {
+				return _selectedItems.getItemAt(0);
 			} else {
 				return null;
 			}	
@@ -120,9 +120,9 @@ package org.openforis.collect.ui.component.input
 		private function getSelectableItemIndex(item:Object):int {
 			var index:int;
 			if (item is CodeListItemProxy) {
-				index = CollectionUtil.getItemIndex(selectableItems, "code", item.code);
+				index = CollectionUtil.getItemIndex(_selectableItems, "code", item.code);
 			} else if (DropDownInputFieldPresenter.isMissingValueItem(item)) { 
-				index = CollectionUtil.getItemIndex(selectableItems, "shortCut", item.shortCut);
+				index = CollectionUtil.getItemIndex(_selectableItems, "shortCut", item.shortCut);
 			} else {
 				index = -1;
 			}

@@ -182,7 +182,7 @@ var submitForm = function(submitCounter) {
 			if (submitCounter < 5) {
 				submitForm(submitCounter + 1);
 			} else {
-				showErrorMessage("Cannot save the data, the Collect Earth server is not running!");
+				showErrorMessage("Cannot save the data. There was a problem communicating with Collect Earth!");
 			}
 			
 	}).always(function() {
@@ -636,7 +636,7 @@ var setValueInInputField = function(inputField, value) {
 				var splitted = value.split(SEPARATOR_MULTIPLE_PARAMETERS);
 				splitted
 						.forEach(function(value, index) {
-							var button = activeCodeItemsContainer.find(".code-item[value=" + escapeRegExp(value) + "]");
+							var button = activeCodeItemsContainer.find(".code-item[value='" + escapeRegExp(value) + "']");
 							button.addClass('active');
 						});
 			}
