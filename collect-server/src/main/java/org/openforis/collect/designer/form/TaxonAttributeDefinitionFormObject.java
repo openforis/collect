@@ -3,6 +3,14 @@
  */
 package org.openforis.collect.designer.form;
 
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.CODE_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.FAMILY_CODE_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.FAMILY_SCIENTIFIC_NAME_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.LANGUAGE_CODE_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +32,13 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	private List<String> qualifiers;
 	private Boolean includeUniqueVernacularName;
 	private Boolean showFamily;
+	private String codeFieldLabel;
+	private String scientificNameFieldLabel;
+	private String vernacularNameFieldLabel;
+	private String languageCodeFieldLabel;
+	private String languageVarietyFieldLabel;
+	private String familyCodeFieldLabel;
+	private String familyNameFieldLabel;
 	
 	TaxonAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -42,6 +57,14 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		CollectAnnotations annotations = survey.getAnnotations();
 		showFamily = annotations.isShowFamily(source);
 		includeUniqueVernacularName = annotations.isIncludeUniqueVernacularName(source);
+		
+		codeFieldLabel = source.getFieldLabel(CODE_FIELD_NAME, languageCode);
+		scientificNameFieldLabel = source.getFieldLabel(SCIENTIFIC_NAME_FIELD_NAME, languageCode);
+		vernacularNameFieldLabel = source.getFieldLabel(VERNACULAR_NAME_FIELD_NAME, languageCode);
+		languageCodeFieldLabel = source.getFieldLabel(LANGUAGE_CODE_FIELD_NAME, languageCode);
+		languageVarietyFieldLabel = source.getFieldLabel(LANGUAGE_VARIETY_FIELD_NAME, languageCode);
+		familyCodeFieldLabel = source.getFieldLabel(FAMILY_CODE_FIELD_NAME, languageCode);
+		familyNameFieldLabel = source.getFieldLabel(FAMILY_SCIENTIFIC_NAME_FIELD_NAME, languageCode);
 	}
 
 	@Override
@@ -50,6 +73,13 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		dest.setTaxonomy(taxonomy);
 		dest.setHighestTaxonRank(TaxonRank.fromName(highestRank));
 		dest.setQualifiers(qualifiers);
+		dest.setFieldLabel(CODE_FIELD_NAME, languageCode, codeFieldLabel);
+		dest.setFieldLabel(SCIENTIFIC_NAME_FIELD_NAME, languageCode, scientificNameFieldLabel);
+		dest.setFieldLabel(VERNACULAR_NAME_FIELD_NAME, languageCode, vernacularNameFieldLabel);
+		dest.setFieldLabel(LANGUAGE_CODE_FIELD_NAME, languageCode, languageCodeFieldLabel);
+		dest.setFieldLabel(LANGUAGE_VARIETY_FIELD_NAME, languageCode, languageVarietyFieldLabel);
+		dest.setFieldLabel(FAMILY_CODE_FIELD_NAME, languageCode, familyCodeFieldLabel);
+		dest.setFieldLabel(FAMILY_SCIENTIFIC_NAME_FIELD_NAME, languageCode, familyNameFieldLabel);
 		
 		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
@@ -95,6 +125,62 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	
 	public void setShowFamily(Boolean showFamily) {
 		this.showFamily = showFamily;
+	}
+
+	public String getCodeFieldLabel() {
+		return codeFieldLabel;
+	}
+
+	public void setCodeFieldLabel(String codeFieldLabel) {
+		this.codeFieldLabel = codeFieldLabel;
+	}
+
+	public String getScientificNameFieldLabel() {
+		return scientificNameFieldLabel;
+	}
+
+	public void setScientificNameFieldLabel(String scientificNameFieldLabel) {
+		this.scientificNameFieldLabel = scientificNameFieldLabel;
+	}
+
+	public String getVernacularNameFieldLabel() {
+		return vernacularNameFieldLabel;
+	}
+
+	public void setVernacularNameFieldLabel(String vernacularNameFieldLabel) {
+		this.vernacularNameFieldLabel = vernacularNameFieldLabel;
+	}
+
+	public String getLanguageCodeFieldLabel() {
+		return languageCodeFieldLabel;
+	}
+
+	public void setLanguageCodeFieldLabel(String languageCodeFieldLabel) {
+		this.languageCodeFieldLabel = languageCodeFieldLabel;
+	}
+
+	public String getLanguageVarietyFieldLabel() {
+		return languageVarietyFieldLabel;
+	}
+
+	public void setLanguageVarietyFieldLabel(String languageVarietyFieldLabel) {
+		this.languageVarietyFieldLabel = languageVarietyFieldLabel;
+	}
+
+	public String getFamilyCodeFieldLabel() {
+		return familyCodeFieldLabel;
+	}
+
+	public void setFamilyCodeFieldLabel(String familyCodeFieldLabel) {
+		this.familyCodeFieldLabel = familyCodeFieldLabel;
+	}
+
+	public String getFamilyNameFieldLabel() {
+		return familyNameFieldLabel;
+	}
+
+	public void setFamilyNameFieldLabel(String familyNameFieldLabel) {
+		this.familyNameFieldLabel = familyNameFieldLabel;
 	}
 	
 }
