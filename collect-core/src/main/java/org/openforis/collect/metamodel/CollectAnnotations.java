@@ -72,6 +72,7 @@ public class CollectAnnotations {
 		COLLECT_EARTH_BING_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "bingKey"), "GENERATE YOUR OWN BING MAPS KEY AT https://www.bingmapsportal.com"),
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
 		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false), 
+		COLLECT_EARTH_OPEN_YANDEX_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openYandexMaps"), false),
 		COLLECT_EARTH_OPEN_GEE_EXPLORER(new QName(COLLECT_EARTH_NAMESPACE_URI, "openExplorer"), true), 
 		COLLECT_EARTH_OPEN_GEE_CODE_EDITOR(new QName(COLLECT_EARTH_NAMESPACE_URI, "openCodeEditor"), true), 
 		COLLECT_EARTH_OPEN_STREET_VIEW(new QName(COLLECT_EARTH_NAMESPACE_URI, "openStreetView"), false)
@@ -238,6 +239,14 @@ public class CollectAnnotations {
 	
 	public void setBingMapsEnabled( boolean value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS, value);
+	}
+	
+	public boolean isYandexMapsEnabled() {
+		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_YANDEX_MAPS);
+	}
+	
+	public void setYandexMapsEnabled( boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_YANDEX_MAPS, value);
 	}
 	
 	public boolean isGEEExplorerEnabled() {

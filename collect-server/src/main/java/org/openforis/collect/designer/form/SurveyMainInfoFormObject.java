@@ -19,6 +19,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String collectEarthPlotArea;
 	private String bingMapsKey;
 	private boolean openBingMaps;
+	private boolean openYandexMaps;
 	private boolean openGEEExplorer;
 	private boolean openGEECodeEditor;
 	private boolean openStreetView;
@@ -34,6 +35,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
 		bingMapsKey = annotations.getBingMapsKey();
 		openBingMaps = annotations.isBingMapsEnabled();
+		openYandexMaps = annotations.isYandexMapsEnabled();
 		openStreetView = annotations.isStreetViewEnabled();
 		openGEEExplorer = annotations.isGEEExplorerEnabled();
 		openGEECodeEditor = annotations.isGEECodeEditorEnabled();
@@ -55,6 +57,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
 		annotations.setBingMapsKey(bingMapsKey);
 		annotations.setBingMapsEnabled( openBingMaps );
+		annotations.setYandexMapsEnabled( openYandexMaps );
 		annotations.setStreetViewEnabled( openStreetView );
 		annotations.setGEECodeEditorEnabled( openGEECodeEditor );
 		annotations.setGEEExplorerEnabled(openGEEExplorer );
