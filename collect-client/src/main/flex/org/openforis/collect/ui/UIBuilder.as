@@ -539,36 +539,7 @@ package org.openforis.collect.ui {
 				l = getLabel(defnLabel, 100, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 				//subheader
-				if ( taxonAttr.showFamily ) {
-					l = getLabel(Message.get('edit.taxon.familyScientificName'), TaxonAttributeRenderer.FAMILY_SCIENTIFIC_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
-					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-					compositeAttributeLabelsGroup.addElement(l);
-				}
-				if ( taxonAttr.codeVisible ) {
-					l = getLabel(Message.get('edit.taxon.code'), TaxonAttributeRenderer.CODE_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
-					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-					compositeAttributeLabelsGroup.addElement(l);
-				}
-				if ( taxonAttr.scientificNameVisible ) {
-					l = getLabel(Message.get('edit.taxon.scientificName'), TaxonAttributeRenderer.SCIENTIFIC_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
-					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-					compositeAttributeLabelsGroup.addElement(l);
-				}
-				if ( taxonAttr.vernacularNameVisible ) {
-					l = getLabel(Message.get('edit.taxon.vernacularName'), TaxonAttributeRenderer.VERNACULAR_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
-					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-					compositeAttributeLabelsGroup.addElement(l);
-				}
-				if ( taxonAttr.languageCodeVisible ) {
-					l = getLabel(Message.get('edit.taxon.languageCode'), TaxonAttributeRenderer.LANGUAGE_CODE_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
-					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-					compositeAttributeLabelsGroup.addElement(l);
-				}
-				if ( taxonAttr.languageVarietyVisible ) {
-					l = getLabel(Message.get('edit.taxon.languageVariety'), TaxonAttributeRenderer.LANGUAGE_VARIETY_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
-					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-					compositeAttributeLabelsGroup.addElement(l);
-				}
+				addTaxonAttributeLabels(compositeAttributeLabelsGroup, TaxonAttributeDefinitionProxy(defn), directionByColumns);
 				result.addElement(compositeAttributeLabelsGroup);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
 				//attribute label
@@ -596,6 +567,48 @@ package org.openforis.collect.ui {
 				result.addElement(l);
 			}
 			return result;
+		}
+		
+		private static function addTaxonAttributeLabels(compositeAttributeLabelsGroup:Group, 
+															 defn:TaxonAttributeDefinitionProxy, directionByColumns:Boolean):void {
+			var l:Label;
+			var labelText:String;
+			if ( defn.showFamily ) {
+				labelText = defn.getFieldLabelText("family_scientific_name", Message.get('edit.taxon.familyScientificName'));
+				l = getLabel(labelText, TaxonAttributeRenderer.FAMILY_SCIENTIFIC_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+			}
+			if ( defn.codeVisible ) {
+				labelText = defn.getFieldLabelText("code", Message.get('edit.taxon.code'));
+				l = getLabel(labelText, TaxonAttributeRenderer.CODE_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+			}
+			if ( defn.scientificNameVisible ) {
+				labelText = defn.getFieldLabelText("scientific_name", Message.get('edit.taxon.scientificName'));
+				l = getLabel(labelText, TaxonAttributeRenderer.SCIENTIFIC_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+			}
+			if ( defn.vernacularNameVisible ) {
+				labelText = defn.getFieldLabelText("vernacular_name", Message.get('edit.taxon.vernacularName'));
+				l = getLabel(labelText, TaxonAttributeRenderer.VERNACULAR_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+			}
+			if ( defn.languageCodeVisible ) {
+				labelText = defn.getFieldLabelText("language_code", Message.get('edit.taxon.languageCode'));
+				l = getLabel(labelText, TaxonAttributeRenderer.LANGUAGE_CODE_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+			}
+			if ( defn.languageVarietyVisible ) {
+				labelText = defn.getFieldLabelText("language_variety", Message.get('edit.taxon.languageVariety'));
+				l = getLabel(labelText, TaxonAttributeRenderer.LANGUAGE_VARIETY_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				compositeAttributeLabelsGroup.addElement(l);
+			}
 		}
 		
 		private static function addCoordinateAttributeLabels(compositeAttributeLabelsGroup:Group, 

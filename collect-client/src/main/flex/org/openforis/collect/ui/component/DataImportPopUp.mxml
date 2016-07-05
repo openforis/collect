@@ -9,7 +9,14 @@
 		 >
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import org.openforis.collect.i18n.Message;
+			
+			private const types:ArrayCollection = new ArrayCollection([
+				Message.get("global.dropDownPrompt"), 
+				Message.get('dataImport.fileFormat.xml'), 
+				Message.get('dataImport.fileFormat.csv')]
+			);
 		]]>
 	</fx:Script>
 	
@@ -22,13 +29,10 @@
 			<s:Label text="{Message.get('dataImport.fileFormat')}"
 					  styleName="formLabel"/>
 			
-			<s:DropDownList id="typeDropDownList" selectedIndex="0" width="350">
-				<mx:ArrayCollection>
-					<fx:String>-- Select one --</fx:String>
-					<fx:String>Backup file (.collect-data, .collect-backup or .zip file)</fx:String>
-					<fx:String>CSV file</fx:String>
-				</mx:ArrayCollection>
-			</s:DropDownList>
+			<s:DropDownList id="typeDropDownList" 
+							selectedIndex="0" 
+							width="350" 
+							dataProvider="{types}" />
 		</s:HGroup>
 						
 		

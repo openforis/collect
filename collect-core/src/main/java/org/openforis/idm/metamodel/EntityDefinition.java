@@ -57,6 +57,14 @@ public class EntityDefinition extends NodeDefinition {
 		childDefinitionByName.put(newName, childDef);
 		updateChildDefinitionNames();
 	}
+	
+	@Override
+	protected void resetPath() {
+		super.resetPath();
+		for (NodeDefinition child : getChildDefinitions()) {
+			child.resetPath();
+		}
+	}
 
 	public boolean isRoot() {
 		return getParentDefinition() == null;

@@ -260,7 +260,7 @@
       		</row>
       	</rows>
       </grid>
-      <groupbox closable="true" open="false" visible="@load(not vm.rootEntity)"
+      <groupbox closable="true" open="false"
       	sclass="collapsible"
       	mold="3d" width="100%">
       	<attribute name="onOpen"><![CDATA[

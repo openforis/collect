@@ -125,40 +125,50 @@
 		<s:VGroup>
 			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
 					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.familyScientificName')}"
-						 includeIn="vertical_form" />
+				<detail:AttributeFieldLabel includeIn="vertical_form" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.taxon.familyScientificName')}"
+											field="family_scientific_name" showTruncationTip="true" styleName="bold"/>
 				<fx:Reparent target="familyScientificNameTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).codeVisible}"
 					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).codeVisible}">
-				<s:Label width="{subLabelWidth}" 
-						 styleName="bold" 
-						 text="{Message.get('edit.taxon.code')}"
-						 includeIn="vertical_form" />
+				<detail:AttributeFieldLabel includeIn="vertical_form" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.taxon.code')}"
+											field="code" showTruncationTip="true" styleName="bold"/>
 				<fx:Reparent target="codeTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).scientificNameVisible}"
 					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).scientificNameVisible}">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.scientificName')}"
-						 includeIn="vertical_form" />
+				<detail:AttributeFieldLabel includeIn="vertical_form" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.taxon.scientificName')}"
+											field="scientific_name" showTruncationTip="true" styleName="bold"/>
 				<fx:Reparent target="scientificNameTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).vernacularNameVisible}"
 					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).vernacularNameVisible}">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.vernacularName')}"
-						 includeIn="vertical_form" />
+				<detail:AttributeFieldLabel includeIn="vertical_form" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.taxon.vernacularName')}"
+											field="vernacular_name" showTruncationTip="true" styleName="bold"/>
 				<fx:Reparent target="vernacularNameTextInput" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).languageCodeVisible}"
 					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).languageCodeVisible}">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageCode')}"
-						 includeIn="vertical_form" />
+				<detail:AttributeFieldLabel includeIn="vertical_form" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.taxon.languageCode')}"
+											field="language_code" showTruncationTip="true" styleName="bold"/>
 				<fx:Reparent target="languageAutocomplete" includeIn="vertical" />
 			</s:HGroup>
 			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).languageVarietyVisible}"
 					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).languageVarietyVisible}">
-				<s:Label width="{subLabelWidth}" styleName="bold" text="{Message.get('edit.taxon.languageVariety')}"
-						 includeIn="vertical_form" />
+				<detail:AttributeFieldLabel includeIn="vertical_form" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.taxon.languageVariety')}"
+											field="language_variety" showTruncationTip="true" styleName="bold"/>
 				<fx:Reparent target="languageVarietyTextInput" includeIn="vertical" />
 			</s:HGroup>
 		</s:VGroup>
