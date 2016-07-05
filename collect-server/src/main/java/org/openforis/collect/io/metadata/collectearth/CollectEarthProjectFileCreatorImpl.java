@@ -180,6 +180,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("ui_language", language);
 		p.put("bing_maps_key", getBingMapsKey(survey));
 		p.put("open_bing_maps", isBingMapsEnabled(survey));
+		p.put("open_yandex_maps", isYandexMapsEnabled(survey));
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
 		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
 		p.put("open_street_view", isStreetViewEnabled(survey));
@@ -217,6 +218,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private String isBingMapsEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isBingMapsEnabled()?"true":"false";
+	}
+	
+	private String isYandexMapsEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isYandexMapsEnabled()?"true":"false";
 	}
 	
 	private String isGEEExplorerEnabled(CollectSurvey survey){

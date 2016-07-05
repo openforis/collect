@@ -135,6 +135,14 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public void setOpenBingMaps(boolean openBingMaps) {
 		this.openBingMaps = openBingMaps;
 	}
+	
+	public boolean isOpenYandexMaps() {
+		return openYandexMaps;
+	}
+
+	public void setOpenYandexMaps(boolean openYandexMaps) {
+		this.openYandexMaps = openYandexMaps;
+	}
 
 	public boolean isOpenGEEExplorer() {
 		return openGEEExplorer;
