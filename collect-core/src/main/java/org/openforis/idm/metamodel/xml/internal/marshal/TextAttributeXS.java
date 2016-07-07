@@ -18,7 +18,6 @@ class TextAttributeXS extends AttributeDefinitionXS<TextAttributeDefinition> {
 		super(TEXT);
 	}
 
-
 	@Override
 	protected void attributes(TextAttributeDefinition defn) throws IOException {
 		super.attributes(defn);

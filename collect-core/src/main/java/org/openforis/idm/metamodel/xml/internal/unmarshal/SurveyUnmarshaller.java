@@ -65,13 +65,13 @@ public class SurveyUnmarshaller extends IdmlPullReader {
 		initSurvey();
 		String lastId = getAttribute(LAST_ID, true);
 		Boolean published = getBooleanAttribute(PUBLISHED, false);
-		String creationDate = getAttribute(CREATED, false);
-		String modifiedDate = getAttribute(MODIFIED, false);
 		survey.setLastId(Integer.valueOf(lastId));
 		survey.setPublished(published == null ? false : published);
+		String creationDate = getAttribute(CREATED, false);
 		if (creationDate != null) {
 			survey.setCreationDate(Dates.parseDateTime(creationDate));
 		}
+		String modifiedDate = getAttribute(MODIFIED, false);
 		if (modifiedDate != null) {
 			survey.setModifiedDate(Dates.parseDateTime(modifiedDate));
 		}

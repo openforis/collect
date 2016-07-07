@@ -50,6 +50,7 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.openforis.idm.metamodel.xml.internal.marshal.SurveyMarshaller.SurveyMarshalParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Propagation;
@@ -443,9 +444,13 @@ public class SurveyManager {
 	public void marshalSurvey(Survey survey, OutputStream os,
 			boolean marshalCodeLists, boolean marshalPersistedCodeLists,
 			boolean marshalExternalCodeLists) {
+		marshalSurvey(survey, os, new SurveyMarshalParameters(marshalCodeLists, marshalPersistedCodeLists, 
+				marshalExternalCodeLists, survey.getDefaultLanguage()));
+	}
+	
+	public void marshalSurvey(Survey survey, OutputStream os, SurveyMarshalParameters parameters) {
 		try {
-			surveySerializer.marshal(survey, os, marshalCodeLists,
-					marshalPersistedCodeLists, marshalExternalCodeLists);
+			surveySerializer.marshal(survey, os, parameters);
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}

@@ -206,7 +206,7 @@ abstract class AttributeDefinitionXS<T extends AttributeDefinition> extends Node
 		
 		@Override
 		protected void marshalInstances(T defn) throws IOException {
-			String defaultLanguage = defn.getSurvey().getDefaultLanguage();
+			String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 			marshal(defn.getFieldLabels(), defaultLanguage);
 		}
 	}

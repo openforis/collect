@@ -103,6 +103,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	private boolean includeData;
 	private boolean includeRecordFiles;
 	private RecordFilter recordFilter;
+	private String outputSurveyDefaultLanguage;
 	private OutputFormat outputFormat;
 	
 	//output
@@ -202,6 +203,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		IdmlExportTask task = createTask(IdmlExportTask.class);
 		task.setSurvey(survey);
 		task.setOutputStream(zipOutputStream);
+		task.setOutputSurveyDefaultLanguage(outputSurveyDefaultLanguage);
 		task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, SURVEY_XML_ENTRY_NAME));
 		addTask(task);
 	}
@@ -340,6 +342,10 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	
 	public void setIncludeRecordFiles(boolean includeRecordFiles) {
 		this.includeRecordFiles = includeRecordFiles;
+	}
+	
+	public void setOutputSurveyDefaultLanguage(String outputSurveyDefaultLanguage) {
+		this.outputSurveyDefaultLanguage = outputSurveyDefaultLanguage;
 	}
 	
 	public boolean isFull() {

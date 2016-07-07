@@ -59,7 +59,7 @@ public abstract class NodeDefinitionXS<T extends NodeDefinition, P> extends Vers
 		
 		@Override
 		protected void marshalInstances(T defn) throws IOException {
-			String defaultLanguage = defn.getSurvey().getDefaultLanguage();
+			String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 			marshal(defn.getLabels(), defaultLanguage);
 		}
 	}
@@ -72,7 +72,7 @@ public abstract class NodeDefinitionXS<T extends NodeDefinition, P> extends Vers
 		
 		@Override
 		protected void marshalInstances(T defn) throws IOException {
-			String defaultLanguage = defn.getSurvey().getDefaultLanguage();
+			String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 			marshal(defn.getDescriptions(), defaultLanguage);
 		}
 	}
@@ -92,7 +92,7 @@ public abstract class NodeDefinitionXS<T extends NodeDefinition, P> extends Vers
 		
 		@Override
 		protected void marshalInstances(T defn) throws IOException {
-			String defaultLanguage = defn.getSurvey().getDefaultLanguage();
+			String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 			marshal(defn.getPrompts(), defaultLanguage);
 		}
 	}

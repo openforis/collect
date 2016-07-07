@@ -67,11 +67,11 @@ public class UIOptionsBinder implements
 	}
 
 	@Override
-	public String marshal(UIOptions options) {
+	public String marshal(UIOptions options, String defaultLanguage) {
 		try {
 			UIOptionsSerializer serializer = new UIOptionsSerializer();
 			Writer writer = new StringWriter();
-			serializer.write(options, writer);
+			serializer.write(options, writer, defaultLanguage);
 			String result = writer.toString();
 			return result;
 		} catch (Exception e) {

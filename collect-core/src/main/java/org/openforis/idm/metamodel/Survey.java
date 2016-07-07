@@ -68,6 +68,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		this.referenceDataSchema = new ReferenceDataSchema();
 		this.lastId = 1;
 		this.creationDate = this.modifiedDate = new Date();
+		this.languages = new ArrayList<String>();
 	}
 	
 	/**
@@ -563,7 +564,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 	
 	public String getDefaultLanguage() {
-		if ( languages == null || languages.isEmpty() ) {
+		if (languages.isEmpty()) {
 			return null;
 		} else {
 			return languages.get(0);
@@ -576,10 +577,9 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 	
 	public void addLanguage(String lang) {
-		if ( languages == null ) {
-			this.languages = new ArrayList<String>();
+		if ( ! getLanguages().contains(lang) ) {
+			languages.add(lang);
 		}
-		languages.add(lang);
 		if ( languages.size() == 1 ) {
 			/*
 			 * Workaround: assign the default language to void language texts that can have been inserted 
@@ -600,7 +600,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 	
 	public void removeLanguage(String lang) {
-		if ( languages == null ) {
+		if (languages.isEmpty()) {
 			return;
 		}
 		languages.remove(lang);

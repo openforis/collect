@@ -15,7 +15,10 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.URI;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -34,10 +37,8 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 
-	private boolean codeListsMarshalEnabled;
-	private boolean persistedCodeListsMarshalEnabled;
-	private boolean externalCodeListsMarshalEnabled;
 	private SurveyIdmlBinder binder;
+	private SurveyMarshalParameters parameters;
 
 	public SurveyMarshaller(SurveyIdmlBinder binder) {
 		this(binder, true, false, false);
@@ -47,12 +48,19 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 			boolean codeListsMarshalEnabled,
 			boolean persistedCodeListsMarshalEnabled,
 			boolean externalCodeListsMarshalEnabled) {
+		this(binder, new SurveyMarshalParameters(
+				codeListsMarshalEnabled,
+				persistedCodeListsMarshalEnabled,
+				externalCodeListsMarshalEnabled,
+				null)
+		);
+	}
+	
+	public SurveyMarshaller(SurveyIdmlBinder binder, SurveyMarshalParameters parameters) {
 		super(IDML3_NAMESPACE_URI, SURVEY);
 		
 		this.binder = binder;
-		this.codeListsMarshalEnabled = codeListsMarshalEnabled;
-		this.persistedCodeListsMarshalEnabled = persistedCodeListsMarshalEnabled;
-		this.externalCodeListsMarshalEnabled = externalCodeListsMarshalEnabled;
+		this.parameters = parameters;
 		
 		addChildMarshallers(
 				new ProjectXS(),
@@ -60,7 +68,7 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 				new CycleXS(),
 				new DescriptionXS(),
 				new LanguageXS(),
-				new ApplicationOptionsXS(binder),
+				new ApplicationOptionsXS(binder, parameters.getOutputSurveyDefaultLanguage()),
 				new VersioningXS(), 
 				new CodeListsXS(),
 				new UnitsXS(),
@@ -72,12 +80,14 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 	@Override
 	public synchronized void marshal(Survey survey, OutputStream os,
 			String enc) throws IOException {
+		updateOutputDefaultLanguageParameter(survey);
 		super.marshal(survey, os, enc);
 	}
-	
+
 	@Override
 	public synchronized void marshal(Survey survey, Writer wr, String enc)
 			throws IOException {
+		updateOutputDefaultLanguageParameter(survey);
 		super.marshal(survey, wr, enc);
 	}
 	
@@ -89,6 +99,12 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 		super.start(survey);
 	}
 
+	private void updateOutputDefaultLanguageParameter(Survey survey) {
+		if (this.parameters.outputSurveyDefaultLanguage == null) {
+			this.parameters.outputSurveyDefaultLanguage = survey.getDefaultLanguage();
+		}
+	}
+	
 	protected void setCustomNamespacePrefixes(Survey survey) throws IOException {
 		List<String> uris = survey.getCustomNamespaces();
 		for (String uri : uris) {
@@ -156,7 +172,7 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 
 		@Override
 		protected void marshalInstances(Survey survey) throws IOException {
-			marshal(survey.getDescriptions(), survey.getDefaultLanguage());
+			marshal(survey.getDescriptions(), parameters.outputSurveyDefaultLanguage);
 		}
 	}
 
@@ -167,7 +183,10 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 
 		@Override
 		protected void marshalInstances(Survey survey) throws IOException {
-			marshal(survey.getLanguages());
+			Set<String> sortedLanguages = new LinkedHashSet<String>();
+			sortedLanguages.add(((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage());
+			sortedLanguages.addAll(survey.getLanguages());
+			marshal(new ArrayList<String>(sortedLanguages));
 		}
 	}
 	
@@ -175,16 +194,87 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 		return binder;
 	}
 
+	public SurveyMarshalParameters getParameters() {
+		return parameters;
+	}
+	
+	/**
+	 * 
+	 * @deprecated Use the corresponding method in the parameters object
+	 */
+	@Deprecated
 	public boolean isCodeListsMarshalEnabled() {
-		return codeListsMarshalEnabled;
+		return parameters.codeListsMarshalEnabled;
 	}
 
+	/**
+	 * 
+	 * @deprecated Use the corresponding method in the parameters object
+	 */
+	@Deprecated
 	public boolean isPersistedCodeListsMarshalEnabled() {
-		return persistedCodeListsMarshalEnabled;
+		return parameters.persistedCodeListsMarshalEnabled;
 	}
 
+	/**
+	 * 
+	 * @deprecated Use the corresponding method in the parameters object
+	 */
+	@Deprecated
 	public boolean isExternalCodeListsMarshalEnabled() {
-		return externalCodeListsMarshalEnabled;
+		return parameters.externalCodeListsMarshalEnabled;
+	}
+	
+	public static class SurveyMarshalParameters {
+		private boolean codeListsMarshalEnabled;
+		private boolean persistedCodeListsMarshalEnabled;
+		private boolean externalCodeListsMarshalEnabled;
+		private String outputSurveyDefaultLanguage;
+		
+		public SurveyMarshalParameters(
+				boolean codeListsMarshalEnabled, 
+				boolean persistedCodeListsMarshalEnabled,
+				boolean externalCodeListsMarshalEnabled, 
+				String outputSurveyDefaultLanguage) {
+			super();
+			this.codeListsMarshalEnabled = codeListsMarshalEnabled;
+			this.persistedCodeListsMarshalEnabled = persistedCodeListsMarshalEnabled;
+			this.externalCodeListsMarshalEnabled = externalCodeListsMarshalEnabled;
+			this.outputSurveyDefaultLanguage = outputSurveyDefaultLanguage;
+		}
+
+		public boolean isCodeListsMarshalEnabled() {
+			return codeListsMarshalEnabled;
+		}
+		
+		public void setCodeListsMarshalEnabled(boolean codeListsMarshalEnabled) {
+			this.codeListsMarshalEnabled = codeListsMarshalEnabled;
+		}
+		
+		public boolean isExternalCodeListsMarshalEnabled() {
+			return externalCodeListsMarshalEnabled;
+		}
+		
+		public void setExternalCodeListsMarshalEnabled(boolean externalCodeListsMarshalEnabled) {
+			this.externalCodeListsMarshalEnabled = externalCodeListsMarshalEnabled;
+		}
+		
+		public String getOutputSurveyDefaultLanguage() {
+			return outputSurveyDefaultLanguage;
+		}
+		
+		public void setOutputSurveyDefaultLanguage(String outputSurveyDefaultLanguage) {
+			this.outputSurveyDefaultLanguage = outputSurveyDefaultLanguage;
+		}
+		
+		public boolean isPersistedCodeListsMarshalEnabled() {
+			return persistedCodeListsMarshalEnabled;
+		}
+		
+		public void setPersistedCodeListsMarshalEnabled(boolean persistedCodeListsMarshalEnabled) {
+			this.persistedCodeListsMarshalEnabled = persistedCodeListsMarshalEnabled;
+		}
+		
 	}
 	
 }

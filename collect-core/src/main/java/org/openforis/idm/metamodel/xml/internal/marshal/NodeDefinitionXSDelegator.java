@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
  * @author G. Miceli
  */
 public class NodeDefinitionXSDelegator extends PolymorphicXmlSerializer<NodeDefinition, EntityDefinition> {
+	
 	public NodeDefinitionXSDelegator(EntityDefinitionXS entityXS) {
 		setDelegate(EntityDefinition.class, entityXS);
 		setDelegate(CodeAttributeDefinition.class, new CodeAttributeXS());

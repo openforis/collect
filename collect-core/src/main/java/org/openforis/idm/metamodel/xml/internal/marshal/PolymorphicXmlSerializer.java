@@ -18,6 +18,7 @@ public abstract class PolymorphicXmlSerializer<T, P> extends XmlSerializerSuppor
 	}
 	
 	protected <V extends T> void setDelegate(Class<V> clazz, XmlSerializerSupport<V, ?> delegate) {
+		delegate.setParentMarshaller(this);
 		delegateMarshallers.put(clazz, delegate);
 	}
 	
