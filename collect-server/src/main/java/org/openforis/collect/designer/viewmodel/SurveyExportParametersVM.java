@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.SuccessHandler;
@@ -273,6 +274,7 @@ public class SurveyExportParametersVM extends BaseVM {
 		surveyBackupJob.setIncludeData(parameters.isIncludeData());
 		surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
 		surveyBackupJob.setOutputFormat(org.openforis.collect.io.SurveyBackupJob.OutputFormat.valueOf(parameters.getOutputFormat()));
+		surveyBackupJob.setOutputSurveyDefaultLanguage(ObjectUtils.defaultIfNull(parameters.getLanguageCode(), survey.getDefaultLanguage()));
 		jobManager.start(surveyBackupJob, String.valueOf(survey.getId()));
 		openSurveyExportStatusPopUp(survey.getName(), surveyBackupJob);
 	}

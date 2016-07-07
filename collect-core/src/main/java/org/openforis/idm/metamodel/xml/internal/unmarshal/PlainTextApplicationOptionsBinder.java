@@ -18,7 +18,7 @@ public class PlainTextApplicationOptionsBinder implements ApplicationOptionsBind
 	} 
 
 	@Override
-	public String marshal(PlainTextApplicationOptions options) {
+	public String marshal(PlainTextApplicationOptions options, String defaultLanguage) {
 		return options.getBody();
 	}
 

@@ -84,7 +84,7 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 		
 		@Override
 		protected void marshalInstances(CodeList list) throws IOException {
-			String defaultLanguage = list.getSurvey().getDefaultLanguage();
+			String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 			marshal(list.getLabels(), defaultLanguage);
 		}
 	}
@@ -97,7 +97,7 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 		
 		@Override
 		protected void marshalInstances(CodeList list) throws IOException {
-			String defaultLanguage = list.getSurvey().getDefaultLanguage();
+			String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 			marshal(list.getDescriptions(), defaultLanguage);
 		}
 	}
@@ -199,7 +199,7 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 			
 			@Override
 			protected void marshalInstances(CodeListItem item) throws IOException {
-				String defaultLanguage = item.getSurvey().getDefaultLanguage();
+				String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 				marshal(item.getLabels(), defaultLanguage);
 			}
 
@@ -213,7 +213,7 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 			
 			@Override
 			protected void marshalInstances(CodeListItem item) throws IOException {
-				String defaultLanguage = item.getSurvey().getDefaultLanguage();
+				String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 				marshal(item.getDescriptions(), defaultLanguage);
 			}
 		}
@@ -241,12 +241,12 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 			SurveyContext context = binder.getSurveyContext();
 			List<? extends CodeListItem> items = null;
 			if ( list.isExternal() ) {
-				if ( root.isExternalCodeListsMarshalEnabled() ) {
+				if ( root.getParameters().isExternalCodeListsMarshalEnabled() ) {
 					ExternalCodeListProvider externalCodeListProvider = context.getExternalCodeListProvider();
 					items = externalCodeListProvider.getRootItems(list);
 				}
 			} else if ( list.isEmpty() ) {
-				if ( root.isPersistedCodeListsMarshalEnabled() ) {
+				if ( root.getParameters().isPersistedCodeListsMarshalEnabled() ) {
 					CodeListService codeListService = context.getCodeListService();
 					items = codeListService.loadRootItems(list);
 				}
@@ -278,12 +278,12 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 			SurveyContext context = binder.getSurveyContext();
 			List<? extends CodeListItem> items = null;
 			if ( list.isExternal() ) {
-				if ( root.isExternalCodeListsMarshalEnabled() ) {
+				if ( root.getParameters().isExternalCodeListsMarshalEnabled() ) {
 					ExternalCodeListProvider externalCodeListProvider = context.getExternalCodeListProvider();
 					items = externalCodeListProvider.getChildItems((ExternalCodeListItem) item);
 				}
 			} else if ( list.isEmpty() ) {
-				if ( root.isPersistedCodeListsMarshalEnabled() ) {
+				if ( root.getParameters().isPersistedCodeListsMarshalEnabled() ) {
 					CodeListService codeListService = context.getCodeListService();
 					items = codeListService.loadChildItems((PersistedCodeListItem) item);
 				}

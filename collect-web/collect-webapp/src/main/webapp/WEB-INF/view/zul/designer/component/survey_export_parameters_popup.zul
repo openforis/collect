@@ -83,7 +83,7 @@
 			</rows>
 		</grid>
 		
-		<grid visible="@bind(fx.outputFormat eq 'EARTH')">
+		<grid visible="@bind(fx.outputFormat eq 'EARTH' or fx.outputFormat eq 'MOBILE')">
 			<columns>
 				<column width="170px" />
 				<column width="100%" />

@@ -1,6 +1,8 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.APPLICATION_OPTIONS;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.OPTIONS;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TYPE;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,11 +20,13 @@ import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 class ApplicationOptionsXS extends XmlSerializerSupport<ApplicationOptions, Survey> {
 
 	private SurveyIdmlBinder binder;
+	private String defaultLanguage;
 
-	ApplicationOptionsXS(SurveyIdmlBinder binder) {
+	ApplicationOptionsXS(SurveyIdmlBinder binder, String defaultLanguage) {
 		super(OPTIONS);
 		setListWrapperTag(APPLICATION_OPTIONS);
 		this.binder = binder;
+		this.defaultLanguage = defaultLanguage;
 	}
 	
 	@Override
@@ -33,8 +37,7 @@ class ApplicationOptionsXS extends XmlSerializerSupport<ApplicationOptions, Surv
 	
 	@Override
 	protected void attributes(ApplicationOptions options) throws IOException {
-		String type= options.getType();
-		attribute(TYPE, type);
+		attribute(TYPE, options.getType());
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -43,7 +46,7 @@ class ApplicationOptionsXS extends XmlSerializerSupport<ApplicationOptions, Surv
 		String namespaceUri = options.getType();
 		setDefaultNamespace(namespaceUri);
 		ApplicationOptionsBinder optionsBinder = binder.getApplicationOptionsBinder(namespaceUri);
-		String xml = optionsBinder.marshal(options);
+		String xml = optionsBinder.marshal(options, defaultLanguage);
 		writeXml(xml);
 	}
 }

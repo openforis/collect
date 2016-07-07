@@ -14,7 +14,6 @@ import java.util.List;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.IdmlConstants;
 import org.xmlpull.v1.XmlPullParserException;
@@ -30,13 +29,22 @@ public class UIOptionsSerializer {
 
 	private static final String INDENT = "http://xmlpull.org/v1/doc/features.html#indent-output";
 
-	public void write(UIOptions options, Writer out) {
+	private static final XmlPullParserFactory PARSER_FACTORY;
+	static {
+		try {
+			PARSER_FACTORY = XmlPullParserFactory.newInstance();
+		} catch (XmlPullParserException e) {
+			throw new RuntimeException("Error inizializing pull parser factory: " + e.getMessage(), e);
+		}
+	}
+	
+	public void write(UIOptions options, Writer out, String defaultLanguage) {
 		try {
 			XmlSerializer serializer = createXmlSerializer();
 			serializer.setOutput(out);
 			List<UITabSet> tabSets = options.getTabSets();
 			for (UITabSet tabSet : tabSets) {
-				writeTabSet(serializer, tabSet);
+				writeTabSet(serializer, tabSet, defaultLanguage);
 			}
 			serializer.flush();
 		} catch ( Exception e ) {
@@ -44,38 +52,27 @@ public class UIOptionsSerializer {
 		}
 	}
 
-	protected XmlSerializer createXmlSerializer() throws XmlPullParserException,
-			IOException {
-		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-		XmlSerializer serializer = factory.newSerializer();
-		serializer.setFeature(INDENT, true);
-		serializer.setPrefix(UI_PREFIX, UI_NAMESPACE_URI);
-		return serializer;
-	}
-
-	protected void writeTabSet(XmlSerializer serializer, UITabSet tabSet)
+	protected void writeTabSet(XmlSerializer serializer, UITabSet tabSet, String defaultLanguage)
 			throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, TAB_SET);
 		serializer.attribute("", NAME, tabSet.getName());
 		List<UITab> tabs = tabSet.getTabs();
 		for (UITab tab : tabs) {
-			writeTab(serializer, tab);
+			writeTab(serializer, tab, defaultLanguage);
 		}
 		serializer.endTag(UI_NAMESPACE_URI, TAB_SET);
 	}
 
-	protected void writeTab(XmlSerializer serializer, UITab tab) throws IOException {
+	protected void writeTab(XmlSerializer serializer, UITab tab, String defaultLanguage) throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, TAB);
 		serializer.attribute("", NAME, tab.getName());
-		CollectSurvey survey = tab.getUIOptions().getSurvey();
-		String defaultLanguage = survey.getDefaultLanguage();
 		List<LanguageSpecificText> labels = tab.getLabels();
 		for (LanguageSpecificText label : labels) {
 			writeLabel(serializer, label, defaultLanguage);
 		}
 		List<UITab> tabs = tab.getTabs();
 		for (UITab innerTab : tabs) {
-			writeTab(serializer, innerTab);
+			writeTab(serializer, innerTab, defaultLanguage);
 		}
 		serializer.endTag(UI_NAMESPACE_URI, TAB);
 	}
@@ -90,4 +87,13 @@ public class UIOptionsSerializer {
 		serializer.text(label.getText());
 		serializer.endTag(UI_NAMESPACE_URI, LABEL);
 	}
+	
+	protected XmlSerializer createXmlSerializer() throws XmlPullParserException, IOException {
+		XmlSerializer serializer = PARSER_FACTORY.newSerializer();
+		serializer.setFeature(INDENT, true);
+		serializer.setPrefix(UI_PREFIX, UI_NAMESPACE_URI);
+		return serializer;
+	}
+		
+
 }

@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.metamodel.xml.internal.marshal.SurveyMarshaller.SurveyMarshalParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -24,6 +25,7 @@ public class IdmlExportTask extends Task {
 	
 	//parameters
 	private CollectSurvey survey;
+	private String outputSurveyDefaultLanguage;
 	private OutputStream outputStream;
 
 	public IdmlExportTask() {
@@ -31,7 +33,8 @@ public class IdmlExportTask extends Task {
 	
 	@Override
 	protected void execute() throws Throwable {
-		surveyManager.marshalSurvey(survey, outputStream, true,	true, false);
+		surveyManager.marshalSurvey(survey, outputStream,
+				new SurveyMarshalParameters(true, true, false, outputSurveyDefaultLanguage));
 	}
 	
 	public void setSurveyManager(SurveyManager surveyManager) {
@@ -52,6 +55,10 @@ public class IdmlExportTask extends Task {
 
 	public void setOutputStream(OutputStream outputStream) {
 		this.outputStream = outputStream;
+	}
+	
+	public void setOutputSurveyDefaultLanguage(String outputSurveyDefaultLanguage) {
+		this.outputSurveyDefaultLanguage = outputSurveyDefaultLanguage;
 	}
 	
 }

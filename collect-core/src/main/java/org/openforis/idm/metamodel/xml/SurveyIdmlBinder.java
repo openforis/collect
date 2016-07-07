@@ -13,6 +13,7 @@ import java.util.List;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.internal.marshal.SurveyMarshaller;
+import org.openforis.idm.metamodel.xml.internal.marshal.SurveyMarshaller.SurveyMarshalParameters;
 import org.openforis.idm.metamodel.xml.internal.unmarshal.SurveyUnmarshaller;
 
 /**
@@ -61,8 +62,12 @@ public class SurveyIdmlBinder {
 			boolean marshalCodeLists, 
 			boolean marshalPersistedCodeLists,
 			boolean marshalExternalCodeLists) throws IOException {
-		SurveyMarshaller ser = new SurveyMarshaller(this, marshalCodeLists,
-				marshalPersistedCodeLists, marshalExternalCodeLists);
+		marshal(survey, os, new SurveyMarshalParameters(
+				marshalCodeLists, marshalPersistedCodeLists, marshalExternalCodeLists, survey.getDefaultLanguage()));
+	}
+	
+	public void marshal(Survey survey, OutputStream os, SurveyMarshalParameters parameters) throws IOException {
+		SurveyMarshaller ser = new SurveyMarshaller(this, parameters); 
 		ser.marshal(survey, os, UTF_8);
 	}
 
@@ -74,8 +79,8 @@ public class SurveyIdmlBinder {
 			boolean marshalCodeLists, 
 			boolean marshalExternalCodeLists,
 			boolean marshalPersistedCodeLists) throws IOException {
-		SurveyMarshaller ser = new SurveyMarshaller(this, marshalCodeLists,
-				marshalPersistedCodeLists, marshalExternalCodeLists);
+		SurveyMarshaller ser = new SurveyMarshaller(this, new SurveyMarshalParameters(
+				marshalCodeLists, marshalPersistedCodeLists, marshalExternalCodeLists, survey.getDefaultLanguage()));
 		ser.marshal(survey, wr, UTF_8);
 	}
 		

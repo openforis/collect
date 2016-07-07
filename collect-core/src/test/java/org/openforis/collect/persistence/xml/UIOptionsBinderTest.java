@@ -64,7 +64,7 @@ public class UIOptionsBinderTest extends CollectIntegrationTest {
 		UIOptions uiOptions = binder.unmarshal(survey, UIOptionsConstants.UI_TYPE, optionsBody);
 		new File("target/test/output").mkdirs();
 		FileOutputStream fos = new FileOutputStream("target/test/output/marshalled.uioptions.xml");
-		String marshalled = binder.marshal(uiOptions);
+		String marshalled = binder.marshal(uiOptions, survey.getDefaultLanguage());
 		IOUtils.write(marshalled, fos);
 		fos.flush();
 		fos.close();

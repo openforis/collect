@@ -23,7 +23,7 @@ public interface ApplicationOptionsBinder<T extends ApplicationOptions> {
 	 * @return the text or well-formed XML to be placed inside the IDML 
 	 * options element
 	 */
-	String marshal(T options);
+	String marshal(T options, String defaultLanguage);
 	
 	
 	/**

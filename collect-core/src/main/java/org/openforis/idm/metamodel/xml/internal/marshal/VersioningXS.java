@@ -42,7 +42,7 @@ class VersioningXS extends XmlSerializerSupport<ModelVersion, Survey> {
 		
 		@Override
 		protected void marshalInstances(ModelVersion version) throws IOException {
-			String defaultLanguage = version.getSurvey().getDefaultLanguage();
+			String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 			marshal(version.getLabels(), defaultLanguage);
 		}
 	}
@@ -55,7 +55,7 @@ class VersioningXS extends XmlSerializerSupport<ModelVersion, Survey> {
 		
 		@Override
 		protected void marshalInstances(ModelVersion version) throws IOException {
-			String defaultLanguage = version.getSurvey().getDefaultLanguage();
+			String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
 			marshal(version.getDescriptions(), defaultLanguage);
 		}
 	}
