@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.CodeValueFKColumn;
@@ -57,10 +58,6 @@ public class NewMondrianSchemaGenerator {
 	private String dbSchemaName;
 	private RelationalSchema rdbSchema;
 
-	public NewMondrianSchemaGenerator(CollectSurvey survey, String language, String dbSchemaName) {
-		this(survey, language, dbSchemaName, RelationalSchemaConfig.createDefault());
-	}
-
 	public NewMondrianSchemaGenerator(CollectSurvey survey, String language, String dbSchemaName,
 			RelationalSchemaConfig rdbConfig) {
 		this.survey = survey;
@@ -76,6 +73,7 @@ public class NewMondrianSchemaGenerator {
 		XStream xStream = new XStream();
 		xStream.processAnnotations(NewMondrianSchemaGenerator.Schema.class);
 		String xmlSchema = xStream.toXML(mondrianSchema);
+		xmlSchema = xmlSchema.replaceAll( HtmlUnicodeEscaperUtil.MONDRIAN_START_UNICODE, "&");
 		return xmlSchema;
 	}
 

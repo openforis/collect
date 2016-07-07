@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.util.IOUtils;
@@ -111,31 +112,31 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		List<CollectSurvey> surveys = surveyManager.getAll();
 		for (CollectSurvey survey : surveys) {
 			initializeRelationalSchemaDefinition(survey);
-			initializeMondrianSchemaDefinition(survey);
+			initializeMondrianSchemaDefinition(survey, survey.getDefaultLanguage());
 		}
 	}
 	
 	@Override
-	public void createRepositories(String surveyName, ProgressListener progressListener) {
+	public void createRepositories(String surveyName, String preferredLanguage, ProgressListener progressListener) {
 		initializeRelationalSchemaDefinition(surveyName);
 		ProcessProgressListener processProgressListener = new ProcessProgressListener(RecordStep.values().length);
 		for (RecordStep step : RecordStep.values()) {
 			try {
-				createRepository(surveyName, step, new ProcessStepProgressListener(processProgressListener, progressListener));
+				createRepository(surveyName, step, preferredLanguage, new ProcessStepProgressListener(processProgressListener, progressListener));
 				processProgressListener.stepCompleted();
 			} catch(CollectRdbException e) {
 				LOG.error("Error generating RDB for survey " + surveyName, e);
 			}
 		}
-		updateMondrianSchemaFile(surveyName);
+		updateMondrianSchemaFile(surveyName, preferredLanguage);
 		writeSaikuDatasources(surveyName);
 	}
 
 	@Override
-	public void createRepository(final String surveyName, final RecordStep recordStep, final ProgressListener progressListener) {
+	public void createRepository(final String surveyName, final RecordStep recordStep, final String preferredLanguage, final ProgressListener progressListener) {
 		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
 		
-		updateMondrianSchemaFile(surveyName);
+		updateMondrianSchemaFile(surveyName, preferredLanguage);
 		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
 			writeSaikuDatasource(surveyName, recordStep);
 		}
@@ -151,9 +152,9 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		});
 	}
 
-	private void updateMondrianSchemaFile(String surveyName) {
+	private void updateMondrianSchemaFile(String surveyName, String preferredLanguage) {
 		CollectSurvey survey = surveyManager.get(surveyName);
-		initializeMondrianSchemaDefinition(survey);
+		initializeMondrianSchemaDefinition(survey, preferredLanguage);
 		writeMondrianSchemaFile(surveyName);
 	}
 
@@ -218,8 +219,8 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	}
 
 	@Override
-	public void updateRepositories(String surveyName, ProgressListener progressListener) {
-		createRepositories(surveyName, progressListener);
+	public void updateRepositories(String surveyName, String preferredLanguage, ProgressListener progressListener) {
+		createRepositories(surveyName, preferredLanguage, progressListener);
 	}
 
 	@Override
@@ -345,11 +346,12 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 	}
 	
-	private void initializeMondrianSchemaDefinition(CollectSurvey survey) {
+	private void initializeMondrianSchemaDefinition(CollectSurvey survey, String preferredLanguage) {
 		try {
 			boolean schemaLess = true; //TODO
 			String schemaName = schemaLess ? "" : survey.getName();
-			NewMondrianSchemaGenerator schemaGenerator = new NewMondrianSchemaGenerator(survey, survey.getDefaultLanguage(), 
+			NewMondrianSchemaGenerator schemaGenerator = new NewMondrianSchemaGenerator(survey, 
+					ObjectUtils.defaultIfNull(preferredLanguage, survey.getDefaultLanguage()), 
 					schemaName, rdbConfig);
 			String mondrianSchema = schemaGenerator.generateXMLSchema();
 			mondrianSchemaDefinitionBySurvey.put(survey.getName(), mondrianSchema);

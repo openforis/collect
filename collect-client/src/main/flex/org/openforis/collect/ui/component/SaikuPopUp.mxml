@@ -20,7 +20,10 @@
 			import org.openforis.collect.concurrency.CollectJobStatusPopUp;
 			import org.openforis.collect.event.CollectJobEvent;
 			import org.openforis.collect.event.EventDispatcherFactory;
+			import org.openforis.collect.i18n.Languages;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.SurveyProxy;
+			import org.openforis.collect.model.SurveySummary;
 			import org.openforis.collect.presenter.JobMonitor;
 			import org.openforis.collect.reporting.proxy.ReportingRepositoryInfoProxy;
 			import org.openforis.collect.util.ApplicationConstants;
@@ -60,6 +63,13 @@
 			
 			private function surveyChangeHandler(event:Event):void {
 				updateSurveyRdbInfo();
+				if (surveyList.selectedItem == null) {
+					languageList.dataProvider = null;
+				} else {
+					var survey:SurveySummary = SurveySummary(surveyList.selectedItem);
+					languageList.dataProvider = survey.languages;
+					languageList.selectedItem = survey.defaultLanguage;
+				}
 			}
 			
 			private function updateSurveyRdbInfo():void {
@@ -84,7 +94,11 @@
 					CollectJobStatusPopUp.openPopUp();
 					jobMonitor.start();
 				}, null);
-				ClientFactory.saikuClient.generateRdb(responder, surveyList.selectedItem.name);
+				ClientFactory.saikuClient.generateRdb(responder, surveyList.selectedItem.name, languageList.selectedItem);
+			}
+			
+			private function languageLabelFunction(langCode:String):String {
+				return langCode;
 			}
 			
 		]]>
@@ -113,6 +127,9 @@
 						<s:HorizontalLayout />
 					</s:layout>
 					<s:Label id="rdbLastUpdateTimestampLabel" text="..." width="200" />
+				</s:FormItem>
+				<s:FormItem label="{Message.get('saiku.preferred_language')}">
+					<s:DropDownList id="languageList" labelFunction="languageLabelFunction" width="50" />
 				</s:FormItem>
 				<s:FormItem label="{Message.get('saiku.updated_records_since_last_rdb_generation')}:">
 					<s:layout>

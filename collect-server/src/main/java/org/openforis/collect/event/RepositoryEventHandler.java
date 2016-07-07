@@ -81,13 +81,13 @@ public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 		if (event instanceof RecordTransaction) {
 			repositories.process((RecordTransaction) event);
 		} else if (event instanceof SurveyCreatedEvent) {
-			repositories.createRepositories(surveyName, keepAliveListener);
+			repositories.createRepositories(surveyName, null, keepAliveListener);
 		} else if (event instanceof SurveyUpdatedEvent) {
-			repositories.updateRepositories(surveyName, keepAliveListener);
+			repositories.updateRepositories(surveyName, null, keepAliveListener);
 		} else if (event instanceof SurveyDeletedEvent) {
 			repositories.deleteRepositories(surveyName);
 		} else if (event instanceof InitializeRDBEvent) {
-			repositories.createRepository(surveyName, ((InitializeRDBEvent) event).getStep(), keepAliveListener);
+			repositories.createRepository(surveyName, ((InitializeRDBEvent) event).getStep(), null, keepAliveListener);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 			try {
 				ProgressListener keepAliveListener = createProgressListener(keepAlive);
 				repositories.deleteRepositories(surveyName);
-				repositories.createRepositories(surveyName, keepAliveListener);
+				repositories.createRepositories(surveyName, null, keepAliveListener);
 				handleEvent(event, keepAlive);
 				considerSurveyEvents(surveyName);
 			} catch (Exception e) {

@@ -116,7 +116,7 @@ public class RepositoryEventHandlerTest {
 		int getInfoFails;
 		
 		@Override
-		public void createRepository(String surveyName, RecordStep recordStep, ProgressListener progressListener) {
+		public void createRepository(String surveyName, RecordStep recordStep, String preferredLanguage, ProgressListener progressListener) {
 			createRepositoryCalls ++;
 			if (createRepositoryFails > 0) {
 				createRepositoryFails --;
@@ -125,7 +125,7 @@ public class RepositoryEventHandlerTest {
 		}
 		
 		@Override
-		public void createRepositories(String surveyName, ProgressListener progressListener) {
+		public void createRepositories(String surveyName, String preferredLanguage, ProgressListener progressListener) {
 			createRepositoriesCalls ++;
 			if (createRepositoriesFails > 0) {
 				createRepositoriesFails --;
@@ -134,7 +134,7 @@ public class RepositoryEventHandlerTest {
 		}
 		
 		@Override
-		public void updateRepositories(String surveyName, ProgressListener progressListener) {
+		public void updateRepositories(String surveyName, String preferredLanguage, ProgressListener progressListener) {
 			updateRepositoriesCalls ++;
 			if (updateRepositoriesFails > 0) {
 				updateRepositoriesFails --;

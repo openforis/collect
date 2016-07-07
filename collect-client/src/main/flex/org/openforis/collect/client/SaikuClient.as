@@ -41,8 +41,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 
-		public function generateRdb(responder:IResponder, surveyName:String):void {
-			var token:AsyncToken = this._generateRdbOperation.send(surveyName);
+		public function generateRdb(responder:IResponder, surveyName:String, preferredLanguage:String):void {
+			var token:AsyncToken = this._generateRdbOperation.send(surveyName, preferredLanguage);
 			token.addResponder(responder);
 		}
 	}

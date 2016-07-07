@@ -29,9 +29,9 @@ public class SaikuController {
 	
 	@RequestMapping(value = "/saiku/datasources/{surveyName}/generate.json", method=GET)
 	public @ResponseBody String generateRepository(@PathVariable("surveyName") String surveyName,
-			@RequestParam("recordStep") RecordStep recordStep)
+			@RequestParam("recordStep") RecordStep recordStep, @RequestParam("preferredLanguage") String preferredLanguage)
 			throws CollectRdbException, SQLException {
-		rdbReportingRepositories.createRepository(surveyName, recordStep, new ProgressListener() {
+		rdbReportingRepositories.createRepository(surveyName, recordStep, preferredLanguage, new ProgressListener() {
 			public void progressMade(Progress progress) {
 				System.out.println(String.format("progress made: %d", progress.getCompletionPercent()));
 			}

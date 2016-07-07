@@ -53,12 +53,12 @@ public class SaikuService {
 		return Proxies.fromObject(reportingRepositories.getInfo(surveyName), ReportingRepositoryInfoProxy.class);
 	}
 	
-	public JobProxy generateRdb(final String surveyName) {
+	public JobProxy generateRdb(final String surveyName, final String preferredLanguage) {
 		SurveyLockingJob job = new SurveyLockingJob() {
 			protected void buildTasks() throws Throwable {
 				addTask(new Task() {
 					protected void execute() throws Throwable {
-						reportingRepositories.createRepositories(surveyName, new ProgressListener() {
+						reportingRepositories.createRepositories(surveyName, preferredLanguage, new ProgressListener() {
 							public void progressMade(Progress progress) {
 								setProcessedItems(progress.getProcessedItems());
 								setTotalItems(progress.getTotalItems());
