@@ -148,6 +148,8 @@ public class RDBReportingRepositories implements ReportingRepositories {
 				RelationalSchemaCreator relationalSchemaCreator = new JooqRelationalSchemaCreator();
 				relationalSchemaCreator.createRelationalSchema(relationalSchema, connection);
 				insertRecords(surveyName, recordStep, relationalSchema, connection, progressListener);
+				relationalSchemaCreator.addConstraints(relationalSchema, connection);
+				relationalSchemaCreator.addIndexes(relationalSchema, connection);
 			}
 		});
 	}
