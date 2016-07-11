@@ -129,7 +129,7 @@
 					<s:Label id="rdbLastUpdateTimestampLabel" text="..." width="200" />
 				</s:FormItem>
 				<s:FormItem label="{Message.get('saiku.preferred_language')}">
-					<s:DropDownList id="languageList" labelFunction="languageLabelFunction" width="50" />
+					<s:DropDownList id="languageList" labelFunction="languageLabelFunction" width="60" />
 				</s:FormItem>
 				<s:FormItem label="{Message.get('saiku.updated_records_since_last_rdb_generation')}:">
 					<s:layout>
