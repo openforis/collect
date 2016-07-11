@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
@@ -333,38 +334,53 @@ public class NewMondrianSchemaGenerator {
 				}
 			}
 			hierarchy.levels.add(generateLevel(attrDef));
-		} else if (attrDef instanceof DateAttributeDefinition) {
-			dimension.type = "";
-			hierarchy.type = "TimeDimension";
-			hierarchy.allMemberName = "attrLabel";
-			String[] levelNames = new String[] { "Year", "Month", "Day" };
-			for (String levelName : levelNames) {
-				Level level = new Level(determineLevelName(attrDef, levelName));
-				level.column = attrDef.getName() + "_" + levelName.toLowerCase(Locale.ENGLISH);
-				level.levelType = String.format("Time%ss", levelName);
-				level.type = NUMERIC_DATATYPE;
-				hierarchy.levels.add(level);
-			}
 		} else if (attrDef instanceof CoordinateAttributeDefinition) {
 			dimension.type = "";
 			hierarchy.type = "StandardDimension";
 
-			Level level = new Level(extractLabel(attrDef) + " - Latitude");
-			level.column = attrDef.getName() + "_y";
+			Level level = new Level(dimension.name, extractLabel(attrDef) + " - Latitude");
+			level.column = attrDef.getName() + "_" + CoordinateAttributeDefinition.Y_FIELD_NAME;
 			hierarchy.levels.add(level);
 
-			Level level2 = new Level(extractLabel(attrDef) + " - Longitude");
-			level2.column = attrDef.getName() + "_x";
+			Level level2 = new Level(dimension.name, extractLabel(attrDef) + " - Longitude");
+			level2.column = attrDef.getName() + "_" + CoordinateAttributeDefinition.X_FIELD_NAME;
 			hierarchy.levels.add(level2);
+		} else if (attrDef instanceof DateAttributeDefinition) {
+			dimension.type = "";
+			hierarchy.type = "TimeDimension";
+			hierarchy.allMemberName = "attrLabel";
+			String[] fieldNames = new String[] { DateAttributeDefinition.YEAR_FIELD_NAME, 
+					DateAttributeDefinition.MONTH_FIELD_NAME, DateAttributeDefinition.DAY_FIELD_NAME };
+			for (String fieldName : fieldNames) {
+				String fieldLabel = StringUtils.capitalize(fieldName);
+				Level level = new Level(dimension.name + "_" + fieldName, determineLevelCaption(attrDef, fieldLabel));
+				level.column = attrDef.getName() + "_" + fieldName.toLowerCase(Locale.ENGLISH);
+				level.levelType = String.format("Time%ss", fieldLabel);
+				level.type = NUMERIC_DATATYPE;
+				hierarchy.levels.add(level);
+			}
+		} else if (attrDef instanceof TimeAttributeDefinition) {
+			dimension.type = "";
+			hierarchy.type = "TimeDimension";
+			hierarchy.allMemberName = "attrLabel";
+			String[] fieldNames = new String[] { TimeAttributeDefinition.HOUR_FIELD, TimeAttributeDefinition.MINUTE_FIELD };
+			for (String fieldName : fieldNames) {
+				String fieldLabel = StringUtils.capitalize(fieldName);
+				Level level = new Level(dimension.name + "_" + fieldName, determineLevelCaption(attrDef, fieldLabel));
+				level.column = attrDef.getName() + "_" + fieldName.toLowerCase(Locale.ENGLISH);
+				level.levelType = String.format("Time%ss", fieldLabel);
+				level.type = NUMERIC_DATATYPE;
+				hierarchy.levels.add(level);
+			}
 		} else {
 			hierarchy.levels.add(generateLevel(attrDef));
 		}
 		return dimension;
 	}
 
-	private Level generateLevel(NodeDefinition nodeDef) {
+	private Level generateLevel(AttributeDefinition nodeDef) {
 		String attrName = nodeDef.getName();
-		Level level = new Level(determineLevelName(nodeDef));
+		Level level = new Level(determineDimensionName(nodeDef), determineLevelCaption(nodeDef));
 		level.levelType = "Regular";
 		if (nodeDef instanceof NumericAttributeDefinition) {
 			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? INTEGER_DATATYPE : NUMERIC_DATATYPE;
@@ -398,11 +414,11 @@ public class NewMondrianSchemaGenerator {
 //		return adaptPathToName(attrDef.getPath());
 	}
 
-	private String determineLevelName(NodeDefinition nodeDef) {
-		return determineLevelName(nodeDef, null);
+	private String determineLevelCaption(NodeDefinition nodeDef) {
+		return determineLevelCaption(nodeDef, null);
 	}
 	
-	private String determineLevelName(NodeDefinition attrDef, String subLevelName) {
+	private String determineLevelCaption(NodeDefinition attrDef, String subLevelName) {
 		EntityDefinition nearestAncestorMultipleEntity = attrDef.getNearestAncestorMultipleEntity();
 		String result =  extractLabel(nearestAncestorMultipleEntity) + " " + extractLabel(attrDef);
 		if (subLevelName != null) {
@@ -629,6 +645,9 @@ public class NewMondrianSchemaGenerator {
 	private static class Level extends MondrianSchemaObject {
 
 		@XStreamAsAttribute
+		private String caption;
+
+		@XStreamAsAttribute
 		private String table;
 
 		@XStreamAsAttribute
@@ -649,8 +668,9 @@ public class NewMondrianSchemaGenerator {
 		@XStreamAsAttribute
 		public String hideMemberIf;
 
-		public Level(String name) {
+		public Level(String name, String caption) {
 			super(name);
+			this.caption = caption;
 		}
 	}
 
