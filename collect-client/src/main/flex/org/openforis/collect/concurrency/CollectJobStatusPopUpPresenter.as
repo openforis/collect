@@ -41,6 +41,11 @@ package org.openforis.collect.concurrency {
 			EventDispatcherFactory.getEventDispatcher().addEventListener(CollectJobEvent.COLLECT_JOB_STATUS_UPDATE, jobStatusUpdateHandler);
 		}
 		
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			EventDispatcherFactory.getEventDispatcher().removeEventListener(CollectJobEvent.COLLECT_JOB_STATUS_UPDATE, jobStatusUpdateHandler);
+		};
+		
 		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.closeButton.addEventListener(MouseEvent.CLICK, closeHandler);

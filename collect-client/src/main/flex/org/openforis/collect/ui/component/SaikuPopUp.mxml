@@ -12,7 +12,11 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.util.AlertUtil;
+			
 			import mx.rpc.AsyncResponder;
+			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
 			import org.openforis.collect.Application;
@@ -82,7 +86,9 @@
 					var info:ReportingRepositoryInfoProxy = event.result;
 					rdbLastUpdateTimestampLabel.text = info == null ? "---" : DateUtil.format(info.lastUpdate);
 					updatedRecordsSinceLastUpdateLabel.text = info == null ? "---" : info.updatedRecordsSinceLastUpdate;
-				}, null);
+				}, function(event:FaultEvent, token:Object = null):void {
+					AlertUtil.showMessage("saiku.error.survey_rdb_info_load");
+				});
 				ClientFactory.saikuClient.loadInfo(responder, surveyList.selectedItem.name);
 			}
 			
@@ -93,7 +99,9 @@
 					var jobMonitor:JobMonitor = new JobMonitor(rdbGenerationJobId);
 					CollectJobStatusPopUp.openPopUp();
 					jobMonitor.start();
-				}, null);
+				}, function(event:FaultEvent, token:Object = null):void {
+					AlertUtil.showMessage("saiku.error.rdb_generation_start");
+				});
 				ClientFactory.saikuClient.generateRdb(responder, surveyList.selectedItem.name, languageList.selectedItem);
 			}
 			
