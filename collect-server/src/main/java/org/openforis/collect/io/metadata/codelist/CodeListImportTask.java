@@ -3,10 +3,11 @@ package org.openforis.collect.io.metadata.codelist;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -223,7 +224,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 	}
 
 	protected CodeListItem getCodeListItemInDescendants(String code) {
-		Stack<CodeListItem> stack = new Stack<CodeListItem>();
+		Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
 		stack.addAll(codeToRootItem.values());
 		while ( ! stack.isEmpty() ) {
 			CodeListItem item = stack.pop();

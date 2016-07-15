@@ -7,10 +7,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +23,6 @@ import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.CodeListItemDao;
 import org.openforis.collect.persistence.DatabaseExternalCodeListProvider;
 import org.openforis.collect.service.CollectCodeListService;
-import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -290,7 +290,7 @@ public class CodeListManager {
 				}
 			}
 		}
-		return CollectionUtils.unmodifiableList(result);
+		return result;
 	}
 
 	public <T extends CodeListItem> List<T> loadValidItems(Entity parent, CodeAttributeDefinition def) {
@@ -323,7 +323,7 @@ public class CodeListManager {
 			} else {
 				result = version.filterApplicableItems(items);
 			}
-			return CollectionUtils.unmodifiableList(result);
+			return result;
 		}
 	}
 	
@@ -365,7 +365,7 @@ public class CodeListManager {
 		} else if ( list.isEmpty() ) {
 			return (T) codeListItemDao.loadItem(list, code, version);
 		} else {
-			Stack<CodeListItem> stack = new Stack<CodeListItem>();
+			Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
 			stack.addAll(list.getItems());
 			while ( ! stack.isEmpty() ) {
 				CodeListItem item = stack.pop();

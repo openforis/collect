@@ -5,13 +5,13 @@ package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.commons.collection.CollectionUtils;
@@ -225,7 +225,7 @@ public class EntityDefinition extends NodeDefinition {
 	 */
 	protected void dfsTraverse(NodeDefinitionVisitor visitor) {
 		// Initialize stack with root entity
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		stack.push(this);
 		// While there are still nodes to insert
 		while (!stack.isEmpty()) {
@@ -272,7 +272,7 @@ public class EntityDefinition extends NodeDefinition {
 	 */
 	public List<AttributeDefinition> getNestedAttributes() {
 		final List<AttributeDefinition> result = new ArrayList<AttributeDefinition>();
-		Stack<EntityDefinition> stack = new Stack<EntityDefinition>();
+		Deque<EntityDefinition> stack = new LinkedList<EntityDefinition>();
 		stack.add(this);
 		while (! stack.isEmpty()) {
 			EntityDefinition entityDef = stack.pop();

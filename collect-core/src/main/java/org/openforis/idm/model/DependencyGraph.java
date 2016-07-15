@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -141,7 +141,7 @@ public abstract class DependencyGraph<T> {
 	
 	private Set<GraphNode> getUnsortedDependents(Collection<GraphNode> startFromNodes) {
 		HashSet<GraphNode> result = new HashSet<GraphNode>();
-		Stack<GraphNode> stack = new Stack<GraphNode>();
+		Deque<GraphNode> stack = new LinkedList<GraphNode>();
 		stack.addAll(startFromNodes);
 		while(! stack.isEmpty()) {
 			GraphNode node = stack.pop();
@@ -266,7 +266,7 @@ public abstract class DependencyGraph<T> {
 		
 		private Set<GraphNode> getUnsortedSources() {
 			Set<GraphNode> result = new LinkedHashSet<GraphNode>();
-			Stack<GraphNode> stack = new Stack<GraphNode>();
+			Deque<GraphNode> stack = new LinkedList<GraphNode>();
 			stack.addAll(this.sources);
 			while (! stack.isEmpty()) {
 				GraphNode node = stack.pop();

@@ -5,13 +5,15 @@ package org.openforis.idm.model;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.collection.CollectionUtils;
@@ -296,9 +298,6 @@ public class Entity extends Node<EntityDefinition> {
 		return node == null ? null: ((CodeAttribute)node).getValue();
 	}
 	
-	/*
-	 * public Set<String> getChildNames() { Set<String> childNames = childrenByName.keySet(); return Collections.unmodifiableSet(childNames); }
-	 */
 	public int getCount(String name) {
 		NodeDefinition childDef = definition.getChildDefinition(name);
 		return getCount(childDef);
@@ -467,9 +466,9 @@ public class Entity extends Node<EntityDefinition> {
 	 */
 	public List<Node<? extends NodeDefinition>> getSortedChildren() {
 		List<Node<?>> result = new ArrayList<Node<?>>();
-		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
-		for (NodeDefinition defn : definitions) {
-			List<Node<?>> tempChildren = childrenByDefinition.get(defn);
+		List<NodeDefinition> childDefinitions = getDefinition().getChildDefinitions();
+		for (NodeDefinition childDefn : childDefinitions) {
+			List<Node<?>> tempChildren = childrenByDefinition.get(childDefn);
 			if (tempChildren != null) {
 				result.addAll(tempChildren);
 			}
@@ -520,8 +519,13 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public void traverse(NodeVisitor visitor) {
-		Stack<Node<?>> stack = new Stack<Node<?>>();
-		stack.add(this);
+		visitor.visit(this, this.getIndex());
+		traverseDescendants(visitor);
+	}
+	
+	public void traverseDescendants(NodeVisitor visitor) {
+		Deque<Node<?>> stack = new LinkedList<Node<?>>();
+		stack.addAll(this.children);
 		while (! stack.isEmpty()) {
 			Node<?> node = stack.pop();
 			visitor.visit(node, node.getIndex());
@@ -589,13 +593,11 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 	
-	private class NodeStack extends Stack<List<Node<? extends NodeDefinition>>> {
+	private class NodeStack extends LinkedList<List<Node<? extends NodeDefinition>>> {
 		private static final long serialVersionUID = 1L;
 
 		public NodeStack(Entity root) {
-			List<Node<?>> rootList = new ArrayList<Node<?>>(1);
-			rootList.add(root);
-			push(rootList);
+			push(Collections.<Node<? extends NodeDefinition>>singletonList(root));
 		}
 	}
 
@@ -693,20 +695,14 @@ public class Entity extends Node<EntityDefinition> {
 	 * Returns all the descendants in depth-first order
 	 */
 	public List<Node<?>> getDescendants() {
-		List<Node<?>> result = new Stack<Node<?>>();
-		Stack<Node<?>> stack = new Stack<Node<?>>();
-		stack.addAll(this.getChildren());
-		while(!stack.isEmpty()){
-			Node<?> n = stack.pop();
-			result.add(0, n);
-			if(n instanceof Entity){
-				Entity entity = (Entity) n;
-				List<Node<?>> children = entity.getChildren();
-				for (Node<?> child : children) {
-					stack.push(child);
+		final List<Node<?>> result = new ArrayList<Node<?>>();
+		this.traverseDescendants(new NodeVisitor() {
+			public void visit(Node<?> node, int idx) {
+				if (node != Entity.this) {
+					result.add(0, node);
 				}
 			}
-		}
+		});
 		return result;
 	}
 

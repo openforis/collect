@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
-import org.openforis.commons.collection.CollectionUtils;
 
 /**
  * @author M. Togna
@@ -67,15 +67,17 @@ public class DynamicTableDao extends JooqDaoSupport {
 		addFilterConditions(lookupTable, select, filters);
 		addNotNullConditions(lookupTable, select, notNullColumns);
 		
-		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 		Result<Record> selectResult = select.fetch();
-		if ( selectResult != null ) {
+		if (selectResult == null) {
+			return Collections.emptyList();
+		} else {
+			List<Map<String, String>> result = new ArrayList<Map<String, String>>(selectResult.size());
 			for (Record record : selectResult) {
 				Map<String, String> rowMap = parseRecord(record, fields);
 				result.add(rowMap);
 			}
+			return result;
 		}
-		return CollectionUtils.unmodifiableList(result);
 	}
 
 	public boolean exists(String table, NameValueEntry[] filters, String[] notNullColumns) {

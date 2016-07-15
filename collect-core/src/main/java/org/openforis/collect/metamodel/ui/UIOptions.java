@@ -9,12 +9,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
-import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
@@ -217,7 +217,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public UITab getTab(String name) {
-		Stack<UITab> stack = new Stack<UITab>();
+		Deque<UITab> stack = new LinkedList<UITab>();
 		List<UITabSet> tabSets = getTabSets();
 		for (UITabSet tabSet : tabSets) {
 			stack.addAll(tabSet.getTabs());
@@ -379,7 +379,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	 * Returns true if the specified tab is not assigned to one of the descendants of the specified rootEntity
 	 */
 	public boolean isUnassigned(UITab tab, EntityDefinition rootEntity) {
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		stack.add(rootEntity);
 		while ( ! stack.isEmpty() ) {
 			NodeDefinition childDefn = stack.pop();
@@ -400,7 +400,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public void removeUnassignedTabs() {
 		List<UITabSet> rootTabSets = getTabSets();
 		for (UITabSet rootTabSet : rootTabSets) {
-			Stack<UITabSet> stack = new Stack<UITabSet>();
+			Deque<UITabSet> stack = new LinkedList<UITabSet>();
 			stack.push(rootTabSet);
 			while ( ! stack.isEmpty() ) {
 				UITabSet tabSet = stack.pop();
@@ -434,7 +434,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		if (tab.getDepth() == 1) {
 			return rootEntity;
 		}
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		stack.push(rootEntity);
 		while ( ! stack.isEmpty() ) {
 			NodeDefinition nodeDefn = stack.pop();
@@ -524,7 +524,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public void removeTabAssociation(UITab tab) {
-		Stack<UITab> stack = new Stack<UITab>();
+		Deque<UITab> stack = new LinkedList<UITab>();
 		stack.push(tab);
 		while ( ! stack.isEmpty() ) {
 			UITab currentTab = stack.pop();

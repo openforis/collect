@@ -1,8 +1,9 @@
 package org.openforis.collect.metamodel.ui;
 
 import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
@@ -123,7 +124,7 @@ public class UITab extends UITabSet {
 	}
 	
 	public void traverse(TabVisitor visitor) {
-		Stack<UITab> stack = new Stack<UITab>();
+		Deque<UITab> stack = new LinkedList<UITab>();
 		stack.push(this);
 		while (! stack.isEmpty()) {
 			UITab tab = stack.pop();

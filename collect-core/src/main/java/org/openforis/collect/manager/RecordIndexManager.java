@@ -9,11 +9,12 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -216,7 +217,7 @@ public class RecordIndexManager extends BaseStorageManager {
 	}
 	
 	public boolean hasIndexableNodes(EntityDefinition entityDefn) {
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		stack.push(entityDefn);
 		while ( ! stack.isEmpty() ) {
 			NodeDefinition defn = stack.pop();

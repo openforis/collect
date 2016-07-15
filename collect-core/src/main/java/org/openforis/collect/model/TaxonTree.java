@@ -11,7 +11,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -193,7 +192,7 @@ public class TaxonTree {
 	}
 	
 	public void depthFirstVisit(NodeVisitor visitor, Node... startFromNodes) {
-		Stack<Node> stack = new Stack<Node>();
+		LinkedList<Node> stack = new LinkedList<Node>();
 		addInverseOrderedItems(stack, Arrays.asList(startFromNodes));
 		while ( ! stack.isEmpty() ) {
 			Node node = stack.pop();

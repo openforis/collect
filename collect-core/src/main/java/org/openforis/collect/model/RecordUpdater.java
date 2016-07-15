@@ -9,11 +9,12 @@ import static org.openforis.idm.model.NodePointers.pointersToNodes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1048,7 +1049,7 @@ public class RecordUpdater {
 		}
 		
 		private void updatePointerAndDescendantsRelevance(NodePointer rootPointer) {
-			Stack<NodePointer> stack = new Stack<NodePointer>();
+			Deque<NodePointer> stack = new LinkedList<NodePointer>();
 			stack.push(rootPointer);
 			
 			while (!stack.isEmpty()) {

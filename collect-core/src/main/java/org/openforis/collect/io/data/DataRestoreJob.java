@@ -249,7 +249,15 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		}
 		
 		@Override
+		protected long countTotalItems() {
+			List<Integer> entryIds = calculateEntryIdsToImport();
+			return entryIds.size() * Step.values().length;
+		}
+		
+		@Override
 		protected void execute() throws Throwable {
+			boolean originalRecordValidationSetting = ((XMLParsingRecordProvider) recordProvider).isValidateRecords();
+			((XMLParsingRecordProvider) recordProvider).setValidateRecords(false);
 			List<Integer> entryIds = calculateEntryIdsToImport();
 			for (Step step : Step.values()) {
 				for (Integer entryId : entryIds) {
@@ -257,14 +265,16 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 					if (packagedRecord != null) {
 						int rootEntityId = packagedRecord.getRootEntity().getDefinition().getId();
 						CollectRecordSummary existingRecordSummary = recordManager.loadUniqueRecordSummaryByKeys(publishedSurvey, rootEntityId, packagedRecord.getRootEntityKeyValues());
-						if (existingRecordSummary != null) {
-							CollectRecord record = recordManager.load(publishedSurvey, existingRecordSummary.getId());
+						if (existingRecordSummary != null && existingRecordSummary.getStep().afterEqual(step)) {
+							CollectRecord record = recordManager.load(publishedSurvey, existingRecordSummary.getId(), step, false);
 							List<File> files = recordFileManager.getAllFiles(record);
 							result.addAll(files);
 						}
 					}
+					incrementProcessedItems();
 				}
 			}
+			((XMLParsingRecordProvider) recordProvider).setValidateRecords(originalRecordValidationSetting);
 		}
 		
 		private List<Integer> calculateEntryIdsToImport() {

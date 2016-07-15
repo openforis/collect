@@ -4,9 +4,10 @@
 package org.openforis.idm.model.expression.internal;
 
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.commons.jxpath.ri.JXPathCompiledExpression;
 import org.apache.commons.jxpath.ri.compiler.CoreFunction;
@@ -64,7 +65,7 @@ public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
 	}
 	
 	private ExpressionValidationResult validateOperations(OperationVaildator operationValidator) {
-		Stack<Expression> stack = new Stack<Expression>();
+		Deque<Expression> stack = new LinkedList<Expression>();
 		stack.push(getExpression());
 		while (!stack.isEmpty()) {
 			Expression expression = stack.pop();
@@ -86,7 +87,7 @@ public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
 	
 	public Set<String> getFunctionNames() {
 		Set<String> names = new HashSet<String>();
-		Stack<Expression> stack = new Stack<Expression>();
+		Deque<Expression> stack = new LinkedList<Expression>();
 		stack.push(getExpression());
 		while (!stack.isEmpty()) {
 			Expression expression = stack.pop();

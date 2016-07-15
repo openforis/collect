@@ -4,10 +4,11 @@
 package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
@@ -137,7 +138,7 @@ public class Schema extends SurveyObject {
 	public List<TaxonAttributeDefinition> getTaxonAttributeDefinitions(String taxonomyName) {
 		List<TaxonAttributeDefinition> result = new ArrayList<TaxonAttributeDefinition>();
 		List<EntityDefinition> rootDefns = getRootEntityDefinitions();
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		stack.addAll(rootDefns);
 		while ( ! stack.isEmpty() ) {
 			NodeDefinition node = stack.pop();
@@ -335,7 +336,7 @@ public class Schema extends SurveyObject {
 	}
 	
 	public List<? extends NodeDefinition> findNodeDefinitions(NodeDefinitionVerifier verifier, boolean stopAfterFirstFound) {
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		List<NodeDefinition> foundNodeDefns = new ArrayList<NodeDefinition>();
 		stack.addAll(rootEntityDefinitions);
 		while (!stack.isEmpty()) {

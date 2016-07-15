@@ -6,11 +6,12 @@ package org.openforis.idm.model;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -344,7 +345,7 @@ public class Record implements DeepComparable {
 		}
 		int totalRequiredAttributes = 0;
 		int filledAttributes = 0;
-		Stack<Node<?>> stack = new Stack<Node<?>>();
+		Deque<Node<?>> stack = new LinkedList<Node<?>>();
 		stack.push(getRootEntity());
 		while (! stack.isEmpty()) {
 			Node<?> node = stack.pop();
@@ -369,7 +370,7 @@ public class Record implements DeepComparable {
 			return -1;
 		}
 		int total = 0;
-		Stack<Node<?>> stack = new Stack<Node<?>>();
+		Deque<Node<?>> stack = new LinkedList<Node<?>>();
 		stack.push(getRootEntity());
 		while (! stack.isEmpty()) {
 			Node<?> node = stack.pop();

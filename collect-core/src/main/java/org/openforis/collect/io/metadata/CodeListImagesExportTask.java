@@ -1,8 +1,9 @@
 package org.openforis.collect.io.metadata;
 
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -39,7 +40,7 @@ public class CodeListImagesExportTask extends Task {
 	protected void execute() throws Throwable {
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList list : codeLists) {
-			Stack<CodeListItem> stack = new Stack<CodeListItem>();
+			Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
 			stack.addAll(rootItems);
 			while (! stack.isEmpty()) {

@@ -4,10 +4,11 @@ import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.UI_CON
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
@@ -110,7 +111,7 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 
 	// Pre-order depth-first traversal from here down
 	public void traverse(UIModelObjectVisitor visitor) {
-		Stack<UIModelObject> stack = new Stack<UIModelObject>();
+		Deque<UIModelObject> stack = new LinkedList<UIModelObject>();
 		
 		// Initialize stack with form sets
 		stack.addAll(getFormSets());

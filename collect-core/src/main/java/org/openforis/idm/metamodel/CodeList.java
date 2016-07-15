@@ -2,9 +2,10 @@ package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -227,7 +228,7 @@ public class CodeList extends VersionableSurveyObject {
 	}
 
 	public CodeListItem getItem(int itemId) {
-		Stack<CodeListItem> stack = new Stack<CodeListItem>();
+		Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
 		stack.addAll(getItems());
 		while (! stack.isEmpty()) {
 			CodeListItem item = stack.pop();
@@ -354,7 +355,7 @@ public class CodeList extends VersionableSurveyObject {
 	public boolean isEnumeratingList() {
 		Survey survey = getSurvey();
 		Schema schema = survey.getSchema();
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		stack.addAll(rootEntityDefinitions);
 		while ( ! stack.isEmpty() ) {
