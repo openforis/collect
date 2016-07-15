@@ -158,7 +158,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
-			_job = event.result as Proxy;
+			_job = event.result as JobProxy;
 			updateView();
 		}
 		
