@@ -227,9 +227,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		JooqDSLContext jf = dsl(codeList);
 		jf.updateQuery(item).execute();
 		
-		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
-		if ( useCache && ! survey.isTemporary() ) {
-			cache.removeItemsByCodeList(survey.getId(), codeList.getId());
+		if ( isCacheInUse(codeList) ) {
+			cache.clearItemsByCodeList(codeList);
 		}
 	}
 	
@@ -292,6 +291,10 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				.set(OFC_CODE_LIST.SORT_ORDER, newSortOrder)
 				.where(OFC_CODE_LIST.ID.equal(item.getSystemId()))
 				.execute();
+			
+			if ( isCacheInUse(list) ) {
+				cache.clearItemsByCodeList(list);
+			}
 		}
 	}
 
@@ -306,18 +309,16 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			//delete referencing items programmatically
 			deleteInvalidParentReferenceItems(codeList);
 		}
-		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
-		if ( useCache && ! survey.isTemporary() ) {
-			cache.removeItemsByCodeList(survey.getId(), codeList.getId());
+		if ( isCacheInUse(codeList) ) {
+			cache.clearItemsByCodeList(codeList);
 		}
 	}
 
 	public void deleteByCodeList(CodeList list) {
 		DeleteConditionStep<OfcCodeListRecord> q = createDeleteQuery(list);
 		q.execute();
-		CollectSurvey survey = (CollectSurvey) list.getSurvey();
-		if ( useCache && ! survey.isTemporary() ) {
-			cache.removeItemsByCodeList(survey.getId(), list.getId());
+		if ( isCacheInUse(list) ) {
+			cache.clearItemsByCodeList(list);
 		}
 	}
 	
@@ -346,8 +347,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.where(OFC_CODE_LIST.SURVEY_ID.equal(surveyId))
 			.execute();
 		
-		if ( useCache && ! work ) {
-			cache.removeItemsBySurvey(surveyId);
+		if ( isCacheInUse(work) ) {
+			cache.clearItemsBySurvey(surveyId);
 		}
 	}
 	
@@ -367,10 +368,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		JooqDSLContext jf = dsl(null);
 		jf.delete(OFC_CODE_LIST).where(whereCondition).execute();
 		
-		if ( useCache && ! survey.isTemporary() ) {
-			for (Integer codeListId : codeListsIds) {
-				cache.removeItemsByCodeList(survey.getId(), codeListId);
-			}
+		if ( isCacheInUse(survey) ) {
+			cache.clearItemsBySurvey(survey.getId());
 		}
 	}
 	
@@ -391,8 +390,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				)
 			.execute();
 		
-		if ( useCache && ! survey.isTemporary() ) {
-			cache.removeItemsByCodeList(survey.getId(), codeListId);
+		if ( isCacheInUse(codeList) ) {
+			cache.clearItemsByCodeList(codeList);
 		}
 	}
 	
@@ -416,8 +415,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				)
 			.execute();
 
-		if ( useCache && ! survey.isTemporary() ) {
-			cache.removeItemsByCodeList(survey.getId(), codeListId);
+		if ( isCacheInUse(codeList) ) {
+			cache.clearItemsByCodeList(codeList);
 		}
 	}
 
@@ -440,8 +439,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 					)
 				.execute();
 			
-			if ( useCache && ! survey.isTemporary() ) {
-				cache.removeItemsByCodeList(survey.getId(), codeListId);
+			if ( isCacheInUse(codeList) ) {
+				cache.clearItemsByCodeList(codeList);
 			}
 		}
 	}
@@ -479,10 +478,21 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Integer parentItemId, ModelVersion version) {
-		JooqDSLContext dsl = dsl(codeList);
-		SelectQuery<Record> q = createSelectChildItemsQuery(dsl, codeList, parentItemId, true);
-		Result<Record> result = q.fetch();
-		return dsl.fromResult(result);
+		List<PersistedCodeListItem> items = null;
+		boolean usingCache = isCacheInUse(codeList);
+		if (usingCache) {
+			items = cache.getItems(codeList, parentItemId);
+		}
+		if (items == null) {
+			JooqDSLContext dsl = dsl(codeList);
+			SelectQuery<Record> q = createSelectChildItemsQuery(dsl, codeList, parentItemId, true);
+			Result<Record> result = q.fetch();
+			items = dsl.fromResult(result);
+			if (usingCache) {
+				cache.putItems(codeList, parentItemId, items);
+			}
+		}
+		return version == null ? items : version.filterApplicableItems(items);
 	}
 	
 	public List<PersistedCodeListItem> loadItemsByLevel(CodeList list, int levelPosition) {
@@ -542,11 +552,15 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code, ModelVersion version) {
-		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
-		boolean usingCache = useCache && ! survey.isTemporary();
+		boolean usingCache = isCacheInUse(codeList);
 		if ( usingCache ) {
-			PersistedCodeListItem item = cache.getItem(survey.getId(), codeList.getId(), parentItemId, code);
-			if ( item != null && (version == null || version.isApplicable(item)) ) {
+			PersistedCodeListItem item = cache.getItem(codeList, parentItemId, code, version);
+			if (item == null) {
+				//update cache
+				loadChildItems(codeList, parentItemId, version);
+				item = cache.getItem(codeList, parentItemId, code, version);
+			}
+			if (item != null) {
 				return item;
 			}
 		}
@@ -561,13 +575,10 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		List<PersistedCodeListItem> filteredByVersion = filterApplicableItems(list, version);
 		
 		PersistedCodeListItem item = filteredByVersion.isEmpty() ? null: filteredByVersion.get(0);
-		
-		if ( usingCache ) {
-			cache.addItem(codeList, parentItemId, code, item);
-		}
+
 		return item;
 	}
-	
+
 	public PersistedCodeListItem loadItem(CodeList codeList, int itemId) {
 		JooqDSLContext dsl = dsl(codeList);
 		SelectQuery<Record> q = createSelectFromCodeListQuery(dsl, codeList);
@@ -590,6 +601,10 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 	}
 
+	public void clearCache() {
+		cache.clear();
+	}
+	
 	protected List<PersistedCodeListItem> filterApplicableItems(List<PersistedCodeListItem> list, ModelVersion version) {
 		if ( version == null ) {
 			return list;
@@ -645,6 +660,18 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return select;
 	}
 	
+	private boolean isCacheInUse(CodeList codeList) {
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		return isCacheInUse(survey);
+	}
+
+	private boolean isCacheInUse(CollectSurvey survey) {
+		return isCacheInUse(survey.isTemporary());
+	}
+
+	private boolean isCacheInUse(boolean temporarySurvey) {
+		return useCache && ! temporarySurvey;
+	}
 	
 	@Override
 	protected JooqDSLContext dsl() {
@@ -667,7 +694,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	public void setUseCache(boolean useCache) {
 		this.useCache = useCache;
 	}
-
+	
 	protected static class JooqDSLContext extends MappingDSLContext<PersistedCodeListItem> {
 
 		private static final long serialVersionUID = 1L;

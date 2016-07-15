@@ -40,6 +40,7 @@ public class CodeListItemDaoIntegrationTest extends CollectIntegrationTest {
 	public void init() throws SurveyImportException, SurveyValidationException {
 		InputStream is = ClassLoader.getSystemResourceAsStream(IDM_TEST_XML);
 		survey = surveyManager.importModel(is, "archenland1", false);
+		codeListItemDao.clearCache();
 	}
 	
 	@Test
