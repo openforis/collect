@@ -3,6 +3,8 @@ package org.openforis.collect.io.metadata.samplingdesign;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -10,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignLine.SamplingDesignLineCodeKey;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.process.AbstractProcess;
@@ -38,7 +41,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	private boolean overwriteAll;
 	
 	private SamplingDesignCSVReader reader;
-	private List<SamplingDesignLine> lines;
+	private Map<SamplingDesignLineCodeKey, List<SamplingDesignLine>> linesByKey;
 
 	private CollectSurvey survey;
 	
@@ -55,7 +58,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	@Override
 	public void init() {
 		super.init();
-		lines = new ArrayList<SamplingDesignLine>();
+		linesByKey = new TreeMap<SamplingDesignLineCodeKey, List<SamplingDesignLine>>();
 		validateParameters();
 	}
 
@@ -104,6 +107,11 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 				try {
 					SamplingDesignLine line = reader.readNextLine();
 					if ( line != null ) {
+						List<SamplingDesignLine> lines = linesByKey.get(line.getKey());
+						if (lines == null) {
+							lines = new ArrayList<SamplingDesignLine>();
+							linesByKey.put(line.getKey(), lines);
+						}
 						lines.add(line);
 					}
 					if ( ! reader.isReady() ) {
@@ -129,16 +137,18 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	}
 	
 	protected void processLines() {
-		for (SamplingDesignLine line : lines) {
-			long lineNumber = line.getLineNumber();
-			if ( status.isRunning() && ! status.isRowProcessed(lineNumber) && ! status.isRowInError(lineNumber) ) {
-				try {
-					boolean processed = processLine(line);
-					if (processed ) {
-						status.addProcessedRow(lineNumber);
+		for (List<SamplingDesignLine> lines : linesByKey.values()) {
+			for (SamplingDesignLine line : lines) {
+				long lineNumber = line.getLineNumber();
+				if ( status.isRunning() && ! status.isRowProcessed(lineNumber) && ! status.isRowInError(lineNumber) ) {
+					try {
+						boolean processed = processLine(line);
+						if (processed ) {
+							status.addProcessedRow(lineNumber);
+						}
+					} catch (ParsingException e) {
+						status.addParsingError(lineNumber, e.getError());
 					}
-				} catch (ParsingException e) {
-					status.addParsingError(lineNumber, e.getError());
 				}
 			}
 		}
@@ -156,14 +166,21 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	}
 
 	protected void checkDuplicateLine(SamplingDesignLine line) throws ParsingException {
-		for (SamplingDesignLine currentLine : lines) {
-			if ( currentLine.getLineNumber() != line.getLineNumber() ) {
-				if ( line.getLevelCodes().equals(currentLine.getLevelCodes()) ) {
-					SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getLevelCodes().size() - 1];
-					throwDuplicateLineException(line, currentLine, new SamplingDesignFileColumn[]{lastLevelCol});
-				}
+		List<SamplingDesignLine> lines = linesByKey.get(line.getKey());
+		for (SamplingDesignLine existingLine : lines) {
+			if (existingLine != null && existingLine.getLineNumber() != line.getLineNumber()) {
+				SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getKey().getLevelCodes().size() - 1];
+				throwDuplicateLineException(line, existingLine, new SamplingDesignFileColumn[]{lastLevelCol});
 			}
 		}
+//		for (SamplingDesignLine currentLine : lines) {
+//			if ( currentLine.getLineNumber() != line.getLineNumber() ) {
+//				if ( line.getLevelCodes().equals(currentLine.getLevelCodes()) ) {
+//					SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getLevelCodes().size() - 1];
+//					throwDuplicateLineException(line, currentLine, new SamplingDesignFileColumn[]{lastLevelCol});
+//				}
+//			}
+//		}
 	}
 	
 	protected void throwDuplicateLineException(SamplingDesignLine line, SamplingDesignLine duplicateLine, 
@@ -215,9 +232,11 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 
 	protected List<SamplingDesignItem> createItemsFromLines() {
 		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
-		for (SamplingDesignLine line : lines) {
-			SamplingDesignItem item = line.toSamplingDesignItem(survey, reader.getInfoColumnNames());
-			items.add(item);
+		for (List<SamplingDesignLine> lines : linesByKey.values()) {
+			for (SamplingDesignLine line : lines) {
+				SamplingDesignItem item = line.toSamplingDesignItem(survey, reader.getInfoColumnNames());
+				items.add(item);
+			}
 		}
 		return items;
 	}

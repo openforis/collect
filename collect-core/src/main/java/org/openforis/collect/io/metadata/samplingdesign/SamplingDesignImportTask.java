@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.ReferenceDataImportTask;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignLine.SamplingDesignLineCodeKey;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
@@ -42,7 +45,7 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	
 	//internal variables
 	private transient SamplingDesignCSVReader reader;
-	private transient List<SamplingDesignLine> lines;
+	private Map<SamplingDesignLineCodeKey, List<SamplingDesignLine>> linesByKey;
 	private boolean skipValidation;
 
 	public SamplingDesignImportTask() {
@@ -51,7 +54,7 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	
 	@Override
 	protected void createInternalVariables() throws Throwable {
-		lines = new ArrayList<SamplingDesignLine>();
+		linesByKey = new TreeMap<SamplingDesignLineCodeKey, List<SamplingDesignLine>>();
 		reader = new SamplingDesignCSVReader(file);
 		super.createInternalVariables();
 	}
@@ -104,6 +107,11 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 				try {
 					SamplingDesignLine line = reader.readNextLine();
 					if ( line != null ) {
+						List<SamplingDesignLine> lines = linesByKey.get(line.getKey());
+						if (lines == null) {
+							lines = new ArrayList<SamplingDesignLine>();
+							linesByKey.put(line.getKey(), lines);
+						}
 						lines.add(line);
 					}
 					if ( ! reader.isReady() ) {
@@ -128,16 +136,18 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	}
 	
 	protected void processLines() {
-		for (SamplingDesignLine line : lines) {
-			long lineNumber = line.getLineNumber();
-			if ( isRunning() && ! isRowProcessed(lineNumber) && ! isRowInError(lineNumber) ) {
-				try {
-					boolean valid = skipValidation || validateLine(line);
-					if (valid ) {
-						addProcessedRow(lineNumber);
+		for (List<SamplingDesignLine> lines : linesByKey.values()) {
+			for (SamplingDesignLine line : lines) {
+				long lineNumber = line.getLineNumber();
+				if ( isRunning() && ! isRowProcessed(lineNumber) && ! isRowInError(lineNumber) ) {
+					try {
+						boolean valid = skipValidation || validateLine(line);
+						if (valid ) {
+							addProcessedRow(lineNumber);
+						}
+					} catch (ParsingException e) {
+						addParsingError(lineNumber, e.getError());
 					}
-				} catch (ParsingException e) {
-					addParsingError(lineNumber, e.getError());
 				}
 			}
 		}
@@ -155,21 +165,32 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	}
 
 	protected void checkDuplicateLine(SamplingDesignLine line) throws ParsingException {
-		for (SamplingDesignLine currentLine : lines) {
-			if ( currentLine.getLineNumber() != line.getLineNumber() ) {
-				if ( isDuplicateLocation(line, currentLine) ) {
-					throwDuplicateLineException(line, currentLine, SamplingDesignFileColumn.LOCATION_COLUMNS);
-				} else if ( line.getLevelCodes().equals(currentLine.getLevelCodes()) ) {
-					SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getLevelCodes().size() - 1];
-					throwDuplicateLineException(line, currentLine, new SamplingDesignFileColumn[]{lastLevelCol});
+		List<SamplingDesignLine> lines = linesByKey.get(line.getKey());
+		for (SamplingDesignLine existingLine : lines) {
+			if (existingLine != null && existingLine.getLineNumber() != line.getLineNumber()) {
+				if ( isDuplicateLocation(line, existingLine) ) {
+					throwDuplicateLineException(line, existingLine, SamplingDesignFileColumn.LOCATION_COLUMNS);
+				} else if ( line.getKey().getLevelCodes().equals(existingLine.getKey().getLevelCodes()) ) {
+					SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getKey().getLevelCodes().size() - 1];
+					throwDuplicateLineException(line, existingLine, new SamplingDesignFileColumn[]{lastLevelCol});
 				}
 			}
 		}
+//		for (SamplingDesignLine currentLine : lines) {
+//			if ( currentLine.getLineNumber() != line.getLineNumber() ) {
+//				if ( isDuplicateLocation(line, currentLine) ) {
+//					throwDuplicateLineException(line, currentLine, SamplingDesignFileColumn.LOCATION_COLUMNS);
+//				} else if ( line.getKey().getLevelCodes().equals(currentLine.getLevelCodes()) ) {
+//					SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getLevelCodes().size() - 1];
+//					throwDuplicateLineException(line, currentLine, new SamplingDesignFileColumn[]{lastLevelCol});
+//				}
+//			}
+//		}
 	}
 	
 	protected boolean isDuplicateLocation(SamplingDesignLine line1, SamplingDesignLine line2) throws ParsingException {
-		List<String> line1LevelCodes = line1.getLevelCodes();
-		List<String> line2LevelCodes = line2.getLevelCodes();
+		List<String> line1LevelCodes = line1.getKey().getLevelCodes();
+		List<String> line2LevelCodes = line2.getKey().getLevelCodes();
 		if ( line1.hasEqualLocation(line2) ) {
 			if ( line2LevelCodes.size() == line1LevelCodes.size()) {
 				return true;
@@ -224,9 +245,11 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 
 	protected List<SamplingDesignItem> createItemsFromLines() {
 		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
-		for (SamplingDesignLine line : lines) {
-			SamplingDesignItem item = line.toSamplingDesignItem(survey, reader.getInfoColumnNames());
-			items.add(item);
+		for (List<SamplingDesignLine> lines : linesByKey.values()) {
+			for (SamplingDesignLine line : lines) {
+				SamplingDesignItem item = line.toSamplingDesignItem(survey, reader.getInfoColumnNames());
+				items.add(item);
+			}
 		}
 		return items;
 	}

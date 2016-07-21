@@ -16,6 +16,7 @@ import org.openforis.collect.io.metadata.parsing.CSVDataImportReader;
 import org.openforis.collect.io.metadata.parsing.CSVLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignLine.SamplingDesignLineCodeKey;
 import org.openforis.commons.io.csv.CsvLine;
 
 /**
@@ -84,7 +85,7 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 			line.setY(getColumnValue(SamplingDesignFileColumn.Y.getColumnName(), true, String.class));
 			line.setSrsId(getColumnValue(SamplingDesignFileColumn.SRS_ID.getColumnName(), true, String.class));
 			List<String> levelCodes = parseLevelCodes(line);
-			line.setLevelCodes(levelCodes);
+			line.setKey(new SamplingDesignLineCodeKey(levelCodes));
 			Map<String, String> infos = parseInfos(line);
 			line.setInfoAttributeByName(infos);
 			return line;
