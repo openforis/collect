@@ -75,14 +75,20 @@ public class CollectEarthBalloonGenerator {
 
 	private CollectSurvey survey;
 	private String language;
+	private boolean preview;
+
 	private Map<String, CEComponent> componentByName;
-	
 	private BalloonInputFieldsUtils balloonInputFieldsUtils;
 	private Map<String, String> htmlParameterNameByNodePath;
 
 	public CollectEarthBalloonGenerator(CollectSurvey survey, String language) {
+		this(survey, language, false);
+	}
+
+	public CollectEarthBalloonGenerator(CollectSurvey survey, String language, boolean preview) {
 		this.survey = survey;
 		this.language = language;
+		this.preview = preview;
 		this.componentByName = new HashMap<String, CEComponent>();
 		this.balloonInputFieldsUtils = new BalloonInputFieldsUtils();
 		this.htmlParameterNameByNodePath = balloonInputFieldsUtils.getHtmlParameterNameByNodePath(getRootEntity());
@@ -90,10 +96,17 @@ public class CollectEarthBalloonGenerator {
 
 	public String generateHTML() throws IOException {
 		String result = getHTMLTemplate();
+		if (preview) {
+			result = replaceHostForPreview(result);
+		}
 		result = addHiddenFields(result);
 		result = fillWithSurveyDefinitionFields(result);
 		result = replaceButtonLocalizationText(result);
 		return result;
+	}
+
+	private String replaceHostForPreview(String html) {
+		return html.replaceAll("\\$\\[host\\]", "preview_");
 	}
 
 	private String replaceButtonLocalizationText(String htmlForBalloon) {

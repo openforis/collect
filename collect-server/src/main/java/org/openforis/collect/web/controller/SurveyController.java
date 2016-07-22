@@ -95,7 +95,7 @@ public class SurveyController extends BasicController {
 	public void showCollectEarthBalloonPreview(HttpServletResponse response, 
 			@RequestParam("surveyId") Integer surveyId, @RequestParam("lang") String languageCode) throws IOException  {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, languageCode);
+		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, languageCode, true);
 		String html = generator.generateHTML();
 		writeHtmlToResponse(response, html);
 	}
