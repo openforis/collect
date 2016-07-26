@@ -52,7 +52,7 @@ public class SamplingDesignExportProcess {
 			for (ReferenceDataDefinition.Attribute attribute : infoAttributes) {
 				colNames.add(attribute.getName());
 			}
-			writer.writeHeaders(colNames.toArray(new String[0]));
+			writer.writeHeaders(colNames);
 			
 			List<SamplingDesignItem> items = summaries.getRecords();
 			for (SamplingDesignItem item : items) {
@@ -84,7 +84,7 @@ public class SamplingDesignExportProcess {
 		for (int i = 0; i < infoAttributes.size(); i++) {
 			lineValues.add(item.getInfoAttribute(i));
 		}
-		writer.writeNext(lineValues.toArray(new String[0]));
+		writer.writeNext(lineValues);
 	}
 
 	private List<ReferenceDataDefinition.Attribute> getInfoAttributes(CollectSurvey survey) {

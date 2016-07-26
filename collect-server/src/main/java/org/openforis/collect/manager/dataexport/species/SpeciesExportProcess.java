@@ -47,7 +47,7 @@ public class SpeciesExportProcess {
 			List<String> vernacularNamesLangCodes = getNotEmptyValues(summaries.getVernacularNamesLanguageCodes());
 			vernacularNamesLangCodes.remove(LATIN_LANG_CODE); //consider Latin vernacular name as synonym
 			colNames.addAll(vernacularNamesLangCodes);
-			writer.writeHeaders(colNames.toArray(new String[0]));
+			writer.writeHeaders(colNames);
 			List<TaxonSummary> items = summaries.getItems();
 			for (TaxonSummary item : items) {
 				writeTaxonSummary(writer, vernacularNamesLangCodes, item);
@@ -83,7 +83,7 @@ public class SpeciesExportProcess {
 			String jointVernacularNames = item.getJointVernacularNames(langCode, VERNACULAR_NAMES_SEPARATOR);
 			lineValues.add(jointVernacularNames);
 		}
-		writer.writeNext(lineValues.toArray(new String[0]));
+		writer.writeNext(lineValues);
 	}
 
 }

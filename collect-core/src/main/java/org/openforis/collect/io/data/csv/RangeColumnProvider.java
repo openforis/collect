@@ -27,7 +27,7 @@ public class RangeColumnProvider extends CompositeAttributeColumnProvider<RangeA
 		if ( ! attributeDefinition.getUnits().isEmpty() ) {
 			result.add(RangeAttributeDefinition.UNIT_FIELD);
 		}
-		return result.toArray(new String[0]);
+		return result.toArray(new String[result.size()]);
 	}
 	
 	@Override

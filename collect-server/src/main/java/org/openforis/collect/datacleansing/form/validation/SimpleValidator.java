@@ -82,10 +82,9 @@ public abstract class SimpleValidator<F> implements Validator {
 
 	protected void rejectRequiredFields(Errors errors, String... fields) {
 		String errorCode = "validation.required_field";
-		String[] messageArgs = new String[0];
-		String defaultMessage = messageSource.getMessage(errorCode, messageArgs, Locale.ENGLISH);
+		String defaultMessage = messageSource.getMessage(errorCode, null, Locale.ENGLISH);
 		for (String field : fields) {
-			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
+			errors.rejectValue(field, errorCode, defaultMessage);
 		}
 	}
 
@@ -110,7 +109,7 @@ public abstract class SimpleValidator<F> implements Validator {
 			String validationMessage = StringUtils.defaultString(result.getDetailedMessage(), result.getMessage());
 			String[] errorMessageArgs = new String[] {validationMessage};
 			String defaultMessage = messageSource.getMessage(errorCode, errorMessageArgs, Locale.ENGLISH);
-			errors.rejectValue(field, errorCode, new String[0], defaultMessage);
+			errors.rejectValue(field, errorCode, defaultMessage);
 		}
 		return result.isOk();
 	}

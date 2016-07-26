@@ -61,7 +61,7 @@ public class SpeciesBackupExportTask extends Task {
 		colNames.add(SpeciesBackupFileColumn.SYNONYMS.getColumnName());
 		colNames.addAll(vernacularNamesLangCodes);
 		
-		writer.writeHeaders(colNames.toArray(new String[0]));
+		writer.writeHeaders(colNames);
 	}
 
 	protected List<String> getNotEmptyValues(List<String> values) {
@@ -90,7 +90,7 @@ public class SpeciesBackupExportTask extends Task {
 			String jointVernacularNames = item.getJointVernacularNames(langCode, VERNACULAR_NAMES_SEPARATOR);
 			lineValues.add(jointVernacularNames);
 		}
-		writer.writeNext(lineValues.toArray(new String[0]));
+		writer.writeNext(lineValues);
 	}
 
 	public SpeciesManager getSpeciesManager() {

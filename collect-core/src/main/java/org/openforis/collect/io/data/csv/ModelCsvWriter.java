@@ -35,12 +35,12 @@ public class ModelCsvWriter extends CsvWriter {
 
 	public void printColumnHeadings() throws IOException {
 		List<String> columnHeadings = xform.getColumnProvider().getColumnHeadings();
-		writeHeaders(columnHeadings.toArray(new String[columnHeadings.size()]));
+		writeHeaders(columnHeadings);
 	}
 
 	public void printRow(Node<?> n) {
 		List<String> values = xform.getColumnProvider().extractValues(n);
-		writeNext(values.toArray(new String[values.size()]));
+		writeNext(values);
 	}
 
 	public int printData(Record record) throws InvalidExpressionException {
