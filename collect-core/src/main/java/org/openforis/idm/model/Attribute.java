@@ -6,7 +6,9 @@ package org.openforis.idm.model;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -79,6 +81,15 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 
 	public int getFieldCount() {
 		return fields.length;
+	}
+	
+	public Map<Integer, Object> getFieldValueByIndex() {
+		Map<Integer, Object> result = new HashMap<Integer, Object>(fields.length);
+		int idx = 0;
+		for (Field<?> field : fieldList) {
+			result.put(idx++, field.getValue());
+		}
+		return result;
 	}
 	
 	public void clearValue() {
