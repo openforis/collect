@@ -5,7 +5,6 @@ package org.openforis.collect.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -17,7 +16,6 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
 
@@ -85,9 +83,9 @@ public class NodeChangeMap implements NodeChangeSet {
 	 */
 	public EntityChange prepareEntityChange(Entity entity) {
 		EntityChange c = (EntityChange) getChange(entity);
-		if(c == null){
+		if (c == null) {
 			c = new EntityChange(entity);
-			addOrMergeChange(c);
+			putChange(c);
 		}
 		return c;
 	}
@@ -101,7 +99,7 @@ public class NodeChangeMap implements NodeChangeSet {
 	 */
 	public AttributeChange prepareAttributeChange(Attribute<?, ?> attribute) {
 		AttributeChange c = (AttributeChange) getChange(attribute);
-		if(c == null){
+		if (c == null) {
 			c = new AttributeChange(attribute);
 			addOrMergeChange(c);
 		}
@@ -118,7 +116,7 @@ public class NodeChangeMap implements NodeChangeSet {
 	 */
 	public NodeDeleteChange addNodeDeleteChange(Integer recordId, Step recordStep, List<Integer> ancestorIds, Node<?> node) {
 		NodeDeleteChange c = new NodeDeleteChange(recordId, recordStep, ancestorIds, node);
-		nodeIdToChange.put(node.getInternalId(), c); //overwrite change if already present
+		putChange(c); //overwrite change if already present
 		return c;
 	}
 	
@@ -130,34 +128,19 @@ public class NodeChangeMap implements NodeChangeSet {
 	 * @return
 	 */
 	public NodeChange<?> addEntityAddChange(Entity entity) {
-		Integer nodeId = entity.getInternalId();
-		NodeChange<?> c = getChange(entity);
-		if ( c == null ) {
-			c = new EntityAddChange(entity);
-			nodeIdToChange.put(nodeId, c);
-			return c;
-		} else {
-			throw new IllegalStateException("AddNodeChange already present for node: " + nodeId);
-		}
+		NodeChange<?> c = new EntityAddChange(entity);
+		addChange(c);
+		return c;
 	}
-
+	
 	/**
 	 * Returns the change already associated to the attribute or creates a new AttributeAddChange
 	 * and puts it in the internal cache
-	 * 
-	 * @param attribute
-	 * @return
 	 */
 	public NodeChange<?> addAttributeAddChange(Attribute<?, ?> attribute) {
-		Integer nodeId = attribute.getInternalId();
-		NodeChange<?> c = getChange(attribute);
-		if ( c == null ) {
-			c = new AttributeAddChange(attribute);
-			nodeIdToChange.put(nodeId, c);
-			return c;
-		} else {
-			throw new IllegalStateException("AddNodeChange already present for node: " + nodeId);
-		}
+		NodeChange<?> c = new AttributeAddChange(attribute);
+		addChange(c);
+		return c;
 	}
 	
 	public void addMergeChanges(NodeChangeSet changeSet) {
@@ -170,36 +153,47 @@ public class NodeChangeMap implements NodeChangeSet {
 	 * Puts a change into the internal cache.
 	 * If a change associated to the node already exists and it is not a NodeDeleteChange,
 	 * merges the old change with the new one.
-	 * 
-	 * @param change
 	 */
 	public void addOrMergeChange(NodeChange<?> change) {
 		Node<?> node = change.getNode();
-		Integer nodeId = node.getInternalId();
-		NodeChange<?> oldItem = nodeIdToChange.get(nodeId);
-		if ( oldItem == null ) {
-			nodeIdToChange.put(nodeId, change);
-		} else if (! (oldItem instanceof NodeDeleteChange) ) {
-			if ( oldItem instanceof AttributeChange && change instanceof AttributeChange ) {
-				((AttributeChange) oldItem).merge((AttributeChange) change);
-			} else if ( oldItem instanceof EntityChange && change instanceof EntityChange ) {
-				((EntityChange) oldItem).merge((EntityChange) change);
+		NodeChange<?> existingChange = getChange(node);
+		if ( existingChange == null ) {
+			putChange(change);
+		} else if (! (existingChange instanceof NodeDeleteChange) ) {
+			if ( existingChange instanceof AttributeChange && change instanceof AttributeChange ) {
+				((AttributeChange) existingChange).merge((AttributeChange) change);
+			} else if ( existingChange instanceof EntityChange && change instanceof EntityChange ) {
+				((EntityChange) existingChange).merge((EntityChange) change);
 			} else {
-				nodeIdToChange.put(nodeId, change);
+				putChange(change);
 			}
 		}
 	}
-
+	
+	/**
+	 * Puts a change into the nodeIdToChange map using the internal node id as key.
+	 * 
+	 * @return Previous node change associated to the node internal id, if already existing, 
+	 * null if there was no mapping with node internal id.
+	 */
+	public NodeChange<?> putChange(NodeChange<?> change) {
+		Node<?> node = change.getNode();
+		Integer nodeId = node.getInternalId();
+		return nodeIdToChange.put(nodeId, change);
+	}
+	
+	public void addChange(NodeChange<?> change) {
+		NodeChange<?> previousChange = putChange(change);
+		if (previousChange != null) {
+			Node<?> node = change.getNode();
+			Integer nodeId = node.getInternalId();
+			throw new IllegalStateException(String.format("%s already present for node with id: %d", change.getClass().getSimpleName(), nodeId));
+		}
+	}
+	
 	public void addValueChange(Attribute<?, ?> attribute) {
 		AttributeChange change = prepareAttributeChange(attribute);
-		
-		int fieldCount = attribute.getFieldCount();
-		Map<Integer, Object> fieldValues = new HashMap<Integer, Object>(fieldCount);
-		for (int idx = 0; idx < fieldCount; idx ++) {
-			Field<?> field = attribute.getField(idx);
-			fieldValues.put(idx, field.getValue());
-		}
-		change.setUpdatedFieldValues(fieldValues);
+		change.setUpdatedFieldValues(attribute.getFieldValueByIndex());
 	}
 
 	public void addValueChanges(Collection<? extends Attribute<?, ?>> attributes) {
