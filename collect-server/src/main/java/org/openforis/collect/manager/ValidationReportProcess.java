@@ -19,8 +19,9 @@ import org.openforis.collect.model.RecordValidationReportItem;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.commons.io.csv.CsvWriter;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
-import org.openforis.idm.model.Node;
+import org.openforis.idm.path.Path;
 
 /**
  * 
@@ -152,9 +153,9 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	protected void writeValidationReportLine(CollectRecord record, RecordValidationReportItem item) {
 		String recordKey = validationMessageBuilder.getRecordKey(record);
 		String phase = record.getStep().name();
-		Node<?> node = record.getNodeByInternalId(item.getNodeId());
-		String attrDefPath = node.getDefinition().getPath();
-		String[] line = new String[]{recordKey, phase, attrDefPath, item.getPath(), item.getPrettyFormatPath(), item.getMessage()};
+		String absolutePath = Path.getAbsolutePath(item.getPath());
+		NodeDefinition nodeDef = record.getSurvey().getSchema().getDefinitionByPath(absolutePath);
+		String[] line = new String[]{recordKey, phase, nodeDef.getPath(), item.getPath(), item.getPrettyFormatPath(), item.getMessage()};
 		switch (reportType) {
 		case CSV:
 			csvWriter.writeNext(line);

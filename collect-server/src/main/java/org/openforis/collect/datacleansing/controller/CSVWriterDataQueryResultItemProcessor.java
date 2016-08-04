@@ -55,7 +55,7 @@ public class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultI
 		headers.add("Path");
 		AttributeDefinition attrDef = (AttributeDefinition) query.getSchema().getDefinitionById(query.getAttributeDefinitionId());
 		headers.addAll(extractFieldHeaders(attrDef));
-		csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
+		csvWriter.writeHeaders(headers);
 	}
 
 	private List<String> extractFieldHeaders(AttributeDefinition attrDef) {
@@ -85,7 +85,7 @@ public class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultI
 			Object fieldValue = valueMap == null ? null : valueMap.get(fieldName);
 			lineValues.add(fieldValue == null ? "": fieldValue.toString());
 		}
-		csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
+		csvWriter.writeNext(lineValues);
 	}
 	
 	@Override

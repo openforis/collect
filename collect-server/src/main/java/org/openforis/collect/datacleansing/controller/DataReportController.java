@@ -210,7 +210,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 		
 		private void writeCSVHeader() {
 			List<String> headers = determineHeaders();
-			csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
+			csvWriter.writeHeaders(headers);
 		}
 
 		protected List<String> determineHeaders() {
@@ -285,7 +285,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 			lineValues.addAll(lastRecordReportInfo.getExtraValues());
 			lineValues.add(StringUtils.join(lastRecordReportInfo.getErrors(), ERRORS_SEPARATOR));
 			lineValues.add(StringUtils.join(lastRecordReportInfo.getWarnings(), ERRORS_SEPARATOR));
-			csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
+			csvWriter.writeNext(lineValues);
 		}
 		
 		@Override

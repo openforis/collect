@@ -10,7 +10,13 @@ import java.util.Locale;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.relational.model.CodeTable;
+import org.openforis.collect.relational.model.CodeValueFKColumn;
+import org.openforis.collect.relational.model.DataTable;
+import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
+import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -44,6 +50,7 @@ public class MondrianCubeGenerator {
 	private CollectSurvey survey;
 	private RelationalSchemaConfig rdbConfig;
 	private String language;
+	private RelationalSchema rdbSchema;
 
 	public MondrianCubeGenerator(CollectSurvey survey, String language) {
 		this.survey = survey;
@@ -52,15 +59,15 @@ public class MondrianCubeGenerator {
 	}
 	
 	public Schema generateSchema() {
-		Schema schema = new Schema(survey.getName());
+		this.rdbSchema = new RelationalSchemaGenerator(rdbConfig).generateSchema(survey, survey.getName());
 		Cube cube = generateCube();
+		Schema schema = new Schema(survey.getName());
 		schema.cube = cube;
-		
 		return schema;
 	}
 	
 	public String generateXMLSchema() {
-		org.openforis.collect.io.metadata.collectearth.MondrianCubeGenerator.Schema mondrianSchema = generateSchema();
+		MondrianCubeGenerator.Schema mondrianSchema = generateSchema();
 		XStream xStream = new XStream();
 		xStream.processAnnotations(MondrianCubeGenerator.Schema.class);
 		String xmlSchema = xStream.toXML(mondrianSchema);
@@ -107,7 +114,10 @@ public class MondrianCubeGenerator {
 				for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
 					String childLabel = extractReportingLabel(childDef);
 					if (childLabel == null) {
-						childLabel = entityLabel + extractFailsafeLabel(childDef);
+						childLabel = extractFailsafeLabel(childDef);
+						if (! childLabel.startsWith(entityLabel)) {
+							childLabel = entityLabel + " " + childLabel;
+						}
 					}
 					Dimension dimension = new Dimension(childLabel);
 					Hierarchy hierarchy = new Hierarchy(childLabel);
@@ -118,19 +128,22 @@ public class MondrianCubeGenerator {
 						hierarchy.primaryKeyTable = entityName;
 						
 						if (childDef instanceof CodeAttributeDefinition) {
+							CodeAttributeDefinition codeAttr = (CodeAttributeDefinition) childDef;
 							
 							Join join = new Join(null);
-							String codeListName = ((CodeAttributeDefinition) childDef).getList().getName();
-							join.leftKey = childDef.getName() + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
-							join.rightKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+							
+							DataTable dataTable = rdbSchema.getDataTable(nodeDef);
+							CodeValueFKColumn foreignKeyCodeColumn = dataTable.getForeignKeyCodeColumn(codeAttr);
+							join.leftKey = foreignKeyCodeColumn.getName();
+							
+							CodeTable codeListTable = rdbSchema.getCodeListTable(codeAttr);
+							join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeListTable.getName());;
 							
 							join.tables = Arrays.asList(
 									new Table(entityName), 
-									new Table(codeListName + rdbConfig.getCodeListTableSuffix())
+									new Table(codeListTable.getName())
 							);
-							
 							hierarchy.join = join;
-							
 						}else{
 							hierarchy.table = new Table(entityName);
 						}
@@ -385,9 +398,7 @@ public class MondrianCubeGenerator {
 				label = nodeDef.getName();
 			}
 		}
-		
 		return escapeMondrianUnicode(label); 
-		
 	}
 	
 	private String extractReportingLabel(NodeDefinition nodeDef) {

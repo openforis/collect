@@ -51,7 +51,7 @@ public class SamplingDesignExportTask extends Task {
 			SamplingDesignSummaries summaries = samplingDesignManager.loadBySurvey(surveyId);
 					
 			ArrayList<String> colNames = getHeaders();
-			writer.writeHeaders(colNames.toArray(new String[0]));
+			writer.writeHeaders(colNames);
 			
 			List<SamplingDesignItem> items = summaries.getRecords();
 			for (SamplingDesignItem item : items) {
@@ -105,7 +105,7 @@ public class SamplingDesignExportTask extends Task {
 		for (int i = 0; i < infoAttributes.size(); i++) {
 			lineValues.add(item.getInfoAttribute(i));
 		}
-		writer.writeNext(lineValues.toArray(new String[0]));
+		writer.writeNext(lineValues);
 	}
 
 	public SamplingDesignManager getSamplingDesignManager() {

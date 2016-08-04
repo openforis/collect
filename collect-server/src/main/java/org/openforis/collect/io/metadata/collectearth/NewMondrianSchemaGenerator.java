@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.HtmlUnicodeEscaperUtil;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.CodeValueFKColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
@@ -30,6 +31,7 @@ import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
@@ -216,15 +218,20 @@ public class NewMondrianSchemaGenerator {
 				if (! codeList.isExternal()) {
 					hierarchy.primaryKey = rootEntityIdColumnName;
 					hierarchy.primaryKeyTable = parentEntityName;
+					
 					Join join = new Join(null);
-					join.leftKey = attrDef.getName() + rdbConfig.getCodeListTableSuffix()
-							+ rdbConfig.getIdColumnSuffix();
-					String codeTableName = CodeListTables.getTableName(rdbConfig, codeList,
-							codeAttrDef.getListLevelIndex());
-					join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeTableName);
-
-					join.tables = Arrays.asList(new Table(dbSchemaName, parentEntityName),
-							new Table(dbSchemaName, codeTableName));
+					
+					DataTable dataTable = rdbSchema.getDataTable(parentDef);
+					CodeValueFKColumn foreignKeyCodeColumn = dataTable.getForeignKeyCodeColumn(codeAttrDef);
+					join.leftKey = foreignKeyCodeColumn.getName();
+					
+					CodeTable codeListTable = rdbSchema.getCodeListTable(codeAttrDef);
+					join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeListTable.getName());;
+					
+					join.tables = Arrays.asList(
+							new Table(dbSchemaName, dataTable.getName()), 
+							new Table(dbSchemaName, codeListTable.getName())
+					);
 					hierarchy.join = join;
 				}
 			} else {
@@ -241,7 +248,7 @@ public class NewMondrianSchemaGenerator {
 	}
 
 	private String getRootEntityIdColumnName(EntityDefinition rootEntityDef) {
-		return rdbConfig.getIdColumnPrefix() + rootEntityDef.getName() + rdbConfig.getIdColumnSuffix();
+		return rdbSchema.getDataTable(rootEntityDef).getPrimaryKeyColumn().getName();
 	}
 
 	private List<Measure> generateEarthSpecificMeasures() {
@@ -326,8 +333,6 @@ public class NewMondrianSchemaGenerator {
 				} else {
 					String codeListTableName = CodeListTables.getTableName(rdbConfig, codeAttrDef);
 					hierarchy.table = new Table(dbSchemaName, codeListTableName);
-//					dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix()
-//							+ rdbConfig.getIdColumnSuffix();
 					DataTable dataTable = rdbSchema.getDataTable(attrDef.getParentEntityDefinition());
 					CodeValueFKColumn foreignKeyCodeColumn = dataTable.getForeignKeyCodeColumn(codeAttrDef);
 					dimension.foreignKey = foreignKeyCodeColumn.getName();
@@ -337,14 +342,18 @@ public class NewMondrianSchemaGenerator {
 		} else if (attrDef instanceof CoordinateAttributeDefinition) {
 			dimension.type = "";
 			hierarchy.type = "StandardDimension";
-
-			Level level = new Level(dimension.name, extractLabel(attrDef) + " - Latitude");
-			level.column = attrDef.getName() + "_" + CoordinateAttributeDefinition.Y_FIELD_NAME;
-			hierarchy.levels.add(level);
-
-			Level level2 = new Level(dimension.name, extractLabel(attrDef) + " - Longitude");
-			level2.column = attrDef.getName() + "_" + CoordinateAttributeDefinition.X_FIELD_NAME;
-			hierarchy.levels.add(level2);
+			{
+				String fieldName = CoordinateAttributeDefinition.Y_FIELD_NAME;
+				Level level = new Level(dimension.name + "_" + fieldName, extractLabel(attrDef) + " - Latitude");
+				level.column = attrDef.getName() + "_" + fieldName;
+				hierarchy.levels.add(level);
+			}
+			{
+				String fieldName = CoordinateAttributeDefinition.X_FIELD_NAME;
+				Level level = new Level(dimension.name + "_" + fieldName, extractLabel(attrDef) + " - Longitude");
+				level.column = attrDef.getName() + "_" + fieldName;
+				hierarchy.levels.add(level);
+			}
 		} else if (attrDef instanceof DateAttributeDefinition) {
 			dimension.type = "";
 			hierarchy.type = "TimeDimension";
@@ -357,6 +366,19 @@ public class NewMondrianSchemaGenerator {
 				level.column = attrDef.getName() + "_" + fieldName.toLowerCase(Locale.ENGLISH);
 				level.levelType = String.format("Time%ss", fieldLabel);
 				level.type = NUMERIC_DATATYPE;
+				hierarchy.levels.add(level);
+			}
+		} else if (attrDef instanceof TaxonAttributeDefinition) {
+			{
+				String fieldName = TaxonAttributeDefinition.CODE_FIELD_NAME;
+				Level level = new Level(dimension.name + "_" + fieldName, extractLabel(attrDef) + " - Code");
+				level.column = attrDef.getName() + "_" + fieldName;
+				hierarchy.levels.add(level);
+			}
+			{
+				String fieldName = TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME;
+				Level level = new Level(dimension.name + "_" + fieldName, extractLabel(attrDef) + " - Scientific name");
+				level.column = attrDef.getName() + "_" + fieldName;
 				hierarchy.levels.add(level);
 			}
 		} else if (attrDef instanceof TimeAttributeDefinition) {
@@ -387,17 +409,18 @@ public class NewMondrianSchemaGenerator {
 		} else if (nodeDef instanceof BooleanAttributeDefinition) {
 			level.type = BOOLEAN_DATATYPE;
 		} else if (nodeDef instanceof CodeAttributeDefinition) {
-			level.type = level.type = ((CodeAttributeDefinition) nodeDef).getList().isExternal() ? STRING_DATATYPE : INTEGER_DATATYPE;
+			level.type = ((CodeAttributeDefinition) nodeDef).getList().isExternal() ? STRING_DATATYPE : INTEGER_DATATYPE;
 		} else {
 			level.type = STRING_DATATYPE;
 		}
 		if (nodeDef instanceof CodeAttributeDefinition && !((CodeAttributeDefinition) nodeDef).getList().isExternal()) {
 			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
-			String codeTableName = CodeListTables.getTableName(rdbConfig, codeDef);
-			level.table = codeTableName;
-			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
-			level.nameColumn = codeTableName.substring(0,
-					codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + language;
+			CodeTable codeListTable = rdbSchema.getCodeListTable(codeDef);
+			level.table = codeListTable.getName();
+			level.column = codeListTable.getPrimaryKeyConstraint().getPrimaryKeyColumn().getName();
+			level.nameColumn = CodeListTables.getLabelColumnName(rdbConfig, codeDef.getList(), codeDef.getLevelIndex(), language);
+		} else if (nodeDef instanceof TaxonAttributeDefinition) {
+			level.column = attrName + "_code";
 		} else {
 			level.column = attrName;
 		}
@@ -437,9 +460,10 @@ public class NewMondrianSchemaGenerator {
 	}
 
 	private boolean canBeMeasured(AttributeDefinition def) {
-		return def instanceof CodeAttributeDefinition 
+		return def instanceof CodeAttributeDefinition
 				|| def instanceof DateAttributeDefinition
-				|| def instanceof NumberAttributeDefinition 
+				|| def instanceof NumberAttributeDefinition
+				|| def instanceof TaxonAttributeDefinition
 				|| def instanceof TextAttributeDefinition
 				|| def instanceof TimeAttributeDefinition;
 	}
