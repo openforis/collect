@@ -1,15 +1,9 @@
 package org.openforis.collect.web.controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
@@ -66,6 +60,18 @@ public class SurveyController extends BasicController {
 		return view;
 	}
 	
+	@RequestMapping(value = "/surveys/temp/{surveyId}/edit.htm", method = RequestMethod.GET)
+	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
+		model.addAttribute("temp_id", surveyId);
+		return new ModelAndView(EDIT_SURVEY_VIEW);
+	}
+	
+	@RequestMapping(value = "/surveys/{surveyId}/edit.htm", method = RequestMethod.GET)
+	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
+		model.addAttribute("id", surveyId);
+		return new ModelAndView(EDIT_SURVEY_VIEW);
+	}
+	
 	protected List<Integer> getRecordIds(SurveySummary s) {
 		List<Integer> recordIds = new ArrayList<Integer>();
 		CollectSurvey survey = surveyManager.getById(s.getId());
@@ -79,38 +85,4 @@ public class SurveyController extends BasicController {
 		return recordIds;
 	}
 	
-	@RequestMapping(value = "/surveys/temp/{surveyId}/edit.htm", method = RequestMethod.GET)
-	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
-		model.addAttribute("temp_id", surveyId);
-		return new ModelAndView(EDIT_SURVEY_VIEW);
-	}
-	
-	@RequestMapping(value = "/surveys/{surveyId}/edit.htm", method = RequestMethod.GET)
-	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
-		model.addAttribute("id", surveyId);
-		return new ModelAndView(EDIT_SURVEY_VIEW);
-	}
-	
-	@RequestMapping(value = "/collectearthpreview.html", method = RequestMethod.GET)
-	public void showCollectEarthBalloonPreview(HttpServletResponse response, 
-			@RequestParam("surveyId") Integer surveyId, @RequestParam("lang") String languageCode) throws IOException  {
-		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, languageCode, true);
-		String html = generator.generateHTML();
-		writeHtmlToResponse(response, html);
-	}
-
-	private void writeHtmlToResponse(HttpServletResponse response, String html) throws IOException {
-		PrintWriter writer = null;
-		try {
-			response.setContentType(MediaType.TEXT_HTML_VALUE);
-			writer = new PrintWriter(response.getOutputStream());
-			writer.print(html);
-			writer.flush();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		} finally {
-			IOUtils.closeQuietly(writer);
-		}
-	}
 }

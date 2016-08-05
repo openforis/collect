@@ -65,6 +65,8 @@
     var COLLECT_NOT_RUNNING = "PLACEHOLDER_COLLECT_NOT_RUNNING";
     var PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";
     
+    var PREVIEW = PLACEHOLDER_PREVIEW;
+    
     
     // By default all Collect Earth surveys are defined as having at least the id attribute "id" which is stored by the balloon as collect_text_id
     // If more id attributes are present in the survey then their names ( using the protocoal for the transmission e.g. "collect_code_year") will be specified in this list :

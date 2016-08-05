@@ -167,6 +167,7 @@ var submitForm = function(submitCounter) {
 		if (DEBUG) {
 			log("data submitted successfully");
 		}
+		setStepsAsVisited();
 		interpretJsonSaveResponse(json, true);
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
@@ -358,6 +359,7 @@ var setStepsAsVisited = function(upToStepIndex) {
 	for (var stepIndex = 0; stepIndex <= upToStepIndex; stepIndex ++) {
 		var stepHeading = getStepHeading(stepIndex);
 		stepHeading.addClass("visited");
+		stepHeading.removeClass("disabled");
 	}
 }
 
@@ -466,7 +468,9 @@ var initSteps = function() {
 		autoFocus : true,
 		titleTemplate : "#title#",
 		labels : {
-			finish : SUBMIT_LABEL
+			finish : SUBMIT_LABEL,
+		    next: NEXT_LABEL,
+		    previous: PREVIOUS_LABEL
 		},
 		onStepChanged : function(event, currentIndex, priorIndex) {
 			var stepHeading = getStepHeading(currentIndex);
@@ -487,7 +491,7 @@ var initSteps = function() {
 		}
 	});
 	$stepsContainer.find("a[href='#finish']").addClass("btn-finish");
-	$stepsContainer.find(".steps ul li").removeClass("disabled"); //enable all steps
+	//$stepsContainer.find(".steps ul li").removeClass("disabled"); //enable all steps
 };
 
 var checkIfPlacemarkAlreadyFilled = function(checkCount) {
@@ -543,7 +547,14 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 };
 
 var getPlacemarkId = function() {
-	var id = $form.find("input[name='collect_text_id']").val();
+	var arrayLength = EXTRA_ID_ATTRIBUTES.length;
+	var id = "";
+	for (var i = 0; i < arrayLength; i++) {
+		id += $form.find("input[name='" + EXTRA_ID_ATTRIBUTES[i] + "']").val();
+		if( i < arrayLength-1){
+			id += ",";
+		}
+	}
 	return id;
 };
 
@@ -761,7 +772,7 @@ var log = function(message) {
 	newContent = limitString(newContent, 2000);
 	consoleBox.html(newContent);
 	consoleBox.scrollTop(consoleBox[0].scrollHeight);
-}
+};
 
 var limitString = function(str, limit) {
 	var length = str.length;
