@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -13,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -41,7 +41,7 @@ public abstract class DependencyGraph<T> {
 
 	protected abstract List<T> getChildren(T item);
 
-	protected abstract Object getId(T item);
+	protected abstract Comparable<?> getId(T item);
 
 	protected abstract String toString(T item);
 
@@ -49,7 +49,7 @@ public abstract class DependencyGraph<T> {
 
 	public DependencyGraph(Survey survey) {
 		super();
-		this.graphNodeById = new HashMap<Object, GraphNode>();
+		this.graphNodeById = new TreeMap<Object, GraphNode>();
 	}
 
 	public void add(Node<?> node) {
@@ -84,24 +84,34 @@ public abstract class DependencyGraph<T> {
 			dependentGraphNode.addSource(graphNode);
 		}
 	}
-
+	
+	private GraphNode getGraphNodeByItem(T item) {
+		return getGraphNode(getId(item));
+	}
+	
+	private GraphNode getGraphNode(Comparable<?> nodeId) {
+		return graphNodeById.get(nodeId);
+	}
+	
 	private GraphNode getOrCreateGraphNode(T item) {
-		Object nodeId = getId(item);
-		GraphNode graphNode = graphNodeById.get(nodeId);
-		if (graphNode == null) {
-			graphNode = new GraphNode(this, item);
-			graphNodeById.put(nodeId, graphNode);
+		GraphNode existingGraphNode = getGraphNodeByItem(item);
+		if (existingGraphNode == null) {
+			GraphNode graphNode = new GraphNode(this, item);
+			Comparable<?> graphNodeId = getId(item);
+			graphNodeById.put(graphNodeId, graphNode);
+			return graphNode;
+		} else {
+			return existingGraphNode;
 		}
-		return graphNode;
 	}
 
 	public void remove(Node<?> node) {
 		Collection<T> items = toItems(node);
 		for (T item : items) {
-			Object nodeId = getId(item);
-			GraphNode graphNode = graphNodeById.get(nodeId);
+			Comparable<?> graphNodeId = getId(item);
+			GraphNode graphNode = getGraphNode(graphNodeId);
 			if ( graphNode != null ) {
-				graphNodeById.remove(nodeId);
+				graphNodeById.remove(graphNodeId);
 				for (GraphNode dependent : graphNode.dependents) {
 					dependent.sources.remove(graphNode);
 				}
@@ -157,8 +167,7 @@ public abstract class DependencyGraph<T> {
 	}
 	
 	protected List<T> sourcesForItem(T item, boolean sort) {
-		Object graphNodeId = getId(item);
-		GraphNode graphNode = graphNodeById.get(graphNodeId);
+		GraphNode graphNode = getGraphNodeByItem(item);
 		if ( graphNode == null ) {
 			return Collections.emptyList();
 		} else if (sort) {
@@ -210,15 +219,14 @@ public abstract class DependencyGraph<T> {
 	private Collection<GraphNode> nodesFromItems(Collection<T> items) {
 		Collection<GraphNode> nodes = new ArrayList<GraphNode>(items.size());
 		for (T item : items) {
-			Object id = getId(item);
-			GraphNode graphNode = graphNodeById.get(id);
+			GraphNode graphNode = getGraphNodeByItem(item);
 			if ( graphNode != null ) {
 				nodes.add(graphNode);
 			}
 		}
 		return nodes;
 	}
-	
+
 	private Collection<T> itemsFromNodes(Collection<Node<?>> nodes) {
 		Collection<T> result = new ArrayList<T>(nodes.size());
 		for (Node<?> node : nodes) {

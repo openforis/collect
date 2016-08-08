@@ -7,13 +7,13 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.collection.CollectionUtils;
@@ -41,12 +41,10 @@ public class Entity extends Node<EntityDefinition> {
 	
 	public Entity(EntityDefinition definition) {
 		super(definition);
-		List<NodeDefinition> childDefs = definition.getChildDefinitions();
-		int numChildDefs = childDefs.size();
 		this.children = new ArrayList<Node<?>>();
-		this.childrenByDefinition = new HashMap<NodeDefinition, List<Node<?>>>(numChildDefs);
-		this.derivedStateCache = new ValidationState(numChildDefs);
-		this.childStates = new HashMap<NodeDefinition, State>(numChildDefs);
+		this.childrenByDefinition = new TreeMap<NodeDefinition, List<Node<?>>>();
+		this.derivedStateCache = new ValidationState();
+		this.childStates = new TreeMap<NodeDefinition, State>();
 	}
 
 	@Override
@@ -805,12 +803,12 @@ public class Entity extends Node<EntityDefinition> {
 		private Map<NodeDefinition, ValidationResultFlag> minCountValidationResultByChildDefinition;
 		private Map<NodeDefinition, ValidationResultFlag> maxCountValidationResultByChildDefinition;
 
-		public ValidationState(int numChildren) {
-			minCountByChildDefinition = new HashMap<NodeDefinition, Integer>(numChildren);
-			maxCountByChildDefinition = new HashMap<NodeDefinition, Integer>(numChildren);
-			relevanceByChildDefinition = new HashMap<NodeDefinition, Boolean>(numChildren);
-			minCountValidationResultByChildDefinition = new HashMap<NodeDefinition, ValidationResultFlag>(numChildren);
-			maxCountValidationResultByChildDefinition = new HashMap<NodeDefinition, ValidationResultFlag>(numChildren);
+		public ValidationState() {
+			minCountByChildDefinition = new TreeMap<NodeDefinition, Integer>();
+			maxCountByChildDefinition = new TreeMap<NodeDefinition, Integer>();
+			relevanceByChildDefinition = new TreeMap<NodeDefinition, Boolean>();
+			minCountValidationResultByChildDefinition = new TreeMap<NodeDefinition, ValidationResultFlag>();
+			maxCountValidationResultByChildDefinition = new TreeMap<NodeDefinition, ValidationResultFlag>();
 		}
 
 		private Integer getMinCount(NodeDefinition childDefinition) {

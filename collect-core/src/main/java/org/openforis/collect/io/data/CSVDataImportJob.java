@@ -234,6 +234,8 @@ public class CSVDataImportJob extends Job {
 		 */
 		private int parentEntityDefinitionId;
 		
+		private EntityDefinition parentEntityDefinition;
+		
 		private CSVDataImportSettings settings;
 
 		public CSVDataImportInput(File file, CollectSurvey survey, Step step, int parentEntityDefinitionId,
@@ -244,6 +246,7 @@ public class CSVDataImportJob extends Job {
 			this.step = step;
 			this.parentEntityDefinitionId = parentEntityDefinitionId;
 			this.settings = settings == null ? new CSVDataImportSettings(): settings;
+			this.parentEntityDefinition = (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
 		}
 
 		public File getFile() {
@@ -277,7 +280,11 @@ public class CSVDataImportJob extends Job {
 		public void setParentEntityDefinitionId(int parentEntityDefinitionId) {
 			this.parentEntityDefinitionId = parentEntityDefinitionId;
 		}
-
+		
+		public EntityDefinition getParentEntityDefinition() {
+			return parentEntityDefinition;
+		}
+		
 		public CSVDataImportSettings getSettings() {
 			return settings;
 		}
@@ -333,8 +340,7 @@ public class CSVDataImportJob extends Job {
 			if ( ! input.file.exists() || ! input.file.canRead() ) {
 				setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
 				changeStatus(Status.FAILED);
-			} else if ( input.settings.isInsertNewRecords() && 
-					input.survey.getSchema().getDefinitionById(input.parentEntityDefinitionId) == null ) {
+			} else if ( input.settings.isInsertNewRecords() && input.parentEntityDefinition == null ) {
 				setErrorMessage(NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY);
 				changeStatus(Status.FAILED);
 			} else if ( input.settings.isInsertNewRecords() && input.settings.getNewRecordVersionName() != null && 
@@ -352,7 +358,7 @@ public class CSVDataImportJob extends Job {
 			recordUpdater.setValidateAfterUpdate(input.settings.isRecordValidationEnabled());
 			dataImportStatus = new ReferenceDataImportStatus<ParsingError>();
 			adminUser = userManager.loadAdminUser();
-			EntityDefinition parentEntityDefn = getParentEntityDefinition();
+			EntityDefinition parentEntityDefn = input.parentEntityDefinition;
 			reader = new DataCSVReader(input.file, parentEntityDefn);
 			try {
 				reader.init();
@@ -413,7 +419,7 @@ public class CSVDataImportJob extends Job {
 			CollectRecord recordSummary = loadRecordSummary(line);
 			if (recordSummary == null && input.settings.isInsertNewRecords() ) {
 				//create new record
-				EntityDefinition rootEntityDefn = getParentEntityDefinition();
+				EntityDefinition rootEntityDefn = input.parentEntityDefinition;
 				CollectRecord record = recordManager.instantiateRecord(input.survey, rootEntityDefn.getName(), 
 						adminUser, input.settings.getNewRecordVersionName(), Step.ENTRY);
 				NodeChangeSet changes = recordManager.initializeRecord(record);
@@ -459,15 +465,11 @@ public class CSVDataImportJob extends Job {
 			dataImportStatus.addProcessedRow(line.getLineNumber());
 		}
 
-		private EntityDefinition getParentEntityDefinition() {
-			return (EntityDefinition) input.survey.getSchema().getDefinitionById(input.parentEntityDefinitionId);
-		}
-
 		private CollectRecord loadRecord(Integer recordId, Step step) {
 			CollectRecord record = recordManager.load(input.survey, recordId, step, input.settings.isRecordValidationEnabled());
 			//delete existing entities
 			RecordStepKey recordStepKey = new RecordStepKey(record.getId(), step);
-			if (input.settings.isDeleteExistingEntities() && ! deletedEntitiesRecordKeys.contains(recordStepKey) && ! getParentEntityDefinition().isRoot()) {
+			if (input.settings.isDeleteExistingEntities() && ! deletedEntitiesRecordKeys.contains(recordStepKey) && ! input.parentEntityDefinition.isRoot()) {
 				deleteAllParentEntities(record);
 				deletedEntitiesRecordKeys.add(recordStepKey);
 			}
@@ -475,7 +477,7 @@ public class CSVDataImportJob extends Job {
 		}
 
 		private void deleteAllParentEntities(CollectRecord record) {
-			String parentEntitiesPath = getParentEntityDefinition().getPath();
+			String parentEntitiesPath = input.parentEntityDefinition.getPath();
 			List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
 			for (Entity entity : entitiesToBeDeleted) {
 				NodeChangeSet changes = recordUpdater.deleteNode(entity);
@@ -519,7 +521,7 @@ public class CSVDataImportJob extends Job {
 		
 		private boolean validateRecordKey(DataLine line) {
 			long currentRowNumber = line.getLineNumber();
-			EntityDefinition parentEntityDefn = getParentEntityDefinition();
+			EntityDefinition parentEntityDefn = input.parentEntityDefinition;
 			EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 			String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 			RecordFilter filter = new RecordFilter(input.survey);
@@ -551,7 +553,7 @@ public class CSVDataImportJob extends Job {
 		}
 		
 		private CollectRecord loadRecordSummary(DataLine line) {
-			EntityDefinition parentEntityDefn = getParentEntityDefinition();
+			EntityDefinition parentEntityDefn = input.parentEntityDefinition;
 			EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 			String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 			List<CollectRecord> recordSummaries = recordManager.loadSummaries(input.survey, rootEntityDefn.getName(), recordKeyValues);
@@ -754,9 +756,7 @@ public class CSVDataImportJob extends Job {
 		}
 		
 		private Entity getOrCreateParentEntity(CollectRecord record, DataLine line) {
-			Survey survey = record.getSurvey();
-			Schema schema = survey.getSchema();
-			EntityDefinition parentEntityDefn = (EntityDefinition) schema.getDefinitionById(input.parentEntityDefinitionId);
+			EntityDefinition parentEntityDefn = input.parentEntityDefinition;
 			Entity rootEntity = record.getRootEntity();
 			Entity currentParent = rootEntity;
 			List<EntityDefinition> ancestorEntityDefns = parentEntityDefn.getAncestorEntityDefinitionsInReverseOrder();

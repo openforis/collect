@@ -35,7 +35,7 @@ public abstract class NodeDependencyGraph extends DependencyGraph<Node<?>> {
 	protected abstract boolean isDependentItemIncluded(Node<?> node);
 
 	@Override
-	protected Object getId(Node<?> node) {
+	protected Comparable<?> getId(Node<?> node) {
 		return node.getInternalId();
 	}
 

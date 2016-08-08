@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -101,7 +102,7 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 		return result;
 	}
 
-	static class NodePointerId {
+	static class NodePointerId implements Comparable<NodePointerId> {
 		
 		private int entityId;
 		private int childDefinitionId;
@@ -111,6 +112,16 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 			this.childDefinitionId = childDefinitionId;
 		}
 
+		@Override
+		public int compareTo(NodePointerId o) {
+			int result = NumberUtils.compare(this.entityId, o.entityId);
+			if (result == 0) {
+				return NumberUtils.compare(this.childDefinitionId, o.childDefinitionId);
+			} else {
+				return result;
+			}
+		}
+		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
