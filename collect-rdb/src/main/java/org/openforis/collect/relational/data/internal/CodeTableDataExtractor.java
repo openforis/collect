@@ -28,6 +28,8 @@ import org.openforis.idm.metamodel.SurveyContext;
 //TODO do not extract all code list items in level with a single query
 public class CodeTableDataExtractor extends DataExtractor {
 
+	public static final int DEFAULT_CODE_ROW_ID = -1;
+	
 	private CodeTable table;
 	private List<CodeListItem> items;
 	private int itemIndex;
@@ -146,7 +148,7 @@ public class CodeTableDataExtractor extends DataExtractor {
 			Column col = columns.get(i);
 			Object val;
 			if ( col instanceof CodePrimaryKeyColumn ) {
-				val = -1;
+				val = DEFAULT_CODE_ROW_ID;
 			} else if ( col instanceof CodeListCodeColumn ) {
 				val = table.getDefaultCode();
 			} else if ( col instanceof CodeLabelColumn ) {

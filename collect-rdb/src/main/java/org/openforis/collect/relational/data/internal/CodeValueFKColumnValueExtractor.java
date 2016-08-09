@@ -35,7 +35,7 @@ public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExt
 			return extractValue((CodeAttribute) valNode);
 		} else if ( ((CodeValueFKColumn) column).getDefaultCodeValue() != null ) {
 			ModelVersion version = context.getRecord().getVersion();
-			return getDefaultCodeId(((CodeAttributeDefinition) defn).getList(), version);
+			return getDefaultCodeItemId(((CodeAttributeDefinition) defn).getList(), version);
 		} else {
 			return null;
 		}
@@ -45,19 +45,15 @@ public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExt
 		CodeListItem item = findCodeListItem(valNode);
 		if ( item == null ) {
 			String defaultCodeValue = ((CodeValueFKColumn) column).getDefaultCodeValue();
-			if ( defaultCodeValue == null ) {
+			if ( defaultCodeValue == null || ! defaultCodeValue.equals(getCodeValue(valNode)) ) {
+				//no default code value specified or code list item not found (invalid code?)
 				return null;
-			}
-			String codeValue = getCodeValue(valNode);
-			if ( defaultCodeValue.equals(codeValue)) {
+			} else {
 				CodeAttributeDefinition definition = valNode.getDefinition();
 				CodeList list = definition.getList();
 				Record record = valNode.getRecord();
 				ModelVersion version = record.getVersion();
-				return getDefaultCodeId(list, version);
-			} else {
-				//code list item not found, invalid code?
-				return null;
+				return getDefaultCodeItemId(list, version);
 			}
 		} else {
 			return item.getId();
@@ -84,10 +80,10 @@ public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExt
 		}
 	}
 
-	private Integer getDefaultCodeId(CodeList list, ModelVersion version) {
+	private Integer getDefaultCodeItemId(CodeList list, ModelVersion version) {
 		CodeListService codeListService = getCodeListService((CollectSurvey) list.getSurvey());
 		CodeListItem defaultCodeItem = codeListService.loadRootItem(list, ((CodeValueFKColumn) column).getDefaultCodeValue(), version);
-		return defaultCodeItem == null ? -1: defaultCodeItem.getId();
+		return defaultCodeItem == null ? CodeTableDataExtractor.DEFAULT_CODE_ROW_ID: defaultCodeItem.getId();
 	}
 
 	private CodeListService getCodeListService(CollectSurvey survey) {
