@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.expression.InvalidExpressionException;
@@ -136,7 +137,13 @@ public abstract class DependencyGraph<T> {
 	}
 
 	private List<T> getDependentNodes(Collection<GraphNode> nodes) {
-		Set<GraphNode> nodesToSort = getUnsortedDependents(nodes);
+		final Set<GraphNode> nodesToSort = new HashSet<GraphNode>();
+		traverseDependentsUnsorted(nodes, new GraphNodeVisitor() {
+			@SuppressWarnings("unchecked")
+			public void visit(DependencyGraph<?>.GraphNode graphNode) {
+				nodesToSort.add((DependencyGraph<T>.GraphNode) graphNode);
+			}
+		});
 		List<T> result = getSortedDependentItems(nodesToSort);
 		
 		Iterator<T> it = result.iterator();
@@ -149,17 +156,26 @@ public abstract class DependencyGraph<T> {
 		return result;
 	}
 	
-	private Set<GraphNode> getUnsortedDependents(Collection<GraphNode> startFromNodes) {
-		HashSet<GraphNode> result = new HashSet<GraphNode>();
+	private void traverseDependentsUnsorted(Collection<GraphNode> startFromNodes, GraphNodeVisitor visitor) {
 		Deque<GraphNode> stack = new LinkedList<GraphNode>();
+		Set<GraphNode> visited = new HashSet<GraphNode>();
 		stack.addAll(startFromNodes);
 		while(! stack.isEmpty()) {
-			GraphNode node = stack.pop();
-			if (result.add(node)) {
-				stack.addAll(node.getFirstLevelDependents());
+			GraphNode graphNode = stack.pop();
+			if (visited.add(graphNode)) {
+				visitor.visit(graphNode);
+				stack.addAll(graphNode.dependents);
+				List<T> children = getChildren(graphNode.item);
+				for (T child : children) {
+					GraphNode childGraphNode = getGraphNodeByItem(child);
+					if (childGraphNode == null) {
+						//child node must have been already added to the graph during node initialization
+						throw new IllegalStateException("Graph node not found for item: " + child);
+					}
+					stack.add(childGraphNode);
+				}
 			}
 		}
-		return result;
 	}
 	
 	protected List<T> sourcesForItem(T item) {
@@ -262,16 +278,6 @@ public abstract class DependencyGraph<T> {
 			}
 		}
 
-		private List<GraphNode> getFirstLevelDependents() {
-			List<GraphNode> result = new ArrayList<GraphNode>();
-			result.addAll(this.dependents);
-			for (T child : getChildren(this.item)) {
-				GraphNode childNode = getOrCreateGraphNode(child);
-				result.add(childNode);
-			}
-			return result;
-		}
-		
 		private Set<GraphNode> getUnsortedSources() {
 			Set<GraphNode> result = new LinkedHashSet<GraphNode>();
 			Deque<GraphNode> stack = new LinkedList<GraphNode>();
@@ -324,6 +330,10 @@ public abstract class DependencyGraph<T> {
 		}
 
 	}
+	
+	interface GraphNodeVisitor extends Visitor<DependencyGraph<?>.GraphNode> {
+	}
+
 
 	/**
 	 * 
@@ -374,4 +384,5 @@ public abstract class DependencyGraph<T> {
 			}
 		}
 	}
+	
 }
