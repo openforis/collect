@@ -237,13 +237,7 @@ public class EntityDefinition extends NodeDefinition {
 
 			// For entities, add existing child nodes to the stack
 			if (defn instanceof EntityDefinition ) {
-				List<NodeDefinition> children = ((EntityDefinition) defn).getChildDefinitions();
-				if ( ! children.isEmpty() ) {
-					@SuppressWarnings({ "rawtypes", "unchecked" })
-					List<NodeDefinition> reversedChildren = new ArrayList(children);
-					Collections.reverse(reversedChildren);
-					stack.addAll(reversedChildren);
-				}
+				stack.addAll(((EntityDefinition) defn).getChildDefinitions());
 			}
 		}
 	}
