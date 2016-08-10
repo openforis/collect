@@ -28,12 +28,14 @@ public class DefaultSurveyContext implements SurveyContext {
 
 	private ExpressionFactory expressionFactory;
 	private ExpressionEvaluator expressionEvaluator;
+	private Validator validator;
 
 	public DefaultSurveyContext() {
 		expressionFactory = new ExpressionFactory();
 		LookupProvider lookupProvider = new UnspecifiedLookupProvider();
 		expressionFactory.setLookupProvider(lookupProvider);
 		expressionEvaluator = new ExpressionEvaluator(expressionFactory);
+		validator = new Validator();
 	}
 
 	@Override
@@ -48,7 +50,7 @@ public class DefaultSurveyContext implements SurveyContext {
 
 	@Override
 	public Validator getValidator() {
-		return new Validator();
+		return validator;
 	}
 
 	@Override
@@ -58,7 +60,7 @@ public class DefaultSurveyContext implements SurveyContext {
 	
 	@Override
 	public CodeListService getCodeListService() {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 	
 	@Override

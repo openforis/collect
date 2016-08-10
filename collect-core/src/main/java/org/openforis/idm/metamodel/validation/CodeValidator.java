@@ -42,5 +42,5 @@ public class CodeValidator implements ValidationRule<CodeAttribute> {
 		CodeAttributeDefinition definition = attribute.getDefinition();
 		return definition.isAllowUnlisted();
 	}
-
+	
 }
