@@ -40,7 +40,7 @@ public class SchemaSummaryCSVExportJob extends Job {
 			@Override
 			protected void execute() throws Throwable {
 				FileOutputStream out = new FileOutputStream(outputFile);
-				final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(new OutputStreamWriter(out)), ',', '"');
+				final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(new OutputStreamWriter(out, "UTF-8")), ',', '"');
 				try {
 					csvWriter.writeHeaders(new String[] {"id", "path", "type", "attribute_type", "label"});
 					
