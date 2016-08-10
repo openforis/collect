@@ -616,6 +616,10 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		return (C) surveyContext;
 	}
 	
+	public void setSurveyContext(SurveyContext surveyContext) {
+		this.surveyContext = surveyContext;
+	}
+	
 	public ReferenceDataSchema getReferenceDataSchema() {
 		return referenceDataSchema;
 	}

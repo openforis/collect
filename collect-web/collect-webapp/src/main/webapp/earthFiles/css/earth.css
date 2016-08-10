@@ -233,7 +233,7 @@ a.btn-finish:active {
 	width: 45%;
 	margin: 2px;
 	white-space: normal;
-	height: 27px;
+	/*height: 27px;*/
 	font-size: 12px;
 }
 

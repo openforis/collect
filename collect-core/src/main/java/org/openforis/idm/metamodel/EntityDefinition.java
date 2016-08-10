@@ -6,12 +6,12 @@ package org.openforis.idm.metamodel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.commons.collection.CollectionUtils;
@@ -44,8 +44,8 @@ public class EntityDefinition extends NodeDefinition {
 		super(survey, id);
 		childDefinitionNames = new String[0];
 		childDefinitions = new ArrayList<NodeDefinition>();
-		childDefinitionByName = new HashMap<String, NodeDefinition>();
-        childDefinitionById = new HashMap<Integer, NodeDefinition>();
+		childDefinitionByName = new TreeMap<String, NodeDefinition>();
+        childDefinitionById = new TreeMap<Integer, NodeDefinition>();
 	}
 
 	void renameChild(String oldName, String newName) {
@@ -237,13 +237,7 @@ public class EntityDefinition extends NodeDefinition {
 
 			// For entities, add existing child nodes to the stack
 			if (defn instanceof EntityDefinition ) {
-				List<NodeDefinition> children = ((EntityDefinition) defn).getChildDefinitions();
-				if ( ! children.isEmpty() ) {
-					@SuppressWarnings({ "rawtypes", "unchecked" })
-					List<NodeDefinition> reversedChildren = new ArrayList(children);
-					Collections.reverse(reversedChildren);
-					stack.addAll(reversedChildren);
-				}
+				stack.addAll(((EntityDefinition) defn).getChildDefinitions());
 			}
 		}
 	}

@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.metamodel.ui.UITable;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -62,6 +64,7 @@ public class CollectEarthBalloonGenerator {
 			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	
 	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt"; //$NON-NLS-1$
+	private static final String NEW_BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template_new.txt"; //$NON-NLS-1$
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS"; //$NON-NLS-1$
 	
 	private static final String PLACEHOLDER_FOR_FINISH_TRANSLATION = "PLACEHOLDER_FINISH"; //$NON-NLS-1$
@@ -72,17 +75,24 @@ public class CollectEarthBalloonGenerator {
 	private static final String PLACEHOLDER_EXTRA_ID_ATTRIBUTES = "PLACEHOLDER_EXTRA_ID_ATTRIBUTES";//$NON-NLS-1$
 	private static final String PLACEHOLDER_UI_LANGUAGE = "PLACEHOLDER_UI_LANGUAGE";
 	private static final String PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST = "PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST";
+	private static final String PLACEHOLDER_PREVIEW = "PLACEHOLDER_PREVIEW";
 
 	private CollectSurvey survey;
 	private String language;
+	private boolean preview;
+
 	private Map<String, CEComponent> componentByName;
-	
 	private BalloonInputFieldsUtils balloonInputFieldsUtils;
 	private Map<String, String> htmlParameterNameByNodePath;
 
 	public CollectEarthBalloonGenerator(CollectSurvey survey, String language) {
+		this(survey, language, false);
+	}
+
+	public CollectEarthBalloonGenerator(CollectSurvey survey, String language, boolean preview) {
 		this.survey = survey;
 		this.language = language;
+		this.preview = preview;
 		this.componentByName = new HashMap<String, CEComponent>();
 		this.balloonInputFieldsUtils = new BalloonInputFieldsUtils();
 		this.htmlParameterNameByNodePath = balloonInputFieldsUtils.getHtmlParameterNameByNodePath(getRootEntity());
@@ -90,10 +100,17 @@ public class CollectEarthBalloonGenerator {
 
 	public String generateHTML() throws IOException {
 		String result = getHTMLTemplate();
+		if (preview) {
+			result = replaceHostForPreview(result);
+		}
 		result = addHiddenFields(result);
 		result = fillWithSurveyDefinitionFields(result);
 		result = replaceButtonLocalizationText(result);
 		return result;
+	}
+
+	private String replaceHostForPreview(String html) {
+		return html.replaceAll("\\$\\[host\\]", "preview_");
 	}
 
 	private String replaceButtonLocalizationText(String htmlForBalloon) {
@@ -111,6 +128,7 @@ public class CollectEarthBalloonGenerator {
 		// Added to handle multiple id attributes within a survey
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST,  getIdPlaceholdersSurvey() ); //$NON-NLS-1$
 
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_PREVIEW, String.valueOf(preview).toLowerCase(Locale.ENGLISH));
 		
 		return htmlForBalloon;
 	}
@@ -152,9 +170,10 @@ public class CollectEarthBalloonGenerator {
 	
 
 	private String getHTMLTemplate() throws IOException {
-		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
+		InputStream is = getClass().getClassLoader().getResourceAsStream(preview ? 
+				NEW_BALLOON_TEMPLATE_TXT : BALLOON_TEMPLATE_TXT);
 		StringWriter writer = new StringWriter();
-		IOUtils.copy(is, writer, "UTF-8"); //$NON-NLS-1$
+		IOUtils.copy(is, writer, OpenForisIOUtils.UTF_8);
 		String template = writer.toString();
 		return template;
 	}

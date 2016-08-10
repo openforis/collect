@@ -5,10 +5,10 @@ package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
@@ -28,7 +28,7 @@ public class Schema extends SurveyObject {
 	
 	public Schema(Survey survey) {
 		super(survey);
-		definitionsById = new HashMap<Integer, NodeDefinition>();
+		this.definitionsById = new TreeMap<Integer, NodeDefinition>();
 	}
 	
 	public NodeDefinition getDefinitionByPath(String absolutePath) throws InvalidPathException {

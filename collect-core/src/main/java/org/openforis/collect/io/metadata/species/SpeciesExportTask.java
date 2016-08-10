@@ -52,7 +52,7 @@ public class SpeciesExportTask extends Task {
 		colNames.add(SpeciesFileColumn.SYNONYMS.getColumnName());
 		colNames.addAll(vernacularNamesLangCodes);
 		
-		writer.writeHeaders(colNames.toArray(new String[0]));
+		writer.writeHeaders(colNames);
 		
 		for (TaxonSummary item : summaries.getItems()) {
 			writeTaxonSummary(writer, vernacularNamesLangCodes, item);
@@ -84,7 +84,7 @@ public class SpeciesExportTask extends Task {
 			String jointVernacularNames = item.getJointVernacularNames(langCode, VERNACULAR_NAMES_SEPARATOR);
 			lineValues.add(jointVernacularNames);
 		}
-		writer.writeNext(lineValues.toArray(new String[0]));
+		writer.writeNext(lineValues);
 	}
 
 	public OutputStream getOutputStream() {

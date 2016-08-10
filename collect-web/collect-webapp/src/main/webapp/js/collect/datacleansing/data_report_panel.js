@@ -11,7 +11,11 @@ Collect.DataCleansing.DataReportPanelController.prototype.getDataGridOptions = f
 	var $this = this;
 	
 	function percentFormatter(value, row) {
-		return value.toFixed(1) + " %";
+		if (typeof value == 'number') {
+			return value.toFixed(1) + " %";
+		} else {
+			return value;
+		}
     }
 	
 	function onExpandRow(index, report, $rowEl) {

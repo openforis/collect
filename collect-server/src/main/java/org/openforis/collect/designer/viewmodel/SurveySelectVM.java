@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.metamodel.SurveySummarySortField;
+import org.openforis.collect.metamodel.SurveySummarySortField.Sortable;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
@@ -33,15 +36,19 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.ListModel;
+import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Window;
 
 /**
@@ -86,7 +93,7 @@ public class SurveySelectVM extends BaseVM {
 	public void init() {
 		super.init();
 		PageUtil.clearConfirmClose();
-		loadSurveySummaries();
+		reloadSurveySummaries(null);
 	}
 
 	@Command
@@ -200,31 +207,31 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	@Command
-	public void publishSelectedSurvey() throws IOException {
+	public void publishSelectedSurvey(@ContextParam(ContextType.BINDER) final Binder binder) throws IOException {
 		final CollectSurvey survey = loadSelectedSurvey();
 		final CollectSurvey publishedSurvey = selectedSurvey.isPublished() ? surveyManager
 				.getByUri(survey.getUri()) : null;
 		SurveyValidator validator = getSurveyValidator(survey);
 		SurveyValidationResults validationResults = validator.validateCompatibility(publishedSurvey, survey);
 		if (validationResults.isOk()) {
-			askConfirmThenPublishSurvey(survey);
+			askConfirmThenPublishSurvey(survey, binder);
 		} else {
 			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(validationResults, ! validationResults.hasErrors());
 			validationResultsPopUp.addEventListener(SurveyValidationResultsVM.CONFIRM_EVENT_NAME, new EventListener<ConfirmEvent>() {
 				public void onEvent(ConfirmEvent event) throws Exception {
 					CollectSurvey survey = loadSelectedSurvey();
-					askConfirmThenPublishSurvey(survey);
+					askConfirmThenPublishSurvey(survey, binder);
 					closePopUp(validationResultsPopUp);
 				}
 			});
 		}
 	}
 
-	private void askConfirmThenPublishSurvey(final CollectSurvey survey) {
+	private void askConfirmThenPublishSurvey(final CollectSurvey survey, final Binder binder) {
 		MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
-				performSurveyPublishing(survey);
+				performSurveyPublishing(survey, binder);
 			}
 		}, "survey.publish.confirm");
 		params.setOkLabelKey("survey.publish");
@@ -232,7 +239,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	@Command
-	public void unpublishSelectedSurvey() throws IOException {
+	public void unpublishSelectedSurvey(@ContextParam(ContextType.BINDER) final Binder binder) throws IOException {
 		final String surveyName = selectedSurvey.getName();
 		//ask for a confirmation about survey unpublishing
 		String messageKey = selectedSurvey.isTemporary() ? "survey.unpublish_overwrite_temporary.confirm" : "survey.unpublish.confirm";
@@ -241,7 +248,7 @@ public class SurveySelectVM extends BaseVM {
 				//ask for a second confirmation about records deletion
 				ConfirmParams confirmParams2 = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 					public void onOk() {
-						performSelectedSurveyUnpublishing();
+						performSelectedSurveyUnpublishing(binder);
 					}
 				});
 				confirmParams2.setMessage("survey.delete_records.confirm", surveyName);
@@ -257,7 +264,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	@Command
-	public void deleteSelectedSurvey() {
+	public void deleteSelectedSurvey(@ContextParam(ContextType.BINDER) final Binder binder) {
 		String messageKey;
 		if (selectedSurvey.isTemporary()) {
 			if (selectedSurvey.isPublished()) {
@@ -274,13 +281,13 @@ public class SurveySelectVM extends BaseVM {
 					//show a second confirmation about deleting all the records associated
 					MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 						public void onOk() {
-							performSelectedSurveyDeletion();
+							performSelectedSurveyDeletion(binder);
 						}
 					}, "survey.delete_records.confirm", new String[] { selectedSurvey.getName() }, 
 					"survey.delete.confirm.title", (String[]) null, 
 					"global.delete_item", "global.cancel");
 				} else {
-					performSelectedSurveyDeletion();
+					performSelectedSurveyDeletion(binder);
 				}
 			}
 		}, messageKey, new String[] { selectedSurvey.getName() }, 
@@ -288,19 +295,19 @@ public class SurveySelectVM extends BaseVM {
 			"global.delete_item", "global.cancel");
 	}
 
-	protected void performSelectedSurveyDeletion() {
+	protected void performSelectedSurveyDeletion(Binder binder) {
 		surveyManager.deleteSurvey(selectedSurvey.getId());
 		selectedSurvey = null;
-		loadSurveySummaries();
-		notifyChange("selectedSurvey","surveySummaries");
+		notifyChange("selectedSurvey");
+		reloadSurveySummaries(binder);
 	}
 
-	protected void performSurveyPublishing(CollectSurvey survey) {
+	protected void performSurveyPublishing(CollectSurvey survey, Binder binder) {
 		try {
 			surveyManager.publish(survey);
-			loadSurveySummaries();
 			selectedSurvey = null;
-			notifyChange("selectedSurvey", "surveySummaries");
+			notifyChange("selectedSurvey");
+			reloadSurveySummaries(binder);
 			Object[] args = new String[] { survey.getName() };
 			MessageUtil.showInfo("survey.successfully_published", args);
 			User user = getLoggedUser();
@@ -310,13 +317,13 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 
-	private void performSelectedSurveyUnpublishing() {
+	private void performSelectedSurveyUnpublishing(Binder binder) {
 		try {
 			Integer publishedSurveyId = selectedSurvey.isTemporary() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
 			CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
-			loadSurveySummaries();
 			selectedSurvey = null;
-			notifyChange("selectedSurvey", "surveySummaries");
+			notifyChange("selectedSurvey");
+			reloadSurveySummaries(binder);
 			Object[] args = new String[] { temporarySurvey.getName() };
 			MessageUtil.showInfo("survey.successfully_unpublished", args);
 		} catch (SurveyStoreException e) {
@@ -338,16 +345,16 @@ public class SurveySelectVM extends BaseVM {
 	@GlobalCommand
 	public void closeSurveyImportPopUp(
 			@BindingParam("successfullyImported") Boolean successfullyImported) {
+		Binder binder = null;
 		if (surveyImportPopUp != null) {
-			Binder binder = ComponentUtil.getBinder(surveyImportPopUp);
+			binder = ComponentUtil.getBinder(surveyImportPopUp);
 			SurveyImportVM vm = (SurveyImportVM) binder.getViewModel();
 			vm.reset();
 		}
 		closePopUp(surveyImportPopUp);
 		surveyImportPopUp = null;
 		if (successfullyImported != null && successfullyImported.booleanValue()) {
-			loadSurveySummaries();
-			notifyChange("surveySummaries");
+			reloadSurveySummaries(binder);
 		}
 	}
 
@@ -379,7 +386,7 @@ public class SurveySelectVM extends BaseVM {
 			return;
 		}
 		try {
-			List<SurveySummary> newSummaries = surveyManager.loadCombinedSummaries(null, true);
+			List<SurveySummary> newSummaries = loadSurveySummaries(null);
 			if (summaries == null) {
 				summaries = newSummaries;
 			} else {
@@ -402,13 +409,65 @@ public class SurveySelectVM extends BaseVM {
 		} catch (Exception e) {
 			return;
 		}
-
 	}
 
-	private void loadSurveySummaries() {
-		summaries = surveyManager.loadCombinedSummaries(null, true);
+	private void reloadSurveySummaries(Binder binder) {
+		Listheader lastSortedHeader = null;
+		boolean lastSortDirectionDescending = true;
+
+		if (binder != null) {
+			Component view = binder.getView();
+			Iterable<Component> listHeaders = view.queryAll("listheader");
+			for (Component headerComp : listHeaders) {
+				Listheader listHeader = (Listheader) headerComp;
+				String sortDirection = listHeader.getSortDirection();
+				if (! "natural".equals(sortDirection)) {
+					lastSortedHeader = listHeader;
+					lastSortDirectionDescending = "descending".equals(sortDirection);
+					break;
+				}
+			}
+		}
+		List<SurveySummarySortField> sortFields;
+		if (lastSortedHeader == null) {
+			sortFields = Arrays.asList(
+					new SurveySummarySortField(Sortable.MODIFIED_DATE, true),
+					new SurveySummarySortField(Sortable.NAME)
+			);
+		} else {
+			String id = lastSortedHeader.getId();
+			Sortable sortableField;
+			if ("surveysListNameHeader".equals(id)) {
+				sortableField = Sortable.NAME;
+			} else if ("surveysListProjectNameHeader".equals(id)) {
+				sortableField = Sortable.PROJECT_NAME;
+			} else if ("surveysListLastModifiedDateHeader".equals(id)) {
+				sortableField = Sortable.MODIFIED_DATE;
+			} else if ("surveysListTargetHeader".equals(id)) {
+				sortableField = Sortable.TARGET;
+			} else if ("surveysListModifiedHeader".equals(id)) {
+				sortableField = Sortable.MODIFIED;
+			} else if ("surveysListPublishedHeader".equals(id)) {
+				sortableField = Sortable.PUBLISHED;
+			} else {
+				throw new IllegalStateException("Unsupported sorting for column with header id " + id);
+			}
+			sortFields = Arrays.asList(
+					new SurveySummarySortField(sortableField, lastSortDirectionDescending),
+					new SurveySummarySortField(Sortable.NAME, lastSortDirectionDescending));
+		}
+		summaries = loadSurveySummaries(sortFields);
+		notifyChange("surveySummaries");
+		
+		if (lastSortedHeader != null) {
+			lastSortedHeader.sort(! lastSortDirectionDescending);
+		}
 	}
 
+	private List<SurveySummary> loadSurveySummaries(List<SurveySummarySortField> sortFields) {
+		return surveyManager.loadCombinedSummaries(null, true, sortFields);
+	}
+	
 	private SurveySummary findSummary(Integer id, boolean published, boolean work) {
 		for (SurveySummary summary : summaries) {
 			if (summary.getId().equals(id)

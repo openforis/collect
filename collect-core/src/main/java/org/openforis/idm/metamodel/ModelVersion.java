@@ -12,7 +12,7 @@ import java.util.List;
  * @author G. Miceli
  * @author M. Togna
  */
-public class ModelVersion extends IdentifiableSurveyObject implements Comparable<ModelVersion> {
+public class ModelVersion extends IdentifiableSurveyObject<ModelVersion> {
 
 	private static final long serialVersionUID = 1L;
 

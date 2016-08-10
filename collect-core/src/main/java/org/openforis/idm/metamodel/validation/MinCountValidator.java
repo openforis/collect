@@ -9,7 +9,11 @@ import static org.openforis.idm.metamodel.validation.ValidationResultFlag.OK;
 import java.util.List;
 
 import org.openforis.idm.metamodel.Calculable;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 
@@ -49,11 +53,27 @@ public class MinCountValidator implements ValidationRule<Entity> {
 						}
 					}
 				}
-				return ERROR;
+				if (nodeDefinition instanceof CodeAttributeDefinition && ! isAvailableCodeListItems(entity)) {
+					return OK;
+				} else {
+					return ERROR;
+				}
 			}
 		} else {
 			return OK;
 		}
+	}
+
+	private boolean isAvailableCodeListItems(Entity parentEntity) {
+		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDefinition;
+		SurveyContext context = codeAttrDef.getSurvey().getContext();
+		CodeListService codeListService = context.getCodeListService();
+		if (codeListService == null) {
+			//test context does not have a CodeListService
+			return true;
+		}
+		List<CodeListItem> validItems = codeListService.loadValidItems(parentEntity, codeAttrDef);
+		return ! validItems.isEmpty();
 	}
 
 	protected boolean isEmpty(Node<?> node){

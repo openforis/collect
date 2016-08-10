@@ -139,7 +139,7 @@ public class CodeListTables {
 		} else {
 			sb.append(tableNameAnnotation);
 		}
-		if ( levelIdx != null ) {
+		if ( codeList.isHierarchical() && levelIdx != null ) {
 			List<CodeListLevel> hierarchy = codeList.getHierarchy();
 			CodeListLevel currentLevel = hierarchy.get(levelIdx);
 			sb.append("_");

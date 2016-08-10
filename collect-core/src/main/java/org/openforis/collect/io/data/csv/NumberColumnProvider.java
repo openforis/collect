@@ -28,7 +28,7 @@ public class NumberColumnProvider extends CompositeAttributeColumnProvider<Numbe
 		if ( ! attributeDefinition.getUnits().isEmpty() ) {
 			result.add(NumberAttributeDefinition.UNIT_NAME_FIELD);
 		}
-		return result.toArray(new String[0]);
+		return result.toArray(new String[result.size()]);
 	}
 	
 	@Override

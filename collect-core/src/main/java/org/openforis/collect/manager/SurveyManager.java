@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -19,8 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.Collect;
@@ -32,6 +36,8 @@ import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.manager.validation.RecordValidationProcess;
 import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.metamodel.SurveySummarySortField;
+import org.openforis.collect.metamodel.SurveySummarySortField.Sortable;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveyFile;
@@ -64,7 +70,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class SurveyManager {
 	
-	private static Log LOG = LogFactory.getLog(SurveyManager.class);
+	private static final Log LOG = LogFactory.getLog(SurveyManager.class);
+	private static final List<SurveySummarySortField> DEFAULT_SURVEY_SUMMARY_SORT_FIELDS = 
+			Arrays.asList(new SurveySummarySortField(Sortable.NAME));
 	private static final String URI_PREFIX = "http://www.openforis.org/idm/";
 	
 	@Autowired
@@ -397,7 +405,7 @@ public class SurveyManager {
 			}
 			summaries.add(summary);
 		}
-		sortByName(summaries);
+		sortSummaries(summaries);
 		return summaries;
 	}
 	
@@ -419,11 +427,46 @@ public class SurveyManager {
 		}
 	}
 	
-	protected void sortByName(List<SurveySummary> summaries) {
+	protected void sortSummaries(List<SurveySummary> summaries) {
+		sortSummaries(summaries, null);
+	}
+	
+	protected void sortSummaries(List<SurveySummary> summaries, List<SurveySummarySortField> sortFields) {
+		final List<SurveySummarySortField> sortFields2 = sortFields == null ? DEFAULT_SURVEY_SUMMARY_SORT_FIELDS: sortFields;
 		Collections.sort(summaries, new Comparator<SurveySummary>() {
+			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			public int compare(SurveySummary s1, SurveySummary s2) {
-				return s1.getName().compareTo(s2.getName());
+				int result = 0;
+				for (SurveySummarySortField sortField : sortFields2) {
+					try {
+						Object f1 = PropertyUtils.getProperty(s1, sortField.getField().getFieldName());
+						Object f2 = PropertyUtils.getProperty(s2, sortField.getField().getFieldName());
+						Object c1, c2; 
+						if (sortField.isDescending()) {
+							c1 = f2;
+							c2 = f1;
+						} else {
+							c1 = f1;
+							c2 = f2;
+						}
+						if (c1 instanceof Date) {
+							result = DateUtils.truncatedCompareTo((Date) c1, (Date) c2, Calendar.SECOND);
+						} else if (c1 instanceof Comparable) {
+							result = ((Comparable) c1).compareTo((Comparable) c2);
+						} else if (c1 instanceof Enum) {
+							result = ((Enum) c1).name().compareTo(((Enum) c2).name());
+						} else {
+							throw new IllegalArgumentException("Survey summary sort error - unsupported type: " + c1.getClass().getName());
+						}
+						if (result != 0) {
+							return result;
+						}
+					} catch (Exception e) {
+						throw new RuntimeException(e); //should never happen
+					}
+				}
+				return result;
 			}
 		});
 	}
@@ -531,6 +574,17 @@ public class SurveyManager {
 	 * @return list of published and temporary surveys.
 	 */
 	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails) {
+		return loadCombinedSummaries(labelLang, includeDetails, null);
+	}
+	
+	/**
+	 * Loads published and temporary survey summaries into a single list.
+	 * 
+	 * @param labelLang 	language code used to 
+	 * @param includeDetails if true, survey info like project name will be included in the summary (it makes the loading process slower).
+	 * @return list of published and temporary surveys.
+	 */
+	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, List<SurveySummarySortField> sortFields) {
 		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang);
 		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails);
 		List<SurveySummary> result = new ArrayList<SurveySummary>();
@@ -550,7 +604,7 @@ public class SurveyManager {
 				temporarySurveySummary.setRecordValidationProcessStatus(publishedSurveySummary.getRecordValidationProcessStatus());
 			}
 		}
-		sortByName(result);
+		sortSummaries(result, sortFields);
 		return result;
 	}
 	

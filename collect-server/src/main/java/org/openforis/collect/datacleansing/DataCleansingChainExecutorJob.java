@@ -194,6 +194,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		}
 		
 		private void appendRecordUpdateQuery(CollectRecord record, Step step) {
+			record.updateSummaryFields();
 			queryBuffer.append(recordManager.createUpdateQuery(record, step));
 		}
 		

@@ -30,16 +30,22 @@
 		selectedItem="@bind(vm.selectedSurvey)">
 		<listhead>
 			<listheader label="${labels.survey.name}" width="250px"
+				id="surveysListNameHeader"
 				sort="auto(name)" />
 			<listheader label="${labels.survey.project_name}"
+				id="surveysListProjectNameHeader"
 				sort="auto(projectName)" />
 			<listheader label="${labels.survey.last_change}" width="100px"
+				id="surveysListLastModifiedDateHeader"
 				sort="auto(modifiedDate)" />
 			<listheader label="${labels.survey.target.$}" width="50px"
+				id="surveysListTargetHeader"
 				sort="auto(target)" />
 			<listheader label="${labels.survey.modified}" width="60px"
+				id="surveysListModifiedHeader"
 				sort="auto(temporary, published, name)" />
 			<listheader label="${labels.survey.published}" width="70px"
+				id="surveysListPublishedHeader"
 				sort="auto(published, temporary, name)" />
 		</listhead>
 		<template name="model">

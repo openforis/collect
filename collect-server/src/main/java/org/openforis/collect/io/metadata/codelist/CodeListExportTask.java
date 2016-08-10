@@ -85,7 +85,7 @@ public class CodeListExportTask extends Task {
 				colNames.add(levelName + CodeListCSVReader.DESCRIPTION_COLUMN_SUFFIX + "_" + lang);
 			}
 		}
-		writer.writeHeaders(colNames.toArray(new String[colNames.size()]));
+		writer.writeHeaders(colNames);
 	}
 
 	protected void writeItem(CodeListItem item, List<CodeListItem> ancestors) {
@@ -93,7 +93,7 @@ public class CodeListExportTask extends Task {
 		addAncestorsLineValues(lineValues, ancestors);
 		addItemLineValues(lineValues, item);
 
-		writer.writeNext(lineValues.toArray(new String[lineValues.size()]));
+		writer.writeNext(lineValues);
 		
 		List<CodeListItem> children = codeListManager.loadChildItems(item);
 		List<CodeListItem> childAncestors = new ArrayList<CodeListItem>(ancestors);

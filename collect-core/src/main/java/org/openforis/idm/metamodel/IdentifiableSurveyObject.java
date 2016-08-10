@@ -1,10 +1,11 @@
 package org.openforis.idm.metamodel;
 
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * @author G. Miceli
  */
-public abstract class IdentifiableSurveyObject extends SurveyObject {
+public abstract class IdentifiableSurveyObject<I extends IdentifiableSurveyObject<I>> extends SurveyObject implements Comparable<I> {
 	private static final long serialVersionUID = 1L;
 	
 	private int id;
@@ -14,7 +15,7 @@ public abstract class IdentifiableSurveyObject extends SurveyObject {
 		this.id = id;
 	}
 
-	protected IdentifiableSurveyObject(IdentifiableSurveyObject object, int id) {
+	protected IdentifiableSurveyObject(IdentifiableSurveyObject<I> object, int id) {
 		super(object);
 		this.id = id;
 	}
@@ -35,7 +36,7 @@ public abstract class IdentifiableSurveyObject extends SurveyObject {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		IdentifiableSurveyObject other = (IdentifiableSurveyObject) obj;
+		IdentifiableSurveyObject<?> other = (IdentifiableSurveyObject<?>) obj;
 		if (id != other.id)
 			return false;
 		return true;
@@ -54,10 +55,15 @@ public abstract class IdentifiableSurveyObject extends SurveyObject {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		IdentifiableSurveyObject other = (IdentifiableSurveyObject) obj;
+		IdentifiableSurveyObject<?> other = (IdentifiableSurveyObject<?>) obj;
 		if (id != other.id)
 			return false;
 		return true;
+	}
+	
+	@Override
+	public int compareTo(I o) {
+		return NumberUtils.compare(this.getId(), o.getId());
 	}
 	
 }

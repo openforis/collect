@@ -167,6 +167,7 @@ var submitForm = function(submitCounter) {
 		if (DEBUG) {
 			log("data submitted successfully");
 		}
+		setStepsAsVisited();
 		interpretJsonSaveResponse(json, true);
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
@@ -182,7 +183,7 @@ var submitForm = function(submitCounter) {
 			if (submitCounter < 5) {
 				submitForm(submitCounter + 1);
 			} else {
-				showErrorMessage("Cannot save the data. There was a problem communicating with Collect Earth!");
+				showErrorMessage("Cannot save the data, the Collect Earth server is not running!");
 			}
 			
 	}).always(function() {
@@ -341,18 +342,31 @@ var toggleStepVisibility = function(index, visible) {
 
 var showCurrentStep = function() {
 	if (currentStepIndex != null && currentStepIndex > 0) {
-		var stepHeading = getStepHeading(currentStepIndex);
-		var relevant = ! stepHeading.hasClass("notrelevant");
+		setStepsAsVisited(currentStepIndex);
+		var currentStepHeading = getStepHeading(currentStepIndex); 
+		//set current step active only if relevant
+		var relevant = ! currentStepHeading.hasClass("notrelevant");
 		if (relevant) {
 			$stepsContainer.steps("setCurrentIndex", currentStepIndex);
 		}
 	}
 };
 
+var setStepsAsVisited = function(upToStepIndex) {
+	if (! upToStepIndex) {
+		upToStepIndex = $stepsContainer.find(".steps ul li").length - 1;
+	}
+	for (var stepIndex = 0; stepIndex <= upToStepIndex; stepIndex ++) {
+		var stepHeading = getStepHeading(stepIndex);
+		stepHeading.addClass("visited");
+		stepHeading.removeClass("disabled");
+	}
+}
+
 var updateStepsErrorFeedback = function() {
 	$form.find(".step").each(function(index, value) {
 		var stepHeading = getStepHeading(index);
-		if (! stepHeading.hasClass("disabled")) {
+		if (stepHeading.hasClass("visited")) {
 			var hasErrors = $(this).find(".form-group.has-error").length > 0;
 			stepHeading.toggleClass("error", hasErrors);
 		}
@@ -459,7 +473,8 @@ var initSteps = function() {
 		    previous: PREVIOUS_LABEL
 		},
 		onStepChanged : function(event, currentIndex, priorIndex) {
-			var stepHeading = $($form.find(".steps .steps ul li")[currentIndex]);
+			var stepHeading = getStepHeading(currentIndex);
+			setStepsAsVisited(currentIndex);
 			if (stepHeading.hasClass("notrelevant")) {
 				if (currentIndex > priorIndex) {
 					$stepsContainer.steps("next");
@@ -476,6 +491,7 @@ var initSteps = function() {
 		}
 	});
 	$stepsContainer.find("a[href='#finish']").addClass("btn-finish");
+	//$stepsContainer.find(".steps ul li").removeClass("disabled"); //enable all steps
 };
 
 var checkIfPlacemarkAlreadyFilled = function(checkCount) {
@@ -513,6 +529,7 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 					forceWindowCloseAfterDialogCloses($("#dialogSuccess"));
 				}
 			}
+			setStepsAsVisited();
 			// Pre-fills the form and after that initilizes the
 			// change event listeners for the inputs
 			updateInputFieldsState(json.inputFieldInfoByParameterName);
@@ -755,7 +772,7 @@ var log = function(message) {
 	newContent = limitString(newContent, 2000);
 	consoleBox.html(newContent);
 	consoleBox.scrollTop(consoleBox[0].scrollHeight);
-}
+};
 
 var limitString = function(str, limit) {
 	var length = str.length;

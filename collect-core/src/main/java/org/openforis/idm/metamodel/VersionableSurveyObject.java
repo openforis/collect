@@ -6,7 +6,7 @@ package org.openforis.idm.metamodel;
  * @author M. Togna
  * @author S. Ricci
  */
-public abstract class VersionableSurveyObject extends IdentifiableSurveyObject {
+public abstract class VersionableSurveyObject extends IdentifiableSurveyObject<VersionableSurveyObject> {
 
 	private static final long serialVersionUID = 1L;
 

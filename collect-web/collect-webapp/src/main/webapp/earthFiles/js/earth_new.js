@@ -101,7 +101,7 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	// if the user stops clicking for over one second
 
 	ajaxTimeout = setTimeout(function() {
-		var data = createPlacemarkUpdateRequest(inputField);
+		var data = PREVIEW ? createPlacemarkUpdateRequest(null) : createPlacemarkUpdateRequest(inputField);
 		
 		lastUpdateRequest = $.ajax({
 			data : data,
@@ -661,7 +661,14 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 };
 
 var getPlacemarkId = function() {
-	var id = findById("collect_text_id").val();
+	var arrayLength = EXTRA_ID_ATTRIBUTES.length;
+	var id = "";
+	for (var i = 0; i < arrayLength; i++) {
+		id += $form.find("input[name='" + EXTRA_ID_ATTRIBUTES[i] + "']").val();
+		if( i < arrayLength-1){
+			id += ",";
+		}
+	}
 	return id;
 };
 
@@ -833,19 +840,19 @@ var forceWindowCloseAfterDialogCloses = function($dialog) {
 var changeState = function(state) {
 	switch(state) {
 		case LOADING_STATE:
-			$("#formAll").hide();
+			$("#contentDiv").hide();
 			$("#collectEarthNotRunningPanel").hide();
 			$("#loadingPanel").show();
 			break;
 		case COLLECT_EARTH_NOT_RUNNING_STATE:
 			$("#loadingPanel").hide();
-			$("#formAll").hide();
+			$("#contentDiv").hide();
 			$("#collectEarthNotRunningPanel").show();
 			break;
 		default:
 			$("#loadingPanel").hide();
 			$("#collectEarthNotRunningPanel").hide();
-			$("#formAll").show();
+			$("#contentDiv").show();
 	}
 }
 
