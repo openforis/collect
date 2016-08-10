@@ -17,6 +17,7 @@ import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.collect.relational.util.CodeListTables;
+import org.openforis.collect.relational.util.DataTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -264,40 +265,38 @@ public class MondrianCubeGenerator {
 	}
 */
 	private Dimension generateDimension(NodeDefinition nodeDef, EntityDefinition rootEntityDef ) {
-		String attrName = nodeDef.getName();
 		String attrLabel = extractFailsafeLabel(nodeDef);
 		Dimension dimension = new Dimension(attrLabel);
 		
 		Hierarchy hierarchy = dimension.hierarchy;
 		
 		if (nodeDef instanceof CodeAttributeDefinition) {
+			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
+			DataTable dataTable = nodeDef.isMultiple() ? rdbSchema.getDataTable(nodeDef) : rdbSchema.getDataTable(nodeDef.getParentDefinition());
+			CodeTable codeListTable = rdbSchema.getCodeListTable(codeDef);
+			String codeListTableName = codeListTable.getName();
+			String codeFKColumnName = DataTables.getCodeFKColumnName(rdbConfig, dataTable, codeDef);
+
 			String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
 			
-			String entityName = attrName;
-			
 			if( nodeDef.isMultiple() ){
-				
 				dimension.foreignKey = rootEntityIdColumnName;
 				hierarchy.primaryKey = rootEntityIdColumnName;
-				hierarchy.primaryKeyTable = entityName;
+				hierarchy.primaryKeyTable = dataTable.getName();
 					
 				Join join = new Join(null);
-				String codeListName = ((CodeAttributeDefinition) nodeDef).getList().getName();
-				join.leftKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
-				join.rightKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+				
+				join.leftKey = codeFKColumnName;
+				join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeListTableName);
 				
 				join.tables = Arrays.asList(
-						new Table(entityName), 
-						new Table(codeListName + rdbConfig.getCodeListTableSuffix())
+						new Table(dataTable.getName()), 
+						new Table(codeListTableName)
 				);
-				
 				hierarchy.join = join;
-										
-			}else{			
-				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDef;
-				String codeTableName = extractCodeListTableName(codeAttrDef);
-				dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();						
-				hierarchy.table = new Table(codeTableName);
+			} else {
+				dimension.foreignKey = codeFKColumnName;
+				hierarchy.table = new Table(codeListTableName);
 			}
 		}
 		
