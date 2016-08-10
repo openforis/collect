@@ -45,7 +45,8 @@ public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExt
 		CodeListItem item = findCodeListItem(valNode);
 		if ( item == null ) {
 			String defaultCodeValue = ((CodeValueFKColumn) column).getDefaultCodeValue();
-			if ( defaultCodeValue == null || ! defaultCodeValue.equals(getCodeValue(valNode)) ) {
+			String codeValue = getCodeValue(valNode);
+			if ( defaultCodeValue == null || (codeValue != null && ! codeValue.equals(defaultCodeValue)) ) {
 				//no default code value specified or code list item not found (invalid code?)
 				return null;
 			} else {
