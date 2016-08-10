@@ -40,24 +40,26 @@ public class CodeListImagesExportTask extends Task {
 	protected void execute() throws Throwable {
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList list : codeLists) {
-			Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
-			List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
-			stack.addAll(rootItems);
-			while (! stack.isEmpty()) {
-				if ( ! isRunning() ) {
-					break;
-				}
-				CodeListItem item = stack.pop();
-				if (item instanceof PersistedCodeListItem && item.hasUploadedImage()) {
-					FileWrapper imageFileWrapper = codeListManager.loadImageContent((PersistedCodeListItem) item);
-					ZipEntry entry = new ZipEntry(getEntryName(item));
-					zipOutputStream.putNextEntry(entry);
-					IOUtils.write(imageFileWrapper.getContent(), zipOutputStream);
-					zipOutputStream.closeEntry();
-				}
-				List<CodeListItem> childItems = codeListManager.loadChildItems(item);
-				for (CodeListItem childItem : childItems) {
-					stack.push(childItem);
+			if (! list.isExternal()) {
+				Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
+				List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
+				stack.addAll(rootItems);
+				while (! stack.isEmpty()) {
+					if ( ! isRunning() ) {
+						break;
+					}
+					CodeListItem item = stack.pop();
+					if (item instanceof PersistedCodeListItem && item.hasUploadedImage()) {
+						FileWrapper imageFileWrapper = codeListManager.loadImageContent((PersistedCodeListItem) item);
+						ZipEntry entry = new ZipEntry(getEntryName(item));
+						zipOutputStream.putNextEntry(entry);
+						IOUtils.write(imageFileWrapper.getContent(), zipOutputStream);
+						zipOutputStream.closeEntry();
+					}
+					List<CodeListItem> childItems = codeListManager.loadChildItems(item);
+					for (CodeListItem childItem : childItems) {
+						stack.push(childItem);
+					}
 				}
 			}
 		}
