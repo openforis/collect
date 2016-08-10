@@ -20,6 +20,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.commons.io.csv.CsvReader;
@@ -219,7 +220,7 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 						break;
 					default:
 				}
-				String attributeName = adjustInternalName(colName);
+				String attributeName = SurveyObjects.adjustInternalName(colName);
 				if (! parentEntityDefinition.containsChildDefinition(attributeName)) {
 					attrDef.setName(attributeName);
 					String label = details.getLabel();

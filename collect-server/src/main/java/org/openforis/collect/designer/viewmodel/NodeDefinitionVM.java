@@ -18,6 +18,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -117,7 +118,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@Command
 	public void nameChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("name") String name) {
-		name = adjustInternalName(name);
+		name = SurveyObjects.adjustInternalName(name);
 		setTempFormObjectFieldValue(NAME_FIELD_NAME, name);
 		((NodeDefinitionFormObject<?>) formObject).setName(name);
 

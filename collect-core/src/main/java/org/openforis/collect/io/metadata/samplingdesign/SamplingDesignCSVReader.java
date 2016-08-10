@@ -17,6 +17,7 @@ import org.openforis.collect.io.metadata.parsing.CSVLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignLine.SamplingDesignLineCodeKey;
+import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.commons.io.csv.CsvLine;
 
 /**
@@ -37,12 +38,13 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 		super.init();
 		List<String> columnNames = csvReader.getColumnNames();
 		for (String col : columnNames) {
-			if ( isInfoAttribute(col) ) {
-				infoColumnNames.add(col);
+			String adjustedName = SurveyObjects.adjustInternalName(col);
+			if ( isInfoAttribute(adjustedName) ) {
+				infoColumnNames.add(adjustedName);
 			}
 		}
 	}
-	
+
 	private boolean isInfoAttribute(String col) {
 		for (SamplingDesignFileColumn column : SamplingDesignFileColumn.values()) {
 			if ( column.getColumnName().equalsIgnoreCase(col) ) {

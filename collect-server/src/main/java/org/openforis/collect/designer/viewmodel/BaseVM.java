@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -38,7 +37,6 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class BaseVM {
 	
-	private static final String INTERNAL_NAME_INVALID_CHARACTERS_REGEX = "[^a-z0-9_]";
 	private static final SimpleDateFormat PRETTY_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	
 	protected static final ServiceLoader<CollectEarthProjectFileCreator> COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER = 
@@ -129,13 +127,6 @@ public abstract class BaseVM {
 	protected void setFormFieldValue(Form form, String field, Object value) {
 		form.setField(field, value);
 		BindUtils.postNotifyChange(null, null, form, field);
-	}
-	
-	protected static String adjustInternalName(String name) {
-		String result = StringUtils.trimToEmpty(name);
-		result = result.toLowerCase(Locale.ENGLISH);
-		result = result.replaceAll(INTERNAL_NAME_INVALID_CHARACTERS_REGEX, "_");
-		return result;
 	}
 	
 	public String joinValues(String[] values, String separator) {
