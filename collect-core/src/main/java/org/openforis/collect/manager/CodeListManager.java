@@ -120,13 +120,13 @@ public class CodeListManager {
 				CodeAttributeDefinition definition = attribute.getDefinition();
 				String parentExpression = definition.getParentExpression();
 				if (StringUtils.isBlank(parentExpression)) {
-					return findCodeListItem(definition.getList().getItems(), codeValue, currentVersion);
+					return getCodeListItem(definition.getList().getItems(), codeValue, currentVersion);
 				} else {
 					CodeAttribute codeParent = attribute.getCodeParent();
 					if (codeParent != null) {
 						CodeListItem codeListItemParent = loadItemByAttribute(codeParent);
 						if (codeListItemParent != null) {
-							return findCodeListItem(codeListItemParent.getChildItems(), codeValue, currentVersion);
+							return getCodeListItem(codeListItemParent.getChildItems(), codeValue, currentVersion);
 						}
 					}
 				}
@@ -252,7 +252,16 @@ public class CodeListManager {
 		
 	}
 	
-	protected CodeListItem findCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
+	private CodeListItem getCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
+		for (CodeListItem item : siblings) {
+			if (code.equals(item.getCode()) && (version == null || version.isApplicable(item))) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	private CodeListItem findCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
 		String adaptedCode = code.trim();
 		//remove initial zeros
 		adaptedCode = adaptedCode.replaceFirst("^0+", "");
