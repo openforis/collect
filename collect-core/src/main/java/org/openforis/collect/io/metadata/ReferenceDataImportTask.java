@@ -5,9 +5,11 @@ package org.openforis.collect.io.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.commons.collection.CollectionUtils;
@@ -20,12 +22,12 @@ import org.openforis.concurrency.Task;
 public abstract class ReferenceDataImportTask<E extends ParsingError> extends Task {
 
 	private Map<Long, List<E>> rowToErrors;
-	private List<Long> processedRows;
+	private Set<Long> processedRows;
 	
 	public ReferenceDataImportTask() {
 		super();
-		this.processedRows = new ArrayList<Long>();
-		this.rowToErrors = new LinkedHashMap<Long, List<E>>();
+		this.processedRows = new TreeSet<Long>();
+		this.rowToErrors = new TreeMap<Long, List<E>>();
 	}
 	
 	protected synchronized void addParsingError(long row, E error) {
@@ -67,7 +69,7 @@ public abstract class ReferenceDataImportTask<E extends ParsingError> extends Ta
 	}
 
 	public synchronized List<Long> getProcessedRows() {
-		return processedRows;
+		return new ArrayList<Long>(processedRows);
 	}
 	
 	public synchronized boolean isRowProcessed(long rowNumber) {
