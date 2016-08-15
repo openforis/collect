@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
 import org.openforis.idm.path.InvalidPathException;
@@ -151,6 +152,27 @@ public class Schema extends SurveyObject {
 				stack.addAll(((EntityDefinition) node).getChildDefinitions());
 			}
 		}
+		return result;
+	}
+	
+	/**
+	 * Returns first level entity definitions that have the attribute countInSummaryList set to true
+	 * 
+	 * @param rootEntityDefinition
+	 * @return 
+	 */
+	public List<EntityDefinition> getCountableEntitiesInRecordList(EntityDefinition rootEntityDefinition) {
+		final List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		rootEntityDefinition.traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if(def instanceof EntityDefinition) {
+					String annotation = def.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
+					if(Boolean.parseBoolean(annotation)) {
+						result.add((EntityDefinition) def);
+					}
+				}
+			}
+		});
 		return result;
 	}
 	

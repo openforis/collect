@@ -177,9 +177,9 @@ public class CollectValidator extends Validator {
 	}
 
 	private boolean isRootEntityKey(Attribute<?, ?> attribute) {
-		Record record = attribute.getRecord();
 		AttributeDefinition attrDef = attribute.getDefinition();
 		if (attrDef.isKey()) {
+			Record record = attribute.getRecord();
 			Entity rootEntity = record.getRootEntity();
 			EntityDefinition rootEntityDef = rootEntity.getDefinition();
 			List<AttributeDefinition> keyAttributeDefs = rootEntityDef.getKeyAttributeDefinitions();

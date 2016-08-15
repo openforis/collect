@@ -82,7 +82,10 @@ public class SurveyValidator {
 	};
 	
 	private static final String CODE_LIST_PATH_FORMAT = "codeList/%s";
-	
+
+	private static final int MAX_KEY_ATTRIBUTE_DEFINITION_COUNT = 3;
+	private static final int MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT = 5;
+
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
@@ -114,6 +117,7 @@ public class SurveyValidator {
 		SurveyValidationResults results = new SurveyValidationResults();
 		
 		results.addResults(validateRootKeyAttributeSpecified(survey));
+		results.addResults(validateShowCountInRecordListEntityCount(survey));
 		results.addResults(validateSchemaNodes(survey));
 		results.addResults(validateCodeLists(survey));
 		return results;
@@ -122,16 +126,28 @@ public class SurveyValidator {
 	private List<SurveyValidationResult> validateRootKeyAttributeSpecified(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
-		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
-		for (EntityDefinition rootEntity : rootEntityDefinitions) {
-			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
+		for (EntityDefinition rootEntityDef : schema.getRootEntityDefinitions()) {
+			List<AttributeDefinition> keyAttributeDefinitions = rootEntityDef.getKeyAttributeDefinitions();
 			if ( keyAttributeDefinitions.isEmpty() ) {
-				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntity.getPath(), 
+				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
 						"survey.validation.error.key_attribute_not_specified");
 				results.add(validationResult);
-			} else if ( keyAttributeDefinitions.size() > 3 ) {
-				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntity.getPath(), 
+			} else if ( keyAttributeDefinitions.size() > MAX_KEY_ATTRIBUTE_DEFINITION_COUNT ) {
+				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
 						"survey.validation.error.maximum_key_attribute_definitions_exceeded");
+				results.add(validationResult);
+			}
+		}
+		return results;
+	}
+	
+	private List<SurveyValidationResult> validateShowCountInRecordListEntityCount(CollectSurvey survey) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		for (EntityDefinition rootEntityDef : survey.getSchema().getRootEntityDefinitions()) {
+			List<EntityDefinition> countableEntities = survey.getSchema().getCountableEntitiesInRecordList(rootEntityDef);
+			if (countableEntities.size() > MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT) {
+				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
+						"survey.validation.error.maximum_count_in_record_list_entity_definitions_exceeded");
 				results.add(validationResult);
 			}
 		}
