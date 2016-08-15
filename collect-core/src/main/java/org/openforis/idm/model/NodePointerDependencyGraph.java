@@ -1,5 +1,6 @@
 package org.openforis.idm.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -54,7 +55,7 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 		if (node instanceof Entity) {
 			EntityDefinition def = (EntityDefinition) node.getDefinition();
 			List<NodeDefinition> defs = def.getChildDefinitionsInVersion(node.getModelVersion());
-			Set<NodePointer> result = new HashSet<NodePointer>(defs.size());
+			List<NodePointer> result = new ArrayList<NodePointer>(defs.size());
 			for (NodeDefinition childDef : defs) {
 				result.add(new NodePointer((Entity) node, childDef));
 			}
@@ -69,9 +70,9 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 	@Override
 	protected Set<NodePointer> determineRelatedItems(NodePointer pointer, NodeDefinition relatedChildDef,
 			String relatedParentEntityPath) throws InvalidExpressionException {
-		Set<NodePointer> result = new HashSet<NodePointer>();
 		Entity pointerEntity = pointer.getEntity();
 		List<Node<?>> relatedParentEntities = Path.parse(relatedParentEntityPath).evaluate(pointerEntity);
+		Set<NodePointer> result = new HashSet<NodePointer>(relatedParentEntities.size());
 		for (Node<?> relatedParentNode : relatedParentEntities) {
 			result.add(new NodePointer((Entity) relatedParentNode, relatedChildDef));
 		}
