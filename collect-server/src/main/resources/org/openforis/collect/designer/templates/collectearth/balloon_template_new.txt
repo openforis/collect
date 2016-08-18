@@ -138,16 +138,16 @@
 		</table>
 	</div>
 
-	<div id="loadingPanel">
-		<span>Loading...</span>
-	</div>
-	
-	<div id="collectEarthNotRunningPanel" style="display: none">
-		<span>PLACEHOLDER_COLLECT_NOT_RUNNING</span>
-	</div>
-	
-	<div id="contentDiv"  style="display: none;">
-		<div id="scrollingDiv" style="overflow: visible;" class="earthDiv">
+	<div id="contentDiv">
+		<div id="loadingPanel">
+			<span>Loading...</span>
+		</div>
+		
+		<div id="collectEarthNotRunningPanel" style="display: none">
+			<span>PLACEHOLDER_COLLECT_NOT_RUNNING</span>
+		</div>
+		
+		<div id="scrollingDiv" style="overflow: visible; display: none;" class="earthDiv">
 			<form id="formAll" class="form-horizontal" action="$[host]save-data-expanded">
 			<!-- <form id="formAll" class="form-horizontal" action="http://127.0.0.1:8028/earth/save-data-expanded"> -->
 								
