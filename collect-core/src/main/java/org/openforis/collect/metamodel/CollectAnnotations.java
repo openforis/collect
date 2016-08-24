@@ -13,6 +13,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.Annotatable;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
@@ -24,11 +25,13 @@ import org.openforis.idm.metamodel.TextAttributeDefinition;
  */
 public class CollectAnnotations {
 
-	public static String COLLECT_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/collect";
-	public static String COLLECT_PREFIX = "collect";
-
-	public static String COLLECT_EARTH_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/collectearth";
-	public static String COLLECT_EARTH_PREFIX = "collectearth";
+	public static final String COLLECT_3_NAMESPACE_PREFIX = "http://www.openforis.org/collect/3.0/";
+	public static final String COLLECT_NAMESPACE_URI_SUFFIX = "collect";
+	public static final String COLLECT_MOBILE_NAMESPACE_URI_SUFFIX = "mobile";
+	public static final String COLLECT_EARTH_NAMESPACE_URI_SUFFIX = "collectearth";
+	public static final String COLLECT_NAMESPACE_URI = COLLECT_3_NAMESPACE_PREFIX + COLLECT_NAMESPACE_URI_SUFFIX;
+	public static final String COLLECT_MOBILE_NAMESPACE_URI = COLLECT_3_NAMESPACE_PREFIX + COLLECT_MOBILE_NAMESPACE_URI_SUFFIX;
+	public static final String COLLECT_EARTH_NAMESPACE_URI = COLLECT_3_NAMESPACE_PREFIX + COLLECT_EARTH_NAMESPACE_URI_SUFFIX;
 	
 	public enum Annotation {
 		//collect namespace
@@ -75,7 +78,10 @@ public class CollectAnnotations {
 		COLLECT_EARTH_OPEN_YANDEX_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openYandexMaps"), false),
 		COLLECT_EARTH_OPEN_GEE_EXPLORER(new QName(COLLECT_EARTH_NAMESPACE_URI, "openExplorer"), true), 
 		COLLECT_EARTH_OPEN_GEE_CODE_EDITOR(new QName(COLLECT_EARTH_NAMESPACE_URI, "openCodeEditor"), true), 
-		COLLECT_EARTH_OPEN_STREET_VIEW(new QName(COLLECT_EARTH_NAMESPACE_URI, "openStreetView"), false)
+		COLLECT_EARTH_OPEN_STREET_VIEW(new QName(COLLECT_EARTH_NAMESPACE_URI, "openStreetView"), false),
+		
+		//Collect Mobile
+		COLLECT_MOBILE_ALLOW_ONLY_DEVICE_COORDINATE(new QName(COLLECT_MOBILE_NAMESPACE_URI, "allowOnlyDeviceCoordinate"), false)
 		;
 		
 		private QName qName;
@@ -279,6 +285,14 @@ public class CollectAnnotations {
 	
 	public void setCollectEarthSamplePoints(Integer value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS, value);
+	}
+	
+	public boolean isAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def) {
+		return getAnnotationBooleanValue(def, Annotation.COLLECT_MOBILE_ALLOW_ONLY_DEVICE_COORDINATE);
+	}
+	
+	public void setAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def, boolean value) {
+		setAnnotationValue(def, Annotation.COLLECT_MOBILE_ALLOW_ONLY_DEVICE_COORDINATE, value);
 	}
 
 	private Step getAnnotaionEnumValue(AttributeDefinition def, Annotation annotation) {
