@@ -63,6 +63,8 @@ import org.xml.sax.SAXException;
  */
 public class SurveyValidator {
 
+	public static final int MAX_NODE_NAME_LENGTH = 63;
+	
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
@@ -212,6 +214,11 @@ public class SurveyValidator {
 		if (! validateNodeName(def.getName())) {
 			results.add(new SurveyValidationResult(def.getPath(), getInvalidNodeNameMessageKey()));
 		}
+		if (! validateNodeNameMaxLength(def.getParentEntityDefinition(), def.getName())) {
+			results.add(new SurveyValidationResult(def.getPath(), getMaxNodeNameLengthExceededMessageKey(), 
+					String.valueOf(generateFullInternalName(def.getParentEntityDefinition(), def.getName()).length()), 
+					String.valueOf(MAX_NODE_NAME_LENGTH)));
+		}
 		
 		results.addAll(validateExpressions(def));
 		
@@ -227,8 +234,41 @@ public class SurveyValidator {
 		return "global.validation.internal_name.invalid_value";
 	}
 	
+	protected String getMaxNodeNameLengthExceededMessageKey() {
+		return "survey.validation.node.name.error.max_length_exceeded";
+	}
+	
 	public boolean validateNodeName(String name) {
 		return Survey.INTERNAL_NAME_PATTERN.matcher(name).matches();
+	}
+	
+	/**
+	 * Validates an internal node name preventing it to be too long when it's concatenated
+	 * with the ancestor single entity names
+	 */
+	public boolean validateNodeNameMaxLength(EntityDefinition parentEntityDefinition, String name) {
+		String fullInternalName = generateFullInternalName(parentEntityDefinition, name);
+		return fullInternalName.length() <= MAX_NODE_NAME_LENGTH;
+	}
+
+	public String generateFullInternalName(EntityDefinition parentEntityDefinition, String name) {
+		String fullInternalName;
+		if (parentEntityDefinition == null) {
+			fullInternalName = name;
+		} else {
+			List<EntityDefinition> ancestorEntityDefinitions = parentEntityDefinition.getAncestorEntityDefinitions();
+			List<EntityDefinition> ancestorSingleEntities = new ArrayList<EntityDefinition>();
+			for (EntityDefinition ancestorEntityDef : ancestorEntityDefinitions) {
+				if (ancestorEntityDef.isMultiple()) {
+					break;
+				} else {
+					ancestorSingleEntities.add(ancestorEntityDef);
+				}
+			}
+			List<String> ancestorSingleEntityNames = CollectionUtils.project(ancestorEntityDefinitions, "name");
+			fullInternalName = StringUtils.join(ancestorSingleEntityNames, "_") + "_" + name;
+		}
+		return fullInternalName;
 	}
 	
 	private List<SurveyValidationResult> validateEntity(EntityDefinition entity) {
@@ -820,4 +860,5 @@ public class SurveyValidator {
 		}
 		
 	}
+
 }
