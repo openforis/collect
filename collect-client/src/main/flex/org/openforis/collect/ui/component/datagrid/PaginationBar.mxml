@@ -220,7 +220,7 @@
 				id="currentPageTextField" 
 				text="{currentPageText}"
 				restrict="[0-9]"
-				width="30"
+				width="60"
 				textAlign="right"
 				enabled.inactive="false" 
 				valueCommit="currentPageTextValueCommitHandler(event)"
@@ -262,7 +262,7 @@
 			<s:Label text="{Message.get('list.recordsPerPage')}:" />
 			<s:DropDownList id="recordPerPageDropDown" 
 							dataProvider="{new ArrayList([10, 20, 50])}" 
-							width="50"
+							width="60"
 							selectedItem="{maxRecordsPerPage}"
 							change="recordsPerPageChangeHandler(event)"/>
 		</s:HGroup>
