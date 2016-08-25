@@ -309,7 +309,11 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Code createValue(Object val) {
-		return val == null ? null : new Code((String) val);
+		if (val == null) {
+			return null;
+		} else {
+			return new Code(String.valueOf(val));
+		}
 	}
 	
 	@Override
