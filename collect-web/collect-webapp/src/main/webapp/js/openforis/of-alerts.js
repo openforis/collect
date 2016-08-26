@@ -156,7 +156,7 @@ OF.Alerts.showMessage = function(type, message, autoDismiss) {
  		alertClass = "success";
  	}
  	
- 	container.removeClass("error", "warning", "success");
+ 	container.removeClass("error, warning, success");
  	container.addClass(alertClass);
 
  	container.find(".modal-title").text(title);
