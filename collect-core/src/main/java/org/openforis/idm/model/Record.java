@@ -62,10 +62,9 @@ public class Record implements DeepComparable {
 			throw new IllegalArgumentException("Survey required");
 		}
 		this.survey = survey;
-		if (version == null) {
-			if (!survey.getVersions().isEmpty()) {
-				throw new IllegalArgumentException("Invalid version '"
-						+ version + '"');
+		if (version == null) { //default to latest version
+			if (survey.getVersions() != null) {
+				this.modelVersion = survey.getLatestVersion();
 			}
 		} else {
 			this.modelVersion = survey.getVersion(version);

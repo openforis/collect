@@ -28,7 +28,6 @@ import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.jooq.UpdateQuery;
 import org.jooq.impl.DSL;
-import org.openforis.collect.manager.RecordConverter;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -40,6 +39,7 @@ import org.openforis.collect.persistence.RecordDao.RecordDSLContext;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
+import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -66,7 +66,8 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	     OFC_RECORD.MISSING, OFC_RECORD.MODEL_VERSION, OFC_RECORD.MODIFIED_BY_ID, OFC_RECORD.OWNER_ID, 
 	     OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.SKIPPED, OFC_RECORD.STATE, OFC_RECORD.STEP, OFC_RECORD.SURVEY_ID, 
 	     OFC_RECORD.WARNINGS, OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3, 
-	     OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
+	     OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5,
+	     OFC_RECORD.APP_VERSION};
 
 	public RecordDao() {
 		super(RecordDSLContext.class);
@@ -521,6 +522,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			c.setErrors(r.getValue(OFC_RECORD.ERRORS));
 			c.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
 			c.setMissing(r.getValue(OFC_RECORD.MISSING));
+			c.setApplicationVersion(new Version(r.getValue(OFC_RECORD.APP_VERSION)));
 
 			Integer step = r.getValue(OFC_RECORD.STEP);
 			if (step != null) {
@@ -557,9 +559,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 				keys.add((String) r.getValue(tableField));
 			}
 			c.setRootEntityKeyValues(keys);
-			
-			//TODO read the application version stored in the table row
-			c.setApplicationVersion(RecordConverter.PREVIOUS_TO_APPLICATION_VERSION_STORAGE_VERSION);
 		}
 
 		private User loadUser(Integer userId) {
@@ -606,6 +605,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			q.addValue(OFC_RECORD.MISSING, record.getMissing());
 			q.addValue(OFC_RECORD.ERRORS, record.getErrors());
 			q.addValue(OFC_RECORD.WARNINGS, record.getWarnings());
+			q.addValue(OFC_RECORD.APP_VERSION, record.getApplicationVersion().toString());
 
 			// set keys
 			List<String> keys = record.getRootEntityKeyValues();

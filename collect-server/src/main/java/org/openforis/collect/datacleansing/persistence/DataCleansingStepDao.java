@@ -26,6 +26,7 @@ import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.DataCleansingStepValue;
 import org.openforis.collect.datacleansing.DataCleansingStepValue.UpdateType;
 import org.openforis.collect.datacleansing.DataQuery;
+import org.openforis.collect.datacleansing.DataCleansingStep.DataCleansingStepType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
@@ -183,9 +184,12 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			o.setModifiedDate(r.getValue(OFC_DATA_CLEANSING_STEP.MODIFIED_DATE));
 			o.setQueryId(r.getValue(OFC_DATA_CLEANSING_STEP.QUERY_ID));
 			o.setTitle(r.getValue(OFC_DATA_CLEANSING_STEP.TITLE));
+			o.setType(DataCleansingStepType.fromCode(r.getValue(OFC_DATA_CLEANSING_STEP.TYPE).charAt(0)));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_CLEANSING_STEP.UUID)));
 			
-			o.setUpdateValues(loadValues(o));
+			if (o.getType() == DataCleansingStepType.ATTRIBUTE_UPDATE) {
+				o.setUpdateValues(loadValues(o));
+			}
 		}
 		
 		@Override
@@ -196,6 +200,7 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			q.addValue(OFC_DATA_CLEANSING_STEP.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
 			q.addValue(OFC_DATA_CLEANSING_STEP.QUERY_ID, o.getQueryId());
 			q.addValue(OFC_DATA_CLEANSING_STEP.TITLE, o.getTitle());
+			q.addValue(OFC_DATA_CLEANSING_STEP.TYPE, String.valueOf(o.getType().getCode()));
 			q.addValue(OFC_DATA_CLEANSING_STEP.UUID, o.getUuid().toString());
 		}
 
@@ -231,11 +236,6 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			}
 			return values;
 		}
-		
-
 	}
-
-	
-
 }
 

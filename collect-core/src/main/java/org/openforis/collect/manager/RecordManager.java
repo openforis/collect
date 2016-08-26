@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
@@ -181,6 +182,11 @@ public class RecordManager {
 		}
 		execute(queries);
 		restartIdSequence(nextId);
+	}
+	
+	@Transactional(readOnly=false, propagation=REQUIRED)
+	public void deleteByIds(Set<Integer> ids) throws RecordPersistenceException {
+		getRecordDao().deleteByIds(ids);
 	}
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)

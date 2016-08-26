@@ -15,10 +15,36 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
 public class DataCleansingStep extends PersistedSurveyObject {
 	
 	private static final long serialVersionUID = 1L;
+
+	public enum DataCleansingStepType {
+		ATTRIBUTE_UPDATE('a'),
+		ENTITY_DELETE('e'),
+		RECORD_DELETE('r');
+		
+		private char code;
+
+		DataCleansingStepType(char code) {
+			this.code = code;
+		}
+		
+		public char getCode() {
+			return code;
+		}
+
+		public static DataCleansingStepType fromCode(char typeCode) {
+			for (DataCleansingStepType type : values()) {
+				if (type.code == typeCode) {
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("Invlaid DataCleansingStepType code: " + typeCode);
+		}
+	}
 	
 	private String title;
 	private String description;
 	private Integer queryId;
+	private DataCleansingStepType type = DataCleansingStepType.ATTRIBUTE_UPDATE;
 	private List<DataCleansingStepValue> updateValues = new ArrayList<DataCleansingStepValue>();
 	
 	private transient DataQuery query;
@@ -66,6 +92,14 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	public void setQueryId(Integer queryId) {
 		this.queryId = queryId;
 		this.query = null;
+	}
+	
+	public DataCleansingStepType getType() {
+		return type;
+	}
+	
+	public void setType(DataCleansingStepType type) {
+		this.type = type;
 	}
 	
 	public DataQuery getQuery() {

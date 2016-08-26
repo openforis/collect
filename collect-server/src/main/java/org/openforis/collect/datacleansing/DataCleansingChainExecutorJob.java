@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.datacleansing.DataCleansingChainExectutorTask.DataCleansingChainExecutorTaskInput;
 import org.openforis.collect.datacleansing.DataCleansingChainExectutorTask.DataCleansingStepNodeProcessor;
+import org.openforis.collect.datacleansing.DataCleansingChainExectutorTask.DataCleansingStepNodeProcessorResult;
 import org.openforis.collect.datacleansing.manager.DataCleansingReportManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
@@ -109,8 +110,12 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		}
 		
 		@Override
-		public boolean process(DataCleansingStep step, Node<?> node) throws Exception {
-			if (node instanceof Attribute) {
+		public DataCleansingStepNodeProcessorResult process(DataCleansingStep step, Node<?> node) throws Exception {
+			switch (step.getType()) {
+			case ATTRIBUTE_UPDATE:
+				if (! (node instanceof Attribute)) {
+					throw new IllegalArgumentException("Invalid node type for attribute update: " + node.getClass().getName());
+				}
 				@SuppressWarnings("unchecked")
 				Attribute<?, Value> attrib = (Attribute<?, Value>) node;
 				AttributeDefinition attrDefn = attrib.getDefinition();
@@ -119,7 +124,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 				
 				DataCleansingStepValue stepValue = determineApplicableValue(step, attrib);
 				if (stepValue == null) {
-					return false;
+					return null;
 				}
 				switch(stepValue.getUpdateType()) {
 				case ATTRIBUTE:
@@ -142,9 +147,15 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 					break;
 				}
 				appendRecordUpdate(record);
-				return true;
+				return DataCleansingStepNodeProcessorResult.ATTRIBUTE_UPDATED;
+			case ENTITY_DELETE:
+				recordUpdater.deleteNode(node.getParent());
+				return DataCleansingStepNodeProcessorResult.ENTITY_DELETED;
+			case RECORD_DELETE:
+				return DataCleansingStepNodeProcessorResult.RECORD_TO_BE_DELETED;
+			default:
+				return null;
 			}
-			return false;
 		}
 
 		private DataCleansingStepValue determineApplicableValue(DataCleansingStep step, Attribute<?, Value> attrib) throws InvalidExpressionException {

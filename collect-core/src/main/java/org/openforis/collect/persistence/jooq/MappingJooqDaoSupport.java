@@ -1,8 +1,10 @@
 package org.openforis.collect.persistence.jooq;
 
 import java.util.List;
+import java.util.Set;
 
 import org.jooq.Configuration;
+import org.jooq.DeleteQuery;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.ResultQuery;
@@ -88,4 +90,14 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 	public void delete(int id) {
 		dsl().deleteQuery(id).execute();
 	}
+	
+	@Transactional
+	public void deleteByIds(Set<Integer> ids) {
+		C dsl = dsl();
+		DeleteQuery<?> delete = dsl.deleteQuery(dsl.getTable());
+		delete.addConditions(dsl.getIdField().in(ids));
+		delete.execute();
+	}
+
+
 }

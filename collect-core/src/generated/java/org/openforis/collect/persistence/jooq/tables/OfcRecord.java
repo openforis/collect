@@ -34,7 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcRecord extends TableImpl<OfcRecordRecord> {
 
-	private static final long serialVersionUID = -634666559;
+	private static final long serialVersionUID = 1357739037;
 
 	/**
 	 * The reference instance of <code>collect.ofc_record</code>
@@ -173,6 +173,11 @@ public class OfcRecord extends TableImpl<OfcRecordRecord> {
 	 * The column <code>collect.ofc_record.owner_id</code>.
 	 */
 	public final TableField<OfcRecordRecord, Integer> OWNER_ID = createField("owner_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>collect.ofc_record.app_version</code>.
+	 */
+	public final TableField<OfcRecordRecord, String> APP_VERSION = createField("app_version", org.jooq.impl.SQLDataType.VARCHAR.length(63).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_record</code> table reference

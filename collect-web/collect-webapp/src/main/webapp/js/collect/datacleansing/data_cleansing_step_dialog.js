@@ -4,13 +4,22 @@ Collect.DataCleansingStepDialogController = function() {
 	this.itemEditService = collect.dataCleansingStepService;
 	this.queries = null;
 	this.querySelectPicker = null;
+	this.cleansingTypeSelectPicker = null;
 	this.stepsDataGrid = null;
 	this.addStepSelectPicker = null;
 	this.updateValuesFieldset = null;
 		
 	this.maxFieldNumber = 6;
 	
-	this.updateTypes = [{name: "ATTRIBUTE", label : "Attribute"}, {name: "FIELD", label : "Field by Field"}];
+	this.cleansingTypes = [
+                       		{code: "a", label : "Update Attribute"}, 
+                       		{code: "e", label : "Delete Entity"}, 
+                       		{code: 'r', label: "Delete Record"}
+			              ];
+	this.updateTypes = [
+                    		{name: "ATTRIBUTE", label : "Attribute"}, 
+                    		{name: "FIELD", label : "Field by Field"}
+	                   ];
 	
 	this.updateValues = [];
 	this.addNewUpdateValue();
@@ -42,6 +51,15 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 			OF.UI.Forms.populateSelect(select, $this.queries, "id", "title", true);
 			select.selectpicker();
 			$this.querySelectPicker = select.data().selectpicker;
+			select.change(function() {
+				$this.updateView();
+			});
+		}
+		{//init query select picker
+			var select = $this.content.find('select[name="typeCode"]');
+			OF.UI.Forms.populateSelect(select, $this.cleansingTypes, "code", "label", true);
+			select.selectpicker();
+			$this.cleansingTypeSelectPicker = select.data().selectpicker;
 			select.change(function() {
 				$this.updateView();
 			});
@@ -80,7 +98,7 @@ Collect.DataCleansingStepDialogController.prototype.updateView = function() {
 	var $this = this;
 	var item = $this.extractFormObject();
 	var query = $this.getSelectedQuery();
-	$this.updateValuesFieldset.toggle(query != null);
+	$this.updateValuesFieldset.toggle(query != null && item.typeCode == 'a');
 	var attributePath = null; 
 	var attributeType = null;
 	if (query != null) {

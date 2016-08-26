@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.openforis.collect.Collect;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -195,6 +196,7 @@ public class CollectRecord extends Record {
 
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
 		super(survey, versionName, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
+		this.applicationVersion = Collect.VERSION;
 		this.step = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();

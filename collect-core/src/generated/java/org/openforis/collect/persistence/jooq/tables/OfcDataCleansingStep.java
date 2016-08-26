@@ -34,7 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingSte
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataCleansingStep extends TableImpl<OfcDataCleansingStepRecord> {
 
-	private static final long serialVersionUID = 1666898415;
+	private static final long serialVersionUID = 2085498698;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_cleansing_step</code>
@@ -83,6 +83,11 @@ public class OfcDataCleansingStep extends TableImpl<OfcDataCleansingStepRecord> 
 	 * The column <code>collect.ofc_data_cleansing_step.modified_date</code>.
 	 */
 	public final TableField<OfcDataCleansingStepRecord, Timestamp> MODIFIED_DATE = createField("modified_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_cleansing_step.type</code>.
+	 */
+	public final TableField<OfcDataCleansingStepRecord, String> TYPE = createField("type", org.jooq.impl.SQLDataType.CHAR.length(1).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_data_cleansing_step</code> table reference

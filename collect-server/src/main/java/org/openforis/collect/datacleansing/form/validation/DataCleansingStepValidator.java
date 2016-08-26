@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.DataCleansingStepValue;
 import org.openforis.collect.datacleansing.DataQuery;
+import org.openforis.collect.datacleansing.DataCleansingStep.DataCleansingStepType;
 import org.openforis.collect.datacleansing.form.DataCleansingStepForm;
 import org.openforis.collect.datacleansing.manager.DataCleansingStepManager;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
@@ -28,6 +29,7 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 	private static final String UPDATE_VALUES_FIELD = "updateValues";
 	private static final String TITLE_FIELD = "title";
 	private static final String QUERY_ID_FIELD = "queryId";
+	private static final String TYPE_CODE_FIELD = "typeCode";
 	
 	@Autowired
 	private DataQueryManager dataQueryManager;
@@ -37,8 +39,11 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 	@Override
 	public void validateForm(DataCleansingStepForm target, Errors errors) {
 		validateRequiredFields(errors, TITLE_FIELD);
-		if (validateRequiredFields(errors, QUERY_ID_FIELD) && validateUniqueness(target, errors) ) {
-			validateUpdateValues(target, errors);
+		if (validateRequiredFields(errors, QUERY_ID_FIELD) && validateUniqueness(target, errors)) {
+			String typeCode = (String) errors.getFieldValue(TYPE_CODE_FIELD);
+			if (typeCode.length() == 1 && typeCode.charAt(0) == DataCleansingStepType.ATTRIBUTE_UPDATE.getCode()) {
+				validateUpdateValues(target, errors);
+			}
 		}
 	}
 
