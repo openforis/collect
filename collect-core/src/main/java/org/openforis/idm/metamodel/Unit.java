@@ -23,7 +23,7 @@ public class Unit extends IdentifiableSurveyObject {
 	private LanguageSpecificTextMap abbreviations;
 
 	public enum Dimension {
-		ANGLE, AREA, CURRENCY, LENGTH, MASS, RATIO, TIME;
+		ANGLE, AREA, CURRENCY, LENGTH, MASS, RATIO, TIME, VOLUME;
 	}
 	
 	Unit(Survey survey, int id) {
