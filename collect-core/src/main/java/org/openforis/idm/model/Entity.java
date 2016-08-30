@@ -192,15 +192,14 @@ public class Entity extends Node<EntityDefinition> {
 		return findChildEntitiesByKeys((EntityDefinition) definition.getChildDefinition(childName), keys);
 	}
 
-	public List<Entity> findChildEntitiesByKeys(EntityDefinition childEntityDef, String... keys) {
-		List<Entity> result = new ArrayList<Entity>();
-		List<Node<?>> siblings = getChildren(childEntityDef);
-		for (Node<?> sibling : siblings) {
-			String[] keyValues = ((Entity) sibling).getKeyValues();
-			if ( compareKeys(keyValues, keys) == 0 ) {
-				result.add((Entity) sibling);
+	public List<Entity> findChildEntitiesByKeys(EntityDefinition childEntityDef, final String... keys) {
+		@SuppressWarnings("unchecked")
+		List<Entity> result = (List<Entity>) findChildren(childEntityDef, new NodePredicate() {
+			public boolean evaluate(Node<?> node) {
+				String[] keyValues = ((Entity) node).getKeyValues();
+				return compareKeys(keyValues, keys) == 0;
 			}
-		}
+		});
 		return result;
 	}
 	
@@ -477,6 +476,27 @@ public class Entity extends Node<EntityDefinition> {
 	public List<Node<? extends NodeDefinition>> getChildren(NodeDefinition childDef) {
 		List<Node<?>> children = childrenByDefinition.get(childDef);
 		return CollectionUtils.unmodifiableList(children);
+	}
+	
+	public void visitChildren(NodeDefinition childDef, NodeVisitor visitor) {
+		List<Node<?>> children = childrenByDefinition.get(childDef);
+		if (children != null) {
+			for (Node<?> child : children) {
+				visitor.visit(child, child.getIndex());
+			}
+		}
+	}
+	
+	public List<? extends Node<? extends NodeDefinition>> findChildren(NodeDefinition childDef, final NodePredicate predicate) {
+		final List<Node<? extends NodeDefinition>> result = new ArrayList<Node<? extends NodeDefinition>>();
+		visitChildren(childDef, new NodeVisitor() {
+			public void visit(Node<? extends NodeDefinition> node, int idx) {
+				if (predicate.evaluate(node)) {
+					result.add(node);
+				}
+			}
+		});
+		return result;
 	}
 
 	/**
