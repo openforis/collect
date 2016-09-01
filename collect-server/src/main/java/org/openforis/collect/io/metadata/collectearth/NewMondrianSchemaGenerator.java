@@ -443,11 +443,17 @@ public class NewMondrianSchemaGenerator {
 	
 	private String determineLevelCaption(NodeDefinition attrDef, String subLevelName) {
 		EntityDefinition nearestAncestorMultipleEntity = attrDef.getNearestAncestorMultipleEntity();
-		String result =  extractLabel(nearestAncestorMultipleEntity) + " " + extractLabel(attrDef);
-		if (subLevelName != null) {
-			result += " - " + subLevelName;
+		StringBuffer sb = new StringBuffer();
+		if (! nearestAncestorMultipleEntity.isRoot()) {
+			sb.append(extractLabel(nearestAncestorMultipleEntity));
+			sb.append(' ');
 		}
-		return result;
+		sb.append(extractLabel(attrDef));
+		if (subLevelName != null) {
+			sb.append(" - ");
+			sb.append(subLevelName);
+		}
+		return sb.toString();
 	}
 
 	private String extractLabel(NodeDefinition nodeDef) {
