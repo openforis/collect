@@ -130,7 +130,7 @@ public class DataRestoreSummaryTask extends Task {
 		
 		addStepPerEntry(entryId, step);
 		
-		CollectRecordSummary oldRecord = findAlreadyExistingRecordSummary(parsedRecord);
+		CollectRecordSummary oldRecord = findAlreadyExistingRecordSummary(entryId, step, parsedRecord);
 		if ( oldRecord != null ) {
 			conflictingRecordByEntryId.put(entryId, oldRecord);
 		}
@@ -255,7 +255,7 @@ public class DataRestoreSummaryTask extends Task {
 		return conflictingRecordItems;
 	}
 
-	private CollectRecordSummary findAlreadyExistingRecordSummary(CollectRecord parsedRecord) {
+	private CollectRecordSummary findAlreadyExistingRecordSummary(int entryId, Step step, CollectRecord parsedRecord) {
 		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
 		Entity rootEntity = parsedRecord.getRootEntity();
@@ -270,7 +270,9 @@ public class DataRestoreSummaryTask extends Task {
 			recordSummary.setFiles(recordFileManager.getAllFiles(record));
 			return recordSummary;
 		} else {
-			throw new IllegalStateException(String.format("Multiple records found in survey %s with key(s): %s", survey.getName(), keyValues));
+			String errorMessage = String.format("Data file: %s - multiple records found in survey %s with key(s) %s", 
+					getEntryName(entryId, step), survey.getName(), keyValues);
+			throw new IllegalStateException(errorMessage);
 		}
 	}
 
