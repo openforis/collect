@@ -1195,13 +1195,7 @@ For more information or questions post a question in the forum : www.openforis.o
         </item>
       </items>
     </list>
-    <list id="3001" name="sampling_design" lookup="ofc_sampling_design">
-      <hierarchy>
-        <level name="level1" />
-        <level name="level2" />
-        <level name="level3" />
-      </hierarchy>
-    </list>
+
   </codeLists>
   <spatialReferenceSystems>
     <spatialReferenceSystem srid="EPSG:4326">
