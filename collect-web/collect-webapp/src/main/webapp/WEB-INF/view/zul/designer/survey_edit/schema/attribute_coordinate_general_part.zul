@@ -7,8 +7,8 @@
     <rows>
       <row visible="@load(not fx.calculated)">
         <fieldErrorHandler message="@load(vmsgs['allowOnlyDeviceCoordinate'])">
-	        <label value="${labels.survey.schema.attribute.coordinate.allow_only_device_coordinate.$}:" />
-	        <image popup="calculatedInfoTooltip" style="cursor:pointer"
+	        <label value="${labels.survey.schema.attribute.coordinate.allow_only_device_coordinates.$}:" />
+	        <image popup="showReadOnlyFieldInCollectEarthInfoTooltip" style="cursor:pointer"
 				src="/assets/images/info-small.png" />
 	        <checkbox checked="@bind(fx.allowOnlyDeviceCoordinate)"
 	    		onCheck="@command('applyChanges')" />
@@ -19,7 +19,7 @@
 
   <popup id="showReadOnlyFieldInCollectEarthInfoTooltip" width="300px">
   	<html><![CDATA[
-		${labels.survey.schema.attribute.coordinate.allowOnlyDeviceCoordinate.tooltip}
+		${labels.survey.schema.attribute.coordinate.allow_only_device_coordinates.tooltip}
   	]]></html>
   </popup>
 </zk>
