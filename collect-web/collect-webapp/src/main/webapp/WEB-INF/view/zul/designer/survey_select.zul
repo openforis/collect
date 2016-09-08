@@ -121,7 +121,8 @@
 		
 				<!-- Advanced options -->
 				<combobutton label="${labels.survey.advanced_functions}" 
-							image="/assets/images/settings-small.png">
+							image="/assets/images/settings-small.png" 
+							onClick="self.open()">
 					<menupopup>
 						<menuitem label="${labels.survey.clone.$}"
 							onClick="@command('cloneSelectedSurvey')" />
