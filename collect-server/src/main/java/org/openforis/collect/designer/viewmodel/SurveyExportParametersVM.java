@@ -77,6 +77,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	 * Pattern for survey export file name (SURVEYNAME_DATE.OUTPUTFORMAT)
 	 */
 	private static final String SURVEY_EXPORT_FILE_NAME_PATTERN = "%s_%s.%s";
+	private static final String SURVEY_EXPORT_MOBILE_FILE_NAME_PATTERN = "%s_%s_%s.%s";
 	
 	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = "cep";
 	private static final CollectEarthProjectFileCreator COLLECT_EARTH_PROJECT_FILE_CREATOR;
@@ -181,9 +182,8 @@ public class SurveyExportParametersVM extends BaseVM {
 		boolean jobStartedByThis = isJobStartedByThis(job);
 		if ( job == surveyBackupJob ) {
 			File file = surveyBackupJob.getOutputFile();
-			CollectSurvey survey = surveyBackupJob.getSurvey();
-			String extension = surveyBackupJob.getOutputFormat().getOutputFileExtension();
-			downloadFile(file, survey, extension, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			downloadFile(file, surveyBackupJob.getOutputFormat().getOutputFileExtension(), MediaType.APPLICATION_OCTET_STREAM_VALUE, 
+					surveyBackupJob.getSurvey(), surveyBackupJob.getOutputSurveyDefaultLanguage());
 			final List<DataBackupError> dataBackupErrors = surveyBackupJob.getDataBackupErrors();
 			if (! dataBackupErrors.isEmpty()) {
 				DataExportErrorsPopUpVM.showPopUp(dataBackupErrors);
@@ -193,7 +193,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			File file = rdbExportJob.getOutputFile();
 			CollectSurvey survey = rdbExportJob.getSurvey();
 			String extension = "sql";
-			downloadFile(file, survey, extension, MediaType.TEXT_PLAIN_VALUE);
+			downloadFile(file, extension, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
 			rdbExportJob = null;
 		}
 		if (jobStartedByThis) {
@@ -214,10 +214,15 @@ public class SurveyExportParametersVM extends BaseVM {
 		closeJobStatusPopUp();
 	}
 	
-	private void downloadFile(File file, CollectSurvey survey, String extension, String contentType) {
+	private void downloadFile(File file, String extension, String contentType, CollectSurvey survey, String defaultLanguageCode) {
 		String surveyName = survey.getName();
 		String dateStr = Dates.formatLocalDateTime(new Date());
-		String fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
+		String fileName;
+		if (org.openforis.collect.io.SurveyBackupJob.OutputFormat.MOBILE.getOutputFileExtension().equals(extension)) {
+			fileName = String.format(SURVEY_EXPORT_MOBILE_FILE_NAME_PATTERN, surveyName, defaultLanguageCode, dateStr, extension);
+		} else {
+			fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
+		}
 		try {
 			Filedownload.save(new FileInputStream(file), contentType, fileName);
 		} catch (FileNotFoundException e) {

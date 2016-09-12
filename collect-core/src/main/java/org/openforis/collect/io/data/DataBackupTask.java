@@ -1,19 +1,32 @@
 package org.openforis.collect.io.data;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
+import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.ZipFiles;
+import org.openforis.commons.io.OpenForisIOUtils;
+import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -28,6 +41,11 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataBackupTask extends Task {
 
+	private static final String[] DATA_SUMMARY_FIXED_HEADERS = new String[]{
+			"entry_id", "step", "created_on", "created_by", 
+			"last_modified", "modified_by"};
+	private static final String DATA_SUMMARY_RECORD_KEY_PREFIX = "key";
+	
 	private RecordManager recordManager;
 	private DataMarshaller dataMarshaller;
 	
@@ -37,6 +55,10 @@ public class DataBackupTask extends Task {
 	private Step[] steps;
 	private RecordFilter recordFilter;
 	private List<DataBackupError> errors;
+	
+	//internal
+	private CsvWriter summaryCSVWriter;
+	private File summaryTempFile;
 	
 	public DataBackupTask() {
 		super();
@@ -50,9 +72,21 @@ public class DataBackupTask extends Task {
 		if ( recordFilter == null ) {
 			recordFilter = new RecordFilter(survey);
 		}
+		initializeDataSummaryCSVWriter();
 		super.createInternalVariables();
 	}
-	
+
+	private void initializeDataSummaryCSVWriter()
+			throws IOException, UnsupportedEncodingException, FileNotFoundException {
+		summaryTempFile = File.createTempFile("summary", ".csv");
+		summaryCSVWriter = new CsvWriter(new FileOutputStream(summaryTempFile), OpenForisIOUtils.UTF_8, ',', '"');
+		List<String> headers = new ArrayList<String>(Arrays.asList(DATA_SUMMARY_FIXED_HEADERS));
+		for (int i = 0; i < SurveyValidator.MAX_KEY_ATTRIBUTE_DEFINITION_COUNT; i++) {
+			headers.add(DATA_SUMMARY_RECORD_KEY_PREFIX + (i + 1));
+		}
+		summaryCSVWriter.writeHeaders(headers);
+	}
+
 	@Override
 	protected long countTotalItems() {
 		int count = 0;
@@ -84,8 +118,19 @@ public class DataBackupTask extends Task {
 						break;
 					}
 				}
+				if (isRunning()) {
+					writeSummaryEntry(summary);
+				}
 			}
 		}
+	}
+	
+	@Override
+	protected void onEnd() {
+		IOUtils.closeQuietly(summaryCSVWriter);
+		String dataSummaryEntryName = SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + "summary.csv";
+		ZipFiles.writeFile(zipOutputStream, summaryTempFile, dataSummaryEntryName);
+		super.onEnd();
 	}
 
 	private void backup(CollectRecord summary, Step step) {
@@ -104,6 +149,25 @@ public class DataBackupTask extends Task {
 			errors.add(error);
 			log().error(error.toString(), e);
 		}
+	}
+
+	private void writeSummaryEntry(CollectRecord summary) {
+		Step lastStep = null;
+		for (Step step : steps) {
+			if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
+				lastStep = step;
+			}
+		}
+		List<String> values = new ArrayList<String>(Arrays.asList(
+				String.valueOf(summary.getId()),
+				lastStep.name(), 
+				Dates.formatDateTime(summary.getCreationDate()),
+				summary.getCreatedBy() == null ? "" : summary.getCreatedBy().getName(),
+				Dates.formatDateTime(summary.getModifiedDate()),
+				summary.getModifiedBy() == null ? "" : summary.getModifiedBy().getName()
+		));
+		values.addAll(summary.getRootEntityKeyValues());
+		summaryCSVWriter.writeNext(values);
 	}
 	
 	public RecordManager getRecordManager() {

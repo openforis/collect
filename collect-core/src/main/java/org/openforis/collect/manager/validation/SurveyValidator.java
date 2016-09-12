@@ -64,6 +64,7 @@ import org.xml.sax.SAXException;
 public class SurveyValidator {
 
 	public static final int MAX_NODE_NAME_LENGTH = 63;
+	public static final int MAX_KEY_ATTRIBUTE_DEFINITION_COUNT = 3;
 	
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
@@ -85,7 +86,6 @@ public class SurveyValidator {
 	
 	private static final String CODE_LIST_PATH_FORMAT = "codeList/%s";
 
-	private static final int MAX_KEY_ATTRIBUTE_DEFINITION_COUNT = 3;
 	private static final int MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT = 5;
 
 	@Autowired

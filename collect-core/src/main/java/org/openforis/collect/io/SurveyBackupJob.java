@@ -344,6 +344,10 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		this.includeRecordFiles = includeRecordFiles;
 	}
 	
+	public String getOutputSurveyDefaultLanguage() {
+		return outputSurveyDefaultLanguage;
+	}
+	
 	public void setOutputSurveyDefaultLanguage(String outputSurveyDefaultLanguage) {
 		this.outputSurveyDefaultLanguage = outputSurveyDefaultLanguage;
 	}
@@ -359,4 +363,5 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	public List<DataBackupError> getDataBackupErrors() {
 		return CollectionUtils.unmodifiableList(dataBackupErrors);
 	}
+
 }
