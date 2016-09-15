@@ -34,6 +34,7 @@ public class RecordOperationGenerator {
 				continue;
 			}
 			parsedRecord.setStep(step);
+			parsedRecord.setOwner(parsedRecord.getModifiedBy());
 
 			if (firstStepToBeProcessed) {
 				CollectRecordSummary oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);

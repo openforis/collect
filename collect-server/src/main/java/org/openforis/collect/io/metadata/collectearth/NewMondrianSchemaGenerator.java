@@ -144,97 +144,18 @@ public class NewMondrianSchemaGenerator {
 			List<AttributeDefinition> attributes = entityDef.getNestedAttributes();
 			for (AttributeDefinition attrDef : attributes) {
 				if (canBeMeasured(attrDef)) {
-					EntityDefinition parentDef = attrDef.getNearestAncestorMultipleEntity();
-					if (parentDef.isRoot()) {
-						addAttributeDimension(cube, attrDef);
-					} else {
-						addNestedAttributeDimension(cube, attrDef);
-					}
+					Dimension dimension = generateDimension(cube, attrDef);
+					cube.dimensions.add(dimension);
 					addMeasures(cube, attrDef);
 				}
 			}
 		}
-		/*
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
-		stack.addAll(multipleEntityDef.getChildDefinitions());
-		while (!stack.isEmpty()) {
-			NodeDefinition def = stack.pop();
-			if (def instanceof AttributeDefinition && isAttributeIncluded((AttributeDefinition) def)) {
-				AttributeDefinition attrDef = (AttributeDefinition) def;
-				EntityDefinition parentDef = def.getParentEntityDefinition();
-				if (parentDef.isRoot()) {
-					addAttributeMeasuresAndDimension(cube, attrDef);
-				} else {
-					addNestedAttributeDimension(cube, attrDef);
-				}
-			} else if (def instanceof EntityDefinition && !def.isMultiple()) {
-				stack.addAll(((EntityDefinition) def).getChildDefinitions());
-			}
-		}
-		*/
 		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
 			cube.measures.addAll(1, generateEarthSpecificMeasures());
 		}
 		return cube;
 	}
 	
-	private void addAttributeDimension(Cube cube, AttributeDefinition attrDef) {
-		Dimension dimension = generateDimension(cube, attrDef);
-		cube.dimensions.add(dimension);
-	}
-
-	private void addNestedAttributeDimension(Cube cube, AttributeDefinition attrDef) {
-		EntityDefinition rootEntityDef = attrDef.getRootEntity();
-		EntityDefinition parentDef = attrDef.getNearestAncestorMultipleEntity();
-		String rootEntityIdColumnName = getEntityPKColumnName(rootEntityDef);
-
-		String parentEntityName = parentDef.getName();
-		String parentEntityLabel = extractLabel(parentDef);
-
-		String nodeLabel = parentEntityLabel + " - " + extractLabel(attrDef);
-		Dimension dimension = new Dimension(determineDimensionName(attrDef));
-		dimension.caption = nodeLabel;
-
-		if (attrDef.isMultiple()) {
-			Hierarchy hierarchy = new Hierarchy(dimension.name);
-			hierarchy.caption = dimension.caption;
-			dimension.foreignKey = rootEntityIdColumnName;
-
-			if (attrDef instanceof CodeAttributeDefinition) {
-				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attrDef;
-				CodeList codeList = codeAttrDef.getList();
-				if (! codeList.isExternal()) {
-					hierarchy.primaryKey = rootEntityIdColumnName;
-					hierarchy.primaryKeyTable = parentEntityName;
-					
-					Join join = new Join(null);
-					
-					DataTable dataTable = rdbSchema.getDataTable(parentDef);
-					CodeValueFKColumn foreignKeyCodeColumn = dataTable.getForeignKeyCodeColumn(codeAttrDef);
-					join.leftKey = foreignKeyCodeColumn.getName();
-					
-					CodeTable codeListTable = rdbSchema.getCodeListTable(codeAttrDef);
-					join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeListTable.getName());;
-					
-					join.tables = Arrays.asList(
-							new Table(dbSchemaName, dataTable.getName()), 
-							new Table(dbSchemaName, codeListTable.getName())
-					);
-					hierarchy.join = join;
-				}
-			} else {
-				hierarchy.primaryKey = rootEntityIdColumnName;
-				hierarchy.primaryKeyTable = parentEntityName;
-				hierarchy.table = new Table(dbSchemaName, parentEntityName);
-			}
-			hierarchy.levels.add(generateLevel(attrDef));
-			dimension.hierarchy = hierarchy;
-		} else {
-			dimension = generateDimension(cube, attrDef);
-		}
-		cube.dimensions.add(dimension);
-	}
-
 	private String getEntityPKColumnName(EntityDefinition entityDef) {
 		return rdbSchema.getDataTable(entityDef).getPrimaryKeyColumn().getName();
 	}
@@ -297,7 +218,6 @@ public class NewMondrianSchemaGenerator {
 	private Dimension generateDimension(Cube cube, AttributeDefinition attrDef) {
 		Dimension dimension = new Dimension(determineDimensionName(attrDef));
 		EntityDefinition ancestorMultipleEntity = attrDef.getNearestAncestorMultipleEntity();
-		DataTable ancestorEntityDataTable = rdbSchema.getDataTable(ancestorMultipleEntity);
 		
 		if (ancestorMultipleEntity.isRoot()) {
 			dimension.caption = extractLabel(attrDef);
@@ -307,7 +227,7 @@ public class NewMondrianSchemaGenerator {
 		}
 
 		Hierarchy hierarchy = dimension.hierarchy;
-		hierarchy.table = new Table(dbSchemaName, ancestorEntityDataTable.getName() + "_view");
+		hierarchy.table = new Table(dbSchemaName, cube.tables.get(0).name);
 
 		if (attrDef instanceof CodeAttributeDefinition) {
 			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attrDef;
