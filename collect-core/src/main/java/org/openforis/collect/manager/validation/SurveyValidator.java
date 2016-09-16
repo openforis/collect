@@ -63,6 +63,9 @@ import org.xml.sax.SAXException;
  */
 public class SurveyValidator {
 
+	public static final int MAX_NODE_NAME_LENGTH = 63;
+	public static final int MAX_KEY_ATTRIBUTE_DEFINITION_COUNT = 3;
+	
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
@@ -82,7 +85,9 @@ public class SurveyValidator {
 	};
 	
 	private static final String CODE_LIST_PATH_FORMAT = "codeList/%s";
-	
+
+	private static final int MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT = 5;
+
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
@@ -114,6 +119,7 @@ public class SurveyValidator {
 		SurveyValidationResults results = new SurveyValidationResults();
 		
 		results.addResults(validateRootKeyAttributeSpecified(survey));
+		results.addResults(validateShowCountInRecordListEntityCount(survey));
 		results.addResults(validateSchemaNodes(survey));
 		results.addResults(validateCodeLists(survey));
 		return results;
@@ -122,16 +128,28 @@ public class SurveyValidator {
 	private List<SurveyValidationResult> validateRootKeyAttributeSpecified(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
-		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
-		for (EntityDefinition rootEntity : rootEntityDefinitions) {
-			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
+		for (EntityDefinition rootEntityDef : schema.getRootEntityDefinitions()) {
+			List<AttributeDefinition> keyAttributeDefinitions = rootEntityDef.getKeyAttributeDefinitions();
 			if ( keyAttributeDefinitions.isEmpty() ) {
-				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntity.getPath(), 
+				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
 						"survey.validation.error.key_attribute_not_specified");
 				results.add(validationResult);
-			} else if ( keyAttributeDefinitions.size() > 3 ) {
-				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntity.getPath(), 
+			} else if ( keyAttributeDefinitions.size() > MAX_KEY_ATTRIBUTE_DEFINITION_COUNT ) {
+				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
 						"survey.validation.error.maximum_key_attribute_definitions_exceeded");
+				results.add(validationResult);
+			}
+		}
+		return results;
+	}
+	
+	private List<SurveyValidationResult> validateShowCountInRecordListEntityCount(CollectSurvey survey) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		for (EntityDefinition rootEntityDef : survey.getSchema().getRootEntityDefinitions()) {
+			List<EntityDefinition> countableEntities = survey.getSchema().getCountableEntitiesInRecordList(rootEntityDef);
+			if (countableEntities.size() > MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT) {
+				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
+						"survey.validation.error.maximum_count_in_record_list_entity_definitions_exceeded");
 				results.add(validationResult);
 			}
 		}
@@ -196,6 +214,11 @@ public class SurveyValidator {
 		if (! validateNodeName(def.getName())) {
 			results.add(new SurveyValidationResult(def.getPath(), getInvalidNodeNameMessageKey()));
 		}
+		if (! validateNodeNameMaxLength(def.getParentEntityDefinition(), def.getName())) {
+			results.add(new SurveyValidationResult(def.getPath(), getMaxNodeNameLengthExceededMessageKey(), 
+					String.valueOf(generateFullInternalName(def.getParentEntityDefinition(), def.getName()).length()), 
+					String.valueOf(MAX_NODE_NAME_LENGTH)));
+		}
 		
 		results.addAll(validateExpressions(def));
 		
@@ -211,8 +234,41 @@ public class SurveyValidator {
 		return "global.validation.internal_name.invalid_value";
 	}
 	
+	protected String getMaxNodeNameLengthExceededMessageKey() {
+		return "survey.validation.node.name.error.max_length_exceeded";
+	}
+	
 	public boolean validateNodeName(String name) {
 		return Survey.INTERNAL_NAME_PATTERN.matcher(name).matches();
+	}
+	
+	/**
+	 * Validates an internal node name preventing it to be too long when it's concatenated
+	 * with the ancestor single entity names
+	 */
+	public boolean validateNodeNameMaxLength(EntityDefinition parentEntityDefinition, String name) {
+		String fullInternalName = generateFullInternalName(parentEntityDefinition, name);
+		return fullInternalName.length() <= MAX_NODE_NAME_LENGTH;
+	}
+
+	public String generateFullInternalName(EntityDefinition parentEntityDefinition, String name) {
+		String fullInternalName;
+		if (parentEntityDefinition == null) {
+			fullInternalName = name;
+		} else {
+			List<EntityDefinition> ancestorEntityDefinitions = parentEntityDefinition.getAncestorEntityDefinitions();
+			List<EntityDefinition> ancestorSingleEntities = new ArrayList<EntityDefinition>();
+			for (EntityDefinition ancestorEntityDef : ancestorEntityDefinitions) {
+				if (ancestorEntityDef.isMultiple()) {
+					break;
+				} else {
+					ancestorSingleEntities.add(ancestorEntityDef);
+				}
+			}
+			List<String> ancestorSingleEntityNames = CollectionUtils.project(ancestorEntityDefinitions, "name");
+			fullInternalName = StringUtils.join(ancestorSingleEntityNames, "_") + "_" + name;
+		}
+		return fullInternalName;
 	}
 	
 	private List<SurveyValidationResult> validateEntity(EntityDefinition entity) {
@@ -804,4 +860,5 @@ public class SurveyValidator {
 		}
 		
 	}
+
 }

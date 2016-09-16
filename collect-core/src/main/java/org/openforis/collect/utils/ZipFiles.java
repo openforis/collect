@@ -1,6 +1,7 @@
 package org.openforis.collect.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,13 +25,16 @@ import org.openforis.concurrency.ProgressListener;
 public class ZipFiles {
 
 	public static void writeFile(ZipOutputStream zipOutputStream, File file, String zipEntryName) {
+		FileInputStream fileInputStream = null;
 		try {
 			zipOutputStream.putNextEntry(new ZipEntry(zipEntryName));
-			byte[] metadataContent = FileUtils.readFileToByteArray(file);
-			IOUtils.write(metadataContent, zipOutputStream);
+			fileInputStream = new FileInputStream(file);
+			IOUtils.copy(fileInputStream, zipOutputStream);
 			zipOutputStream.closeEntry();
 		} catch (IOException e) {
 			throw new RuntimeException("Error writing data to zip file", e);
+		} finally {
+			IOUtils.closeQuietly(fileInputStream);
 		}
 	}
 	

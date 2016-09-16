@@ -3,9 +3,10 @@
  */
 package org.openforis.idm.model.expression.internal;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.jxpath.Pointer;
 import org.apache.commons.jxpath.ri.EvalContext;
@@ -73,16 +74,16 @@ public class ModelRelationalExpression extends CoreOperation {
 		if ( right instanceof InitialContext ) {
 			((InitialContext) right).reset();
 		}
-		if ( left instanceof Iterator && right instanceof Iterator ) {
-			return findMatch((Iterator<?>) left, (Iterator<?>) right);
-		}
 		if ( left instanceof Iterator ) {
-			return containsMatch((Iterator<?>) left, right);
+			if (right instanceof Iterator ) {
+				return findMatch((Iterator<?>) left, (Iterator<?>) right);
+			} else {
+				return containsMatch((Iterator<?>) left, right);
+			}
 		}
 		if ( right instanceof Iterator ) {
 			return containsMatch(left, (Iterator<?>) right);
 		}
-
 		Object leftValue = getValue(left);
 		Object rightValue = getValue(right);
 
@@ -90,26 +91,19 @@ public class ModelRelationalExpression extends CoreOperation {
 	}
 
 	private boolean internalCompute(Object leftValue, Object rightValue) {
-		if( leftValue  == null || rightValue == null) {
+		if( leftValue == null || rightValue == null) {
+			return false;
+		} else if ( leftValue instanceof String && rightValue instanceof String ) {
+			return evaluate((String) leftValue, (String) rightValue, operation);
+		} else if ( leftValue instanceof Number && rightValue instanceof NumericRange ) {
+			return computeRange((Number) leftValue, (NumericRange<?>) rightValue, operation);
+		} else if ( leftValue instanceof NumericRange && rightValue instanceof Number ) {
+			return computeRange((NumericRange<?>) leftValue, (Number) rightValue, operation);
+		} else if ( leftValue instanceof Number || rightValue instanceof Number ) {
+			return evaluate(getDoubleValue(leftValue), getDoubleValue(rightValue), operation);
+		} else {
 			return false;
 		}
-		
-		if ( leftValue instanceof String && rightValue instanceof String ) {
-			return evaluate((String) leftValue, (String) rightValue, operation);
-		}
-		if ( leftValue instanceof Number && rightValue instanceof NumericRange ) {
-			return computeRange((Number) leftValue, (NumericRange<?>) rightValue, operation);
-		}
-		if ( leftValue instanceof NumericRange && rightValue instanceof Number ) {
-			return computeRange((NumericRange<?>) leftValue, (Number) rightValue, operation);
-		}
-		if ( leftValue instanceof Number || rightValue instanceof Number ) {
-			Double left = getDoubleValue(leftValue);
-			Double right = getDoubleValue(rightValue);
-			return evaluate(left, right, operation);
-		}
-
-		return false;
 	}
 
 	private <T extends Comparable<T>> boolean evaluate(T leftValue, T rightValue, Operation operation) {
@@ -275,8 +269,7 @@ public class ModelRelationalExpression extends CoreOperation {
 	private Object reduce(Object o) {
 		if ( o instanceof SelfContext ) {
 			o = ((EvalContext) o).getSingleNodePointer();
-		}
-		if ( o instanceof Collection ) {
+		} else if ( o instanceof Collection ) {
 			o = ((Collection<?>) o).iterator();
 		}
 		return o;
@@ -292,12 +285,12 @@ public class ModelRelationalExpression extends CoreOperation {
 	 * @return whether a match was found
 	 */
 	private boolean findMatch(Iterator<?> lit, Iterator<?> rit) {
-		HashSet<Object> left = new HashSet<Object>();
+		List<Object> leftIterable = new ArrayList<Object>();
 		while ( lit.hasNext() ) {
-			left.add(lit.next());
+			leftIterable.add(lit.next());
 		}
 		while ( rit.hasNext() ) {
-			if ( containsMatch(left.iterator(), rit.next()) ) {
+			if ( containsMatch(leftIterable.iterator(), rit.next()) ) {
 				return true;
 			}
 		}

@@ -6,6 +6,7 @@ import org.openforis.collect.designer.form.NodeDefinitionFormObject.RequirenessT
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -73,15 +74,25 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 	protected boolean validateName(ValidationContext ctx) {
 		boolean valid = validateRequired(ctx, NAME_FIELD);
 		if (valid) {
+			EntityDefinition parentEntity = getParentEntity(ctx);
+			String name = getValue(ctx, NAME_FIELD);
 			CollectSurvey survey = getEditedNode(ctx).getSurvey();
 			if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
-				String name = getValue(ctx, NAME_FIELD);
 				valid = new CollectEarthSurveyValidator().validateNodeName(name);
 				if (! valid) {
 					addInvalidMessage(ctx, NAME_FIELD, Labels.getLabel("survey.validation.collect_earth.invalid_node_name"));
 				}
 			} else {
 				valid = super.validateInternalName(ctx, NAME_FIELD);
+				if (valid) {
+					SurveyValidator surveyValidator = new SurveyValidator();
+					valid = surveyValidator.validateNodeNameMaxLength(parentEntity, name);
+					if (! valid) {
+						String errorMessage = Labels.getLabel("survey.validation.node.name.error.max_length_exceeded", 
+								new Object[]{surveyValidator.generateFullInternalName(parentEntity, name).length(), SurveyValidator.MAX_NODE_NAME_LENGTH});
+						addInvalidMessage(ctx, NAME_FIELD, errorMessage);
+					}
+				}
 			}
 			if (valid) {
 				valid = validateNameUniqueness(ctx);

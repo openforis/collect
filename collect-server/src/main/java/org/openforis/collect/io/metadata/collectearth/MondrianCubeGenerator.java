@@ -83,6 +83,9 @@ public class MondrianCubeGenerator {
 		
 		List<NodeDefinition> children = rootEntityDef.getChildDefinitions();
 		for (NodeDefinition nodeDef : children) {
+			if (! survey.getAnnotations().isIncludedInDataExport(nodeDef)) {
+				continue;
+			}
 			String nodeName = nodeDef.getName();
 			if (nodeDef instanceof AttributeDefinition) {
 				Dimension dimension = generateDimension(nodeDef, rootEntityDef );

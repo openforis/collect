@@ -206,6 +206,9 @@
 						  includeInLayout="false" 
 						  includeInLayout.partialExportParametersSelection="true"
 						  gap="10">
+					<s:CheckBox id="includeKMLColumnForCoordinatesCheckBox" 
+								selected="false" 
+								label="{Message.get('export.includeKMLColumnForCoordinates')}*" />
 					<s:CheckBox id="includeAllAncestorAttributesCheckBox" 
 								selected="false" 
 								label="{Message.get('export.includeAllAncestorAttributes')}*" />

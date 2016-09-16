@@ -15,7 +15,8 @@
 		<include id="attributeCommonInclude"
 			src="survey_edit/schema/attribute_common.zul" 
 			otherLabelsForm="survey_edit/schema/attribute_coordinate_other_labels_form.zul"
-			otherLayoutForm="survey_edit/schema/attribute_coordinate_layout_part.zul"/>
+			otherLayoutForm="survey_edit/schema/attribute_coordinate_layout_part.zul"
+			otherMinorGeneralDetailsForm="survey_edit/schema/attribute_coordinate_general_part.zul" />
 		
   </vlayout>
 </zk>

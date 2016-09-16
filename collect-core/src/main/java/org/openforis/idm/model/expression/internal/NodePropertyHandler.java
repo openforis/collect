@@ -1,6 +1,5 @@
 package org.openforis.idm.model.expression.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -12,6 +11,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodePredicate;
 import org.openforis.idm.path.Path;
 
 /**
@@ -70,15 +70,12 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 
 	private Object extractNonEmptyChildren(Entity entity, String childName) {
 		NodeDefinition childDef = entity.getDefinition().getChildDefinition(childName);
-		List<Node<?>> children = entity.getChildren(childDef);
-
-		List<Node<?>> list = new ArrayList<Node<?>>(children.size());
 		
-		for (Node<?> childNode : children) {
-			if( childNode instanceof Entity || ( ! childNode.isEmpty()) ) {
-				list.add(childNode);
+		List<? extends Node<?>> list = entity.findChildren(childDef, new NodePredicate() {
+			public boolean evaluate(Node<?> childNode) {
+				return childNode instanceof Entity || ( ! childNode.isEmpty());
 			}
-		}
+		});
 		if (list.isEmpty()) {
 			return null;
 		} else {

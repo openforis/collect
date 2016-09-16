@@ -5,14 +5,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.datacleansing.xpath.XPathDataQueryEvaluator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Node;
@@ -75,28 +77,57 @@ public class DataCleansingChainExectutorTask extends Task {
 		datasetSize = recordSummaries.size();
 		lastRecordModifiedDate = null;
 		
+		//Delete records in bulk if needed
+		Set<Integer> recordIdsToBeDeleted = new TreeSet<Integer>();
+		
 		Iterator<CollectRecord> it = recordSummaries.iterator();
 		while (it.hasNext() && isRunning()) {
 			CollectRecord recordSummary = (CollectRecord) it.next();
 			udpateLastRecordModifiedDate(recordSummary);
 			
 			CollectRecord record = recordManager.load(survey, recordSummary.getId(), input.step, false);
-			boolean recordNodesProcessed = false;
+			boolean recordCleansed = false;
 			for (DataCleansingStep step : input.chain.getSteps()) {
-				DataQueryEvaluator queryEvaluator = createQueryEvaluator(step.getQuery());
-				List<Node<?>> nodes = queryEvaluator.evaluate(record);
-				for (Node<?> node : nodes) {
-					if (processNode(step, node)) {
-						cleansedNodes ++;
-						recordNodesProcessed = true;
+				DataCleansingStepExecutionResult stepExecutionResult = executeStep(record, step);
+				if (stepExecutionResult != null) {
+					recordCleansed = true;
+					if (stepExecutionResult == DataCleansingStepExecutionResult.RECORD_TO_BE_DELETED) {
+						recordIdsToBeDeleted.add(record.getId());
+						break;
 					}
 				}
 			}
-			if (recordNodesProcessed) {
+			if (recordCleansed) {
 				cleansedRecords ++;
 			}
 			incrementProcessedItems();
 		}
+		recordManager.deleteByIds(recordIdsToBeDeleted);
+	}
+
+	private DataCleansingStepExecutionResult executeStep(CollectRecord record, DataCleansingStep step) {
+		DataCleansingStepExecutionResult result = null;
+		DataQueryEvaluator queryEvaluator = createQueryEvaluator(step.getQuery());
+		List<Node<?>> nodes = queryEvaluator.evaluate(record);
+		for (Node<?> node : nodes) {
+			DataCleansingStepNodeProcessorResult processResult = processNode(step, node);
+			if (processResult != null) {
+				switch(processResult) {
+				case ATTRIBUTE_UPDATED:
+				case ENTITY_DELETED:
+					cleansedNodes ++;
+					result = DataCleansingStepExecutionResult.RECORD_UPDATED;
+					break;
+				case RECORD_TO_BE_DELETED:
+					result = DataCleansingStepExecutionResult.RECORD_TO_BE_DELETED;
+					break;
+				}
+			}
+			if (processResult == DataCleansingStepNodeProcessorResult.RECORD_TO_BE_DELETED) {
+				break;
+			}
+		}
+		return result;
 	}
 
 	private void udpateLastRecordModifiedDate(CollectRecord recordSummary) {
@@ -106,14 +137,14 @@ public class DataCleansingChainExectutorTask extends Task {
 		}
 	}
 
-	private boolean processNode(DataCleansingStep step, Node<?> node) {
+	private DataCleansingStepNodeProcessorResult processNode(DataCleansingStep step, Node<?> node) {
 		try {
 			return input.nodeProcessor.process(step, node);
 		} catch(Exception e) {
 			log().error(String.format("Error executing cleansing step %s", step.getId()), e);
 			CollectRecord record = (CollectRecord) node.getRecord();
 			errors.add(new DataQueryExecutorError(record.getRootEntityKeyValues(), record.getId(), node.getPath(), e.getMessage()));
-			return false;
+			return null;
 		}
 	}
 	
@@ -134,11 +165,11 @@ public class DataCleansingChainExectutorTask extends Task {
 		return new XPathDataQueryEvaluator(query);
 	}
 	
-	public DataCleansingChainExectutorTask.DataCleansingChainExecutorTaskInput getInput() {
+	public DataCleansingChainExecutorTaskInput getInput() {
 		return input;
 	}
 	
-	public void setInput(DataCleansingChainExectutorTask.DataCleansingChainExecutorTaskInput input) {
+	public void setInput(DataCleansingChainExecutorTaskInput input) {
 		this.input = input;
 	}
 	
@@ -244,7 +275,18 @@ public class DataCleansingChainExectutorTask extends Task {
 	
 	public interface DataCleansingStepNodeProcessor extends Closeable {
 		
-		boolean process(DataCleansingStep step, Node<?> node) throws Exception;
+		DataCleansingStepNodeProcessorResult process(DataCleansingStep step, Node<?> node) throws Exception;
+	}
+	
+	public enum DataCleansingStepNodeProcessorResult {
+		ATTRIBUTE_UPDATED, 
+		ENTITY_DELETED, 
+		RECORD_TO_BE_DELETED;
+	}
+	
+	public enum DataCleansingStepExecutionResult {
+		RECORD_UPDATED,
+		RECORD_TO_BE_DELETED
 	}
 
 }

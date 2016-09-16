@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.form.validator;
 
+import java.util.regex.Pattern;
+
 import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.idm.metamodel.CodeList;
@@ -14,7 +16,9 @@ import org.zkoss.util.resource.Labels;
  */
 public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeListItem> {
 	
+	private static final Pattern CODE_VALID_FORMAT_PATTERN = Pattern.compile("[\\w|-]+");
 	public static final String CODE_ALREADY_DEFINED_MESSAGE_KEY = "survey.code_list.validation.code_already_defined";
+	public static final String CODE_INVALID_FORMAT_MESSAGE_KEY = "survey.code_list.validation.code_invalid_format";
 
 	protected static final String PARENT_ITEM_ARG = "parentItem";
 	protected static final String CODE_LIST_MANAGER_ARG = "codeListManager";
@@ -37,11 +41,9 @@ public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeLis
 	}
 	
 	protected boolean validateCode(ValidationContext ctx) {
-		boolean result = validateRequired(ctx, CODE_FIELD);
-		if ( result ) {
-			result = validateCodeUniqueness(ctx);
-		}
-		return result;
+		return validateRequired(ctx, CODE_FIELD) 
+				&& validateRegEx(ctx, CODE_VALID_FORMAT_PATTERN, CODE_FIELD, CODE_INVALID_FORMAT_MESSAGE_KEY)
+				&& validateCodeUniqueness(ctx);
 	}
 
 	protected boolean validateCodeUniqueness(ValidationContext ctx) {

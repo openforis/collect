@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-data-cleansing-step-type" author="ricci" dbms="postgresql">
+		<comment>Add data cleansing step type column</comment>
+		
+		<addColumn tableName="ofc_data_cleansing_step">
+            <column name="type" type="char" defaultValue="a" />
+	    </addColumn>
+	        
+	</changeSet>
+  
+  	<changeSet id="add-record-application-version" author="ricci" dbms="postgresql">
+		<comment>Add record application version column</comment>
+		
+		<addColumn tableName="ofc_record">
+            <column name="app_version" type="varchar(63)" defaultValue="3.9.0" />
+	    </addColumn>
+	        
+	</changeSet>
+	
+</databaseChangeLog>

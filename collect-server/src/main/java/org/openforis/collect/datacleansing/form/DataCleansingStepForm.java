@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.datacleansing.DataCleansingStep;
+import org.openforis.collect.datacleansing.DataCleansingStep.DataCleansingStepType;
 import org.openforis.collect.datacleansing.DataCleansingStepValue;
 import org.openforis.collect.datacleansing.DataQuery;
 
@@ -17,6 +18,7 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 	private Integer queryId;
 	private String title;
 	private String description;
+	private char typeCode;
 
 	private List<DataCleansingStepValue> updateValues;
 	
@@ -38,10 +40,12 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 		}
 		List<DataCleansingStepValue> values = step.getUpdateValues();
 		this.updateValues = new ArrayList<DataCleansingStepValue>(values);
-//		for (DataCleansingStepValue stepValue : values) {
-//			DataCleansingStepValueForm valueForm = new DataCleansingStepValueForm(stepValue);
-//			this.updateValues.add(valueForm);
-//		}
+		this.typeCode = step.getType().getCode();
+	}
+	
+	public DataCleansingStepType getType() {
+		boolean nullType = Character.getNumericValue(typeCode) == -1;
+		return nullType ? DataCleansingStepType.ATTRIBUTE_UPDATE : DataCleansingStepType.fromCode(typeCode);
 	}
 	
 	public String getQueryTitle() {
@@ -76,6 +80,14 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 		this.description = description;
 	}
 	
+	public char getTypeCode() {
+		return typeCode;
+	}
+	
+	public void setTypeCode(char typeCode) {
+		this.typeCode = typeCode;
+	}
+	
 	public List<DataCleansingStepValue> getUpdateValues() {
 		return updateValues;
 	}
@@ -83,5 +95,5 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 	public void setUpdateValues(List<DataCleansingStepValue> values) {
 		this.updateValues = values;
 	}
-
+	
 }

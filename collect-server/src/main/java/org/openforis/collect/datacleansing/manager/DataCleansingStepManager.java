@@ -9,6 +9,7 @@ import java.util.Set;
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.DataQuery;
+import org.openforis.collect.datacleansing.DataCleansingStep.DataCleansingStepType;
 import org.openforis.collect.datacleansing.persistence.DataCleansingStepDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -71,7 +72,7 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	public void save(DataCleansingStep step) {
 		super.save(step);
 		dao.deleteStepValues(step.getId());
-		if (! step.getUpdateValues().isEmpty()) {
+		if (step.getType() == DataCleansingStepType.ATTRIBUTE_UPDATE && ! step.getUpdateValues().isEmpty()) {
 			dao.insertStepValues(step.getId(), step.getUpdateValues());
 		}
 	}

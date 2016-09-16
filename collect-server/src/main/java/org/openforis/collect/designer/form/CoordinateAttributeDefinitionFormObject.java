@@ -20,6 +20,7 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	private String xFieldLabel;
 	private String yFieldLabel;
 	private String srsFieldLabel;
+	private boolean allowOnlyDeviceCoordinate;
 	
 	CoordinateAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -32,6 +33,8 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		dest.setFieldLabel(CoordinateAttributeDefinition.X_FIELD_NAME, languageCode, xFieldLabel);
 		dest.setFieldLabel(CoordinateAttributeDefinition.Y_FIELD_NAME, languageCode, yFieldLabel);
 		dest.setFieldLabel(CoordinateAttributeDefinition.SRS_FIELD_NAME, languageCode, srsFieldLabel);
+
+		((CollectSurvey) dest.getSurvey()).getAnnotations().setAllowOnlyDeviceCoordinate(dest, allowOnlyDeviceCoordinate);
 	}
 
 	protected void saveFieldOrderValue(T dest) {
@@ -53,6 +56,8 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		xFieldLabel = source.getFieldLabel(CoordinateAttributeDefinition.X_FIELD_NAME, languageCode);
 		yFieldLabel = source.getFieldLabel(CoordinateAttributeDefinition.Y_FIELD_NAME, languageCode);
 		srsFieldLabel = source.getFieldLabel(CoordinateAttributeDefinition.SRS_FIELD_NAME, languageCode);
+		
+		allowOnlyDeviceCoordinate = ((CollectSurvey) source.getSurvey()).getAnnotations().isAllowOnlyDeviceCoordinate(source);
 	}
 
 	protected void loadFieldsOrderValue(T source) {
@@ -94,4 +99,11 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		this.srsFieldLabel = srsFieldLabel;
 	}
 
+	public boolean isAllowOnlyDeviceCoordinate() {
+		return allowOnlyDeviceCoordinate;
+	}
+	
+	public void setAllowOnlyDeviceCoordinate(boolean allowOnlyDeviceCoordinate) {
+		this.allowOnlyDeviceCoordinate = allowOnlyDeviceCoordinate;
+	}
 }

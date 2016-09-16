@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.openforis.collect.Collect;
 import org.openforis.collect.event.RecordStep;
-import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -197,6 +196,7 @@ public class CollectRecord extends Record {
 
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
 		super(survey, versionName, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
+		this.applicationVersion = Collect.VERSION;
 		this.step = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
@@ -423,34 +423,12 @@ public class CollectRecord extends Record {
 
 	private void updateEntityCounts() {
 		List<Integer> counts = new ArrayList<Integer>();
-		List<EntityDefinition> countableDefns = getCountableEntitiesInList();
+		List<EntityDefinition> countableDefns = getSurvey().getSchema().getCountableEntitiesInRecordList(getRootEntity().getDefinition());
 		for (EntityDefinition defn : countableDefns) {
 			List<Node<?>> nodes = findNodesByPath(defn.getPath());
 			counts.add(nodes.size());
 		}
 		this.entityCounts = counts;
-	}
-	
-	/**
-	 * Returns first level entity definitions that have the attribute countInSummaryList set to true
-	 * 
-	 * @param rootEntityDefinition
-	 * @return 
-	 */
-	protected List<EntityDefinition> getCountableEntitiesInList() {
-		final List<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		EntityDefinition rootEntityDefinition = getRootEntity().getDefinition();
-		rootEntityDefinition.traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition def) {
-				if(def instanceof EntityDefinition) {
-					String annotation = def.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
-					if(Boolean.parseBoolean(annotation)) {
-						result.add((EntityDefinition) def);
-					}
-				}
-			}
-		});
-		return result;
 	}
 	
 	public List<FileAttribute> getFileAttributes() {

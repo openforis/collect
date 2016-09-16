@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-data-cleansing-step-type" author="ricci" dbms="sqlite">
+		<comment>Add data cleansing step type column</comment>
+		
+		<sql>
+			alter table ofc_data_cleansing_step add column type char default 'a';			
+		</sql>
+		
+	</changeSet>
+	
+	<changeSet id="add-record-application-version" author="ricci" dbms="sqlite">
+	
+		<sql>
+			alter table ofc_record add column app_version varchar(63) default '3.9.0';			
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>

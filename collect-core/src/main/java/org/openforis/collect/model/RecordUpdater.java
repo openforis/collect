@@ -787,12 +787,13 @@ public class RecordUpdater {
 					addEmptyChildren(entity, childDefn, toBeInserted);
 				}
 			} else {
-				List<Node<?>> children = entity.getChildren(childDefn);
-				for (Node<?> child : children) {
-					if(child instanceof Entity) {
-						addEmptyNodes((Entity) child);
+				entity.visitChildren(childDefn, new NodeVisitor() {
+					public void visit(Node<? extends NodeDefinition> child, int idx) {
+						if(child instanceof Entity) {
+							addEmptyNodes((Entity) child);
+						}
 					}
-				}
+				});
 			}
 		}
 	}

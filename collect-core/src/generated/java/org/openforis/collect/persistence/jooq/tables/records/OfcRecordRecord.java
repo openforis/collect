@@ -26,7 +26,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcRecordRecord extends UpdatableRecordImpl<OfcRecordRecord> {
 
-	private static final long serialVersionUID = 1020282842;
+	private static final long serialVersionUID = 299564515;
 
 	/**
 	 * Setter for <code>collect.ofc_record.id</code>.
@@ -378,6 +378,20 @@ public class OfcRecordRecord extends UpdatableRecordImpl<OfcRecordRecord> {
 		return (Integer) getValue(24);
 	}
 
+	/**
+	 * Setter for <code>collect.ofc_record.app_version</code>.
+	 */
+	public void setAppVersion(String value) {
+		setValue(25, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_record.app_version</code>.
+	 */
+	public String getAppVersion() {
+		return (String) getValue(25);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -404,7 +418,7 @@ public class OfcRecordRecord extends UpdatableRecordImpl<OfcRecordRecord> {
 	/**
 	 * Create a detached, initialised OfcRecordRecord
 	 */
-	public OfcRecordRecord(Integer id, Integer surveyId, Integer rootEntityDefinitionId, Timestamp dateCreated, Integer createdById, Timestamp dateModified, Integer modifiedById, String modelVersion, Integer step, String state, Integer skipped, Integer missing, Integer errors, Integer warnings, String key1, String key2, String key3, Integer count1, Integer count2, Integer count3, Integer count4, Integer count5, byte[] data1, byte[] data2, Integer ownerId) {
+	public OfcRecordRecord(Integer id, Integer surveyId, Integer rootEntityDefinitionId, Timestamp dateCreated, Integer createdById, Timestamp dateModified, Integer modifiedById, String modelVersion, Integer step, String state, Integer skipped, Integer missing, Integer errors, Integer warnings, String key1, String key2, String key3, Integer count1, Integer count2, Integer count3, Integer count4, Integer count5, byte[] data1, byte[] data2, Integer ownerId, String appVersion) {
 		super(OfcRecord.OFC_RECORD);
 
 		setValue(0, id);
@@ -432,5 +446,6 @@ public class OfcRecordRecord extends UpdatableRecordImpl<OfcRecordRecord> {
 		setValue(22, data1);
 		setValue(23, data2);
 		setValue(24, ownerId);
+		setValue(25, appVersion);
 	}
 }

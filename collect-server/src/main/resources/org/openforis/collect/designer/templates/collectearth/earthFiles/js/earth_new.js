@@ -833,19 +833,19 @@ var forceWindowCloseAfterDialogCloses = function($dialog) {
 var changeState = function(state) {
 	switch(state) {
 		case LOADING_STATE:
-			$("#formAll").hide();
+			$("#scrollingDiv").hide();
 			$("#collectEarthNotRunningPanel").hide();
 			$("#loadingPanel").show();
 			break;
 		case COLLECT_EARTH_NOT_RUNNING_STATE:
 			$("#loadingPanel").hide();
-			$("#formAll").hide();
+			$("#scrollingDiv").hide();
 			$("#collectEarthNotRunningPanel").show();
 			break;
 		default:
 			$("#loadingPanel").hide();
 			$("#collectEarthNotRunningPanel").hide();
-			$("#formAll").show();
+			$("#scrollingDiv").show();
 	}
 }
 

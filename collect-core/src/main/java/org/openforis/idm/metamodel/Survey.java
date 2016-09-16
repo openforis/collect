@@ -283,6 +283,15 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		return CollectionUtils.unmodifiableList(this.modelVersions);
 	}
 	
+	public ModelVersion getLatestVersion() {
+		List<ModelVersion> sortedVersions = getSortedVersions();
+		if (sortedVersions.isEmpty()) {
+			return null;
+		} else {
+			return sortedVersions.get(sortedVersions.size() - 1);
+		}
+	}
+	
 	public void addVersion(ModelVersion version) {
 		if ( modelVersions == null ) {
 			modelVersions = new ArrayList<ModelVersion>();

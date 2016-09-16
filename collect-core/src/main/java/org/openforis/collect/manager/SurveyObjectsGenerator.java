@@ -74,6 +74,22 @@ public class SurveyObjectsGenerator {
 				Arrays.asList("percent"), 
 				Arrays.asList("%"),
 				labelLanguages);
+		
+		//VOLUME
+		addUnit(survey, "cm3", Dimension.VOLUME, 0.001,
+				Arrays.asList("Cubic centimeters"), 
+				Arrays.asList("cm3"),
+				labelLanguages);
+		
+		addUnit(survey, "l", Dimension.VOLUME, 1.0,
+				Arrays.asList("Litres"), 
+				Arrays.asList("l"),
+				labelLanguages);
+		
+		addUnit(survey, "m3", Dimension.VOLUME, 1000.0,
+				Arrays.asList("Cubic metres"), 
+				Arrays.asList("m3"),
+				labelLanguages);
 	}
 	
 	protected void addPredefinedSRSs(Survey survey) {

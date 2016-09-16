@@ -1,0 +1,25 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <grid class="inner">
+    <columns>
+      <column />
+    </columns>
+    <rows>
+      <row visible="@load(not fx.calculated)">
+        <fieldErrorHandler message="@load(vmsgs['allowOnlyDeviceCoordinate'])">
+	        <label value="${labels.survey.schema.attribute.coordinate.allow_only_device_coordinates.$}:" />
+	        <image popup="showReadOnlyFieldInCollectEarthInfoTooltip" style="cursor:pointer"
+				src="/assets/images/info-small.png" />
+	        <checkbox checked="@bind(fx.allowOnlyDeviceCoordinate)"
+	    		onCheck="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
+    </rows>
+  </grid>
+
+  <popup id="showReadOnlyFieldInCollectEarthInfoTooltip" width="300px">
+  	<html><![CDATA[
+		${labels.survey.schema.attribute.coordinate.allow_only_device_coordinates.tooltip}
+  	]]></html>
+  </popup>
+</zk>

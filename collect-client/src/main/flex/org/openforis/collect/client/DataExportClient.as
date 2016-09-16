@@ -38,9 +38,11 @@ package org.openforis.collect.client {
 							   includeAllAncestorAttributes:Boolean = false, includeEnumeratedEntities:Boolean = false, 
 							   includeCompositeAttributeMergedColumn:Boolean = false,
 							   codeAttributeExpanded:Boolean = false,
-							   onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null):void {
+							   onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null, 
+							   includeKMLColumnForCoordinates:Boolean = false):void {
 			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes, 
-					includeEnumeratedEntities, includeCompositeAttributeMergedColumn, codeAttributeExpanded, onlyOwnedRecords, rootEntityKeyValues);
+					includeEnumeratedEntities, includeCompositeAttributeMergedColumn, codeAttributeExpanded, onlyOwnedRecords, rootEntityKeyValues,
+					includeKMLColumnForCoordinates);
 			token.addResponder(responder);
 		}
 		
