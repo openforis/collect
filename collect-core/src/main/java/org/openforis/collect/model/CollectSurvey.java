@@ -17,8 +17,11 @@ import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.ApplicationOptions;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 
@@ -130,6 +133,27 @@ public class CollectSurvey extends Survey {
 		return codeLists;
 	}
 
+	/**
+	 * Goes though the attributes on the survey finding those that are marked as coming "From CSV" meaning that the popup-up will not show the attributes and they will be kept as hidden inputs
+	 * @param survey
+	 * @return The list of attributes that are marked as coming "From CSV" or that are key attributes
+	 */
+	public List<AttributeDefinition> getExtendedDataFields() {
+		final CollectAnnotations annotations = getAnnotations();
+		final List<AttributeDefinition> fromCsvAttributes = new ArrayList<AttributeDefinition>();
+		getSchema().traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if (def instanceof AttributeDefinition) {
+					AttributeDefinition attrDef = (AttributeDefinition) def;
+					if (annotations.isFromCollectEarthCSV(attrDef) && !attrDef.isKey()) {
+						fromCsvAttributes.add(attrDef);
+					}					
+				}
+			}
+		});
+		return fromCsvAttributes;
+	}
+	
 	public CollectAnnotations getAnnotations() {
 		return annotations;
 	}

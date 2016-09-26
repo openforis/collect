@@ -4,7 +4,10 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +16,18 @@ import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyFileFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGeneratorImpl;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
+import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.Files;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
+import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -27,6 +36,7 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Filedownload;
 
 /**
  * @author S. Ricci
@@ -34,6 +44,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
  */
 public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 
+	private static final String TYPE_FIELD_NAME = "type";
 	private static final String APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND = "applyChangesToEditedSurveyFile";
 	private static final String CLOSE_SURVEY_FILE_EDIT_POPUP_GLOBAL_COMMAND = "closeSurveyFileEditPopUp";
 	
@@ -103,13 +114,42 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 			if (newItem && uploadedFile == null) {
 				MessageUtil.showError("global.file_not_selected");
 			} else {
-				boolean wasNewItem = newItem;
-				super.commitChanges(binder);
-				if (! wasNewItem) {
-					surveyManager.updateSurveyFile(survey, editedItem, uploadedFile);
-				}
-				BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND, null);
+//				if (validateFileContent(binder)) {
+					boolean wasNewItem = newItem;
+					super.commitChanges(binder);
+					if (! wasNewItem) {
+						surveyManager.updateSurveyFile(survey, editedItem, uploadedFile);
+					}
+					BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND, null);
+//				}
 			}
+		}
+	}
+
+	private boolean validateFileContent(Binder binder) {
+		String typeName = getFormFieldValue(binder, TYPE_FIELD_NAME);
+		SurveyFileType type = SurveyFileType.valueOf(typeName);
+		switch (type) {
+		case COLLECT_EARTH_GRID:
+			CollectEarthGridTemplateGenerator templateGenerator = new CollectEarthGridTemplateGeneratorImpl();
+			CSVFileValidationResult headersValidationResult = templateGenerator.validate(uploadedFile, survey);
+			if (headersValidationResult.isSuccessful()) {
+				return true;
+			} else {
+				switch(headersValidationResult.getErrorType()) {
+				case INVALID_FILE_TYPE:
+					MessageUtil.showError("survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
+					break;
+				case INVALID_HEADERS:
+					MessageUtil.showError("survey.file.type.collect_earth_grid.error.invalid_file_structure", 
+							new Object[]{headersValidationResult.getExpectedHeaders().toString(), 
+									headersValidationResult.getFoundHeaders().toString()});
+					break;
+				}
+				return false;
+			}
+		default:
+			return true;
 		}
 	}
 	
@@ -135,8 +175,21 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		updateForm(binder);
 	}
 	
+	@Command
+	public void downloadExampleFile(@BindingParam("fileType") String fileType) throws IOException {
+		switch (SurveyFileType.valueOf(fileType)) {
+		case COLLECT_EARTH_GRID:
+			File templateFile = new CollectEarthGridTemplateGeneratorImpl().generateTemplateCSVFile(survey);
+			String fileName = String.format("%s_grid_template_%s.csv", survey.getName(), Dates.formatDateTime(new Date()));
+			Filedownload.save(new FileInputStream(templateFile),  Files.CSV_CONTENT_TYPE, fileName);
+			break;
+		default:
+			//TODO
+		}
+	}
+	
 	private void updateForm(Binder binder) {
-		String typeName = getFormFieldValue(binder, "type");
+		String typeName = getFormFieldValue(binder, TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		String filename = type.getFixedFilename();
 		if (filename == null) {

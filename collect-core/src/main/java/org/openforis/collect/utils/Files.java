@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class Files {
 	
+	public static final String CSV_CONTENT_TYPE = "text/csv";
 	private static final String PATH_SEPARATOR_PATTERN = "[\\\\|/]";
 
 	public static File writeToTempFile(String text, String tempFilePrefix, String tempFileSuffix) throws IOException {

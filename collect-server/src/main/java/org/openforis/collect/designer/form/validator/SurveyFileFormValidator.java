@@ -28,7 +28,7 @@ public class SurveyFileFormValidator extends FormValidator {
 	
 	protected static final String SURVEY_MANAGER_ARG = "surveyManager";
 	
-	private static final Pattern VALID_FILENAME_PATTERN = Pattern.compile("^[\\w-]+\\.[\\w-]+$");
+	private static final Pattern VALID_FILENAME_PATTERN = Pattern.compile("^[\\w-\\.]+\\.[\\w-]+$");
 
 	private static final Set<String> RESERVED_FILENAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE.getFixedFilename(), "balloon.html", "collectEarthCubes.xml.fmt", "kml_template.fmt", "placemark.idm.xml",

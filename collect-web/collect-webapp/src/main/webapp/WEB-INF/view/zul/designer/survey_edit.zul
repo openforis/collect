@@ -127,7 +127,10 @@
 									<menuitem  label="${labels.survey.schema.attributes_import.$}"
 										onClick="@command('openSchemaAttributesImportPopUp')" />
 									<menuitem  label="${labels.survey.schema.export_csv_data_import_template}"
-										onClick="@command('exportCsvDataExportTemplate')" />
+										onClick="@command('exportCsvDataImportTemplate')" />
+									<menuitem  label="${labels.survey.schema.export_ce_grid_template}"
+										onClick="@command('exportCEGridTemplate')"
+										visible="@load(vm.collectEarthSurvey)" />
 								</menupopup>
 							</menu>
 						</menubar>

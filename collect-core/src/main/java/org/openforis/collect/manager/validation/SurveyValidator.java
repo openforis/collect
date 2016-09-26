@@ -2,6 +2,7 @@ package org.openforis.collect.manager.validation;
 
 import static org.openforis.collect.metamodel.ui.UIOptions.Layout.TABLE;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,7 +11,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import javax.xml.transform.Source;
@@ -21,15 +24,21 @@ import javax.xml.validation.Validator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.Collect;
+import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult.Flag;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.collect.model.SurveyFile;
+import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -85,9 +94,20 @@ public class SurveyValidator {
 	};
 	
 	private static final String CODE_LIST_PATH_FORMAT = "codeList/%s";
+	private static final String SURVEY_FILE_PATH_FORMAT = "survey files / %s";
 
 	private static final int MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT = 5;
 
+	private static final ServiceLoader<CollectEarthGridTemplateGenerator> COLLECT_EARTH_GRID_TEMPLATE_GENERATOR_LOADER = 
+			ServiceLoader.load(CollectEarthGridTemplateGenerator.class);
+	private static final CollectEarthGridTemplateGenerator COLLECT_EARTH_GRID_TEMPLATE_GENERATOR;
+	static {
+		Iterator<CollectEarthGridTemplateGenerator> it = COLLECT_EARTH_GRID_TEMPLATE_GENERATOR_LOADER.iterator();
+		COLLECT_EARTH_GRID_TEMPLATE_GENERATOR = it.hasNext() ? it.next(): null;
+	}
+	
+	@Autowired
+	private SurveyManager surveyManager;
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
@@ -122,6 +142,7 @@ public class SurveyValidator {
 		results.addResults(validateShowCountInRecordListEntityCount(survey));
 		results.addResults(validateSchemaNodes(survey));
 		results.addResults(validateCodeLists(survey));
+		results.addResults(validateSurveyFiles(survey));
 		return results;
 	}
 	
@@ -176,6 +197,46 @@ public class SurveyValidator {
 		return results;
 	}
 
+	private List<SurveyValidationResult> validateSurveyFiles(CollectSurvey survey) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		List<SurveyFile> surveyFileSummaries = surveyManager.loadSurveyFileSummaries(survey);
+		for (SurveyFile surveyFile : surveyFileSummaries) {
+			if (surveyFile.getType() == SurveyFileType.COLLECT_EARTH_GRID) {
+				results.addAll(validateCollectEarthGridFile(survey, surveyFile));
+			}
+		}
+		return results;
+	}
+
+	private List<SurveyValidationResult> validateCollectEarthGridFile(CollectSurvey survey, SurveyFile surveyFile) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		if (COLLECT_EARTH_GRID_TEMPLATE_GENERATOR != null) {
+			byte[] fileContent = surveyManager.loadSurveyFileContent(surveyFile);
+			ByteArrayInputStream is = new ByteArrayInputStream(fileContent);
+			File file = OpenForisIOUtils.copyToTempFile(is);
+			CSVFileValidationResult fileValidationResult = COLLECT_EARTH_GRID_TEMPLATE_GENERATOR.validate(file, survey);
+			if (! fileValidationResult.isSuccessful()) {
+				SurveyValidationResult validationResult = null;
+				switch(fileValidationResult.getErrorType()) {
+				case INVALID_FILE_TYPE:
+					validationResult = new SurveyValidationResult(Flag.ERROR, 
+							String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
+							"survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
+					break;
+				case INVALID_HEADERS:
+					validationResult = new SurveyValidationResult(Flag.ERROR, 
+							String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
+							"survey.file.type.collect_earth_grid.error.invalid_file_structure", 
+							fileValidationResult.getExpectedHeaders().toString(), 
+							fileValidationResult.getFoundHeaders().toString());
+					break;
+				}
+				results.add(validationResult);
+			}
+		}
+		return results;
+	}
+		
 	public List<SurveyValidationResult> validateChanges(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<SurveyValidationResult> partialResults;
