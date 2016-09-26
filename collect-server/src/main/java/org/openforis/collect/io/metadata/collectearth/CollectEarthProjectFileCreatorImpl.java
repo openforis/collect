@@ -8,10 +8,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
@@ -29,15 +30,8 @@ import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.Zip4jFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.CodeListService;
-import org.openforis.idm.metamodel.DateAttributeDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NodeDefinitionVisitor;
-import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.slf4j.Logger;
@@ -63,7 +57,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String EARTH_FILES_RESOURCE_PATH = "org/openforis/collect/designer/templates/collectearth/earthFiles/";
 	private static final String EARTH_FILES_FOLDER_NAME = "earthFiles";
 	private static final String KML_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
-	private static final String TEST_PLOTS_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/test_plots.ced.template";
 	private static final String PLACEMARK_FILE_NAME = "placemark.idm.xml";
 	private static final String BALLOON_FILE_NAME = "balloon.html";
 	private static final String KML_TEMPLATE_FILE_NAME = "kml_template.fmt";
@@ -74,6 +67,14 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String README_FILE = "README.txt";
 //	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
 	private static final String GRID_FOLDER_NAME = "grid";
+	
+	private static final ServiceLoader<CollectEarthGridTemplateGenerator> COLLECT_EARTH_GRID_TEMPLATE_GENERATOR_LOADER = 
+			ServiceLoader.load(CollectEarthGridTemplateGenerator.class);
+	private static final CollectEarthGridTemplateGenerator COLLECT_EARTH_GRID_TEMPLATE_GENERATOR;
+	static {
+		Iterator<CollectEarthGridTemplateGenerator> it = COLLECT_EARTH_GRID_TEMPLATE_GENERATOR_LOADER.iterator();
+		COLLECT_EARTH_GRID_TEMPLATE_GENERATOR = it.hasNext() ? it.next(): null;
+	}
 	
 	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
 		
@@ -92,7 +93,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		File balloon = generateBalloon(survey, language);
 		File cube = generateCube(survey, language);
 		File kmlTemplate = generateKMLTemplate(survey);
-		File testPlotsCSVFile = generateTestPlotsCSVFile(survey);
+		File testPlotsCSVFile = COLLECT_EARTH_GRID_TEMPLATE_GENERATOR.generateTemplateCSVFile(survey);
 		File readmeFile = getFileFromResouces(README_FILE_PATH);
 		
 		ZipFile zipFile = new ZipFile(outputFile);
@@ -122,7 +123,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return outputFile;
 	}
 
-	public File getFileFromResouces( String pathToResource ) throws URISyntaxException {
+	private File getFileFromResouces( String pathToResource ) throws URISyntaxException {
 		InputStream readmeContents = this.getClass().getClassLoader().getResourceAsStream( pathToResource );
 		File tempFile = null;
 		try {
@@ -280,7 +281,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		String templateContent = writer.toString();
 		
 		//find "fromCSV" attributes
-		List<AttributeDefinition> fromCsvAttributes = getExtendedDataFields(survey);
+		List<AttributeDefinition> fromCsvAttributes = survey.getExtendedDataFields();
 		
 		//write the dynamic content to be replaced into the template
 		String nameOfField = "extraColumns";
@@ -294,7 +295,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");
 	}
 
-	public StringBuffer addExtraDataHolders(
+	private StringBuffer addExtraDataHolders(
 			List<AttributeDefinition> fromCsvAttributes, String nameOfField) {
 		int extraInfoIndex = 0;
 		StringBuffer sb = new StringBuffer();
@@ -314,116 +315,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return sb;
 	}
 
-	/**
-	 * Goes though the attributes on the survey finding those that are marked as coming "From CSV" meaning that the popup-up will not show the attributes and they will be kept as hidden inputs
-	 * @param survey
-	 * @return The list of attributes that are marked as coming "From CSV" or that are key attributes
-	 */
-	private List<AttributeDefinition> getExtendedDataFields(CollectSurvey survey) {
-		final CollectAnnotations annotations = survey.getAnnotations();
-		final List<AttributeDefinition> fromCsvAttributes = new ArrayList<AttributeDefinition>();
-		survey.getSchema().traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition def) {
-				if (def instanceof AttributeDefinition) {
-					AttributeDefinition attrDef = (AttributeDefinition) def;
-					if (annotations.isFromCollectEarthCSV(attrDef) && !attrDef.isKey()) {
-						fromCsvAttributes.add(attrDef);
-					}					
-				}
-			}
-		});
-		return fromCsvAttributes;
-	}
-	
-	private File generateTestPlotsCSVFile(CollectSurvey survey) throws IOException {
-		//copy the template txt file into a String
-		InputStream is = getClass().getClassLoader().getResourceAsStream(TEST_PLOTS_TEMPLATE_PATH);
-		StringWriter writer = new StringWriter();
-		IOUtils.copy(is, writer, "UTF-8");
-		String templateContent = writer.toString();
-		
-		//find "fromCSV" attributes
-		List<AttributeDefinition> fromCsvAttributes = getExtendedDataFields(survey);
-		
-		//write the dynamic content to be replaced into the template
-		StringBuffer headerSB = new StringBuffer();
-		StringBuffer valuesSB = new StringBuffer();
-		for (AttributeDefinition attrDef : fromCsvAttributes) {
-			String attrName = attrDef.getName();
-			headerSB.append(",\"" + attrName + "\"");
-			String value = getDummyValue(attrDef,null);
-			valuesSB.append(",\"").append(value).append("\"");
-		}
-		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER, headerSB.toString());
-		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES, valuesSB.toString());
-		
-		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
-		String keyAttributes = "";
-		for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
-			keyAttributes += keyAttributeDefinition.getName() + ",";
-		}
-		keyAttributes = keyAttributes.substring(0, keyAttributes.lastIndexOf(",") );		
-		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_ID_COLUMNS_HEADER, keyAttributes);
-		
-		
-		for( int i=1; i<=15;i++){
-			String keyValues = "";
-			for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
-				String value = getDummyValue(keyAttributeDefinition,i);
-				keyValues += value + ",";
-			}
-			
-			String replaceIdsLine = CollectEarthProjectFileCreator.PLACEHOLDER_ID_COLUMNS_VALUES + "_" + i + ",";
-			content = content.replace(replaceIdsLine, keyValues );
-		}
-		
-		
-		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".ced");
-	}
-
-	public String getDummyValue(AttributeDefinition attrDef, Integer ord) {
-		String attrName = attrDef.getName();
-		
-		String value;
-		if (attrDef instanceof NumericAttributeDefinition || 
-				attrDef instanceof BooleanAttributeDefinition) {
-			value = "0";
-			if( ord!=null){
-				value = ord + "";
-			}
-		} else if (attrDef instanceof DateAttributeDefinition) {
-			value = "1/1/2000";
-		} else if (attrDef instanceof CodeAttributeDefinition) {
-			CodeListItem firstAvailableItem = getFirstAvailableCodeItem(attrDef);
-			value = firstAvailableItem == null ? "0": firstAvailableItem.getCode();
-		} else {
-			value = "value_" + attrName;
-			if( ord != null ){
-				value += "_"+ord;
-			}
-		}
-		return value;
-	}
-
-	private CodeListItem getFirstAvailableCodeItem(AttributeDefinition attrDef) {
-		CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) attrDef;
-		CodeList list = codeDefn.getList();
-		CodeListService codeListService = attrDef.getSurvey().getContext().getCodeListService();
-		Integer levelIndex = codeDefn.getListLevelIndex();
-		int levelPosition = levelIndex == null ? 1: levelIndex + 1;
-		List<CodeListItem> items;
-		if (levelPosition == 1) {
-			items = codeListService.loadRootItems(list);
-		} else {
-			items = codeListService.loadItems(list, levelPosition);
-		}
-		if (items.isEmpty()) {
-			return null;
-		} else {
-			return items.get(0);
-		}
-	}
-	
 	private File generateCube(CollectSurvey survey, String language) throws IOException {
 		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey, language);
 		String xmlSchema = cubeGenerator.generateXMLSchema();

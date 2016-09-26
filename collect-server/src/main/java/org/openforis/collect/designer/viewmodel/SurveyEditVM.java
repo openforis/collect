@@ -23,6 +23,7 @@ import org.openforis.collect.designer.util.SuccessHandler;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGeneratorImpl;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
@@ -34,6 +35,7 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.Files;
 import org.openforis.concurrency.Job;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -363,9 +365,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void exportCsvDataExportTemplate() throws IOException {
+	public void exportCsvDataImportTemplate() throws IOException {
 		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
-		job.setOutputFile(File.createTempFile("data-export-template", ".zip"));
+		job.setOutputFile(File.createTempFile("data-import-template", ".zip"));
 		RecordFilter recordFilter = new RecordFilter(survey);
 		recordFilter.setRootEntityId(survey.getSchema().getRootEntityDefinitions().get(0).getId());
 		job.setRecordFilter(recordFilter);
@@ -387,6 +389,13 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@Command
 	public void exportSurvey() throws IOException {
 		SurveyExportParametersVM.openPopUp(SurveySummary.createFromSurvey(survey));
+	}
+	
+	@Command
+	public void exportCEGridTemplate() throws IOException {
+		File templateFile = new CollectEarthGridTemplateGeneratorImpl().generateTemplateCSVFile(survey);
+		String fileName = String.format("%s_grid_template_%s.csv", survey.getName(), Dates.formatDateTime(new Date()));
+		Filedownload.save(new FileInputStream(templateFile),  Files.CSV_CONTENT_TYPE, fileName);
 	}
 	
 	@GlobalCommand
