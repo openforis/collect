@@ -81,6 +81,10 @@ public class CollectEarthGridTemplateGeneratorImpl implements CollectEarthGridTe
 		CsvReader csvReader = null;
 		try {
 			csvReader = new CsvReader(file);
+			if (csvReader.size() == 1) {
+				//skip validation when there is only one row (e.g. ChangeThisGrid.csv file)
+				return new CSVFileValidationResult();
+			}
 			csvReader.readHeaders();
 			List<String> columnNames = csvReader.getColumnNames();
 			return validateCSVHeaders(columnNames, survey);
