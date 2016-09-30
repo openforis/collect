@@ -3,10 +3,11 @@
  */
 package org.openforis.collect.designer.form;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.CollectAnnotations.FileType;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 
@@ -24,7 +25,7 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	* Max file size in mega bytes
 	*/
 	private Integer maxSize;
-	private String extensions;
+	private String fileType;
 	
 	FileAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -35,11 +36,8 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 		super.saveTo(dest, languageCode);
 		dest.setMaxSize(convertToBytes(maxSize));
 		dest.removeAllExtensions();
-		if  ( StringUtils.isNotBlank(extensions) ) {
-			String[] extensionsArr = extensions.split(EXTENSIONS_SEPARATOR);
-			List<String> extensionsList = Arrays.asList(extensionsArr);
-			dest.addExtensions(extensionsList);
-		}
+		CollectAnnotations annotations = ((CollectSurvey) dest.getSurvey()).getAnnotations();
+		annotations.setFileType(dest, FileType.valueOf(fileType));
 	}
 	
 	@Override
@@ -47,7 +45,8 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 		super.loadFrom(source, languageCode);
 		maxSize = convertToMB(source.getMaxSize());
 		List<String> extensionsList = source.getExtensions();
-		extensions = StringUtils.join(extensionsList, EXTENSIONS_SEPARATOR);
+		CollectAnnotations annotations = ((CollectSurvey) source.getSurvey()).getAnnotations();
+		fileType = annotations.getFileType(source).name();
 	}
 
 	private static Integer convertToMB(Integer bytes) {
@@ -69,20 +68,20 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 		}
 	}
 	
-	public String getExtensions() {
-		return extensions;
-	}
-
-	public void setExtensions(String extensions) {
-		this.extensions = extensions;
-	}
-	
 	public Integer getMaxSize() {
 		return maxSize;
 	}
 	
 	public void setMaxSize(Integer maxSize) {
 		this.maxSize = maxSize;
+	}
+	
+	public String getFileType() {
+		return fileType;
+	}
+	
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
 	}
 
 }

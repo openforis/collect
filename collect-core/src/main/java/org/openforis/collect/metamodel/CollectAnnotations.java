@@ -14,6 +14,7 @@ import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.Annotatable;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
@@ -33,11 +34,21 @@ public class CollectAnnotations {
 	public static final String COLLECT_MOBILE_NAMESPACE_URI = COLLECT_3_NAMESPACE_PREFIX + COLLECT_MOBILE_NAMESPACE_URI_SUFFIX;
 	public static final String COLLECT_EARTH_NAMESPACE_URI = COLLECT_3_NAMESPACE_PREFIX + COLLECT_EARTH_NAMESPACE_URI_SUFFIX;
 	
+	public enum FileType {
+		IMAGE, AUDIO, VIDEO, DOCUMENT
+	}
+	
+	public enum TextInput {
+		KEYBOARD, BARCODE
+	}
+	
 	public enum Annotation {
 		//collect namespace
 		INCLUDE_IN_DATA_EXPORT(new QName(COLLECT_NAMESPACE_URI, "includeInDataExport"), true),
 		PHASE_TO_APPLY_DEFAULT_VALUE(new QName(COLLECT_NAMESPACE_URI, "phaseToApplyDefaultValue"), Step.ENTRY),
 		EDITABLE(new QName(COLLECT_NAMESPACE_URI, "editable"), true),
+		FILE_TYPE(new QName(COLLECT_NAMESPACE_URI, "fileType"), FileType.IMAGE),
+		TEXT_INPUT(new QName(COLLECT_NAMESPACE_URI, "textInput"), TextInput.KEYBOARD),
 		TARGET(new QName(COLLECT_NAMESPACE_URI, "target"), SurveyTarget.COLLECT_DESKTOP),
 		COLLECT_VERSION(new QName(COLLECT_NAMESPACE_URI, "collectVersion"), "3.4.0"),
 		
@@ -156,7 +167,7 @@ public class CollectAnnotations {
 	}
 
 	public Step getPhaseToApplyDefaultValue(AttributeDefinition def) {
-		return getAnnotaionEnumValue(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE);
+		return (Step) getAnnotationEnumValue(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE, Step.class);
 	}
 
 	public void setPhaseToApplyDefaultValue(AttributeDefinition def, Step value) {
@@ -294,13 +305,29 @@ public class CollectAnnotations {
 	public void setAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def, boolean value) {
 		setAnnotationValue(def, Annotation.COLLECT_MOBILE_ALLOW_ONLY_DEVICE_COORDINATE, value);
 	}
+	
+	public FileType getFileType(FileAttributeDefinition def) {
+		return (FileType) getAnnotationEnumValue(def, Annotation.FILE_TYPE, FileType.class);
+	}
+	
+	public void setFileType(FileAttributeDefinition def, FileType fileType) {
+		setAnnotationValue(def, Annotation.FILE_TYPE, fileType);
+	}
+	
+	public TextInput getTextInput(TextAttributeDefinition def) {
+		return (TextInput) getAnnotationEnumValue(def, Annotation.TEXT_INPUT, TextInput.class);
+	}
+	
+	public void setTextInput(TextAttributeDefinition def, TextInput textInput) {
+		setAnnotationValue(def, Annotation.TEXT_INPUT, textInput);
+	}
 
-	private Step getAnnotaionEnumValue(AttributeDefinition def, Annotation annotation) {
+	private <T extends Enum<T>> Enum<T> getAnnotationEnumValue(AttributeDefinition def, Annotation annotation, Class<T> enumType) {
 		String enumName = def.getAnnotation(annotation.getQName());
 		if(StringUtils.isBlank(enumName)) {
 			return annotation.getDefaultValue();
 		} else {
-			return Step.valueOf(enumName);
+			return Enum.valueOf(enumType, enumName);
 		}
 	}
 	

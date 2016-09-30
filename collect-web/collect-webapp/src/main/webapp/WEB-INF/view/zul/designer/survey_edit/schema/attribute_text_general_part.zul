@@ -18,7 +18,30 @@
 					value="MEMO" />
 			</radiogroup>
 		</row>
+		<row>
+			<fieldErrorHandler message="@load(vmsgs['input'])">
+				<label value="${labels.survey.schema.attribute.text.input.$}:" />
+				<image popup="textInputInfoTooltip" style="cursor:pointer"
+					src="/assets/images/info-small.png" />
+	    	</fieldErrorHandler>
+			
+			<radiogroup selectedItem="@bind(fx.input)"
+				onCheck="@command('applyChanges')">
+				<radio
+					label="${labels.survey.schema.attribute.text.input.keyboard}"
+					value="KEYBOARD" />
+				<radio
+					label="${labels.survey.schema.attribute.text.input.barcode}"
+					value="BARCODE" />
+			</radiogroup>
+		</row>
     </rows>
   </grid>
 
+  <popup id="textInputInfoTooltip" width="300px">
+     <html><![CDATA[
+  		${labels.survey.schema.attribute.text.input.tooltip}
+     ]]></html>
+  </popup>
+	
 </zk>

@@ -11,7 +11,6 @@ public class FileAttributeDefinitionFormValidator extends AttributeDefinitionFor
 	
 	protected static final int MAX_FILE_SIZE = 1024; //in MB = 1GB
 	protected static final String MAX_SIZE_FIELD = "maxSize";
-	protected static final String EXTENSIONS_FIELD = "extensions";
 	protected static final String EXPRESSIONS_REGEX = "([a-zA-Z0-9]+\\s?)+";
 	protected static final String INVALID_EXTENSIONS_ERROR_KEY = "survey.schema.attribute.file.validation.error.extensions";
 	
@@ -19,7 +18,6 @@ public class FileAttributeDefinitionFormValidator extends AttributeDefinitionFor
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
 		validateMaxSize(ctx);
-		validateExtensions(ctx);
 	}
 
 	protected void validateMaxSize(ValidationContext ctx) {
@@ -29,10 +27,6 @@ public class FileAttributeDefinitionFormValidator extends AttributeDefinitionFor
 				validateLessThan(ctx, field, MAX_FILE_SIZE, false);
 			}
 		}
-	}
-
-	protected boolean validateExtensions(ValidationContext ctx) {
-		return validateRegEx(ctx, EXPRESSIONS_REGEX, EXTENSIONS_FIELD, INVALID_EXTENSIONS_ERROR_KEY);
 	}
 
 }
