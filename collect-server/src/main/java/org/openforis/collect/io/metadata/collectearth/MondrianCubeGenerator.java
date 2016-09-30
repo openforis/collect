@@ -19,6 +19,7 @@ import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.collect.relational.util.DataTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -47,6 +48,10 @@ public class MondrianCubeGenerator {
 	
 	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
 	private static final String[] MEASURE_AGGREGATORS = new String[] {"min", "max", "avg"};
+	private static final String BOOLEAN_DATATYPE = "Boolean";
+	private static final String INTEGER_DATATYPE = "Integer";
+	private static final String NUMERIC_DATATYPE = "Numeric";
+	private static final String STRING_DATATYPE = "String";
 	
 	private CollectSurvey survey;
 	private RelationalSchemaConfig rdbConfig;
@@ -361,11 +366,11 @@ public class MondrianCubeGenerator {
 		Level level = new Level(attrLabel);
 		levels.add(level);
 		if (nodeDef instanceof NumericAttributeDefinition) {
-			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? "Integer": "Numeric";
+			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? INTEGER_DATATYPE: NUMERIC_DATATYPE;
 		} else if (nodeDef instanceof CodeAttributeDefinition) {
-			level.type = "Integer";
+			level.type = ((CodeAttributeDefinition) nodeDef).getList().isExternal() ? STRING_DATATYPE : INTEGER_DATATYPE;
 		} else {
-			level.type = "String";	
+			level.type = STRING_DATATYPE;	
 		}
 		level.levelType = "Regular";
 		if (nodeDef instanceof CodeAttributeDefinition) {
