@@ -3,9 +3,22 @@ Collect.DataCleansing.MapPanelComposer = function(panel) {
 	this.map = null;
 	this.initialized = false;
 	this.surveyDataLoaded = false;
+	this.dependenciesLoaded = false;
 };
 
-Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
+Collect.DataCleansing.MapPanelComposer.prototype.init = function(onComplete) {
+	var $this = this;
+	if ($this.dependenciesLoaded) {
+		$this.onDependenciesLoaded(onComplete);
+	} else {
+		System.import('leaflet').then(function() {
+			$this.dependenciesLoaded = true;
+			$this.onDependenciesLoaded(onComplete);
+		});
+	}
+}
+	
+Collect.DataCleansing.MapPanelComposer.prototype.onDependenciesLoaded = function(onComplete) {
 	var $this = this;
 	
 	$(window).resize(function() {
@@ -13,32 +26,41 @@ Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
 	});
 	
 	$this.map = L.map('map').setView([ 51.505, -0.09 ], 3);
-
+	
 	var satelliteTileLayer = L.tileLayer(
-		// Esri_WorldImagery
-		'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-		{
-			attribution : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
-					'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-		}).addTo(this.map);
+			// Esri_WorldImagery
+			'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+			{
+				attribution : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
+				'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+			}
+	);
 	
-	var openStreetMapTileLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 19,
-		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-	});
-	
-	this.baseMaps = {
-		"Satellite (Esri)" : satelliteTileLayer
-		, "OpenStreetMap" : openStreetMapTileLayer
-	};
-
-	this.samplingPointsLayerGroup = L.layerGroup();
-
-	this.overlayMaps = {
-		"Sampling Points" : this.samplingPointsLayerGroup
+	var openStreetMapTileLayer = L.tileLayer(
+			'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+			{
+				maxZoom: 19,
+				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+			}
+	);
+	$this.baseMaps = {
+			"Satellite (Esri)" : satelliteTileLayer
+			, "OpenStreetMap" : openStreetMapTileLayer
 	};
 	
-	this.initialized = true;
+	$this.samplingPointsLayerGroup = L.layerGroup();
+	
+	$this.overlayMaps = {
+			"Sampling Points" : $this.samplingPointsLayerGroup
+	};
+	
+	satelliteTileLayer.addTo($this.map);
+	
+	$this.initialized = true;
+	
+	if (onComplete) {
+		onComplete();
+	}
 }
 
 Collect.DataCleansing.MapPanelComposer.prototype.reset = function() {
@@ -47,12 +69,14 @@ Collect.DataCleansing.MapPanelComposer.prototype.reset = function() {
 }
 
 Collect.DataCleansing.MapPanelComposer.prototype.onPanelShow = function() {
-	if (this.map == null) {
-		this.resizeMapContainer();
-		this.init();
-		if (! this.surveyDataLoaded) {
-			this.onSurveyChanged();
-		}
+	var $this = this;
+	if ($this.map == null) {
+		$this.resizeMapContainer();
+		$this.init(function() {
+			if (! $this.surveyDataLoaded) {
+				$this.onSurveyChanged();
+			}
+		});
 	}
 }
 
@@ -111,8 +135,10 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 		coordinateAttributeLayers.push(coordinateAttributeLayer);
 		this.overlayMaps[coordinateAttribute.label] = coordinateAttributeLayer;
 	}
-
-	L.control.layers(this.baseMaps, this.overlayMaps).addTo(this.map);
+	
+	setTimeout(function() {
+		L.control.layers($this.baseMaps, $this.overlayMaps).addTo($this.map);
+	}, 1000);
 
 	this.surveyDataLoaded = true;
 	
