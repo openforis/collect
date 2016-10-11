@@ -22,6 +22,7 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.SuccessHandler;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
+import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGeneratorImpl;
 import org.openforis.collect.manager.SurveyManager;
@@ -369,14 +370,45 @@ public class SurveyEditVM extends SurveyBaseVM {
 		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 		job.setOutputFile(File.createTempFile("data-import-template", ".zip"));
 		RecordFilter recordFilter = new RecordFilter(survey);
-		recordFilter.setRootEntityId(survey.getSchema().getRootEntityDefinitions().get(0).getId());
+		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		recordFilter.setRootEntityId(rootEntityDef.getId());
 		job.setRecordFilter(recordFilter);
 		job.setAlwaysGenerateZipFile(true);
+		CSVExportConfiguration configuration = new CSVExportConfiguration();
+		configuration.setIncludeEnumeratedEntities(false);
+		job.setConfiguration(configuration);
 		jobManager.start(job, false);
 		if (job.isCompleted()) {
 			File outputFile = job.getOutputFile();
 			String dateStr = Dates.formatLocalDateTime(new Date());
 			String fileName = String.format(DATA_IMPORT_TEMPLATE_FILE_NAME_PATTERN, survey.getName(), dateStr, "zip");
+			String contentType = URLConnection.guessContentTypeFromName(fileName);
+			FileInputStream is = new FileInputStream(outputFile);
+			Filedownload.save(is, contentType, fileName);
+		} else {
+			throw new RuntimeException("Error generating the CSV data export template: " + job.getErrorMessage(), 
+					job.getLastException());
+		}
+	}
+	
+	@Command
+	public void exportCeCsvDataImportTemplate() throws IOException {
+		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
+		job.setOutputFile(File.createTempFile("ce-data-import-template-" + survey.getName(), ".csv"));
+		RecordFilter recordFilter = new RecordFilter(survey);
+		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		recordFilter.setRootEntityId(rootEntityDef.getId());
+		job.setRecordFilter(recordFilter);
+		job.setEntityId(rootEntityDef.getId());
+		job.setAlwaysGenerateZipFile(false);
+		CSVExportConfiguration configuration = new CSVExportConfiguration();
+		configuration.setIncludeEnumeratedEntities(true);
+		job.setConfiguration(configuration);
+		jobManager.start(job, false);
+		if (job.isCompleted()) {
+			File outputFile = job.getOutputFile();
+			String dateStr = Dates.formatLocalDateTime(new Date());
+			String fileName = String.format(DATA_IMPORT_TEMPLATE_FILE_NAME_PATTERN, survey.getName(), dateStr, "csv");
 			String contentType = URLConnection.guessContentTypeFromName(fileName);
 			FileInputStream is = new FileInputStream(outputFile);
 			Filedownload.save(is, contentType, fileName);
