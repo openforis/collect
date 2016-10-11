@@ -7,6 +7,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularNa
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
@@ -79,13 +80,13 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 	public List<TaxonVernacularName> findByVernacularName(int taxonomyId, String searchString, String[] qualifierValues, int maxResults) {
 		TaxonVernacularNameDSLContext dsl = dsl();
 		//find containing
-		searchString = "%" + searchString.toUpperCase() + "%";
+		searchString = "%" + searchString.toLowerCase(Locale.ENGLISH) + "%";
 		
 		SelectConditionStep selectConditionStep = dsl.select(OFC_TAXON_VERNACULAR_NAME.fields())
 			.from(OFC_TAXON_VERNACULAR_NAME)
 			.join(OFC_TAXON).on(OFC_TAXON.ID.equal(OFC_TAXON_VERNACULAR_NAME.TAXON_ID))
 			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
-				.and(DSL.upper(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME).like(searchString)));
+				.and(DSL.lower(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME).like(searchString)));
 		
 		if ( qualifierValues != null ) {
 			for (int i = 0; i < qualifierValues.length; i++) {

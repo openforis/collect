@@ -5,6 +5,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
@@ -79,11 +80,11 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 
 	protected List<Taxon> findStartingWith(TableField<?,String> field, int taxonomyId, TaxonRank rank, String searchString, int maxResults) {
 		TaxonDSLContext dsl = dsl();
-		searchString = searchString.toUpperCase() + "%";
+		searchString = searchString.toLowerCase(Locale.ENGLISH) + "%";
 		SelectConditionStep<Record> query = dsl.select()
 			.from(OFC_TAXON)
 			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
-				.and(DSL.upper(field).like(searchString)));
+				.and(DSL.lower(field).like(searchString)));
 		if (rank != null) {
 			query.and(OFC_TAXON.TAXON_RANK.equal(rank.name()));
 		}
