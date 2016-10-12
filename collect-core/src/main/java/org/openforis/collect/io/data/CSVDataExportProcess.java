@@ -261,8 +261,10 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 				providers.add(columnProvider);
 			}
 			if ( isPositionColumnRequired(ancestorEntityDefn) ) {
+				String relativePath = contextEntityDefn.getRelativePath(ancestorEntityDefn);
 				ColumnProvider positionColumnProvider = createPositionColumnProvider(ancestorEntityDefn);
-				providers.add(positionColumnProvider);
+				PivotExpressionColumnProvider columnProvider = new PivotExpressionColumnProvider(configuration, relativePath, "", positionColumnProvider);
+				providers.add(columnProvider);
 			}
 		}
 		return new ColumnProviderChain(configuration, providers);
