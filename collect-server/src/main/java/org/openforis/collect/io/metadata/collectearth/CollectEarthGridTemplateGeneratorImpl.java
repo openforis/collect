@@ -7,6 +7,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult.ErrorType;
@@ -101,7 +103,8 @@ public class CollectEarthGridTemplateGeneratorImpl implements CollectEarthGridTe
 			return new CSVFileValidationResult(ErrorType.INVALID_HEADERS, expectedHeaders, headers);
 		} else {
 			List<String> headersSublist = headers.subList(0, expectedHeaders.size());
-			if (expectedHeaders.equals(headersSublist)) {
+			
+			if (toLowerCaseList(expectedHeaders).equals(toLowerCaseList(headersSublist))) {
 				return new CSVFileValidationResult();
 			} else {
 				return new CSVFileValidationResult(ErrorType.INVALID_HEADERS, expectedHeaders, headers);
@@ -165,4 +168,14 @@ public class CollectEarthGridTemplateGeneratorImpl implements CollectEarthGridTe
 			return items.get(0);
 		}
 	}
+	
+	private List<String> toLowerCaseList(List<String> list) {
+		List<String> result = new ArrayList<String>(list);
+		ListIterator<String> iterator = result.listIterator();
+		while (iterator.hasNext()) {
+			iterator.set(iterator.next().toLowerCase(Locale.ENGLISH));
+		}
+		return result;
+	}
+
 }

@@ -114,14 +114,14 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 			if (newItem && uploadedFile == null) {
 				MessageUtil.showError("global.file_not_selected");
 			} else {
-//				if (validateFileContent(binder)) {
+				if (uploadedFile == null || validateFileContent(binder)) {
 					boolean wasNewItem = newItem;
 					super.commitChanges(binder);
 					if (! wasNewItem) {
 						surveyManager.updateSurveyFile(survey, editedItem, uploadedFile);
 					}
 					BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND, null);
-//				}
+				}
 			}
 		}
 	}
