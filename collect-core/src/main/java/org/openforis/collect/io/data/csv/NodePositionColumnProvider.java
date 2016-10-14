@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.openforis.collect.io.data.csv.ColumnProvider;
 import org.openforis.idm.model.Node;
 
 /**
  * @author S. Ricci
  */
 public class NodePositionColumnProvider implements ColumnProvider {
+	
 	private String headerName;
 
 	public NodePositionColumnProvider(String headerName) {
@@ -29,4 +29,5 @@ public class NodePositionColumnProvider implements ColumnProvider {
 			return Arrays.asList(Integer.toString(position));
 		}
 	}
+
 }

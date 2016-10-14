@@ -120,14 +120,22 @@
 								<menupopup>
 									<menuitem label="${labels.survey.validate}"
 										onClick="@command('validate')" />
+									<menuseparator/>
 									<menuitem  label="${labels.survey.export.$}"
 										onClick="@command('exportSurvey')" />
+									<menuseparator/>
 									<menuitem  label="${labels.survey.schema.export_summary.$}"
 										onClick="@command('exportSchemaSummary')" />
+									<menuseparator/>
 									<menuitem  label="${labels.survey.schema.attributes_import.$}"
 										onClick="@command('openSchemaAttributesImportPopUp')" />
+									<menuseparator/>
 									<menuitem  label="${labels.survey.schema.export_csv_data_import_template}"
 										onClick="@command('exportCsvDataImportTemplate')" />
+									<menuitem  label="${labels.survey.schema.export_ce_csv_data_import_template}"
+										onClick="@command('exportCeCsvDataImportTemplate')"
+										visible="@load(vm.collectEarthSurvey)" />
+									<menuseparator/>
 									<menuitem  label="${labels.survey.schema.export_ce_grid_template}"
 										onClick="@command('exportCEGridTemplate')"
 										visible="@load(vm.collectEarthSurvey)" />

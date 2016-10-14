@@ -489,6 +489,7 @@ package org.openforis.collect.presenter {
 			var filter:RecordFilterProxy = (! filterEnabled || currentFilter == null) ? new RecordFilterProxy(): ObjectUtil.clone(currentFilter) as RecordFilterProxy;
 			filter.offset = offset;
 			filter.maxNumberOfRecords = recordsPerPage;
+			filter.rootEntityId = Application.activeRootEntity == null ? NaN : Application.activeRootEntity.id;
 			_dataClient.loadRecordSummaries(responder, filter, currentSortFields);
 		}
 		

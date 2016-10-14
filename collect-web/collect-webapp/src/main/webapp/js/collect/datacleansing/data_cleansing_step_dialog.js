@@ -232,6 +232,7 @@ Collect.DataCleansingStepDialogController.prototype.fillForm = function(callback
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
 		$this.querySelectPicker.val($this.item.queryId);
+		$this.cleansingTypeSelectPicker.val($this.item.typeCode);
 		$this.updateValues = $this.item.updateValues;
 		
 		$this.updateView();

@@ -214,7 +214,7 @@ public class CSVDataExportJob extends Job {
 			return columnProviders;
 		}
 		
-		private ColumnProvider createAncestorColumnProvider(EntityDefinition contextEntity, EntityDefinition ancestorEntityDefn) {
+		private ColumnProvider createAncestorColumnProvider(EntityDefinition contextEntityDefn, EntityDefinition ancestorEntityDefn) {
 			List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
 			if ( configuration.isIncludeAllAncestorAttributes() ) {
 				AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(configuration, ancestorEntityDefn.getName() + "_", ancestorEntityDefn);
@@ -223,7 +223,7 @@ public class CSVDataExportJob extends Job {
 				//include only key attributes
 				List<AttributeDefinition> keyAttrDefns = ancestorEntityDefn.getKeyAttributeDefinitions();
 				for (AttributeDefinition keyDefn : keyAttrDefns) {
-					String relativePath = contextEntity.getRelativePath(ancestorEntityDefn);
+					String relativePath = contextEntityDefn.getRelativePath(ancestorEntityDefn);
 					
 					ColumnProvider keyColumnProvider = ColumnProviders.createAttributeProvider(configuration, keyDefn);
 					String headingPrefix = keyDefn.getParentEntityDefinition().getName() + "_";
@@ -231,8 +231,10 @@ public class CSVDataExportJob extends Job {
 					providers.add(columnProvider);
 				}
 				if ( isPositionColumnRequired(ancestorEntityDefn) ) {
+					String relativePath = contextEntityDefn.getRelativePath(ancestorEntityDefn);
 					ColumnProvider positionColumnProvider = createPositionColumnProvider(ancestorEntityDefn);
-					providers.add(positionColumnProvider);
+					PivotExpressionColumnProvider columnProvider = new PivotExpressionColumnProvider(configuration, relativePath, "", positionColumnProvider);
+					providers.add(columnProvider);
 				}
 			}
 			return new ColumnProviderChain(configuration, providers);
@@ -244,8 +246,7 @@ public class CSVDataExportJob extends Job {
 		
 		private ColumnProvider createPositionColumnProvider(EntityDefinition entityDefn) {
 			String columnName = calculatePositionColumnName(entityDefn);
-			NodePositionColumnProvider columnProvider = new NodePositionColumnProvider(columnName);
-			return columnProvider;
+			return new NodePositionColumnProvider(columnName);
 		}
 		
 		private String calculatePositionColumnName(EntityDefinition nodeDefn) {
