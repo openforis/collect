@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
  * 
@@ -39,6 +40,20 @@ public class RecordFilter {
 		this(survey.getId(), rootEntityId);
 		this.survey = survey;
 		this.caseSensitiveKeyValues = true;
+	}
+	
+	public RecordFilter(CollectSurvey survey, String rootEntityName) {
+		this(survey, getRootEntityId(survey, rootEntityName));
+	}
+
+	private static Integer getRootEntityId(CollectSurvey survey,
+			String rootEntityName) {
+		if (rootEntityName == null) {
+			return null;
+		} else {
+			EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinition(rootEntityName);
+			return rootEntityDef.getId();
+		}
 	}
 
 	public Integer getOffset() {

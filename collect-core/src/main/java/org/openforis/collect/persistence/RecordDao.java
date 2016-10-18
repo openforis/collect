@@ -38,7 +38,6 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao.RecordDSLContext;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
-import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -515,9 +514,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			c.setId(r.getValue(OFC_RECORD.ID));
 			c.setCreationDate(r.getValue(OFC_RECORD.DATE_CREATED));
 			c.setModifiedDate(r.getValue(OFC_RECORD.DATE_MODIFIED));
-			c.setCreatedBy(loadUser(r.getValue(OFC_RECORD.CREATED_BY_ID)));
-			c.setModifiedBy(loadUser(r.getValue(OFC_RECORD.MODIFIED_BY_ID)));
-			c.setOwner(loadUser(r.getValue(OFC_RECORD.OWNER_ID)));
+			c.setCreatedBy(createDetachedUser(r.getValue(OFC_RECORD.CREATED_BY_ID)));
+			c.setModifiedBy(createDetachedUser(r.getValue(OFC_RECORD.MODIFIED_BY_ID)));
+			c.setOwner(createDetachedUser(r.getValue(OFC_RECORD.OWNER_ID)));
 			c.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 			c.setErrors(r.getValue(OFC_RECORD.ERRORS));
 			c.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
@@ -561,17 +560,12 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			c.setRootEntityKeyValues(keys);
 		}
 
-		private User loadUser(Integer userId) {
+		private User createDetachedUser(Integer userId) {
 			if ( userId == null ) {
 				return null;
 			}
-			SelectQuery<OfcUserRecord> userSelect = selectQuery(OFC_USER);
-			userSelect.addConditions(OFC_USER.ID.equal(userId));
-			OfcUserRecord userRecord = userSelect.fetchOne();
 			User user = new User();
-			user.setId(userRecord.getId());
-			user.setName(userRecord.getUsername());
-			user.setPassword(userRecord.getPassword());
+			user.setId(userId);
 			return user;
 		}
 

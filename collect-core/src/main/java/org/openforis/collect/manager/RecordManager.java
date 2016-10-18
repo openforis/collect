@@ -38,7 +38,6 @@ import org.openforis.collect.utils.Consumer;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -64,6 +63,8 @@ public class RecordManager {
 	private CodeListManager codeListManager;
 	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
+	private UserManager userManager;
 	
 	private RecordUpdater updater;
 	private RecordConverter recordConverter;
@@ -286,37 +287,58 @@ public class RecordManager {
 	
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate) {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber(), validate);
+		loadDetachedObjects(record);
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
 		recordUpdater.setValidateAfterUpdate(validate);
 		recordUpdater.initializeRecord(record);
 		return record;
 	}
+
+	private void loadDetachedObjects(List<CollectRecord> summaries) {
+		for (CollectRecord summary : summaries) {
+			loadDetachedObjects(summary);
+		}
+	}
+	
+	private void loadDetachedObjects(CollectRecord record) {
+		record.setCreatedBy(loadUser(record.getCreatedBy()));
+		record.setModifiedBy(loadUser(record.getModifiedBy()));
+		record.setOwner(loadUser(record.getOwner()));
+	}
 	
 	public byte[] loadBinaryData(CollectSurvey survey, int recordId, Step step) {
-		byte[] result = recordDao.loadBinaryData(survey, recordId, step.getStepNumber());
-		return result;
+		return recordDao.loadBinaryData(survey, recordId, step.getStepNumber());
 	}
 
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
-		return loadSummaries(survey, rootEntity, (String[]) null);
+		List<CollectRecord> summaries = loadSummaries(survey, rootEntity, (String[]) null);
+		return summaries;
 	}
 
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
-		return recordDao.loadSummaries(survey, rootEntity, step);
+		RecordFilter filter = new RecordFilter(survey, rootEntity);
+		filter.setStep(step);
+		return loadSummaries(filter);
 	}
-	
+
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keys) {
-		return recordDao.loadSummaries(survey, rootEntity, keys);
+		return loadSummaries(survey, rootEntity, true, keys);
 	}
 	
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, boolean caseSensitiveKeys, String... keys) {
-		return recordDao.loadSummaries(survey, rootEntity, caseSensitiveKeys, keys);
+		RecordFilter filter = new RecordFilter(survey, rootEntity);
+		filter.setCaseSensitiveKeyValues(caseSensitiveKeys);
+		filter.setKeyValues(keys);
+		return loadSummaries(filter);
 	}
 	
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, keyValues);
-		return summaries;
+		RecordFilter filter = new RecordFilter(survey, rootEntity);
+		filter.setOffset(offset);
+		filter.setMaxNumberOfRecords(maxNumberOfRecords);
+		filter.setKeyValues(keyValues);
+		return loadSummaries(filter, sortFields);
 	}
 	
 	public List<CollectRecord> loadSummaries(RecordFilter filter) {
@@ -324,7 +346,9 @@ public class RecordManager {
 	}
 	
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
-		return recordDao.loadSummaries(filter, sortFields);
+		List<CollectRecord> summaries = recordDao.loadSummaries(filter, sortFields);
+		loadDetachedObjects(summaries);
+		return summaries;
 	}
 
 	public CollectRecordSummary loadUniqueRecordSummaryByKeys(CollectSurvey survey, int rootEntityId, List<String> keyValues) {
@@ -357,7 +381,9 @@ public class RecordManager {
 	 * Returns only the records modified after the specified date.
 	 */
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Date modifiedSince) {
-		return recordDao.loadSummaries(survey, rootEntity, modifiedSince);
+		RecordFilter filter = new RecordFilter(survey, rootEntity);
+		filter.setModifiedSince(modifiedSince);
+		return loadSummaries(filter);
 	}
 	
 	public int countRecords(CollectSurvey survey) {
@@ -382,9 +408,7 @@ public class RecordManager {
 	}
 	
 	public int countRecords(CollectSurvey survey, String rootEntity, String... keyValues) {
-		Schema schema = survey.getSchema();
-		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
-		RecordFilter filter = new RecordFilter(survey, rootEntityDefn.getId());
+		RecordFilter filter = new RecordFilter(survey, rootEntity);
 		filter.setKeyValues(keyValues);
 		return countRecords(filter);
 	}
@@ -510,6 +534,7 @@ public class RecordManager {
 	public CollectRecord demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
 		CollectRecord record = recordDao.load( survey, recordId, prevStep.getStepNumber() );
+		loadDetachedObjects(record);
 		record.setModifiedBy( user );
 		record.setModifiedDate( new Date() );
 		record.setStep( prevStep );
@@ -727,6 +752,13 @@ public class RecordManager {
 		}
 	}
 	
+	private User loadUser(User user) {
+		if (user == null) {
+			return null;
+		}
+		return userManager.loadById(user.getId());
+	}
+
 	public void checkIsLocked(int recordId, User user, String lockId) throws RecordUnlockedException {
 		if ( lockingEnabled ) {
 			lockManager.checkIsLocked(recordId, user, lockId);
