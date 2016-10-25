@@ -157,6 +157,18 @@ public class CalculatedAttributeDependencyGraphTest extends DependencyGraphTest 
 		assertDependents(dbh1, total);
 		assertDependents(dbh2, total);
 	}
+	
+//	@Test
+	public void testDependencyOnEntityCount() {
+		Entity plot = entity(rootEntity, "plot");
+
+		entityDefinition(plot.getDefinition(), "tree");
+		
+		Attribute<?, ?> treeCount = calculatedAttribute(plot, "tree_count", "count(parent()/tree)");
+		Entity tree1 = entity(plot, "tree");
+
+		assertDependents(tree1, treeCount);
+	}
 
 	@Test
 	public void testAggregateFunctionsInSameEntity() {
