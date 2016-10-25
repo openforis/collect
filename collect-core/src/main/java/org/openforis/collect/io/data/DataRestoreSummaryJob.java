@@ -5,8 +5,6 @@ package org.openforis.collect.io.data;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.model.CollectRecord;
-import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -21,9 +19,7 @@ import org.springframework.stereotype.Component;
 public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 
 	//input
-	private Predicate<CollectRecord> includeRecordPredicate;
 	private boolean fullSummary;
-	
 	//output
 	private DataImportSummary summary;
 
@@ -78,15 +74,6 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	
 	public void setRecordManager(RecordManager recordManager) {
 		this.recordManager = recordManager;
-	}
-	
-	public Predicate<CollectRecord> getIncludeRecordPredicate() {
-		return includeRecordPredicate;
-	}
-	
-	public void setIncludeRecordPredicate(
-			Predicate<CollectRecord> includeRecordPredicate) {
-		this.includeRecordPredicate = includeRecordPredicate;
 	}
 	
 	public DataImportSummary getSummary() {

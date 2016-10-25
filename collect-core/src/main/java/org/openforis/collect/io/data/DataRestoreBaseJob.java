@@ -15,7 +15,9 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.versioning.Version;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
@@ -42,6 +44,7 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected transient CollectSurvey publishedSurvey; //optional: if not specified, the packaged survey will be published as a new one
 	protected transient CollectSurvey packagedSurvey; //optional: if not specified, it will be extracted from the ZIP file
 	protected transient boolean validateRecords;
+	protected Predicate<CollectRecord> includeRecordPredicate;
 
 	protected RecordProvider recordProvider; //if null it will be created and initialized, otherwise it will be re-used
 
@@ -189,6 +192,15 @@ public abstract class DataRestoreBaseJob extends Job {
 		this.file = file;
 	}
 
+	public Predicate<CollectRecord> getIncludeRecordPredicate() {
+		return includeRecordPredicate;
+	}
+	
+	public void setIncludeRecordPredicate(
+			Predicate<CollectRecord> includeRecordPredicate) {
+		this.includeRecordPredicate = includeRecordPredicate;
+	}
+	
 	public void setRecordProvider(RecordProvider recordProvider) {
 		this.recordProvider = recordProvider;
 	}

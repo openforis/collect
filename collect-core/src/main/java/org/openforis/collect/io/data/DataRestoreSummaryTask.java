@@ -54,6 +54,7 @@ public class DataRestoreSummaryTask extends Task {
 
 	/**
 	 * If specified, it will be used to filter the records to include in the summary
+	 * Ignored when the summary is not "full".
 	 */
 	private Predicate<CollectRecord> includeRecordPredicate;
 

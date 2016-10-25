@@ -10,18 +10,21 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.Predicate;
 
 public class RecordOperationGenerator {
 	private final RecordProvider recordProvider;
 	private final RecordManager recordManager;
 	private final int entryId;
+	private Predicate<CollectRecord> includeRecordPredicate;
 
 	public RecordOperationGenerator(RecordProvider recordProvider,
-			RecordManager recordManager, int entryId) {
+			RecordManager recordManager, int entryId, Predicate<CollectRecord> includeRecordPredicate) {
 		super();
 		this.recordProvider = recordProvider;
 		this.recordManager = recordManager;
 		this.entryId = entryId;
+		this.includeRecordPredicate = includeRecordPredicate;
 	}
 
 	public RecordOperations generate() throws IOException, MissingStepsException, RecordParsingException {
@@ -30,7 +33,7 @@ public class RecordOperationGenerator {
 		Integer lastRecordId = null;
 		for (Step step : Step.values()) {
 			CollectRecord parsedRecord = recordProvider.provideRecord(entryId, step);
-			if (parsedRecord == null) {
+			if (parsedRecord == null || ! isToBeProcessed(parsedRecord)) {
 				continue;
 			}
 			parsedRecord.setStep(step);
@@ -58,6 +61,10 @@ public class RecordOperationGenerator {
 			throw new MissingStepsException(operations);
 		}
 		return operations;
+	}
+
+	private boolean isToBeProcessed(CollectRecord record) {
+		return includeRecordPredicate == null || includeRecordPredicate.evaluate(record);
 	}
 
 	private CollectRecordSummary findAlreadyExistingRecordSummary(

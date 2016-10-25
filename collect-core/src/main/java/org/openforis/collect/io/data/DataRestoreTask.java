@@ -21,6 +21,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.collect.utils.Consumer;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,8 @@ public class DataRestoreTask extends Task {
 	//temporary instance variables
 	private final List<Integer> processedRecords;
 	private final RecordUpdateBuffer updateBuffer;
+
+	private Predicate<CollectRecord> includeRecordPredicate;
 
 	public DataRestoreTask() {
 		super();
@@ -96,7 +99,8 @@ public class DataRestoreTask extends Task {
 	
 	private void importEntries(int entryId) throws IOException, MissingStepsException {
 		try {
-			RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, entryId);
+			RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, 
+					entryId, includeRecordPredicate);
 			RecordOperations recordOperations = operationGenerator.generate();
 			if (! recordOperations.isEmpty()) {
 				updateBuffer.append(recordOperations);
@@ -168,7 +172,11 @@ public class DataRestoreTask extends Task {
 	public void setRecordProvider(RecordProvider recordProvider) {
 		this.recordProvider = recordProvider;
 	}
-
+	
+	public void setIncludeRecordPredicate(Predicate<CollectRecord> includeRecordPredicate) {
+		this.includeRecordPredicate = includeRecordPredicate;
+	}
+	
 	private class RecordUpdateBuffer {
 		
 		public static final int BUFFER_SIZE = 20;
@@ -216,5 +224,5 @@ public class DataRestoreTask extends Task {
 					recordId, recordStep, events));
 		}
 	}
-	
+
 }

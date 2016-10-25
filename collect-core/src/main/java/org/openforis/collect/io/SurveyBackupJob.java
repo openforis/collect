@@ -314,6 +314,10 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		return outputFile;
 	}
 	
+	public void setOutputFile(File outputFile) {
+		this.outputFile = outputFile;
+	}
+	
 	public OutputFormat getOutputFormat() {
 		return outputFormat;
 	}

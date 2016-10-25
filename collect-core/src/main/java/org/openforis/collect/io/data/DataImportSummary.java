@@ -47,6 +47,13 @@ public class DataImportSummary {
 		}
 		return result;
 	}
+	
+	public List<DataImportSummaryItem> getTotalRecords() {
+		List<DataImportSummaryItem> items = new ArrayList<DataImportSummaryItem>();
+		items.addAll(recordsToImport);
+		items.addAll(conflictingRecords);
+		return items;
+	}
 
 	public Map<Step, Integer> getTotalPerStep() {
 		return totalPerStep;
