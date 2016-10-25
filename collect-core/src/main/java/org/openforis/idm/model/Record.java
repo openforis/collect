@@ -37,7 +37,8 @@ public class Record implements DeepComparable {
 	private ModelVersion modelVersion;
 	private int nextId;
 	private Entity rootEntity;
-
+	private Integer rootEntityDefinitionId;
+	
 	boolean enableValidationDependencyGraphs;
 	boolean ignoreDuplicateRecordKeyValidationErrors;
 	NodeDependencyGraph calculatedAttributeDependencies;
@@ -105,6 +106,7 @@ public class Record implements DeepComparable {
 
 	private void setRootEntity(Entity entity) {
 		this.rootEntity = entity;
+		this.rootEntityDefinitionId = entity.getDefinition().getId();
 		put(rootEntity);
 	}
 
@@ -151,6 +153,14 @@ public class Record implements DeepComparable {
 
 	public Entity getRootEntity() {
 		return this.rootEntity;
+	}
+	
+	public void setRootEntityDefinitionId(Integer rootEntityDefinitionId) {
+		this.rootEntityDefinitionId = rootEntityDefinitionId;
+	}
+	
+	public Integer getRootEntityDefinitionId() {
+		return rootEntityDefinitionId;
 	}
 
 	public ModelVersion getVersion() {

@@ -540,12 +540,13 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			c.setEntityCounts(counts);
 
 			int rootEntityDefId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
-
-			if ( dataAlias != null ) {
+			
+			if (dataAlias == null) {
+				c.setRootEntityDefinitionId(rootEntityDefId);
+			} else {
 				byte[] data = r.getValue(dataAlias);
-				//System.out.println("r.getValue(dataAlias) = " + r.getValue(dataAlias));
-				Entity rootEntity = c.createRootEntity(rootEntityDefId);
 				ModelSerializer modelSerializer = getSerializer();
+				Entity rootEntity = c.createRootEntity(rootEntityDefId);
 				modelSerializer.mergeFrom(data, rootEntity);
 			}
 

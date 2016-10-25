@@ -58,6 +58,8 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	public static final String DATA_CLEANSING_METADATA_ENTRY_NAME = CLEANSING_FOLDER_NAME + ZIP_FOLDER_SEPARATOR + "cleansing_metadata.json";
 	public static final String INFO_FILE_NAME = "info.properties";
 	public static final String DATA_FOLDER = "data";
+	public static final String DATA_SUMMARY_FILE_NAME = "summary.csv";
+	public static final String DATA_SUMMARY_ENTRY_NAME = DATA_FOLDER + ZIP_FOLDER_SEPARATOR + DATA_SUMMARY_FILE_NAME;
 	public static final String CODE_LIST_IMAGES_FOLDER = "code_list_images";
 	public static final String UPLOADED_FILES_FOLDER = "upload";
 	public static final String SURVEY_FILES_FOLDER = "files";

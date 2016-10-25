@@ -22,16 +22,20 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 
 	//input
 	private Predicate<CollectRecord> includeRecordPredicate;
-	private boolean completeSummary;
+	private boolean fullSummary;
 	
 	//output
 	private DataImportSummary summary;
-
 
 	@Override
 	protected void buildTasks() throws Throwable {
 		super.buildTasks();
 		addTask(DataRestoreSummaryTask.class);
+	}
+	
+	@Override
+	protected boolean isRecordProviderToBeInitialized() {
+		return isFullSummary();
 	}
 	
 	@Override
@@ -42,7 +46,8 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setRecordFileManager(recordFileManager);
 			t.setUserManager(userManager);
 			t.setRecordProvider(recordProvider);
-			t.setCompleteSummary(completeSummary);
+			t.setFullSummary(fullSummary);
+			t.setDataSummaryFile(dataSummaryFile);
 			t.setOldFormat(oldBackupFormat);
 			t.setSurvey(publishedSurvey);
 			t.setIncludeRecordPredicate(includeRecordPredicate);
@@ -88,13 +93,13 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 		return summary;
 	}
 	
-	public boolean isCompleteSummary() {
-		return completeSummary;
+	public boolean isFullSummary() {
+		return fullSummary;
 	}
 	
-	public void setCompleteSummary(boolean completeSummary) {
-		this.completeSummary = completeSummary;
-		super.setValidateRecords(completeSummary);
+	public void setFullSummary(boolean fullSummary) {
+		this.fullSummary = fullSummary;
+		super.setValidateRecords(fullSummary);
 	}
 	
 	@Override

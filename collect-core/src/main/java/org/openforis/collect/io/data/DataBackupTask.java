@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 public class DataBackupTask extends Task {
 
 	private static final String[] DATA_SUMMARY_FIXED_HEADERS = new String[]{
-			"entry_id", "step", "created_on", "created_by", 
+			"entry_id", "root_entity_id", "step", "created_on", "created_by", 
 			"last_modified", "modified_by"};
 	private static final String DATA_SUMMARY_RECORD_KEY_PREFIX = "key";
 	
@@ -128,8 +128,7 @@ public class DataBackupTask extends Task {
 	@Override
 	protected void onEnd() {
 		IOUtils.closeQuietly(summaryCSVWriter);
-		String dataSummaryEntryName = SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + "summary.csv";
-		ZipFiles.writeFile(zipOutputStream, summaryTempFile, dataSummaryEntryName);
+		ZipFiles.writeFile(zipOutputStream, summaryTempFile, SurveyBackupJob.DATA_SUMMARY_ENTRY_NAME);
 		super.onEnd();
 	}
 
@@ -160,6 +159,7 @@ public class DataBackupTask extends Task {
 		}
 		List<String> values = new ArrayList<String>(Arrays.asList(
 				String.valueOf(summary.getId()),
+				summary.getRootEntityDefinitionId().toString(),
 				lastStep.name(), 
 				Dates.formatDateTime(summary.getCreationDate()),
 				summary.getCreatedBy() == null ? "" : summary.getCreatedBy().getName(),

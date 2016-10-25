@@ -41,8 +41,8 @@ package org.openforis.collect.client {
 		}
 		
 		public function startSummaryCreation(responder:IResponder, filePath:String, selectedSurveyUri:String, overwriteAll:Boolean = false, 
-				completeSummary:Boolean = false):void {
-			var token:AsyncToken = this._startSummaryCreationOperation.send(filePath, selectedSurveyUri, overwriteAll, completeSummary);
+				fullSummary:Boolean = false):void {
+			var token:AsyncToken = this._startSummaryCreationOperation.send(filePath, selectedSurveyUri, overwriteAll, fullSummary);
 			token.addResponder(responder);
 		}
 		

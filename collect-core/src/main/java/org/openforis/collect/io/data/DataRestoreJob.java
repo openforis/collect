@@ -229,7 +229,6 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		protected void execute() throws Throwable {
 			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
 		}
-		
 	}
 	
 	private class DeleteRecordsTask extends Task {
