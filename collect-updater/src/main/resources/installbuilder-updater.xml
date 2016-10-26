@@ -25,6 +25,14 @@
 				</folder>
 			</folderList>
 			<postInstallationActionList>
+				<!-- Delete Collect temporary files (if the previous delete has not been fully completed) -->
+		        <deleteFile>
+		  			<path>../tomcat/webapps/collect</path>
+					<abortOnError>1</abortOnError>
+					<showMessageOnError>1</showMessageOnError>
+					<customErrorMessage>Cannot delete the folder "opt/openforis/collect/tomcat/webapps/collect": 
+						please shutdown Collect, delete it and try to run again the updater.</customErrorMessage>
+		  		</deleteFile>
 				<writeFile>
 					<path>update.ini</path>
 					<text>[Update]
@@ -75,11 +83,13 @@ check_for_updates = 1</text>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
         </copyFile>
-        <!-- Delete temp files -->
+        <!-- Delete temporary files -->
         <deleteFile>
   			<path>../tomcat/webapps/collect</path>
-			<abortOnError>0</abortOnError>
-			<showMessageOnError>0</showMessageOnError>
+			<abortOnError>1</abortOnError>
+			<showMessageOnError>1</showMessageOnError>
+			<customErrorMessage>Cannot delete the folder "opt/openforis/collect/tomcat/webapps/collect": 
+				please shutdown Collect, delete it and try to run again the updater.</customErrorMessage>
   		</deleteFile>
 	</readyToInstallActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
