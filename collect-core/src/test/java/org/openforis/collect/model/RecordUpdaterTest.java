@@ -491,6 +491,51 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 	}
 	
 	@Test
+	public void testRelevanceUpdatedInSiblingsWhenEntityIsAdded() {
+		record(
+			rootEntityDef(
+				entityDef("land_feature")
+					.multiple(),
+				entityDef("land_feature_proportioning")
+					.multiple()
+					.relevant("count(land_feature) > 1")
+			)
+		);
+		
+		assertFalse(record.getRootEntity().isRelevant("land_feature_proportioning"));
+		
+		updater.addEntity(record.getRootEntity(), "land_feature");
+		
+		assertFalse(record.getRootEntity().isRelevant("land_feature_proportioning"));
+		
+		updater.addEntity(record.getRootEntity(), "land_feature");
+		
+		assertTrue(record.getRootEntity().isRelevant("land_feature_proportioning"));
+	}
+	
+	@Test
+	public void testRelevanceUpdatedInSiblingsWhenEntityIsRemoved() {
+		record(
+			rootEntityDef(
+				entityDef("land_feature")
+					.multiple(),
+				entityDef("land_feature_proportioning")
+					.multiple()
+					.relevant("count(land_feature) > 1")
+			)
+		);
+		
+		updater.addEntity(record.getRootEntity(), "land_feature");
+		updater.addEntity(record.getRootEntity(), "land_feature");
+		
+		Node<?> landFeature2 = record.findNodeByPath("/root/land_feature[2]");
+		
+		updater.deleteNode(landFeature2);
+		
+		assertFalse(record.getRootEntity().isRelevant("land_feature_proportioning"));
+	}
+	
+	@Test
 	public void testRelevanceNotUpdatedInAttributesNotInVersion() {
 		record(
 			rootEntityDef(

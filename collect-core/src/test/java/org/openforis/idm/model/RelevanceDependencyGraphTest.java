@@ -153,19 +153,22 @@ public class RelevanceDependencyGraphTest extends NodePointerDependencyGraphTest
 		assertDependentNodePointers(accessibility, dbh2Pointer);
 	}
 	
-//	@Test
+	@Test
 	public void testDependencyOnEntityCount() {
 		rootEntityDef(
-			entityDef("land_feature")
-				.multiple(),
-			entityDef("land_feature_proportioning")
-				.relevant("count(parent()/land_feature) >= 2")
-				.multiple()
+			entityDef("plot",
+				entityDef("land_feature")
+					.multiple(),
+				entityDef("land_feature_proportioning")
+					.relevant("count(land_feature) >= 2")
+					.multiple()
+			).multiple()
 		);
 		createTestRecord();
 
-		NodePointer landFeaturePointer = new NodePointer(rootEntity, "land_feature");
-		NodePointer landFeatureProportioningPointer = new NodePointer(rootEntity, "land_feature_proportioning");
+		Entity plot = entity(rootEntity, "plot");
+		NodePointer landFeaturePointer = new NodePointer(plot, "land_feature");
+		NodePointer landFeatureProportioningPointer = new NodePointer(plot, "land_feature_proportioning");
 		assertDependentNodePointers(landFeaturePointer, landFeatureProportioningPointer);
 	}
 

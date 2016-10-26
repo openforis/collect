@@ -148,6 +148,10 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 			return true;
 		}
 
+		@Override
+		public String toString() {
+			return String.format("Entity id: %d - child def id: %d", entityId, childDefinitionId);
+		}
 	}
 	
 }

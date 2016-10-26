@@ -8,6 +8,7 @@ import static org.openforis.idm.model.NodePointers.nodesToPointers;
 import static org.openforis.idm.model.NodePointers.pointersToNodes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
@@ -466,6 +467,8 @@ public class RecordUpdater {
 
 		NodePointer nodePointer = new NodePointer(node);
 		List<NodePointer> ancestorPointers = getAncestorPointers(node);
+
+		Entity parentEntity = node.getParent();
 		
 		// calculated attributes
 		List<Attribute<?, ?>> dependentCalculatedAttributes = record.determineCalculatedAttributes(nodesToBeDeleted);
@@ -496,10 +499,15 @@ public class RecordUpdater {
 			changeMap.addValueChanges(updatedCalculatedAttributes);
 			
 			// relevance
-			Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
-			nodesToCheckRelevanceFor.addAll(pointersToNodes(relevanceDependenciesToDeleted));
+			Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>();
+			pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodes(updatedCalculatedAttributes));
+			pointersToRecalculateRelevanceFor.addAll(relevanceDependenciesToDeleted);
+			if (parentEntity != null) {
+				pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodePointers(
+						Arrays.asList(new NodePointer(parentEntity, node.getDefinition()))));
+			}
 			
-			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
+			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodePointers(pointersToRecalculateRelevanceFor);
 			//check relevance update with detached entity in node pointer
 			RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
 			Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
@@ -679,10 +687,10 @@ public class RecordUpdater {
 	private Entity performEntityAdd(Entity parentEntity, EntityDefinition defn, Integer idx) {
 		ModelVersion version = parentEntity.getRecord().getVersion();
 		Entity entity = (Entity) defn.createNode();
-		if ( idx != null ) {
-			parentEntity.add(entity, idx);
-		} else {
+		if ( idx == null ) {
 			parentEntity.add(entity);
+		} else {
+			parentEntity.add(entity, idx);
 		}
 		for (NodeDefinition childDef : defn.getChildDefinitionsInVersion(version)) {
 			entity.setMinCount(childDef, calculateMinCount(entity, childDef));
@@ -743,11 +751,12 @@ public class RecordUpdater {
 			updatedCardinalityPointers.addAll(updatedMaxCountPointers);
 	
 			//relevance
-			List<NodePointer> childNodePointers = getChildNodePointers(entity);
-			List<NodePointer> relevanceDependentPointers = record.determineRelevanceDependentNodes(calculatedAttributes);
-			
-			Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>(childNodePointers);
-			pointersToRecalculateRelevanceFor.addAll(relevanceDependentPointers);
+			Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>();
+			pointersToRecalculateRelevanceFor.addAll(getChildNodePointers(entity));
+			pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodes(calculatedAttributes));
+			if (entity.getParent() != null) {
+				pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodePointers(Arrays.asList(new NodePointer(entity.getParent(), entity.getDefinition()))));
+			}
 			
 			Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
 			changeMap.addRelevanceChanges(updatedRelevancePointers);

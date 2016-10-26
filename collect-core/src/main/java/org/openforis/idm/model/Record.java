@@ -315,6 +315,11 @@ public class Record implements DeepComparable {
 		List<NodePointer> result = relevanceDependencies.dependenciesFor((Collection<Node<?>>) nodes);
 		return result;
 	}
+	
+	public List<NodePointer> determineRelevanceDependentNodePointers(Collection<NodePointer> nodePointers) {
+		List<NodePointer> result = relevanceDependencies.dependenciesForPointers(nodePointers);
+		return result;
+	}
 
 	public Collection<NodePointer> determineMinCountDependentNodes(Collection<NodePointer> nodePointers) {
 		Collection<NodePointer> result = minCountDependencies.dependenciesForNodePointers(nodePointers);
