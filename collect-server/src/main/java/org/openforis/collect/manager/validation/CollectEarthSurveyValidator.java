@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
+import org.openforis.collect.earth.app.EarthConstants;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -111,9 +112,13 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 		return results;
 	}
 
+	public boolean validateRootEntityName(String name) {
+		return EarthConstants.ROOT_ENTITY_NAME.equals(name);
+	}
+	
 	public boolean validateNodeName(String name) {
 		return super.validateNodeName(name) && 
-			! INVALID_NODE_NAME_PATTERN.matcher(name).matches();
+				! INVALID_NODE_NAME_PATTERN.matcher(name).matches();
 	}
 	
 	protected String getInvalidNodeNameMessageKey() {
