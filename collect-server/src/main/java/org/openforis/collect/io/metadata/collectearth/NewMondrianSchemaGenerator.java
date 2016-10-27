@@ -203,11 +203,7 @@ public class NewMondrianSchemaGenerator {
 
 	private void addCountMeasure(Cube cube, EntityDefinition entityDef) {
 		Measure measure = new Measure(entityDef.getName() + "_count");
-		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
-			measure.column = "_" + entityDef.getName() + "_id";
-		} else {
-			measure.column = rdbSchema.getDataTable(entityDef).getPrimaryKeyColumn().getName();
-		}
+		measure.column = rdbSchema.getDataTable(entityDef).getPrimaryKeyColumn().getName();
 		measure.caption = escapeMondrianUnicode(extractLabel(entityDef) + " Count");
 		measure.aggregator = "distinct count";
 		measure.datatype = INTEGER_DATATYPE;
@@ -387,12 +383,13 @@ public class NewMondrianSchemaGenerator {
 	}
 
 	private boolean canBeMeasured(AttributeDefinition def) {
-		return def instanceof CodeAttributeDefinition
+		return (def instanceof CodeAttributeDefinition
 				|| def instanceof DateAttributeDefinition
 				|| def instanceof NumberAttributeDefinition
 				|| def instanceof TaxonAttributeDefinition
 				|| def instanceof TextAttributeDefinition
-				|| def instanceof TimeAttributeDefinition;
+				|| def instanceof TimeAttributeDefinition)
+			&& survey.getAnnotations().isIncludedInDataExport(def);
 	}
 
 	private static class MondrianSchemaObject {
