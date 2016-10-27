@@ -143,14 +143,18 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordProxy = uiEvent.obj as RecordProxy;
-			if ( ! record.unassigned && 
-				! Application.user.isOwner(record) &&
-				! Application.user.canEditNotOwnedRecords ) {
-				AlertUtil.showError("list.error.cannotEdit.differentOwner", [record.owner.name]);
-			} else {
+			if ( record.unassigned || Application.user.isOwner(record)
+				|| Application.user.canViewAllRecords || Application.user.canEditNotOwnedRecords) {
 				var recordInfo:Object = {id: record.id, step: record.step};
 				var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, recordInfo);
-				_dataClient.loadRecord(responder, record.id, record.step);
+				
+				if (Application.user.canEditNotOwnedRecords) {
+					_dataClient.checkoutRecord(responder, record.id, record.step);
+				} else {
+					_dataClient.loadRecord(responder, record.id, record.step);
+				}
+			} else {
+				AlertUtil.showError("list.error.cannotEdit.differentOwner", [record.owner.name]);
 			}
 		}
 		
@@ -161,7 +165,7 @@ package org.openforis.collect.presenter {
 			var recordId:int = uiEvent.obj.recordId;
 			var recordInfo:Object = {id: recordId, step: null};
 			var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, recordInfo);
-			_dataClient.loadRecord(responder, recordId);
+			_dataClient.checkoutRecord(responder, recordId);
 		}
 		
 		/**
@@ -256,15 +260,16 @@ package org.openforis.collect.presenter {
 		protected function loadRecordFaultHandler(event:FaultEvent, token:Object = null):void {
 			var faultCode:String = event.fault.faultCode;
 			if(faultCode == "org.openforis.collect.persistence.RecordLockedByActiveUserException" ||
-				(faultCode == "org.openforis.collect.persistence.RecordLockedException" && Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN))) {
-					AlertUtil.showConfirm('edit.confirmUnlock', null, null, performUnlock, [token]);
+					(faultCode == "org.openforis.collect.persistence.RecordLockedException" && Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN))) {
+				AlertUtil.showConfirm('edit.confirmUnlock', null, null, forceUnlock, [token]);
 			} else {
 				AbstractPresenter.faultHandler(event, token);
 			}
 		}
 		
-		protected function performUnlock(recordInfo:Object):void {
-			_dataClient.loadRecord(new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, recordInfo), recordInfo.id, recordInfo.step, true);
+		protected function forceUnlock(recordInfo:Object):void {
+			_dataClient.checkoutRecord(new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, recordInfo), 
+				recordInfo.id, recordInfo.step, true);
 		}
 	}
 }

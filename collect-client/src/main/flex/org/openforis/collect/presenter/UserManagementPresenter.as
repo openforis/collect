@@ -148,6 +148,9 @@ package org.openforis.collect.presenter {
 			var roles:ListCollectionView = user.roles;
 			for each (var role:String in roles) {
 				switch ( role ) {
+					case UserProxy.ROLE_VIEW:
+						view.usersListContainer.roleViewCheckBox.selected = true;
+						break;
 					case UserProxy.ROLE_ENTRY:
 						view.usersListContainer.roleEntryCheckBox.selected = true;
 						break;
@@ -166,6 +169,7 @@ package org.openforis.collect.presenter {
 
 		protected function getAllCheckBoxes():Array {
 			var checkBoxes:Array = [
+				view.usersListContainer.roleViewCheckBox,
 				view.usersListContainer.roleEntryCheckBox, 
 				view.usersListContainer.roleCleansingCheckBox, 
 				view.usersListContainer.roleAnalysisCheckBox, 
@@ -188,6 +192,9 @@ package org.openforis.collect.presenter {
 				if ( checkBox.selected ) {
 					var role:String = null;
 					switch ( checkBox ) {
+						case view.usersListContainer.roleViewCheckBox:
+							role = UserProxy.ROLE_VIEW;
+							break;
 						case view.usersListContainer.roleEntryCheckBox:
 							role = UserProxy.ROLE_ENTRY;
 							break;

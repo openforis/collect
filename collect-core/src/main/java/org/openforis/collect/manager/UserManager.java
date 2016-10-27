@@ -53,7 +53,15 @@ public class UserManager {
 		return user;
 	}
 
-	public User loadByUserName(String userName, Boolean enabled) {
+	public User loadByUserName(String userName) {
+		return loadByUserName(userName, null);
+	}
+	
+	public User loadEnabledUser(String userName) {
+		return loadByUserName(userName, true);
+	}
+	
+	private User loadByUserName(String userName, Boolean enabled) {
 		User user = userByName.get(userName);
 		if (user == null) {
 			user = userDao.loadByUserName(userName, null);
@@ -64,10 +72,6 @@ public class UserManager {
 		} else {
 			return null;
 		}
-	}
-
-	public User loadByUserName(String userName) {
-		return loadByUserName(userName, null);
 	}
 	
 	public User loadAdminUser() {
@@ -115,8 +119,10 @@ public class UserManager {
 	}
 
 	private void updateCache(User user) {
-		userById.put(user.getId(), user);
-		userByName.put(user.getName(), user);
+		if (user != null) {
+			userById.put(user.getId(), user);
+			userByName.put(user.getName(), user);
+		}
 	}
 
 	protected String checkAndEncodePassword(String password) throws UserPersistenceException {

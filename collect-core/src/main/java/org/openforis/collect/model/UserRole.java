@@ -2,10 +2,12 @@ package org.openforis.collect.model;
 
 public enum UserRole {
 	
-	ENTRY("ROLE_ENTRY", 1),
-	CLEANSING("ROLE_CLEANSING", 2),
-	ANALYSIS("ROLE_ANALYSIS", 3),
-	ADMIN("ROLE_ADMIN", 4);
+	VIEW(UserRoles.VIEW, 0),
+	ENTRY(UserRoles.ENTRY, 1),
+	CLEANSING(UserRoles.CLEANSING, 2),
+	ANALYSIS(UserRoles.ANALYSIS, 3),
+	ADMIN(UserRoles.ADMIN, 4);
+	
 	
 	public static UserRole fromCode(String code) {
 		for (UserRole role : values()) {
@@ -31,5 +33,5 @@ public enum UserRole {
 	public int getHierarchicalOrder() {
 		return hierarchicalOrder;
 	}
-
+	
 }
