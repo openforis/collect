@@ -312,7 +312,7 @@ package org.openforis.collect.presenter {
 		
 		internal function logoutResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.activeRecord = null;
-			var u:URLRequest = new URLRequest(ApplicationConstants.URL +"login.htm");
+			var u:URLRequest = new URLRequest(ApplicationConstants.URL +"login");
 			navigateToURL(u,"_self");
 		}
 		

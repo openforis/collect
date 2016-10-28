@@ -5,6 +5,7 @@ package org.openforis.collect.remoting.service;
 
 
 import static org.openforis.collect.model.UserRoles.ADMIN;
+import static org.openforis.collect.model.UserRoles.ANALYSIS;
 import static org.openforis.collect.model.UserRoles.CLEANSING;
 import static org.openforis.collect.model.UserRoles.ENTRY;
 import static org.openforis.collect.model.UserRoles.USER;
@@ -395,7 +396,7 @@ public class DataService {
 	}
 
 	@Transactional
-	@Secured("ROLE_ANALYSIS")
+	@Secured(ANALYSIS)
 	public void demoteToCleansing() throws RecordPersistenceException {
 		demote(Step.CLEANSING);
 	}
