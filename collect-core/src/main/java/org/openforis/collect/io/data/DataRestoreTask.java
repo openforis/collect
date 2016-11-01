@@ -179,13 +179,22 @@ public class DataRestoreTask extends Task {
 	
 	private class RecordUpdateBuffer {
 		
-		public static final int BUFFER_SIZE = 20;
+		public static final int BUFFER_SIZE = 100;
+		/**
+		 * limits the total size of the operations to be executed in batch to 30,000 record nodes
+		 * in order to avoid a too big heap size growing during the database update process.
+		 */
+		public static final int MAX_OPERATIONS_SIZE = 30000; 
 		
 		private List<RecordOperations> operations = new ArrayList<RecordOperations>();
+		private int operationsSize = 0;
 		
 		public void append(RecordOperations opts) {
 			this.operations.add(opts);
-			if (this.operations.size() >= BUFFER_SIZE) {
+			this.operationsSize += opts.getOperationsSize();
+			
+			if (this.operations.size() >= BUFFER_SIZE || 
+					this.operationsSize >= MAX_OPERATIONS_SIZE) {
 				flush();
 			}
 		}
@@ -197,6 +206,7 @@ public class DataRestoreTask extends Task {
 				recordManager.executeRecordOperations(operations);
 			}
 			operations.clear();
+			operationsSize = 0;
 		}
 	}
 

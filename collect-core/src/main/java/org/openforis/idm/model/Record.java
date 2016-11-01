@@ -238,6 +238,10 @@ public class Record implements DeepComparable {
 		});
 	}
 
+	public int countNodes() {
+		return nodesByInternalId.size();
+	}
+	
 	void put(Node<?> node) {
 		initialize(node);
 		if ( enableValidationDependencyGraphs ) {

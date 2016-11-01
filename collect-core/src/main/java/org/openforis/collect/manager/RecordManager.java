@@ -841,6 +841,13 @@ public class RecordManager {
 		public boolean isInsert() {
 			return insert;
 		}
+		
+		/**
+		 * Returns the size as number of nodes in the record.
+		 */
+		public int getSize() {
+			return record.countNodes();
+		}
 	}
 	
 	public static class RecordOperations {
@@ -849,6 +856,7 @@ public class RecordManager {
 		private Step originalStep;
 		private Step lastUpdatedStep;
 		private List<RecordStepOperation> operations = new ArrayList<RecordStepOperation>();
+		private int operationsSize = 0;
 		
 		public void initializeRecordId(Integer recordId) {
 			this.recordId = recordId;
@@ -876,6 +884,7 @@ public class RecordManager {
 		private void add(RecordStepOperation operation) {
 			operations.add(operation);
 			lastUpdatedStep = operation.getStep();
+			operationsSize += operation.getSize();
 		}
 		
 		public List<RecordStepOperation> getOperations() {
@@ -898,6 +907,10 @@ public class RecordManager {
 			return lastUpdatedStep;
 		}
 
+		public int getOperationsSize() {
+			return operationsSize;
+		}
+		
 	}
 
 }

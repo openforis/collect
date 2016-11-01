@@ -39,7 +39,7 @@ public abstract class DependencyGraph<T> {
 
 	protected abstract Set<NodePathPointer> determineDependents(T source) throws InvalidExpressionException;
 
-	protected abstract Set<NodePathPointer> determineSources(T dependent)	throws InvalidExpressionException;
+	protected abstract Set<NodePathPointer> determineSources(T dependent) throws InvalidExpressionException;
 
 	protected abstract List<T> getChildren(T item);
 
