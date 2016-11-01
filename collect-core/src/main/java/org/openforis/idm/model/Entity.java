@@ -488,15 +488,18 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public List<? extends Node<? extends NodeDefinition>> findChildren(NodeDefinition childDef, final NodePredicate predicate) {
-		final List<Node<? extends NodeDefinition>> result = new ArrayList<Node<? extends NodeDefinition>>();
-		visitChildren(childDef, new NodeVisitor() {
-			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				if (predicate.evaluate(node)) {
-					result.add(node);
+		List<Node<?>> children = childrenByDefinition.get(childDef);
+		if (children == null || children.isEmpty()) {
+			return Collections.emptyList();
+		} else {
+			List<Node<? extends NodeDefinition>> result = new ArrayList<Node<? extends NodeDefinition>>(children.size());
+			for (Node<?> child : children) {
+				if (predicate.evaluate(child)) {
+					result.add(child);
 				}
 			}
-		});
-		return result;
+			return result;
+		}
 	}
 
 	/**

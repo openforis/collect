@@ -3,8 +3,7 @@
  */
 package org.openforis.idm.metamodel.validation;
 
-import java.util.List;
-
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
@@ -38,25 +37,22 @@ public class UniquenessCheck extends Check<Attribute<?, ?>> {
 	}
 	
 	@Override
-	public ValidationResultFlag evaluate(Attribute<?, ?> attribute) {
+	public ValidationResultFlag evaluate(final Attribute<?, ?> attribute) {
 		try {
 			SurveyContext recordContext = attribute.getRecord().getSurveyContext();
 			ExpressionEvaluator expressionEvaluator = recordContext.getExpressionEvaluator();
-			List<Node<?>> list = expressionEvaluator.evaluateNodes(attribute.getParent(), attribute, expression);
-			boolean unique = true;
-			if (list != null && list.size() > 1) {
-				for (Node<?> node : list) {
-					if (node != attribute) {
-						if (node instanceof Attribute) {
-							Value value = ((Attribute<?, ?>) node).getValue();
-							if ( value != null && value.equals(attribute.getValue()) ) {
-								unique = false;
-								break;
-							}
+			Node<?> duplicateNode = expressionEvaluator.findNode(attribute.getParent(), attribute, expression, new Predicate<Node<?>>() {
+				public boolean evaluate(Node<?> node) {
+					if (node instanceof Attribute && node != attribute) {
+						Value value = ((Attribute<?, ?>) node).getValue();
+						if ( value != null && value.equals(attribute.getValue()) ) {
+							return true;
 						}
 					}
-				}
-			}
+					return false;
+				};
+			});
+			boolean unique = duplicateNode == null;
 			return ValidationResultFlag.valueOf(unique, this.getFlag());
 		} catch (InvalidExpressionException e) {
 			throw new IdmInterpretationError("Error evaluating uniqueness check", e);

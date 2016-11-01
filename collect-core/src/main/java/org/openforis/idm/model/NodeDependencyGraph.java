@@ -1,12 +1,11 @@
 package org.openforis.idm.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.expression.InvalidExpressionException;
@@ -54,22 +53,25 @@ public abstract class NodeDependencyGraph extends DependencyGraph<Node<?>> {
 	}
 
 	@Override
-	protected Set<Node<?>> determineRelatedItems(Node<?> node, NodeDefinition relatedChildDef, String relatedParentEntityPath) throws InvalidExpressionException {
-		Set<Node<?>> relatedNodes = new HashSet<Node<?>>();
-		Entity parent = node.getParent();
-		List<Node<?>> relatedParentEntities = new ArrayList<Node<?>>();
-		relatedParentEntities = Path.parse(relatedParentEntityPath).evaluate(parent);
+	protected void visitRelatedItems(Node<?> node, NodeDefinition relatedChildDef, String relatedParentEntityPath,
+			Visitor<Node<?>> visitor) throws InvalidExpressionException {
+		List<Node<?>> relatedParentEntities = Path.parse(relatedParentEntityPath).evaluate(node.getParent());
 		for (Node<?> relatedParentEntity : relatedParentEntities) {
-			List<Node<?>> dependentNodes = ((Entity) relatedParentEntity).getChildren(relatedChildDef);
-			relatedNodes.addAll(dependentNodes);
+			visitChildren((Entity) relatedParentEntity, relatedChildDef, visitor);
 		}
-		return relatedNodes;
+	}
+	
+	@Override
+	protected void visitRelatedItems(Node<?> node, NodeDefinition childDef, final Visitor<Node<?>> visitor) {
+		visitChildren(node.getParent(), childDef, visitor);
 	}
 
-	@Override
-	protected Set<Node<?>> determineRelatedItems(Node<?> node, NodeDefinition childDef) {
-		List<Node<?>> dependentNodes = node.getParent().getChildren(childDef);
-		return new HashSet<Node<?>>(dependentNodes);
+	private void visitChildren(Entity entity, NodeDefinition childDef, final Visitor<Node<?>> visitor) {
+		entity.visitChildren(childDef, new NodeVisitor() {
+			public void visit(Node<? extends NodeDefinition> node, int idx) {
+				visitor.visit(node);
+			}
+		});
 	}
 
 	@Override
