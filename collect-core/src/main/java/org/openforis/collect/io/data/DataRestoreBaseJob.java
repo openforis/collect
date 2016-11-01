@@ -44,7 +44,8 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected transient CollectSurvey publishedSurvey; //optional: if not specified, the packaged survey will be published as a new one
 	protected transient CollectSurvey packagedSurvey; //optional: if not specified, it will be extracted from the ZIP file
 	protected transient boolean validateRecords;
-	protected Predicate<CollectRecord> includeRecordPredicate;
+	protected transient boolean closeRecordProviderOnComplete = true;
+	protected transient Predicate<CollectRecord> includeRecordPredicate;
 
 	protected RecordProvider recordProvider; //if null it will be created and initialized, otherwise it will be re-used
 
@@ -61,9 +62,21 @@ public abstract class DataRestoreBaseJob extends Job {
 		newSurvey = publishedSurvey == null;
 		backupFileExtractor = new BackupFileExtractor(file);
 		oldBackupFormat = backupFileExtractor.isOldFormat();
-		dataSummaryFile = backupFileExtractor.extractInfo().getCollectVersion()
-				.compareTo(DATA_SUMMARY_FILE_COLLECT_VERSION) >= 0 ? backupFileExtractor.extractDataSummaryFile() : null;
+		dataSummaryFile = extractDataSummaryFile();
 		surveyName = newSurvey ? extractSurveyName() : publishedSurvey.getName();
+	}
+
+	private File extractDataSummaryFile() {
+		if (oldBackupFormat) {
+			return null;
+		} else {
+			SurveyBackupInfo info = backupFileExtractor.extractInfo();
+			if (info.getCollectVersion().compareTo(DATA_SUMMARY_FILE_COLLECT_VERSION) >= 0) {
+				return backupFileExtractor.extractDataSummaryFile();
+			} else {
+				return null;
+			}
+		}
 	}
 	
 	@Override
@@ -154,6 +167,14 @@ public abstract class DataRestoreBaseJob extends Job {
 			this.recordProvider = ((RecordProviderInitializerTask) task).getOutput();
 		}
 	}
+	
+//	@Override
+//	protected void onEnd() {
+//		super.onEnd();
+//		if (! this.isCompleted() || closeRecordProviderOnComplete) {
+//			IOUtils.closeQuietly(recordProvider);
+//		}
+//	}
 
 	private CollectSurvey findExistingPublishedSurvey(SurveyBackupInfo backupInfo) {
 		CollectSurvey existingPublishedSurvey = surveyManager.get(backupInfo.getSurveyName());
@@ -227,5 +248,9 @@ public abstract class DataRestoreBaseJob extends Job {
 	
 	public void setValidateRecords(boolean validateRecords) {
 		this.validateRecords = validateRecords;
+	}
+	
+	public void setCloseRecordProviderOnComplete(boolean closeRecordProviderOnComplete) {
+		this.closeRecordProviderOnComplete = closeRecordProviderOnComplete;
 	}
 }

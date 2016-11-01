@@ -1,6 +1,5 @@
 package org.openforis.collect.io.data;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +31,7 @@ import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.ProgressListener;
 
-public class XMLParsingRecordProvider implements RecordProvider, Closeable {
+public class XMLParsingRecordProvider implements RecordProvider {
 
 	private final File file;
 	private final CollectSurvey packagedSurvey;

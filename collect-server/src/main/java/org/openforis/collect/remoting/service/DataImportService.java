@@ -60,6 +60,7 @@ public class DataImportService {
 			job.setFullSummary(fullSummary);
 			job.setFile(packagedFile);
 			job.setPublishedSurvey(survey);
+			job.setCloseRecordProviderOnComplete(false);
 
 			resetJobs();
 			this.summaryJob = job;
@@ -85,7 +86,6 @@ public class DataImportService {
 			job.setFile(packagedFile);
 			job.setValidateRecords(validateRecords);
 			job.setRecordProvider(summaryJob.getRecordProvider());
-//			((XMLParsingRecordProvider) recordProvider).setValidateRecords(validateRecords);
 			job.setPackagedSurvey(summaryJob.getPackagedSurvey());
 			job.setPublishedSurvey(summaryJob.getPublishedSurvey());
 			job.setEntryIdsToImport(entryIdsToImport);

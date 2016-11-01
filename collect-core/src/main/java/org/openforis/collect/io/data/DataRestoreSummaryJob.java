@@ -31,7 +31,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	
 	@Override
 	protected boolean isRecordProviderToBeInitialized() {
-		return isFullSummary();
+		return isFullSummary() || oldBackupFormat || dataSummaryFile == null;
 	}
 	
 	@Override
