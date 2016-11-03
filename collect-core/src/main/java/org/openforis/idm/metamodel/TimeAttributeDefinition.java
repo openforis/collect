@@ -64,7 +64,7 @@ public class TimeAttributeDefinition extends AttributeDefinition {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+	public <V extends Value> V createValueFromKeyFieldValues(List<String> fieldValues) {
 		if (StringUtils.isAnyBlank(fieldValues.toArray(new String[fieldValues.size()]))) {
 			return null;
 		}

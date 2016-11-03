@@ -8,6 +8,7 @@ import java.util.List;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Value;
 
 /**
  * @author S. Ricci
@@ -23,7 +24,7 @@ public class EntityKeyValidator implements ValidationRule<Attribute<?, ?>> {
 		if ( multipleEntityDef.isRoot() ) {
 			return ValidationResultFlag.OK;
 		}
-		String[] keyValues = multipleEntity.getKeyValues();
+		Value[] keyValues = multipleEntity.getKeyAttributeValues();
 		if (keyValues == null) {
 			return null;
 		}

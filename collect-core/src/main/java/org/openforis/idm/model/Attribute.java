@@ -199,7 +199,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 		AbstractValue value = (AbstractValue) getValue();
 		return value == null ? null : value.toInternalString();
 	}
-
+	
 	@Override
 	protected void write(StringWriter sw, int indent) {
 		for (int i = 0; i < indent; i++) {

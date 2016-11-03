@@ -553,6 +553,8 @@ public class RecordUpdater {
 	
 			validateAttributes(record, attributesToRevalidate, changeMap);
 		} else {
+			performNodeDeletion(node);
+			
 			// calculated attributes
 			List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
 			changeMap.addValueChanges(updatedCalculatedAttributes);

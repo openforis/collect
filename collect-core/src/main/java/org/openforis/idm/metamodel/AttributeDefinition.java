@@ -165,7 +165,7 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	
 	public abstract <V extends Value> V createValue(String string);
 	
-	public abstract <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues);
+	public abstract <V extends Value> V createValueFromKeyFieldValues(List<String> fieldValues);
 
 //	public Set<NodePathPointer> getCheckDependencyPaths() {
 //		Survey survey = getSurvey();
@@ -188,6 +188,17 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	
 	public FieldDefinition<?> getMainFieldDefinition() {
 		return getFieldDefinition(getMainFieldName());
+	}
+	
+	/**
+	 * Returns the name of the fields that will be used to generate the value of a "key" attribute
+	 */
+	public List<String> getKeyFieldNames() {
+		if (hasMainField()) {
+			return Arrays.asList(getMainFieldName());
+		} else {
+			return getFieldNames();
+		}
 	}
 
 	public List<FieldLabel> getFieldLabels() {

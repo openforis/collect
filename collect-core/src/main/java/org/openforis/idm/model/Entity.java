@@ -192,17 +192,24 @@ public class Entity extends Node<EntityDefinition> {
 		return findChildEntitiesByKeys((EntityDefinition) definition.getChildDefinition(childName), keys);
 	}
 
+	public List<Entity> findChildEntitiesByKeys(EntityDefinition childEntityDef, final Value... keyValues) {
+		return findChildEntitiesByKeys(childEntityDef, Values.toStringValues(keyValues));
+	}
+	
+	/**
+	 * @deprecated Replaced by {@link #findChildEntitiesByKeys(EntityDefinition, Value...)}
+	 */
 	public List<Entity> findChildEntitiesByKeys(EntityDefinition childEntityDef, final String... keys) {
 		@SuppressWarnings("unchecked")
 		List<Entity> result = (List<Entity>) findChildren(childEntityDef, new NodePredicate() {
 			public boolean evaluate(Node<?> node) {
-				String[] keyValues = ((Entity) node).getKeyValues();
-				return compareKeys(keyValues, keys) == 0;
+				Value[] keyValues = ((Entity) node).getKeyAttributeValues();
+				return compareKeys(Values.toStringValues(keyValues), keys) == 0;
 			}
 		});
 		return result;
 	}
-	
+
 	private int compareKeys(String[] keys1, String[] keys2) {
 		if ( keys1 == keys2) {
 			return 0;
@@ -238,22 +245,32 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 
+	/**
+	 * 
+	 * @deprecated Replaced by {@link #getKeyAttributeValues}
+	 */
 	public String[] getKeyValues() {
+		return Values.toStringValues(getKeyAttributeValues());
+	}
+	
+	public Value[] getKeyAttributeValues() {
 		EntityDefinition defn = getDefinition();
 		List<AttributeDefinition> keyDefns = defn.getKeyAttributeDefinitions();
 		if ( keyDefns.isEmpty() ) {
 			return null;
 		} else {
-			String[] result = new String[keyDefns.size()];
+			Value[] result = new Value[keyDefns.size()];
 			for (int i = 0; i < keyDefns.size(); i++) {
 				AttributeDefinition keyDefn = keyDefns.get(i);
 				Attribute<?, Value> keyAttr = getKeyAttribute(keyDefn);
-				String keyValue = keyAttr == null ? null: keyAttr.extractTextValue();
+				Value keyValue = keyAttr == null ? null: keyAttr.getValue();
 				result[i] = keyValue;
 			}
 			return result;
 		}
 	}
+	
+	
 
 	protected Attribute<?, Value> getKeyAttribute(AttributeDefinition keyDefn) {
 		if ( ! keyDefn.isDescendantOf(this.getDefinition()) ) {

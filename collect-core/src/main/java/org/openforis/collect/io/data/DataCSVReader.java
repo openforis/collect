@@ -31,6 +31,7 @@ import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.AbstractValue;
+import org.openforis.idm.model.Value;
 
 /**
  * @author S. Ricci
@@ -77,12 +78,12 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			AttributeDefinition keyAttrDefn) {
 		EntityDefinition parentDefn = keyAttrDefn.getParentEntityDefinition();
 		String prefix = parentDefn == parentEntityDefinition ? "" : parentDefn.getName() + "_";
-		if (keyAttrDefn.isSingleFieldKeyAttribute()) {
+		List<String> keyFieldNames = keyAttrDefn.getKeyFieldNames();
+		if (keyFieldNames.size() == 1) {
 			return Arrays.asList(prefix + keyAttrDefn.getName());
 		} else {
-			List<String> fieldNames = keyAttrDefn.getFieldNames();
-			List<String> result = new ArrayList<String>(fieldNames.size());
-			for (String fieldName : fieldNames) {
+			List<String> result = new ArrayList<String>(keyFieldNames.size());
+			for (String fieldName : keyFieldNames) {
 				result.add(prefix + keyAttrDefn.getName() + "_" + fieldName);
 			}
 			return result;
@@ -245,7 +246,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 					EntityIdentifier<?> identifier = new DataLine.EntityKeysIdentifier((EntityKeysIdentifierDefintion) identifierDefn);
 					List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
 					for (AttributeDefinition keyDefn : keyDefns) {
-						String value = extractValue(keyDefn);
+						Value value = extractValue(keyDefn);
 						((EntityKeysIdentifier) identifier).addKeyValue(keyDefn.getId(), value);
 					}
 					line.addAncestorIdentifier(identifier);
@@ -264,19 +265,21 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			}
 		}
 
-		private String extractValue(AttributeDefinition keyDefn) throws ParsingException {
+		private Value extractValue(AttributeDefinition keyDefn) throws ParsingException {
 			List<String> keyAttrColNames = getKeyAttributeColumnNames(parentEntityDefinition, keyDefn);
 			if (keyDefn.isSingleFieldKeyAttribute()) {
-				return getColumnValue(keyAttrColNames.get(0), false, String.class);
+				String colVal = getColumnValue(keyAttrColNames.get(0), false, String.class);
+				Value val = keyDefn.createValue(colVal);
+				return val;
 			} else {
 				List<String> fieldValues = new ArrayList<String>(keyAttrColNames.size());
 				for (int i = 0; i < keyAttrColNames.size(); i++) {
 					String keyAttrColName = keyAttrColNames.get(i);
-					String fieldValue = getColumnValue(keyAttrColName, false, String.class);
-					fieldValues.add(fieldValue);
+					String fieldVal = getColumnValue(keyAttrColName, false, String.class);
+					fieldValues.add(fieldVal);
 				}
-				AbstractValue value = keyDefn.createValueFromFieldStringValues(fieldValues);
-				return value == null ? null : value.toInternalString();
+				AbstractValue value = keyDefn.createValueFromKeyFieldValues(fieldValues);
+				return value == null ? null : value;
 			}
 		}
 
@@ -297,7 +300,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
 			AttributeDefinition attrDefn = (AttributeDefinition) fieldDefn.getParentDefinition();
 			int attrPos = extractAttributePosition(colName);
-			FieldValueKey fieldValueKey = new DataLine.FieldValueKey(attrDefn.getId(), attrPos, fieldDefn.getName());
+			FieldValueKey fieldValueKey = new FieldValueKey(attrDefn.getId(), attrPos, fieldDefn.getName());
 			return fieldValueKey;
 		}
 

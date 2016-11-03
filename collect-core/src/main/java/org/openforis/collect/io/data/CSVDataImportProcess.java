@@ -53,12 +53,15 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.Unit;
+import org.openforis.idm.model.AbstractValue;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
+import org.openforis.idm.model.Value;
+import org.openforis.idm.model.Values;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -286,13 +289,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 	private void setRecordKeys(DataLine line, CollectRecord record) {
 		EntityDefinition rootEntityDefn = record.getRootEntity().getDefinition();
-		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+		Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 
 		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefn.getKeyAttributeDefinitions();
 		for ( int i = 0; i < keyAttributeDefinitions.size(); i ++ ) {
 			AttributeDefinition keyDefn = keyAttributeDefinitions.get(i);
 			Attribute<?, ?> keyAttr = (Attribute<?, ?>) record.findNodeByPath(keyDefn.getPath() ); //for record key attributes, absolute path must be equal to relative path
-			setValueInField(keyAttr, keyDefn.getMainFieldName(), recordKeyValues[i], line.getLineNumber(), null);
+			Value keyVal = recordKeyValues[i];
+			setValueInField(keyAttr, keyDefn.getMainFieldName(), ((AbstractValue) keyVal).toInternalString(), line.getLineNumber(), null);
 		}
 	}
 
@@ -314,8 +318,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		long currentRowNumber = line.getLineNumber();
 		EntityDefinition parentEntityDefn = getParentEntityDefinition();
 		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
-		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
+		Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+		String[] recordKeyStringValues = Values.toStringValues(recordKeyValues);
+		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityDefn.getName(), recordKeyStringValues);
 		String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
 				parentEntityDefn,
 				rootEntityDefn.getKeyAttributeDefinitions());
@@ -334,7 +339,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		} else {
 			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
 					currentRowNumber, recordKeyColumnNames, errorMessageKey);
-			parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
+			parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyStringValues)});
 			status.addParsingError(currentRowNumber, parsingError);
 			return false;
 		}
@@ -343,8 +348,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private CollectRecordSummary loadRecordSummaryIfAny(DataLine line) {
 		EntityDefinition parentEntityDefn = getParentEntityDefinition();
 		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
-		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-		CollectRecordSummary recordSummary = recordManager.loadUniqueRecordSummaryByKeys(survey, rootEntityDefn.getName(), recordKeyValues);
+		Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+		CollectRecordSummary recordSummary = recordManager.loadUniqueRecordSummaryByKeys(survey, rootEntityDefn.getName(), 
+				Values.toStringValues(recordKeyValues));
 		return recordSummary;
 	}
 
@@ -612,8 +618,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		} else {
 			EntityDefinition parentDefn = currentParent.getDefinition();
 			EntityDefinition childDefn = parentDefn.getChildDefinition(childName, EntityDefinition.class);
-			String[] keys = ((EntityKeysIdentifier) identifier).getKeyValues();
-			return currentParent.findChildEntitiesByKeys(childDefn, keys);
+			Value[] keyValues = ((EntityKeysIdentifier) identifier).getKeyValues();
+			return currentParent.findChildEntitiesByKeys(childDefn, keyValues);
 		}
 	}
 	
@@ -634,7 +640,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			}
 		} else {
 			Entity entity = (Entity) performNodeAdd(currentParent, childName);
-			String[] keyValues = ((EntityKeysIdentifier) identifier).getKeyValues();
+			Value[] keyValues = ((EntityKeysIdentifier) identifier).getKeyValues();
 			setKeyValues(entity, keyValues, colNamesByField, row);
 			return entity;
 		}
@@ -674,14 +680,20 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		return error;
 	}
 	
-	private void setKeyValues(Entity entity, String[] values, Map<FieldValueKey, String> colNamesByField, long row) {
+	private void setKeyValues(Entity entity, Value[] values, Map<FieldValueKey, String> colNamesByField, long row) {
 		//create key attribute values by name
 		Map<FieldValueKey, String> keyValuesByField = new HashMap<FieldValueKey, String>();
 		EntityDefinition entityDefn = entity.getDefinition();
 		List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
 		for (int i = 0; i < keyDefns.size(); i++) {
 			AttributeDefinition keyDefn = keyDefns.get(i);
-			keyValuesByField.put(new FieldValueKey(keyDefn), values[i]);
+			Value keyValue = values[i];
+			Map<String, Object> keyValueMap = keyValue.toMap();
+			List<String> keyFieldNames = keyDefn.getKeyFieldNames();
+			for (String keyFieldName : keyFieldNames) {
+				Object keyValueFieldVal = keyValueMap.get(keyFieldName);
+				keyValuesByField.put(new FieldValueKey(keyDefn, keyFieldName), keyValueFieldVal.toString());
+			}
 		}
 		setValuesInAttributes(entity, keyValuesByField, colNamesByField, row);
 	}
