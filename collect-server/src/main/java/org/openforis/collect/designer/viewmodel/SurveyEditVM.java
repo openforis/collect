@@ -24,7 +24,7 @@ import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.Confir
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
-import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGeneratorImpl;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
@@ -425,7 +425,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void exportCEGridTemplate() throws IOException {
-		File templateFile = new CollectEarthGridTemplateGeneratorImpl().generateTemplateCSVFile(survey);
+		File templateFile = new CollectEarthGridTemplateGenerator().generateTemplateCSVFile(survey);
 		String fileName = String.format("%s_grid_template_%s.csv", survey.getName(), Dates.formatDateTime(new Date()));
 		Filedownload.save(new FileInputStream(templateFile),  Files.CSV_CONTENT_TYPE, fileName);
 	}

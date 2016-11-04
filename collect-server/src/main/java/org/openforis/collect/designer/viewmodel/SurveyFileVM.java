@@ -18,7 +18,6 @@ import org.openforis.collect.designer.form.SurveyFileFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
-import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGeneratorImpl;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
@@ -131,7 +130,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		switch (type) {
 		case COLLECT_EARTH_GRID:
-			CollectEarthGridTemplateGenerator templateGenerator = new CollectEarthGridTemplateGeneratorImpl();
+			CollectEarthGridTemplateGenerator templateGenerator = new CollectEarthGridTemplateGenerator();
 			CSVFileValidationResult headersValidationResult = templateGenerator.validate(uploadedFile, survey);
 			if (headersValidationResult.isSuccessful()) {
 				return true;
@@ -179,7 +178,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	public void downloadExampleFile(@BindingParam("fileType") String fileType) throws IOException {
 		switch (SurveyFileType.valueOf(fileType)) {
 		case COLLECT_EARTH_GRID:
-			File templateFile = new CollectEarthGridTemplateGeneratorImpl().generateTemplateCSVFile(survey);
+			File templateFile = new CollectEarthGridTemplateGenerator().generateTemplateCSVFile(survey);
 			String fileName = String.format("%s_grid_template_%s.csv", survey.getName(), Dates.formatDateTime(new Date()));
 			Filedownload.save(new FileInputStream(templateFile),  Files.CSV_CONTENT_TYPE, fileName);
 			break;
