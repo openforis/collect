@@ -241,37 +241,38 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return getAssignedTab(parentDefn, nodeDefn, includeInherited);
 	}
 	
-	public UITab getAssignedTab(EntityDefinition parentDefn, NodeDefinition nodeDefn, boolean includeInherited) {
-		UITab result = null;
+	public UITab getAssignedTab(EntityDefinition parentDefn, NodeDefinition nodeDefn, boolean inheritIfNull) {
 		UITabSet rootTabSet = getAssignedRootTabSet(parentDefn, nodeDefn);
-		if ( rootTabSet != null ) {
-			String tabName = nodeDefn.getAnnotation(Annotation.TAB_NAME.getQName());
-			if ( StringUtils.isNotBlank(tabName) ) {
-				if ( parentDefn == null || parentDefn.getParentDefinition() == null ) {
-					result = rootTabSet.getTab(tabName);
-					if ( result == null ) {
-						//try to find tab among main tab children
-						UITab mainTab = getMainTab(rootTabSet);
-						result = mainTab == null ? null : mainTab.getTab(tabName);
-					}
-				} else {
-					UITab parentTab = getAssignedTab(parentDefn);
-					if ( parentTab != null ) {
-						if ( tabName.equals(parentTab.getName()) ) {
-							result = parentTab;
-						} else {
-							result = parentTab.getTab(tabName);
-						}
-					}
-				}
+		if ( rootTabSet == null ) {
+			return null;
+		}
+		String tabName = nodeDefn.getAnnotation(Annotation.TAB_NAME.getQName());
+		if ( StringUtils.isBlank(tabName) ) {
+			if ( inheritIfNull ) {
+				return getAssignedTab(parentDefn);
 			} else {
-				if ( includeInherited ) {
-					UITab parentTab = getAssignedTab(parentDefn);
-					result = parentTab;
-				}
+				return null;
+			}
+		} else if ( parentDefn == null || parentDefn.isRoot() ) {
+			UITab result = null;
+			result = rootTabSet.getTab(tabName);
+			if ( result == null ) {
+				//try to find tab among main tab children
+				UITab mainTab = getMainTab(rootTabSet);
+				result = mainTab == null ? null : mainTab.getTab(tabName);
+			}
+			return result;
+		} else {
+			UITab parentTab = getAssignedTab(parentDefn);
+			if ( parentTab == null ) {
+				return null;
+			} else if (! parentDefn.isMultiple() || tabName.equals(parentTab.getName()) ) {
+				//single entities cannot have nested tabs, ignore them when found
+				return parentTab;
+			} else {
+				return parentTab.getTab(tabName);
 			}
 		}
-		return result;
 	}
 
 	protected UITabSet getAssignedRootTabSet(EntityDefinition parentDefn, NodeDefinition nodeDefn) {
