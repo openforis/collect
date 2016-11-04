@@ -4,6 +4,12 @@
 package org.openforis.collect.remoting.service;
 
 
+import static org.openforis.collect.model.UserRoles.ADMIN;
+import static org.openforis.collect.model.UserRoles.ANALYSIS;
+import static org.openforis.collect.model.UserRoles.CLEANSING;
+import static org.openforis.collect.model.UserRoles.ENTRY;
+import static org.openforis.collect.model.UserRoles.USER;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -99,8 +105,19 @@ public class DataService {
 	 */
 	private boolean hasActiveSurveyIndexedNodes;
 
-	@Secured("ROLE_ENTRY")
-	public RecordProxy loadRecord(int id, Integer stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
+	@Secured(USER)
+	public RecordProxy loadRecord(int id, Integer stepNumber) {
+		SessionState sessionState = sessionManager.getSessionState();
+		final CollectSurvey survey = sessionState.getActiveSurvey();
+		Step step = stepNumber == null ? null: Step.valueOf(stepNumber);
+		CollectRecord record = step == null ? recordManager.load(survey, id) : recordManager.load(survey, id, step);
+		sessionManager.setActiveRecord(record);
+		Locale locale = sessionState.getLocale();
+		return new RecordProxy(record, locale);
+	}
+	
+	@Secured(ENTRY)
+	public RecordProxy checkoutRecord(int id, Integer stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
@@ -125,7 +142,7 @@ public class DataService {
 		recordIndexService.cleanTemporaryIndex();
 	}
 	
-	@Secured("ROLE_ENTRY")
+	@Secured(USER)
 	public Map<String, Object> loadRecordSummaries(RecordFilterProxy filterProxy, List<RecordSummarySortField> sortFields) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		
@@ -158,7 +175,7 @@ public class DataService {
 	 * 
 	 * @return map with "count" and "records" items
 	 */
-	@Secured("ROLE_ENTRY")
+	@Secured(USER)
 	public Map<String, Object> loadRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String[] keyValues) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		
@@ -186,7 +203,7 @@ public class DataService {
 		return result;
 	}
 
-	@Secured("ROLE_ENTRY")
+	@Secured(ENTRY)
 	public RecordProxy createRecord(String rootEntityName, String versionName, Step recordStep) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
@@ -209,7 +226,7 @@ public class DataService {
 	}
 	
 	@Transactional
-	@Secured("ROLE_ENTRY")
+	@Secured(ENTRY)
 	public void deleteRecord(int id) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
@@ -226,7 +243,7 @@ public class DataService {
 	}
 
 	@Transactional
-	@Secured("ROLE_ENTRY")
+	@Secured(ENTRY)
 	public void saveActiveRecord() throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -247,7 +264,7 @@ public class DataService {
 	}
 
 	@Transactional
-	@Secured("ROLE_ENTRY")
+	@Secured(ENTRY)
 	public NodeChangeSetProxy updateActiveRecord(NodeUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		CollectRecord activeRecord = getActiveRecord();
@@ -337,13 +354,13 @@ public class DataService {
 	}
 	
 	@Transactional
-	@Secured("ROLE_ENTRY")
+	@Secured(ENTRY)
 	public void promoteToCleansing() throws RecordPersistenceException, RecordPromoteException  {
 		promote(Step.CLEANSING);
 	}
 
 	@Transactional
-	@Secured("ROLE_CLEANSING")
+	@Secured(CLEANSING)
 	public void promoteToAnalysis() throws RecordPersistenceException, RecordPromoteException  {
 		promote(Step.ANALYSIS);
 	}
@@ -379,13 +396,13 @@ public class DataService {
 	}
 
 	@Transactional
-	@Secured("ROLE_ANALYSIS")
+	@Secured(ANALYSIS)
 	public void demoteToCleansing() throws RecordPersistenceException {
 		demote(Step.CLEANSING);
 	}
 	
 	@Transactional
-	@Secured("ROLE_CLEANSING")
+	@Secured(CLEANSING)
 	public void demoteToEntry() throws RecordPersistenceException {
 		demote(Step.ENTRY);
 	}
@@ -414,7 +431,7 @@ public class DataService {
 	 * @throws RecordPersistenceException 
 	 * @throws RecordIndexException 
 	 */
-	@Secured("ROLE_ENTRY")
+	@Secured(ENTRY)
 	public void clearActiveRecord() {
 		try {
 			sessionManager.releaseRecord();
@@ -426,7 +443,7 @@ public class DataService {
 		}
 	}
 	
-	@Secured("ROLE_ENTRY")
+	@Secured(ENTRY)
 	public void moveNode(int nodeId, int index) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
@@ -441,7 +458,7 @@ public class DataService {
 	 * @param codes
 	 * @return
 	 */
-	@Secured("ROLE_ENTRY")
+	@Secured(USER)
 	public List<CodeListItemProxy> getCodeListItems(int parentEntityId, String attrName, String[] codes){
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
@@ -469,7 +486,7 @@ public class DataService {
 	 * @param attrName
 	 * @return
 	 */
-	@Secured("ROLE_ENTRY")
+	@Secured(USER)
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attrName){
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
@@ -489,7 +506,7 @@ public class DataService {
 	 * @param codes
 	 * @return
 	 */
-	@Secured("ROLE_ENTRY")
+	@Secured(USER)
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attributeName, String[] codes) {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
@@ -502,7 +519,7 @@ public class DataService {
 		return result;
 	}
 	
-	@Secured("ROLE_ENTRY")
+	@Secured(USER)
 	public List<String> searchAutoCompleteValues(int attributeDefnId, int fieldIndex, String searchText) throws Exception {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
@@ -511,14 +528,14 @@ public class DataService {
 		return result;
 	}
 	
-	@Secured("ROLE_CLEANSING")
+	@Secured(CLEANSING)
 	public void assignOwner(int recordId, Integer ownerId) throws RecordLockedException, MultipleEditException {
 		SessionState sessionState = sessionManager.getSessionState();
 		recordManager.assignOwner(sessionState.getActiveSurvey(), 
 				recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
 	}
 	
-	@Secured("ROLE_ADMIN")
+	@Secured(ADMIN)
 	public SurveyLockingJobProxy moveRecords(String rootEntity, int fromStepNumber, final boolean promote) {
 		BulkRecordMoveJob job = collectJobManager.createJob(BulkRecordMoveJob.class);
 		SessionState sessionState = getSessionState();

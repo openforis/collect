@@ -1,5 +1,6 @@
 package org.openforis.collect.io.data;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.concurrency.ProgressListener;
 
-public interface RecordProvider {
+public interface RecordProvider extends Closeable {
 	
 	void init() throws Exception;
 	

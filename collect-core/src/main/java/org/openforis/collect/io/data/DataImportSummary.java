@@ -15,6 +15,7 @@ import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
  */
 public class DataImportSummary {
 	
+	private boolean full = true;
 	private Map<Step, Integer> totalPerStep;
 	private List<DataImportSummaryItem> recordsToImport;
 	private List<DataImportSummaryItem> conflictingRecords;
@@ -22,13 +23,22 @@ public class DataImportSummary {
 	private String surveyName;
 	
 	public DataImportSummary() {
+		this(true);
 	}
 	
+	public DataImportSummary(boolean full) {
+		super();
+		this.full = full;
+	}
+
 	public List<File> getConflictingRecordFiles() {
 		return getConflictingRecordFiles(null);
 	}
 	
 	public List<File> getConflictingRecordFiles(List<Integer> entryIds) {
+		if (! full) {
+			return null;
+		}
 		List<File> result = new ArrayList<File>();
 		for (DataImportSummaryItem conflictingRecordItem : conflictingRecords) {
 			if (entryIds == null || entryIds.contains(conflictingRecordItem.getEntryId())) {
@@ -36,6 +46,13 @@ public class DataImportSummary {
 			}
 		}
 		return result;
+	}
+	
+	public List<DataImportSummaryItem> getTotalRecords() {
+		List<DataImportSummaryItem> items = new ArrayList<DataImportSummaryItem>();
+		items.addAll(recordsToImport);
+		items.addAll(conflictingRecords);
+		return items;
 	}
 
 	public Map<Step, Integer> getTotalPerStep() {

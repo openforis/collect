@@ -122,6 +122,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setRecordProvider(recordProvider);
 			t.setOverwriteAll(overwriteAll);
 			t.setEntryIdsToImport(entryIdsToImport);
+			t.setIncludeRecordPredicate(includeRecordPredicate);
 		} else if ( task instanceof RecordFileRestoreTask ) {
 			RecordFileRestoreTask t = (RecordFileRestoreTask) task;
 			t.setRecordManager(recordManager);
@@ -229,7 +230,6 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		protected void execute() throws Throwable {
 			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
 		}
-		
 	}
 	
 	private class DeleteRecordsTask extends Task {

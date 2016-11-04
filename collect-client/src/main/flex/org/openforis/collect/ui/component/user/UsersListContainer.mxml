@@ -116,6 +116,8 @@
 							<mx:TextInput id="repeatPasswordTextInput" displayAsPassword="true" />
 						</mx:FormItem>
 						<mx:FormItem label="{Message.get('usersManagement.roles')}">
+							<mx:CheckBox id="roleViewCheckBox"
+										 label="{Message.get('roles.view')}" />
 							<mx:CheckBox id="roleEntryCheckBox"
 										label="{Message.get('roles.entry')}" />
 							<mx:CheckBox id="roleCleansingCheckBox" 

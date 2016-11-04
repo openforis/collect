@@ -4,7 +4,6 @@
 package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -191,17 +190,17 @@ public class EntityDefinition extends NodeDefinition {
 	 * The key attribute definitions can even be defined inside nested single entities.
 	 */
 	public List<AttributeDefinition> getKeyAttributeDefinitions() {
-		List<AttributeDefinition> result = new LinkedList<AttributeDefinition>();
-		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>(getChildDefinitions());
+		List<AttributeDefinition> result = new ArrayList<AttributeDefinition>(10);
+		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>(childDefinitions);
 		while ( ! queue.isEmpty() ) {
 			NodeDefinition nodeDefn = queue.remove();
 			if ( nodeDefn instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDefn).isKey() ) {
 				result.add((AttributeDefinition) nodeDefn);
 			} else if ( nodeDefn instanceof EntityDefinition && ! nodeDefn.isMultiple() ) {
-				queue.addAll(((EntityDefinition) nodeDefn).getChildDefinitions());
+				queue.addAll(((EntityDefinition) nodeDefn).childDefinitions);
 			}
 		}
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 
 	public void traverse(NodeDefinitionVisitor visitor) {

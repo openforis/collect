@@ -78,9 +78,17 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 			String name = getValue(ctx, NAME_FIELD);
 			CollectSurvey survey = getEditedNode(ctx).getSurvey();
 			if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
-				valid = new CollectEarthSurveyValidator().validateNodeName(name);
-				if (! valid) {
-					addInvalidMessage(ctx, NAME_FIELD, Labels.getLabel("survey.validation.collect_earth.invalid_node_name"));
+				CollectEarthSurveyValidator collectEarthSurveyValidator = new CollectEarthSurveyValidator();
+				if (parentEntity == null) {
+					valid = collectEarthSurveyValidator.validateRootEntityName(name);
+					if (! valid) {
+						addInvalidMessage(ctx, NAME_FIELD, Labels.getLabel("survey.validation.collect_earth.invalid_root_entity_name"));
+					}
+				} else {
+					valid = collectEarthSurveyValidator.validateNodeName(name);
+					if (! valid) {
+						addInvalidMessage(ctx, NAME_FIELD, Labels.getLabel("survey.validation.collect_earth.invalid_node_name"));
+					}
 				}
 			} else {
 				valid = super.validateInternalName(ctx, NAME_FIELD);

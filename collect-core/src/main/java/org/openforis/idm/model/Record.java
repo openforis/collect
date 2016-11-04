@@ -37,7 +37,8 @@ public class Record implements DeepComparable {
 	private ModelVersion modelVersion;
 	private int nextId;
 	private Entity rootEntity;
-
+	private Integer rootEntityDefinitionId;
+	
 	boolean enableValidationDependencyGraphs;
 	boolean ignoreDuplicateRecordKeyValidationErrors;
 	NodeDependencyGraph calculatedAttributeDependencies;
@@ -105,6 +106,7 @@ public class Record implements DeepComparable {
 
 	private void setRootEntity(Entity entity) {
 		this.rootEntity = entity;
+		this.rootEntityDefinitionId = entity.getDefinition().getId();
 		put(rootEntity);
 	}
 
@@ -151,6 +153,14 @@ public class Record implements DeepComparable {
 
 	public Entity getRootEntity() {
 		return this.rootEntity;
+	}
+	
+	public void setRootEntityDefinitionId(Integer rootEntityDefinitionId) {
+		this.rootEntityDefinitionId = rootEntityDefinitionId;
+	}
+	
+	public Integer getRootEntityDefinitionId() {
+		return rootEntityDefinitionId;
 	}
 
 	public ModelVersion getVersion() {
@@ -228,6 +238,10 @@ public class Record implements DeepComparable {
 		});
 	}
 
+	public int countNodes() {
+		return nodesByInternalId.size();
+	}
+	
 	void put(Node<?> node) {
 		initialize(node);
 		if ( enableValidationDependencyGraphs ) {
@@ -303,6 +317,11 @@ public class Record implements DeepComparable {
 	public <N extends Node<?>> List<NodePointer> determineRelevanceDependentNodes(Collection<N> nodes) {
 		@SuppressWarnings("unchecked")
 		List<NodePointer> result = relevanceDependencies.dependenciesFor((Collection<Node<?>>) nodes);
+		return result;
+	}
+	
+	public List<NodePointer> determineRelevanceDependentNodePointers(Collection<NodePointer> nodePointers) {
+		List<NodePointer> result = relevanceDependencies.dependenciesForPointers(nodePointers);
 		return result;
 	}
 

@@ -1,5 +1,7 @@
 package org.openforis.collect.event
 {
+	import mx.core.UIComponent;
+	
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
 	
@@ -13,13 +15,16 @@ package org.openforis.collect.event
 		private var _role:String;
 		private var _user:UserProxy;
 		private var _selected:Boolean;
+		private var _source:UIComponent;
 			
 		public function UserManagementEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false, 
-											role:String = null, user:UserProxy = null, selected:Boolean = false) {
+											role:String = null, user:UserProxy = null, selected:Boolean = false, 
+											source:UIComponent = null) {
 			super(type, bubbles, cancelable);
-			this.role = role;
-			this.user = user;
-			this.selected = selected;
+			this._role = role;
+			this._user = user;
+			this._selected = selected;
+			this._source = source;
 		}
 
 		public function get role():String {
@@ -44,6 +49,10 @@ package org.openforis.collect.event
 
 		public function set selected(value:Boolean):void {
 			_selected = value;
+		}
+		
+		public function get source():UIComponent {
+			return _source;
 		}
 
 	}

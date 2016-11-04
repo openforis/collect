@@ -37,13 +37,14 @@ public class DataRestoreServiceImpl implements DataRestoreService {
 		job.setFile(backupFile);
 		job.setOverwriteAll(true);
 		job.setRestoreUploadedFiles(true);
+		job.setCloseRecordProviderOnComplete(true);
 		
 		String lockId = surveyUri;
 		jobManager.start(job, lockId);
 		
 		return lockId;
 	}
-
+	
 	private void checkValidSurvey(String surveyName, String surveyUri) {
 		CollectSurvey expectedSurvey = surveyManager.get(surveyName);
 		String expectedSurveyUri = expectedSurvey.getUri();

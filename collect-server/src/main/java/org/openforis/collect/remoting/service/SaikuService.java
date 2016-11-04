@@ -1,5 +1,7 @@
 package org.openforis.collect.remoting.service;
 
+import static org.openforis.collect.model.UserRoles.USER;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,6 +23,7 @@ import org.openforis.concurrency.ProgressListener;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.proxy.JobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,6 +56,7 @@ public class SaikuService {
 		return Proxies.fromObject(reportingRepositories.getInfo(surveyName), ReportingRepositoryInfoProxy.class);
 	}
 	
+	@Secured(USER)
 	public JobProxy generateRdb(final String surveyName, final String preferredLanguage) {
 		SurveyLockingJob job = new SurveyLockingJob() {
 			protected void buildTasks() throws Throwable {

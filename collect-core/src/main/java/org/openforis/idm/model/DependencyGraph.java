@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.commons.collection.ItemAddVisitor;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -38,7 +39,7 @@ public abstract class DependencyGraph<T> {
 
 	protected abstract Set<NodePathPointer> determineDependents(T source) throws InvalidExpressionException;
 
-	protected abstract Set<NodePathPointer> determineSources(T dependent)	throws InvalidExpressionException;
+	protected abstract Set<NodePathPointer> determineSources(T dependent) throws InvalidExpressionException;
 
 	protected abstract List<T> getChildren(T item);
 
@@ -62,30 +63,30 @@ public abstract class DependencyGraph<T> {
 
 	private void addItem(T item) {
 		try {
+			final GraphNode graphNode = getOrCreateGraphNode(item);
+
+			//add graph node dependencies
+			
 			Set<NodePathPointer> sourceNodePointers = determineSources(item);
-			Set<T> sourceItems = getRelatedItems(item, sourceNodePointers);
-			
+			visitRelatedItems(item, sourceNodePointers, new Visitor<T>() {
+				public void visit(T source) {
+					GraphNode sourceGraphNode = getOrCreateGraphNode(source);
+					graphNode.addSource(sourceGraphNode);
+				}
+			});
+
 			Set<NodePathPointer> dependentNodePointers = determineDependents(item);
-			Set<T> dependentItems = getRelatedItems(item, dependentNodePointers);
-			
-			addDependencies(item, sourceItems, dependentItems);
+			visitRelatedItems(item, dependentNodePointers, new Visitor<T>() {
+				public void visit(T dependent) {
+					GraphNode dependentGraphNode = getOrCreateGraphNode(dependent);
+					dependentGraphNode.addSource(graphNode);
+				};
+			});
 		} catch (InvalidExpressionException e) {
 			log.error(String.format("Error registering dependencies for node %s", toString(item)), e);
 		}
 	}
 
-	private void addDependencies(T item, Set<T> sources, Set<T> dependents) {
-		GraphNode graphNode = getOrCreateGraphNode(item);
-		for (T source : sources) {
-			GraphNode sourceGraphNode = getOrCreateGraphNode(source);
-			graphNode.addSource(sourceGraphNode);
-		}
-		for (T dependent : dependents) {
-			GraphNode dependentGraphNode = getOrCreateGraphNode(dependent);
-			dependentGraphNode.addSource(graphNode);
-		}
-	}
-	
 	private GraphNode getGraphNodeByItem(T item) {
 		return getGraphNode(getId(item));
 	}
@@ -204,24 +205,37 @@ public abstract class DependencyGraph<T> {
 		return items;
 	}
 	
-	private Set<T> getRelatedItems(T item, Set<NodePathPointer> pointers) throws InvalidExpressionException {
-		Set<T> result = new HashSet<T>();
+	private void visitRelatedItems(T item, Set<NodePathPointer> pointers, Visitor<T> visitor) throws InvalidExpressionException {
 		for (NodePathPointer nodePathPointer : pointers) {
 			String entityPath = nodePathPointer.getEntityPath();
 			if ( StringUtils.isBlank(entityPath) ) {
-				result.addAll(determineRelatedItems(item, nodePathPointer.getReferencedNodeDefinition()));
+				visitRelatedItems(item, nodePathPointer.getReferencedNodeDefinition(), visitor);
 			} else {
-				result.addAll(determineRelatedItems(item, nodePathPointer.getReferencedNodeDefinition(), entityPath));
+				visitRelatedItems(item, nodePathPointer.getReferencedNodeDefinition(), entityPath, visitor);
 			}
 		}
+	}
+	
+	protected Set<T> determineRelatedItems(T item, NodeDefinition childDef) {
+		Set<T> result = new HashSet<T>();
+		visitRelatedItems(item, childDef, new ItemAddVisitor<T>(result));
 		return result;
 	}
 	
-	protected abstract Set<T> determineRelatedItems(T item, NodeDefinition childDef);
+	protected abstract void visitRelatedItems(T item, NodeDefinition childDef, Visitor<T> visitor);
 
-	protected abstract Set<T> determineRelatedItems(T item,
+	protected Set<T> determineRelatedItems(T item,
 			NodeDefinition relatedChildDef,
 			String entityPath)
+			throws InvalidExpressionException {
+		Set<T> result = new HashSet<T>();
+		visitRelatedItems(item, relatedChildDef, entityPath, new ItemAddVisitor<T>(result));
+		return result;
+	}
+	
+	protected abstract void visitRelatedItems(T item,
+			NodeDefinition relatedChildDef,
+			String entityPath, Visitor<T> visitor)
 			throws InvalidExpressionException;
 	
 	protected List<T> extractItems(Collection<GraphNode> nodes) {

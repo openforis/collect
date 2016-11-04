@@ -312,7 +312,7 @@ package org.openforis.collect.presenter {
 		
 		internal function logoutResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.activeRecord = null;
-			var u:URLRequest = new URLRequest(ApplicationConstants.URL +"login.htm");
+			var u:URLRequest = new URLRequest(ApplicationConstants.URL +"login");
 			navigateToURL(u,"_self");
 		}
 		
@@ -430,7 +430,7 @@ package org.openforis.collect.presenter {
 		internal function getSurveySummariesResultHandler(event:ResultEvent, token:Object = null):void {
 			var summaries:IList =  event.result as IList;
 			Application.surveySummaries = summaries;
-			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) || Application.user.hasRole(UserProxy.ROLE_VIEW)) {
 				showHomePage();
 			} else if ( CollectionUtil.isEmpty(Application.surveySummaries) ) {
 				showErrorPage(Message.get("error.no_published_surveys_found"));

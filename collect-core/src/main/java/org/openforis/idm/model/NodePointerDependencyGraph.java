@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -68,22 +69,18 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 	}
 
 	@Override
-	protected Set<NodePointer> determineRelatedItems(NodePointer pointer, NodeDefinition relatedChildDef,
-			String relatedParentEntityPath) throws InvalidExpressionException {
+	protected void visitRelatedItems(NodePointer pointer, NodeDefinition relatedChildDef, String relatedParentEntityPath,
+			Visitor<NodePointer> visitor) throws InvalidExpressionException {
 		Entity pointerEntity = pointer.getEntity();
 		List<Node<?>> relatedParentEntities = Path.parse(relatedParentEntityPath).evaluate(pointerEntity);
-		Set<NodePointer> result = new HashSet<NodePointer>(relatedParentEntities.size());
-		for (Node<?> relatedParentNode : relatedParentEntities) {
-			result.add(new NodePointer((Entity) relatedParentNode, relatedChildDef));
+		for (Node<?> relatedParentEntity : relatedParentEntities) {
+			visitor.visit(new NodePointer((Entity) relatedParentEntity, relatedChildDef));
 		}
-		return result;
 	}
-
+	
 	@Override
-	protected Set<NodePointer> determineRelatedItems(NodePointer pointer, NodeDefinition childDef) {
-		Entity pointerEntity = pointer.getEntity();
-		NodePointer nodePointer = new NodePointer(pointerEntity, childDef);
-		return Collections.singleton(nodePointer);
+	protected void visitRelatedItems(NodePointer pointer, NodeDefinition childDef, Visitor<NodePointer> visitor) {
+		visitor.visit(new NodePointer(pointer.getEntity(), childDef));
 	}
 	
 	public List<NodePointer> dependenciesForPointers(Collection<NodePointer> pointers) {
@@ -148,6 +145,10 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 			return true;
 		}
 
+		@Override
+		public String toString() {
+			return String.format("Entity id: %d - child def id: %d", entityId, childDefinitionId);
+		}
 	}
 	
 }

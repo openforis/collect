@@ -27,7 +27,7 @@ public class CollectUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userManager.loadByUserName(username, true);
+		User user = userManager.loadEnabledUser(username);
 		if (user == null) {
 			throw new UsernameNotFoundException(username);
 		} else {

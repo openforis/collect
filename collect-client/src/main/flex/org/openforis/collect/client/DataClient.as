@@ -27,6 +27,7 @@ package org.openforis.collect.client {
 		private var _deleteRecordOperation:Operation;
 		private var _loadRecordSummariesOperation:Operation;
 		private var _loadRecordOperation:Operation;
+		private var _checkoutRecordOperation:Operation;
 		private var _isLockingActiveRecordOperation:Operation;
 		private var _promoteToCleansingOperation:Operation;
 		private var _promoteToAnalysisOperation:Operation;
@@ -50,6 +51,7 @@ package org.openforis.collect.client {
 			this._deleteRecordOperation = getOperation("deleteRecord");
 			this._loadRecordSummariesOperation = getOperation("loadRecordSummaries", CONCURRENCY_LAST);
 			this._loadRecordOperation = getOperation("loadRecord");
+			this._checkoutRecordOperation = getOperation("checkoutRecord");
 			this._promoteToCleansingOperation = getOperation("promoteToCleansing");
 			this._promoteToAnalysisOperation = getOperation("promoteToAnalysis");
 			this._demoteToCleansingOperation = getOperation("demoteToCleansing");
@@ -81,9 +83,15 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step = null, forceUnlock:Boolean = false):void {
+		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step = null):void {
 			var stepNumber:Number = step == null ? NaN: Application.getRecordStepNumber(step);
-			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber, forceUnlock);
+			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber);
+			token.addResponder(responder);
+		}
+		
+		public function checkoutRecord(responder:IResponder, id:int, step:CollectRecord$Step = null, forceUnlock:Boolean = false):void {
+			var stepNumber:Number = step == null ? NaN: Application.getRecordStepNumber(step);
+			var token:AsyncToken = this._checkoutRecordOperation.send(id, stepNumber, forceUnlock);
 			token.addResponder(responder);
 		}
 		

@@ -112,6 +112,7 @@ package org.openforis.collect.presenter {
 			super.init();
 			view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
 			view.paginationBar.maxRecordsPerPage = MAX_RECORDS_PER_PAGE;
+			updateView();
 			createAdvancedFunctionMenu();
 		}
 
@@ -122,6 +123,7 @@ package org.openforis.collect.presenter {
 
 			view.backToMainMenuButton.addEventListener(MouseEvent.CLICK, backToMainMenuClickHandler);
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			view.viewButton.addEventListener(MouseEvent.CLICK, viewButtonClickHandler);
 			view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
 			view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
 			view.advancedFunctionsButton.addEventListener(MenuEvent.ITEM_CLICK, advancedFunctionItemClickHandler);
@@ -281,6 +283,10 @@ package org.openforis.collect.presenter {
 			uiEvent.obj = record;
 			eventDispatcher.dispatchEvent(uiEvent);
 			PopUpManager.removePopUp(view);
+		}
+		
+		protected function viewButtonClickHandler(event:MouseEvent):void {
+			editButtonClickHandler(event);
 		}
 		
 		/**
@@ -524,6 +530,13 @@ package org.openforis.collect.presenter {
 			reloadRecordSummaries();
 		}
 		
+		private function updateView():void {
+			var recordEditButtons:Array = [view.addButton, view.editButton, view.deleteButton];
+			for each (var button:UIComponent in recordEditButtons) {
+				button.visible = button.includeInLayout = Application.user.canEditRecords;
+			}
+			view.viewButton.visible = view.viewButton.includeInLayout = Application.user.canViewAllRecords;
+		}
 		
 	}
 }

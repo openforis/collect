@@ -106,6 +106,8 @@ package org.openforis.collect.presenter {
 				result.addItem(SAIKU_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
 				result.addItem(CONFIGURATION_MENU_ITEM);
+			} else if (Application.user.hasRole(UserProxy.ROLE_VIEW)) {
+				result.addItem(SAIKU_MENU_ITEM);
 			}
 			return result;
 		}

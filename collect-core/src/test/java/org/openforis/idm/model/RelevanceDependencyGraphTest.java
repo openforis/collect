@@ -1,11 +1,13 @@
 package org.openforis.idm.model;
 
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -150,10 +152,40 @@ public class RelevanceDependencyGraphTest extends NodePointerDependencyGraphTest
 
 		assertDependentNodePointers(accessibility, dbh2Pointer);
 	}
+	
+	@Test
+	public void testDependencyOnEntityCount() {
+		rootEntityDef(
+			entityDef("plot",
+				entityDef("land_feature")
+					.multiple(),
+				entityDef("land_feature_proportioning")
+					.relevant("count(land_feature) >= 2")
+					.multiple()
+			).multiple()
+		);
+		createTestRecord();
+
+		Entity plot = entity(rootEntity, "plot");
+		NodePointer landFeaturePointer = new NodePointer(plot, "land_feature");
+		NodePointer landFeatureProportioningPointer = new NodePointer(plot, "land_feature_proportioning");
+		assertDependentNodePointers(landFeaturePointer, landFeatureProportioningPointer);
+	}
 
 	@Override
 	protected List<NodePointer> determineDependents(List<Node<?>> sources) {
 		return record.relevanceDependencies.dependenciesFor(sources);
+	}
+
+	protected List<NodePointer> determineDependentPointers(List<NodePointer> sourcePointers) {
+		return record.relevanceDependencies.dependenciesForItems(sourcePointers);
+	}
+
+	protected void assertDependentNodePointers(NodePointer source, NodePointer... expectedDependents) {
+		List<?> dependencies = determineDependentPointers(Arrays.asList(source));
+		Set<String> expectedPaths = toPointerPaths(Arrays.asList(expectedDependents));
+		Set<String> actualPaths = toPointerPaths((List<NodePointer>) dependencies);
+		assertEquals(expectedPaths, actualPaths);
 	}
 
 	protected EntityDefinition rootEntityDef(NodeDefinitionBuilder... builders) {

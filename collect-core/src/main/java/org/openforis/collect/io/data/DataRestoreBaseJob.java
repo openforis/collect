@@ -15,7 +15,10 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.Predicate;
+import org.openforis.commons.versioning.Version;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class DataRestoreBaseJob extends Job {
 
+	private static final Version DATA_SUMMARY_FILE_COLLECT_VERSION = new Version("3.11.5");
 	@Autowired
 	protected SurveyManager surveyManager;
 	@Autowired
@@ -39,6 +43,9 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected transient File file;
 	protected transient CollectSurvey publishedSurvey; //optional: if not specified, the packaged survey will be published as a new one
 	protected transient CollectSurvey packagedSurvey; //optional: if not specified, it will be extracted from the ZIP file
+	protected transient boolean validateRecords;
+	protected transient boolean closeRecordProviderOnComplete = true;
+	protected transient Predicate<CollectRecord> includeRecordPredicate;
 
 	protected RecordProvider recordProvider; //if null it will be created and initialized, otherwise it will be re-used
 
@@ -47,7 +54,7 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected transient String surveyName; //published survey name or packaged survey name
 	protected transient BackupFileExtractor backupFileExtractor;
 	protected transient boolean oldBackupFormat;
-	protected transient boolean validateRecords;
+	protected transient File dataSummaryFile;
 
 	@Override
 	public void createInternalVariables() throws Throwable {
@@ -55,7 +62,21 @@ public abstract class DataRestoreBaseJob extends Job {
 		newSurvey = publishedSurvey == null;
 		backupFileExtractor = new BackupFileExtractor(file);
 		oldBackupFormat = backupFileExtractor.isOldFormat();
+		dataSummaryFile = extractDataSummaryFile();
 		surveyName = newSurvey ? extractSurveyName() : publishedSurvey.getName();
+	}
+
+	private File extractDataSummaryFile() {
+		if (oldBackupFormat) {
+			return null;
+		} else {
+			SurveyBackupInfo info = backupFileExtractor.extractInfo();
+			if (info.getCollectVersion().compareTo(DATA_SUMMARY_FILE_COLLECT_VERSION) >= 0) {
+				return backupFileExtractor.extractDataSummaryFile();
+			} else {
+				return null;
+			}
+		}
 	}
 	
 	@Override
@@ -96,7 +117,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		} else if (packagedSurvey == null) {
 			addTask(createTask(IdmlUnmarshallTask.class));
 		}
-		if (recordProvider == null) {
+		if (recordProvider == null && isRecordProviderToBeInitialized()) {
 			addTask(RecordProviderInitializerTask.class);
 		}
 	}
@@ -146,6 +167,14 @@ public abstract class DataRestoreBaseJob extends Job {
 			this.recordProvider = ((RecordProviderInitializerTask) task).getOutput();
 		}
 	}
+	
+//	@Override
+//	protected void onEnd() {
+//		super.onEnd();
+//		if (! this.isCompleted() || closeRecordProviderOnComplete) {
+//			IOUtils.closeQuietly(recordProvider);
+//		}
+//	}
 
 	private CollectSurvey findExistingPublishedSurvey(SurveyBackupInfo backupInfo) {
 		CollectSurvey existingPublishedSurvey = surveyManager.get(backupInfo.getSurveyName());
@@ -158,6 +187,10 @@ public abstract class DataRestoreBaseJob extends Job {
 	private String extractSurveyName() {
 		SurveyBackupInfo info = backupFileExtractor.extractInfo();
 		return info.getSurveyName();
+	}
+
+	protected boolean isRecordProviderToBeInitialized() {
+		return true;
 	}
 
 	public SurveyManager getSurveyManager() {
@@ -180,6 +213,15 @@ public abstract class DataRestoreBaseJob extends Job {
 		this.file = file;
 	}
 
+	public Predicate<CollectRecord> getIncludeRecordPredicate() {
+		return includeRecordPredicate;
+	}
+	
+	public void setIncludeRecordPredicate(
+			Predicate<CollectRecord> includeRecordPredicate) {
+		this.includeRecordPredicate = includeRecordPredicate;
+	}
+	
 	public void setRecordProvider(RecordProvider recordProvider) {
 		this.recordProvider = recordProvider;
 	}
@@ -206,5 +248,9 @@ public abstract class DataRestoreBaseJob extends Job {
 	
 	public void setValidateRecords(boolean validateRecords) {
 		this.validateRecords = validateRecords;
+	}
+	
+	public void setCloseRecordProviderOnComplete(boolean closeRecordProviderOnComplete) {
+		this.closeRecordProviderOnComplete = closeRecordProviderOnComplete;
 	}
 }

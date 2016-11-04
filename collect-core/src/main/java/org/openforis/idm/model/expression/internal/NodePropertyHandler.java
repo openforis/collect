@@ -77,20 +77,24 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 	 * @return
 	 */
 	private Object extractNonEmptyChildren(Entity entity, String childName) {
-		List<? extends Node<?>> list = null;
 		NodeDefinition childDef = entity.getDefinition().getChildDefinition(childName);
 		if (childDef instanceof EntityDefinition) {
 			//return all child entities
-			list = entity.getChildren(childDef);
+			return entity.getChildren(childDef);
 		} else {
 			//return only not empty attributes
-			list = entity.findChildren(childDef, new NodePredicate() {
+			List<?> list = entity.findChildren(childDef, new NodePredicate() {
 				public boolean evaluate(Node<?> childNode) {
 					return ! childNode.isEmpty();
 				}
 			});
+			if (childDef.isMultiple() || ! list.isEmpty()) {
+				return list;
+			} else {
+				return null;
+			}
 		}
-		return list.isEmpty() ? null : list;
+//		return list.isEmpty() ? null : list;
 	}
 
 }

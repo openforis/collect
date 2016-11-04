@@ -1,5 +1,6 @@
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
 import org.openforis.collect.io.exception.DataParsingExeption;
@@ -19,9 +21,13 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
+import org.openforis.collect.utils.Dates;
 import org.openforis.commons.collection.Predicate;
+import org.openforis.commons.io.csv.CsvLine;
+import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -44,10 +50,11 @@ public class DataRestoreSummaryTask extends Task {
 	//input
 	private CollectSurvey survey;
 	private boolean oldFormat;
-	private boolean completeSummary;
+	private boolean fullSummary;
 
 	/**
 	 * If specified, it will be used to filter the records to include in the summary
+	 * Ignored when the summary is not "full".
 	 */
 	private Predicate<CollectRecord> includeRecordPredicate;
 
@@ -69,25 +76,71 @@ public class DataRestoreSummaryTask extends Task {
 	
 	//output
 	private DataImportSummary summary;
+	private File dataSummaryFile;
 	
 	@Override
 	protected long countTotalItems() {
-		List<Integer> entryIds = recordProvider.findEntryIds();
+		List<Integer> entryIds = extractEntryIdsToImport();
 		return Step.values().length * entryIds.size();
 	}
-	
+
 	@Override
 	protected void execute() throws Throwable {
-		List<Integer> idsToImport = recordProvider.findEntryIds();
-		for (Integer entryId : idsToImport) {
-			if (! isRunning()) {
-				break;
-			}
-			for (Step step : Step.values()) {
+		if (fullSummary || dataSummaryFile == null) {
+			List<Integer> idsToImport = extractEntryIdsToImport();
+			for (Integer entryId : idsToImport) {
 				if (! isRunning()) {
 					break;
 				}
-				createSummaryForEntry(entryId, step);
+				for (Step step : Step.values()) {
+					if (! isRunning()) {
+						break;
+					}
+					createSummaryForEntry(entryId, step);
+				}
+			}
+		} else {
+			CsvReader dataSummaryCSVReader = null;
+			try {
+				dataSummaryCSVReader = new CsvReader(dataSummaryFile);
+				dataSummaryCSVReader.readHeaders();
+				CsvLine line = dataSummaryCSVReader.readNextLine();
+				while (line != null) {
+					Integer entryId = line.getValue("entry_id", Integer.class);
+					String stepVal = line.getValue("step", String.class);
+					Step step = Step.valueOf(stepVal);
+					
+					CollectRecordSummary recordSummary = new CollectRecordSummary();
+					recordSummary.setStep(step);
+					List<String> rootEntityKeyValues = Arrays.asList(
+							line.getValue("key1", String.class),
+							line.getValue("key2", String.class),
+							line.getValue("key3", String.class)
+					);
+					recordSummary.setRootEntityKeyValues(rootEntityKeyValues);
+					recordSummary.setCreationDate(Dates.parseDateTime(line.getValue("created_on", String.class)));
+					recordSummary.setModifiedDate(Dates.parseDateTime(line.getValue("last_modified", String.class)));
+					Integer rootEntityDefId = line.getValue("root_entity_id", Integer.class);
+					recordSummary.setRootEntityDefinitionId(rootEntityDefId);
+					recordSummaryByEntryId.put(entryId, recordSummary);
+					
+					for (Step s : Step.values()) {
+						if (s.beforeEqual(step)) {
+							addStepPerEntry(entryId, s);
+							incrementTotalPerStep(step);
+							incrementProcessedItems();
+						}
+					}
+					CollectRecordSummary oldRecord = findAlreadyExistingRecordSummary(entryId, step, rootEntityDefId, rootEntityKeyValues);
+					if ( oldRecord != null ) {
+						conflictingRecordByEntryId.put(entryId, oldRecord);
+					}
+					line = dataSummaryCSVReader.readNextLine();
+				}
+			} catch(Exception e) {
+				throw new RuntimeException(e);
+			} finally {
+				IOUtils.closeQuietly(dataSummaryCSVReader);
 			}
 		}
 	}
@@ -130,7 +183,7 @@ public class DataRestoreSummaryTask extends Task {
 		
 		addStepPerEntry(entryId, step);
 		
-		CollectRecordSummary oldRecord = findAlreadyExistingRecordSummary(entryId, step, parsedRecord);
+		CollectRecordSummary oldRecord = findAlreadyExistingFullRecordSummary(entryId, step, parsedRecord);
 		if ( oldRecord != null ) {
 			conflictingRecordByEntryId.put(entryId, oldRecord);
 		}
@@ -167,7 +220,7 @@ public class DataRestoreSummaryTask extends Task {
 	}
 	
 	private DataImportSummary createFinalSummary() {
-		DataImportSummary summary = new DataImportSummary();
+		DataImportSummary summary = new DataImportSummary(fullSummary);
 		summary.setSurveyName(survey == null ? null: survey.getName());
 		summary.setRecordsToImport(createRecordToImportItems());
 		summary.setSkippedFileErrors(createSkippedFileErrorItems());
@@ -255,17 +308,38 @@ public class DataRestoreSummaryTask extends Task {
 		return conflictingRecordItems;
 	}
 
-	private CollectRecordSummary findAlreadyExistingRecordSummary(int entryId, Step step, CollectRecord parsedRecord) {
-		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
+	private CollectRecordSummary findAlreadyExistingRecordSummary(int entryId, Step step, int rootEntityDefId, List<String> rootEntityKeys) {
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(rootEntityDefId);
+		filter.setKeyValues(rootEntityKeys);
+		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
+		switch (summaries.size()) {
+		case 0:
+			return null;
+		case 1:
+			CollectRecord summary = summaries.get(0);
+			CollectRecordSummary recordSummary = CollectRecordSummary.fromRecord(summary);
+			return recordSummary;
+		default:
+			String errorMessage = String.format("Data file: %s - multiple records found in survey %s with key(s) %s", 
+					getEntryName(entryId, step), survey.getName(), rootEntityKeys);
+			throw new IllegalStateException(errorMessage);
+		}
+	}
+		
+	private CollectRecordSummary findAlreadyExistingFullRecordSummary(int entryId, Step step, CollectRecord parsedRecord) {
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
 		Entity rootEntity = parsedRecord.getRootEntity();
-		String rootEntityName = rootEntity.getName();
-		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[keyValues.size()]));
+		int rootEntityDefId = rootEntity.getDefinition().getId();
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(rootEntityDefId);
+		filter.setKeyValues(keyValues);
+		List<CollectRecord> oldRecords = recordManager.loadSummaries(filter);
 		if ( oldRecords == null || oldRecords.isEmpty() ) {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {
 			CollectRecord summary = oldRecords.get(0);
-			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), completeSummary);
+			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), fullSummary);
 			CollectRecordSummary recordSummary = CollectRecordSummary.fromRecord(record);
 			recordSummary.setFiles(recordFileManager.getAllFiles(record));
 			return recordSummary;
@@ -282,6 +356,30 @@ public class DataRestoreSummaryTask extends Task {
 		return entryName;
 	}
 
+	private List<Integer> extractEntryIdsToImport() {
+		if (dataSummaryFile == null) { 
+			return recordProvider.findEntryIds();
+		} else {
+			CsvReader dataSummaryCSVReader = null;
+			try {
+				dataSummaryCSVReader = new CsvReader(dataSummaryFile);
+				dataSummaryCSVReader.readHeaders();
+				List<Integer> entryIds = new ArrayList<Integer>(dataSummaryCSVReader.size());
+				CsvLine line = dataSummaryCSVReader.readNextLine();
+				while (line != null) {
+					Integer entryId = line.getValue("entry_id", Integer.class);
+					entryIds.add(entryId);
+					line = dataSummaryCSVReader.readNextLine();
+				}
+				return entryIds;
+			} catch(Exception e) {
+				throw new RuntimeException(e);
+			} finally {
+				IOUtils.closeQuietly(dataSummaryCSVReader);
+			}
+		}
+	}
+	
 	private boolean isToBeIncluded(CollectRecord recordSummary) {
 		return includeRecordPredicate == null || includeRecordPredicate.evaluate(recordSummary);
 	}
@@ -339,12 +437,16 @@ public class DataRestoreSummaryTask extends Task {
 		this.recordProvider = recordProvider;
 	}
 
-	public boolean isCompleteSummary() {
-		return completeSummary;
+	public boolean isFullSummary() {
+		return fullSummary;
 	}
 
-	public void setCompleteSummary(boolean completeSummary) {
-		this.completeSummary = completeSummary;
+	public void setFullSummary(boolean fullSummary) {
+		this.fullSummary = fullSummary;
+	}
+
+	public void setDataSummaryFile(File dataSummaryFile) {
+		this.dataSummaryFile = dataSummaryFile;
 	}
 
 }

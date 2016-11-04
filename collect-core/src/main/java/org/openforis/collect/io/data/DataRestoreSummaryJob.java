@@ -5,8 +5,6 @@ package org.openforis.collect.io.data;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.model.CollectRecord;
-import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -21,17 +19,19 @@ import org.springframework.stereotype.Component;
 public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 
 	//input
-	private Predicate<CollectRecord> includeRecordPredicate;
-	private boolean completeSummary;
-	
+	private boolean fullSummary;
 	//output
 	private DataImportSummary summary;
-
 
 	@Override
 	protected void buildTasks() throws Throwable {
 		super.buildTasks();
 		addTask(DataRestoreSummaryTask.class);
+	}
+	
+	@Override
+	protected boolean isRecordProviderToBeInitialized() {
+		return isFullSummary() || oldBackupFormat || dataSummaryFile == null;
 	}
 	
 	@Override
@@ -42,7 +42,8 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setRecordFileManager(recordFileManager);
 			t.setUserManager(userManager);
 			t.setRecordProvider(recordProvider);
-			t.setCompleteSummary(completeSummary);
+			t.setFullSummary(fullSummary);
+			t.setDataSummaryFile(dataSummaryFile);
 			t.setOldFormat(oldBackupFormat);
 			t.setSurvey(publishedSurvey);
 			t.setIncludeRecordPredicate(includeRecordPredicate);
@@ -75,26 +76,17 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 		this.recordManager = recordManager;
 	}
 	
-	public Predicate<CollectRecord> getIncludeRecordPredicate() {
-		return includeRecordPredicate;
-	}
-	
-	public void setIncludeRecordPredicate(
-			Predicate<CollectRecord> includeRecordPredicate) {
-		this.includeRecordPredicate = includeRecordPredicate;
-	}
-	
 	public DataImportSummary getSummary() {
 		return summary;
 	}
 	
-	public boolean isCompleteSummary() {
-		return completeSummary;
+	public boolean isFullSummary() {
+		return fullSummary;
 	}
 	
-	public void setCompleteSummary(boolean completeSummary) {
-		this.completeSummary = completeSummary;
-		super.setValidateRecords(completeSummary);
+	public void setFullSummary(boolean fullSummary) {
+		this.fullSummary = fullSummary;
+		super.setValidateRecords(fullSummary);
 	}
 	
 	@Override

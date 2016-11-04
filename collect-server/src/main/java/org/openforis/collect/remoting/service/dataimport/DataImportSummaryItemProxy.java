@@ -13,6 +13,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
+import org.openforis.collect.utils.Numbers;
 
 /**
  * 
@@ -52,17 +53,17 @@ public class DataImportSummaryItemProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public int getRecordTotalErrors() {
-		return item.getRecord().getTotalErrors();
+		return item.getRecord() == null ? -1: Numbers.toInt(item.getRecord().getTotalErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getRecordErrors() {
-		return item.getRecord().getErrors();
+		return item.getRecord() == null ? -1: Numbers.toInt(item.getRecord().getErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getRecordMissingErrors() {
-		return item.getRecord().getMissingErrors();
+		return item.getRecord() == null ? -1: Numbers.toInt(item.getRecord().getMissingErrors(), -1);
 	}
 	
 	@ExternalizedProperty
@@ -83,31 +84,19 @@ public class DataImportSummaryItemProxy implements Proxy {
 	@ExternalizedProperty
 	public int getConflictingRecordTotalErrors() {
 		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
-		if (conflictingRecord == null) {
-			return -1;
-		} else {
-			return conflictingRecord.getTotalErrors();
-		}
+		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getTotalErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getConflictingRecordErrors() {
 		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
-		if (conflictingRecord == null) {
-			return -1;
-		} else {
-			return conflictingRecord.getErrors();
-		}
+		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getConflictingRecordMissingErrors() {
 		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
-		if (conflictingRecord == null) {
-			return -1;
-		} else {
-			return conflictingRecord.getMissingErrors();
-		}
+		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getMissingErrors(), -1);
 	}
 	
 	@ExternalizedProperty

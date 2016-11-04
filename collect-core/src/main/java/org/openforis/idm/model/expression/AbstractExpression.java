@@ -20,6 +20,7 @@ import org.apache.commons.jxpath.Variables;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.VariablePointer;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
@@ -27,6 +28,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.expression.internal.ModelJXPathCompiledExpression;
 import org.openforis.idm.model.expression.internal.ModelJXPathContext;
 import org.openforis.idm.model.expression.internal.ModelNodePointer;
@@ -112,27 +114,34 @@ public abstract class AbstractExpression {
 	 *
 	 * @throws InvalidExpressionException
 	 */
-	protected List<Node<?>> evaluateMultiple(Node<?> contextNode, Node<?> thisNode) throws InvalidExpressionException {
+	public List<Node<?>> evaluateMultiple(Node<?> contextNode, final Node<?> thisNode) throws InvalidExpressionException {
+		final List<Node<?>> list = new ArrayList<Node<?>>();
+		iterateMultiple(contextNode, thisNode, new NodeVisitor() {
+			public void visit(Node<?> item, int index) {
+				list.add(item);
+			}
+		});
+		return list;
+	}
+	
+	protected void iterateMultiple(Node<?> contextNode, Node<?> thisNode, NodeVisitor visitor) throws InvalidExpressionException {
 		try {
-			List<Node<?>> list = new ArrayList<Node<?>>();
 			JXPathContext jxPathContext = createJXPathContext(contextNode, thisNode);
-
 			Iterator<?> pointers = compiledExpression.iteratePointers(jxPathContext);
 			while (pointers.hasNext()) {
-				Object pointer = pointers.next();
-				if (pointer instanceof ModelNodePointer) {
-					ModelNodePointer modelNodePointer = (ModelNodePointer) pointer;
+				Object item = pointers.next();
+				if (item instanceof ModelNodePointer) {
+					ModelNodePointer modelNodePointer = (ModelNodePointer) item;
 					Object ptrNode = modelNodePointer.getNode();
 					if (ptrNode != null && ptrNode instanceof Node) {
-						Node<?> n = (Node<?>) ptrNode;
-						list.add(n);
+						Node<?> node = (Node<?>) ptrNode;
+						visitor.visit(node, node.getIndex());
 					}
-				} else if (pointer instanceof VariablePointer && ((VariablePointer) pointer).getName().equals(THIS)) {
-					list.add(thisNode);
+				} else if (item instanceof VariablePointer && ((VariablePointer) item).getName().equals(THIS)) {
+					visitor.visit(thisNode, thisNode.getIndex());
 				}
 				// ignore node pointer if it's a NullPointer
 			}
-			return list;
 		} catch (IllegalArgumentException e) {
 			throw new InvalidExpressionException(e.getMessage(), this.compiledExpression.toString());
 		} catch (JXPathInvalidSyntaxException e) {
@@ -140,6 +149,36 @@ public abstract class AbstractExpression {
 		}
 	}
 
+	protected Node<?> findNode(Node<?> contextNode, Node<?> thisNode, Predicate<Node<?>> predicate) throws InvalidExpressionException {
+		try {
+			JXPathContext jxPathContext = createJXPathContext(contextNode, thisNode);
+			Iterator<?> pointers = compiledExpression.iteratePointers(jxPathContext);
+			while (pointers.hasNext()) {
+				Object item = pointers.next();
+				if (item instanceof ModelNodePointer) {
+					ModelNodePointer modelNodePointer = (ModelNodePointer) item;
+					Object ptrNode = modelNodePointer.getNode();
+					if (ptrNode != null && ptrNode instanceof Node) {
+						Node<?> node = (Node<?>) ptrNode;
+						if (predicate.evaluate(node)) {
+							return node;
+						}
+					}
+				} else if (item instanceof VariablePointer && ((VariablePointer) item).getName().equals(THIS)) {
+					if (predicate.evaluate(thisNode)) {
+						return thisNode;
+					}
+				}
+				// ignore node pointer if it's a NullPointer
+			}
+			return null;
+		} catch (IllegalArgumentException e) {
+			throw new InvalidExpressionException(e.getMessage(), this.compiledExpression.toString());
+		} catch (JXPathInvalidSyntaxException e) {
+			throw new InvalidExpressionException(e.getMessage());
+		}
+	}
+	
 	private NodeDefinition getChildDefinition(NodeDefinition contextNode, NodeDefinition thisNodeDef, String pathSection) throws InvalidExpressionException {
 		if (Path.NORMALIZED_PARENT_FUNCTION.equals(pathSection)) {
 			if (contextNode.getParentDefinition() == null) {
@@ -226,5 +265,5 @@ public abstract class AbstractExpression {
 		}
 		return jxPathContext;
 	}
-
+	
 }

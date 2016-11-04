@@ -13,13 +13,14 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.UserProxy")]
     public class UserProxy extends UserProxyBase {
 		
+		public static const ROLE_VIEW:String = "ROLE_VIEW";
 		public static const ROLE_ENTRY:String = "ROLE_ENTRY";
 		public static const ROLE_CLEANSING:String = "ROLE_CLEANSING";
 		public static const ROLE_ANALYSIS:String = "ROLE_ANALYSIS";
 		public static const ROLE_ADMIN:String = "ROLE_ADMIN";
-		public static const ROLES:Array = [ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
+		public static const ROLES:Array = [ROLE_VIEW, ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
 		
-		protected static const ROLES_HIERARCHY:Array = [ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
+		protected static const ROLES_HIERARCHY:Array = [ROLE_VIEW, ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
 		
 		private function calculateHighestRoleIndex():int {
 			var max:int = -1;
@@ -89,12 +90,24 @@ package org.openforis.collect.model.proxy {
 			return hasEffectiveRole(ROLE_ADMIN);
 		}
 		
+		public function get canEditRecords():Boolean {
+			return hasEffectiveRole(ROLE_ENTRY);
+		}
+		
 		public function get canEditNotOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_ADMIN);
 		}
 		
+		public function get canViewAllRecords():Boolean {
+			return hasRole(ROLE_VIEW);
+		}
+		
 		public function get canViewNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN);
+			return hasEffectiveRole(ROLE_ADMIN) || hasRole(ROLE_VIEW);
+		}
+		
+		public function get canRunSaikuAnalysis():Boolean {
+			return hasEffectiveRole(ROLE_ADMIN) || hasRole(ROLE_VIEW);
 		}
 		
 		public function get canCancelApplicationLockingJob():Boolean {

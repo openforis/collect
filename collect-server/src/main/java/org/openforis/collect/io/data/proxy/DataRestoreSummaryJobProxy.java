@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.io.data.proxy;
 
-import org.openforis.collect.io.data.DataRestoreSummaryJob;
+import org.openforis.collect.io.data.DataRestoreBaseJob;
 import org.openforis.concurrency.proxy.JobProxy;
 
 /**
@@ -12,7 +12,7 @@ import org.openforis.concurrency.proxy.JobProxy;
  */
 public class DataRestoreSummaryJobProxy extends JobProxy {
 
-	public DataRestoreSummaryJobProxy(DataRestoreSummaryJob job) {
+	public DataRestoreSummaryJobProxy(DataRestoreBaseJob job) {
 		super(job);
 	}
 

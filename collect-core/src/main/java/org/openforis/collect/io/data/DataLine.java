@@ -10,6 +10,7 @@ import org.openforis.collect.io.metadata.parsing.Line;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
+import org.openforis.idm.model.Value;
 
 /**
  * 
@@ -46,7 +47,7 @@ public class DataLine extends Line {
 		columnNameByField.put(key, colName);
 	}
 	
-	public String[] getRecordKeyValues(EntityDefinition rootEntityDefn) {
+	public Value[] getRecordKeyValues(EntityDefinition rootEntityDefn) {
 		EntityKeysIdentifier identifier = (EntityKeysIdentifier) ancestorIdentifierByDefinitionId.get(rootEntityDefn.getId());
 		return identifier.getKeyValues();
 	}
@@ -85,7 +86,11 @@ public class DataLine extends Line {
 		private String fieldName;
 		
 		public FieldValueKey(AttributeDefinition defn) {
-			this(defn.getId(), 1, defn.getMainFieldName());
+			this(defn, defn.getMainFieldName());
+		}
+
+		public FieldValueKey(AttributeDefinition defn, String fieldName) {
+			this(defn.getId(), 1, fieldName);
 		}
 		
 		public FieldValueKey(int attributeDefinitionId, 
@@ -309,27 +314,27 @@ public class DataLine extends Line {
 	
 	public static class EntityKeysIdentifier extends EntityIdentifier<EntityKeysIdentifierDefintion> {
 		
-		private Map<Integer, String> keyByDefinitionId;
+		private Map<Integer, Value> keyByDefinitionId;
 
 		public EntityKeysIdentifier(EntityKeysIdentifierDefintion definition) {
 			super(definition);
-			keyByDefinitionId = new HashMap<Integer, String>();
+			keyByDefinitionId = new HashMap<Integer, Value>();
 		}
 
-		public void addKeyValue(int keyDefnId, String value) {
+		public void addKeyValue(int keyDefnId, Value value) {
 			keyByDefinitionId.put(keyDefnId, value);
 		}
 		
-		public String getKeyValue(int keyDefnId) {
+		public Value getKeyValue(int keyDefnId) {
 			return keyByDefinitionId.get(keyDefnId);
 		}
 		
-		public String[] getKeyValues() {
+		public Value[] getKeyValues() {
 			int[] definitionIds = getDefinition().getKeyDefinitionIds();
-			String[] result = new String[definitionIds.length];
+			Value[] result = new Value[definitionIds.length];
 			for (int i = 0; i < definitionIds.length; i++) {
 				int id = definitionIds[i];
-				String key = keyByDefinitionId.get(id);
+				Value key = keyByDefinitionId.get(id);
 				result[i] = key;
 			}
 			return result;

@@ -83,13 +83,35 @@ package org.openforis.collect.presenter {
 		protected function userPerRoleSelectedHandler(event:UserManagementEvent):void {
 			var user:UserProxy = event.user;
 			var role:String = event.role;
-			if ( event.selected ) {
-				user.addRole(role);
+			var selected:Boolean = event.selected;
+			
+			if (validateUserPerRoleSelection(user, role, selected)) {
+				if ( selected ) {
+					user.addRole(role);
+				} else {
+					user.removeRole(role);
+				}
+				var responder:IResponder = new AsyncResponder(saveRolePerUserResultHandler, faultHandler);
+				_userClient.save(responder, user);
 			} else {
-				user.removeRole(role);
+				//undo selection
+				if (event.source.hasOwnProperty("selected")) {
+					event.source["selected"] = !selected;
+				}
 			}
-			var responder:IResponder = new AsyncResponder(saveRolePerUserResultHandler, faultHandler);
-			_userClient.save(responder, user);
+		}
+		
+		private function validateUserPerRoleSelection(user:UserProxy, role:String, selected:Boolean):Boolean {
+			if (selected) {
+				return true;
+			} else {
+				if(user.roles.length > 1) {
+					return true;
+				} else {
+					AlertUtil.showError('usersManagement.error.userMustHaveAtLeastOneRole', [user.name]);
+					return false;
+				}
+			}
 		}
 		
 		protected function initRoles():void {
@@ -148,6 +170,9 @@ package org.openforis.collect.presenter {
 			var roles:ListCollectionView = user.roles;
 			for each (var role:String in roles) {
 				switch ( role ) {
+					case UserProxy.ROLE_VIEW:
+						view.usersListContainer.roleViewCheckBox.selected = true;
+						break;
 					case UserProxy.ROLE_ENTRY:
 						view.usersListContainer.roleEntryCheckBox.selected = true;
 						break;
@@ -166,6 +191,7 @@ package org.openforis.collect.presenter {
 
 		protected function getAllCheckBoxes():Array {
 			var checkBoxes:Array = [
+				view.usersListContainer.roleViewCheckBox,
 				view.usersListContainer.roleEntryCheckBox, 
 				view.usersListContainer.roleCleansingCheckBox, 
 				view.usersListContainer.roleAnalysisCheckBox, 
@@ -188,6 +214,9 @@ package org.openforis.collect.presenter {
 				if ( checkBox.selected ) {
 					var role:String = null;
 					switch ( checkBox ) {
+						case view.usersListContainer.roleViewCheckBox:
+							role = UserProxy.ROLE_VIEW;
+							break;
 						case view.usersListContainer.roleEntryCheckBox:
 							role = UserProxy.ROLE_ENTRY;
 							break;
@@ -226,36 +255,15 @@ package org.openforis.collect.presenter {
 					failed = true;
 				}
 			}
-			if ( failed ) {
-				AlertUtil.showError("usersManagement.error.errorsInForm");
-			}
-			return ! failed;
-			/*
-			view.usersListContainer.nameTextInput.text = name;
-			if ( StringUtil.isBlank(name) ) {
-				AlertUtil.showError('usersManagement.error.nameRequired');
-				return false;
-			}
-			//TODO validate password against regexp
-			var password:String = view.usersListContainer.passwordTextInput.text;
-			if ( view.usersListContainer.currentState == UsersListContainer.STATE_NEW ) {
-				if ( StringUtil.isBlank(password) ) {
-					AlertUtil.showError('usersManagement.error.passwordRequired');
-					return false;
-				}
-			}
-			
-			var repeatedPassword:String = view.usersListContainer.repeatPasswordTextInput.text;
-			if ( password != repeatedPassword ) {
-				AlertUtil.showError('usersManagement.error.repeatPasswordCorrectly');
-				return false;
-			}
 			var roles:ListCollectionView = getSelectedRoles();
 			if ( roles.length == 0 ) {
 				AlertUtil.showError('usersManagement.error.noRolesSelected');
 				return false;
 			}
-			*/
+			if ( failed ) {
+				AlertUtil.showError("usersManagement.error.errorsInForm");
+				return false;
+			}
 			return true;
 		}
 		

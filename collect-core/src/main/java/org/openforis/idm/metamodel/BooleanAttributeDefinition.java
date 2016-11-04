@@ -56,7 +56,7 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+	public <V extends Value> V createValueFromKeyFieldValues(List<String> fieldValues) {
 		return (V) createValue(fieldValues.get(0));
 	}
 	

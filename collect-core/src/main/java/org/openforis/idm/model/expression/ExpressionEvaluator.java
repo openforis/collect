@@ -5,11 +5,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
 
@@ -97,10 +99,19 @@ public class ExpressionEvaluator {
 
 	public List<Node<?>> evaluateNodes(Node<?> context, Node<?> thisNode, String expression) throws InvalidExpressionException {
 		ModelPathExpression expr = expressionFactory.createModelPathExpression(expression);
-		List<Node<?>> nodes = expr.iterate(context, thisNode);
-		return nodes;
+		return expr.evaluateMultiple(context, thisNode);
 	}
 
+	public void iterateNodes(Node<?> context, Node<?> thisNode, String expression, NodeVisitor evaluator) throws InvalidExpressionException {
+		ModelPathExpression expr = expressionFactory.createModelPathExpression(expression);
+		expr.iterateMultiple(context, thisNode, evaluator);
+	}
+	
+	public Node<?> findNode(Node<?> context, Node<?> thisNode, String expression, Predicate<Node<?>> evaluator) throws InvalidExpressionException {
+		ModelPathExpression expr = expressionFactory.createModelPathExpression(expression);
+		return expr.findNode(context, thisNode, evaluator);
+	}
+	
 	public List<Node<?>> evaluateAbsolutePath(Record record, String expression) throws InvalidExpressionException {
 		AbsoluteModelPathExpression expr = expressionFactory.createAbsoluteModelPathExpression(expression);
 		List<Node<?>> nodes = expr.iterate(record);

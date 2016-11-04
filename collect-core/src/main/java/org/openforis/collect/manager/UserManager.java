@@ -6,6 +6,8 @@ package org.openforis.collect.manager;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
@@ -31,24 +33,45 @@ public class UserManager {
 
 	@Autowired
 	private UserDao userDao;
-	
 	@Autowired
 	private RecordDao recordDao;
+	
+	//cache
+	private Map<Integer, User> userById = new TreeMap<Integer, User>();
+	private Map<String, User> userByName = new TreeMap<String, User>();
 	
 	public int getUserId(String username) {
 		return userDao.getUserId(username);
 	}
 
 	public User loadById(int userId) {
-		return userDao.loadById(userId);
-	}
-
-	public User loadByUserName(String userName, Boolean enabled) {
-		return userDao.loadByUserName(userName, enabled);
+		User user = userById.get(userId);
+		if (user == null) {
+			user = userDao.loadById(userId);
+			updateCache(user);
+		}
+		return user;
 	}
 
 	public User loadByUserName(String userName) {
-		return userDao.loadByUserName(userName, null);
+		return loadByUserName(userName, null);
+	}
+	
+	public User loadEnabledUser(String userName) {
+		return loadByUserName(userName, true);
+	}
+	
+	private User loadByUserName(String userName, Boolean enabled) {
+		User user = userByName.get(userName);
+		if (user == null) {
+			user = userDao.loadByUserName(userName, null);
+			updateCache(user);
+		}
+		if (user != null && (enabled == null || enabled.equals(user.getEnabled()))) {
+			return user;
+		} else {
+			return null;
+		}
 	}
 	
 	public User loadAdminUser() {
@@ -78,6 +101,7 @@ public class UserManager {
 		} else {
 			userDao.update(user);
 		}
+		updateCache(user);
 	}
 	
 	@Transactional
@@ -88,8 +112,16 @@ public class UserManager {
 			String encodedNewPassword = checkAndEncodePassword(newPassword);
 			user.setPassword(encodedNewPassword);
 			userDao.update(user);
+			updateCache(user);
 		} else {
 			throw new WrongOldPasswordException();
+		}
+	}
+
+	private void updateCache(User user) {
+		if (user != null) {
+			userById.put(user.getId(), user);
+			userByName.put(user.getName(), user);
 		}
 	}
 
@@ -127,6 +159,12 @@ public class UserManager {
 			throw new CannotDeleteUserException();
 		}
 		userDao.delete(id);
+		
+		User cachedUser = userById.get(id);
+		if (cachedUser != null) {
+			userById.remove(id);
+			userByName.remove(cachedUser.getName());
+		}
 	}
 	
 	/**

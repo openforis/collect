@@ -10,9 +10,7 @@ import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreSummaryJob;
-import org.openforis.collect.io.data.RecordProvider;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
-import org.openforis.collect.io.data.XMLParsingRecordProvider;
 import org.openforis.collect.io.data.proxy.DataRestoreJobProxy;
 import org.openforis.collect.io.data.proxy.DataRestoreSummaryJobProxy;
 import org.openforis.collect.io.exception.DataImportExeption;
@@ -48,7 +46,7 @@ public class DataImportService {
 	
 	@Secured("ROLE_ADMIN")
 	public JobProxy startSummaryCreation(String filePath, String selectedSurveyUri, boolean overwriteAll,
-			boolean completeSummary) throws DataImportExeption {
+			boolean fullSummary) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
 			log.info("Starting data import summary creation");
 			
@@ -59,9 +57,10 @@ public class DataImportService {
 			CollectSurvey survey = surveyManager.getByUri(selectedSurveyUri);
 
 			DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
-			job.setCompleteSummary(completeSummary);
+			job.setFullSummary(fullSummary);
 			job.setFile(packagedFile);
 			job.setPublishedSurvey(survey);
+			job.setCloseRecordProviderOnComplete(false);
 
 			resetJobs();
 			this.summaryJob = job;
@@ -85,9 +84,8 @@ public class DataImportService {
 				job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
 			}
 			job.setFile(packagedFile);
-			RecordProvider recordProvider = summaryJob.getRecordProvider();
-			job.setRecordProvider(recordProvider);
-			((XMLParsingRecordProvider) recordProvider).setValidateRecords(validateRecords);
+			job.setValidateRecords(validateRecords);
+			job.setRecordProvider(summaryJob.getRecordProvider());
 			job.setPackagedSurvey(summaryJob.getPackagedSurvey());
 			job.setPublishedSurvey(summaryJob.getPublishedSurvey());
 			job.setEntryIdsToImport(entryIdsToImport);

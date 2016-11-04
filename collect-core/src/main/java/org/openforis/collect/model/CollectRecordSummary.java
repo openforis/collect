@@ -22,6 +22,7 @@ public class CollectRecordSummary {
 	private Integer missingWarnings;
 	private User modifiedBy;
 	private Date modifiedDate;
+	private Integer rootEntityDefinitionId;
 	private List<String> rootEntityKeyValues;
 	private Integer skipped;
 	private State state;
@@ -50,6 +51,7 @@ public class CollectRecordSummary {
 		result.setMissingWarnings(record.getMissingWarnings());
 		result.setModifiedBy(record.getModifiedBy());
 		result.setModifiedDate(record.getModifiedDate());
+		result.setRootEntityDefinitionId(record.getRootEntityDefinitionId());
 		result.setRootEntityKeyValues(record.getRootEntityKeyValues());
 		result.setSkipped(record.getSkipped());
 		result.setState(record.getState());
@@ -148,6 +150,14 @@ public class CollectRecordSummary {
 		this.modifiedDate = modifiedDate;
 	}
 
+	public Integer getRootEntityDefinitionId() {
+		return rootEntityDefinitionId;
+	}
+	
+	public void setRootEntityDefinitionId(Integer rootEntityDefinitionId) {
+		this.rootEntityDefinitionId = rootEntityDefinitionId;
+	}
+	
 	public List<String> getRootEntityKeyValues() {
 		return rootEntityKeyValues;
 	}

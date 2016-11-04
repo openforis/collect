@@ -58,6 +58,7 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.Unit;
+import org.openforis.idm.model.AbstractValue;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
@@ -65,6 +66,7 @@ import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Value;
+import org.openforis.idm.model.Values;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -489,13 +491,13 @@ public class CSVDataImportJob extends Job {
 
 		private void setRecordKeys(DataLine line, CollectRecord record) {
 			EntityDefinition rootEntityDefn = record.getRootEntity().getDefinition();
-			String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+			Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 
 			List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefn.getKeyAttributeDefinitions();
 			for ( int i = 0; i < keyAttributeDefinitions.size(); i ++ ) {
 				AttributeDefinition keyDefn = keyAttributeDefinitions.get(i);
 				Attribute<?, ?> keyAttr = (Attribute<?, ?>) record.findNodeByPath(keyDefn.getPath() ); //for record key attributes, absolute path must be equal to relative path
-				String value = recordKeyValues[i];
+				String value = ((AbstractValue) recordKeyValues[i]).toInternalString();
 				if (keyDefn.isSingleFieldKeyAttribute()) {
 					setValueInField(keyAttr, keyDefn.getMainFieldName(), value, line.getLineNumber(), null);
 				} else {
@@ -523,10 +525,10 @@ public class CSVDataImportJob extends Job {
 			long currentRowNumber = line.getLineNumber();
 			EntityDefinition parentEntityDefn = input.parentEntityDefinition;
 			EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
-			String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+			Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 			RecordFilter filter = new RecordFilter(input.survey);
 			filter.setRootEntityId(rootEntityDefn.getId());
-			filter.setKeyValues(recordKeyValues);
+			filter.setKeyValues(Values.toStringValues(recordKeyValues));
 			int recordCount = recordManager.countRecords(filter);
 			String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
 					parentEntityDefn,
@@ -555,8 +557,9 @@ public class CSVDataImportJob extends Job {
 		private CollectRecord loadRecordSummary(DataLine line) {
 			EntityDefinition parentEntityDefn = input.parentEntityDefinition;
 			EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
-			String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-			List<CollectRecord> recordSummaries = recordManager.loadSummaries(input.survey, rootEntityDefn.getName(), recordKeyValues);
+			Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+			List<CollectRecord> recordSummaries = recordManager.loadSummaries(input.survey, rootEntityDefn.getName(), 
+					Values.toStringValues(recordKeyValues));
 			CollectRecord recordSummary = recordSummaries.isEmpty() ? null : recordSummaries.get(0);
 			return recordSummary;
 		}
@@ -569,15 +572,11 @@ public class CSVDataImportJob extends Job {
 				//TODO add parsing error?
 				return false;
 			} else {
-				setValuesInAttributes(parentEntity, line);
+				setValuesInAttributes(parentEntity, line.getFieldValues(), line.getColumnNamesByField(), line.getLineNumber());
 				return true;
 			}
 		}
 
-		private void setValuesInAttributes(Entity parentEntity, DataLine line) {
-			setValuesInAttributes(parentEntity, line.getFieldValues(), line.getColumnNamesByField(), line.getLineNumber());
-		}
-		
 		private void setValuesInAttributes(Entity ancestorEntity, Map<FieldValueKey, String> fieldValues, 
 				Map<FieldValueKey, String> colNameByField, long row) {
 			Set<Entry<FieldValueKey,String>> entrySet = fieldValues.entrySet();
@@ -812,8 +811,8 @@ public class CSVDataImportJob extends Job {
 			} else {
 				EntityDefinition parentDefn = currentParent.getDefinition();
 				EntityDefinition childDefn = parentDefn.getChildDefinition(childName, EntityDefinition.class);
-				String[] keys = ((EntityKeysIdentifier) identifier).getKeyValues();
-				return currentParent.findChildEntitiesByKeys(childDefn, keys);
+				Value[] keyValues = ((EntityKeysIdentifier) identifier).getKeyValues();
+				return currentParent.findChildEntitiesByKeys(childDefn, keyValues);
 			}
 		}
 		
@@ -834,7 +833,7 @@ public class CSVDataImportJob extends Job {
 				}
 			} else {
 				Entity entity = (Entity) performNodeAdd(currentParent, childName);
-				String[] keyValues = ((EntityKeysIdentifier) identifier).getKeyValues();
+				Value[] keyValues = ((EntityKeysIdentifier) identifier).getKeyValues();
 				setKeyValues(entity, keyValues, colNamesByField, row);
 				return entity;
 			}
@@ -874,16 +873,22 @@ public class CSVDataImportJob extends Job {
 			return error;
 		}
 		
-		private void setKeyValues(Entity entity, String[] values, Map<FieldValueKey, String> colNamesByField, long row) {
+		private void setKeyValues(Entity entity, Value[] values, Map<FieldValueKey, String> colNameByField, long row) {
 			//create key attribute values by name
 			Map<FieldValueKey, String> keyValuesByField = new HashMap<FieldValueKey, String>();
 			EntityDefinition entityDefn = entity.getDefinition();
 			List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
 			for (int i = 0; i < keyDefns.size(); i++) {
 				AttributeDefinition keyDefn = keyDefns.get(i);
-				keyValuesByField.put(new FieldValueKey(keyDefn), values[i]);
+				Value keyValue = values[i];
+				Map<String, Object> keyValueMap = keyValue.toMap();
+				List<String> keyFieldNames = keyDefn.getKeyFieldNames();
+				for (String keyFieldName : keyFieldNames) {
+					Object keyValueFieldVal = keyValueMap.get(keyFieldName);
+					keyValuesByField.put(new FieldValueKey(keyDefn, keyFieldName), keyValueFieldVal.toString());
+				}
 			}
-			setValuesInAttributes(entity, keyValuesByField, colNamesByField, row);
+			setValuesInAttributes(entity, keyValuesByField, colNameByField, row);
 		}
 		
 		public CSVDataImportInput getInput() {

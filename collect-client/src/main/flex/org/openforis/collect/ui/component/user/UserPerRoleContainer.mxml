@@ -18,6 +18,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.proxy.UserProxy;
 			
@@ -69,6 +70,8 @@
 										</s:layout>
 										<fx:Script>
 											<![CDATA[
+												import mx.core.UIComponent;
+												
 												import org.openforis.collect.event.EventDispatcherFactory;
 												import org.openforis.collect.event.UserManagementEvent;
 												import org.openforis.collect.model.proxy.UserProxy;
@@ -78,11 +81,12 @@
 										<s:CheckBox selected="{data.selected}"
 													label="{data.user.name}"
 													enabled="{! (data.role == UserProxy.ROLE_ADMIN &amp;&amp; data.user.name == UserManagementPresenter.ADMIN_USER_NAME)}"
-													change="{data.selected = event.target.selected; 
-													EventDispatcherFactory.getEventDispatcher().dispatchEvent(
-														new UserManagementEvent(UserManagementEvent.USER_PER_ROLE_SELECTED, false, false, 
-															outerDocument.rolesList.selectedItem, data.user, data.selected));}"
-													/>
+													change="{
+														data.selected = event.target.selected; 
+														EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+															new UserManagementEvent(UserManagementEvent.USER_PER_ROLE_SELECTED, false, false, 
+																outerDocument.rolesList.selectedItem, data.user, data.selected, event.target as UIComponent));
+													}" />
 									</s:ItemRenderer>
 								</fx:Component>
 							</s:itemRenderer>

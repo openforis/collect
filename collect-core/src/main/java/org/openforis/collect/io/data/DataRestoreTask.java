@@ -21,6 +21,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.collect.utils.Consumer;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,8 @@ public class DataRestoreTask extends Task {
 	//temporary instance variables
 	private final List<Integer> processedRecords;
 	private final RecordUpdateBuffer updateBuffer;
+
+	private Predicate<CollectRecord> includeRecordPredicate;
 
 	public DataRestoreTask() {
 		super();
@@ -96,7 +99,8 @@ public class DataRestoreTask extends Task {
 	
 	private void importEntries(int entryId) throws IOException, MissingStepsException {
 		try {
-			RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, entryId);
+			RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, 
+					entryId, includeRecordPredicate);
 			RecordOperations recordOperations = operationGenerator.generate();
 			if (! recordOperations.isEmpty()) {
 				updateBuffer.append(recordOperations);
@@ -168,16 +172,29 @@ public class DataRestoreTask extends Task {
 	public void setRecordProvider(RecordProvider recordProvider) {
 		this.recordProvider = recordProvider;
 	}
-
+	
+	public void setIncludeRecordPredicate(Predicate<CollectRecord> includeRecordPredicate) {
+		this.includeRecordPredicate = includeRecordPredicate;
+	}
+	
 	private class RecordUpdateBuffer {
 		
-		public static final int BUFFER_SIZE = 20;
+		public static final int BUFFER_SIZE = 100;
+		/**
+		 * limits the total size of the operations to be executed in batch to 30,000 record nodes
+		 * in order to avoid a too big heap size growing during the database update process.
+		 */
+		public static final int MAX_OPERATIONS_SIZE = 30000; 
 		
 		private List<RecordOperations> operations = new ArrayList<RecordOperations>();
+		private int operationsSize = 0;
 		
 		public void append(RecordOperations opts) {
 			this.operations.add(opts);
-			if (this.operations.size() >= BUFFER_SIZE) {
+			this.operationsSize += opts.getOperationsSize();
+			
+			if (this.operations.size() >= BUFFER_SIZE || 
+					this.operationsSize >= MAX_OPERATIONS_SIZE) {
 				flush();
 			}
 		}
@@ -189,6 +206,7 @@ public class DataRestoreTask extends Task {
 				recordManager.executeRecordOperations(operations);
 			}
 			operations.clear();
+			operationsSize = 0;
 		}
 	}
 
@@ -216,5 +234,5 @@ public class DataRestoreTask extends Task {
 					recordId, recordStep, events));
 		}
 	}
-	
+
 }

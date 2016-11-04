@@ -111,7 +111,7 @@ public class FileAttributeDefinition extends AttributeDefinition {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
+	public <V extends Value> V createValueFromKeyFieldValues(List<String> fieldValues) {
 		return (V) new File(fieldValues.get(0), Long.parseLong(fieldValues.get(1)));
 	}
 	

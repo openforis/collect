@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.commons.lang.Numbers;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
@@ -98,9 +97,10 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <V extends Value> V createValueFromFieldStringValues(List<String> fieldValues) {
-		return (V) new TaxonOccurrence(Numbers.toIntegerObject(fieldValues.get(0)), fieldValues.get(1), fieldValues.get(2),
-				fieldValues.get(3), fieldValues.get(4), fieldValues.get(5));
+	public <V extends Value> V createValueFromKeyFieldValues(List<String> keyFieldValues) {
+		String code = keyFieldValues.get(0);
+		String scientificName = keyFieldValues.get(1);
+		return (V) new TaxonOccurrence(code, scientificName);
 	}
 	
 	@Override
@@ -159,12 +159,16 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	
 	@Override
 	public boolean hasMainField() {
-		return false;
+		return true;
 	}
 	
 	@Override
 	public String getMainFieldName() {
 		throw new IllegalArgumentException("Main field not defined");
+	}
+	
+	public List<String> getKeyFieldNames() {
+		return Arrays.asList(CODE_FIELD_NAME, SCIENTIFIC_NAME_FIELD_NAME);
 	}
 	
 	public FieldDefinition<String> getCodeFieldDefinition() {
