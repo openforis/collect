@@ -202,6 +202,35 @@ public class EntityDefinition extends NodeDefinition {
 		}
 		return result;
 	}
+	
+	public <N extends NodeDefinition> N findDescendantDefinition(NodeDefinitionVerifier verifier) {
+		@SuppressWarnings("unchecked")
+		List<N> nodeDefns = (List<N>) findDescendantDefinitions(verifier, true);
+		return nodeDefns.isEmpty() ? null: nodeDefns.get(0);
+	}
+	
+	public List<? extends NodeDefinition> findDescendantDefinitions(NodeDefinitionVerifier verifier) {
+		return findDescendantDefinitions(verifier, false);
+	}
+	
+	public List<? extends NodeDefinition> findDescendantDefinitions(NodeDefinitionVerifier verifier, boolean stopAfterFirstFound) {
+		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
+		List<NodeDefinition> foundNodeDefns = new ArrayList<NodeDefinition>();
+		stack.addAll(childDefinitions);
+		while (! stack.isEmpty()) {
+			NodeDefinition defn = stack.pop();
+			if (verifier.verify(defn)) {
+				foundNodeDefns.add(defn);
+				if (stopAfterFirstFound) {
+					break;
+				}
+			}
+			if (defn instanceof EntityDefinition ) {
+				stack.addAll(((EntityDefinition) defn).childDefinitions);
+			}
+		}
+		return foundNodeDefns;
+	}
 
 	public void traverse(NodeDefinitionVisitor visitor) {
 		//use depth first search by default

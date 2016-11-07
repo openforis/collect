@@ -27,6 +27,7 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVerifier;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
@@ -429,33 +430,33 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 
-	public EntityDefinition getParentEntityForAssignedNodes(UITab tab) {
+	public EntityDefinition getParentEntityForAssignedNodes(final UITab tab) {
 		UITabSet root = tab.getRootTabSet();
 		EntityDefinition rootEntity = getRootEntityDefinition(root);
 		if (tab.getDepth() == 1) {
 			return rootEntity;
 		}
-		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
-		stack.push(rootEntity);
-		while ( ! stack.isEmpty() ) {
-			NodeDefinition nodeDefn = stack.pop();
-			if ( nodeDefn instanceof EntityDefinition ) {
-				EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
-				UITab assignedTab = getAssignedTab(entityDefn, false);
-				if ( assignedTab == tab ) {
-					return entityDefn;
-				}
-				List<NodeDefinition> children = entityDefn.getChildDefinitions();
-				for (NodeDefinition child : children) {
-					stack.push(child);
+		EntityDefinition tabEntityDefn = rootEntity.getSchema().findNodeDefinition(new NodeDefinitionVerifier() {
+			public boolean verify(NodeDefinition nodeDefn) {
+				if ( nodeDefn instanceof EntityDefinition ) {
+					EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
+					UITab assignedTab = getAssignedTab(entityDefn, false);
+					return assignedTab == tab;
+				} else {
+					return false;
 				}
 			}
+		});
+		if (tabEntityDefn != null) {
+			return tabEntityDefn;
+		} else {
+			UITabSet parentTab = tab.getParent();
+			if (parentTab != null && parentTab instanceof UITab) {
+				return getParentEntityForAssignedNodes((UITab) parentTab);
+			} else {
+				throw new IllegalStateException("Parent entity for assigned nodes not found for tab: " + tab.getName());
+			}
 		}
-		UITabSet parentTab = tab.getParent();
-		if (parentTab != null && parentTab instanceof UITab) {
-			return getParentEntityForAssignedNodes((UITab) parentTab);
-		}
-		throw new IllegalStateException("Parent entity for assigned nodes not found for tab: " + tab.getName());
 	}
 	
 	public boolean isAssociatedWithMultipleEntityForm(UITab tab) {

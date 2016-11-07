@@ -358,20 +358,15 @@ public class Schema extends SurveyObject {
 	}
 	
 	public List<? extends NodeDefinition> findNodeDefinitions(NodeDefinitionVerifier verifier, boolean stopAfterFirstFound) {
-		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		List<NodeDefinition> foundNodeDefns = new ArrayList<NodeDefinition>();
-		stack.addAll(rootEntityDefinitions);
-		while (!stack.isEmpty()) {
-			NodeDefinition defn = stack.pop();
-			if (verifier.verify(defn)) {
-				foundNodeDefns.add(defn);
+		for (EntityDefinition rootEntityDef : rootEntityDefinitions) {
+			if (verifier.verify(rootEntityDef)) {
+				foundNodeDefns.add(rootEntityDef);
 				if (stopAfterFirstFound) {
 					break;
 				}
 			}
-			if (defn instanceof EntityDefinition ) {
-				stack.addAll(((EntityDefinition) defn).getChildDefinitions());
-			}
+			foundNodeDefns.addAll(rootEntityDef.findDescendantDefinitions(verifier, stopAfterFirstFound));
 		}
 		return foundNodeDefns;
 	}
