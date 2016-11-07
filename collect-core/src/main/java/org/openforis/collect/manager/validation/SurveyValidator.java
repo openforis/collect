@@ -11,9 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import javax.xml.transform.Source;
@@ -98,14 +96,6 @@ public class SurveyValidator {
 
 	private static final int MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT = 5;
 
-	private static final ServiceLoader<CollectEarthGridTemplateGenerator> COLLECT_EARTH_GRID_TEMPLATE_GENERATOR_LOADER = 
-			ServiceLoader.load(CollectEarthGridTemplateGenerator.class);
-	private static final CollectEarthGridTemplateGenerator COLLECT_EARTH_GRID_TEMPLATE_GENERATOR;
-	static {
-		Iterator<CollectEarthGridTemplateGenerator> it = COLLECT_EARTH_GRID_TEMPLATE_GENERATOR_LOADER.iterator();
-		COLLECT_EARTH_GRID_TEMPLATE_GENERATOR = it.hasNext() ? it.next(): null;
-	}
-	
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -210,29 +200,28 @@ public class SurveyValidator {
 
 	private List<SurveyValidationResult> validateCollectEarthGridFile(CollectSurvey survey, SurveyFile surveyFile) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
-		if (COLLECT_EARTH_GRID_TEMPLATE_GENERATOR != null) {
-			byte[] fileContent = surveyManager.loadSurveyFileContent(surveyFile);
-			ByteArrayInputStream is = new ByteArrayInputStream(fileContent);
-			File file = OpenForisIOUtils.copyToTempFile(is);
-			CSVFileValidationResult fileValidationResult = COLLECT_EARTH_GRID_TEMPLATE_GENERATOR.validate(file, survey);
-			if (! fileValidationResult.isSuccessful()) {
-				SurveyValidationResult validationResult = null;
-				switch(fileValidationResult.getErrorType()) {
-				case INVALID_FILE_TYPE:
-					validationResult = new SurveyValidationResult(Flag.ERROR, 
-							String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
-							"survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
-					break;
-				case INVALID_HEADERS:
-					validationResult = new SurveyValidationResult(Flag.ERROR, 
-							String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
-							"survey.file.type.collect_earth_grid.error.invalid_file_structure", 
-							fileValidationResult.getExpectedHeaders().toString(), 
-							fileValidationResult.getFoundHeaders().toString());
-					break;
-				}
-				results.add(validationResult);
+		byte[] fileContent = surveyManager.loadSurveyFileContent(surveyFile);
+		ByteArrayInputStream is = new ByteArrayInputStream(fileContent);
+		File file = OpenForisIOUtils.copyToTempFile(is);
+		CSVFileValidationResult fileValidationResult = new CollectEarthGridTemplateGenerator().validate(file, survey);
+		if (! fileValidationResult.isSuccessful()) {
+			SurveyValidationResult validationResult = null;
+			switch(fileValidationResult.getErrorType()) {
+			case INVALID_FILE_TYPE:
+				validationResult = new SurveyValidationResult(Flag.ERROR, 
+						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
+						"survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
+				break;
+			case INVALID_HEADERS:
+				validationResult = new SurveyValidationResult(Flag.ERROR, 
+						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
+						"survey.file.type.collect_earth_grid.error.invalid_file_structure", 
+						fileValidationResult.getExpectedHeaders().toString(), 
+						fileValidationResult.getFoundHeaders().toString());
+				break;
+			default:
 			}
+			results.add(validationResult);
 		}
 		return results;
 	}

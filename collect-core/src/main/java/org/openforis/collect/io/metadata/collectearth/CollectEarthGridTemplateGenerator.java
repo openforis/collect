@@ -99,16 +99,15 @@ public class CollectEarthGridTemplateGenerator  {
 				return validationResults;
 			}
 			
-			
 			csvReader.readHeaders();
 			List<String> possibleHeaders = csvReader.getColumnNames();
-			boolean headersPresent = false;
+			boolean headersFound = false;
 			if( lineContainsHeaders(survey, possibleHeaders) ){
-				headersPresent = true;
+				headersFound = true;
 				validationResults = validateCSVHeaders(possibleHeaders, survey);
 			}
 			
-			rowValidations.addAll( validateCsvRows( csvReader , survey, headersPresent ) );
+			rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound ) );
 					
 		} catch (Exception e) {
 			validationResults  = new CSVFileValidationResult(ErrorType.INVALID_FILE_TYPE);
@@ -132,18 +131,18 @@ public class CollectEarthGridTemplateGenerator  {
 	
 	private List<CSVRowValidationResult> validateCsvRows( CsvReader csvReader, CollectSurvey survey, boolean firstLineIsHeaders ) throws IOException {
 				
-		CsvLine nextLine = null;
 		List<CSVRowValidationResult> results = new ArrayList<CSVRowValidationResult>();
 		int rowNumber = firstLineIsHeaders ? 2 : 1 ;
 		
 		// Get the list of attribute types expected per row!
 		List<AttributeDefinition> attributesPerRow = getAttributesPerRow(survey);
 				
-		while( ( nextLine = csvReader.readNextLine() ) != null ){
+		CsvLine csvLine = null;
+		while( ( csvLine = csvReader.readNextLine() ) != null ){
 			
 
 			// Validate that the number of columns in the CSV and the expected number of columns match!!!!
-			if( nextLine.getLine().length != attributesPerRow.size() ){
+			if( csvLine.getLine().length != attributesPerRow.size() ){
 				// The excted number of columns and the actual columns do not fit!!
 				// Break the operation and return a validation error!
 				CSVRowValidationResult columnsMissing = new CSVRowValidationResult( rowNumber , ErrorType.INVALID_NUMBER_OF_COLUMNS);
@@ -151,7 +150,7 @@ public class CollectEarthGridTemplateGenerator  {
 				break;
 			}
 			
-			CSVRowValidationResult validateCsvRow = validateCsvRow(  survey, attributesPerRow, nextLine, rowNumber );
+			CSVRowValidationResult validateCsvRow = validateCsvRow(  survey, attributesPerRow, csvLine, rowNumber );
 			if( validateCsvRow != null){
 				results.add( validateCsvRow);
 			}
