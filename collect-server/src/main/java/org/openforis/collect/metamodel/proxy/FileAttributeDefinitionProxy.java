@@ -3,6 +3,7 @@ package org.openforis.collect.metamodel.proxy;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.metamodel.CollectAnnotations.FileType;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 
 /**
@@ -33,7 +34,8 @@ public class FileAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	
 	@ExternalizedProperty
 	public boolean isImageContent() {
-		return containsOne(attributeDefinition.getExtensions(), IMAGE_CONTENT_EXTENSIONS, true);
+		FileType fileType = getAnnotations().getFileType(attributeDefinition);
+		return fileType == FileType.IMAGE || containsOne(attributeDefinition.getExtensions(), IMAGE_CONTENT_EXTENSIONS, true);
 	}
 	
 	protected static boolean containsOne(List<String> list, String[] values, boolean caseSensitive) {
