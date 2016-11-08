@@ -246,7 +246,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 					EntityIdentifier<?> identifier = new DataLine.EntityKeysIdentifier((EntityKeysIdentifierDefintion) identifierDefn);
 					List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
 					for (AttributeDefinition keyDefn : keyDefns) {
-						Value value = extractValue(keyDefn);
+						Value value = extractValue(line, keyDefn);
 						((EntityKeysIdentifier) identifier).addKeyValue(keyDefn.getId(), value);
 					}
 					line.addAncestorIdentifier(identifier);
@@ -265,21 +265,26 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			}
 		}
 
-		private Value extractValue(AttributeDefinition keyDefn) throws ParsingException {
+		private Value extractValue(DataLine line, AttributeDefinition keyDefn) throws ParsingException {
 			List<String> keyAttrColNames = getKeyAttributeColumnNames(parentEntityDefinition, keyDefn);
-			if (keyDefn.isSingleFieldKeyAttribute()) {
-				String colVal = getColumnValue(keyAttrColNames.get(0), false, String.class);
-				Value val = keyDefn.createValue(colVal);
-				return val;
-			} else {
-				List<String> fieldValues = new ArrayList<String>(keyAttrColNames.size());
-				for (int i = 0; i < keyAttrColNames.size(); i++) {
-					String keyAttrColName = keyAttrColNames.get(i);
-					String fieldVal = getColumnValue(keyAttrColName, false, String.class);
-					fieldValues.add(fieldVal);
+			try {
+				if (keyDefn.isSingleFieldKeyAttribute()) {
+					String colVal = getColumnValue(keyAttrColNames.get(0), false, String.class);
+					Value val = keyDefn.createValue(colVal);
+					return val;
+				} else {
+					List<String> fieldValues = new ArrayList<String>(keyAttrColNames.size());
+					for (int i = 0; i < keyAttrColNames.size(); i++) {
+						String keyAttrColName = keyAttrColNames.get(i);
+						String fieldVal = getColumnValue(keyAttrColName, false, String.class);
+						fieldValues.add(fieldVal);
+					}
+					AbstractValue value = keyDefn.createValueFromKeyFieldValues(fieldValues);
+					return value == null ? null : value;
 				}
-				AbstractValue value = keyDefn.createValueFromKeyFieldValues(fieldValues);
-				return value == null ? null : value;
+			} catch (Exception e) {
+				throw new ParsingException(new ParsingError(ErrorType.EMPTY, 
+						line.getLineNumber(), keyAttrColNames.toArray(new String[keyAttrColNames.size()])));
 			}
 		}
 
