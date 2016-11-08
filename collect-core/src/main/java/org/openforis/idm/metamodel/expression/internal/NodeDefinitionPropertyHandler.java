@@ -3,7 +3,6 @@
  */
 package org.openforis.idm.metamodel.expression.internal;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.jxpath.DynamicPropertyHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -41,10 +40,9 @@ public class NodeDefinitionPropertyHandler implements DynamicPropertyHandler {
 			EntityDefinition entityDefinition = (EntityDefinition) object;
 			return entityDefinition.getChildDefinition(propertyName);
 		} else if (object instanceof AttributeDefinition) {
-			try {
-				return PropertyUtils.getProperty(object, propertyName);
-			} catch (Exception e) {
-				return null;
+			AttributeDefinition attrDefn = (AttributeDefinition) object;
+			if (attrDefn.hasField(propertyName)) {
+				return attrDefn.getFieldDefinition(propertyName);
 			}
 		}
 		return null;

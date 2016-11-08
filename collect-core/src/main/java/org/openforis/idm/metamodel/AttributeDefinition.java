@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -188,6 +189,16 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	
 	public FieldDefinition<?> getMainFieldDefinition() {
 		return getFieldDefinition(getMainFieldName());
+	}
+	
+	public FieldDefinition<?> findFieldDefinition(String name) {
+		FieldDefinition<?> fieldDef = getFieldDefinition(name);
+		if (fieldDef == null) {
+			//try to replace upper camel case to lower underscore case 
+			String newFieldName = name.replaceAll("(.)([A-Z])", "$1_$2").toLowerCase(Locale.ENGLISH);
+			fieldDef = getFieldDefinition(newFieldName);
+		}
+		return fieldDef;
 	}
 	
 	/**

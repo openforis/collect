@@ -4,6 +4,7 @@
 package org.openforis.idm.model;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -23,7 +25,6 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 
 	private static final long serialVersionUID = 1L;
 
-	private Field<?>[] fields;
 	private List<Field<?>> fieldList;
 	private transient ValidationResults validationResults;
 	//summary info
@@ -41,13 +42,13 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 
 	public void clearFieldSymbols() {
-		for ( Field<?> field : fields ) {
+		for ( Field<?> field : fieldList ) {
 			field.setSymbol( null );
 		}
 	} 
 	
 	public void clearFieldStates() {
-		for ( Field<?> field : fields ) {
+		for ( Field<?> field : fieldList ) {
 			field.getState().set(0);
 		}
 	}
@@ -55,19 +56,19 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	private void initFields() {
 		int fieldIdx = 0;
 		List<FieldDefinition<?>> fieldsDefinitions = definition.getFieldDefinitions();
-		this.fields = new Field<?>[fieldsDefinitions.size()];
+		this.fieldList = new ArrayList<Field<?>>(fieldsDefinitions.size());
 		for (FieldDefinition<?> fieldDefn : fieldsDefinitions) {
 			Field<?> field = (Field<?>) fieldDefn.createNode();
 			field.setAttribute(this);
 			field.index = fieldIdx;
-			this.fields[fieldIdx] = field;
+			this.fieldList.add(field);
 			fieldIdx ++;
 		}
-		this.fieldList = Collections.unmodifiableList(Arrays.asList(fields));
+		this.fieldList = Collections.unmodifiableList(fieldList);
 	}
 	
 	public Field<?> getField(int idx) {
-		return fields[idx];
+		return fieldList.get(idx);
 	}
 	
 	public Field<?> getField(String name) {
@@ -80,11 +81,11 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 
 	public int getFieldCount() {
-		return fields.length;
+		return fieldList.size();
 	}
 	
 	public Map<Integer, Object> getFieldValueByIndex() {
-		Map<Integer, Object> result = new HashMap<Integer, Object>(fields.length);
+		Map<Integer, Object> result = new HashMap<Integer, Object>(fieldList.size());
 		int idx = 0;
 		for (Field<?> field : fieldList) {
 			result.put(idx++, field.getValue());
@@ -97,7 +98,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 	
 	protected void clearFieldValues() {
-		for (Field<?> field : fields) {
+		for (Field<?> field : fieldList) {
 			field.setValue(null);
 		}
 	}
@@ -106,7 +107,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	 * Reset all properties of all attributeFields (remarks, value, symbol)
 	 */
 	public void clearFields() {
-		for (Field<?> field : fields) {
+		for (Field<?> field : fieldList) {
 			field.clear();
 		}
 	}
@@ -138,7 +139,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 	
 	protected boolean calculateIsEmpty() {
-		for (Field<?> field : fields) {
+		for (Field<?> field : fieldList) {
 			if ( field.hasValue() ) {
 				return false;
 			}
@@ -156,7 +157,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 	
 	protected boolean calculateHasData() {
-		for (Field<?> field : fields) {
+		for (Field<?> field : fieldList) {
 			if ( field.hasData() ) {
 				return true;
 			}
@@ -173,7 +174,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 
 	protected boolean calculateAllFieldsFilled() {
-		for ( Field<?> field : fields ) {
+		for ( Field<?> field : fieldList ) {
 			if ( ! field.hasValue() ) {
 				return false;
 			}
@@ -243,7 +244,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		return Arrays.deepEquals(fields, ((Attribute<?,?>) obj).fields);
+		return CollectionUtils.deepEquals((List<Field<?>>) fieldList, (List<Field<?>>) ((Attribute<?,?>) obj).fieldList);
 	}
 
 	@Override

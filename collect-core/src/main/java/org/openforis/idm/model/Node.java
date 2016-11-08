@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -23,7 +24,7 @@ import org.openforis.idm.metamodel.SurveyContext;
  * @author M. Togna
  * @author S. Ricci
  */
-public abstract class Node<D extends NodeDefinition> implements Serializable {
+public abstract class Node<D extends NodeDefinition> implements Serializable, DeepComparable {
 
 	private static final long serialVersionUID = 1L;
 

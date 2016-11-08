@@ -3,16 +3,13 @@
  */
 package org.openforis.idm.model.expression;
 
-import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathInvalidSyntaxException;
 import org.apache.commons.jxpath.JXPathNotFoundException;
@@ -26,7 +23,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
-import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.expression.internal.ModelJXPathCompiledExpression;
@@ -209,35 +205,16 @@ public abstract class AbstractExpression {
 
 	private void checkPropertyExists(AttributeDefinition attrDef, String childName) throws InvalidExpressionException {
 		String fieldName = childName.substring(1);
-		FieldDefinition<?> fieldDef = getField(attrDef, fieldName);
+		FieldDefinition<?> fieldDef = attrDef.findFieldDefinition(fieldName);
 		if (fieldDef == null) {
-			boolean propertyFound = false;
-			try {
-				Attribute<?, ?> attr = (Attribute<?, ?>) attrDef.createNode();
-				PropertyDescriptor propertyDescriptor = PropertyUtils.getPropertyDescriptor(attr, fieldName);
-				propertyFound = propertyDescriptor != null;
-			} catch (Exception e) {}
-			
-			if (! propertyFound) {
-				String message = String.format("Field '%s' not found", fieldName);
-				List<String> fieldNames = attrDef.getFieldNames();
-				String detailedMessage = String.format("Field '%s' not found\n - current attribute: '%s'\n - possible valid values in %s:\n %s", 
-						fieldName, attrDef.getPath(), attrDef.getPath(), fieldNames);
-				throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
-			}
+			String message = String.format("Field '%s' not found", fieldName);
+			List<String> fieldNames = attrDef.getFieldNames();
+			String detailedMessage = String.format("Field '%s' not found\n - current attribute: '%s'\n - possible valid values in %s:\n %s", 
+					fieldName, attrDef.getPath(), attrDef.getPath(), fieldNames);
+			throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
 		}
 	}
 
-	private FieldDefinition<?> getField(AttributeDefinition attrDef, String fieldName) {
-		FieldDefinition<?> fieldDef = attrDef.getFieldDefinition(fieldName);
-		if (fieldDef == null) {
-			//try to replace uppercase letters with an underscore
-			String newFieldName = fieldName.replaceAll("(.)([A-Z])", "$1_$2").toLowerCase(Locale.ENGLISH);
-			fieldDef = attrDef.getFieldDefinition(newFieldName);
-		}
-		return fieldDef;
-	}
-	
 	private String joinSplittingInGroups(String[] items, int groupSize, String itemSeparator, String groupSeparator) {
 		StringBuilder sb = new StringBuilder();
 		int count = 0;

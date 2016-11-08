@@ -2,10 +2,10 @@ package org.openforis.idm.model.expression.internal;
 
 import java.util.List;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.jxpath.DynamicPropertyHandler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -55,16 +55,12 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 	}
 
 	private Object getAttributeProperty(Attribute<?, ?> attr, String propertyName) {
-		if (attr.getDefinition().hasField(propertyName)) {
-			Field<?> field = attr.getField(propertyName);
-			return field.getValue();
+		FieldDefinition<?> fieldDef = attr.getDefinition().findFieldDefinition(propertyName);
+		if (fieldDef == null) {
+			return null;
 		} else {
-			try {
-				Object prop = PropertyUtils.getProperty(attr, propertyName);
-				return prop;
-			} catch (Exception e) {
-				return null;
-			}
+			Field<?> field = attr.getField(fieldDef.getName());
+			return field.getValue();
 		}
 	}
 

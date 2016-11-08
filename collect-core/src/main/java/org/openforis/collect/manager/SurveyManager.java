@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -440,8 +439,8 @@ public class SurveyManager {
 				int result = 0;
 				for (SurveySummarySortField sortField : sortFields2) {
 					try {
-						Object f1 = PropertyUtils.getProperty(s1, sortField.getField().getFieldName());
-						Object f2 = PropertyUtils.getProperty(s2, sortField.getField().getFieldName());
+						Object f1 = getFieldValue(s1, sortField);
+						Object f2 = getFieldValue(s2, sortField);
 						Object c1, c2; 
 						if (sortField.isDescending()) {
 							c1 = f2;
@@ -450,7 +449,13 @@ public class SurveyManager {
 							c1 = f1;
 							c2 = f2;
 						}
-						if (c1 instanceof Date) {
+						if (c1 == null && c2 == null) {
+							return 0;
+						} else if (c1 == null) {
+							return -1;
+						} else if (c2 == null) {
+							return 1;
+						} else if (c1 instanceof Date) {
 							result = DateUtils.truncatedCompareTo((Date) c1, (Date) c2, Calendar.SECOND);
 						} else if (c1 instanceof Comparable) {
 							result = ((Comparable) c1).compareTo((Comparable) c2);
@@ -467,6 +472,25 @@ public class SurveyManager {
 					}
 				}
 				return result;
+			}
+
+			private Object getFieldValue(SurveySummary s, SurveySummarySortField sortField) {
+				switch(sortField.getField()) {
+				case MODIFIED:
+					return s.isTemporary();
+				case MODIFIED_DATE:
+					return s.getModifiedDate();
+				case NAME:
+					return s.getName();
+				case PROJECT_NAME:
+					return s.getProjectName();
+				case PUBLISHED:
+					return s.isPublished();
+				case TARGET:
+					return s.getTarget();
+				default:
+					return null;
+				}
 			}
 		});
 	}

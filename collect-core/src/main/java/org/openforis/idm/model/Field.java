@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.FieldDefinition;
 
 /**
