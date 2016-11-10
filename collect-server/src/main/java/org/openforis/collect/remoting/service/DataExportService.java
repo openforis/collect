@@ -60,7 +60,7 @@ public class DataExportService {
 	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes, 
 			boolean includeEnumeratedEntities, boolean includeCompositeAttributeMergedColumn, 
 			boolean codeAttributeExpanded, boolean onlyOwnedRecords, String[] rootEntityKeyValues,
-			boolean includeKMLColumnForCoordinates) throws IOException {
+			boolean includeKMLColumnForCoordinates, boolean includeCodeItemLabelColumn) throws IOException {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			resetJobs();
 			
@@ -92,6 +92,7 @@ public class DataExportService {
 			config.setIncludeCompositeAttributeMergedColumn(includeCompositeAttributeMergedColumn);
 			config.setIncludeKMLColumnForCoordinates(includeKMLColumnForCoordinates);
 			config.setCodeAttributeExpanded(codeAttributeExpanded);
+			config.setIncludeCodeItemLabelColumn(includeCodeItemLabelColumn);
 			process.setConfiguration(config);
 			
 			process.init();

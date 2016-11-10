@@ -25,6 +25,8 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 
 	private static final String ITEM_POSITION_FIELD_NAME = "item_pos";
 	private static final String ITEM_POSITION_SUFFIX = "class";
+	private static final String ITEM_LABEL_FIELD_NAME = "item_label";
+	private static final String ITEM_LABEL_SUFFIX = "label";
 	
 	private boolean hasExpandedItems = false;
 	private List<CodeListItem> expandedItems = null;
@@ -67,6 +69,10 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 		if ( getConfig().isIncludeCodeItemPositionColumn() && ! list.isExternal() ) {
 			result.add(ITEM_POSITION_FIELD_NAME);
 		}
+		//label field
+		if ( getConfig().isIncludeCodeItemLabelColumn() && ! list.isExternal() ) {
+			result.add(ITEM_LABEL_FIELD_NAME);
+		}
 		return result.toArray(new String[result.size()]);
 	}
 
@@ -97,6 +103,8 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 			return attributeDefinition.getName();
 		} else if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
 			return "_" + attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + ITEM_POSITION_SUFFIX;
+		} else if ( ITEM_LABEL_FIELD_NAME.equals(fieldName) ) {
+			return attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + ITEM_LABEL_SUFFIX;
 		} else {
 			return super.generateFieldHeading(fieldName);
 		}
@@ -131,15 +139,18 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	
 	@Override
 	protected String extractValue(Attribute<?, ?> attr, String fieldName) {
-		if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
+		if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) 
+				|| ITEM_LABEL_FIELD_NAME.equals(fieldName) ) {
 			CodeListService codeListService = getCodeListService();
 			CodeListItem item = codeListService.loadItem((CodeAttribute) attr);
 			if ( item == null ) {
 				return "";
-			} else {
+			} else if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
 				List<CodeListItem> items = codeListService.loadItems(attributeDefinition.getList(), attributeDefinition.getLevelPosition());
 				int position = items.indexOf(item) + 1;
 				return Integer.toString(position);
+			} else {
+				return item.getLabel();
 			}
 		} else {
 			return super.extractValue(attr, fieldName);

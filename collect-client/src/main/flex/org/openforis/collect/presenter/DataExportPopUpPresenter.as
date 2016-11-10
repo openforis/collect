@@ -141,16 +141,16 @@ package org.openforis.collect.presenter {
 					var selectedEntity:NodeItem = view.rootTree.selectedItem as NodeItem;
 					entityId = selectedEntity.id;
 				}
-				var includeAllAncestorAttributes:Boolean = view.includeAllAncestorAttributesCheckBox.selected;
-				var includeEnumeratedEntities:Boolean = view.includeEnumeratedEntitiesCheckBox.selected;
+				var includeAllAncestorAttributes:Boolean 		= view.includeAllAncestorAttributesCheckBox.selected;
+				var includeEnumeratedEntities:Boolean 			= view.includeEnumeratedEntitiesCheckBox.selected;
 				var includeCompositeAttributeMergedColumn:Boolean = view.includeCompositeAttributeMergedColumnCheckBox.selected;
-				var includeKMLColumnForCoordinates:Boolean = view.includeKMLColumnForCoordinatesCheckBox.selected;
-				
-				var expandCodeAttributes:Boolean = view.expandCodeAttributesCheckBox.selected;
+				var includeKMLColumnForCoordinates:Boolean 		= view.includeKMLColumnForCoordinatesCheckBox.selected;
+				var includeCodeItemLabelColumn:Boolean 			= view.includeCodeItemLabelColumnCheckBox.selected;
+				var expandCodeAttributes:Boolean 				= view.expandCodeAttributesCheckBox.selected;
 				
 				ClientFactory.dataExportClient.export(_exportResponder, rootEntity, stepNumber, entityId, 
 						includeAllAncestorAttributes, includeEnumeratedEntities, includeCompositeAttributeMergedColumn, 
-						expandCodeAttributes, onlyOwnedRecords, rootEntityKeys, includeKMLColumnForCoordinates);
+						expandCodeAttributes, onlyOwnedRecords, rootEntityKeys, includeKMLColumnForCoordinates, includeCodeItemLabelColumn);
 				
 				view.currentState = DataExportPopUp.STATE_EXPORTING;
 				view.progressBar.setProgress(0, 0);

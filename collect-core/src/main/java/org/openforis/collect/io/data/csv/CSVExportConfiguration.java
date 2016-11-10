@@ -14,6 +14,7 @@ public class CSVExportConfiguration {
 	private boolean includeKMLColumnForCoordinates = false;
 	private boolean includeEnumeratedEntities = true;
 	private boolean includeCompositeAttributeMergedColumn = false;
+	private boolean includeCodeItemLabelColumn = false;
 	private boolean codeAttributeExpanded = false;
 	private int maxMultipleAttributeValues = 10;
 	private int maxExpandedCodeAttributeItems = 30;
@@ -67,6 +68,14 @@ public class CSVExportConfiguration {
 
 	public void setIncludeAllAncestorAttributes(boolean includeAllAncestorAttributes) {
 		this.includeAllAncestorAttributes = includeAllAncestorAttributes;
+	}
+	
+	public boolean isIncludeCodeItemLabelColumn() {
+		return includeCodeItemLabelColumn;
+	}
+	
+	public void setIncludeCodeItemLabelColumn(boolean includeCodeItemLabelColumn) {
+		this.includeCodeItemLabelColumn = includeCodeItemLabelColumn;
 	}
 	
 	public int getMaxMultipleAttributeValues() {

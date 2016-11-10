@@ -39,10 +39,12 @@ package org.openforis.collect.client {
 							   includeCompositeAttributeMergedColumn:Boolean = false,
 							   codeAttributeExpanded:Boolean = false,
 							   onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null, 
-							   includeKMLColumnForCoordinates:Boolean = false):void {
+							   includeKMLColumnForCoordinates:Boolean = false,
+							   includeCodeItemLabelColumn:Boolean = false
+							   ):void {
 			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes, 
 					includeEnumeratedEntities, includeCompositeAttributeMergedColumn, codeAttributeExpanded, onlyOwnedRecords, rootEntityKeyValues,
-					includeKMLColumnForCoordinates);
+					includeKMLColumnForCoordinates, includeCodeItemLabelColumn);
 			token.addResponder(responder);
 		}
 		

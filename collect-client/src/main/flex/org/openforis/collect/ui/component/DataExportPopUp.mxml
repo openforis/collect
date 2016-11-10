@@ -221,6 +221,10 @@
 					<s:CheckBox id="expandCodeAttributesCheckBox" 
 								selected="false" 
 								label="{Message.get('export.expandCodeAttributes')}*" />
+					<s:CheckBox id="includeCodeItemLabelColumnCheckBox" 
+								selected="false" 
+								label="{Message.get('export.includeCodeItemLabelColumn')}*" />
+					
 					<s:Label text="* = {Message.get('export.notCompatibleWithDataImport')}" />
 				</s:VGroup>
 			</container:CollapsiblePanel>
