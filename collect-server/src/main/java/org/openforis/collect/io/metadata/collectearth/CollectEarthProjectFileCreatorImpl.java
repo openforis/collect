@@ -9,11 +9,14 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.ServiceLoader;
 import java.util.Stack;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,11 +43,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
-
 /**
  * 
  * @author S. Ricci
@@ -68,14 +66,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 //	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
 	private static final String GRID_FOLDER_NAME = "grid";
 	
-	private static final ServiceLoader<CollectEarthGridTemplateGenerator> COLLECT_EARTH_GRID_TEMPLATE_GENERATOR_LOADER = 
-			ServiceLoader.load(CollectEarthGridTemplateGenerator.class);
-	private static final CollectEarthGridTemplateGenerator COLLECT_EARTH_GRID_TEMPLATE_GENERATOR;
-	static {
-		Iterator<CollectEarthGridTemplateGenerator> it = COLLECT_EARTH_GRID_TEMPLATE_GENERATOR_LOADER.iterator();
-		COLLECT_EARTH_GRID_TEMPLATE_GENERATOR = it.hasNext() ? it.next(): null;
-	}
-	
 	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
 		
 	private CodeListManager codeListManager;
@@ -93,7 +83,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		File balloon = generateBalloon(survey, language);
 		File cube = generateCube(survey, language);
 		File kmlTemplate = generateKMLTemplate(survey);
-		File testPlotsCSVFile = COLLECT_EARTH_GRID_TEMPLATE_GENERATOR.generateTemplateCSVFile(survey);
+		File testPlotsCSVFile = new CollectEarthGridTemplateGenerator().generateTemplateCSVFile(survey);
 		File readmeFile = getFileFromResouces(README_FILE_PATH);
 		
 		ZipFile zipFile = new ZipFile(outputFile);
