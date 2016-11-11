@@ -18,6 +18,7 @@ import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
+import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResultFlag;
@@ -127,6 +128,23 @@ public class IDMFunctions extends CustomFunctions {
 					}
 				}
 				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, "First argument must be a valid sampling point attribute");
+			}
+		});
+		
+		register("speciesListData", new CustomFunction(3) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				String[] strings = toStringArray(objects);
+				String taxonomyName = strings[0];
+				String attribute = strings[1];
+				String speciesCode = strings[2];
+				
+				if (StringUtils.isAnyBlank(taxonomyName, attribute, speciesCode)) {
+					return null;
+				} else {
+					Survey survey = getSurvey(expressionContext);
+					SpeciesListService speciesListService = getSpeciesListService(expressionContext);
+					return speciesListService.loadSpeciesListData(survey, taxonomyName, attribute, speciesCode);
+				}
 			}
 		});
 		
@@ -404,6 +422,11 @@ public class IDMFunctions extends CustomFunctions {
 		ModelJXPathContext jxPathContext = (ModelJXPathContext) context.getJXPathContext();
 		Survey survey = jxPathContext.getSurvey();
 		return survey;
+	}
+	
+	private static SpeciesListService getSpeciesListService(ExpressionContext context) {
+		Survey survey = getSurvey(context);
+		return survey.getContext().getSpeciesListService();
 	}
 	
 }

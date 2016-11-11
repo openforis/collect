@@ -12,6 +12,7 @@ import org.openforis.collect.model.validation.CollectValidator;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
+import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
@@ -42,16 +43,18 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	private transient Validator validator;
 	private transient ExternalCodeListProvider externalCodeListProvider;
 	private transient CodeListService codeListService;
+	private transient SpeciesListService speciesListService;
 
 	public CollectSurveyContext() {
 		this(new ExpressionFactory(), new CollectValidator());
 	}
 
 	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
-		this(expressionFactory, validator, (CodeListService) null);
+		this(expressionFactory, validator, (CodeListService) null, (SpeciesListService) null);
 	}
 	
-	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, CodeListService codeListService) {
+	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, 
+			CodeListService codeListService, SpeciesListService speciesListService) {
 		this.expressionFactory = expressionFactory;
 		this.validator = validator;
 		this.codeListService = codeListService;
@@ -104,6 +107,15 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		this.codeListService = codeListService;
 	}
 
+	@Override
+	public SpeciesListService getSpeciesListService() {
+		return speciesListService;
+	}
+	
+	public void setSpeciesListService(SpeciesListService speciesListService) {
+		this.speciesListService = speciesListService;
+	}
+	
 	@Override
 	public CoordinateOperations getCoordinateOperations() {
 		return COORDINATE_OPERATIONS;

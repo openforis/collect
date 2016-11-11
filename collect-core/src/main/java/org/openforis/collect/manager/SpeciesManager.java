@@ -143,6 +143,7 @@ public class SpeciesManager {
 		}
 		return result;
 	}
+	
 	private List<TaxonOccurrence> fromTaxonomiesToTaxonOccurrences(List<Taxon> list, TaxonSearchParameters parameters) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>(list.size());
 		for (Taxon taxon : list) {

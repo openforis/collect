@@ -64,6 +64,11 @@ public class DefaultSurveyContext implements SurveyContext {
 	}
 	
 	@Override
+	public SpeciesListService getSpeciesListService() {
+		return null;
+	}
+	
+	@Override
 	public CoordinateOperations getCoordinateOperations() {
 		return COORDINATE_OPERATIONS;
 	}

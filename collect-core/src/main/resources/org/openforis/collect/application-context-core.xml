@@ -143,6 +143,7 @@
 	
 	<!--  Services -->
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />
+	<bean id="speciesListService"	 	class="org.openforis.collect.service.CollectSpeciesListService" />
 	
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />
@@ -159,6 +160,7 @@
 	    <constructor-arg ref="validator" />
 	    <property name="externalCodeListProvider" ref="externalCodeListProvider" />
    		<property name="codeListService" ref="codeListService" />
+   		<property name="speciesListService" ref="speciesListService" />
 	</bean>
 
 	<bean id="collectSurveySerializer" class="org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder">

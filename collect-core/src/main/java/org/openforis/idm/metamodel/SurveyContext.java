@@ -23,6 +23,8 @@ public interface SurveyContext {
 	
 	CodeListService getCodeListService();
 	
+	SpeciesListService getSpeciesListService();
+	
 	ExternalCodeListProvider getExternalCodeListProvider();
 	
 	CoordinateOperations getCoordinateOperations();

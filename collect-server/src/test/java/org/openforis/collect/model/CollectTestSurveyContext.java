@@ -6,6 +6,7 @@ import java.util.ServiceLoader;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
+import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
@@ -57,6 +58,11 @@ public class CollectTestSurveyContext implements SurveyContext {
 
 	@Override
 	public CodeListService getCodeListService() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public SpeciesListService getSpeciesListService() {
 		throw new UnsupportedOperationException();
 	}
 	
