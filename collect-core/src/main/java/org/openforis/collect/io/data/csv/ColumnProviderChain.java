@@ -3,9 +3,12 @@ package org.openforis.collect.io.data.csv;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.model.Node;
 
 /**
@@ -15,6 +18,7 @@ import org.openforis.idm.model.Node;
  */
 public class ColumnProviderChain extends BasicColumnProvider {
 	private List<ColumnProvider> providers;
+	private String headingPrefix;
 	private List<String> headings;
 
 	public ColumnProviderChain(CSVExportConfiguration config, String headingPrefix, ColumnProvider... providers) {
@@ -35,7 +39,14 @@ public class ColumnProviderChain extends BasicColumnProvider {
 //		}
 		super(config);
 		this.providers = providers;
+		this.headingPrefix = headingPrefix;
 		this.headings = getColumnHeadingsInternal(headingPrefix);
+		
+		for (ColumnProvider p : providers) {
+			if (p instanceof BasicColumnProvider) {
+				((BasicColumnProvider) p).setParentProvider(this);
+			}
+		}
 	}
 	
 	public List<String> getColumnHeadings() {
@@ -44,6 +55,10 @@ public class ColumnProviderChain extends BasicColumnProvider {
 
 	public List<ColumnProvider> getColumnProviders() {
 		return providers;
+	}
+	
+	public String getHeadingPrefix() {
+		return headingPrefix;
 	}
 	
 	private List<String> getColumnHeadingsInternal(String headingPrefix) {
@@ -63,6 +78,18 @@ public class ColumnProviderChain extends BasicColumnProvider {
 			v.addAll(p.extractValues(axis));
 		}
 		return v;
+	}
+	
+	public void traverseProviders(Visitor<ColumnProvider> visitor) {
+		Deque<ColumnProvider> stack = new LinkedList<ColumnProvider>();
+		stack.addAll(providers);
+		while (! stack.isEmpty()) {
+			ColumnProvider p = stack.pop();
+			visitor.visit(p);
+			if (p instanceof ColumnProviderChain) {
+				stack.addAll(((ColumnProviderChain) p).providers);
+			}
+		}
 	}
 	
 	protected List<String> emptyValues() {

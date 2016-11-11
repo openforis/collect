@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.openforis.collect.io.data.DataLine.EntityIdentifier;
 import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
 import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
@@ -20,11 +21,18 @@ import org.openforis.collect.io.data.DataLine.EntityKeysIdentifierDefintion;
 import org.openforis.collect.io.data.DataLine.EntityPositionIdentifierDefinition;
 import org.openforis.collect.io.data.DataLine.FieldValueKey;
 import org.openforis.collect.io.data.DataLine.SingleEntityIdentifierDefinition;
+import org.openforis.collect.io.data.csv.BasicColumnProvider;
+import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CodeColumnProvider;
+import org.openforis.collect.io.data.csv.ColumnProvider;
+import org.openforis.collect.io.data.csv.ColumnProviderChain;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.CSVDataImportReader;
 import org.openforis.collect.io.metadata.parsing.CSVLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
@@ -46,8 +54,11 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataImport.parsingError.missing_required_columns.message";
 	private static final String INVALID_NODE_POSITION_VALUE_MESSAGE_KEY = "csvDataImport.error.invalidNodePosition";
 
+	//input variables
 	private EntityDefinition parentEntityDefinition;
-
+	
+	//temporary variables
+	private List<String> ignoredColumns = new ArrayList<String>();
 	
 	public DataCSVReader(File file, EntityDefinition parentEntityDefinition) throws IOException, ParsingException {
 		super(file);
@@ -68,11 +79,51 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 
 	@Override
 	public boolean validateAllFile() throws ParsingException {
+		this.ignoredColumns = calculateIgnoredColumns();
 		Validator validator = new Validator();
 		validator.validate();
 		return true;
 	}
 	
+	private List<String> calculateIgnoredColumns() {
+		final CSVExportConfiguration csvExportConfig = new CSVExportConfiguration();
+		csvExportConfig.setIncludeCodeItemLabelColumn(true);
+		csvExportConfig.setIncludeEnumeratedEntities(false);
+		
+		CollectSurvey survey = (CollectSurvey) parentEntityDefinition.getSurvey();
+		
+		ColumnProviderChain columnProvider = new CSVDataExportColumnProviderGenerator(survey, csvExportConfig)
+				.generateColumnProviderChain(parentEntityDefinition);
+		
+		List<String> result = new ArrayList<String>();
+		List<String> colNames = getColumnNames();
+		for (final String colName : colNames) {
+			final MutableBoolean ignored = new MutableBoolean(false);
+			
+			columnProvider.traverseProviders(new Visitor<ColumnProvider>() {
+				public void visit(ColumnProvider p) {
+					if (! (p instanceof ColumnProviderChain) && p instanceof BasicColumnProvider) {
+						List<String> finalColumnHeadings = ((BasicColumnProvider) p).generateFinalColumnHeadings();
+						if (finalColumnHeadings.contains(colName)) {
+							if (p instanceof CodeColumnProvider &&
+									colName.endsWith(csvExportConfig.getFieldHeadingSeparator() + CodeColumnProvider.ITEM_LABEL_SUFFIX)) {
+								ignored.setTrue();
+							}
+						}
+					}
+				}
+			});
+			if (ignored.booleanValue()) {
+				result.add(colName); 
+			}
+		}
+		return result;
+	}
+	
+	private boolean isIgnoredInDataExport(String columnName) {
+		return ignoredColumns.contains(columnName);
+	}
+
 	protected static List<String> getKeyAttributeColumnNames(
 			EntityDefinition parentEntityDefinition,
 			AttributeDefinition keyAttrDefn) {
@@ -294,10 +345,12 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			List<String> attrColNames = new ArrayList<String>(colNames);
 			attrColNames.removeAll(expectedAncestorKeyColumnNames);
 			for (String colName : attrColNames) {
-				String value = getColumnValue(colName, false, String.class);
-				FieldValueKey fieldValueKey = extractFieldValueKey(colName);
-				line.setFieldValue(fieldValueKey, value);
-				line.setColumnNameByField(fieldValueKey, colName);
+				if (! isIgnoredInDataExport(colName)) {
+					String value = getColumnValue(colName, false, String.class);
+					FieldValueKey fieldValueKey = extractFieldValueKey(colName);
+					line.setFieldValue(fieldValueKey, value);
+					line.setColumnNameByField(fieldValueKey, colName);
+				}
 			}
 		}
 
@@ -319,6 +372,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 
 		protected void validateHeaders() throws ParsingException {
 			List<String> colNames = getColumnNames();
+			
 			List<String> expectedEntityKeyColumns = getExpectedAncestorKeyColumnNames();
 			if (! colNames.containsAll(expectedEntityKeyColumns)) {
 				ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
@@ -327,7 +381,10 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				error.setMessageArgs(new String[]{messageArg});
 				throw new ParsingException(error);
 			}
+			
+			
 			List<String> attributeColumnNames = colNames.subList(expectedEntityKeyColumns.size(), colNames.size());
+			
 			validateAttributeHeaders(attributeColumnNames);
 		}
 
@@ -335,12 +392,15 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				throws ParsingException {
 			for (int i = 0; i < colNames.size(); i++) {
 				String colName = StringUtils.trimToEmpty(colNames.get(i));
+				
 				FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
 				if ( fieldDefn == null ) {
-					//attribute definition not found
-					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, 
-							"csvDataImport.error.fieldDefinitionNotFound");
-					throw new ParsingException(error);
+					if (! isIgnoredInDataExport(colName)) {
+						//attribute definition not found
+						ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, 
+								"csvDataImport.error.fieldDefinitionNotFound");
+						throw new ParsingException(error);
+					}
 				} else {
 					AttributeDefinition attrDefn = fieldDefn.getAttributeDefinition();
 					if (attrDefn.isMultiple()) {
@@ -357,5 +417,5 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		}
 
 	}
-
+	
 }

@@ -26,7 +26,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	private static final String ITEM_POSITION_FIELD_NAME = "item_pos";
 	private static final String ITEM_POSITION_SUFFIX = "class";
 	private static final String ITEM_LABEL_FIELD_NAME = "item_label";
-	private static final String ITEM_LABEL_SUFFIX = "label";
+	public static final String ITEM_LABEL_SUFFIX = "label";
 	
 	private boolean hasExpandedItems = false;
 	private List<CodeListItem> expandedItems = null;

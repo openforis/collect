@@ -18,15 +18,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.lucene.util.IOUtils;
-import org.openforis.collect.io.data.csv.AutomaticColumnProvider;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
-import org.openforis.collect.io.data.csv.ColumnProvider;
-import org.openforis.collect.io.data.csv.ColumnProviderChain;
-import org.openforis.collect.io.data.csv.ColumnProviders;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
-import org.openforis.collect.io.data.csv.NodePositionColumnProvider;
-import org.openforis.collect.io.data.csv.PivotExpressionColumnProvider;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -36,7 +30,6 @@ import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
@@ -78,6 +71,50 @@ public class CSVDataExportJob extends Job {
 		addTask(new CSVDataExportTask());
 	}
 
+	public File getOutputFile() {
+		return outputFile;
+	}
+
+	public void setOutputFile(File outputFile) {
+		this.outputFile = outputFile;
+	}
+
+	public RecordFilter getRecordFilter() {
+		return recordFilter;
+	}
+	
+	public void setRecordFilter(RecordFilter recordFilter) {
+		this.recordFilter = recordFilter;
+	}
+	
+	public Integer getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(Integer entityId) {
+		this.entityId = entityId;
+	}
+	
+	public CSVExportConfiguration getConfiguration() {
+		return configuration;
+	}
+	
+	public void setConfiguration(CSVExportConfiguration configuration) {
+		this.configuration = configuration;
+	}
+
+	public boolean isAlwaysGenerateZipFile() {
+		return alwaysGenerateZipFile;
+	}
+
+	public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
+		this.alwaysGenerateZipFile = alwaysGenerateZipFile;
+	}
+
+	public void setNodeFilter(NodeFilter nodeFilter) {
+		this.nodeFilter = nodeFilter;
+	}
+	
 	private class CSVDataExportTask extends Task {
 		
 		@Override
@@ -129,7 +166,8 @@ public class CSVDataExportJob extends Job {
 		
 		private void exportData(OutputStream outputStream, int entityDefId) throws InvalidExpressionException, IOException, RecordPersistenceException {
 			Writer outputWriter = new OutputStreamWriter(outputStream, OpenForisIOUtils.UTF_8);
-			DataTransformation transform = getTransform(entityDefId);
+			CSVDataExportColumnProviderGenerator csvDataExportColumnProviderGenerator = new CSVDataExportColumnProviderGenerator(recordFilter.getSurvey(), configuration);
+			DataTransformation transform = csvDataExportColumnProviderGenerator.generateDataTransformation(entityDefId);
 			
 			@SuppressWarnings("resource")
 			//closing modelWriter will close referenced output stream
@@ -170,88 +208,6 @@ public class CSVDataExportJob extends Job {
 			}
 			return result;
 		}
-		
-		protected DataTransformation getTransform(int entityDefId) throws InvalidExpressionException {
-			List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
-			
-			CollectSurvey survey = recordFilter.getSurvey();
-			Schema schema = survey.getSchema();
-			EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityDefId);
-			
-			//entity children columns
-			AutomaticColumnProvider entityColumnProvider = createEntityColumnProvider(entityDefn);
-
-			//ancestor columns
-			columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
-			
-			//position column
-			if ( isPositionColumnRequired(entityDefn) ) {
-				columnProviders.add(createPositionColumnProvider(entityDefn));
-			}
-			columnProviders.add(entityColumnProvider);
-			
-			//create data transformation
-			ColumnProvider provider = new ColumnProviderChain(configuration, columnProviders);
-			String axisPath = entityDefn.getPath();
-			return new DataTransformation(axisPath, provider);
-		}
-
-		protected AutomaticColumnProvider createEntityColumnProvider(EntityDefinition entityDefn) {
-			AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(configuration, "", entityDefn, null);
-			return entityColumnProvider;
-		}
-		
-		private List<ColumnProvider> createAncestorsColumnsProvider(EntityDefinition entityDefn) {
-			List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
-			EntityDefinition ancestorDefn = (EntityDefinition) entityDefn.getParentDefinition();
-			while ( ancestorDefn != null ) {
-				if (ancestorDefn.isMultiple()) {
-					ColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(entityDefn, ancestorDefn);
-					columnProviders.add(0, parentKeysColumnsProvider);
-				}
-				ancestorDefn = ancestorDefn.getParentEntityDefinition();
-			}
-			return columnProviders;
-		}
-		
-		private ColumnProvider createAncestorColumnProvider(EntityDefinition contextEntityDefn, EntityDefinition ancestorEntityDefn) {
-			List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
-			if ( configuration.isIncludeAllAncestorAttributes() ) {
-				AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(configuration, ancestorEntityDefn.getName() + "_", ancestorEntityDefn);
-				providers.add(0, ancestorEntityColumnProvider);
-			} else {
-				//include only key attributes
-				List<AttributeDefinition> keyAttrDefns = ancestorEntityDefn.getKeyAttributeDefinitions();
-				for (AttributeDefinition keyDefn : keyAttrDefns) {
-					String relativePath = contextEntityDefn.getRelativePath(ancestorEntityDefn);
-					
-					ColumnProvider keyColumnProvider = ColumnProviders.createAttributeProvider(configuration, keyDefn);
-					String headingPrefix = keyDefn.getParentEntityDefinition().getName() + "_";
-					PivotExpressionColumnProvider columnProvider = new PivotExpressionColumnProvider(configuration, relativePath, headingPrefix, keyColumnProvider);
-					providers.add(columnProvider);
-				}
-				if ( isPositionColumnRequired(ancestorEntityDefn) ) {
-					String relativePath = contextEntityDefn.getRelativePath(ancestorEntityDefn);
-					ColumnProvider positionColumnProvider = createPositionColumnProvider(ancestorEntityDefn);
-					PivotExpressionColumnProvider columnProvider = new PivotExpressionColumnProvider(configuration, relativePath, "", positionColumnProvider);
-					providers.add(columnProvider);
-				}
-			}
-			return new ColumnProviderChain(configuration, providers);
-		}
-		
-		private boolean isPositionColumnRequired(EntityDefinition entityDefn) {
-			return entityDefn.getParentDefinition() != null && entityDefn.isMultiple() && entityDefn.getKeyAttributeDefinitions().isEmpty();
-		}
-		
-		private ColumnProvider createPositionColumnProvider(EntityDefinition entityDefn) {
-			String columnName = calculatePositionColumnName(entityDefn);
-			return new NodePositionColumnProvider(columnName);
-		}
-		
-		private String calculatePositionColumnName(EntityDefinition nodeDefn) {
-			return "_" + nodeDefn.getName() + "_position";
-		}
 	}
 	
 	public static class EntryNameGenerator {
@@ -284,50 +240,6 @@ public class CSVDataExportJob extends Job {
 			});
 			return result;
 		}
-	}
-
-	public File getOutputFile() {
-		return outputFile;
-	}
-
-	public void setOutputFile(File outputFile) {
-		this.outputFile = outputFile;
-	}
-
-	public RecordFilter getRecordFilter() {
-		return recordFilter;
-	}
-	
-	public void setRecordFilter(RecordFilter recordFilter) {
-		this.recordFilter = recordFilter;
-	}
-	
-	public Integer getEntityId() {
-		return entityId;
-	}
-
-	public void setEntityId(Integer entityId) {
-		this.entityId = entityId;
-	}
-	
-	public CSVExportConfiguration getConfiguration() {
-		return configuration;
-	}
-	
-	public void setConfiguration(CSVExportConfiguration configuration) {
-		this.configuration = configuration;
-	}
-
-	public boolean isAlwaysGenerateZipFile() {
-		return alwaysGenerateZipFile;
-	}
-
-	public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
-		this.alwaysGenerateZipFile = alwaysGenerateZipFile;
-	}
-
-	public void setNodeFilter(NodeFilter nodeFilter) {
-		this.nodeFilter = nodeFilter;
 	}
 	
 }
