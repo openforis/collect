@@ -8,7 +8,6 @@ import static org.openforis.collect.persistence.jooq.Tables.OFC_USER;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -38,6 +37,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao.RecordDSLContext;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -186,14 +186,26 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return jf.fromResult(result);
 	}
 
-	public Iterator<CollectRecord> iterateSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
+	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
+			Visitor<CollectRecord> visitor) {
 		CollectSurvey survey = filter.getSurvey();
 		
 		RecordDSLContext jf = createDSLContext(survey);
 		SelectQuery<Record> q = createQuery(jf, filter, sortFields);
 
-		Cursor<Record> it = q.fetchLazy();
-		return new RecordIterator(jf, it);
+		Cursor<Record> cursor = null;
+		try {
+			cursor = q.fetchLazy();
+			while (cursor.hasNext()) {
+				Record r = cursor.fetchOne();
+				CollectRecord record = jf.fromRecord(r);
+				visitor.visit(record);
+			}
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+		    }
+		}
 	}
 
 	private SelectQuery<Record> createQuery(DSLContext jf, RecordFilter filter,
@@ -660,35 +672,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		
 		public Query getInternalQuery() {
 			return internalQuery;
-		}
-		
-	}
-	
-	private static class RecordIterator implements Iterator<CollectRecord> {
-
-		private RecordDSLContext jf;
-		private Cursor<Record> internalIterator;
-		
-		public RecordIterator(RecordDSLContext jf, Cursor<Record> it) {
-			super();
-			this.jf = jf;
-			this.internalIterator = it;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return internalIterator.hasNext();
-		}
-
-		@Override
-		public CollectRecord next() {
-			Record r = internalIterator.fetchOne();
-			return jf.fromRecord(r);
-		}
-		
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException();
 		}
 		
 	}

@@ -8,7 +8,6 @@ import static org.springframework.transaction.annotation.Propagation.SUPPORTS;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +34,7 @@ import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.RecordValidationInProgressException;
 import org.openforis.collect.utils.Consumer;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -373,8 +373,8 @@ public class RecordManager {
 	}
 	
 	@Transactional(readOnly=true)
-	public Iterator<CollectRecord> iterateSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
-		return recordDao.iterateSummaries(filter, sortFields);
+	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, Visitor<CollectRecord> visitor) {
+		recordDao.visitSummaries(filter, sortFields, visitor);
 	}
 	
 	/**

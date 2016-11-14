@@ -12,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,16 +35,14 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
-import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.relational.data.RecordIterator;
 import org.openforis.collect.relational.print.RDBPrintJob;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.openforis.collect.utils.Dates;
 import org.openforis.concurrency.Job;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.http.MediaType;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
@@ -236,7 +233,10 @@ public class SurveyExportParametersVM extends BaseVM {
 		rdbExportJob = new RDBPrintJob();
 		rdbExportJob.setSurvey(survey);
 		rdbExportJob.setTargetSchemaName(survey.getName());
-		rdbExportJob.setRecordIterator(new RecordManagerRecordIterator(survey, Step.ANALYSIS));
+		rdbExportJob.setRecordManager(recordManager);
+		RecordFilter recordFilter = new RecordFilter(survey);
+		recordFilter.setStep(Step.ANALYSIS);
+		rdbExportJob.setRecordFilter(recordFilter);
 		rdbExportJob.setIncludeData(parameters.isIncludeData());
 		rdbExportJob.setDialect(parameters.getRdbDialectEnum());
 		rdbExportJob.setDateTimeFormat(parameters.getRdbDateTimeFormat());
@@ -445,41 +445,5 @@ public class SurveyExportParametersVM extends BaseVM {
 			this.languageCode = languageCode;
 		}
 	}
-	
-	private class RecordManagerRecordIterator implements RecordIterator {
-		
-		private List<CollectRecord> summaries;
-		private int nextRecordIndex = 0;
-		private CollectSurvey survey;
-		
-		public RecordManagerRecordIterator(CollectSurvey survey, Step step) {
-			this.survey = survey;
-			this.summaries = new ArrayList<CollectRecord>();
-			for (EntityDefinition rootDef : survey.getSchema().getRootEntityDefinitions()) {
-				this.summaries.addAll(recordManager.loadSummaries(survey, rootDef.getName(), step));
-			}
-		}
-		
-		@Override
-		public boolean hasNext() {
-			return nextRecordIndex < size();
-		}
 
-		@Override
-		public CollectRecord next() {
-			CollectRecord summary = summaries.get(nextRecordIndex++);
-			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep());
-			return record;
-		}
-
-		@Override
-		public void remove() {
-		}
-
-		@Override
-		public int size() {
-			return summaries.size();
-		}
-		
-	}
 }

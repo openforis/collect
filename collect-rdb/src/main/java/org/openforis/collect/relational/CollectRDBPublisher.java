@@ -3,7 +3,7 @@ package org.openforis.collect.relational;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sql.DataSource;
 
@@ -20,6 +20,7 @@ import org.openforis.collect.relational.jooq.JooqRelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.concurrency.ProcessProgressListener;
 import org.openforis.concurrency.ProcessStepProgressListener;
 import org.openforis.concurrency.Progress;
@@ -107,37 +108,38 @@ public class CollectRDBPublisher {
 		}
 	}
 
-	private void insertData(CollectSurvey survey, String rootEntityName, Step step, Connection targetConn,
+	private void insertData(final CollectSurvey survey, String rootEntityName, final Step step, Connection targetConn,
 			RelationalSchema relationalSchema, ProgressListener progressListener) throws IOException {
 		// Insert data
 		RecordFilter recordFilter = new RecordFilter(survey);
 		recordFilter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
 		recordFilter.setStepGreaterOrEqual(step);
 		
-		int total = recordManager.countRecords(recordFilter);
+		final int total = recordManager.countRecords(recordFilter);
 		if ( LOG.isInfoEnabled() ) {
 			LOG.info("Total records: " + total);
 		}
-		DatabaseExporter databaseExporter = createDatabaseExporter(relationalSchema, targetConn);
+		final DatabaseExporter databaseExporter = createDatabaseExporter(relationalSchema, targetConn);
 		
 		ProcessProgressListener totalProgressListener = new ProcessProgressListener(2);
 		
 		databaseExporter.insertReferenceData(new ProcessStepProgressListener(totalProgressListener, progressListener));
 		
-		ProcessStepProgressListener insertRecordsProgressListener = new ProcessStepProgressListener(totalProgressListener, progressListener);
+		final ProcessStepProgressListener insertRecordsProgressListener = new ProcessStepProgressListener(totalProgressListener, progressListener);
 		
-		Iterator<CollectRecord> iterator = recordManager.iterateSummaries(recordFilter, null);
-		int count = 0;
-		while(iterator.hasNext()) {
-			CollectRecord summary = iterator.next();
-			try {
-				CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
-				databaseExporter.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
-			} catch (CollectRdbException e) {
-				LOG.error( e.getMessage(), e);
+		final AtomicInteger count = new AtomicInteger();
+		recordManager.visitSummaries(recordFilter, null, new Visitor<CollectRecord>() {
+			public void visit(CollectRecord summary) {
+				try {
+					CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
+					databaseExporter.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
+				} catch (CollectRdbException e) {
+					LOG.error( e.getMessage(), e);
+				}
+				insertRecordsProgressListener.progressMade(new Progress(count.addAndGet(1), total));			
 			}
-			insertRecordsProgressListener.progressMade(new Progress(++count, total));
-		}
+		});
+		
 		databaseExporter.close();
 		
 		if ( LOG.isInfoEnabled() ) {

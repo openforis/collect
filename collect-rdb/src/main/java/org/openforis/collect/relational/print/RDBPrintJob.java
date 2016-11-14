@@ -5,15 +5,17 @@ import java.io.FileWriter;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.relational.data.DataExtractorFactory;
-import org.openforis.collect.relational.data.RecordIterator;
 import org.openforis.collect.relational.data.internal.CodeTableDataExtractor;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
@@ -33,7 +35,8 @@ public class RDBPrintJob extends Job {
 	private CollectSurvey survey;
 	private String targetSchemaName;
 	private boolean includeData;
-	private RecordIterator recordIterator;
+	private RecordManager recordManager;
+	private RecordFilter recordFilter;
 	private RdbDialect dialect;
 	private String dateTimeFormat;
 	private boolean includeForeignKeysInCreateTable;
@@ -80,7 +83,9 @@ public class RDBPrintJob extends Job {
 			if(task instanceof RDBSchemaPrintTask) {
 				((RDBSchemaPrintTask) task).setIncludeForeignKeysInCreateTable(includeForeignKeysInCreateTable);
 			} else if(task instanceof RecordDataPrintTask) {
-				((RecordDataPrintTask) task).setRecordIterator(recordIterator);
+				RecordDataPrintTask dataPrintTask = (RecordDataPrintTask) task;
+				dataPrintTask.setRecordManager(recordManager);
+				dataPrintTask.setRecordFilter(recordFilter);
 			}
 		}
 		super.initializeTask(task);
@@ -112,8 +117,12 @@ public class RDBPrintJob extends Job {
 		this.includeData = includeData;
 	}
 	
-	public void setRecordIterator(RecordIterator recordIterator) {
-		this.recordIterator = recordIterator;
+	public void setRecordManager(RecordManager recordManager) {
+		this.recordManager = recordManager;
+	}
+	
+	public void setRecordFilter(RecordFilter recordFilter) {
+		this.recordFilter = recordFilter;
 	}
 	
 	public void setWriter(Writer writer) {
@@ -204,29 +213,42 @@ public class RDBPrintJob extends Job {
 
 	public static class RecordDataPrintTask extends RDBPrintTask {
 		
-		private RecordIterator recordIterator;
+		private RecordManager recordManager;
+		private RecordFilter recordFilter;
 
 		@Override
 		protected long countTotalItems() {
-			return recordIterator.size();
+			return recordManager.countRecords(recordFilter);
 		}
 
 		@Override
 		protected void execute() throws Throwable {
-			while(recordIterator.hasNext()) {
-				CollectRecord record = recordIterator.next();
-				for (DataTable table : schema.getDataTables()) {
-					if(!isRunning()) {
-						return;
+			recordManager.visitSummaries(recordFilter, null, new Visitor<CollectRecord>() {
+				public void visit(CollectRecord summary) {
+					CollectRecord record = recordManager.load((CollectSurvey) summary.getSurvey(), summary.getId(), recordFilter.getStep());
+					if (record != null) {
+						for (DataTable table : schema.getDataTables()) {
+							if(!isRunning()) {
+								return;
+							}
+							try {
+								writeBatchInsert(table, DataExtractorFactory.getRecordDataExtractor(table, record));
+							} catch(Exception e) {
+								throw new RuntimeException(e);
+							}
+						}
 					}
-					writeBatchInsert(table, DataExtractorFactory.getRecordDataExtractor(table, record));
+					incrementProcessedItems();
 				}
-				incrementProcessedItems();
-			}
+			});
 		}
 		
-		public void setRecordIterator(RecordIterator recordIterator) {
-			this.recordIterator = recordIterator;
+		public void setRecordManager(RecordManager recordManager) {
+			this.recordManager = recordManager;
+		}
+		
+		public void setRecordFilter(RecordFilter recordFilter) {
+			this.recordFilter = recordFilter;
 		}
 	}
 	
