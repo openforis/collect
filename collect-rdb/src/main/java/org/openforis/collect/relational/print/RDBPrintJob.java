@@ -197,13 +197,6 @@ public class RDBPrintJob extends Job {
 				if(!isRunning()) {
 					return;
 				}
-//				CodeTableDataExtractor extractor = new CodeTableDataExtractor(codeTable) {
-//				public Row next() {
-//					Row row = super.next();
-//					incrementItemsProcessed();
-//					return row;
-//				}
-//			};
 				CodeTableDataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
 				setProcessedItems(getProcessedItems() + extractor.getTotal());
 			}
