@@ -32,7 +32,6 @@ import org.openforis.collect.relational.model.PrimaryKeyConstraint;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
 
 /**
  * 
@@ -139,12 +138,11 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 	private void addCodeListsCodeIndexes(RelationalSchema schema, CollectDSLContext dsl) {
 		for (Table<?> table : schema.getTables()) {
 			if (table instanceof CodeTable) {
+				CodeTable codeTable = (CodeTable) table;
 				org.jooq.Table<Record> jooqTable = jooqTable(schema, table, ! dsl.isSchemaLess());
-				CodeListCodeColumn codeColumn = ((CodeTable) table).getCodeColumn();
-				Integer levelIdx = ((CodeTable) table).getLevelIdx();
-				
+				CodeListCodeColumn codeColumn = codeTable.getCodeColumn();
 				CollectCreateIndexStep createIndexStep = dsl.createIndex(table.getName() + "_code_idx");
-				if (levelIdx == null || levelIdx == 0 || ((CodeTable) table).getCodeList().getCodeScope() == CodeScope.SCHEME) {
+				if (codeTable.getLevelIdx() == null || codeTable.getLevelIdx() == 0) { 
 					//unique index only for first level or when the code scope is 'scheme'
 					createIndexStep.unique();
 				}

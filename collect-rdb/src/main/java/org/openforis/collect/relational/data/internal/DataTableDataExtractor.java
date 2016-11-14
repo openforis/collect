@@ -11,6 +11,8 @@ import org.openforis.collect.relational.data.Dataset;
 import org.openforis.collect.relational.data.Row;
 import org.openforis.collect.relational.model.CodeValueFKColumn;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.CoordinateLatitudeColumn;
+import org.openforis.collect.relational.model.CoordinateLongitudeColumn;
 import org.openforis.collect.relational.model.DataAncestorFKColumn;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
@@ -103,6 +105,12 @@ public class DataTableDataExtractor extends DataExtractor {
 		} else if (column instanceof CodeValueFKColumn) {
 			CodeValueFKColumnValueExtractor valueExtractor = new CodeValueFKColumnValueExtractor(table, (CodeValueFKColumn) column);
 			return valueExtractor.extractValue(context);
+		} else if (column instanceof CoordinateLatitudeColumn) {
+			return new CoordinateLatitudeColumnValueExtractor(table, (CoordinateLatitudeColumn) column)
+					.extractValue(context);
+		} else if (column instanceof CoordinateLongitudeColumn) {
+			return new CoordinateLongitudeColumnValueExtractor(table, (CoordinateLongitudeColumn) column)
+					.extractValue(context);
 		} else if (column instanceof DataAncestorFKColumn) {
 			EntityDefinition referencedEntityDefinition = table.getReferencedEntityDefinition((DataAncestorFKColumn) column);
 			Entity ancestor = context.getAncestorByDefinition(referencedEntityDefinition);

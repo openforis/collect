@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.CodeListService;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
@@ -337,9 +338,11 @@ public class RelationalSchemaGenerator {
 	
 	private void addDataColumns(RelationalSchema rs, DataTable table, AttributeDefinition defn, Path relativePath) throws CollectRdbException {
 		if ( defn instanceof CodeAttributeDefinition ) {
-			addDataColumns(rs, table, (CodeAttributeDefinition) defn, relativePath);
+			addCodeAttributeDataColumns(rs, table, (CodeAttributeDefinition) defn, relativePath);
+		} else if ( defn instanceof CoordinateAttributeDefinition ) {
+			addCoordinateAttributeDataColumns(rs, table, (CoordinateAttributeDefinition) defn, relativePath);
 		} else if ( defn instanceof NumericAttributeDefinition ) {
-			addDataColumns(table, (NumericAttributeDefinition) defn, relativePath);
+			addNumericAttributeDataColumns(table, (NumericAttributeDefinition) defn, relativePath);
 		} else if ( defn instanceof DateAttributeDefinition || 
 					defn instanceof TimeAttributeDefinition ) {
 			//create date or time type column
@@ -357,7 +360,7 @@ public class RelationalSchemaGenerator {
 		}
 	}
 	
-	private void addDataColumns(RelationalSchema rs, DataTable table, CodeAttributeDefinition defn, Path relativePath) throws CollectRdbException {
+	private void addCodeAttributeDataColumns(RelationalSchema rs, DataTable table, CodeAttributeDefinition defn, Path relativePath) throws CollectRdbException {
 		FieldDefinition<?> codeField = defn.getFieldDefinition(CodeAttributeDefinition.CODE_FIELD);
 		addCodeColumn(table, codeField, relativePath);
 		CodeList list = defn.getList();
@@ -370,6 +373,19 @@ public class RelationalSchemaGenerator {
 		}
 	}
 	
+	private void addCoordinateAttributeDataColumns(RelationalSchema rs, DataTable table, CoordinateAttributeDefinition defn, Path relativePath) throws CollectRdbException {
+		addDataColumnsForEachField(table, defn, relativePath);
+		
+		String baseName = columnNameGenerator.generateName(defn);
+		String latColName = baseName + "_lat";
+		CoordinateLatitudeColumn latCol = new CoordinateLatitudeColumn(latColName, defn, relativePath);
+		addColumn(table, latCol);
+		
+		String longColName = baseName + "_long";
+		CoordinateLongitudeColumn longCol = new CoordinateLongitudeColumn(longColName, defn, relativePath);
+		addColumn(table, longCol);
+	}
+
 	protected boolean isQualifiable(CodeList list) {
 		boolean qualifiable = false;
 		if ( list.isExternal() ) {
@@ -385,7 +401,7 @@ public class RelationalSchemaGenerator {
 		return qualifiable;
 	}
 	
-	private void addDataColumns(DataTable table, NumericAttributeDefinition defn, Path relativePath) throws CollectRdbException {
+	private void addNumericAttributeDataColumns(DataTable table, NumericAttributeDefinition defn, Path relativePath) throws CollectRdbException {
 		boolean variableUnit = defn.isVariableUnit();
 		for (FieldDefinition<?> field : defn.getFieldDefinitions()) {
 			String name = field.getName();

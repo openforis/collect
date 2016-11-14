@@ -18,17 +18,4 @@ public class AncestorKeyColumn extends DataColumn {
 				relPath, getFieldLength(defn), true);
 	}
 	
-	protected static Integer getFieldLength(FieldDefinition<?> defn) {
-		Class<?> type = defn.getValueType();
-		if ( type == Integer.class ) {
-			return null;
-		} else if ( type == Double.class ) {
-			return 24;
-		} else if ( type == String.class ) {
-			return 255;
-		} else {
-			throw new UnsupportedOperationException("Unknown field type "+type);				
-		}
-	}
-	
 }

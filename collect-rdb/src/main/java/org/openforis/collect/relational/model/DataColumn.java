@@ -19,6 +19,23 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 	private NodeDefinition nodeDefinition;
 	private Path relativePath;
 
+	protected static Integer getFieldLength(FieldDefinition<?> defn) {
+		Class<?> type = defn.getValueType();
+		return getFieldLength(type);
+	}
+
+	protected static Integer getFieldLength(Class<?> type) {
+		if ( type == Integer.class ) {
+			return null;
+		} else if ( type == Double.class ) {
+			return 24;
+		} else if ( type == String.class ) {
+			return 255;
+		} else {
+			throw new UnsupportedOperationException("Unknown field type "+type);				
+		}
+	}
+	
 	DataColumn(String name, RDBJdbcType type, NodeDefinition defn, Path relPath, Integer length, boolean nullable) {
 		this(name, type, defn, relPath, length, nullable, null);
 	}
