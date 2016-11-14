@@ -22,11 +22,11 @@ import org.openforis.idm.model.TimeAttribute;
  * @author S. Ricci
  *
  */
-public class DataTableDataColumnValueExtractor extends ColumnValueExtractor<DataTable, DataColumn> {
+public class DataTableDataColumnValueExtractor<C extends DataColumn> extends ColumnValueExtractor<DataTable, C> {
 
 	private static final Log LOG = LogFactory.getLog(DataTableDataColumnValueExtractor.class);
 	
-	public DataTableDataColumnValueExtractor(DataTable table, DataColumn column) {
+	public DataTableDataColumnValueExtractor(DataTable table, C column) {
 		super(table, column);
 	}
 	

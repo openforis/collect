@@ -3,7 +3,6 @@ package org.openforis.collect.relational.data.internal;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.CodeValueFKColumn;
-import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -21,9 +20,9 @@ import org.openforis.idm.model.Record;
  * @author S. Ricci
  *
  */
-public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExtractor {
+public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExtractor<CodeValueFKColumn> {
 
-	public CodeValueFKColumnValueExtractor(DataTable table, DataColumn column) {
+	public CodeValueFKColumnValueExtractor(DataTable table, CodeValueFKColumn column) {
 		super(table, column);
 	}
 	
@@ -33,7 +32,7 @@ public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExt
 		Node<?> valNode = super.extractValueNode(context);
 		if ( valNode != null && valNode instanceof CodeAttribute ) {
 			return extractValue((CodeAttribute) valNode);
-		} else if ( ((CodeValueFKColumn) column).getDefaultCodeValue() != null ) {
+		} else if ( column.getDefaultCodeValue() != null ) {
 			ModelVersion version = context.getRecord().getVersion();
 			return getDefaultCodeItemId(((CodeAttributeDefinition) defn).getList(), version);
 		} else {
@@ -44,7 +43,7 @@ public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExt
 	private Object extractValue(CodeAttribute valNode) {
 		CodeListItem item = findCodeListItem(valNode);
 		if ( item == null ) {
-			String defaultCodeValue = ((CodeValueFKColumn) column).getDefaultCodeValue();
+			String defaultCodeValue = column.getDefaultCodeValue();
 			String codeValue = getCodeValue(valNode);
 			if ( defaultCodeValue == null || (codeValue != null && ! codeValue.equals(defaultCodeValue)) ) {
 				//no default code value specified or code list item not found (invalid code?)
@@ -83,7 +82,7 @@ public class CodeValueFKColumnValueExtractor extends DataTableDataColumnValueExt
 
 	private Integer getDefaultCodeItemId(CodeList list, ModelVersion version) {
 		CodeListService codeListService = getCodeListService((CollectSurvey) list.getSurvey());
-		CodeListItem defaultCodeItem = codeListService.loadRootItem(list, ((CodeValueFKColumn) column).getDefaultCodeValue(), version);
+		CodeListItem defaultCodeItem = codeListService.loadRootItem(list, column.getDefaultCodeValue(), version);
 		return defaultCodeItem == null ? CodeTableDataExtractor.DEFAULT_CODE_ROW_ID: defaultCodeItem.getId();
 	}
 

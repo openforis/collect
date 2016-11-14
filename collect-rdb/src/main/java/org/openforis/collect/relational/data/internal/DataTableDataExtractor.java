@@ -121,7 +121,8 @@ public class DataTableDataExtractor extends DataExtractor {
 				return getTableArtificialPK(ancestor);
 			}
 		} else if (column instanceof DataColumn) {
-			DataTableDataColumnValueExtractor valueExtractor = new DataTableDataColumnValueExtractor(table, (DataColumn) column);
+			DataTableDataColumnValueExtractor<DataColumn> valueExtractor = 
+					new DataTableDataColumnValueExtractor<DataColumn>(table, (DataColumn) column);
 			return valueExtractor.extractValue(context);
 		} else {
 			throw new IllegalArgumentException("Unsupported column type: " + column.getClass().getName());

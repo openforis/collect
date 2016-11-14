@@ -11,7 +11,7 @@ import org.openforis.idm.model.Node;
  * @author S. Ricci
  *
  */
-public class CoordinateLongitudeColumnValueExtractor extends DataTableDataColumnValueExtractor {
+public class CoordinateLongitudeColumnValueExtractor extends DataTableDataColumnValueExtractor<CoordinateLongitudeColumn> {
 
 	public CoordinateLongitudeColumnValueExtractor(DataTable table, CoordinateLongitudeColumn column) {
 		super(table, column);
