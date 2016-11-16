@@ -179,11 +179,11 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Close
 	}
 	
 	private List<Field<?>> toFields(List<? extends Column<?>> columns) {
-		List<Field<?>> ancestorColumns = new ArrayList<Field<?>>(columns.size());
+		List<Field<?>> fields = new ArrayList<Field<?>>(columns.size());
 		for (Column<?> column : columns) {
-			ancestorColumns.add(field(name(column.getName()), dsl.getDataType(column.getType().getJavaType())));
+			fields.add(field(name(column.getName()), dsl.getDataType(column.getType().getJavaType())));
 		}
-		return ancestorColumns;
+		return fields;
 	}
 	
 	@Override

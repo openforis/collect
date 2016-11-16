@@ -2,6 +2,7 @@ package org.openforis.collect.persistence.jooq;
 
 import static org.jooq.impl.DSL.name;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.Date;
 
@@ -77,13 +78,21 @@ public class CollectDSLContext extends DefaultDSLContext {
 				execute("ALTER SEQUENCE " +  qualifiedName + " RESTART WITH " + restartValue);
 				break;
 			default:
-				throw new RuntimeException("DB dialeg not supported : " + configuration().dialect());
+				throw new RuntimeException("DB dialect not supported : " + configuration().dialect());
 			}
 		}
 	}
 	
 	public DataType<?> getDataType(Class<?> type) {
-		return DefaultDataType.getDataType(dialect(), type == Date.class ? java.sql.Date.class: type);
+		Class<?> jooqType;
+		if (type == Date.class) {
+			jooqType = java.sql.Date.class;
+		} else if (type == Double.class) {
+			jooqType = BigDecimal.class;
+		} else {
+			jooqType = type;
+		}
+		return DefaultDataType.getDataType(dialect(), jooqType);
 	}
 	
 	private boolean isSequenceSupported() {
