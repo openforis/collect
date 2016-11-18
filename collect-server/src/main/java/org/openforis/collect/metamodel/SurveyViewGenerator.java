@@ -10,10 +10,12 @@ import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.model.Coordinate;
 
 /**
  * 
@@ -170,11 +172,33 @@ public class SurveyViewGenerator {
 	
 	public static class SurveyView {
 		
+		public enum Shape {
+			CIRCLE, SQUARE
+		}
+		
+		public enum Distribution {
+			RANDOM, GRIDDED
+		}
+		
 		private Integer id;
 		private String name;
 		private boolean temporary;
 		private SurveyTarget target;
+		private List<CodeListView> codeLists;
 		private List<EntityDefView> rootEntities;
+		//TODO
+		private List<Coordinate> aoiBoundary;
+		private Integer numberOfPlots;
+		private Shape plotShape;
+		private Double plotWidth;
+		private Double plotResolution;
+		private Distribution plotDistribution;
+		private Integer samplesPerPlot;
+		private Shape sampleShape;
+		private Double sampleWidth;
+		private Double sampleResolution;
+		private Distribution sampleDistribution;
+		private List<String> imagery;
 		
 		public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
 			this.id = id;
@@ -216,5 +240,21 @@ public class SurveyViewGenerator {
 			return rootEntities;
 		}
 		
+	}
+
+	
+	private class CodeListItemView {
+		
+		private String code;
+		private String label;
+		private String color;
+		
+		private List<CodeListItemView> items;
+		
+	}
+	
+	private class CodeListView {
+		
+		private List<CodeListItemView> items;
 	}
 }

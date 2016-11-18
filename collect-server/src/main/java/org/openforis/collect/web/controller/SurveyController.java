@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
+@RequestMapping("/surveys/")
 public class SurveyController extends BasicController {
 
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
@@ -37,8 +41,18 @@ public class SurveyController extends BasicController {
 	private RecordManager recordManager;
 	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
+	private SamplingDesignManager samplingDesignManager;
 
-	@RequestMapping(value = "/surveys/summaries.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "summaries-by-user.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	List<SurveySummary> loadSummariesByUser(@RequestParam(required=false) int userID) {
+		//TODO
+		return null;
+		//TODO add institution, imagery, boundaries
+	}
+
+	@RequestMapping(value = "summaries.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SurveySummary> loadSummaries(
 			@RequestParam(required=false) boolean includeTemporary,
@@ -50,28 +64,50 @@ public class SurveyController extends BasicController {
 			return surveyManager.getSurveySummaries(language);
 		}
 	}
-
-	@RequestMapping(value = "/surveys/{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	
+	@RequestMapping(value = "{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id) throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH);
-		SurveyView view = viewGenerator.generateView(survey);
-		return view;
+		return generateView(survey);
 	}
-	
-	@RequestMapping(value = "/surveys/temp/{surveyId}/edit.htm", method = RequestMethod.GET)
+
+	@RequestMapping(value = "temp/{surveyId}/edit.htm", method = RequestMethod.GET)
 	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("temp_id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	@RequestMapping(value = "/surveys/{surveyId}/edit.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "{surveyId}/edit.htm", method = RequestMethod.GET)
 	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
+	@RequestMapping(value = "create-single-attribute-survey.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	SurveyView createSingleAttributeSurvey(
+			String name, String description, 
+			double boundaryLonMin, double boundaryLonMax, double boundaryLatMin, double boundaryLatMax, 
+			int numPlots, String plotDistribution, double plotResolution, String plotShape, double plotWidth, 
+			int samplesPerPlot, double sampleResolution, 
+			String sampleDistribution, String sampleShape, double sampleWidth,
+			Object[] sampleValues, String[] imagery
+			) throws Exception {
+		
+		CollectSurvey survey = null; //TODO
+		
+		List<SamplingDesignItem> items = new SamplingPointDataGenerator().generate(
+				boundaryLonMin, boundaryLonMax, boundaryLatMin, boundaryLatMax,
+				numPlots, plotDistribution, plotResolution, plotWidth,
+				samplesPerPlot, sampleResolution, sampleDistribution,
+				sampleWidth);
+		
+		samplingDesignManager.insert(survey, items, true);
+		
+		return generateView(survey);
+	}
+
 	protected List<Integer> getRecordIds(SurveySummary s) {
 		List<Integer> recordIds = new ArrayList<Integer>();
 		CollectSurvey survey = surveyManager.getById(s.getId());
@@ -83,6 +119,12 @@ public class SurveyController extends BasicController {
 			recordIds.add(r.getId());
 		}
 		return recordIds;
+	}
+
+	private SurveyView generateView(CollectSurvey survey) {
+		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH);
+		SurveyView view = viewGenerator.generateView(survey);
+		return view;
 	}
 	
 }
