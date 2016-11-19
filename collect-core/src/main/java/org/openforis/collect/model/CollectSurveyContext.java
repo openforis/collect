@@ -4,8 +4,6 @@
 package org.openforis.collect.model;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.validation.CollectValidator;
@@ -26,16 +24,6 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  */
 public class CollectSurveyContext implements SurveyContext, Serializable {
 
-	private static CoordinateOperations COORDINATE_OPERATIONS;
-
-	static {
-		ServiceLoader<CoordinateOperations> loader = ServiceLoader.load(CoordinateOperations.class);
-		Iterator<CoordinateOperations> it = loader.iterator();
-		if ( it.hasNext() ) {
-			COORDINATE_OPERATIONS = it.next();
-		}
-	}
-	
 	private static final long serialVersionUID = 1L;
 	
 	private transient ExpressionFactory expressionFactory;
@@ -44,6 +32,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	private transient ExternalCodeListProvider externalCodeListProvider;
 	private transient CodeListService codeListService;
 	private transient SpeciesListService speciesListService;
+	private transient CoordinateOperations coordinateOperations = new CoordinateOperations();
 
 	public CollectSurveyContext() {
 		this(new ExpressionFactory(), new CollectValidator());
@@ -118,7 +107,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	
 	@Override
 	public CoordinateOperations getCoordinateOperations() {
-		return COORDINATE_OPERATIONS;
+		return coordinateOperations;
 	}
 	
 }

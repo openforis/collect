@@ -97,9 +97,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	
 	private void initCoordinateOperations() {
 		CoordinateOperations coordinateOperations = getContext().getCoordinateOperations();
-		if (coordinateOperations != null) {
-			coordinateOperations.parseSRS(getSpatialReferenceSystems());
-		}
+		coordinateOperations.registerSrs(getSpatialReferenceSystems());
 	}
 	
 	public Record createRecord() {
@@ -761,7 +759,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		if (spatialReferenceSystems == null) {
 			if (other.spatialReferenceSystems != null)
 				return false;
-		} else if (!spatialReferenceSystems.equals(other.spatialReferenceSystems))
+		} else if (! CollectionUtils.deepEquals(spatialReferenceSystems, other.spatialReferenceSystems))
 			return false;
 		if (units == null) {
 			if (other.units != null)

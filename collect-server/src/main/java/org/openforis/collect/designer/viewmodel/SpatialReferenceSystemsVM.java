@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SpatialReferenceSystemFormObject;
+import org.openforis.collect.geospatial.GeoToolsCoordinateOperations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
@@ -29,7 +29,6 @@ import org.zkoss.bind.annotation.Init;
  */
 public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferenceSystem> {
 
-	private static final ServiceLoader<CoordinateOperations> COORDINATE_OPERATIONS_LOADER = ServiceLoader.load(CoordinateOperations.class);
 	private String selectedPredefinedSrsCode;
 
 	@Override
@@ -47,8 +46,7 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 	
 	@Override
 	protected SpatialReferenceSystem createItemInstance() {
-		SpatialReferenceSystem instance = new SpatialReferenceSystem();
-		return instance;
+		return new SpatialReferenceSystem();
 	}
 
 	@Override
@@ -79,7 +77,7 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 		for (SpatialReferenceSystem srs : currentSRSs) {
 			insertedSRSCodes.add(srs.getId());
 		}
-		CoordinateOperations coordinateOperations = getCoordinateOperations();
+		GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
 		Set<String> availableSRSs = coordinateOperations.getAvailableSRSs();
 		
 		List<String> result = new ArrayList<String>(availableSRSs);
@@ -94,7 +92,7 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
-				CoordinateOperations coordinateOperations = getCoordinateOperations();
+				GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
 				Set<String> languages = new HashSet<String>(survey.getLanguages());
 				
 				SpatialReferenceSystem srs = coordinateOperations.fetchSRS(selectedPredefinedSrsCode, languages);
@@ -105,13 +103,6 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 				dispatchSurveyChangedCommand();
 			}
 		});
-	}
-
-	private CoordinateOperations getCoordinateOperations() {
-		for (CoordinateOperations coordinateOperations : COORDINATE_OPERATIONS_LOADER) {
-			return coordinateOperations;
-		}
-		return null;
 	}
 
 	public String getSelectedPredefinedSrsCode() {

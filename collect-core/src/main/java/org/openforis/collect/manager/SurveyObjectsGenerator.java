@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.openforis.idm.geospatial.CoordinateOperations;
@@ -93,23 +92,13 @@ public class SurveyObjectsGenerator {
 	}
 	
 	protected void addPredefinedSRSs(Survey survey) {
-		CoordinateOperations coordinateOperations = getCoordinateOperationsService();
+		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
 		if ( coordinateOperations != null ) {
 			Set<String> labelLanguages = new HashSet<String>(survey.getLanguages());
 			labelLanguages.add("en");
-
-			SpatialReferenceSystem srs = coordinateOperations.fetchSRS(CoordinateOperations.WGS84_SRS_ID, labelLanguages);
-			survey.addSpatialReferenceSystem(srs);
+			survey.addSpatialReferenceSystem(new SpatialReferenceSystem(SpatialReferenceSystem.LAT_LON_SRS));
 		}
 		return;
-	}
-	
-	private CoordinateOperations getCoordinateOperationsService() {
-		ServiceLoader<CoordinateOperations> serviceLoader = ServiceLoader.load(CoordinateOperations.class);
-		for (CoordinateOperations coordinateOperations : serviceLoader) {
-			return coordinateOperations;
-		}
-		return null;
 	}
 	
 	private void addUnit(Survey survey, String name, Dimension dimension,

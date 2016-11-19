@@ -18,6 +18,7 @@ import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
@@ -180,9 +181,9 @@ public class IDMFunctions extends CustomFunctions {
 			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
 					Expression[] arguments) {
 				Survey survey = contextNodeDef.getSurvey();
-				if(survey.getSpatialReferenceSystem(CoordinateOperations.WGS84_SRS_ID) == null) {
+				if(survey.getSpatialReferenceSystem(SpatialReferenceSystem.WGS84_SRS_ID) == null) {
 					String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
-							LATLONG_FUNCTION_NAME, CoordinateOperations.WGS84_SRS_ID);
+							LATLONG_FUNCTION_NAME, SpatialReferenceSystem.WGS84_SRS_ID);
 					return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
 				} else {
 					return new ExpressionValidationResult();
@@ -385,9 +386,9 @@ public class IDMFunctions extends CustomFunctions {
 		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
 		if (coordinateOperations == null) {
 			return null;
+		} else {
+			return coordinateOperations.convertToWgs84(coordinate);
 		}
-		Coordinate wgs84Coordinate = coordinateOperations.convertToWgs84(coordinate);
-		return wgs84Coordinate;
 	}
 
 	private static Calendar getCalendar(Date date2, Time time2, TimeUnit timeUnit) {

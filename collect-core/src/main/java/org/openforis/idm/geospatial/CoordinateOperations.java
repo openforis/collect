@@ -1,41 +1,69 @@
-/**
- * 
- */
 package org.openforis.idm.geospatial;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
 
 /**
- * @author S. Ricci
- *
+ * @author Daniel Wiell
  */
-public interface CoordinateOperations {
+public class CoordinateOperations {
 
-	public  static final String WGS84_SRS_ID = "EPSG:4326";
+	private Map<String, SpatialReferenceSystem> spatialReferenceSystemsById = new ConcurrentHashMap<String, SpatialReferenceSystem>();
 
-	void validateWKT(String wkt) throws Exception;
-	
-	void parseSRS(List<SpatialReferenceSystem> srss);
+	public void registerSrs(List<SpatialReferenceSystem> list) {
+		for (SpatialReferenceSystem srs : list)
+			registerSRS(srs);
+	}
 
-	void parseSRS(SpatialReferenceSystem srs);
+	public void registerSRS(SpatialReferenceSystem srs) {
+		if (!spatialReferenceSystemsById.containsKey(srs.getId()))
+			spatialReferenceSystemsById.put(srs.getId(), srs);
+	}
 
-	boolean validate(Coordinate coordinate);
-	
-	double orthodromicDistance(double startX, double startY, String startSRSId,
-			double destX, double destY, String destSRSId);
+	public double orthodromicDistance(double startX, double startY,
+			String startSRSId, double destX, double destY, String destSRSId) {
+		return CoordinateUtils.distance(getSrs(startSRSId), new double[] {
+				startX, startY }, getSrs(destSRSId), new double[] { destX, destY });
+	}
 
-	double orthodromicDistance(Coordinate from, Coordinate to);
-	
-	SpatialReferenceSystem fetchSRS(String code);
+	public double orthodromicDistance(Coordinate from, Coordinate to) {
+		return CoordinateUtils.distance(getSrs(from.getSrsId()),
+				toUiCoordinate(from), toSrs(to), toUiCoordinate(to));
+	}
 
-	SpatialReferenceSystem fetchSRS(String code, Set<String> labelLanguages);
-	
-	Set<String> getAvailableSRSs();
-	
-	Coordinate convertToWgs84(Coordinate coordinate);
+	private double[] toUiCoordinate(Coordinate coordinate) {
+		return new double[] { coordinate.getX(), coordinate.getY() };
+	}
+
+	private SpatialReferenceSystem toSrs(Coordinate coordinate) {
+		return spatialReferenceSystemsById.get(coordinate.getSrsId());
+	}
+
+	private SpatialReferenceSystem getSrs(String srsId) {
+		return spatialReferenceSystemsById.get(srsId);
+	}
+
+	public Coordinate convertToWgs84(Coordinate coordinate) {
+		SpatialReferenceSystem fromSrs = toSrs(coordinate);
+		SpatialReferenceSystem toSrs = SpatialReferenceSystem.LAT_LON_SRS;
+		if (fromSrs.equals(toSrs)) {
+			return coordinate;
+		} else {
+			double[] uiCoordinate = toUiCoordinate(coordinate);
+			double[] transformed = CoordinateUtils.transform(fromSrs, uiCoordinate, toSrs);
+			return new Coordinate(transformed[0], transformed[1], toSrs.getId());
+		}
+	}
+
+	public boolean validate(Coordinate coordinate) {
+		return true; // TODO: Implement validation
+	}
+
+	public void validateWKT(String wkt) throws Exception {
+	}
 	
 }
