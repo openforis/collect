@@ -18,6 +18,29 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Daniel Wiell
  */
 public class CoordinateUtils {
+	
+	/**
+     * The Authalic mean radius (A<subscript>r</subscript>) of the earth
+     * [6371.0072 km] (see <a
+     * href="http://en.wikipedia.org/wiki/Earth_radius#Authalic_radius"
+     * target="_blank">Wikipedia</a>).
+     */
+    private static final double EARTH_RADIUS_MEAN = 6371.0072;
+
+    /**
+     * The equatorial radius of the earth [6378.1370 km] (see <a
+     * href="http://en.wikipedia.org/wiki/Earth_radius#Equatorial_radius"
+     * target="_blank">Wikipedia</a>) as derived from the WGS-84 ellipsoid.
+     */
+    private static final double EARTH_RADIUS_EQUATORIAL = 6378.1370;
+
+    /**
+     * The polar radius of the earth [6356.7523 km] (see <a
+     * href="http://en.wikipedia.org/wiki/Earth_radius#Polar_radius"
+     * target="_blank">Wikipedia</a>) as derived from the WGS-84 ellipsoid.
+     */
+    private static final double EARTH_RADIUS_POLAR = 6356.7523;
+    
     private static final CRSFactory CRS_FACTORY = new CRSFactory();
     private static Map<String, GeodeticCRS> crsCache = new ConcurrentHashMap<String, GeodeticCRS>();
     private static Map<String, List<CoordinateOperation>> operationCache = new ConcurrentHashMap<String, List<CoordinateOperation>>();
@@ -74,8 +97,6 @@ public class CoordinateUtils {
     }
 
     public static double distance(SpatialReferenceSystem fromSrs, double[] from, SpatialReferenceSystem toSrs, double[] to) {
-        final int R = 6371; // Radius of the earth
-
         double[] fromLatLng = transform(fromSrs, from, LAT_LON_SRS);
         double[] toLatLng = transform(toSrs, to, LAT_LON_SRS);
 
@@ -83,6 +104,9 @@ public class CoordinateUtils {
         double lon1 = fromLatLng[0];
         double lat2 = toLatLng[1];
         double lon2 = toLatLng[0];
+
+    	double avgLat = (lat1 + lat2) / 2;
+        final double R = radiusAtLocation(deg2rad(avgLat)); // Radius of the earth
 
         Double latDistance = deg2rad(lat2 - lat1);
         Double lonDistance = deg2rad(lon2 - lon1);
@@ -108,5 +132,15 @@ public class CoordinateUtils {
 
     private static double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);
+    }
+    
+    private static double radiusAtLocation(double latRad) {
+        double cosL = Math.cos(latRad);
+        double sinL = Math.sin(latRad);
+        double C1 = cosL * EARTH_RADIUS_EQUATORIAL;
+        double C2 = C1 * EARTH_RADIUS_EQUATORIAL;
+        double C3 = sinL * EARTH_RADIUS_POLAR;
+        double C4 = C3 * EARTH_RADIUS_POLAR;
+        return Math.sqrt((C2 * C2 + C4 * C4) / (C1 * C1 + C3 * C3));
     }
 }

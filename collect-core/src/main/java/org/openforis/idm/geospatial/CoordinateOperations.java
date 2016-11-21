@@ -58,7 +58,7 @@ public class CoordinateOperations {
 			return new Coordinate(transformed[0], transformed[1], toSrs.getId());
 		}
 	}
-
+	
 	public boolean validate(Coordinate coordinate) {
 		return true; // TODO: Implement validation
 	}
