@@ -8,13 +8,23 @@ import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGene
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
+import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Distribution;
+import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -89,13 +99,16 @@ public class SurveyController extends BasicController {
 	SurveyView createSingleAttributeSurvey(
 			String name, String description, 
 			double boundaryLonMin, double boundaryLonMax, double boundaryLatMin, double boundaryLatMax, 
-			int numPlots, String plotDistribution, double plotResolution, String plotShape, double plotWidth, 
+			int numPlots, Distribution plotDistribution, double plotResolution, Shape plotShape, double plotWidth, 
 			int samplesPerPlot, double sampleResolution, 
-			String sampleDistribution, String sampleShape, double sampleWidth,
+			Distribution sampleDistribution, String sampleShape, double sampleWidth,
 			Object[] sampleValues, String[] imagery
 			) throws Exception {
 		
-		CollectSurvey survey = null; //TODO
+		CollectSurvey survey = createSingleAttributeSurvey(name, sampleValues);
+		
+		surveyManager.save(survey);
+		surveyManager.publish(survey);
 		
 		List<SamplingDesignItem> items = new SamplingPointDataGenerator().generate(
 				boundaryLonMin, boundaryLonMax, boundaryLatMin, boundaryLatMax,
@@ -106,6 +119,55 @@ public class SurveyController extends BasicController {
 		samplingDesignManager.insert(survey, items, true);
 		
 		return generateView(survey);
+	}
+
+	private CollectSurvey createSingleAttributeSurvey(String name, Object[] sampleValues) {
+		String langCode = Locale.ENGLISH.getLanguage();
+		CollectSurvey survey = surveyManager.createTemporarySurvey(name, langCode);
+		
+		Schema schema = survey.getSchema();
+		
+		EntityDefinition rootEntityDef = survey.getSchema().createEntityDefinition();
+		rootEntityDef.setName("plot");
+		schema.addRootEntityDefinition(rootEntityDef);
+		
+		CodeAttributeDefinition idAttrDef = schema.createCodeAttributeDefinition();
+		idAttrDef.setName("plot_id");
+		idAttrDef.setKey(true);
+		idAttrDef.setList(survey.getSamplingDesignCodeList());
+		
+		rootEntityDef.addChildDefinition(idAttrDef);
+		
+		CodeList valuesCodeList = survey.createCodeList();
+		valuesCodeList.setName("values");
+		for (int i = 0; i < sampleValues.length; i++) {
+			Object sampleValue = sampleValues[i];
+			CodeListItem item = valuesCodeList.createItem(1);
+			item.setCode(String.valueOf(i + 1));
+			item.setLabel(langCode, sampleValue.toString());
+			valuesCodeList.addItem(item);
+		}
+		survey.addCodeList(valuesCodeList);
+		
+		CodeAttributeDefinition valueAttrDef = schema.createCodeAttributeDefinition();
+		valueAttrDef.setName("value");
+		valueAttrDef.setList(valuesCodeList);
+		
+		rootEntityDef.addChildDefinition(valueAttrDef);
+		
+		//create root tab set
+		UIOptions uiOptions = survey.getUIOptions();
+		UITabSet rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntityDef);
+		UITab mainTab = uiOptions.getMainTab(rootTabSet);
+		mainTab.setLabel(langCode, "Plot");
+		
+		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
+		surveyObjectsGenerator.addPredefinedObjects(survey);
+		
+		if ( survey.getSamplingDesignCodeList() == null ) {
+			survey.addSamplingDesignCodeList();
+		}
+		return survey;
 	}
 
 	protected List<Integer> getRecordIds(SurveySummary s) {

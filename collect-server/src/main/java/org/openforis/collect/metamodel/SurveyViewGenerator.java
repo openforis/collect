@@ -10,7 +10,9 @@ import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
@@ -34,7 +36,23 @@ public class SurveyViewGenerator {
 	public SurveyView generateView(CollectSurvey survey) {
 		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
 		final String langCode = locale.getLanguage();
-		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();;
+		
+		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList codeList : codeLists) {
+			CodeListView codeListView = new CodeListView();
+			codeListView.setId(codeList.getId());
+			codeListView.setName(codeList.getName());
+			
+			CodeListService service = survey.getContext().getCodeListService();
+			List<CodeListItem> items = service.loadRootItems(codeList);
+			for (CodeListItem item : items) {
+				codeListView.items.add(createCodeListItemView(item, langCode));
+			}
+			
+			surveyView.codeLists.add(codeListView);
+		}
+		
+		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();
 		survey.getSchema().traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
 				int id = def.getId();
@@ -62,6 +80,22 @@ public class SurveyViewGenerator {
 		return surveyView;
 	}
 	
+	private CodeListItemView createCodeListItemView(CodeListItem item, String langCode) {
+		CodeListService service = item.getSurvey().getContext().getCodeListService();
+		
+		CodeListItemView itemView = new CodeListItemView();
+		itemView.code = item.getCode();
+		itemView.label = item.getLabel(langCode);
+		
+		List<CodeListItemView> childItemsView = new ArrayList<CodeListItemView>();
+		List<CodeListItem> childItems = service.loadChildItems(item);
+		for (CodeListItem childItem : childItems) {
+			childItemsView.add(createCodeListItemView(childItem, langCode));
+		}
+		itemView.items.addAll(childItemsView);
+		return itemView;
+	}
+
 	private String getLabel(NodeDefinition def, String langCode) {
 		String label = def.getLabel(Type.INSTANCE, langCode);
 		if (label == null && ! def.getSurvey().isDefaultLanguage(langCode)) {
@@ -69,10 +103,161 @@ public class SurveyViewGenerator {
 		}
 		return label;
 	}
-
-	public static abstract class NodeDefView {
+	
+	public static class SurveyView {
 		
-		private int id;
+		public enum Shape {
+			CIRCLE, SQUARE
+		}
+		
+		public enum Distribution {
+			RANDOM, GRIDDED
+		}
+		
+		private Integer id;
+		private String name;
+		private boolean temporary;
+		private SurveyTarget target;
+		private List<CodeListView> codeLists = new ArrayList<CodeListView>();
+		private List<EntityDefView> rootEntities = new ArrayList<EntityDefView>();
+		//TODO
+		private List<Coordinate> aoiBoundary;
+		private Integer numberOfPlots;
+		private Shape plotShape;
+		private Double plotWidth;
+		private Double plotResolution;
+		private Distribution plotDistribution;
+		private Integer samplesPerPlot;
+		private Shape sampleShape;
+		private Double sampleWidth;
+		private Double sampleResolution;
+		private Distribution sampleDistribution;
+		private List<String> imagery;
+		
+		public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
+			this.id = id;
+			this.name = name;
+			this.temporary = temporary;
+			this.target = target;
+		}
+		
+		public Integer getId() {
+			return id;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public boolean isTemporary() {
+			return temporary;
+		}
+		
+		public void setTemporary(boolean temporary) {
+			this.temporary = temporary;
+		}
+		
+		public SurveyTarget getTarget() {
+			return target;
+		}
+		
+		public void setTarget(SurveyTarget target) {
+			this.target = target;
+		}
+		
+		public void addRootEntity(EntityDefView rootEntity) {
+			rootEntities.add(rootEntity);
+		}
+		
+		public List<EntityDefView> getRootEntities() {
+			return rootEntities;
+		}
+		
+		public List<CodeListView> getCodeLists() {
+			return codeLists;
+		}
+	}
+	
+	public static abstract class SurveyObjectView {
+		
+		protected int id;
+		
+		public int getId() {
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+	}
+	
+	public static class CodeListItemView extends SurveyObjectView {
+		
+		private String code;
+		private String label;
+		private String color;
+		
+		private List<CodeListItemView> items = new ArrayList<CodeListItemView>();
+
+		public String getCode() {
+			return code;
+		}
+
+		public void setCode(String code) {
+			this.code = code;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public void setLabel(String label) {
+			this.label = label;
+		}
+
+		public String getColor() {
+			return color;
+		}
+
+		public void setColor(String color) {
+			this.color = color;
+		}
+
+		public List<CodeListItemView> getItems() {
+			return items;
+		}
+
+		public void setItems(List<CodeListItemView> items) {
+			this.items = items;
+		}
+		
+	}
+	
+	public static class CodeListView extends SurveyObjectView {
+		
+		private String name;
+		private List<CodeListItemView> items = new ArrayList<CodeListItemView>();
+		
+		public List<CodeListItemView> getItems() {
+			return items;
+		}
+		
+		public void setItems(List<CodeListItemView> items) {
+			this.items = items;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+	}
+
+	public static abstract class NodeDefView extends SurveyObjectView {
+		
 		private String name;
 		private String label;
 		private NodeType type;
@@ -89,14 +274,7 @@ public class SurveyViewGenerator {
 			this.multiple = multiple;
 		}
 
-		public int getId() {
-			return id;
-		}
-
-		public void setId(int id) {
-			this.id = id;
-		}
-
+		
 		public String getName() {
 			return name;
 		}
@@ -170,91 +348,5 @@ public class SurveyViewGenerator {
 		}
 	}
 	
-	public static class SurveyView {
-		
-		public enum Shape {
-			CIRCLE, SQUARE
-		}
-		
-		public enum Distribution {
-			RANDOM, GRIDDED
-		}
-		
-		private Integer id;
-		private String name;
-		private boolean temporary;
-		private SurveyTarget target;
-		private List<CodeListView> codeLists;
-		private List<EntityDefView> rootEntities;
-		//TODO
-		private List<Coordinate> aoiBoundary;
-		private Integer numberOfPlots;
-		private Shape plotShape;
-		private Double plotWidth;
-		private Double plotResolution;
-		private Distribution plotDistribution;
-		private Integer samplesPerPlot;
-		private Shape sampleShape;
-		private Double sampleWidth;
-		private Double sampleResolution;
-		private Distribution sampleDistribution;
-		private List<String> imagery;
-		
-		public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
-			this.id = id;
-			this.name = name;
-			this.temporary = temporary;
-			this.target = target;
-			this.rootEntities = new ArrayList<EntityDefView>();
-		}
-		
-		public Integer getId() {
-			return id;
-		}
-		
-		public String getName() {
-			return name;
-		}
-		
-		public boolean isTemporary() {
-			return temporary;
-		}
-		
-		public void setTemporary(boolean temporary) {
-			this.temporary = temporary;
-		}
-		
-		public SurveyTarget getTarget() {
-			return target;
-		}
-		
-		public void setTarget(SurveyTarget target) {
-			this.target = target;
-		}
-		
-		public void addRootEntity(EntityDefView rootEntity) {
-			rootEntities.add(rootEntity);
-		}
-		
-		public List<EntityDefView> getRootEntities() {
-			return rootEntities;
-		}
-		
-	}
-
 	
-	private class CodeListItemView {
-		
-		private String code;
-		private String label;
-		private String color;
-		
-		private List<CodeListItemView> items;
-		
-	}
-	
-	private class CodeListView {
-		
-		private List<CodeListItemView> items;
-	}
 }
