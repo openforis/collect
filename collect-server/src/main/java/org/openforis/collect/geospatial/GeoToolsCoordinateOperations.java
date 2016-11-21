@@ -6,6 +6,7 @@ package org.openforis.collect.geospatial;
 
 import static org.geotools.referencing.CRS.parseWKT;
 import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
+import static org.openforis.idm.metamodel.SpatialReferenceSystem.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +24,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.AbstractSingleCRS;
 import org.openforis.idm.geospatial.CoordinateOperationException;
-import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
 import org.opengis.geometry.DirectPosition;
@@ -34,12 +34,13 @@ import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.GenericName;
+import org.opengis.util.InternationalString;
 
 /**
  * @author M. Togna
- * 
+ * @deprecated
  */
-public class GeoToolsCoordinateOperations implements CoordinateOperations {
+public class GeoToolsCoordinateOperations {
 
 	private static final Log LOG = LogFactory.getLog(GeoToolsCoordinateOperations.class);
 
@@ -57,7 +58,7 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 			TO_WGS84_TRANSFORMS = new HashMap<String, MathTransform>();
 
 			MathTransform wgs84Transform = CRS.findMathTransform(WGS84, WGS84);
-			TO_WGS84_TRANSFORMS.put(CoordinateOperations.WGS84_SRS_ID, wgs84Transform);
+			TO_WGS84_TRANSFORMS.put(WGS84_SRS_ID, wgs84Transform);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled()) {
 				LOG.error("Error while initializing CoordinateOperations", e);
@@ -86,7 +87,6 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		}
 	}
 	
-	@Override
 	public boolean validate(Coordinate coordinate) {
 		try {
 			double x = coordinate.getX();
@@ -102,19 +102,16 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		}
 	}
 
-	@Override
 	public void validateWKT(String wkt) throws Exception {
 		parseWKT(wkt);
 	}
 	
-	@Override
 	public double orthodromicDistance(double startX, double startY, String startSRSId, double destX, double destY, String destSRSId) throws CoordinateOperationException {
 		Position startingPosition = toWgs84(startX, startY, startSRSId);
 		Position destinationPosition = toWgs84(destX, destY, destSRSId);
 		return orthodromicDistance(startingPosition, destinationPosition);
 	}
 
-	@Override
 	public double orthodromicDistance(Coordinate startingCoordinate, Coordinate destinationCoordinate) throws CoordinateOperationException {
 		double startX = startingCoordinate.getX();
 		double startY = startingCoordinate.getY();
@@ -127,19 +124,15 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		return orthodromicDistance(startX, startY, startSRSId, destX, destY, destSRSId);
 	}
 
-	@Override
 	public SpatialReferenceSystem fetchSRS(String code) {
 		return fetchSRS(code, Collections.singleton("en"));
 	}
 
-	@Override
 	public SpatialReferenceSystem fetchSRS(String code, Set<String> labelLanguages) {
 		try {
 			CRSAuthorityFactory factory = CRS.getAuthorityFactory(true);
 			CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem(code);
-			SpatialReferenceSystem result = new SpatialReferenceSystem();
-			result.setId(code);
-			result.setWellKnownText(crs.toWKT());
+			SpatialReferenceSystem result = new SpatialReferenceSystem(code, crs.toWKT(), null);
 			String description = getDescription(crs);
 			for (String lang : labelLanguages) {
 				result.setLabel(lang, code);
@@ -167,15 +160,14 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 			parts.add(genericName.toString());
 		}
 		//scope
-		String scope = crs.getScope().toString();
-		if ( StringUtils.isNotBlank(scope) ) {
-			parts.add(scope);
+		InternationalString scope = crs.getScope();
+		if ( scope != null && StringUtils.isNotBlank(scope) ) {
+			parts.add(scope.toString());
 		}
 		String result = StringUtils.join(parts, "\n");
 		return result;
 	}
 	
-	@Override
 	public Set<String> getAvailableSRSs() {
 		Set<String> result = new HashSet<String>();
 		String authorityCode = "EPSG";
@@ -191,14 +183,12 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		return result;
 	}
 	
-	@Override
 	public void parseSRS(List<SpatialReferenceSystem> srss) {
 		for (SpatialReferenceSystem srs : srss) {
 			parseSRS(srs);
 		}
 	}
 	
-	@Override
 	public void parseSRS(SpatialReferenceSystem srs) {
 		String srsId = srs.getId();
 		MathTransform transform = TO_WGS84_TRANSFORMS.get(srsId);
@@ -217,14 +207,13 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		}
 	}
 	
-	@Override
 	public Coordinate convertToWgs84(Coordinate coordinate) {
-		if (CoordinateOperations.WGS84_SRS_ID.equals(coordinate.getSrsId())) {
+		if (WGS84_SRS_ID.equals(coordinate.getSrsId())) {
 			return coordinate;
 		} else {
 			Position position = toWgs84(coordinate.getX(), coordinate.getY(), coordinate.getSrsId());
 			DirectPosition directPosition = position.getDirectPosition();
-			return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), CoordinateOperations.WGS84_SRS_ID);
+			return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), WGS84_SRS_ID);
 		}
 	}
 

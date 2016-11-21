@@ -370,6 +370,13 @@
 			<artifactId>protostuff-xml</artifactId>
 			<version>${protostuff.version}</version>
 		</dependency>
+		<!-- https://github.com/orbisgis -->
+		<dependency>
+		    <groupId>org.orbisgis</groupId>
+		    <artifactId>cts</artifactId>
+		    <version>1.4.0</version>
+		</dependency>
+				
 	
 		<!-- TEST DEPENDENCIES -->
 		<dependency>

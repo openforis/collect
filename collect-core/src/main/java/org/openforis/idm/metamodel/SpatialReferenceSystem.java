@@ -6,21 +6,55 @@ package org.openforis.idm.metamodel;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+
+import org.openforis.commons.lang.DeepComparable;
 
 
 /**
  * @author G. Miceli
  * @author M. Togna
  */
-public class SpatialReferenceSystem implements Serializable {
+public class SpatialReferenceSystem implements Serializable, DeepComparable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final String WGS84_SRS_ID = "EPSG:4326";
+
+	public static final SpatialReferenceSystem LAT_LON_SRS = new SpatialReferenceSystem(
+	            WGS84_SRS_ID, 
+	            "GEOGCS[\"WGS 84\",\n" +
+	            "    DATUM[\"WGS_1984\",\n" +
+	            "        SPHEROID[\"WGS 84\",6378137,298.257223563,\n" +
+	            "            AUTHORITY[\"EPSG\",\"7030\"]],\n" +
+	            "        AUTHORITY[\"EPSG\",\"6326\"]],\n" +
+	            "    PRIMEM[\"Greenwich\",0,\n" +
+	            "        AUTHORITY[\"EPSG\",\"8901\"]],\n" +
+	            "    UNIT[\"degree\",0.01745329251994328,\n" +
+	            "        AUTHORITY[\"EPSG\",\"9122\"]],\n" +
+	            "    AUTHORITY[\"EPSG\",\"4326\"]]", "Lat Lon");
 
 	private String id;
 	private LanguageSpecificTextMap labels;
 	private LanguageSpecificTextMap descriptions;
 	private String wellKnownText;
+	
+	public SpatialReferenceSystem() {
+	}
+	
+	public SpatialReferenceSystem(String id, String wellKnownText, String defaultLabel) {
+		this.id = id;
+		this.wellKnownText = wellKnownText;
+		addLabel(new LanguageSpecificText(Locale.ENGLISH.getLanguage(), defaultLabel));
+	}
 
+	public SpatialReferenceSystem(SpatialReferenceSystem srs) {
+		this.id = srs.id;
+		this.wellKnownText = srs.wellKnownText;
+		this.labels = srs.labels == null ? null : new LanguageSpecificTextMap(srs.labels);
+		this.descriptions = srs.descriptions == null ? null : new LanguageSpecificTextMap(srs.descriptions);
+	}
+	
 	public String getId() {
 		return this.id;
 	}
@@ -101,15 +135,29 @@ public class SpatialReferenceSystem implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((descriptions == null) ? 0 : descriptions.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
-		result = prime * result + ((wellKnownText == null) ? 0 : wellKnownText.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SpatialReferenceSystem other = (SpatialReferenceSystem) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
