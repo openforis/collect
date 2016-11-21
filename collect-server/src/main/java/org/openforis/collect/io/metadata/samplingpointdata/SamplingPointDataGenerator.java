@@ -50,18 +50,18 @@ public class SamplingPointDataGenerator {
 			
 	public List<SamplingDesignItem> generate(
 			double boundaryLonMin, double boundaryLonMax,
-			double boundaryLatMin, double boundaryLatMax, int numPlots,
-			Distribution plotDistribution, double plotResolution, double plotWidth,
-			int samplesPerPlot, double sampleResolution,
-			Distribution sampleDistribution, double sampleWidth) {
+			double boundaryLatMin, double boundaryLatMax, 
+			int numPlots, Distribution plotDistribution, double plotResolution, double plotWidth,
+			int samplesPerPlot, Distribution sampleDistribution, double sampleResolution, double sampleWidth) {
 		
 		Coordinate latLonAoiCenter = new Coordinate(boundaryLonMin + (boundaryLonMax - boundaryLonMin) / 2, 
 				boundaryLatMin + (boundaryLatMax - boundaryLatMin) / 2, WGS84_SRS_ID);
 		
 		Coordinate reprojectedAoiCenter = reprojectFromLatLonToWebMarcator(latLonAoiCenter);
 		
-		List<Coordinate> plotLocations = generateLocationsInCircle(reprojectedAoiCenter, plotWidth / 2, numPlots, plotResolution, plotDistribution);
 		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>(numPlots + numPlots * samplesPerPlot);
+		
+		List<Coordinate> plotLocations = generateLocationsInCircle(reprojectedAoiCenter, plotWidth / 2, numPlots, plotResolution, plotDistribution);
 		
 		for (int plotIdx = 0; plotIdx < plotLocations.size(); plotIdx++) {
 			Coordinate plotCenter = plotLocations.get(plotIdx);

@@ -77,9 +77,11 @@ public class SurveyController extends BasicController {
 	
 	@RequestMapping(value = "{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	SurveyView loadSurvey(@PathVariable int id) throws Exception {
+	SurveyView loadSurvey(@PathVariable int id, 
+			@RequestParam(value="include-code-lists", required=false) boolean includeCodeLists) 
+			throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		return generateView(survey);
+		return generateView(survey, includeCodeLists);
 	}
 
 	@RequestMapping(value = "temp/{surveyId}/edit.htm", method = RequestMethod.GET)
@@ -113,8 +115,7 @@ public class SurveyController extends BasicController {
 		List<SamplingDesignItem> items = new SamplingPointDataGenerator().generate(
 				boundaryLonMin, boundaryLonMax, boundaryLatMin, boundaryLatMax,
 				numPlots, plotDistribution, plotResolution, plotWidth,
-				samplesPerPlot, sampleResolution, sampleDistribution,
-				sampleWidth);
+				samplesPerPlot, sampleDistribution, sampleResolution, sampleWidth);
 		
 		samplingDesignManager.insert(survey, items, true);
 		
@@ -184,7 +185,12 @@ public class SurveyController extends BasicController {
 	}
 
 	private SurveyView generateView(CollectSurvey survey) {
+		return generateView(survey, false);
+	}
+	
+	private SurveyView generateView(CollectSurvey survey, boolean includeCodeLists) {
 		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH);
+		viewGenerator.setIncludeCodeLists(includeCodeLists);
 		SurveyView view = viewGenerator.generateView(survey);
 		return view;
 	}

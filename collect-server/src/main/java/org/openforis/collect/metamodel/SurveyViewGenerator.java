@@ -27,6 +27,7 @@ import org.openforis.idm.model.Coordinate;
 public class SurveyViewGenerator {
 
 	private Locale locale;
+	private boolean includeCodeLists = false;
 	
 	public SurveyViewGenerator(Locale locale) {
 		super();
@@ -35,21 +36,22 @@ public class SurveyViewGenerator {
 
 	public SurveyView generateView(CollectSurvey survey) {
 		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
-		final String langCode = locale.getLanguage();
 		
-		List<CodeList> codeLists = survey.getCodeLists();
-		for (CodeList codeList : codeLists) {
-			CodeListView codeListView = new CodeListView();
-			codeListView.setId(codeList.getId());
-			codeListView.setName(codeList.getName());
-			
-			CodeListService service = survey.getContext().getCodeListService();
-			List<CodeListItem> items = service.loadRootItems(codeList);
-			for (CodeListItem item : items) {
-				codeListView.items.add(createCodeListItemView(item, langCode));
+		if (includeCodeLists) {
+			List<CodeList> codeLists = survey.getCodeLists();
+			for (CodeList codeList : codeLists) {
+				CodeListView codeListView = new CodeListView();
+				codeListView.setId(codeList.getId());
+				codeListView.setName(codeList.getName());
+				
+				CodeListService service = survey.getContext().getCodeListService();
+				List<CodeListItem> items = service.loadRootItems(codeList);
+				for (CodeListItem item : items) {
+					codeListView.items.add(createCodeListItemView(item));
+				}
+				
+				surveyView.codeLists.add(codeListView);
 			}
-			
-			surveyView.codeLists.add(codeListView);
 		}
 		
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();
@@ -57,7 +59,7 @@ public class SurveyViewGenerator {
 			public void visit(NodeDefinition def) {
 				int id = def.getId();
 				String name = def.getName();
-				String label = getLabel(def, langCode);
+				String label = getLabel(def);
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
 					view = new EntityDefView(((EntityDefinition) def).isRoot(), id, name, label, def.isMultiple());
@@ -80,28 +82,35 @@ public class SurveyViewGenerator {
 		return surveyView;
 	}
 	
-	private CodeListItemView createCodeListItemView(CodeListItem item, String langCode) {
+	private CodeListItemView createCodeListItemView(CodeListItem item) {
+		String langCode = locale.getLanguage();
 		CodeListService service = item.getSurvey().getContext().getCodeListService();
 		
 		CodeListItemView itemView = new CodeListItemView();
+		itemView.id = item.getId();
 		itemView.code = item.getCode();
 		itemView.label = item.getLabel(langCode);
 		
 		List<CodeListItemView> childItemsView = new ArrayList<CodeListItemView>();
 		List<CodeListItem> childItems = service.loadChildItems(item);
 		for (CodeListItem childItem : childItems) {
-			childItemsView.add(createCodeListItemView(childItem, langCode));
+			childItemsView.add(createCodeListItemView(childItem));
 		}
 		itemView.items.addAll(childItemsView);
 		return itemView;
 	}
 
-	private String getLabel(NodeDefinition def, String langCode) {
+	private String getLabel(NodeDefinition def) {
+		String langCode = locale.getLanguage();
 		String label = def.getLabel(Type.INSTANCE, langCode);
 		if (label == null && ! def.getSurvey().isDefaultLanguage(langCode)) {
 			label = def.getLabel(Type.INSTANCE);
 		}
 		return label;
+	}
+	
+	public void setIncludeCodeLists(boolean includeCodeLists) {
+		this.includeCodeLists = includeCodeLists;
 	}
 	
 	public static class SurveyView {

@@ -1,17 +1,20 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordSessionManager;
@@ -21,23 +24,23 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
+import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.commons.collection.Visitor;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.TextValue;
+import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-
-import static org.springframework.http.MediaType.*;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import static org.springframework.web.bind.annotation.RequestMethod.*;
-
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
@@ -117,37 +120,58 @@ public class RecordController extends BasicController implements Serializable {
 	
 	@RequestMapping(value = "/surveys/{survey_id}/records/create-random-record.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable(value="survey_id") int surveyId, @RequestParam final int userID) {
+	RecordProxy createRandomRecord(@PathVariable(value="survey_id") int surveyId, @RequestParam final int userID) throws RecordPersistenceException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		final Map<Integer, Integer> measurementsByRecordId = new HashMap<Integer, Integer>();
+		final Map<String, Integer> measurementsByRecordKey = new HashMap<String, Integer>();
 		recordManager.visitSummaries(new RecordFilter(survey), null, new Visitor<CollectRecord>() {
 			public void visit(CollectRecord summary) {
 				if (summary.getCreatedBy().getId() != userID) {
-					Integer measurements = measurementsByRecordId.get(summary.getId());
+					String key = summary.getRootEntityKeyValues().get(0);
+					Integer measurements = measurementsByRecordKey.get(key);
 					if (measurements == null) {
 						measurements = 1;
 					} else {
 						measurements += 1;
 					}
-					measurementsByRecordId.put(summary.getId(), measurements);
+					measurementsByRecordKey.put(key, measurements);
 				}
 			}
 		});
-		Integer minMeasurements = Collections.min(measurementsByRecordId.values());
 		
-		Iterator<Entry<Integer, Integer>> iterator = measurementsByRecordId.entrySet().iterator();
+		Set<String> plannedRecordKeys = new HashSet<String>();
+		SamplingDesignSummaries samplingPoints = samplingDesignManager.loadBySurvey(surveyId, 1);
+		for (SamplingDesignItem item : samplingPoints.getRecords()) {
+			String key = item.getLevelCode(1);
+			Integer measurements = measurementsByRecordKey.get(key);
+			if (measurements == null) {
+				measurements = 0;
+				plannedRecordKeys.add(key);
+			}
+		}		
+		Integer minMeasurements = Collections.min(measurementsByRecordKey.values());
+		
+		Iterator<Entry<String, Integer>> iterator = measurementsByRecordKey.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Entry<Integer, Integer> entry = iterator.next();
+			Entry<String, Integer> entry = iterator.next();
 			if (entry.getValue() != minMeasurements) {
 				iterator.remove();
 			}
 		}
-		ArrayList<Integer> recordKeys = new ArrayList<Integer>(measurementsByRecordId.keySet());
+		ArrayList<String> recordKeys = new ArrayList<String>(measurementsByRecordKey.keySet());
 		int recordKeyIdx = new Double(Math.floor(Math.random() * recordKeys.size())).intValue();
-		Integer recordKey = recordKeys.get(recordKeyIdx);
+		String recordKey = recordKeys.get(recordKeyIdx);
 		
-		SamplingDesignSummaries samplingPoints = samplingDesignManager.loadBySurvey(surveyId);
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
 		
+		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		String rootEntityName = rootEntityDef.getName();
+		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
+		
+		Attribute<?,Value> keyAttribute = record.findNodeByPath(rootEntityDef.getPath());
+		recordManager.updateAttribute(keyAttribute, keyAttribute.getDefinition().createValue(recordKey));
+		
+		return new RecordProxy(record, Locale.ENGLISH);
 	}
 	
 	

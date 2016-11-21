@@ -37,7 +37,6 @@ import org.openforis.collect.utils.Consumer;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -431,19 +430,19 @@ public class RecordManager {
 		return true;
 	}
 	
-	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName) throws RecordPersistenceException {
+	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName) {
 		return create(survey, rootEntityName, user, modelVersionName, (String) null);
 	}
 	
-	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
+	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName, String sessionId) {
 		return create(survey, rootEntityDefinition.getName(), user, modelVersionName, sessionId);
 	}
 	
-	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
+	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId) {
 		return create(survey, rootEntityName, user, modelVersionName, sessionId, Step.ENTRY);
 	}
 	
-	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId, Step step) throws RecordPersistenceException {
+	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId, Step step) {
 		CollectRecord record = instantiateRecord(survey, rootEntityName, user,
 				modelVersionName, step);
 		initializeRecord(record);
@@ -576,8 +575,7 @@ public class RecordManager {
 	 * @return
 	 */
 	public <V extends Value> NodeChangeSet updateAttribute(
-			Attribute<? extends NodeDefinition, V> attribute,
-			V value) {
+			Attribute<?, V> attribute, V value) {
 		return updater.updateAttribute(attribute, value);
 	}
 	
