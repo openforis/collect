@@ -20,9 +20,10 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 	private static final long serialVersionUID = 1L;
 
 	public static final String WGS84_SRS_ID = "EPSG:4326";
+	public static final String LAT_LON_SRS_ID = WGS84_SRS_ID;
 
 	public static final SpatialReferenceSystem LAT_LON_SRS = new SpatialReferenceSystem(
-	            WGS84_SRS_ID, 
+				LAT_LON_SRS_ID, 
 	            "GEOGCS[\"WGS 84\",\n" +
 	            "    DATUM[\"WGS_1984\",\n" +
 	            "        SPHEROID[\"WGS 84\",6378137,298.257223563,\n" +

@@ -33,7 +33,6 @@ import org.openforis.collect.web.session.SessionState;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -120,8 +119,39 @@ public class RecordController extends BasicController implements Serializable {
 	
 	@RequestMapping(value = "/surveys/{survey_id}/records/create-random-record.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable(value="survey_id") int surveyId, @RequestParam final int userID) throws RecordPersistenceException {
+	RecordProxy createRandomRecord(@PathVariable(value="survey_id") int surveyId, @RequestParam int userID) throws RecordPersistenceException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		Map<String, Integer> recordMeasurementsByKey = calculateRecordMeasurementsByKey(survey, userID);
+		
+		Integer minMeasurements = Collections.min(recordMeasurementsByKey.values());
+		
+		//do not consider measurements different from minimum measurement
+		Iterator<Entry<String, Integer>> iterator = recordMeasurementsByKey.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Entry<String, Integer> entry = iterator.next();
+			if (entry.getValue() != minMeasurements) {
+				iterator.remove();
+			}
+		}
+		//randomly select one record key among the ones with minimum measurements
+		ArrayList<String> recordKeys = new ArrayList<String>(recordMeasurementsByKey.keySet());
+		int recordKeyIdx = new Double(Math.floor(Math.random() * recordKeys.size())).intValue();
+		String recordKey = recordKeys.get(recordKeyIdx);
+		
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		
+		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		String rootEntityName = rootEntityDef.getName();
+		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
+		
+		Attribute<?,Value> keyAttribute = record.findNodeByPath(rootEntityDef.getPath());
+		recordManager.updateAttribute(keyAttribute, keyAttribute.getDefinition().createValue(recordKey));
+		
+		return new RecordProxy(record, Locale.ENGLISH);
+	}
+	
+	private Map<String, Integer> calculateRecordMeasurementsByKey(CollectSurvey survey, final int userID) {
 		final Map<String, Integer> measurementsByRecordKey = new HashMap<String, Integer>();
 		recordManager.visitSummaries(new RecordFilter(survey), null, new Visitor<CollectRecord>() {
 			public void visit(CollectRecord summary) {
@@ -139,7 +169,7 @@ public class RecordController extends BasicController implements Serializable {
 		});
 		
 		Set<String> plannedRecordKeys = new HashSet<String>();
-		SamplingDesignSummaries samplingPoints = samplingDesignManager.loadBySurvey(surveyId, 1);
+		SamplingDesignSummaries samplingPoints = samplingDesignManager.loadBySurvey(survey.getId(), 1);
 		for (SamplingDesignItem item : samplingPoints.getRecords()) {
 			String key = item.getLevelCode(1);
 			Integer measurements = measurementsByRecordKey.get(key);
@@ -147,32 +177,7 @@ public class RecordController extends BasicController implements Serializable {
 				measurements = 0;
 				plannedRecordKeys.add(key);
 			}
-		}		
-		Integer minMeasurements = Collections.min(measurementsByRecordKey.values());
-		
-		Iterator<Entry<String, Integer>> iterator = measurementsByRecordKey.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<String, Integer> entry = iterator.next();
-			if (entry.getValue() != minMeasurements) {
-				iterator.remove();
-			}
 		}
-		ArrayList<String> recordKeys = new ArrayList<String>(measurementsByRecordKey.keySet());
-		int recordKeyIdx = new Double(Math.floor(Math.random() * recordKeys.size())).intValue();
-		String recordKey = recordKeys.get(recordKeyIdx);
-		
-		SessionState sessionState = sessionManager.getSessionState();
-		User user = sessionState.getUser();
-		
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
-		String rootEntityName = rootEntityDef.getName();
-		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
-		
-		Attribute<?,Value> keyAttribute = record.findNodeByPath(rootEntityDef.getPath());
-		recordManager.updateAttribute(keyAttribute, keyAttribute.getDefinition().createValue(recordKey));
-		
-		return new RecordProxy(record, Locale.ENGLISH);
+		return measurementsByRecordKey;
 	}
-	
-	
 }

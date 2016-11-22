@@ -55,7 +55,7 @@ public class SamplingPointDataGenerator {
 			int samplesPerPlot, Distribution sampleDistribution, double sampleResolution, double sampleWidth) {
 		
 		Coordinate latLonAoiCenter = new Coordinate(boundaryLonMin + (boundaryLonMax - boundaryLonMin) / 2, 
-				boundaryLatMin + (boundaryLatMax - boundaryLatMin) / 2, WGS84_SRS_ID);
+				boundaryLatMin + (boundaryLatMax - boundaryLatMin) / 2, LAT_LON_SRS_ID);
 		
 		Coordinate reprojectedAoiCenter = reprojectFromLatLonToWebMarcator(latLonAoiCenter);
 		
@@ -66,9 +66,10 @@ public class SamplingPointDataGenerator {
 		for (int plotIdx = 0; plotIdx < plotLocations.size(); plotIdx++) {
 			Coordinate plotCenter = plotLocations.get(plotIdx);
 
-			Coordinate latLonPlotCenter = reprojectFromLatLonToWebMarcator(plotCenter);
+			Coordinate latLonPlotCenter = reprojectFromWebMarcatorToLatLon(plotCenter);
 			
 			SamplingDesignItem plotCenterItem = new SamplingDesignItem();
+			plotCenterItem.setSrsId(LAT_LON_SRS_ID);
 			plotCenterItem.setLevelCodes(Arrays.asList(String.valueOf(plotIdx + 1)));
 			plotCenterItem.setX(latLonPlotCenter.getX());
 			plotCenterItem.setY(latLonPlotCenter.getY());
@@ -80,6 +81,7 @@ public class SamplingPointDataGenerator {
 				Coordinate latLonSampleLocation = reprojectFromWebMarcatorToLatLon(sampleLocation);
 				SamplingDesignItem sampleItem = new SamplingDesignItem();
 				sampleItem.setLevelCodes(Arrays.asList(String.valueOf(plotIdx + 1), String.valueOf(sampleIdx + 1)));
+				sampleItem.setSrsId(LAT_LON_SRS_ID);
 				sampleItem.setX(latLonSampleLocation.getX());
 				sampleItem.setY(latLonSampleLocation.getY());
 				items.add(sampleItem);
@@ -93,27 +95,34 @@ public class SamplingPointDataGenerator {
 		List<Coordinate> result = new ArrayList<Coordinate>(numberOfLocations);
 		switch(distribution) {
 		case RANDOM:
-			for (int i = 0; i < numberOfLocations; i++) {
+			double radiusSquared = radius * radius;
+			int count = 0;
+			while (count < numberOfLocations) {
 				double offsetAngle = Math.random() * Math.PI * 2;
 				double offsetMagnitude = Math.random() * radius;
 				double xOffset = offsetMagnitude * Math.cos(offsetAngle);
 				double yOffset = offsetMagnitude * Math.sin(offsetAngle);
-				result.add(new Coordinate(center.getX() + xOffset, center.getY() + yOffset, 
-						center.getSrsId()));
+				double x = center.getX() + xOffset;
+				double y = center.getY() + yOffset;
+				
+				if (squareDistance(x, y, center.getX(), center.getY()) < radiusSquared) {
+					result.add(new Coordinate(x, y,	center.getSrsId()));
+					count ++;
+				}
 			}
 			break;
 		case GRIDDED:
 			double left = center.getX() - radius;
 			double top = center.getY() - radius;
-			double radiusSquared = radius * radius;
+//			double radiusSquared = radius * radius;
 			double numberOfSteps = Math.floor(2 * radius / resolution);
 			for (int xStep = 0; xStep < numberOfSteps; xStep++) {
 				double x = left + xStep * resolution;
 				for (int yStep = 0; yStep < numberOfSteps; yStep++) {
 					double y = top + yStep * resolution;
-					if (squareDistance(x, y, center.getX(), center.getY()) < radiusSquared) {
+					//if (squareDistance(x, y, center.getX(), center.getY()) < radiusSquared) {
 						result.add(new Coordinate(x, y,	center.getSrsId()));
-					}
+					//}
 				}
 			}
 		}

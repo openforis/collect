@@ -26,12 +26,12 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import static org.springframework.http.MediaType.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -54,7 +54,7 @@ public class SurveyController extends BasicController {
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 
-	@RequestMapping(value = "summaries-by-user.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "summaries-by-user.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SurveySummary> loadSummariesByUser(@RequestParam(required=false) int userID) {
 		//TODO
@@ -62,7 +62,7 @@ public class SurveyController extends BasicController {
 		//TODO add institution, imagery, boundaries
 	}
 
-	@RequestMapping(value = "summaries.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SurveySummary> loadSummaries(
 			@RequestParam(required=false) boolean includeTemporary,
@@ -75,7 +75,7 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value = "{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "{id}.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
 			@RequestParam(value="include-code-lists", required=false) boolean includeCodeLists) 
@@ -84,19 +84,19 @@ public class SurveyController extends BasicController {
 		return generateView(survey, includeCodeLists);
 	}
 
-	@RequestMapping(value = "temp/{surveyId}/edit.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "temp/{surveyId}/edit.htm", method=GET)
 	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("temp_id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	@RequestMapping(value = "{surveyId}/edit.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "{surveyId}/edit.htm", method=GET)
 	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	@RequestMapping(value = "create-single-attribute-survey.json", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "create-single-attribute-survey.json", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView createSingleAttributeSurvey(
 			String name, String description, 

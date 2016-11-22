@@ -109,4 +109,11 @@ public class SamplingDesignItem {
 	public void setInfoAttributes(List<String> infos) {
 		this.infoAttributes = infos;
 	}
+
+	@Override
+	public String toString() {
+		return levelCodes + " srsId=" + srsId +", x=" + x + ", y=" + y;
+	}
+	
+	
 }
