@@ -224,7 +224,10 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 	}
 
 	private void addLevelKeyNullConditions(SelectQuery<Record> q, Integer fromLevel) {
-		for (int levelIdx = fromLevel == null ? 0: fromLevel; levelIdx < LEVEL_CODE_FIELDS.length; levelIdx ++) {
+		if (fromLevel == null || fromLevel == 0) {
+			return;
+		}
+		for (int levelIdx = fromLevel; levelIdx < LEVEL_CODE_FIELDS.length; levelIdx ++) {
 			q.addConditions(LEVEL_CODE_FIELDS[levelIdx].isNull());
 		}
 	}
