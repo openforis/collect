@@ -78,7 +78,7 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value = "{id}.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
-			@RequestParam(value="include-code-lists", required=false) boolean includeCodeLists) 
+			@RequestParam(value="include-code-lists", required=false, defaultValue="true") boolean includeCodeLists) 
 			throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		return generateView(survey, includeCodeLists);
