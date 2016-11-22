@@ -1,6 +1,5 @@
 package org.openforis.collect.relational.model;
 
-import org.openforis.collect.relational.sql.RDBJdbcType;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.path.Path;
 
@@ -10,11 +9,10 @@ import org.openforis.idm.path.Path;
  * @author A. Sanchez-Paus
  *
  */
-public class CoordinateLatitudeColumn extends DataColumn {
+public class CoordinateLatitudeColumn extends CoordinateLatLonColumn {
 
 	CoordinateLatitudeColumn(String name, CoordinateAttributeDefinition defn, Path relPath) {
-		super(name, RDBJdbcType.fromType(Double.class), defn, 
-				relPath, getFieldLength(Double.class), true);
+		super(name, defn, relPath);
 	}
 
 }
