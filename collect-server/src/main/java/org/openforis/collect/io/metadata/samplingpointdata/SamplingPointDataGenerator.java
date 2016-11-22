@@ -53,6 +53,8 @@ public class SamplingPointDataGenerator {
 			double boundaryLatMin, double boundaryLatMax, 
 			int numPlots, Distribution plotDistribution, double plotResolution, double plotWidth,
 			int samplesPerPlot, Distribution sampleDistribution, double sampleResolution, double sampleWidth) {
+		//TODO use sampleWidth ?
+		double aoiWidth = calculateAoiWidth(boundaryLonMin, boundaryLonMax, boundaryLatMin, boundaryLatMax);
 		
 		Coordinate latLonAoiCenter = new Coordinate(boundaryLonMin + (boundaryLonMax - boundaryLonMin) / 2, 
 				boundaryLatMin + (boundaryLatMax - boundaryLatMin) / 2, LAT_LON_SRS_ID);
@@ -61,7 +63,7 @@ public class SamplingPointDataGenerator {
 		
 		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>(numPlots + numPlots * samplesPerPlot);
 		
-		List<Coordinate> plotLocations = generateLocationsInCircle(reprojectedAoiCenter, plotWidth / 2, numPlots, plotResolution, plotDistribution);
+		List<Coordinate> plotLocations = generateLocationsInCircle(reprojectedAoiCenter, aoiWidth / 2, numPlots, plotResolution, plotDistribution, plotWidth / 2);
 		
 		for (int plotIdx = 0; plotIdx < plotLocations.size(); plotIdx++) {
 			Coordinate plotCenter = plotLocations.get(plotIdx);
@@ -75,7 +77,7 @@ public class SamplingPointDataGenerator {
 			plotCenterItem.setY(latLonPlotCenter.getY());
 			items.add(plotCenterItem);
 			
-			List<Coordinate> sampleLocations = generateLocationsInCircle(plotCenter, sampleWidth / 2, samplesPerPlot, sampleResolution, sampleDistribution);
+			List<Coordinate> sampleLocations = generateLocationsInCircle(plotCenter, plotWidth / 2, samplesPerPlot, sampleResolution, sampleDistribution, sampleWidth / 2);
 			for (int sampleIdx = 0; sampleIdx < sampleLocations.size(); sampleIdx++) {
 				Coordinate sampleLocation = sampleLocations.get(sampleIdx);
 				Coordinate latLonSampleLocation = reprojectFromWebMarcatorToLatLon(sampleLocation);
@@ -90,16 +92,27 @@ public class SamplingPointDataGenerator {
 		return items;
 	}
 
-	private List<Coordinate> generateLocationsInCircle(Coordinate center, double radius,
-			int numberOfLocations, double resolution, Distribution distribution) {
+	public double calculateAoiWidth(double boundaryLonMin, double boundaryLonMax, double boundaryLatMin,
+			double boundaryLatMax) {
+		Coordinate topLeftLatLonCoordinate = new Coordinate(boundaryLonMin, boundaryLatMax, LAT_LON_SRS_ID);
+		Coordinate bottomRightLatLonCoordinate = new Coordinate(boundaryLonMax, boundaryLatMin, LAT_LON_SRS_ID);
+		
+		Coordinate topLeftReprojectedCoordinate = reprojectFromLatLonToWebMarcator(topLeftLatLonCoordinate);
+		Coordinate bottomRightReprojectedCoordinate = reprojectFromLatLonToWebMarcator(bottomRightLatLonCoordinate);
+		double aoiWidth = bottomRightReprojectedCoordinate.getX() - topLeftReprojectedCoordinate.getX();
+		return aoiWidth;
+	}
+
+	private List<Coordinate> generateLocationsInCircle(Coordinate center, double circleRadius,
+			int numberOfLocations, double resolution, Distribution distribution, double locationRadius) {
 		List<Coordinate> result = new ArrayList<Coordinate>(numberOfLocations);
+		double radiusSquared = circleRadius * circleRadius;
 		switch(distribution) {
 		case RANDOM:
-			double radiusSquared = radius * radius;
 			int count = 0;
 			while (count < numberOfLocations) {
 				double offsetAngle = Math.random() * Math.PI * 2;
-				double offsetMagnitude = Math.random() * radius;
+				double offsetMagnitude = Math.random() * circleRadius;
 				double xOffset = offsetMagnitude * Math.cos(offsetAngle);
 				double yOffset = offsetMagnitude * Math.sin(offsetAngle);
 				double x = center.getX() + xOffset;
@@ -112,17 +125,16 @@ public class SamplingPointDataGenerator {
 			}
 			break;
 		case GRIDDED:
-			double left = center.getX() - radius;
-			double top = center.getY() - radius;
-//			double radiusSquared = radius * radius;
-			double numberOfSteps = Math.floor(2 * radius / resolution);
+			double left = center.getX() - circleRadius;
+			double top = center.getY() - circleRadius;
+			double numberOfSteps = Math.floor(2 * circleRadius / resolution);
 			for (int xStep = 0; xStep < numberOfSteps; xStep++) {
-				double x = left + xStep * resolution;
+				double x = left + xStep * resolution + locationRadius;
 				for (int yStep = 0; yStep < numberOfSteps; yStep++) {
-					double y = top + yStep * resolution;
-					//if (squareDistance(x, y, center.getX(), center.getY()) < radiusSquared) {
+					double y = top + yStep * resolution + locationRadius;
+					if (squareDistance(x, y, center.getX(), center.getY()) < radiusSquared) {
 						result.add(new Coordinate(x, y,	center.getSrsId()));
-					//}
+					}
 				}
 			}
 		}

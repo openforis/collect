@@ -27,20 +27,20 @@ public class SamplingPointDataGeneratorTest {
 		Coordinate topLeftCoordinate = new Coordinate(12.369192d, 41.987927d, LAT_LON_SRS_ID); 
 		Coordinate bottomRightCoordinate = new Coordinate(12.621191d, 41.802904d, LAT_LON_SRS_ID); 
 		
-		int numPlots = 16;
+		int numPlots = 25;
 		int samplesPerPlot = 10;
-		int plotWidth = 200;
+		int plotWidth = 1000;
 		
 		List<SamplingDesignItem> items = generator.generate(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
 				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), 
-				numPlots, Distribution.GRIDDED, 50, plotWidth, 
+				numPlots, Distribution.GRIDDED, 5000, plotWidth, 
 				samplesPerPlot, Distribution.RANDOM, 20, 10);
 		
-		//printLatLonPoints(items);
+		printLatLonPoints(items);
 		
-		assertEquals(numPlots + numPlots*samplesPerPlot, items.size());
+		assertTrue(items.size() <= numPlots + numPlots*samplesPerPlot);
 		List<SamplingDesignItem> plotItems = getSamplingItemsInLevel(items, 1);
-		assertEquals(numPlots, plotItems.size());
+		assertTrue(plotItems.size() <= numPlots);
 		for (SamplingDesignItem plotItem : plotItems) {
 			assertPointInSquare(plotItem, topLeftCoordinate, bottomRightCoordinate);
 		}
@@ -52,17 +52,18 @@ public class SamplingPointDataGeneratorTest {
 		Coordinate topLeftCoordinate = new Coordinate(12.369192d, 41.987927d, LAT_LON_SRS_ID); 
 		Coordinate bottomRightCoordinate = new Coordinate(12.621191d, 41.802904d, LAT_LON_SRS_ID); 
 		
-		int numPlots = 16;
+		int numPlots = 25;
 		int samplesPerPlot = 10;
-		int plotWidth = 200;
+		int plotWidth = 1000;
 		
 		List<SamplingDesignItem> items = generator.generate(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
 				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), 
-				numPlots, Distribution.GRIDDED, 50, plotWidth, 
+				numPlots, Distribution.GRIDDED, 5000, plotWidth, 
 				samplesPerPlot, Distribution.RANDOM, 20, 10);
 		
+		List<SamplingDesignItem> plotItems = getSamplingItemsInLevel(items, 1);
 		List<SamplingDesignItem> samplingPointItems = getSamplingItemsInLevel(items, 2);
-		assertEquals(numPlots*samplesPerPlot, samplingPointItems.size());
+		assertEquals(plotItems.size() * samplesPerPlot, samplingPointItems.size());
 		for (final SamplingDesignItem samplingPointItem : samplingPointItems) {
 			SamplingDesignItem plotItem = (SamplingDesignItem) CollectionUtils.find(items, new Predicate() {
 				public boolean evaluate(Object object) {
@@ -74,9 +75,9 @@ public class SamplingPointDataGeneratorTest {
 		}
 	}
 
-	private void assertPointInSquare(SamplingDesignItem plotItem, Coordinate upperLeftCoordinate, Coordinate bottomRightCoordinate) {
-		assertTrue(betweenExclusive(plotItem.getX(), upperLeftCoordinate.getX(), bottomRightCoordinate.getX()));
-		assertTrue(betweenExclusive(plotItem.getY(), bottomRightCoordinate.getY(), upperLeftCoordinate.getY()));
+	private void assertPointInSquare(SamplingDesignItem plotItem, Coordinate topLeftCoordinate, Coordinate bottomRightCoordinate) {
+		assertTrue(betweenExclusive(plotItem.getX(), topLeftCoordinate.getX(), bottomRightCoordinate.getX()));
+		assertTrue(betweenExclusive(plotItem.getY(), bottomRightCoordinate.getY(), topLeftCoordinate.getY()));
 	}
 	
 	private void assertPointInCircle(SamplingDesignItem item, Coordinate center, int radius) {
