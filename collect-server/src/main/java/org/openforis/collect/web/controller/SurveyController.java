@@ -1,10 +1,15 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
+import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator.PointsConfiguration;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -26,12 +31,10 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
-import static org.springframework.http.MediaType.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -112,10 +115,11 @@ public class SurveyController extends BasicController {
 		surveyManager.save(survey);
 		surveyManager.publish(survey);
 		
-		List<SamplingDesignItem> items = new SamplingPointDataGenerator().generate(
-				boundaryLonMin, boundaryLonMax, boundaryLatMin, boundaryLatMax,
-				numPlots, plotDistribution, plotResolution, plotWidth,
-				samplesPerPlot, sampleDistribution, sampleResolution, sampleWidth);
+		PointsConfiguration plotPointsConfig = new PointsConfiguration(numPlots, Shape.CIRCLE, plotDistribution, plotResolution, plotWidth);
+		PointsConfiguration samplePointsConfig = new PointsConfiguration(samplesPerPlot, Shape.CIRCLE, sampleDistribution, sampleResolution, sampleWidth);
+		
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(boundaryLonMin, boundaryLonMax, boundaryLatMin, boundaryLatMax, plotPointsConfig, samplePointsConfig);
+		List<SamplingDesignItem> items = generator.generate();
 		
 		samplingDesignManager.insert(survey, items, true);
 		

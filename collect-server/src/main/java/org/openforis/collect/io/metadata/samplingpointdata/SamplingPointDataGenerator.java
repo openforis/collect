@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Distribution;
+import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.idm.geospatial.CoordinateUtils;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
@@ -46,25 +47,36 @@ public class SamplingPointDataGenerator {
 			"       AUTHORITY[\"EPSG\",\"3857\"]]",
 			"WGS84 web mercator"
 			);
-					
-			
-	public List<SamplingDesignItem> generate(
-			double boundaryLonMin, double boundaryLonMax,
-			double boundaryLatMin, double boundaryLatMax, 
-			int numPlots, Distribution plotDistribution, double plotResolution, double plotWidth,
-			int samplesPerPlot, Distribution sampleDistribution, double sampleResolution, double sampleWidth) {
+	
+	private double boundaryLonMin;
+	private double boundaryLonMax;
+	private double boundaryLatMin;
+	private double boundaryLatMax;
+	private PointsConfiguration plotPointsConfiguration;
+	private PointsConfiguration samplePointsConfiguration;
+	
+	public SamplingPointDataGenerator(double boundaryLonMin, double boundaryLonMax, double boundaryLatMin,
+			double boundaryLatMax, PointsConfiguration plotPointsConfiguration,
+			PointsConfiguration samplePointsConfiguration) {
+		super();
+		this.boundaryLonMin = boundaryLonMin;
+		this.boundaryLonMax = boundaryLonMax;
+		this.boundaryLatMin = boundaryLatMin;
+		this.boundaryLatMax = boundaryLatMax;
+		this.plotPointsConfiguration = plotPointsConfiguration;
+		this.samplePointsConfiguration = samplePointsConfiguration;
+	}
+
+	public List<SamplingDesignItem> generate() {
 		//TODO use sampleWidth ?
-		double aoiWidth = calculateAoiWidth(boundaryLonMin, boundaryLonMax, boundaryLatMin, boundaryLatMax);
-		
-		Coordinate latLonAoiCenter = new Coordinate(boundaryLonMin + (boundaryLonMax - boundaryLonMin) / 2, 
-				boundaryLatMin + (boundaryLatMax - boundaryLatMin) / 2, LAT_LON_SRS_ID);
-		
+		double aoiWidth = calculateAoiWidth();
+		Coordinate latLonAoiCenter = calculateAoiCenter();
 		Coordinate reprojectedAoiCenter = reprojectFromLatLonToWebMarcator(latLonAoiCenter);
 		
-		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>(numPlots + numPlots * samplesPerPlot);
+		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>(plotPointsConfiguration.getNumPoints() + plotPointsConfiguration.getNumPoints() + samplePointsConfiguration.getNumPoints());
 		
-		List<Coordinate> plotLocations = generateLocationsInCircle(reprojectedAoiCenter, aoiWidth / 2, numPlots, plotResolution, plotDistribution, plotWidth / 2);
-		
+		List<Coordinate> plotLocations = generateLocations(reprojectedAoiCenter, aoiWidth, plotPointsConfiguration);
+//		
 		for (int plotIdx = 0; plotIdx < plotLocations.size(); plotIdx++) {
 			Coordinate plotCenter = plotLocations.get(plotIdx);
 
@@ -77,7 +89,7 @@ public class SamplingPointDataGenerator {
 			plotCenterItem.setY(latLonPlotCenter.getY());
 			items.add(plotCenterItem);
 			
-			List<Coordinate> sampleLocations = generateLocationsInCircle(plotCenter, plotWidth / 2, samplesPerPlot, sampleResolution, sampleDistribution, sampleWidth / 2);
+			List<Coordinate> sampleLocations = generateLocations(plotCenter, plotPointsConfiguration.getPointWidth(), samplePointsConfiguration);
 			for (int sampleIdx = 0; sampleIdx < sampleLocations.size(); sampleIdx++) {
 				Coordinate sampleLocation = sampleLocations.get(sampleIdx);
 				Coordinate latLonSampleLocation = reprojectFromWebMarcatorToLatLon(sampleLocation);
@@ -92,46 +104,53 @@ public class SamplingPointDataGenerator {
 		return items;
 	}
 
-	public double calculateAoiWidth(double boundaryLonMin, double boundaryLonMax, double boundaryLatMin,
-			double boundaryLatMax) {
+	public Coordinate calculateAoiCenter() {
+		return new Coordinate(boundaryLonMin + (boundaryLonMax - boundaryLonMin) / 2, 
+				boundaryLatMin + (boundaryLatMax - boundaryLatMin) / 2, LAT_LON_SRS_ID);
+	}
+
+	private double calculateAoiWidth() {
 		Coordinate topLeftLatLonCoordinate = new Coordinate(boundaryLonMin, boundaryLatMax, LAT_LON_SRS_ID);
 		Coordinate bottomRightLatLonCoordinate = new Coordinate(boundaryLonMax, boundaryLatMin, LAT_LON_SRS_ID);
 		
 		Coordinate topLeftReprojectedCoordinate = reprojectFromLatLonToWebMarcator(topLeftLatLonCoordinate);
 		Coordinate bottomRightReprojectedCoordinate = reprojectFromLatLonToWebMarcator(bottomRightLatLonCoordinate);
-		double aoiWidth = bottomRightReprojectedCoordinate.getX() - topLeftReprojectedCoordinate.getX();
-		return aoiWidth;
+		return bottomRightReprojectedCoordinate.getX() - topLeftReprojectedCoordinate.getX();
 	}
 
-	private List<Coordinate> generateLocationsInCircle(Coordinate center, double circleRadius,
-			int numberOfLocations, double resolution, Distribution distribution, double locationRadius) {
-		List<Coordinate> result = new ArrayList<Coordinate>(numberOfLocations);
+	private List<Coordinate> generateLocations(Coordinate center, double areaWidth, PointsConfiguration c) {
+		switch(c.getShape()) {
+		case CIRCLE:
+			return generateLocationsInCircle(center, areaWidth / 2, c);
+		default:
+			throw new IllegalArgumentException("Shape type not supported: " + c.getShape());
+		}
+	}
+	
+	private List<Coordinate> generateLocationsInCircle(Coordinate center, double circleRadius, PointsConfiguration c) {
+		List<Coordinate> result = new ArrayList<Coordinate>(c.getNumPoints());
 		double radiusSquared = circleRadius * circleRadius;
-		switch(distribution) {
+		double locationRadius = c.getPointWidth() / 2;
+		switch(c.getDistribution()) {
 		case RANDOM:
-			int count = 0;
-			while (count < numberOfLocations) {
+			for (int i = 0; i < c.getNumPoints(); i++) {
 				double offsetAngle = Math.random() * Math.PI * 2;
 				double offsetMagnitude = Math.random() * circleRadius;
 				double xOffset = offsetMagnitude * Math.cos(offsetAngle);
 				double yOffset = offsetMagnitude * Math.sin(offsetAngle);
 				double x = center.getX() + xOffset;
 				double y = center.getY() + yOffset;
-				
-				if (squareDistance(x, y, center.getX(), center.getY()) < radiusSquared) {
-					result.add(new Coordinate(x, y,	center.getSrsId()));
-					count ++;
-				}
+				result.add(new Coordinate(x, y,	center.getSrsId()));
 			}
 			break;
 		case GRIDDED:
 			double left = center.getX() - circleRadius;
 			double top = center.getY() - circleRadius;
-			double numberOfSteps = Math.floor(2 * circleRadius / resolution);
+			double numberOfSteps = Math.floor(2 * circleRadius / c.getResolution());
 			for (int xStep = 0; xStep < numberOfSteps; xStep++) {
-				double x = left + xStep * resolution + locationRadius;
+				double x = left + xStep * c.getResolution() + locationRadius;
 				for (int yStep = 0; yStep < numberOfSteps; yStep++) {
-					double y = top + yStep * resolution + locationRadius;
+					double y = top + yStep * c.getResolution() + locationRadius;
 					if (squareDistance(x, y, center.getX(), center.getY()) < radiusSquared) {
 						result.add(new Coordinate(x, y,	center.getSrsId()));
 					}
@@ -155,6 +174,64 @@ public class SamplingPointDataGenerator {
 		double[] reprojectedPoint = CoordinateUtils.transform(WEB_MARCATOR_SRS, 
 				new double[]{coordinate.getX(), coordinate.getY()}, LAT_LON_SRS);
 		return new Coordinate(reprojectedPoint[0], reprojectedPoint[1], LAT_LON_SRS.getId());
+	}
+	
+	public static class PointsConfiguration {
+		
+		private int numPoints;
+		private Shape shape;
+		private Distribution distribution;
+		private double resolution;
+		private double pointWidth;
+		
+		public PointsConfiguration(int numPoints, Shape shape, Distribution distribution, double resolution, double pointWidth) {
+			super();
+			this.numPoints = numPoints;
+			this.shape = shape;
+			this.distribution = distribution;
+			this.resolution = resolution;
+			this.pointWidth = pointWidth;
+		}
+		
+		public int getNumPoints() {
+			return numPoints;
+		}
+
+		public void setNumPoints(int numPoints) {
+			this.numPoints = numPoints;
+		}
+
+		public Shape getShape() {
+			return shape;
+		}
+
+		public void setShape(Shape shape) {
+			this.shape = shape;
+		}
+
+		public Distribution getDistribution() {
+			return distribution;
+		}
+
+		public void setDistribution(Distribution distribution) {
+			this.distribution = distribution;
+		}
+
+		public double getResolution() {
+			return resolution;
+		}
+
+		public void setResolution(double resolution) {
+			this.resolution = resolution;
+		}
+
+		public double getPointWidth() {
+			return pointWidth;
+		}
+
+		public void setPointWidth(double pointWidth) {
+			this.pointWidth = pointWidth;
+		}
 	}
 	
 }

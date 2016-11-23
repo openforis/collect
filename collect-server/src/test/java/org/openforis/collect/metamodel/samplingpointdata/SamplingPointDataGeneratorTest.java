@@ -14,7 +14,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.junit.Test;
 import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
+import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator.PointsConfiguration;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Distribution;
+import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.idm.geospatial.CoordinateUtils;
 import org.openforis.idm.model.Coordinate;
@@ -23,7 +25,6 @@ public class SamplingPointDataGeneratorTest {
 
 	@Test
 	public void griddedPlotsGenerationTest() {
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator();
 		Coordinate topLeftCoordinate = new Coordinate(12.369192d, 41.987927d, LAT_LON_SRS_ID); 
 		Coordinate bottomRightCoordinate = new Coordinate(12.621191d, 41.802904d, LAT_LON_SRS_ID); 
 		
@@ -31,10 +32,13 @@ public class SamplingPointDataGeneratorTest {
 		int samplesPerPlot = 10;
 		int plotWidth = 1000;
 		
-		List<SamplingDesignItem> items = generator.generate(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
-				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), 
-				numPlots, Distribution.GRIDDED, 5000, plotWidth, 
-				samplesPerPlot, Distribution.RANDOM, 20, 10);
+		PointsConfiguration plotPointsConfig = new PointsConfiguration(numPlots, Shape.CIRCLE, Distribution.GRIDDED, 5000, plotWidth);
+		PointsConfiguration samplePointsConfig = new PointsConfiguration(samplesPerPlot, Shape.CIRCLE, Distribution.RANDOM, 20, 10);
+		
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
+				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), plotPointsConfig, samplePointsConfig);
+		
+		List<SamplingDesignItem> items = generator.generate();
 		
 		printLatLonPoints(items);
 		
@@ -48,7 +52,6 @@ public class SamplingPointDataGeneratorTest {
 	
 	@Test
 	public void randomSamplingPointsGenerationTest() {
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator();
 		Coordinate topLeftCoordinate = new Coordinate(12.369192d, 41.987927d, LAT_LON_SRS_ID); 
 		Coordinate bottomRightCoordinate = new Coordinate(12.621191d, 41.802904d, LAT_LON_SRS_ID); 
 		
@@ -56,10 +59,13 @@ public class SamplingPointDataGeneratorTest {
 		int samplesPerPlot = 10;
 		int plotWidth = 1000;
 		
-		List<SamplingDesignItem> items = generator.generate(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
-				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), 
-				numPlots, Distribution.GRIDDED, 5000, plotWidth, 
-				samplesPerPlot, Distribution.RANDOM, 20, 10);
+		PointsConfiguration plotPointsConfig = new PointsConfiguration(numPlots, Shape.CIRCLE, Distribution.GRIDDED, 5000, plotWidth);
+		PointsConfiguration samplePointsConfig = new PointsConfiguration(samplesPerPlot, Shape.CIRCLE, Distribution.RANDOM, 20, 10);
+		
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
+				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), plotPointsConfig, samplePointsConfig);
+		
+		List<SamplingDesignItem> items = generator.generate();
 		
 		List<SamplingDesignItem> plotItems = getSamplingItemsInLevel(items, 1);
 		List<SamplingDesignItem> samplingPointItems = getSamplingItemsInLevel(items, 2);
