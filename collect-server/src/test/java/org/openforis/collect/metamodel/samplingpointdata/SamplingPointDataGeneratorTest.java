@@ -40,7 +40,7 @@ public class SamplingPointDataGeneratorTest {
 		
 		List<SamplingDesignItem> items = generator.generate();
 		
-		printLatLonPoints(items);
+//		printLatLonPoints(items);
 		
 		assertTrue(items.size() <= numPlots + numPlots*samplesPerPlot);
 		List<SamplingDesignItem> plotItems = getSamplingItemsInLevel(items, 1);
