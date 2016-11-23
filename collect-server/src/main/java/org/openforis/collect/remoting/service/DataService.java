@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.EventQueue;
@@ -28,6 +29,7 @@ import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.data.BulkRecordMoveJob;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
@@ -69,6 +71,7 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
@@ -83,6 +86,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class DataService {
 	
+	@Autowired
+	private SurveyContext surveyContext;
+	@Autowired
+	private MessageSource messageSource;
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
@@ -104,6 +111,7 @@ public class DataService {
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
 	 */
 	private boolean hasActiveSurveyIndexedNodes;
+	private ProxyContext proxyContext;
 
 	@Secured(USER)
 	public RecordProxy loadRecord(int id, Integer stepNumber) {
@@ -112,10 +120,9 @@ public class DataService {
 		Step step = stepNumber == null ? null: Step.valueOf(stepNumber);
 		CollectRecord record = step == null ? recordManager.load(survey, id) : recordManager.load(survey, id, step);
 		sessionManager.setActiveRecord(record);
-		Locale locale = sessionState.getLocale();
-		return new RecordProxy(record, locale);
+		return toProxy(record);
 	}
-	
+
 	@Secured(ENTRY)
 	public RecordProxy checkoutRecord(int id, Integer stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
@@ -130,8 +137,7 @@ public class DataService {
 				: recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
-		Locale locale = sessionState.getLocale();
-		return new RecordProxy(record, locale);
+		return toProxy(record);
 	}
 
 	protected void prepareRecordIndexing() throws RecordIndexException {
@@ -153,8 +159,7 @@ public class DataService {
 		
 		//load summaries
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter, sortFields);
-		Locale locale = sessionState.getLocale();
-		List<RecordProxy> proxies = RecordProxy.fromList(summaries, locale);
+		List<RecordProxy> proxies = RecordProxy.fromList(summaries, getProxyContext());
 		
 		result.put("records", proxies);
 		
@@ -191,8 +196,7 @@ public class DataService {
 		
 		//load summaries
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter, sortFields);
-		Locale locale = sessionState.getLocale();
-		List<RecordProxy> proxies = RecordProxy.fromList(summaries, locale);
+		List<RecordProxy> proxies = RecordProxy.fromList(summaries, getProxyContext());
 		
 		result.put("records", proxies);
 		
@@ -220,9 +224,7 @@ public class DataService {
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
 		
-		
-		RecordProxy recordProxy = new RecordProxy(record, sessionState.getLocale());
-		return recordProxy;
+		return toProxy(record);
 	}
 	
 	@Transactional
@@ -278,7 +280,7 @@ public class DataService {
 		List<RecordEvent> events = new EventProducer().produceFor(changeSet, userName);
 		sessionManager.onEvents(events);
 		
-		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getCurrentLocale());
+		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getProxyContext());
 		if ( requestSet.isAutoSave() ) {
 			try {
 				saveActiveRecord();
@@ -593,6 +595,17 @@ public class DataService {
 		return locale;
 	}
 
+	private RecordProxy toProxy(CollectRecord record) {
+		return new RecordProxy(record, getProxyContext());
+	}
+
+	private ProxyContext getProxyContext() {
+		if (proxyContext == null) {
+			proxyContext = new ProxyContext(getCurrentLocale(), messageSource, surveyContext);
+		}
+		return proxyContext;
+	}
+	
 	protected SessionState getSessionState() {
 		SessionState sessionState = getSessionManager().getSessionState();
 		return sessionState;

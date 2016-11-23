@@ -6,10 +6,10 @@ package org.openforis.collect.model.proxy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
@@ -26,7 +26,7 @@ import org.openforis.idm.model.Entity;
 public class RecordProxy implements Proxy {
 
 	private transient CollectRecord record;
-	private transient Locale locale;
+	private transient ProxyContext context;
 
 	private Integer errors;
 	private Integer skipped;
@@ -36,9 +36,9 @@ public class RecordProxy implements Proxy {
 	private Integer warnings;
 	private UserProxy owner;
 	
-	public RecordProxy(CollectRecord record, Locale locale) {
+	public RecordProxy(CollectRecord record, ProxyContext context) {
 		this.record = record;
-		this.locale = locale;
+		this.context = context;
 		
 		errors = record.getErrors();
 		skipped = record.getSkipped();
@@ -50,11 +50,11 @@ public class RecordProxy implements Proxy {
 		owner = record.getOwner() == null ? null: new UserProxy(record.getOwner());
 	}
 
-	public static List<RecordProxy> fromList(List<CollectRecord> records, Locale locale) {
+	public static List<RecordProxy> fromList(List<CollectRecord> records, ProxyContext context) {
 		List<RecordProxy> result = new ArrayList<RecordProxy>();
 		if ( records != null ) {
 			for (CollectRecord collectRecord : records) {
-				result.add(new RecordProxy(collectRecord, locale));
+				result.add(new RecordProxy(collectRecord, context));
 			}
 		}
 		return result;
@@ -100,7 +100,7 @@ public class RecordProxy implements Proxy {
 	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
 		Entity rootEntity = record.getRootEntity();
-		return rootEntity == null ? null: new EntityProxy(null, record.getRootEntity(), locale);
+		return rootEntity == null ? null: new EntityProxy(null, record.getRootEntity(), context);
 	}
 
 	@ExternalizedProperty

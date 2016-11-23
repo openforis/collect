@@ -6,10 +6,10 @@ package org.openforis.collect.model.proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -30,8 +30,8 @@ public class EntityProxy extends NodeProxy {
 	private transient Entity entity;
 	private transient List<NodeDefinition> availableChildDefinitions;
 	
-	public EntityProxy(EntityProxy parent, Entity entity, Locale locale) {
-		super(parent, entity, locale);
+	public EntityProxy(EntityProxy parent, Entity entity, ProxyContext context) {
+		super(parent, entity, context);
 		this.entity = entity;
 		this.availableChildDefinitions = getAvailableChildDefinitions();
 	}
@@ -41,7 +41,7 @@ public class EntityProxy extends NodeProxy {
 		Map<Integer, List<NodeProxy>> result = new HashMap<Integer, List<NodeProxy>>();
 		for (NodeDefinition childDefinition : availableChildDefinitions) {
 			List<Node<?>> nodes = this.entity.getChildren(childDefinition);
-			List<NodeProxy> proxies = NodeProxy.fromList(this, nodes, getLocale());
+			List<NodeProxy> proxies = NodeProxy.fromList(this, nodes, context);
 			result.put(childDefinition.getId(), proxies);
 		}
 		return result;

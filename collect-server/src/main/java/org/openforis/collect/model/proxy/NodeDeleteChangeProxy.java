@@ -1,8 +1,7 @@
 package org.openforis.collect.model.proxy;
 
-import java.util.Locale;
-
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.model.NodeDeleteChange;
 
 /**
@@ -12,8 +11,8 @@ import org.openforis.collect.model.NodeDeleteChange;
  */
 public class NodeDeleteChangeProxy extends NodeChangeProxy<NodeDeleteChange> {
 
-	public NodeDeleteChangeProxy(NodeDeleteChange change, Locale locale) {
-		super(change, locale);
+	public NodeDeleteChangeProxy(NodeDeleteChange change, ProxyContext context) {
+		super(change, context);
 	}
 
 	@ExternalizedProperty

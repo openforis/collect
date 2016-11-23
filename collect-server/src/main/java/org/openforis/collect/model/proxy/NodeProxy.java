@@ -7,20 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.ServletContext;
-
-import org.granite.context.GraniteContext;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.granite.messaging.webapp.HttpGraniteContext;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.manager.MessageSource;
-import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author S. Ricci
@@ -30,37 +24,36 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class NodeProxy implements Proxy {
 
 	private transient Node<?> node;
-	private transient Locale locale;
+	protected transient ProxyContext context;
 	
-	public static NodeProxy fromNode(Node<?> node, Locale locale) {
+	public static NodeProxy fromNode(Node<?> node, ProxyContext context) {
 		if (node instanceof Attribute<?, ?>) {
-			return new AttributeProxy(null, (Attribute<?, ?>) node, locale);
+			return new AttributeProxy(null, (Attribute<?, ?>) node, context);
 		} else if (node instanceof Entity) {
-			return new EntityProxy(null, (Entity) node, locale);
+			return new EntityProxy(null, (Entity) node, context);
 		}
 		return null;
 	}
 	
-	public NodeProxy(EntityProxy parent, Node<?> node, Locale locale) {
+	public NodeProxy(EntityProxy parent, Node<?> node, ProxyContext context) {
 		super();
 		this.node = node;
-		this.locale = locale;
+		this.context = context;
 	}
 
-	public static List<NodeProxy> fromList(EntityProxy parent,
-			List<Node<?>> list, Locale locale) {
+	public static List<NodeProxy> fromList(EntityProxy parent, List<Node<?>> list, ProxyContext context) {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		if(list != null) {
 			for (Node<?> node : list) {
 				NodeProxy proxy;
 				if(node instanceof Attribute<?, ?>) {
 					if(node instanceof CodeAttribute) {
-						proxy = new CodeAttributeProxy(parent, (CodeAttribute) node, locale);
+						proxy = new CodeAttributeProxy(parent, (CodeAttribute) node, context);
 					} else {
-						proxy = new AttributeProxy(parent, (Attribute<?, ?>) node, locale);
+						proxy = new AttributeProxy(parent, (Attribute<?, ?>) node, context);
 					}
 				} else {
-					proxy = new EntityProxy(parent, (Entity) node, locale);
+					proxy = new EntityProxy(parent, (Entity) node, context);
 				}
 				result.add(proxy);
 			}
@@ -97,19 +90,10 @@ public class NodeProxy implements Proxy {
 	}
 	
 	protected MessageSource getMessageSource() {
-		Class<SpringMessageSource> type = SpringMessageSource.class;
-		return getContextBean(type);
-	}
-
-	protected <T extends Object> T getContextBean(Class<T> type) {
-		HttpGraniteContext graniteContext = (HttpGraniteContext) GraniteContext.getCurrentInstance();
-		ServletContext servletContext = graniteContext.getServletContext();
-		WebApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-		T bean = applicationContext.getBean(type);
-		return bean;
+		return context.getMessageSource();
 	}
 
 	protected Locale getLocale() {
-		return locale;
+		return context.getLocale();
 	}
 }
