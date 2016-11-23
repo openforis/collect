@@ -18,7 +18,6 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 
 	private static final String KML_POINT_FORMAT = "<Point><coordinates>%f,%f,0.0</coordinates></Point>";
 	private static final String KML_FIELD_NAME = "kml";
-	
 	private static final String KML_COLUMN_SUFFIX = "kml";
 
 	private String kmlFormat;
@@ -47,7 +46,8 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 	@Override
 	protected String generateFieldHeading(String fieldName) {
 		if ( KML_FIELD_NAME.equals(fieldName) ) {
-			return "_" + getAttributeName() + getConfig().getFieldHeadingSeparator() + KML_COLUMN_SUFFIX;
+			return "_" + ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + 
+					getConfig().getFieldHeadingSeparator() + KML_COLUMN_SUFFIX;
 		} else {
 			return super.generateFieldHeading(fieldName);
 		}

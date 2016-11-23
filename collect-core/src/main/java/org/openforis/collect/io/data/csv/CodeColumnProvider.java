@@ -88,7 +88,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	private List<String> generateExpandedItemsHeadings() {
 		List<String> headings = new ArrayList<String>();
 		for (CodeListItem item : expandedItems) {
-			String heading = attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + item.getCode();
+			String heading = ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + item.getCode();
 			headings.add(heading);
 			if (item.isQualifiable()) {
 				headings.add(heading + getConfig().getFieldHeadingSeparator() + CodeAttributeDefinition.QUALIFIER_FIELD);
@@ -100,11 +100,11 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	@Override
 	protected String generateFieldHeading(String fieldName) {
 		if ( CodeAttributeDefinition.CODE_FIELD.equals(fieldName) ) {
-			return attributeDefinition.getName();
+			return ColumnProviders.generateHeadingPrefix(attributeDefinition, config);
 		} else if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
-			return "_" + attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + ITEM_POSITION_SUFFIX;
+			return "_" + ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + ITEM_POSITION_SUFFIX;
 		} else if ( ITEM_LABEL_FIELD_NAME.equals(fieldName) ) {
-			return attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + ITEM_LABEL_SUFFIX;
+			return ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + ITEM_LABEL_SUFFIX;
 		} else {
 			return super.generateFieldHeading(fieldName);
 		}
@@ -150,7 +150,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 				int position = items.indexOf(item) + 1;
 				return Integer.toString(position);
 			} else {
-				return item.getLabel();
+				return item.getLabel(getConfig().getLanguageCode());
 			}
 		} else {
 			return super.extractValue(attr, fieldName);

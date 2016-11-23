@@ -6,7 +6,7 @@
 				 xmlns:container="org.openforis.collect.ui.container.*" 
 				 xmlns:detail="org.openforis.collect.ui.component.detail.*" 
 				 xmlns:input="org.openforis.collect.ui.component.input.*"
-				 width="600" height="600" 
+				 width="800" height="700" 
 				 title="{Message.get('export.popUp.title')}" 
 				 currentState="{STATE_LOADING}" xmlns:layout="org.openforis.collect.ui.layout.*"
 				 >
@@ -29,6 +29,10 @@
 			
 			private var _presenter:DataExportPopUpPresenter;
 			private var _rootEntityKeyDefinitions:IList;
+			private var _headingSources:IList;
+			private var _surveyLanguages:IList;
+			private var _selectedHeadingSourceIndex:int = 0;
+			private var _selectedLanguageIndex:int = 0;
 			
 			override protected function createPresenter():PopUpPresenter {
 				return new DataExportPopUpPresenter(this);
@@ -56,6 +60,41 @@
 				this._rootEntityKeyDefinitions = value;
 			}
 			
+			[Bindable]
+			public function get headingSources():IList {
+				return _headingSources;
+			}
+			
+			public function set headingSources(values:IList):void {
+				this._headingSources = values;
+			}
+			
+			[Bindable]
+			public function get surveyLanguages():IList {
+				return _surveyLanguages;
+			}
+			
+			public function set surveyLanguages(values:IList):void {
+				this._surveyLanguages = values;
+			}
+			
+			[Bindable]
+			public function get selectedHeadingSourceIndex():int {
+				return _selectedHeadingSourceIndex;
+			}
+			
+			public function set selectedHeadingSourceIndex(value:int):void {
+				this._selectedHeadingSourceIndex = value;
+			}
+			
+			[Bindable]
+			public function get selectedLanguageIndex():int {
+				return _selectedLanguageIndex;
+			}
+			
+			public function set selectedLanguageIndex(value:int):void {
+				this._selectedLanguageIndex = value;
+			}
 		]]>
 	</fx:Script>
 	
@@ -206,6 +245,24 @@
 						  includeInLayout="false" 
 						  includeInLayout.partialExportParametersSelection="true"
 						  gap="10">
+					<s:HGroup>
+						<s:HGroup verticalAlign="middle">
+							<s:Label text="{Message.get('export.headingSource')}:" styleName="formLabel" />
+							<s:DropDownList id="headingSourceDropDown" width="200" dataProvider="{headingSources}"
+											selectedIndex="{selectedHeadingSourceIndex}" />
+						</s:HGroup>
+						<s:VGroup visible="{headingSourceDropDown.selectedIndex != 0}"
+							includeInLayout="{headingSourceDropDown.selectedIndex != 0}">
+							<s:HGroup verticalAlign="middle">
+								<s:Label text="{Message.get('export.headingSourceLanguage')}" />
+								<s:DropDownList id="languageDropDown" width="200" dataProvider="{surveyLanguages}" 
+												selectedIndex="{selectedLanguageIndex}" />
+							</s:HGroup>
+							<s:CheckBox id="includeGroupingLabelsCheckBox"  
+										label="{Message.get('export.includeGroupingLabels')}*"
+										selected="true" />
+						</s:VGroup>
+					</s:HGroup>
 					<s:CheckBox id="includeKMLColumnForCoordinatesCheckBox" 
 								selected="false" 
 								label="{Message.get('export.includeKMLColumnForCoordinates')}*" />

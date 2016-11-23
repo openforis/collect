@@ -24,8 +24,11 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 	// TODO Check that list is not lookup
 	// TODO support hierarchical lists!
 	
+	private EntityDefinition entityDefinition;
+
 	public EnumerableEntityColumnProvider(CSVExportConfiguration config, EntityDefinition defn) {
-		super(config, defn.getName()+"_", createProviders(config, defn));
+		super(config, createProviders(config, defn));
+		this.entityDefinition = defn;
 	}
 
 	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition defn) {
@@ -36,7 +39,6 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 		SurveyContext context = defn.getSurvey().getContext();
 		CodeListService codeListService = context.getCodeListService();
 		List<CodeListItem> items = codeListService.loadRootItems(codeList);
-//		String entityName = defn.getName();
 		for (CodeListItem item : items) {
 			String code = item.getCode();
 			String keyName = keyDef.getName();
@@ -44,6 +46,11 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 			providers.add(p);
 		}
 		return providers;
+	}
+	
+	@Override
+	protected String generateHeadingPrefix() {
+		return ColumnProviders.generateHeadingPrefix(entityDefinition, config);
 	}
 
 	private static class EnumeratedCodeItemColumnProvider extends AutomaticColumnProvider {

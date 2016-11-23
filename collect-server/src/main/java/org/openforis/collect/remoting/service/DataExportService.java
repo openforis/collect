@@ -13,6 +13,7 @@ import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.CSVDataExportProcess;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CSVExportConfiguration.HeadingSource;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 import org.openforis.collect.manager.RecordManager;
@@ -60,7 +61,8 @@ public class DataExportService {
 	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes, 
 			boolean includeEnumeratedEntities, boolean includeCompositeAttributeMergedColumn, 
 			boolean codeAttributeExpanded, boolean onlyOwnedRecords, String[] rootEntityKeyValues,
-			boolean includeKMLColumnForCoordinates, boolean includeCodeItemLabelColumn) throws IOException {
+			boolean includeKMLColumnForCoordinates, boolean includeCodeItemLabelColumn, 
+			String headingSource, String languageCode, boolean includeGroupingLabels) throws IOException {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			resetJobs();
 			
@@ -86,6 +88,7 @@ public class DataExportService {
 			process.setRecordFilter(recordFilter);
 			process.setEntityId(entityId);
 			process.setAlwaysGenerateZipFile(true);
+			
 			CSVExportConfiguration config = new CSVExportConfiguration();
 			config.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
 			config.setIncludeEnumeratedEntities(includeEnumeratedEntities);
@@ -93,6 +96,10 @@ public class DataExportService {
 			config.setIncludeKMLColumnForCoordinates(includeKMLColumnForCoordinates);
 			config.setCodeAttributeExpanded(codeAttributeExpanded);
 			config.setIncludeCodeItemLabelColumn(includeCodeItemLabelColumn);
+			config.setHeadingSource(HeadingSource.valueOf(headingSource));
+			config.setLanguageCode(languageCode);
+			config.setIncludeGroupingLabels(includeGroupingLabels);
+			
 			process.setConfiguration(config);
 			
 			process.init();

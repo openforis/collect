@@ -24,10 +24,6 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 		this.attributeDefinition = attrDefn;
 	}
 
-	protected String getAttributeName() {
-		return attributeDefinition.getName();
-	}
-
 	protected int getMaxAttributeValues() {
 		if (attributeDefinition.isMultiple()) {
 			return ObjectUtils.defaultIfNull(attributeDefinition.getFixedMaxCount(), getConfig().getMaxMultipleAttributeValues());
@@ -57,6 +53,11 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 			return generateSingleAttributeColumnHeadings();
 		}
 	}
+	
+	@Override
+	protected String generateHeadingPrefix() {
+		return ColumnProviders.generateHeadingPrefix(attributeDefinition, config);
+	}
 
 	protected abstract int getNumberOfColumnsPerAttribute();
 
@@ -64,10 +65,15 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 
 	protected abstract List<String> generateAttributeColumnHeadings(int i);
 	
+	protected String generateAttributePositionSuffix(int attributeIdx) {
+		return attributeDefinition.isMultiple() ? "[" + (attributeIdx + 1) + "]": "";
+	}
+	
+	
 	@Override
 	public String toString() {
 		return new ToStringBuilder(null)
-			.append("Attribute", getAttributeName())
+			.append("Attribute", attributeDefinition.getName())
 			.append("Column headings", getColumnHeadings())
 			.build();
 	}

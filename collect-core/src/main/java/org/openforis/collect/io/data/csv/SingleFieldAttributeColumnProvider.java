@@ -2,7 +2,6 @@ package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -15,18 +14,12 @@ import org.openforis.idm.model.Node;
 /**
  * @author G. Miceli
  * @author M. Togna
+ * @author S. Ricci
  */
 public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProvider<AttributeDefinition> {
 	
-	private String headerName;
-
 	public SingleFieldAttributeColumnProvider(CSVExportConfiguration config, AttributeDefinition defn) {
-		this(config, defn, defn.getName());
-	}
-	
-	public SingleFieldAttributeColumnProvider(CSVExportConfiguration config, AttributeDefinition defn, String headerName) {
 		super(config, defn);
-		this.headerName = headerName;
 	}
 	
 	@Override
@@ -36,14 +29,14 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 	
 	@Override
 	protected List<String> generateSingleAttributeColumnHeadings() {
-		return Collections.unmodifiableList(Arrays.asList(headerName));
+		return generateAttributeColumnHeadings(0);
 	}
 	
 	@Override
 	protected List<String> generateAttributeColumnHeadings(int i) {
-		return Arrays.asList(headerName + "[" + (i + 1) + "]");
+		return Arrays.asList(generateHeadingPrefix() + generateAttributePositionSuffix(i));
 	}
-
+	
 	public List<String> extractValues(Node<?> axis) {
 		if ( axis == null ) {
 			throw new NullPointerException("Axis must be non-null");

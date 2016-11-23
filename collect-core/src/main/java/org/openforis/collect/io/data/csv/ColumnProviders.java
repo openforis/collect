@@ -4,10 +4,12 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
+import org.openforis.idm.metamodel.NodeLabel.Type;
 
 public class ColumnProviders {
 
@@ -27,9 +29,27 @@ public class ColumnProviders {
 		} else if(defn instanceof TimeAttributeDefinition){
 			return new TimeColumnProvider(config, (TimeAttributeDefinition) defn);
 		} else {
-			String name = defn.getName();
-			return new SingleFieldAttributeColumnProvider(config, defn, name);
+			return new SingleFieldAttributeColumnProvider(config, defn);
 		}
 	}
-	
+
+	public static String generateHeadingPrefix(NodeDefinition nodeDefinition, CSVExportConfiguration config) {
+		String result = null;
+		switch(config.getHeadingSource()) {
+		case ATTRIBUTE_NAME:
+			result = nodeDefinition.getName();
+			break;
+		case INSTANCE_LABEL:
+			result = nodeDefinition.getLabel(Type.INSTANCE, config.getLanguageCode());
+			break;
+		case REPORTING_LABEL:
+			result = nodeDefinition.getFailSafeLabel(config.getLanguageCode(), Type.REPORTING, Type.INSTANCE);
+			break;
+		}
+		//default to attribute name
+		if (result == null) {
+			result = nodeDefinition.getName();
+		}
+		return result;
+	}
 }

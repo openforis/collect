@@ -12,8 +12,8 @@ import org.openforis.commons.lang.Strings;
  */
 public abstract class BasicColumnProvider implements ColumnProvider {
 
-	private CSVExportConfiguration config;
-	private ColumnProviderChain parentProvider;
+	protected CSVExportConfiguration config;
+	protected ColumnProviderChain parentProvider;
 
 	public BasicColumnProvider(CSVExportConfiguration config) {
 		super();
@@ -38,6 +38,8 @@ public abstract class BasicColumnProvider implements ColumnProvider {
 		}
 		return columnHeadings;
 	}
+	
+	protected abstract String generateHeadingPrefix();
 	
 	public CSVExportConfiguration getConfig() {
 		return config;
