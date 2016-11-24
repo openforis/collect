@@ -24,11 +24,8 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 	// TODO Check that list is not lookup
 	// TODO support hierarchical lists!
 	
-	private EntityDefinition entityDefinition;
-
 	public EnumerableEntityColumnProvider(CSVExportConfiguration config, EntityDefinition defn) {
-		super(config, createProviders(config, defn));
-		this.entityDefinition = defn;
+		super(config, defn, createProviders(config, defn));
 	}
 
 	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition defn) {
@@ -50,6 +47,9 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 	
 	@Override
 	protected String generateHeadingPrefix() {
+		if (entityDefinition == null) {
+			throw new IllegalStateException("Entity definition not specified for enumerable entity column provider");
+		}
 		return ColumnProviders.generateHeadingPrefix(entityDefinition, config);
 	}
 

@@ -31,7 +31,7 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	}
 	
 	public AutomaticColumnProvider(CSVExportConfiguration config, String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
-		super(config, headingPrefix, createProviders(config, entityDefinition, exclusions));
+		super(config, entityDefinition, headingPrefix, createProviders(config, entityDefinition, exclusions));
 	}
 	
 	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition rowDefn, List<String> exclusions) {
