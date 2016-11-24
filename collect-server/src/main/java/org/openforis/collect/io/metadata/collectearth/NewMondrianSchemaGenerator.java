@@ -167,8 +167,8 @@ public class NewMondrianSchemaGenerator {
 			measure.column = "expansion_factor";
 			measure.caption = "Area (HA)";
 			measure.aggregator = "sum";
-			measure.datatype = INTEGER_DATATYPE;
-			measure.formatString = "###,###";
+			measure.datatype = NUMERIC_DATATYPE;
+			measure.formatString = "###,###.00";
 			measures.add(measure);
 		}
 
@@ -178,8 +178,8 @@ public class NewMondrianSchemaGenerator {
 			measure.column = "plot_weight";
 			measure.caption = "Plot Weight";
 			measure.aggregator = "sum";
-			measure.datatype = INTEGER_DATATYPE;
-			measure.formatString = "#,###";
+			measure.datatype = NUMERIC_DATATYPE;
+			measure.formatString = "#,###.##";
 			measures.add(measure);
 		}
 

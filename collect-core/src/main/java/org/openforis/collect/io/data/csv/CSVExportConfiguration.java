@@ -6,6 +6,10 @@ package org.openforis.collect.io.data.csv;
  *
  */
 public class CSVExportConfiguration {
+	
+	public enum HeadingSource {
+		ATTRIBUTE_NAME, INSTANCE_LABEL, REPORTING_LABEL;
+	}
 
 	private String multipleAttributeValueSeparator = ", ";
 	private String fieldHeadingSeparator = "_";
@@ -15,9 +19,12 @@ public class CSVExportConfiguration {
 	private boolean includeEnumeratedEntities = true;
 	private boolean includeCompositeAttributeMergedColumn = false;
 	private boolean includeCodeItemLabelColumn = false;
+	private boolean includeGroupingLabels = true;
 	private boolean codeAttributeExpanded = false;
 	private int maxMultipleAttributeValues = 10;
 	private int maxExpandedCodeAttributeItems = 30;
+	private HeadingSource headingSource = HeadingSource.ATTRIBUTE_NAME;
+	private String languageCode = null;
 	
 	public String getMultipleAttributeValueSeparator() {
 		return multipleAttributeValueSeparator;
@@ -112,4 +119,27 @@ public class CSVExportConfiguration {
 		this.maxExpandedCodeAttributeItems = maxExpandedCodeAttributeItems;
 	}
 	
+	public HeadingSource getHeadingSource() {
+		return headingSource;
+	}
+	
+	public void setHeadingSource(HeadingSource headingSource) {
+		this.headingSource = headingSource;
+	}
+	
+	public String getLanguageCode() {
+		return languageCode;
+	}
+	
+	public void setLanguageCode(String languageCode) {
+		this.languageCode = languageCode;
+	}
+	
+	public boolean isIncludeGroupingLabels() {
+		return includeGroupingLabels;
+	}
+	
+	public void setIncludeGroupingLabels(boolean includeGroupingLabels) {
+		this.includeGroupingLabels = includeGroupingLabels;
+	}
 }

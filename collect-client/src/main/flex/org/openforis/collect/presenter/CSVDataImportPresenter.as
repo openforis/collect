@@ -195,7 +195,6 @@ package org.openforis.collect.presenter
 
 		override protected function performProcessStart():void {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
-			var transactional:Boolean = view.transactionalCheckBox.selected;
 			var validateRecords:Boolean = view.validateRecordsCheckBox.selected;
 			var deleteExistingEntities:Boolean = view.deleteExistingEntitiesCheckBox.selected;
 			
@@ -226,6 +225,7 @@ package org.openforis.collect.presenter
 				var selectedStepItem:* = view.stepDropDownList.selectedItem;
 				selectedStep = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
 			}
+			var transactional:Boolean = true;
 			_importClient.start(responder, _uploadedTempFileName, entityId, selectedStep, transactional, validateRecords, 
 					insertNewRecords, newRecordModelVersion, deleteExistingEntities);
 		}
@@ -269,7 +269,6 @@ package org.openforis.collect.presenter
 			initFormVersionsDropDown();
 			initStepsDropDown();
 			view.importType.selectedValue = CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE;
-			view.transactionalCheckBox.selected = true;
 			view.validateRecordsCheckBox.selected = true;
 		}
 		

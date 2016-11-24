@@ -49,6 +49,11 @@ package org.openforis.collect.presenter {
 		
 		private static const PROGRESS_DELAY:int = 2000;
 		private static const ALL_STEPS_ITEM:Object = {label: Message.get('global.allItemsLabel')};
+		private static const HEADING_SOURCE_ITEMS:ArrayCollection = new ArrayCollection([
+			{name: "ATTRIBUTE_NAME", label: Message.get("export.headingSource.attribute_name")},
+			{name: "INSTANCE_LABEL", label: Message.get("export.headingSource.label")},
+			{name: "REPORTING_LABEL", label: Message.get("export.headingSource.reporting_label")}
+		]);
 		
 		private static const TYPE_FULL:String = "full";
 		private static const TYPE_PARTIAL:String = "partial";
@@ -147,10 +152,14 @@ package org.openforis.collect.presenter {
 				var includeKMLColumnForCoordinates:Boolean 		= view.includeKMLColumnForCoordinatesCheckBox.selected;
 				var includeCodeItemLabelColumn:Boolean 			= view.includeCodeItemLabelColumnCheckBox.selected;
 				var expandCodeAttributes:Boolean 				= view.expandCodeAttributesCheckBox.selected;
+				var headingSource:String 						= view.headingSourceDropDown.selectedItem.name;
+				var languageCode:String 						= view.languageDropDown.selectedItem;
+				var includeGroupingLabels:Boolean				= view.includeGroupingLabelsCheckBox.selected;
 				
 				ClientFactory.dataExportClient.export(_exportResponder, rootEntity, stepNumber, entityId, 
 						includeAllAncestorAttributes, includeEnumeratedEntities, includeCompositeAttributeMergedColumn, 
-						expandCodeAttributes, onlyOwnedRecords, rootEntityKeys, includeKMLColumnForCoordinates, includeCodeItemLabelColumn);
+						expandCodeAttributes, onlyOwnedRecords, rootEntityKeys, includeKMLColumnForCoordinates, includeCodeItemLabelColumn,
+						headingSource, languageCode, includeGroupingLabels);
 				
 				view.currentState = DataExportPopUp.STATE_EXPORTING;
 				view.progressBar.setProgress(0, 0);
@@ -352,6 +361,14 @@ package org.openforis.collect.presenter {
 		protected function initView():void {
 			initEntitiesTree();
 			initStepsDropDown();
+			view.headingSources = HEADING_SOURCE_ITEMS;
+			view.surveyLanguages = Application.activeSurvey.languages;
+			var langIdx:int = Application.activeSurvey.languages.getItemIndex(Application.localeLanguageCode);
+			if (langIdx < 0) {
+				langIdx = 0;
+			}
+			view.selectedLanguageIndex = langIdx;
+			
 			//try to see if there is an export still running
 			updateExportState();
 			
@@ -392,9 +409,7 @@ package org.openforis.collect.presenter {
 			var stepDropDownList:DropDownList = view.stepDropDownList;
 			stepDropDownList.dataProvider = steps;
 			stepDropDownList.callLater(function():void {
-				if ( _type == TYPE_FULL ) {
-					stepDropDownList.selectedIndex = 0;
-				}
+				stepDropDownList.selectedIndex = 0;
 			});
 		}
 		

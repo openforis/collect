@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.openforis.commons.collection.Visitor;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Node;
 
 /**
@@ -20,33 +21,44 @@ public class ColumnProviderChain extends BasicColumnProvider {
 	private List<ColumnProvider> providers;
 	private String headingPrefix;
 	private List<String> headings;
-
-	public ColumnProviderChain(CSVExportConfiguration config, String headingPrefix, ColumnProvider... providers) {
-		this(config, headingPrefix, Arrays.asList(providers));
-	}
+	protected EntityDefinition entityDefinition; //optional
 	
 	public ColumnProviderChain(CSVExportConfiguration config, List<ColumnProvider> providers) {
-		this(config, "", providers);
+		this(config, null, providers);
+	}
+
+	public ColumnProviderChain(CSVExportConfiguration config, EntityDefinition entityDefinition, List<ColumnProvider> providers) {
+		this(config, entityDefinition, null, providers);
 	}
 
 	public ColumnProviderChain(CSVExportConfiguration config, ColumnProvider... providers) {
-		this(config, Arrays.asList(providers));
+		this(config, null, providers);
+	}
+	
+	public ColumnProviderChain(CSVExportConfiguration config, EntityDefinition entityDefinition, ColumnProvider... providers) {
+		this(config, entityDefinition, Arrays.asList(providers));
 	}
 
-	public ColumnProviderChain(CSVExportConfiguration config, String headingPrefix, List<ColumnProvider> providers) {
+	public ColumnProviderChain(CSVExportConfiguration config, EntityDefinition entityDefinition, String headingPrefix, List<ColumnProvider> providers) {
 //		if ( providers == null || providers.isEmpty() ) {
 //			throw new IllegalArgumentException("Providers may not be null or empty");
 //		}
 		super(config);
+		this.entityDefinition = entityDefinition;
 		this.providers = providers;
 		this.headingPrefix = headingPrefix;
-		this.headings = getColumnHeadingsInternal(headingPrefix);
+		this.headings = generateColumnHeadingsInternal();
 		
 		for (ColumnProvider p : providers) {
 			if (p instanceof BasicColumnProvider) {
 				((BasicColumnProvider) p).setParentProvider(this);
 			}
 		}
+	}
+	
+	@Override
+	protected String generateHeadingPrefix() {
+		return "";
 	}
 	
 	public List<String> getColumnHeadings() {
@@ -57,16 +69,19 @@ public class ColumnProviderChain extends BasicColumnProvider {
 		return providers;
 	}
 	
-	public String getHeadingPrefix() {
+	protected String getHeadingPrefix() {
+		if (headingPrefix == null) {
+			headingPrefix = generateHeadingPrefix();
+		}
 		return headingPrefix;
 	}
 	
-	private List<String> getColumnHeadingsInternal(String headingPrefix) {
+	private List<String> generateColumnHeadingsInternal() {
 		ArrayList<String> h = new ArrayList<String>(); 
 		for (ColumnProvider p : providers) {
 			List<String> columnHeadings = p.getColumnHeadings();
 			for (String heading : columnHeadings) {
-				h.add(headingPrefix+heading);
+				h.add(getHeadingPrefix() + heading);
 			}
 		}
 		return Collections.unmodifiableList(h);

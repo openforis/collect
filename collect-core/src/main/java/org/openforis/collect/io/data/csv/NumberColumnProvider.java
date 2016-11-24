@@ -34,7 +34,7 @@ public class NumberColumnProvider extends CompositeAttributeColumnProvider<Numbe
 	@Override
 	protected String generateFieldHeading(String fieldName) {
 		if ( NumberAttributeDefinition.VALUE_FIELD.equals(fieldName) ) {
-			return attributeDefinition.getName();
+			return ColumnProviders.generateHeadingPrefix(attributeDefinition, config);
 		} else {
 			return super.generateFieldHeading(fieldName);
 		}

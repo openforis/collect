@@ -24,7 +24,7 @@ public class PivotExpressionColumnProvider extends ColumnProviderChain {
 	}
 	
 	public PivotExpressionColumnProvider(CSVExportConfiguration config, String expression, String headingPrefix, List<ColumnProvider> providers) {
-		super(config, headingPrefix, providers);
+		super(config, null, headingPrefix, providers);
 		try {
 			ExpressionFactory ef = new ExpressionFactory();
 			this.expression = ef.createModelPathExpression(expression);

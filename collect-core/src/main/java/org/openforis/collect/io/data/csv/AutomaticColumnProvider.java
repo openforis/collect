@@ -31,7 +31,7 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	}
 	
 	public AutomaticColumnProvider(CSVExportConfiguration config, String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
-		super(config, headingPrefix, createProviders(config, entityDefinition, exclusions));
+		super(config, entityDefinition, headingPrefix, createProviders(config, entityDefinition, exclusions));
 	}
 	
 	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition rowDefn, List<String> exclusions) {
@@ -64,13 +64,12 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		} else {
 			ColumnProvider p = new AutomaticColumnProvider(config, defn);
 			List<ColumnProvider> childCols = Arrays.asList(p);
-			String entityName = defn.getName();
-			String pivotExpression = entityName;
-			String headingPrefix = entityName + "_";
+			String pivotExpression = defn.getName();
+			String headingPrefix = config.isIncludeGroupingLabels() ? 
+					ColumnProviders.generateHeadingPrefix(defn, config) + config.getFieldHeadingSeparator() 
+					: "";
 			PivotExpressionColumnProvider col = new PivotExpressionColumnProvider(config, pivotExpression, headingPrefix, childCols);
 			cols.add(col);
 		}
 	}
-
-	
 }

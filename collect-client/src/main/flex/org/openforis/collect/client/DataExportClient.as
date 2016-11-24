@@ -40,11 +40,14 @@ package org.openforis.collect.client {
 							   codeAttributeExpanded:Boolean = false,
 							   onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null, 
 							   includeKMLColumnForCoordinates:Boolean = false,
-							   includeCodeItemLabelColumn:Boolean = false
+							   includeCodeItemLabelColumn:Boolean = false,
+							   headingSource:String = "ATTRIBUTE_NAME",
+							   headingLanguage:String = null,
+							   includeGroupingLabels:Boolean = true
 							   ):void {
 			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes, 
 					includeEnumeratedEntities, includeCompositeAttributeMergedColumn, codeAttributeExpanded, onlyOwnedRecords, rootEntityKeyValues,
-					includeKMLColumnForCoordinates, includeCodeItemLabelColumn);
+					includeKMLColumnForCoordinates, includeCodeItemLabelColumn, headingSource, headingLanguage, includeGroupingLabels);
 			token.addResponder(responder);
 		}
 		

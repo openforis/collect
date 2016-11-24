@@ -82,7 +82,9 @@ public class CSVDataExportColumnProviderGenerator {
 	private ColumnProvider createAncestorColumnProvider(EntityDefinition contextEntityDefn, EntityDefinition ancestorEntityDefn) {
 		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
 		if ( configuration.isIncludeAllAncestorAttributes() ) {
-			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(configuration, ancestorEntityDefn.getName() + "_", ancestorEntityDefn);
+			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(configuration, 
+					ColumnProviders.generateHeadingPrefix(ancestorEntityDefn, configuration) + 
+					configuration.getFieldHeadingSeparator(), ancestorEntityDefn);
 			providers.add(0, ancestorEntityColumnProvider);
 		} else {
 			//include only key attributes
@@ -91,7 +93,9 @@ public class CSVDataExportColumnProviderGenerator {
 				String relativePath = contextEntityDefn.getRelativePath(ancestorEntityDefn);
 				
 				ColumnProvider keyColumnProvider = ColumnProviders.createAttributeProvider(configuration, keyDefn);
-				String headingPrefix = keyDefn.getParentEntityDefinition().getName() + "_";
+				String headingPrefix = configuration.isIncludeGroupingLabels() ?
+						ColumnProviders.generateHeadingPrefix(keyDefn.getParentEntityDefinition(), configuration) + configuration.getFieldHeadingSeparator()
+						: "";
 				PivotExpressionColumnProvider columnProvider = new PivotExpressionColumnProvider(configuration, relativePath, headingPrefix, keyColumnProvider);
 				providers.add(columnProvider);
 			}

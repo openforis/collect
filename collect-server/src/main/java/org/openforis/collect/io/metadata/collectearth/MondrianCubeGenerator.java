@@ -19,7 +19,6 @@ import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.collect.relational.util.DataTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -192,8 +191,8 @@ public class MondrianCubeGenerator {
 			measure.column = "expansion_factor";
 			measure.caption = "Area (HA)";
 			measure.aggregator = "sum";
-			measure.datatype = "Integer";
-			measure.formatString = "###,###";
+			measure.datatype = "Numeric";
+			measure.formatString = "###,###.00";
 			measures.add(measure);
 		}
 		
@@ -203,8 +202,8 @@ public class MondrianCubeGenerator {
 			measure.column = "plot_weight";
 			measure.caption = "Plot Weight";
 			measure.aggregator = "sum";
-			measure.datatype = "Integer";
-			measure.formatString = "#,###";
+			measure.datatype = "Numeric";
+			measure.formatString = "#,###.##";
 			measures.add(measure);
 		}
 		

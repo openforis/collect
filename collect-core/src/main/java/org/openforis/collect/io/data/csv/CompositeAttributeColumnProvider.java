@@ -52,14 +52,10 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 		headings.addAll(generateAttributeFieldHeadings(attributeIdx));
 		return headings;
 	}
-
-	protected String generateAttributePositionSuffix(int attributeIdx) {
-		return attributeDefinition.isMultiple() ? "[" + (attributeIdx + 1) + "]": "";
-	}
-
+	
 	protected List<String> generateAttributeFieldHeadings(int attributeIdx) {
+		List<String> headings = new ArrayList<String>(fieldNames.length);
 		String attrPosSuffix = generateAttributePositionSuffix(attributeIdx);
-		List<String> headings = new ArrayList<String>();
 		for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
 			headings.add(generateFieldHeading(fieldNames[fieldIdx]) + attrPosSuffix);
 		}
@@ -69,12 +65,11 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	protected abstract String[] getFieldNames();
 	
 	protected String generateMergedValueHeading(int attributeIdx) {
-		String attrPosSuffix = generateAttributePositionSuffix(attributeIdx);
-		return attributeDefinition.getName() + attrPosSuffix;
+		return generateHeadingPrefix() + generateAttributePositionSuffix(attributeIdx);
 	}
 
 	protected String generateFieldHeading(String fieldName) {
-		return attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + fieldName;
+		return generateHeadingPrefix() + getConfig().getFieldHeadingSeparator() + fieldName;
 	}
 	
 	protected boolean isMergedValueSupported() {

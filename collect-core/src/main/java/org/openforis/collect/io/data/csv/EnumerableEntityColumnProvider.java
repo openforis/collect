@@ -25,7 +25,7 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 	// TODO support hierarchical lists!
 	
 	public EnumerableEntityColumnProvider(CSVExportConfiguration config, EntityDefinition defn) {
-		super(config, defn.getName()+"_", createProviders(config, defn));
+		super(config, defn, createProviders(config, defn));
 	}
 
 	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition defn) {
@@ -36,7 +36,6 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 		SurveyContext context = defn.getSurvey().getContext();
 		CodeListService codeListService = context.getCodeListService();
 		List<CodeListItem> items = codeListService.loadRootItems(codeList);
-//		String entityName = defn.getName();
 		for (CodeListItem item : items) {
 			String code = item.getCode();
 			String keyName = keyDef.getName();
@@ -44,6 +43,14 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 			providers.add(p);
 		}
 		return providers;
+	}
+	
+	@Override
+	protected String generateHeadingPrefix() {
+		if (entityDefinition == null) {
+			throw new IllegalStateException("Entity definition not specified for enumerable entity column provider");
+		}
+		return ColumnProviders.generateHeadingPrefix(entityDefinition, config);
 	}
 
 	private static class EnumeratedCodeItemColumnProvider extends AutomaticColumnProvider {
