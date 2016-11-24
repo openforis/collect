@@ -49,9 +49,6 @@
 			public var stepDropDownList:DropDownList;
 			
 			[SkinPart(required="true", type="spark.compoenents.CheckBox")]
-			public var transactionalCheckBox:CheckBox;
-			
-			[SkinPart(required="true", type="spark.compoenents.CheckBox")]
 			public var validateRecordsCheckBox:CheckBox;
 			
 			[SkinPart(required="true", type="spark.compoenents.CheckBox")]

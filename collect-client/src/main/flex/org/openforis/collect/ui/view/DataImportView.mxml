@@ -137,21 +137,16 @@
 			  horizontalAlign="center"
 			  height="100%" width="100%"
 			  >
-		<s:Form id="form">
-			<s:FormItem label="{Message.get('dataImport.surveyNameLabel')}" 
-						label.summaryCreationCompleteNewSurvey="{Message.get('dataImport.newSurveyNameLabel')}">
-				<s:TextInput id="surveyNameTextInput" editable="false" width="300"
-							 editable.summaryCreationCompleteNewSurvey="true" />
-			</s:FormItem>
-			<s:HGroup>
-				<s:FormItem label="{Message.get('dataImport.validateRecords')}">
-					<s:CheckBox id="validateRecordsCheckBox" selected="true" />
-				</s:FormItem>
-				<s:FormItem label="{Message.get('dataImport.processInTransaction')}">
-					<s:CheckBox id="processInTransactionCheckBox" selected="true" />
-				</s:FormItem>
-			</s:HGroup>
-		</s:Form>
+		<s:HGroup gap="40">
+			<s:Label text="{Message.get('dataImport.surveyNameLabel')}"
+					 text.summaryCreationCompleteNewSurvey="{Message.get('dataImport.newSurveyNameLabel')}"
+					 styleName="formLabel" />
+			<s:TextInput id="surveyNameTextInput" editable="false" width="300"
+						 editable.summaryCreationCompleteNewSurvey="true" />
+			<s:CheckBox id="validateRecordsCheckBox" 
+						selected="true" 
+						label="{Message.get('dataImport.validateRecords')}" />
+		</s:HGroup>
 		
 		<s:VGroup id="conflictsContainer" 
 				  visible="{conflictDataGrid.dataProvider.length > 0}"

@@ -390,17 +390,13 @@ public class DataUnmarshaller {
 		@SuppressWarnings({ "rawtypes" })
 		protected void endAttributeElement() {
 			Attribute attr = (Attribute) node;
-			try {
-				if (field != null) {
-					Field<?> fld = getField();
-					if ( fld == null ) {
-						warn(field, "Can't parse field with type "+attr.getClass().getSimpleName());
-					} else {
-						setFieldData(fld);
-					}
+			if (field != null) {
+				Field<?> fld = getField();
+				if ( fld == null ) {
+					warn(field, "Can't parse field with type "+attr.getClass().getSimpleName());
+				} else {
+					setFieldData(fld);
 				}
-			} catch (NumberFormatException e) {
-				warn(field, e.toString());
 			}
 			if ( field == null ) {
 				Node<?> oldNode = node;
@@ -459,13 +455,16 @@ public class DataUnmarshaller {
 			fld.getAttribute().updateSummaryInfo();
 		}
 
-		private Integer getNodeState() {
+		private Integer getNodeState()  {
 			String state = attributes.getValue(ATTRIBUTE_STATE);
-			if ( state == null) {
-				return null;
-			} else {
-				return Integer.parseInt(state);
+			if ( StringUtils.isNotBlank(state) ) {
+				try {
+					return Integer.parseInt(state);
+				} catch (NumberFormatException e) {
+					warn(field, "Error parsing node state from value '" + state + "': " + e.toString());
+				}
 			}
+			return null;
 		}
 		
 		@Override
@@ -475,17 +474,6 @@ public class DataUnmarshaller {
 			}
 		}
 		
-//		protected Map<String, String> createAttributesMap(Attributes attributes) {
-//			HashMap<String, String> result = new HashMap<String, String>();
-//			int length = attributes.getLength();
-//			for ( int i = 0; i < length; i++) {
-//				String qName = attributes.getQName(i);
-//				String value = attributes.getValue(i);
-//				result.put(qName, value);
-//			}
-//			return result;
-//		}
-
 		public CollectRecord getRecord() {
 			return record;
 		}

@@ -7,7 +7,6 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.FieldDefinition;
 
 /**
@@ -121,7 +120,12 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 	}
 
 	public void setValueFromString(String s) {
-		setValue(parseValue(s));
+		try {
+			T parsedValue = parseValue(s);
+			setValue(parsedValue);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Class<T> getValueType() {
