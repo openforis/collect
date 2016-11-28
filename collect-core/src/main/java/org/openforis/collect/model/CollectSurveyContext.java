@@ -42,6 +42,10 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		this(expressionFactory, validator, (CodeListService) null, (SpeciesListService) null);
 	}
 	
+	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, CodeListService codeListService) {
+		this(expressionFactory, validator, codeListService, (SpeciesListService) null);
+	}
+	
 	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, 
 			CodeListService codeListService, SpeciesListService speciesListService) {
 		this.expressionFactory = expressionFactory;
