@@ -184,8 +184,11 @@ public class SamplingPointDataGenerator {
 		private double resolution;
 		private double pointWidth;
 		
-		public PointsConfiguration(int numPoints, Shape shape, Distribution distribution, double resolution, double pointWidth) {
+		public PointsConfiguration() {
 			super();
+		}
+		
+		public PointsConfiguration(int numPoints, Shape shape, Distribution distribution, double resolution, double pointWidth) {
 			this.numPoints = numPoints;
 			this.shape = shape;
 			this.distribution = distribution;

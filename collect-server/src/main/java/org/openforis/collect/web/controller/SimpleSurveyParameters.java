@@ -1,141 +1,104 @@
 package org.openforis.collect.web.controller;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Distribution;
-import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
+import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator.PointsConfiguration;
 
 public class SimpleSurveyParameters implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	String name;
+	private String name;
 	private String description;
-	double boundaryLonMin;
-	double boundaryLonMax;
-	double boundaryLatMin;
-	double boundaryLatMax; 
-	int numPlots;
-	Distribution plotDistribution;
-	double plotResolution;
-	private Shape plotShape;
-	double plotWidth;
-	int samplesPerPlot;
-	double sampleResolution;
-	Distribution sampleDistribution;
-	private String sampleShape;
-	double sampleWidth;
-	Object[] sampleValues;
-	String[] imagery;
+	private Double boundaryLonMin;
+	private Double boundaryLonMax;
+	private Double boundaryLatMin;
+	private Double boundaryLatMax; 
+	private PointsConfiguration plotPointsConfiguration = new PointsConfiguration();
+	private PointsConfiguration samplePointsConfiguration = new PointsConfiguration();
+	private List<Object> sampleValues = new ArrayList<Object>();
+	private List<String> imagery = new ArrayList<String>();
 	
 	public String getName() {
 		return name;
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	public String getDescription() {
 		return description;
 	}
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public double getBoundaryLonMin() {
+	
+	public Double getBoundaryLonMin() {
 		return boundaryLonMin;
 	}
-	public void setBoundaryLonMin(double boundaryLonMin) {
+	
+	public void setBoundaryLonMin(Double boundaryLonMin) {
 		this.boundaryLonMin = boundaryLonMin;
 	}
-	public double getBoundaryLonMax() {
+	
+	public Double getBoundaryLonMax() {
 		return boundaryLonMax;
 	}
-	public void setBoundaryLonMax(double boundaryLonMax) {
+	
+	public void setBoundaryLonMax(Double boundaryLonMax) {
 		this.boundaryLonMax = boundaryLonMax;
 	}
-	public double getBoundaryLatMin() {
+	
+	public Double getBoundaryLatMin() {
 		return boundaryLatMin;
 	}
-	public void setBoundaryLatMin(double boundaryLatMin) {
+	
+	public void setBoundaryLatMin(Double boundaryLatMin) {
 		this.boundaryLatMin = boundaryLatMin;
 	}
-	public double getBoundaryLatMax() {
+	
+	public Double getBoundaryLatMax() {
 		return boundaryLatMax;
 	}
-	public void setBoundaryLatMax(double boundaryLatMax) {
+	
+	public void setBoundaryLatMax(Double boundaryLatMax) {
 		this.boundaryLatMax = boundaryLatMax;
 	}
-	public int getNumPlots() {
-		return numPlots;
-	}
-	public void setNumPlots(int numPlots) {
-		this.numPlots = numPlots;
-	}
-	public Distribution getPlotDistribution() {
-		return plotDistribution;
-	}
-	public void setPlotDistribution(Distribution plotDistribution) {
-		this.plotDistribution = plotDistribution;
-	}
-	public double getPlotResolution() {
-		return plotResolution;
-	}
-	public void setPlotResolution(double plotResolution) {
-		this.plotResolution = plotResolution;
-	}
-	public Shape getPlotShape() {
-		return plotShape;
-	}
-	public void setPlotShape(Shape plotShape) {
-		this.plotShape = plotShape;
-	}
-	public double getPlotWidth() {
-		return plotWidth;
-	}
-	public void setPlotWidth(double plotWidth) {
-		this.plotWidth = plotWidth;
-	}
-	public int getSamplesPerPlot() {
-		return samplesPerPlot;
-	}
-	public void setSamplesPerPlot(int samplesPerPlot) {
-		this.samplesPerPlot = samplesPerPlot;
-	}
-	public double getSampleResolution() {
-		return sampleResolution;
-	}
-	public void setSampleResolution(double sampleResolution) {
-		this.sampleResolution = sampleResolution;
-	}
-	public Distribution getSampleDistribution() {
-		return sampleDistribution;
-	}
-	public void setSampleDistribution(Distribution sampleDistribution) {
-		this.sampleDistribution = sampleDistribution;
-	}
-	public String getSampleShape() {
-		return sampleShape;
-	}
-	public void setSampleShape(String sampleShape) {
-		this.sampleShape = sampleShape;
-	}
-	public double getSampleWidth() {
-		return sampleWidth;
-	}
-	public void setSampleWidth(double sampleWidth) {
-		this.sampleWidth = sampleWidth;
-	}
-	public Object[] getSampleValues() {
+	
+	public List<Object> getSampleValues() {
 		return sampleValues;
 	}
-	public void setSampleValues(Object[] sampleValues) {
+
+	public void setSampleValues(List<Object> sampleValues) {
 		this.sampleValues = sampleValues;
 	}
-	public String[] getImagery() {
+
+	public List<String> getImagery() {
 		return imagery;
 	}
-	public void setImagery(String[] imagery) {
+
+	public void setImagery(List<String> imagery) {
 		this.imagery = imagery;
 	}
-	
+
+	public PointsConfiguration getPlotPointsConfiguration() {
+		return plotPointsConfiguration;
+	}
+
+	public void setPlotPointsConfiguration(PointsConfiguration plotPointsConfiguration) {
+		this.plotPointsConfiguration = plotPointsConfiguration;
+	}
+
+	public PointsConfiguration getSamplePointsConfiguration() {
+		return samplePointsConfiguration;
+	}
+
+	public void setSamplePointsConfiguration(PointsConfiguration samplePointsConfiguration) {
+		this.samplePointsConfiguration = samplePointsConfiguration;
+	}
 	
 }

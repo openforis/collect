@@ -9,14 +9,12 @@ import java.util.List;
 import java.util.Locale;
 
 import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
-import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator.PointsConfiguration;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
-import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
@@ -24,6 +22,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.web.validator.SimpleSurveyParametersValidator;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -31,8 +30,12 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,6 +53,14 @@ public class SurveyController extends BasicController {
 
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
 
+	@Autowired
+	private SimpleSurveyParametersValidator validator;
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.setValidator(validator);
+	}
+	
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
@@ -99,22 +110,18 @@ public class SurveyController extends BasicController {
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
+	@Transactional
 	@RequestMapping(value = "create-single-attribute-survey.json", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	SurveyView createSingleAttributeSurvey(@Validated SimpleSurveyParameters parameters) throws Exception {
+	SurveyView createSingleAttributeSurvey(@Validated SimpleSurveyParameters parameters, BindingResult result) throws Exception {
 		
-		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.name, parameters.sampleValues);
+		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.getName(), parameters.getSampleValues());
 		
 		surveyManager.save(survey);
 		surveyManager.publish(survey);
 		
-		PointsConfiguration plotPointsConfig = new PointsConfiguration(parameters.numPlots, Shape.CIRCLE, parameters.plotDistribution, 
-				parameters.plotResolution, parameters.plotWidth);
-		PointsConfiguration samplePointsConfig = new PointsConfiguration(parameters.samplesPerPlot, Shape.CIRCLE, 
-				parameters.sampleDistribution, parameters.sampleResolution, parameters.sampleWidth);
-		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(parameters.boundaryLonMin, parameters.boundaryLonMax, 
-				parameters.boundaryLatMin, parameters.boundaryLatMax, plotPointsConfig, samplePointsConfig);
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(parameters.getBoundaryLonMin(), parameters.getBoundaryLonMax(), 
+				parameters.getBoundaryLatMin(), parameters.getBoundaryLatMax(), parameters.getPlotPointsConfiguration(), parameters.getSamplePointsConfiguration());
 		List<SamplingDesignItem> items = generator.generate();
 		
 		samplingDesignManager.insert(survey, items, true);
@@ -122,7 +129,7 @@ public class SurveyController extends BasicController {
 		return generateView(survey);
 	}
 
-	private CollectSurvey createTemporarySingleAttributeSurvey(String name, Object[] sampleValues) {
+	private CollectSurvey createTemporarySingleAttributeSurvey(String name, List<Object> sampleValues) {
 		String langCode = Locale.ENGLISH.getLanguage();
 		CollectSurvey survey = surveyManager.createTemporarySurvey(name, langCode);
 		
@@ -141,8 +148,8 @@ public class SurveyController extends BasicController {
 		
 		CodeList valuesCodeList = survey.createCodeList();
 		valuesCodeList.setName("values");
-		for (int i = 0; i < sampleValues.length; i++) {
-			Object sampleValue = sampleValues[i];
+		for (int i = 0; i < sampleValues.size(); i++) {
+			Object sampleValue = sampleValues.get(i);
 			CodeListItem item = valuesCodeList.createItem(1);
 			item.setCode(String.valueOf(i + 1));
 			item.setLabel(langCode, sampleValue.toString());
