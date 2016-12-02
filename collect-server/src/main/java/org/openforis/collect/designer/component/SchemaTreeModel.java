@@ -175,9 +175,11 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 		Set<SurveyObject> result = new HashSet<SurveyObject>();
 		Set<TreeNode<SchemaNodeData>> openObjects = getOpenObjects();
 		for (TreeNode<SchemaNodeData> treeNode : openObjects) {
-			SchemaNodeData data = treeNode.getData();
-			SurveyObject node = data.getSurveyObject();
-			result.add(node);
+			if (treeNode != null) {
+				SchemaNodeData data = treeNode.getData();
+				SurveyObject node = data.getSurveyObject();
+				result.add(node);
+			}
 		}
 		return result;
 	}
