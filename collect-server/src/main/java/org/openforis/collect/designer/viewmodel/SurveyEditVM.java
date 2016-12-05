@@ -505,26 +505,25 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void showDataEntryPreview() {
+	public void showDataEntryPreview() throws SurveyStoreException {
 		showPreview(Step.ENTRY);
 	}
 	
 	@Command
-	public void showDataCleansingPreview() {
+	public void showDataCleansingPreview() throws SurveyStoreException {
 		showPreview(Step.CLEANSING);
 	}
 
-	public void showPreview(Step recordStep) {
+	public void showPreview(Step recordStep) throws SurveyStoreException {
 		if (survey.getId() == null || changed)  {
-			MessageUtil.showWarning(LabelKeys.PREVIEW_ERROR_SAVE_SURVEY_FIRST);
-		} else {
-			previewStep = recordStep;
-			checkValidity(true, new SuccessHandler() {
-				public void onSuccess() {
-					openPreviewPopUp();
-				}
-			});
+			save(null);
 		}
+		previewStep = recordStep;
+		checkValidity(true, new SuccessHandler() {
+			public void onSuccess() {
+				openPreviewPopUp();
+			}
+		});
 	}
 
 	protected void openPreviewPreferencesPopUp() {
