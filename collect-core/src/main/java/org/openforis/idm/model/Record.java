@@ -70,7 +70,7 @@ public class Record implements DeepComparable {
 		} else {
 			this.modelVersion = survey.getVersion(version);
 			if (modelVersion == null) {
-				throw new IllegalArgumentException("Version not specified");
+				throw new IllegalArgumentException(String.format("Invalid version name: %s", version));
 			}
 		}
 		this.enableValidationDependencyGraphs = enableValidationDependencyGraphs;
