@@ -274,7 +274,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void save(@ContextParam(ContextType.BINDER) Binder binder) throws SurveyStoreException {
 		dispatchValidateAllCommand();
 		if ( checkCanSave() ) {
-			backgroundSurveySave();
+			checkValidity(true, new SuccessHandler() {
+				public void onSuccess() {
+					try {
+						backgroundSurveySave();
+					} catch (SurveyStoreException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}, Labels.getLabel("survey.save.confirm_save_with_errors"));
 		}
 	}
 	
@@ -335,14 +343,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 			public void onSuccess() {
 				MessageUtil.showInfo("survey.successfully_validated");
 			}
-		});
+		}, null);
 	}
 	
-	private void checkValidity(boolean showConfirm, final SuccessHandler successHandler) {
+	private void checkValidity(boolean showConfirm, final SuccessHandler successHandler, String confirmButtonLabel) {
 		SurveyValidator surveyValidator = getSurveyValidator(survey);
 		SurveyValidationResults results = surveyValidator.validate(survey);
 		if ( results.hasErrors() || results.hasWarnings() ) {
-			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm);
+			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm, 
+					confirmButtonLabel);
 			validationResultsPopUp.addEventListener(SurveyValidationResultsVM.CONFIRM_EVENT_NAME, new EventListener<ConfirmEvent>() {
 				public void onEvent(ConfirmEvent event) throws Exception {
 					successHandler.onSuccess();
@@ -523,7 +532,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			public void onSuccess() {
 				openPreviewPopUp();
 			}
-		});
+		}, Labels.getLabel("survey.preview.show_preview"));
 	}
 
 	protected void openPreviewPreferencesPopUp() {
