@@ -17,6 +17,8 @@ import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGene
 import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator.PointsConfiguration;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Distribution;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.idm.geospatial.CoordinateUtils;
 import org.openforis.idm.model.Coordinate;
@@ -35,7 +37,9 @@ public class SamplingPointDataGeneratorTest {
 		PointsConfiguration plotPointsConfig = new PointsConfiguration(numPlots, Shape.CIRCLE, Distribution.GRIDDED, 5000, plotWidth);
 		PointsConfiguration samplePointsConfig = new PointsConfiguration(samplesPerPlot, Shape.CIRCLE, Distribution.RANDOM, 20, 10);
 		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
+		CollectSurvey survey = createTestSurvey();
+		
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
 				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), Arrays.asList(plotPointsConfig, samplePointsConfig));
 		
 		List<SamplingDesignItem> items = generator.generate();
@@ -48,6 +52,12 @@ public class SamplingPointDataGeneratorTest {
 		for (SamplingDesignItem plotItem : plotItems) {
 			assertPointInSquare(plotItem, topLeftCoordinate, bottomRightCoordinate);
 		}
+	}
+
+	private CollectSurvey createTestSurvey() {
+		CollectSurvey survey = (CollectSurvey) new CollectSurveyContext().createSurvey();
+		survey.setId(1);
+		return survey;
 	}
 	
 	@Test
@@ -62,7 +72,9 @@ public class SamplingPointDataGeneratorTest {
 		PointsConfiguration plotPointsConfig = new PointsConfiguration(numPlots, Shape.CIRCLE, Distribution.GRIDDED, 5000, plotWidth);
 		PointsConfiguration samplePointsConfig = new PointsConfiguration(samplesPerPlot, Shape.CIRCLE, Distribution.RANDOM, 20, 10);
 		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
+		CollectSurvey survey = createTestSurvey();
+		
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
 				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), Arrays.asList(plotPointsConfig, samplePointsConfig));
 		
 		List<SamplingDesignItem> items = generator.generate();

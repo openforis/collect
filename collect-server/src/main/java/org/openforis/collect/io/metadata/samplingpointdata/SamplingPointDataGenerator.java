@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Distribution;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.idm.geospatial.CoordinateUtils;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
@@ -49,15 +50,17 @@ public class SamplingPointDataGenerator {
 			"WGS84 web mercator"
 			);
 	
+	private CollectSurvey survey;
 	private double boundaryLonMin;
 	private double boundaryLonMax;
 	private double boundaryLatMin;
 	private double boundaryLatMax;
 	private List<PointsConfiguration> samplingPointsConfigurationByLevels = new ArrayList<PointsConfiguration>();
 	
-	public SamplingPointDataGenerator(double boundaryLonMin, double boundaryLonMax, double boundaryLatMin,
+	public SamplingPointDataGenerator(CollectSurvey survey, double boundaryLonMin, double boundaryLonMax, double boundaryLatMin,
 			double boundaryLatMax, List<PointsConfiguration> samplingPointsConfigurationByLevels) {
 		super();
+		this.survey = survey;
 		this.boundaryLonMin = boundaryLonMin;
 		this.boundaryLonMax = boundaryLonMax;
 		this.boundaryLatMin = boundaryLatMin;
@@ -84,16 +87,15 @@ public class SamplingPointDataGenerator {
 
 			Coordinate latLonCenter = reprojectFromWebMarcatorToLatLon(webMarcatorCenter);
 			
-			SamplingDesignItem centerItem = new SamplingDesignItem();
-			centerItem.setSrsId(LAT_LON_SRS_ID);
-			String currentLevelKey = String.valueOf(locationIdx + 1);
-			List<String> itemKeys = new ArrayList<String>();
-			itemKeys.addAll(previousLevelKeys);
-			itemKeys.add(currentLevelKey);
-			centerItem.setLevelCodes(itemKeys);
-			centerItem.setX(latLonCenter.getX());
-			centerItem.setY(latLonCenter.getY());
-			items.add(centerItem);
+			SamplingDesignItem item = new SamplingDesignItem();
+			item.setSrsId(LAT_LON_SRS_ID);
+			item.setSurveyId(survey.getId());
+			List<String> itemKeys = new ArrayList<String>(previousLevelKeys);
+			itemKeys.add(String.valueOf(locationIdx + 1));
+			item.setLevelCodes(itemKeys);
+			item.setX(latLonCenter.getX());
+			item.setY(latLonCenter.getY());
+			items.add(item);
 			
 			if (levelIdx < samplingPointsConfigurationByLevels.size() - 1) {
 				items.addAll(generateItems(levelIdx + 1, itemKeys, latLonCenter));

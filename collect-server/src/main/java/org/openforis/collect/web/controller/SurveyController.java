@@ -120,6 +120,7 @@ public class SurveyController extends BasicController {
 		surveyManager.publish(survey);
 		
 		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(
+				survey,
 				parameters.getBoundaryLonMin(), parameters.getBoundaryLonMax(), 
 				parameters.getBoundaryLatMin(), parameters.getBoundaryLatMax(), 
 				parameters.getSamplingPointsConfigurationByLevels());

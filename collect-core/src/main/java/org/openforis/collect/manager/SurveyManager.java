@@ -732,6 +732,9 @@ public class SurveyManager {
 		survey.setUri(generateSurveyUri(name));
 		survey.addLanguage(language);
 		survey.setTemporary(true);
+		if (survey.getSamplingDesignCodeList() == null) {
+			survey.addSamplingDesignCodeList();
+		}
 		return survey;
 	}
 	

@@ -168,9 +168,6 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
 		surveyObjectsGenerator.addPredefinedObjects(survey);
 		
-		if ( survey.getSamplingDesignCodeList() == null ) {
-			survey.addSamplingDesignCodeList();
-		}
 		return survey;
 	}
 	
