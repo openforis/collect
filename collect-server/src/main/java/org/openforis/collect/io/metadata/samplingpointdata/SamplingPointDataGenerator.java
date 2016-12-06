@@ -1,9 +1,10 @@
 package org.openforis.collect.io.metadata.samplingpointdata;
 
-import static org.openforis.idm.metamodel.SpatialReferenceSystem.*;
+import static org.openforis.idm.metamodel.SpatialReferenceSystem.LAT_LON_SRS;
+import static org.openforis.idm.metamodel.SpatialReferenceSystem.LAT_LON_SRS_ID;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Distribution;
@@ -52,53 +53,50 @@ public class SamplingPointDataGenerator {
 	private double boundaryLonMax;
 	private double boundaryLatMin;
 	private double boundaryLatMax;
-	private PointsConfiguration plotPointsConfiguration;
-	private PointsConfiguration samplePointsConfiguration;
+	private List<PointsConfiguration> samplingPointsConfigurationByLevels = new ArrayList<PointsConfiguration>();
 	
 	public SamplingPointDataGenerator(double boundaryLonMin, double boundaryLonMax, double boundaryLatMin,
-			double boundaryLatMax, PointsConfiguration plotPointsConfiguration,
-			PointsConfiguration samplePointsConfiguration) {
+			double boundaryLatMax, List<PointsConfiguration> samplingPointsConfigurationByLevels) {
 		super();
 		this.boundaryLonMin = boundaryLonMin;
 		this.boundaryLonMax = boundaryLonMax;
 		this.boundaryLatMin = boundaryLatMin;
 		this.boundaryLatMax = boundaryLatMax;
-		this.plotPointsConfiguration = plotPointsConfiguration;
-		this.samplePointsConfiguration = samplePointsConfiguration;
+		this.samplingPointsConfigurationByLevels = samplingPointsConfigurationByLevels;
 	}
 
 	public List<SamplingDesignItem> generate() {
-		//TODO use sampleWidth ?
-		double aoiWidth = calculateAoiWidth();
 		Coordinate latLonAoiCenter = calculateAoiCenter();
-		Coordinate reprojectedAoiCenter = reprojectFromLatLonToWebMarcator(latLonAoiCenter);
 		
-		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>(plotPointsConfiguration.getNumPoints() + plotPointsConfiguration.getNumPoints() + samplePointsConfiguration.getNumPoints());
-		
-		List<Coordinate> plotLocations = generateLocations(reprojectedAoiCenter, aoiWidth, plotPointsConfiguration);
-//		
-		for (int plotIdx = 0; plotIdx < plotLocations.size(); plotIdx++) {
-			Coordinate plotCenter = plotLocations.get(plotIdx);
+		return generateItems(0, Collections.<String>emptyList(), latLonAoiCenter);
+	}
 
-			Coordinate latLonPlotCenter = reprojectFromWebMarcatorToLatLon(plotCenter);
+	private List<SamplingDesignItem> generateItems(int levelIdx, List<String> previousLevelKeys, Coordinate latLonAoiCenter) {
+		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
+		Coordinate reprojectedAoiCenter = reprojectFromLatLonToWebMarcator(latLonAoiCenter);
+		double areaWidth = calculateAoiWidth(levelIdx);
+		PointsConfiguration pointsConfiguration = samplingPointsConfigurationByLevels.get(levelIdx);
+		
+		List<Coordinate> locations = generateLocations(reprojectedAoiCenter, areaWidth, pointsConfiguration);
+		
+		for (int locationIdx = 0; locationIdx < locations.size(); locationIdx++) {
+			Coordinate webMarcatorCenter = locations.get(locationIdx);
+
+			Coordinate latLonCenter = reprojectFromWebMarcatorToLatLon(webMarcatorCenter);
 			
-			SamplingDesignItem plotCenterItem = new SamplingDesignItem();
-			plotCenterItem.setSrsId(LAT_LON_SRS_ID);
-			plotCenterItem.setLevelCodes(Arrays.asList(String.valueOf(plotIdx + 1)));
-			plotCenterItem.setX(latLonPlotCenter.getX());
-			plotCenterItem.setY(latLonPlotCenter.getY());
-			items.add(plotCenterItem);
+			SamplingDesignItem centerItem = new SamplingDesignItem();
+			centerItem.setSrsId(LAT_LON_SRS_ID);
+			String currentLevelKey = String.valueOf(locationIdx + 1);
+			List<String> itemKeys = new ArrayList<String>();
+			itemKeys.addAll(previousLevelKeys);
+			itemKeys.add(currentLevelKey);
+			centerItem.setLevelCodes(itemKeys);
+			centerItem.setX(latLonCenter.getX());
+			centerItem.setY(latLonCenter.getY());
+			items.add(centerItem);
 			
-			List<Coordinate> sampleLocations = generateLocations(plotCenter, plotPointsConfiguration.getPointWidth(), samplePointsConfiguration);
-			for (int sampleIdx = 0; sampleIdx < sampleLocations.size(); sampleIdx++) {
-				Coordinate sampleLocation = sampleLocations.get(sampleIdx);
-				Coordinate latLonSampleLocation = reprojectFromWebMarcatorToLatLon(sampleLocation);
-				SamplingDesignItem sampleItem = new SamplingDesignItem();
-				sampleItem.setLevelCodes(Arrays.asList(String.valueOf(plotIdx + 1), String.valueOf(sampleIdx + 1)));
-				sampleItem.setSrsId(LAT_LON_SRS_ID);
-				sampleItem.setX(latLonSampleLocation.getX());
-				sampleItem.setY(latLonSampleLocation.getY());
-				items.add(sampleItem);
+			if (levelIdx < samplingPointsConfigurationByLevels.size() - 1) {
+				items.addAll(generateItems(levelIdx + 1, itemKeys, latLonCenter));
 			}
 		}
 		return items;
@@ -109,13 +107,19 @@ public class SamplingPointDataGenerator {
 				boundaryLatMin + (boundaryLatMax - boundaryLatMin) / 2, LAT_LON_SRS_ID);
 	}
 
-	private double calculateAoiWidth() {
-		Coordinate topLeftLatLonCoordinate = new Coordinate(boundaryLonMin, boundaryLatMax, LAT_LON_SRS_ID);
-		Coordinate bottomRightLatLonCoordinate = new Coordinate(boundaryLonMax, boundaryLatMin, LAT_LON_SRS_ID);
-		
-		Coordinate topLeftReprojectedCoordinate = reprojectFromLatLonToWebMarcator(topLeftLatLonCoordinate);
-		Coordinate bottomRightReprojectedCoordinate = reprojectFromLatLonToWebMarcator(bottomRightLatLonCoordinate);
-		return bottomRightReprojectedCoordinate.getX() - topLeftReprojectedCoordinate.getX();
+	private double calculateAoiWidth(int levelIdx) {
+		switch(levelIdx) {
+		case 0:
+			Coordinate topLeftLatLonCoordinate = new Coordinate(boundaryLonMin, boundaryLatMax, LAT_LON_SRS_ID);
+			Coordinate bottomRightLatLonCoordinate = new Coordinate(boundaryLonMax, boundaryLatMin, LAT_LON_SRS_ID);
+			
+			Coordinate topLeftReprojectedCoordinate = reprojectFromLatLonToWebMarcator(topLeftLatLonCoordinate);
+			Coordinate bottomRightReprojectedCoordinate = reprojectFromLatLonToWebMarcator(bottomRightLatLonCoordinate);
+			return bottomRightReprojectedCoordinate.getX() - topLeftReprojectedCoordinate.getX();
+		default:
+			PointsConfiguration previousLevelConfiguration = samplingPointsConfigurationByLevels.get(levelIdx - 1);
+			return previousLevelConfiguration.getPointWidth();
+		}
 	}
 
 	private List<Coordinate> generateLocations(Coordinate center, double areaWidth, PointsConfiguration c) {

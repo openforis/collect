@@ -36,7 +36,7 @@ public class SamplingPointDataGeneratorTest {
 		PointsConfiguration samplePointsConfig = new PointsConfiguration(samplesPerPlot, Shape.CIRCLE, Distribution.RANDOM, 20, 10);
 		
 		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
-				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), plotPointsConfig, samplePointsConfig);
+				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), Arrays.asList(plotPointsConfig, samplePointsConfig));
 		
 		List<SamplingDesignItem> items = generator.generate();
 		
@@ -63,7 +63,7 @@ public class SamplingPointDataGeneratorTest {
 		PointsConfiguration samplePointsConfig = new PointsConfiguration(samplesPerPlot, Shape.CIRCLE, Distribution.RANDOM, 20, 10);
 		
 		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
-				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), plotPointsConfig, samplePointsConfig);
+				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), Arrays.asList(plotPointsConfig, samplePointsConfig));
 		
 		List<SamplingDesignItem> items = generator.generate();
 		

@@ -114,14 +114,15 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value = "create-single-attribute-survey.json", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView createSingleAttributeSurvey(@Validated SimpleSurveyParameters parameters, BindingResult result) throws Exception {
-		
 		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.getName(), parameters.getSampleValues());
 		
 		surveyManager.save(survey);
 		surveyManager.publish(survey);
 		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(parameters.getBoundaryLonMin(), parameters.getBoundaryLonMax(), 
-				parameters.getBoundaryLatMin(), parameters.getBoundaryLatMax(), parameters.getPlotPointsConfiguration(), parameters.getSamplePointsConfiguration());
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(
+				parameters.getBoundaryLonMin(), parameters.getBoundaryLonMax(), 
+				parameters.getBoundaryLatMin(), parameters.getBoundaryLatMax(), 
+				parameters.getSamplingPointsConfigurationByLevels());
 		List<SamplingDesignItem> items = generator.generate();
 		
 		samplingDesignManager.insert(survey, items, true);

@@ -16,8 +16,7 @@ public class SimpleSurveyParameters implements Serializable {
 	private Double boundaryLonMax;
 	private Double boundaryLatMin;
 	private Double boundaryLatMax; 
-	private PointsConfiguration plotPointsConfiguration = new PointsConfiguration();
-	private PointsConfiguration samplePointsConfiguration = new PointsConfiguration();
+	private List<PointsConfiguration> samplingPointsConfigurationByLevels = new ArrayList<PointsConfiguration>(3);
 	private List<Object> sampleValues = new ArrayList<Object>();
 	private List<String> imagery = new ArrayList<String>();
 	
@@ -85,20 +84,12 @@ public class SimpleSurveyParameters implements Serializable {
 		this.imagery = imagery;
 	}
 
-	public PointsConfiguration getPlotPointsConfiguration() {
-		return plotPointsConfiguration;
+	public List<PointsConfiguration> getSamplingPointsConfigurationByLevels() {
+		return samplingPointsConfigurationByLevels;
 	}
 
-	public void setPlotPointsConfiguration(PointsConfiguration plotPointsConfiguration) {
-		this.plotPointsConfiguration = plotPointsConfiguration;
-	}
-
-	public PointsConfiguration getSamplePointsConfiguration() {
-		return samplePointsConfiguration;
-	}
-
-	public void setSamplePointsConfiguration(PointsConfiguration samplePointsConfiguration) {
-		this.samplePointsConfiguration = samplePointsConfiguration;
+	public void setSamplingPointsConfigurationByLevels(List<PointsConfiguration> samplingPointsConfigurationByLevels) {
+		this.samplingPointsConfigurationByLevels = samplingPointsConfigurationByLevels;
 	}
 	
 }
