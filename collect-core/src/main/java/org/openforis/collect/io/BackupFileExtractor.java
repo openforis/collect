@@ -55,7 +55,7 @@ public class BackupFileExtractor implements Closeable {
 	}
 	
 	public File extractDataSummaryFile() {
-		return extract(SurveyBackupJob.DATA_SUMMARY_ENTRY_NAME);
+		return extract(SurveyBackupJob.DATA_SUMMARY_ENTRY_NAME, false);
 	}
 	
 	public File extract(String entryName) {

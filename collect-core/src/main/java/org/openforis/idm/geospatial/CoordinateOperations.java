@@ -14,6 +14,10 @@ public class CoordinateOperations {
 
 	private Map<String, SpatialReferenceSystem> spatialReferenceSystemsById = new ConcurrentHashMap<String, SpatialReferenceSystem>();
 
+	public CoordinateOperations() {
+		registerSRS(SpatialReferenceSystem.LAT_LON_SRS);
+	}
+	
 	public void registerSrs(List<SpatialReferenceSystem> list) {
 		for (SpatialReferenceSystem srs : list)
 			registerSRS(srs);

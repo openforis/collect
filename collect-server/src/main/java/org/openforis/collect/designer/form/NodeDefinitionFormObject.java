@@ -207,12 +207,13 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		dest.setPrompt(Prompt.Type.PC, languageCode, pcPromptLabel);
 		dest.setDescription(languageCode, description);
 
-		dest.setMultiple(false);
 		dest.setMinCountExpression(null);
 		dest.setMaxCountExpression(null);
 		dest.setRequiredExpression(null);
 		
-		if ( ! (dest instanceof EntityDefinition && dest.getRootEntity() == dest || dest instanceof AttributeDefinition && calculated)) {
+		if (dest instanceof EntityDefinition && ((EntityDefinition) dest).isRoot()) {
+			dest.setMultiple(true);
+		} else if (! (dest instanceof AttributeDefinition && calculated)) {
 			if (multiple) {
 				dest.setMultiple(true);
 				dest.setMinCountExpression(StringUtils.trimToNull(minCountExpression));
