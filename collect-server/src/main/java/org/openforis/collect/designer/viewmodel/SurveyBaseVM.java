@@ -375,7 +375,8 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	public List<CodeList> getCodeLists() {
 		CollectSurvey survey = getSurvey();
-		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists());
+		boolean includeSamplingDesignList = survey.getTarget() != SurveyTarget.COLLECT_EARTH;
+		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists(includeSamplingDesignList));
 		result = sort(result);
 		return new BindingListModelList<CodeList>(result, false);
 	}

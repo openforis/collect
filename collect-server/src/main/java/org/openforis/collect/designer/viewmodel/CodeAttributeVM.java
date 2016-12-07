@@ -141,11 +141,13 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
 			CodeList oldList = fo.getList();
 			if (oldList != null && ! oldList.equals(selectedCodeList)) {
-				confirmCodeListChange(binder, selectedCodeList);
+				if (oldList != survey.getSamplingDesignCodeList()) {
+					confirmCodeListChange(binder, selectedCodeList);
+				}
 			} else if ( selectedCodeList != null ) {
 				onListChanged(binder, selectedCodeList);
+				validateForm(binder);
 			}
-			validateForm(binder);
 		}
 	}
 
