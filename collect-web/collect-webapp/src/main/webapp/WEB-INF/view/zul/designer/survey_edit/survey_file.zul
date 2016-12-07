@@ -48,6 +48,9 @@
 	              <listitem visible="@load(vm.collectEarthSurvey)"
 	                label="${labels.survey.file.type.collect_earth_ee_script}"
 	                value="COLLECT_EARTH_EE_SCRIPT" />
+	              <listitem visible="@load(vm.collectEarthSurvey)"
+	                label="${labels.survey.file.type.collect_earth_saiku_query}"
+	                value="COLLECT_EARTH_SAIKU_QUERY" />
 	          </listbox>
 	          <button label="${labels.survey.file.type.download_example}"
 	          		visible="@load(fx.type eq 'COLLECT_EARTH_GRID')"

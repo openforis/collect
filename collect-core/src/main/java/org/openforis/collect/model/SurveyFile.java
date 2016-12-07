@@ -15,6 +15,7 @@ public class SurveyFile extends PersistedSurveyObject {
 		COLLECT_EARTH_AREA_PER_ATTRIBUTE("ce_area", "areas_per_attribute.csv"),
 		COLLECT_EARTH_GRID("ce_grid"),
 		COLLECT_EARTH_EE_SCRIPT("ce_eescript", "eePlaygroundScript.fmt"),
+		COLLECT_EARTH_SAIKU_QUERY("ce_saiku_query"),
 		GENERIC("generic");
 		
 		public static SurveyFileType fromCode(String code) {

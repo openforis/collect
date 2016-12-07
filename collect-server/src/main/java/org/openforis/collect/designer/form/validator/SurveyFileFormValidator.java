@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.viewmodel.SurveyFileVM;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -29,7 +30,9 @@ public class SurveyFileFormValidator extends FormValidator {
 	protected static final String SURVEY_MANAGER_ARG = "surveyManager";
 	
 	private static final Pattern VALID_FILENAME_PATTERN = Pattern.compile("^[\\w-\\.]+\\.[\\w-]+$");
-
+	
+	private static final String SAIKU_QUERY_FILE_EXTENSION = "saiku";
+	
 	private static final Set<String> RESERVED_FILENAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE.getFixedFilename(), "balloon.html", "collectEarthCubes.xml.fmt", "kml_template.fmt", "placemark.idm.xml",
 			"project_definition.properties", "README.txt", "test_plots.ced", "earthFiles",
@@ -90,6 +93,15 @@ public class SurveyFileFormValidator extends FormValidator {
 					addInvalidMessage(ctx, message);
 					return false;
 				}
+			case COLLECT_EARTH_SAIKU_QUERY:
+				String extension = FilenameUtils.getExtension(filename);
+				if (! SAIKU_QUERY_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+					String message = Labels.getLabel("survey.file.error.invalid_extension", 
+							new String[] { SAIKU_QUERY_FILE_EXTENSION, extension });
+					addInvalidMessage(ctx, FILENAME_FIELD_NAME, message);
+					return false;
+				}
+				
 			default:
 				if (RESERVED_FILENAMES.contains(filename)) {
 					addInvalidMessage(ctx, FILENAME_FIELD_NAME, Labels.getLabel("survey.file.error.reserved_filename"));

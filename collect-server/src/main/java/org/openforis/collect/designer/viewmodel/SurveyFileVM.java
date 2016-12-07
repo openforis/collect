@@ -43,7 +43,6 @@ import org.zkoss.zul.Filedownload;
  */
 public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 
-	private static final String TYPE_FIELD_NAME = "type";
 	private static final String APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND = "applyChangesToEditedSurveyFile";
 	private static final String CLOSE_SURVEY_FILE_EDIT_POPUP_GLOBAL_COMMAND = "closeSurveyFileEditPopUp";
 	
@@ -126,7 +125,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 
 	private boolean validateFileContent(Binder binder) {
-		String typeName = getFormFieldValue(binder, TYPE_FIELD_NAME);
+		String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		switch (type) {
 		case COLLECT_EARTH_GRID:
@@ -188,7 +187,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 	
 	private void updateForm(Binder binder) {
-		String typeName = getFormFieldValue(binder, TYPE_FIELD_NAME);
+		String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		String filename = type.getFixedFilename();
 		if (filename == null) {
