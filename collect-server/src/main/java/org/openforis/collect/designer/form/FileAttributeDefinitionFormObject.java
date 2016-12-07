@@ -3,8 +3,6 @@
  */
 package org.openforis.collect.designer.form;
 
-import java.util.List;
-
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.CollectAnnotations.FileType;
 import org.openforis.collect.model.CollectSurvey;
@@ -19,8 +17,6 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	
 	private static final int MB_IN_BYTES = 1024 * 1024;
 
-	private static final String EXTENSIONS_SEPARATOR = " ";
-	
 	/**
 	* Max file size in mega bytes
 	*/
@@ -44,7 +40,6 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		maxSize = convertToMB(source.getMaxSize());
-		List<String> extensionsList = source.getExtensions();
 		CollectAnnotations annotations = ((CollectSurvey) source.getSurvey()).getAnnotations();
 		fileType = annotations.getFileType(source).name();
 	}
