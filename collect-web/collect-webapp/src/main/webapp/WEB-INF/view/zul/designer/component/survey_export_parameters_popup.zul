@@ -41,7 +41,8 @@
 							onCheck="@command('outputFormatChanged')">
 						<radio label="${labels.survey.export.output_format.desktop}" value="DESKTOP" selected="true" />
 						<radio label="${labels.survey.export.output_format.mobile}" value="MOBILE" />
-						<radio label="${labels.survey.export.output_format.collect_earth}" value="EARTH" />
+						<radio label="${labels.survey.export.output_format.collect_earth}" value="EARTH"
+							visible="@load(vm.collectEarthSurvey)" />
 						<radio label="${labels.survey.export.output_format.rdb}" value="RDB" />
 					</radiogroup>
 				</row>
