@@ -60,6 +60,10 @@ public class CodeList extends VersionableSurveyObject {
 		}
 	}
 	
+	public String getLabel(CodeListLabel.Type type) {
+		return getLabel(type, getSurvey().getDefaultLanguage());
+	}
+	
 	public String getLabel(CodeListLabel.Type type, String language) {
 		return labels == null ? null: labels.getText(type, language);
 	}
@@ -90,6 +94,10 @@ public class CodeList extends VersionableSurveyObject {
 		} else {
 			return this.descriptions.values();
 		}
+	}
+	
+	public String getDescription() {
+		return getDescription(getSurvey().getDefaultLanguage());
 	}
 
 	public String getDescription(String language) {

@@ -412,6 +412,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 	}
 	
+	public String getDefaultLanguageCode() {
+		return survey == null ? null : survey.getDefaultLanguage();
+	}
+	
 	public String getCurrentLanguageCode() {
 		return currentLanguageCode;
 	}

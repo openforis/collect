@@ -65,6 +65,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String handheldPromptLabel;
 	private String pcPromptLabel;
 	
+	private String defaultInstanceLabel;
+	private String defaultHeadingLabel;
+	private String defaultDescription;
+	
 	//layout
 	private String tabName;
 	private int column;
@@ -164,6 +168,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		handheldPromptLabel = source.getPrompt(Prompt.Type.HANDHELD, language);
 		pcPromptLabel = source.getPrompt(Prompt.Type.PC, language);
 		description = source.getDescription(language);
+		
+		defaultInstanceLabel = source.getLabel(Type.INSTANCE);
+		defaultHeadingLabel = source.getLabel(Type.HEADING);
+		defaultDescription = source.getDescription();
+		
 		//layout
 		hideWhenNotRelevant = uiOptions.isHideWhenNotRelevant(source);
 		column = uiOptions.getColumn(source);
@@ -554,5 +563,17 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setHideKeyInCollectEarthRecordList(boolean hideKeyInCollectEarthRecordList) {
 		this.hideKeyInCollectEarthRecordList = hideKeyInCollectEarthRecordList;
+	}
+
+	public String getDefaultInstanceLabel() {
+		return defaultInstanceLabel;
+	}
+
+	public String getDefaultHeadingLabel() {
+		return defaultHeadingLabel;
+	}
+
+	public String getDefaultDescription() {
+		return defaultDescription;
 	}
 }
