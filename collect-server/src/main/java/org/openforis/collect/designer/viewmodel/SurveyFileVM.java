@@ -136,13 +136,13 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 			} else {
 				switch(headersValidationResult.getErrorType()) {
 				case INVALID_FILE_TYPE:
-					MessageUtil.showError("survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
-					return false;
+					MessageUtil.showWarning("survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
+					return true; //don't block the user
 				case INVALID_HEADERS:
-					MessageUtil.showError("survey.file.type.collect_earth_grid.error.invalid_file_structure", 
+					MessageUtil.showWarning("survey.file.type.collect_earth_grid.error.invalid_file_structure", 
 							new Object[]{headersValidationResult.getExpectedHeaders().toString(), 
 									headersValidationResult.getFoundHeaders().toString()});
-					return false;
+					return true; //don't block the user
 				default:
 					return true;
 				}

@@ -208,12 +208,12 @@ public class SurveyValidator {
 			SurveyValidationResult validationResult = null;
 			switch(fileValidationResult.getErrorType()) {
 			case INVALID_FILE_TYPE:
-				validationResult = new SurveyValidationResult(Flag.ERROR, 
+				validationResult = new SurveyValidationResult(Flag.WARNING, 
 						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
 						"survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
 				break;
 			case INVALID_HEADERS:
-				validationResult = new SurveyValidationResult(Flag.ERROR, 
+				validationResult = new SurveyValidationResult(Flag.WARNING, 
 						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
 						"survey.file.type.collect_earth_grid.error.invalid_file_structure", 
 						fileValidationResult.getExpectedHeaders().toString(), 
