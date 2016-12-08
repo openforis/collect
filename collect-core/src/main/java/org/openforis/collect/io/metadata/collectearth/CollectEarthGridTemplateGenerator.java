@@ -143,6 +143,11 @@ public class CollectEarthGridTemplateGenerator  {
 		List<AttributeDefinition> attributesPerRow = getAttributesPerRow(survey);
 				
 		CsvLine csvLine = null;
+		
+		if( !firstLineIsHeaders ){
+			csvReader.setHeadersRead(true);
+		}
+		
 		while( ( csvLine = csvReader.readNextLine() ) != null ){
 			
 
