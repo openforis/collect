@@ -15,6 +15,9 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 	private String description;
 	private boolean qualifiable;
 	
+	private String defaultLabel;
+	private String defaultDescription;
+	
 	@Override
 	public void loadFrom(CodeListItem source, String languageCode) {
 		super.loadFrom(source, languageCode);
@@ -22,6 +25,9 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 		label = source.getLabel(languageCode);
 		description = source.getDescription(languageCode);
 		qualifiable = source.isQualifiable();
+		
+		defaultLabel = source.getLabel();
+		defaultDescription = source.getDescription();
 	}
 	
 	@Override
@@ -63,6 +69,14 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 
 	public void setQualifiable(boolean qualifiable) {
 		this.qualifiable = qualifiable;
+	}
+	
+	public String getDefaultLabel() {
+		return defaultLabel;
+	}
+	
+	public String getDefaultDescription() {
+		return defaultDescription;
 	}
 
 }

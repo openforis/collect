@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.viewmodel.CodeListsVM.EDITING_ATTRIBUTE_PARAM;
+import static org.openforis.collect.designer.viewmodel.CodeListsVM.SELECTED_CODE_LIST_PARAM;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -144,22 +147,22 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void openCodeListsManagerPopUp(
-			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
-			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
+			@BindingParam(EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
+			@BindingParam(SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
 			dispatchCurrentFormValidatedCommand(true);
 			Map<String, Object> args = new HashMap<String, Object>();
-			args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
+			args.put(EDITING_ATTRIBUTE_PARAM, editingAttribute);
 			CodeList selectedCodeListInPopUp = selectedCodeList == survey.getSamplingDesignCodeList() ? null: selectedCodeList;
-			args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeListInPopUp);
+			args.put(SELECTED_CODE_LIST_PARAM, selectedCodeListInPopUp);
 			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
 		}
 	}
 
 	@GlobalCommand
 	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder,
-			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
-			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
+			@BindingParam(EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
+			@BindingParam(SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
 		if ( codeListsPopUp != null ) {
 			closePopUp(codeListsPopUp);
 			codeListsPopUp = null;
@@ -170,8 +173,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	public void dispatchCodeListsPopUpClosedCommand(Boolean editingAttribute, CodeList selectedCodeList) {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
-		args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
+		args.put(EDITING_ATTRIBUTE_PARAM, editingAttribute);
+		args.put(SELECTED_CODE_LIST_PARAM, selectedCodeList);
 		BindUtils.postGlobalCommand(null, null, CODE_LISTS_POP_UP_CLOSED_COMMAND, args);
 	}
 	
