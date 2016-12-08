@@ -24,6 +24,9 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private boolean openGEECodeEditor;
 	private boolean openStreetView;
 	
+	private String defaultDescription;
+	private String defaultProjectName;
+	
 	@Override
 	public void loadFrom(CollectSurvey source, String languageCode) {
 		name = source.getName();
@@ -39,6 +42,9 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		openStreetView = annotations.isStreetViewEnabled();
 		openGEEExplorer = annotations.isGEEExplorerEnabled();
 		openGEECodeEditor = annotations.isGEECodeEditorEnabled();
+		
+		defaultProjectName = source.getProjectName();
+		defaultDescription = source.getDescription();
 	}
 
 	protected String toListitemValue(Double number) {
@@ -168,4 +174,11 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		this.openStreetView = openStreetView;
 	}
 
+	public String getDefaultProjectName() {
+		return defaultProjectName;
+	}
+	
+	public String getDefaultDescription() {
+		return defaultDescription;
+	}
 }
