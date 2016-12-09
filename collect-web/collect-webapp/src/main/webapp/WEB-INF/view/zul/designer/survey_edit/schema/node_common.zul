@@ -241,7 +241,8 @@
       				message="@load(vmsgs['instanceLabel'])">
       				<textbox width="250px"
       					value="@bind(fx.instanceLabel)"
-  						onChange="@command('singleInstanceLabelChange', label=self.value)" />
+      					placeholder="@load(fx.defaultInstanceLabel)"
+      					onChange="@command('singleInstanceLabelChange', label=self.value)" />
       			</fieldErrorHandler>
       		</row>
       		<row>
@@ -256,6 +257,7 @@
       				message="@load(vmsgs['description'])">
       				<textbox width="300px" multiline="true" rows="4"
       					value="@bind(fx.description)"
+      					placeholder="@load(fx.defaultDescription)"
       					onChange="@command('applyChanges')" />
       			</fieldErrorHandler>
       		</row>
@@ -290,6 +292,7 @@
 	      				message="@load(vmsgs['headingLabel'])">
 	      				<textbox width="250px"
 	      					value="@bind(fx.headingLabel)"
+	      					placeholder="@load(fx.defaultHeadingLabel)"
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
 	      		</row>

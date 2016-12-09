@@ -43,7 +43,6 @@ import org.zkoss.zul.Filedownload;
  */
 public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 
-	private static final String TYPE_FIELD_NAME = "type";
 	private static final String APPLY_CHANGES_TO_EDITED_SURVEY_FILE_GLOBAL_COMMAND = "applyChangesToEditedSurveyFile";
 	private static final String CLOSE_SURVEY_FILE_EDIT_POPUP_GLOBAL_COMMAND = "closeSurveyFileEditPopUp";
 	
@@ -126,7 +125,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 
 	private boolean validateFileContent(Binder binder) {
-		String typeName = getFormFieldValue(binder, TYPE_FIELD_NAME);
+		String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		switch (type) {
 		case COLLECT_EARTH_GRID:
@@ -137,15 +136,16 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 			} else {
 				switch(headersValidationResult.getErrorType()) {
 				case INVALID_FILE_TYPE:
-					MessageUtil.showError("survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
-					break;
+					MessageUtil.showWarning("survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
+					return true; //don't block the user
 				case INVALID_HEADERS:
-					MessageUtil.showError("survey.file.type.collect_earth_grid.error.invalid_file_structure", 
+					MessageUtil.showWarning("survey.file.type.collect_earth_grid.error.invalid_file_structure", 
 							new Object[]{headersValidationResult.getExpectedHeaders().toString(), 
 									headersValidationResult.getFoundHeaders().toString()});
-					break;
+					return true; //don't block the user
+				default:
+					return true;
 				}
-				return false;
 			}
 		default:
 			return true;
@@ -188,7 +188,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 	
 	private void updateForm(Binder binder) {
-		String typeName = getFormFieldValue(binder, TYPE_FIELD_NAME);
+		String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		String filename = type.getFixedFilename();
 		if (filename == null) {

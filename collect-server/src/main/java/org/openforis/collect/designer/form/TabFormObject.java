@@ -11,6 +11,8 @@ public class TabFormObject extends SurveyObjectFormObject<UITab> {
 	
 	private String label;
 	
+	private String defaultLabel;
+	
 	TabFormObject() {
 	}
 	
@@ -22,6 +24,7 @@ public class TabFormObject extends SurveyObjectFormObject<UITab> {
 	@Override
 	public void loadFrom(UITab source, String language) {
 		label = source.getLabel(language);
+		defaultLabel = source.getLabel();
 	}
 	
 	@Override
@@ -40,6 +43,10 @@ public class TabFormObject extends SurveyObjectFormObject<UITab> {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	
+	public String getDefaultLabel() {
+		return defaultLabel;
 	}
 	
 }

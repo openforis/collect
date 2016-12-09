@@ -19,6 +19,10 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 	private String description;
 	private String type;
 	
+	private String defaultItemLabel;
+	private String defaultListLabel;
+	private String defaultDescription;
+	
 	public enum Type {
 		FLAT, HIERARCHICAL;
 	}
@@ -34,6 +38,11 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		itemLabel = source.getLabel(CodeListLabel.Type.ITEM, languageCode);
 		listLabel = source.getLabel(CodeListLabel.Type.LIST, languageCode);
 		description = source.getDescription(languageCode);
+		
+		defaultItemLabel = source.getLabel(CodeListLabel.Type.ITEM);
+		defaultListLabel = source.getLabel(CodeListLabel.Type.LIST);
+		defaultDescription = source.getDescription();
+		
 		List<CodeListLevel> levels = source.getHierarchy();
 		boolean hasMultipleLevels = levels.size() > 1;
 		type = hasMultipleLevels ? Type.HIERARCHICAL.name(): Type.FLAT.name();
@@ -88,4 +97,16 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		this.type = type;
 	}
 
+	public String getDefaultItemLabel() {
+		return defaultItemLabel;
+	}
+
+	public String getDefaultListLabel() {
+		return defaultListLabel;
+	}
+
+	public String getDefaultDescription() {
+		return defaultDescription;
+	}
+	
 }

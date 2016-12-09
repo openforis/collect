@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.viewmodel.CodeListsVM.EDITING_ATTRIBUTE_PARAM;
+import static org.openforis.collect.designer.viewmodel.CodeListsVM.SELECTED_CODE_LIST_PARAM;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -144,25 +147,22 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void openCodeListsManagerPopUp(
-			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
-			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
+			@BindingParam(EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
+			@BindingParam(SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
-			if (selectedCodeList == survey.getSamplingDesignCodeList()) {
-				MessageUtil.showWarning("survey.code_list.alert.cannot_edit_sampling_design_list");
-			} else {
-				dispatchCurrentFormValidatedCommand(true);
-				Map<String, Object> args = new HashMap<String, Object>();
-				args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
-				args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
-				codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
-			}
+			dispatchCurrentFormValidatedCommand(true);
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put(EDITING_ATTRIBUTE_PARAM, editingAttribute);
+			CodeList selectedCodeListInPopUp = selectedCodeList == survey.getSamplingDesignCodeList() ? null: selectedCodeList;
+			args.put(SELECTED_CODE_LIST_PARAM, selectedCodeListInPopUp);
+			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
 		}
 	}
 
 	@GlobalCommand
 	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder,
-			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
-			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
+			@BindingParam(EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
+			@BindingParam(SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
 		if ( codeListsPopUp != null ) {
 			closePopUp(codeListsPopUp);
 			codeListsPopUp = null;
@@ -173,8 +173,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	public void dispatchCodeListsPopUpClosedCommand(Boolean editingAttribute, CodeList selectedCodeList) {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
-		args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
+		args.put(EDITING_ATTRIBUTE_PARAM, editingAttribute);
+		args.put(SELECTED_CODE_LIST_PARAM, selectedCodeList);
 		BindUtils.postGlobalCommand(null, null, CODE_LISTS_POP_UP_CLOSED_COMMAND, args);
 	}
 	
@@ -274,7 +274,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void save(@ContextParam(ContextType.BINDER) Binder binder) throws SurveyStoreException {
 		dispatchValidateAllCommand();
 		if ( checkCanSave() ) {
-			backgroundSurveySave();
+			checkValidity(true, new SuccessHandler() {
+				public void onSuccess() {
+					try {
+						backgroundSurveySave();
+					} catch (SurveyStoreException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}, Labels.getLabel("survey.save.confirm_save_with_errors"));
 		}
 	}
 	
@@ -335,14 +343,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 			public void onSuccess() {
 				MessageUtil.showInfo("survey.successfully_validated");
 			}
-		});
+		}, null);
 	}
 	
-	private void checkValidity(boolean showConfirm, final SuccessHandler successHandler) {
+	private void checkValidity(boolean showConfirm, final SuccessHandler successHandler, String confirmButtonLabel) {
 		SurveyValidator surveyValidator = getSurveyValidator(survey);
 		SurveyValidationResults results = surveyValidator.validate(survey);
 		if ( results.hasErrors() || results.hasWarnings() ) {
-			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm);
+			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm, 
+					confirmButtonLabel);
 			validationResultsPopUp.addEventListener(SurveyValidationResultsVM.CONFIRM_EVENT_NAME, new EventListener<ConfirmEvent>() {
 				public void onEvent(ConfirmEvent event) throws Exception {
 					successHandler.onSuccess();
@@ -523,7 +532,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			public void onSuccess() {
 				openPreviewPopUp();
 			}
-		});
+		}, Labels.getLabel("survey.preview.show_preview"));
 	}
 
 	protected void openPreviewPreferencesPopUp() {

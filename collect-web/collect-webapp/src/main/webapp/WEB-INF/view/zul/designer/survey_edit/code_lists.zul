@@ -102,6 +102,7 @@
 		        						message="@load(vmsgs['itemLabel'])">
 		        						<textbox width="150px"
 		        							value="@bind(fx.itemLabel)"
+		        							placeholder="@load(fx.defaultItemLabel)"
 		        							onChange="@command('applyChanges')" />
 		        					</fieldErrorHandler>
 		        				</row>
@@ -117,6 +118,7 @@
 		        						message="@load(vmsgs['description'])">
 		        						<textbox width="300px"
 		        							value="@bind(fx.description)" multiline="true" rows="4"
+											placeholder="@load(fx.defaultDescription)"
 		        							onChange="@command('applyChanges')" />
 		        					</fieldErrorHandler>
 		        				</row>

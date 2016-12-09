@@ -31,7 +31,8 @@
 	        </fieldErrorHandler>
             <fieldErrorHandler message="@load(vmsgs['projectName'])">
               <textbox width="350px" value="@bind(fx.projectName)"
-                onChange="@command('applyChanges')" />
+              		placeholder="@bind(fx.defaultProjectName)"
+                	onChange="@command('applyChanges')" />
             </fieldErrorHandler>
           </row>
           <row>
@@ -44,6 +45,7 @@
             <fieldErrorHandler message="@load(vmsgs['description'])">
               	<textbox width="350px" value="@bind(fx.description)"
 	                multiline="true" rows="4"
+	                placeholder="@bind(fx.defaultDescription)"
 	                onChange="@command('applyChanges')" />
             </fieldErrorHandler>
           </row>

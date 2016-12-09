@@ -98,13 +98,19 @@ public class CollectEarthGridTemplateGenerator  {
 				//skip validation when there is only one row (e.g. ChangeThisGrid.csv file)
 				return validationResults;
 			}
-			
-			csvReader.readHeaders();
-			List<String> possibleHeaders = csvReader.getColumnNames();
 			boolean headersFound = false;
-			if( lineContainsHeaders(survey, possibleHeaders) ){
-				headersFound = true;
-				validationResults = validateCSVHeaders(possibleHeaders, survey);
+			try {
+				csvReader.readHeaders();
+				List<String> firstLineValues = csvReader.getColumnNames();
+				
+				headersFound = lineContainsHeaders(survey, firstLineValues);
+				if( headersFound ){
+					validationResults = validateCSVHeaders(firstLineValues, survey);
+				}
+			} catch(Exception e) {
+				//this may happen when there are duplicate values in the first row
+				headersFound = false;
+				csvReader.setHeadersRead(true);
 			}
 			
 			rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound ) );
@@ -138,8 +144,8 @@ public class CollectEarthGridTemplateGenerator  {
 		List<AttributeDefinition> attributesPerRow = getAttributesPerRow(survey);
 				
 		CsvLine csvLine = null;
+		
 		while( ( csvLine = csvReader.readNextLine() ) != null ){
-			
 
 			// Validate that the number of columns in the CSV and the expected number of columns match!!!!
 			if( csvLine.getLine().length != attributesPerRow.size() ){

@@ -35,6 +35,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
@@ -309,6 +310,10 @@ public class SurveyExportParametersVM extends BaseVM {
 		SurveyType type = SurveyType.valueOf(getTypeFormField());
 		OutputFormat outputFormat = OutputFormat.valueOf(getOutputFormatFormField());
 		return type == PUBLISHED && outputFormat == RDB;
+	}
+
+	public boolean isCollectEarthSurvey() {
+		return surveySummary != null && surveySummary.getTarget() == SurveyTarget.COLLECT_EARTH;
 	}
 
 	public SurveyExportParametersFormObject getFormObject() {
