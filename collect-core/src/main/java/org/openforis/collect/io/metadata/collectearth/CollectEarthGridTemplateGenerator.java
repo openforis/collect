@@ -110,6 +110,7 @@ public class CollectEarthGridTemplateGenerator  {
 			} catch(Exception e) {
 				//this may happen when there are duplicate values in the first row
 				headersFound = false;
+				csvReader.setHeadersRead(true);
 			}
 			
 			rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound ) );
@@ -144,12 +145,7 @@ public class CollectEarthGridTemplateGenerator  {
 				
 		CsvLine csvLine = null;
 		
-		if( !firstLineIsHeaders ){
-			csvReader.setHeadersRead(true);
-		}
-		
 		while( ( csvLine = csvReader.readNextLine() ) != null ){
-			
 
 			// Validate that the number of columns in the CSV and the expected number of columns match!!!!
 			if( csvLine.getLine().length != attributesPerRow.size() ){
