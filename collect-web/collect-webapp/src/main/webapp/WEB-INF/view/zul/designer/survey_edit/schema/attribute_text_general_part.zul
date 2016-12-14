@@ -18,14 +18,13 @@
 					value="MEMO" />
 			</radiogroup>
 		</row>
-		<row>
+		<row visible="@load(not vm.collectEarthSurvey)">
 			<fieldErrorHandler message="@load(vmsgs['input'])">
 				<label value="${labels.survey.schema.attribute.text.input.$}:" />
 				<image popup="textInputInfoTooltip" style="cursor:pointer"
 					src="/assets/images/info-small.png" />
 	    	</fieldErrorHandler>
-			
-			<radiogroup selectedItem="@bind(fx.input)"
+			<radiogroup selectedItem="@bind(fx.input)" 
 				onCheck="@command('applyChanges')">
 				<radio
 					label="${labels.survey.schema.attribute.text.input.keyboard}"
