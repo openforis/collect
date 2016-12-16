@@ -45,13 +45,19 @@ check_for_updates = 1</text>
 		</component>
 	</componentList>
     <preInstallationActionList>
+    	<setInstallerVariable name="tomcat_http_port" value="8080"/>
+    	<propertiesFileGet>
+		   <file>../tomcat/collect.properties</file>
+		   <key>http_port</key>
+		   <variable>tomcat_http_port</variable>
+		</propertiesFileGet>
 		<throwError>
 			<explanation>Open Foris Collect is running</explanation>
 			<text>Open Foris Collect is running. Shutdown Collect before updating it.</text>
 			<ruleList>
 				<portTest>
 					<condition>cannot_bind</condition>
-					<port>8080</port>
+					<port>${tomcat_http_port}</port>
 				</portTest>
 			</ruleList>
         </throwError>

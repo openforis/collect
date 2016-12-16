@@ -7,7 +7,7 @@
 :: Set JRE_HOME
 if "%JRE_HOME%"=="" (
 	echo Setting JRE_HOME
-        if exist "%ProgramFiles%\Java" (
+    if exist "%ProgramFiles%\Java" (
 		for /d %%i in ("%ProgramFiles%\Java\jre*") do set JRE_HOME=%%i
 	) else if exist "%ProgramFiles% (x86)\Java" (
 		for /d %%i in ("%ProgramFiles% (x86)\Java\jre*") do set JRE_HOME=%%i
@@ -23,9 +23,5 @@ if "%JRE_HOME%"=="" (
 	echo     System Properties / Enviromnent Variables / System variables
 	pause
 ) else (
-	set JRE_HOME
-	find_tomcat_port.cmd
-	cd tomcat/bin
-	startup.bat
-	start echo http://localhost:%COLLECT_TOMCAT_HTTP_PORT%/collect
+	_start.cmd
 )
