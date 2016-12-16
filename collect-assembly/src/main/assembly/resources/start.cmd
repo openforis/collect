@@ -24,7 +24,8 @@ if "%JRE_HOME%"=="" (
 	pause
 ) else (
 	set JRE_HOME
+	find_tomcat_port.cmd
 	cd tomcat/bin
 	startup.bat
-	start http://localhost:8080/collect
+	start echo http://localhost:%COLLECT_TOMCAT_HTTP_PORT%/collect
 )
