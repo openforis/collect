@@ -1,6 +1,6 @@
 @echo off
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: startup.cmd (v1.0)                                 ::
+:: start.cmd (v2.0)                                   ::
 :: Microsoft Windows OpenForis Collect startup script ::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -15,6 +15,7 @@ if "%JRE_HOME%"=="" (
 ) else (
 	echo Using already defined JRE_HOME
 )
+
 :: Check that variable is properly defined
 if "%JRE_HOME%"=="" (
 	echo Error: cannot determine JRE_HOME path automatically
@@ -23,5 +24,11 @@ if "%JRE_HOME%"=="" (
 	echo     System Properties / Enviromnent Variables / System variables
 	pause
 ) else (
-	_start.cmd
+	set JRE_HOME
+	start http://localhost:8080/collect
+	
+	echo Starting up Tomcat...
+	cd tomcat\bin
+	call startup.bat
+	cd ..\..
 )

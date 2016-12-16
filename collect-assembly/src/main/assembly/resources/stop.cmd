@@ -7,7 +7,7 @@
 :: Set JRE_HOME
 if "%JRE_HOME%"=="" (
 	echo Setting JRE_HOME
-        if exist "%ProgramFiles%\Java" (
+    if exist "%ProgramFiles%\Java" (
 		for /d %%i in ("%ProgramFiles%\Java\jre*") do set JRE_HOME=%%i
 	) else if exist "%ProgramFiles% (x86)\Java" (
 		for /d %%i in ("%ProgramFiles% (x86)\Java\jre*") do set JRE_HOME=%%i
@@ -15,6 +15,7 @@ if "%JRE_HOME%"=="" (
 ) else (
 	echo Using already defined JRE_HOME
 )
+
 :: Check that variable is properly defined
 if "%JRE_HOME%"=="" (
 	echo Error: cannot determine JRE_HOME path automatically
@@ -24,6 +25,6 @@ if "%JRE_HOME%"=="" (
 	pause
 ) else (
 	set JRE_HOME
-	cd tomcat/bin
+	cd tomcat\bin
 	shutdown.bat
 )
