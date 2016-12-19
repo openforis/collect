@@ -1,5 +1,8 @@
 package org.openforis.collect.io.metadata.collectearth;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -17,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -30,19 +32,19 @@ public class CollectEarthBalloonPreviewController extends AbstractPlacemarkDataC
 	@Autowired
 	private SurveyManager surveyManager;
 
-	@RequestMapping(value="/preview_placemark-info-expanded", method = RequestMethod.GET)
+	@RequestMapping(value="/preview_placemark-info-expanded", method = GET)
 	protected void placemarkInfoExpanded(@RequestParam("id") String placemarkId, HttpServletResponse response) throws IOException {
 		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
 		earthSurveyService.setCollectSurvey(survey);
 		super.placemarkInfoExpanded(placemarkId, response);
 	}
 
-	@RequestMapping(value="/preview_save-data-expanded", method = RequestMethod.POST)
+	@RequestMapping(value="/preview_save-data-expanded", method = POST)
 	public void saveDataExpanded(PlacemarkUpdateRequest updateRequest, HttpServletResponse response) throws IOException {
 		super.saveDataExpanded(updateRequest, response);
 	}
 	
-	@RequestMapping(value = "/collectearthpreview.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/collectearthpreview.html", method = GET)
 	public void showCollectEarthBalloonPreview(HttpServletResponse response, 
 			@RequestParam("surveyId") Integer surveyId, @RequestParam("lang") String languageCode) throws IOException  {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
