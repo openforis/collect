@@ -70,7 +70,7 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder builder =  parentBuilder.e("fieldset"); //$NON-NLS-1$
+		XMLBuilder builder =  parentBuilder.e("fieldset").attr("class", "entity-group" ); //$NON-NLS-1$
 		String legend =  comp.getLabelOrName() ;
 		builder.e("legend").t(legend); //$NON-NLS-1$
 		XMLBuilder tableBuilder = builder.e("table").a("class", "table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -98,7 +98,7 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset"); //$NON-NLS-1$
+		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset").attr("class", "entity-group" );; //$NON-NLS-1$
 		fieldSetBuilder.e("legend").t( comp.getLabelOrName()); //$NON-NLS-1$
 		
 		for (CEComponent child : comp.getChildren()) {
