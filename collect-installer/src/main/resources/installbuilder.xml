@@ -248,6 +248,11 @@ check_for_updates = 1</text>
 		                </substitution>
 		            </substitutionList>
 		        </substitute>
+		        <propertiesFileSet>
+		        	<file>${installdir}/collect.properties</file>
+		        	<key>tomcat_http_port</key>
+		        	<value>${tomcat_http}</value>
+		        </propertiesFileSet>
 			</postInstallationActionList>
 		</component>
 		<include>
@@ -261,14 +266,6 @@ check_for_updates = 1</text>
 		</setInstallerVariable>
 	</preInstallationActionList>
 	<postInstallationActionList>
-		<changePermissions>
-			<files>${installdir}/*.sh</files>
-			<permissions>0555</permissions>
-		</changePermissions>
-		<changePermissions>
-			<files>${installdir}/autoupdate/*.run</files>
-			<permissions>0555</permissions>
-		</changePermissions>
 		<substitute>
 			<files>${installdir}/start.sh;${installdir}/stop.sh;${installdir}/start.cmd;${installdir}/stop.cmd;</files>
 			<type>exact</type>
@@ -289,6 +286,14 @@ check_for_updates = 1</text>
                 </substitution>
             </substitutionList>
         </substitute>
+   		<changePermissions>
+			<files>${installdir}/*.sh</files>
+			<permissions>0775</permissions>
+		</changePermissions>
+		<changePermissions>
+			<files>${installdir}/autoupdate/*.run</files>
+			<permissions>0775</permissions>
+		</changePermissions>
 		<changeOwnerAndGroup>
 			<files>/home/${env(SUDO_USER)}/Desktop/${java_launcher_binary_name}
 			</files>
