@@ -20,6 +20,7 @@ import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SamplingDesignItem;
+import org.openforis.collect.web.controller.SingleAttributeSurveyCreationParameters.SamplingPointDataConfiguration;
 import org.openforis.idm.geospatial.CoordinateUtils;
 import org.openforis.idm.model.Coordinate;
 
@@ -39,8 +40,14 @@ public class SamplingPointDataGeneratorTest {
 		
 		CollectSurvey survey = createTestSurvey();
 		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
-				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), Arrays.asList(plotPointsConfig, samplePointsConfig));
+		SamplingPointDataConfiguration conf = new SamplingPointDataConfiguration();
+		conf.setBoundaryLonMin(topLeftCoordinate.getX());
+		conf.setBoundaryLonMax(bottomRightCoordinate.getX());
+		conf.setBoundaryLatMin(topLeftCoordinate.getY());
+		conf.setBoundaryLatMax(bottomRightCoordinate.getY());
+		conf.setLevelsConfiguration(Arrays.asList(plotPointsConfig, samplePointsConfig));
+
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, conf);
 		
 		List<SamplingDesignItem> items = generator.generate();
 		
@@ -74,8 +81,14 @@ public class SamplingPointDataGeneratorTest {
 		
 		CollectSurvey survey = createTestSurvey();
 		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, topLeftCoordinate.getX(), bottomRightCoordinate.getX(), 
-				topLeftCoordinate.getY(), bottomRightCoordinate.getY(), Arrays.asList(plotPointsConfig, samplePointsConfig));
+		SamplingPointDataConfiguration conf = new SamplingPointDataConfiguration();
+		conf.setBoundaryLonMin(topLeftCoordinate.getX());
+		conf.setBoundaryLonMax(bottomRightCoordinate.getX());
+		conf.setBoundaryLatMin(topLeftCoordinate.getY());
+		conf.setBoundaryLatMax(bottomRightCoordinate.getY());
+		conf.setLevelsConfiguration(Arrays.asList(plotPointsConfig, samplePointsConfig));
+		
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, conf);
 		
 		List<SamplingDesignItem> items = generator.generate();
 		

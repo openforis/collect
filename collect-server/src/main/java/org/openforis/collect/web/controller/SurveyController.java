@@ -113,17 +113,14 @@ public class SurveyController extends BasicController {
 	@Transactional
 	@RequestMapping(value = "create-single-attribute-survey.json", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	SurveyView createSingleAttributeSurvey(@Validated SimpleSurveyParameters parameters, BindingResult result) throws Exception {
-		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.getName(), parameters.getSampleValues());
+	SurveyView createSingleAttributeSurvey(@Validated SingleAttributeSurveyCreationParameters parameters, BindingResult result) throws Exception {
+		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.getName(), parameters.getValues());
 		
 		surveyManager.save(survey);
 		surveyManager.publish(survey);
 		
 		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(
-				survey,
-				parameters.getBoundaryLonMin(), parameters.getBoundaryLonMax(), 
-				parameters.getBoundaryLatMin(), parameters.getBoundaryLatMax(), 
-				parameters.getSamplingPointsConfigurationByLevels());
+				survey,	parameters.getSamplingPointDataConfiguration());
 		List<SamplingDesignItem> items = generator.generate();
 		
 		samplingDesignManager.insert(survey, items, true);
@@ -131,9 +128,20 @@ public class SurveyController extends BasicController {
 		return generateView(survey);
 	}
 
-	private CollectSurvey createTemporarySingleAttributeSurvey(String name, List<Object> sampleValues) {
+	private CollectSurvey createTemporarySingleAttributeSurvey(String name, List<Object> values) {
 		String langCode = Locale.ENGLISH.getLanguage();
 		CollectSurvey survey = surveyManager.createTemporarySurvey(name, langCode);
+
+		CodeList codeList = survey.createCodeList();
+		codeList.setName("values");
+		for (int i = 0; i < values.size(); i++) {
+			Object value = values.get(i);
+			CodeListItem item = codeList.createItem(1);
+			item.setCode(String.valueOf(i + 1));
+			item.setLabel(langCode, value.toString());
+			codeList.addItem(item);
+		}
+		survey.addCodeList(codeList);
 		
 		Schema schema = survey.getSchema();
 		
@@ -148,20 +156,9 @@ public class SurveyController extends BasicController {
 		
 		rootEntityDef.addChildDefinition(idAttrDef);
 		
-		CodeList valuesCodeList = survey.createCodeList();
-		valuesCodeList.setName("values");
-		for (int i = 0; i < sampleValues.size(); i++) {
-			Object sampleValue = sampleValues.get(i);
-			CodeListItem item = valuesCodeList.createItem(1);
-			item.setCode(String.valueOf(i + 1));
-			item.setLabel(langCode, sampleValue.toString());
-			valuesCodeList.addItem(item);
-		}
-		survey.addCodeList(valuesCodeList);
-		
 		CodeAttributeDefinition valueAttrDef = schema.createCodeAttributeDefinition();
 		valueAttrDef.setName("value");
-		valueAttrDef.setList(valuesCodeList);
+		valueAttrDef.setList(codeList);
 		
 		rootEntityDef.addChildDefinition(valueAttrDef);
 		

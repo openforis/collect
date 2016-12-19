@@ -11,6 +11,7 @@ import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Distributi
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView.Shape;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
+import org.openforis.collect.web.controller.SingleAttributeSurveyCreationParameters.SamplingPointDataConfiguration;
 import org.openforis.idm.geospatial.CoordinateUtils;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
@@ -51,21 +52,12 @@ public class SamplingPointDataGenerator {
 			);
 	
 	private CollectSurvey survey;
-	private double boundaryLonMin;
-	private double boundaryLonMax;
-	private double boundaryLatMin;
-	private double boundaryLatMax;
-	private List<PointsConfiguration> samplingPointsConfigurationByLevels = new ArrayList<PointsConfiguration>();
+	private SamplingPointDataConfiguration configuration;
 	
-	public SamplingPointDataGenerator(CollectSurvey survey, double boundaryLonMin, double boundaryLonMax, double boundaryLatMin,
-			double boundaryLatMax, List<PointsConfiguration> samplingPointsConfigurationByLevels) {
+	public SamplingPointDataGenerator(CollectSurvey survey, SamplingPointDataConfiguration configuration) {
 		super();
 		this.survey = survey;
-		this.boundaryLonMin = boundaryLonMin;
-		this.boundaryLonMax = boundaryLonMax;
-		this.boundaryLatMin = boundaryLatMin;
-		this.boundaryLatMax = boundaryLatMax;
-		this.samplingPointsConfigurationByLevels = samplingPointsConfigurationByLevels;
+		this.configuration = configuration;
 	}
 
 	public List<SamplingDesignItem> generate() {
@@ -78,7 +70,7 @@ public class SamplingPointDataGenerator {
 		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
 		Coordinate reprojectedAoiCenter = reprojectFromLatLonToWebMarcator(latLonAoiCenter);
 		double areaWidth = calculateAoiWidth(levelIdx);
-		PointsConfiguration pointsConfiguration = samplingPointsConfigurationByLevels.get(levelIdx);
+		PointsConfiguration pointsConfiguration = configuration.getLevelsConfiguration().get(levelIdx);
 		
 		List<Coordinate> locations = generateLocations(reprojectedAoiCenter, areaWidth, pointsConfiguration);
 		
@@ -97,7 +89,7 @@ public class SamplingPointDataGenerator {
 			item.setY(latLonCenter.getY());
 			items.add(item);
 			
-			if (levelIdx < samplingPointsConfigurationByLevels.size() - 1) {
+			if (levelIdx < configuration.getLevelsConfiguration().size() - 1) {
 				items.addAll(generateItems(levelIdx + 1, itemKeys, latLonCenter));
 			}
 		}
@@ -105,21 +97,21 @@ public class SamplingPointDataGenerator {
 	}
 
 	public Coordinate calculateAoiCenter() {
-		return new Coordinate(boundaryLonMin + (boundaryLonMax - boundaryLonMin) / 2, 
-				boundaryLatMin + (boundaryLatMax - boundaryLatMin) / 2, LAT_LON_SRS_ID);
+		return new Coordinate(configuration.getBoundaryLonMin() + (configuration.getBoundaryLonMax() - configuration.getBoundaryLonMin()) / 2, 
+				configuration.getBoundaryLatMin() + (configuration.getBoundaryLatMax() - configuration.getBoundaryLatMin()) / 2, LAT_LON_SRS_ID);
 	}
 
 	private double calculateAoiWidth(int levelIdx) {
 		switch(levelIdx) {
 		case 0:
-			Coordinate topLeftLatLonCoordinate = new Coordinate(boundaryLonMin, boundaryLatMax, LAT_LON_SRS_ID);
-			Coordinate bottomRightLatLonCoordinate = new Coordinate(boundaryLonMax, boundaryLatMin, LAT_LON_SRS_ID);
+			Coordinate topLeftLatLonCoordinate = new Coordinate(configuration.getBoundaryLonMin(), configuration.getBoundaryLatMax(), LAT_LON_SRS_ID);
+			Coordinate bottomRightLatLonCoordinate = new Coordinate(configuration.getBoundaryLonMax(), configuration.getBoundaryLatMin(), LAT_LON_SRS_ID);
 			
 			Coordinate topLeftReprojectedCoordinate = reprojectFromLatLonToWebMarcator(topLeftLatLonCoordinate);
 			Coordinate bottomRightReprojectedCoordinate = reprojectFromLatLonToWebMarcator(bottomRightLatLonCoordinate);
 			return bottomRightReprojectedCoordinate.getX() - topLeftReprojectedCoordinate.getX();
 		default:
-			PointsConfiguration previousLevelConfiguration = samplingPointsConfigurationByLevels.get(levelIdx - 1);
+			PointsConfiguration previousLevelConfiguration = configuration.getLevelsConfiguration().get(levelIdx - 1);
 			return previousLevelConfiguration.getPointWidth();
 		}
 	}
