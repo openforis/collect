@@ -1,0 +1,104 @@
+package org.openforis.collect.metamodel;
+
+import java.util.List;
+import java.util.Locale;
+
+import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
+import org.openforis.collect.manager.SamplingDesignManager;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.SurveyObjectsGenerator;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SamplingDesignItem;
+import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.collect.web.controller.SingleAttributeSurveyCreationParameters;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.Schema;
+
+public class SurveyCreator {
+
+	private SurveyManager surveyManager;
+	private SamplingDesignManager samplingDesignManager;
+	//TODO make it configurable
+	private String languageCode = Locale.ENGLISH.getLanguage();
+	private String singleAttributeSurveyCodeListName = "values";
+	private String singleAttributeSurveyRootEntityName = "plot";
+	private String singleAttributeSurveyIdAttributeName = "plot_id";
+	private String singleAttributeSurveyAttributeName = "value";
+	private String singleAttributeSurveyTabLabel = "Plot";
+	
+	public SurveyCreator(SurveyManager surveyManager, SamplingDesignManager samplingDesignManager) {
+		super();
+		this.surveyManager = surveyManager;
+		this.samplingDesignManager = samplingDesignManager;
+	}
+
+	public CollectSurvey generateAndPublishSurvey(SingleAttributeSurveyCreationParameters parameters)
+			throws SurveyStoreException, SurveyImportException {
+		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.getName(), parameters.getValues());
+		
+		surveyManager.save(survey);
+		surveyManager.publish(survey);
+		
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(
+				survey,	parameters.getSamplingPointDataConfiguration());
+		List<SamplingDesignItem> items = generator.generate();
+		
+		samplingDesignManager.insert(survey, items, true);
+		return survey;
+	}
+
+	private CollectSurvey createTemporarySingleAttributeSurvey(String name, List<Object> values) {
+		CollectSurvey survey = surveyManager.createTemporarySurvey(name, languageCode);
+
+		CodeList codeList = survey.createCodeList();
+		codeList.setName(singleAttributeSurveyCodeListName);
+		for (int i = 0; i < values.size(); i++) {
+			Object value = values.get(i);
+			CodeListItem item = codeList.createItem(1);
+			item.setCode(String.valueOf(i + 1));
+			item.setLabel(languageCode, value.toString());
+			codeList.addItem(item);
+		}
+		survey.addCodeList(codeList);
+		
+		Schema schema = survey.getSchema();
+
+		EntityDefinition rootEntityDef = survey.getSchema().createEntityDefinition();
+		rootEntityDef.setName(singleAttributeSurveyRootEntityName);
+		schema.addRootEntityDefinition(rootEntityDef);
+		
+		CodeAttributeDefinition idAttrDef = schema.createCodeAttributeDefinition();
+		idAttrDef.setName(singleAttributeSurveyIdAttributeName);
+		idAttrDef.setKey(true);
+		idAttrDef.setList(survey.getSamplingDesignCodeList());
+		
+		rootEntityDef.addChildDefinition(idAttrDef);
+		
+		CodeAttributeDefinition valueAttrDef = schema.createCodeAttributeDefinition();
+		valueAttrDef.setName(singleAttributeSurveyAttributeName);
+		valueAttrDef.setList(codeList);
+		
+		rootEntityDef.addChildDefinition(valueAttrDef);
+		
+		//create root tab set
+		UIOptions uiOptions = survey.getUIOptions();
+		UITabSet rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntityDef);
+		UITab mainTab = uiOptions.getMainTab(rootTabSet);
+		mainTab.setLabel(languageCode, singleAttributeSurveyTabLabel);
+		
+		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
+		surveyObjectsGenerator.addPredefinedObjects(survey);
+		
+		if ( survey.getSamplingDesignCodeList() == null ) {
+			survey.addSamplingDesignCodeList();
+		}
+		return survey;
+	}
+}
