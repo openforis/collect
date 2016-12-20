@@ -7,6 +7,7 @@ import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGene
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
+import org.openforis.collect.metamodel.samplingdesign.SingleAttributeSurveyCreationParameters;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
@@ -14,7 +15,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
-import org.openforis.collect.web.controller.SingleAttributeSurveyCreationParameters;
+import org.openforis.collect.persistence.xml.CeoApplicationOptions;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -43,11 +44,15 @@ public class SurveyCreator {
 			throws SurveyStoreException, SurveyImportException {
 		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.getName(), parameters.getValues());
 		
+		CeoApplicationOptions ceoApplicationOptions = new CeoApplicationOptions();
+		ceoApplicationOptions.setSamplingPointDataConfiguration(parameters.getSamplingPointGenerationSettings());
+		survey.addApplicationOptions(ceoApplicationOptions);
+		
 		surveyManager.save(survey);
 		surveyManager.publish(survey);
 		
 		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(
-				survey,	parameters.getSamplingPointDataConfiguration());
+				survey,	parameters.getSamplingPointGenerationSettings());
 		List<SamplingDesignItem> items = generator.generate();
 		
 		samplingDesignManager.insert(survey, items, true);

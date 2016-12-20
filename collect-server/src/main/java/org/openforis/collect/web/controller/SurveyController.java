@@ -14,6 +14,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.SurveyCreator;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
+import org.openforis.collect.metamodel.samplingdesign.SingleAttributeSurveyCreationParameters;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;

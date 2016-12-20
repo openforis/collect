@@ -528,11 +528,12 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		return null;
 	}
 
-	public ApplicationOptions getApplicationOptions(String type) {
+	@SuppressWarnings("unchecked")
+	public <A extends ApplicationOptions> A getApplicationOptions(String type) {
 		if ( applicationOptionsMap == null ) {
 			return null;
 		} else {
-			return applicationOptionsMap.get(type);
+			return (A) applicationOptionsMap.get(type);
 		}
 	}
 
