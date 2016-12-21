@@ -7,7 +7,7 @@ import org.openforis.idm.model.Coordinate;
 
 public class SamplingPointGenerationSettings {
 	
-	private List<Coordinate> aoiBoundary;
+	private List<Coordinate> aoiBoundary = new ArrayList<Coordinate>();
 	private List<SamplingPointLevelGenerationSettings> levelsSettings = 
 			new ArrayList<SamplingPointLevelGenerationSettings>(3);
 	
