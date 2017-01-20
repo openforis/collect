@@ -310,6 +310,15 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 				.find(".form-group:not(.notrelevant)").length > 0;
 		toggleStepVisibility(index, hasNestedVisibleFormFields);
 	});
+	
+	// manage entity visibility
+	$form.find(".entity-group").each(function(index, value) {
+		var entityBody = $(this);
+		var hasNestedVisibleFormFields = entityBody
+				.find(".form-group:not(.notrelevant)").length > 0;
+		entityBody.toggleClass("notrelevant", !hasNestedVisibleFormFields);
+	});
+	
 	if (DEBUG) {
 		log("input fields state updated successfully");
 	}
@@ -339,6 +348,7 @@ var toggleStepVisibility = function(index, visible) {
 		stepBody.hide();
 	}
 };
+
 
 var showCurrentStep = function() {
 	if (currentStepIndex != null && currentStepIndex > 0) {

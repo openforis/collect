@@ -15,9 +15,9 @@
 			<show>1</show>
 			<desktopShortcutList>
 				<shortcut>
-					<name>Startup Open Foris Collect</name>
-					<comment>Startup Open Foris Collect</comment>
-					<exec>${installdir}/startup-linux.sh</exec>
+					<name>Start Open Foris Collect</name>
+					<comment>Start Open Foris Collect</comment>
+					<exec>${installdir}/start.sh</exec>
 					<path>${installdir}</path>
 					<icon>${installdir}/images/of-collect-logo.png</icon>
 					<platforms>linux</platforms>
@@ -29,9 +29,9 @@
 					<windowsPath></windowsPath>
 				</shortcut>
 				<shortcut>
-					<name>Shutdown Open Foris Collect</name>
-					<comment>Shutdown Open Foris Collect</comment>
-					<exec>${installdir}/shutdown-linux.sh</exec>
+					<name>Stop Open Foris Collect</name>
+					<comment>Stop Open Foris Collect</comment>
+					<exec>${installdir}/stop.sh</exec>
 					<path>${installdir}</path>
 					<icon>${installdir}/images/of-collect-logo.png</icon>
 					<platforms>linux</platforms>
@@ -80,10 +80,10 @@
 					<platforms>linux</platforms>
 					<distributionFileList>
 						<distributionFile>
-							<origin>startup-linux.sh</origin>
+							<origin>start.sh</origin>
 						</distributionFile>
 						<distributionFile>
-							<origin>shutdown-linux.sh</origin>
+							<origin>stop.sh</origin>
 						</distributionFile>
 					</distributionFileList>
 				</folder>
@@ -94,43 +94,35 @@
 					<platforms>windows</platforms>
 					<distributionFileList>
 						<distributionFile>
-							<origin>startup-windows.cmd</origin>
+							<origin>start.cmd</origin>
 						</distributionFile>
 						<distributionFile>
-							<origin>shutdown-windows.cmd</origin>
+							<origin>stop.cmd</origin>
 						</distributionFile>
 					</distributionFileList>
 				</folder>
 			</folderList>
 			<startMenuShortcutList>
 				<startMenuShortcut>
-					<name>Startup Open Foris Collect</name>
-					<comment>Startup Open Foris Collect</comment>
+					<name>Start Open Foris Collect</name>
+					<comment>Start Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
-					<windowsExec>${installdir}/startup-windows.cmd</windowsExec>
+					<windowsExec>${installdir}/start.cmd</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
 					<windowsIcon>${installdir}/images/of-collect-logo.ico</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
 				<startMenuShortcut>
-					<name>Shutdown Open Foris Collect</name>
-					<comment>Shutdown Open Foris Collect</comment>
+					<name>Stop Open Foris Collect</name>
+					<comment>Stop Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
-					<windowsExec>${installdir}/shutdown-windows.cmd</windowsExec>
+					<windowsExec>${installdir}/stop.cmd</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
 					<windowsIcon>${installdir}/images/of-collect-logo.ico</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
-				<startMenuLinkShortcut>
-					<name>Open Collect in default browser</name>
-					<comment>Open Collect in your default browser</comment>
-					<runAsAdmin>0</runAsAdmin>
-					<runInTerminal>0</runInTerminal>
-					<url>http://localhost:8080/collect</url>
-					<windowsIcon>${installdir}/images/browser.ico</windowsIcon>
-				</startMenuLinkShortcut>
 				<startMenuShortcut>
 					<name>Update Open Foris Collect</name>
 					<comment>Update Open Foris Collect</comment>
@@ -139,16 +131,6 @@
 					<windowsExec>${installdir}/autoupdate/autoupdate-windows.exe</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
 					<windowsIcon>${installdir}/images/update.ico</windowsIcon>
-				</startMenuShortcut>
-				<startMenuShortcut>
-					<name>Uninstall ${product_fullname}</name>
-					<comment>Uninstall ${product_fullname}</comment>
-					<runAsAdmin>0</runAsAdmin>
-					<runInTerminal>0</runInTerminal>
-					<windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
-					<windowsExecArgs></windowsExecArgs>
-					<windowsIcon></windowsIcon>
-					<windowsPath>${installdir}/</windowsPath>
 				</startMenuShortcut>
 			</startMenuShortcutList>
 		</component>
@@ -196,6 +178,81 @@ version_id = VERSION_ID
 update_download_location = ${system_temp_directory}
 check_for_updates = 1</text>
 				</writeFile>
+				<getFreePort>
+					<finalPort>8399</finalPort>
+					<initialPort>8305</initialPort>
+					<variable>tomcat_shutdown</variable>
+		        </getFreePort>
+		        <substitute>
+		            <files>${installdir}/tomcat/conf/server.xml</files>
+		            <type>exact</type>
+		            <substitutionList>
+		                <substitution>
+		                    <pattern>8005</pattern>
+		                    <value>${tomcat_shutdown}</value>
+		                </substitution>
+		            </substitutionList>
+		        </substitute>
+		        <getFreePort>
+		            <finalPort>8399</finalPort>
+		            <initialPort>8380</initialPort>
+		            <variable>tomcat_http</variable>
+		        </getFreePort>
+		        <substitute>
+		            <files>${installdir}/tomcat/conf/server.xml</files>
+		            <type>exact</type>
+		            <substitutionList>
+		                <substitution>
+		                    <pattern>8080</pattern>
+		                    <value>${tomcat_http}</value>
+		                </substitution>
+		            </substitutionList>
+		        </substitute>
+		        <substitute>
+		            <files>${installdir}/tomcat/collect.properties</files>
+		            <type>exact</type>
+		            <substitutionList>
+		                <substitution>
+		                    <pattern>{HTTP_PORT}</pattern>
+		                    <value>${tomcat_http}</value>
+		                </substitution>
+		            </substitutionList>
+		        </substitute>
+		        <getFreePort>
+		            <finalPort>8799</finalPort>
+		            <initialPort>8743</initialPort>
+		            <variable>tomcat_redirect</variable>
+		        </getFreePort>
+		        <substitute>
+		            <files>${installdir}/tomcat/conf/server.xml</files>
+		            <type>exact</type>
+		            <substitutionList>
+		                <substitution>
+		                    <pattern>8443</pattern>
+		                    <value>${tomcat_redirect}</value>
+		                </substitution>
+		            </substitutionList>
+		        </substitute>
+		        <getFreePort>
+		            <finalPort>8399</finalPort>
+		            <initialPort>8309</initialPort>
+		            <variable>tomcat_ajp</variable>
+		        </getFreePort>
+		        <substitute>
+		            <files>${installdir}/tomcat/conf/server.xml</files>
+		            <type>exact</type>
+		            <substitutionList>
+		                <substitution>
+		                    <pattern>8009</pattern>
+		                    <value>${tomcat_ajp}</value>
+		                </substitution>
+		            </substitutionList>
+		        </substitute>
+		        <propertiesFileSet>
+		        	<file>${installdir}/collect.properties</file>
+		        	<key>tomcat_http_port</key>
+		        	<value>${tomcat_http}</value>
+		        </propertiesFileSet>
 			</postInstallationActionList>
 		</component>
 		<include>
@@ -209,16 +266,8 @@ check_for_updates = 1</text>
 		</setInstallerVariable>
 	</preInstallationActionList>
 	<postInstallationActionList>
-		<changePermissions>
-			<files>${installdir}/*.sh</files>
-			<permissions>0555</permissions>
-		</changePermissions>
-		<changePermissions>
-			<files>${installdir}/autoupdate/*.run</files>
-			<permissions>0555</permissions>
-		</changePermissions>
 		<substitute>
-			<files>${installdir}/startup-linux.sh;${installdir}/shutdown-linux.sh;${installdir}/startup-windows.cmd;${installdir}/shutdown-windows.cmd;</files>
+			<files>${installdir}/start.sh;${installdir}/stop.sh;${installdir}/start.cmd;${installdir}/stop.cmd;</files>
 			<type>exact</type>
 			<substitutionList>
 				<substitution>
@@ -227,6 +276,24 @@ check_for_updates = 1</text>
 				</substitution>
 			</substitutionList>
 		</substitute>
+        <substitute>
+            <files>${installdir}/start.sh;${installdir}/start.cmd;</files>
+            <type>exact</type>
+            <substitutionList>
+                <substitution>
+                    <pattern>{TOMCAT_HTTP_PORT}</pattern>
+                    <value>${tomcat_http}</value>
+                </substitution>
+            </substitutionList>
+        </substitute>
+   		<changePermissions>
+			<files>${installdir}/*.sh</files>
+			<permissions>0775</permissions>
+		</changePermissions>
+		<changePermissions>
+			<files>${installdir}/autoupdate/*.run</files>
+			<permissions>0775</permissions>
+		</changePermissions>
 		<changeOwnerAndGroup>
 			<files>/home/${env(SUDO_USER)}/Desktop/${java_launcher_binary_name}
 			</files>
