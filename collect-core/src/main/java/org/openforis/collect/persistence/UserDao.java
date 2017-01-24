@@ -121,7 +121,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 			boolean enabled = "Y".equals(enabledFlag);
 			user.setEnabled(enabled);
 			user.setId(r.getValue(OFC_USER.ID));
-			user.setName(r.getValue(OFC_USER.USERNAME));
+			user.setUsername(r.getValue(OFC_USER.USERNAME));
 			user.setPassword(r.getValue(OFC_USER.PASSWORD));
 			
 			loadRoles(user);
@@ -133,7 +133,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 			String enabledFlag = enabled != null && enabled.booleanValue() ? "Y": "N";
 			q.addValue(OFC_USER.ENABLED, enabledFlag);
 			q.addValue(OFC_USER.ID, user.getId());
-			q.addValue(OFC_USER.USERNAME, user.getName());
+			q.addValue(OFC_USER.USERNAME, user.getUsername());
 			q.addValue(OFC_USER.PASSWORD, user.getPassword());
 		}
 		

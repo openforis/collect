@@ -280,7 +280,7 @@ package org.openforis.collect.presenter {
 			}
 			user.enabled = view.usersListContainer.enabledCheckBox.selected;
 			user.name = view.usersListContainer.nameTextInput.text;
-			user.password = view.usersListContainer.passwordTextInput.text;
+			user.rawPassword = view.usersListContainer.passwordTextInput.text;
 			var roles:ListCollectionView = getSelectedRoles();
 			user.roles = roles;
 			return user;

@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.remoting.service;
 
+import org.openforis.collect.manager.OperationResult;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.UserPersistenceException;
@@ -20,10 +21,10 @@ public class UserSessionService {
 	@Autowired
 	private RecordSessionManager sessionManager;
 
-	public void changePassword(String oldPassword, String newPassword) throws UserPersistenceException {
+	public OperationResult changePassword(String oldPassword, String newPassword) throws UserPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		User currentUser = sessionState.getUser();
-		userManager.changePassword(currentUser.getId(), oldPassword, newPassword);
+		return userManager.changePassword(currentUser.getUsername(), oldPassword, newPassword);
 	}
 	
 }

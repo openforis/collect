@@ -7,7 +7,6 @@ import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGene
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
-import org.openforis.collect.metamodel.samplingdesign.SingleAttributeSurveyCreationParameters;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;

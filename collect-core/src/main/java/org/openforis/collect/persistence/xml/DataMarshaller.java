@@ -70,11 +70,11 @@ public class DataMarshaller {
         }
         User createdBy = record.getCreatedBy();
 		if ( createdBy != null ) {
-        	serializer.attribute(null, RECORD_CREATED_BY_ATTRIBUTE, createdBy.getName());
+        	serializer.attribute(null, RECORD_CREATED_BY_ATTRIBUTE, createdBy.getUsername());
         }
         User modifiedBy = record.getModifiedBy();
 		if ( modifiedBy != null ) {
-        	serializer.attribute(null, RECORD_MODIFIED_BY_ATTRIBUTE, modifiedBy.getName());
+        	serializer.attribute(null, RECORD_MODIFIED_BY_ATTRIBUTE, modifiedBy.getUsername());
         }
         addDateAttribute(serializer, RECORD_CREATED_ATTRIBUTE, record.getCreationDate());
         addDateAttribute(serializer, RECORD_MODIFIED_ATTRIBUTE, record.getModifiedDate());

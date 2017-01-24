@@ -21,13 +21,14 @@ public class UserProxy implements Proxy {
 	private Integer id;
 	private String name;
 	private String password;
+	private String rawPassword;
 	private List<String> roles;
 
 	public UserProxy(User user) {
 		super();
 		this.enabled = user.getEnabled();
 		this.id = user.getId();
-		this.name = user.getName();
+		this.name = user.getUsername();
 		this.roles = user.getRoleCodes();
 		//password is not initialized, so the client will not know its value
 	}
@@ -47,8 +48,9 @@ public class UserProxy implements Proxy {
 		User user = new User();
 		user.setEnabled(enabled);
 		user.setId(id);
-		user.setName(name);
+		user.setUsername(name);
 		user.setPassword(password);
+		user.setRawPassword(rawPassword);
 		user.setRoles(getRolesFromCodes(roles));
 		return user;
 	}
@@ -102,4 +104,11 @@ public class UserProxy implements Proxy {
 		this.password = password;
 	}
 
+	public String getRawPassword() {
+		return rawPassword;
+	}
+	
+	public void setRawPassword(String rawPassword) {
+		this.rawPassword = rawPassword;
+	}
 }

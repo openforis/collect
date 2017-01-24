@@ -1,8 +1,10 @@
-package org.openforis.collect.metamodel.samplingdesign;
+package org.openforis.collect.metamodel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSettings;
 
 public class SingleAttributeSurveyCreationParameters implements Serializable {
 	

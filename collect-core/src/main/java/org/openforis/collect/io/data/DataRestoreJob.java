@@ -18,6 +18,7 @@ import org.openforis.collect.io.data.restore.RestoredBackupStorageManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;

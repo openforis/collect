@@ -38,6 +38,9 @@
 		<listener-class>org.granite.config.GraniteConfigListener</listener-class>
 	</listener>
 	<listener>
+		<listener-class>org.openforis.collect.web.listener.CollectServletContextListener</listener-class>
+	</listener>
+	<listener>
 		<listener-class>org.openforis.collect.web.listener.SessionListener</listener-class>
 	</listener>
 	<listener>

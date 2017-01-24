@@ -171,12 +171,12 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		public void adjustUserReferences(CollectRecord record) {
 			User createdBy = record.getCreatedBy();
 			if (createdBy != null) {
-				User user = loadOrCreateAndInsertUser(createdBy.getName());
+				User user = loadOrCreateAndInsertUser(createdBy.getUsername());
 				record.setCreatedBy(user);
 			}
 			User modifiedBy = record.getModifiedBy();
 			if (modifiedBy != null) {
-				User user = loadOrCreateAndInsertUser(modifiedBy.getName());
+				User user = loadOrCreateAndInsertUser(modifiedBy.getUsername());
 				record.setModifiedBy(user);
 			}
 		}

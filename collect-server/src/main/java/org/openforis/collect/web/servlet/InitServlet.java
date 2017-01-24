@@ -35,7 +35,7 @@ public class InitServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		super.init();
-
+		
 		if ( LOG.isInfoEnabled() ) {
 			LOG.info("============= Open Foris Collect Initialized =============");
 		}

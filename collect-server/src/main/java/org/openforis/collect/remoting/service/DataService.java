@@ -218,7 +218,7 @@ public class DataService {
 		CollectRecord record = recordManager.instantiateRecord(activeSurvey, rootEntityName, user, versionName, recordStep);
 		NodeChangeSet changeSet = recordManager.initializeRecord(record);
 
-		List<RecordEvent> events = new EventProducer().produceFor(changeSet, user.getName());
+		List<RecordEvent> events = new EventProducer().produceFor(changeSet, user.getUsername());
 		sessionManager.onEvents(events);
 		
 		sessionManager.setActiveRecord(record);
@@ -232,7 +232,7 @@ public class DataService {
 	public void deleteRecord(int id) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
-		String userName = sessionState.getUser().getName();
+		String userName = sessionState.getUser().getUsername();
 
 		CollectRecord record = recordManager.load(survey, id);
 		if (record.getStep() != Step.ENTRY) {
@@ -276,7 +276,7 @@ public class DataService {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
 		
-		String userName = sessionManager.getSessionState().getUser().getName();
+		String userName = sessionManager.getSessionState().getUser().getUsername();
 		List<RecordEvent> events = new EventProducer().produceFor(changeSet, userName);
 		sessionManager.onEvents(events);
 		
@@ -371,7 +371,7 @@ public class DataService {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		String userName = sessionState.getUser().getName();
+		String userName = sessionState.getUser().getUsername();
 		Step currentStep = record.getStep();
 		Step exptectedStep = to.getPrevious();
 		if ( exptectedStep == currentStep ) {
@@ -419,7 +419,7 @@ public class DataService {
 			throw new IllegalStateException("The active record cannot be demoted: it is not in the exptected phase: " + exptectedFromStep);
 		}
 		CollectSurvey survey = sessionState.getActiveSurvey();
-		String userName = sessionState.getUser().getName();
+		String userName = sessionState.getUser().getUsername();
 		User user = sessionState.getUser();
 		Integer recordId = record.getId();
 		publishRecordDeletedEvent(record, fromStep.toRecordStep(), userName);
@@ -541,7 +541,7 @@ public class DataService {
 	public SurveyLockingJobProxy moveRecords(String rootEntity, int fromStepNumber, final boolean promote) {
 		BulkRecordMoveJob job = collectJobManager.createJob(BulkRecordMoveJob.class);
 		SessionState sessionState = getSessionState();
-		final String userName = sessionState.getUser().getName();
+		final String userName = sessionState.getUser().getUsername();
 		job.setSurvey(sessionState.getActiveSurvey());
 		job.setRootEntity(rootEntity);
 		job.setPromote(promote);

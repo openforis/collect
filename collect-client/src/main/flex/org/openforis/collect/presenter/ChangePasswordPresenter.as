@@ -13,6 +13,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.UserSessionClient;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.manager.OperationResult;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.component.user.ChangePasswordPopUp;
 	import org.openforis.collect.util.AlertUtil;
@@ -68,29 +69,29 @@ package org.openforis.collect.presenter {
 		
 		protected function saveButtonClickHandler(event:MouseEvent):void {
 			if ( validateForm() ) {
-				var responder:IResponder = new AsyncResponder(saveUserResultHandler, saveUserFaultHandler);
+				var responder:IResponder = new AsyncResponder(changePasswordResultHandler, faultHandler);
 				var oldPassword:String = view.oldPasswordTextInput.text;
 				var newPassword:String = view.passwordTextInput.text;
 				_userSessionClient.changePassword(responder, oldPassword, newPassword);
 			}
 		}
 		
-		protected function saveUserResultHandler(event:ResultEvent, token:Object = null):void {
-			PopUpManager.removePopUp(view);
-			AlertUtil.showMessage("usersManagement.message.passwordChanged");
-		}
-		
-		protected function saveUserFaultHandler(event:FaultEvent, token:Object = null):void {
-			var faultCode:String = event.fault.faultCode;
-			switch(faultCode) {
-				case "org.openforis.collect.manager.WrongOldPasswordException":
+		protected function changePasswordResultHandler(event:ResultEvent, token:Object = null):void {
+			var result:OperationResult = event.result as OperationResult;
+			if (result.success) {
+				PopUpManager.removePopUp(view);
+				AlertUtil.showMessage("usersManagement.message.passwordChanged");
+			} else {
+				switch(result.errorCode) {
+				case "WRONG_PASSWORD":
 					AlertUtil.showError("usersManagement.error.wrongOldPassword");
 					break;
-				case "org.openforis.collect.manager.InvalidUserPasswordException":
+				case "INVALID_PASSWORD":
 					AlertUtil.showError("usersManagement.error.invalidPassword");
 					break;
 				default:
-					faultHandler(event, token);
+					AlertUtil.showError(result.errorMessage);
+				}
 			}
 		}
 		

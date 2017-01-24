@@ -194,7 +194,7 @@ public class RecordManager {
 		if ( isLockingEnabled() && lockManager.isLocked(recordId) ) {
 			RecordLock lock = lockManager.getLock(recordId);
 			User lockUser = lock.getUser();
-			throw new RecordLockedException(lockUser.getName());
+			throw new RecordLockedException(lockUser.getUsername());
 		} else {
 			recordDao.delete(recordId);
 		}
@@ -254,7 +254,7 @@ public class RecordManager {
 			if ( isLockingEnabled() ) {
 				releaseLock(recordId);
 			}
-			throw new RecordNotOwnedException(record.getOwner().getName());
+			throw new RecordNotOwnedException(record.getOwner().getUsername());
 		}
 		if(isLockingEnabled()) {
 			//refresh lock because record loading can be time consuming

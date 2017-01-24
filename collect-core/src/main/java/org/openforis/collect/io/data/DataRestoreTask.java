@@ -222,7 +222,7 @@ public class DataRestoreTask extends Task {
 			RecordStep recordStep = record.getStep().toRecordStep();
 			Entity rootEntity = record.getRootEntity();
 			
-			String userName = record.getModifiedBy().getName();
+			String userName = record.getModifiedBy().getUsername();
 			List<RecordEvent> events = eventProducer.produceFor(record, userName);
 			
 			if (! operation.isInsert()) {

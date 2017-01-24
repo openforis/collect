@@ -1,7 +1,7 @@
 package org.openforis.collect.web.validator;
 
 import org.openforis.collect.datacleansing.form.validation.SimpleValidator;
-import org.openforis.collect.metamodel.samplingdesign.SingleAttributeSurveyCreationParameters;
+import org.openforis.collect.metamodel.SingleAttributeSurveyCreationParameters;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 

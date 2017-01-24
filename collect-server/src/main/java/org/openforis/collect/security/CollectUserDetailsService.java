@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,7 +35,7 @@ public class CollectUserDetailsService implements UserDetailsService {
 	}
 
 	private UserDetails createUserDetails(User user) {
-		String username = user.getName();
+		String username = user.getUsername();
 		boolean accountNonLocked = true;
 		boolean credentialsNonExpired = true;
 		boolean accountNonExpired = true;
@@ -51,10 +50,10 @@ public class CollectUserDetailsService implements UserDetailsService {
 	}
 
 	private Collection<GrantedAuthority> getAuthorities(User user) {
-		List<UserRole> roles = user.getRoles();
+		List<String> roles = user.getRoleCodes();
 		List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>(roles.size());
-		for (UserRole role : roles) {
-			authList.add(new SimpleGrantedAuthority(role.getCode()));
+		for (String role : roles) {
+			authList.add(new SimpleGrantedAuthority(role));
 		}
 		return authList;
 	}

@@ -162,9 +162,9 @@ public class DataBackupTask extends Task {
 				summary.getRootEntityDefinitionId().toString(),
 				lastStep.name(), 
 				Dates.formatDateTime(summary.getCreationDate()),
-				summary.getCreatedBy() == null ? "" : summary.getCreatedBy().getName(),
+				summary.getCreatedBy() == null ? "" : summary.getCreatedBy().getUsername(),
 				Dates.formatDateTime(summary.getModifiedDate()),
-				summary.getModifiedBy() == null ? "" : summary.getModifiedBy().getName()
+				summary.getModifiedBy() == null ? "" : summary.getModifiedBy().getUsername()
 		));
 		values.addAll(summary.getRootEntityKeyValues());
 		summaryCSVWriter.writeNext(values);

@@ -100,6 +100,7 @@
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.manager.referencedataimport.proxy.*</includeClass>
+                                <includeClass>org.openforis.collect.manager.OperationResult</includeClass>
                                 <includeClass>org.openforis.collect.manager.TaxonSearchParameters</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.NodeDefinitionSummary</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.SurveyTarget</includeClass>

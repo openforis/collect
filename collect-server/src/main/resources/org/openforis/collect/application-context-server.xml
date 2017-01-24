@@ -37,7 +37,9 @@
 	
 	<bean id="recordSessionManager" class="org.openforis.collect.manager.RecordSessionManager"
 		scope="session" />
-		
+	
+	<bean id="userManager" 			class="org.openforis.collect.manager.ClientUserManager" />
+	
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->

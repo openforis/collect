@@ -15,8 +15,9 @@ public class User {
 	private Boolean enabled;
 	private Integer id;
 	private List<UserRole> roles;
-	private String name;
+	private String username;
 	private String password;
+	private String rawPassword;
 	
 	public User() {
 		roles = new ArrayList<UserRole>();
@@ -24,7 +25,7 @@ public class User {
 
 	public User(String name) {
 		this();
-		this.name = name;
+		this.username = name;
 	}
 
 	public User(Integer id, String name) {
@@ -77,16 +78,16 @@ public class User {
 		return Collections.unmodifiableList(roles);
 	}
 
-	public String getName() {
-		return name;
+	public String getUsername() {
+		return username;
 	}
 
 	public void setRoles(List<UserRole> roles) {
 		this.roles = roles;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setUsername(String name) {
+		this.username = name;
 	}
 
 	public Integer getId() {
@@ -105,11 +106,19 @@ public class User {
 		this.password = password;
 	}
 
+	public String getRawPassword() {
+		return rawPassword;
+	}
+
+	public void setRawPassword(String rawPassword) {
+		this.rawPassword = rawPassword;
+	}
+
 	@Override
 	public String toString() {
 		StringWriter sw = new StringWriter();
 		sw.append("User: '");
-		sw.append(getName());
+		sw.append(getUsername());
 		sw.append("' ");
 		sw.append(" roles:");
 		sw.append(getRoles().toString());
@@ -122,7 +131,7 @@ public class User {
 		int result = 1;
 		result = prime * result + ((enabled == null) ? 0 : enabled.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
 		result = prime * result + ((roles == null) ? 0 : roles.hashCode());
 		return result;
@@ -147,10 +156,10 @@ public class User {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (name == null) {
-			if (other.name != null)
+		if (username == null) {
+			if (other.username != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!username.equals(other.username))
 			return false;
 		if (password == null) {
 			if (other.password != null)

@@ -45,7 +45,7 @@ public class SessionListener implements HttpSessionListener {
 			if ( LOG.isInfoEnabled() ) {
 				String message = "Session destroyed: " + se.getSession().getId();
 				if ( user != null ) {
-					message += " username: " +user.getName();
+					message += " username: " +user.getUsername();
 				}
 				LOG.info(message);
 			}
