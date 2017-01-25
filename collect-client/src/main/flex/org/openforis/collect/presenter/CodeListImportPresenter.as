@@ -9,7 +9,6 @@ package org.openforis.collect.presenter
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.granite.util.Enum;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.CodeListClient;
 	import org.openforis.collect.client.CodeListImportClient;
@@ -53,24 +52,6 @@ package org.openforis.collect.presenter
 			return MessageKeys(_messageKeys);
 		}
 		
-		override public function init():void {
-			super.init();
-			
-			view.charsets = enumToList(FileCharset, "referenceDataImport.charset.");
-			view.separators = enumToList(CSVFileSeparator, "referenceDataImport.separator.");
-			view.textDelimiters = enumToList(CSVFileTextDelimiter, "referenceDataImport.text_delimiter.");
-		}
-		
-		private function enumToList(enum:Class, labelKeyPrefix:String):IList {
-			var items:IList = new ArrayList();
-			var values:Array = enum["constants"];
-			for each (var value:Enum in values) {
-				var item:Object = {name: value.name, label: Message.get(labelKeyPrefix + value.name.toLowerCase())};
-				items.addItem(item);
-			}
-			return items;
-		}
-			
 		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.browseButton.addEventListener(MouseEvent.CLICK, browseButtonClickHandler);

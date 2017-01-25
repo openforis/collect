@@ -5,6 +5,7 @@ package org.openforis.collect.client {
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.remoting.Operation;
+	import org.openforis.collect.io.parsing.CSVFileOptions;
 	
 	/**
 	 * 
@@ -29,8 +30,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function start(responder:IResponder, tempFileName:String, taxonomyId:int, overwriteAll:Boolean):void {
-			var token:AsyncToken = this._startOperation.send(tempFileName, taxonomyId, overwriteAll);
+		public function start(responder:IResponder, tempFileName:String, csvFileOptions:CSVFileOptions, taxonomyId:int, overwriteAll:Boolean):void {
+			var token:AsyncToken = this._startOperation.send(tempFileName, csvFileOptions, taxonomyId, overwriteAll);
 			token.addResponder(responder);
 		}
 
