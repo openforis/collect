@@ -78,11 +78,11 @@
 		
 	</changeSet>
 	
-  	<changeSet id="species-import-tool" author="ricci" dbms="postgresql">
+  	<changeSet id="species-import-tool-fixed" author="ricci" dbms="postgresql">
 
 	    <preConditions onFail="MARK_RAN">
 	    	<not>
-	    		<foreignKeyConstraintExists foreignKeyName="ofc_taxonomy_survey_fkey"/>
+	    		<columnExists tableName="ofc_taxonomy" columnName="survey_id"/>
 	    	</not>
 	    </preConditions>
 	    
