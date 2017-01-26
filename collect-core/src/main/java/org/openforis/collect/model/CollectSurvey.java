@@ -40,6 +40,7 @@ public class CollectSurvey extends Survey {
 	private Version collectVersion;
 	private SurveyTarget target;
 	private Integer publishedId;
+	private Long institutionId;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -194,6 +195,14 @@ public class CollectSurvey extends Survey {
 		if (! annotations.getCollectVersion().equals(collectVersion)) {
 			annotations.setCollectVersion(collectVersion);
 		}
+	}
+	
+	public Long getInstitutionId() {
+		return institutionId;
+	}
+	
+	public void setInstitutionId(Long institutionId) {
+		this.institutionId = institutionId;
 	}
 	
 	public UIConfiguration getUIConfiguration() {

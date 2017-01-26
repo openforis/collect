@@ -7,9 +7,15 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,6 +28,13 @@ public abstract class AbstractClient {
 	}
 
 	public <T extends Object> List<T> getList(String url, final Class<T> type) {
+		return getList(url, null, type);
+	}
+	
+	public <T extends Object> List<T> getList(String url, Map<String, Object> params, final Class<T> type) {
+		if (params != null) {
+			url = appendQueryParams(url, params);
+		}
 		return get(url, new ResponseProcessor<List<T>>() {
 			public List<T> process(Reader r) {
 				T[] result = new GsonBuilder().create().fromJson(r, TypeToken.getArray(type).getType());
@@ -29,9 +42,13 @@ public abstract class AbstractClient {
 			}
 		});
 	}
-	
+
 	public <T extends Object> T post(String url, Object data, Class<T> resultType) {
 		return httpConnect(url, "POST", toPostData(data), createSingleItemResponseProcessor(resultType));
+	}
+	
+	public <T extends Object> T patch(String url, Object data, Class<T> resultType) {
+		return httpConnect(url, "PATCH", toPostData(data), createSingleItemResponseProcessor(resultType));
 	}
 	
 	public void delete(String url) {
@@ -100,6 +117,15 @@ public abstract class AbstractClient {
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private String appendQueryParams(String url, Map<String, Object> params) {
+		List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+		for (Entry<String, Object> entry : params.entrySet()) {
+			Object entryVal = entry.getValue();
+			pairs.add(new BasicNameValuePair(entry.getKey(), entryVal == null ? null : entryVal.toString()));
+		}
+		return url + "?" + URLEncodedUtils.format(pairs, "UTF-8");
 	}
 	
 	private interface ResponseProcessor<R extends Object> {

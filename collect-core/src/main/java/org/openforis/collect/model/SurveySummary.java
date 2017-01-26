@@ -18,6 +18,7 @@ public class SurveySummary {
 
 	private Integer id;
 	private Integer publishedId;
+	private Long institutionId;
 	private String name;
 	private String uri;
 	private String projectName;
@@ -115,6 +116,14 @@ public class SurveySummary {
 		this.publishedId = publishedId;
 	}
 
+	public Long getInstitutionId() {
+		return institutionId;
+	}
+	
+	public void setInstitutionId(Long institutionId) {
+		this.institutionId = institutionId;
+	}
+	
 	public ProcessStatus getRecordValidationProcessStatus() {
 		return recordValidationProcessStatus;
 	}

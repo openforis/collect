@@ -98,6 +98,8 @@ public class SurveyManager {
 	private EventQueue eventQueue;
 	@Autowired(required=false)
 	private SurveyDataCleansingManager dataCleansingManager;
+	@Autowired(required=false)
+	private InstitutionManager institutionManager;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
