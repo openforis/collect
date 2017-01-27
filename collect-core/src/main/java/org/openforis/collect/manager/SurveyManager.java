@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -39,6 +40,7 @@ import org.openforis.collect.metamodel.SurveySummarySortField;
 import org.openforis.collect.metamodel.SurveySummarySortField.Sortable;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.collect.model.Institution;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
@@ -125,6 +127,7 @@ public class SurveyManager {
 		surveysByName.clear();
 		surveysByUri.clear();
 		surveys = surveyDao.loadAllPublished();
+		fillReferencedItems(surveys);
 		for (CollectSurvey survey : surveys) {
 			addToCache(survey);
 		}
@@ -397,14 +400,32 @@ public class SurveyManager {
 	}
 
 	public List<SurveySummary> getSurveySummaries(String lang) {
+		return getSurveySummaries(lang, null);
+	}
+	
+	public List<SurveySummary> getSurveySummaries(User availableToUser) {
+		return getSurveySummaries(null, availableToUser);
+	}
+	
+	public List<SurveySummary> getSurveySummaries(String lang, User availableToUser) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
+		
+		List<Long> userInstitutionIds;
+		if (institutionManager == null || availableToUser == null) {
+			userInstitutionIds = Collections.emptyList();
+		} else {
+			List<Institution> userInstitutions = institutionManager.findByUser(availableToUser);
+			userInstitutionIds = CollectionUtils.project(userInstitutions, "id");
+		}
 		for (CollectSurvey survey : surveys) {
-			SurveySummary summary = SurveySummary.createFromSurvey(survey, lang);
-			if ( summary.isPublished() ) {
-				int publishedSurveyId = summary.isTemporary() ? summary.getPublishedId(): summary.getId();
-				summary.setRecordValidationProcessStatus(getRecordValidationProcessStatus(publishedSurveyId));
+			if (availableToUser == null || userInstitutionIds.contains(survey.getInstitutionId())) {
+				SurveySummary summary = SurveySummary.createFromSurvey(survey, lang);
+				if ( summary.isPublished() ) {
+					int publishedSurveyId = summary.isTemporary() ? summary.getPublishedId(): summary.getId();
+					summary.setRecordValidationProcessStatus(getRecordValidationProcessStatus(publishedSurveyId));
+				}
+				summaries.add(summary);
 			}
-			summaries.add(summary);
 		}
 		sortSummaries(summaries);
 		return summaries;
@@ -674,10 +695,11 @@ public class SurveyManager {
 			if ( survey.getSamplingDesignCodeList() == null ) {
 				survey.addSamplingDesignCodeList();
 			}
+			fillReferencedItems(survey);
 		}
 		return survey;
 	}
-	
+
 	public CollectSurvey getOrLoadSurveyById(int id) {
 		CollectSurvey survey = getById(id);
 		if (survey == null) {
@@ -883,8 +905,8 @@ public class SurveyManager {
 			surveyDao.delete(temporarySurveyId);
 			CollectSurvey oldPublishedSurvey = getById(oldPublishedSurveyId);
 			if (oldPublishedSurvey != null) {
-			removeFromCache(oldPublishedSurvey);
-		}
+				removeFromCache(oldPublishedSurvey);
+			}
 		}
 		addToCache(survey);
 		
@@ -1037,6 +1059,18 @@ public class SurveyManager {
 			}
 		} catch(Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	private void fillReferencedItems(Collection<CollectSurvey> surveys) {
+		for (CollectSurvey survey : surveys) {
+			fillReferencedItems(survey);
+		}
+	}
+	
+	private void fillReferencedItems(CollectSurvey survey) {
+		if (institutionManager != null && survey.getInstitutionId() != null) {
+			survey.setInstitution(institutionManager.findById(survey.getInstitutionId()));
 		}
 	}
 

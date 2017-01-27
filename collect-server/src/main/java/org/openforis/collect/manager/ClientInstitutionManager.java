@@ -36,7 +36,7 @@ public class ClientInstitutionManager extends AbstractClient implements Institut
 	
 	@Override
 	public Institution findById(long id) {
-		return getOne(getUsersRestfulApiUrl() + "/group" + id, Institution.class);
+		return getOne(getUsersRestfulApiUrl() + "/group/" + id, Institution.class);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

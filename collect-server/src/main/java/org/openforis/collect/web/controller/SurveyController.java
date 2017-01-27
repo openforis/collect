@@ -47,25 +47,16 @@ public class SurveyController extends BasicController {
 
 	@Autowired
 	private SimpleSurveyParametersValidator validator;
-	
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-		binder.setValidator(validator);
-	}
-	
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
-
-	@RequestMapping(value = "summaries-by-user.json", method=GET, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	List<SurveySummary> loadSummariesByUser(@RequestParam(required=false) int userID) {
-		//TODO
-		return null;
-		//TODO add institution, imagery, boundaries
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.setValidator(validator);
 	}
 
 	@RequestMapping(value = "summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)

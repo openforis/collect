@@ -41,6 +41,7 @@ public class CollectSurvey extends Survey {
 	private SurveyTarget target;
 	private Integer publishedId;
 	private Long institutionId;
+	private Institution institution;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -205,6 +206,14 @@ public class CollectSurvey extends Survey {
 		this.institutionId = institutionId;
 	}
 	
+	public Institution getInstitution() {
+		return institution;
+	}
+	
+	public void setInstitution(Institution institution) {
+		this.institution = institution;
+	}
+	
 	public UIConfiguration getUIConfiguration() {
 		return uiConfiguration;
 	}
@@ -212,5 +221,5 @@ public class CollectSurvey extends Survey {
 	public void setUIConfiguration(UIConfiguration uiConfiguration) {
 		this.uiConfiguration = uiConfiguration;
 	}
-	
+
 }

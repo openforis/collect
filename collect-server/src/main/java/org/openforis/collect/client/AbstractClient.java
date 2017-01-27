@@ -91,7 +91,7 @@ public abstract class AbstractClient {
 			}
 			
 			if (c.getResponseCode() != HttpURLConnection.HTTP_OK) {
-				throw new RuntimeException("Failed : HTTP error code : " + c.getResponseCode());
+				throw new RuntimeException(String.format("Failed to load url %s with method %s: HTTP error code : %s", url, method, c.getResponseCode()));
 			}
 			BufferedReader br = new BufferedReader(new InputStreamReader((c.getInputStream())));
 			return responseProcessor.process(br);

@@ -34,7 +34,7 @@ public class SurveyViewGenerator {
 	}
 
 	public SurveyView generateView(CollectSurvey survey) {
-		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
+		final SurveyView surveyView = new SurveyView(survey);
 		
 		surveyView.ceoApplicationOptions = survey.getApplicationOptions(CeoApplicationOptions.TYPE);
 		

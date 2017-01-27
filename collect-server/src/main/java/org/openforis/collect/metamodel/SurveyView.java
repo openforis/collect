@@ -3,6 +3,8 @@ package org.openforis.collect.metamodel;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Institution;
 import org.openforis.collect.persistence.xml.CeoApplicationOptions;
 
 public class SurveyView {
@@ -11,6 +13,7 @@ public class SurveyView {
 	private String name;
 	private boolean temporary;
 	private SurveyTarget target;
+	private Institution institution;
 	List<CodeListView> codeLists = new ArrayList<CodeListView>();
 	private List<EntityDefView> rootEntities = new ArrayList<EntityDefView>();
 	CeoApplicationOptions ceoApplicationOptions;
@@ -22,6 +25,11 @@ public class SurveyView {
 		this.target = target;
 	}
 	
+	public SurveyView(CollectSurvey survey) {
+		this(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
+		this.institution = survey.getInstitution();
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -44,6 +52,14 @@ public class SurveyView {
 	
 	public void setTarget(SurveyTarget target) {
 		this.target = target;
+	}
+	
+	public Institution getInstitution() {
+		return institution;
+	}
+	
+	public void setInstitution(Institution institution) {
+		this.institution = institution;
 	}
 	
 	public void addRootEntity(EntityDefView rootEntity) {
