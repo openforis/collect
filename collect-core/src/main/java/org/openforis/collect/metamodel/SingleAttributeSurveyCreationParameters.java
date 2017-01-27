@@ -6,13 +6,18 @@ import java.util.List;
 
 import org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSettings;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class SingleAttributeSurveyCreationParameters implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private String name;
 	private String description;
-	private List<Object> values = new ArrayList<Object>();
+	private List<ListItem> values = new ArrayList<ListItem>();
 	private List<String> imagery = new ArrayList<String>();
 	private SamplingPointGenerationSettings samplingPointConfiguration;
 	
@@ -32,11 +37,11 @@ public class SingleAttributeSurveyCreationParameters implements Serializable {
 		this.description = description;
 	}
 	
-	public List<Object> getValues() {
+	public List<ListItem> getValues() {
 		return values;
 	}
 	
-	public void setValues(List<Object> values) {
+	public void setValues(List<ListItem> values) {
 		this.values = values;
 	}
 
@@ -54,6 +59,37 @@ public class SingleAttributeSurveyCreationParameters implements Serializable {
 	
 	public void setSamplingPointGenerationSettings(SamplingPointGenerationSettings samplingPointGenerationSettings) {
 		this.samplingPointConfiguration = samplingPointGenerationSettings;
+	}
+	
+	public static class ListItem {
+		
+		private String code;
+		private String label;
+		private String color;
+
+		public String getCode() {
+			return code;
+		}
+
+		public void setCode(String code) {
+			this.code = code;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public void setLabel(String label) {
+			this.label = label;
+		}
+
+		public String getColor() {
+			return color;
+		}
+
+		public void setColor(String color) {
+			this.color = color;
+		}
 	}
 	
 }

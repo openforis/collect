@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcCodeList extends TableImpl<OfcCodeListRecord> {
 
-	private static final long serialVersionUID = -1802573810;
+	private static final long serialVersionUID = -898295103;
 
 	/**
 	 * The reference instance of <code>collect.ofc_code_list</code>
@@ -162,6 +162,11 @@ public class OfcCodeList extends TableImpl<OfcCodeListRecord> {
 	 * The column <code>collect.ofc_code_list.description5</code>.
 	 */
 	public final TableField<OfcCodeListRecord, String> DESCRIPTION5 = createField("description5", org.jooq.impl.SQLDataType.VARCHAR.length(1023), this, "");
+
+	/**
+	 * The column <code>collect.ofc_code_list.color</code>.
+	 */
+	public final TableField<OfcCodeListRecord, String> COLOR = createField("color", org.jooq.impl.SQLDataType.CHAR.length(6), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_code_list</code> table reference

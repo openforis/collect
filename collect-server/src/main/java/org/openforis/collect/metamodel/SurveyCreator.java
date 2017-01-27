@@ -3,10 +3,12 @@ package org.openforis.collect.metamodel;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
+import org.openforis.collect.metamodel.SingleAttributeSurveyCreationParameters.ListItem;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
@@ -58,16 +60,16 @@ public class SurveyCreator {
 		return survey;
 	}
 
-	private CollectSurvey createTemporarySingleAttributeSurvey(String name, List<Object> values) {
+	private CollectSurvey createTemporarySingleAttributeSurvey(String name, List<ListItem> list) {
 		CollectSurvey survey = surveyManager.createTemporarySurvey(name, languageCode);
 
 		CodeList codeList = survey.createCodeList();
 		codeList.setName(singleAttributeSurveyCodeListName);
-		for (int i = 0; i < values.size(); i++) {
-			Object value = values.get(i);
+		for (int i = 0; i < list.size(); i++) {
+			ListItem paramItem = list.get(i);
 			CodeListItem item = codeList.createItem(1);
-			item.setCode(String.valueOf(i + 1));
-			item.setLabel(languageCode, value.toString());
+			item.setCode(ObjectUtils.defaultIfNull(paramItem.getCode(), String.valueOf(i + 1))); //specified code or item index
+			item.setLabel(languageCode, paramItem.getLabel());
 			codeList.addItem(item);
 		}
 		survey.addCodeList(codeList);

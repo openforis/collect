@@ -75,6 +75,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		OFC_CODE_LIST.SINCE_VERSION_ID,
 		OFC_CODE_LIST.DEPRECATED_VERSION_ID,
 		OFC_CODE_LIST.IMAGE_FILE_NAME,
+		OFC_CODE_LIST.COLOR,
 		OFC_CODE_LIST.LABEL1, 
 		OFC_CODE_LIST.LABEL2, 
 		OFC_CODE_LIST.LABEL3,
@@ -201,7 +202,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				OFC_CODE_LIST.QUALIFIABLE,
 				OFC_CODE_LIST.SINCE_VERSION_ID,
 				OFC_CODE_LIST.DEPRECATED_VERSION_ID,
-				OFC_CODE_LIST.IMAGE_FILE_NAME
+				OFC_CODE_LIST.IMAGE_FILE_NAME,
+				OFC_CODE_LIST.COLOR
 		));
 		selectFields.addAll(Arrays.<Field<?>>asList(LABEL_FIELDS));
 		selectFields.addAll(Arrays.<Field<?>>asList(DESCRIPTION_FIELDS));
@@ -734,6 +736,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			i.setSinceVersion(extractModelVersion(r, i, OFC_CODE_LIST.SINCE_VERSION_ID));
 			i.setDeprecatedVersion(extractModelVersion(r, i, OFC_CODE_LIST.DEPRECATED_VERSION_ID));
 			i.setImageFileName(r.getValue(OFC_CODE_LIST.IMAGE_FILE_NAME));
+			i.setColor(r.getValue(OFC_CODE_LIST.COLOR));
 			extractLabels(r, i);
 			extractDescriptions(r, i);
 		}
@@ -794,6 +797,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			Integer deprecatedVersionId = item.getDeprecatedVersion() == null ? null: item.getDeprecatedVersion().getId();
 			q.addValue(OFC_CODE_LIST.DEPRECATED_VERSION_ID, deprecatedVersionId);
 			q.addValue(OFC_CODE_LIST.IMAGE_FILE_NAME, item.getImageFileName());
+			q.addValue(OFC_CODE_LIST.COLOR, item.getColor());
 			addLabelValues(q, item);
 			addDescriptionValues(q, item);
 		}

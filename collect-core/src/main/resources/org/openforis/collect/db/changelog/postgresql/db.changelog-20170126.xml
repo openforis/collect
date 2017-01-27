@@ -9,7 +9,13 @@
 		<addColumn tableName="ofc_survey">
             <column name="institution_id" type="bigint" />
 	    </addColumn>
-	        
+	    
+	</changeSet>
+	
+	<changeSet id="add-code-list-item-color-column" author="ricci" dbms="postgresql">
+		<addColumn tableName="ofc_code_list">
+			<column name="color" type="char(6)" />
+		</addColumn>
 	</changeSet>
 	
 </databaseChangeLog>
