@@ -9,6 +9,7 @@ import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Institution;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,8 @@ public abstract class AbstractSurveyRestoreJob extends Job {
 	 * If true, validates the XML file to import against schema.
 	 */
 	protected boolean validateSurvey;
+
+	protected Institution institution;
 
 	//output
 	protected CollectSurvey survey;
@@ -111,6 +114,10 @@ public abstract class AbstractSurveyRestoreJob extends Job {
 	
 	public CollectSurvey getSurvey() {
 		return survey;
+	}
+
+	public void setInstitution(Institution institution) {
+		this.institution = institution;
 	}
 	
 }

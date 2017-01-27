@@ -2,30 +2,63 @@ package org.openforis.collect.manager;
 
 import static org.openforis.collect.config.CollectConfiguration.getUsersRestfulApiUrl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.openforis.collect.client.AbstractClient;
 import org.openforis.collect.model.Institution;
-import org.springframework.stereotype.Component;
+import org.openforis.collect.model.User;
 
-@Component
 public class ClientInstitutionManager extends AbstractClient implements InstitutionManager {
 
 	@Override
-	public List<Institution> loadAll() {
-		List<Institution> result = getList(getUsersRestfulApiUrl() + "/group", Institution.class);
+	public String getDefaultPrivateInstitutionName(User user) {
+		return user.getUsername() + DEFAULT_PRIVATE_INSTITUTION_NAME_SUFFIX;
+	}
+	
+	@Override
+	public List<Institution> findAll() {
+		return getList(getUsersRestfulApiUrl() + "/group", Institution.class);
+	}
+	
+	@Override
+	public Institution findByName(final String name) {
+		@SuppressWarnings("serial")
+		HashMap<String,Object> params = new HashMap<String,Object>(){{
+			put("name", name);
+		}};
+		List<Institution> list = getList(getUsersRestfulApiUrl() + "/group", params, Institution.class);
+		return list.isEmpty() ? null : list.get(0);
+	}
+	
+	@Override
+	public Institution findById(long id) {
+		return getOne(getUsersRestfulApiUrl() + "/group" + id, Institution.class);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List<Institution> findByUser(User user) {
+		List<Institution> result = new ArrayList<Institution>();
+		List<Map> userGroups = getList(getUsersRestfulApiUrl() + "/user/" + user.getId() + "/groups", Map.class);
+		for (Map<String, Object> item : userGroups) {
+			Object group = item.get("group");
+			Institution institution = new Institution();
+			try {
+				BeanUtils.copyProperties(institution, group);
+				result.add(institution);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 		return result;
 	}
 	
 	@Override
-	public Institution loadById(long id) {
-		return getOne(getUsersRestfulApiUrl() + "/group" + id, Institution.class);
-	}
-	
-	@Override
-	public List<Institution> loadPublicInstitutions() {
+	public List<Institution> findPublicInstitutions() {
 		@SuppressWarnings("serial")
 		List<Institution> result = getList(getUsersRestfulApiUrl() + "/group", new HashMap<String, Object>(){{
 			put("visibility", "PUBLIC");
@@ -56,8 +89,7 @@ public class ClientInstitutionManager extends AbstractClient implements Institut
 			return null;
 		} else {
 			Long institutionId = (Long) result.get("groupId");
-			Institution institution = loadById(institutionId);
-			return institution;
+			return findById(institutionId);
 		}
 	}
 	
@@ -77,4 +109,5 @@ public class ClientInstitutionManager extends AbstractClient implements Institut
 		String url = getUsersRestfulApiUrl() + "/group" + institutionId + "/resource/" + resourceType + "/" + resourceId;
 		super.delete(url);
 	}
+
 }

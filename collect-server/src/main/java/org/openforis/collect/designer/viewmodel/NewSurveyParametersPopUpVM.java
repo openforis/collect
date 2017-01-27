@@ -21,6 +21,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Institution;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
@@ -45,6 +46,10 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
 	private static final String SURVEY_NAME_FIELD = "name";
+	private static final String TEMPLATE_FIELD_NAME = "template";
+	private static final String LANGUAGE_FIELD_NAME = "language";
+	private static final String INSTITUTION_FIELD_NAME = "institution";
+
 
 	private enum TemplateType {
 		BLANK,
@@ -64,12 +69,14 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	private Validator nameValidator;
 	
-	@Init
+	@Init(superclass=false)
 	public void init() {
+		super.init();
 		form = new HashMap<String, Object>();
 		nameValidator = new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, true);
 		initLanguageModel();
 		initTemplatesModel();
+		form.put(INSTITUTION_FIELD_NAME, getDefaultPublicInstitutionItem());
 	}
 
 	private void initTemplatesModel() {
@@ -103,10 +110,11 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	
 	@Command
 	public void ok() throws IdmlParseException, SurveyValidationException, SurveyStoreException {
-		String name = (String) form.get("name");
-		String langCode = ((LabelledItem) form.get("language")).getCode();
-		String templateCode = ((LabelledItem) form.get("template")).getCode();
+		String name = (String) form.get(SURVEY_NAME_FIELD);
+		String langCode = ((LabelledItem) form.get(LANGUAGE_FIELD_NAME)).getCode();
+		String templateCode = ((LabelledItem) form.get(TEMPLATE_FIELD_NAME)).getCode();
 		TemplateType templateType = TemplateType.valueOf(templateCode);
+		String institutionName = ((LabelledItem) form.get(INSTITUTION_FIELD_NAME)).getCode();
 		
 		CollectSurvey survey;
 		switch (templateType) {
@@ -116,6 +124,8 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		default:
 			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
+		Institution institution = institutionManager.findByName(institutionName);
+		survey.setInstitutionId(institution.getId());
 		surveyManager.save(survey);
 		//put survey in session and redirect into survey edit page
 		SessionStatus sessionStatus = getSessionStatus();

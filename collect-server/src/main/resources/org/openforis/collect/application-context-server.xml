@@ -26,18 +26,15 @@
 	</bean>
 	
 	<!-- Override scope for Collect core sessionRecordFileManager bean, use "session" scope -->
+	<bean id="institutionManager" 	class="org.openforis.collect.manager.ClientInstitutionManager" />
+	<bean id="recordSessionManager" class="org.openforis.collect.manager.RecordSessionManager"
+		scope="session" />
+	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
 	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager" 
 		init-method="init" />
-	
 	<bean id="volatileRecordIndexManager"
 		class="org.openforis.collect.remoting.service.recordindex.VolatileRecordIndexManager"
 		init-method="init" scope="session" lazy-init="false" autowire="byName" />
-	
-	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
-	
-	<bean id="recordSessionManager" class="org.openforis.collect.manager.RecordSessionManager"
-		scope="session" />
-	
 	<bean id="userManager" 			class="org.openforis.collect.manager.ClientUserManager" />
 	
 	<!-- ===================================== -->

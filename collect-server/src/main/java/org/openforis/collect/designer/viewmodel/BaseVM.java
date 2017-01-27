@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -9,24 +10,30 @@ import java.util.ServiceLoader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
+import org.openforis.collect.manager.InstitutionManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.model.Institution;
 import org.openforis.collect.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.WebApp;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zkplus.databind.BindingListModelListModel;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
 /**
@@ -46,8 +53,41 @@ public abstract class BaseVM {
 	protected UserManager userManager;
 	@WireVariable
 	protected CollectJobManager jobManager;
+	@WireVariable
+	protected InstitutionManager institutionManager;
+
+	private BindingListModelListModel<LabelledItem> institutionModel;
 
 	void init() {
+		initInstitutionsModel();
+	}
+	
+	protected void initInstitutionsModel() {
+		List<LabelledItem> items = new ArrayList<LabelledItem>();
+		User loggedUser = getLoggedUser();
+		List<Institution> institutions = institutionManager.findByUser(loggedUser);
+
+		String defaultPublicInstitutionName = InstitutionManager.DEFAULT_PUBLIC_INSTITUTION_NAME;
+		LabelledItem publicInstitutionItem = new LabelledItem(defaultPublicInstitutionName, Labels.getLabel("survey.template.institution.public"));
+		items.add(publicInstitutionItem);
+		
+		String defaultPrivateInstitutionName = institutionManager.getDefaultPrivateInstitutionName(loggedUser);
+		items.add(new LabelledItem(defaultPrivateInstitutionName, Labels.getLabel("survey.template.institution.private")));
+
+		List<String> predefinedInstitutionNames = Arrays.asList(new String[]{defaultPrivateInstitutionName, defaultPublicInstitutionName});
+		
+		for (Institution institution : institutions) {
+			String label = institution.getLabel();
+			if (! predefinedInstitutionNames.contains(institution.getName())) {
+				items.add(new LabelledItem(institution.getName(), label));
+			}
+		}
+		institutionModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
+		institutionModel.setMultiple(false);
+	}
+	
+	protected LabelledItem getDefaultPublicInstitutionItem() {
+		return institutionModel.getElementAt(0);
 	}
 	
 	public String getComponentsPath() {
@@ -139,6 +179,10 @@ public abstract class BaseVM {
 	
 	public String prettyDateFormat(Date date) {
 		return PRETTY_DATE_FORMAT.format(date);
+	}
+	
+	public BindingListModelListModel<LabelledItem> getInstitutionModel() {
+		return institutionModel;
 	}
 }
 

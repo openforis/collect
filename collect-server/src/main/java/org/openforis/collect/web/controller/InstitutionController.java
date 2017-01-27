@@ -23,7 +23,7 @@ public class InstitutionController {
 
 	@RequestMapping(value = "summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody List<Institution> loadPublicInstitutions() {
-		return institutionManager.loadPublicInstitutions();
+		return institutionManager.findPublicInstitutions();
 	}
 	
 	@RequestMapping(value = "add.json", method=POST, produces=APPLICATION_JSON_VALUE)

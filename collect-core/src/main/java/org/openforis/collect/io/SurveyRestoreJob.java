@@ -171,6 +171,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			this.backupInfo = t.getInfo();
 		} else if ( task instanceof IdmlUnmarshallTask ) {
 			CollectSurvey s = ((IdmlUnmarshallTask) task).getSurvey();
+			s.setInstitutionId(institution.getId());
 			this.surveyUri = s.getUri();
 		} else if ( task instanceof IdmlImportTask ) {
 			IdmlImportTask t = (IdmlImportTask) task;

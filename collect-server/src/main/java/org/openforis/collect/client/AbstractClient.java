@@ -23,11 +23,11 @@ import com.google.gson.reflect.TypeToken;
 
 public abstract class AbstractClient {
 
-	public <T extends Object> T getOne(String url, final Class<T> type) {
+	public <T extends Object> T getOne(String url, Class<T> type) {
 		return get(url, createSingleItemResponseProcessor(type));
 	}
 
-	public <T extends Object> List<T> getList(String url, final Class<T> type) {
+	public <T extends Object> List<T> getList(String url, Class<T> type) {
 		return getList(url, null, type);
 	}
 	

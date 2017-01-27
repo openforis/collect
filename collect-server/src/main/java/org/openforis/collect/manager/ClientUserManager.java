@@ -1,12 +1,13 @@
 package org.openforis.collect.manager;
 
+import static org.openforis.collect.config.CollectConfiguration.getUsersRestfulApiUrl;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.client.AbstractClient;
-import static org.openforis.collect.config.CollectConfiguration.*;
-
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
 
@@ -75,12 +76,12 @@ public class ClientUserManager extends AbstractClient implements UserManager  {
 
 	@Override
 	public Boolean isDefaultAdminPasswordSet() {
-		@SuppressWarnings("serial")
-		Boolean result = post(getUsersRestfulApiUrl() + "/login", new HashMap<String, Object>(){{
+		@SuppressWarnings({ "serial", "unchecked" })
+		Map<String, Object> result = post(getUsersRestfulApiUrl() + "/login", new HashMap<String, Object>(){{
 			put("username", ADMIN_USER_NAME);
 			put("rawPassword", ADMIN_DEFAULT_PASSWORD);
-		}}, Boolean.class);
-		return result;
+		}}, Map.class);
+		return (Boolean) result.get("success");
 	}
 
 	@Override
