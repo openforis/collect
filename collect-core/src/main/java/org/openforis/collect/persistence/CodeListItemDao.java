@@ -819,7 +819,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			List<Object> values = new ArrayList<Object>(POJO_FIELDS.length);
 			values.addAll(Arrays.<Object>asList(item.getSystemId(), surveyId, 
 					list.getId(), item.getId(), item.getParentId(), item.getLevel(), item.getSortOrder(), item.getCode(), 
-					item.isQualifiable(), sinceVersionId, deprecatedVersionId, item.getImageFileName()));
+					item.isQualifiable(), sinceVersionId, deprecatedVersionId, item.getImageFileName(), item.getColor()));
 			values.addAll(getLabelValues(item));
 			values.addAll(getDescriptionValues(item));
 			return values;
