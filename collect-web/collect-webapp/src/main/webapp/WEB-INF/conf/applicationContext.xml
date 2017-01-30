@@ -51,7 +51,7 @@
 		<entry key="/logout.htm" value-ref="fileNameViewController" />
 		<entry key="/logoUpload" value-ref="fileNameViewController" />
 
-		<entry key="/surveys" value-ref="fileNameViewController" />
+		<entry key="/survey/**" value-ref="fileNameViewController" />
 		<entry key="/speciesImport" value-ref="fileNameViewController" />
 		<entry key="/species/export/*" value-ref="fileNameViewController" />
 		<entry key="/samplingdesign/export/*" value-ref="fileNameViewController" />

@@ -40,7 +40,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
-@RequestMapping("/surveys/")
+@RequestMapping("/survey/")
 public class SurveyController extends BasicController {
 
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
@@ -59,7 +59,7 @@ public class SurveyController extends BasicController {
 		binder.setValidator(validator);
 	}
 
-	@RequestMapping(value = "summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SurveySummary> loadSummaries(
 			@RequestParam(required=false) boolean includeTemporary,
@@ -72,7 +72,7 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value = "{id}.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="{id}.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
 			@RequestParam(value="include-code-lists", required=false, defaultValue="true") boolean includeCodeLists) 
@@ -81,20 +81,20 @@ public class SurveyController extends BasicController {
 		return generateView(survey, includeCodeLists);
 	}
 
-	@RequestMapping(value = "temp/{surveyId}/edit.htm", method=GET)
+	@RequestMapping(value="temp/{surveyId}/edit.htm", method=GET)
 	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("temp_id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	@RequestMapping(value = "{surveyId}/edit.htm", method=GET)
+	@RequestMapping(value="{surveyId}/edit.htm", method=GET)
 	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
 	@Transactional
-	@RequestMapping(value = "create-single-attribute-survey.json", method=POST, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="save.json", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView createSingleAttributeSurvey(@Validated SingleAttributeSurveyCreationParameters parameters, BindingResult result) throws Exception {
 		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager);

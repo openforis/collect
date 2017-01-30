@@ -103,69 +103,31 @@ public class SurveyManager {
 	@Autowired(required=false)
 	private InstitutionManager institutionManager;
 	
-	private List<CollectSurvey> surveys;
-	private Map<Integer, CollectSurvey> surveysById;
-	private Map<String, CollectSurvey> surveysByName;
-	private Map<String, CollectSurvey> surveysByUri;
-	
 	private Map<Integer, ProcessStatus> recordValidationStatusBySurvey;
 	
+	private SurveyCache publishedSurveyCache = null;
+	
 	public SurveyManager() {
-		surveys = new ArrayList<CollectSurvey>();
-		surveysById = new HashMap<Integer, CollectSurvey>();
-		surveysByName = new HashMap<String, CollectSurvey>();
-		surveysByUri = new HashMap<String, CollectSurvey>();
 		recordValidationStatusBySurvey = Collections.synchronizedMap(new HashMap<Integer, ProcessStatus>());
 	}
 
 	public void init() {
-		initPublishedSurveysCache();
 	}
 
-	protected void initPublishedSurveysCache() {
-		surveysById.clear();
-		surveysByName.clear();
-		surveysByUri.clear();
-		surveys = surveyDao.loadAllPublished();
-		fillReferencedItems(surveys);
-		for (CollectSurvey survey : surveys) {
-			addToCache(survey);
-		}
-	}
-
-	private void addToCache(CollectSurvey survey) {
-		if ( ! surveys.contains(survey) ) {
-			surveys.add(survey);
-		}
-		surveysById.put(survey.getId(), survey);
-		surveysByName.put(survey.getName(), survey);
-		surveysByUri.put(survey.getUri(), survey);
-	}
-	
-	protected void removeFromCache(CollectSurvey survey) {
-		surveys.remove(survey);
-		surveysById.remove(survey.getId());
-		surveysByName.remove(survey.getName());
-		surveysByUri.remove(survey.getUri());
-	}
-	
 	public List<CollectSurvey> getAll() {
-		return CollectionUtils.unmodifiableList(surveys);
+		return CollectionUtils.unmodifiableList(getPublishedSurveyCache().surveys);
 	}
-	
+
 	public CollectSurvey get(String name) {
-		CollectSurvey survey = surveysByName.get(name);
-		return survey;
+		return getPublishedSurveyCache().getByName(name);
 	}
 	
 	public CollectSurvey getById(int id) {
-		CollectSurvey survey = surveysById.get(id);
-		return survey;
+		return getPublishedSurveyCache().getById(id);
 	}
 	
 	public CollectSurvey getByUri(String uri) {
-		CollectSurvey survey = surveysByUri.get(uri);
-		return survey;
+		return getPublishedSurveyCache().getByUri(uri);
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
@@ -238,7 +200,9 @@ public class SurveyManager {
 			survey.setName(name);
 			survey.setPublished(true);
 			surveyDao.insert(survey);
-			addToCache(survey);
+			
+			getPublishedSurveyCache().add(survey);
+			
 			codeListManager.importCodeLists(survey, surveyFile);
 			return survey;
 		} catch ( CodeListImportException e ) {
@@ -313,9 +277,11 @@ public class SurveyManager {
 //		}
 		codeListManager.deleteAllItemsBySurvey(id, false);
 		
-		removeFromCache(oldPublishedSurvey);
+		getPublishedSurveyCache().remove(oldPublishedSurvey);
+		
 		surveyDao.update(packagedSurvey);
-		addToCache(packagedSurvey);
+
+		getPublishedSurveyCache().add(packagedSurvey);
 		
 		try {
 			codeListManager.importCodeLists(packagedSurvey, surveyFile);
@@ -374,7 +340,7 @@ public class SurveyManager {
 	@Deprecated
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.insert(survey);
-		addToCache(survey);
+		getPublishedSurveyCache().add(survey);
 	}
 	
 	/**
@@ -391,12 +357,12 @@ public class SurveyManager {
 		//remove old survey from surveys cache
 		CollectSurvey oldSurvey = get(survey.getName());
 		if ( oldSurvey != null ) {
-			removeFromCache(oldSurvey);
+			getPublishedSurveyCache().remove(oldSurvey);
 		} else {
 			throw new SurveyImportException("Could not find survey to update");
 		}
 		surveyDao.update(survey);
-		addToCache(survey);
+		getPublishedSurveyCache().add(survey);
 	}
 
 	public List<SurveySummary> getSurveySummaries(String lang) {
@@ -417,7 +383,7 @@ public class SurveyManager {
 			List<Institution> userInstitutions = institutionManager.findByUser(availableToUser);
 			userInstitutionIds = CollectionUtils.project(userInstitutions, "id");
 		}
-		for (CollectSurvey survey : surveys) {
+		for (CollectSurvey survey : getPublishedSurveyCache().surveys) {
 			if (availableToUser == null || userInstitutionIds.contains(survey.getInstitutionId())) {
 				SurveySummary summary = SurveySummary.createFromSurvey(survey, lang);
 				if ( summary.isPublished() ) {
@@ -905,10 +871,10 @@ public class SurveyManager {
 			surveyDao.delete(temporarySurveyId);
 			CollectSurvey oldPublishedSurvey = getById(oldPublishedSurveyId);
 			if (oldPublishedSurvey != null) {
-				removeFromCache(oldPublishedSurvey);
+				getPublishedSurveyCache().remove(oldPublishedSurvey);
 			}
 		}
-		addToCache(survey);
+		getPublishedSurveyCache().add(survey);
 		
 		if (eventQueue != null && eventQueue.isEnabled()) {
 			eventQueue.publish(new SurveyUpdatedEvent(survey.getName()));
@@ -952,7 +918,7 @@ public class SurveyManager {
 	}
 
 	public void validateRecords(int surveyId, User user) {
-		CollectSurvey survey = surveysById.get(surveyId);
+		CollectSurvey survey = getPublishedSurveyCache().getById(surveyId);
 		if ( survey == null ) {
 			throw new IllegalStateException("Published survey not found, id="+surveyId);
 		}
@@ -1003,7 +969,7 @@ public class SurveyManager {
 		surveyDao.delete(id);
 		
 		if ( ! temporary ) {
-			removeFromCache(publishedSurvey);
+			getPublishedSurveyCache().remove(publishedSurvey);
 		}
 	}
 	
@@ -1100,6 +1066,13 @@ public class SurveyManager {
 		return status != null && status.isRunning();
 	}
 
+	private SurveyCache getPublishedSurveyCache() {
+		if (publishedSurveyCache == null) {
+			publishedSurveyCache = new SurveyCache();
+		}
+		return publishedSurveyCache;
+	}
+	
 	/*
 	 * Getters and setters
 	 * 
@@ -1158,6 +1131,55 @@ public class SurveyManager {
 	
 	public void setSurveySerializer(CollectSurveyIdmlBinder surveySerializer) {
 		this.surveySerializer = surveySerializer;
+	}
+	
+	private class SurveyCache {
+		
+		private List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();
+		private Map<Integer, CollectSurvey> surveysById = new HashMap<Integer, CollectSurvey>();
+		private Map<String, CollectSurvey> surveysByName = new HashMap<String, CollectSurvey>();
+		private Map<String, CollectSurvey> surveysByUri = new HashMap<String, CollectSurvey>();
+		
+		public SurveyCache() {
+			populate();
+		}
+		
+		private void populate() {
+			surveys = surveyDao.loadAllPublished();
+			fillReferencedItems(surveys);
+			for (CollectSurvey survey : surveys) {
+				add(survey);
+			}
+		}
+		
+		public CollectSurvey getById(int id) {
+			return surveysById.get(id);
+		}
+		
+		public CollectSurvey getByName(String name) {
+			return surveysByName.get(name);
+		}
+		
+		public CollectSurvey getByUri(String uri) {
+			return surveysByUri.get(uri);
+		}
+		
+		private void add(CollectSurvey survey) {
+			if ( ! surveys.contains(survey) ) {
+				surveys.add(survey);
+			}
+			surveysById.put(survey.getId(), survey);
+			surveysByName.put(survey.getName(), survey);
+			surveysByUri.put(survey.getUri(), survey);
+		}
+		
+		protected void remove(CollectSurvey survey) {
+			surveys.remove(survey);
+			surveysById.remove(survey.getId());
+			surveysByName.remove(survey.getName());
+			surveysByUri.remove(survey.getUri());
+		}
+		
 	}
 
 }

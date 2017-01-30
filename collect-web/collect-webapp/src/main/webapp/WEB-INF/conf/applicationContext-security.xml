@@ -36,7 +36,7 @@
 		<intercept-url access="permitAll" pattern="/login" />
 		<intercept-url access="permitAll" pattern="/logout.htm" />
 		<intercept-url access="permitAll" pattern="/session/**" />
-		<intercept-url access="permitAll" pattern="/surveys/summaries.json" />
+		<intercept-url access="permitAll" pattern="/survey/summaries.json" />
 		<intercept-url access="permitAll" pattern="/zkau" />
 <!-- 		security disabled for these urls because of an issue with flash player -->
 <!-- 		for netscape compatible browser and uplaod to a secured url -->

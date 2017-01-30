@@ -26,12 +26,12 @@ public class InstitutionController {
 		return institutionManager.findPublicInstitutions();
 	}
 	
-	@RequestMapping(value = "add.json", method=POST, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody Institution insertInstitution(@RequestBody Institution institution) {
 		return institutionManager.save(institution);
 	}
 	
-	@RequestMapping(value = "/{id}/delete.json", method=DELETE, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/{id}", method=DELETE, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody void deleteInstitution(@PathVariable Long id) {
 		institutionManager.delete(id);
 	}
