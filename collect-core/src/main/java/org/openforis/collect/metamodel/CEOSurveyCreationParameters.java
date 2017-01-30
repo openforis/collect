@@ -11,7 +11,7 @@ import org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSet
  * @author S. Ricci
  *
  */
-public class SingleAttributeSurveyCreationParameters implements Serializable {
+public class CEOSurveyCreationParameters implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -19,7 +19,7 @@ public class SingleAttributeSurveyCreationParameters implements Serializable {
 	private String description;
 	private List<ListItem> values = new ArrayList<ListItem>();
 	private List<String> imagery = new ArrayList<String>();
-	private SamplingPointGenerationSettings samplingPointConfiguration;
+	private SamplingPointGenerationSettings samplingPointGenerationSettings;
 	
 	public String getName() {
 		return name;
@@ -54,11 +54,11 @@ public class SingleAttributeSurveyCreationParameters implements Serializable {
 	}
 	
 	public SamplingPointGenerationSettings getSamplingPointGenerationSettings() {
-		return samplingPointConfiguration;
+		return samplingPointGenerationSettings;
 	}
 	
 	public void setSamplingPointGenerationSettings(SamplingPointGenerationSettings samplingPointGenerationSettings) {
-		this.samplingPointConfiguration = samplingPointGenerationSettings;
+		this.samplingPointGenerationSettings = samplingPointGenerationSettings;
 	}
 	
 	public static class ListItem {

@@ -1,0 +1,307 @@
+swagger: '2.0'
+info:
+  title: Collect API
+  description: Collect RESTful API
+  version: "0.1.0"
+# the domain of the service
+host: localhost
+# array of all schemes that your API supports
+schemes:
+  - http
+# will be prefixed to all paths
+basePath: /collect/
+produces:
+  - application/json
+paths:
+  /survey/summaries.json:
+    get:
+      summary: Surveys Summaries
+      description: |
+        Full list of surveys (only summaries).
+      parameters:
+        - name: include-temporary
+          in: query
+          description: Include temporary surveys in the list.
+          required: false
+          type: boolean
+      tags:
+        - Surveys
+      responses:
+        200:
+          description: An array of survey summary objects
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SurveySummary'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /{userId}/surveys/summaries.json:
+    get:
+      summary: Surveys Summaries (only belonging to user institutions)
+      description: |
+        List of surveys belonging to user institutions.
+      parameters:
+        - name: userId
+          in: path
+          description: User ID.
+          required: true
+          type: integer
+      tags:
+        - Surveys
+      responses:
+        200:
+          description: An array of survey summary objects
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SurveySummary'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /survey/{id}.json:
+    get:
+      summary: Complete survey structure
+      description: |
+        Complete survey with all attribute definitions.
+      parameters:
+        - name: id
+          in: path
+          description: survey id
+          required: true
+          type: number
+          format: int32
+        - name: include-code-lists
+          in: query
+          description: Whether or not to include the code list items.
+          required: false
+          type: boolean
+      tags:
+        - Survey
+      responses:
+        200:
+          description: The full survey having the specified ID
+          schema:
+            $ref: '#/definitions/SurveyView'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /survey/ceo:
+    post:
+      summary: Create a new Collect Earth Online project (survey)
+      parameters:
+        - name: parameters
+          in: body
+          description: survey id
+          required: true
+          schema:
+            $ref: '#/definitions/CEOSurveyCreationParameters'
+      tags:
+        - Survey
+      responses:
+        200:
+          description: The survey generated using the specified parameters
+          schema:
+            $ref: '#/definitions/SurveyView'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /survey/{id}/sampling-point-data/list.json:
+    get:
+      summary: List of sampling point data associated to the survey with the specified id
+      parameters:
+        - name: id
+          in: path
+          description: survey id
+          required: true
+          type: integer
+        - name: parent_keys
+          in: query
+          description: list of keys to filter the row(s) in the sampling point data. E.g. if the if you specify only the first key will give you the list of sampling point data in the second level; if you specify first and second level keys, the items in the third level will be returned
+          required: false
+          type: array
+          items:
+            type: string
+      tags:
+        - Sampling point data
+      responses:
+        200:
+          description: List of sampling point data associated to the survey with the specified id
+          schema:
+            $ref: '#/definitions/SamplingDesignItem'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  SurveySummary:
+    type: object
+    description: please refer to org.openforis.collect.model.SurveySummary Java class
+    properties:
+      id:
+        type: number
+        description: Unique identifier.
+      name:
+        type: string
+        description: Human readable identifier.
+      uri:
+        type: string
+        description: Global identifier.
+      projectName:
+        type: string
+        description: Name of the project for which the survey has been created.
+  EntityDefView:
+    type: object
+    description: please refer to org.openforis.collect.metamodel.EntityDefView Java class
+    properties:
+      internalId: 
+        type: integer
+        description: internal ID
+  SamplingDesignItem:
+    type: object
+    description: please refer to org.openforis.collect.model.SamplingDesignItem Java class
+    properties:
+      id: 
+        type: integer
+        description: internal ID
+      surveyId: 
+        type: integer
+        description: survey internal ID
+      x: 
+        type: number
+      y: 
+        type: number
+      srsId: 
+        type: string
+  CodeListView:
+    type: object
+    description: please refer to org.openforis.collect.metamodel.CodeListView Java class
+    properties:
+      id: 
+        type: integer
+        description: internal ID
+      name: 
+        type: string
+        description: internal human readable identifier
+      items:
+        type: array
+        description: please refer to org.openforis.collect.metamodel.CodeListItemView Java class
+        items:
+          $ref: '#/definitions/CodeListItemView'
+  CodeListItemView:
+    type: object
+    description: please refer to org.openforis.collect.metamodel.CodeListItemiew Java class
+    properties:
+      id:
+        type: integer
+        description: internal ID
+      code:
+        type: string
+        description: value that will be stored in the data
+      label:
+        type: string
+        description: Label shown to the data entry user
+      color:
+        type: string
+        description: color of the item
+  ListItem:
+    type: object
+    description: please refer to org.openforis.collect.metamodel.CEOSurveyCreationParameters.ListItem Java class
+    properties:
+      code:
+        type: string
+        description: value that will be stored in the data
+      label:
+        type: string
+        description: Label shown to the data entry user
+      color:
+        type: string
+        description: color of the item
+  SurveyView:
+    type: object
+    description: please refer to org.openforis.collect.metamodel.SurveyView Java class
+    properties:
+      id:
+        type: integer
+        description: Unique identifier
+      rootEntities:
+        type: array
+        items:
+          $ref: '#/definitions/EntityDefView'
+        description: ""
+      codeLists:
+        type: array
+        items:
+          $ref: '#/definitions/CodeListView'
+        description: ""
+  CEOSurveyCreationParameters:
+    type: object
+    description: please refer to org.openforis.collect.metamodel.CEOSurveyCreationParameters Java class
+    properties:
+      name:
+        type: string
+        description: survey name
+      description:
+        type: string
+        description: survey description
+      values:
+        type: array
+        description: single code attribute list of values
+        items:
+          $ref: '#/definitions/ListItem'
+      samplingPointGenerationSettings:
+        type: object
+        description: please refer to org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSettings Java class
+        properties:
+          aoiBoundary:
+            type: array
+            description: List of coordinate boundaries for the AOI
+            items:
+              $ref: '#/definitions/Coordinate'
+          levelsSettings:
+            type: array
+            items:
+              $ref: '#/definitions/SamplingPointLevelGenerationSettings'
+            description: Settings for the geneation of sampling points for every level (from root to nested levels)
+  Coordinate:
+    type: object
+    properties:
+      x:
+        type: number
+      y:
+        type: number
+      srsId:
+        type: string
+  SamplingPointLevelGenerationSettings:
+    type: object
+    description: please refer to org.openforis.collect.metamodel.samplingdesign.SamplingPointLevelGenerationSettings Java class
+    properties:
+      numPoints:
+        type: integer
+        description: Total number of points to be generated
+      shape:
+        type: string
+        description: Shape of the generated sampling points (CIRCLE or SQUARE)
+      distribution:
+        type: string
+        description: Distribution of the generated sampling points (RANDOM or GRIDDED)
+      resolution:
+        type: number
+        description: Resolution of the points (in meters)
+      pointWidth:
+        type: string
+        description: Width of every generated point
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

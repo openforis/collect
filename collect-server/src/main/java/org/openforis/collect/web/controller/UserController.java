@@ -29,7 +29,7 @@ public class UserController {
 	@Autowired
 	private UserManager userManager;
 
-	@RequestMapping(value = "{userId}/available_surveys/summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "{userId}/surveys/summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SurveySummary> loadSummariesByUser(@PathVariable int userId) {
 		User user = userManager.loadById(userId);

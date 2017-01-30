@@ -140,6 +140,26 @@
 					<useStandardDocletOptions>false</useStandardDocletOptions>
 				</configuration>
 			</plugin>
+			<plugin>
+			    <groupId>io.github.swagger2markup</groupId>
+				<artifactId>swagger2markup-maven-plugin</artifactId>
+				<version>1.2.0</version>
+				<configuration>
+					<swaggerInput>${basedir}/src/main/resources/org/openforis/collect/api.yaml</swaggerInput>
+					<outputFile>${project.build.directory}/generated-docs/asciidoc/ApiDocumentation</outputFile>
+					<config>
+						<swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
+					</config>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>convertSwagger2markup</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -476,5 +496,20 @@
 		</dependency>
 		
 	</dependencies>
-
+	
+	<pluginRepositories>
+		<pluginRepository>
+	        <id>jcenter-snapshots</id>
+	        <name>jcenter</name>
+	        <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
+	    </pluginRepository>
+	    <pluginRepository>
+	        <snapshots>
+	            <enabled>false</enabled>
+	        </snapshots>
+	        <id>jcenter-releases</id>
+	        <name>jcenter</name>
+	        <url>http://jcenter.bintray.com</url>
+	    </pluginRepository>
+	</pluginRepositories>
 </project>

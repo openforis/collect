@@ -42,6 +42,7 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.UploadEvent;
@@ -89,7 +90,10 @@ public class SurveyImportVM extends SurveyBaseVM {
 	
 	private Window jobStatusPopUp;
 	
-	public SurveyImportVM() {
+	@Init(superclass=false)
+	@Override
+	public void init() {
+		super.init();
 		form = new HashMap<String, Object>();
 		reset();
 	}

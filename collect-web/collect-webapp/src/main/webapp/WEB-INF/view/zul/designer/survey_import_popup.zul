@@ -57,6 +57,15 @@
 	        		value="${labels.survey.import_survey.updating_published_survey}" />
         	</cell>
         </row>
+        <row>
+			<label value="${labels.survey.template.institution.$}:" />
+			<listbox model="@load(vm.institutionModel)" mold="select"
+				selectedItem="@bind(fx.institution)">
+				<template name="model">
+					<listitem label="${each.label}" value="${each.code}" />
+				</template>
+			</listbox>
+		</row>
       </rows>
     </grid>
 

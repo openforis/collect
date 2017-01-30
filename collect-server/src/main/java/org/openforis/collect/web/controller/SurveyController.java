@@ -4,22 +4,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.metamodel.SingleAttributeSurveyCreationParameters;
+import org.openforis.collect.metamodel.CEOSurveyCreationParameters;
 import org.openforis.collect.metamodel.SurveyCreator;
 import org.openforis.collect.metamodel.SurveyView;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
-import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.web.validator.SimpleSurveyParametersValidator;
-import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.collect.web.validator.CEOSurveyParametersValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +42,7 @@ public class SurveyController extends BasicController {
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
 
 	@Autowired
-	private SimpleSurveyParametersValidator validator;
-	@Autowired
-	private RecordManager recordManager;
+	private CEOSurveyParametersValidator validator;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -62,8 +56,7 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value="summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SurveySummary> loadSummaries(
-			@RequestParam(required=false) boolean includeTemporary,
-			@RequestParam(required=false) boolean includeRecordIds) throws Exception {
+			@RequestParam(value="include-temporary", required=false) boolean includeTemporary) throws Exception {
 		String language = Locale.ENGLISH.getLanguage();
 		if (includeTemporary) {
 			return surveyManager.loadCombinedSummaries(language, true);
@@ -80,6 +73,15 @@ public class SurveyController extends BasicController {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		return generateView(survey, includeCodeLists);
 	}
+	
+	@Transactional
+	@RequestMapping(value="ceo", method=POST, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	SurveyView insertSurvey(@Validated CEOSurveyCreationParameters parameters, BindingResult result) throws Exception {
+		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager);
+		CollectSurvey survey = surveyCreator.generateAndPublishSurvey(parameters);
+		return generateView(survey, false);
+	}
 
 	@RequestMapping(value="temp/{surveyId}/edit.htm", method=GET)
 	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
@@ -91,32 +93,6 @@ public class SurveyController extends BasicController {
 	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
-	}
-	
-	@Transactional
-	@RequestMapping(value="save.json", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	SurveyView createSingleAttributeSurvey(@Validated SingleAttributeSurveyCreationParameters parameters, BindingResult result) throws Exception {
-		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager);
-		CollectSurvey survey = surveyCreator.generateAndPublishSurvey(parameters);
-		return generateView(survey);
-	}
-
-	protected List<Integer> getRecordIds(SurveySummary s) {
-		List<Integer> recordIds = new ArrayList<Integer>();
-		CollectSurvey survey = surveyManager.getById(s.getId());
-		List<EntityDefinition> rootEntities = survey.getSchema().getRootEntityDefinitions();
-		EntityDefinition rootEntity = rootEntities.get(0);
-		String rootEntityName = rootEntity.getName();
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityName);
-		for (CollectRecord r : recordSummaries) {
-			recordIds.add(r.getId());
-		}
-		return recordIds;
-	}
-
-	private SurveyView generateView(CollectSurvey survey) {
-		return generateView(survey, false);
 	}
 	
 	private SurveyView generateView(CollectSurvey survey, boolean includeCodeLists) {
