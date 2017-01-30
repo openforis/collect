@@ -5,16 +5,15 @@
  
   	<changeSet id="add-survey-institution-id" author="ricci" dbms="sqlite">
 		<comment>Add survey institution id column</comment>
-		
-		<addColumn tableName="ofc_survey">
-            <column name="institution_id" type="bigint" />
-	    </addColumn>
+		<sql>
+			alter table ofc_survey add column institution_id bigint;			
+		</sql>
 	</changeSet>
 	
 	<changeSet id="add-code-list-item-color-column" author="ricci" dbms="sqlite">
-		<addColumn tableName="ofc_code_list">
-			<column name="color" type="char(6)" />
-		</addColumn>
+		<sql>
+			alter table ofc_code_list add column color char(6);			
+		</sql>
 	</changeSet>
 	
 </databaseChangeLog>
