@@ -313,11 +313,18 @@ public class CalculatedAttributeDependencyGraphTest extends DependencyGraphTest 
 
 	@Test(expected=IllegalStateException.class)
 	public void testCalculatedAttributeCircularDependency() {
-		calculatedAttribute(rootEntity, "c1", "c2");
-		calculatedAttribute(rootEntity, "c2", "c1");
-
+		rootEntityDef(survey, "root",
+			attributeDef("c1")
+				.calculated("c2")
+			, attributeDef("c2")
+				.calculated("c1")
+		);
+		createTestRecord();
+		attribute(rootEntity, "c1");
+		attribute(rootEntity, "c2");
 		record.determineCalculatedAttributes(rootEntity);
 	}
+	
 	@Override
 	protected List<?> determineDependents(Node<?> source) {
 		List<?> dependencies = source.getRecord().determineCalculatedAttributes(source);
