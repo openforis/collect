@@ -441,6 +441,21 @@
     </unit>
   </units>
   <spatialReferenceSystems>
+	<spatialReferenceSystem srid="EPSG:4326">
+      <label xml:lang="en">EPSG:4326</label>
+      <description xml:lang="en">EPSG:World Geodetic System 1984 
+      	Horizontal component of 3D system. Used by the GPS satellite navigation system and for NATO military geodetic surveying.</description>
+      <wkt><![CDATA[GEOGCS["WGS 84", 
+		  DATUM["World Geodetic System 1984", 
+		    SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]], 
+		    AUTHORITY["EPSG","6326"]], 
+		  PRIMEM["Greenwich", 0.0, AUTHORITY["EPSG","8901"]], 
+		  UNIT["degree", 0.017453292519943295], 
+		  AXIS["Geodetic longitude", EAST], 
+		  AXIS["Geodetic latitude", NORTH], 
+		  AUTHORITY["EPSG","4326"]]]]>
+      </wkt>
+    </spatialReferenceSystem>
     <spatialReferenceSystem srid="EPSG:21035">
       <label xml:lang="en">UTM 35S</label>
       <description xml:lang="en">Arc 1960 / UTM zone 35S</description>
@@ -468,19 +483,6 @@
                 AUTHORITY["EPSG","21035"],
                 AXIS["Easting",EAST],
                 AXIS["Northing",NORTH]]            
-        
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       ]]>
       </wkt>
     </spatialReferenceSystem>
@@ -511,19 +513,6 @@
                 AUTHORITY["EPSG","21036"],
                 AXIS["Easting",EAST],
                 AXIS["Northing",NORTH]]
-        
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       ]]>
       </wkt>
     </spatialReferenceSystem>
@@ -554,19 +543,6 @@
                 AUTHORITY["EPSG","21037"],
                 AXIS["Easting",EAST],
                 AXIS["Northing",NORTH]]
-        
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       ]]>
       </wkt>
     </spatialReferenceSystem>
