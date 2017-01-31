@@ -3,6 +3,7 @@ package org.openforis.idm.metamodel.xml.internal.marshal;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.CODE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.CODE_LISTS;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.CODING_SCHEME;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.COLOR;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.DEPRECATED;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.HIERARCHY;
@@ -28,14 +29,16 @@ import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
-import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
+
+import liquibase.util.StringUtils;
 
 /**
  * 
@@ -177,6 +180,10 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 			}
 			attribute(SINCE, item.getSinceVersionName());
 			attribute(DEPRECATED, item.getDeprecatedVersionName());
+			String color = StringUtils.trimToNull(item.getColor());
+			if (color != null) {
+				attribute(COLOR, color);
+			}
 		}
 		
 		private class CodeXS extends TextXS<CodeListItem> {

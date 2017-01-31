@@ -1,6 +1,7 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
 import static org.openforis.idm.metamodel.xml.IdmlConstants.CODE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.COLOR;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.DEPRECATED;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.ID;
@@ -45,11 +46,13 @@ class CodeListItemPR extends IdmlPullReader {
 		Boolean q = getBooleanAttribute(QUALIFIABLE, false);
 		String since = getAttribute(SINCE, false);
 		String deprecated = getAttribute(DEPRECATED, false);
+		String color = getAttribute(COLOR, false);
 		int level = parentItem == null ? 1: parentItem.getLevel() + 1;
 		createItem(id, level);
 		item.setQualifiable(q==null ? false : q);
 		item.setSinceVersionByName(since);
 		item.setDeprecatedVersionByName(deprecated);
+		item.setColor(color);
 	}
 
 	protected void createItem(int id, int level) {
