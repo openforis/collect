@@ -10,10 +10,12 @@ import org.openforis.idm.metamodel.CodeListItem;
  */
 public class CodeListItemFormObject extends VersionableItemFormObject<CodeListItem> {
 
+	private static final String DEFAULT_COLOR = "000000";
 	private String code;
 	private String label;
 	private String description;
 	private boolean qualifiable;
+	private String color;
 	
 	private String defaultLabel;
 	private String defaultDescription;
@@ -25,6 +27,8 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 		label = source.getLabel(languageCode);
 		description = source.getDescription(languageCode);
 		qualifiable = source.isQualifiable();
+		String sourceColor = source.getColor();
+		color = sourceColor == null ? DEFAULT_COLOR: sourceColor;
 		
 		defaultLabel = source.getLabel();
 		defaultDescription = source.getDescription();
@@ -37,6 +41,7 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 		dest.setLabel(languageCode, StringUtils.trimToNull(label));
 		dest.setDescription(languageCode, StringUtils.trimToNull(description));
 		dest.setQualifiable(qualifiable);
+		dest.setColor(color == null || color.equals(DEFAULT_COLOR) ? null : color);
 	}
 
 	public String getCode() {
@@ -69,6 +74,14 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 
 	public void setQualifiable(boolean qualifiable) {
 		this.qualifiable = qualifiable;
+	}
+	
+	public String getColor() {
+		return color;
+	}
+	
+	public void setColor(String color) {
+		this.color = color;
 	}
 	
 	public String getDefaultLabel() {
