@@ -1035,8 +1035,15 @@ public class SurveyManager {
 	}
 	
 	private void fillReferencedItems(CollectSurvey survey) {
-		if (institutionManager != null && survey.getInstitutionId() != null) {
-			survey.setInstitution(institutionManager.findById(survey.getInstitutionId()));
+		if (institutionManager != null) {
+			Institution institution = null;
+			if (survey.getInstitutionId() == null) {
+				//use default public institution
+				institution = institutionManager.findByName(InstitutionManager.DEFAULT_PUBLIC_INSTITUTION_NAME);
+			} else {
+				institution = institutionManager.findById(survey.getInstitutionId());
+			}
+			survey.setInstitution(institution);
 		}
 	}
 
