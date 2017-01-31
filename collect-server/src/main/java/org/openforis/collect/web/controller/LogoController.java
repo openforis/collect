@@ -15,6 +15,7 @@ import org.openforis.collect.manager.LogoManager;
 import org.openforis.collect.model.Logo;
 import org.openforis.collect.model.LogoPosition;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.upload.UploadItem;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,7 @@ public class LogoController extends BasicController {
 				}
 				//TODO get extension from db
 				String extension = "jpg";
-				writeFileToResponse(is, contentType, data.length, response, "logo." + extension);
+				Controllers.writeFileToResponse(response, is, "logo." + extension, contentType, data.length);
 			} catch (IOException e) {
 				log.error("Error writing logo in position: " + position, e);
 			}

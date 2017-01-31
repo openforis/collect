@@ -92,7 +92,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 		return;
 	}
 	var $this = this;
-	collect.geoDataService.loadSamplingPointCoordinates(collect.activeSurvey.name, 0, 1000000000,
+	collect.geoDataService.loadSamplingPointCoordinates(collect.activeSurvey.id, 0, 1000000000,
 		function(samplingPointItems) {
 			samplingPointItems.forEach(function(item) {
 				var circle = L
@@ -161,7 +161,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 					
 					var blockProcessor = new BlockProcessor(totalItems, blockSize, function(blockOffset, callback) {
 						collect.geoDataService.loadCoordinateValues(
-							collect.activeSurvey.name, step, coordinateAttribute.id, blockOffset, blockSize, function(coordinateValues) {
+							collect.activeSurvey.id, step, coordinateAttribute.id, blockOffset, blockSize, function(coordinateValues) {
 								for (i = 0; i < coordinateValues.length; i++) {
 									var value = coordinateValues[i];
 									var circle = createCoordinateAttributeCircle(coordinateAttribute, value);

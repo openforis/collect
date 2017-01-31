@@ -29,7 +29,7 @@ Collect.DataCleansing.QueryResultMapDialog.prototype.init = function() {
 Collect.DataCleansing.QueryResultMapDialog.prototype.loadLayers = function() {
 	var $this = this;
 	var survey = collect.activeSurvey;
-	var surveyName = survey.name;
+	var surveyId = survey.id;
 	var coordinateAttrDefs = new Array();
 	survey.traverse(function(nodeDef) {
 		if (nodeDef instanceof Collect.Metamodel.AttributeDefinition && nodeDef.attributeType == "COORDINATE") {
@@ -46,7 +46,7 @@ Collect.DataCleansing.QueryResultMapDialog.prototype.loadLayers = function() {
 		var blockProcessor = new BlockProcessor(totalItems, blockSize, function(blockOffset, callback) {
 			coordinateAttrDefs.forEach(function(coordAttrDef) {
 				var layerOverlay = new LayerOverlay();
-				collect.geoDataService.loadCoordinateValues(surveyName, coordAttrDef.id, blockOffset, blockSize, function(lngLats) {
+				collect.geoDataService.loadCoordinateValues(surveyId, coordAttrDef.id, blockOffset, blockSize, function(lngLats) {
 					lngLats.forEach(function(lngLatItem) {
 						var latLng = new google.maps.LatLng(lngLatItem[1], lngLatItem[0]);
 						var point = new google.maps.Circle({

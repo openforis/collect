@@ -25,7 +25,7 @@ paths:
           required: false
           type: boolean
       tags:
-        - Surveys
+        - Survey
       responses:
         200:
           description: An array of survey summary objects
@@ -49,7 +49,7 @@ paths:
           required: true
           type: integer
       tags:
-        - Surveys
+        - Survey
       responses:
         200:
           description: An array of survey summary objects
@@ -89,16 +89,16 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /survey/ceo:
+  /survey/simple:
     post:
-      summary: Create a new Collect Earth Online project (survey)
+      summary: Create a new simple project (single attribute survey)
       parameters:
         - name: parameters
           in: body
           description: survey id
           required: true
           schema:
-            $ref: '#/definitions/CEOSurveyCreationParameters'
+            $ref: '#/definitions/SimpleSurveyCreationParameters'
       tags:
         - Survey
       responses:
@@ -110,7 +110,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /survey/{id}/sampling-point-data/list.json:
+  /survey/{id}/sampling-point-data:
     get:
       summary: List of sampling point data associated to the survey with the specified id
       parameters:
@@ -133,6 +133,40 @@ paths:
           description: List of sampling point data associated to the survey with the specified id
           schema:
             $ref: '#/definitions/SamplingDesignItem'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /survey/{surveyId}/schema/{coordinateAttributeId}/data/{step}/geo/coordinatevalues.json:
+    get:
+      summary: Coordinate values associated to a coordinate attribute
+      description: List of coordinate values recorded for a survey and associated to the specified coordinate attribute
+      parameters:
+        - name: surveyId
+          in: path
+          required: true
+          type: integer
+          description: survey id
+        - name: coordinateAttributeId
+          in: path
+          required: true
+          type: integer
+          description: coordinate attribute internal id
+        - name: step
+          in: path
+          required: true
+          type: integer
+          description: data step number (1=ENTRY, 2=CLEANSING, 3=ANALYSIS)
+      tags:
+        - Coordinate
+        - Data
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CoordinateAttributePoint'
         default:
           description: Unexpected error
           schema:
@@ -208,19 +242,6 @@ definitions:
       color:
         type: string
         description: color of the item
-  ListItem:
-    type: object
-    description: please refer to org.openforis.collect.metamodel.CEOSurveyCreationParameters.ListItem Java class
-    properties:
-      code:
-        type: string
-        description: value that will be stored in the data
-      label:
-        type: string
-        description: Label shown to the data entry user
-      color:
-        type: string
-        description: color of the item
   SurveyView:
     type: object
     description: please refer to org.openforis.collect.metamodel.SurveyView Java class
@@ -238,9 +259,9 @@ definitions:
         items:
           $ref: '#/definitions/CodeListView'
         description: ""
-  CEOSurveyCreationParameters:
+  SimpleSurveyCreationParameters:
     type: object
-    description: please refer to org.openforis.collect.metamodel.CEOSurveyCreationParameters Java class
+    description: please refer to org.openforis.collect.metamodel.SimpleSurveyCreationParameters Java class
     properties:
       name:
         type: string
@@ -252,7 +273,18 @@ definitions:
         type: array
         description: single code attribute list of values
         items:
-          $ref: '#/definitions/ListItem'
+          type: object
+          description: please refer to org.openforis.collect.metamodel.SimpleSurveyCreationParameters.ListItem Java class
+          properties:
+            code:
+              type: string
+              description: value that will be stored in the data
+            label:
+              type: string
+              description: Label shown to the data entry user
+            color:
+              type: string
+              description: color of the item
       samplingPointGenerationSettings:
         type: object
         description: please refer to org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSettings Java class
@@ -276,6 +308,19 @@ definitions:
         type: number
       srsId:
         type: string
+  CoordinateAttributePoint:
+    type: object
+    properties:
+      recordId: 
+        type: integer
+      lat:
+        type: number
+      lon:
+        type: number
+      recordKeys:
+        type: array
+        items: 
+          type: string
   SamplingPointLevelGenerationSettings:
     type: object
     description: please refer to org.openforis.collect.metamodel.samplingdesign.SamplingPointLevelGenerationSettings Java class

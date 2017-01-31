@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -41,7 +42,7 @@ public class RecordFileController extends BasicController implements Serializabl
 		CollectRecord record = sessionState.getActiveRecord();
 		File file = fileManager.getFile(record, nodeId);
 		if(file != null && file.exists()) {
-			writeFileToResponse(response, file);
+			Controllers.writeFileToResponse(response, file);
 		} else {
 			Integer recordId = record == null ? null: record.getId();
 			String fileName = file == null ? null: file.getName();

@@ -11,7 +11,7 @@ import org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSet
  * @author S. Ricci
  *
  */
-public class CEOSurveyCreationParameters implements Serializable {
+public class SimpleSurveyCreationParameters implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	

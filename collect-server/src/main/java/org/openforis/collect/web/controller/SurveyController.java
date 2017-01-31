@@ -9,13 +9,13 @@ import java.util.Locale;
 
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.metamodel.CEOSurveyCreationParameters;
+import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
 import org.openforis.collect.metamodel.SurveyCreator;
 import org.openforis.collect.metamodel.SurveyView;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.web.validator.CEOSurveyParametersValidator;
+import org.openforis.collect.web.validator.SimpleSurveyParametersValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ public class SurveyController extends BasicController {
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
 
 	@Autowired
-	private CEOSurveyParametersValidator validator;
+	private SimpleSurveyParametersValidator validator;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -75,9 +75,9 @@ public class SurveyController extends BasicController {
 	}
 	
 	@Transactional
-	@RequestMapping(value="ceo", method=POST, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="simple", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	SurveyView insertSurvey(@Validated CEOSurveyCreationParameters parameters, BindingResult result) throws Exception {
+	SurveyView insertSurvey(@Validated SimpleSurveyCreationParameters parameters, BindingResult result) throws Exception {
 		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager);
 		CollectSurvey survey = surveyCreator.generateAndPublishSurvey(parameters);
 		return generateView(survey, false);

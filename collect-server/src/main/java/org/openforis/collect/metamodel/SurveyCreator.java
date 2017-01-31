@@ -8,7 +8,7 @@ import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGene
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
-import org.openforis.collect.metamodel.CEOSurveyCreationParameters.ListItem;
+import org.openforis.collect.metamodel.SimpleSurveyCreationParameters.ListItem;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
@@ -41,7 +41,7 @@ public class SurveyCreator {
 		this.samplingDesignManager = samplingDesignManager;
 	}
 
-	public CollectSurvey generateAndPublishSurvey(CEOSurveyCreationParameters parameters)
+	public CollectSurvey generateAndPublishSurvey(SimpleSurveyCreationParameters parameters)
 			throws SurveyStoreException, SurveyImportException {
 		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.getName(), parameters.getValues());
 		

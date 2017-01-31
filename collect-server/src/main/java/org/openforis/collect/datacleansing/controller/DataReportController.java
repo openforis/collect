@@ -141,7 +141,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 		String outputFileName = String.format(DATA_REPORT_CSV_FILE_NAME_FORMAT, 
 				report.getQueryGroup().getTitle(), 
 				Dates.formatDate(report.getCreationDate()));
-		Controllers.writeFileToResponse(file, "text/csv", response, outputFileName);
+		Controllers.writeFileToResponse(response, file, outputFileName, Controllers.CSV_CONTENT_TYPE);
 	}
 	
 	@RequestMapping(value="{reportId}/items.json", method=GET)
