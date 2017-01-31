@@ -7,10 +7,12 @@ Collect.GeoDataService.prototype = Object.create(Collect.AbstractService.prototy
 
 Collect.GeoDataService.prototype.loadCoordinateValues = function(surveyId, stepNum, coordinateAttributeId, recordOffset, maxNumberOfRecords, onSuccess, onError) {
 	var data = {
+		stepNum: stepNum,
+		coordinateAttributeId: coordinateAttributeId,
 		recordOffset: recordOffset, 
 		maxNumberOfRecords: maxNumberOfRecords
 	};
-	this.send("survey/" + surveyId + "/schema/" + coordinateAttributeId + "/data/" + stepNum + "/geo/coordinatevalues.json", data, "GET", onSuccess, onError);
+	this.send("survey/" + surveyId + "/data/coordinatevalues.json", data, "GET", onSuccess, onError);
 };
 
 Collect.GeoDataService.prototype.loadSamplingPointCoordinates = function(surveyId, recordOffset, maxNumberOfRecords, onSuccess, onError) {
@@ -18,5 +20,5 @@ Collect.GeoDataService.prototype.loadSamplingPointCoordinates = function(surveyI
 		recordOffset: recordOffset, 
 		maxNumberOfRecords: maxNumberOfRecords
 	};
-	this.send("survey/" + surveyId + "/sampling-point-data", data, "GET", onSuccess, onError);
+	this.send("survey/" + surveyId + "/sampling-point-data.json", data, "GET", onSuccess, onError);
 };

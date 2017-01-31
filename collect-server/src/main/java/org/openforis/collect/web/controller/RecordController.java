@@ -2,6 +2,7 @@ package org.openforis.collect.web.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -72,11 +73,13 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private MessageSource messageSource;
 	
-	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/binary_data.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	Map<String, Object> loadData(@PathVariable(value="survey_id") int surveyId,
-			@PathVariable(value="record_id") int recordId,
-			@PathVariable(value="step") int stepNumber) throws Exception {
+	Map<String, Object> loadData(
+			@PathVariable int surveyId,
+			@PathVariable int recordId,
+			@RequestParam(value="step") Integer stepNumber) throws Exception {
+		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		byte[] data = recordManager.loadBinaryData(survey, recordId, Step.valueOf(stepNumber));
 		byte[] encoded = Base64.encodeBase64(data);
@@ -88,19 +91,19 @@ public class RecordController extends BasicController implements Serializable {
  		return map;
 	}
 
-	@RequestMapping(value = "/surveys/{survey_id}/records/count.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/surveys/{surveyId}/data/records/count.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	int getCount(@PathVariable(value="survey_id") int surveyId,
+	int getCount(@PathVariable int surveyId,
 			@RequestParam(value="rootEntityDefinitionId") int rootEntityDefinitionId,
-			@RequestParam(value="step") int stepNumber) throws Exception {
+			@RequestParam(value="step", required=false) Integer stepNumber) throws Exception {
+		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		int count = recordManager.countRecords(survey, rootEntityDefinitionId, stepNumber);
 		return count;
 	}
 
-	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/edit.htm", method=GET)
-	public ModelAndView editRecord(@PathVariable(value="survey_id") int surveyId,
-			@PathVariable(value="record_id") int recordId ) throws Exception {
+	@RequestMapping(value = "/surveys/{surveyId}/data/records/{recordId}/edit.htm", method=GET)
+	public ModelAndView editRecord(@PathVariable int surveyId, @PathVariable int recordId ) throws Exception {
 		URIBuilder uriBuilder = new URIBuilder("redirect:/index.htm");
 		uriBuilder.addParameter("edit", "true");
 		uriBuilder.addParameter("surveyId", Integer.toString(surveyId));
@@ -110,21 +113,22 @@ public class RecordController extends BasicController implements Serializable {
 		return new ModelAndView(url);
 	}
 	
-	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/content.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/surveys/{surveyId}/data/records/{recordId}/content.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	RecordProxy loadRecord(
-			@PathVariable(value="survey_id") int surveyId, 
-			@PathVariable(value="record_id") int recordId,
-			@PathVariable(value="step") int stepNumber) throws RecordPersistenceException {
+			@PathVariable int surveyId, 
+			@PathVariable int recordId,
+			@RequestParam(value="step", required=false) Integer stepNumber) throws RecordPersistenceException {
+		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = recordManager.checkout(survey, sessionState.getUser(), recordId, Step.valueOf(stepNumber), sessionState.getSessionId(), true);
 		return toProxy(record);
 	}
 
-	@RequestMapping(value = "/surveys/{survey_id}/records/create-random-record.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/surveys/{surveyId}/data/records/random.json", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable(value="survey_id") int surveyId, @RequestParam int userID) throws RecordPersistenceException {
+	RecordProxy createRandomRecord(@PathVariable int surveyId, @RequestParam int userID) throws RecordPersistenceException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		Map<List<String>, Integer> recordMeasurementsByKey = calculateRecordMeasurementsByKey(survey, userID);
 		
@@ -198,6 +202,13 @@ public class RecordController extends BasicController implements Serializable {
 		SessionState sessionState = sessionManager.getSessionState();
 		ProxyContext context = new ProxyContext(sessionState.getLocale(), messageSource, surveyContext);
 		return new RecordProxy(record, context);
+	}
+
+	private Integer getStepNumberOrDefault(Integer stepNumber) {
+		if (stepNumber == null) {
+			stepNumber = Step.ENTRY.getStepNumber();
+		}
+		return stepNumber;
 	}
 
 }

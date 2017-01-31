@@ -110,7 +110,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /survey/{id}/sampling-point-data:
+  /survey/{id}/sampling-point-data.json:
     get:
       summary: List of sampling point data associated to the survey with the specified id
       parameters:
@@ -137,7 +137,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /survey/{surveyId}/schema/{coordinateAttributeId}/data/{step}/geo/coordinatevalues.json:
+  /survey/{surveyId}/data/coordinatevalues.json:
     get:
       summary: Coordinate values associated to a coordinate attribute
       description: List of coordinate values recorded for a survey and associated to the specified coordinate attribute
@@ -148,12 +148,12 @@ paths:
           type: integer
           description: survey id
         - name: coordinateAttributeId
-          in: path
+          in: query
           required: true
           type: integer
           description: coordinate attribute internal id
-        - name: step
-          in: path
+        - name: stepNum
+          in: query
           required: true
           type: integer
           description: data step number (1=ENTRY, 2=CLEANSING, 3=ANALYSIS)
@@ -167,6 +167,66 @@ paths:
             type: array
             items:
               $ref: '#/definitions/CoordinateAttributePoint'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /surveys/{surveyId}/data/records/count.json:
+    get:
+      summary: Survey records count
+      parameters:
+        - name: surveyId
+          in: path
+          required: true
+          type: integer
+          description: survey id
+        - name: rootEntityDefinitionId
+          in: query
+          type: integer
+          required: true
+          description: internal ID of the root entity definition
+        - name: step
+          in: query
+          type: integer
+          required: false
+          description: data step number
+      tags:
+        - Data
+      responses:
+        200:
+          description: OK
+          schema:
+            type: integer
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /surveys/{surveyId}/data/records/{recordId}/content.json:
+    get:
+      summary: Record content
+      parameters:
+        - name: surveyId
+          in: path
+          required: true
+          type: integer
+          description: survey id
+        - name: recordId
+          in: path
+          type: integer
+          required: true
+          description: internal ID of the record
+        - name: step
+          in: query
+          type: integer
+          required: false
+          description: data step number
+      tags:
+        - Data
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Record'
         default:
           description: Unexpected error
           schema:
@@ -340,6 +400,21 @@ definitions:
       pointWidth:
         type: string
         description: Width of every generated point
+  Record:
+    type: object
+    description: please refer to org.openforis.collect.model.proxy.RecordProxy Java class
+    properties:
+      id:
+        type: integer
+      rootEntity:
+        $ref: '#definitions/Entity'
+  Entity:
+    type: object
+    summary: record entity
+    description: please refer to org.openforis.collect.model.proxy.EntityProxy Java class
+    properties:
+      id:
+        type: integer
   Error:
     type: object
     properties:

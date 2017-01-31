@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -41,16 +42,17 @@ public class GeoDataController {
 	@Autowired
 	private RecordManager recordManager;
 	
-	@RequestMapping(value = "survey/{surveyId}/schema/{coordinateAttributeId}/data/{step}/geo/coordinatevalues.json", method=GET)
+	@RequestMapping(value = "survey/{surveyId}/data/coordinatevalues.json", method=GET)
 	public @ResponseBody List<CoordinateAttributePoint> loadCoordinateValues(
-			@PathVariable("surveyId") int surveyId, 
-			@PathVariable("step") int stepNumber,
-			@PathVariable("coordinateAttributeId") int coordinateAttributeId, 
-			int recordOffset, int maxNumberOfRecords) {
+			@PathVariable int surveyId, 
+			@RequestParam int stepNum,
+			@RequestParam int coordinateAttributeId, 
+			@RequestParam int recordOffset, 
+			@RequestParam int maxNumberOfRecords) {
 		final List<CoordinateAttributePoint> result = new ArrayList<CoordinateAttributePoint>();
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		
-		extractAllRecordCoordinates(survey, Step.valueOf(stepNumber), recordOffset, maxNumberOfRecords, coordinateAttributeId, new CoordinateProcessor() {
+		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), recordOffset, maxNumberOfRecords, coordinateAttributeId, new CoordinateProcessor() {
 			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				CoordinateAttributePoint point = new CoordinateAttributePoint(coordAttr, wgs84Coordinate);
 				result.add(point);
@@ -59,11 +61,11 @@ public class GeoDataController {
 		return result;
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/schema/{coordinateAttributeId}/data/coordinates.kml", method=GET, produces=KML_CONTENT_TYPE)
+	@RequestMapping(value = "survey/{surveyId}/data/coordinatesvalues.kml", method=GET, produces=KML_CONTENT_TYPE)
 	public void createCoordinateValuesKML(
 			@PathVariable("surveyId") int surveyId, 
-			@PathVariable("coordinateAttributeId") int coordinateAttributeId, 
-			@PathVariable("step") int stepNumber,
+			@RequestParam int stepNum,
+			@RequestParam int coordinateAttributeId,
 			HttpServletResponse response) throws IOException {
 		Kml kml = new Kml();
 		
@@ -71,7 +73,7 @@ public class GeoDataController {
 		
 		final Document kmlDoc = kml.createAndSetDocument().withName(survey.getName());
 		
-		extractAllRecordCoordinates(survey, Step.valueOf(stepNumber), null, null, coordinateAttributeId, new CoordinateProcessor() {
+		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), null, null, coordinateAttributeId, new CoordinateProcessor() {
 			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				kmlDoc.createAndAddPlacemark()
 					.withName(record.getRootEntityKeyValues().toString())

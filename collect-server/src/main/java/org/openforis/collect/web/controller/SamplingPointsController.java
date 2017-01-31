@@ -47,14 +47,15 @@ public class SamplingPointsController extends BasicController {
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value="survey/{surveyId}/sampling-point-data/", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="survey/{surveyId}/sampling-point-data.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	List<SamplingDesignItem> loadSamplingPoints(@PathVariable int surveyId, 
+	List<SamplingDesignItem> loadSamplingPoints(
+			@PathVariable int surveyId, 
 			@RequestParam(value="parent_keys", required=false) String[] parentKeys) {
 		return samplingDesignManager.loadChildItems(surveyId, parentKeys);
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/sampling-point-data/export.csv", method=GET)
+	@RequestMapping(value = "survey/{surveyId}/sampling-point-data.csv", method=GET)
 	public @ResponseBody String exportWorkSamplingDesign(HttpServletResponse response,
 			@PathVariable("surveyId") Integer surveyId) throws IOException {
 		SamplingDesignExportProcess process = new SamplingDesignExportProcess(samplingDesignManager);
@@ -65,7 +66,23 @@ public class SamplingPointsController extends BasicController {
 		return "ok";
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}//sampling-point-data/samplingpoints.json", method=GET)
+	@RequestMapping(value = "survey/{surveyId}/sampling-point-data.kml", method=GET, produces=KML_CONTENT_TYPE)
+	public void loadSamplingPointKmlData(@PathVariable int surveyId, HttpServletResponse response) throws Exception {
+		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		Kml kml = KmlFactory.createKml();
+		Document doc = kml.createAndSetDocument();
+		CoordinateOperations coordinateOperations = getCoordinateOperations(survey);
+		List<SamplingDesignItem> samplingDesignItems = loadSamplingDesignItems(survey);
+		for (SamplingDesignItem item : samplingDesignItems) {
+			Coordinate coordinate = new Coordinate(item.getX(), item.getY(), item.getSrsId());
+			LngLatAlt lngLatAlt = createLngLatAlt(coordinateOperations, coordinate);
+			doc.createAndAddPlacemark().withName(item.getLevelCode(1)).withOpen(true).createAndSetPoint()
+					.addToCoordinates(lngLatAlt.getLongitude(), lngLatAlt.getLatitude());
+		}
+		kml.marshal(response.getOutputStream());
+	}
+
+	@RequestMapping(value = "survey/{surveyId}/sampling-point-data-features.json", method=GET)
 	public @ResponseBody FeatureCollection loadSamplingPointData(@PathVariable int surveyId) {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		return loadSamplingPointDataFeatures(survey);
@@ -88,22 +105,6 @@ public class SamplingPointsController extends BasicController {
 		feature.setGeometry(multiPoint);
 		featureCollection.add(feature);
 		return featureCollection;
-	}
-
-	@RequestMapping(value = "survey/{surveyId}/data/geo/samplingpoints.kml", method=GET, produces=KML_CONTENT_TYPE)
-	public void loadSamplingPointKmlData(@PathVariable int surveyId, HttpServletResponse response) throws Exception {
-		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-		Kml kml = KmlFactory.createKml();
-		Document doc = kml.createAndSetDocument();
-		CoordinateOperations coordinateOperations = getCoordinateOperations(survey);
-		List<SamplingDesignItem> samplingDesignItems = loadSamplingDesignItems(survey);
-		for (SamplingDesignItem item : samplingDesignItems) {
-			Coordinate coordinate = new Coordinate(item.getX(), item.getY(), item.getSrsId());
-			LngLatAlt lngLatAlt = createLngLatAlt(coordinateOperations, coordinate);
-			doc.createAndAddPlacemark().withName(item.getLevelCode(1)).withOpen(true).createAndSetPoint()
-					.addToCoordinates(lngLatAlt.getLongitude(), lngLatAlt.getLatitude());
-		}
-		kml.marshal(response.getOutputStream());
 	}
 
 	private List<SamplingDesignItem> loadSamplingDesignItems(CollectSurvey survey) {
