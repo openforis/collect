@@ -212,6 +212,7 @@ public class CollectSurvey extends Survey {
 	
 	public void setInstitution(Institution institution) {
 		this.institution = institution;
+		this.institutionId = institution == null ? null : institution.getId();
 	}
 	
 	public UIConfiguration getUIConfiguration() {
