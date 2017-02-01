@@ -163,4 +163,9 @@
 <!-- 		<constructor-arg ref="eventQueue" /> -->
 <!-- 	</bean> -->
 	
+	<!--  Commands -->
+	<bean id="commandQueue" 			class="org.openforis.collect.command.CommandQueue" />
+	<bean id="commandProcessor"			class="org.openforis.collect.command.CommandProcessor" />
+	
+	
 </beans>
