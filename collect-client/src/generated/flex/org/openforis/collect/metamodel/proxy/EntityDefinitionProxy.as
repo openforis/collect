@@ -119,6 +119,16 @@ package org.openforis.collect.metamodel.proxy {
 			return result;
 		}
 		
+		public function getNestedDefinitionsInVersion(version:ModelVersionProxy):IList {
+			var result:ArrayCollection = new ArrayCollection();
+			traverseBFSSingleEntities(function(defn:NodeDefinitionProxy):void {
+				if(version == null || version.isApplicable(defn)){
+					result.addItem(defn);
+				}
+			});
+			return result;
+		}
+		
 		public function get countableDefinitions():IList {
 			var result:ArrayCollection = new ArrayCollection();
 			traverseBFS(function(defn:NodeDefinitionProxy):void {
