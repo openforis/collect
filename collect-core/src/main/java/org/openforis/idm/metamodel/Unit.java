@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * @author G. Miceli
  * @author M. Togna
  */
-public class Unit extends IdentifiableSurveyObject {
+public class Unit extends IdentifiableSurveyObject<Unit> {
 
 	private static final long serialVersionUID = 1L;
 
