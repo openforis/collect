@@ -28,18 +28,9 @@
 			public var downloadExampleButton:Button;
 			[SkinPart(required="true", type="spark.components.TextInput")]
 			public var sourceFileTextInput:TextInput;
-			[SkinPart(required="true", type="spark.components.DropDownList")]
-			public var charsetDropDownList:DropDownList;
-			[SkinPart(required="true", type="spark.components.DropDownList")]
-			public var separatorDropDownList:DropDownList;
-			[SkinPart(required="true", type="spark.components.DropDownList")]
-			public var textDelimiterDropDownList:DropDownList;
 			
 			private var _presenter:CodeListImportPresenter;
 			private var _codeListId:int;
-			private var _charsets:IList;
-			private var _separators:IList;
-			private var _textDelimiters:IList;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new CodeListImportPresenter(this);
@@ -52,33 +43,6 @@
 
 			public function set codeListId(value:int):void {
 				_codeListId = value;
-			}
-			
-			[Bindable]
-			public function get charsets():IList {
-				return _charsets;
-			}
-			
-			public function set charsets(charsets:IList):void {
-				_charsets = charsets;
-			}
-
-			[Bindable]
-			public function get separators():IList {
-				return _separators;
-			}
-			
-			public function set separators(separators:IList):void {
-				_separators = separators;
-			}
-			
-			[Bindable]
-			public function get textDelimiters():IList {
-				return _textDelimiters;
-			}
-			
-			public function set textDelimiters(textDelimiters:IList):void {
-				_textDelimiters = textDelimiters;
 			}
 			
 			override protected function getErrorMessageKey(item:ParsingErrorProxy):String {

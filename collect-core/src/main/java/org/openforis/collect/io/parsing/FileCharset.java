@@ -9,7 +9,8 @@ import org.openforis.commons.io.OpenForisIOUtils;
  */
 public enum FileCharset {
 	
-	UTF_8(OpenForisIOUtils.UTF_8), 
+	UTF_8(OpenForisIOUtils.UTF_8),
+	UTF_16("UTF-16"), 
 	WESTERN_EUROPEAN("ISO-8859-1");
 	
 	private String code;

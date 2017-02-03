@@ -14,6 +14,7 @@ package org.openforis.collect.io.parsing {
     public class FileCharset extends Enum {
 
         public static const UTF_8:FileCharset = new FileCharset("UTF_8", _);
+        public static const UTF_16:FileCharset = new FileCharset("UTF_16", _);
         public static const WESTERN_EUROPEAN:FileCharset = new FileCharset("WESTERN_EUROPEAN", _);
 
         function FileCharset(value:String = null, restrictor:* = null) {
@@ -25,7 +26,7 @@ package org.openforis.collect.io.parsing {
         }
 
         public static function get constants():Array {
-            return [UTF_8, WESTERN_EUROPEAN];
+            return [UTF_8, UTF_16, WESTERN_EUROPEAN];
         }
 
         public static function valueOf(name:String):FileCharset {

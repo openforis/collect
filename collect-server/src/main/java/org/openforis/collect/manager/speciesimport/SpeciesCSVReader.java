@@ -32,6 +32,7 @@ import org.openforis.collect.io.metadata.parsing.CSVLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
@@ -44,8 +45,8 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 
 	private static final String HYBRID_MARKER = "×";
 	
-	public SpeciesCSVReader(File file) throws IOException, ParsingException {
-		super(file);
+	public SpeciesCSVReader(File file, CSVFileOptions csvFileOptions) throws IOException, ParsingException {
+		super(file, csvFileOptions);
 	}
 
 	@Override

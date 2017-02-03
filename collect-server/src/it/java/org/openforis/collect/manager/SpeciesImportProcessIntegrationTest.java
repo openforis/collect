@@ -24,6 +24,7 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.speciesimport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesimport.SpeciesImportStatus;
@@ -78,7 +79,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		taxonomy.setSurveyId(survey.getId());
 		taxonomy.setName(TEST_TAXONOMY_NAME);
 		speciesManager.save(taxonomy);
-		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomy.getId(), file, true);
+		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomy.getId(), file, new CSVFileOptions(), true);
 		process.call();
 		return process;
 	}

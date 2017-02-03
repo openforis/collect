@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
-		xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*" xmlns:container="org.openforis.collect.ui.container.*">
+		xmlns:mx="library://ns.adobe.com/flex/mx" 
+		xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*" 
+		xmlns:container="org.openforis.collect.ui.container.*">
 	<!-- host component -->
 	<fx:Metadata>
 		[HostComponent("org.openforis.collect.ui.view.CodeListImportView")]
