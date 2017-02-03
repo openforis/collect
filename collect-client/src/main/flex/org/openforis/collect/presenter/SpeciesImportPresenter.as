@@ -18,6 +18,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Languages;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.io.parsing.CSVFileOptions;
+	import org.openforis.collect.io.parsing.CSVFileSeparator;
+	import org.openforis.collect.io.parsing.CSVFileTextDelimiter;
+	import org.openforis.collect.io.parsing.FileCharset;
 	import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonSummaryProxy;
 	import org.openforis.collect.model.proxy.TaxonomyProxy;
@@ -337,7 +341,14 @@ package org.openforis.collect.presenter {
 			var taxonomyId:int = _selectedTaxonomy.id;
 			var surveyId:int = view.surveyId;
 			var work:Boolean = view.work;
-			_speciesImportClient.start(responder, _uploadedTempFileName, taxonomyId, true);
+			var csvFileOptions:CSVFileOptions = null;
+			if (view.charsetDropDownList != null) {
+				csvFileOptions = new CSVFileOptions();
+				csvFileOptions.charset = FileCharset.valueOf(view.charsetDropDownList.selectedItem.name);
+				csvFileOptions.separator = CSVFileSeparator.valueOf(view.separatorDropDownList.selectedItem.name);
+				csvFileOptions.textDelimiter = CSVFileTextDelimiter.valueOf(view.textDelimiterDropDownList.selectedItem.name);
+			}
+			_speciesImportClient.start(responder, _uploadedTempFileName, csvFileOptions, taxonomyId, true);
 		}
 		
 		override protected function updateStatus():void {

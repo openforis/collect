@@ -13,12 +13,21 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
+	import mx.collections.ArrayList;
+	import mx.collections.IList;
+	
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.granite.util.Enum;
+	
 	import org.openforis.collect.event.PaginationBarEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.io.parsing.CSVFileOptions;
+	import org.openforis.collect.io.parsing.CSVFileSeparator;
+	import org.openforis.collect.io.parsing.CSVFileTextDelimiter;
+	import org.openforis.collect.io.parsing.FileCharset;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.manager.process.proxy.ProcessStatusProxy;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
@@ -80,6 +89,20 @@ package org.openforis.collect.presenter {
 				view.paginationBar.maxRecordsPerPage = MAX_SUMMARIES_PER_PAGE;
 			}
 			loadInitialData();
+			
+			view.charsets = enumToList(FileCharset, "referenceDataImport.charset.");
+			view.separators = enumToList(CSVFileSeparator, "referenceDataImport.separator.");
+			view.textDelimiters = enumToList(CSVFileTextDelimiter, "referenceDataImport.text_delimiter.");
+		}
+		
+		private function enumToList(enum:Class, labelKeyPrefix:String):IList {
+			var items:IList = new ArrayList();
+			var values:Array = enum["constants"];
+			for each (var value:Enum in values) {
+				var item:Object = {name: value.name, label: Message.get(labelKeyPrefix + value.name.toLowerCase())};
+				items.addItem(item);
+			}
+			return items;
 		}
 		
 		private function get view():AbstractReferenceDataImportView {

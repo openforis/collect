@@ -22,6 +22,7 @@ import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.TaxonTree;
@@ -54,17 +55,19 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private SpeciesManager speciesManager;
 	private int taxonomyId;
 	private File file;
+	private CSVFileOptions csvFileOptions;
 	private boolean overwriteAll;
 	
 	private TaxonTree taxonTree;
 	private SpeciesCSVReader reader;
 	private List<SpeciesLine> lines;
 	
-	public SpeciesImportProcess(SpeciesManager speciesManager, int taxonomyId, File file, boolean overwriteAll) {
+	public SpeciesImportProcess(SpeciesManager speciesManager, int taxonomyId, File file, CSVFileOptions csvFileOptions, boolean overwriteAll) {
 		super();
 		this.speciesManager = speciesManager;
 		this.taxonomyId = taxonomyId;
 		this.file = file;
+		this.csvFileOptions = csvFileOptions;
 		this.overwriteAll = overwriteAll;
 	}
 	
@@ -132,7 +135,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	protected void parseTaxonCSVLines(File file) {
 		long currentRowNumber = 0;
 		try {
-			reader = new SpeciesCSVReader(file);
+			reader = new SpeciesCSVReader(file, csvFileOptions);
 			reader.init();
 			status.addProcessedRow(1);
 			currentRowNumber = 2;

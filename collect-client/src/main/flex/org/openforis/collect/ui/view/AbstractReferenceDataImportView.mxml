@@ -5,6 +5,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.IList;
 			import mx.controls.ProgressBar;
 			
 			import org.openforis.collect.i18n.Message;
@@ -15,6 +16,7 @@
 			
 			import spark.components.Button;
 			import spark.components.DataGrid;
+			import spark.components.DropDownList;
 			import spark.components.gridClasses.GridColumn;
 			
 			public static const STATE_DEFAULT:String = "default";
@@ -25,6 +27,9 @@
 			
 			private var _progressLabelText:String;
 			private var _progressTitleText:String;
+			private var _charsets:IList;
+			private var _separators:IList;
+			private var _textDelimiters:IList;
 			
 			[SkinPart(required="false",type="org.openforis.collect.ui.component.datagrid.PaginationBar")]
 			public var paginationBar:PaginationBar;
@@ -46,6 +51,12 @@
 			public var errorsOkButton:Button;
 			[SkinPart(required="false", type="spark.components.Button")]
 			public var exportErrorsButton:Button;
+			[SkinPart(required="false", type="spark.components.DropDownList")]
+			public var charsetDropDownList:DropDownList;
+			[SkinPart(required="false", type="spark.components.DropDownList")]
+			public var separatorDropDownList:DropDownList;
+			[SkinPart(required="false", type="spark.components.DropDownList")]
+			public var textDelimiterDropDownList:DropDownList;
 
 			private var _surveyId:int;
 			private var _work:Boolean;
@@ -151,6 +162,32 @@
 				_importFileFormatInfo = value;
 			}
 			
+			[Bindable]
+			public function get charsets():IList {
+				return _charsets;
+			}
+			
+			public function set charsets(charsets:IList):void {
+				_charsets = charsets;
+			}
+
+			[Bindable]
+			public function get separators():IList {
+				return _separators;
+			}
+			
+			public function set separators(separators:IList):void {
+				_separators = separators;
+			}
+			
+			[Bindable]
+			public function get textDelimiters():IList {
+				return _textDelimiters;
+			}
+			
+			public function set textDelimiters(textDelimiters:IList):void {
+				_textDelimiters = textDelimiters;
+			}
 		]]>
 	</fx:Script>
 	

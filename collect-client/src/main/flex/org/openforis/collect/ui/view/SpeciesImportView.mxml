@@ -20,6 +20,7 @@
 			
 			import spark.components.Button;
 			import spark.components.DropDownList;
+			import spark.components.TextInput;
 			import spark.components.gridClasses.GridColumn;
 			
 			[SkinPart(required="true", type="spark.components.DropDownList")]
