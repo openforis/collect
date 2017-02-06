@@ -22,9 +22,11 @@ import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Value;
+import org.openforis.rmb.KeepAlive;
+import org.openforis.rmb.KeepAliveMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class CommandProcessor {
+public class CommandProcessor implements KeepAliveMessageHandler<Command> {
 
 	@Autowired
 	private EventQueue eventQueue;
@@ -34,10 +36,15 @@ public class CommandProcessor {
 	private SurveyManager surveyManager;
 	@Autowired
 	private RecordManager recordManager;
-	@Autowired
+	
 	private RecordUpdater recordUpdater;
 	
-	public void process(Command command) {
+	public CommandProcessor() {
+		recordUpdater = new RecordUpdater();
+	}
+	
+	@Override
+	public void handle(Command command, KeepAlive keepAlive) {
 		if (command instanceof CreateRecordCommand) {
 			process((CreateRecordCommand) command);
 		} else if (command instanceof UpdateAttributeCommand) {
@@ -84,6 +91,5 @@ public class CommandProcessor {
 			throw new IllegalArgumentException("Unsupported update attribute command type: " + command);
 		}
 	}
-		
-	
+
 }

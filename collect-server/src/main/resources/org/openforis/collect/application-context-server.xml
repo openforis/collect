@@ -164,8 +164,30 @@
 <!-- 	</bean> -->
 	
 	<!--  Commands -->
-	<bean id="commandQueue" 			class="org.openforis.collect.command.CommandQueue" />
-	<bean id="commandProcessor"			class="org.openforis.collect.command.CommandProcessor" />
 	
+	<bean id="commandProcessor" class="org.openforis.collect.command.CommandProcessor">
+		
+	</bean>
+	
+	<bean id="commandQueue" class="org.openforis.collect.command.CommandBrokerCommandQueue"
+			lazy-init="false">
+		<constructor-arg>
+			 <bean class="org.openforis.rmb.spring.SpringMessageQueue">
+		        <constructor-arg ref="messageBroker"/>
+		        <constructor-arg value="collect_commands"/>
+		        <constructor-arg>
+		            <list>
+		                <bean class="org.openforis.rmb.spring.SpringMessageConsumer">
+		                    <constructor-arg value="collect_command_consumer"/>
+		                    <constructor-arg ref="commandProcessor" />
+		                    <property name="messagesHandledInParallel" value="1"/>
+		                </bean>
+		            </list>
+		        </constructor-arg>
+		    </bean>
+		</constructor-arg>
+		<!-- Event Queue DISABLED by default -->
+		<property name="enabled" value="false" />
+	</bean>
 	
 </beans>

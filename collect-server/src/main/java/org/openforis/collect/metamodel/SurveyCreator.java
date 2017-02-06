@@ -43,7 +43,13 @@ public class SurveyCreator {
 
 	public CollectSurvey generateAndPublishSurvey(SimpleSurveyCreationParameters parameters)
 			throws SurveyStoreException, SurveyImportException {
-		CollectSurvey survey = createTemporarySingleAttributeSurvey(parameters.getName(), parameters.getValues());
+		String name = parameters.getName();
+		CollectSurvey existingSurvey = surveyManager.get(name);
+		if (existingSurvey != null) {
+			//TODO move it to validator
+			throw new IllegalArgumentException(String.format("Survey with name %s already existing", name));
+		}
+		CollectSurvey survey = createTemporarySingleAttributeSurvey(name, parameters.getValues());
 		
 		CeoApplicationOptions ceoApplicationOptions = new CeoApplicationOptions();
 		ceoApplicationOptions.setSamplingPointDataConfiguration(parameters.getSamplingPointGenerationSettings());
