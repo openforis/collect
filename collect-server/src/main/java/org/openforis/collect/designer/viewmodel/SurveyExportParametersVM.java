@@ -12,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLConnection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -214,7 +213,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	private void downloadFile(File file, String extension, String contentType, CollectSurvey survey, String defaultLanguageCode) {
 		String surveyName = survey.getName();
-		String dateStr = Dates.formatLocalDateTime(new Date());
+		String dateStr = Dates.formatLocalDateTime(survey.getModifiedDate());
 		String fileName;
 		if (org.openforis.collect.io.SurveyBackupJob.OutputFormat.MOBILE.getOutputFileExtension().equals(extension)) {
 			fileName = String.format(SURVEY_EXPORT_MOBILE_FILE_NAME_PATTERN, surveyName, defaultLanguageCode, dateStr, extension);
