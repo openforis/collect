@@ -32,6 +32,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -282,7 +283,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 						throw new RuntimeException(e);
 					}
 				}
-			}, Labels.getLabel("survey.save.confirm_save_with_errors"));
+			}, Labels.getLabel("survey.save.confirm_save_with_errors"), false);
 		}
 	}
 	
@@ -343,12 +344,16 @@ public class SurveyEditVM extends SurveyBaseVM {
 			public void onSuccess() {
 				MessageUtil.showInfo("survey.successfully_validated");
 			}
-		}, null);
+		}, null, true);
 	}
 	
-	private void checkValidity(boolean showConfirm, final SuccessHandler successHandler, String confirmButtonLabel) {
+	private void checkValidity(boolean showConfirm, final SuccessHandler successHandler, 
+			String confirmButtonLabel, boolean showWarnings) {
 		SurveyValidator surveyValidator = getSurveyValidator(survey);
-		SurveyValidationResults results = surveyValidator.validate(survey);
+		ValidationParameters validationParameters = new ValidationParameters();
+		validationParameters.setWarnOnEmptyCodeLists(showWarnings);
+		validationParameters.setWarnOnUnusedCodeLists(showWarnings);
+		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
 		if ( results.hasErrors() || results.hasWarnings() ) {
 			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm, 
 					confirmButtonLabel);
@@ -532,7 +537,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			public void onSuccess() {
 				openPreviewPopUp();
 			}
-		}, Labels.getLabel("survey.preview.show_preview"));
+		}, Labels.getLabel("survey.preview.show_preview"), false);
 	}
 
 	protected void openPreviewPreferencesPopUp() {

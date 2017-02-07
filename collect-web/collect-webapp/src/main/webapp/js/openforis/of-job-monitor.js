@@ -47,7 +47,12 @@ OF.JobMonitor.prototype.loadJob = function(onSuccess) {
 		if (job != null) {
 			$this.job = job;
 			onSuccess();
-		} else if ($this.job != null) {
+		} else if ($this.job == null) {
+			//job completed immediately
+			if ($this.onComplete) {
+				$this.onComplete();
+			}
+		} else {
 			//monitoring a survey or application locking job that is completed, retrieve it using job ID
 			$this.service.send("job.json", {jobId: $this.job.id}, "GET", function(job) {
 				$this.job = job;
