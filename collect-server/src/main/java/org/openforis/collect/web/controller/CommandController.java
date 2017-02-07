@@ -2,14 +2,18 @@ package org.openforis.collect.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.command.Command;
-import org.openforis.collect.command.CommandBrokerCommandQueue;
+import org.openforis.collect.command.CommandDispatcher;
+import org.openforis.collect.command.CreateRecordCommand;
+import org.openforis.collect.command.UpdateAttributeCommand;
 import org.openforis.collect.command.UpdateBooleanAttributeCommand;
 import org.openforis.collect.command.UpdateCodeAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
+import org.openforis.collect.event.RecordEvent;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,14 +28,52 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class CommandController {
 
 	@Autowired
-	private CommandBrokerCommandQueue commandQueue;
-	
+	private CommandDispatcher commandDispatcher;
+//	@Autowired
+//	private MessageSource messageSource;
+//	@Autowired
+//	private SurveyContext surveyContext;
+
+	@RequestMapping(value="record", method=POST, consumes=MediaType.APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody List<RecordEventView> createRecord(@RequestBody CreateRecordCommand command) {
+		List<RecordEvent> events = commandDispatcher.submit(command);
+		return toView(events);
+	}
+
 	@RequestMapping(value="attribute", method=POST, consumes=MediaType.APPLICATION_JSON_VALUE)
 	@Transactional
-	public @ResponseBody Boolean send(@RequestBody UpdateAttributeCommandWrapper commandWrapper) {
-		Command command = commandWrapper.toCommand();
-		commandQueue.publish(command);
-		return true;
+	public @ResponseBody List<RecordEvent> updateAttribute(@RequestBody UpdateAttributeCommandWrapper commandWrapper) {
+		UpdateAttributeCommand command = commandWrapper.toCommand();
+		List<RecordEvent> result = commandDispatcher.submit(command);
+		return result;
+	}
+	
+	private List<RecordEventView> toView(List<RecordEvent> events) {
+		List<RecordEventView> result = new ArrayList<RecordEventView>(events.size());
+		for (RecordEvent recordEvent : events) {
+			result.add(new RecordEventView(recordEvent));
+		}
+		return result;
+	}
+		
+	static class RecordEventView {
+		
+		private RecordEvent event;
+		
+		public RecordEventView(RecordEvent event) {
+			super();
+			this.event = event;
+		}
+
+		public String getEventType() {
+			return event.getClass().getSimpleName();
+		}
+		
+		public RecordEvent getEvent() {
+			return event;
+		}
+		
 	}
 	
 	static class UpdateAttributeCommandWrapper {
@@ -48,8 +90,8 @@ public class CommandController {
 		private int attributeDefId;
 		private Map<String, Object> value;
 		
-		public Command toCommand() {
-			Command c;
+		public UpdateAttributeCommand toCommand() {
+			UpdateAttributeCommand c;
 			switch(type) {
 			case BOOLEAN:
 				c = new UpdateBooleanAttributeCommand();

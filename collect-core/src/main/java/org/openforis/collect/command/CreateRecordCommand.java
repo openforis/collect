@@ -1,15 +1,25 @@
 package org.openforis.collect.command;
 
-public class CreateRecordCommand implements Command {
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openforis.collect.event.RecordEvent;
+
+public class CreateRecordCommand implements Command<List<RecordEvent>> {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private int surveyId;
 	private String username;
 	private String formVersion;
+	private List<String> keyValues = new ArrayList<String>();
+	
+	public CreateRecordCommand() {
+		super();
+	}
 	
 	public CreateRecordCommand(int surveyId, String username) {
-		super();
+		this();
 		this.surveyId = surveyId;
 		this.username = username;
 	}
@@ -36,6 +46,14 @@ public class CreateRecordCommand implements Command {
 	
 	public void setFormVersion(String formVersion) {
 		this.formVersion = formVersion;
+	}
+	
+	public List<String> getKeyValues() {
+		return keyValues;
+	}
+
+	public void setKeyValues(List<String> keyValues) {
+		this.keyValues = keyValues;
 	}
 	
 }

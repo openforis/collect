@@ -1,6 +1,10 @@
 package org.openforis.collect.command;
 
-public abstract class UpdateAttributeCommand implements Command {
+import java.util.List;
+
+import org.openforis.collect.event.RecordEvent;
+
+public abstract class UpdateAttributeCommand implements Command<List<RecordEvent>> {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -13,7 +17,6 @@ public abstract class UpdateAttributeCommand implements Command {
 	public UpdateAttributeCommand() {
 	}
 	
-	@Override
 	public String getUsername() {
 		return username;
 	}
