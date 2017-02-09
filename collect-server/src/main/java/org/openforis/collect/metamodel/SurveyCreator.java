@@ -34,6 +34,8 @@ public class SurveyCreator {
 	private String singleAttributeSurveyIdAttributeName = "plot_id";
 	private String singleAttributeSurveyAttributeName = "value";
 	private String singleAttributeSurveyTabLabel = "Plot";
+	private String singleAttributeSurveySecondLevelEntityName = "subplot";
+	private String singleAttributeSurveySecondLevelIdAttributeName = "subplot_id";
 	
 	public SurveyCreator(SurveyManager surveyManager, SamplingDesignManager samplingDesignManager) {
 		super();
@@ -82,7 +84,7 @@ public class SurveyCreator {
 		
 		Schema schema = survey.getSchema();
 
-		EntityDefinition rootEntityDef = survey.getSchema().createEntityDefinition();
+		EntityDefinition rootEntityDef = schema.createEntityDefinition();
 		rootEntityDef.setName(singleAttributeSurveyRootEntityName);
 		schema.addRootEntityDefinition(rootEntityDef);
 		
@@ -93,11 +95,24 @@ public class SurveyCreator {
 		
 		rootEntityDef.addChildDefinition(idAttrDef);
 		
+		EntityDefinition secondLevelEntityDef = schema.createEntityDefinition();
+		secondLevelEntityDef.setName(singleAttributeSurveySecondLevelEntityName);
+		
+		rootEntityDef.addChildDefinition(secondLevelEntityDef);
+		
+		CodeAttributeDefinition secondLevelIdAttrDef = schema.createCodeAttributeDefinition();
+		secondLevelIdAttrDef.setName(singleAttributeSurveySecondLevelIdAttributeName);
+		secondLevelIdAttrDef.setKey(true);
+		secondLevelIdAttrDef.setList(survey.getSamplingDesignCodeList());
+		secondLevelIdAttrDef.setParentCodeAttributeDefinition(idAttrDef);
+		
+		secondLevelEntityDef.addChildDefinition(secondLevelIdAttrDef);
+		
 		CodeAttributeDefinition valueAttrDef = schema.createCodeAttributeDefinition();
 		valueAttrDef.setName(singleAttributeSurveyAttributeName);
 		valueAttrDef.setList(codeList);
 		
-		rootEntityDef.addChildDefinition(valueAttrDef);
+		secondLevelEntityDef.addChildDefinition(valueAttrDef);
 		
 		//create root tab set
 		UIOptions uiOptions = survey.getUIOptions();

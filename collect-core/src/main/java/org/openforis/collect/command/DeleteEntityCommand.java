@@ -1,8 +1,7 @@
 package org.openforis.collect.command;
 
-public abstract class UpdateAttributeCommand extends NodeCommand {
+public class DeleteEntityCommand extends DeleteNodeCommand {
 
 	private static final long serialVersionUID = 1L;
-	
 	
 }

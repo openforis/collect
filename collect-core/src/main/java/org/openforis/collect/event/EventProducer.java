@@ -206,7 +206,9 @@ public class EventProducer {
 			List<RecordEvent> result = new ArrayList<RecordEvent>();
 			result.add(new AttributeCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						ancestorIds, String.valueOf(nodeId), timestamp, userName));
-			result.addAll(attributeUpdated());
+			if (node.hasData()) {
+				result.addAll(attributeUpdated());
+			}
 			return result;
 		}
 		

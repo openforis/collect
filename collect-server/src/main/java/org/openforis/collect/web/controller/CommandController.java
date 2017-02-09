@@ -1,22 +1,32 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.command.AddAttributeCommand;
+import org.openforis.collect.command.AddEntityCommand;
 import org.openforis.collect.command.CommandDispatcher;
 import org.openforis.collect.command.CreateRecordCommand;
+import org.openforis.collect.command.DeleteNodeCommand;
+import org.openforis.collect.command.DeleteEntityCommand;
+import org.openforis.collect.command.DeleteRecordCommand;
+import org.openforis.collect.command.NodeCommand;
 import org.openforis.collect.command.UpdateAttributeCommand;
 import org.openforis.collect.command.UpdateBooleanAttributeCommand;
 import org.openforis.collect.command.UpdateCodeAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
+import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.event.RecordEvent;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,19 +44,54 @@ public class CommandController {
 //	@Autowired
 //	private SurveyContext surveyContext;
 
-	@RequestMapping(value="record", method=POST, consumes=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="record", method=POST, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> createRecord(@RequestBody CreateRecordCommand command) {
 		List<RecordEvent> events = commandDispatcher.submit(command);
 		return toView(events);
 	}
 
-	@RequestMapping(value="attribute", method=POST, consumes=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="record", method=DELETE, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
-	public @ResponseBody List<RecordEvent> updateAttribute(@RequestBody UpdateAttributeCommandWrapper commandWrapper) {
+	public @ResponseBody List<RecordEventView> deleteRecord(@RequestBody DeleteRecordCommand command) {
+		RecordEvent events = commandDispatcher.submit(command);
+		return toView(Arrays.asList(events));
+	}
+
+	@RequestMapping(value="attribute", method=POST, consumes=APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody List<RecordEventView> addAttribute(@RequestBody AddAttributeCommand command) {
+		List<RecordEvent> events = commandDispatcher.submit(command);
+		return toView(events);
+	}
+	
+	@RequestMapping(value="attribute", method=PATCH, consumes=APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody List<RecordEventView> updateAttribute(@RequestBody UpdateAttributeCommandWrapper commandWrapper) {
 		UpdateAttributeCommand command = commandWrapper.toCommand();
-		List<RecordEvent> result = commandDispatcher.submit(command);
-		return result;
+		List<RecordEvent> events = commandDispatcher.submit(command);
+		return toView(events);
+	}
+	
+	@RequestMapping(value="attribute", method=DELETE, consumes=APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody List<RecordEventView> deleteAttribute(@RequestBody DeleteNodeCommand command) {
+		List<RecordEvent> events = commandDispatcher.submit(command);
+		return toView(events);
+	}
+	
+	@RequestMapping(value="entity", method=POST, consumes=APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody List<RecordEventView> addEntity(@RequestBody AddEntityCommand command) {
+		List<RecordEvent> events = commandDispatcher.submit(command);
+		return toView(events);
+	}
+	
+	@RequestMapping(value="entity", method=DELETE, consumes=APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody List<RecordEventView> deleteEntity(@RequestBody DeleteEntityCommand command) {
+		List<RecordEvent> events = commandDispatcher.submit(command);
+		return toView(events);
 	}
 	
 	private List<RecordEventView> toView(List<RecordEvent> events) {
@@ -78,48 +123,63 @@ public class CommandController {
 	
 	static class UpdateAttributeCommandWrapper {
 		
-		public enum Type {
-			BOOLEAN, CODE, DATE
-		}
-		
-		private Type type;
-		private String username;
-		private int surveyId;
-		private int recordId;
-		private int parentEntityId;
-		private int attributeDefId;
-		private Map<String, Object> value;
-		
-		public UpdateAttributeCommand toCommand() {
-			UpdateAttributeCommand c;
-			switch(type) {
+		AttributeType attributeType;
+		String username;
+		int surveyId;
+		int recordId;
+		int parentEntityId;
+		int attributeDefId;
+		Integer attributeId;
+		Map<String, Object> value;
+
+		void setValueInCommand(NodeCommand c) {
+			switch(attributeType) {
 			case BOOLEAN:
-				c = new UpdateBooleanAttributeCommand();
-				BeanUtils.copyProperties(this, c, "value");
 				((UpdateBooleanAttributeCommand) c).setValue((Boolean) value.get("value"));
 				break;
 			case CODE:
-				c = new UpdateCodeAttributeCommand();
-				BeanUtils.copyProperties(this, c, "value");
 				((UpdateCodeAttributeCommand) c).setCode((String) value.get("code"));
 				break;
 			case DATE:
-				c = new UpdateDateAttributeCommand();
-				BeanUtils.copyProperties(this, c, "value");
 				((UpdateDateAttributeCommand) c).setValue((Date) value.get("value"));
 				break;
 			default:
-				throw new IllegalStateException("Unsupported command type: " + type);
+				throw new IllegalStateException("Unsupported command type: " + attributeType);
 			}
-			return c;
 		}
 		
-		public Type getType() {
-			return type;
+		public UpdateAttributeCommand toCommand() {
+			UpdateAttributeCommand c;
+			Class<? extends UpdateAttributeCommand> commandType = toCommandType();
+			try {
+				c = commandType.getConstructor().newInstance();
+				BeanUtils.copyProperties(this, c, "attributeType", "value");
+				setValueInCommand(c);
+				return c;
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
 
-		public void setType(Type type) {
-			this.type = type;
+		private Class<? extends UpdateAttributeCommand> toCommandType() {
+			switch(attributeType) {
+			case BOOLEAN:
+				return UpdateBooleanAttributeCommand.class;
+			case CODE:
+				return UpdateCodeAttributeCommand.class;
+			case DATE:
+				return UpdateDateAttributeCommand.class;
+			default:
+				throw new IllegalStateException("Unsupported command type: " + attributeType);
+			}
+		}
+		
+		public AttributeType getAttributeType() {
+			return attributeType;
+		}
+
+		public void setAttributeType(AttributeType attributeType) {
+			this.attributeType = attributeType;
 		}
 
 		public String getUsername() {
@@ -161,7 +221,15 @@ public class CommandController {
 		public void setAttributeDefId(int attributeDefId) {
 			this.attributeDefId = attributeDefId;
 		}
+		
+		public Integer getAttributeId() {
+			return attributeId;
+		}
 
+		public void setAttributeId(Integer attributeId) {
+			this.attributeId = attributeId;
+		}
+		
 		public Map<String, Object> getValue() {
 			return value;
 		}
@@ -169,8 +237,6 @@ public class CommandController {
 		public void setValue(Map<String, Object> value) {
 			this.value = value;
 		}
-		
 	}
-	
 	
 }

@@ -145,8 +145,8 @@
 				<artifactId>swagger2markup-maven-plugin</artifactId>
 				<version>1.2.0</version>
 				<configuration>
-					<swaggerInput>${basedir}/src/main/resources/org/openforis/collect/api.yaml</swaggerInput>
-					<outputFile>${project.build.directory}/generated-docs/asciidoc/ApiDocumentation</outputFile>
+					<swaggerInput>${basedir}/doc/restful_api/restful_api.yaml</swaggerInput>
+					<outputFile>${project.build.directory}/generated-docs/asciidoc/RESTful_API_Doc</outputFile>
 					<config>
 						<swagger2markup.markupLanguage>ASCIIDOC</swagger2markup.markupLanguage>
 					</config>

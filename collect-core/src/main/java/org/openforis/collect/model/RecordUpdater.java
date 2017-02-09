@@ -115,10 +115,14 @@ public class RecordUpdater {
 	
 	public NodeChangeSet addNode(Entity parentEntity, String nodeName) {
 		NodeDefinition nodeDef = parentEntity.getDefinition().getChildDefinition(nodeName);
+		return addNode(parentEntity, nodeDef);
+	}
+
+	public NodeChangeSet addNode(Entity parentEntity, NodeDefinition nodeDef) {
 		if ( nodeDef instanceof EntityDefinition ) {
-			return addEntity(parentEntity, nodeName);
+			return addEntity(parentEntity, (EntityDefinition) nodeDef);
 		} else {
-			return addAttribute(parentEntity, nodeName);
+			return addAttribute(parentEntity, (AttributeDefinition) nodeDef);
 		}
 	}
 
@@ -130,9 +134,14 @@ public class RecordUpdater {
 	 * @return Changes applied to the record 
 	 */
 	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
-		Entity entity = performEntityAdd(parentEntity, entityName, null);
+		EntityDefinition entityDef = parentEntity.getDefinition().getChildDefinition(entityName, EntityDefinition.class);
+		return addEntity(parentEntity, entityDef);
+	}
+	
+	public NodeChangeSet addEntity(Entity parentEntity, EntityDefinition entityDef) {
+		Entity entity = performEntityAdd(parentEntity, entityDef, null);
 		
-		setMissingValueApproved(parentEntity, entityName, false);
+		setMissingValueApproved(parentEntity, entityDef.getName(), false);
 
 		NodeChangeMap changeMap = initializeEntity(entity, true);
 		return changeMap;
@@ -144,6 +153,10 @@ public class RecordUpdater {
 	
 	public NodeChangeSet addAttribute(Entity parentEntity, String attributeName, Value value) {
 		return addAttribute(parentEntity, attributeName, value, null, null);
+	}
+	
+	public NodeChangeSet addAttribute(Entity parentEntity, AttributeDefinition attributeDef) {
+		return addAttribute(parentEntity, attributeDef, null, null, null);
 	}
 	
 	/**
@@ -163,9 +176,16 @@ public class RecordUpdater {
 									  Value value, 
 									  FieldSymbol symbol, 
 									  String remarks) {
-		Attribute<?, ?> attribute = performAttributeAdd(parentEntity, attributeName, value, symbol, remarks);
+		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
+		AttributeDefinition attributeDef = (AttributeDefinition) parentEntityDefn.getChildDefinition(attributeName);
+		return addAttribute(parentEntity, attributeDef, value, symbol, remarks);
+	}
+
+	public NodeChangeSet addAttribute(Entity parentEntity, AttributeDefinition attributeDef, Value value,
+			FieldSymbol symbol, String remarks) {
+		Attribute<?, ?> attribute = performAttributeAdd(parentEntity, attributeDef, value, symbol, remarks);
 		
-		setMissingValueApproved(parentEntity, attributeName, false);
+		setMissingValueApproved(parentEntity, attribute.getName(), false);
 		
 		if (value == null) {
 			applyInitialValue(attribute, true);
@@ -655,15 +675,13 @@ public class RecordUpdater {
 		initializeRecord(record);
 	}
 
-	private Attribute<?, ?> performAttributeAdd(Entity parentEntity, String nodeName, Value value, 
+	private Attribute<?, ?> performAttributeAdd(Entity parentEntity, AttributeDefinition attributeDef, Value value,
 			FieldSymbol symbol, String remarks) {
 		if ( value != null && symbol != null ) {
 			throw new IllegalArgumentException("Cannot specify both value and symbol");
 		}
-		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-		AttributeDefinition def = (AttributeDefinition) parentEntityDefn.getChildDefinition(nodeName);
 		@SuppressWarnings("unchecked")
-		Attribute<?, Value> attribute = (Attribute<?, Value>) def.createNode();
+		Attribute<?, Value> attribute = (Attribute<?, Value>) attributeDef.createNode();
 		parentEntity.add(attribute);
 		if ( value != null ) {
 			attribute.setValue(value);
@@ -678,12 +696,6 @@ public class RecordUpdater {
 	
 	private Entity performEntityAdd(Entity parentEntity, EntityDefinition defn) {
 		return performEntityAdd(parentEntity, defn, null);
-	}
-	
-	private Entity performEntityAdd(Entity parentEntity, String name, Integer idx) {
-		EntityDefinition parentDefn = parentEntity.getDefinition();
-		EntityDefinition defn = parentDefn.getChildDefinition(name, EntityDefinition.class);
-		return performEntityAdd(parentEntity, defn, idx);
 	}
 	
 	private Entity performEntityAdd(Entity parentEntity, EntityDefinition defn, Integer idx) {

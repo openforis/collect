@@ -2,16 +2,13 @@ swagger: '2.0'
 info:
   title: Collect API
   description: Collect RESTful API
-  version: "0.1.0"
-# the domain of the service
+  version: 0.1.0
 host: localhost
-# array of all schemes that your API supports
 schemes:
-  - http
-# will be prefixed to all paths
+- http
 basePath: /collect/
 produces:
-  - application/json
+- application/json
 paths:
   /survey/summaries.json:
     get:
@@ -19,13 +16,13 @@ paths:
       description: |
         Full list of surveys (only summaries).
       parameters:
-        - name: include-temporary
-          in: query
-          description: Include temporary surveys in the list.
-          required: false
-          type: boolean
+      - name: include-temporary
+        in: query
+        description: Include temporary surveys in the list.
+        required: false
+        type: boolean
       tags:
-        - Survey
+      - Survey
       responses:
         200:
           description: An array of survey summary objects
@@ -43,13 +40,13 @@ paths:
       description: |
         List of surveys belonging to user institutions.
       parameters:
-        - name: userId
-          in: path
-          description: User ID.
-          required: true
-          type: integer
+      - name: userId
+        in: path
+        description: User ID.
+        required: true
+        type: integer
       tags:
-        - Survey
+      - Survey
       responses:
         200:
           description: An array of survey summary objects
@@ -67,19 +64,19 @@ paths:
       description: |
         Complete survey with all attribute definitions.
       parameters:
-        - name: id
-          in: path
-          description: survey id
-          required: true
-          type: number
-          format: int32
-        - name: include-code-lists
-          in: query
-          description: Whether or not to include the code list items.
-          required: false
-          type: boolean
+      - name: id
+        in: path
+        description: survey id
+        required: true
+        type: number
+        format: int32
+      - name: include-code-lists
+        in: query
+        description: Whether or not to include the code list items.
+        required: false
+        type: boolean
       tags:
-        - Survey
+      - Survey
       responses:
         200:
           description: The full survey having the specified ID
@@ -93,14 +90,14 @@ paths:
     post:
       summary: Create a new simple project (single attribute survey)
       parameters:
-        - name: parameters
-          in: body
-          description: survey id
-          required: true
-          schema:
-            $ref: '#/definitions/SimpleSurveyCreationParameters'
+      - name: parameters
+        in: body
+        description: survey id
+        required: true
+        schema:
+          $ref: '#/definitions/SimpleSurveyCreationParameters'
       tags:
-        - Survey
+      - Survey
       responses:
         200:
           description: The survey generated using the specified parameters
@@ -114,20 +111,20 @@ paths:
     get:
       summary: List of sampling point data associated to the survey with the specified id
       parameters:
-        - name: id
-          in: path
-          description: survey id
-          required: true
-          type: integer
-        - name: parent_keys
-          in: query
-          description: list of keys to filter the row(s) in the sampling point data. E.g. if the if you specify only the first key will give you the list of sampling point data in the second level; if you specify first and second level keys, the items in the third level will be returned
-          required: false
-          type: array
-          items:
-            type: string
+      - name: id
+        in: path
+        description: survey id
+        required: true
+        type: integer
+      - name: parent_keys
+        in: query
+        description: list of keys to filter the row(s) in the sampling point data. E.g. if the if you specify only the first key will give you the list of sampling point data in the second level; if you specify first and second level keys, the items in the third level will be returned
+        required: false
+        type: array
+        items:
+          type: string
       tags:
-        - Sampling point data
+      - Sampling point data
       responses:
         200:
           description: List of sampling point data associated to the survey with the specified id
@@ -142,24 +139,24 @@ paths:
       summary: Coordinate values associated to a coordinate attribute
       description: List of coordinate values recorded for a survey and associated to the specified coordinate attribute
       parameters:
-        - name: surveyId
-          in: path
-          required: true
-          type: integer
-          description: survey id
-        - name: coordinateAttributeId
-          in: query
-          required: true
-          type: integer
-          description: coordinate attribute internal id
-        - name: stepNum
-          in: query
-          required: true
-          type: integer
-          description: data step number (1=ENTRY, 2=CLEANSING, 3=ANALYSIS)
+      - name: surveyId
+        in: path
+        required: true
+        type: integer
+        description: survey id
+      - name: coordinateAttributeId
+        in: query
+        required: true
+        type: integer
+        description: coordinate attribute internal id
+      - name: stepNum
+        in: query
+        required: true
+        type: integer
+        description: data step number (1=ENTRY, 2=CLEANSING, 3=ANALYSIS)
       tags:
-        - Coordinate
-        - Data
+      - Coordinate
+      - Data
       responses:
         200:
           description: OK
@@ -175,23 +172,23 @@ paths:
     get:
       summary: Survey records count
       parameters:
-        - name: surveyId
-          in: path
-          required: true
-          type: integer
-          description: survey id
-        - name: rootEntityDefinitionId
-          in: query
-          type: integer
-          required: true
-          description: internal ID of the root entity definition
-        - name: step
-          in: query
-          type: integer
-          required: false
-          description: data step number
+      - name: surveyId
+        in: path
+        required: true
+        type: integer
+        description: survey id
+      - name: rootEntityDefinitionId
+        in: query
+        type: integer
+        required: true
+        description: internal ID of the root entity definition
+      - name: step
+        in: query
+        type: integer
+        required: false
+        description: data step number
       tags:
-        - Data
+      - Data
       responses:
         200:
           description: OK
@@ -205,23 +202,48 @@ paths:
     get:
       summary: Record content
       parameters:
-        - name: surveyId
-          in: path
-          required: true
-          type: integer
-          description: survey id
-        - name: recordId
-          in: path
-          type: integer
-          required: true
-          description: internal ID of the record
-        - name: step
-          in: query
-          type: integer
-          required: false
-          description: data step number
+      - name: surveyId
+        in: path
+        required: true
+        type: integer
+        description: survey id
+      - name: recordId
+        in: path
+        type: integer
+        required: true
+        description: internal ID of the record
+      - name: step
+        in: query
+        type: integer
+        required: false
+        description: data step number
       tags:
-        - Data
+      - Data
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Record'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /survey/{surveyId}/data/records/random.json:
+    post:
+      summary: Create a new record and assign it an id based on the sampling point data
+      parameters:
+      - name: surveyId
+        in: path
+        required: true
+        type: integer
+        description: survey id
+      - name: userId
+        in: query
+        description: User ID
+        required: true
+        type: integer
+      tags:
+      - Data
       responses:
         200:
           description: OK
@@ -252,33 +274,33 @@ definitions:
     type: object
     description: please refer to org.openforis.collect.metamodel.EntityDefView Java class
     properties:
-      internalId: 
+      internalId:
         type: integer
         description: internal ID
   SamplingDesignItem:
     type: object
     description: please refer to org.openforis.collect.model.SamplingDesignItem Java class
     properties:
-      id: 
+      id:
         type: integer
         description: internal ID
-      surveyId: 
+      surveyId:
         type: integer
         description: survey internal ID
-      x: 
+      x:
         type: number
-      y: 
+      y:
         type: number
-      srsId: 
+      srsId:
         type: string
   CodeListView:
     type: object
     description: please refer to org.openforis.collect.metamodel.CodeListView Java class
     properties:
-      id: 
+      id:
         type: integer
         description: internal ID
-      name: 
+      name:
         type: string
         description: internal human readable identifier
       items:
@@ -313,12 +335,12 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/EntityDefView'
-        description: ""
+        description: ''
       codeLists:
         type: array
         items:
           $ref: '#/definitions/CodeListView'
-        description: ""
+        description: ''
   SimpleSurveyCreationParameters:
     type: object
     description: please refer to org.openforis.collect.metamodel.SimpleSurveyCreationParameters Java class
@@ -371,7 +393,7 @@ definitions:
   CoordinateAttributePoint:
     type: object
     properties:
-      recordId: 
+      recordId:
         type: integer
       lat:
         type: number
@@ -379,7 +401,7 @@ definitions:
         type: number
       recordKeys:
         type: array
-        items: 
+        items:
           type: string
   SamplingPointLevelGenerationSettings:
     type: object
@@ -407,14 +429,32 @@ definitions:
       id:
         type: integer
       rootEntity:
-        $ref: '#definitions/Entity'
-  Entity:
+        $ref: '#/definitions/Entity'
+  Node:
     type: object
-    summary: record entity
-    description: please refer to org.openforis.collect.model.proxy.EntityProxy Java class
     properties:
       id:
         type: integer
+      name:
+        type: string
+  Entity:
+    type: object
+    description: please refer to org.openforis.collect.model.proxy.EntityProxy Java class
+    allOf:
+      - $ref: '#/definitions/Node'
+      - properties:
+          children:
+            type: array
+            items:
+              $ref: '#/definitions/Node'
+  Attribute:
+    type: object
+    description: please refer to org.openforis.collect.model.proxy.AttributeProxy Java class
+    allOf:
+      - $ref: '#/definitions/Node'
+      - properties:
+          value:
+            type: object
   Error:
     type: object
     properties:

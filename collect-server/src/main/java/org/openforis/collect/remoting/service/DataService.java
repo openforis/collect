@@ -574,11 +574,8 @@ public class DataService {
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		Entity rootEntity = record.getRootEntity();
-		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		List<RecordDeletedEvent> events = Arrays.asList(new RecordDeletedEvent(record.getSurvey().getName(), 
-				record.getId(), recordStep, String.valueOf(rootEntityDef.getId()), 
-				String.valueOf(rootEntity.getInternalId()), new Date(), userName));
+				record.getId(), new Date(), userName));
 		String surveyName = record.getSurvey().getName();
 		eventQueue.publish(new RecordTransaction(surveyName, record.getId(), recordStep, events));
 	}

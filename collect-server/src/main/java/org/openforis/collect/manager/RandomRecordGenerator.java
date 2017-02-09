@@ -8,16 +8,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.regexp.recompile;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.EntityAddChange;
+import org.openforis.collect.model.NodeChange;
+import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.model.User;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,9 +47,11 @@ public class RandomRecordGenerator {
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 	
+	private RecordUpdater recordUpdater = new RecordUpdater();
+	
 	@Transactional
 	public CollectRecord generate(int surveyId, int userId) {
-		CollectSurvey survey = surveyManager.getById(surveyId);
+		final CollectSurvey survey = surveyManager.getById(surveyId);
 		Map<List<String>, Integer> recordMeasurementsByKey = calculateRecordMeasurementsByKey(survey, userId);
 		
 		if (recordMeasurementsByKey.isEmpty()) {
@@ -59,9 +73,11 @@ public class RandomRecordGenerator {
 		
 		User user = userManager.loadById(userId);
 		
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		Schema schema = survey.getSchema();
+		
+		EntityDefinition rootEntityDef = schema.getRootEntityDefinitions().get(0);
 		String rootEntityName = rootEntityDef.getName();
-		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
+		final CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
 		
 		List<AttributeDefinition> keyAttributeDefs = rootEntityDef.getKeyAttributeDefinitions();
 		//TODO exclude measurement attribute (and update it later with username?)
@@ -69,8 +85,46 @@ public class RandomRecordGenerator {
 			String keyPart = recordKey.get(i);
 			AttributeDefinition keyAttrDef = keyAttributeDefs.get(i);
 			Attribute<?,Value> keyAttribute = record.findNodeByPath(keyAttrDef.getPath());
-			recordManager.updateAttribute(keyAttribute, keyAttrDef.createValue(keyPart));
+			recordUpdater.updateAttribute(keyAttribute, keyAttrDef.createValue(keyPart));
 		}
+		
+		List<SamplingDesignItem> secondLevelSamplingPointItems = samplingDesignManager.loadChildItems(survey.getId(), 
+				recordKey.toArray(new String[recordKey.size()]));
+		
+		final List<CodeAttributeDefinition> ancestorSamplingPointDataCodeAttributeDefs = new ArrayList<CodeAttributeDefinition>();
+		rootEntityDef.traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				EntityDefinition ancestorMultipleEntity = def.getNearestAncestorMultipleEntity();
+				if (! ancestorMultipleEntity.isRoot() && def instanceof CodeAttributeDefinition 
+						&& ((CodeAttributeDefinition) def).getList().equals(survey.getSamplingDesignCodeList())) {
+					ancestorSamplingPointDataCodeAttributeDefs.add((CodeAttributeDefinition) def);
+				}
+			}
+		}, TraversalType.BFS);
+		
+		for (SamplingDesignItem samplingDesignItem : secondLevelSamplingPointItems) {
+			CodeAttributeDefinition ancestorCodeDef = ancestorSamplingPointDataCodeAttributeDefs.get(0);
+			EntityDefinition ancestorEntityDef = ancestorCodeDef.getParentEntityDefinition();
+			NodeChangeSet addEntityChangeSet = recordUpdater.addEntity(record.getRootEntity(), ancestorEntityDef);
+			List<NodeChange<?>> changes = addEntityChangeSet.getChanges();
+			for (NodeChange<?> nodeChange : changes) {
+				if (nodeChange instanceof EntityAddChange) {
+					Entity entity = (Entity) nodeChange.getNode();
+				}
+			}
+		}
+		
+		rootEntityDef.traverse(new NodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition def) {
+				if (! def.getParentEntityDefinition().isRoot() && def instanceof CodeAttributeDefinition 
+						&& ((CodeAttributeDefinition) def).getList().equals(survey.getSamplingDesignCodeList())) {
+					//add entity to root and create a key attribute for it
+					EntityDefinition entityDef = def.getParentEntityDefinition();
+					
+				}
+			}
+		});
 		
 		recordManager.save(record);
 		

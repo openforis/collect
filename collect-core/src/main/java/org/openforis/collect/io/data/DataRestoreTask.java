@@ -23,7 +23,6 @@ import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.collect.utils.Consumer;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -220,15 +219,12 @@ public class DataRestoreTask extends Task {
 			String surveyName = record.getSurvey().getName();
 			int recordId = record.getId();
 			RecordStep recordStep = record.getStep().toRecordStep();
-			Entity rootEntity = record.getRootEntity();
 			
 			String userName = record.getModifiedBy().getUsername();
 			List<RecordEvent> events = eventProducer.produceFor(record, userName);
 			
 			if (! operation.isInsert()) {
-				events.add(0, new RecordDeletedEvent(surveyName, recordId, recordStep, 
-						String.valueOf(rootEntity.getDefinition().getId()), 
-						String.valueOf(rootEntity.getInternalId()), new Date(), userName));
+				events.add(0, new RecordDeletedEvent(surveyName, recordId, new Date(), userName));
 			}
 			eventQueue.publish(new RecordTransaction(surveyName, 
 					recordId, recordStep, events));

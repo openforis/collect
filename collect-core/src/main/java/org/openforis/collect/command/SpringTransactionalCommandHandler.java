@@ -6,12 +6,12 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-public class TransactionalCommandHandler<R, C extends Command<R>> implements CommandHandler<R, C> {
+public class SpringTransactionalCommandHandler<R, C extends Command<R>> implements CommandHandler<R, C> {
 
 	private PlatformTransactionManager transactionManager;
 	private final CommandHandler<R, C> next;
 
-	public TransactionalCommandHandler(PlatformTransactionManager transactionManager,
+	public SpringTransactionalCommandHandler(PlatformTransactionManager transactionManager,
 			CommandHandler<R, C> next) {
 		this.transactionManager = transactionManager;
 		this.next = next;
