@@ -6,6 +6,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
@@ -14,24 +15,21 @@ import org.openforis.collect.ProxyContext;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -40,7 +38,6 @@ import org.springframework.web.servlet.ModelAndView;
  * 
  */
 @Controller
-@Scope(WebApplicationContext.SCOPE_SESSION)
 public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -52,15 +49,13 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private RecordSessionManager sessionManager;
-	@Autowired
 	private SurveyContext surveyContext;
 	@Autowired
 	private MessageSource messageSource;
 	@Autowired
 	private RandomRecordGenerator randomRecordGenerator;
 	
-	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
 	public @ResponseBody
 	Map<String, Object> loadData(
 			@PathVariable int surveyId,
@@ -78,13 +73,16 @@ public class RecordController extends BasicController implements Serializable {
  		return map;
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/records/count.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/survey/{surveyId}/data/records/count.json", method=GET)
 	public @ResponseBody
 	int getCount(@PathVariable int surveyId,
-			@RequestParam(value="rootEntityDefinitionId") int rootEntityDefinitionId,
+			@RequestParam(value="rootEntityDefinitionId", required=false) Integer rootEntityDefinitionId,
 			@RequestParam(value="step", required=false) Integer stepNumber) throws Exception {
 		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		if (rootEntityDefinitionId == null) {
+			rootEntityDefinitionId = survey.getSchema().getFirstRootEntityDefinition().getId();
+		}
 		int count = recordManager.countRecords(survey, rootEntityDefinitionId, stepNumber);
 		return count;
 	}
@@ -108,30 +106,44 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestParam(value="step", required=false) Integer stepNumber) throws RecordPersistenceException {
 		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectRecord record = recordManager.checkout(survey, sessionState.getUser(), recordId, Step.valueOf(stepNumber), sessionState.getSessionId(), true);
+		CollectRecord record = recordManager.load(survey, recordId, Step.valueOf(stepNumber));
 		return toProxy(record);
 	}
 
 	@Transactional
-	@RequestMapping(value = "survey/{surveyId}/data/records/random.json", method=POST, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/records/random.json", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable int surveyId, @RequestParam int userId) throws RecordPersistenceException {
-		CollectRecord record = randomRecordGenerator.generate(surveyId, userId);
+	RecordProxy createRandomRecord(@PathVariable int surveyId, @RequestBody RandomRecordGenerationParameters params) throws RecordPersistenceException {
+		CollectRecord record = randomRecordGenerator.generate(surveyId, params.getUserId());
 		return toProxy(record);
 	}
 	
 	private RecordProxy toProxy(CollectRecord record) {
-		SessionState sessionState = sessionManager.getSessionState();
-		ProxyContext context = new ProxyContext(sessionState.getLocale(), messageSource, surveyContext);
+		String defaultLanguage = record.getSurvey().getDefaultLanguage();
+		Locale locale = new Locale(defaultLanguage);
+		ProxyContext context = new ProxyContext(locale, messageSource, surveyContext);
 		return new RecordProxy(record, context);
 	}
-
+	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
 		if (stepNumber == null) {
 			stepNumber = Step.ENTRY.getStepNumber();
 		}
 		return stepNumber;
+	}
+	
+	static class RandomRecordGenerationParameters {
+		
+		private int userId;
+
+		public int getUserId() {
+			return userId;
+		}
+
+		public void setUserId(int userId) {
+			this.userId = userId;
+		}
+		
 	}
 
 }

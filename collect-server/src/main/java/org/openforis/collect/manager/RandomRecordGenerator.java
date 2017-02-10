@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.regexp.recompile;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.EntityAddChange;
@@ -26,10 +25,10 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,8 +50,23 @@ public class RandomRecordGenerator {
 	
 	@Transactional
 	public CollectRecord generate(int surveyId, int userId) {
-		final CollectSurvey survey = surveyManager.getById(surveyId);
-		Map<List<String>, Integer> recordMeasurementsByKey = calculateRecordMeasurementsByKey(survey, userId);
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		User user = userManager.loadById(userId);
+		
+		List<String> recordKey = provideRandomLessMeasuredRecordKey(survey, user);
+		
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
+		String rootEntityName = rootEntityDef.getName();
+		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
+		
+		addSecondLevelEntities(record, recordKey);
+		
+		recordManager.save(record);
+		return record;
+	}
+
+	private List<String> provideRandomLessMeasuredRecordKey(final CollectSurvey survey, User user) {
+		Map<List<String>, Integer> recordMeasurementsByKey = calculateRecordMeasurementsByKey(survey, user);
 		
 		if (recordMeasurementsByKey.isEmpty()) {
 			throw new IllegalStateException(String.format("Sampling design data not defined for survey %s", survey.getName()));
@@ -70,15 +84,12 @@ public class RandomRecordGenerator {
 		List<List<String>> recordKeys = new ArrayList<List<String>>(recordMeasurementsByKey.keySet());
 		int recordKeyIdx = new Double(Math.floor(Math.random() * recordKeys.size())).intValue();
 		List<String> recordKey = recordKeys.get(recordKeyIdx);
-		
-		User user = userManager.loadById(userId);
-		
-		Schema schema = survey.getSchema();
-		
-		EntityDefinition rootEntityDef = schema.getRootEntityDefinitions().get(0);
-		String rootEntityName = rootEntityDef.getName();
-		final CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
-		
+		return recordKey;
+	}
+
+	private void addSecondLevelEntities(CollectRecord record, List<String> recordKey) {
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		EntityDefinition rootEntityDef = record.getRootEntity().getDefinition();
 		List<AttributeDefinition> keyAttributeDefs = rootEntityDef.getKeyAttributeDefinitions();
 		//TODO exclude measurement attribute (and update it later with username?)
 		for (int i = 0; i < keyAttributeDefs.size(); i++) {
@@ -88,54 +99,27 @@ public class RandomRecordGenerator {
 			recordUpdater.updateAttribute(keyAttribute, keyAttrDef.createValue(keyPart));
 		}
 		
-		List<SamplingDesignItem> secondLevelSamplingPointItems = samplingDesignManager.loadChildItems(survey.getId(), 
-				recordKey.toArray(new String[recordKey.size()]));
-		
-		final List<CodeAttributeDefinition> ancestorSamplingPointDataCodeAttributeDefs = new ArrayList<CodeAttributeDefinition>();
-		rootEntityDef.traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition def) {
-				EntityDefinition ancestorMultipleEntity = def.getNearestAncestorMultipleEntity();
-				if (! ancestorMultipleEntity.isRoot() && def instanceof CodeAttributeDefinition 
-						&& ((CodeAttributeDefinition) def).getList().equals(survey.getSamplingDesignCodeList())) {
-					ancestorSamplingPointDataCodeAttributeDefs.add((CodeAttributeDefinition) def);
-				}
-			}
-		}, TraversalType.BFS);
-		
-		for (SamplingDesignItem samplingDesignItem : secondLevelSamplingPointItems) {
-			CodeAttributeDefinition ancestorCodeDef = ancestorSamplingPointDataCodeAttributeDefs.get(0);
-			EntityDefinition ancestorEntityDef = ancestorCodeDef.getParentEntityDefinition();
-			NodeChangeSet addEntityChangeSet = recordUpdater.addEntity(record.getRootEntity(), ancestorEntityDef);
-			List<NodeChange<?>> changes = addEntityChangeSet.getChanges();
-			for (NodeChange<?> nodeChange : changes) {
-				if (nodeChange instanceof EntityAddChange) {
-					Entity entity = (Entity) nodeChange.getNode();
-				}
+		List<SamplingDesignItem> secondLevelSamplingPointItems = samplingDesignManager.loadChildItems(survey.getId(), recordKey);
+		List<CodeAttributeDefinition> samplingPointDataCodeAttributeDefs = findSamplingPointCodeAttributes(survey);
+		if (! secondLevelSamplingPointItems.isEmpty() && samplingPointDataCodeAttributeDefs.size() > 1) {
+			int levelIndex = 1;
+			for (SamplingDesignItem samplingDesignItem : secondLevelSamplingPointItems) {
+				CodeAttributeDefinition ancestorCodeDef = samplingPointDataCodeAttributeDefs.get(levelIndex);
+				EntityDefinition ancestorEntityDef = ancestorCodeDef.getParentEntityDefinition();
+				Entity parentEntity = record.getRootEntity();
+				NodeChangeSet addEntityChangeSet = recordUpdater.addEntity(parentEntity, ancestorEntityDef);
+				Entity entity = getAddedEntity(addEntityChangeSet);
+				CodeAttribute keyAttr = entity.getChild(ancestorCodeDef);
+				recordUpdater.updateAttribute(keyAttr, new Code(samplingDesignItem.getLevelCode(levelIndex + 1)));
 			}
 		}
-		
-		rootEntityDef.traverse(new NodeDefinitionVisitor() {
-			@Override
-			public void visit(NodeDefinition def) {
-				if (! def.getParentEntityDefinition().isRoot() && def instanceof CodeAttributeDefinition 
-						&& ((CodeAttributeDefinition) def).getList().equals(survey.getSamplingDesignCodeList())) {
-					//add entity to root and create a key attribute for it
-					EntityDefinition entityDef = def.getParentEntityDefinition();
-					
-				}
-			}
-		});
-		
-		recordManager.save(record);
-		
-		return record;
 	}
-	
-	private Map<List<String>, Integer> calculateRecordMeasurementsByKey(CollectSurvey survey, final int userID) {
+
+	private Map<List<String>, Integer> calculateRecordMeasurementsByKey(CollectSurvey survey, final User user) {
 		final Map<List<String>, Integer> measurementsByRecordKey = new HashMap<List<String>, Integer>();
 		recordManager.visitSummaries(new RecordFilter(survey), null, new Visitor<CollectRecord>() {
 			public void visit(CollectRecord summary) {
-				if (summary.getCreatedBy().getId() != userID) {
+				if (summary.getCreatedBy().getId() != user.getId()) {
 					List<String> keys = summary.getRootEntityKeyValues();
 					Integer measurements = measurementsByRecordKey.get(keys);
 					if (measurements == null) {
@@ -164,4 +148,28 @@ public class RandomRecordGenerator {
 		return measurementsByRecordKey;
 	}
 
+	private List<CodeAttributeDefinition> findSamplingPointCodeAttributes(final CollectSurvey survey) {
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
+		final List<CodeAttributeDefinition> samplingPointDataCodeAttributeDefs = new ArrayList<CodeAttributeDefinition>();
+		rootEntityDef.traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if (def instanceof CodeAttributeDefinition 
+						&& ((CodeAttributeDefinition) def).getList().equals(survey.getSamplingDesignCodeList())) {
+					samplingPointDataCodeAttributeDefs.add((CodeAttributeDefinition) def);
+				}
+			}
+		}, TraversalType.BFS);
+		return samplingPointDataCodeAttributeDefs;
+	}
+	
+	private Entity getAddedEntity(NodeChangeSet changeSet) {
+		List<NodeChange<?>> changes = changeSet.getChanges();
+		for (NodeChange<?> nodeChange : changes) {
+			if (nodeChange instanceof EntityAddChange) {
+				Entity entity = (Entity) nodeChange.getNode();
+				return entity;
+			}
+		}
+		throw new IllegalArgumentException("Cannot find added entity in node change set");
+	}
 }
