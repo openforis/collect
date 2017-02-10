@@ -57,9 +57,13 @@ public class SamplingDesignManager {
 	}
 	
 	public List<SamplingDesignItem> loadChildItems(int surveyId, String... parentKeys) {
-		return samplingDesignDao.loadItems(surveyId, parentKeys);
+		return samplingDesignDao.loadChildItems(surveyId, parentKeys);
 	}
 
+	public List<SamplingDesignItem> loadChildItems(int surveyId, List<String> parentKeys) {
+		return loadChildItems(surveyId, parentKeys.toArray(new String[parentKeys.size()]));
+	}
+	
 	public boolean hasSamplingDesign(CollectSurvey survey) {
 		Integer id = survey.getId();
 		if ( id == null ) {

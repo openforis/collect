@@ -137,7 +137,13 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		return dsl.fromResult(result);
 	}
 
-	public List<SamplingDesignItem> loadItems(int surveyId, String... parentKeys) {
+	/**
+	 * Returns the items in the level next to the one defined by the parent keys
+	 * @param surveyId
+	 * @param parentKeys
+	 * @return
+	 */
+	public List<SamplingDesignItem> loadChildItems(int surveyId, String... parentKeys) {
 		SamplingDesignDSLContext dsl = dsl();
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_SAMPLING_DESIGN);
@@ -149,8 +155,15 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 				q.addConditions(tableField.eq(parentKeys[levelIdx]));
 			}
 		}
-		addLevelKeyNullConditions(q, parentKeys == null ? 0: parentKeys.length);
+		int nextLevelIndex = parentKeys == null ? 0: parentKeys.length;
 		
+		//not null value for the "next" level
+		//null values for the code fields in the other levels
+		if (nextLevelIndex < LEVEL_CODE_FIELDS.length) {
+			q.addConditions(LEVEL_CODE_FIELDS[nextLevelIndex].isNotNull());
+			addLevelKeyNullConditions(q, nextLevelIndex + 1);
+		}
+
 		q.addOrderBy(OFC_SAMPLING_DESIGN.ID);
 
 		//fetch results
