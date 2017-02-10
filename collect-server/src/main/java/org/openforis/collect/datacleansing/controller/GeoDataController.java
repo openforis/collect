@@ -101,9 +101,11 @@ public class GeoDataController {
 			List<Node<?>> nodes = record.findNodesByPath(coordAttrDef.getPath());
 			for (Node<?> node : nodes) {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
-				Coordinate coordinate = coordAttr.getValue();
-				Coordinate wgs84Coord = coordinateOperations.convertToWgs84(coordinate);
-				coordinateProcessor.process(record, coordAttr, wgs84Coord);
+				if (coordAttr.isFilled()) {
+					Coordinate coordinate = coordAttr.getValue();
+					Coordinate wgs84Coord = coordinateOperations.convertToWgs84(coordinate);
+					coordinateProcessor.process(record, coordAttr, wgs84Coord);
+				}
 			}
 		}
 	}
