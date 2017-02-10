@@ -10,5 +10,5 @@ Collect.DataService.prototype.countRecords = function(surveyId, rootEntityDefini
 		rootEntityDefinitionId: rootEntityDefinitionId,
 		step: stepNum
 	}
-	this.send("surveys/" + surveyId + "/data/records/count.json", data, "GET", onSuccess, onError);
+	this.send("survey/" + surveyId + "/data/records/count.json", data, "GET", onSuccess, onError);
 };
