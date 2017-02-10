@@ -168,7 +168,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /surveys/{surveyId}/data/records/count.json:
+  /survey/{surveyId}/data/records/count.json:
     get:
       summary: Survey records count
       parameters:
@@ -198,7 +198,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /surveys/{surveyId}/data/records/{recordId}/content.json:
+  /survey/{surveyId}/data/records/{recordId}/content.json:
     get:
       summary: Record content
       parameters:
@@ -253,6 +253,72 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /command/record/attribute:
+    post:
+      summary: Submit an AddAttributeCommand
+      parameters:
+      - name: command
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/AddAttributeCommand'
+      tags:
+      - Data
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RecordEvent'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: Submit an UpdateAttributeCommand
+      parameters:
+      - name: command
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAttributeCommandWrapper'
+      tags:
+      - Data
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RecordEvent'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /command/record/node:
+    delete:
+      summary: Submit a DeleteNodeCommand
+      parameters:
+      - name: command
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/DeleteNodeCommand'
+      tags:
+      - Data
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RecordEvent'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
 definitions:
   SurveySummary:
     type: object
@@ -455,6 +521,63 @@ definitions:
       - properties:
           value:
             type: object
+  NodeCommand:
+    type: object
+    properties:
+      username:
+        type: string
+      surveyId:
+        type: integer
+      recordId:
+        type: integer
+      parentEntityId:
+        type: integer
+      nodeDefId:
+        type: integer
+      nodeId:
+        type: integer
+  AddAttributeCommand:
+    type: object
+    allOf:
+      - $ref: '#/definitions/NodeCommand'
+      - properties:
+          index:
+            type: integer
+  UpdateAttributeCommandWrapper:
+    type: object
+    allOf:
+      - $ref: '#/definitions/NodeCommand'
+      - properties:
+          attributeType:
+            type: string
+          value:
+            type: object
+            description: the content depends on the type of attribute; it will be a field by field map of the value
+  DeleteNodeCommand:
+    type: object
+    allOf:
+      - $ref: '#/definitions/NodeCommand'
+  RecordEvent:
+    type: object
+    properties:
+      surveyName:
+        type: string
+      recordId:
+        type: integer
+      recordStep:
+        type: string
+      definitionId:
+        type: integer
+      ancestorIds:
+        type: array
+        items:
+          type: integer
+      nodeId:
+        type: integer
+      timestamp:
+        type: string
+      userName:
+        type: string
   Error:
     type: object
     properties:

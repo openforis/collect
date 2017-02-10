@@ -16,7 +16,6 @@ import org.openforis.collect.command.AddEntityCommand;
 import org.openforis.collect.command.CommandDispatcher;
 import org.openforis.collect.command.CreateRecordCommand;
 import org.openforis.collect.command.DeleteNodeCommand;
-import org.openforis.collect.command.DeleteEntityCommand;
 import org.openforis.collect.command.DeleteRecordCommand;
 import org.openforis.collect.command.NodeCommand;
 import org.openforis.collect.command.UpdateAttributeCommand;
@@ -58,14 +57,14 @@ public class CommandController {
 		return toView(Arrays.asList(events));
 	}
 
-	@RequestMapping(value="attribute", method=POST, consumes=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="record/attribute", method=POST, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> addAttribute(@RequestBody AddAttributeCommand command) {
 		List<RecordEvent> events = commandDispatcher.submit(command);
 		return toView(events);
 	}
 	
-	@RequestMapping(value="attribute", method=PATCH, consumes=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="record/attribute", method=PATCH, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> updateAttribute(@RequestBody UpdateAttributeCommandWrapper commandWrapper) {
 		UpdateAttributeCommand command = commandWrapper.toCommand();
@@ -73,23 +72,16 @@ public class CommandController {
 		return toView(events);
 	}
 	
-	@RequestMapping(value="attribute", method=DELETE, consumes=APPLICATION_JSON_VALUE)
-	@Transactional
-	public @ResponseBody List<RecordEventView> deleteAttribute(@RequestBody DeleteNodeCommand command) {
-		List<RecordEvent> events = commandDispatcher.submit(command);
-		return toView(events);
-	}
-	
-	@RequestMapping(value="entity", method=POST, consumes=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="record/entity", method=POST, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> addEntity(@RequestBody AddEntityCommand command) {
 		List<RecordEvent> events = commandDispatcher.submit(command);
 		return toView(events);
 	}
 	
-	@RequestMapping(value="entity", method=DELETE, consumes=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="record/node", method=DELETE, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
-	public @ResponseBody List<RecordEventView> deleteEntity(@RequestBody DeleteEntityCommand command) {
+	public @ResponseBody List<RecordEventView> deleteNode(@RequestBody DeleteNodeCommand command) {
 		List<RecordEvent> events = commandDispatcher.submit(command);
 		return toView(events);
 	}
@@ -121,15 +113,11 @@ public class CommandController {
 		
 	}
 	
-	static class UpdateAttributeCommandWrapper {
+	static class UpdateAttributeCommandWrapper extends UpdateAttributeCommand {
+		
+		private static final long serialVersionUID = 1L;
 		
 		AttributeType attributeType;
-		String username;
-		int surveyId;
-		int recordId;
-		int parentEntityId;
-		int attributeDefId;
-		Integer attributeId;
 		Map<String, Object> value;
 
 		void setValueInCommand(NodeCommand c) {
@@ -182,54 +170,6 @@ public class CommandController {
 			this.attributeType = attributeType;
 		}
 
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
-		public int getSurveyId() {
-			return surveyId;
-		}
-
-		public void setSurveyId(int surveyId) {
-			this.surveyId = surveyId;
-		}
-
-		public int getRecordId() {
-			return recordId;
-		}
-
-		public void setRecordId(int recordId) {
-			this.recordId = recordId;
-		}
-
-		public int getParentEntityId() {
-			return parentEntityId;
-		}
-
-		public void setParentEntityId(int parentEntityId) {
-			this.parentEntityId = parentEntityId;
-		}
-
-		public int getAttributeDefId() {
-			return attributeDefId;
-		}
-
-		public void setAttributeDefId(int attributeDefId) {
-			this.attributeDefId = attributeDefId;
-		}
-		
-		public Integer getAttributeId() {
-			return attributeId;
-		}
-
-		public void setAttributeId(Integer attributeId) {
-			this.attributeId = attributeId;
-		}
-		
 		public Map<String, Object> getValue() {
 			return value;
 		}
