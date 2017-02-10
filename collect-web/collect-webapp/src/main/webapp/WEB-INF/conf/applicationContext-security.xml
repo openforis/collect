@@ -44,23 +44,23 @@
 		<intercept-url access="permitAll" pattern="/uploadData.htm" />
 		<intercept-url access="permitAll" pattern="/uploadFile.htm" />
 		
-		<intercept-url access="hasRole('ADMIN')" pattern="/codelist/export/**/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/codelist/import/**/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/designer.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/editSurvey.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/importSurvey.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/logoUpload" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/rdbpublish" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/saiku/**/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/export/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/import/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/species/export/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/species/import/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/speciesImport" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/surveys" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/validateAllRecords.htm" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/export/**/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/import/**/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/designer.htm" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/editSurvey.htm" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/importSurvey.htm" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/logoUpload" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/rdbpublish" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/saiku/**/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/samplingdesign/export/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/samplingdesign/import/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/export/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/import/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/speciesImport" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/survey/**" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/validateAllRecords.htm" />
 		
-		<intercept-url access="hasRole('USER')" pattern="/**" />
+		<intercept-url access="hasRole('ROLE_USER')" pattern="/**" />
 
 		<form-login login-page="/login" 
 			default-target-url="/index.htm"
