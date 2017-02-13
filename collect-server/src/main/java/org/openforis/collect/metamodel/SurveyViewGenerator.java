@@ -60,6 +60,14 @@ public class SurveyViewGenerator {
 		return surveyView;
 	}
 	
+	public List<SurveyView> generateViews(List<CollectSurvey> surveys) {
+		List<SurveyView> result = new ArrayList<SurveyView>(surveys.size());
+		for (CollectSurvey s : surveys) {
+			result.add(generateView(s));
+		}
+		return result;
+	}
+	
 	private String getLabel(NodeDefinition def, String langCode) {
 		String label = def.getLabel(Type.INSTANCE, langCode);
 		if (label == null && ! def.getSurvey().isDefaultLanguage(langCode)) {

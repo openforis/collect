@@ -11,7 +11,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.init = function(onComplete) {
 	if ($this.dependenciesLoaded) {
 		$this.onDependenciesLoaded(onComplete);
 	} else {
-		System.import('leaflet').then(function() {
+		System.import('openlayers').then(function() {
 			$this.dependenciesLoaded = true;
 			$this.onDependenciesLoaded(onComplete);
 		});
@@ -25,24 +25,125 @@ Collect.DataCleansing.MapPanelComposer.prototype.onDependenciesLoaded = function
 		$this.resizeMapContainer();
 	});
 	
-	$this.map = L.map('map').setView([ 51.505, -0.09 ], 3);
+	var worldTopoMapTileLayer = new ol.layer.Tile({
+		// World Topographic Map
+    	title: 'Topographic map',
+    	type: 'base',
+    	visible: false,
+        source: new ol.source.XYZ({
+            attributions: [new ol.Attribution({
+                html: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
+                'rest/services/World_Topo_Map/MapServer">ArcGIS</a>'
+        	})],
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/' +
+                'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
+        })
+    });
 	
-	var satelliteTileLayer = L.tileLayer(
-			// Esri_WorldImagery
-			'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-			{
-				attribution : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
+	var satelliteMapTileLayer = new ol.layer.Tile({
+    	title: 'Satellite (ESRI)',
+    	type: 'base',
+    	visible: true,
+		// Esri_WorldImagery
+        source: new ol.source.XYZ({
+            attributions: [new ol.Attribution({
+                html: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
 				'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-			}
-	);
+        	})],
+            url: 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        })
+    });
 	
-	var openStreetMapTileLayer = L.tileLayer(
-			'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
-			{
-				maxZoom: 19,
-				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	var openStreetMapTileLayer = new ol.layer.Tile({
+		title: 'Open Street Map',
+		type: 'base',
+		visible: false,
+		source: new ol.source.OSM()
+    });
+	
+	var surveysOverlayGroup = new ol.layer.Group({
+        title: 'Surveys',
+        layers: [
+        ]
+    });
+
+	$this.map = new ol.Map({
+		target : 'map',
+		layers : [
+			new ol.layer.Group({
+				title : 'Base maps',
+				layers : [
+					openStreetMapTileLayer,
+					worldTopoMapTileLayer,
+					satelliteMapTileLayer
+				]
+			}),
+			surveysOverlayGroup
+		],
+		view : new ol.View({
+			center : ol.proj.fromLonLat([ -121.1, 47.5 ]),
+			zoom : 7
+		})
+	});
+
+	var layerSwitcher = new ol.control.LayerSwitcher({
+		tipLabel : 'Leggend' // Optional label for button
+	});
+	$this.map.addControl(layerSwitcher);
+	
+	collect.surveyService.loadFullPublishedSurveys(function(surveys) {
+		surveys.forEach(function(jsonSurvey) {
+			var survey = new Collect.Metamodel.Survey(jsonSurvey);
+			var coordinateDataLayers = new Array();
+			survey.traverse(function(nodeDef) {
+				if (nodeDef.type == 'ATTRIBUTE' && nodeDef.attributeType == 'COORDINATE') {
+					var dataLayer = new ol.layer.Vector({
+						id: OF.Strings.format('{0}|{1}|data', survey.name, nodeDef.name),
+						title: OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
+						visible: false,
+						type: 'coordinate_data',
+	                	 survey: survey,
+	                	 node_definition: nodeDef
+				    });
+					coordinateDataLayers.push(dataLayer);
+				}
+			});
+			
+			var surveyGroup = new ol.layer.Group({
+		        title: OF.Strings.firstNotBlank(survey.projectName, survey.name),
+		        layers: [
+	                 new ol.layer.Vector({
+	                	 title: 'Sampling Points',
+	                	 visible: false,
+	                	 type: 'sampling_points',
+	                	 survey: survey,
+	                	 projection: 'EPSG:4326'
+	                 }),
+	                 new ol.layer.Group({
+	                   	 title: 'Data',
+	                   	 layers: coordinateDataLayers
+                    })
+                 ]
+		    });
+			
+			function bindLayerEventListeners(layer) {
+				layer.on('change:visible', $this.onTileVisibleChange);
 			}
-	);
+
+			surveyGroup.getLayers().forEach(function(layer) {
+				bindLayerEventListeners(layer);
+			});
+			coordinateDataLayers.forEach(function(layer) {
+				bindLayerEventListeners(layer);
+			});
+			
+			surveysOverlayGroup.getLayers().push(surveyGroup);
+		});
+			
+	}, function(){}, true);
+	
+	/*
+	
 	$this.baseMaps = {
 			"Satellite (Esri)" : satelliteTileLayer
 			, "OpenStreetMap" : openStreetMapTileLayer
@@ -61,10 +162,80 @@ Collect.DataCleansing.MapPanelComposer.prototype.onDependenciesLoaded = function
 	if (onComplete) {
 		onComplete();
 	}
+	*/
+	
+	$this.initialized = true;
+	
+	if (onComplete) {
+		onComplete();
+	}
 }
 
+Collect.DataCleansing.MapPanelComposer.prototype.onTileVisibleChange = function(event) {
+ 	var tile = event.target;
+ 	if (tile.getVisible()) {
+ 		var survey = tile.get('survey');
+ 		
+ 		switch(tile.get('type')) {
+ 		case 'sampling_points':
+ 			collect.geoDataService.loadSamplingPointCoordinates(survey.name, 0, 1000000000,
+				function(samplingPointItems) {
+					var geojsonObject = {
+						'type': 'FeatureCollection',
+						'features': []
+					};
+					samplingPointItems.forEach(function(item) {
+						geojsonObject.features.push({
+							'type': 'Point',
+							'coordinates': [item.y, item.x]
+						});
+						/*
+						var circle = L
+								.circle([ item.y, item.x ],	10,
+									{
+										color : 'white',
+										fillColor : determineSamplingPointCoordinateFillColor(item.level),
+										fillOpacity : 0.5
+									});
+						circle.bindPopup("<b>Sampling Point</b>"
+								+ "<br>" + printLevelCodes(item)
+								+ "latitude: " + item.y + "<br>"
+								+ "longitude: " + item.x + "<br>");
+						$this.samplingPointsLayerGroup.addLayer(circle);
+
+						function printLevelCodes(item) {
+							var result = "";
+							for (var i = 0; i < item.levelCodes.length; i++) {
+								result += "level " + (i + 1) + ": "
+										+ item.levelCodes[i]
+										+ "<br>";
+							}
+							return result;
+						}
+						*/
+					});
+					 var vectorSource = new ol.source.Vector({
+				        features: (new ol.format.GeoJSON()).readFeatures(geojsonObject),
+				        format: new ol.format.GeoJSON({
+
+				            defaultDataProjection : 'EPSG:4326', 
+				            projection: 'EPSG:4326'
+
+				         })
+				      });
+					 tile.setSource(vectorSource);
+				});
+ 			break;
+ 		case 'coordinate_data':
+ 			
+ 			break;
+ 		}
+ 	}
+	
+};
+
 Collect.DataCleansing.MapPanelComposer.prototype.reset = function() {
-	this.map.remove();
+	//this.map.remove();
 	this.init();
 }
 
@@ -74,7 +245,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.onPanelShow = function() {
 		$this.resizeMapContainer();
 		$this.init(function() {
 			if (! $this.surveyDataLoaded) {
-				$this.onSurveyChanged();
+				//$this.onSurveyChanged();
 			}
 		});
 	}
@@ -92,33 +263,7 @@ Collect.DataCleansing.MapPanelComposer.prototype.onSurveyChanged = function() {
 		return;
 	}
 	var $this = this;
-	collect.geoDataService.loadSamplingPointCoordinates(collect.activeSurvey.name, 0, 1000000000,
-		function(samplingPointItems) {
-			samplingPointItems.forEach(function(item) {
-				var circle = L
-						.circle([ item.y, item.x ],	10,
-							{
-								color : 'white',
-								fillColor : determineSamplingPointCoordinateFillColor(item.level),
-								fillOpacity : 0.5
-							});
-				circle.bindPopup("<b>Sampling Point</b>"
-						+ "<br>" + printLevelCodes(item)
-						+ "latitude: " + item.y + "<br>"
-						+ "longitude: " + item.x + "<br>");
-				$this.samplingPointsLayerGroup.addLayer(circle);
-
-				function printLevelCodes(item) {
-					var result = "";
-					for (var i = 0; i < item.levelCodes.length; i++) {
-						result += "level " + (i + 1) + ": "
-								+ item.levelCodes[i]
-								+ "<br>";
-					}
-					return result;
-				}
-			});
-		});
+	
 
 	var coordinateAttributes = [];
 	collect.activeSurvey.traverse(function(node) {

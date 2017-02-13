@@ -50,6 +50,15 @@ public class SurveyController extends BasicController {
 			return surveyManager.getSurveySummaries(language);
 		}
 	}
+	
+	@RequestMapping(value = "/surveys/published/full-list.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	List<SurveyView> loadFullList() throws Exception {
+		Locale locale = Locale.ENGLISH;
+		List<CollectSurvey> result = surveyManager.getAll();
+		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
+		return viewGenerator.generateViews(result);
+	}
 
 	@RequestMapping(value = "/surveys/{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
