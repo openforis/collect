@@ -14,6 +14,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
+import org.openforis.collect.manager.RandomRecordGenerator.Parameters;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
@@ -113,8 +114,8 @@ public class RecordController extends BasicController implements Serializable {
 	@Transactional
 	@RequestMapping(value = "survey/{surveyId}/data/records/random.json", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable int surveyId, @RequestBody RandomRecordGenerationParameters params) throws RecordPersistenceException {
-		CollectRecord record = randomRecordGenerator.generate(surveyId, params.getUserId());
+	RecordProxy createRandomRecord(@PathVariable int surveyId, @RequestBody Parameters params) throws RecordPersistenceException {
+		CollectRecord record = randomRecordGenerator.generate(surveyId, params);
 		return toProxy(record);
 	}
 	
@@ -132,18 +133,4 @@ public class RecordController extends BasicController implements Serializable {
 		return stepNumber;
 	}
 	
-	static class RandomRecordGenerationParameters {
-		
-		private int userId;
-
-		public int getUserId() {
-			return userId;
-		}
-
-		public void setUserId(int userId) {
-			this.userId = userId;
-		}
-		
-	}
-
 }

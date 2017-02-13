@@ -1,6 +1,5 @@
 package org.openforis.collect.web.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public class UserController {
 	@Autowired
 	private UserManager userManager;
 
-	@RequestMapping(value = "{userId}/surveys/summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "{userId}/surveys/summaries.json", method=GET)
 	public @ResponseBody
 	List<SurveySummary> loadSummariesByUser(@PathVariable int userId) {
 		User user = userManager.loadById(userId);

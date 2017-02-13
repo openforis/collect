@@ -49,19 +49,27 @@ public class RandomRecordGenerator {
 	private RecordUpdater recordUpdater = new RecordUpdater();
 	
 	@Transactional
-	public CollectRecord generate(int surveyId, int userId) {
+	public CollectRecord generate(int surveyId, Parameters parameters) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		User user = userManager.loadById(userId);
+		User user = userManager.loadById(parameters.getUserId());
 		
 		List<String> recordKey = provideRandomLessMeasuredRecordKey(survey, user);
 		
+		CollectRecord record = createRecord(survey, user);
+		
+		setRecordKeyValues(record, recordKey);
+		
+		if (parameters.isAddSecondLevelEntities()) {
+			addSecondLevelEntities(record, recordKey);
+		}
+		recordManager.save(record);
+		return record;
+	}
+
+	private CollectRecord createRecord(CollectSurvey survey, User user) {
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		String rootEntityName = rootEntityDef.getName();
 		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
-		
-		addSecondLevelEntities(record, recordKey);
-		
-		recordManager.save(record);
 		return record;
 	}
 
@@ -89,6 +97,24 @@ public class RandomRecordGenerator {
 
 	private void addSecondLevelEntities(CollectRecord record, List<String> recordKey) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		List<SamplingDesignItem> secondLevelSamplingPointItems = samplingDesignManager.loadChildItems(survey.getId(), recordKey);
+		List<CodeAttributeDefinition> samplingPointDataCodeAttributeDefs = findSamplingPointCodeAttributes(survey);
+		if (! secondLevelSamplingPointItems.isEmpty() && samplingPointDataCodeAttributeDefs.size() > 1) {
+			int levelIndex = 1;
+			for (SamplingDesignItem samplingDesignItem : secondLevelSamplingPointItems) {
+				CodeAttributeDefinition levelKeyDef = samplingPointDataCodeAttributeDefs.get(levelIndex);
+				EntityDefinition levelEntityDef = levelKeyDef.getParentEntityDefinition();
+				Entity parentLevelEntity = record.getRootEntity();
+				NodeChangeSet addEntityChangeSet = recordUpdater.addEntity(parentLevelEntity, levelEntityDef);
+				Entity entity = getAddedEntity(addEntityChangeSet);
+				CodeAttribute keyAttr = entity.getChild(levelKeyDef);
+				recordUpdater.updateAttribute(keyAttr, new Code(samplingDesignItem.getLevelCode(levelIndex + 1)));
+			}
+		}
+	}
+
+	private CollectSurvey setRecordKeyValues(CollectRecord record, List<String> recordKey) {
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		EntityDefinition rootEntityDef = record.getRootEntity().getDefinition();
 		List<AttributeDefinition> keyAttributeDefs = rootEntityDef.getKeyAttributeDefinitions();
 		//TODO exclude measurement attribute (and update it later with username?)
@@ -98,21 +124,7 @@ public class RandomRecordGenerator {
 			Attribute<?,Value> keyAttribute = record.findNodeByPath(keyAttrDef.getPath());
 			recordUpdater.updateAttribute(keyAttribute, keyAttrDef.createValue(keyPart));
 		}
-		
-		List<SamplingDesignItem> secondLevelSamplingPointItems = samplingDesignManager.loadChildItems(survey.getId(), recordKey);
-		List<CodeAttributeDefinition> samplingPointDataCodeAttributeDefs = findSamplingPointCodeAttributes(survey);
-		if (! secondLevelSamplingPointItems.isEmpty() && samplingPointDataCodeAttributeDefs.size() > 1) {
-			int levelIndex = 1;
-			for (SamplingDesignItem samplingDesignItem : secondLevelSamplingPointItems) {
-				CodeAttributeDefinition ancestorCodeDef = samplingPointDataCodeAttributeDefs.get(levelIndex);
-				EntityDefinition ancestorEntityDef = ancestorCodeDef.getParentEntityDefinition();
-				Entity parentEntity = record.getRootEntity();
-				NodeChangeSet addEntityChangeSet = recordUpdater.addEntity(parentEntity, ancestorEntityDef);
-				Entity entity = getAddedEntity(addEntityChangeSet);
-				CodeAttribute keyAttr = entity.getChild(ancestorCodeDef);
-				recordUpdater.updateAttribute(keyAttr, new Code(samplingDesignItem.getLevelCode(levelIndex + 1)));
-			}
-		}
+		return survey;
 	}
 
 	private Map<List<String>, Integer> calculateRecordMeasurementsByKey(CollectSurvey survey, final User user) {
@@ -131,7 +143,7 @@ public class RandomRecordGenerator {
 				}
 			}
 		});
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		List<AttributeDefinition> keyAttrDefs = rootEntityDef.getKeyAttributeDefinitions();
 		//TODO exclude measurement attributes
 		List<AttributeDefinition> nonMeasurementKeyAttrDefs = keyAttrDefs;
@@ -171,5 +183,28 @@ public class RandomRecordGenerator {
 			}
 		}
 		throw new IllegalArgumentException("Cannot find added entity in node change set");
+	}
+	
+	
+	public static class Parameters {
+		
+		private int userId;
+		private boolean addSecondLevelEntities = false;
+
+		public int getUserId() {
+			return userId;
+		}
+
+		public void setUserId(int userId) {
+			this.userId = userId;
+		}
+		
+		public boolean isAddSecondLevelEntities() {
+			return addSecondLevelEntities;
+		}
+
+		public void setAddSecondLevelEntities(boolean addSecondLevelEntities) {
+			this.addSecondLevelEntities = addSecondLevelEntities;
+		}
 	}
 }
