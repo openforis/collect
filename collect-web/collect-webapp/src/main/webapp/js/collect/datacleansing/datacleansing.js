@@ -193,6 +193,6 @@ Collect.DataCleansing.prototype.initDataCleansingChainPanel = function() {
 };
 
 Collect.DataCleansing.prototype.initMapPanel = function() {
-	this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
+	this.mapPanelComposer = new Collect.DataManager.MapPanelComposer($("#map-panel"));
 //	this.mapPanelComposer.init();
 };

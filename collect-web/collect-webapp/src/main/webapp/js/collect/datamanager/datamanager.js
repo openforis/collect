@@ -1,0 +1,3 @@
+Collect.DataManager = function() {
+	
+};

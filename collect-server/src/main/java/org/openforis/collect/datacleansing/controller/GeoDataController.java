@@ -97,7 +97,7 @@ public class GeoDataController {
 		}
 		kml.marshal(response.getOutputStream());
 	}
-
+	
 	private List<SamplingDesignItem> loadSamplingDesignItems(CollectSurvey survey) {
 		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId());
 		List<SamplingDesignItem> samplingDesignItems = samplingDesignSummaries.getRecords();
@@ -236,9 +236,11 @@ public class GeoDataController {
 			List<Node<?>> nodes = record.findNodesByPath(coordAttrDef.getPath());
 			for (Node<?> node : nodes) {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
-				Coordinate coordinate = coordAttr.getValue();
-				Coordinate wgs84Coord = coordinateOperations.convertToWgs84(coordinate);
-				coordinateProcessor.process(record, coordAttr, wgs84Coord);
+				if (coordAttr.isFilled()) {
+					Coordinate coordinate = coordAttr.getValue();
+					Coordinate wgs84Coord = coordinateOperations.convertToWgs84(coordinate);
+					coordinateProcessor.process(record, coordAttr, wgs84Coord);
+				}
 			}
 		}
 	}
@@ -274,6 +276,14 @@ public class GeoDataController {
 		
 		public int getRecordId() {
 			return attribute.getRecord().getId();
+		}
+		
+		public int getAttributeId() {
+			return attribute.getInternalId();
+		}
+		
+		public int getAttributeDefinitionId() {
+			return attribute.getDefinition().getId();
 		}
 		
 		public Double getLat() {
