@@ -26,6 +26,9 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/data_management.png")]
 		public static const DATA_MANAGEMENT:Class;
 		
+		[Embed("/assets/images/map_visualizer.png")]
+		public static const MAP_VISUALIZER:Class;
+		
 		[Embed("/assets/images/database_designer.png")]
 		public static const DATABASE_DESIGNER:Class;
 		

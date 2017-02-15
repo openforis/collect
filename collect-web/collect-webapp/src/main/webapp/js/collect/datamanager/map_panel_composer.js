@@ -4,13 +4,25 @@ Collect.DataManager.MapPanelComposer = function(panel) {
 	this.$panel = panel;
 	this.map = null;
 	this.initialized = false;
-	this.surveyDataLoaded = false;
 	this.dependenciesLoaded = false;
+	
+	this.verticalPadding = 220;
+	this.horizontalPadding = 50;
+	
+	this.startLat = 12.1;
+	this.startLon = 41.5;
+	this.startZoom = 3;
+}
 
+Collect.DataManager.MapPanelComposer.prototype.init = function(onComplete) {
+	var $this = this;
+	
+	$this.resizeMapContainer();
+	
 	this.popupContainer = $(
 		'<div class="ol-popup">' +
-		'<a href="#" class="ol-popup-closer"></a>' +
-		'<div class="popup-content"></div>' +
+			'<a href="#" class="ol-popup-closer"></a>' +
+			'<div class="popup-content"></div>' +
 		'</div>'
 	);
 
@@ -39,11 +51,7 @@ Collect.DataManager.MapPanelComposer = function(panel) {
 		popupCloser.blur();
 		return false;
 	});
-
-};
-
-Collect.DataManager.MapPanelComposer.prototype.init = function(onComplete) {
-	var $this = this;
+	
 	if ($this.dependenciesLoaded) {
 		$this.onDependenciesLoaded(onComplete);
 	} else {
@@ -73,8 +81,8 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			surveysOverlayGroup
 		],
 		view : new ol.View({
-			center : ol.proj.fromLonLat([ 12.1, 41.5 ]),
-			zoom : 10
+			center : ol.proj.fromLonLat([ $this.startLat, $this.startLon ]),
+			zoom : $this.startZoom
 		}),
 		overlays : [ $this.overlay ],
 	});
@@ -289,6 +297,8 @@ Collect.DataManager.MapPanelComposer.prototype.onTileVisibleChange = function(ev
 			case 'sampling_points':
 				$this.createSamplingPointDataSource(survey, function(source) {
 					tile.setSource(source);
+				}, function(source) {
+					$this.zoomToLayer(tile);
 				});
 				break;
 			case 'coordinate_data':
@@ -296,15 +306,29 @@ Collect.DataManager.MapPanelComposer.prototype.onTileVisibleChange = function(ev
 				
 				$this.createCoordinateDataSource(survey, coordinateAttributeDef, function(source) {
 					tile.setSource(source);
+				}, function(source) {
+					$this.zoomToLayer(tile);
 				});
 				break;
 			}
+		} else {
+			$this.zoomToLayer(tile);
 		}
 	}
 
 };
 
-Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback) {
+Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
+	$this = this;
+	if (tile.getSource() != null) {
+		var extent = tile.getSource().getExtent();
+		$this.map.getView().fit(extent, {
+			maxZoom: 7
+		});
+	}
+}
+
+Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback, readyCallback) {
 	collect.geoDataService.loadSamplingPointCoordinates(survey.name, 0, 1000000000,
 		function(samplingPointItems) {
 			var geojsonObject = {
@@ -330,6 +354,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 						feature.set('type', 'sampling_point');
 						feature.set('survey', survey);
 					});
+					readyCallback(source);
 				}
 			});
 			callback(source);
@@ -337,7 +362,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 	);
 };
 
-Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = function(survey, coordinateAttributeDef, callback) {
+Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = function(survey, coordinateAttributeDef, callback, readyCallback) {
 	var step = 1;
 	var rootEntityDefinitionId = survey.rootEntities[0].id;
 	
@@ -369,9 +394,12 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 			for (i = 0; i < coordinateAttributePoints.length; i++) {
 				processCoordinateValue(coordinateAttributePoints[i]);
 			}
-
+			
+			callback(source);
+			
 			if (batchProcessor.progressPercent == 100) {
 				jobDialog.close();
+				readyCallback(source);
 			} else {
 				var fakeProgressJob = {
 					status : "RUNNING",
@@ -381,7 +409,6 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 				};
 				jobDialog.updateUI(fakeProgressJob);
 			}
-			callback(source);
 		};
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset, callback) {
@@ -443,11 +470,7 @@ Collect.DataManager.MapPanelComposer.prototype.onPanelShow = function() {
 	var $this = this;
 	if ($this.map == null) {
 		$this.resizeMapContainer();
-		$this.init(function() {
-			if (!$this.surveyDataLoaded) {
-				//$this.onSurveyChanged();
-			}
-		});
+		$this.init();
 	}
 }
 
@@ -455,8 +478,8 @@ Collect.DataManager.MapPanelComposer.prototype.onSurveyChanged = function() {
 }
 
 Collect.DataManager.MapPanelComposer.prototype.resizeMapContainer = function() {
-	$("#map").height($(window).height() - 220);
-	$("#map").width($(window).width() - 50);
+	$("#map").height($(window).height() - this.verticalPadding);
+	$("#map").width($(window).width() - this.horizontalPadding);
 }
 
 Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, recordId, recordKeyString) {
