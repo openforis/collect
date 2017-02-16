@@ -17,6 +17,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
@@ -46,13 +47,15 @@ public class GeoDataController {
 	public @ResponseBody List<CoordinateAttributePoint> loadCoordinateValues(
 			@PathVariable int surveyId, 
 			@RequestParam int stepNum,
-			@RequestParam int coordinateAttributeId, 
+			@RequestParam int coordinateAttributeId,
+			@RequestParam String srsId,
 			@RequestParam int recordOffset, 
 			@RequestParam int maxNumberOfRecords) {
 		final List<CoordinateAttributePoint> result = new ArrayList<CoordinateAttributePoint>();
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		
-		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), recordOffset, maxNumberOfRecords, coordinateAttributeId, new CoordinateProcessor() {
+		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), recordOffset, maxNumberOfRecords, 
+				coordinateAttributeId, srsId, new CoordinateProcessor() {
 			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				CoordinateAttributePoint point = new CoordinateAttributePoint(coordAttr, wgs84Coordinate);
 				result.add(point);
@@ -73,7 +76,8 @@ public class GeoDataController {
 		
 		final Document kmlDoc = kml.createAndSetDocument().withName(survey.getName());
 		
-		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), null, null, coordinateAttributeId, new CoordinateProcessor() {
+		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), null, null, coordinateAttributeId, 
+				SpatialReferenceSystem.WGS84_SRS_ID, new CoordinateProcessor() {
 			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				kmlDoc.createAndAddPlacemark()
 					.withName(record.getRootEntityKeyValues().toString())
@@ -86,7 +90,7 @@ public class GeoDataController {
 	}
 	
 	private void extractAllRecordCoordinates(CollectSurvey survey, Step step, Integer recordOffset, Integer maxNumberOfRecords, 
-			int coordinateAttributeId, CoordinateProcessor coordinateProcessor) {
+			int coordinateAttributeId, String toSrsId, CoordinateProcessor coordinateProcessor) {
 		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
 		CoordinateAttributeDefinition coordAttrDef = (CoordinateAttributeDefinition) 
 				survey.getSchema().getDefinitionById(coordinateAttributeId);
@@ -103,7 +107,7 @@ public class GeoDataController {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
 				if (coordAttr.isFilled()) {
 					Coordinate coordinate = coordAttr.getValue();
-					Coordinate wgs84Coord = coordinateOperations.convertToWgs84(coordinate);
+					Coordinate wgs84Coord = coordinateOperations.convertTo(coordinate, toSrsId);
 					coordinateProcessor.process(record, coordAttr, wgs84Coord);
 				}
 			}

@@ -184,12 +184,11 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				type : 'coordinate_data',
 				survey : survey,
 				coordinate_attribute_def : nodeDef,
-				projection : 'EPSG:4326',
 				source : null,
 				style : new ol.style.Style({
 					image : new ol.style.Circle({
 						fill : new ol.style.Fill({
-							color : getRandomRGBColor().concat([1])
+							color : getRandomRGBColor()
 						}),
 						radius : 5
 					})
@@ -211,11 +210,10 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				visible : false,
 				type : 'sampling_points',
 				survey : survey,
-				projection : 'EPSG:4326',
 				style : new ol.style.Style({
 					image : new ol.style.Circle({
 						fill : new ol.style.Fill({
-							color : getRandomRGBColor().concat([1])
+							color : getRandomRGBColor()
 						}),
 						radius : 5
 					})
@@ -370,11 +368,12 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		var startTime = new Date().getTime();
 
 		var processCoordinateValue = function(coordinateAttributePoint) {
+			var xyCoord = [ coordinateAttributePoint.lon, coordinateAttributePoint.lat ];
 			var coordinateFeature = new ol.Feature({
-				type : "coordinate_attribute_value",
-				point : coordinateAttributePoint,
+				//type : "coordinate_attribute_value",
+				coordAttrPoint : coordinateAttributePoint,
 				survey : survey,
-				geometry : new ol.geom.Point([ coordinateAttributePoint.lat, coordinateAttributePoint.lon ])
+				geometry : new ol.geom.Point(xyCoord, 'XY')
 			});
 			source.addFeature(coordinateFeature);
 		};
@@ -401,7 +400,7 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		};
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset, callback) {
-			collect.geoDataService.loadCoordinateValues(survey.id, step, coordinateAttributeDef.id, blockOffset, batchSize, processCoordinateValues);
+			collect.geoDataService.loadCoordinateValues(survey.id, step, coordinateAttributeDef.id, 'EPSG:3857', blockOffset, batchSize, processCoordinateValues);
 		});
 
 		jobDialog.cancelBtn.click(function() {
@@ -442,10 +441,7 @@ function getRandomRGBColor(rMin, rMax, gMin, gMax, bMin, bMax) {
 	return result;
 	
 	function getRandomValue(min, max) {
-		var result = 0;
-		do {
-			result = Math.random() * max;
-		} while (result < min);
+		var result = min + Math.random() * (max - min);
 		return result;
 	}
 }
