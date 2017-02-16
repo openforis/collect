@@ -33,6 +33,14 @@ public class SurveyViewGenerator {
 		this.locale = locale;
 	}
 
+	public List<SurveyView> generateViews(List<CollectSurvey> surveys) {
+		List<SurveyView> result = new ArrayList<SurveyView>();
+		for (CollectSurvey s : surveys) {
+			result.add(generateView(s));
+		}
+		return result;
+	}
+	
 	public SurveyView generateView(CollectSurvey survey) {
 		final SurveyView surveyView = new SurveyView(survey);
 		

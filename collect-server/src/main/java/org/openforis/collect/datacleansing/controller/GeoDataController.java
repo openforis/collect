@@ -124,6 +124,14 @@ public class GeoDataController {
 			return attribute.getRecord().getId();
 		}
 		
+		public int getAttributeId() {
+			return attribute.getInternalId();
+		}
+		
+		public int getAttributeDefinitionId() {
+			return attribute.getDefinition().getId();
+		}
+		
 		public Double getLat() {
 			return latLongCoordinate == null ? null : latLongCoordinate.getY();
 		}

@@ -1,6 +1,5 @@
 package org.openforis.collect.web.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -53,7 +52,7 @@ public class SurveyController extends BasicController {
 		binder.setValidator(validator);
 	}
 
-	@RequestMapping(value="summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="summaries.json", method=GET)
 	public @ResponseBody
 	List<SurveySummary> loadSummaries(
 			@RequestParam(value="include-temporary", required=false) boolean includeTemporary) throws Exception {
@@ -65,7 +64,16 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value="{id}.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/published/full-list.json", method=GET)
+	public @ResponseBody
+	List<SurveyView> loadFullList() throws Exception {
+		Locale locale = Locale.ENGLISH;
+		List<CollectSurvey> result = surveyManager.getAll();
+		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
+		return viewGenerator.generateViews(result);
+	}
+
+	@RequestMapping(value="{id}.json", method=GET)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
 			@RequestParam(value="include-code-lists", required=false, defaultValue="true") boolean includeCodeLists) 
@@ -75,7 +83,7 @@ public class SurveyController extends BasicController {
 	}
 	
 	@Transactional
-	@RequestMapping(value="simple", method=POST, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="simple", method=POST)
 	public @ResponseBody
 	SurveyView insertSurvey(@RequestBody SimpleSurveyCreationParameters parameters, BindingResult bindingResult) throws Exception {
 		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager);

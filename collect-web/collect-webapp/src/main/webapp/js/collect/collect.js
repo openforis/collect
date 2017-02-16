@@ -23,12 +23,7 @@ Collect.prototype.init = function() {
 	
 	this.initGlobalEventHandlers();
 	
-	this.checkActiveSurveySelected();
-	
 	this.initView();
-	
-	this.dataCleansing = new Collect.DataCleansing();
-	this.dataCleansing.init();
 };
 
 Collect.prototype.initI18n = function() {

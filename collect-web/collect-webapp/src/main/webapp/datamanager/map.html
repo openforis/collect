@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Open Foris Collect - Map Visualizer</title>
+		
+		<base href="../"></base>
+		
+		<script type="text/javascript" src="js/eventbus.js"></script>
+		<script type="text/javascript" src="js/jquery/2.1.1/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-ui/1.11.2/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-i18n-properties/1.2.0/jquery.i18n.properties.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-jsgrid/1.1.0/jsgrid.min.js"></script>
+		<script type="text/javascript" src="js/openforis/jquery-double-list/double-list-1.0.js"></script>
+		<script type="text/javascript" src="js/bootstrap/3.3.1/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap/bootstrap-select/1.6.3/bootstrap-select.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap/bootstrap-table/1.9.0/bootstrap-table.min.js"></script>
+		<script type="text/javascript" src="js/jstree/jstree-3.0.8.min.js"></script>
+		<script type="text/javascript" src="js/systemjs/0.19.39/system.js"></script>
+		<script type="text/javascript" src="js/ol/4.0.0/ol.js"></script>
+		<script type="text/javascript" src="js/ol/ol3-layerswitcher.js"></script>
+		
+		<script type="text/javascript" src="js/collect/systemjs_config.js"></script>
+		
+		<script type="text/javascript" src="script/sessionping.js"></script>
+		<script type="text/javascript" src="js/openforis/of.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-objects.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-strings.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-dates.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-arrays.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-i18n.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-batch.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-remote.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-job-monitor.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-alerts.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-ui.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-ui-forms.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-ui-forms-validation.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-ui-job-dialog.js?v=PROJECT_VERSION"></script>
+		
+		<script type="text/javascript" src="js/collect/collect.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/util/grids.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/node_tree.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/metamodel/survey.js?v=PROJECT_VERSION"></script>
+		
+		<script type="text/javascript" src="js/collect/service/abstract_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/session_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/survey_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_query_type_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_query_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_query_group_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_report_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_cleansing_step_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_cleansing_step_value_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_cleansing_chain_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/geo_data_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/job_service.js?v=PROJECT_VERSION"></script>
+		
+		<script type="text/javascript" src="js/collect/datamanager/datamanager.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datamanager/map_panel_composer.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datamanager/map_page_composer.js?v=PROJECT_VERSION"></script>
+		
+		<link rel="stylesheet" href="css/bootstrap/3.3.1/bootstrap.min.css">
+		<link rel="stylesheet" href="data:text/css;charset=utf-8," 
+			data-href="css/bootstrap/3.3.5/bootstrap-theme.min.css" id="bs-theme-stylesheet">
+		<link rel="stylesheet" href="css/bootstrap/bootstrap-select/1.6.3/bootstrap-select.min.css">
+		<link rel="stylesheet" href="css/bootstrap/bootstrap-table/1.9.0/bootstrap-table.min.css">
+		<link rel="stylesheet" href="css/jquery/jquery-ui/1.11.2/jquery-ui.min.css">
+		<link rel="stylesheet" href="css/jquery/jquery-jsgrid/1.1.0/jsgrid.min.css">
+		<link rel="stylesheet" href="css/jquery/jquery-jsgrid/1.1.0/jsgrid-theme.min.css">
+		<link rel="stylesheet" href="css/jstree/themes/default/style.min.css" />
+		<link rel="stylesheet" href="assets/font-awesome-4.3.0/css/font-awesome.min.css">
+		
+		<link rel="stylesheet" href="css/ol/4.0.0/ol.css" />
+		<link rel="stylesheet" href="css/ol/ol3-layerswitcher.css" />
+		
+		<link rel="stylesheet" href="css/collect.css?v=PROJECT_VERSION">
+	</head>
+	
+	<body>
+
+		<!-- HEADER -->
+		<div id="header">
+			<div id="headerLink" title="Collect Home Page"></div>
+			<img id="headerImg" alt="Loading..."></img> <img id="logoImg"
+				alt="Loading..." width="80px" height="80px"></img>
+		</div>
+		
+		<div class="content">
+			<div class="center-container">
+				<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">
+					<div id="map" class="map-canvas" style="height: 600px; width: 1000px"></div>
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<img id="footerImg" alt="Loading..." />
+			<div class="appliactionVersionContainer row">
+				<label>Application version: </label>
+				<label class="applicationVersion">Loading...</label>
+			</div>
+		</div>
+		
+		<div id="record-edit-modal" class="record-edit-modal modal fade" tabindex="-1" role="dialog" >
+			<div class="modal-dialog" style="width: 1020px">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">×</button>
+						<h3>Editing Record: <span class="record-key-label"></span></h3>
+					</div>
+					<div class="modal-body">
+						<iframe src="" width="1000" frameborder="0"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

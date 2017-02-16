@@ -29,6 +29,7 @@
 	<mvc:resources mapping="/assets/**" location="/assets/" />
 	<mvc:resources mapping="/css/**" location="/css/" />
 	<mvc:resources mapping="/datacleansing/**" location="/datacleansing/" />
+	<mvc:resources mapping="/datamanager/**" location="/datamanager/" />
 	<mvc:resources mapping="/earthFiles/**" location="/earthFiles/" />
 	<mvc:resources mapping="/images/**" location="/images/" />
 	<mvc:resources mapping="/js/**" location="/js/" />
