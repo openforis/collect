@@ -324,7 +324,8 @@ Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 		var extent = tile.getSource().getExtent();
 		if (extent.length > 0 && isFinite(extent[0])) {
 			$this.map.getView().fit(extent, {
-				maxZoom: 7
+				maxZoom: 7,
+				duration: 2000
 			});
 		}
 	}
