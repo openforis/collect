@@ -142,7 +142,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 //		File file = csvExportItemProcessor.getOutputFile();
 		File file = exportJob.getOutputFile();
-		Controllers.writeFileToResponse(file, "text/csv", response, "collect-query.csv");
+		Controllers.writeFileToResponse(response, file, "collect-query.csv", Controllers.CSV_CONTENT_TYPE);
 	}
 	
 	@RequestMapping(value = "test-result.json", method = RequestMethod.GET)

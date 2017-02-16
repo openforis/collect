@@ -322,44 +322,32 @@ Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 	$this = this;
 	if (tile.getSource() != null) {
 		var extent = tile.getSource().getExtent();
-		$this.map.getView().fit(extent, {
-			maxZoom: 7
-		});
+		if (extent.length > 0 && isFinite(extent[0])) {
+			$this.map.getView().fit(extent, {
+				maxZoom: 7
+			});
+		}
 	}
 }
 
 Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback, readyCallback) {
-	collect.geoDataService.loadSamplingPointCoordinates(survey.name, 0, 1000000000,
-		function(samplingPointItems) {
-			var geojsonObject = {
-				'type' : 'FeatureCollection',
-				'features' : []
-			};
-			samplingPointItems.forEach(function(item) {
-				geojsonObject.features.push({
-					'type' : 'Point',
-					'coordinates' : [ item.y, item.x ]
-				});
+	var url = OF.Strings.format("survey/{0}/sampling-point-data.kml", survey.id);
+	var source = new ol.source.Vector({
+		url : url,
+		format : new ol.format.KML({
+			extractStyles : false
+		})
+	});
+	source.on('change', function(event) {
+		if (source.getState() == 'ready') {
+			source.forEachFeature(function(feature) {
+				feature.set('type', 'sampling_point');
+				feature.set('survey', survey);
 			});
-			var url = OF.Strings.format("survey/{0}/samplingpointdata.kml", survey.id);
-			var source = new ol.source.Vector({
-				url : url,
-				format : new ol.format.KML({
-					extractStyles : false
-				})
-			});
-			source.on('change', function(event) {
-				if (source.getState() == 'ready') {
-					source.forEachFeature(function(feature) {
-						feature.set('type', 'sampling_point');
-						feature.set('survey', survey);
-					});
-					readyCallback(source);
-				}
-			});
-			callback(source);
+			readyCallback(source);
 		}
-	);
+	});
+	callback(source);
 };
 
 Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = function(survey, coordinateAttributeDef, callback, readyCallback) {
@@ -412,7 +400,7 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		};
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset, callback) {
-			collect.geoDataService.loadCoordinateValues(survey.name, step, coordinateAttributeDef.id, blockOffset, batchSize, processCoordinateValues);
+			collect.geoDataService.loadCoordinateValues(survey.id, step, coordinateAttributeDef.id, blockOffset, batchSize, processCoordinateValues);
 		});
 
 		jobDialog.cancelBtn.click(function() {

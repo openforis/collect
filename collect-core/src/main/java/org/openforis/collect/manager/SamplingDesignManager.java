@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.manager;
 
+import static org.springframework.transaction.annotation.Propagation.REQUIRED;
+import static org.springframework.transaction.annotation.Propagation.SUPPORTS;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  * 
  */
+@Transactional(readOnly=true, propagation=SUPPORTS)
 public class SamplingDesignManager {
 	
 	//private final Log log = LogFactory.getLog(SamplingDesignManager.class);
@@ -25,40 +29,41 @@ public class SamplingDesignManager {
 	@Autowired
 	private SamplingDesignDao samplingDesignDao;
 
-	@Transactional
 	public SamplingDesignItem loadById(int id) {
 		return samplingDesignDao.loadById(id);
 	}
 
-	@Transactional
 	public SamplingDesignSummaries loadBySurvey(int surveyId) {
 		return loadBySurvey(surveyId, 0, Integer.MAX_VALUE);
 	}
 
-	@Transactional
 	public SamplingDesignSummaries loadBySurvey(int surveyId, Integer upToLevel) {
 		return loadBySurvey(surveyId, upToLevel, 0, Integer.MAX_VALUE);
 	}
 
-	@Transactional
 	public SamplingDesignSummaries loadBySurvey(int surveyId, int offset, int maxRecords) {
 		return loadBySurvey(surveyId, null, offset, maxRecords);
 	}
 
-	@Transactional
 	public SamplingDesignSummaries loadBySurvey(int surveyId, Integer upToLevel, int offset, int maxRecords) {
 		int totalCount = samplingDesignDao.countBySurvey(surveyId);
-		List<SamplingDesignItem> records;
+		List<SamplingDesignItem> items;
 		if ( totalCount > 0 ) {
-			records = samplingDesignDao.loadItems(surveyId, upToLevel, offset, maxRecords); 
+			items = samplingDesignDao.loadItems(surveyId, upToLevel, offset, maxRecords); 
 		} else {
-			records = Collections.emptyList();
+			items = Collections.emptyList();
 		}
-		SamplingDesignSummaries result = new SamplingDesignSummaries(totalCount, records);
-		return result;
+		return new SamplingDesignSummaries(totalCount, items);
 	}
 	
-	@Transactional
+	public List<SamplingDesignItem> loadChildItems(int surveyId, String... parentKeys) {
+		return samplingDesignDao.loadChildItems(surveyId, parentKeys);
+	}
+
+	public List<SamplingDesignItem> loadChildItems(int surveyId, List<String> parentKeys) {
+		return loadChildItems(surveyId, parentKeys.toArray(new String[parentKeys.size()]));
+	}
+	
 	public boolean hasSamplingDesign(CollectSurvey survey) {
 		Integer id = survey.getId();
 		if ( id == null ) {
@@ -68,12 +73,11 @@ public class SamplingDesignManager {
 		}
 	}
 	
-	@Transactional
 	public int countBySurvey(int surveyId) {
 		return samplingDesignDao.countBySurvey(surveyId);
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void save(SamplingDesignItem item) {
 		if ( item.getId() == null ) {
 			samplingDesignDao.insert(item);
@@ -82,29 +86,29 @@ public class SamplingDesignManager {
 		}
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void delete(SamplingDesignItem item) {
 		Integer id = item.getId();
 		samplingDesignDao.delete(id);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void deleteBySurvey(int surveyId) {
 		samplingDesignDao.deleteBySurvey(surveyId);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void moveSamplingDesign(int fromSurveyId, int toSurveyId) {
 		samplingDesignDao.deleteBySurvey(toSurveyId);
 		samplingDesignDao.moveItems(fromSurveyId, toSurveyId);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void copySamplingDesign(int fromSurveyId, int toSurveyId) {
 		samplingDesignDao.copyItems(fromSurveyId, toSurveyId);
 	}
 
-	@Transactional
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void insert(CollectSurvey survey, List<SamplingDesignItem> items, boolean overwriteAll) {
 		if ( overwriteAll ) {
 			deleteBySurvey(survey.getId());
