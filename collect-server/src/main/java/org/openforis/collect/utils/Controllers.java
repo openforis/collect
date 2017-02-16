@@ -44,7 +44,7 @@ public class Controllers {
 		BufferedInputStream buf = null;
 		ServletOutputStream os = response.getOutputStream();
 		try {
-			setOutputContent(response, contentType, outputFileName, fileSize);
+			setOutputContent(response, outputFileName, contentType, fileSize);
 			buf = new BufferedInputStream(is);
 			int readBytes = 0;
 			//read from the file; write to the ServletOutputStream
@@ -58,11 +58,11 @@ public class Controllers {
 		}
 	}
 
-	public static void setOutputContent(HttpServletResponse response, String contentType, String outputFileName) {
-		setOutputContent(response, contentType, outputFileName, null);
+	public static void setOutputContent(HttpServletResponse response, String outputFileName, String contentType) {
+		setOutputContent(response, outputFileName, contentType, null);
 	}
 	
-	public static void setOutputContent(HttpServletResponse response, String contentType, String outputFileName, Integer contentLength) {
+	public static void setOutputContent(HttpServletResponse response, String outputFileName, String contentType, Integer contentLength) {
 		response.setContentType(contentType); 
 		response.setHeader("Content-Disposition", "attachment; filename=" + outputFileName);
 		if (contentLength != null) {

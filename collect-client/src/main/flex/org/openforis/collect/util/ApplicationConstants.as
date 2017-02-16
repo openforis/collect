@@ -21,8 +21,7 @@ package org.openforis.collect.util {
 		private static const SPECIES_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "species/import/example.htm";
 		private static const _SPECIES_EXPORT_URL:String = "species/export/{0}";
 		
-		private static const _SAMPLING_DESIGN_EXPORT_URL:String = "samplingdesign/export/{0}";
-		private static const _SAMPLING_DESIGN_WORK_SURVEY_EXPORT_URL:String = "samplingdesign/export/work/{0}";
+		private static const _SAMPLING_DESIGN_EXPORT_URL:String = "survey/{0}/sampling-point-data.csv";
 		private static const SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "samplingdesign/import/example.htm";
 
 		private static const CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "codelist/import/example.htm";
@@ -79,7 +78,7 @@ package org.openforis.collect.util {
 		}
 
 		public static function getSamplingDesignExportUrl(surveyId:int, work:Boolean = false):String {
-			var baseUrl:String = work ? _SAMPLING_DESIGN_WORK_SURVEY_EXPORT_URL: _SAMPLING_DESIGN_EXPORT_URL;
+			var baseUrl:String = _SAMPLING_DESIGN_EXPORT_URL;
 			return mx.utils.StringUtil.substitute(baseUrl, surveyId);
 		}
 

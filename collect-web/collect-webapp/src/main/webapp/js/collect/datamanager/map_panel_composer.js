@@ -324,44 +324,31 @@ Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 		var extent = tile.getSource().getExtent();
 		if (extent.length > 0 && isFinite(extent[0])) {
 			$this.map.getView().fit(extent, {
-				maxZoom: 7
+				maxZoom: 7,
+				duration: 2000
 			});
 		}
 	}
 }
 
 Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback, readyCallback) {
-	collect.geoDataService.loadSamplingPointCoordinates(survey.id, 0, 1000000000,
-		function(samplingPointItems) {
-			var geojsonObject = {
-				'type' : 'FeatureCollection',
-				'features' : []
-			};
-			samplingPointItems.forEach(function(item) {
-				geojsonObject.features.push({
-					'type' : 'Point',
-					'coordinates' : [ item.y, item.x ]
-				});
+	var url = OF.Strings.format("survey/{0}/sampling-point-data.kml", survey.id);
+	var source = new ol.source.Vector({
+		url : url,
+		format : new ol.format.KML({
+			extractStyles : false
+		})
+	});
+	source.on('change', function(event) {
+		if (source.getState() == 'ready') {
+			source.forEachFeature(function(feature) {
+				feature.set('type', 'sampling_point');
+				feature.set('survey', survey);
 			});
-			var url = OF.Strings.format("survey/{0}/sampling-point-data.kml", survey.id);
-			var source = new ol.source.Vector({
-				url : url,
-				format : new ol.format.KML({
-					extractStyles : false
-				})
-			});
-			source.on('change', function(event) {
-				if (source.getState() == 'ready') {
-					source.forEachFeature(function(feature) {
-						feature.set('type', 'sampling_point');
-						feature.set('survey', survey);
-					});
-					readyCallback(source);
-				}
-			});
-			callback(source);
+			readyCallback(source);
 		}
-	);
+	});
+	callback(source);
 };
 
 Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = function(survey, coordinateAttributeDef, callback, readyCallback) {
@@ -426,43 +413,6 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 	});
 };
 
-function getRandomColor(minimum, maximum) {
-	if (! min) {
-		min = '#000000';
-	}
-	if (! max) {
-		max = '#FFFFFF';
-	}
-	var result;
-	do {
-		result = '#'+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);
-	} while (result < min || result > max);
-	return result;
-}
-
-function defaultIfNull(value, defaultValue) {
-	return value ? value : defaultValue;
-}
-
-function getRandomRGBColor(rMin, rMax, gMin, gMax, bMin, bMax) {
-	rMin = defaultIfNull(rMin, 0);
-	rMax = defaultIfNull(rMax, 255);
-	gMin = defaultIfNull(gMin, 0);
-	gMax = defaultIfNull(gMax, 255);
-	bMin = defaultIfNull(bMin, 0);
-	bMax = defaultIfNull(bMax, 255);
-	var result = [getRandomValue(rMin, rMax), getRandomValue(gMin, gMax), getRandomValue(bMin, bMax)];
-	return result;
-	
-	function getRandomValue(min, max) {
-		var result = 0;
-		do {
-			result = Math.random() * max;
-		} while (result < min);
-		return result;
-	}
-}
-
 Collect.DataManager.MapPanelComposer.prototype.reset = function() {
 	//this.map.remove();
 	this.init();
@@ -524,3 +474,40 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 
 	setInitialRecordEditPopUpSize();
 };
+
+function getRandomColor(minimum, maximum) {
+	if (! min) {
+		min = '#000000';
+	}
+	if (! max) {
+		max = '#FFFFFF';
+	}
+	var result;
+	do {
+		result = '#'+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);
+	} while (result < min || result > max);
+	return result;
+}
+
+function defaultIfNull(value, defaultValue) {
+	return value ? value : defaultValue;
+}
+
+function getRandomRGBColor(rMin, rMax, gMin, gMax, bMin, bMax) {
+	rMin = defaultIfNull(rMin, 0);
+	rMax = defaultIfNull(rMax, 255);
+	gMin = defaultIfNull(gMin, 0);
+	gMax = defaultIfNull(gMax, 255);
+	bMin = defaultIfNull(bMin, 0);
+	bMax = defaultIfNull(bMax, 255);
+	var result = [getRandomValue(rMin, rMax), getRandomValue(gMin, gMax), getRandomValue(bMin, bMax)];
+	return result;
+	
+	function getRandomValue(min, max) {
+		var result = 0;
+		do {
+			result = Math.random() * max;
+		} while (result < min);
+		return result;
+	}
+}
