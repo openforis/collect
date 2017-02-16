@@ -313,9 +313,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		if ( keyValues != null && keyValues.length > 0 ) {
 			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
 				String key = keyValues[i];
-				if(StringUtils.isNotBlank(key)) {
-					@SuppressWarnings("unchecked")
-					Field<String> keyField = (Field<String>) KEY_FIELDS[i];
+				@SuppressWarnings("unchecked")
+				Field<String> keyField = (Field<String>) KEY_FIELDS[i];
+				if (StringUtils.isBlank(key)) {
+					q.addConditions(keyField.isNull());
+				} else {
 					if (caseSensitiveKeyValues) {
 						q.addConditions(keyField.equal(key));
 					} else {
