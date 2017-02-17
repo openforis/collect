@@ -1,4 +1,4 @@
-package org.openforis.collect.datacleansing.controller;
+package org.openforis.collect.web.controller;
 
 import static org.openforis.collect.utils.Controllers.KML_CONTENT_TYPE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -117,39 +117,43 @@ public class GeoDataController {
 	public static class CoordinateAttributePoint {
 		
 		private CoordinateAttribute attribute;
-		private Coordinate latLongCoordinate;
+		private Coordinate coordinate;
 
-		public CoordinateAttributePoint(CoordinateAttribute attribute, Coordinate latLongCoordinate) {
+		public CoordinateAttributePoint(CoordinateAttribute attribute, Coordinate coordinate) {
 			this.attribute = attribute;
-			this.latLongCoordinate = latLongCoordinate;
+			this.coordinate = coordinate;
 		}
 		
-		public int getRecordId() {
+		public int getRecId() {
 			return attribute.getRecord().getId();
 		}
 		
-		public int getAttributeId() {
+		public int getAttrId() {
 			return attribute.getInternalId();
 		}
 		
-		public int getAttributeDefinitionId() {
+		public int getAttrDefId() {
 			return attribute.getDefinition().getId();
 		}
 		
-		public Double getLat() {
-			return latLongCoordinate == null ? null : latLongCoordinate.getY();
+		public Double getX() {
+			return coordinate == null ? null : coordinate.getX();
 		}
 		
-		public Double getLon() {
-			return latLongCoordinate == null ? null : latLongCoordinate.getX();
+		public Double getY() {
+			return coordinate == null ? null : coordinate.getY();
 		}
 		
-		public List<String> getRecordKeys() {
+		public List<String> getRecKeys() {
 			CollectRecord record = (CollectRecord) this.attribute.getRecord();
 			return record.getRootEntityKeyValues();
 		}
 		
-		public Double getDistanceToExpectedLocation() {
+		/**
+		 * Returns the distance to the expected location
+		 * @return
+		 */
+		public Double getDistance() {
 			DistanceCheck distanceCheck = this.attribute.getDefinition().extractMaxDistanceCheck();
 			if (distanceCheck == null) {
 				return null;
@@ -157,7 +161,6 @@ public class GeoDataController {
 				return distanceCheck.evaluateDistanceToDestination(attribute);
 			}
 		}
-		
 	}
 	
 	private interface CoordinateProcessor {
