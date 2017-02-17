@@ -101,6 +101,8 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			
 			switch (feature.get('type')) {
 			case 'sampling_point':
+				var lonLat = ol.proj.toLonLat([coordinate[0], coordinate[1]]);
+				
 				function printLevelCodes(levelCodes) {
 					var result = "";
 					for (var i = 0; i < levelCodes.length; i++) {
@@ -120,7 +122,7 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 						+ "<br>"
 						+ "longitude: {2}"
 						+ "<br>"
-						, printLevelCodes(levelCodes), coordinate[0], coordinate[1]);
+						, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
 				break;
 			case 'coordinate_attribute_value':
 				var point = feature.get('point');
@@ -344,19 +346,22 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 	
 	//wait for load complete (change event)
 	source.on('change', function(event) {
-		checkReady();
+		if (source.getState() == 'ready') {
+			onReady();
+		}
 	});
 	
-	function checkReady() {
-		if (source.getState() == 'ready') {
-			source.forEachFeature(function(feature) {
-				feature.set('type', 'sampling_point');
-				feature.set('survey', survey);
-			});
-			readyCallback(source);
-		}
+	function onReady() {
+		source.forEachFeature(function(feature) {
+			feature.setProperties({
+				'type': 'sampling_point',
+				'survey' : survey
+			}, true);
+		});
+		readyCallback(source);
 	}
-	checkReady();
+	
+	onReady();
 };
 
 Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = function(survey, coordinateAttributeDef, callback, readyCallback) {
@@ -379,11 +384,16 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 
 		var processCoordinateValue = function(coordinateAttributePoint) {
 			var xyCoord = [ coordinateAttributePoint.x, coordinateAttributePoint.y ];
+			
+			//var webMarcatorXY = ol.proj.fromLonLat(xyCoord);
+			
+			var webMarcatorXY = xyCoord;
+			
 			var coordinateFeature = new ol.Feature({
 				type : "coordinate_attribute_value",
 				point : coordinateAttributePoint,
 				survey : survey,
-				geometry : new ol.geom.Point(xyCoord, 'XY')
+				geometry : new ol.geom.Point(webMarcatorXY, 'XY')
 			});
 			source.addFeature(coordinateFeature);
 		};
@@ -411,8 +421,9 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		};
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset) {
+			var srsId = /*'EPSG:4326';*/ 'EPSG:3857';
 			collect.geoDataService.loadCoordinateValues(survey.id, step, coordinateAttributeDef.id, 
-					'EPSG:3857', blockOffset, batchSize, processCoordinateValues);
+					srsId, blockOffset, batchSize, processCoordinateValues);
 		}, 2000);
 
 		jobDialog.cancelBtn.click(function() {

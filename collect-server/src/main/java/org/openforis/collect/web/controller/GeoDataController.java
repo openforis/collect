@@ -9,13 +9,13 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.openforis.collect.geospatial.GeoToolsCoordinateOperations;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
-import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
@@ -91,7 +91,7 @@ public class GeoDataController {
 	
 	private void extractAllRecordCoordinates(CollectSurvey survey, Step step, Integer recordOffset, Integer maxNumberOfRecords, 
 			int coordinateAttributeId, String toSrsId, CoordinateProcessor coordinateProcessor) {
-		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
+		GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
 		CoordinateAttributeDefinition coordAttrDef = (CoordinateAttributeDefinition) 
 				survey.getSchema().getDefinitionById(coordinateAttributeId);
 
@@ -107,8 +107,8 @@ public class GeoDataController {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
 				if (coordAttr.isFilled()) {
 					Coordinate coordinate = coordAttr.getValue();
-					Coordinate wgs84Coord = coordinateOperations.convertTo(coordinate, toSrsId);
-					coordinateProcessor.process(record, coordAttr, wgs84Coord);
+					Coordinate projectedCoord = coordinateOperations.convertToWebMarcator(coordinate);
+					coordinateProcessor.process(record, coordAttr, projectedCoord);
 				}
 			}
 		}
