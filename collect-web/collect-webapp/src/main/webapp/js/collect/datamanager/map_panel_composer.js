@@ -421,7 +421,7 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		};
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset) {
-			var srsId = /*'EPSG:4326';*/ 'EPSG:3857';
+			var srsId = 'EPSG:3857'; //web marcator srs
 			collect.geoDataService.loadCoordinateValues(survey.id, step, coordinateAttributeDef.id, 
 					srsId, blockOffset, batchSize, processCoordinateValues);
 		}, 2000);
