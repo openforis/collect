@@ -24,9 +24,12 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -36,6 +39,10 @@ import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 public class CollectEarthGridTemplateGenerator  {
 
 	private static final String TEST_PLOTS_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/test_plots.ced.template";
+	
+	public static final int CSV_LENGTH_ERROR = 4000;
+	public static final int CSV_LENGTH_WARNING = 2000;
+	private Logger logger = LoggerFactory.getLogger( getClass() );
 
 	public File generateTemplateCSVFile(CollectSurvey survey) throws IOException {
 		InputStream streamFileWithCsv = getClass().getClassLoader().getResourceAsStream(TEST_PLOTS_TEMPLATE_PATH);
@@ -90,7 +97,7 @@ public class CollectEarthGridTemplateGenerator  {
 
 	public CSVFileValidationResult validate(File file, CollectSurvey survey) {
 		CsvReader csvReader = null;
-		CSVFileValidationResult validationResults = new CSVFileValidationResult();
+		CSVFileValidationResult validationResults = null;
 		List<CSVRowValidationResult> rowValidations = new ArrayList<CSVRowValidationResult>();
 		try {
 			csvReader = new CsvReader(file);
@@ -106,20 +113,57 @@ public class CollectEarthGridTemplateGenerator  {
 				headersFound = lineContainsHeaders(survey, firstLineValues);
 				if( headersFound ){
 					validationResults = validateCSVHeaders(firstLineValues, survey);
+				}else{
+					
+					//Check that the number of columns coincide with the number of attributes expected
+					// Get the list of attribute types expected per row!
+					List<AttributeDefinition> attributesPerRow = getAttributesPerRow(survey);
+					
+					// Validate that the number of columns in the CSV and the expected number of columns match!!!!
+					if( firstLineValues.size() != attributesPerRow.size() ){
+						// The expected number of columns and the actual columns do not fit!!
+						// Break the operation and return a validation error!
+						validationResults = new CSVFileValidationResult( ErrorType.INVALID_HEADERS, getExpectedHeaders(survey) , firstLineValues);
+					}
 				}
 			} catch(Exception e) {
 				//this may happen when there are duplicate values in the first row
 				headersFound = false;
 				csvReader.setHeadersRead(true);
+				
+				
 			}
 			
-			rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound ) );
+			
+			
+			if( validationResults == null ){
+				
+				rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound ) );
+				
+				long linesRead = csvReader.getLinesRead();
+				if( linesRead > CSV_LENGTH_ERROR ){
+					validationResults  = new CSVFileValidationResult(ErrorType.INVALID_NUMBER_OF_PLOTS_TOO_LARGE);
+					validationResults.setNumberOfRows( (int)linesRead );
+				}else if( csvReader.getLinesRead() > CSV_LENGTH_WARNING){
+					validationResults  = new CSVFileValidationResult(ErrorType.INVALID_NUMBER_OF_PLOTS_WARNING);
+					validationResults.setNumberOfRows( (int)linesRead );
+				}
+				
+				
+			}
+			
 					
 		} catch (Exception e) {
+			logger.error( "Error reading CSV file ", e);
 			validationResults  = new CSVFileValidationResult(ErrorType.INVALID_FILE_TYPE);
 		} finally {
 			IOUtils.closeQuietly(csvReader);
 		}
+		
+		if( validationResults == null ){
+			validationResults = new CSVFileValidationResult();
+		}
+		
 		validationResults.setRowValidations( rowValidations );
 		return validationResults;
 	}
@@ -146,70 +190,104 @@ public class CollectEarthGridTemplateGenerator  {
 		CsvLine csvLine = null;
 		
 		while( ( csvLine = csvReader.readNextLine() ) != null ){
-
-			// Validate that the number of columns in the CSV and the expected number of columns match!!!!
-			if( csvLine.getLine().length != attributesPerRow.size() ){
-				// The excted number of columns and the actual columns do not fit!!
-				// Break the operation and return a validation error!
-				CSVRowValidationResult columnsMissing = new CSVRowValidationResult( rowNumber , ErrorType.INVALID_NUMBER_OF_COLUMNS);
-				columnsMissing.setExpectedColumns( determineExpectedHeaders(survey) );
-				break;
-			}
 			
-			CSVRowValidationResult validateCsvRow = validateCsvRow(  survey, attributesPerRow, csvLine, rowNumber );
-			if( validateCsvRow != null){
-				results.add( validateCsvRow);
+			List<CSVRowValidationResult> validateCsvRow = validateCsvRow(  survey, attributesPerRow, csvLine, rowNumber );
+			if(validateCsvRow!=null){
+				results.addAll( validateCsvRow  );
 			}
-			
+						
 			rowNumber++;
-			
 		}	
 		
 		return results;
 		
 	}
 	
-	private CSVRowValidationResult validateCsvRow(CollectSurvey survey, List<AttributeDefinition> attributesPerRow, CsvLine nextLine,
+	private List<CSVRowValidationResult> validateCsvRow(CollectSurvey survey, List<AttributeDefinition> attributesPerRow, CsvLine nextLine,
 			int rowNumber) {
 		
+		List<CSVRowValidationResult> validationColumns = new ArrayList<CSVRowValidationResult>();
+		
+		int column = 0;
 		for( int pos = 0; pos < attributesPerRow.size(); pos++ ){
 		
-			String message = validateCell( survey, attributesPerRow.get(pos), nextLine.getLine()[pos] );
+			String message = validateCell( attributesPerRow.get(pos), nextLine.getLine()[pos] );
 			if( message !=null ){
-				CSVRowValidationResult validation =  new CSVRowValidationResult( rowNumber, ErrorType.INVALID_CONTENT_IN_LINE );
-				validation.setMessage(message);
-				return validation;
-			}
+				validationColumns.add( new CSVRowValidationResult(rowNumber, ErrorType.INVALID_VALUES_IN_CSV, column, message ));
+			} 
+			
+			column++;
 			
 		}
 		
-		return null;
+		return validationColumns;
 		
 		
 	}
 
-	private String validateCell(CollectSurvey survey,
-			AttributeDefinition attributeDefinition, String string) {
-		// TODO Auto-generated method stub
+	/**
+	 * Checks if a value can be used as the input for an attribute 
+	 * @param attributeDefinition The attribute that we want to check the value against
+	 * @param value The value that should be checked
+	 * @return True if the value can be used in the attribute. False otherwise (for instance trying to use a string "abc" as the input for a Number attribute
+	 */
+	private String validateCell(AttributeDefinition attributeDefinition, String value) {
+		
+		try{
+			
+			attributeDefinition.createValue( value );
+			if( attributeDefinition instanceof CodeAttributeDefinition ){
+				
+				CodeAttributeDefinition cad = (CodeAttributeDefinition) attributeDefinition;
+				// IF IT IS A STRICT CODE LIST
+				if( !cad.isAllowUnlisted() ){
+					
+					// Check that the code exists in the codelist
+					
+					// Gets the level (in case of hierarchical codelists) that the attribute refers to. If it is a flat codelist then it is alway 0
+					int levelIndex = cad.getLevelIndex();
+					
+					CodeListService codeListService = attributeDefinition.getSurvey().getContext().getCodeListService();
+					
+					List<CodeListItem> items = codeListService.loadItems( cad.getList(), levelIndex+1 );
+					
+					// Check one by one in the codes of the codelist assigned to the attribute if the value is present as a code!
+					for (CodeListItem codeListItem : items) {
+						if( codeListItem.getCode().equals(value)){
+							// FOUND! All good, return null
+							return null;
+						}
+					}
+					
+					return String.format("The code with value \"%s\" is not part of the codelist used by code %s ", value, attributeDefinition.getLabel( NodeLabel.Type.INSTANCE ));
+					
+				}
+				
+			}
+		
+		}catch(Exception e){
+			return String.format("The value \"%s\" cannot be used as a value for the attribute %s", value, attributeDefinition.getLabel( NodeLabel.Type.INSTANCE ) );
+		}
+		
 		return null;
 	}
 
 	private CSVFileValidationResult validateCSVHeaders(List<String> headers, CollectSurvey survey) {
-		List<String> expectedHeaders = determineExpectedHeaders(survey);
+		List<String> expectedHeaders = getExpectedHeaders(survey);
 		if (headers == null || headers.size() < expectedHeaders.size()) {
 			return new CSVFileValidationResult(ErrorType.INVALID_HEADERS, expectedHeaders, headers);
 		} else {
 			List<String> headersSublist = headers.subList(0, expectedHeaders.size());
 			
 			if (toLowerCaseList(expectedHeaders).equals(toLowerCaseList(headersSublist))) {
-				return new CSVFileValidationResult();
+				return null;
 			} else {
 				return new CSVFileValidationResult(ErrorType.INVALID_HEADERS, expectedHeaders, headers);
 			}
 		}
 	}
 
-	public List<String> determineExpectedHeaders(CollectSurvey survey) {	
+	public List<String> getExpectedHeaders(CollectSurvey survey) {	
 		List<AttributeDefinition> attributesPerRow = getAttributesPerRow(survey);
 		return CollectionUtils.project(attributesPerRow, "name");
 	}

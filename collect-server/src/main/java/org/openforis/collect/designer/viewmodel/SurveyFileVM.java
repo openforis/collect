@@ -128,27 +128,33 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		switch (type) {
-		case COLLECT_EARTH_GRID:
-			CollectEarthGridTemplateGenerator templateGenerator = new CollectEarthGridTemplateGenerator();
-			CSVFileValidationResult headersValidationResult = templateGenerator.validate(uploadedFile, survey);
-			if (headersValidationResult.isSuccessful()) {
-				return true;
-			} else {
-				switch(headersValidationResult.getErrorType()) {
-				case INVALID_FILE_TYPE:
-					MessageUtil.showWarning("survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
-					return true; //don't block the user
-				case INVALID_HEADERS:
-					MessageUtil.showWarning("survey.file.type.collect_earth_grid.error.invalid_file_structure", 
-							new Object[]{headersValidationResult.getExpectedHeaders().toString(), 
-									headersValidationResult.getFoundHeaders().toString()});
-					return true; //don't block the user
-				default:
+			case COLLECT_EARTH_GRID:
+				CollectEarthGridTemplateGenerator templateGenerator = new CollectEarthGridTemplateGenerator();
+				CSVFileValidationResult headersValidationResult = templateGenerator.validate(uploadedFile, survey);
+				if (headersValidationResult.isSuccessful()) {
 					return true;
+				} else {
+					switch(headersValidationResult.getErrorType()) {
+					case INVALID_FILE_TYPE:
+						MessageUtil.showWarning("survey.file.error.invalid_file_type", "CSV (Comma Separated Values)");
+						return true; //don't block the user
+					case INVALID_HEADERS:
+						MessageUtil.showWarning("survey.file.type.collect_earth_grid.error.invalid_file_structure", 
+								new Object[]{headersValidationResult.getExpectedHeaders().toString(), 
+										headersValidationResult.getFoundHeaders().toString()});
+						return true; //don't block the user
+					case INVALID_NUMBER_OF_PLOTS_WARNING:
+						MessageUtil.showWarning("survey.file.error.warning_csv_size",  CollectEarthGridTemplateGenerator.CSV_LENGTH_WARNING +"");
+						return true; //don't block the user
+					case INVALID_NUMBER_OF_PLOTS_TOO_LARGE:
+						MessageUtil.showWarning("survey.file.error.error_csv_size",  CollectEarthGridTemplateGenerator.CSV_LENGTH_ERROR +"");
+						return false; //block the user , a file so large would make the CEP file unusable!
+					default:
+						return true;
+					}
 				}
-			}
-		default:
-			return true;
+			default:
+				return true;
 		}
 	}
 	

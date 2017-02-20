@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.Collect;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult;
+import org.openforis.collect.io.metadata.collectearth.CSVRowValidationResult;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SpeciesManager;
@@ -219,13 +220,58 @@ public class SurveyValidator {
 						fileValidationResult.getExpectedHeaders().toString(), 
 						fileValidationResult.getFoundHeaders().toString());
 				break;
+				
+			case INVALID_VALUES_IN_CSV:
+				validationResult = new SurveyValidationResult(
+						Flag.WARNING, 
+						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
+						"survey.file.error.invalid_content", 
+						getRowValidationMessages(fileValidationResult.getRowValidations())
+						);
+				break;
+			
+			case INVALID_NUMBER_OF_COLUMNS:
+				validationResult = new SurveyValidationResult(Flag.WARNING, 
+						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
+						"survey.file.type.collect_earth_grid.error.invalid_file_structure", 
+						fileValidationResult.getExpectedHeaders().toString(), 
+						fileValidationResult.getFoundHeaders().toString());
+				break;
+				
+			case INVALID_NUMBER_OF_PLOTS_TOO_LARGE:
+				validationResult = new SurveyValidationResult(Flag.WARNING, 
+						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
+						"survey.file.error.error_csv_size", 
+						fileValidationResult.getNumberOfRows().toString());
+				break;
+				
+			case INVALID_NUMBER_OF_PLOTS_WARNING:
+				validationResult = new SurveyValidationResult(Flag.WARNING, 
+						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
+						"survey.file.error.warning_csv_size", 
+						fileValidationResult.getNumberOfRows().toString());
+				break;
+			
+				
+				
 			default:
 			}
-			results.add(validationResult);
+			if( validationResult != null )
+				results.add(validationResult);
 		}
 		return results;
 	}
 		
+	private String getRowValidationMessages(
+			List<CSVRowValidationResult> rowValidations) {
+		
+		String message  = "";
+		for (CSVRowValidationResult csvRowValidationResult : rowValidations) {
+			message += "ROW " + csvRowValidationResult.getRowNumber() + " - "+ csvRowValidationResult.getMessage() + "\n";
+		}
+		return message;
+	}
+
 	public List<SurveyValidationResult> validateChanges(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<SurveyValidationResult> partialResults;
@@ -767,6 +813,7 @@ public class SurveyValidator {
 		}
 		
 		public void addResult(SurveyValidationResult result) {
+			//dfgdfg
 			switch ( result.getFlag() ) {
 			case ERROR:
 				errors.add(result);
