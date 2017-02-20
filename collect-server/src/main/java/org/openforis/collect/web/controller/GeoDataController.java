@@ -1,4 +1,4 @@
-package org.openforis.collect.datacleansing.controller;
+package org.openforis.collect.web.controller;
 
 import static org.openforis.collect.utils.Controllers.KML_CONTENT_TYPE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -9,14 +9,15 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.openforis.collect.geospatial.GeoToolsCoordinateOperations;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
-import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
@@ -45,14 +46,15 @@ public class GeoDataController {
 	@RequestMapping(value = "survey/{surveyId}/data/coordinatevalues.json", method=GET)
 	public @ResponseBody List<CoordinateAttributePoint> loadCoordinateValues(
 			@PathVariable int surveyId, 
-			@RequestParam int stepNum,
-			@RequestParam int coordinateAttributeId, 
+			@RequestParam int coordinateAttributeId,
+			@RequestParam String srsId,
 			@RequestParam int recordOffset, 
 			@RequestParam int maxNumberOfRecords) {
 		final List<CoordinateAttributePoint> result = new ArrayList<CoordinateAttributePoint>();
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		
-		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), recordOffset, maxNumberOfRecords, coordinateAttributeId, new CoordinateProcessor() {
+		extractAllRecordCoordinates(survey, recordOffset, maxNumberOfRecords, 
+				coordinateAttributeId, srsId, new CoordinateProcessor() {
 			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				CoordinateAttributePoint point = new CoordinateAttributePoint(coordAttr, wgs84Coordinate);
 				result.add(point);
@@ -73,7 +75,8 @@ public class GeoDataController {
 		
 		final Document kmlDoc = kml.createAndSetDocument().withName(survey.getName());
 		
-		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), null, null, coordinateAttributeId, new CoordinateProcessor() {
+		extractAllRecordCoordinates(survey, null, null, coordinateAttributeId, 
+				SpatialReferenceSystem.WGS84_SRS_ID, new CoordinateProcessor() {
 			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				kmlDoc.createAndAddPlacemark()
 					.withName(record.getRootEntityKeyValues().toString())
@@ -85,26 +88,27 @@ public class GeoDataController {
 		kml.marshal(response.getOutputStream());
 	}
 	
-	private void extractAllRecordCoordinates(CollectSurvey survey, Step step, Integer recordOffset, Integer maxNumberOfRecords, 
-			int coordinateAttributeId, CoordinateProcessor coordinateProcessor) {
-		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
+	private void extractAllRecordCoordinates(CollectSurvey survey, Integer recordOffset, Integer maxNumberOfRecords, 
+			int coordinateAttributeId, String toSrsId, CoordinateProcessor coordinateProcessor) {
+		GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
+		coordinateOperations.registerSRS(survey.getSpatialReferenceSystems());
+		
 		CoordinateAttributeDefinition coordAttrDef = (CoordinateAttributeDefinition) 
 				survey.getSchema().getDefinitionById(coordinateAttributeId);
 
 		RecordFilter filter = new RecordFilter(survey);
-		filter.setStepGreaterOrEqual(step);
 		filter.setOffset(recordOffset);
 		filter.setMaxNumberOfRecords(maxNumberOfRecords);
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
 		for (CollectRecord summary : summaries) {
-			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
+			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), false);
 			List<Node<?>> nodes = record.findNodesByPath(coordAttrDef.getPath());
 			for (Node<?> node : nodes) {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
 				if (coordAttr.isFilled()) {
 					Coordinate coordinate = coordAttr.getValue();
-					Coordinate wgs84Coord = coordinateOperations.convertToWgs84(coordinate);
-					coordinateProcessor.process(record, coordAttr, wgs84Coord);
+					Coordinate projectedCoord = coordinateOperations.convertTo(coordinate, toSrsId);
+					coordinateProcessor.process(record, coordAttr, projectedCoord);
 				}
 			}
 		}
@@ -113,39 +117,47 @@ public class GeoDataController {
 	public static class CoordinateAttributePoint {
 		
 		private CoordinateAttribute attribute;
-		private Coordinate latLongCoordinate;
+		private Coordinate coordinate;
 
-		public CoordinateAttributePoint(CoordinateAttribute attribute, Coordinate latLongCoordinate) {
+		public CoordinateAttributePoint(CoordinateAttribute attribute, Coordinate coordinate) {
 			this.attribute = attribute;
-			this.latLongCoordinate = latLongCoordinate;
+			this.coordinate = coordinate;
 		}
 		
-		public int getRecordId() {
+		public int getRecId() {
 			return attribute.getRecord().getId();
 		}
 		
-		public int getAttributeId() {
-			return attribute.getInternalId();
+		public Step getRecStep() {
+			return ((CollectRecord) attribute.getRecord()).getStep();
 		}
 		
-		public int getAttributeDefinitionId() {
-			return attribute.getDefinition().getId();
-		}
-		
-		public Double getLat() {
-			return latLongCoordinate == null ? null : latLongCoordinate.getY();
-		}
-		
-		public Double getLon() {
-			return latLongCoordinate == null ? null : latLongCoordinate.getX();
-		}
-		
-		public List<String> getRecordKeys() {
+		public List<String> getRecKeys() {
 			CollectRecord record = (CollectRecord) this.attribute.getRecord();
 			return record.getRootEntityKeyValues();
 		}
 		
-		public Double getDistanceToExpectedLocation() {
+		public int getAttrId() {
+			return attribute.getInternalId();
+		}
+		
+		public int getAttrDefId() {
+			return attribute.getDefinition().getId();
+		}
+		
+		public Double getX() {
+			return coordinate == null ? null : coordinate.getX();
+		}
+		
+		public Double getY() {
+			return coordinate == null ? null : coordinate.getY();
+		}
+		
+		/**
+		 * Returns the distance to the expected location
+		 * @return
+		 */
+		public Double getDistance() {
 			DistanceCheck distanceCheck = this.attribute.getDefinition().extractMaxDistanceCheck();
 			if (distanceCheck == null) {
 				return null;
@@ -153,7 +165,6 @@ public class GeoDataController {
 				return distanceCheck.evaluateDistanceToDestination(attribute);
 			}
 		}
-		
 	}
 	
 	private interface CoordinateProcessor {

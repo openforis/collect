@@ -20,6 +20,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -76,15 +77,16 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "/survey/{surveyId}/data/records/count.json", method=GET)
 	public @ResponseBody
-	int getCount(@PathVariable int surveyId,
-			@RequestParam(value="rootEntityDefinitionId", required=false) Integer rootEntityDefinitionId,
+	int getCount(@PathVariable(value="survey_id") int surveyId,
+			@RequestParam(value="rootEntityDefinitionId") int rootEntityDefinitionId,
 			@RequestParam(value="step", required=false) Integer stepNumber) throws Exception {
-		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		if (rootEntityDefinitionId == null) {
-			rootEntityDefinitionId = survey.getSchema().getFirstRootEntityDefinition().getId();
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(rootEntityDefinitionId);
+		if (stepNumber != null) {
+			filter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
 		}
-		int count = recordManager.countRecords(survey, rootEntityDefinitionId, stepNumber);
+		int count = recordManager.countRecords(filter);
 		return count;
 	}
 

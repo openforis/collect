@@ -1,6 +1,6 @@
 OF.Batch = function() {};
 
-OF.Batch.BatchProcessor = function(totalItems, batchSize, processFn) {
+OF.Batch.BatchProcessor = function(totalItems, batchSize, processFn, interval) {
 	this.totalItems = totalItems;
 	this.batchSize = batchSize;
 	this.processFn = processFn;
@@ -12,22 +12,22 @@ OF.Batch.BatchProcessor = function(totalItems, batchSize, processFn) {
 
 OF.Batch.BatchProcessor.prototype = {
 	start : function() {
+		var $this = this;
 		this.running = true;
-		this.processNextIfPossible();
+		$this.processNextIfPossible();
 	},
 	stop : function() {
 		this.running = false;
+		if ($this.timeout != null) {
+			clearInterval($this.timeout);
+		}
 	},
 	processNext : function() {
 		var $this = this;
 		$this.progressPercent = Math.floor((100 * ($this.nextBlockIndex + 1)) / $this.blocks);
 		var blockOffset = $this.nextBlockIndex * $this.batchSize;
-		$this.processFn(blockOffset, function() {
-			if ($this.running) {
-				$this.nextBlockIndex++;
-				$this.processNextIfPossible();
-			}
-		});
+		$this.processFn(blockOffset);
+		$this.nextBlockIndex++;
 	},
 	processNextIfPossible : function() {
 		if (this.nextBlockIndex < this.blocks) {

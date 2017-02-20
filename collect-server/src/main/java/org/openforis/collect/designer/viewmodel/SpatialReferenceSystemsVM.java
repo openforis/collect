@@ -13,7 +13,6 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SpatialReferenceSystemFormObject;
 import org.openforis.collect.geospatial.GeoToolsCoordinateOperations;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;

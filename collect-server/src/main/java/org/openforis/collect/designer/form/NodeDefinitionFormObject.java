@@ -31,7 +31,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		ALWAYS_RELEVANT, RELEVANT_WHEN
 	}
 	
-	@SuppressWarnings("unused")
 	private EntityDefinition parentDefinition;
 	
 	//generic
@@ -220,11 +219,12 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		dest.setMaxCountExpression(null);
 		dest.setRequiredExpression(null);
 		
-		if (dest instanceof EntityDefinition && ((EntityDefinition) dest).isRoot()) {
+		if (dest instanceof EntityDefinition && parentDefinition == null) {
+			//root entity is always true
 			dest.setMultiple(true);
 		} else if (! (dest instanceof AttributeDefinition && calculated)) {
+			dest.setMultiple(multiple);
 			if (multiple) {
-				dest.setMultiple(true);
 				dest.setMinCountExpression(StringUtils.trimToNull(minCountExpression));
 				dest.setMaxCountExpression(StringUtils.trimToNull(maxCountExpression));
 			} else {

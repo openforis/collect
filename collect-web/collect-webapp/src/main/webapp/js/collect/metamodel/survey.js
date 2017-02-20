@@ -45,6 +45,14 @@ Collect.Metamodel.Survey.prototype.getDefinition = function(id) {
 	return node;
 };
 
+Collect.Metamodel.Survey.prototype.getMainRootEntity = function() {
+	return this.rootEntities.length > 0 ? this.rootEntities[0] : null;
+}
+
+Collect.Metamodel.Survey.prototype.getRooEntityKeyDefinitions = function() {
+	return this.getKeyDefinitions(this.getMainRootEntity());
+};
+
 Collect.Metamodel.Survey.prototype.getKeyDefinitions = function(rootEntity) {
 	var result = new Array();
 	var stack = new Array();
@@ -89,6 +97,10 @@ Collect.Metamodel.NodeDefinition.prototype.getPath = function() {
 		currentNode = currentNode.parent;
 	}
 	return result;
+}
+
+Collect.Metamodel.NodeDefinition.prototype.getLabelOrName = function() {
+	return this.label == null ? this.name : this.label;
 }
 
 Collect.Metamodel.AttributeDefinition = function(json) {

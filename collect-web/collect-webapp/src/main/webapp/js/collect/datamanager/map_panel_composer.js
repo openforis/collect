@@ -97,16 +97,19 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			return feature;
 		});
 		if (feature) {
+			var survey = feature.get('survey');
 			var htmlContent;
 			
 			switch (feature.get('type')) {
 			case 'sampling_point':
+				var lonLat = ol.proj.toLonLat([coordinate[0], coordinate[1]]);
+				var keyDefs = survey.getRooEntityKeyDefinitions();
 				function printLevelCodes(levelCodes) {
 					var result = "";
 					for (var i = 0; i < levelCodes.length; i++) {
-						result += "level " + (i + 1) + ": "
-						+ levelCodes[i]
-						+ "<br>";
+						var keyDef = keyDefs.length > i ? keyDefs[i] : null;
+						var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
+						result += levelName + ": " + levelCodes[i] + "<br>";
 					}
 					return result;
 				}
@@ -116,36 +119,41 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 						"<b>Sampling Point</b>"
 						+ "<br>"
 						+ "{0}"
-						+ "latitude: {1}"
+						+ "Latitude: {1}"
 						+ "<br>"
-						+ "longitude: {2}"
+						+ "Longitude: {2}"
 						+ "<br>"
-						, printLevelCodes(levelCodes), coordinate[0], coordinate[1]);
+						, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
 				break;
 			case 'coordinate_attribute_value':
 				var point = feature.get('point');
-				var survey = feature.get('survey');
+				//project coordinate from Web Marcator to lat lon
+				var lonLat = ol.proj.toLonLat([point.x, point.y]);
 				
 				htmlContent = OF.Strings.format("<b>{0}</b>"
-				+ "<br>"
-				+ "<b>record</b>: {1}"
-				+ "<br>"
-				+ "latitude: {2}" 
-				+ "<br>"
-				+ "longitude: {3}"
-				+ "<br>" 
-				+ "{4}"
-				+ "<br>"
-				+ "<a href=\"javascript:void(0);\" onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({5}, {6}, '{7}')\">Edit</a>"
-				, survey.getDefinition(point.attributeDefinitionId).label
-				, point.recordKeys
-				, point.lat
-				, point.lon
-				, (isNaN(point.distanceToExpectedLocation) ? "" : "distance to expected location: " +
-						Math.round(point.distanceToExpectedLocation) + "m")
+					+ "<br>"
+					+ "<b>Record</b>: {1}"
+					+ "<br>"
+					+ "Latitude: {2}" 
+					+ "<br>"
+					+ "Longitude: {3}"
+					+ "<br>" 
+					+ "{4}"
+					+ "<br>"
+					+ "Phase: {5}"
+					+ "<br>" 
+					+ "<a href=\"javascript:void(0);\" "
+					+ "onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({6}, {7}, '{8}')\">Edit</a>"
+				, survey.getDefinition(point.attrDefId).label
+				, point.recKeys
+				, lonLat[1]
+				, lonLat[0]
+				, (isNaN(point.distance) ? "" : "Distance to expected location: " +
+						Math.round(point.distance) + "m")
+				, point.recStep
 				, survey.id
-				, point.recordId
-				, point.recordKeys);
+				, point.recId
+				, point.recKeys);
 				break;
 			}
 			$this.popupContent.html(htmlContent);
@@ -184,16 +192,8 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				type : 'coordinate_data',
 				survey : survey,
 				coordinate_attribute_def : nodeDef,
-				projection : 'EPSG:4326',
 				source : null,
-				style : new ol.style.Style({
-					image : new ol.style.Circle({
-						fill : new ol.style.Fill({
-							color : getRandomRGBColor().concat([1])
-						}),
-						radius : 5
-					})
-				})
+				style : $this.coordinateAttributeLayerStyleFunction
 			});
 			coordinateDataLayers.push(dataLayer);
 		}
@@ -211,11 +211,10 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				visible : false,
 				type : 'sampling_points',
 				survey : survey,
-				projection : 'EPSG:4326',
 				style : new ol.style.Style({
 					image : new ol.style.Circle({
 						fill : new ol.style.Fill({
-							color : getRandomRGBColor().concat([1])
+							color : "#0000FF"
 						}),
 						radius : 5
 					})
@@ -236,6 +235,32 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 	});
 
 	return surveyGroup;
+};
+
+Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunction = function(feature) {
+	var point = feature.get('point');
+	var step = point.recStep;
+	var color;
+	switch (step) {
+	case 'ENTRY':
+		color = "#FF0000";
+		break;
+	case 'CLEANSING':
+		color = "#FF9933";
+		break;
+	case 'ANALYSIS':
+		color = "#00FF00";
+		break;
+	}
+	var style = new ol.style.Style({
+		image : new ol.style.Circle({
+			fill : new ol.style.Fill({
+				color : color
+			}),
+			radius : 5
+		})
+	});
+	return [style];
 };
 
 Collect.DataManager.MapPanelComposer.prototype.createBaseMapsLayer = function() {
@@ -339,25 +364,35 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 			extractStyles : false
 		})
 	});
+	
+	callback(source);
+	
+	//wait for load complete (change event)
 	source.on('change', function(event) {
 		if (source.getState() == 'ready') {
-			source.forEachFeature(function(feature) {
-				feature.set('type', 'sampling_point');
-				feature.set('survey', survey);
-			});
-			readyCallback(source);
+			onReady();
 		}
 	});
-	callback(source);
+	
+	function onReady() {
+		source.forEachFeature(function(feature) {
+			feature.setProperties({
+				'type': 'sampling_point',
+				'survey' : survey
+			}, true);
+		});
+		readyCallback(source);
+	}
+	
+	onReady();
 };
 
 Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = function(survey, coordinateAttributeDef, callback, readyCallback) {
-	var step = 1;
 	var rootEntityDefinitionId = survey.rootEntities[0].id;
 	
 	var source = new ol.source.Vector();
 	
-	collect.dataService.countRecords(survey.id, rootEntityDefinitionId, step, function(recordCount) {
+	collect.dataService.countRecords(survey.id, rootEntityDefinitionId, function(recordCount) {
 		if (recordCount == 0) {
 			return;
 		}
@@ -370,11 +405,17 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		var startTime = new Date().getTime();
 
 		var processCoordinateValue = function(coordinateAttributePoint) {
+			var xyCoord = [ coordinateAttributePoint.x, coordinateAttributePoint.y ];
+			
+			//var webMarcatorXY = ol.proj.fromLonLat(xyCoord);
+			
+			var webMarcatorXY = xyCoord;
+			
 			var coordinateFeature = new ol.Feature({
 				type : "coordinate_attribute_value",
 				point : coordinateAttributePoint,
 				survey : survey,
-				geometry : new ol.geom.Point([ coordinateAttributePoint.lat, coordinateAttributePoint.lon ])
+				geometry : new ol.geom.Point(webMarcatorXY, 'XY')
 			});
 			source.addFeature(coordinateFeature);
 		};
@@ -397,12 +438,15 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 					progressPercent : batchProcessor.progressPercent
 				};
 				jobDialog.updateUI(fakeProgressJob);
+				batchProcessor.processNext();
 			}
 		};
 
-		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset, callback) {
-			collect.geoDataService.loadCoordinateValues(survey.id, step, coordinateAttributeDef.id, blockOffset, batchSize, processCoordinateValues);
-		});
+		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset) {
+			var srsId = 'EPSG:3857'; //web marcator srs
+			collect.geoDataService.loadCoordinateValues(survey.id, coordinateAttributeDef.id, 
+					srsId, blockOffset, batchSize, processCoordinateValues);
+		}, 500);
 
 		jobDialog.cancelBtn.click(function() {
 			batchProcessor.stop();
@@ -412,6 +456,40 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		batchProcessor.start();
 	});
 };
+
+function getRandomColor(minimum, maximum) {
+	if (! min) {
+		min = '#000000';
+	}
+	if (! max) {
+		max = '#FFFFFF';
+	}
+	var result;
+	do {
+		result = '#'+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);
+	} while (result < min || result > max);
+	return result;
+}
+
+function defaultIfNull(value, defaultValue) {
+	return value ? value : defaultValue;
+}
+
+function getRandomRGBColor(rMin, rMax, gMin, gMax, bMin, bMax) {
+	rMin = defaultIfNull(rMin, 0);
+	rMax = defaultIfNull(rMax, 255);
+	gMin = defaultIfNull(gMin, 0);
+	gMax = defaultIfNull(gMax, 255);
+	bMin = defaultIfNull(bMin, 0);
+	bMax = defaultIfNull(bMax, 255);
+	var result = [getRandomValue(rMin, rMax), getRandomValue(gMin, gMax), getRandomValue(bMin, bMax)];
+	return result;
+	
+	function getRandomValue(min, max) {
+		var result = min + Math.random() * (max - min);
+		return result;
+	}
+}
 
 Collect.DataManager.MapPanelComposer.prototype.reset = function() {
 	//this.map.remove();
@@ -474,40 +552,3 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 
 	setInitialRecordEditPopUpSize();
 };
-
-function getRandomColor(minimum, maximum) {
-	if (! min) {
-		min = '#000000';
-	}
-	if (! max) {
-		max = '#FFFFFF';
-	}
-	var result;
-	do {
-		result = '#'+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6);
-	} while (result < min || result > max);
-	return result;
-}
-
-function defaultIfNull(value, defaultValue) {
-	return value ? value : defaultValue;
-}
-
-function getRandomRGBColor(rMin, rMax, gMin, gMax, bMin, bMax) {
-	rMin = defaultIfNull(rMin, 0);
-	rMax = defaultIfNull(rMax, 255);
-	gMin = defaultIfNull(gMin, 0);
-	gMax = defaultIfNull(gMax, 255);
-	bMin = defaultIfNull(bMin, 0);
-	bMax = defaultIfNull(bMax, 255);
-	var result = [getRandomValue(rMin, rMax), getRandomValue(gMin, gMax), getRandomValue(bMin, bMax)];
-	return result;
-	
-	function getRandomValue(min, max) {
-		var result = 0;
-		do {
-			result = Math.random() * max;
-		} while (result < min);
-		return result;
-	}
-}

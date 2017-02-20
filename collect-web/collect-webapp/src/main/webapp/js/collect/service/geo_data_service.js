@@ -5,10 +5,11 @@ Collect.GeoDataService = function() {
 
 Collect.GeoDataService.prototype = Object.create(Collect.AbstractService.prototype);
 
-Collect.GeoDataService.prototype.loadCoordinateValues = function(surveyId, stepNum, coordinateAttributeId, recordOffset, maxNumberOfRecords, onSuccess, onError) {
+Collect.GeoDataService.prototype.loadCoordinateValues = function(surveyId, coordinateAttributeId, srsId, 
+		recordOffset, maxNumberOfRecords, onSuccess, onError) {
 	var data = {
-		stepNum: stepNum,
 		coordinateAttributeId: coordinateAttributeId,
+		srsId: srsId,
 		recordOffset: recordOffset, 
 		maxNumberOfRecords: maxNumberOfRecords
 	};
