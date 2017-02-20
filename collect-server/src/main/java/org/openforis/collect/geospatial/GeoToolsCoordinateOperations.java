@@ -46,28 +46,21 @@ public class GeoToolsCoordinateOperations {
 
 	// private static CoordinateOperationFactory CO_FACTORY;
 	// private static Map<String, CoordinateReferenceSystem> SYSTEMS;
-	private static TransformCache transformCache;
-	private static Map<String, CoordinateReferenceSystem> CRS_BY_SRS_ID;
+	private TransformCache transformCache;
+	private Map<String, CoordinateReferenceSystem> CRS_BY_SRS_ID;
 
-	static {
-		init();
-	}
-
-	private static void init() {
+	public GeoToolsCoordinateOperations() {
 		try {
 			// SYSTEMS = new HashMap<String, CoordinateReferenceSystem>();
 			transformCache = new TransformCache();
 			CRS_BY_SRS_ID = new HashMap<String, CoordinateReferenceSystem>();
 			
 			CRS_BY_SRS_ID.put(WGS84_SRS_ID, WGS84);
-			
 			CoordinateReferenceSystem webMercatorCrs = CRS.decode(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
-			MathTransform webMarcatorToLatLonTransform = CRS.findMathTransform(webMercatorCrs, WGS84, true);
-			transformCache.put(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, WGS84_SRS_ID, webMarcatorToLatLonTransform);
-			
-			MathTransform latLonToWebMarcatorTransform = CRS.findMathTransform(WGS84, webMercatorCrs, true);
-			transformCache.put(WGS84_SRS_ID, SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, latLonToWebMarcatorTransform);
 			CRS_BY_SRS_ID.put(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, webMercatorCrs);
+			
+			getOrCreateTransform(SpatialReferenceSystem.WGS84_SRS_ID, SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
+			getOrCreateTransform(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, SpatialReferenceSystem.WGS84_SRS_ID);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled()) {
 				LOG.error("Error while initializing CoordinateOperations", e);
@@ -101,7 +94,7 @@ public class GeoToolsCoordinateOperations {
 			double x = coordinate.getX();
 			double y = coordinate.getY();
 			String srsId = coordinate.getSrsId();
-			Position position = toWgs84(x, y, srsId);
+			Position position = toLatLonPosition(x, y, srsId);
 			GeodeticCalculator calculator = new GeodeticCalculator();
 			//this will call methods checkLatidude and checkLongitude inside of GeodeticCalculator
 			calculator.setStartingPosition(position);
@@ -116,8 +109,8 @@ public class GeoToolsCoordinateOperations {
 	}
 	
 	public double orthodromicDistance(double startX, double startY, String startSRSId, double destX, double destY, String destSRSId) throws CoordinateOperationException {
-		Position startingPosition = toWgs84(startX, startY, startSRSId);
-		Position destinationPosition = toWgs84(destX, destY, destSRSId);
+		Position startingPosition = toLatLonPosition(startX, startY, startSRSId);
+		Position destinationPosition = toLatLonPosition(destX, destY, destSRSId);
 		return orthodromicDistance(startingPosition, destinationPosition);
 	}
 
@@ -214,7 +207,7 @@ public class GeoToolsCoordinateOperations {
 		registerSRS(srs);
 	}
 	
-	public static void registerSRS(SpatialReferenceSystem srs) {
+	public void registerSRS(SpatialReferenceSystem srs) {
 		String srsId = srs.getId();
 		MathTransform latLonTransform = transformCache.get(SpatialReferenceSystem.WGS84_SRS_ID, srsId);
 		if (latLonTransform == null) {
@@ -223,6 +216,11 @@ public class GeoToolsCoordinateOperations {
 				CoordinateReferenceSystem crs = parseWKT(wkt);
 				latLonTransform = findToWGS84MathTransform(crs);
 				transformCache.put(srsId, SpatialReferenceSystem.WGS84_SRS_ID, latLonTransform);
+				
+				CoordinateReferenceSystem webMarcatorCrs = CRS_BY_SRS_ID.get(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
+				MathTransform webMarcatorTransform = CRS.findMathTransform(crs, webMarcatorCrs);
+				transformCache.put(srsId, SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, webMarcatorTransform);
+				
 				CRS_BY_SRS_ID.put(srsId, crs);
 			} catch (Exception e) {
 				//TODO throw exception
@@ -243,7 +241,7 @@ public class GeoToolsCoordinateOperations {
 		if (toSrsId.equals(coordinate.getSrsId())) {
 			return coordinate;
 		} else {
-			Position position = toWgs84(coordinate.getX(), coordinate.getY(), coordinate.getSrsId());
+			Position position = toPosition(coordinate.getX(), coordinate.getY(), coordinate.getSrsId(), toSrsId);
 			DirectPosition directPosition = position.getDirectPosition();
 			return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), toSrsId);
 		}
@@ -258,20 +256,19 @@ public class GeoToolsCoordinateOperations {
 	}
 
 	private Coordinate convert(double x, double y, String fromSrsId, String toSrsId) {
-		CoordinateReferenceSystem fromCRS = CRS_BY_SRS_ID.get(fromSrsId);
 		try {
 			DirectPosition src = new DirectPosition2D(x, y);
-			CoordinateReferenceSystem toCrs = CRS_BY_SRS_ID.get(toSrsId);
-			MathTransform transform = CRS.findMathTransform(fromCRS, toCrs);
+			MathTransform transform = getOrCreateTransform(fromSrsId, toSrsId);
 			if (transform == null) {
 				if (LOG.isErrorEnabled()) {
 					LOG.error("Unknown CRS: " + toSrsId);
 				}
 				return new Coordinate(0d, 0d, toSrsId);
+			} else {
+				DirectPosition directPosition = transform.transform(src, null);
+				double[] coord = directPosition.getCoordinate();
+				return new Coordinate(coord[0], coord[1], toSrsId);
 			}
-			DirectPosition directPosition = transform.transform(src, null);
-			double[] coord = directPosition.getCoordinate();
-			return new Coordinate(coord[0], coord[1], toSrsId);
 		} catch (Throwable t) {
 			if (LOG.isErrorEnabled()) {
 				LOG.error("Error converting lat lon to web marcator: lat=" + y + " lon=" + x, t);
@@ -280,13 +277,17 @@ public class GeoToolsCoordinateOperations {
 		}
 	}
 
-	private static Position toWgs84(double x, double y, String srsId) {
+	private Position toLatLonPosition(double x, double y, String srsId) {
+		return toPosition(x, y, srsId, SpatialReferenceSystem.WGS84_SRS_ID);
+	}
+	
+	private Position toPosition(double x, double y, String fromSrsId, String toSrsId) {
 		try {
 			DirectPosition src = new DirectPosition2D(x, y);
-			MathTransform transform = transformCache.get(srsId, SpatialReferenceSystem.WGS84_SRS_ID);
+			MathTransform transform = getOrCreateTransform(fromSrsId, toSrsId);
 			if (transform == null) {
 				if (LOG.isErrorEnabled()) {
-					LOG.error("Unknown CRS: " + srsId);
+					LOG.error(String.format("Cannot find transform from %s to %s", fromSrsId, toSrsId));
 				}
 				return new DirectPosition2D(0, 0);
 			}
@@ -294,7 +295,7 @@ public class GeoToolsCoordinateOperations {
 			return directPosition;
 		} catch (Throwable t) {
 			if (LOG.isErrorEnabled()) {
-				LOG.error("Error converting: x=" + x + " y=" + y + " srs=" + srsId, t);
+				LOG.error("Error converting: x=" + x + " y=" + y + " srs=" + fromSrsId, t);
 			}
 			return new DirectPosition2D(0, 0);
 		}
@@ -303,6 +304,17 @@ public class GeoToolsCoordinateOperations {
 	private static MathTransform findToWGS84MathTransform(CoordinateReferenceSystem crs) throws FactoryException {
 		MathTransform mathTransform = CRS.findMathTransform(crs, WGS84, true);
 		return mathTransform;
+	}
+
+	private MathTransform getOrCreateTransform(String fromSrsId, String toSrsId) throws FactoryException {
+		MathTransform transform = transformCache.get(fromSrsId, toSrsId);
+		if (transform == null) {
+			CoordinateReferenceSystem fromCRS = CRS_BY_SRS_ID.get(fromSrsId);
+			CoordinateReferenceSystem toCrs = CRS_BY_SRS_ID.get(toSrsId);
+			transform = CRS.findMathTransform(fromCRS, toCrs, true);
+			transformCache.put(fromSrsId, toSrsId, transform);
+		}
+		return transform;
 	}
 
 	private static class TransformCache {

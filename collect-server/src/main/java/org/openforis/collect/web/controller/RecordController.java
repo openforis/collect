@@ -12,6 +12,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.web.session.SessionState;
@@ -68,9 +69,14 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody
 	int getCount(@PathVariable(value="survey_id") int surveyId,
 			@RequestParam(value="rootEntityDefinitionId") int rootEntityDefinitionId,
-			@RequestParam(value="step") int stepNumber) throws Exception {
+			@RequestParam(value="step", required=false) Integer stepNumber) throws Exception {
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		int count = recordManager.countRecords(survey, rootEntityDefinitionId, stepNumber);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(rootEntityDefinitionId);
+		if (stepNumber != null) {
+			filter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
+		}
+		int count = recordManager.countRecords(filter);
 		return count;
 	}
 

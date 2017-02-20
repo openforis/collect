@@ -131,22 +131,26 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 				var lonLat = ol.proj.toLonLat([point.x, point.y]);
 				
 				htmlContent = OF.Strings.format("<b>{0}</b>"
-				+ "<br>"
-				+ "<b>record</b>: {1}"
-				+ "<br>"
-				+ "latitude: {2}" 
-				+ "<br>"
-				+ "longitude: {3}"
-				+ "<br>" 
-				+ "{4}"
-				+ "<br>"
-				+ "<a href=\"javascript:void(0);\" onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({5}, {6}, '{7}')\">Edit</a>"
+					+ "<br>"
+					+ "<b>record</b>: {1}"
+					+ "<br>"
+					+ "latitude: {2}" 
+					+ "<br>"
+					+ "longitude: {3}"
+					+ "<br>" 
+					+ "{4}"
+					+ "<br>"
+					+ "phase: {5}"
+					+ "<br>" 
+					+ "<a href=\"javascript:void(0);\" "
+					+ "onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({6}, {7}, '{8}')\">Edit</a>"
 				, survey.getDefinition(point.attrDefId).label
 				, point.recKeys
 				, lonLat[1]
 				, lonLat[0]
 				, (isNaN(point.distance) ? "" : "distance to expected location: " +
 						Math.round(point.distance) + "m")
+				, point.recStep
 				, survey.id
 				, point.recId
 				, point.recKeys);
@@ -189,14 +193,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				survey : survey,
 				coordinate_attribute_def : nodeDef,
 				source : null,
-				style : new ol.style.Style({
-					image : new ol.style.Circle({
-						fill : new ol.style.Fill({
-							color : getRandomRGBColor()
-						}),
-						radius : 5
-					})
-				})
+				style : $this.coordinateAttributeLayerStyleFunction
 			});
 			coordinateDataLayers.push(dataLayer);
 		}
@@ -217,7 +214,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				style : new ol.style.Style({
 					image : new ol.style.Circle({
 						fill : new ol.style.Fill({
-							color : getRandomRGBColor()
+							color : "#0000FF"
 						}),
 						radius : 5
 					})
@@ -238,6 +235,32 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 	});
 
 	return surveyGroup;
+};
+
+Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunction = function(feature) {
+	var point = feature.get('point');
+	var step = point.recStep;
+	var color;
+	switch (step) {
+	case 'ENTRY':
+		color = "#FF0000";
+		break;
+	case 'CLEANSING':
+		color = "#FF9933";
+		break;
+	case 'ANALYSIS':
+		color = "#00FF00";
+		break;
+	}
+	var style = new ol.style.Style({
+		image : new ol.style.Circle({
+			fill : new ol.style.Fill({
+				color : color
+			}),
+			radius : 5
+		})
+	});
+	return [style];
 };
 
 Collect.DataManager.MapPanelComposer.prototype.createBaseMapsLayer = function() {
@@ -365,12 +388,11 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 };
 
 Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = function(survey, coordinateAttributeDef, callback, readyCallback) {
-	var step = 1;
 	var rootEntityDefinitionId = survey.rootEntities[0].id;
 	
 	var source = new ol.source.Vector();
 	
-	collect.dataService.countRecords(survey.id, rootEntityDefinitionId, step, function(recordCount) {
+	collect.dataService.countRecords(survey.id, rootEntityDefinitionId, function(recordCount) {
 		if (recordCount == 0) {
 			return;
 		}
@@ -422,9 +444,9 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset) {
 			var srsId = 'EPSG:3857'; //web marcator srs
-			collect.geoDataService.loadCoordinateValues(survey.id, step, coordinateAttributeDef.id, 
+			collect.geoDataService.loadCoordinateValues(survey.id, coordinateAttributeDef.id, 
 					srsId, blockOffset, batchSize, processCoordinateValues);
-		}, 2000);
+		}, 500);
 
 		jobDialog.cancelBtn.click(function() {
 			batchProcessor.stop();

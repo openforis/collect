@@ -46,7 +46,6 @@ public class GeoDataController {
 	@RequestMapping(value = "survey/{surveyId}/data/coordinatevalues.json", method=GET)
 	public @ResponseBody List<CoordinateAttributePoint> loadCoordinateValues(
 			@PathVariable int surveyId, 
-			@RequestParam int stepNum,
 			@RequestParam int coordinateAttributeId,
 			@RequestParam String srsId,
 			@RequestParam int recordOffset, 
@@ -54,7 +53,7 @@ public class GeoDataController {
 		final List<CoordinateAttributePoint> result = new ArrayList<CoordinateAttributePoint>();
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		
-		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), recordOffset, maxNumberOfRecords, 
+		extractAllRecordCoordinates(survey, recordOffset, maxNumberOfRecords, 
 				coordinateAttributeId, srsId, new CoordinateProcessor() {
 			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				CoordinateAttributePoint point = new CoordinateAttributePoint(coordAttr, wgs84Coordinate);
@@ -76,7 +75,7 @@ public class GeoDataController {
 		
 		final Document kmlDoc = kml.createAndSetDocument().withName(survey.getName());
 		
-		extractAllRecordCoordinates(survey, Step.valueOf(stepNum), null, null, coordinateAttributeId, 
+		extractAllRecordCoordinates(survey, null, null, coordinateAttributeId, 
 				SpatialReferenceSystem.WGS84_SRS_ID, new CoordinateProcessor() {
 			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
 				kmlDoc.createAndAddPlacemark()
@@ -89,25 +88,26 @@ public class GeoDataController {
 		kml.marshal(response.getOutputStream());
 	}
 	
-	private void extractAllRecordCoordinates(CollectSurvey survey, Step step, Integer recordOffset, Integer maxNumberOfRecords, 
+	private void extractAllRecordCoordinates(CollectSurvey survey, Integer recordOffset, Integer maxNumberOfRecords, 
 			int coordinateAttributeId, String toSrsId, CoordinateProcessor coordinateProcessor) {
 		GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
+		coordinateOperations.registerSRS(survey.getSpatialReferenceSystems());
+		
 		CoordinateAttributeDefinition coordAttrDef = (CoordinateAttributeDefinition) 
 				survey.getSchema().getDefinitionById(coordinateAttributeId);
 
 		RecordFilter filter = new RecordFilter(survey);
-		filter.setStepGreaterOrEqual(step);
 		filter.setOffset(recordOffset);
 		filter.setMaxNumberOfRecords(maxNumberOfRecords);
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
 		for (CollectRecord summary : summaries) {
-			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
+			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), false);
 			List<Node<?>> nodes = record.findNodesByPath(coordAttrDef.getPath());
 			for (Node<?> node : nodes) {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
 				if (coordAttr.isFilled()) {
 					Coordinate coordinate = coordAttr.getValue();
-					Coordinate projectedCoord = coordinateOperations.convertToWebMarcator(coordinate);
+					Coordinate projectedCoord = coordinateOperations.convertTo(coordinate, toSrsId);
 					coordinateProcessor.process(record, coordAttr, projectedCoord);
 				}
 			}
@@ -128,6 +128,15 @@ public class GeoDataController {
 			return attribute.getRecord().getId();
 		}
 		
+		public Step getRecStep() {
+			return ((CollectRecord) attribute.getRecord()).getStep();
+		}
+		
+		public List<String> getRecKeys() {
+			CollectRecord record = (CollectRecord) this.attribute.getRecord();
+			return record.getRootEntityKeyValues();
+		}
+		
 		public int getAttrId() {
 			return attribute.getInternalId();
 		}
@@ -142,11 +151,6 @@ public class GeoDataController {
 		
 		public Double getY() {
 			return coordinate == null ? null : coordinate.getY();
-		}
-		
-		public List<String> getRecKeys() {
-			CollectRecord record = (CollectRecord) this.attribute.getRecord();
-			return record.getRootEntityKeyValues();
 		}
 		
 		/**
