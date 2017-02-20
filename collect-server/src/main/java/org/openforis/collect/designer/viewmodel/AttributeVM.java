@@ -1,8 +1,11 @@
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.ATTRIBUTE_DEFAULTS_FIELD;
+import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.KEY_FIELD;
+import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.MEASUREMENT_FIELD;
+import static org.openforis.collect.designer.form.NodeDefinitionFormObject.MULTIPLE_FIELD;
 import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_ERROR;
 import static org.openforis.collect.designer.model.LabelKeys.CHECK_FLAG_WARNING;
-import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -157,6 +160,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@Command
 	public void keyChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("key") boolean key ) {
+		if (! key) {
+			setTempFormObjectFieldValue(MEASUREMENT_FIELD, false);
+		}
 		dispatchApplyChangesCommand(binder);
 		dispatchKeyChangingCommand(key);
 	}
@@ -170,8 +176,8 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	@Command
 	public void calculatedChanged(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("changed") boolean changed) {
-		setTempFormObjectFieldValue("key", false);
-		setTempFormObjectFieldValue("multiple", false);
+		setTempFormObjectFieldValue(KEY_FIELD, false);
+		setTempFormObjectFieldValue(MULTIPLE_FIELD, false);
 		setTempFormObjectFieldValue("showInUI", true);
 		setTempFormObjectFieldValue("includeInDataExport", Annotation.INCLUDE_IN_DATA_EXPORT.getDefaultValue());
 		setTempFormObjectFieldValue("editable", Annotation.EDITABLE.getDefaultValue());

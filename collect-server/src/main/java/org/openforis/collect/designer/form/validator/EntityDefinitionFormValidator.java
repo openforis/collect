@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.form.validator;
 
+import static org.openforis.collect.designer.form.NodeDefinitionFormObject.MULTIPLE_FIELD;
+
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;

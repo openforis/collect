@@ -8,6 +8,7 @@ import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.CHECKS_FIELD;
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.KEY_FIELD;
 import static org.openforis.collect.designer.form.AttributeDefinitionFormObject.REFERENCED_ATTRIBUTE_PATH_FIELD;
+import static org.openforis.collect.designer.form.NodeDefinitionFormObject.MULTIPLE_FIELD;
 
 import java.util.HashSet;
 import java.util.List;

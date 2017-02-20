@@ -26,6 +26,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
 	public static final String CHECKS_FIELD = "checks";
 	public static final String KEY_FIELD = "key";
+	public static final String MEASUREMENT_FIELD = "measurement";
 	public static final String CALCULATED_FIELD = "calculated";
 	public static final String REFERENCED_ATTRIBUTE_PATH_FIELD = "referencedAttributePath";
 
@@ -60,6 +61,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		CollectAnnotations annotations = survey.getAnnotations();
 		annotations.setPhaseToApplyDefaultValue(dest, Step.valueOf(phaseToApplyDefaultValue));
 		annotations.setEditable(dest, editable);
+		annotations.setMeasurementAttribute(dest, measurement);
 
 		// save checks
 		dest.removeAllChecks();
@@ -77,7 +79,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
 
-		key = ((AttributeDefinition) source).isKey();
+		key = source.isKey();
 
 		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
 
@@ -86,7 +88,8 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 
 		phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue(source).name();
 		editable = annotations.isEditable(source);
-
+		measurement = annotations.isMeasurementAttribute(source);
+		
 		checks = new ArrayList<Check<?>>(source.getChecks());
 
 		UIOptions uiOptions = getUIOptions(source);

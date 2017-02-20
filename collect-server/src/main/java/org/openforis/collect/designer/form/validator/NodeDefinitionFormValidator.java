@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.form.validator;
 
+import static org.openforis.collect.designer.form.NodeDefinitionFormObject.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject.RelevanceType;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject.RequirenessType;
@@ -27,7 +29,6 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 
 	protected static final String 	DESCRIPTION_FIELD = "description";
 	protected static final String 	NAME_FIELD = "name";
-	protected static final String 	MULTIPLE_FIELD = "multiple";
 	protected static final String 	MIN_COUNT_EXPRESSION_FIELD = "minCountExpression";
 	protected static final String 	MAX_COUNT_EXPRESSION_FIELD = "maxCountExpression";
 	protected static final String 	TAB_NAME_FIELD = "tabName";
