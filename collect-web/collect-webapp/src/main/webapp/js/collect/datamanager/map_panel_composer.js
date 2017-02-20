@@ -97,18 +97,19 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			return feature;
 		});
 		if (feature) {
+			var survey = feature.get('survey');
 			var htmlContent;
 			
 			switch (feature.get('type')) {
 			case 'sampling_point':
 				var lonLat = ol.proj.toLonLat([coordinate[0], coordinate[1]]);
-				
+				var keyDefs = survey.getRooEntityKeyDefinitions();
 				function printLevelCodes(levelCodes) {
 					var result = "";
 					for (var i = 0; i < levelCodes.length; i++) {
-						result += "level " + (i + 1) + ": "
-						+ levelCodes[i]
-						+ "<br>";
+						var keyDef = keyDefs.length > i ? keyDefs[i] : null;
+						var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
+						result += levelName + ": " + levelCodes[i] + "<br>";
 					}
 					return result;
 				}
@@ -118,29 +119,28 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 						"<b>Sampling Point</b>"
 						+ "<br>"
 						+ "{0}"
-						+ "latitude: {1}"
+						+ "Latitude: {1}"
 						+ "<br>"
-						+ "longitude: {2}"
+						+ "Longitude: {2}"
 						+ "<br>"
 						, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
 				break;
 			case 'coordinate_attribute_value':
 				var point = feature.get('point');
-				var survey = feature.get('survey');
 				//project coordinate from Web Marcator to lat lon
 				var lonLat = ol.proj.toLonLat([point.x, point.y]);
 				
 				htmlContent = OF.Strings.format("<b>{0}</b>"
 					+ "<br>"
-					+ "<b>record</b>: {1}"
+					+ "<b>Record</b>: {1}"
 					+ "<br>"
-					+ "latitude: {2}" 
+					+ "Latitude: {2}" 
 					+ "<br>"
-					+ "longitude: {3}"
+					+ "Longitude: {3}"
 					+ "<br>" 
 					+ "{4}"
 					+ "<br>"
-					+ "phase: {5}"
+					+ "Phase: {5}"
 					+ "<br>" 
 					+ "<a href=\"javascript:void(0);\" "
 					+ "onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({6}, {7}, '{8}')\">Edit</a>"
@@ -148,7 +148,7 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 				, point.recKeys
 				, lonLat[1]
 				, lonLat[0]
-				, (isNaN(point.distance) ? "" : "distance to expected location: " +
+				, (isNaN(point.distance) ? "" : "Distance to expected location: " +
 						Math.round(point.distance) + "m")
 				, point.recStep
 				, survey.id
