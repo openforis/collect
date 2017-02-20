@@ -148,7 +148,7 @@ package org.openforis.collect.presenter {
 				var recordInfo:Object = {id: record.id, step: record.step};
 				var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, recordInfo);
 				
-				if (Application.user.canEditNotOwnedRecords) {
+				if (Application.user.canEditRecords) {
 					_dataClient.checkoutRecord(responder, record.id, record.step);
 				} else {
 					_dataClient.loadRecord(responder, record.id, record.step);

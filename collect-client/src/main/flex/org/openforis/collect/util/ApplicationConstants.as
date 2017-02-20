@@ -21,8 +21,7 @@ package org.openforis.collect.util {
 		private static const SPECIES_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "species/import/example.htm";
 		private static const _SPECIES_EXPORT_URL:String = "species/export/{0}";
 		
-		private static const _SAMPLING_DESIGN_EXPORT_URL:String = "samplingdesign/export/{0}";
-		private static const _SAMPLING_DESIGN_WORK_SURVEY_EXPORT_URL:String = "samplingdesign/export/work/{0}";
+		private static const _SAMPLING_DESIGN_EXPORT_URL:String = "survey/{0}/sampling-point-data.csv";
 		private static const SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "samplingdesign/import/example.htm";
 
 		private static const CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "codelist/import/example.htm";
@@ -37,6 +36,7 @@ package org.openforis.collect.util {
 		private static const VALIDATION_REPORT_SERVLET_NAME:String = "validationReport";
 		
 		private static const _DESIGNER_URL_PART:String = "designer.htm";
+		private static const _MAP_VISUALIZER_URL_PART:String = "datamanager/map.html";
 		private static const _DATA_CLEANSING_URL_PART:String = "datacleansing/main.html";
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
@@ -55,6 +55,7 @@ package org.openforis.collect.util {
 		private static var _CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_URL:String;
 		private static var _DESIGNER_URL:String;
 		private static var _DATA_CLEANSING_URL:String;
+		private static var _MAP_VISUALIZER_URL:String;
 		
 		private static var _HOST:String;
 		private static var _PORT:uint;
@@ -77,7 +78,7 @@ package org.openforis.collect.util {
 		}
 
 		public static function getSamplingDesignExportUrl(surveyId:int, work:Boolean = false):String {
-			var baseUrl:String = work ? _SAMPLING_DESIGN_WORK_SURVEY_EXPORT_URL: _SAMPLING_DESIGN_EXPORT_URL;
+			var baseUrl:String = _SAMPLING_DESIGN_EXPORT_URL;
 			return mx.utils.StringUtil.substitute(baseUrl, surveyId);
 		}
 
@@ -119,6 +120,10 @@ package org.openforis.collect.util {
 		
 		public static function get FILE_UPLOAD_URL():String {
 			return _FILE_UPLOAD_URL;
+		}
+		
+		public static function get MAP_VISUALIZER_URL():String {
+			return _MAP_VISUALIZER_URL;
 		}
 		
 		public static function get DESIGNER_URL():String {
@@ -178,6 +183,7 @@ package org.openforis.collect.util {
 			_CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_URL = URL + CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME;
 			_DESIGNER_URL = _URL + _DESIGNER_URL_PART;
 			_DATA_CLEANSING_URL = _URL + _DATA_CLEANSING_URL_PART;
+			_MAP_VISUALIZER_URL = _URL + _MAP_VISUALIZER_URL_PART;
 		}
 
 	}

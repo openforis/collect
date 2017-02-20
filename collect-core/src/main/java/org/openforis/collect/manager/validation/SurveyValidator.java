@@ -127,12 +127,16 @@ public class SurveyValidator {
 	}
 	
 	public SurveyValidationResults validate(CollectSurvey survey) {
+		return validate(survey, new ValidationParameters());
+	}
+
+	public SurveyValidationResults validate(CollectSurvey survey, ValidationParameters validationParameters) {
 		SurveyValidationResults results = new SurveyValidationResults();
 		
 		results.addResults(validateRootKeyAttributeSpecified(survey));
 		results.addResults(validateShowCountInRecordListEntityCount(survey));
 		results.addResults(validateSchemaNodes(survey));
-		results.addResults(validateCodeLists(survey));
+		results.addResults(validateCodeLists(survey, validationParameters));
 		results.addResults(validateSurveyFiles(survey));
 		return results;
 	}
@@ -168,16 +172,16 @@ public class SurveyValidator {
 		return results;
 	}
 	
-	private List<SurveyValidationResult> validateCodeLists(CollectSurvey survey) {
+	private List<SurveyValidationResult> validateCodeLists(CollectSurvey survey, ValidationParameters validationParameters) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		for (CodeList list : survey.getCodeLists()) {
 			if ( ! survey.isPredefinedCodeList(list) ) {
-				if ( ! codeListManager.isInUse(list) ) {
+				if ( validationParameters.warnOnUnusedCodeLists && ! codeListManager.isInUse(list) ) {
 					//unused code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
 							String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.unused_code_list");
 					results.add(validationResult);
-				} else if ( ! list.isExternal() && codeListManager.isEmpty(list) ) {
+				} else if ( validationParameters.warnOnEmptyCodeLists && ! list.isExternal() && codeListManager.isEmpty(list) ) {
 					//empty code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
 							String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.empty_code_list");
@@ -958,4 +962,25 @@ public class SurveyValidator {
 		
 	}
 
+	public static class ValidationParameters {
+		
+		private boolean warnOnUnusedCodeLists = true;
+		private boolean warnOnEmptyCodeLists = true;
+
+		public boolean isWarnOnUnusedCodeLists() {
+			return warnOnUnusedCodeLists;
+		}
+
+		public void setWarnOnUnusedCodeLists(boolean warnOnUnusedCodeLists) {
+			this.warnOnUnusedCodeLists = warnOnUnusedCodeLists;
+		}
+
+		public boolean isWarnOnEmptyCodeLists() {
+			return warnOnEmptyCodeLists;
+		}
+
+		public void setWarnOnEmptyCodeLists(boolean warnOnEmptyCodeLists) {
+			this.warnOnEmptyCodeLists = warnOnEmptyCodeLists;
+		}
+	}
 }

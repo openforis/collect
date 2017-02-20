@@ -95,7 +95,7 @@
 					width="100%"
 					styleName="functionList">
 				<s:layout>
-					<s:VerticalLayout gap="20" />
+					<s:VerticalLayout gap="10" />
 				</s:layout>
 				<s:itemRenderer>
 					<fx:Component>

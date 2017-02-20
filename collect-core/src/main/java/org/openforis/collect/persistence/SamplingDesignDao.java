@@ -124,11 +124,9 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_SAMPLING_DESIGN);
 		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
-		if (upToLevel != null) {
-			for (int levelIdx = upToLevel; levelIdx < LEVEL_CODE_FIELDS.length; levelIdx ++) {
-				q.addConditions(LEVEL_CODE_FIELDS[levelIdx].isNull());
-			}
-		}
+		
+		addLevelKeyNullConditions(q, upToLevel);
+		
 		q.addOrderBy(OFC_SAMPLING_DESIGN.ID);
 		//add limit
 		q.addLimit(offset, maxRecords);
@@ -139,6 +137,41 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		return dsl.fromResult(result);
 	}
 
+	/**
+	 * Returns the items in the level next to the one defined by the parent keys
+	 * @param surveyId
+	 * @param parentKeys
+	 * @return
+	 */
+	public List<SamplingDesignItem> loadChildItems(int surveyId, String... parentKeys) {
+		SamplingDesignDSLContext dsl = dsl();
+		SelectQuery<Record> q = dsl.selectQuery();	
+		q.addFrom(OFC_SAMPLING_DESIGN);
+		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
+		if (parentKeys != null) {
+			for (int levelIdx = 0; levelIdx < parentKeys.length; levelIdx ++) {
+				@SuppressWarnings("unchecked")
+				Field<String> tableField = LEVEL_CODE_FIELDS[levelIdx];
+				q.addConditions(tableField.eq(parentKeys[levelIdx]));
+			}
+		}
+		int nextLevelIndex = parentKeys == null ? 0: parentKeys.length;
+		
+		//not null value for the "next" level
+		//null values for the code fields in the other levels
+		if (nextLevelIndex < LEVEL_CODE_FIELDS.length) {
+			q.addConditions(LEVEL_CODE_FIELDS[nextLevelIndex].isNotNull());
+			addLevelKeyNullConditions(q, nextLevelIndex + 1);
+		}
+
+		q.addOrderBy(OFC_SAMPLING_DESIGN.ID);
+
+		//fetch results
+		Result<Record> result = q.fetch();
+		
+		return dsl.fromResult(result);
+	}
+	
 	/**
 	 * Inserts the items in batch.
 	 * 
@@ -201,6 +234,15 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			.set(OFC_SAMPLING_DESIGN.SURVEY_ID, toSurveyId)
 			.where(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(fromSurveyId))
 			.execute();
+	}
+
+	private void addLevelKeyNullConditions(SelectQuery<Record> q, Integer fromLevel) {
+		if (fromLevel == null || fromLevel == 0) {
+			return;
+		}
+		for (int levelIdx = fromLevel; levelIdx < LEVEL_CODE_FIELDS.length; levelIdx ++) {
+			q.addConditions(LEVEL_CODE_FIELDS[levelIdx].isNull());
+		}
 	}
 
 	protected static class SamplingDesignDSLContext extends MappingDSLContext<SamplingDesignItem> {

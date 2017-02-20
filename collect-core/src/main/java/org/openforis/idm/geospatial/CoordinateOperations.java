@@ -16,6 +16,7 @@ public class CoordinateOperations {
 
 	public CoordinateOperations() {
 		registerSRS(SpatialReferenceSystem.LAT_LON_SRS);
+		registerSRS(SpatialReferenceSystem.WEB_MARCATOR_SRS);
 	}
 	
 	public void registerSrs(List<SpatialReferenceSystem> list) {
@@ -52,8 +53,17 @@ public class CoordinateOperations {
 	}
 
 	public Coordinate convertToWgs84(Coordinate coordinate) {
-		SpatialReferenceSystem fromSrs = toSrs(coordinate);
 		SpatialReferenceSystem toSrs = SpatialReferenceSystem.LAT_LON_SRS;
+		return convertTo(coordinate, toSrs);
+	}
+
+	public Coordinate convertTo(Coordinate coordinate, String toSrsId) {
+		SpatialReferenceSystem toSrs = spatialReferenceSystemsById.get(toSrsId);
+		return convertTo(coordinate, toSrs);
+	}
+	
+	private Coordinate convertTo(Coordinate coordinate, SpatialReferenceSystem toSrs) {
+		SpatialReferenceSystem fromSrs = toSrs(coordinate);
 		if (fromSrs.equals(toSrs)) {
 			return coordinate;
 		} else {

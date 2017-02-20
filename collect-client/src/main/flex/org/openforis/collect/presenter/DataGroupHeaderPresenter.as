@@ -129,7 +129,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function getChildDefinitionsInVersion():IList {
-			return view.entityDefinition.getDefinitionsInVersion(view.modelVersion);
+			return view.entityDefinition.getNestedDefinitionsInVersion(view.modelVersion);
 		}
 	}
 }

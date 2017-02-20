@@ -35,6 +35,11 @@ package org.openforis.collect.presenter {
 			label: Message.get('home.dataManagement'), 
 			icon: Images.DATA_MANAGEMENT,
 			enabled: true};
+			
+		private static const MAP_VISUALIZER_MENU_ITEM:Object = {
+			label: Message.get('home.map_visualizer'),
+			icon: Images.MAP_VISUALIZER,
+			enabled: true};
 		
 		private static const USERS_MANAGEMENT_MENU_ITEM:Object = {
 			label: Message.get('home.userAccounts'),
@@ -98,6 +103,7 @@ package org.openforis.collect.presenter {
 		protected function createFunctionsList():IList {
 			var result:IList = new ArrayList();
 			result.addItem(DATA_MANAGEMENT_MENU_ITEM);
+			result.addItem(MAP_VISUALIZER_MENU_ITEM);
 			
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(DESIGNER_MENU_ITEM);
@@ -106,7 +112,7 @@ package org.openforis.collect.presenter {
 				result.addItem(SAIKU_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
 				result.addItem(CONFIGURATION_MENU_ITEM);
-			} else if (Application.user.hasRole(UserProxy.ROLE_VIEW)) {
+			} else if ( Application.user.hasEffectiveRole(UserProxy.ROLE_VIEW) ) {
 				result.addItem(SAIKU_MENU_ITEM);
 			}
 			return result;
@@ -119,6 +125,9 @@ package org.openforis.collect.presenter {
 			switch (item) {
 				case DATA_MANAGEMENT_MENU_ITEM:
 					eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_LIST_OF_RECORDS));
+					break;
+				case MAP_VISUALIZER_MENU_ITEM:
+					navigateToURL(new URLRequest(ApplicationConstants.MAP_VISUALIZER_URL), "_self");
 					break;
 				case DESIGNER_MENU_ITEM:
 					navigateToURL(new URLRequest(ApplicationConstants.DESIGNER_URL), "_self");
