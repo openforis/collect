@@ -31,7 +31,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		ALWAYS_RELEVANT, RELEVANT_WHEN
 	}
 	
-	@SuppressWarnings("unused")
 	private EntityDefinition parentDefinition;
 	
 	//generic
