@@ -48,6 +48,7 @@ public class CollectAnnotations {
 		PHASE_TO_APPLY_DEFAULT_VALUE(new QName(COLLECT_NAMESPACE_URI, "phaseToApplyDefaultValue"), Step.ENTRY),
 		EDITABLE(new QName(COLLECT_NAMESPACE_URI, "editable"), true),
 		FILE_TYPE(new QName(COLLECT_NAMESPACE_URI, "fileType"), FileType.IMAGE),
+		MEASUREMENT(new QName(COLLECT_NAMESPACE_URI, "measurement"), false),
 		TEXT_INPUT(new QName(COLLECT_NAMESPACE_URI, "textInput"), TextInput.KEYBOARD),
 		TARGET(new QName(COLLECT_NAMESPACE_URI, "target"), SurveyTarget.COLLECT_DESKTOP),
 		COLLECT_VERSION(new QName(COLLECT_NAMESPACE_URI, "collectVersion"), "3.4.0"),
@@ -180,6 +181,14 @@ public class CollectAnnotations {
 	
 	public void setEditable(AttributeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.EDITABLE, value);
+	}
+	
+	public boolean isMeasurementAttribute(AttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.MEASUREMENT);
+	}
+	
+	public void setMeasurementAttribute(AttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.MEASUREMENT, value);
 	}
 	
 	public boolean isShowFamily(TaxonAttributeDefinition defn) {
