@@ -223,8 +223,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if (dest instanceof EntityDefinition && ((EntityDefinition) dest).isRoot()) {
 			dest.setMultiple(true);
 		} else if (! (dest instanceof AttributeDefinition && calculated)) {
+			dest.setMultiple(multiple);
 			if (multiple) {
-				dest.setMultiple(true);
 				dest.setMinCountExpression(StringUtils.trimToNull(minCountExpression));
 				dest.setMaxCountExpression(StringUtils.trimToNull(maxCountExpression));
 			} else {
