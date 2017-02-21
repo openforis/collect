@@ -46,6 +46,16 @@
 		    		
 	    		</hbox>
 	    	</row>
+	    	<row visible="@load(vm.attribute and vm.parentEntityRoot and fx.key)">
+	    		<fieldErrorHandler message="@load(vmsgs['measurement'])">
+	  				<label value="${labels.survey.schema.attribute.measurement}" />
+	  			</fieldErrorHandler>
+  				<fieldErrorHandler message="@load(vmsgs['measurement'])">
+  					<checkbox
+	  						checked="@bind(fx.measurement)"
+	  						onCheck="@command('applyChanges')" />
+  				</fieldErrorHandler>
+	    	</row>
   		</rows>
   	</grid>
 

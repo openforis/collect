@@ -21,8 +21,9 @@ import org.openforis.idm.metamodel.Prompt;
  */
 public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends VersionableItemFormObject<T> {
 	
+	public static final String MULTIPLE_FIELD = "multiple";
 	public static final String REQUIRED_FIELD = "required";
-	
+
 	public enum RequirenessType {
 		NOT_REQUIRED, ALWAYS_REQUIRED, REQUIRED_WHEN
 	}
@@ -35,7 +36,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	//generic
 	private String name;
-	protected boolean key; //only for AttributeDefinition
 	private String description;
 	private boolean multiple;
 	private String requirenessType;
@@ -52,6 +52,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean includedInCollectEarthHeader;
 	private boolean showReadOnlyFieldInCollectEarth;
 	private boolean hideKeyInCollectEarthRecordList;
+	protected boolean key; //only for AttributeDefinition
+	protected boolean measurement; //only for AttributeDefinition
 	
 	//labels
 	private String headingLabel;
@@ -575,5 +577,13 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 
 	public String getDefaultDescription() {
 		return defaultDescription;
+	}
+	
+	public boolean isMeasurement() {
+		return measurement;
+	}
+	
+	public void setMeasurement(boolean measurement) {
+		this.measurement = measurement;
 	}
 }

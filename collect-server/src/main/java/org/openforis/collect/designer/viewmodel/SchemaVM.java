@@ -1529,12 +1529,16 @@ public class SchemaVM extends SurveyBaseVM {
 		// update tab
 		UIOptions uiOptions = survey.getUIOptions();
 		uiOptions.removeTabAssociation(node);
+		if (node instanceof AttributeDefinition) {
+			survey.getAnnotations().setMeasurementAttribute((AttributeDefinition) node, false);
+		}
 		// update ui
 		refreshTreeModel();
 		editedNodeParentEntity = newParentEntity;
 		selectTreeNode(editedNode);
 		treeModel.showSelectedNode();
 		notifyChange("selectedTreeNode", "editedNode");
+		refreshNodeForm();
 	}
 
 	private void associateNodeToTab(NodeDefinition node, UITab tab) {
