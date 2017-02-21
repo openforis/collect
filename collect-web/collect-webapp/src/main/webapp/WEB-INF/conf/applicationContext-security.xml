@@ -25,7 +25,6 @@
 		
 		<intercept-url access="permitAll" pattern="collect.swf" />
 		<intercept-url access="permitAll" pattern="/assets/**" />
-		<intercept-url access="permitAll" pattern="/command/**" />
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
 		<intercept-url access="permitAll" pattern="/js/**" />
@@ -44,6 +43,8 @@
 		<intercept-url access="permitAll" pattern="/uploadData.htm" />
 		<intercept-url access="permitAll" pattern="/uploadFile.htm" />
 		
+		<intercept-url access="hasRole('ROLE_USER') or hasIpAddress('127.0.0.1')" pattern="/command/**" />
+		
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/export/**/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/import/**/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/designer.htm" />
@@ -57,7 +58,7 @@
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/export/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/import/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/speciesImport" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/survey/**" />
+		<intercept-url access="hasRole('ROLE_ADMIN') or hasIpAddress('127.0.0.1')" pattern="/survey/**" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/validateAllRecords.htm" />
 		
 		<intercept-url access="hasRole('ROLE_USER')" pattern="/**" />
