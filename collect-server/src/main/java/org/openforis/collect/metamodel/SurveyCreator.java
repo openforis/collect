@@ -22,6 +22,8 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
+import org.openforis.idm.metamodel.NodeLabel.Type;
 
 public class SurveyCreator {
 
@@ -36,6 +38,8 @@ public class SurveyCreator {
 	private String singleAttributeSurveyTabLabel = "Plot";
 	private String singleAttributeSurveySecondLevelEntityName = "subplot";
 	private String singleAttributeSurveySecondLevelIdAttributeName = "subplot_id";
+	private String singleAttributeSurveyOperatorAttributeName = "operator";
+	private String singleAttributeSurveyOperatorAttributeLabel = "Operator";
 	
 	public SurveyCreator(SurveyManager surveyManager, SamplingDesignManager samplingDesignManager) {
 		super();
@@ -95,8 +99,17 @@ public class SurveyCreator {
 		
 		rootEntityDef.addChildDefinition(idAttrDef);
 		
+		TextAttributeDefinition operatorAttrDef = schema.createTextAttributeDefinition();
+		operatorAttrDef.setName(singleAttributeSurveyOperatorAttributeName);
+		operatorAttrDef.setKey(true);
+		operatorAttrDef.setLabel(Type.INSTANCE, languageCode, singleAttributeSurveyOperatorAttributeLabel);
+		survey.getAnnotations().setMeasurementAttribute(operatorAttrDef, true);
+		
+		rootEntityDef.addChildDefinition(operatorAttrDef);
+		
 		EntityDefinition secondLevelEntityDef = schema.createEntityDefinition();
 		secondLevelEntityDef.setName(singleAttributeSurveySecondLevelEntityName);
+		secondLevelEntityDef.setMultiple(true);
 		
 		rootEntityDef.addChildDefinition(secondLevelEntityDef);
 		

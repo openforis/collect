@@ -115,9 +115,8 @@ public class RandomRecordGenerator {
 
 	private CollectSurvey setRecordKeyValues(CollectRecord record, List<String> recordKey) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		EntityDefinition rootEntityDef = record.getRootEntity().getDefinition();
-		List<AttributeDefinition> keyAttributeDefs = rootEntityDef.getKeyAttributeDefinitions();
-		//TODO exclude measurement attribute (and update it later with username?)
+		List<AttributeDefinition> keyAttributeDefs = getNonMeasurementKeyDefs(survey);
+		//TODO update measurement attribute with... username?
 		for (int i = 0; i < keyAttributeDefs.size(); i++) {
 			String keyPart = recordKey.get(i);
 			AttributeDefinition keyAttrDef = keyAttributeDefs.get(i);
@@ -128,25 +127,30 @@ public class RandomRecordGenerator {
 	}
 
 	private Map<List<String>, Integer> calculateRecordMeasurementsByKey(CollectSurvey survey, final User user) {
+		final List<AttributeDefinition> nonMeasurementKeyDefs = getNonMeasurementKeyDefs(survey);
 		final Map<List<String>, Integer> measurementsByRecordKey = new HashMap<List<String>, Integer>();
 		recordManager.visitSummaries(new RecordFilter(survey), null, new Visitor<CollectRecord>() {
 			public void visit(CollectRecord summary) {
 				if (summary.getCreatedBy().getId() != user.getId()) {
 					List<String> keys = summary.getRootEntityKeyValues();
-					Integer measurements = measurementsByRecordKey.get(keys);
+					List<String> nonMeasurementKeys;
+					if (keys.size() > nonMeasurementKeyDefs.size()) {
+						nonMeasurementKeys = keys.subList(0, nonMeasurementKeyDefs.size() - 1);
+					} else {
+						nonMeasurementKeys = keys;
+					}
+					Integer measurements = measurementsByRecordKey.get(nonMeasurementKeys);
 					if (measurements == null) {
 						measurements = 1;
 					} else {
 						measurements += 1;
 					}
-					measurementsByRecordKey.put(keys, measurements);
+					measurementsByRecordKey.put(nonMeasurementKeys, measurements);
 				}
 			}
 		});
-		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
-		List<AttributeDefinition> keyAttrDefs = rootEntityDef.getKeyAttributeDefinitions();
-		//TODO exclude measurement attributes
-		List<AttributeDefinition> nonMeasurementKeyAttrDefs = keyAttrDefs;
+		List<AttributeDefinition> nonMeasurementKeyAttrDefs = getNonMeasurementKeyDefs(survey);
+		
 		SamplingDesignSummaries samplingPoints = samplingDesignManager.loadBySurvey(survey.getId(), nonMeasurementKeyAttrDefs.size());
 		for (SamplingDesignItem item : samplingPoints.getRecords()) {
 			if (item.getLevelCodes().size() == nonMeasurementKeyAttrDefs.size()) {
@@ -185,6 +189,17 @@ public class RandomRecordGenerator {
 		throw new IllegalArgumentException("Cannot find added entity in node change set");
 	}
 	
+	private List<AttributeDefinition> getNonMeasurementKeyDefs(CollectSurvey survey) {
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
+		List<AttributeDefinition> keyAttrDefs = rootEntityDef.getKeyAttributeDefinitions();
+		List<AttributeDefinition> nonMeasurementKeyAttrDefs = new ArrayList<AttributeDefinition>();
+		for (AttributeDefinition keyAttrDef : keyAttrDefs) {
+			if (! survey.getAnnotations().isMeasurementAttribute(keyAttrDef)) {
+				nonMeasurementKeyAttrDefs.add(keyAttrDef);
+			}
+		}
+		return nonMeasurementKeyAttrDefs;
+	}
 	
 	public static class Parameters {
 		
