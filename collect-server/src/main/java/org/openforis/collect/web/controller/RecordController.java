@@ -6,21 +6,26 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.ProxyContext;
+import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
 import org.openforis.collect.manager.RandomRecordGenerator.Parameters;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -52,6 +57,8 @@ public class RecordController extends BasicController implements Serializable {
 	private SurveyManager surveyManager;
 	@Autowired
 	private SurveyContext surveyContext;
+	@Autowired
+	private UserManager userManager;
 	@Autowired
 	private MessageSource messageSource;
 	@Autowired
@@ -116,9 +123,11 @@ public class RecordController extends BasicController implements Serializable {
 	@Transactional
 	@RequestMapping(value = "survey/{surveyId}/data/records/random.json", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable int surveyId, @RequestBody Parameters params) throws RecordPersistenceException {
+	List<RecordEvent> createRandomRecord(@PathVariable int surveyId, @RequestBody Parameters params) throws RecordPersistenceException {
 		CollectRecord record = randomRecordGenerator.generate(surveyId, params);
-		return toProxy(record);
+		User user = userManager.loadById(params.getUserId());
+		List<RecordEvent> events = new EventProducer().produceFor(record, user.getUsername());
+		return events;
 	}
 	
 	private RecordProxy toProxy(CollectRecord record) {
