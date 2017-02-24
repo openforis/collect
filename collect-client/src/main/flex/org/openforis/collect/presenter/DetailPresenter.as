@@ -105,8 +105,8 @@ package org.openforis.collect.presenter {
 			var canViewAllRecords:Boolean = !preview && user.canViewAllRecords;
 			
 			var showHeader:Boolean = !(preview || onlyOneRecordEdit);
-			var showTopButtonBar:Boolean = !preview && (canSubmit || canReject || canViewAllRecords);
 			var showBackToListButton:Boolean = !(preview || onlyOneRecordEdit) || canViewAllRecords;
+			var showTopButtonBar:Boolean = showBackToListButton || (canSubmit || canReject);
 			var showFooter:Boolean = !preview && canSave;
 
 			FlexGlobals.topLevelApplication.header.visible = FlexGlobals.topLevelApplication.header.includeInLayout = showHeader;
