@@ -6,10 +6,13 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import flash.net.URLRequest;
+			import flash.net.navigateToURL;
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
 			
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.util.ApplicationConstants;
 			
 			private var _message:String;
 			private var _details:String;
@@ -27,6 +30,10 @@
 				PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 				PopUpManager.centerPopUp(popUp);
 				return popUp;
+			}
+			
+			public function refreshPage():void {
+				navigateToURL(new URLRequest(ApplicationConstants.URL), "_self");
 			}
 			
 			[Bindable]
@@ -69,15 +76,16 @@
 		<s:Group includeIn="messageIconVisible" styleName="imageWrapper">
 			<s:Image source="{messageIconClass}" />
 		</s:Group>
-		<s:VGroup>
-			<s:Label text="{message}" styleName="blockingMessageText" maxWidth="400" />
-			<container:CollapsiblePanel title="{Message.get('global.details')}" collapsed="true">
+		<s:VGroup horizontalAlign="center">
+			<s:Label text="{message}" styleName="blockingMessageText" maxWidth="400" width="100%" />
+			<container:FieldSet legend="{Message.get('global.details')}">
 				<s:TextArea editable="false" 
 							text="{details}" 
 							width="400"
 							maxHeight="200"
 							/>
-			</container:CollapsiblePanel>
+			</container:FieldSet>
+			<s:Button label="{Message.get('global.refreshPage')}" click="refreshPage()" />
 		</s:VGroup>
 	</s:HGroup>
 	
