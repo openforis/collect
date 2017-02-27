@@ -19,7 +19,7 @@
 		<!-- saiku installer file names -->
 		<windows-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-windows-installer.exe</windows-saiku-installer-file-name>
 		<linux-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-linux-installer.run</linux-saiku-installer-file-name>
-		<osx-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-osx-installer.app.zip</osx-saiku-installer-file-name>
+		<osx-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-osx-installer.dmg</osx-saiku-installer-file-name>
 	</properties>
 	
 	<profiles>

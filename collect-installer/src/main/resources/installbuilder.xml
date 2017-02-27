@@ -360,7 +360,7 @@ check_for_updates = 1</text>
 	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
 	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
 	<saveRelativePaths>1</saveRelativePaths>
-	<createOsxBundleZip>1</createOsxBundleZip>
+	<createOsxBundleDmg>1</createOsxBundleDmg>
 	<parameterList>
 		<directoryParameter>
 			<name>installdir</name>

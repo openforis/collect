@@ -18,7 +18,7 @@
 		<!-- updater file names -->
 		<windows-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-windows-installer.exe</windows-updater-file-name>
 		<linux-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-installer.run</linux-updater-file-name>
-		<osx-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-osx-installer.app.zip</osx-updater-file-name>
+		<osx-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-osx-installer.dmg</osx-updater-file-name>
 	</properties>
 	
 	<profiles>

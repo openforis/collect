@@ -17,6 +17,10 @@
 			<filename>collect-updater-PROJECT_VERSION-linux.run</filename>
 			<platform>linux-x64</platform>
 		</platformFile>
+		<platformFile>
+			<filename>collect-updater-PROJECT_VERSION-osx.dmg</filename>
+			<platform>osx</platform>
+		</platformFile>
 	</platformFileList>
 	<downloadLocationList>
 		<downloadLocation>

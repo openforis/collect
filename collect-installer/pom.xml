@@ -19,7 +19,7 @@
 		<!-- installer file names -->
 		<windows-installer-file-name>OpenForisCollect-${installer-version-id}-windows-installer.exe</windows-installer-file-name>
 		<linux-installer-file-name>OpenForisCollect-${installer-version-id}-linux-installer.run</linux-installer-file-name>
-		<osx-installer-file-name>OpenForisCollect-${installer-version-id}-osx-installer.app.zip</osx-installer-file-name>
+		<osx-installer-file-name>OpenForisCollect-${installer-version-id}-osx-installer.dmg</osx-installer-file-name>
 		<!-- autoupdate file names -->
 		<windows-autoupdater-file-name>autoupdate-windows.exe</windows-autoupdater-file-name>
 		<linux-autoupdater-file-name>autoupdate-linux.run</linux-autoupdater-file-name>
@@ -328,7 +328,7 @@
 										<artifact>
 											<file>${project.build.directory}/${osx-installer-file-name}</file>
 											<classifier>osx</classifier>
-											<type>zip</type>
+											<type>dmg</type>
 										</artifact>
 									</artifacts>
 								</configuration>
