@@ -11,7 +11,7 @@
 	   type="javax.sql.DataSource"
 	   factory="org.apache.commons.dbcp.BasicDataSourceFactory"
 	   driverClassName="org.sqlite.JDBC"
-       url="jdbc:sqlite:${user.home}/openforis/collect/data/collect.db">
+       url="jdbc:sqlite:${user.home}/OpenForis/Collect/data/collect.db">
 	 </Resource>
 	 
 	<!-- PostgreSQL database configuration
