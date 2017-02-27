@@ -4,7 +4,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Opernforis Collect Designer</title>
+<title>Opern Foris Collect - Survey Designer - List of surveys</title>
+<link rel="shortcut icon" href="assets/images/favicon.ico" />
 </head>
 <body>
 	<jsp:forward page="/WEB-INF/view/zul/designer/survey_select.zul" />

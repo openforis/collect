@@ -1,4 +1,8 @@
-<?page title="Open Foris Collect Database Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+<?page title="Open Foris Collect - Survey Designer - Edit Survey" contentType="text/html;charset=UTF-8"?>
+
+<?link rel="shortcut icon" type="image/x-icon" href="/assets/images/favicon.ico"?>
+<?link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico"?>
+
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
 <?component name="extendedTextbox" class="org.openforis.collect.designer.component.ExtendedTextbox"?>
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
