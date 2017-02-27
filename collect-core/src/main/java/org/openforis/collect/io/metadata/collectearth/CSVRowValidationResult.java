@@ -8,8 +8,10 @@ public class CSVRowValidationResult {
 
 	Integer rowNumber;
 	String message;
-	List<String> expectedRows;
+	List<String> expectedColumns;
 	ErrorType errorType;
+	Integer columnPosition;
+	List<String> validationMessages;
 		
 	public CSVRowValidationResult(Integer rowNumber, ErrorType errorType) {
 		super();
@@ -17,10 +19,13 @@ public class CSVRowValidationResult {
 		this.errorType = errorType;
 	}
 	
-	public CSVRowValidationResult(Integer rowNumber, String message) {
+	public CSVRowValidationResult(int rowNumber, ErrorType errorType, int columnPosition, String message) {
 		super();
 		this.rowNumber = rowNumber;
+		this.errorType = errorType;
+		this.columnPosition = columnPosition;
 		this.message = message;
+		
 	}
 	
 	public Integer getRowNumber() {
@@ -39,12 +44,12 @@ public class CSVRowValidationResult {
 		this.message = message;
 	}
 
-	public List<String> getExpectedRows() {
-		return expectedRows;
+	public List<String> getExpectedColumns() {
+		return expectedColumns;
 	}
 
-	public void setExpectedColumns(List<String> expectedRows) {
-		this.expectedRows = expectedRows;
+	public void setExpectedColumns(List<String> expectedColumn) {
+		this.expectedColumns = expectedColumn;
 	}
 
 	public ErrorType getErrorType() {
@@ -54,4 +59,13 @@ public class CSVRowValidationResult {
 	public void setErrorType(ErrorType errorType) {
 		this.errorType = errorType;
 	}
+
+	public Integer getColumnPosition() {
+		return columnPosition;
+	}
+
+	public void setColumnPosition(Integer columnPosition) {
+		this.columnPosition = columnPosition;
+	}
+
 }
