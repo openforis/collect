@@ -17,6 +17,7 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ public class CollectEarthBalloonPreviewController extends AbstractPlacemarkDataC
 	@Autowired
 	private EarthSurveyService earthSurveyService;
 	@Autowired
+	@Qualifier("sessionManager")
 	private SessionManager sessionManager;
 	@Autowired
 	private SurveyManager surveyManager;
