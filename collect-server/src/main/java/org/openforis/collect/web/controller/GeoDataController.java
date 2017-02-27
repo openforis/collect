@@ -55,8 +55,8 @@ public class GeoDataController {
 		
 		extractAllRecordCoordinates(survey, recordOffset, maxNumberOfRecords, 
 				coordinateAttributeId, srsId, new CoordinateProcessor() {
-			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
-				CoordinateAttributePoint point = new CoordinateAttributePoint(coordAttr, wgs84Coordinate);
+			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate coordinate) {
+				CoordinateAttributePoint point = new CoordinateAttributePoint(coordAttr, coordinate);
 				result.add(point);
 			}
 		});
@@ -143,6 +143,10 @@ public class GeoDataController {
 		
 		public int getAttrDefId() {
 			return attribute.getDefinition().getId();
+		}
+		
+		public Coordinate getOriginalCoordinate() {
+			return attribute.getValue();
 		}
 		
 		public Double getX() {

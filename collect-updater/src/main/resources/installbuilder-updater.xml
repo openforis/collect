@@ -80,7 +80,7 @@ check_for_updates = 1</text>
 			<showMessageOnError>0</showMessageOnError>
         </copyFile>
         <copyFile>
-			<origin>../tomcat/data/collect.db</origin>
+			<origin>../data/collect.db</origin>
 			<destination>../backup/${timestamp}/collect.db</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
