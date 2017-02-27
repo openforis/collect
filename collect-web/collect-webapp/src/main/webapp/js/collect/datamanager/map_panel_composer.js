@@ -406,9 +406,7 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 
 		var processCoordinateValue = function(coordinateAttributePoint) {
 			var xyCoord = [ coordinateAttributePoint.x, coordinateAttributePoint.y ];
-			
 			//var webMarcatorXY = ol.proj.fromLonLat(xyCoord);
-			
 			var webMarcatorXY = xyCoord;
 			
 			var coordinateFeature = new ol.Feature({
