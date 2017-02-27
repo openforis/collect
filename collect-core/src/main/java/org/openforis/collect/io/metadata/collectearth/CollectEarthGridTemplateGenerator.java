@@ -10,6 +10,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult.ErrorType;
 import org.openforis.collect.model.CollectSurvey;
@@ -28,6 +29,8 @@ import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.model.NumberValue;
+import org.openforis.idm.model.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +40,10 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class CollectEarthGridTemplateGenerator  {
+
+	private static final String LONG_COORDINATE = "XCoordinate";
+
+	private static final String LAT_COORDINATE = "YCoordinate";
 
 	private static final String TEST_PLOTS_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/test_plots.ced.template";
 	
@@ -129,15 +136,11 @@ public class CollectEarthGridTemplateGenerator  {
 			} catch(Exception e) {
 				//this may happen when there are duplicate values in the first row
 				headersFound = false;
-				csvReader.setHeadersRead(true);
-				
-				
+				csvReader.setHeadersRead(true);	
 			}
 			
-			
-			
 			if( validationResults == null ){
-				
+
 				rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound ) );
 				
 				long linesRead = csvReader.getLinesRead();
@@ -182,28 +185,36 @@ public class CollectEarthGridTemplateGenerator  {
 	private List<CSVRowValidationResult> validateCsvRows( CsvReader csvReader, CollectSurvey survey, boolean firstLineIsHeaders ) throws IOException {
 				
 		List<CSVRowValidationResult> results = new ArrayList<CSVRowValidationResult>();
-		int rowNumber = firstLineIsHeaders ? 2 : 1 ;
-		
+		List<CSVRowValidationResult> validateCsvRow = null;
 		// Get the list of attribute types expected per row!
 		List<AttributeDefinition> attributesPerRow = getAttributesPerRow(survey);
+		
+		int rowNumber =1 ;
+		
+		if (!firstLineIsHeaders){
+			validateCsvRow = validateCsvRow(  survey, attributesPerRow, (String[]) csvReader.getColumnNames().toArray( new String[ csvReader.getColumnNames().size() ]), rowNumber++ );
+			if(validateCsvRow!=null){
+				results.addAll( validateCsvRow  );
+			}
+		}
+
 				
 		CsvLine csvLine = null;
 		
 		while( ( csvLine = csvReader.readNextLine() ) != null ){
 			
-			List<CSVRowValidationResult> validateCsvRow = validateCsvRow(  survey, attributesPerRow, csvLine, rowNumber );
+
+			validateCsvRow = validateCsvRow(  survey, attributesPerRow, csvLine.getLine(), rowNumber++ );
 			if(validateCsvRow!=null){
 				results.addAll( validateCsvRow  );
 			}
-						
-			rowNumber++;
 		}	
 		
 		return results;
 		
 	}
 	
-	private List<CSVRowValidationResult> validateCsvRow(CollectSurvey survey, List<AttributeDefinition> attributesPerRow, CsvLine nextLine,
+	private List<CSVRowValidationResult> validateCsvRow(CollectSurvey survey, List<AttributeDefinition> attributesPerRow, String[] nextLine,
 			int rowNumber) {
 		
 		List<CSVRowValidationResult> validationColumns = new ArrayList<CSVRowValidationResult>();
@@ -211,7 +222,7 @@ public class CollectEarthGridTemplateGenerator  {
 		int column = 0;
 		for( int pos = 0; pos < attributesPerRow.size(); pos++ ){
 		
-			String message = validateCell( attributesPerRow.get(pos), nextLine.getLine()[pos] );
+			String message = validateCell( attributesPerRow.get(pos), nextLine[pos] );
 			if( message !=null ){
 				validationColumns.add( new CSVRowValidationResult(rowNumber, ErrorType.INVALID_VALUES_IN_CSV, column, message ));
 			} 
@@ -235,7 +246,28 @@ public class CollectEarthGridTemplateGenerator  {
 		
 		try{
 			
-			attributeDefinition.createValue( value );
+			// By creating the value using hte attribute definitoon a validation is performed
+			Value valueCreated = attributeDefinition.createValue( value );
+			
+			if( attributeDefinition.isAlwaysRequired() && StringUtils.isBlank( value )){
+				return String.format("The attribute %s is marekd as \"always required\". The value in the cell is empty!", attributeDefinition.getLabel( NodeLabel.Type.INSTANCE ));
+			}
+			
+			if ( attributeDefinition.getName().equals(LAT_COORDINATE) ){
+				double lat = ( (NumberValue<Number>) valueCreated ).getValue().doubleValue();
+				if(lat < -90 || lat > 90 ){
+					return "The latitude of a plot must be between -90 and 90 degrees!"; 
+				}
+			}
+			
+			if ( attributeDefinition.getName().equals(LONG_COORDINATE) ){
+				double longitude = ( (NumberValue<Number>) valueCreated ).getValue().doubleValue();
+				if(longitude < -180 || longitude > 180 ){
+					return "The latitude of a plot must be between -180 and 180 degrees!"; 
+				}
+			}
+			
+			// Make sure that the code used in a code-attribute is actually present on the codelist
 			if( attributeDefinition instanceof CodeAttributeDefinition ){
 				
 				CodeAttributeDefinition cad = (CodeAttributeDefinition) attributeDefinition;
@@ -262,6 +294,8 @@ public class CollectEarthGridTemplateGenerator  {
 					return String.format("The code with value \"%s\" is not part of the codelist used by code %s ", value, attributeDefinition.getLabel( NodeLabel.Type.INSTANCE ));
 					
 				}
+				
+			}else if( attributeDefinition instanceof CodeAttributeDefinition ){
 				
 			}
 		
@@ -300,14 +334,16 @@ public class CollectEarthGridTemplateGenerator  {
 		expectedColumns.addAll(keyAttributeDefinitions);
 		NumberAttributeDefinition latAttribute = survey.getSchema().createNumberAttributeDefinition();
 		latAttribute.setType(Type.REAL);
-		latAttribute.setName("YCoordinate");
+		latAttribute.setName(LAT_COORDINATE);
+		latAttribute.setLabel(NodeLabel.Type.INSTANCE, survey.getDefaultLanguage(), "Latitude");
 		expectedColumns.add( latAttribute );
 		
 		NumberAttributeDefinition longAttribute = survey.getSchema().createNumberAttributeDefinition();
 		longAttribute.setType(Type.REAL);
-		longAttribute.setName("XCoordinate");
+		longAttribute.setName(LONG_COORDINATE);
+		longAttribute.setLabel(NodeLabel.Type.INSTANCE, survey.getDefaultLanguage(), "Longitude");
+
 		expectedColumns.add( longAttribute );
-		
 		List<AttributeDefinition> fromCsvAttributes = survey.getExtendedDataFields();
 		expectedColumns.addAll(fromCsvAttributes);
 		
