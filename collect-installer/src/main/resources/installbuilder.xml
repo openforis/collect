@@ -94,10 +94,24 @@
 					<platforms>windows</platforms>
 					<distributionFileList>
 						<distributionFile>
-							<origin>start.cmd</origin>
+							<origin>start.bat</origin>
 						</distributionFile>
 						<distributionFile>
-							<origin>stop.cmd</origin>
+							<origin>stop.bat</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>programfilesosx</name>
+					<description>OSx Program Files</description>
+					<destination>${installdir}</destination>
+					<platforms>osx</platforms>
+					<distributionFileList>
+						<distributionFile>
+							<origin>start.sh</origin>
+						</distributionFile>
+						<distributionFile>
+							<origin>stop.sh</origin>
 						</distributionFile>
 					</distributionFileList>
 				</folder>
@@ -108,7 +122,7 @@
 					<comment>Start Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
-					<windowsExec>${installdir}/start.cmd</windowsExec>
+					<windowsExec>${installdir}/start.bat</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
 					<windowsIcon>${installdir}/images/of-collect-logo.ico</windowsIcon>
 					<windowsPath></windowsPath>
@@ -118,7 +132,7 @@
 					<comment>Stop Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
-					<windowsExec>${installdir}/stop.cmd</windowsExec>
+					<windowsExec>${installdir}/stop.bat</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
 					<windowsIcon>${installdir}/images/of-collect-logo.ico</windowsIcon>
 					<windowsPath></windowsPath>
@@ -178,6 +192,9 @@ version_id = VERSION_ID
 update_download_location = ${system_temp_directory}
 check_for_updates = 1</text>
 				</writeFile>
+				<createDirectory>
+					<path>${installdir}/data</path>
+				</createDirectory>
 				<getFreePort>
 					<finalPort>8399</finalPort>
 					<initialPort>8305</initialPort>
@@ -262,12 +279,21 @@ check_for_updates = 1</text>
 	<preInstallationActionList>
 		<setInstallerVariable>
 			<name>installdir</name>
-			<value>${env(SYSTEMDRIVE)}/opt/openforis/collect</value>
+			<value>${user_home_directory}/OpenForis/Collect</value>
 		</setInstallerVariable>
+		<throwError>
+			<explanation>Open Foris Collect has been already installed</explanation>
+			<text>Open Foris Collect has been already installed. Please run Update Open Foris Collect if you want to update it.</text>
+			<ruleEvaluationLogic>and</ruleEvaluationLogic>
+			<ruleList>
+				<fileTest path="${installdir}" condition="exists" />
+				<fileTest path="${installdir}" condition="is_not_empty" />
+			</ruleList>
+        </throwError>
 	</preInstallationActionList>
 	<postInstallationActionList>
 		<substitute>
-			<files>${installdir}/start.sh;${installdir}/stop.sh;${installdir}/start.cmd;${installdir}/stop.cmd;</files>
+			<files>${installdir}/start.sh;${installdir}/stop.sh;${installdir}/start.bat;${installdir}/stop.bat;</files>
 			<type>exact</type>
 			<substitutionList>
 				<substitution>
@@ -277,7 +303,7 @@ check_for_updates = 1</text>
 			</substitutionList>
 		</substitute>
         <substitute>
-            <files>${installdir}/start.sh;${installdir}/start.cmd;</files>
+            <files>${installdir}/start.sh;${installdir}/start.bat;</files>
             <type>exact</type>
             <substitutionList>
                 <substitution>
@@ -305,6 +331,15 @@ check_for_updates = 1</text>
 				</platformTest>
 			</ruleList>
 		</changeOwnerAndGroup>
+		<!-- delete temporary files (if any, from previous installations) -->
+        <deleteFile>
+  			<path>${installdir}/tomcat/webapps/collect</path>
+			<abortOnError>0</abortOnError>
+		</deleteFile>
+		<createJavaLaunchers>
+		    <javaLauncherList>
+		    </javaLauncherList>
+		</createJavaLaunchers>
 	</postInstallationActionList>
 	<postUninstallationActionList>
 		<deleteFile>

@@ -21,12 +21,21 @@ public abstract class BaseStorageManager implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final String DEFAULT_BASE_DATA_SUBDIR = "data";
-	private static final String DEFAULT_BASE_TEMP_SUBDIR = "temp";
+	private static final String OPENFORIS_FOLDER_NAME = "openforis";
+	private static final String COLLECT_FOLDER_NAME = "collect";
+	private static final String DATA_FOLDER_NAME = "data";
+
+	private static final String DATA_SUBDIR = OPENFORIS_FOLDER_NAME + File.separator + COLLECT_FOLDER_NAME + File.separator + DATA_FOLDER_NAME;
+	private static final String TEMP_FOLDER_NAME = "temp";
 	private static final String DEFAULT_BASE_WEBAPPS_SUBDIR = "webapps";
 
 	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 	private static final String CATALINA_BASE = "catalina.base";
+	private static final String USER_HOME = "user.home";
+
+	private static final File USER_HOME_DATA_FOLDER = getReadableSysPropLocation(USER_HOME, DATA_SUBDIR);
+	private static final File CATALINA_BASE_DATA_FOLDER = getReadableSysPropLocation(CATALINA_BASE, DATA_FOLDER_NAME);
+	private static final File TEMP_FOLDER = getReadableSysPropLocation(JAVA_IO_TMPDIR, null);
 
 	@Autowired
 	protected transient ConfigurationManager configurationManager;
@@ -61,16 +70,8 @@ public abstract class BaseStorageManager implements Serializable {
 		this.defaultSubFolder = defaultSubFolder;
 	}
 	
-	protected static File getTempFolder() {
-		return getReadableSysPropLocation(JAVA_IO_TMPDIR, null);
-	}
-	
-	protected static File getCatalinaBaseDataFolder() {
-		return getReadableSysPropLocation(CATALINA_BASE, DEFAULT_BASE_DATA_SUBDIR);
-	}
-	
 	protected static File getCatalinaBaseTempFolder() {
-		return getReadableSysPropLocation(CATALINA_BASE, DEFAULT_BASE_TEMP_SUBDIR);
+		return getReadableSysPropLocation(CATALINA_BASE, TEMP_FOLDER_NAME);
 	}
 
 	protected static File getCatalinaBaseWebappsFolder() {
@@ -81,14 +82,15 @@ public abstract class BaseStorageManager implements Serializable {
 		return getSysPropPath(CATALINA_BASE, DEFAULT_BASE_WEBAPPS_SUBDIR);
 	}
 	
-	protected static String getSysPropPath(String sysProp, String subDir) {
+	protected static String getSysPropPath(String sysProp, String subdirectories) {
 		String base = System.getProperty(sysProp);
 		if ( base == null ) {
 			return null;
 		}
 		String path = base;
-		if ( subDir != null ) {
-			path = path + File.separator + subDir;
+		if ( subdirectories != null ) {
+			String[] pathParts = subdirectories.split("[\\|/]");
+			path += File.separator + StringUtils.join(pathParts, File.separator);
 		}
 		return path;
 	}
@@ -104,7 +106,7 @@ public abstract class BaseStorageManager implements Serializable {
 
 	protected static File getLocationIfAccessible(String path) {
 		File result = new File(path);
-		if ( (result.exists() || result.mkdirs()) && result.canWrite() ) {
+		if ( result.exists() && result.canWrite() ) {
 			return result;
 		} else {
 			return null;
@@ -144,9 +146,12 @@ public abstract class BaseStorageManager implements Serializable {
 
 	protected File getDefaultStorageRootDirectory() {
 		if ( defaultRootStoragePath == null ) {
-			File rootDir = getCatalinaBaseDataFolder();
+			File rootDir = USER_HOME_DATA_FOLDER;
 			if ( rootDir == null ) {
-				rootDir = getTempFolder();
+				rootDir = CATALINA_BASE_DATA_FOLDER;
+			}
+			if (rootDir == null) {
+				rootDir = TEMP_FOLDER;
 			}
 			return rootDir;
 		} else {
