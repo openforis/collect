@@ -15,7 +15,7 @@
 			by the installer -->
 		<installer-build-path>${project.build.directory}/installer</installer-build-path>
 		<installbuilder-file-name>installbuilder.xml</installbuilder-file-name>
-		<jre.version>1.8.0_11</jre.version>
+		<jre.version>1.8.0_121</jre.version>
 		<!-- installer file names -->
 		<windows-installer-file-name>OpenForisCollect-${installer-version-id}-windows-installer.exe</windows-installer-file-name>
 		<linux-installer-file-name>OpenForisCollect-${installer-version-id}-linux-installer.run</linux-installer-file-name>
@@ -86,24 +86,6 @@
 											<artifactId>jre</artifactId>
 											<version>${jre.version}</version>
 											<classifier>windows-x64</classifier>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.oracle.java</groupId>
-											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
-											<classifier>solaris-intel</classifier>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.oracle.java</groupId>
-											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
-											<classifier>solaris-sparc</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
