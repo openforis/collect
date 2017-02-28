@@ -373,6 +373,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		SchemaSummaryCSVExportJob job = new SchemaSummaryCSVExportJob();
 		job.setJobManager(jobManager);
 		job.setSurvey(survey);
+		job.setLabelLanguage(currentLanguageCode);
 		jobManager.start(job, survey.getId().toString());
 		
 		String statusPopUpTitle = Labels.getLabel("survey.schema.export_summary.process_status_popup.message", new String[] { survey.getName() });

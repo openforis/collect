@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.lang.Numbers;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePathPointer;
+import org.openforis.idm.model.expression.Expressions;
 import org.openforis.idm.path.InvalidPathException;
 import org.openforis.idm.path.Path;
 
@@ -104,6 +105,10 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 
 	public String getRelevantExpression() {
 		return this.relevantExpression;
+	}
+	
+	public boolean isAlwaysRelevant() {
+		return StringUtils.isBlank(this.relevantExpression) || Expressions.TRUE_FUNCTION.equals(this.relevantExpression);
 	}
 
 	/**

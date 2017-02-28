@@ -25,7 +25,10 @@ import org.openforis.idm.metamodel.Schema;
  */
 public class SchemaSummaryCSVExportJob extends Job {
 
+	//input
 	private CollectSurvey survey;
+	private String labelLanguage;
+	//output
 	private File outputFile;
 	
 	@Override
@@ -42,7 +45,8 @@ public class SchemaSummaryCSVExportJob extends Job {
 				FileOutputStream out = new FileOutputStream(outputFile);
 				final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(new OutputStreamWriter(out, "UTF-8")), ',', '"');
 				try {
-					csvWriter.writeHeaders(new String[] {"id", "path", "type", "attribute_type", "label"});
+					csvWriter.writeHeaders(new String[] {"id", "path", "type", "attribute_type", "label", 
+							"always_relevant", "relevant_when", "always_required", "required_when"});
 					
 					Schema schema = survey.getSchema();
 					schema.traverse(new NodeDefinitionVisitor() {
@@ -53,7 +57,11 @@ public class SchemaSummaryCSVExportJob extends Job {
 									nodeDefn.getPath(),
 									nodeDefn instanceof EntityDefinition ? "entity": "attribute",
 									nodeDefn instanceof AttributeDefinition ? AttributeType.valueOf((AttributeDefinition) nodeDefn).getLabel(): "",
-									nodeDefn.getLabel(Type.INSTANCE)
+									nodeDefn.getLabel(Type.INSTANCE, labelLanguage),
+									String.valueOf(nodeDefn.isAlwaysRelevant()),
+									nodeDefn.isAlwaysRelevant() ? "" : nodeDefn.getRelevantExpression(),
+									String.valueOf(nodeDefn.isAlwaysRequired()),
+									nodeDefn.isAlwaysRequired() ? "" : nodeDefn.getMinCountExpression()
 								});
 						}
 					});
@@ -67,6 +75,10 @@ public class SchemaSummaryCSVExportJob extends Job {
 	
 	public void setSurvey(CollectSurvey survey) {
 		this.survey = survey;
+	}
+	
+	public void setLabelLanguage(String labelLanguage) {
+		this.labelLanguage = labelLanguage;
 	}
 	
 	public File getOutputFile() {
