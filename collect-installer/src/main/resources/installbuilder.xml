@@ -192,9 +192,11 @@ version_id = VERSION_ID
 update_download_location = ${system_temp_directory}
 check_for_updates = 1</text>
 				</writeFile>
+				<!-- Create Data folder -->
 				<createDirectory>
-					<path>${installdir}/data</path>
+					<path>${data_dir}</path>
 				</createDirectory>
+				<!-- Find free ports and replace the values in Tomcat server.xml file -->
 				<getFreePort>
 					<finalPort>8399</finalPort>
 					<initialPort>8305</initialPort>
@@ -265,6 +267,7 @@ check_for_updates = 1</text>
 		                </substitution>
 		            </substitutionList>
 		        </substitute>
+		        <!-- Write the ports configuration in collect.properties file -->
 		        <propertiesFileSet>
 		        	<file>${installdir}/collect.properties</file>
 		        	<key>tomcat_http_port</key>
@@ -277,9 +280,32 @@ check_for_updates = 1</text>
 		</include>
 	</componentList>
 	<preInstallationActionList>
+		<if>
+        	<actionList>
+        		<setInstallerVariable>
+        			<name>installdir</name>
+        			<value>${env(SYSTEMDRIVE)}/OpenForis/Collect</value> 
+        		</setInstallerVariable>
+        	</actionList>
+        	<conditionRuleList>
+        		<platformTest>
+        			<type>windows</type>
+        		</platformTest>
+			</conditionRuleList> 
+			<elseActionList>
+				<setInstallerVariable>
+					<name>installdir</name>
+					<value>~/OpenForis/Collect</value>
+				</setInstallerVariable>
+			</elseActionList>
+		</if>
 		<setInstallerVariable>
-			<name>installdir</name>
+			<name>root_user_dir</name>
 			<value>${user_home_directory}/OpenForis/Collect</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>data_dir</name>
+			<value>${root_user_dir}/data</value>
 		</setInstallerVariable>
 		<throwError>
 			<explanation>Open Foris Collect has been already installed</explanation>

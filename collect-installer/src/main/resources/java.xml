@@ -15,7 +15,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre1.8.0_11-windows/java-windows/*</origin>
+                    <origin>jre_files/jre%JRE_VERSION_FULL%-windows/java-windows/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -31,7 +31,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre1.8.0_11-windows-x64/java-windows/*</origin>
+                    <origin>jre_files/jre%JRE_VERSION_FULL%-windows-x64/java-windows/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -47,7 +47,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre1.8.0_11-linux/java-linux/*</origin>
+                    <origin>jre_files/jre%JRE_VERSION_FULL%-linux/java-linux/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -62,37 +62,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre1.8.0_11-linux-x64/java-linux-x64/*</origin>
-                </distributionFile>
-            </distributionFileList>
-            <ruleList>
-                <isTrue value="${java_install_jre}"/>
-            </ruleList>
-        </folder>
-        <folder>
-            <description>Java binaries - Solaris Sparc</description>
-            <destination>${installdir}/java</destination>
-            <name>java_solaris_sparc</name>
-            <platforms>solaris-sparc</platforms>
-            <distributionFileList>
-                <distributionFile>
-                    <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre1.8.0_11-solaris-sparc/java-solaris-sparc/*</origin>
-                </distributionFile>
-            </distributionFileList>
-            <ruleList>
-                <isTrue value="${java_install_jre}"/>
-            </ruleList>
-        </folder>
-        <folder>
-            <description>Java binaries - Solaris Intel</description>
-            <destination>${installdir}/java</destination>
-            <name>java_solaris_intel</name>
-            <platforms>solaris-intel</platforms>
-            <distributionFileList>
-                <distributionFile>
-                    <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre1.8.0_11-solaris-intel/java-solaris-intel/*</origin>
+                    <origin>jre_files/jre%JRE_VERSION_FULL%-linux-x64/java-linux-x64/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -107,7 +77,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre1.8.0_11-osx/java-osx/*</origin>
+                    <origin>jre_files/jre%JRE_VERSION_FULL%-osx/java-osx/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -286,116 +256,6 @@
                 <platformTest type="linux-x64"/>
             </ruleList>
         </actionGroup>
-        <actionGroup>
-            <actionList>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/bin"/>
-                        <fileExists path="${installdir}/java/jre/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/i386/client/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/i386/client"/>
-                        <fileExists path="${installdir}/java/jre/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/i386/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/i386/server"/>
-                        <fileExists path="${installdir}/java/jre/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/i386/client/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/i386/client"/>
-                        <fileExists path="${installdir}/java/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/i386/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/i386/server"/>
-                        <fileExists path="${installdir}/java/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-            </actionList>
-            <ruleList>
-                <platformTest type="solaris-intel"/>
-            </ruleList>
-        </actionGroup>
-        <actionGroup>
-            <actionList>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/bin"/>
-                        <fileExists path="${installdir}/java/jre/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/sparc/client/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/sparc/client"/>
-                        <fileExists path="${installdir}/java/jre/lib/sparc/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/sparc/libjdgaSUNWafb.so" target="libjdgaSUNWffb.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/sparc"/>
-                        <fileExists path="${installdir}/java/jre/lib/sparc/libjdgaSUNWffb.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/sparc/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/sparc/server"/>
-                        <fileExists path="${installdir}/java/jre/lib/sparc/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/sparc/client/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/sparc/client"/>
-                        <fileExists path="${installdir}/java/lib/sparc/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/sparc/libjdgaSUNWafb.so" target="libjdgaSUNWffb.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/sparc"/>
-                        <fileExists path="${installdir}/java/lib/sparc/libjdgaSUNWffb.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/sparc/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/sparc/server"/>
-                        <fileExists path="${installdir}/java/lib/sparc/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-            </actionList>
-            <ruleList>
-                <platformTest type="solaris-sparc"/>
-            </ruleList>
-        </actionGroup>
 
         <!-- create Java launcher using preferred JRE -->
         <createJavaLaunchers>
@@ -477,10 +337,10 @@
     <readyToInstallActionList>
         <if>
             <actionList>
-                <setInstallerVariable name="java_version_major" value="1.7"/>
-                <setInstallerVariable name="java_version" value="1.7.0"/>
-                <setInstallerVariable name="java_version_full" value="1.7.0_60"/>
-                <setInstallerVariable name="java_version_vendor" value="Sun"/>
+                <setInstallerVariable name="java_version_major" value="%JRE_VERSION_MAJOR%"/>
+                <setInstallerVariable name="java_version" value="%JRE_VERSION%"/>
+                <setInstallerVariable name="java_version_full" value="%JRE_VERSION_FULL%"/>
+                <setInstallerVariable name="java_version_vendor" value="Oracle"/>
                 <setInstallerVariable name="java_bitness" value="64"/>
 
                 <!-- determine Java binary name - javaw.exe on Windows, java otherwise -->
