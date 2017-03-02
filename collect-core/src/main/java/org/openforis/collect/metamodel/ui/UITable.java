@@ -37,6 +37,9 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 	private boolean showRowNumbers;
 	private boolean countInSummaryList;
 	private Direction direction;
+	private int columnSpan;
+	private int column;
+	private int row;
 	
 	<P extends UIFormContentContainer> UITable(P parent, int id) {
 		super(parent, id);
@@ -134,7 +137,37 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}
+	
+	@Override
+	public int getColumn() {
+		return column;
+	}
+	
+	@Override
+	public void setColumn(int column) {
+		this.column = column;
+	}
 
+	@Override
+	public int getColumnSpan() {
+		return columnSpan;
+	}
+	
+	@Override
+	public void setColumnSpan(int columnSpan) {
+		this.columnSpan = columnSpan;
+	}
+
+	@Override
+	public int getRow() {
+		return row;
+	}
+	
+	@Override
+	public void setRow(int row) {
+		this.row = row;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

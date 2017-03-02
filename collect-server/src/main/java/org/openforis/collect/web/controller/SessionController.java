@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.metamodel.SurveyView;
-import org.openforis.collect.metamodel.SurveyViewGenerator;
+import org.openforis.collect.metamodel.view.SurveyView;
+import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.commons.web.HttpResponses;

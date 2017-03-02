@@ -1,4 +1,4 @@
-package org.openforis.collect.metamodel;
+package org.openforis.collect.metamodel.view;
 
 import org.openforis.collect.designer.metamodel.NodeType;
 

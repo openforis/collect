@@ -80,8 +80,15 @@ public class UIOptionsMigrator {
 
 		//create form components
 		List<NodeDefinition> childNodes = oldUIOptions.getNodesPerTab(tab, false);
+		int lastCol = 1;
+		int currentRow = 0;
 		for (NodeDefinition nodeDefn : childNodes) {
-			addFormComponent(form, nodeDefn);
+			int childCol = oldUIOptions.getColumn(nodeDefn);
+			if (childCol <= lastCol) {
+				currentRow ++;
+			}
+			addFormComponent(form, nodeDefn, currentRow);
+			lastCol = childCol;
 		}
 		
 		//create inner forms
@@ -150,7 +157,7 @@ public class UIOptionsMigrator {
 		return null;
 	}
 
-	protected void addFormComponent(UIFormContentContainer parent, NodeDefinition nodeDefn) throws UIOptionsMigrationException {
+	protected void addFormComponent(UIFormContentContainer parent, NodeDefinition nodeDefn, int row) throws UIOptionsMigrationException {
 		CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
 		UIOptions oldUIOptions = survey.getUIOptions();
 		UIFormComponent component;
@@ -164,6 +171,9 @@ public class UIOptionsMigrator {
 				component = createFormSection(parent, entityDefn);
 			}
 		}
+		component.setColumn(oldUIOptions.getColumn(nodeDefn));
+		component.setColumnSpan(oldUIOptions.getColumnSpan(nodeDefn));
+		component.setRow(row);
 		parent.addChild(component);
 	}
 
@@ -193,11 +203,18 @@ public class UIOptionsMigrator {
 		UIFormSection formSection = parent.createFormSection();
 		formSection.setEntityDefinition(entityDefn);
 
+		int currentRow = 0;
+		int lastCol = 1;
 		List<NodeDefinition> childDefns = entityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefns) {
 			UITab assignedChildTab = uiOptions.getAssignedTab(childDefn, true);
 			if ( assignedChildTab == parentTab ) {
-				addFormComponent(formSection, childDefn);
+				int childCol = uiOptions.getColumn(childDefn);
+				if (childCol <= lastCol) {
+					currentRow ++;
+				}
+				addFormComponent(formSection, childDefn, currentRow);
+				lastCol = childCol;
 			}
 		}
 		

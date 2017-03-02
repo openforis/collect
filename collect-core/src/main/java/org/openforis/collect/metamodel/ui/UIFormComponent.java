@@ -10,4 +10,16 @@ package org.openforis.collect.metamodel.ui;
  */
 public interface UIFormComponent extends Identifiable {
 
+	int getColumn();
+	
+	void setColumn(int column);
+
+	int getColumnSpan();
+	
+	void setColumnSpan(int columnSpan);
+
+	int getRow();
+	
+	void setRow(int row);
+	
 }

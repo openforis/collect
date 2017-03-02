@@ -1,4 +1,4 @@
-package org.openforis.collect.metamodel;
+package org.openforis.collect.metamodel.view;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.xml.CeoApplicationOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -44,8 +43,6 @@ public class SurveyViewGenerator {
 	public SurveyView generateView(CollectSurvey survey) {
 		final SurveyView surveyView = new SurveyView(survey);
 		
-		surveyView.ceoApplicationOptions = survey.getApplicationOptions(CeoApplicationOptions.TYPE);
-		
 		if (includeCodeLists) {
 			List<CodeList> codeLists = survey.getCodeLists();
 			for (CodeList codeList : codeLists) {
@@ -59,7 +56,7 @@ public class SurveyViewGenerator {
 					codeListView.items.add(createCodeListItemView(item));
 				}
 				
-				surveyView.codeLists.add(codeListView);
+				surveyView.addCodeList(codeListView);
 			}
 		}
 		
@@ -79,7 +76,7 @@ public class SurveyViewGenerator {
 				}
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
-					surveyView.addRootEntity((EntityDefView) view);
+					surveyView.getSchema().addRootEntity((EntityDefView) view);
 				} else {
 					EntityDefView parentView = (EntityDefView) viewById.get(parentDef.getId());
 					parentView.addChild(view);

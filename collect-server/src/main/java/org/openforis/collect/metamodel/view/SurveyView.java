@@ -1,8 +1,11 @@
-package org.openforis.collect.metamodel;
+package org.openforis.collect.metamodel.view;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.metamodel.SurveyTarget;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
+import org.openforis.collect.metamodel.uiconfiguration.view.UIConfigurationView;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Institution;
 import org.openforis.collect.persistence.xml.CeoApplicationOptions;
@@ -14,9 +17,10 @@ public class SurveyView {
 	private boolean temporary;
 	private SurveyTarget target;
 	private Institution institution;
-	List<CodeListView> codeLists = new ArrayList<CodeListView>();
-	private List<EntityDefView> rootEntities = new ArrayList<EntityDefView>();
-	CeoApplicationOptions ceoApplicationOptions;
+	private SchemaView schema;
+	private List<CodeListView> codeLists = new ArrayList<CodeListView>();
+	private CeoApplicationOptions ceoApplicationOptions;
+	private UIConfiguration uiConfiguration;
 	
 	public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
 		this.id = id;
@@ -28,6 +32,17 @@ public class SurveyView {
 	public SurveyView(CollectSurvey survey) {
 		this(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
 		this.institution = survey.getInstitution();
+		this.schema = new SchemaView();
+		this.uiConfiguration = survey.getUIConfiguration();
+		this.ceoApplicationOptions = survey.getApplicationOptions(CeoApplicationOptions.TYPE);
+	}
+
+	public UIConfigurationView getUiConfiguration() {
+		return new UIConfigurationView(uiConfiguration);
+	}
+	
+	public void addCodeList(CodeListView codeListView) {
+		this.codeLists.add(codeListView);
 	}
 
 	public Integer getId() {
@@ -62,16 +77,12 @@ public class SurveyView {
 		this.institution = institution;
 	}
 	
-	public void addRootEntity(EntityDefView rootEntity) {
-		rootEntities.add(rootEntity);
-	}
-	
-	public List<EntityDefView> getRootEntities() {
-		return rootEntities;
-	}
-	
 	public List<CodeListView> getCodeLists() {
 		return codeLists;
+	}
+	
+	public SchemaView getSchema() {
+		return schema;
 	}
 	
 	public CeoApplicationOptions getCeoApplicationOptions() {
@@ -81,4 +92,5 @@ public class SurveyView {
 	public void setCeoApplicationOptions(CeoApplicationOptions ceoApplicationOptions) {
 		this.ceoApplicationOptions = ceoApplicationOptions;
 	}
+
 }

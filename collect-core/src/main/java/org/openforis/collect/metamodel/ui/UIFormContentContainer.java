@@ -14,7 +14,7 @@ public abstract class UIFormContentContainer extends UIModelObject {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<UIFormComponent> children;
+	private List<UIFormComponent> children = new ArrayList<UIFormComponent>();
 	private List<UIForm> forms;
 	
 	UIFormContentContainer(UIModelObject parent, int id) {
@@ -26,9 +26,6 @@ public abstract class UIFormContentContainer extends UIModelObject {
 	}
 	
 	public void addChild(UIFormComponent child) {
-		if ( children == null ) {
-			children = new ArrayList<UIFormComponent>();
-		}
 		children.add(child);
 		getUIConfiguration().attachItem(child);
 	}
@@ -89,5 +86,29 @@ public abstract class UIFormContentContainer extends UIModelObject {
 	public void removeForm(UIForm form) {
 		forms.remove(form);
 		getUIConfiguration().detachItem(form);
+	}
+	
+	public int getTotalColumns() {
+		int maxExtent = 1;
+		for (UIFormComponent child : children) {
+			int childCol = child.getColumn();
+			int childColSpan = child.getColumnSpan();
+			int maxChildExtent = childCol + (childColSpan - 1);
+			maxExtent = Math.max(maxChildExtent, maxExtent);
+		}
+		return maxExtent;
+	}
+	
+	public int getTotalRows() {
+		int totalRows = 0;
+		int lastColumn = 1;
+		for (UIFormComponent child : children) {
+			int childColumn = child.getColumn();
+			if (childColumn <= lastColumn) {
+				totalRows ++;
+			}
+			lastColumn = childColumn;
+		}
+		return totalRows;
 	}
 }

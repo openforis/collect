@@ -1,4 +1,4 @@
-package org.openforis.collect.metamodel;
+package org.openforis.collect.metamodel.view;
 
 public abstract class SurveyObjectView {
 	
