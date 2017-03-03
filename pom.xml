@@ -18,6 +18,7 @@
 		<module>collect-installer</module>
 		<module>collect-updater</module>
 		<module>collect-saiku-installer</module>
+		<module>collect-control-panel</module>
 	</modules>
 
 	<properties>
