@@ -21,6 +21,7 @@ public class DbInitializer {
 		Connection conn = null;
 		try {
 			conn = connectionProvider.acquire();
+			conn.setAutoCommit(false);
 			Statement stmt = conn.createStatement();
 			stmt.execute(String.format("CREATE SCHEMA IF NOT EXISTS %s", DbUtils.SCHEMA_NAME));
 			conn.commit();
