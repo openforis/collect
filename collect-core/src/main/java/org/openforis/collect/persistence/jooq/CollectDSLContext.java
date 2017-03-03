@@ -73,13 +73,7 @@ public class CollectDSLContext extends DefaultDSLContext {
 			} else {
 				qualifiedName = name;
 			}
-			switch (configuration().dialect()) {
-			case POSTGRES:
-				execute("ALTER SEQUENCE " +  qualifiedName + " RESTART WITH " + restartValue);
-				break;
-			default:
-				throw new RuntimeException("DB dialect not supported : " + configuration().dialect());
-			}
+			execute("ALTER SEQUENCE " +  qualifiedName + " RESTART WITH " + restartValue);
 		}
 	}
 	

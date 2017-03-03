@@ -68,6 +68,7 @@
 	}
 	
 ]]></zscript>
+	
 	<style src="/assets/designer_style.css" />
 	
     <box hflex="true" vflex="true" align="center" sclass="mainContainer"

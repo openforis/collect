@@ -4,8 +4,12 @@
 
 <html>
   <head>
-    <title>OpenForis Collect</title>
+    <title>Open Foris Collect</title>
+    
   	<meta http-equiv="Pragma" content="no-cache">
+  	
+  	<link rel="shortcut icon" href="assets/images/favicon.ico" />
+  	
   	<script type="text/javascript" src="script/jquery-1.6.2.min.js"></script>
     <script type="text/javascript" src="script/sessionping.js"></script>
     <script type="text/javascript" src="js/jquery/jquery-i18n-properties/1.2.0/jquery.i18n.properties.js"></script>

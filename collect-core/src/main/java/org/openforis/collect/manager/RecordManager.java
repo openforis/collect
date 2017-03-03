@@ -416,12 +416,15 @@ public class RecordManager {
 	 * Returns false if another record with the same root entity key values exists.
 	 */
 	public boolean isUnique(CollectRecord record) {
-		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		record.updateSummaryFields();
-		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		
-		Entity rootEntity = record.getRootEntity();
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity.getName(), rootEntityKeyValues.toArray(new String[rootEntityKeyValues.size()]));
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		
+		RecordFilter filter = new RecordFilter(survey, record.getRootEntityDefinitionId());
+		filter.setKeyValues(record.getRootEntityKeyValues());
+		filter.setIncludeNullConditionsForKeyValues(true);
+		
+		List<CollectRecord> summaries = recordDao.loadSummaries(filter);
 		for (CollectRecord collectRecord : summaries) {
 			if ( ! collectRecord.getId().equals(record.getId()) ) {
 				return false;

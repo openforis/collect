@@ -5,14 +5,14 @@ import java.util.List;
 public class CSVFileValidationResult {
 	
 	public enum ErrorType {
-		INVALID_HEADERS, INVALID_FILE_TYPE, INVALID_CONTENT_IN_LINE, INVALID_NUMBER_OF_COLUMNS
+		INVALID_HEADERS, INVALID_FILE_TYPE, INVALID_NUMBER_OF_COLUMNS, INVALID_NUMBER_OF_PLOTS_TOO_LARGE, INVALID_NUMBER_OF_PLOTS_WARNING, INVALID_VALUES_IN_CSV
 	}
 	
 	private boolean successful;
 	private ErrorType errorType;
 	private List<String> expectedHeaders;
 	private List<String> foundHeaders;
-	private Integer rowNumber;
+	private Integer numberOfRows;
 	private String message;
 	private List<CSVRowValidationResult> rowValidations;
 	
@@ -49,14 +49,6 @@ public class CSVFileValidationResult {
 		return foundHeaders;
 	}
 
-	public Integer getRowNumber() {
-		return rowNumber;
-	}
-
-	public void setRowNumber(Integer rowNumber) {
-		this.rowNumber = rowNumber;
-	}
-
 	public String getMessage() {
 		return message;
 	}
@@ -66,11 +58,23 @@ public class CSVFileValidationResult {
 	}
 
 	public void setRowValidations(List<CSVRowValidationResult> rowValidations) {
+		if( rowValidations != null && rowValidations.size() > 0 ){
+			successful = false;
+			errorType = ErrorType.INVALID_VALUES_IN_CSV;
+		}
 		this.rowValidations = rowValidations;
 	}
 
 	public List<CSVRowValidationResult> getRowValidations() {
 		return rowValidations;
+	}
+
+	public Integer getNumberOfRows() {
+		return numberOfRows;
+	}
+
+	public void setNumberOfRows(Integer numberOfRows) {
+		this.numberOfRows = numberOfRows;
 	}
 	
 	

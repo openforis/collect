@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.17-SNAPSHOT</version>
+		<version>3.12.22-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-saiku-installer</artifactId>
 	<packaging>pom</packaging>
@@ -19,7 +19,7 @@
 		<!-- saiku installer file names -->
 		<windows-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-windows-installer.exe</windows-saiku-installer-file-name>
 		<linux-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-linux-installer.run</linux-saiku-installer-file-name>
-		<osx-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-osx-installer.app.zip</osx-saiku-installer-file-name>
+		<osx-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-osx-installer.dmg</osx-saiku-installer-file-name>
 	</properties>
 	
 	<profiles>

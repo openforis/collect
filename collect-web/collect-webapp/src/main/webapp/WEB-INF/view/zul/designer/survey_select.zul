@@ -1,4 +1,8 @@
-<?page title="Open Foris Collect Database Designer - Select Survey"?>
+<?page title="Open Foris Collect - Survey Designer - Select Survey"?>
+
+<?link rel="shortcut icon" type="image/x-icon" href="/assets/images/favicon.ico"?>
+<?link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico"?>
+
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveySelectBox"?>
 <?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>

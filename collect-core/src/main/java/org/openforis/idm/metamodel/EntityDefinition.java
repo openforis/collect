@@ -64,6 +64,11 @@ public class EntityDefinition extends NodeDefinition {
 			child.resetPath();
 		}
 	}
+	
+	@Override
+	public boolean isAlwaysRequired() {
+		return isRoot() ? true : super.isAlwaysRequired();
+	}
 
 	public boolean isRoot() {
 		return getParentDefinition() == null;

@@ -4,6 +4,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">	
     <head>
 		<title>Open Foris Collect</title>
+		
+		<link rel="shortcut icon" href="assets/images/favicon.ico" />
+		
 	    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
 		<meta http-equiv="Pragma" content="no-store, no-cache" />
 		<meta http-equiv="Expires" content="0" />

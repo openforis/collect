@@ -94,10 +94,24 @@
 					<platforms>windows</platforms>
 					<distributionFileList>
 						<distributionFile>
-							<origin>start.cmd</origin>
+							<origin>start.bat</origin>
 						</distributionFile>
 						<distributionFile>
-							<origin>stop.cmd</origin>
+							<origin>stop.bat</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>programfilesosx</name>
+					<description>OSx Program Files</description>
+					<destination>${installdir}</destination>
+					<platforms>osx</platforms>
+					<distributionFileList>
+						<distributionFile>
+							<origin>start.sh</origin>
+						</distributionFile>
+						<distributionFile>
+							<origin>stop.sh</origin>
 						</distributionFile>
 					</distributionFileList>
 				</folder>
@@ -108,7 +122,7 @@
 					<comment>Start Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
-					<windowsExec>${installdir}/start.cmd</windowsExec>
+					<windowsExec>${installdir}/start.bat</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
 					<windowsIcon>${installdir}/images/of-collect-logo.ico</windowsIcon>
 					<windowsPath></windowsPath>
@@ -118,7 +132,7 @@
 					<comment>Stop Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
-					<windowsExec>${installdir}/stop.cmd</windowsExec>
+					<windowsExec>${installdir}/stop.bat</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
 					<windowsIcon>${installdir}/images/of-collect-logo.ico</windowsIcon>
 					<windowsPath></windowsPath>
@@ -178,6 +192,11 @@ version_id = VERSION_ID
 update_download_location = ${system_temp_directory}
 check_for_updates = 1</text>
 				</writeFile>
+				<!-- Create Data folder -->
+				<createDirectory>
+					<path>${data_dir}</path>
+				</createDirectory>
+				<!-- Find free ports and replace the values in Tomcat server.xml file -->
 				<getFreePort>
 					<finalPort>8399</finalPort>
 					<initialPort>8305</initialPort>
@@ -248,6 +267,7 @@ check_for_updates = 1</text>
 		                </substitution>
 		            </substitutionList>
 		        </substitute>
+		        <!-- Write the ports configuration in collect.properties file -->
 		        <propertiesFileSet>
 		        	<file>${installdir}/collect.properties</file>
 		        	<key>tomcat_http_port</key>
@@ -260,14 +280,46 @@ check_for_updates = 1</text>
 		</include>
 	</componentList>
 	<preInstallationActionList>
+		<if>
+        	<actionList>
+        		<setInstallerVariable>
+        			<name>installdir</name>
+        			<value>${env(SYSTEMDRIVE)}/OpenForis/Collect</value> 
+        		</setInstallerVariable>
+        	</actionList>
+        	<conditionRuleList>
+        		<platformTest>
+        			<type>windows</type>
+        		</platformTest>
+			</conditionRuleList> 
+			<elseActionList>
+				<setInstallerVariable>
+					<name>installdir</name>
+					<value>~/OpenForis/Collect</value>
+				</setInstallerVariable>
+			</elseActionList>
+		</if>
 		<setInstallerVariable>
-			<name>installdir</name>
-			<value>${env(SYSTEMDRIVE)}/opt/openforis/collect</value>
+			<name>root_user_dir</name>
+			<value>${user_home_directory}/OpenForis/Collect</value>
 		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>data_dir</name>
+			<value>${root_user_dir}/data</value>
+		</setInstallerVariable>
+		<throwError>
+			<explanation>Open Foris Collect has been already installed</explanation>
+			<text>Open Foris Collect has been already installed. Please run Update Open Foris Collect if you want to update it.</text>
+			<ruleEvaluationLogic>and</ruleEvaluationLogic>
+			<ruleList>
+				<fileTest path="${installdir}" condition="exists" />
+				<fileTest path="${installdir}" condition="is_not_empty" />
+			</ruleList>
+        </throwError>
 	</preInstallationActionList>
 	<postInstallationActionList>
 		<substitute>
-			<files>${installdir}/start.sh;${installdir}/stop.sh;${installdir}/start.cmd;${installdir}/stop.cmd;</files>
+			<files>${installdir}/start.sh;${installdir}/stop.sh;${installdir}/start.bat;${installdir}/stop.bat;</files>
 			<type>exact</type>
 			<substitutionList>
 				<substitution>
@@ -277,7 +329,7 @@ check_for_updates = 1</text>
 			</substitutionList>
 		</substitute>
         <substitute>
-            <files>${installdir}/start.sh;${installdir}/start.cmd;</files>
+            <files>${installdir}/start.sh;${installdir}/start.bat;</files>
             <type>exact</type>
             <substitutionList>
                 <substitution>
@@ -305,6 +357,15 @@ check_for_updates = 1</text>
 				</platformTest>
 			</ruleList>
 		</changeOwnerAndGroup>
+		<!-- delete temporary files (if any, from previous installations) -->
+        <deleteFile>
+  			<path>${installdir}/tomcat/webapps/collect</path>
+			<abortOnError>0</abortOnError>
+		</deleteFile>
+		<createJavaLaunchers>
+		    <javaLauncherList>
+		    </javaLauncherList>
+		</createJavaLaunchers>
 	</postInstallationActionList>
 	<postUninstallationActionList>
 		<deleteFile>
@@ -325,7 +386,7 @@ check_for_updates = 1</text>
 	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
 	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
 	<saveRelativePaths>1</saveRelativePaths>
-	<createOsxBundleZip>1</createOsxBundleZip>
+	<createOsxBundleDmg>1</createOsxBundleDmg>
 	<parameterList>
 		<directoryParameter>
 			<name>installdir</name>

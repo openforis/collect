@@ -4,14 +4,14 @@
    	<!-- Parameters -->
 	<Parameter name="collect.simple_editor" value="false" /> <!-- Simplifies Survey Editor UI -->
 	
-   	<!-- SQLite database stored in CATALINA_HOME/data/collect.db file -->
+   	<!-- SQLite database stored in USER_HOME/openforis/collect/data/collect.db file -->
 	<Resource 
 	   name="jdbc/collectDs" 
 	   auth="Container"
 	   type="javax.sql.DataSource"
 	   factory="org.apache.commons.dbcp.BasicDataSourceFactory"
 	   driverClassName="org.sqlite.JDBC"
-       url="jdbc:sqlite:${catalina.home}/data/collect.db">
+       url="jdbc:sqlite:${user.home}/OpenForis/Collect/data/collect.db">
 	 </Resource>
 	 
 	<!-- PostgreSQL database configuration

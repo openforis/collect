@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.17-SNAPSHOT</version>
+		<version>3.12.22-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
@@ -15,11 +15,13 @@
 			by the installer -->
 		<installer-build-path>${project.build.directory}/installer</installer-build-path>
 		<installbuilder-file-name>installbuilder.xml</installbuilder-file-name>
-		<jre.version>1.8.0_11</jre.version>
+		<jre.version.major>1.8</jre.version.major>
+		<jre.version>1.8.0</jre.version>
+		<jre.version.full>1.8.0_121</jre.version.full>
 		<!-- installer file names -->
 		<windows-installer-file-name>OpenForisCollect-${installer-version-id}-windows-installer.exe</windows-installer-file-name>
 		<linux-installer-file-name>OpenForisCollect-${installer-version-id}-linux-installer.run</linux-installer-file-name>
-		<osx-installer-file-name>OpenForisCollect-${installer-version-id}-osx-installer.app.zip</osx-installer-file-name>
+		<osx-installer-file-name>OpenForisCollect-${installer-version-id}-osx-installer.dmg</osx-installer-file-name>
 		<!-- autoupdate file names -->
 		<windows-autoupdater-file-name>autoupdate-windows.exe</windows-autoupdater-file-name>
 		<linux-autoupdater-file-name>autoupdate-linux.run</linux-autoupdater-file-name>
@@ -48,8 +50,8 @@
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
 											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
-											<classifier>linux-i386</classifier>
+											<version>${jre.version.full}</version>
+											<classifier>linux</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
@@ -57,7 +59,7 @@
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
 											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
+											<version>${jre.version.full}</version>
 											<classifier>linux-x64</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
@@ -66,7 +68,7 @@
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
 											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
+											<version>${jre.version.full}</version>
 											<classifier>osx</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
@@ -75,7 +77,7 @@
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
 											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
+											<version>${jre.version.full}</version>
 											<classifier>windows-i386</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
@@ -84,26 +86,8 @@
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
 											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
+											<version>${jre.version.full}</version>
 											<classifier>windows-x64</classifier>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.oracle.java</groupId>
-											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
-											<classifier>solaris-intel</classifier>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.oracle.java</groupId>
-											<artifactId>jre</artifactId>
-											<version>${jre.version}</version>
-											<classifier>solaris-sparc</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
@@ -190,8 +174,8 @@
 						</executions>
 					</plugin>
 
-					<!-- 3. replace application version into the xml installbuilder source 
-						file -->
+					<!-- 3. replace application version into the InstallBuilder XML source file
+							replace Java version into the InstallBuilder java.xml file -->
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
 						<artifactId>maven-replacer-plugin</artifactId>
@@ -208,6 +192,7 @@
 							<basedir>${installer-build-path}</basedir>
 							<includes>
 								<include>${installbuilder-file-name}</include>
+								<include>java.xml</include>
 							</includes>
 							<regex>false</regex>
 							<replacements>
@@ -219,10 +204,22 @@
 									<token>UPDATE_XML_URL</token>
 									<value>${collect.update.url}</value>
 								</replacement>
+								<replacement>
+									<token><![CDATA[%JRE_VERSION_FULL%]]></token>
+									<value>${jre.version.full}</value>
+								</replacement>
+								<replacement>
+									<token><![CDATA[%JRE_VERSION_MAJOR%]]></token>
+									<value>${jre.version.major}</value>
+								</replacement>
+								<replacement>
+									<token><![CDATA[%JRE_VERSION%]]></token>
+									<value>${jre.version}</value>
+								</replacement>
 							</replacements>
 						</configuration>
 					</plugin>
-
+					
 					<!-- 4. execute installbuilder to produce the installers -->
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
@@ -328,7 +325,7 @@
 										<artifact>
 											<file>${project.build.directory}/${osx-installer-file-name}</file>
 											<classifier>osx</classifier>
-											<type>zip</type>
+											<type>dmg</type>
 										</artifact>
 									</artifacts>
 								</configuration>

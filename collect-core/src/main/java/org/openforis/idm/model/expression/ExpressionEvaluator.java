@@ -1,5 +1,8 @@
 package org.openforis.idm.model.expression;
 
+import static org.openforis.idm.model.expression.Expressions.FALSE_FUNCTION;
+import static org.openforis.idm.model.expression.Expressions.TRUE_FUNCTION;
+
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -23,8 +26,6 @@ import org.openforis.idm.model.Value;
 public class ExpressionEvaluator {
 	
 	private static final Pattern NUMBER_PATTERN = Pattern.compile("^-?\\d*(\\.\\d+)?$");
-	private static final String TRUE_FUNCTION = "true()";
-	private static final String FALSE_FUNCTION = "false()";
 	
 	private ExpressionFactory expressionFactory;
 
