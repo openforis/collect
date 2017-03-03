@@ -214,7 +214,11 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				style : new ol.style.Style({
 					image : new ol.style.Circle({
 						fill : new ol.style.Fill({
-							color : "#0000FF"
+							color : [0,0,0,0] //transparent fill
+						}),
+						stroke: new ol.style.Stroke({
+							color : "#0000FF",
+							width: 2
 						}),
 						radius : 5
 					})
