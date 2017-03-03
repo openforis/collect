@@ -26,6 +26,7 @@ public class RecordFilter {
 	private Integer ownerId;
 	private List<String> keyValues;
 	private boolean caseSensitiveKeyValues;
+	private boolean includeNullConditionsForKeyValues = false;
 	
 	public RecordFilter(int surveyId, Integer rootEntityId) {
 		this.surveyId = surveyId;
@@ -150,6 +151,14 @@ public class RecordFilter {
 
 	public void setCaseSensitiveKeyValues(boolean caseSensitiveKeyValues) {
 		this.caseSensitiveKeyValues = caseSensitiveKeyValues;
+	}
+	
+	public boolean isIncludeNullConditionsForKeyValues() {
+		return includeNullConditionsForKeyValues;
+	}
+	
+	public void setIncludeNullConditionsForKeyValues(boolean includeNullConditionsForKeyValues) {
+		this.includeNullConditionsForKeyValues = includeNullConditionsForKeyValues;
 	}
 	
 }

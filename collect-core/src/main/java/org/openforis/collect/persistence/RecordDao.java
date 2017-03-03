@@ -174,6 +174,10 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return loadSummaries(filter, sortFields);
 	}
 	
+	public List<CollectRecord> loadSummaries(RecordFilter filter) {
+		return loadSummaries(filter, null);
+	}
+	
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		CollectSurvey survey = filter.getSurvey();
 		
@@ -270,7 +274,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 		//record keys
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
-			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.getKeyValues());
+			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.isIncludeNullConditionsForKeyValues(), filter.getKeyValues());
 		}
 	}
 	
@@ -305,24 +309,24 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return countRecords(filter);
 	}
 	
-	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, List<String> keyValues) {
-		addFilterByKeyConditions(q, caseSensitiveKeyValues, keyValues.toArray(new String[keyValues.size()]));
+	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, boolean includeNullConditions, List<String> keyValues) {
+		addFilterByKeyConditions(q, caseSensitiveKeyValues, includeNullConditions, keyValues.toArray(new String[keyValues.size()]));
 	}
 	
-	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, String... keyValues) {
+	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, boolean includeNullConditions, String... keyValues) {
 		if ( keyValues != null && keyValues.length > 0 ) {
 			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
 				String key = keyValues[i];
 				@SuppressWarnings("unchecked")
 				Field<String> keyField = (Field<String>) KEY_FIELDS[i];
-				if (StringUtils.isBlank(key)) {
-					q.addConditions(keyField.isNull());
-				} else {
+				if (StringUtils.isNotBlank(key)) {
 					if (caseSensitiveKeyValues) {
 						q.addConditions(keyField.equal(key));
 					} else {
 						q.addConditions(keyField.upper().equal(key.toUpperCase()));
 					}
+				} else if (includeNullConditions) {
+					q.addConditions(keyField.isNull());
 				}
 			}
 		}
