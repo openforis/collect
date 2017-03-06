@@ -376,8 +376,12 @@
 		    <artifactId>cts</artifactId>
 		    <version>1.4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jamesmurty.utils</groupId>
+			<artifactId>java-xmlbuilder</artifactId>
+			<version>1.1</version>
+		</dependency>
 				
-	
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
 			<groupId>org.springframework</groupId>
