@@ -9,6 +9,7 @@ import java.util.Map;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
@@ -69,6 +70,11 @@ public class SurveyViewGenerator {
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
 					view = new EntityDefView(((EntityDefinition) def).isRoot(), id, name, label, def.isMultiple());
+				} else if (def instanceof CodeAttributeDefinition) {
+					CodeAttributeDefinition attrDef = (CodeAttributeDefinition) def;
+					int codeListId = attrDef.getList() == null ? -1: attrDef.getList().getId();
+					view = new CodeAttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(), 
+							attrDef.isKey(), attrDef.isMultiple(), codeListId);
 				} else {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
 					view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(),
