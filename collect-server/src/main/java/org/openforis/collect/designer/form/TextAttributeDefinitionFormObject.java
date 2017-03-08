@@ -22,6 +22,7 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 	private String input;
 	private String autocompleteGroup;
 	private boolean autoUppercase;
+	private boolean geometry;
 	
 	TextAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -41,6 +42,8 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 		CollectAnnotations annotations = ((CollectSurvey) dest.getSurvey()).getAnnotations();
 		TextInput textInput = TextInput.valueOf(input);
 		annotations.setTextInput(dest, textInput);
+		
+		annotations.setGeometry(dest, geometry);
 	}
 	
 	@Override
@@ -59,6 +62,8 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 		CollectAnnotations annotations = ((CollectSurvey) source.getSurvey()).getAnnotations();
 		TextInput textInput = annotations.getTextInput(source);
 		input = textInput.name();
+		
+		geometry = annotations.isGeometry(source);
 	}
 
 	public String getInput() {
@@ -91,5 +96,13 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 	
 	public void setAutoUppercase(boolean autoUppercase) {
 		this.autoUppercase = autoUppercase;
+	}
+	
+	public boolean isGeometry() {
+		return geometry;
+	}
+	
+	public void setGeometry(boolean geometry) {
+		this.geometry = geometry;
 	}
 }

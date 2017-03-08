@@ -6,6 +6,15 @@
       <column />
     </columns>
     <rows>
+       <row visible="@load(not vm.collectEarthSurvey)">
+		<fieldErrorHandler message="@load(vmsgs['geometry'])">
+			<label value="${labels.survey.schema.attribute.text.geometry.$}:" />
+			<image popup="geometryInfoTooltip" style="cursor:pointer"
+				src="/assets/images/info-small.png" />
+    	</fieldErrorHandler>
+		<checkbox checked="@bind(fx.geometry)"
+			onCheck="@command('applyChanges')" />
+	  </row>
       <row visible="@load(not fx.calculated)">
         <label
           value="${labels.survey.schema.attribute.text.autocomplete_group}:" />
@@ -24,4 +33,10 @@
       </row>
     </rows>
   </grid>
+  
+  <popup id="geometryInfoTooltip" width="300px">
+     <html><![CDATA[
+  		${labels.survey.schema.attribute.text.geometry.tooltip}
+     ]]></html>
+  </popup>
 </zk>

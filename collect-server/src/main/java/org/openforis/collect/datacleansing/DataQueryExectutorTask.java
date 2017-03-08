@@ -1,5 +1,6 @@
 package org.openforis.collect.datacleansing;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,9 +9,10 @@ import org.apache.commons.io.IOUtils;
 import org.openforis.collect.datacleansing.xpath.XPathDataQueryEvaluator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.NodeProcessor;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Node;
@@ -53,7 +55,9 @@ public class DataQueryExectutorTask extends Task {
 	@Override
 	protected void onCompleted() {
 		super.onCompleted();
-		IOUtils.closeQuietly(input.nodeProcessor);
+		if (input.nodeProcessor instanceof Closeable) {
+			IOUtils.closeQuietly((Closeable) input.nodeProcessor);
+		}
 	}
 	
 	@Override

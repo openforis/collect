@@ -114,9 +114,9 @@ public class GeoFunctions extends CustomFunctions {
 		for (Coordinate coordinate : coordinates) {
 			if (coordinate.isComplete()) {
 				Coordinate latLonCoord = coordinateOperations.convertToWgs84(coordinate);
-				coordinatesSb.append(latLonCoord.getY());
-				coordinatesSb.append(',');
 				coordinatesSb.append(latLonCoord.getX());
+				coordinatesSb.append(',');
+				coordinatesSb.append(latLonCoord.getY());
 				coordinatesSb.append('\n');
 			}
 		}

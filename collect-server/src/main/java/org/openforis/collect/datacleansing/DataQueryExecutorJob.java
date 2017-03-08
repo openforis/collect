@@ -2,6 +2,7 @@ package org.openforis.collect.datacleansing;
 
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorTaskInput;
+import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
