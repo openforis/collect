@@ -317,6 +317,7 @@ public class MondrianCubeGenerator {
 				level.column = nodeDef.getName() + "_" + levelName.toLowerCase(Locale.ENGLISH);
 				level.levelType = String.format("Time%ss", levelName);
 				level.type = "Numeric";
+				level.uniqueMembers = "false"; // Avoids grouping the values of the sane day over multiple months!!!
 				hierarchy.levels.add(level);
 			}
 		} else if (nodeDef instanceof CoordinateAttributeDefinition) {
