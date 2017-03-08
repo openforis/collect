@@ -3,9 +3,11 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
+import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -33,7 +35,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		allowValuesSorting = false;
 		showAllowedValuesPreview = (Boolean) Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue();
 		layoutType = ((CodeAttributeLayoutType) Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE.getDefaultValue()).name();
-		layoutDirection = Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION.getDefaultValue();
+		layoutDirection = ((Orientation) Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION.getDefaultValue()).name();
 		showCode = (Boolean) Annotation.CODE_ATTRIBUTE_SHOW_CODE.getDefaultValue();
 	}
 
@@ -49,8 +51,8 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		UIOptions uiOptions = survey.getUIOptions();
 		uiOptions.setShowAllowedValuesPreviewValue(dest, showAllowedValuesPreview);
 		
-		uiOptions.setLayoutType(dest, CodeAttributeLayoutType.valueOf(layoutType.toUpperCase()));
-		uiOptions.setLayoutDirection(dest, layoutDirection);
+		uiOptions.setLayoutType(dest, CodeAttributeLayoutType.valueOf(layoutType));
+		uiOptions.setLayoutDirection(dest, StringUtils.isBlank(layoutDirection) ? null : Orientation.valueOf(layoutDirection));
 		uiOptions.setShowCode(dest, showCode);
 	}
 	
@@ -67,8 +69,9 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		UIOptions uiOptions = survey.getUIOptions();
 		showAllowedValuesPreview = uiOptions.getShowAllowedValuesPreviewValue(source);
 		
-		layoutType = uiOptions.getLayoutType(source).toString();
-		layoutDirection = uiOptions.getLayoutDirection(source);
+		layoutType = uiOptions.getLayoutType(source).name();
+		Orientation sourceItemsDirection = uiOptions.getLayoutDirection(source);
+		layoutDirection = sourceItemsDirection == null ? null : sourceItemsDirection.name();
 		showCode = uiOptions.getShowCode(source);
 	}
 	

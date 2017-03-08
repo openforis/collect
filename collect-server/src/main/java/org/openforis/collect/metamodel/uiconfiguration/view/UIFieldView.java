@@ -5,9 +5,9 @@ import org.openforis.collect.metamodel.ui.UIField;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 
-public class UIFieldView extends UIModelObjectView<UIField> implements UITabComponentView<UIField> {
+public class UIFieldView<O extends UIField> extends UIModelObjectView<O> implements UITabComponentView<O> {
 
-	public UIFieldView(UIField uiObject) {
+	public UIFieldView(O uiObject) {
 		super(uiObject);
 	}
 	

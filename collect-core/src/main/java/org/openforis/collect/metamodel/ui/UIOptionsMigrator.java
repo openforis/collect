@@ -10,6 +10,7 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITable.Direction;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -181,13 +182,23 @@ public class UIOptionsMigrator {
 		CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
 		CollectAnnotations annotations = survey.getAnnotations();
-		UIField field = parent.createField();
+		UIField field;
+		if (nodeDefn instanceof CodeAttributeDefinition) {
+			UICodeField codeField = parent.createCodeField();
+			CodeAttributeDefinition codeAttrDefn = (CodeAttributeDefinition) nodeDefn;
+			codeField.setLayout(uiOptions.getLayoutType(codeAttrDefn));
+			codeField.setShowCode(uiOptions.getShowCode(codeAttrDefn));
+			codeField.setItemsOrientation(uiOptions.getLayoutDirection(codeAttrDefn));
+			field = codeField;
+		} else {
+			field = parent.createField();
+		}
 		field.setAttributeDefinitionId(nodeDefn.getId());
+		
 		if ( nodeDefn instanceof TextAttributeDefinition ) {
 			String autoCompleteGroup = annotations.getAutoCompleteGroup((TextAttributeDefinition) nodeDefn);
 			field.setAutoCompleteGroup(autoCompleteGroup);
-		}
-		if ( nodeDefn instanceof CoordinateAttributeDefinition ) {
+		} else if ( nodeDefn instanceof CoordinateAttributeDefinition ) {
 			CoordinateAttributeFieldsOrder fieldsOrder = uiOptions.getFieldsOrder((CoordinateAttributeDefinition) nodeDefn);
 			field.setFieldsOrder(fieldsOrder);
 		}
