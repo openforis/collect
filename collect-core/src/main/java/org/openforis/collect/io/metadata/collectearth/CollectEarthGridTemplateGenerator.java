@@ -29,6 +29,7 @@ import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.NumberValue;
 import org.openforis.idm.model.Value;
 import org.slf4j.Logger;
@@ -108,37 +109,38 @@ public class CollectEarthGridTemplateGenerator  {
 		List<CSVRowValidationResult> rowValidations = new ArrayList<CSVRowValidationResult>();
 		try {
 			csvReader = new CsvReader(file);
-			if (csvReader.size() == 1) {
-				//skip validation when there is only one row (e.g. ChangeThisGrid.csv file)
-				return validationResults;
-			}
 			boolean headersFound = false;
-			try {
-				csvReader.readHeaders();
-				List<String> firstLineValues = csvReader.getColumnNames();
-				
-				headersFound = lineContainsHeaders(survey, firstLineValues);
-				if( headersFound ){
-					validationResults = validateCSVHeaders(firstLineValues, survey);
-				}else{
-					
-					//Check that the number of columns coincide with the number of attributes expected
-					// Get the list of attribute types expected per row!
-					List<AttributeDefinition> attributesPerRow = getAttributesPerRow(survey);
-					
-					// Validate that the number of columns in the CSV and the expected number of columns match!!!!
-					if( firstLineValues.size() != attributesPerRow.size() ){
-						// The expected number of columns and the actual columns do not fit!!
-						// Break the operation and return a validation error!
-						validationResults = new CSVFileValidationResult( ErrorType.INVALID_HEADERS, getExpectedHeaders(survey) , firstLineValues);
-					}
-				}
-			} catch(Exception e) {
-				//this may happen when there are duplicate values in the first row
-				headersFound = false;
-				csvReader.setHeadersRead(true);	
-			}
 			
+			if (csvReader.size() == 1) {
+				headersFound = true;
+			}else{			
+				
+				try {
+					csvReader.readHeaders();
+					List<String> firstLineValues = csvReader.getColumnNames();
+					
+					headersFound = lineContainsHeaders(survey, firstLineValues);
+					if( headersFound ){
+						validationResults = validateCSVHeaders(firstLineValues, survey);
+					}else{
+						
+						//Check that the number of columns coincide with the number of attributes expected
+						// Get the list of attribute types expected per row!
+						List<AttributeDefinition> attributesPerRow = getAttributesPerRow(survey);
+						
+						// Validate that the number of columns in the CSV and the expected number of columns match!!!!
+						if( firstLineValues.size() != attributesPerRow.size() ){
+							// The expected number of columns and the actual columns do not fit!!
+							// Break the operation and return a validation error!
+							validationResults = new CSVFileValidationResult( ErrorType.INVALID_HEADERS, getExpectedHeaders(survey) , firstLineValues);
+						}
+					}
+				} catch(Exception e) {
+					//this may happen when there are duplicate values in the first row
+					headersFound = false;
+					csvReader.setHeadersRead(true);	
+				}
+			}
 			if( validationResults == null ){
 
 				rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound ) );
@@ -199,7 +201,7 @@ public class CollectEarthGridTemplateGenerator  {
 		}
 
 				
-		CsvLine csvLine = null;
+		CsvLine csvLine;
 		
 		while( ( csvLine = csvReader.readNextLine() ) != null ){
 			
@@ -222,11 +224,12 @@ public class CollectEarthGridTemplateGenerator  {
 		int column = 0;
 		for( int pos = 0; pos < attributesPerRow.size(); pos++ ){
 		
-			String message = validateCell( attributesPerRow.get(pos), nextLine[pos] );
-			if( message !=null ){
-				validationColumns.add( new CSVRowValidationResult(rowNumber, ErrorType.INVALID_VALUES_IN_CSV, column, message ));
-			} 
-			
+			if( nextLine.length > pos ){
+				String message = validateCell( survey, attributesPerRow.get(pos), nextLine[pos] );
+				if( message !=null ){
+					validationColumns.add( new CSVRowValidationResult(rowNumber+1, ErrorType.INVALID_VALUES_IN_CSV, column, message ));
+				} 
+			}
 			column++;
 			
 		}
@@ -236,13 +239,18 @@ public class CollectEarthGridTemplateGenerator  {
 		
 	}
 
+	
+	private boolean isEpsg4326SRS(CollectSurvey survey){
+		return survey.getSpatialReferenceSystem("EPSG:4326")!=null;
+	}
+	
 	/**
 	 * Checks if a value can be used as the input for an attribute 
 	 * @param attributeDefinition The attribute that we want to check the value against
 	 * @param value The value that should be checked
 	 * @return True if the value can be used in the attribute. False otherwise (for instance trying to use a string "abc" as the input for a Number attribute
 	 */
-	private String validateCell(AttributeDefinition attributeDefinition, String value) {
+	private String validateCell(CollectSurvey survey, AttributeDefinition attributeDefinition, String value) {
 		
 		try{
 			
@@ -253,14 +261,14 @@ public class CollectEarthGridTemplateGenerator  {
 				return String.format("The attribute %s is marekd as \"always required\". The value in the cell is empty!", attributeDefinition.getLabel( NodeLabel.Type.INSTANCE ));
 			}
 			
-			if ( attributeDefinition.getName().equals(LAT_COORDINATE) ){
+			if ( isEpsg4326SRS(survey) && attributeDefinition.getName().equals(LAT_COORDINATE) ){
 				double lat = ( (NumberValue<Number>) valueCreated ).getValue().doubleValue();
 				if(lat < -90 || lat > 90 ){
 					return "The latitude of a plot must be between -90 and 90 degrees!"; 
 				}
 			}
 			
-			if ( attributeDefinition.getName().equals(LONG_COORDINATE) ){
+			if ( isEpsg4326SRS(survey) && attributeDefinition.getName().equals(LONG_COORDINATE) ){
 				double longitude = ( (NumberValue<Number>) valueCreated ).getValue().doubleValue();
 				if(longitude < -180 || longitude > 180 ){
 					return "The latitude of a plot must be between -180 and 180 degrees!"; 
