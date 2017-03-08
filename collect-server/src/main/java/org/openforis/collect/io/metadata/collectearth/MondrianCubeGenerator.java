@@ -544,7 +544,7 @@ public class MondrianCubeGenerator {
 		private String nameColumn;
 		
 		@XStreamAsAttribute
-		private String uniqueMembers ="true";
+		private String uniqueMembers ="false"; // Only the plot id should be unique
 		
 		@XStreamAsAttribute
 		private String levelType;
