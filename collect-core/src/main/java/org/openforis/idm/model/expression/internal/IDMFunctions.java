@@ -14,7 +14,6 @@ import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
@@ -149,9 +148,10 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
+		//deprecated
 		register("distance", new CustomFunction(2) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return distance(expressionContext, objects[0], objects[1]);
+				return GeoFunctions.distance(expressionContext, objects[0], objects[1]);
 			}
 			@Override
 			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
@@ -297,34 +297,6 @@ public class IDMFunctions extends CustomFunctions {
 		return true;
 	}
 
-	/**
-	 * Calculates the orthodromic distance between 2 coordinates (in meters)
-	 */
-	private static Double distance(ExpressionContext context, Object from, Object to) {
-		if (from == null || to == null) {
-			return null;
-		}
-		Coordinate fromC = from instanceof Coordinate ? (Coordinate) from: Coordinate.parseCoordinate(from);
-		if (fromC == null || ! fromC.isComplete()) {
-			return null;
-		}
-		Coordinate toC = to instanceof Coordinate ? (Coordinate) to: Coordinate.parseCoordinate(to);
-		if (toC == null || ! toC.isComplete()) {
-			return null;
-		}
-		CoordinateOperations coordinateOperations = getSurvey(context).getContext().getCoordinateOperations();
-		if (coordinateOperations == null) {
-			return null;
-		} else {
-			try {
-				double distance = coordinateOperations.orthodromicDistance(fromC, toC);
-				return distance;
-			} catch (CoordinateOperationException e) {
-				return null;
-			}
-		}
-	}
-
 	private Object dateTimeDifference(ExpressionContext expressionContext, Integer date1, Integer time1, Integer date2, Integer time2) {
 		return dateTimeDifference(expressionContext, date1, time1, date2, time2, TimeUnit.MINUTE.name());
 	}
@@ -412,22 +384,4 @@ public class IDMFunctions extends CustomFunctions {
 			throw new IllegalArgumentException("Time unit not supported: " + timeUnit);
 		}
 	}
-	
-	private static LookupProvider getLookupProvider(ExpressionContext context) {
-		ModelJXPathContext jxPathContext = (ModelJXPathContext) context.getJXPathContext();
-		LookupProvider lookupProvider = jxPathContext.getLookupProvider();
-		return lookupProvider;
-	}
-
-	private static Survey getSurvey(ExpressionContext context) {
-		ModelJXPathContext jxPathContext = (ModelJXPathContext) context.getJXPathContext();
-		Survey survey = jxPathContext.getSurvey();
-		return survey;
-	}
-	
-	private static SpeciesListService getSpeciesListService(ExpressionContext context) {
-		Survey survey = getSurvey(context);
-		return survey.getContext().getSpeciesListService();
-	}
-	
 }

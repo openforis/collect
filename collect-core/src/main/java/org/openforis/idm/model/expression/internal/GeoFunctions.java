@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.ri.compiler.Expression;
+import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -47,6 +48,17 @@ public class GeoFunctions extends CustomFunctions {
 				}
 			}
 			
+			@Override
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				return super.performArgumentValidation(contextNodeDef, arguments);
+			}
+		});
+		
+		register("distance", new CustomFunction(2) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return distance(expressionContext, objects[0], objects[1]);
+			}
 			@Override
 			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
 					Expression[] arguments) {
@@ -122,4 +134,33 @@ public class GeoFunctions extends CustomFunctions {
 		}
 		return coordinatesSb.toString();
 	}
+	
+	/**
+	 * Calculates the orthodromic distance between 2 coordinates (in meters)
+	 */
+	protected static Double distance(ExpressionContext context, Object from, Object to) {
+		if (from == null || to == null) {
+			return null;
+		}
+		Coordinate fromC = from instanceof Coordinate ? (Coordinate) from: Coordinate.parseCoordinate(from);
+		if (fromC == null || ! fromC.isComplete()) {
+			return null;
+		}
+		Coordinate toC = to instanceof Coordinate ? (Coordinate) to: Coordinate.parseCoordinate(to);
+		if (toC == null || ! toC.isComplete()) {
+			return null;
+		}
+		CoordinateOperations coordinateOperations = getSurvey(context).getContext().getCoordinateOperations();
+		if (coordinateOperations == null) {
+			return null;
+		} else {
+			try {
+				double distance = coordinateOperations.orthodromicDistance(fromC, toC);
+				return distance;
+			} catch (CoordinateOperationException e) {
+				return null;
+			}
+		}
+	}
+
 }
