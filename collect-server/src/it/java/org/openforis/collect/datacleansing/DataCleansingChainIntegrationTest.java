@@ -5,7 +5,6 @@ import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -25,6 +24,7 @@ import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -161,14 +161,9 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		final List<Node<?>> nodes = new ArrayList<Node<?>>();
 		DataQueryExecutorJob job = jobManager.createJob(DataQueryExecutorJob.class);
 		DataQueryExecutorJobInput dataQueryExecutorJobInput = new DataQueryExecutorJobInput(query, Step.ENTRY, new NodeProcessor() {
-			@Override
-			public void init() throws Exception {}
-			@Override
 			public void process(Node<?> node) throws Exception {
 				nodes.add(node);
 			}
-			@Override
-			public void close() throws IOException {}
 		});
 		job.setInput(dataQueryExecutorJobInput);
 		jobManager.start(job, false);

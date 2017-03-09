@@ -14,7 +14,6 @@ import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.DataQueryExecutorJob;
 import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.datacleansing.DataQueryResultItem;
-import org.openforis.collect.datacleansing.NodeProcessor;
 import org.openforis.collect.datacleansing.form.DataQueryForm;
 import org.openforis.collect.datacleansing.form.DataQueryResultItemForm;
 import org.openforis.collect.datacleansing.form.validation.DataQueryValidator;
@@ -26,6 +25,7 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
@@ -230,17 +230,10 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 			items = new ArrayList<DataQueryResultItem>();
 		}
 		
-		@Override
-		public void init() throws Exception {}
-		
-		@Override
 		public void process(DataQueryResultItem item) {
 			items.add(item);			
 		}
 
-		@Override
-		public void close() throws IOException {}
-		
 		public List<DataQueryResultItem> getItems() {
 			return items;
 		}

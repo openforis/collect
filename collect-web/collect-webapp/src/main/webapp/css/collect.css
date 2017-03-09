@@ -254,6 +254,13 @@ fieldset.has-error legend {
 	color: #a94442;
 }
 
+.info-icon-button {
+	cursor: pointer;
+	background-image: url('../assets/images/info-small.png');
+	width: 16px;
+	height: 16px;
+}
+
 .remove-icon {
 	cursor: pointer;
 	color: #c9302c;

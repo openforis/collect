@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.12.22-SNAPSHOT</version>
+		<version>3.12.25-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-server</artifactId>
@@ -378,7 +378,12 @@
 			<version>${geotools.version}</version>
 		</dependency>
 		<!-- end of GeoTools dependencies -->
-		
+		<dependency>
+			<groupId>de.micromata.jak</groupId>
+			<artifactId>JavaAPIforKml</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+	
 		<dependency>
 			<groupId>org.gbif</groupId>
 			<artifactId>ecat-common</artifactId>
@@ -398,11 +403,6 @@
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.jamesmurty.utils</groupId>
-			<artifactId>java-xmlbuilder</artifactId>
-			<version>1.1</version>
-		</dependency>
 		
 		<dependency>
 			<groupId>javax.el</groupId>
@@ -418,11 +418,6 @@
 			<groupId>de.grundid.opendatalab</groupId>
 			<artifactId>geojson-jackson</artifactId>
 			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>de.micromata.jak</groupId>
-			<artifactId>JavaAPIforKml</artifactId>
-			<version>2.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>

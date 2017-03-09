@@ -1,7 +1,11 @@
 package org.openforis.idm.model.expression.internal;
 
+import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.Function;
 import org.apache.commons.jxpath.Functions;
+import org.openforis.idm.metamodel.SpeciesListService;
+import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.validation.LookupProvider;
 
 import java.util.*;
 
@@ -55,7 +59,24 @@ public abstract class CustomFunctions implements Functions {
 			register(name, parameterCount, function);
 		}
 	}
+	
+	protected static LookupProvider getLookupProvider(ExpressionContext context) {
+		ModelJXPathContext jxPathContext = (ModelJXPathContext) context.getJXPathContext();
+		LookupProvider lookupProvider = jxPathContext.getLookupProvider();
+		return lookupProvider;
+	}
 
+	protected static Survey getSurvey(ExpressionContext context) {
+		ModelJXPathContext jxPathContext = (ModelJXPathContext) context.getJXPathContext();
+		Survey survey = jxPathContext.getSurvey();
+		return survey;
+	}
+	
+	protected static SpeciesListService getSpeciesListService(ExpressionContext context) {
+		Survey survey = getSurvey(context);
+		return survey.getContext().getSpeciesListService();
+	}
+	
 	private static class FunctionKey {
 		public final String name;
 		public final int parameterCount;

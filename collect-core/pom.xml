@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.22-SNAPSHOT</version>
+		<version>3.12.25-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
@@ -376,8 +376,12 @@
 		    <artifactId>cts</artifactId>
 		    <version>1.4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jamesmurty.utils</groupId>
+			<artifactId>java-xmlbuilder</artifactId>
+			<version>1.1</version>
+		</dependency>
 				
-	
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
 			<groupId>org.springframework</groupId>

@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 import org.jooq.ConnectionProvider;
+import org.jooq.impl.DialectAwareJooqConfiguration;
+import org.openforis.collect.persistence.jooq.CollectDSLContext;
 
 public class DbInitializer {
 	
@@ -14,7 +16,11 @@ public class DbInitializer {
 	}
 	
 	public void start() {
-		createDbSchema();
+		DialectAwareJooqConfiguration jooqConf = new DialectAwareJooqConfiguration(connectionProvider);
+		CollectDSLContext dslContext = new CollectDSLContext(jooqConf);
+		if (! dslContext.isSchemaLess()) {
+			createDbSchema();
+		}
 	}
 	
 	private void createDbSchema() {
@@ -28,7 +34,9 @@ public class DbInitializer {
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating schema", e);
 		} finally {
-			DbUtils.closeQuietly(conn);
+			if (conn != null) {
+				connectionProvider.release(conn);
+			}
 		}
 	}
 	
