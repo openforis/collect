@@ -9,7 +9,7 @@ Collect.DataManager.MapPanelComposer = function(panel) {
 	this.verticalPadding = 220;
 	this.horizontalPadding = 50;
 	
-	this.startLat = 0;
+	this.startLat = 30;
 	this.startLon = 0;
 	this.startZoom = 4;
 }
@@ -104,7 +104,6 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			switch (feature.get('type')) {
 			case 'sampling_point':
 				var lonLat = coordinate;
-//				var lonLat = ol.proj.toLonLat([coordinate[0], coordinate[1]]);
 				var keyDefs = survey.getRooEntityKeyDefinitions();
 				function printLevelCodes(levelCodes) {
 					var result = "";
@@ -283,6 +282,7 @@ Collect.DataManager.MapPanelComposer.prototype.geometryLayerStyleFunction = func
 	var $this = this;
 	
 	var survey = feature.get("survey");
+	var lineColor = $this.stringToColor(survey.name);
 	
 	var styles = [
 		/* We are using two different styles for the polygons:
@@ -294,7 +294,7 @@ Collect.DataManager.MapPanelComposer.prototype.geometryLayerStyleFunction = func
 		 */
 		new ol.style.Style({
 			stroke : new ol.style.Stroke({
-				color : $this.getRandomRGBColor(),
+				color : lineColor,
 				width : 3
 			}),
 			fill : new ol.style.Fill({
@@ -305,7 +305,7 @@ Collect.DataManager.MapPanelComposer.prototype.geometryLayerStyleFunction = func
 			image : new ol.style.Circle({
 				radius : 5,
 				fill : new ol.style.Fill({
-					color : $this.getRandomRGBColor()
+					color : lineColor
 				})
 			}),
 			geometry : function(feature) {
@@ -595,6 +595,18 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		batchProcessor.start();
 	});
 };
+
+function intToRGB(i) {
+	var c = (i & 0x00FFFFFF)
+		.toString(16)
+		.toLowerCase();
+
+	return "00000".substring(0, 6 - c.length) + c;
+}
+
+function stringToColor(s) {
+	return "#" + this.intToRGB(OF.Strings.hashCode(s));
+}
 
 function getRandomColor(minimum, maximum) {
 	if (! min) {

@@ -43,3 +43,11 @@ OF.Strings.format = function(format) {
 		return typeof args[number] != 'undefined' ? args[number] : match;
 	});
 };
+
+OF.Strings.hashCode = function(s) {
+	var hash = 0;
+	for (var i = 0; i < s.length; i++) {
+		hash = s.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	return hash;
+}
