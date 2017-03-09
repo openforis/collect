@@ -14,6 +14,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
  * 
@@ -45,6 +46,11 @@ public class SurveyViewGenerator {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
 					view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(),
 							attrDef.isKey(), attrDef.isMultiple());
+					if (attrDef instanceof TextAttributeDefinition) {
+						CollectSurvey survey = attrDef.getSurvey();
+						((AttributeDefView) view).setGeometry(survey.getAnnotations()
+								.isGeometry((TextAttributeDefinition) attrDef));
+					}
 				}
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
@@ -159,6 +165,7 @@ public class SurveyViewGenerator {
 
 		private AttributeType attributeType;
 		private List<String> fieldNames;
+		private boolean geometry;
 		
 		public AttributeDefView(int id, String name, String label, AttributeType type, 
 				List<String> fieldNames, boolean key, boolean multiple) {
@@ -173,6 +180,14 @@ public class SurveyViewGenerator {
 		
 		public List<String> getFieldNames() {
 			return this.fieldNames;
+		}
+		
+		public boolean isGeometry() {
+			return geometry;
+		}
+		
+		public void setGeometry(boolean geometry) {
+			this.geometry = geometry;
 		}
 	}
 	

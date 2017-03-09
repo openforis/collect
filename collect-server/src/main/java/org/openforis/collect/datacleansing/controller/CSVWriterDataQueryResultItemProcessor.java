@@ -1,5 +1,6 @@
 package org.openforis.collect.datacleansing.controller;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,22 +24,26 @@ import org.openforis.idm.model.Value;
  * @author S. Ricci
  *
  */
-public class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultItemProcessor {
-	
-	private CsvWriter csvWriter;
+public class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultItemProcessor implements Closeable {
 	
 	//output
 	private File tempFile;
+	//transient
+	private CsvWriter csvWriter;
 	
 	public CSVWriterDataQueryResultItemProcessor(DataQuery query) {
 		super(query);
+		init();
 	}
 	
-	@Override
-	public void init() throws Exception {
-		tempFile = File.createTempFile("collect-data-cleansing-query", ".csv");
-		csvWriter = new CsvWriter(new FileOutputStream(tempFile), IOUtils.UTF_8, ',', '"');
-		writeCSVHeader();
+	private void init() {
+		try {
+			tempFile = File.createTempFile("collect-data-cleansing-query", ".csv");
+			csvWriter = new CsvWriter(new FileOutputStream(tempFile), IOUtils.UTF_8, ',', '"');
+			writeCSVHeader();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private void writeCSVHeader() {
