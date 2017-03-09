@@ -133,6 +133,10 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			}
 			$this.popupContent.html(htmlContent);
 			$this.popupContent.find(".accordion").accordion({heightStyle: "content", animate: 0});
+			$this.popupContent.find(".data.info-icon-button").tooltip({
+				html: true,
+				title: 'In order to show or hide an attribute, use the \"Show in Map balloon\" option in the Survey Designer'
+			});
 			$this.overlay.setPosition(coordinate);
 		}
 	};
@@ -175,7 +179,10 @@ Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(
 		+ "<label>Phase</label>: {2}"
 		+ "<br>"
 		+ "<div class='accordion' style='width: 300px; height: 200px; padding: 0.5em'>"
-		+ "   <h3>Data</h3>"
+		+ "   <h3>"
+		+ "     <span>Data</span>"
+		+ "     <span class='data info-icon-button' style='float: right;' />"
+		+ "   </h3>"
 		+ "   <div style='min-height: 135px; padding: 0.5em'>"
 		+ "      <p>{3}</p>"
 		+ "   </div>"
