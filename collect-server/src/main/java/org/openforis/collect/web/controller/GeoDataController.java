@@ -11,18 +11,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.openforis.collect.geospatial.GeoToolsCoordinateOperations;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
+import org.openforis.idm.model.AbstractValue;
+import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,12 +176,57 @@ public class GeoDataController {
 			return record.getRootEntityKeyValues();
 		}
 		
+		public List<RecordDataItem> getRecordData() {
+			final List<RecordDataItem> result = new ArrayList<RecordDataItem>();
+			CollectSurvey survey = (CollectSurvey) this.node.getSurvey();
+			final CollectAnnotations annotations = survey.getAnnotations();
+			this.node.getRecord().getRootEntity().visitChildren(new NodeVisitor() {
+				public void visit(Node<? extends NodeDefinition> node, int idx) {
+					if (node instanceof Attribute && annotations.isShowInMapBalloon((AttributeDefinition) node.getDefinition())) {
+						Attribute<?,?> attr = (Attribute<?, ?>) node;
+						AbstractValue val = (AbstractValue) attr.getValue();
+						String value = val.toPrettyFormatString();
+						result.add(new RecordDataItem(node.getDefinition().getId(), value));
+					}
+				}
+			}, true);
+			return result;
+		}
+		
 		public int getAttrId() {
 			return node.getInternalId();
 		}
 		
 		public int getAttrDefId() {
 			return node.getDefinition().getId();
+		}
+	}
+	
+	public static class RecordDataItem {
+		
+		private int definitionId;
+		private String value;
+		
+		public RecordDataItem(int definitionId, String value) {
+			super();
+			this.definitionId = definitionId;
+			this.value = value;
+		}
+
+		public int getDefinitionId() {
+			return definitionId;
+		}
+
+		public void setDefinitionId(int definitionId) {
+			this.definitionId = definitionId;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
 		}
 	}
 	

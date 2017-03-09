@@ -53,6 +53,7 @@ public class CollectAnnotations {
 		TARGET(new QName(COLLECT_NAMESPACE_URI, "target"), SurveyTarget.COLLECT_DESKTOP),
 		COLLECT_VERSION(new QName(COLLECT_NAMESPACE_URI, "collectVersion"), "3.4.0"),
 		GEOMETRY(new QName(COLLECT_NAMESPACE_URI, "geometry"), false),
+		SHOW_IN_MAP_BALLOON(new QName(COLLECT_NAMESPACE_URI, "showInMapBalloon"), true),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -338,6 +339,14 @@ public class CollectAnnotations {
 
 	public void setGeometry(TextAttributeDefinition def, boolean geometry) {
 		setAnnotationValue(def, Annotation.GEOMETRY, geometry);
+	}
+	
+	public boolean isShowInMapBalloon(AttributeDefinition def) {
+		return getAnnotationBooleanValue(def, Annotation.SHOW_IN_MAP_BALLOON);
+	}
+	
+	public void setShowInMapBalloon(AttributeDefinition def, boolean showInMapBalloon) {
+		setAnnotationValue(def, Annotation.SHOW_IN_MAP_BALLOON, showInMapBalloon);
 	}
 
 	private <T extends Enum<T>> Enum<T> getAnnotationEnumValue(AttributeDefinition def, Annotation annotation, Class<T> enumType) {

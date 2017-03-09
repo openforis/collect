@@ -504,6 +504,22 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 	
+	public void visitChildren(NodeVisitor visitor) {
+		visitChildren(visitor, false);
+	}
+	
+	public void visitChildren(NodeVisitor visitor, boolean includeSingleEntitiesDescendants) {
+		Deque<Node<?>> stack = new LinkedList<Node<?>>();
+		stack.addAll(this.children);
+		while (! stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			visitor.visit(node, node.getIndex());
+			if (node instanceof Entity && ! node.getDefinition().isMultiple() && includeSingleEntitiesDescendants) {
+				stack.addAll(((Entity) node).children);
+			}
+		}
+	}
+	
 	public List<? extends Node<? extends NodeDefinition>> findChildren(NodeDefinition childDef, final NodePredicate predicate) {
 		List<Node<?>> children = childrenByDefinition.get(childDef);
 		if (children == null || children.isEmpty()) {

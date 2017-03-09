@@ -31,6 +31,7 @@ public class SurveyViewGenerator {
 	}
 
 	public SurveyView generateView(CollectSurvey survey) {
+		final CollectAnnotations annotations = survey.getAnnotations();
 		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
 		final String langCode = locale.getLanguage();
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();;
@@ -46,6 +47,8 @@ public class SurveyViewGenerator {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
 					view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(),
 							attrDef.isKey(), attrDef.isMultiple());
+					((AttributeDefView) view).setShowInMapBalloon(annotations.isShowInMapBalloon(attrDef));
+					
 					if (attrDef instanceof TextAttributeDefinition) {
 						CollectSurvey survey = attrDef.getSurvey();
 						((AttributeDefView) view).setGeometry(survey.getAnnotations()
@@ -166,6 +169,7 @@ public class SurveyViewGenerator {
 		private AttributeType attributeType;
 		private List<String> fieldNames;
 		private boolean geometry;
+		private boolean showInMapBalloon;
 		
 		public AttributeDefView(int id, String name, String label, AttributeType type, 
 				List<String> fieldNames, boolean key, boolean multiple) {
@@ -188,6 +192,14 @@ public class SurveyViewGenerator {
 		
 		public void setGeometry(boolean geometry) {
 			this.geometry = geometry;
+		}
+		
+		public boolean isShowInMapBalloon() {
+			return showInMapBalloon;
+		}
+		
+		public void setShowInMapBalloon(boolean showInMapBalloon) {
+			this.showInMapBalloon = showInMapBalloon;
 		}
 	}
 	

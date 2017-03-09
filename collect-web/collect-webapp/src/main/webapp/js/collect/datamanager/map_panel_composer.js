@@ -128,35 +128,11 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 				break;
 			case 'coordinate_attribute_value':
 				var point = feature.get('point');
-				var lonLat = [point.x, point.y];
-				
-				htmlContent = OF.Strings.format("<b>{0}</b>"
-					+ "<br>"
-					+ "<b>Record</b>: {1}"
-					+ "<br>"
-					+ "Latitude: {2}" 
-					+ "<br>"
-					+ "Longitude: {3}"
-					+ "<br>" 
-					+ "{4}"
-					+ "<br>"
-					+ "Phase: {5}"
-					+ "<br>" 
-					+ "<a href=\"javascript:void(0);\" "
-					+ "onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({6}, {7}, '{8}')\">Edit</a>"
-				, survey.getDefinition(point.attrDefId).label
-				, point.recKeys
-				, lonLat[1]
-				, lonLat[0]
-				, (isNaN(point.distance) ? "" : "Distance to expected location: " +
-						Math.round(point.distance) + "m")
-				, point.recStep
-				, survey.id
-				, point.recId
-				, point.recKeys);
+				htmlContent = $this.createNodeInfoBalloon(survey, point);
 				break;
 			}
 			$this.popupContent.html(htmlContent);
+			$this.popupContent.find(".accordion").accordion({heightStyle: "content", animate: 0});
 			$this.overlay.setPosition(coordinate);
 		}
 	};
@@ -179,6 +155,59 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 		onComplete();
 	}
 }
+
+Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(survey, nodeInfo) {
+	var lonLat = [nodeInfo.x, nodeInfo.y];
+	
+	var dynamicPart = "";
+	var data = nodeInfo.recordData;
+	data.forEach(function(item) {
+		var def = survey.getDefinition(item.definitionId);
+		dynamicPart += "<label>" + def.label + "</label>: " + item.value;
+		dynamicPart += "<br/>";
+	});
+
+	var result = OF.Strings.format(
+		"<b>{0}</b>"
+		+ "<br>"
+		+ "<label>Record</label>: {1}"
+		+ "<br>"
+		+ "<label>Phase</label>: {2}"
+		+ "<br>"
+		+ "<div class='accordion' style='width: 300px; height: 200px; padding: 0.5em'>"
+		+ "   <h3>Data</h3>"
+		+ "   <div style='min-height: 135px; padding: 0.5em'>"
+		+ "      <p>{3}</p>"
+		+ "   </div>"
+		+ "   <h3>Location</h3>"
+		+ "   <div style='min-height: 135px; padding: 0.5em'>"
+		+ "      <p>"
+		+ "         <label>Latitude:</label> {4}" 
+		+ "         <br>"
+		+ "         <label>Longitude</label>: {5}"
+		+ "         <br>" 
+		+ "         {6}"
+		+ "      </p>"
+		+ "   </div>"
+		+ "</div>"
+		+ "<br>" 
+		+ "<a href=\"javascript:void(0);\" "
+		+ "onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({7}, {8}, '{9}')\">Edit Record</a>"
+		+ "</div>"
+	, survey.getDefinition(nodeInfo.attrDefId).label
+	, nodeInfo.recKeys
+	, nodeInfo.recStep
+	, dynamicPart
+	, lonLat[1]
+	, lonLat[0]
+	, (isNaN(nodeInfo.distance) ? "" : "<label>Dist. to expected loc.</label>: " +
+			Math.round(nodeInfo.distance) + "m")
+	, survey.id
+	, nodeInfo.recId
+	, nodeInfo.recKeys);
+	
+	return result;
+};
 
 Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function(survey) {
 	var $this = this;
