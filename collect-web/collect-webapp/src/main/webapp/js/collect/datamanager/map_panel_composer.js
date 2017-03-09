@@ -468,9 +468,7 @@ Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = functi
 
 		var startTime = new Date().getTime();
 
-		var processGeometry = function(nodeInfo) {
-			var polygonKml = nodeInfo.geometry;
-			
+		var extractVerticesFromKml = function(polygonKml) {
 			var kmlDoc = $.parseXML(polygonKml);
 			var $kml = $(kmlDoc)
 			var $coordinatesStrEl = $kml.find("coordinates");
@@ -484,6 +482,12 @@ Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = functi
 					vertices.push(lonLatArr);
 				}
 			});
+			return vertices;
+		}
+		
+		var processGeometry = function(nodeInfo) {
+			var vertices = extractVerticesFromKml(nodeInfo.geometry);
+			
 			var polygon = new ol.geom.Polygon([vertices]);
 			
 			var polygonFeature = new ol.Feature({
