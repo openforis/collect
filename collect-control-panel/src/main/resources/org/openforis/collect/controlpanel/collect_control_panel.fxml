@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<Pane 
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+	fx:id="applicationPane"
+	fx:controller="org.openforis.collect.controlpanel.CollectControlPanelController" 
+	maxHeight="500.0" maxWidth="600.0"
+	minHeight="180.0" minWidth="600.0" 
+	prefHeight="500.0" prefWidth="600.0"
+	styleClass="main-pane" 
+	stylesheets="@org/openforis/collect/controlpanel/collect_control_panel.css"
+	>
+	
+   <children>
+      <HBox layoutX="173.0" layoutY="36.0" spacing="50.0">
+         <children>
+            <Button fx:id="startBtn" layoutX="173.0" layoutY="45.0" mnemonicParsing="false" onMouseClicked="#startServer" prefHeight="60.0" prefWidth="100.0" text="Start" />
+            <Button fx:id="stopBtn" layoutX="324.0" layoutY="45.0" mnemonicParsing="false" onMouseClicked="#stopServer" prefHeight="60.0" prefWidth="100.0" text="Stop" />
+         </children>
+      </HBox>
+      <TextArea fx:id="console" 
+      		editable="false" 
+      		layoutX="21.0" layoutY="128.0" prefHeight="370.0" prefWidth="560.0" />
+      <Button fx:id="logBtn" 
+      		layoutX="514.0" layoutY="70.0" prefHeight="25.0" prefWidth="66.0"
+      		mnemonicParsing="false" 
+      		onMouseClicked="#toggleLog"
+      		text="Log" />
+   </children>
+</Pane>

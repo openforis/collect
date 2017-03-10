@@ -1,0 +1,5 @@
+http_port=8380
+collect_war_file_location=
+collect_context=collect
+saiku_war_file_location=
+saiku_context=saiku

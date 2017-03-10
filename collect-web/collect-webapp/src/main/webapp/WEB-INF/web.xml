@@ -24,7 +24,7 @@
 			/WEB-INF/conf/applicationContext-graniteds.xml
         </param-value>
 	</context-param>
-
+	
 	<listener>
 		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 	</listener>
