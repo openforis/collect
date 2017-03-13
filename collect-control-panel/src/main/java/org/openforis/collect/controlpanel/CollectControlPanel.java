@@ -14,7 +14,6 @@ public class CollectControlPanel extends Application {
 
 	private CollectControlPanelController controller;
 
-
 	public static void main(String[] args) {
 		launch();
 	}
@@ -34,7 +33,6 @@ public class CollectControlPanel extends Application {
 		stage.setScene(scene);
 		Window window = scene.getWindow();
 		window.setHeight(150);
-//		window.setWidth(400);
 		stage.show();
 
 		controller.openBrowser(this, 3000);

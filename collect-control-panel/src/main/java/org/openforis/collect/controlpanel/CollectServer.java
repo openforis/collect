@@ -1,7 +1,10 @@
 package org.openforis.collect.controlpanel;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -15,11 +18,10 @@ import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.plus.jndi.Resource;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.LocalConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.webapp.Configuration.ClassList;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public class CollectServer {
@@ -32,25 +34,27 @@ public class CollectServer {
 	private WebAppConfiguration[] webAppConfigurations;
 	
 	private Server server;
+	private Path log;
 
-	public CollectServer(int port, String context, WebAppConfiguration... webAppConfigurations) {
+	public CollectServer(int port, WebAppConfiguration... webAppConfigurations) {
 		super();
 		this.port = port;
 		this.webAppConfigurations = webAppConfigurations;
+		
+		log = Paths.get(getCollectLogFileLocation());
 	}
 
 	public void start() throws Exception {
 		server = new Server(port);
 
 		//Enable parsing of jndi-related parts of web.xml and jetty-env.xml
-        org.eclipse.jetty.webapp.Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList.setServerDefault(server);
+        ClassList classlist = ClassList.setServerDefault(server);
 		classlist.addAfter(
 				"org.eclipse.jetty.webapp.FragmentConfiguration",
 				"org.eclipse.jetty.plus.webapp.EnvConfiguration", 
 				"org.eclipse.jetty.plus.webapp.PlusConfiguration"
 		);
-	
-
+		//add webapps
 		HandlerCollection handlerCollection = new HandlerCollection();
 		ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();
 		for (WebAppConfiguration webAppConfiguration : webAppConfigurations) {
@@ -62,8 +66,22 @@ public class CollectServer {
 		server.setHandler(handlerCollection);
 		
 		server.start();
-		
-//		server.join();
+	}
+
+	public void stop() throws Exception {
+		server.stop();
+	}
+	
+	public boolean isRunning() {
+		return server.isRunning();
+	}
+
+	public String getUrl() {
+		return String.format("%s://%s:%d/%s", "http", "localhost", port, getCollectWebAppConfiguration().getContext());
+	}
+
+	public Path getLog() {
+		return log;
 	}
 
 	private WebAppContext createWebapp(WebAppConfiguration webAppConfiguration) {
@@ -75,7 +93,7 @@ public class CollectServer {
 		    "org.eclipse.jetty.webapp.FragmentConfiguration",
 		    "org.eclipse.jetty.plus.webapp.EnvConfiguration",
 		    "org.eclipse.jetty.plus.webapp.PlusConfiguration",
-		    "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
+		    "org.eclipse.jetty.webapp.JettyWebXmlConfiguration"
 		});
 		
 		webapp.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
@@ -113,18 +131,6 @@ public class CollectServer {
 		new Resource(context.getServer(), DB_JNDI_RESOURCE_NAME, dataSource);
 	}
 
-	public void stop() throws Exception {
-		server.stop();
-	}
-	
-	public boolean isRunning() {
-		return server.isRunning();
-	}
-
-	public String getUrl() {
-		return String.format("%s://%s:%d/%s", "http", "localhost", port, getCollectWebAppConfiguration().getContext());
-	}
-
 	private WebAppConfiguration getCollectWebAppConfiguration() {
 		for (WebAppConfiguration conf : webAppConfigurations) {
 			if (conf.getContext().equals("collect")) {
@@ -134,6 +140,14 @@ public class CollectServer {
 		throw new IllegalStateException("Collect webapp configuration not found");
 	}
 	
+	private String getCollectLogFileLocation() {
+		WebAppConfiguration collectWebAppConfiguration = getCollectWebAppConfiguration();
+		String webappsFolder = new File(collectWebAppConfiguration.getWarFileLocation()).getParent();
+		String collectWebappLocation = webappsFolder + File.separator + collectWebAppConfiguration.getContext();
+		String collectLogFileLocation = collectWebappLocation + "/logs/collect.log";
+		return collectLogFileLocation;
+	}
+
 	public static class WebAppConfiguration {
 		
 		private String warFileLocation;
