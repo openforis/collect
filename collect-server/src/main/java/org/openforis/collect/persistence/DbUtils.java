@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 public abstract class DbUtils {
@@ -23,18 +24,23 @@ public abstract class DbUtils {
 
 	public static DataSource getDataSource() {
 		try {
-			Context initCtx = new InitialContext();
 			DataSource ds;
+			Context initCtx = new InitialContext();
 			try {
-				ds = (DataSource) initCtx.lookup(DbUtils.DB_JNDI_RESOURCE_NAME);
-			} catch (Exception e) {
-				//try to prepend environment prefix
-				ds = (DataSource) initCtx.lookup("java:comp/env/" + DbUtils.DB_JNDI_RESOURCE_NAME);
+				ds = lookupDataSource(initCtx);
+			} catch (NamingException e) {
+				//try to look for data source in Environment Context
+				Context envCtx = (Context) initCtx.lookup("java:comp/env");
+				ds = lookupDataSource(envCtx);
 			}
 			return ds;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static DataSource lookupDataSource(Context ctx) throws NamingException {
+		return (DataSource) ctx.lookup(DbUtils.DB_JNDI_RESOURCE_NAME);
 	}
 
 	public static void closeQuietly(Connection conn) {

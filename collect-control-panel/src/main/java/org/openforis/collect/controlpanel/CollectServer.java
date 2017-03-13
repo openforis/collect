@@ -15,6 +15,8 @@ import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.plus.jndi.Resource;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.LocalConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -61,7 +63,7 @@ public class CollectServer {
 		
 		server.start();
 		
-		server.join();
+//		server.join();
 	}
 
 	private WebAppContext createWebapp(WebAppConfiguration webAppConfiguration) {
@@ -115,6 +117,23 @@ public class CollectServer {
 		server.stop();
 	}
 	
+	public boolean isRunning() {
+		return server.isRunning();
+	}
+
+	public String getUrl() {
+		return String.format("%s://%s:%d/%s", "http", "localhost", port, getCollectWebAppConfiguration().getContext());
+	}
+
+	private WebAppConfiguration getCollectWebAppConfiguration() {
+		for (WebAppConfiguration conf : webAppConfigurations) {
+			if (conf.getContext().equals("collect")) {
+				return conf;
+			}
+		}
+		throw new IllegalStateException("Collect webapp configuration not found");
+	}
+	
 	public static class WebAppConfiguration {
 		
 		private String warFileLocation;
@@ -134,4 +153,5 @@ public class CollectServer {
 			return context;
 		}
 	}
+
 }

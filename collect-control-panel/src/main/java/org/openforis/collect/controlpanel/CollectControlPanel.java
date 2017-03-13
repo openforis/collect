@@ -25,7 +25,7 @@ public class CollectControlPanel extends Application {
 		stage.setResizable(false);
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
-		Pane pane = (Pane) fxmlLoader.load(getClass().getResource(CONTROL_PANEL_FXML).openStream());
+		Pane pane = (Pane) fxmlLoader.load(getClass().getResourceAsStream(CONTROL_PANEL_FXML));
 
 		controller = fxmlLoader.getController();
 		controller.startServer();
@@ -34,6 +34,7 @@ public class CollectControlPanel extends Application {
 		stage.setScene(scene);
 		Window window = scene.getWindow();
 		window.setHeight(150);
+//		window.setWidth(400);
 		stage.show();
 
 		controller.openBrowser(this, 3000);
