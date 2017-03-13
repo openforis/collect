@@ -167,7 +167,7 @@ Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(
 	var data = nodeInfo.recordData;
 	data.forEach(function(item) {
 		var def = survey.getDefinition(item.definitionId);
-		dynamicPart += "<label>" + def.label + "</label>: " + item.value;
+		dynamicPart += "<label>" + def.label + "</label>: " + (item.value == null ? "-": item.value);
 		dynamicPart += "<br/>";
 	});
 
@@ -183,7 +183,7 @@ Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(
 		+ "     <span>Data</span>"
 		+ "     <span class='data info-icon-button' style='float: right;' />"
 		+ "   </h3>"
-		+ "   <div style='min-height: 135px; padding: 0.5em'>"
+		+ "   <div style='min-height: 135px; max-height: 135px; overflow-y: auto; padding: 0.5em'>"
 		+ "      <p>{3}</p>"
 		+ "   </div>"
 		+ "   <h3>Location</h3>"

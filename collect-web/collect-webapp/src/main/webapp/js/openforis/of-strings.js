@@ -51,3 +51,7 @@ OF.Strings.hashCode = function(s) {
 	}
 	return hash;
 }
+
+OF.Strings.nullToBlank = function(value) {
+	return value == null ? "" : value;
+};
