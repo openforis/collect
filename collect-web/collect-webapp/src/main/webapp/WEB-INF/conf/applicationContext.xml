@@ -36,6 +36,8 @@
 	<mvc:resources mapping="/script/**" location="/script/" />
 	<mvc:resources mapping="/org/**" location="/org/" />
 	
+	<mvc:view-controller path="/" view-name="index" />
+	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
 	<bean class="org.openforis.collect.spring.handler.UrlFilenameHandlerAdapter" autowire="byName" />
