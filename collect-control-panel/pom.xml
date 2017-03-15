@@ -7,9 +7,9 @@
 		<version>3.12.25-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-control-panel</artifactId>
-	<packaging>jar</packaging>
 	<name>Open Foris Collect Control Panel</name>
 	<description>Starts up Collect using a Jetty application server</description>
+	<packaging>jar</packaging>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,25 +27,47 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>org.openforis.collect.controlpanel.CollectControlPanel</mainClass>
+						</manifest>
+					</archive>
+					<excludes>
+						<exclude>collect*.properties</exclude>
+						<exclude>logs/**</exclude>
+					</excludes>
+				</configuration>
+      		</plugin>
+      		<plugin>
+		        <artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+	      	</plugin>
 		</plugins>
 	</build>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-webapp</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-		</dependency>
-		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-			<version>1.5.4</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
@@ -58,25 +80,10 @@
 		    <version>${jetty.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.eclipse.jetty</groupId>
-		    <artifactId>jetty-jsp</artifactId>
-		     <version>9.2.21.v20170120</version>
-		</dependency>
-		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.7.2</version>
-		</dependency>
-		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc4</version>
-		</dependency>
-		<dependency>
-			<groupId>meteorite.bi</groupId>
-			<artifactId>saiku-webapp-full</artifactId>
-			<version>2.6</version>
-			<type>war</type>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

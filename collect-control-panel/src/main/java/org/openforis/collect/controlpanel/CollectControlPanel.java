@@ -5,10 +5,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 public class CollectControlPanel extends Application {
 
+	private static final int BROWSER_OPEN_DELAY = 3000;
 	private static final String CONTROL_PANEL_FXML = "collect_control_panel.fxml";
 	private static final String TITLE = "Open Foris Collect - Control Panel";
 
@@ -26,16 +26,24 @@ public class CollectControlPanel extends Application {
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Pane pane = (Pane) fxmlLoader.load(getClass().getResourceAsStream(CONTROL_PANEL_FXML));
 
-		controller = fxmlLoader.getController();
-		controller.startServer();
-
 		Scene scene = new Scene(pane);
 		stage.setScene(scene);
-		Window window = scene.getWindow();
-		window.setHeight(150);
-		stage.show();
 
-		controller.openBrowser(this, 3000);
+		controller = fxmlLoader.getController();
+		controller.setApp(this);
+		controller.closeLog();
+		
+        new Thread() {
+            public void run() {
+            	try {
+					controller.startServer();
+					controller.openBrowser(BROWSER_OPEN_DELAY);
+            	} catch(Exception e) {
+            		throw new RuntimeException(e);
+            	}
+            }
+        }.start();	
+		stage.show();
 	}
 
 	@Override

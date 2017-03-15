@@ -16,31 +16,41 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.util.RolloverFileOutputStream;
-import org.eclipse.jetty.util.log.Log;
-import org.openforis.collect.controlpanel.CollectServer.WebAppConfiguration;
+import org.openforis.web.server.ApplicationServer;
 
 import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
 import com.sun.javafx.application.HostServicesDelegate;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import javafx.stage.Window;
 
 @SuppressWarnings("restriction")
 public class CollectControlPanelController implements Initializable {
 
+	private static final String DEFAULT_WEBAPPS_LOCATION = System.getProperty("user.dir") + File.separator + "webapps";
+
 	private static final String LOG_FILENAME = "collect.log";
 	private static final String LOGS_FOLDER_NAME = "logs";
 	private static final String SETTINGS_FILENAME = "collect.properties";
-	private static final int WINDOW_TOTAL_HEIGHT = 550;
+	private static final int LOG_OPENED_WINDOW_HEIGHT = 550;
+	private static final int LOG_CLOSED_WINDOW_HEIGHT = 200;
+	
+	private enum Status {
+		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
+	}
 	
 	//ui elements
+	@FXML
+	private Pane applicationPane;
 	@FXML
 	private Button startBtn;
 	@FXML
@@ -50,36 +60,37 @@ public class CollectControlPanelController implements Initializable {
 	@FXML
 	public TextArea console;
 	@FXML
-	private Pane applicationPane;
+	public Hyperlink urlHyperlink;
+	@FXML
+	public Text infoTxt;
+	@FXML
+	private HBox runningAtUrlBox;
 		
-	private CollectServer server;
-
-	private boolean logOpened = false;
-	private int logFileReadLine = 0;
-	private double windowHeight = WINDOW_TOTAL_HEIGHT;
+	private CollectControlPanel app;
+	private ApplicationServer server;
 	private ScheduledExecutorService executorService;
+	
+	private Status status = Status.INITIALIZING;
+	private boolean logOpened = false;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
-			Properties properties = loadProperties();
-			String portStr = properties.getProperty("http_port");
-			String collectWarFileLocation = properties.getProperty("collect_war_file_location");
-			String collectContext = properties.getProperty("collect_context");
-			String saikuWarFileLocation = properties.getProperty("saiku_war_file_location");
-			String saikuContext = properties.getProperty("saiku_context");
+			CollectProperties collectProperties = new CollectPropertiesParser().parse(loadProperties());
+			String webappsLocation = collectProperties.getWebappsLocation();
+			if (webappsLocation == null) {
+				webappsLocation = DEFAULT_WEBAPPS_LOCATION;
+			}
+			File webappsFolder = new File(webappsLocation);
+			server = new CollectJettyServer(collectProperties.getHttpPort(),
+					webappsFolder,
+					collectProperties.getCollectDataSourceConfiguration());
 			
-			int port = Integer.parseInt(portStr);
+			urlHyperlink.setText(server.getUrl());
 			
-			server = new CollectServer(port,
-					new WebAppConfiguration(collectWarFileLocation, collectContext), 
-					new WebAppConfiguration(saikuWarFileLocation, saikuContext));
-			
-			executorService = Executors.newScheduledThreadPool( 5 );
+			executorService = Executors.newScheduledThreadPool(5);
 			
 			initializeLogger();
-			
-			Log.getRootLogger().info("Test");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -99,34 +110,44 @@ public class CollectControlPanelController implements Initializable {
 
 		System.setOut(logStream);
 		System.setErr(logStream);
-		File logFile = new File(System.getProperty("user.dir") + "/" + LOGS_FOLDER_NAME +"/" + LOG_FILENAME);
+		File logFile = new File(System.getProperty("user.dir") + File.separator + LOGS_FOLDER_NAME + File.separator + LOG_FILENAME);
 		
-		//write logging info to console
-		executorService.scheduleWithFixedDelay(new LogFileReader(logFile, (String text) -> {
+		FileLinesProcessor logFileLinesProcessor = new FileLinesProcessor(logFile, (String text) -> {
 			console.appendText(text);
 			console.appendText("\n");
-		}), 1, 1, TimeUnit.SECONDS);
+		});
+		//write logging info to console
+		executorService.scheduleWithFixedDelay(() -> {
+			Platform.runLater(() -> {
+				logFileLinesProcessor.processNextLines();
+			});
+		}, 1, 1, TimeUnit.SECONDS);
 	}
 	
 	public void startServer() throws Exception {
-		startBtn.setDisable(true);
-		stopBtn.setDisable(true);
+		changeStatus(Status.STARTING);
 		
 		server.start();
 		
 		//enable stop button after 5 seconds
 		runAfter(() -> {
-			stopBtn.setDisable(false);
+			changeStatus(Status.RUNNING);
 		}, 5000);
 	}
 
+	private void changeStatus(Status status) {
+		this.status = status;
+		updateUI();
+	}
+
 	public void stopServer() throws Exception {
-		stopBtn.setDisable(true);
+		changeStatus(Status.STOPPING);
+
 		server.stop();
 		
 		// enable start button once server is down
 		waitThenRun(() -> {
-			startBtn.setDisable(false);
+			changeStatus(Status.IDLE);
 		}, () -> {
 			return server.isRunning();
 		}, 1000);
@@ -148,10 +169,15 @@ public class CollectControlPanelController implements Initializable {
 		executorService.shutdownNow();
 	}
 	
-	void openBrowser(Application application, final long delay) {
-		final HostServicesDelegate hostServices = HostServicesFactory.getInstance( application );
+	@FXML
+	void openBrowserFromLink(MouseEvent event) {
+		openBrowser(0);
+	}
+	
+	void openBrowser(final long delay) {
+		final HostServicesDelegate hostServices = HostServicesFactory.getInstance(app);
 		
-		executorService.submit( () -> {
+		executorService.submit(() -> {
 			try {
 				Thread.sleep(delay);
 				String url = server.getUrl();
@@ -164,15 +190,59 @@ public class CollectControlPanelController implements Initializable {
 	
 	@FXML
 	public void toggleLog( MouseEvent event ) {
+		setLogVisible(! logOpened);
+	}
+	
+	public void closeLog() {
+		setLogVisible(false);
+	}
+
+	private void setLogVisible(boolean value) {
+		logOpened = value;
+		updateUI();
+	}
+	
+	public void updateUI() {
+		int windowHeight = this.logOpened ? LOG_OPENED_WINDOW_HEIGHT : LOG_CLOSED_WINDOW_HEIGHT;
 		Window window = applicationPane.getScene().getWindow();
+		window.setHeight(windowHeight);
 		
-		if (this.logOpened) {
-			window.setHeight(150);
-			this.logOpened = false;
-		} else {
-			window.setHeight(windowHeight);
-			this.logOpened = true;
+		boolean runningAtUrlVisible = false;
+		boolean infoMessageVisible = true;
+		boolean startBtnDisabled = true;
+		boolean stopBtnDisabled = true;
+		String infoMessage = null;
+		switch(status) {
+		case INITIALIZING:
+			infoMessage = "Initializing...";
+			break;
+		case STARTING:
+			infoMessage = "Starting up...";
+			break;
+		case RUNNING:
+			runningAtUrlVisible = true;
+			infoMessage = null;
+			infoMessageVisible = false;
+			stopBtnDisabled = false;
+			break;
+		case STOPPING:
+			infoMessage = "Shutting down...";
+			break;
+		case IDLE:
+			infoMessage = null;
+			infoMessageVisible = false;
+			startBtnDisabled = false;
+		case ERROR:
+			infoMessage = "Error occurred: see log";
+		default:
+			break;
 		}
+		runningAtUrlBox.setVisible(runningAtUrlVisible);
+		infoTxt.setText(infoMessage);
+		infoTxt.setVisible(infoMessageVisible);
+		startBtn.setDisable(startBtnDisabled);
+		stopBtn.setDisable(stopBtnDisabled);
+		console.setVisible(logOpened);
 	}
 	
 	private Properties loadProperties() throws IOException {
@@ -195,44 +265,52 @@ public class CollectControlPanelController implements Initializable {
 		}, 0, TimeUnit.SECONDS );
 	}
 	
+	public void setApp(CollectControlPanel app) {
+		this.app = app;
+	}
+
+	
 	/**
 	 * Reads a file and writes it's content into a TextWriter
 	 * 
 	 * @author S. Ricci
 	 *
 	 */
-	private class LogFileReader implements Runnable {
+	private static class FileLinesProcessor {
 
 		private File file;
 		private TextProcessor lineProcessor;
+		private int readLines;
 
-		public LogFileReader(File file, TextProcessor lineProcessor) {
+		public FileLinesProcessor(File file, TextProcessor lineProcessor) {
 			this.file = file;
 			this.lineProcessor = lineProcessor;
 		}
 
-		@Override
-		public void run() {
-			Platform.runLater(() -> {
-				try {
-					FileInputStream inputStream = new FileInputStream(file);
-					@SuppressWarnings("resource")
-					BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-					for (int i = 0; i < logFileReadLine; i++) {
-						br.readLine();
-					}
-
-					String line = null;
-
-					while ((line = br.readLine()) != null) {
-						lineProcessor.process(line);
-						logFileReadLine ++;
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
+		public void processNextLines() {
+			BufferedReader br = null;
+			try {
+				FileInputStream inputStream = new FileInputStream(file);
+				br = new BufferedReader(new InputStreamReader(inputStream));
+				for (int i = 0; i < readLines; i++) {
+					br.readLine();
 				}
-			});
-
+				
+				//process only new lines
+				String line = null;
+				while ((line = br.readLine()) != null) {
+					lineProcessor.process(line);
+					readLines ++;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e) {}
+				}
+			}
 		}
 	}
 	

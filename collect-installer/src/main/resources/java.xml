@@ -307,23 +307,23 @@
                 <createDirectory>
                     <path>${java_launcher_startmenudirectory}</path>
                 </createDirectory>
-<!--                 <createShortcuts> -->
-<!--                     <destination>${java_launcher_startmenudirectory}</destination> -->
-<!--                     <explanation>${msg(Installer.Java.CreateLauncherShortcuts.Explanation)}</explanation> -->
-<!--                     <progressText>${msg(Installer.Java.CreateLauncherShortcuts.Text)}</progressText> -->
-<!--                     <shortcutList> -->
-<!--                         <startMenuShortcut> -->
-<!--                             <comment>${java_launcher_binary_name}</comment> -->
-<!--                             <name>${java_launcher_startmenu_shortcut_name}</name> -->
-<!--                             <runAsAdmin>0</runAsAdmin> -->
-<!--                             <runInTerminal>0</runInTerminal> -->
-<!--                             <windowsExec>${java_launcher_destination}/${java_launcher_binary_name}</windowsExec> -->
-<!--                             <windowsExecArgs></windowsExecArgs> -->
-<!--                             <windowsIcon></windowsIcon> -->
-<!--                             <windowsPath>${java_launcher_destination}</windowsPath> -->
-<!--                         </startMenuShortcut> -->
-<!--                     </shortcutList> -->
-<!--                 </createShortcuts> -->
+                <createShortcuts>
+                    <destination>${java_launcher_startmenudirectory}</destination>
+                    <explanation>${msg(Installer.Java.CreateLauncherShortcuts.Explanation)}</explanation>
+                    <progressText>${msg(Installer.Java.CreateLauncherShortcuts.Text)}</progressText>
+                    <shortcutList>
+                        <startMenuShortcut>
+                            <comment>${java_launcher_binary_name}</comment>
+                            <name>${java_launcher_startmenu_shortcut_name}</name>
+                            <runAsAdmin>0</runAsAdmin>
+                            <runInTerminal>0</runInTerminal>
+                            <windowsExec>${java_launcher_destination}/${java_launcher_binary_name}</windowsExec>
+                            <windowsExecArgs></windowsExecArgs>
+                            <windowsIcon></windowsIcon>
+                            <windowsPath>${java_launcher_destination}</windowsPath>
+                        </startMenuShortcut>
+                    </shortcutList>
+                </createShortcuts>
             </actionList>
             <ruleList>
                 <platformTest type="windows"/>

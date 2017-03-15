@@ -5,6 +5,10 @@
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
 	<version>3.12.25-SNAPSHOT</version>
+	<organization>
+		<name>Open Foris</name>
+		<url>www.openforis.org</url>
+	</organization>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -14,11 +18,11 @@
 		<module>collect-client</module>
 		<module>collect-web</module>
 		<module>collect-assembly</module>
+		<module>collect-control-panel</module>
 		<module>collect-autoupdater</module>
 		<module>collect-installer</module>
 		<module>collect-updater</module>
 		<module>collect-saiku-installer</module>
-		<module>collect-control-panel</module>
 	</modules>
 
 	<properties>
