@@ -1,0 +1,13 @@
+<zk>
+  <window title="${labels.survey.preview.title}"
+    width="1010px" height="100%" sizable="true"
+    border="normal" position="center" 
+    closable="true"
+    onClose="@global-commnad('closeCollectEarthPreviewPopUp')"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.PreviewPopUpVM')">
+	
+	<iframe id="iframe" src="@load(vm.contentUrl)"
+		hflex="true" vflex="true" />
+  </window>
+</zk>

@@ -1,8 +1,11 @@
 package org.openforis.web.server;
 
-import java.nio.file.Path;
+import java.io.File;
+import java.io.IOException;
 
 public interface ApplicationServer {
+
+	void initialize() throws IOException;
 
 	void start() throws Exception;
 
@@ -12,6 +15,6 @@ public interface ApplicationServer {
 
 	String getUrl();
 
-	Path getLog();
+	File getLogFile();
 
 }

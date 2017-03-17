@@ -15,7 +15,7 @@
 				<folder>
 					<name>webapps</name>
 					<description>Tomcat Webapps</description>
-					<destination>../tomcat/webapps</destination>
+					<destination>${webapps_folder}</destination>
 					<platforms>all</platforms>
 					<distributionFileList>
 						<distributionFile>
@@ -27,10 +27,10 @@
 			<postInstallationActionList>
 				<!-- Delete Collect temporary files (if the previous delete has not been fully completed) -->
 		        <deleteFile>
-		  			<path>../tomcat/webapps/collect</path>
+		  			<path>${webapps_folder}/collect</path>
 					<abortOnError>1</abortOnError>
 					<showMessageOnError>1</showMessageOnError>
-					<customErrorMessage>Cannot delete the folder "opt/openforis/collect/tomcat/webapps/collect": 
+					<customErrorMessage>Cannot delete the folder "${webapps_folder}/collect": 
 						please shutdown Collect, delete it and try to run again the updater.</customErrorMessage>
 		  		</deleteFile>
 				<writeFile>
@@ -45,11 +45,32 @@ check_for_updates = 1</text>
 		</component>
 	</componentList>
     <preInstallationActionList>
-    	<setInstallerVariable name="tomcat_http_port" value="8080"/>
+    	<setInstallerVariable name="server_http_port" value="8080"/>
+    	<if>
+    		<conditionRuleList>
+				<fileExists path="../tomcat/webapps" />
+				<fileTest path="../tomcat/webapps" condition="is_directory" />
+    		</conditionRuleList>
+    		<actionList>
+		    	<setInstallerVariable name="webapps_folder" value="../tomcat/webapps"/>
+    		</actionList>
+    		<elseActionList>
+    			<setInstallerVariable name="webapps_folder" value="../webapps"/>
+    		</elseActionList>
+    	</if>
+    	
+    	<!-- For backwards compatibility -->
     	<propertiesFileGet>
 		   <file>../collect.properties</file>
 		   <key>tomcat_http_port</key>
-		   <variable>tomcat_http_port</variable>
+		   <variable>server_http_port</variable>
+		   <showMessageOnError>0</showMessageOnError>
+		   <abortOnError>0</abortOnError>
+		</propertiesFileGet>
+		<propertiesFileGet>
+		   <file>../collect.properties</file>
+		   <key>collect.http_port</key>
+		   <variable>server_http_port</variable>
 		   <showMessageOnError>0</showMessageOnError>
 		   <abortOnError>0</abortOnError>
 		</propertiesFileGet>
@@ -59,7 +80,7 @@ check_for_updates = 1</text>
 			<ruleList>
 				<portTest>
 					<condition>cannot_bind</condition>
-					<port>${tomcat_http_port}</port>
+					<port>${server_http_port}</port>
 				</portTest>
 			</ruleList>
         </throwError>

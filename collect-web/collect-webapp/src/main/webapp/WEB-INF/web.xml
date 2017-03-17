@@ -106,10 +106,28 @@
 		<servlet-class>org.openforis.collect.web.servlet.InitServlet</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
+	<servlet>
+	    <description>ZK loader for evaluating ZUML pages</description>
+	    <servlet-name>zkLoader</servlet-name>
+	    <servlet-class>org.zkoss.zk.ui.http.DHtmlLayoutServlet</servlet-class>
+	    <init-param>
+	        <param-name>update-uri</param-name>
+	        <param-value>zkau</param-value>
+	    </init-param>
+	    <load-on-startup>3</load-on-startup><!-- MUST -->
+	</servlet>
 	
 	<!-- ====================================================================== -->
 	<!-- S E R V L E T M A P P I N G -->
 	<!-- ====================================================================== -->
+	<servlet-mapping>
+	    <servlet-name>zkLoader</servlet-name>
+	    <url-pattern>*.zul</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+	    <servlet-name>zkLoader</servlet-name>
+	    <url-pattern>*.zhtml</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>dispatcher</servlet-name>
 		<url-pattern>/</url-pattern>

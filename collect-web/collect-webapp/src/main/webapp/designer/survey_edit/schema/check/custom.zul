@@ -1,0 +1,79 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="expressionInfoIcon" class="org.openforis.collect.designer.component.ExpressionInfoIcon"?>
+<zk>
+  <custom-attributes parentDefinition="${arg.parentDefinition}"/>
+  <custom-attributes check="${arg.check}"/>
+  <custom-attributes newItem="${arg.newItem}"/>
+  <vlayout
+    id="formContainer"
+    sclass="form"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CustomCheckVM')"
+    validationMessages="@id('vmsgs')"
+    form="@id('fx') 
+      @load(vm.formObject) 
+      @save(vm.formObject, before={'validate','applyChanges'})
+      @validator('org.openforis.collect.designer.form.validator.CustomCheckFormValidator', parentDefinition=parentDefinition)">
+    <grid>
+      <columns>
+        <column width="150px" />
+        <column />
+      </columns>
+      <rows>
+        <row>
+          <label value="${labels.survey.schema.node.check.flag.$}:" />
+          <listbox
+              selectedItem="@bind(fx.flag)"
+              mold="select" onSelect="@command('applyChanges')">
+              <listitem
+                label="${labels.survey.schema.node.check.flag.error}"
+                value="ERROR" />
+              <listitem
+                label="${labels.survey.schema.node.check.flag.warning}"
+                value="WARN" />
+          </listbox>
+        </row>
+        <row>
+          <fieldErrorHandler message="@load(vmsgs['message'])">
+	          <label use="org.openforis.collect.designer.component.FieldLabel"
+			  		value="${labels.survey.schema.node.check.message}" 
+	              	languageCode="@load(vm.currentLanguageCode)" />
+	      </fieldErrorHandler>
+          <fieldErrorHandler message="@load(vmsgs['message'])">
+            	<textbox width="450px" value="@bind(fx.message)" 
+                          onChange="@command('applyChanges')" />
+          </fieldErrorHandler>
+        </row>
+        <row>
+          <fieldErrorHandler message="@load(vmsgs['condition'])">
+	          <label use="org.openforis.collect.designer.component.FieldLabel"
+			  		value="${labels.survey.schema.node.check.condition}" />
+	      </fieldErrorHandler>
+			<hlayout spacing="2px">
+	          <fieldErrorHandler message="@load(vmsgs['condition'])">
+	            <textbox width="450px" value="@bind(fx.condition)" 
+	            	onChange="@command('applyChanges')"
+	            	multiline="true" rows="4"  />
+	          </fieldErrorHandler>
+	          <expressionInfoIcon />
+	       </hlayout>
+        </row>
+        <row>
+            <fieldErrorHandler message="@load(vmsgs['expression'])">
+	            <label use="org.openforis.collect.designer.component.FieldLabel"
+			  		value="${labels.survey.schema.node.check.custom.expression}" />
+			</fieldErrorHandler>
+			<hlayout spacing="2px">
+	            <fieldErrorHandler message="@load(vmsgs['expression'])">
+		            <textbox width="450px" value="@bind(fx.expression)"
+		                    onChange="@command('applyChanges')"
+		                    multiline="true" rows="4" />
+	          	</fieldErrorHandler>
+	            <expressionInfoIcon />
+	        </hlayout>
+        </row>
+      </rows>
+    </grid>
+  </vlayout>
+</zk>
+     

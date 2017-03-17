@@ -1,0 +1,37 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column />
+    </columns>
+    <rows>
+      <row>
+        <label value="${labels.survey.schema.attribute.file.max_size}:" />
+        <fieldErrorHandler message="@load(vmsgs['maxSize'])">
+          <intbox width="50px" value="@bind(fx.maxSize)"
+            onChange="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
+      <row>
+        <label value="${labels.survey.schema.attribute.file.file_type.$}:" />
+		<cell>
+			<radiogroup selectedItem="@bind(fx.fileType)" onCheck="@command('applyChanges')">
+				<radio 
+					label="${labels.survey.schema.attribute.file.file_type.image}"
+					value="IMAGE" />
+				<radio
+					label="${labels.survey.schema.attribute.file.file_type.audio}"
+					value="AUDIO" />
+				<radio
+					label="${labels.survey.schema.attribute.file.file_type.video}"
+					value="VIDEO" />
+				<radio 
+					label="${labels.survey.schema.attribute.file.file_type.document}"
+					value="DOCUMENT" />
+			</radiogroup>
+		</cell>
+      </row>
+    </rows>
+  </grid>
+</zk>

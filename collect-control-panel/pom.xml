@@ -38,31 +38,20 @@
 						</manifest>
 					</archive>
 					<excludes>
-						<exclude>collect*.properties</exclude>
+						<exclude>collect.properties*</exclude>
 						<exclude>logs/**</exclude>
 					</excludes>
 				</configuration>
       		</plugin>
-      		<plugin>
-		        <artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-	      	</plugin>
 		</plugins>
 	</build>
 
 	<dependencies>
+		<dependency>
+		    <groupId>net.lingala.zip4j</groupId>
+		    <artifactId>zip4j</artifactId>
+		    <version>1.3.2</version>
+		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>

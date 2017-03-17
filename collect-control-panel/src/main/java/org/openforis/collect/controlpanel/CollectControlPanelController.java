@@ -4,18 +4,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.jetty.util.RolloverFileOutputStream;
+import org.openforis.utils.Files;
 import org.openforis.web.server.ApplicationServer;
 
 import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
@@ -36,15 +33,12 @@ import javafx.stage.Window;
 @SuppressWarnings("restriction")
 public class CollectControlPanelController implements Initializable {
 
-	private static final String DEFAULT_WEBAPPS_LOCATION = System.getProperty("user.dir") + File.separator + "webapps";
-
-	private static final String LOG_FILENAME = "collect.log";
-	private static final String LOGS_FOLDER_NAME = "logs";
 	private static final String SETTINGS_FILENAME = "collect.properties";
+	private static final String LOG_FILE_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis", "Collect", "logs", "collect.log");
+	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), "webapps");
 	private static final int LOG_OPENED_WINDOW_HEIGHT = 550;
 	private static final int LOG_CLOSED_WINDOW_HEIGHT = 200;
-	
-	private enum Status {
+	public enum Status {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
 	}
 	
@@ -71,26 +65,30 @@ public class CollectControlPanelController implements Initializable {
 	private ScheduledExecutorService executorService;
 	
 	private Status status = Status.INITIALIZING;
+	private String errorMessage;
 	private boolean logOpened = false;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
+			executorService = Executors.newScheduledThreadPool(5);
+
 			CollectProperties collectProperties = new CollectPropertiesParser().parse(loadProperties());
 			String webappsLocation = collectProperties.getWebappsLocation();
-			if (webappsLocation == null) {
+			if (webappsLocation == null || webappsLocation.isEmpty()) {
 				webappsLocation = DEFAULT_WEBAPPS_LOCATION;
 			}
 			File webappsFolder = new File(webappsLocation);
+			File logFile = new File(LOG_FILE_LOCATION);
+			
 			server = new CollectJettyServer(collectProperties.getHttpPort(),
-					webappsFolder,
+					webappsFolder, logFile,
 					collectProperties.getCollectDataSourceConfiguration());
+			server.initialize();
+			
+			initializeLogFileReader();
 			
 			urlHyperlink.setText(server.getUrl());
-			
-			executorService = Executors.newScheduledThreadPool(5);
-			
-			initializeLogger();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -101,18 +99,8 @@ public class CollectControlPanelController implements Initializable {
 	 * 
 	 * @throws IOException
 	 */
-	private void initializeLogger() throws IOException {
-		String relativePathLogFilename = "./" + LOGS_FOLDER_NAME +"/" + LOG_FILENAME;
-		RolloverFileOutputStream os = new RolloverFileOutputStream(relativePathLogFilename, false, 90,
-				TimeZone.getTimeZone("GMT"), "yyyy_MM_dd", "yyyy_MM_dd_hhmm");
-		
-		PrintStream logStream = new PrintStream(os);
-
-		System.setOut(logStream);
-		System.setErr(logStream);
-		File logFile = new File(System.getProperty("user.dir") + File.separator + LOGS_FOLDER_NAME + File.separator + LOG_FILENAME);
-		
-		FileLinesProcessor logFileLinesProcessor = new FileLinesProcessor(logFile, (String text) -> {
+	private void initializeLogFileReader() throws IOException {
+		FileLinesProcessor logFileLinesProcessor = new FileLinesProcessor(server.getLogFile(), (String text) -> {
 			console.appendText(text);
 			console.appendText("\n");
 		});
@@ -124,15 +112,26 @@ public class CollectControlPanelController implements Initializable {
 		}, 1, 1, TimeUnit.SECONDS);
 	}
 	
-	public void startServer() throws Exception {
-		changeStatus(Status.STARTING);
-		
-		server.start();
-		
-		//enable stop button after 5 seconds
-		runAfter(() -> {
-			changeStatus(Status.RUNNING);
-		}, 5000);
+	public void startServer(MouseEvent event) throws Exception {
+		startServer((Runnable) null);
+	}
+	
+	public void startServer(Runnable onComplete) throws Exception {
+		executorService.schedule(() -> {
+			changeStatus(Status.STARTING);
+			
+			try {
+				server.start();
+				
+				changeStatus(Status.RUNNING);
+				
+				if (onComplete != null) {
+					onComplete.run();
+				}
+			} catch(Exception e) {
+				handleException(e);
+			}
+		}, 0, TimeUnit.SECONDS);
 	}
 
 	private void changeStatus(Status status) {
@@ -143,27 +142,19 @@ public class CollectControlPanelController implements Initializable {
 	public void stopServer() throws Exception {
 		changeStatus(Status.STOPPING);
 
-		server.stop();
+		try {
+			server.stop();
 		
-		// enable start button once server is down
-		waitThenRun(() -> {
-			changeStatus(Status.IDLE);
-		}, () -> {
-			return server.isRunning();
-		}, 1000);
+			waitUntilConditionIsVerifiedThenRun(() -> {
+				changeStatus(Status.IDLE);
+			}, () -> {
+				return server.isRunning();
+			}, 1000);
+		} catch(Exception e) {
+			handleException(e);
+		}
 	}
 
-	private void waitThenRun(Runnable runnable, Verifier sleepConditionVerifier, int sleepInterval) {
-		executorService.schedule(() -> {
-			while (sleepConditionVerifier.verify()) {
-				try {
-					Thread.sleep(sleepInterval);
-				} catch (InterruptedException e) {}
-			}
-			Platform.runLater(runnable);
-		}, 0, TimeUnit.SECONDS);
-	}
-	
 	void shutdown() throws Exception {
 		stopServer();
 		executorService.shutdownNow();
@@ -175,14 +166,13 @@ public class CollectControlPanelController implements Initializable {
 	}
 	
 	void openBrowser(final long delay) {
-		final HostServicesDelegate hostServices = HostServicesFactory.getInstance(app);
-		
 		executorService.submit(() -> {
 			try {
+				HostServicesDelegate hostServices = HostServicesFactory.getInstance(app);
 				Thread.sleep(delay);
 				String url = server.getUrl();
 				hostServices.showDocument(url);
-			} catch ( Exception e ) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
@@ -202,7 +192,7 @@ public class CollectControlPanelController implements Initializable {
 		updateUI();
 	}
 	
-	public void updateUI() {
+	private void updateUI() {
 		int windowHeight = this.logOpened ? LOG_OPENED_WINDOW_HEIGHT : LOG_CLOSED_WINDOW_HEIGHT;
 		Window window = applicationPane.getScene().getWindow();
 		window.setHeight(windowHeight);
@@ -233,7 +223,8 @@ public class CollectControlPanelController implements Initializable {
 			infoMessageVisible = false;
 			startBtnDisabled = false;
 		case ERROR:
-			infoMessage = "Error occurred: see log";
+			infoMessage = String.format("An error occurred: %s\n"
+					+ "Open Log for more detals", errorMessage);
 		default:
 			break;
 		}
@@ -245,28 +236,38 @@ public class CollectControlPanelController implements Initializable {
 		console.setVisible(logOpened);
 	}
 	
-	private Properties loadProperties() throws IOException {
-		Properties properties = new Properties();
-		InputStream propertiesIs = getClass().getClassLoader().getResourceAsStream(SETTINGS_FILENAME);
-		properties.load(propertiesIs);
-		return properties;
+	private void handleException(Exception e) {
+		e.printStackTrace();
+		errorMessage = e.getMessage();
+		changeStatus(Status.ERROR);
+	}
+
+	private void waitUntilConditionIsVerifiedThenRun(Runnable runnable, Verifier sleepConditionVerifier, int sleepInterval) {
+		executorService.schedule(() -> {
+			while (sleepConditionVerifier.verify()) {
+				try {
+					Thread.sleep(sleepInterval);
+				} catch (InterruptedException e) {}
+			}
+			Platform.runLater(runnable);
+		}, 0, TimeUnit.SECONDS);
 	}
 	
-	private void runAfter(Runnable runnable, int delay) {
-		executorService.schedule( new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(delay);
-				} catch (InterruptedException e) {
-				}
-				Platform.runLater(runnable);
-
-			}
-		}, 0, TimeUnit.SECONDS );
+	private Properties loadProperties() throws IOException {
+		Properties properties = new Properties();
+		String currentLocation = Files.getCurrentLocation();
+		File propertiesFile = new File(currentLocation, SETTINGS_FILENAME);
+		FileInputStream is = new FileInputStream(propertiesFile);
+		properties.load(is);
+		return properties;
 	}
 	
 	public void setApp(CollectControlPanel app) {
 		this.app = app;
+	}
+	
+	public Status getStatus() {
+		return status;
 	}
 
 	

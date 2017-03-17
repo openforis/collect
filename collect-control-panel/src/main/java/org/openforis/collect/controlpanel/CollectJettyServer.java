@@ -6,8 +6,8 @@ import org.openforis.web.server.JndiDataSourceConfiguration;
 
 public class CollectJettyServer extends JettyApplicationServer {
 
-	public CollectJettyServer(int port, File webappsFolder, JndiDataSourceConfiguration... jndiDsConfigurations) {
-		super(port, webappsFolder, jndiDsConfigurations);
+	public CollectJettyServer(int port, File webappsFolder, File logFile, JndiDataSourceConfiguration... jndiDsConfigurations) {
+		super(port, webappsFolder, logFile, jndiDsConfigurations);
 	}
 	
 	@Override
@@ -15,12 +15,4 @@ public class CollectJettyServer extends JettyApplicationServer {
 		return "collect";
 	}
 
-	@Override
-	protected String getDefaultLogFileLocation() {
-		String currentFolder = System.getProperty("user.dir");
-		String webappsFolder = currentFolder + File.separator + "webapps";
-		String collectWebappLocation = webappsFolder + File.separator + getMainWebAppName();
-		String collectLogFileLocation = collectWebappLocation + "/logs/collect.log";
-		return collectLogFileLocation;
-	}
 }

@@ -35,7 +35,7 @@ package org.openforis.collect.util {
 		private static const DOWNLOAD_BACKUP_SERVLET_NAME:String = "downloadBackup.htm";
 		private static const VALIDATION_REPORT_SERVLET_NAME:String = "validationReport";
 		
-		private static const _DESIGNER_URL_PART:String = "designer.htm";
+		private static const _DESIGNER_URL_PART:String = "designer/home.zul";
 		private static const _MAP_VISUALIZER_URL_PART:String = "datamanager/map.html";
 		private static const _DATA_CLEANSING_URL_PART:String = "datacleansing/main.html";
 		

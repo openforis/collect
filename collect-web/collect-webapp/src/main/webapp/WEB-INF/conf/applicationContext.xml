@@ -30,6 +30,7 @@
 	<mvc:resources mapping="/css/**" location="/css/" />
 	<mvc:resources mapping="/datacleansing/**" location="/datacleansing/" />
 	<mvc:resources mapping="/datamanager/**" location="/datamanager/" />
+	<mvc:resources mapping="/designer/**" location="/designer/" />
 	<mvc:resources mapping="/earthFiles/**" location="/earthFiles/" />
 	<mvc:resources mapping="/images/**" location="/images/" />
 	<mvc:resources mapping="/js/**" location="/js/" />
@@ -45,8 +46,6 @@
 	<util:map id="urlMappings">
 		<!-- <entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
 		<entry key="/index.htm" value-ref="fileNameViewController" />
-		<entry key="/designer.htm" value-ref="fileNameViewController" />
-		<entry key="/editSurvey.htm" value-ref="fileNameViewController" />
 		<entry key="/error.htm" value-ref="fileNameViewController" />
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
 		<entry key="/exitUser.htm" value-ref="fileNameViewController" />

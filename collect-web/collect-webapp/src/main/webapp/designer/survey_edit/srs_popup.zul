@@ -1,0 +1,150 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<window 
+		title="${labels.survey.srs.$}" 
+		height="400px"
+		width="700px"
+		border="normal"
+		position="center" 
+		validationMessages="@id('vmsgs')"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SpatialReferenceSystemsVM')"
+		closable="false">
+		<borderlayout>
+			<north>
+				<box pack="center" align="center" height="30px" hflex="1">
+					<label value="${labels.susvey.srs.introduction}" />
+				</box>
+			</north>
+			<west width="180px">
+				<borderlayout>
+					<center border="none"
+						title="${labels.global.items.header.inserted}:">
+						<listbox id="itemsListBox"
+				        	selectedItem="@load(vm.selectedItem)"
+				        	model="@load(vm.items)"
+				        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+				        	width="100%"
+				        	vflex="true">
+				        	<listhead>
+								<listheader label="" width="100%" />
+							</listhead>
+				            <template name="model">
+				                <listitem>
+				                    <listcell label="@load(each.id)" />
+				                </listitem>
+				            </template>
+				        </listbox>
+					</center>
+					<south border="none">
+						<vbox spacing="0px" hflex="true">
+							<label value="${labels.survey.srs.predefined_srss}:" />
+							<hbox>
+								<listbox id="predefinedSrsList"
+	       							model="@load(vm.availablePredefinedSRSs)"
+	       							selectedItem="@bind(vm.selectedPredefinedSrsCode)"
+	       							mold="select" />
+								<button label="${labels.global.add_item}" 
+									disabled="@load(empty vm.selectedPredefinedSrsCode)"
+									onClick="@command('addPredefinedSrs')" />
+							</hbox>
+							<separator bar="true" />
+					        <toolbar height="30px">
+					        	<toolbarbutton tooltiptext="${labels.global.add_item}" 
+	                                    image="/assets/images/add.png"
+	                                    onClick="@command('newItem')" />
+	                            <toolbarbutton tooltiptext="${labels.global.delete_item}" 
+	                                    image="/assets/images/delete.png"
+	                                    disabled="@load(empty vm.selectedItem)" 
+	                                    onClick="@command('deleteItem', item=vm.selectedItem)" />
+					        	<toolbarbutton tooltiptext="${labels.global.item.move_up}" 
+	                                    image="/assets/images/arrow-up.png"
+										disabled="@load(vm.moveSelectedItemUpDisabled)" 
+							        	onClick="@command('moveSelectedItemUp')" />
+					        	<toolbarbutton tooltiptext="${labels.global.item.move_down}" 
+	                                    image="/assets/images/arrow-down.png"
+										disabled="@load(vm.moveSelectedItemDownDisabled)" 
+							        	onClick="@command('moveSelectedItemDown')" />
+					        </toolbar>
+						</vbox>
+					</south>
+				</borderlayout>
+		    </west>
+	        <center>
+	        	<absolutelayout>
+	        		<absolutechildren hflex="1" vflex="1">
+	        			<box pack="center" align="center" hflex="1" vflex="1">
+		        			<label value="${labels.global.item.select_or_create_new_one}" />
+	        			</box>
+	        		</absolutechildren>
+	        		<absolutechildren hflex="1" vflex="1">
+				        <div 
+				        	visible="@load(vm.editingItem)"
+		                    sclass="form"
+							form="@id('fx') 
+								@load(vm.formObject) 
+		                        @save(vm.formObject, before={'validate','applyChanges'})
+		                        @validator('org.openforis.collect.designer.form.validator.SRSFormValidator')"
+							hflex="1">
+							<grid>
+								<columns>
+									<column width="100px" />
+									<column />
+								</columns>
+								<rows>
+									<row>
+										<fieldErrorHandler message="@load(vmsgs['id'])">
+											<label value="${labels.survey.srs.id}:" />
+										</fieldErrorHandler>
+										<fieldErrorHandler message="@load(vmsgs['id'])">
+											<textbox width="150px" value="@bind(fx.id)" onChange="@command('applyChanges')" />
+										</fieldErrorHandler>
+									</row>
+									<row>
+		                                <fieldErrorHandler message="@load(vmsgs['label'])">
+											<label
+								  				use="org.openforis.collect.designer.component.FieldLabel"
+								  				value="${labels.survey.srs.label}" 
+			                                  	languageCode="@load(vm.currentLanguageCode)" />
+			                            </fieldErrorHandler>
+		                                <fieldErrorHandler message="@load(vmsgs['label'])">
+											<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+										</fieldErrorHandler>
+									</row>
+									<row>
+		                                <fieldErrorHandler message="@load(vmsgs['description'])">
+											<label
+								  				use="org.openforis.collect.designer.component.FieldLabel"
+												value="${labels.survey.srs.description}" 
+		                                  		languageCode="@load(vm.currentLanguageCode)" />
+		                                </fieldErrorHandler>
+		                                <fieldErrorHandler message="@load(vmsgs['description'])">
+											<textbox width="300px" multiline="true" rows="4"
+		                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
+										</fieldErrorHandler>
+									</row>
+									<row>
+		                                <fieldErrorHandler message="@load(vmsgs['wellKnownText'])">
+											<label value="${labels.survey.srs.wkt}:" />
+										</fieldErrorHandler>
+		                                <fieldErrorHandler message="@load(vmsgs['wellKnownText'])">
+											<textbox width="300px" value="@bind(fx.wellKnownText)" 
+												multiline="true" rows="10" cols="40"
+												onChange="@command('applyChanges')" />
+										</fieldErrorHandler>
+									</row>
+								</rows>
+							</grid>
+						</div>
+	        			
+	        		</absolutechildren>
+	        	</absolutelayout>
+			</center>
+			<south>
+				<box align="center" width="100%">
+					<button label="${labels.global.apply}" onClick="@command('apply')" />
+				</box>
+			</south>
+		</borderlayout>
+    </window>
+</zk>

@@ -1,0 +1,21 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+    <custom-attributes parentEntity="${arg.parentEntity}"/>
+	<vlayout 
+		id="nodeFormContainer"
+		sclass="form"
+        apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.DefaultAttributeVM')"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx')
+			@init(vm.tempFormObject)
+			@load(vm.formObject) 
+			@save(vm.formObject, before={'validate','applyChanges'})
+            @validator('org.openforis.collect.designer.form.validator.FileAttributeDefinitionFormValidator', parentEntity=parentEntity)">
+		
+        <include id="attributeCommonInclude"
+        	src="survey_edit/schema/attribute_common.zul" 
+        	otherGeneralDetailsForm="survey_edit/schema/attribute_file_general_part.zul" />
+        
+	</vlayout>
+</zk>

@@ -9,3 +9,21 @@
 
 .main-pane {
 }
+
+#startBtn {
+	-fx-min-width: 100;
+	-fx-min-height: 80;
+	-fx-background-image: url("images/start-64x64.png");
+	-fx-background-size: 64 64;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;   
+}
+
+#stopBtn {
+	-fx-min-width: 100;
+	-fx-min-height: 80;
+	-fx-background-image: url("images/stop-64x64.png");
+	-fx-background-size: 64 64;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;   
+}

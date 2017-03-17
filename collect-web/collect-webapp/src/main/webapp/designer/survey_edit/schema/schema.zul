@@ -1,0 +1,338 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk>
+  <div id="itemsContainer"
+    apply="org.openforis.collect.designer.composer.SurveySchemaEditComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaVM')"
+    width="100%" height="100%">
+    
+    <include src="survey_edit/schema/nodes_tree_filter.zul"
+          canEditRootEntities="true" />
+          
+    <borderlayout vflex="1">
+      <west title="${labels.survey.schema.definitions}" 
+        width="250px"
+        minsize="250"
+        splittable="true">
+        <borderlayout visible="@load(not empty vm.treeModel)">
+        	<north border="none">
+				<!-- View type -->
+       		  <hlayout valign="middle">
+       		  	<label value="${labels.survey.schema.tree.view_type.$}:" />
+       		  	<listbox width="150px"
+       		  		model="@load(vm.treeViewTypes)"
+       		  		selectedItem="@load(vm.selectedTreeViewType)" mold="select"
+       		  		onSelect="@command('treeViewTypeSelected', type=self.selectedItem.value)">
+       		  		<template name="model">
+       		  			<listitem label="@load(vm.getTreeViewTypeLabel(each))" />
+       		  		</template>
+       		  	</listbox>
+       		  </hlayout>
+        	</north>
+          <center border="none">
+            <tree id="nodesTree" zclass="z-dottree" width="100%"
+              vflex="true" model="@load(vm.treeModel)"
+              context="nodesTreePopup"
+              onSelect="@command('nodeSelected', data=self.selectedItem.value.data)">
+              <template name="model">
+                <treeitem draggable="false"
+                	context="@load(vm.getPopupMenu(each.data))">
+                	<treerow>
+                		<treecell image="@load(each.icon)"
+                			label="@load(each.data.label)" />
+                	</treerow>
+                </treeitem>
+              </template>
+            </tree>
+          </center>
+          <south>
+          	<vlayout>
+          		<!-- Info tip -->
+       		  <label value="${labels.survey.schema.right_click_tip}" sclass="tipMessage" />
+          		<!-- Button bar -->
+	            <toolbar width="100%" height="26px">
+	              <toolbarbutton image="/assets/images/arrow-up.png"
+	              	tooltiptext="${labels.global.item.move_up}"
+	                disabled="@load(vm.moveNodeUpDisabled)"
+	                onClick="@command('moveNodeUp')" />
+	              <toolbarbutton image="/assets/images/arrow-down.png"
+	              	tooltiptext="${labels.global.item.move_down}"
+	                disabled="@load(vm.moveNodeDownDisabled)"
+	                onClick="@command('moveNodeDown')" />
+	              <space width="100px" />
+	              <toolbarbutton image="/assets/images/expand-small.png"
+	              	tooltiptext="${labels.survey.schema.tree.expand}"
+	                onClick="@command('expandTree')" />
+	              <toolbarbutton image="/assets/images/collapse-small.png"
+	              	tooltiptext="${labels.survey.schema.tree.collapse}"
+	                onClick="@command('collapseTree')" />
+	            </toolbar>
+          	</vlayout>
+          </south>
+        </borderlayout>
+      </west>
+      <center>
+      	<borderlayout hflex="true" visible="@load(vm.editingNode)">
+      		<north border="none" height="30px">
+      			<hlayout hflex="true" sclass="z-center-header node-type-header">
+  					<box hflex="1">
+		      			<label value="@load(vm.nodeTypeHeaderLabel)" />
+					</box>
+  					<box hflex="1" align="end">
+      					<hlayout>
+			      			<label value="Path:" sclass="path-label" />
+			      			<label value="@load(vm.editedNodePath)" />
+      					</hlayout>
+					</box>
+      			</hlayout>
+      		</north>
+      		<center border="none" autoscroll="true">
+	      		<include id="nodeFormInclude" hflex="true" />
+      		</center>
+      	</borderlayout>
+      </center>
+    </borderlayout>
+
+    <menupopup id="nodesTreePopup">
+    	<!-- Add tab -->
+    	<menuitem label="${labels.survey.layout.tab.add}"
+    		image="/assets/images/node_types/tab-small.png"
+    		onClick="@command('addTab')" />
+    </menupopup>
+    
+    <menupopup id="mainTabPopup">
+    	<!-- Add tab -->
+    	<menuitem label="${labels.survey.layout.tab.add}"
+    		image="/assets/images/node_types/tab-small.png"
+    		onClick="@command('addChildTab')" />
+    	<menuseparator />
+    	<!-- Add entity -->
+     	<menu label="${labels.survey.schema.add_entity}"
+ 			image="/assets/images/node_types/table-small.png">
+    		<menupopup>
+    			<menuitem
+    				label="${labels.survey.schema.add_single_entity}"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				image="/assets/images/node_types/grouping-small.png" />
+    			<menuitem
+    				label="${labels.survey.schema.add_multiple_form_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='FORM')"
+    				image="/assets/images/node_types/form-small.png" />
+    			<menuitem
+    				label="${labels.survey.schema.add_multiple_table_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE')"
+    				image="/assets/images/node_types/table-small.png" />
+    		</menupopup>
+    	</menu>
+    	<menuseparator />
+    	<!-- Add attribute -->
+    	<menu label="${labels.survey.schema.add_attribute.label}"
+ 			image="/assets/images/node_types/number-small.png">
+    		<menupopup>
+    			<zk forEach="${vm.attributeTypeValues}">
+    				<menuitem image="${vm.getAttributeIcon(each)}"
+    					label="${vm.getAttributeTypeLabel(each)}" value="${each}"
+    					onClick="@command('addChildAttribute', attributeType=self.value)" />
+    			</zk>
+    		</menupopup>
+    	</menu>
+    </menupopup>
+    
+    <menupopup id="tabPopup">
+    	<!-- Add tab -->
+    	<menuitem label="${labels.survey.layout.tab.add}"
+    		image="/assets/images/node_types/tab-small.png"
+    		onClick="@command('addChildTab')" />
+    	<menuseparator />
+    	<!-- Add entity -->
+     	<menu label="${labels.survey.schema.add_entity}"
+ 			image="/assets/images/node_types/table-small.png">
+    		<menupopup>
+    			<menuitem
+    				label="${labels.survey.schema.add_single_entity}"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				image="/assets/images/node_types/grouping-small.png" />
+    			<menuitem
+    				label="${labels.survey.schema.add_multiple_form_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='FORM')"
+    				image="/assets/images/node_types/form-small.png" />
+    			<menuitem
+    				label="${labels.survey.schema.add_multiple_table_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE')"
+    				image="/assets/images/node_types/table-small.png" />
+    		</menupopup>
+    	</menu>
+    	<menuseparator />
+    	<!-- Add attribute -->
+    	<menu label="${labels.survey.schema.add_attribute.label}"
+ 			image="/assets/images/node_types/number-small.png">
+    		<menupopup>
+    			<zk forEach="${vm.attributeTypeValues}">
+    				<menuitem image="${vm.getAttributeIcon(each)}"
+    					label="${vm.getAttributeTypeLabel(each)}" value="${each}"
+    					onClick="@command('addChildAttribute', attributeType=self.value)" />
+    			</zk>
+    		</menupopup>
+    	</menu>
+    	<menuseparator />
+    	<!-- Remove tab -->
+    	<menuitem label="${labels.survey.schema.remove_node}"
+    		image="/assets/images/delete-small.png"
+    		onClick="@command('removeTab')" />
+    </menupopup>
+    
+    <menupopup id="singleEntityPopup">
+    	<!-- Add entity -->
+     	<menu label="${labels.survey.schema.add_entity}"
+ 			image="/assets/images/node_types/table-small.png">
+    		<menupopup>
+    			<menuitem
+    				label="${labels.survey.schema.add_single_entity}"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				image="/assets/images/node_types/grouping-small.png" />
+    			<menuitem
+    				label="${labels.survey.schema.add_multiple_form_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='FORM')"
+    				image="/assets/images/node_types/form-small.png" />
+    			<menuitem
+    				label="${labels.survey.schema.add_multiple_table_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE')"
+    				image="/assets/images/node_types/table-small.png" />
+    		</menupopup>
+    	</menu>
+    	<menuseparator />
+    	<!-- Add attribute -->
+    	<menu label="${labels.survey.schema.add_attribute.label}"
+ 			image="/assets/images/node_types/number-small.png">
+    		<menupopup>
+    			<zk forEach="${vm.attributeTypeValues}">
+    				<menuitem image="${vm.getAttributeIcon(each)}"
+    					label="${vm.getAttributeTypeLabel(each)}" value="${each}"
+    					onClick="@command('addChildAttribute', attributeType=self.value)" />
+    			</zk>
+    		</menupopup>
+    	</menu>
+    	<menuseparator />
+    	<!-- Move node -->
+    	<menuitem label="${labels.survey.schema.move_node.$}"
+    		image="/assets/images/move-small.png"
+    		onClick="@command('openMoveNodePopup')" />
+    	<menuseparator />
+    	<!-- Remove node -->
+    	<menuitem label="${labels.survey.schema.remove_node}"
+    		image="/assets/images/delete-small.png"
+    		onClick="@command('removeNode')" />
+    </menupopup>
+    
+    <menupopup id="formEntityPopup">
+    	<!-- Add tab -->
+    	<menuitem label="${labels.survey.layout.tab.add}"
+    		image="/assets/images/node_types/tab-small.png"
+    		onClick="@command('addChildTab')" />
+    	<menuseparator />
+    	<!-- Add entity -->
+     	<menu label="${labels.survey.schema.add_entity}"
+ 			image="/assets/images/node_types/table-small.png">
+    		<menupopup>
+    			<menuitem
+    				label="${labels.survey.schema.add_single_entity}"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				image="/assets/images/node_types/grouping-small.png" />
+    			<menuitem
+    				label="${labels.survey.schema.add_multiple_form_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='FORM')"
+    				image="/assets/images/node_types/form-small.png" />
+    			<menuitem
+    				label="${labels.survey.schema.add_multiple_table_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE')"
+    				image="/assets/images/node_types/table-small.png" />
+    		</menupopup>
+    	</menu>
+    	<menuseparator />
+    	<!-- Add attribute -->
+    	<menu label="${labels.survey.schema.add_attribute.label}"
+ 			image="/assets/images/node_types/number-small.png">
+    		<menupopup>
+    			<zk forEach="${vm.attributeTypeValues}">
+    				<menuitem image="${vm.getAttributeIcon(each)}"
+    					label="${vm.getAttributeTypeLabel(each)}" value="${each}"
+    					onClick="@command('addChildAttribute', attributeType=self.value)" />
+    			</zk>
+    		</menupopup>
+    	</menu>
+    	<menuseparator />
+    	<!-- Move node -->
+    	<menuitem label="${labels.survey.schema.move_node.$}"
+    		image="/assets/images/move-small.png"
+    		onClick="@command('openMoveNodePopup')" />
+    	<menuseparator />
+    	<!-- Remove node -->
+    	<menuitem label="${labels.survey.schema.remove_node}"
+    		image="/assets/images/delete-small.png"
+    		onClick="@command('removeNode')" />
+    </menupopup>
+
+    <menupopup id="tableEntityPopup">
+    	<!-- Add entity -->
+     	<menu label="${labels.survey.schema.add_entity}"
+ 			image="/assets/images/node_types/table-small.png">
+    		<menupopup>
+    			<menuitem
+    				label="${labels.survey.schema.add_single_entity}"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				image="/assets/images/node_types/grouping-small.png" />
+    		</menupopup>
+    	</menu>
+    	<!-- Add attribute -->
+    	<menu label="${labels.survey.schema.add_attribute.label}"
+ 			image="/assets/images/node_types/number-small.png">
+    		<menupopup>
+    			<zk forEach="${vm.attributeTypeValues}">
+    				<menuitem image="${vm.getAttributeIcon(each)}"
+    					label="${vm.getAttributeTypeLabel(each)}" value="${each}"
+    					onClick="@command('addChildAttribute', attributeType=self.value)" />
+    			</zk>
+    		</menupopup>
+    	</menu>
+    	<menuseparator />
+    	<!-- Move node -->
+    	<menuitem label="${labels.survey.schema.move_node.$}"
+    		image="/assets/images/move-small.png"
+    		onClick="@command('openMoveNodePopup')" />
+    	<menuseparator />
+    	<!-- Remove node -->
+    	<menuitem label="${labels.survey.schema.remove_node}"
+    		image="/assets/images/delete-small.png"
+    		onClick="@command('removeNode')" />
+    </menupopup>
+    
+    <menupopup id="attributePopup">
+    	<!-- Move node -->
+    	<menuitem label="${labels.survey.schema.move_node.$}"
+    		image="/assets/images/move-small.png"
+    		onClick="@command('openMoveNodePopup')" />
+    	<menuseparator />
+    	<!-- Duplicate node -->
+    	<menuitem label="${labels.survey.schema.duplicate_node}"
+    		image="/assets/images/duplicate-small.png"
+    		onClick="@command('openDuplicateNodePopup')" />
+    	<menuseparator />
+    	<!-- Convert node -->
+    	<menuitem label="${labels.survey.schema.convert_node}"
+    		image="/assets/images/convert-small.png"
+    		onClick="@command('openNodeConversionPopup')" />
+    	<menuseparator />
+    	<!-- Remove node -->
+    	<menuitem label="${labels.survey.schema.remove_node}"
+    		image="/assets/images/delete-small.png"
+    		onClick="@command('removeNode')" />
+    </menupopup>
+    
+    <menupopup id="detachedNodePopup">
+    	<!-- Remove node -->
+    	<menuitem label="${labels.survey.schema.remove_node}"
+    		image="/assets/images/delete-small.png"
+    		onClick="@command('removeNode')" />
+    </menupopup>
+    
+  </div>
+</zk>

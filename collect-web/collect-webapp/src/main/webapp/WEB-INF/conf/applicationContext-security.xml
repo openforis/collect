@@ -37,7 +37,7 @@
 		<intercept-url access="permitAll" pattern="/logout.htm" />
 		<intercept-url access="permitAll" pattern="/session/**" />
 		<intercept-url access="permitAll" pattern="/surveys/summaries.json" />
-		<intercept-url access="permitAll" pattern="/zkau" />
+		<intercept-url access="permitAll" pattern="/zkau/**" />
 <!-- 		security disabled for these urls because of an issue with flash player -->
 <!-- 		for netscape compatible browser and uplaod to a secured url -->
 		<intercept-url access="permitAll" pattern="/uploadData.htm" />
@@ -45,11 +45,8 @@
 		
 		<intercept-url access="hasRole('ADMIN')" pattern="/codelist/export/**/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/codelist/import/**/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/designer.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/editSurvey.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/importSurvey.htm" />
+		<intercept-url access="hasRole('ADMIN')" pattern="/designer/**" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/logoUpload" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/rdbpublish" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/saiku/**/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/export/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/import/*" />

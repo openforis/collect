@@ -1,0 +1,42 @@
+<zk>
+	<borderlayout id="itemsContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaLayoutVM')"
+		width="100%" height="100%">
+	 	<west title="${labels.survey.schema.nodes_title}"
+	 		width="300px"
+	 		splittable="true">
+	 		<vlayout hflex="true" vflex="true">
+		 		<hlayout>
+					<label value="${labels.survey.layout.form_version}:" />
+					<listbox width="150px" model="@load(vm.formVersions)"
+						selectedItem="@load(vm.formVersion)" mold="select"
+						onSelect="@command('formVersionChanged', version=self.selectedItem.value)">
+						<template name="model">
+							<listitem label="@load(each.name)" />
+						</template>
+					</listbox>
+				</hlayout>
+				<tree id="nodesTree"
+					width="100%" vflex="true"
+					model="@load(vm.nodes)"
+					onSelect="@command('nodeSelected', node=self.selectedItem)"
+					droppable="true">
+					<template name="model">
+			            <treeitem draggable="true" >
+			                <treerow>
+			                    <treecell label="@load(each.data.name)" 
+                                   sclass="@load(vm.isAssociatedToTab(each.data) ? 'associated': '')" />
+			                </treerow>
+			            </treeitem>
+			  		</template>
+			    </tree>
+	 		</vlayout>
+		</west>
+		<center title="${labels.survey.layout.form_layout}">
+			<div id="tabsEditor" visible="@load(not empty vm.rootTabSet)" width="100%" height="100%">
+				<include id="tabsGroupContainerInclude" defer="true" width="100%" height="100%" /> 
+			</div>
+		</center>
+    </borderlayout>
+</zk>

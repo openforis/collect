@@ -1,0 +1,53 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<window title="${labels.survey.clone.title}" 
+		width="500px"
+		border="normal" 
+		position="center" 
+		closable="true"
+		apply="org.zkoss.bind.BindComposer"
+		form="@id('fx') @load(vm.form) @save(vm.form, before='ok') @validator(vm.nameValidator)" 
+		validationMessages="@id('vmsgs')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyCloneParametersPopUpVM')">
+
+		<grid>
+			<columns>
+				<column width="200px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.clone.original_name}:" />
+					<textbox width="300px"
+            			disabled="true"
+            			value="@load(vm.originalSurvey.name)" />
+				</row>
+				<row>
+					<label value="${labels.survey.clone.original_type.$}:" />
+					<radiogroup id="typeRadiogroup" orient="horizontal" 
+							selectedItem="@bind(fx.originalType)">
+						<radio id="publishedTypeRadio" label="${labels.survey.clone.original_type.published}" 
+								value="PUBLISHED"
+								disabled="@load(vm.originalSurvey.notLinkedToPublishedSurvey)" />
+						<radio id="temporaryTypeRadio" label="${labels.survey.clone.original_type.temporary}" 
+								value="TEMPORARY" 
+								disabled="@load(! vm.originalSurvey.temporary)" />
+					</radiogroup>
+				</row>
+				<row>
+					<fieldErrorHandler message="@load(vmsgs['name'])">
+						<label value="${labels.survey.clone.new_name}:" />
+					</fieldErrorHandler>
+					<fieldErrorHandler message="@load(vmsgs['name'])">
+						<textbox width="150px" value="@bind(fx.name) @validator(vm.nameValidator)" />
+					</fieldErrorHandler>
+				</row>
+			</rows>
+		</grid>
+
+		<box width="100%" align="center">
+			<button id="okBtn" label="${labels.global.ok}"
+				onClick="@command('ok')" />
+		</box>
+	</window>
+</zk>

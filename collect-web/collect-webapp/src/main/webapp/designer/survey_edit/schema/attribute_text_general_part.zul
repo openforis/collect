@@ -1,0 +1,45 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column />
+    </columns>
+    <rows>
+		<row>
+			<label value="${labels.survey.schema.attribute.text.type}:" />
+			<radiogroup selectedItem="@bind(fx.type)"
+				onCheck="@command('applyChanges')">
+				<radio
+					label="${labels.survey.schema.attribute.text.type_short}"
+					value="SHORT" />
+				<radio
+					label="${labels.survey.schema.attribute.text.type_memo}"
+					value="MEMO" />
+			</radiogroup>
+		</row>
+		<row visible="@load(not vm.collectEarthSurvey)">
+			<fieldErrorHandler message="@load(vmsgs['input'])">
+				<label value="${labels.survey.schema.attribute.text.input.$}:" />
+				<image popup="textInputInfoTooltip" style="cursor:pointer"
+					src="/assets/images/info-small.png" />
+	    	</fieldErrorHandler>
+			<radiogroup selectedItem="@bind(fx.input)" 
+				onCheck="@command('applyChanges')">
+				<radio
+					label="${labels.survey.schema.attribute.text.input.keyboard}"
+					value="KEYBOARD" />
+				<radio
+					label="${labels.survey.schema.attribute.text.input.barcode}"
+					value="BARCODE" />
+			</radiogroup>
+		</row>
+    </rows>
+  </grid>
+
+  <popup id="textInputInfoTooltip" width="300px">
+     <html><![CDATA[
+  		${labels.survey.schema.attribute.text.input.tooltip}
+     ]]></html>
+  </popup>
+</zk>

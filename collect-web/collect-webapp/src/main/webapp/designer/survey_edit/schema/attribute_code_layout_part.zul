@@ -1,0 +1,57 @@
+<zk>
+	<custom-attributes parentEntity="${arg.parentEntity}" />
+
+	<grid class="inner">
+		<columns>
+			<column width="200px" />
+			<column width="100%" />
+		</columns>
+		<rows>
+			<row>
+				<label
+					value="${labels.survey.schema.attribute.code.layout_type.$}:" />
+				<cell>
+					<radiogroup selectedItem="@bind(fx.layoutType)"
+						onCheck="@command('layoutTypeChange', layoutType=self.selectedItem.value)">
+						<radio 
+							label="${labels.survey.schema.attribute.code.layout_type.text}"
+							value="text" />
+						<radio
+							label="${labels.survey.schema.attribute.code.layout_type.dropdown}"
+							value="dropdown" />
+						<radio
+							label="${labels.survey.schema.attribute.code.layout_type.radio}"
+							value="radio" />
+					</radiogroup>
+				</cell>
+			</row>
+			<row visible="@load(not vm.collectEarthSurvey and fx.layoutType eq 'text')">
+				<label
+					value="${labels.survey.schema.attribute.code.showAllowedValuesPreview}:" />
+				<checkbox
+					checked="@load(fx.showAllowedValuesPreview eq true) @save(fx.showAllowedValuesPreview)"
+					onCheck="@command('applyChanges')" />
+			</row>
+			<row visible="@load(not vm.collectEarthSurvey and fx.layoutType eq 'radio')">
+				<label
+					value="${labels.survey.schema.attribute.code.layout_direction.$}:" />
+				<radiogroup selectedItem="@bind(fx.layoutDirection)"
+					onCheck="@command('applyChanges')">
+					<radio 
+						label="${labels.survey.schema.attribute.code.layout_direction.vertical}"
+						value="vertical" />
+					<radio 
+						label="${labels.survey.schema.attribute.code.layout_direction.horizontal}"
+						value="horizontal" />
+				</radiogroup>
+			</row>
+			<row visible="@load(not vm.collectEarthSurvey)">
+				<label
+					value="${labels.survey.schema.attribute.code.show_code}:" />
+				<checkbox
+					checked="@load(fx.showCode eq true) @save(fx.showCode)"
+					onCheck="@command('applyChanges')" />
+			</row>
+		</rows>
+	</grid>
+</zk>

@@ -133,17 +133,6 @@
 											<outputDirectory>${installer-build-path}</outputDirectory>
 											<destFileName>${osx-autoupdater-file-name}</destFileName>
 										</artifactItem>
-										<!-- Control Panel -->
-										<artifactItem>
-											<groupId>org.openforis.collect</groupId>
-											<artifactId>collect-control-panel</artifactId>
-											<version>${project.version}</version>
-											<type>jar</type>
-											<classifier>jar-with-dependencies</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/libs</outputDirectory>
-											<destFileName>OpenForisCollectControlPanel.jar</destFileName>
-										</artifactItem>
 										<!-- Collect WebApp -->
 										<artifactItem>
 											<groupId>org.openforis.collect</groupId>
@@ -206,6 +195,17 @@
 											<outputDirectory>${installer-build-path}/libs</outputDirectory>
 										</artifactItem>
 									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>copy-control-panel-dependencies</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${installer-build-path}/libs</outputDirectory>
+									<includeScope>compile</includeScope>
 								</configuration>
 							</execution>
 						</executions>
@@ -401,5 +401,12 @@
 			</build>
 		</profile>
 	</profiles>
-
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.openforis.collect</groupId>
+			<artifactId>collect-control-panel</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>

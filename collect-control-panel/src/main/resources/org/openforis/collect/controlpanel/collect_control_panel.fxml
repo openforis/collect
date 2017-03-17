@@ -10,6 +10,9 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.control.Tooltip?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="applicationPane"
@@ -27,13 +30,17 @@
 			</HBox>
 			<HBox spacing="100.0" alignment="CENTER">
 				<Button fx:id="startBtn" 
-					mnemonicParsing="false" onMouseClicked="#startServer" 
-					minHeight="60.0" minWidth="100.0"
-					text="Start" />
+					mnemonicParsing="false" onMouseClicked="#startServer">
+					<tooltip>
+						<Tooltip text="Start" />
+					</tooltip>
+				</Button>
 				<Button fx:id="stopBtn" 
-					mnemonicParsing="false" onMouseClicked="#stopServer" 
-					minHeight="60.0" minWidth="100.0" 
-					text="Stop" />
+					mnemonicParsing="false" onMouseClicked="#stopServer">
+					<tooltip>
+						<Tooltip text="Stop" />
+					</tooltip>
+				</Button>
 			</HBox>
 		</VBox>
 	</top>
@@ -43,7 +50,8 @@
 				prefHeight="25.0" prefWidth="66.0" mnemonicParsing="false"
 				onMouseClicked="#toggleLog" text="Log" />
 			<TextArea fx:id="console" editable="false" 
-				prefWidth="560.0" prefHeight="400" />
+				prefWidth="560.0" prefHeight="400"
+				wrapText="true" />
 		</VBox>
 	</center>
 </BorderPane>

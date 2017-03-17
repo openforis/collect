@@ -30,6 +30,6 @@
     default-autowire="byName"
     default-lazy-init="false">
   	    
-    <graniteds:flex-filter url-pattern="/*"/>
+    <graniteds:flex-filter url-pattern="graniteamf/*"/>
 
 </beans>

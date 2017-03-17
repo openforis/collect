@@ -1,0 +1,43 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<window id="schemaTreePopUp" 
+		title="${arg.title}" 
+		width="500px"
+		height="320px" 
+		border="normal" 
+		position="center" 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM')"
+		closable="true">
+
+		<vlayout hflex="true" vflex="true">
+			<tree id="tree" 
+				zclass="z-dottree" 
+				width="100%"
+				vflex="true" 
+				model="@load(vm.treeModel)">
+				<template name="model">
+					<treeitem draggable="false" 
+						disabled="@load(each.disabled)"
+						onClick="@command('nodeSelected', node=self.value.data.surveyObject)">
+						<treerow>
+							<treecell image="@load(each.icon)"
+								label="@load(each.data.label)"
+								 />
+						</treerow>
+					</treeitem>
+				</template>
+			</tree>
+			
+			<label value="${labels.survey.schema.tree.popup.info}" />
+			
+			<box width="100%" align="center">
+				<button label="${labels.global.apply}"
+			        	onClick="@command('apply', selectedSurveyObject=tree.selectedItem.value.data.surveyObject)"/>
+			</box>
+    	
+		</vlayout>
+		
+	</window>
+</zk>

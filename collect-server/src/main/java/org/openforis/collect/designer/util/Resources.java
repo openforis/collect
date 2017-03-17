@@ -8,14 +8,14 @@ package org.openforis.collect.designer.util;
 public class Resources {
 	
 	public static final String PAGES_BASE_PATH = "/";
-	public static final String COMPONENTS_BASE_PATH = "/WEB-INF/view/zul/designer/";
+	public static final String COMPONENTS_BASE_PATH = "/designer/";
 	
 	public enum Page {
 	
 		INDEX("index.htm"),
 		LOGOUT("logout.htm"),
-		DESIGNER("designer.htm"),
-		SURVEY_EDIT("editSurvey.htm"),
+		DESIGNER("designer/home.zul"),
+		SURVEY_EDIT("designer/survey_edit.zul"),
 		COLLECT_SWF("collect.swf"),
 		PREVIEW_PATH("index.htm");
 		

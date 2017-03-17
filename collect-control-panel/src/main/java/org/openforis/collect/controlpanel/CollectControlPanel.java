@@ -33,24 +33,16 @@ public class CollectControlPanel extends Application {
 		controller.setApp(this);
 		controller.closeLog();
 		
-        new Thread() {
-            public void run() {
-            	try {
-					controller.startServer();
-					controller.openBrowser(BROWSER_OPEN_DELAY);
-            	} catch(Exception e) {
-            		throw new RuntimeException(e);
-            	}
-            }
-        }.start();	
+		controller.startServer(() -> {
+			controller.openBrowser(BROWSER_OPEN_DELAY);
+		});
 		stage.show();
 	}
-
+	
 	@Override
 	public void stop() throws Exception {
-		controller.shutdown();
-
 		super.stop();
+		controller.shutdown();
 	}
 
 }
