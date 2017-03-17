@@ -112,7 +112,7 @@
 	    <servlet-class>org.zkoss.zk.ui.http.DHtmlLayoutServlet</servlet-class>
 	    <init-param>
 	        <param-name>update-uri</param-name>
-	        <param-value>zkau</param-value>
+	        <param-value>/zkau</param-value>
 	    </init-param>
 	    <load-on-startup>3</load-on-startup><!-- MUST -->
 	</servlet>
