@@ -12,8 +12,29 @@
     -fx-text-fill: #2d3e4c;
 }
 
-.info-message {
-	-fx-font-size: 1.5em;
+.message {
+}
+
+#statusTxt {
+	-fx-font-size: 2em;
+}
+
+#statusTxt.initializing, 
+#statusTxt.starting, 
+#statusTxt.stopping {
+	-fx-fill: orange;
+}
+
+#statusTxt.running {
+	-fx-fill: green;
+}
+
+#statusTxt.error {
+	-fx-fill: red;
+}
+
+#errorMessageTxt {
+	-fx-fill: red;
 }
 
 Label {

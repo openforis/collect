@@ -33,11 +33,16 @@ import javafx.stage.Window;
 @SuppressWarnings("restriction")
 public class CollectControlPanelController implements Initializable {
 
+	private static final String COLLECT_USER_HOME_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis", "Collect");
+	private static final String LOG_FOLDER_NAME = "log";
+	private static final String LOG_FILE_LOCATION = Files.getLocation(COLLECT_USER_HOME_LOCATION, LOG_FOLDER_NAME, "collect.log");
 	private static final String SETTINGS_FILENAME = "collect.properties";
-	private static final String LOG_FILE_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis", "Collect", "logs", "collect.log");
-	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), "webapps");
+	private static final String SETTINGS_FILE_LOCATION = Files.getLocation(COLLECT_USER_HOME_LOCATION, SETTINGS_FILENAME);
+	private static final String SETTINGS_FILE_LOCATION_DEV = Files.getLocation(Files.getCurrentLocation(), SETTINGS_FILENAME);
+	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
+	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), DEFAULT_WEBAPPS_FOLDER_NAME);
 	private static final int LOG_OPENED_WINDOW_HEIGHT = 550;
-	private static final int LOG_CLOSED_WINDOW_HEIGHT = 200;
+	private static final int LOG_CLOSED_WINDOW_HEIGHT = 220;
 	public enum Status {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
 	}
@@ -52,7 +57,9 @@ public class CollectControlPanelController implements Initializable {
 	@FXML
 	public Hyperlink urlHyperlink;
 	@FXML
-	public Text infoTxt;
+	public Text statusTxt;
+	@FXML
+	public Text errorMessageTxt;
 	@FXML
 	private VBox runningAtUrlBox;
 		
@@ -194,34 +201,42 @@ public class CollectControlPanelController implements Initializable {
 		window.setHeight(windowHeight);
 		
 		boolean runningAtUrlVisible = false;
-		boolean infoMessageVisible = true;
-		String infoMessage = null;
+		boolean errorMessageVisible = false;
+		String detailedErrorMessage = null;
+		String statusMessage = null;
+		String statusMessageClassName = "info";
 		switch(status) {
 		case INITIALIZING:
-			infoMessage = "Initializing...";
+			statusMessage = "Initializing...";
 			break;
 		case STARTING:
-			infoMessage = "Starting up...";
+			statusMessage = "Starting up...";
 			break;
 		case RUNNING:
+			statusMessage = "Running!";
 			runningAtUrlVisible = true;
-			infoMessage = "Running!";
 			break;
 		case STOPPING:
-			infoMessage = "Shutting down...";
+			statusMessage = "Shutting down...";
 			break;
 		case IDLE:
-			infoMessage = null;
-			infoMessageVisible = false;
+			break;
 		case ERROR:
-			infoMessage = String.format("An error occurred: %s\n"
+			statusMessage = "Error";
+			detailedErrorMessage = String.format("An error has occurred: %s\n"
 					+ "Open Log for more detals", errorMessage);
+			errorMessageVisible = true;
+			break;
 		default:
 			break;
 		}
+		statusMessageClassName = status.name().toLowerCase();
 		runningAtUrlBox.setVisible(runningAtUrlVisible);
-		infoTxt.setText(infoMessage);
-		infoTxt.setVisible(infoMessageVisible);
+		errorMessageTxt.setText(detailedErrorMessage);
+		errorMessageTxt.setVisible(errorMessageVisible);
+		statusTxt.setText(statusMessage);
+		statusTxt.getStyleClass().clear();
+		statusTxt.getStyleClass().add(statusMessageClassName);
 		console.setVisible(logOpened);
 	}
 	
@@ -244,8 +259,20 @@ public class CollectControlPanelController implements Initializable {
 	
 	private Properties loadProperties() throws IOException {
 		Properties properties = new Properties();
-		String currentLocation = Files.getCurrentLocation();
-		File propertiesFile = new File(currentLocation, SETTINGS_FILENAME);
+		String[] possibleLocations = new String[]{
+			SETTINGS_FILE_LOCATION, 
+			SETTINGS_FILE_LOCATION_DEV
+		};
+		File propertiesFile = null;
+		for (String location : possibleLocations) {
+			propertiesFile = new File(location);
+			if (propertiesFile.exists()) {
+				break;
+			}
+		}
+		if (! propertiesFile.exists()) {
+			throw new IllegalStateException(String.format("Cannot find %s file", SETTINGS_FILENAME));
+		}
 		FileInputStream is = new FileInputStream(propertiesFile);
 		properties.load(is);
 		return properties;
@@ -261,7 +288,7 @@ public class CollectControlPanelController implements Initializable {
 
 	
 	/**
-	 * Reads a file and writes it's content into a TextWriter
+	 * Reads a file and process it's content with a TextProcessor
 	 * 
 	 * @author S. Ricci
 	 *

@@ -110,7 +110,7 @@ check_for_updates = 1</text>
 					<path>${data_dir}</path>
 				</createDirectory>
 				<createDirectory>
-					<path>${logs_dir}</path>
+					<path>${log_dir}</path>
 				</createDirectory>
 				<!-- Find free http port -->
 		        <getFreePort>
@@ -172,8 +172,8 @@ check_for_updates = 1</text>
 			<value>${root_user_dir}/data</value>
 		</setInstallerVariable>
 		<setInstallerVariable>
-			<name>logs_dir</name>
-			<value>${root_user_dir}/logs</value>
+			<name>log_dir</name>
+			<value>${root_user_dir}/log</value>
 		</setInstallerVariable>
 		<setInstallerVariable>
 			<name>java_launcher_mainClass</name>

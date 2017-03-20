@@ -18,13 +18,16 @@
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="applicationPane"
 	fx:controller="org.openforis.collect.controlpanel.CollectControlPanelController"
-	minHeight="200.0" maxHeight="550.0" prefHeight="200.0" 
+	minHeight="220.0" maxHeight="550.0" prefHeight="220.0" 
 	maxWidth="600.0" minWidth="600.0" prefWidth="600.0" 
 	styleClass="main-pane"
 	stylesheets="@org/openforis/collect/controlpanel/collect_control_panel.css">
 	
 	<HBox minHeight="50" alignment="CENTER">
-		<Text fx:id="infoTxt" styleClass="info-message" />
+		<Text fx:id="statusTxt" />
+	</HBox>
+	<HBox minHeight="50" alignment="CENTER">
+		<Text fx:id="errorMessageTxt" wrappingWidth="600" />
 	</HBox>
 	
 	<HBox minWidth="580" alignment="TOP_LEFT">

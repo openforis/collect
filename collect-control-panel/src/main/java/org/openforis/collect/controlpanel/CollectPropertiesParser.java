@@ -10,12 +10,12 @@ public class CollectPropertiesParser {
 		CollectProperties collectProp = new CollectProperties();
 		
 		collectProp.setHttpPort(getIntegerProperty(properties, "collect.http_port"));
-		collectProp.setWebappsLocation(properties.getProperty("collect.webapps_location"));
+		collectProp.setWebappsLocation(getSystemVariableReplacedProperty(properties, "collect.webapps_location"));
 		
 		JndiDataSourceConfiguration collectDsConfig = new JndiDataSourceConfiguration();
 		collectDsConfig.setJndiName(properties.getProperty("collect.db.jndiName"));
 		collectDsConfig.setDriverClassName(properties.getProperty("collect.db.driverClassName"));
-		collectDsConfig.setUrl(extractDbUrl(properties));
+		collectDsConfig.setUrl(getSystemVariableReplacedProperty(properties, "collect.db.url"));
 		collectDsConfig.setUsername(properties.getProperty("collect.db.username"));
 		collectDsConfig.setPassword(properties.getProperty("collect.db.password"));
 		collectDsConfig.setInitialSize(getIntegerProperty(properties, "collect.db.initialSize"));
@@ -26,15 +26,18 @@ public class CollectPropertiesParser {
 		return collectProp;
 	}
 
-	private String extractDbUrl(Properties properties) {
-		String url = properties.getProperty("collect.db.url");
-		String variableReplacedUrl = url;
-		String[] systemProps = {"user.home"};
-		for (String propName : systemProps) {
-			String propVal = System.getProperty(propName);
-			variableReplacedUrl = variableReplacedUrl.replace("${" + propName + "}", propVal);
+	private String getSystemVariableReplacedProperty(Properties properties, String propName) {
+		String originalValue = properties.getProperty(propName);
+		if (originalValue == null || originalValue.length() == 0) {
+			return originalValue;
 		}
-		return variableReplacedUrl;
+		String finalValue = originalValue;
+		String[] systemProps = {"user.home"};
+		for (String sysPropName : systemProps) {
+			String propVal = System.getProperty(sysPropName);
+			finalValue = finalValue.replace("${" + sysPropName + "}", propVal);
+		}
+		return finalValue;
 	}
 
 	private int getIntegerProperty(Properties properties, String key) {
