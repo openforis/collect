@@ -25,8 +25,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Window;
 
@@ -46,10 +46,6 @@ public class CollectControlPanelController implements Initializable {
 	@FXML
 	private Pane applicationPane;
 	@FXML
-	private Button startBtn;
-	@FXML
-	private Button stopBtn;
-	@FXML
 	private Button logBtn;
 	@FXML
 	public TextArea console;
@@ -58,7 +54,7 @@ public class CollectControlPanelController implements Initializable {
 	@FXML
 	public Text infoTxt;
 	@FXML
-	private HBox runningAtUrlBox;
+	private VBox runningAtUrlBox;
 		
 	private CollectControlPanel app;
 	private ApplicationServer server;
@@ -199,8 +195,6 @@ public class CollectControlPanelController implements Initializable {
 		
 		boolean runningAtUrlVisible = false;
 		boolean infoMessageVisible = true;
-		boolean startBtnDisabled = true;
-		boolean stopBtnDisabled = true;
 		String infoMessage = null;
 		switch(status) {
 		case INITIALIZING:
@@ -211,9 +205,7 @@ public class CollectControlPanelController implements Initializable {
 			break;
 		case RUNNING:
 			runningAtUrlVisible = true;
-			infoMessage = null;
-			infoMessageVisible = false;
-			stopBtnDisabled = false;
+			infoMessage = "Running!";
 			break;
 		case STOPPING:
 			infoMessage = "Shutting down...";
@@ -221,7 +213,6 @@ public class CollectControlPanelController implements Initializable {
 		case IDLE:
 			infoMessage = null;
 			infoMessageVisible = false;
-			startBtnDisabled = false;
 		case ERROR:
 			infoMessage = String.format("An error occurred: %s\n"
 					+ "Open Log for more detals", errorMessage);
@@ -231,8 +222,6 @@ public class CollectControlPanelController implements Initializable {
 		runningAtUrlBox.setVisible(runningAtUrlVisible);
 		infoTxt.setText(infoMessage);
 		infoTxt.setVisible(infoMessageVisible);
-		startBtn.setDisable(startBtnDisabled);
-		stopBtn.setDisable(stopBtnDisabled);
 		console.setVisible(logOpened);
 	}
 	

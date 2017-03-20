@@ -1,3 +1,8 @@
+.main-pane {
+	-fx-alignment: top_center;
+	-fx-spacing: 1em;
+}
+
 .menu-bar {
     -fx-background-color: #aeb5ba, linear-gradient(to bottom, #ecf4fa 0%, #ced4d9 100%);
     -fx-background-insets: 0, 0 0 1 0;
@@ -7,23 +12,14 @@
     -fx-text-fill: #2d3e4c;
 }
 
-.main-pane {
+.info-message {
+	-fx-font-size: 1.5em;
 }
 
-#startBtn {
-	-fx-min-width: 100;
-	-fx-min-height: 80;
-	-fx-background-image: url("images/start-64x64.png");
-	-fx-background-size: 64 64;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;   
+Label {
+	-fx-font-size: 1em;
 }
 
-#stopBtn {
-	-fx-min-width: 100;
-	-fx-min-height: 80;
-	-fx-background-image: url("images/stop-64x64.png");
-	-fx-background-size: 64 64;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;   
+#urlHyperlink {
+	-fx-font-size: 1.5em;
 }

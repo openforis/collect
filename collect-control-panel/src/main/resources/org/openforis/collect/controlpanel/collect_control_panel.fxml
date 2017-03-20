@@ -13,45 +13,33 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="applicationPane"
 	fx:controller="org.openforis.collect.controlpanel.CollectControlPanelController"
-	maxHeight="500.0" maxWidth="600.0" minHeight="180.0" minWidth="600.0"
-	prefHeight="500.0" prefWidth="600.0" styleClass="main-pane"
+	minHeight="200.0" maxHeight="550.0" prefHeight="200.0" 
+	maxWidth="600.0" minWidth="600.0" prefWidth="600.0" 
+	styleClass="main-pane"
 	stylesheets="@org/openforis/collect/controlpanel/collect_control_panel.css">
 	
-	<top>
-		<VBox alignment="TOP_CENTER" minHeight="150" spacing="5">
-			<Text fx:id="infoTxt" />
-			<HBox fx:id="runningAtUrlBox" alignment="CENTER">
-				<Label text="Collect running at:" />
-				<Hyperlink fx:id="urlHyperlink" onMouseClicked="#openBrowserFromLink" />
-			</HBox>
-			<HBox spacing="100.0" alignment="CENTER">
-				<Button fx:id="startBtn" 
-					mnemonicParsing="false" onMouseClicked="#startServer">
-					<tooltip>
-						<Tooltip text="Start" />
-					</tooltip>
-				</Button>
-				<Button fx:id="stopBtn" 
-					mnemonicParsing="false" onMouseClicked="#stopServer">
-					<tooltip>
-						<Tooltip text="Stop" />
-					</tooltip>
-				</Button>
-			</HBox>
+	<HBox minHeight="50" alignment="CENTER">
+		<Text fx:id="infoTxt" styleClass="info-message" />
+	</HBox>
+	
+	<HBox minWidth="580" alignment="TOP_LEFT">
+		<VBox fx:id="runningAtUrlBox" alignment="CENTER" minWidth="500">
+			<Label text="Collect running in default web browser at:" />
+			<Hyperlink fx:id="urlHyperlink" onMouseClicked="#openBrowserFromLink" />
 		</VBox>
-	</top>
-	<center>
-		<VBox alignment="CENTER_RIGHT">
+		
+		<HBox alignment="BOTTOM_RIGHT">
 			<Button fx:id="logBtn" 
-				prefHeight="25.0" prefWidth="66.0" mnemonicParsing="false"
+				mnemonicParsing="false"
 				onMouseClicked="#toggleLog" text="Log" />
-			<TextArea fx:id="console" editable="false" 
-				prefWidth="560.0" prefHeight="400"
-				wrapText="true" />
-		</VBox>
-	</center>
-</BorderPane>
+		</HBox>
+	</HBox>
+	<TextArea fx:id="console" editable="false"
+		prefWidth="560.0" prefHeight="400"
+		wrapText="true" />
+</VBox>

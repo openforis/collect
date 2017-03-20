@@ -100,6 +100,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 				"org.eclipse.jetty.plus.webapp.EnvConfiguration", 
 				"org.eclipse.jetty.plus.webapp.PlusConfiguration"
 		);
+		
 		File[] webappsFiles = webappsFolder.listFiles();
 		
 		if (webappsFiles == null || webappsFiles.length == 0) {
@@ -148,13 +149,13 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 	private WebAppContext createWebapp(File warFile) {
 		WebAppContext webapp = new WebAppContext();
 		webapp.setConfigurationClasses(new String[]{
-			"org.eclipse.jetty.plus.webapp.EnvConfiguration",
-			"org.eclipse.jetty.plus.webapp.PlusConfiguration",
-		    "org.eclipse.jetty.webapp.FragmentConfiguration",
+			"org.eclipse.jetty.webapp.WebInfConfiguration",
+		    "org.eclipse.jetty.webapp.WebXmlConfiguration",
 		    "org.eclipse.jetty.webapp.MetaInfConfiguration",
-		    "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-		    "org.eclipse.jetty.webapp.WebInfConfiguration",
-		    "org.eclipse.jetty.webapp.WebXmlConfiguration"
+		    "org.eclipse.jetty.webapp.FragmentConfiguration",
+		    "org.eclipse.jetty.plus.webapp.EnvConfiguration",
+		    "org.eclipse.jetty.plus.webapp.PlusConfiguration",
+		    "org.eclipse.jetty.webapp.JettyWebXmlConfiguration"
 		});
 
 		webapp.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
@@ -168,6 +169,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 		
 		File webappFolder = new File(warFile.getParentFile(), context);
 		
+		//unzip war file (if unzipped folder does not exist)
 		if (! webappFolder.exists()) {
 			try {
 				new ZipFile(warFile).extractAll(webappFolder.getAbsolutePath());
