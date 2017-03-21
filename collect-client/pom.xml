@@ -83,7 +83,7 @@
                                 <includeClass>org.openforis.concurrency.proxy.*</includeClass>
                                 <includeClass>org.openforis.idm.model.species.Taxon$TaxonRank</includeClass>
                                 <includeClass>org.openforis.idm.metamodel.validation.ValidationResultFlag</includeClass>
-                                <includeClass>org.openforis.collect.CollectInfo</includeClass>
+                                <includeClass>org.openforis.collect.CollectCompleteInfo</includeClass>
                                 <includeClass>org.openforis.collect.Proxy</includeClass>
                                 <includeClass>org.openforis.collect.io.parsing.FileCharset</includeClass>
                                 <includeClass>org.openforis.collect.io.parsing.CSVFileOptions</includeClass>

@@ -3,7 +3,7 @@ package org.openforis.collect.util {
 	import mx.utils.StringUtil;
 	import mx.utils.URLUtil;
 
-	import org.openforis.collect.CollectInfo;
+	import org.openforis.collect.CollectCompleteInfo;
 	
 	/**
 	 * 
@@ -62,7 +62,7 @@ package org.openforis.collect.util {
 		private static var _ROOT_URL:String;
 		private static var _URL:String;
 
-		private static var _collectInfo:CollectInfo;
+		private static var _collectInfo:CollectCompleteInfo;
 		
 		{
 			setUrl("http://localhost:8080/collect/collect.swf");
@@ -150,11 +150,11 @@ package org.openforis.collect.util {
 			return _URL;
 		}
 
-		public static function get collectInfo():CollectInfo {
+		public static function get collectInfo():CollectCompleteInfo {
 			return _collectInfo;
 		}
 
-		public static function set collectInfo(value:CollectInfo):void {
+		public static function set collectInfo(value:CollectCompleteInfo):void {
 			_collectInfo = value;
 		}
 

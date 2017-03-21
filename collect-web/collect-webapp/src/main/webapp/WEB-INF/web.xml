@@ -26,6 +26,9 @@
 	</context-param>
 	
 	<listener>
+	    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+	<listener>
 		<listener-class>org.openforis.collect.web.listener.ApplicationInitializerServletContextListener</listener-class>
 	</listener>
 	<listener>

@@ -17,7 +17,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.CollectInfo;
+	import org.openforis.collect.CollectCompleteInfo;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.ModelClient;
 	import org.openforis.collect.client.SessionClient;
@@ -161,7 +161,7 @@ package org.openforis.collect.presenter {
 		
 		private function updateApplicationVersionInfo():void {
 			function resultHandler(event:ResultEvent, token:Object = null):void {
-				var info:CollectInfo = CollectInfo(event.result);
+				var info:CollectCompleteInfo = CollectCompleteInfo(event.result);
 				ApplicationConstants.collectInfo = info;
 				eventDispatcher.dispatchEvent(new UIEvent(UIEvent.APPLICATION_INFO_LOADED));
 			}

@@ -9,7 +9,7 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.CollectInfo;
+			import org.openforis.collect.CollectCompleteInfo;
 			import org.openforis.collect.event.EventDispatcherFactory;
 			import org.openforis.collect.event.UIEvent;
 			import org.openforis.collect.i18n.Message;
@@ -26,7 +26,7 @@
 			
 			private function applicationInfoLoadedHandler(event:Event = null):void {
 				currentState = "default";
-				var info:CollectInfo = ApplicationConstants.collectInfo;
+				var info:CollectCompleteInfo = ApplicationConstants.collectInfo;
 				var buttonStyleName:String, tootTipMessageKey:String;
 				if (info.latestReleaseVersionVerified) {
 					if (info.latestReleaseVersion) {

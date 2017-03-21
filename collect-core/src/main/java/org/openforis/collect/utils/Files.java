@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 
@@ -20,6 +21,8 @@ public class Files {
 	
 	public static final String CSV_CONTENT_TYPE = "text/csv";
 	private static final String PATH_SEPARATOR_PATTERN = "[\\\\|/]";
+	public static final String JAVA_IO_TMPDIR_SYS_PROP = "java.io.tmpdir";
+	public static final File TEMP_FOLDER = getReadableSysPropLocation(JAVA_IO_TMPDIR_SYS_PROP, null);
 
 	public static File writeToTempFile(String text, String tempFilePrefix, String tempFileSuffix) throws IOException {
 		File file = File.createTempFile(tempFilePrefix, tempFileSuffix);
@@ -107,6 +110,37 @@ public class Files {
 			writer.flush();
 		} finally {
 			IOUtils.closeQuietly(writer);
+		}
+	}
+	
+	public static File getReadableSysPropLocation(String sysProp, String subDir) {
+		String path = getSysPropPath(sysProp, subDir);
+		if (path == null) {
+			return null;
+		} else {
+			return getLocationIfAccessible(path);
+		}
+	}
+
+	public static String getSysPropPath(String sysProp, String subdirectories) {
+		String base = System.getProperty(sysProp);
+		if ( base == null ) {
+			return null;
+		}
+		String path = base;
+		if ( subdirectories != null ) {
+			String[] pathParts = subdirectories.split("[\\|/]");
+			path += File.separator + StringUtils.join(pathParts, File.separator);
+		}
+		return path;
+	}
+	
+	public static File getLocationIfAccessible(String path) {
+		File result = new File(path);
+		if ( result.exists() && result.canWrite() ) {
+			return result;
+		} else {
+			return null;
 		}
 	}
 	

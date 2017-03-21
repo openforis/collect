@@ -6,10 +6,12 @@ import java.util.Locale;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
+import org.openforis.collect.CollectInternalInfo;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.BaseStorageManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.relational.CollectLocalRDBStorageManager;
+import org.openforis.collect.remoting.service.CollectInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +37,9 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 			+ "password=password";
 	
 	@Autowired
+	private CollectInfoService infoService;
+	@Autowired
 	private SaikuConfiguration saikuConfiguration;
-	
 	@Autowired
 	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
 	@Autowired
@@ -44,7 +47,8 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 	
 	@PostConstruct
 	public void init() {
-		this.setDefaultRootStoragePath(getCatalinaBaseWebappsFolderPath());
+		CollectInternalInfo info = infoService.getInternalInfo();
+		this.setDefaultRootStoragePath(info.getWebappsPath());
 		this.setDefaultSubFolder(saikuConfiguration.getContextPath());
 		super.initStorageDirectory(ConfigurationItem.SAIKU_BASE_DIR, false);
 	}
