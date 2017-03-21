@@ -2,16 +2,25 @@ package org.openforis.collect;
 
 import java.io.File;
 
+import org.openforis.collect.utils.Files;
+
 public class CollectInternalInfo extends CollectInfo {
 
 	private static final String COLLECT_ROOT_SYS_VAR_NAME = "collect.root";
-	private String rootPath;
 	private String webappsPath;
+	private String rootPath;
 	
 	public CollectInternalInfo() {
 		super();
 		this.rootPath = determineRootPath();
-		this.webappsPath = new File(this.rootPath).getParent();
+		this.webappsPath = determineWebappsPath();
+	}
+
+	private String determineWebappsPath() {
+		if (rootPath == null) {
+			throw new IllegalStateException("Root path not initialized");
+		}
+		return new File(rootPath).getParent();
 	}
 
 	private String determineRootPath() {
@@ -19,9 +28,13 @@ public class CollectInternalInfo extends CollectInfo {
 		if (collectRoot != null) {
 			return collectRoot;
 		} else {
-			String sysVarName = COLLECT_ROOT_SYS_VAR_NAME;
-			throw new IllegalStateException("Collect root path not set on system variable " + sysVarName);
+			File tempFolder = Files.TEMP_FOLDER;
+			return tempFolder.getAbsolutePath();
 		}
+	}
+	
+	public String getRootPath() {
+		return rootPath;
 	}
 	
 	public String getWebappsPath() {
