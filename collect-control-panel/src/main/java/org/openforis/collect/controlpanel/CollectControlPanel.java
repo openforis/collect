@@ -1,8 +1,11 @@
 package org.openforis.collect.controlpanel;
 
+import java.io.InputStream;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -22,6 +25,9 @@ public class CollectControlPanel extends Application {
 	public void start(Stage stage) throws Exception {
 		stage.setTitle(TITLE);
 		stage.setResizable(false);
+		InputStream logoIs = this.getClass().getClassLoader().getResourceAsStream("org/openforis/collect/controlpanel/of-collect-logo.png");
+		Image logo = new Image(logoIs);
+		stage.getIcons().add(logo);
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Pane pane = (Pane) fxmlLoader.load(getClass().getResourceAsStream(CONTROL_PANEL_FXML));
@@ -42,7 +48,7 @@ public class CollectControlPanel extends Application {
 	@Override
 	public void stop() throws Exception {
 		super.stop();
-		controller.shutdown();
+		controller.stop();
 	}
 
 }

@@ -42,7 +42,7 @@ public class CollectControlPanelController implements Initializable {
 	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
 	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), DEFAULT_WEBAPPS_FOLDER_NAME);
 	private static final int LOG_OPENED_WINDOW_HEIGHT = 550;
-	private static final int LOG_CLOSED_WINDOW_HEIGHT = 220;
+	private static final int LOG_CLOSED_WINDOW_HEIGHT = 230;
 	public enum Status {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
 	}
@@ -52,6 +52,8 @@ public class CollectControlPanelController implements Initializable {
 	private Pane applicationPane;
 	@FXML
 	private Button logBtn;
+	@FXML
+	private Button shutdownBtn;
 	@FXML
 	public TextArea console;
 	@FXML
@@ -158,7 +160,7 @@ public class CollectControlPanelController implements Initializable {
 		}
 	}
 
-	void shutdown() throws Exception {
+	void stop() throws Exception {
 		stopServer();
 		executorService.shutdownNow();
 	}
@@ -166,6 +168,12 @@ public class CollectControlPanelController implements Initializable {
 	@FXML
 	void openBrowserFromLink(MouseEvent event) {
 		openBrowser(0);
+	}
+
+	@FXML
+	void shutdown(MouseEvent event) throws Exception {
+		stop();
+		Platform.exit();
 	}
 	
 	void openBrowser(final long delay) {
@@ -202,6 +210,7 @@ public class CollectControlPanelController implements Initializable {
 		
 		boolean runningAtUrlVisible = false;
 		boolean errorMessageVisible = false;
+		boolean shutdownBtnVisible = false;
 		String detailedErrorMessage = null;
 		String statusMessage = null;
 		String statusMessageClassName = "info";
@@ -215,6 +224,7 @@ public class CollectControlPanelController implements Initializable {
 		case RUNNING:
 			statusMessage = "Running!";
 			runningAtUrlVisible = true;
+			shutdownBtnVisible = true;
 			break;
 		case STOPPING:
 			statusMessage = "Shutting down...";
@@ -232,6 +242,7 @@ public class CollectControlPanelController implements Initializable {
 		}
 		statusMessageClassName = status.name().toLowerCase();
 		runningAtUrlBox.setVisible(runningAtUrlVisible);
+		shutdownBtn.setVisible(shutdownBtnVisible);
 		errorMessageTxt.setText(detailedErrorMessage);
 		errorMessageTxt.setVisible(errorMessageVisible);
 		statusTxt.setText(statusMessage);

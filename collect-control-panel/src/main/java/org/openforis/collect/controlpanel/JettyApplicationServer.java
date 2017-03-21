@@ -3,6 +3,7 @@ package org.openforis.collect.controlpanel;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
@@ -73,11 +74,15 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 	
 	@Override
 	public void start() throws Exception {
-		server = new Server(port);
-		
-		registerWebapps();
-		
-		server.start();
+		if (portAvailable()) {
+			server = new Server(port);
+			
+			registerWebapps();
+			
+			server.start();
+		} else {
+			throw new RuntimeException(String.format("Port %d already in use", port));
+		}
 	}
 
 	private void initializeLogger() throws IOException {
@@ -183,7 +188,15 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 		return webapp;
 	}
 	
-	private static List<ContainerInitializer> jspInitializers() {
+	private boolean portAvailable() {
+	    try (Socket ignored = new Socket("localhost", port)) {
+	        return false;
+	    } catch (IOException ignored) {
+	        return true;
+	    }
+	}
+
+	private List<ContainerInitializer> jspInitializers() {
 		JettyJasperInitializer sci = new JettyJasperInitializer();
 		ContainerInitializer initializer = new ContainerInitializer(sci, null);
 		return Arrays.asList(initializer);
