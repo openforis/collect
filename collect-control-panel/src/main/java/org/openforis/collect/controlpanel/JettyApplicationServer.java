@@ -133,12 +133,14 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 
 	@Override
 	public void stop() throws Exception {
-		server.stop();
+		if (server != null) {
+			server.stop();
+		}
 	}
 
 	@Override
 	public boolean isRunning() {
-		return server.isRunning();
+		return server != null && server.isRunning();
 	}
 
 	@Override
