@@ -22,6 +22,7 @@
 		<module>collect-autoupdater</module>
 		<module>collect-installer</module>
 		<module>collect-updater</module>
+		<module>collect-updater-2</module>
 		<module>collect-saiku-installer</module>
 	</modules>
 
