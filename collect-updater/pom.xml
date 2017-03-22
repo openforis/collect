@@ -100,7 +100,7 @@
 							<basedir>${installer-build-path}</basedir>
 							<includes>
 								<include>${installbuilder-updater-file-name}</include>
-								<include>update.xml</include>
+								<include>${autoupdate-xml-file-name}</include>
 							</includes>
 							<regex>false</regex>
 							<replacements>

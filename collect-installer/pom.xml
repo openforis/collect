@@ -160,7 +160,7 @@
 											<version>1.4</version>
 											<type>jar</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/libs</outputDirectory>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>commons-pool</groupId>
@@ -168,7 +168,7 @@
 											<version>1.5.4</version>
 											<type>jar</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/libs</outputDirectory>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.h2database</groupId>
@@ -176,7 +176,7 @@
 											<version>1.4.193</version>
 											<type>jar</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/libs</outputDirectory>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>org.xerial</groupId>
@@ -184,7 +184,7 @@
 											<version>3.7.2</version>
 											<type>jar</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/libs</outputDirectory>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>postgresql</groupId>
@@ -192,7 +192,7 @@
 											<version>9.1-901.jdbc4</version>
 											<type>jar</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/libs</outputDirectory>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
 										</artifactItem>
 									</artifactItems>
 								</configuration>
@@ -204,7 +204,7 @@
 									<goal>copy-dependencies</goal>
 								</goals>
 								<configuration>
-									<outputDirectory>${installer-build-path}/libs</outputDirectory>
+									<outputDirectory>${installer-build-path}/lib</outputDirectory>
 									<includeScope>compile</includeScope>
 								</configuration>
 							</execution>
@@ -266,7 +266,7 @@
 								</replacement>
 								<replacement>
 									<token>UPDATE_XML_URL</token>
-									<value>${collect.update.url}</value>
+									<value>${collect.update_2.url}</value>
 								</replacement>
 								<replacement>
 									<token><![CDATA[%JRE_VERSION_FULL%]]></token>
