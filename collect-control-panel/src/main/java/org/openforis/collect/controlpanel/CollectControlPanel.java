@@ -22,19 +22,17 @@ public class CollectControlPanel extends Application {
 	}
 
 	@Override
-	public void start(Stage stage) throws Exception {
-		stage.setTitle(TITLE);
-		stage.setResizable(false);
-		InputStream logoIs = this.getClass().getClassLoader().getResourceAsStream("org/openforis/collect/controlpanel/of-collect-logo.png");
-		Image logo = new Image(logoIs);
-		stage.getIcons().add(logo);
-
+	public void start(Stage primaryStage) throws Exception {
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Pane pane = (Pane) fxmlLoader.load(getClass().getResourceAsStream(CONTROL_PANEL_FXML));
-
 		Scene scene = new Scene(pane);
-		stage.setScene(scene);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle(TITLE);
+		primaryStage.setResizable(false);
 
+		setLogo(primaryStage);
+
+		//initialize controller
 		controller = fxmlLoader.getController();
 		controller.setApp(this);
 		controller.closeLog();
@@ -42,7 +40,14 @@ public class CollectControlPanel extends Application {
 		controller.startServer(() -> {
 			controller.openBrowser(BROWSER_OPEN_DELAY);
 		});
-		stage.show();
+		
+		primaryStage.show();
+	}
+
+	private void setLogo(Stage primaryStage) {
+		InputStream logoIs = this.getClass().getClassLoader().getResourceAsStream("org/openforis/collect/controlpanel/of-collect-logo.png");
+		Image logo = new Image(logoIs);
+		primaryStage.getIcons().add(logo);
 	}
 	
 	@Override
