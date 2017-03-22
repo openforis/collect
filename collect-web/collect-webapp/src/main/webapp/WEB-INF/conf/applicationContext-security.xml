@@ -45,7 +45,8 @@
 		
 		<intercept-url access="hasRole('ADMIN')" pattern="/codelist/export/**/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/codelist/import/**/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/designer/**" />
+		<intercept-url access="hasRole('ADMIN')" pattern="/designer.htm" />
+		<intercept-url access="hasRole('ADMIN')" pattern="/editSurvey.htm" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/logoUpload" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/saiku/**/*" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/export/*" />
