@@ -145,18 +145,22 @@ public class CollectControlPanelController implements Initializable {
 	}
 
 	public void stopServer() throws Exception {
-		changeStatus(Status.STOPPING);
+		if (server == null) {
+			changeStatus(Status.ERROR);
+		} else {
+			changeStatus(Status.STOPPING);
 
-		try {
-			server.stop();
-		
-			waitUntilConditionIsVerifiedThenRun(() -> {
-				changeStatus(Status.IDLE);
-			}, () -> {
-				return server.isRunning();
-			}, 1000);
-		} catch(Exception e) {
-			handleException(e);
+			try {
+				server.stop();
+			
+				waitUntilConditionIsVerifiedThenRun(() -> {
+					changeStatus(Status.IDLE);
+				}, () -> {
+					return server.isRunning();
+				}, 1000);
+			} catch(Exception e) {
+				handleException(e);
+			}
 		}
 	}
 
@@ -258,14 +262,12 @@ public class CollectControlPanelController implements Initializable {
 	}
 
 	private void waitUntilConditionIsVerifiedThenRun(Runnable runnable, Verifier sleepConditionVerifier, int sleepInterval) {
-		executorService.schedule(() -> {
-			while (sleepConditionVerifier.verify()) {
-				try {
-					Thread.sleep(sleepInterval);
-				} catch (InterruptedException e) {}
-			}
-			Platform.runLater(runnable);
-		}, 0, TimeUnit.SECONDS);
+		while (sleepConditionVerifier.verify()) {
+			try {
+				Thread.sleep(sleepInterval);
+			} catch (InterruptedException e) {}
+		}
+		Platform.runLater(runnable);
 	}
 	
 	private Properties loadProperties() throws IOException {
