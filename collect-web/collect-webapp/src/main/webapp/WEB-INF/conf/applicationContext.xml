@@ -36,6 +36,8 @@
 	<mvc:resources mapping="/script/**" location="/script/" />
 	<mvc:resources mapping="/org/**" location="/org/" />
 	
+	<mvc:view-controller path="/" view-name="index" />
+	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
 	<bean class="org.openforis.collect.spring.handler.UrlFilenameHandlerAdapter" autowire="byName" />
@@ -43,11 +45,11 @@
 	<util:map id="urlMappings">
 		<!-- <entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
 		<entry key="/index.htm" value-ref="fileNameViewController" />
-		<entry key="/designer.htm" value-ref="fileNameViewController" />
-		<entry key="/editSurvey.htm" value-ref="fileNameViewController" />
 		<entry key="/error.htm" value-ref="fileNameViewController" />
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
+		<entry key="/designer.htm" value-ref="fileNameViewController" />
 		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
+		<entry key="/editSurvey.htm" value-ref="fileNameViewController" />
 		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
 		<entry key="/logout.htm" value-ref="fileNameViewController" />
 		<entry key="/logoUpload" value-ref="fileNameViewController" />

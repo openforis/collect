@@ -72,7 +72,7 @@ public final class Coordinate extends AbstractValue {
 	}
 	
 	public boolean isComplete() {
-		return x != null && y != null && srsId != null;
+		return x != null && y != null && srsId != null && !srsId.equals("null");
 	}
 
 	public Double getX() {

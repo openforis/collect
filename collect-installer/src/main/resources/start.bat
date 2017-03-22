@@ -1,6 +1,0 @@
-set JRE_HOME=install_directory/java
-cd "install_directory/tomcat/bin"
-echo Opening Collect into the default browser...
-start http://localhost:{TOMCAT_HTTP_PORT}/collect
-echo Starting up Tomcat...
-startup.bat

@@ -9,9 +9,9 @@ Collect.DataManager.MapPanelComposer = function(panel) {
 	this.verticalPadding = 220;
 	this.horizontalPadding = 50;
 	
-	this.startLat = 12.1;
-	this.startLon = 41.5;
-	this.startZoom = 3;
+	this.startLat = 30;
+	this.startLon = 0;
+	this.startZoom = 4;
 }
 
 Collect.DataManager.MapPanelComposer.prototype.init = function(onComplete) {
@@ -81,7 +81,8 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			surveysOverlayGroup
 		],
 		view : new ol.View({
-			center : ol.proj.fromLonLat([ $this.startLat, $this.startLon ]),
+			projection: 'EPSG:4326',
+			center : [$this.startLon, $this.startLat],
 			zoom : $this.startZoom
 		}),
 		overlays : [ $this.overlay ],
@@ -102,7 +103,7 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			
 			switch (feature.get('type')) {
 			case 'sampling_point':
-				var lonLat = ol.proj.toLonLat([coordinate[0], coordinate[1]]);
+				var lonLat = coordinate;
 				var keyDefs = survey.getRooEntityKeyDefinitions();
 				function printLevelCodes(levelCodes) {
 					var result = "";
@@ -127,36 +128,15 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 				break;
 			case 'coordinate_attribute_value':
 				var point = feature.get('point');
-				//project coordinate from Web Marcator to lat lon
-				var lonLat = ol.proj.toLonLat([point.x, point.y]);
-				
-				htmlContent = OF.Strings.format("<b>{0}</b>"
-					+ "<br>"
-					+ "<b>Record</b>: {1}"
-					+ "<br>"
-					+ "Latitude: {2}" 
-					+ "<br>"
-					+ "Longitude: {3}"
-					+ "<br>" 
-					+ "{4}"
-					+ "<br>"
-					+ "Phase: {5}"
-					+ "<br>" 
-					+ "<a href=\"javascript:void(0);\" "
-					+ "onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({6}, {7}, '{8}')\">Edit</a>"
-				, survey.getDefinition(point.attrDefId).label
-				, point.recKeys
-				, lonLat[1]
-				, lonLat[0]
-				, (isNaN(point.distance) ? "" : "Distance to expected location: " +
-						Math.round(point.distance) + "m")
-				, point.recStep
-				, survey.id
-				, point.recId
-				, point.recKeys);
+				htmlContent = $this.createNodeInfoBalloon(survey, point);
 				break;
 			}
 			$this.popupContent.html(htmlContent);
+			$this.popupContent.find(".accordion").accordion({heightStyle: "content", animate: 0});
+			$this.popupContent.find(".data.info-icon-button").tooltip({
+				html: true,
+				title: 'In order to show or hide an attribute, use the \"Show in Map balloon\" option in the Survey Designer'
+			});
 			$this.overlay.setPosition(coordinate);
 		}
 	};
@@ -180,10 +160,66 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 	}
 }
 
+Collect.DataManager.MapPanelComposer.prototype.createNodeInfoBalloon = function(survey, nodeInfo) {
+	var lonLat = [nodeInfo.x, nodeInfo.y];
+	
+	var dynamicPart = "";
+	var data = nodeInfo.recordData;
+	data.forEach(function(item) {
+		var def = survey.getDefinition(item.definitionId);
+		dynamicPart += "<label>" + def.label + "</label>: " + (item.value == null ? "-": item.value);
+		dynamicPart += "<br/>";
+	});
+
+	var result = OF.Strings.format(
+		"<b>{0}</b>"
+		+ "<br>"
+		+ "<label>Record</label>: {1}"
+		+ "<br>"
+		+ "<label>Phase</label>: {2}"
+		+ "<br>"
+		+ "<div class='accordion' style='width: 300px; height: 200px; padding: 0.5em'>"
+		+ "   <h3>"
+		+ "     <span>Data</span>"
+		+ "     <span class='data info-icon-button' style='float: right;' />"
+		+ "   </h3>"
+		+ "   <div style='min-height: 135px; max-height: 135px; overflow-y: auto; padding: 0.5em'>"
+		+ "      <p>{3}</p>"
+		+ "   </div>"
+		+ "   <h3>Location</h3>"
+		+ "   <div style='min-height: 135px; padding: 0.5em'>"
+		+ "      <p>"
+		+ "         <label>Latitude:</label> {4}" 
+		+ "         <br>"
+		+ "         <label>Longitude</label>: {5}"
+		+ "         <br>" 
+		+ "         {6}"
+		+ "      </p>"
+		+ "   </div>"
+		+ "</div>"
+		+ "<br>" 
+		+ "<a href=\"javascript:void(0);\" "
+		+ "onclick=\"Collect.DataManager.MapPanelComposer.openRecordEditPopUp({7}, {8}, '{9}')\">Edit Record</a>"
+		+ "</div>"
+	, survey.getDefinition(nodeInfo.attrDefId).label
+	, nodeInfo.recKeys
+	, nodeInfo.recStep
+	, dynamicPart
+	, lonLat[1]
+	, lonLat[0]
+	, (isNaN(nodeInfo.distance) ? "" : "<label>Dist. to expected loc.</label>: " +
+			Math.round(nodeInfo.distance) + "m")
+	, survey.id
+	, nodeInfo.recId
+	, nodeInfo.recKeys);
+	
+	return result;
+};
+
 Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function(survey) {
 	var $this = this;
 	
-	var coordinateDataLayers = new Array();
+	var dataLayers = new Array();
 	survey.traverse(function(nodeDef) {
 		if (nodeDef.type == 'ATTRIBUTE' && nodeDef.attributeType == 'COORDINATE') {
 			var dataLayer = new ol.layer.Vector({
@@ -195,7 +231,18 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				source : null,
 				style : $this.coordinateAttributeLayerStyleFunction
 			});
-			coordinateDataLayers.push(dataLayer);
+			dataLayers.push(dataLayer);
+		} else if (nodeDef.type == 'ATTRIBUTE' && nodeDef.geometry) {
+			var dataLayer = new ol.layer.Vector({
+				title : OF.Strings.firstNotBlank(nodeDef.label, nodeDef.name),
+				visible : false,
+				type : 'geometry_data',
+				survey : survey,
+				attribute_def : nodeDef,
+				source : null,
+				style : $this.geometryLayerStyleFunction
+			});
+			dataLayers.push(dataLayer);
 		}
 	});
 
@@ -204,7 +251,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 		layers : [
 			new ol.layer.Group({
 				title : 'Data',
-				layers : coordinateDataLayers
+				layers : dataLayers
 			}),
 			new ol.layer.Vector({
 				title : 'Sampling Points',
@@ -234,7 +281,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 	surveyGroup.getLayers().forEach(function(layer) {
 		bindLayerEventListeners(layer);
 	});
-	coordinateDataLayers.forEach(function(layer) {
+	dataLayers.forEach(function(layer) {
 		bindLayerEventListeners(layer);
 	});
 
@@ -265,6 +312,46 @@ Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunc
 		})
 	});
 	return [style];
+};
+
+Collect.DataManager.MapPanelComposer.prototype.geometryLayerStyleFunction = function(feature) {
+	var $this = this;
+	
+	var survey = feature.get("survey");
+	var lineColor = $this.stringToColor(survey.name);
+	
+	var styles = [
+		/* We are using two different styles for the polygons:
+		 *  - The first style is for the polygons themselves.
+		 *  - The second style is to draw the vertices of the polygons.
+		 *    In a custom `geometry` function the vertices of a polygon are
+		 *    returned as `MultiPoint` geometry, which will be used to render
+		 *    the style.
+		 */
+		new ol.style.Style({
+			stroke : new ol.style.Stroke({
+				color : lineColor,
+				width : 3
+			}),
+			fill : new ol.style.Fill({
+				color : [0,0,0,0]
+			})
+		}),
+		new ol.style.Style({
+			image : new ol.style.Circle({
+				radius : 5,
+				fill : new ol.style.Fill({
+					color : lineColor
+				})
+			}),
+			geometry : function(feature) {
+				// return the coordinates of the first ring of the polygon
+				var coordinates = feature.getGeometry().getCoordinates()[0];
+				return new ol.geom.MultiPoint(coordinates);
+			}
+		})
+	];
+	return styles;
 };
 
 Collect.DataManager.MapPanelComposer.prototype.createBaseMapsLayer = function() {
@@ -339,6 +426,15 @@ Collect.DataManager.MapPanelComposer.prototype.onTileVisibleChange = function(ev
 					$this.zoomToLayer(tile);
 				});
 				break;
+			case 'geometry_data':
+				var attributeDef = tile.get('attribute_def');
+				
+				$this.createGeometryDataSource(survey, attributeDef, function(source) {
+					tile.setSource(source);
+				}, function(source) {
+					$this.zoomToLayer(tile);
+				});
+				break;
 			}
 		} else {
 			$this.zoomToLayer(tile);
@@ -391,6 +487,89 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 	onReady();
 };
 
+Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = function(survey, attributeDef, callback, readyCallback) {
+	var rootEntityDefinitionId = survey.getMainRootEntity().id;
+	
+	var source = new ol.source.Vector();
+	
+	collect.dataService.countRecords(survey.id, rootEntityDefinitionId, function(recordCount) {
+		if (recordCount == 0) {
+			return;
+		}
+		var batchSize = 200;
+		var maxProcessableItems = 1000 * 1000 * 1000;
+		var totalItems = Math.min(recordCount, maxProcessableItems);
+
+		var jobDialog = new OF.UI.JobDialog();
+
+		var startTime = new Date().getTime();
+
+		var extractVerticesFromKml = function(polygonKml) {
+			var kmlDoc = $.parseXML(polygonKml);
+			var $kml = $(kmlDoc)
+			var $coordinatesStrEl = $kml.find("coordinates");
+			var coordinatesStr = $coordinatesStrEl[0].textContent;
+			var coordinates = coordinatesStr.split('\n');
+			
+			var vertices = new Array();
+			coordinates.forEach(function(lonLatStr) {
+				if (lonLatStr != null && lonLatStr != '') {
+					var lonLatArr = lonLatStr.split(',');
+					vertices.push(lonLatArr);
+				}
+			});
+			return vertices;
+		}
+		
+		var processGeometry = function(nodeInfo) {
+			var vertices = extractVerticesFromKml(nodeInfo.geometry);
+			
+			var polygon = new ol.geom.Polygon([vertices]);
+			
+			var polygonFeature = new ol.Feature({
+				survey : survey,
+				geometry: polygon
+			});
+			source.addFeature(polygonFeature);
+		};
+
+		var processGeometries = function(geometries) {
+			for (i = 0; i < geometries.length; i++) {
+				processGeometry(geometries[i]);
+			}
+			
+			callback(source);
+			
+			if (batchProcessor.progressPercent == 100) {
+				jobDialog.close();
+				readyCallback(source);
+			} else {
+				var fakeProgressJob = {
+					status : "RUNNING",
+					elapsedTime : new Date().getTime() - startTime,
+					remainingMinutes : 0,
+					progressPercent : batchProcessor.progressPercent
+				};
+				jobDialog.updateUI(fakeProgressJob);
+				batchProcessor.processNext();
+			}
+		};
+
+		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset) {
+			var srsId = 'EPSG:4326';
+			collect.geoDataService.loadGeometryValues(survey.id, attributeDef.id, 
+					srsId, blockOffset, batchSize, processGeometries);
+		}, 500);
+
+		jobDialog.cancelBtn.click(function() {
+			batchProcessor.stop();
+			jobDialog.close();
+		});
+
+		batchProcessor.start();
+	});
+};
+
 Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = function(survey, coordinateAttributeDef, callback, readyCallback) {
 	var rootEntityDefinitionId = survey.rootEntities[0].id;
 	
@@ -410,14 +589,12 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 
 		var processCoordinateValue = function(coordinateAttributePoint) {
 			var xyCoord = [ coordinateAttributePoint.x, coordinateAttributePoint.y ];
-			//var webMarcatorXY = ol.proj.fromLonLat(xyCoord);
-			var webMarcatorXY = xyCoord;
 			
 			var coordinateFeature = new ol.Feature({
 				type : "coordinate_attribute_value",
 				point : coordinateAttributePoint,
 				survey : survey,
-				geometry : new ol.geom.Point(webMarcatorXY, 'XY')
+				geometry : new ol.geom.Point(xyCoord, 'XY')
 			});
 			source.addFeature(coordinateFeature);
 		};
@@ -445,7 +622,7 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		};
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset) {
-			var srsId = 'EPSG:3857'; //web marcator srs
+			var srsId = 'EPSG:4326';
 			collect.geoDataService.loadCoordinateValues(survey.id, coordinateAttributeDef.id, 
 					srsId, blockOffset, batchSize, processCoordinateValues);
 		}, 500);
@@ -458,6 +635,18 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		batchProcessor.start();
 	});
 };
+
+function intToRGB(i) {
+	var c = (i & 0x00FFFFFF)
+		.toString(16)
+		.toLowerCase();
+
+	return "00000".substring(0, 6 - c.length) + c;
+}
+
+function stringToColor(s) {
+	return "#" + this.intToRGB(OF.Strings.hashCode(s));
+}
 
 function getRandomColor(minimum, maximum) {
 	if (! min) {

@@ -52,6 +52,8 @@ public class CollectAnnotations {
 		TEXT_INPUT(new QName(COLLECT_NAMESPACE_URI, "textInput"), TextInput.KEYBOARD),
 		TARGET(new QName(COLLECT_NAMESPACE_URI, "target"), SurveyTarget.COLLECT_DESKTOP),
 		COLLECT_VERSION(new QName(COLLECT_NAMESPACE_URI, "collectVersion"), "3.4.0"),
+		GEOMETRY(new QName(COLLECT_NAMESPACE_URI, "geometry"), false),
+		SHOW_IN_MAP_BALLOON(new QName(COLLECT_NAMESPACE_URI, "showInMapBalloon"), true),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -77,7 +79,7 @@ public class CollectAnnotations {
 		LABEL_WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_WIDTH)),
 		LABEL_ORIENTATION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_ORIENTATION), Orientation.HORIZONTAL),
 		AUTO_UPPERCASE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTO_UPPERCASE), false),
-		
+
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
 		COLLECT_EARTH_HIDE_IN_RECORD_LIST(new QName(COLLECT_EARTH_NAMESPACE_URI, "hideinrecordlist"), false),
@@ -93,7 +95,7 @@ public class CollectAnnotations {
 		COLLECT_EARTH_OPEN_STREET_VIEW(new QName(COLLECT_EARTH_NAMESPACE_URI, "openStreetView"), false),
 		
 		//Collect Mobile
-		COLLECT_MOBILE_ALLOW_ONLY_DEVICE_COORDINATE(new QName(COLLECT_MOBILE_NAMESPACE_URI, "allowOnlyDeviceCoordinate"), false)
+		COLLECT_MOBILE_ALLOW_ONLY_DEVICE_COORDINATE(new QName(COLLECT_MOBILE_NAMESPACE_URI, "allowOnlyDeviceCoordinate"), false), 
 		;
 		
 		private QName qName;
@@ -329,6 +331,22 @@ public class CollectAnnotations {
 	
 	public void setTextInput(TextAttributeDefinition def, TextInput textInput) {
 		setAnnotationValue(def, Annotation.TEXT_INPUT, textInput);
+	}
+	
+	public boolean isGeometry(TextAttributeDefinition def) {
+		return getAnnotationBooleanValue(def, Annotation.GEOMETRY);
+	}
+
+	public void setGeometry(TextAttributeDefinition def, boolean geometry) {
+		setAnnotationValue(def, Annotation.GEOMETRY, geometry);
+	}
+	
+	public boolean isShowInMapBalloon(AttributeDefinition def) {
+		return getAnnotationBooleanValue(def, Annotation.SHOW_IN_MAP_BALLOON);
+	}
+	
+	public void setShowInMapBalloon(AttributeDefinition def, boolean showInMapBalloon) {
+		setAnnotationValue(def, Annotation.SHOW_IN_MAP_BALLOON, showInMapBalloon);
 	}
 
 	private <T extends Enum<T>> Enum<T> getAnnotationEnumValue(AttributeDefinition def, Annotation annotation, Class<T> enumType) {

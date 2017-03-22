@@ -1,0 +1,30 @@
+<installerInformation>
+	<versionId>VERSION_ID</versionId>
+	<platformFileList>
+		<platformFile>
+			<filename>collect-updater-2-PROJECT_VERSION-windows.exe</filename>
+			<platform>windows</platform>
+		</platformFile>
+		<platformFile>
+			<filename>collect-updater-2-PROJECT_VERSION-windows.exe</filename>
+			<platform>windows-x64</platform>
+		</platformFile>
+		<platformFile>
+			<filename>collect-updater-2-PROJECT_VERSION-linux.run</filename>
+			<platform>linux</platform>
+		</platformFile>
+		<platformFile>
+			<filename>collect-updater-2-PROJECT_VERSION-linux.run</filename>
+			<platform>linux-x64</platform>
+		</platformFile>
+		<platformFile>
+			<filename>collect-updater-2-PROJECT_VERSION-osx.dmg</filename>
+			<platform>osx</platform>
+		</platformFile>
+	</platformFileList>
+	<downloadLocationList>
+		<downloadLocation>
+			<url>http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-updater-2/PROJECT_VERSION/</url>
+		</downloadLocation>
+	</downloadLocationList>
+</installerInformation>

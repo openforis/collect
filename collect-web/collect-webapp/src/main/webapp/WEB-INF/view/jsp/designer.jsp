@@ -4,7 +4,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<title>Opern Foris Collect - Survey Designer</title>
+	<title>Open Foris Collect - Survey Designer</title>
 </head>
 <body>
 	<jsp:forward page="/WEB-INF/view/zul/designer/survey_select.zul" />

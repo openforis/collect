@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.22-SNAPSHOT</version>
+		<version>3.12.26-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-updater</artifactId>
 	<packaging>pom</packaging>
@@ -100,7 +100,7 @@
 							<basedir>${installer-build-path}</basedir>
 							<includes>
 								<include>${installbuilder-updater-file-name}</include>
-								<include>update.xml</include>
+								<include>${autoupdate-xml-file-name}</include>
 							</includes>
 							<regex>false</regex>
 							<replacements>

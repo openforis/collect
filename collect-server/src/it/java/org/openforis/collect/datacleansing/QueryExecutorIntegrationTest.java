@@ -22,6 +22,7 @@ import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -66,14 +67,9 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 		final List<Node<?>> nodes = new ArrayList<Node<?>>();
 		DataQueryExecutorJob job = jobManager.createJob(DataQueryExecutorJob.class);
 		DataQueryExecutorJobInput input = new DataQueryExecutorJobInput(query, Step.ENTRY, new NodeProcessor() {
-			@Override
-			public void init() throws Exception {}
-			@Override
 			public void process(Node<?> node) {
 				nodes.add(node);
 			}
-			@Override
-			public void close() throws IOException {}
 		});
 		job.setInput(input);
 		jobManager.start(job, false);

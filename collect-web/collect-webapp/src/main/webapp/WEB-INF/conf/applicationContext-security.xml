@@ -44,7 +44,7 @@
 		<intercept-url access="permitAll" pattern="/uploadFile.htm" />
 		
 		<intercept-url access="hasRole('ROLE_USER') or hasIpAddress('127.0.0.1')" pattern="/command/**" />
-		
+
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/export/**/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/import/**/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/designer.htm" />

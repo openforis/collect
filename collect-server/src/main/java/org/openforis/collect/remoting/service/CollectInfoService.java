@@ -13,6 +13,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.openforis.collect.Collect;
 import org.openforis.collect.CollectInfo;
+import org.openforis.collect.CollectInternalInfo;
+import org.openforis.collect.CollectCompleteInfo;
 import org.openforis.commons.versioning.Version;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -29,12 +31,16 @@ public class CollectInfoService {
 		return new CollectInfo();
 	}
 	
-	public CollectInfo getCompleteInfo() {
+	public CollectCompleteInfo getCompleteInfo() {
 		Version latestRelease = latestRelease();
 		Version currentVersion = Collect.VERSION;
-		return new CollectInfo(currentVersion, latestRelease);
+		return new CollectCompleteInfo(currentVersion, latestRelease);
 	}
 	
+	public CollectInternalInfo getInternalInfo() {
+		return new CollectInternalInfo();
+	}
+
 	public Version latestRelease() {
 		try {
 			CloseableHttpClient client = HttpClients.createDefault();

@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.web.controller;
 
+import org.openforis.collect.CollectCompleteInfo;
 import org.openforis.collect.CollectInfo;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.remoting.service.CollectInfoService;
@@ -35,7 +36,7 @@ public class CollectController extends BasicController {
 	}
 	
 	@RequestMapping(value = "/complete-info.json", method = RequestMethod.GET)
-	public @ResponseBody CollectInfo completeInfo() {
+	public @ResponseBody CollectCompleteInfo completeInfo() {
 		return infoService.getCompleteInfo();
 	}
 	

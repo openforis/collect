@@ -5,11 +5,12 @@ import java.sql.SQLException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 public abstract class DbUtils {
 	
-	public static final String DB_JNDI_RESOURCE_NAME = "java:comp/env/jdbc/collectDs";
+	public static final String DB_JNDI_RESOURCE_NAME = "jdbc/collectDs";
 	public static final String SCHEMA_NAME = "collect";
 	
 	public static Connection getConnection() {
@@ -23,12 +24,23 @@ public abstract class DbUtils {
 
 	public static DataSource getDataSource() {
 		try {
-			Context initialContext = new InitialContext();
-			DataSource datasource = (DataSource) initialContext.lookup(DbUtils.DB_JNDI_RESOURCE_NAME);
-			return datasource;
+			DataSource ds;
+			Context initCtx = new InitialContext();
+			try {
+				ds = lookupDataSource(initCtx);
+			} catch (NamingException e) {
+				//try to look for data source in Environment Context
+				Context envCtx = (Context) initCtx.lookup("java:comp/env");
+				ds = lookupDataSource(envCtx);
+			}
+			return ds;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static DataSource lookupDataSource(Context ctx) throws NamingException {
+		return (DataSource) ctx.lookup(DbUtils.DB_JNDI_RESOURCE_NAME);
 	}
 
 	public static void closeQuietly(Connection conn) {

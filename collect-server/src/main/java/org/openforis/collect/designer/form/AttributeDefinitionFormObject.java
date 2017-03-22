@@ -36,6 +36,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	private boolean editable;
 	private List<Check<?>> checks;
 	private String[] visibleFields;
+	private boolean showInMapBalloon;
 
 	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -62,6 +63,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		annotations.setPhaseToApplyDefaultValue(dest, Step.valueOf(phaseToApplyDefaultValue));
 		annotations.setEditable(dest, editable);
 		annotations.setMeasurementAttribute(dest, measurement);
+		annotations.setShowInMapBalloon(dest, showInMapBalloon);
 
 		// save checks
 		dest.removeAllChecks();
@@ -89,6 +91,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue(source).name();
 		editable = annotations.isEditable(source);
 		measurement = annotations.isMeasurementAttribute(source);
+		showInMapBalloon = annotations.isShowInMapBalloon(source);
 		
 		checks = new ArrayList<Check<?>>(source.getChecks());
 
@@ -129,6 +132,14 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 
 	public void setEditable(boolean editable) {
 		this.editable = editable;
+	}
+	
+	public boolean isShowInMapBalloon() {
+		return showInMapBalloon;
+	}
+	
+	public void setShowInMapBalloon(boolean showInMapBalloon) {
+		this.showInMapBalloon = showInMapBalloon;
 	}
 
 	public List<Check<?>> getChecks() {

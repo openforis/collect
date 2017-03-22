@@ -14,8 +14,8 @@
 			<folderList>
 				<folder>
 					<name>webapps</name>
-					<description>Tomcat Webapps</description>
-					<destination>../tomcat/webapps</destination>
+					<description>Webapps</description>
+					<destination>${webapps_dir}</destination>
 					<platforms>all</platforms>
 					<distributionFileList>
 						<distributionFile>
@@ -27,10 +27,10 @@
 			<postInstallationActionList>
 				<!-- Delete Collect temporary files (if the previous delete has not been fully completed) -->
 		        <deleteFile>
-		  			<path>../tomcat/webapps/collect</path>
+		  			<path>${webapps_dir}/collect</path>
 					<abortOnError>1</abortOnError>
 					<showMessageOnError>1</showMessageOnError>
-					<customErrorMessage>Cannot delete the folder "opt/openforis/collect/tomcat/webapps/collect": 
+					<customErrorMessage>Cannot delete the folder "${webapps_dir}/collect": 
 						please shutdown Collect, delete it and try to run again the updater.</customErrorMessage>
 		  		</deleteFile>
 				<writeFile>
@@ -45,66 +45,64 @@ check_for_updates = 1</text>
 		</component>
 	</componentList>
     <preInstallationActionList>
-    	<setInstallerVariable name="tomcat_http_port" value="8080"/>
+        <createTimeStamp>
+			<variable>timestamp</variable>
+			<format>%Y%m%d%H%M%S</format>
+		</createTimeStamp>
+    	<setInstallerVariable name="server_http_port" 
+    			value="8080"/>
+    	<setInstallerVariable name="backup_dir" 
+				value="../tomcat/backup/${timestamp}" />
+		<setInstallerVariable name="data_dir" 
+				value="../tomcat/data" />
+    	<setInstallerVariable name="webapps_dir" 
+    			value="../tomcat/webapps"/>
     	<propertiesFileGet>
 		   <file>../collect.properties</file>
 		   <key>tomcat_http_port</key>
-		   <variable>tomcat_http_port</variable>
+		   <variable>server_http_port</variable>
 		   <showMessageOnError>0</showMessageOnError>
 		   <abortOnError>0</abortOnError>
 		</propertiesFileGet>
 		<throwError>
 			<explanation>Open Foris Collect is running</explanation>
-			<text>Open Foris Collect is running. Shutdown Collect before updating it.</text>
+			<text>Open Foris Collect is running on port ${server_http_port}. Shutdown Collect before updating it.</text>
 			<ruleList>
 				<portTest>
 					<condition>cannot_bind</condition>
-					<port>${tomcat_http_port}</port>
+					<port>${server_http_port}</port>
 				</portTest>
 			</ruleList>
         </throwError>
-        <createTimeStamp>
-			<variable>timestamp</variable>
-			<format>%Y%m%d%H%M%S</format>
-		</createTimeStamp>
 	</preInstallationActionList>
 	<readyToInstallActionList>
-		<!-- Backup old data and webapp -->
 		<createDirectory>
-			<path>../backup/${timestamp}</path>
+			<path>${backup_dir}</path>
 		</createDirectory>
-		<copyFile>
-			<origin>../tomcat/webapps/collect.war</origin>
-			<destination>../backup/${timestamp}/collect.war</destination>
-			<abortOnError>0</abortOnError>
-			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
-        <copyFile>
-			<origin>../data/collect.db</origin>
-			<destination>../backup/${timestamp}/collect.db</destination>
-			<abortOnError>0</abortOnError>
-			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
+		<!-- Backup old data and webapp -->
         <copyFile>
 			<origin>../tomcat/conf/Catalina/localhost/collect.xml</origin>
-			<destination>../backup/${timestamp}/collect.xml</destination>
+			<destination>${backup_dir}/collect.xml</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
         </copyFile>
-        <!-- For backwards compatibility (data was stored under tomcat folder) -->
         <copyFile>
-			<origin>../tomcat/data/collect.db</origin>
-			<destination>../backup/${timestamp}/collect.db</destination>
+			<origin>${data_dir}/collect.db</origin>
+			<destination>${backup_dir}/collect.db</destination>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+        </copyFile>
+		<copyFile>
+			<origin>${webapps_dir}/collect.war</origin>
+			<destination>${backup_dir}/collect.war</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
         </copyFile>
         <!-- Delete temporary files -->
         <deleteFile>
-  			<path>../tomcat/webapps/collect</path>
-			<abortOnError>1</abortOnError>
-			<showMessageOnError>1</showMessageOnError>
-			<customErrorMessage>Cannot delete the folder "opt/openforis/collect/tomcat/webapps/collect": 
-				please shutdown Collect, delete it and try to run again the updater.</customErrorMessage>
+  			<path>${webapps_dir}/collect</path>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
   		</deleteFile>
 	</readyToInstallActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>

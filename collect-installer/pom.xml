@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.22-SNAPSHOT</version>
+		<version>3.12.26-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
@@ -33,7 +33,7 @@
 			<id>installer</id>
 			<build>
 				<plugins>
-					<!-- 1. extract jre and collect-assembly into build folder  -->
+					<!-- 1. extract jre into build folder, copy autoupdater and contolpanel  -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
@@ -92,19 +92,11 @@
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
 										</artifactItem>
-										<artifactItem>
-											<groupId>org.openforis.collect</groupId>
-											<artifactId>collect-assembly</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/</outputDirectory>
-										</artifactItem>
 									</artifactItems>
 								</configuration>
 							</execution>
 							<execution>
-								<id>copy-autoupdater</id>
+								<id>copy-artifacts</id>
 								<phase>process-sources</phase>
 								<goals>
 									<goal>copy</goal>
@@ -141,7 +133,79 @@
 											<outputDirectory>${installer-build-path}</outputDirectory>
 											<destFileName>${osx-autoupdater-file-name}</destFileName>
 										</artifactItem>
+										<!-- Collect WebApp -->
+										<artifactItem>
+											<groupId>org.openforis.collect</groupId>
+											<artifactId>collect-webapp-jetty</artifactId>
+											<version>${project.version}</version>
+											<type>war</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/webapps</outputDirectory>
+											<destFileName>collect.war</destFileName>
+										</artifactItem>
+										<!-- Saiku WebApp -->
+										<artifactItem>
+											<groupId>meteorite.bi</groupId>
+											<artifactId>saiku-webapp-full</artifactId>
+											<version>2.6</version>
+											<type>war</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/webapps</outputDirectory>
+											<destFileName>saiku.war</destFileName>
+										</artifactItem>
+										<!-- Libraries -->
+										<artifactItem>
+											<groupId>commons-dbcp</groupId>
+											<artifactId>commons-dbcp</artifactId>
+											<version>1.4</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>commons-pool</groupId>
+											<artifactId>commons-pool</artifactId>
+											<version>1.5.4</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.h2database</groupId>
+											<artifactId>h2</artifactId>
+											<version>1.4.193</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.xerial</groupId>
+											<artifactId>sqlite-jdbc</artifactId>
+											<version>3.7.2</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>postgresql</groupId>
+											<artifactId>postgresql</artifactId>
+											<version>9.1-901.jdbc4</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
 									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>copy-control-panel-dependencies</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${installer-build-path}/lib</outputDirectory>
+									<includeScope>compile</includeScope>
 								</configuration>
 							</execution>
 						</executions>
@@ -202,7 +266,7 @@
 								</replacement>
 								<replacement>
 									<token>UPDATE_XML_URL</token>
-									<value>${collect.update.url}</value>
+									<value>${collect.update_2.url}</value>
 								</replacement>
 								<replacement>
 									<token><![CDATA[%JRE_VERSION_FULL%]]></token>
@@ -337,5 +401,12 @@
 			</build>
 		</profile>
 	</profiles>
-
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.openforis.collect</groupId>
+			<artifactId>collect-control-panel</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>

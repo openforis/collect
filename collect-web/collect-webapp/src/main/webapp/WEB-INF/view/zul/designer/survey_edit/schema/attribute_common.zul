@@ -13,6 +13,28 @@
 		otherLabelsForm="${otherLabelsForm}"
 		otherLayoutForm="${otherLayoutForm}" />
 
+	<groupbox width="100%" closable="false" class="tableFieldSet">
+		<caption label="${labels.survey.schema.attribute.map_options.caption}" />
+		<grid class="inner">
+	  		<columns>
+	  			<column width="150px" />
+	  			<column />
+	  		</columns>
+	  		<rows>
+	  			<row>
+	  				<fieldErrorHandler message="@load(vmsgs['showInMapBalloon'])">
+		  				<label value="${labels.survey.schema.attribute.show_in_map_balloon}:" />
+		  			</fieldErrorHandler>
+	  				<fieldErrorHandler message="@load(vmsgs['showInMapBalloon'])">
+	  					<checkbox
+		  						checked="@bind(fx.showInMapBalloon)"
+		  						onCheck="@command('applyChanges')" />
+	  				</fieldErrorHandler>
+	  			</row>
+	  		</rows>
+		</grid>
+	</groupbox>
+
 	<fieldErrorHandler message="@load(vmsgs['attributeDefaults'])">
 		<groupbox width="100%" closable="false" class="tableFieldSet">
 			<caption>

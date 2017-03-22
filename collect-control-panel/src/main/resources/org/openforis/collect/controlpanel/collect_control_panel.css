@@ -1,0 +1,46 @@
+.main-pane {
+	-fx-alignment: top_center;
+	-fx-spacing: 1em;
+}
+
+.menu-bar {
+    -fx-background-color: #aeb5ba, linear-gradient(to bottom, #ecf4fa 0%, #ced4d9 100%);
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.menu-bar .menu .label {
+    -fx-text-fill: #2d3e4c;
+}
+
+.message {
+}
+
+#statusTxt {
+	-fx-font-size: 2em;
+}
+
+#statusTxt.initializing, 
+#statusTxt.starting, 
+#statusTxt.stopping {
+	-fx-fill: orange;
+}
+
+#statusTxt.running {
+	-fx-fill: green;
+}
+
+#statusTxt.error {
+	-fx-fill: red;
+}
+
+#errorMessageTxt {
+	-fx-fill: red;
+}
+
+Label {
+	-fx-font-size: 1em;
+}
+
+#urlHyperlink {
+	-fx-font-size: 1.5em;
+}
