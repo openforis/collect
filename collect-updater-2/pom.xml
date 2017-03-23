@@ -18,6 +18,7 @@
 		<!-- updater file names -->
 		<windows-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-windows-installer.exe</windows-updater-file-name>
 		<linux-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-installer.run</linux-updater-file-name>
+		<linux-x64-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-x64-installer.run</linux-x64-updater-file-name>
 		<osx-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-osx-installer.dmg</osx-updater-file-name>
 	</properties>
 	
@@ -142,6 +143,22 @@
 									</arguments>
 								</configuration>
 							</execution>
+							<!-- Linux -->
+							<execution>
+								<id>linux-x64-installer</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder-home}/bin/builder</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
+										<argument>linux-x64</argument>
+									</arguments>
+								</configuration>
+							</execution>
 							<!-- Windows -->
 							<execution>
 								<id>windows-installer</id>
@@ -190,9 +207,14 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/output/${windows-updater-file-name}" tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-updater-file-name}" tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${osx-updater-file-name}" tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${windows-updater-file-name}" 
+											tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${linux-updater-file-name}" 
+											tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${linux-x64-updater-file-name}" 
+											tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${osx-updater-file-name}" 
+											tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
 									</tasks>
 								</configuration>
 							</execution>
@@ -220,6 +242,11 @@
 					                    <artifact>
 					                        <file>${project.build.directory}/${linux-updater-file-name}</file>
 					                        <classifier>linux</classifier>
+					                        <type>run</type>
+					                    </artifact>
+					                    <artifact>
+					                        <file>${project.build.directory}/${linux-x64-updater-file-name}</file>
+					                        <classifier>linux-x64</classifier>
 					                        <type>run</type>
 					                    </artifact>
 					                    <artifact>

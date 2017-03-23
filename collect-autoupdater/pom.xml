@@ -18,6 +18,7 @@
 		<!-- autoupdate file names -->
 		<windows-autoupdater-file-name>autoupdate-windows.exe</windows-autoupdater-file-name>
 		<linux-autoupdater-file-name>autoupdate-linux.run</linux-autoupdater-file-name>
+		<linux-x64-autoupdater-file-name>autoupdate-linux-x64.run</linux-x64-autoupdater-file-name>
 		<osx-autoupdater-file-name>autoupdate-osx.app.zip</osx-autoupdater-file-name>
 	</properties>
 
@@ -108,6 +109,22 @@
 									</arguments>
 								</configuration>
 							</execution>
+							<!-- Linux x64 Autoupdater -->
+							<execution>
+								<id>linux-x64-autoupdater</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder-home}/autoupdate/bin/customize.run</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-autoupdate-configuration-file-name}</argument>
+										<argument>linux-x64</argument>
+									</arguments>
+								</configuration>
+							</execution>
 							<!-- Windows Autoupdater -->
 							<execution>
 								<id>windows-autoupdater</id>
@@ -156,9 +173,14 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/autoupdate/output/${linux-autoupdater-file-name}" tofile="${project.build.directory}/${linux-autoupdater-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/autoupdate/output/${windows-autoupdater-file-name}" tofile="${project.build.directory}/${windows-autoupdater-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/autoupdate/output/${osx-autoupdater-file-name}" tofile="${project.build.directory}/${osx-autoupdater-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/autoupdate/output/${linux-autoupdater-file-name}" 
+											tofile="${project.build.directory}/${linux-autoupdater-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/autoupdate/output/${linux-x64-autoupdater-file-name}" 
+											tofile="${project.build.directory}/${linux-x64-autoupdater-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/autoupdate/output/${windows-autoupdater-file-name}" 
+											tofile="${project.build.directory}/${windows-autoupdater-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/autoupdate/output/${osx-autoupdater-file-name}" 
+											tofile="${project.build.directory}/${osx-autoupdater-file-name}" failonerror="true" />
 									</tasks>
 								</configuration>
 							</execution>
@@ -186,6 +208,11 @@
 										<artifact>
 											<file>${project.build.directory}/${linux-autoupdater-file-name}</file>
 											<classifier>linux</classifier>
+											<type>run</type>
+										</artifact>
+										<artifact>
+											<file>${project.build.directory}/${linux-x64-autoupdater-file-name}</file>
+											<classifier>linux-x64</classifier>
 											<type>run</type>
 										</artifact>
 										<artifact>

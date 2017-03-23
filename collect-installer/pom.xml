@@ -21,10 +21,12 @@
 		<!-- installer file names -->
 		<windows-installer-file-name>OpenForisCollect-${installer-version-id}-windows-installer.exe</windows-installer-file-name>
 		<linux-installer-file-name>OpenForisCollect-${installer-version-id}-linux-installer.run</linux-installer-file-name>
+		<linux-x64-installer-file-name>OpenForisCollect-${installer-version-id}-linux-x64-installer.run</linux-x64-installer-file-name>
 		<osx-installer-file-name>OpenForisCollect-${installer-version-id}-osx-installer.dmg</osx-installer-file-name>
 		<!-- autoupdate file names -->
 		<windows-autoupdater-file-name>autoupdate-windows.exe</windows-autoupdater-file-name>
 		<linux-autoupdater-file-name>autoupdate-linux.run</linux-autoupdater-file-name>
+		<linux-x64-autoupdater-file-name>autoupdate-linux-x64.run</linux-x64-autoupdater-file-name>
 		<osx-autoupdater-file-name>autoupdate-osx.app.zip</osx-autoupdater-file-name>
 	</properties>
 
@@ -122,6 +124,16 @@
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}</outputDirectory>
 											<destFileName>${linux-autoupdater-file-name}</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.openforis.collect</groupId>
+											<artifactId>collect-autoupdater</artifactId>
+											<version>${project.version}</version>
+											<classifier>linux-x64</classifier>
+											<type>run</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}</outputDirectory>
+											<destFileName>${linux-x64-autoupdater-file-name}</destFileName>
 										</artifactItem>
 										<artifactItem>
 											<groupId>org.openforis.collect</groupId>
@@ -306,6 +318,22 @@
 									</arguments>
 								</configuration>
 							</execution>
+							<!-- Linux x64 -->
+							<execution>
+								<id>linux-x64-installer</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder-home}/bin/builder</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-file-name}</argument>
+										<argument>linux-x64</argument>
+									</arguments>
+								</configuration>
+							</execution>
 							<!-- Windows -->
 							<execution>
 								<id>windows-installer</id>
@@ -354,9 +382,14 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/output/${windows-installer-file-name}" tofile="${project.build.directory}/${windows-installer-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/output/${linux-installer-file-name}" tofile="${project.build.directory}/${linux-installer-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/output/${osx-installer-file-name}" tofile="${project.build.directory}/${osx-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${windows-installer-file-name}" 
+											tofile="${project.build.directory}/${windows-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${linux-installer-file-name}" 
+											tofile="${project.build.directory}/${linux-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${linux-x64-installer-file-name}" 
+											tofile="${project.build.directory}/${linux-x64-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${osx-installer-file-name}" 
+											tofile="${project.build.directory}/${osx-installer-file-name}" failonerror="true" />
 									</tasks>
 								</configuration>
 							</execution>
@@ -384,6 +417,11 @@
 										<artifact>
 											<file>${project.build.directory}/${linux-installer-file-name}</file>
 											<classifier>linux</classifier>
+											<type>run</type>
+										</artifact>
+										<artifact>
+											<file>${project.build.directory}/${linux-x64-installer-file-name}</file>
+											<classifier>linux-x64</classifier>
 											<type>run</type>
 										</artifact>
 										<artifact>
