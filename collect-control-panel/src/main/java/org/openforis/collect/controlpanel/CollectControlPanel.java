@@ -11,9 +11,9 @@ import javafx.stage.Stage;
 
 public class CollectControlPanel extends Application {
 
-	private static final int BROWSER_OPEN_DELAY = 3000;
-	private static final String CONTROL_PANEL_FXML = "collect_control_panel.fxml";
 	private static final String TITLE = "Open Foris Collect - Control Panel";
+	private static final String CONTROL_PANEL_FXML = "collect_control_panel.fxml";
+	private static final String LOGO_PATH = "of-collect-logo.png";
 
 	private CollectControlPanelController controller;
 
@@ -38,14 +38,14 @@ public class CollectControlPanel extends Application {
 		controller.closeLog();
 		
 		controller.startServer(() -> {
-			controller.openBrowser(BROWSER_OPEN_DELAY);
+			controller.openBrowser();
 		});
 		
 		primaryStage.show();
 	}
 
 	private void setLogo(Stage primaryStage) {
-		InputStream logoIs = this.getClass().getClassLoader().getResourceAsStream("org/openforis/collect/controlpanel/of-collect-logo.png");
+		InputStream logoIs = getClass().getResourceAsStream(LOGO_PATH);
 		Image logo = new Image(logoIs);
 		primaryStage.getIcons().add(logo);
 	}
