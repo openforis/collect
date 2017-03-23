@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.26-SNAPSHOT</version>
+		<version>3.12.26</version>
 	</parent>
 	<artifactId>collect-autoupdater</artifactId>
 	<packaging>pom</packaging>
@@ -173,14 +173,10 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/autoupdate/output/${linux-autoupdater-file-name}" 
-											tofile="${project.build.directory}/${linux-autoupdater-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/autoupdate/output/${linux-x64-autoupdater-file-name}" 
-											tofile="${project.build.directory}/${linux-x64-autoupdater-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/autoupdate/output/${windows-autoupdater-file-name}" 
-											tofile="${project.build.directory}/${windows-autoupdater-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/autoupdate/output/${osx-autoupdater-file-name}" 
-											tofile="${project.build.directory}/${osx-autoupdater-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/autoupdate/output/${linux-autoupdater-file-name}" tofile="${project.build.directory}/${linux-autoupdater-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/autoupdate/output/${linux-x64-autoupdater-file-name}" tofile="${project.build.directory}/${linux-x64-autoupdater-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/autoupdate/output/${windows-autoupdater-file-name}" tofile="${project.build.directory}/${windows-autoupdater-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/autoupdate/output/${osx-autoupdater-file-name}" tofile="${project.build.directory}/${osx-autoupdater-file-name}" failonerror="true" />
 									</tasks>
 								</configuration>
 							</execution>
