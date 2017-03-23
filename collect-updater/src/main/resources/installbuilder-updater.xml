@@ -38,7 +38,7 @@
 					<text>[Update]
 url = UPDATE_XML_URL
 version_id = VERSION_ID
-update_download_location = ${system_temp_directory}
+update_download_location = ${installer_directory}/tmp
 check_for_updates = 1</text>
 				</writeFile>
 			</postInstallationActionList>
