@@ -1425,6 +1425,7 @@ public class SchemaVM extends SurveyBaseVM {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
 				changeEditedNodeParent(selectedParent, false);
+				refreshNodeForm();
 				closePopUp(popup);
 			}
 		});
@@ -1509,6 +1510,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if (newParent instanceof UITab) {
 			associateNodeToTab(editedNodeDef, (UITab) newParent);
 		}
+		dispatchSurveyChangedCommand();
 	}
 
 	private EntityDefinition determineRelatedEntity(SurveyObject obj) {
@@ -1538,7 +1540,6 @@ public class SchemaVM extends SurveyBaseVM {
 		selectTreeNode(editedNode);
 		treeModel.showSelectedNode();
 		notifyChange("selectedTreeNode", "editedNode");
-		refreshNodeForm();
 	}
 
 	private void associateNodeToTab(NodeDefinition node, UITab tab) {

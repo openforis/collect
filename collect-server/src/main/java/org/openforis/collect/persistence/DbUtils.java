@@ -8,10 +8,15 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class DbUtils {
 	
 	public static final String DB_JNDI_RESOURCE_NAME = "jdbc/collectDs";
 	public static final String SCHEMA_NAME = "collect";
+	
+	private static final Log LOG = LogFactory.getLog(DbUtils.class);
 	
 	public static Connection getConnection() {
 		try {
@@ -28,14 +33,16 @@ public abstract class DbUtils {
 			Context initCtx = new InitialContext();
 			try {
 				ds = lookupDataSource(initCtx);
+				LOG.info("Data source found in initial context with name " + DB_JNDI_RESOURCE_NAME);
 			} catch (NamingException e) {
 				//try to look for data source in Environment Context
 				Context envCtx = (Context) initCtx.lookup("java:comp/env");
 				ds = lookupDataSource(envCtx);
+				LOG.info("Data source found in environment context with name " + "java:comp/env" + DB_JNDI_RESOURCE_NAME);
 			}
 			return ds;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("", e);
 		}
 	}
 

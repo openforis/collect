@@ -171,7 +171,7 @@ public class CollectControlPanelController implements Initializable {
 	
 	@FXML
 	void openBrowserFromLink(MouseEvent event) {
-		openBrowser(0);
+		openBrowser();
 	}
 
 	@FXML
@@ -180,17 +180,10 @@ public class CollectControlPanelController implements Initializable {
 		Platform.exit();
 	}
 	
-	void openBrowser(final long delay) {
-		executorService.submit(() -> {
-			try {
-				HostServicesDelegate hostServices = HostServicesFactory.getInstance(app);
-				Thread.sleep(delay);
-				String url = server.getUrl();
-				hostServices.showDocument(url);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
+	void openBrowser() {
+		HostServicesDelegate hostServices = HostServicesFactory.getInstance(app);
+		String url = server.getUrl();
+		hostServices.showDocument(url);
 	}
 	
 	@FXML

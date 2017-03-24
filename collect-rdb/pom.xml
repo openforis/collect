@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.12.26-SNAPSHOT</version>
+		<version>3.12.28-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-rdb</artifactId>
 	<packaging>jar</packaging>
@@ -29,21 +29,6 @@
 			<artifactId>ddlutils</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>pentaho</groupId> -->
-<!-- 			<artifactId>mondrian</artifactId> -->
-<!-- 			<version>4.3.0.1-130</version> -->
-<!-- 			 <exclusions> -->
-<!-- 		    	<exclusion> -->
-<!-- 					<groupId>javax.servlet</groupId> -->
-<!-- 					<artifactId>jsp-api</artifactId> -->
-<!-- 		    	</exclusion> -->
-<!-- 		    </exclusions> -->
-<!-- 		</dependency> -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
