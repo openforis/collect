@@ -137,7 +137,7 @@ public class SurveyValidator {
 		results.addResults(validateShowCountInRecordListEntityCount(survey));
 		results.addResults(validateSchemaNodes(survey));
 		results.addResults(validateCodeLists(survey, validationParameters));
-		results.addResults(validateSurveyFiles(survey));
+		results.addResults(validateSurveyFiles(survey, validationParameters ));
 		return results;
 	}
 	
@@ -192,23 +192,23 @@ public class SurveyValidator {
 		return results;
 	}
 
-	private List<SurveyValidationResult> validateSurveyFiles(CollectSurvey survey) {
+	private List<SurveyValidationResult> validateSurveyFiles(CollectSurvey survey, ValidationParameters validationParameters) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<SurveyFile> surveyFileSummaries = surveyManager.loadSurveyFileSummaries(survey);
 		for (SurveyFile surveyFile : surveyFileSummaries) {
 			if (surveyFile.getType() == SurveyFileType.COLLECT_EARTH_GRID) {
-				results.addAll(validateCollectEarthGridFile(survey, surveyFile));
+				results.addAll(validateCollectEarthGridFile(survey, surveyFile, validationParameters));
 			}
 		}
 		return results;
 	}
 
-	private List<SurveyValidationResult> validateCollectEarthGridFile(CollectSurvey survey, SurveyFile surveyFile) {
+	private List<SurveyValidationResult> validateCollectEarthGridFile(CollectSurvey survey, SurveyFile surveyFile, ValidationParameters validationParameters) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		byte[] fileContent = surveyManager.loadSurveyFileContent(surveyFile);
 		ByteArrayInputStream is = new ByteArrayInputStream(fileContent);
 		File file = OpenForisIOUtils.copyToTempFile(is);
-		CSVFileValidationResult fileValidationResult = new CollectEarthGridTemplateGenerator().validate(file, survey);
+		CSVFileValidationResult fileValidationResult = new CollectEarthGridTemplateGenerator().validate(file, survey, validationParameters);
 		if (! fileValidationResult.isSuccessful()) {
 			SurveyValidationResult validationResult = null;
 			switch(fileValidationResult.getErrorType()) {
@@ -268,7 +268,6 @@ public class SurveyValidator {
 		
 	private String getRowValidationMessages(
 			List<CSVRowValidationResult> rowValidations) {
-		
 		String message  = "";
 		for (CSVRowValidationResult csvRowValidationResult : rowValidations) {
 			message += "ROW " + csvRowValidationResult.getRowNumber() + " - "+ csvRowValidationResult.getMessage() + "\n";
@@ -966,6 +965,7 @@ public class SurveyValidator {
 		
 		private boolean warnOnUnusedCodeLists = true;
 		private boolean warnOnEmptyCodeLists = true;
+		private boolean validateOnlyFirstLines = true;
 
 		public boolean isWarnOnUnusedCodeLists() {
 			return warnOnUnusedCodeLists;
@@ -981,6 +981,14 @@ public class SurveyValidator {
 
 		public void setWarnOnEmptyCodeLists(boolean warnOnEmptyCodeLists) {
 			this.warnOnEmptyCodeLists = warnOnEmptyCodeLists;
+		}
+
+		public boolean isValidateOnlyFirstLines() {
+			return validateOnlyFirstLines;
+		}
+
+		public void setValidateOnlyFirstLines(boolean validateOnlyFirstLines) {
+			this.validateOnlyFirstLines = validateOnlyFirstLines;
 		}
 	}
 }

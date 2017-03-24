@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult.ErrorType;
+import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Files;
 import org.openforis.commons.collection.CollectionUtils;
@@ -29,7 +30,6 @@ import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
-import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.NumberValue;
 import org.openforis.idm.model.Value;
 import org.slf4j.Logger;
@@ -103,7 +103,7 @@ public class CollectEarthGridTemplateGenerator  {
 	}
 	
 
-	public CSVFileValidationResult validate(File file, CollectSurvey survey) {
+	public CSVFileValidationResult validate(File file, CollectSurvey survey, ValidationParameters validationParameters) {
 		CsvReader csvReader = null;
 		CSVFileValidationResult validationResults = null;
 		List<CSVRowValidationResult> rowValidations = new ArrayList<CSVRowValidationResult>();
@@ -143,7 +143,7 @@ public class CollectEarthGridTemplateGenerator  {
 			}
 			if( validationResults == null ){
 
-				rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound ) );
+				rowValidations.addAll( validateCsvRows( csvReader , survey, headersFound , validationParameters.isValidateOnlyFirstLines() ) );
 				
 				long linesRead = csvReader.getLinesRead();
 				if( linesRead > CSV_LENGTH_ERROR ){
@@ -184,7 +184,7 @@ public class CollectEarthGridTemplateGenerator  {
 	}
 
 	
-	private List<CSVRowValidationResult> validateCsvRows( CsvReader csvReader, CollectSurvey survey, boolean firstLineIsHeaders ) throws IOException {
+	private List<CSVRowValidationResult> validateCsvRows( CsvReader csvReader, CollectSurvey survey, boolean firstLineIsHeaders, boolean validateOnlyFirstLines ) throws IOException {
 				
 		List<CSVRowValidationResult> results = new ArrayList<CSVRowValidationResult>();
 		List<CSVRowValidationResult> validateCsvRow = null;
@@ -195,7 +195,7 @@ public class CollectEarthGridTemplateGenerator  {
 		
 		if (!firstLineIsHeaders){
 			validateCsvRow = validateCsvRow(  survey, attributesPerRow, (String[]) csvReader.getColumnNames().toArray( new String[ csvReader.getColumnNames().size() ]), rowNumber++ );
-			if(validateCsvRow!=null){
+			if( !validateCsvRow.isEmpty() ){
 				results.addAll( validateCsvRow  );
 			}
 		}
@@ -204,11 +204,11 @@ public class CollectEarthGridTemplateGenerator  {
 		CsvLine csvLine;
 		
 		while( ( csvLine = csvReader.readNextLine() ) != null ){
-			
-
-			validateCsvRow = validateCsvRow(  survey, attributesPerRow, csvLine.getLine(), rowNumber++ );
-			if(validateCsvRow!=null){
-				results.addAll( validateCsvRow  );
+			if( validateOnlyFirstLines && rowNumber < 50 ){
+				validateCsvRow = validateCsvRow(  survey, attributesPerRow, csvLine.getLine(), rowNumber++ );
+				if(validateCsvRow!=null){
+					results.addAll( validateCsvRow  );
+				}
 			}
 		}	
 		

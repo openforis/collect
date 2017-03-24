@@ -19,6 +19,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.utils.Dates;
@@ -130,7 +131,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		switch (type) {
 			case COLLECT_EARTH_GRID:
 				CollectEarthGridTemplateGenerator templateGenerator = new CollectEarthGridTemplateGenerator();
-				CSVFileValidationResult headersValidationResult = templateGenerator.validate(uploadedFile, survey);
+				CSVFileValidationResult headersValidationResult = templateGenerator.validate(uploadedFile, survey, new ValidationParameters() );
 				if (headersValidationResult.isSuccessful()) {
 					return true;
 				} else {
