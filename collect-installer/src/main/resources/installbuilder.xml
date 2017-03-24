@@ -63,7 +63,7 @@
 				<shortcut>
 					<name>Update Open Foris Collect</name>
 					<comment>Update Open Foris Collect</comment>
-					<exec>${installdir}/autoupdate/autoupdate-linux.run</exec>
+					<exec>${installdir}/autoupdate/autoupdate-${platform_name}.${platform_exec_suffix}</exec>
 					<path>${installdir}/autoupdate</path>
 					<icon>${installdir}/images/update.png</icon>
 					<platforms>linux linux-x64</platforms>
