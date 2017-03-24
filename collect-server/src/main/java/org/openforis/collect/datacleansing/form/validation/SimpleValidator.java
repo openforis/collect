@@ -15,6 +15,7 @@ import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.util.Assert;
@@ -31,6 +32,7 @@ public abstract class SimpleValidator<F> implements Validator {
 	final Class<F> genericType;
 
 	@Autowired
+	@Qualifier("sessionManager")
 	protected SessionManager sessionManager;
 	@Autowired
 	protected ExpressionValidator expressionValidator;
