@@ -8,6 +8,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.web.PersistedObjectForm;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * 
@@ -20,6 +21,7 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 			extends AbstractPersistedObjectEditFormController<T, F, M> {
 	
 	@Autowired
+	@Qualifier("sessionManager")
 	protected SessionManager sessionManager;
 	
 	protected abstract T createItemInstance(CollectSurvey survey);
