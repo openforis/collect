@@ -30,21 +30,6 @@
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>pentaho</groupId> -->
-<!-- 			<artifactId>mondrian</artifactId> -->
-<!-- 			<version>4.3.0.1-130</version> -->
-<!-- 			 <exclusions> -->
-<!-- 		    	<exclusion> -->
-<!-- 					<groupId>javax.servlet</groupId> -->
-<!-- 					<artifactId>jsp-api</artifactId> -->
-<!-- 		    	</exclusion> -->
-<!-- 		    </exclusions> -->
-<!-- 		</dependency> -->
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
