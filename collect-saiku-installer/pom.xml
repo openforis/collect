@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.28</version>
+		<version>3.12.29-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-saiku-installer</artifactId>
 	<packaging>pom</packaging>
