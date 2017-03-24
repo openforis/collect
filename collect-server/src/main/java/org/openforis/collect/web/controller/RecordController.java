@@ -82,10 +82,10 @@ public class RecordController extends BasicController implements Serializable {
  		return map;
 	}
 
-	@RequestMapping(value = "/survey/{surveyId}/data/records/count.json", method=GET)
+	@RequestMapping(value = "survey/{surveyId}/data/records/count.json", method=GET)
 	public @ResponseBody
-	int getCount(@PathVariable(value="survey_id") int surveyId,
-			@RequestParam(value="rootEntityDefinitionId") int rootEntityDefinitionId,
+	int getCount(@PathVariable int surveyId,
+			@RequestParam(value="rootEntityDefinitionId", required=false) Integer rootEntityDefinitionId,
 			@RequestParam(value="step", required=false) Integer stepNumber) throws Exception {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		RecordFilter filter = new RecordFilter(survey);
