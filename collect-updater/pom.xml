@@ -44,14 +44,66 @@
 									<artifactItems>
 										<artifactItem>
 											<groupId>org.openforis.collect</groupId>
-											<artifactId>collect-webapp-tomcat</artifactId>
+											<artifactId>collect-webapp-jetty</artifactId>
 											<version>${project.version}</version>
 											<type>war</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/</outputDirectory>
+											<outputDirectory>${installer-build-path}/webapps</outputDirectory>
 											<destFileName>collect.war</destFileName>
 										</artifactItem>
+										<!-- Libraries -->
+										<artifactItem>
+											<groupId>commons-dbcp</groupId>
+											<artifactId>commons-dbcp</artifactId>
+											<version>1.4</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>commons-pool</groupId>
+											<artifactId>commons-pool</artifactId>
+											<version>1.5.4</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.h2database</groupId>
+											<artifactId>h2</artifactId>
+											<version>1.4.193</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.xerial</groupId>
+											<artifactId>sqlite-jdbc</artifactId>
+											<version>3.7.2</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>postgresql</groupId>
+											<artifactId>postgresql</artifactId>
+											<version>9.1-901.jdbc4</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
 									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>copy-control-panel-dependencies</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${installer-build-path}/lib</outputDirectory>
+									<includeScope>compile</includeScope>
 								</configuration>
 							</execution>
 						</executions>
@@ -115,7 +167,7 @@
 			                    </replacement>
 			                    <replacement>
 			                        <token>UPDATE_XML_URL</token>
-			                        <value>${collect.update.url}</value>
+			                        <value>${collect.update_2.url}</value>
 			                    </replacement>
 			                </replacements>      
 						</configuration>
@@ -129,7 +181,7 @@
 						<executions>
 							<!-- Linux -->
 							<execution>
-								<id>linux-installer</id>
+								<id>linux-udpater</id>
 								<phase>prepare-package</phase>
 								<goals>
 									<goal>exec</goal>
@@ -145,7 +197,7 @@
 							</execution>
 							<!-- Linux x64 -->
 							<execution>
-								<id>linux-x64-installer</id>
+								<id>linux-x64-udpater</id>
 								<phase>prepare-package</phase>
 								<goals>
 									<goal>exec</goal>
@@ -161,7 +213,7 @@
 							</execution>
 							<!-- Windows -->
 							<execution>
-								<id>windows-installer</id>
+								<id>windows-udpater</id>
 								<phase>prepare-package</phase>
 								<goals>
 									<goal>exec</goal>
@@ -177,7 +229,7 @@
 							</execution>
 							<!-- OS X -->
 							<execution>
-								<id>osx-installer</id>
+								<id>osx-udpater</id>
 								<phase>prepare-package</phase>
 								<goals>
 									<goal>exec</goal>
@@ -194,47 +246,46 @@
 						</executions>
 					</plugin>
 					
-					<!--  5. move the installers into the target folder -->
+					<!--  5. move the udpaters into the target folder -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>run-ant-move-installers-into-build-directory</id>
+								<id>run-ant-move-updaters-into-build-directory</id>
 								<phase>prepare-package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/output/${windows-updater-file-name}" tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-updater-file-name}" tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-x64-updater-file-name}" tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${osx-updater-file-name}" tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${linux-updater-file-name}" 
+											tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${linux-x64-updater-file-name}" 
+											tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${osx-updater-file-name}" 
+											tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${windows-updater-file-name}" 
+											tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
 									</tasks>
 								</configuration>
 							</execution>
 						</executions>
 					</plugin>
 
-			    	<!-- 6. attach installers as artifact -->
+			    	<!-- 6. attach updaters as artifact -->
 					<plugin>
 					    <groupId>org.codehaus.mojo</groupId>
 					    <artifactId>build-helper-maven-plugin</artifactId>
 					    <executions>
 					        <execution>
-					            <id>attach-installer-artifacts</id>
+					            <id>attach-updater-artifacts</id>
 					            <phase>package</phase>
 					            <goals>
 					                <goal>attach-artifact</goal>
 					            </goals>
 					            <configuration>
 					                <artifacts>
-					                    <artifact>
-					                        <file>${project.build.directory}/${windows-updater-file-name}</file>
-					                        <classifier>windows</classifier>
-					                        <type>exe</type>
-					                    </artifact>
 					                    <artifact>
 					                        <file>${project.build.directory}/${linux-updater-file-name}</file>
 					                        <classifier>linux</classifier>
@@ -249,6 +300,11 @@
 					                        <file>${project.build.directory}/${osx-updater-file-name}</file>
 					                        <classifier>osx</classifier>
 					                        <type>zip</type>
+					                    </artifact>
+					                    <artifact>
+					                        <file>${project.build.directory}/${windows-updater-file-name}</file>
+					                        <classifier>windows</classifier>
+					                        <type>exe</type>
 					                    </artifact>
 					                </artifacts>
 					            </configuration>
