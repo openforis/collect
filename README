@@ -1,10 +1,10 @@
 Available Maven profiles:
 
 - assembly: 	builds a zip file containing Tomcat + collect-webapp among its webapps
-- autoupdater: 	builds the auto-udpater executable file
+- autoupdater: 	builds the auto-udpater executable files
 - installer:	builds the installers
 - updater: 		builds the updaters (used by the autoupdater)
-- publish:		publish the udpate using the specified parameters (
+- publishupdater: publish the updaters using the specified parameters
  
 Release a new version:
 
