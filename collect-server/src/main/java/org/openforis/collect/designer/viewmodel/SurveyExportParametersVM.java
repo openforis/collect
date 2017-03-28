@@ -185,13 +185,11 @@ public class SurveyExportParametersVM extends BaseVM {
 			if (! dataBackupErrors.isEmpty()) {
 				DataExportErrorsPopUpVM.showPopUp(dataBackupErrors);
 			}
-			surveyBackupJob = null;
 		} else if ( job == rdbExportJob ) {
 			File file = rdbExportJob.getOutputFile();
 			CollectSurvey survey = rdbExportJob.getSurvey();
 			String extension = "sql";
 			downloadFile(file, extension, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
-			rdbExportJob = null;
 		}
 		if (jobStartedByThis) {
 			onJobEnd(job);
@@ -208,6 +206,7 @@ public class SurveyExportParametersVM extends BaseVM {
 		} else if (job == rdbExportJob) {
 			rdbExportJob = null;
 		}
+		MessageUtil.showInfo("survey.export.completed");
 		closeJobStatusPopUp();
 	}
 	
