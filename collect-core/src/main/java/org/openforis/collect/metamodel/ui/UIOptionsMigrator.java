@@ -264,12 +264,13 @@ public class UIOptionsMigrator {
 				throw new UIOptionsMigrationException("Nested multiple entity inside table layout entity is not supported: " + nodeDefn.getPath());
 			}
 			component = parent.createColumnGroup();
-			((UIColumnGroup) component).setEntityDefinition(entityDefn);
+			UIColumnGroup columnGroup = (UIColumnGroup) component;
+			columnGroup.setEntityDefinition(entityDefn);
 			
 			List<NodeDefinition> innerChildDefns = entityDefn.getChildDefinitions();
 			for (NodeDefinition innerChildDefn : innerChildDefns) {
-				UITableHeadingComponent innerComponent = createTableHeadingComponent(parent, innerChildDefn);
-				((UIColumnGroup) component).addHeadingComponent(innerComponent);
+				UITableHeadingComponent innerComponent = createTableHeadingComponent(columnGroup, innerChildDefn);
+				columnGroup.addHeadingComponent(innerComponent);
 			}
 		} else {
 			component = parent.createColumn();

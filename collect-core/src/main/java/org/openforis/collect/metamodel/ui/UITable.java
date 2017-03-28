@@ -1,6 +1,9 @@
 package org.openforis.collect.metamodel.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
@@ -77,6 +80,11 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 		return getEntityDefinition();
 	}
 	
+	@Override
+	public int indexOf(UITableHeadingComponent component) {
+		return headingComponents.indexOf(component);
+	}
+	
 	public Integer getEntityDefinitionId() {
 		return entityDefinitionId;
 	}
@@ -114,6 +122,81 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 		getUIConfiguration().detachItem(component);
 	}
 
+	/**
+	 * Calculate the maximum depth of the headings 
+	 * @return
+	 */
+	public int getTotalHeadingRows() {
+		return getHeadingRows().size();
+	}
+	
+	public List<List<UITableHeadingComponent>> getHeadingRows() {
+		if (headingComponents.isEmpty()) {
+			return Collections.emptyList();
+		}
+		List<List<UITableHeadingComponent>> result = new ArrayList<List<UITableHeadingComponent>>();
+		Deque<List<UITableHeadingComponent>> stack = new LinkedList<List<UITableHeadingComponent>>();
+		stack.add(headingComponents);
+		while(! stack.isEmpty()) {
+			List<UITableHeadingComponent> currentRowComponents = stack.pop();
+			result.add(currentRowComponents);
+			List<UITableHeadingComponent> nextRowComponents = new ArrayList<UITableHeadingComponent>();
+			for (UITableHeadingComponent currentRowComponent: currentRowComponents) {
+				if (currentRowComponent instanceof UIColumnGroup) {
+					nextRowComponents.addAll(((UIColumnGroup) currentRowComponent).getHeadingComponents());
+				}
+			}
+			if (! nextRowComponents.isEmpty()) {
+				stack.add(nextRowComponents);
+			}
+		}
+		return result;
+	}
+	
+	public List<UIColumn> getHeadingColumns() {
+		List<UIColumn> columns = new ArrayList<UIColumn>();
+		Deque<UITableHeadingComponent> stack = new LinkedList<UITableHeadingComponent>();
+		stack.addAll(headingComponents);
+		while(! stack.isEmpty()) {
+			UITableHeadingComponent component = stack.pop();
+			if (component instanceof UIColumn) {
+				columns.add((UIColumn) component);
+			} else {
+				List<UITableHeadingComponent> groupComponents = new ArrayList<UITableHeadingComponent>(
+						((UIColumnGroup) component).getHeadingComponents());
+				Collections.reverse(groupComponents);
+				
+				for (UITableHeadingComponent groupComponent : groupComponents) {
+					stack.push(groupComponent);
+				}
+			}
+		}
+		return columns;
+	}
+	
+	public int getTotalHeadingColumns() {
+		return getHeadingColumns().size();
+	}
+
+	/**
+	 * Finds the component that will be in the specified position
+	 */
+	public UITableHeadingComponent findComponent(int row, int col) {
+		Deque<UITableHeadingComponent> stack = new LinkedList<UITableHeadingComponent>();
+		stack.addAll(headingComponents);
+		while (! stack.isEmpty()) {
+			UITableHeadingComponent component = stack.pop();
+			if (component.getRow() <= row && (component.getRow() + component.getRowSpan()) >= row
+					&& component.getCol() <= col && (component.getCol() + component.getColSpan()) >= col) {
+				return component;
+			}
+			if (component instanceof UIColumnGroup) {
+				stack.addAll(((UIColumnGroup) component).getHeadingComponents());
+			}
+		}
+		return null;
+	}
+	
 	public boolean isShowRowNumbers() {
 		return showRowNumbers;
 	}

@@ -13,15 +13,33 @@ public abstract class UITableHeadingComponentView<O extends UITableHeadingCompon
 		super(uiObject);
 	}
 
-	public static List<UITableHeadingComponentView<?>> fromObjects(List<UITableHeadingComponent> components) {
-		List<UITableHeadingComponentView<?>> views = new ArrayList<UITableHeadingComponentView<?>>(components.size());
-		for (UITableHeadingComponent c : components) {
+	@SuppressWarnings("unchecked")
+	public static <V extends UITableHeadingComponentView<?>, C extends UITableHeadingComponent> 
+			List<V> fromObjects(List<C> components) {
+		List<V> views = new ArrayList<V>(components.size());
+		for (C c : components) {
 			if (c instanceof UIColumn) {
-				views.add(new UIColumnView((UIColumn) c));
+				views.add((V) new UIColumnView((UIColumn) c));
 			} else {
-				views.add(new UIColumnGroupView((UIColumnGroup) c));
+				views.add((V) new UIColumnGroupView((UIColumnGroup) c));
 			}
 		}
 		return views;
+	}
+	
+	public int getCol() {
+		return uiObject.getCol();
+	}
+	
+	public int getColSpan() {
+		return uiObject.getColSpan();
+	}
+	
+	public int getRow() {
+		return uiObject.getRow();
+	}
+	
+	public int getRowSpan() {
+		return uiObject.getRowSpan();
 	}
 }

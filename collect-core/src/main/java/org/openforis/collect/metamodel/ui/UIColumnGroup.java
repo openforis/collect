@@ -4,6 +4,8 @@
 package org.openforis.collect.metamodel.ui;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
@@ -24,6 +26,48 @@ public class UIColumnGroup extends UITableHeadingComponent implements UITableHea
 
 	public UIColumnGroup(UITableHeadingContainer parent, int id) {
 		super(parent, id);
+	}
+	
+	@Override
+	public int getColSpan() {
+		return getNestedColumnsCount();
+	}
+	
+	protected int getNestedColumnsCount() {
+		int result = 0;
+		for (UITableHeadingComponent headingComponent : headingComponents) {
+			if (headingComponent instanceof UIColumnGroup) {
+				result += ((UIColumnGroup) headingComponent).getNestedColumnsCount();
+			} else {
+				result ++;
+			}
+		}
+		return result;
+	}
+	
+	protected int getNestedRowsCount() {
+		Deque<List<UITableHeadingComponent>> stack = new LinkedList<List<UITableHeadingComponent>>();
+		stack.add(headingComponents);
+		int currentRow = 0;
+		while(! stack.isEmpty()) {
+			currentRow ++;
+			List<UITableHeadingComponent> currentRowComponents = stack.pop();
+			List<UITableHeadingComponent> nextRowComponents = new ArrayList<UITableHeadingComponent>();
+			for (UITableHeadingComponent currentRowComponent : currentRowComponents) {
+				if (currentRowComponent instanceof UIColumnGroup) {
+					nextRowComponents.addAll(((UIColumnGroup) currentRowComponent).headingComponents);
+				}
+			}
+			if (! nextRowComponents.isEmpty()) {
+				stack.add(nextRowComponents);
+			}
+		}
+		return currentRow;
+	}
+	
+	@Override
+	public int indexOf(UITableHeadingComponent component) {
+		return headingComponents.indexOf(component);
 	}
 	
 	@Override

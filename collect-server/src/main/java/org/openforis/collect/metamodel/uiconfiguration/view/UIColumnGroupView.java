@@ -16,7 +16,7 @@ public class UIColumnGroupView extends UITableHeadingComponentView<UIColumnGroup
 	public String getType() {
 		return "COLUMN_GROUP";
 	}
-	
+
 	public int getEntityDefinitionId() {
 		return uiObject.getEntityDefinitionId();
 	}
