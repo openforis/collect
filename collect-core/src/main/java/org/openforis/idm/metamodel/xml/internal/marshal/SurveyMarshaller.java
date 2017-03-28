@@ -139,7 +139,7 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 
 		@Override
 		protected void marshalInstances(Survey survey) throws IOException {
-			marshal(survey.getProjectNames(), survey.getDefaultLanguage());
+			marshal(survey.getProjectNames(), parameters.outputSurveyDefaultLanguage);
 		}
 	}
 
