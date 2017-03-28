@@ -60,13 +60,24 @@
         <row>
           <label value="${labels.survey.file.file}:" />
           <cell>
-            <hbox hflex="1">
-              <hbox hflex="1">
-                <label visible="@load(not empty vm.uploadedFileName)" value="@load(vm.uploadedFileName)" />
-                <label visible="@load(empty vm.uploadedFileName)" value="${labels.global.file_not_selected}" />
+            <hbox hflex="1" visible="@load(newItem or not empty vm.uploadedFileName)">
+              <hbox width="300px">
+                <label visible="@load(empty vm.uploadedFileName)" 
+                	value="${labels.global.file_not_selected}" />
+	            <a visible="@load(not (empty vm.uploadedFileName))" 
+	            	label="@load(vm.uploadedFileName)" tooltiptext="${labels.global.download}" 
+	            	onClick="@command('downloadUploadedFile')" />
               </hbox>
-              <button id="selectFileBtn" label="${labels.global.select_file_to_upload}"
-                upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
+              <button label="${labels.global.select_file_to_upload}"
+                	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
+            </hbox>
+            <hbox hflex="1" visible="@load(not newItem and empty vm.uploadedFileName)">
+              <hbox width="300px">
+       	          <a label="@load(vm.editedItemFilename)" tooltiptext="${labels.global.download}" 
+	            	onClick="@command('downloadFile')" />
+              </hbox>
+              <button label="${labels.global.select_new_file_to_upload}"
+                	upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
             </hbox>
           </cell>
         </row>

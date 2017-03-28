@@ -17,13 +17,6 @@
 		<module>collect-server</module>
 		<module>collect-client</module>
 		<module>collect-web</module>
-		<module>collect-assembly</module>
-		<module>collect-control-panel</module>
-		<module>collect-autoupdater</module>
-		<module>collect-installer</module>
-		<module>collect-updater</module>
-		<module>collect-updater-2</module>
-		<module>collect-saiku-installer</module>
 	</modules>
 
 	<properties>
@@ -57,6 +50,21 @@
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
+	
+	<profiles>
+		<profile>
+			<id>installer</id>
+			<modules>
+				<module>collect-assembly</module>
+				<module>collect-control-panel</module>
+				<module>collect-autoupdater</module>
+				<module>collect-installer</module>
+				<module>collect-updater</module>
+				<module>collect-updater-2</module>
+				<module>collect-saiku-installer</module>
+			</modules>
+		</profile>
+	</profiles>
 	
 	<build>
 		<plugins>
@@ -146,7 +154,7 @@
 				<version>2.5.1</version>
 				<configuration>
 					<!-- During release:perform, enable these profiles -->
-					<releaseProfiles>assembly,autoupdater,installer,saikuinstaller,updater,publishupdater</releaseProfiles>
+					<releaseProfiles>installer,publishupdater</releaseProfiles>
 				</configuration>
 	    	</plugin>
 <!-- 	    	<plugin> -->
