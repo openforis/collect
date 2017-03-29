@@ -22,47 +22,19 @@ public class MessageUtil {
 		INFO, WARNING, ERROR;
 	}
 	
-	public static void showInfo(String messageKey) {
-		showMessage(MessageType.INFO, messageKey);
-	}
-
-	public static void showInfo(String messageKey, String arg) {
-		showInfo(messageKey, new String[] {arg});
-	}
-	
-	public static void showInfo(String messageKey, Object[] args) {
+	public static void showInfo(String messageKey, Object... args) {
 		showMessage(MessageType.INFO, messageKey, args);
 	}
 	
-	public static void showError(String messageKey) {
-		showMessage(MessageType.ERROR, messageKey);
-	}
-
-	public static void showError(String messageKey, String arg) {
-		showError(messageKey, new String[] {arg});
-	}
-	
-	public static void showError(String messageKey, Object[] args) {
+	public static void showError(String messageKey, Object... args) {
 		showMessage(MessageType.ERROR, messageKey, args);
 	}
 	
-	public static void showWarning(String messageKey, String arg) {
-		showWarning(messageKey, new String[] {arg});
-	}
-	
-	public static void showWarning(String messageKey, Object[] args) {
+	public static void showWarning(String messageKey, Object... args) {
 		showMessage(MessageType.WARNING, messageKey, args);
 	}
 
-	public static void showWarning(String messageKey) {
-		showMessage(MessageType.WARNING, messageKey);
-	}
-	
-	public static void showMessage(MessageType type, String messageKey) {
-		showMessage(type, messageKey, null);
-	}
-	
-	public static void showMessage(MessageType type, String messageKey, Object[] args) {
+	public static void showMessage(MessageType type, String messageKey, Object... args) {
 		String titleKey;
 		switch ( type ) {
 		case ERROR:
@@ -147,11 +119,7 @@ public class MessageUtil {
 			    eventListener);
 	}
 	
-	protected static String getLabel(String key) {
-		return getLabel(key, (Object[]) null);
-	}
-	
-	protected static String getLabel(String key, Object[] args) {
+	protected static String getLabel(String key, Object... args) {
 		String label = Labels.getLabel(key, args);
 		if ( label != null ) {
 			label = label.replaceAll("\\\\n", "\n");

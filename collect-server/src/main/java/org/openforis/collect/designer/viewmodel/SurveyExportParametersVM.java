@@ -223,7 +223,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			Filedownload.save(new FileInputStream(file), contentType, fileName);
 		} catch (FileNotFoundException e) {
 			LOG.error(e);
-			MessageUtil.showError("survey.export_survey.error", new String[]{e.getMessage()});
+			MessageUtil.showError("survey.export_survey.error", e.getMessage());
 		}
 	}
 	
@@ -267,7 +267,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			Filedownload.save(is, contentType, outputFileName);
 		} catch(Exception e) {
 			LOG.error(e);
-			MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
+			MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", e.getMessage());
 		}
 	}
 
