@@ -14,6 +14,7 @@ import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -287,6 +288,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			//ignore
 		}
 		return result;
+	}
+	
+	public boolean isPredefinedCollectEarthAttribute() {
+		return editedItem != null && ! newItem && editedItem.getParentEntityDefinition() != null && editedItem.getParentEntityDefinition().isRoot()
+				&& CollectEarthSurveyValidator.REQUIRED_FIELD_NAMES.contains(editedItem.getName());
 	}
 
 	protected List<Map<String, String>> getDependentNodeInfos(String type, List<NodeDefinition> nodes) {

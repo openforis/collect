@@ -459,7 +459,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 				Filedownload.save(is, contentType, fileName);
 			} catch (FileNotFoundException e) {
 				log.error(e);
-				MessageUtil.showError("survey.schema.export_summary.error", new String[]{e.getMessage()});
+				MessageUtil.showError("survey.schema.export_summary.error", e.getMessage());
 			}
 		}
 	}

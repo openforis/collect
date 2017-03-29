@@ -149,7 +149,7 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 			if (media instanceof Image) {
 				int lengthofImage = media.getByteData().length;
 				if (lengthofImage > MAX_IMAGE_SIZE_BYTES) {
-					MessageUtil.showInfo("survey.code_list.image.error.max_size_exceeded", new Object[] {MAX_IMAGE_SIZE_KBYTES});
+					MessageUtil.showInfo("survey.code_list.image.error.max_size_exceeded", MAX_IMAGE_SIZE_KBYTES);
 					return false;
 				} else {
 					return true;
