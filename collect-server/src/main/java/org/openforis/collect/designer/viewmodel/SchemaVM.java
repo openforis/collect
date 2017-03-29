@@ -42,6 +42,7 @@ import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -587,9 +588,32 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@Command
 	public void removeNode() {
-		removeTreeNode(selectedTreeNode);
+		if (checkCanDeleteSelectedNode()) {
+			removeTreeNode(selectedTreeNode);
+		}
 	}
 
+	private boolean checkCanDeleteSelectedNode() {
+		if (isCollectEarthSurvey()) {
+			if (! selectedTreeNode.isDetached()) {
+				SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
+				if (surveyObject instanceof NodeDefinition) {
+					NodeDefinition nodeDef = (NodeDefinition) surveyObject;
+					if (isCollectEarthRequiredField(nodeDef)) {
+						MessageUtil.showWarning("survey.schema.cannot_remove_ce_required_field", nodeDef.getName());
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	private boolean isCollectEarthRequiredField(NodeDefinition nodeDef) {
+		return nodeDef.getParentEntityDefinition().isRoot() && 
+				CollectEarthSurveyValidator.REQUIRED_FIELD_NAMES.contains(nodeDef.getName());
+	}
+	
 	private void removeTreeNode(final SchemaNodeData data) {
 		if (data.isDetached()) {
 			performRemoveSelectedTreeNode();
@@ -1174,7 +1198,24 @@ public class SchemaVM extends SurveyBaseVM {
 	@Command
 	public void removeTab() {
 		UITab tab = (UITab) selectedTreeNode.getSurveyObject();
-		removeTab(tab);
+		if (checkCanRemoveTab(tab)) {
+			removeTab(tab);
+		}
+	}
+
+	private boolean checkCanRemoveTab(UITab tab) {
+		if (isCollectEarthSurvey()) {
+			List<NodeDefinition> nodes = survey.getUIOptions().getNodesPerTab(tab, true);
+			for (NodeDefinition nodeDef: nodes) {
+				if (isCollectEarthRequiredField(nodeDef)) {
+					MessageUtil.showWarning("survey.schema.cannot_remove_tab_containing_ce_required_field",
+							tab.getLabel(currentLanguageCode),
+							nodeDef.getName());
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private UITab getSelectedNodeParentTab() {

@@ -1,6 +1,7 @@
 package org.openforis.collect.manager.validation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -8,6 +9,7 @@ import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.earth.app.EarthConstants;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
@@ -29,7 +31,7 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 	private Pattern INVALID_NODE_NAME_PATTERN = Pattern.compile(".*_\\d*$");
 	
 	//TODO use CollectEarthBalloonGenerator.HIDDEN_ATTRIBUTE_NAMES 
-	private static final CollectEarthField[] REQUIRED_FIELDS = new CollectEarthField[] {
+	public static final CollectEarthField[] REQUIRED_FIELDS = new CollectEarthField[] {
 		new CollectEarthField("id", TextAttributeDefinition.class),
 		new CollectEarthField("operator", TextAttributeDefinition.class),
 		new CollectEarthField("location", CoordinateAttributeDefinition.class),
@@ -37,6 +39,9 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 		new CollectEarthField("actively_saved", BooleanAttributeDefinition.class),
 		new CollectEarthField("actively_saved_on", DateAttributeDefinition.class)
 	};
+	
+	public static final List<String> REQUIRED_FIELD_NAMES = 
+			CollectionUtils.project(Arrays.<CollectEarthField>asList(REQUIRED_FIELDS), "name");
 	
 	private static class CollectEarthField {
 		private String name;
