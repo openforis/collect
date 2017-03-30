@@ -223,8 +223,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			String labelsMessage = Labels.getLabel(errorMessageKey);
 			message = labelsMessage == null ? errorMessageKey: labelsMessage;
 		}
-		Object[] args = new String[] { message };
-		MessageUtil.showError("survey.import_survey.error", args);
+		MessageUtil.showError("survey.import_survey.error", message);
 	}
 	
 	@GlobalCommand
@@ -347,8 +346,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected void onSurveyImportComplete() {
-		Object[] args = new String[]{getFormSurveyName()};
-		MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
+		MessageUtil.showInfo("survey.import_survey.successfully_imported", getFormSurveyName());
 		closeImportPopUp(true);
 		restoreJob = null;
 	}

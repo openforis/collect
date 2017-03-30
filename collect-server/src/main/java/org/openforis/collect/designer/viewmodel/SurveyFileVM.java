@@ -6,6 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -194,6 +195,20 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		}
 	}
 	
+	@Command
+	public void downloadUploadedFile() throws IOException {
+		String contentType = URLConnection.guessContentTypeFromName(uploadedFileName);
+		Filedownload.save(new FileInputStream(uploadedFile), contentType, uploadedFileName);
+	}
+	
+	@Command
+	public void downloadFile() {
+		byte[] content = surveyManager.loadSurveyFileContent(editedItem);
+		String fileName = editedItem.getFilename();
+		String contentType = URLConnection.guessContentTypeFromName(fileName);
+		Filedownload.save(content, contentType, fileName);
+	}
+	
 	private void updateForm(Binder binder) {
 		String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
@@ -213,6 +228,10 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		return filename.replaceAll("[^\\w-.]", "_");
 	}
 
+	public String getEditedItemFilename() {
+		return editedItem == null ? null : editedItem.getFilename();
+	}
+	
 	public String getUploadedFileName() {
 		return uploadedFileName;
 	}

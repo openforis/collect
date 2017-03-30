@@ -85,7 +85,7 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 			List<AttributeDefinition> newAttributes = new AttributesImporter(parentEntityDefinition, booleanAsCode)
 					.importAttributes(attributeDetailsByColumn);
 			MessageUtil.showInfo("survey.schema.attributes_import.import_complete", 
-					new Object[]{newAttributes.size(), attributeDetailsByColumn.size() - newAttributes.size()});
+					newAttributes.size(), attributeDetailsByColumn.size() - newAttributes.size());
 			dispatchSchemaChangedCommand();
 		}
 	}

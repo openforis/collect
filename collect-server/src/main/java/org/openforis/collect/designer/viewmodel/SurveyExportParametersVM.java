@@ -185,13 +185,11 @@ public class SurveyExportParametersVM extends BaseVM {
 			if (! dataBackupErrors.isEmpty()) {
 				DataExportErrorsPopUpVM.showPopUp(dataBackupErrors);
 			}
-			surveyBackupJob = null;
 		} else if ( job == rdbExportJob ) {
 			File file = rdbExportJob.getOutputFile();
 			CollectSurvey survey = rdbExportJob.getSurvey();
 			String extension = "sql";
 			downloadFile(file, extension, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
-			rdbExportJob = null;
 		}
 		if (jobStartedByThis) {
 			onJobEnd(job);
@@ -208,6 +206,7 @@ public class SurveyExportParametersVM extends BaseVM {
 		} else if (job == rdbExportJob) {
 			rdbExportJob = null;
 		}
+		MessageUtil.showInfo("survey.export.completed");
 		closeJobStatusPopUp();
 	}
 	
@@ -224,7 +223,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			Filedownload.save(new FileInputStream(file), contentType, fileName);
 		} catch (FileNotFoundException e) {
 			LOG.error(e);
-			MessageUtil.showError("survey.export_survey.error", new String[]{e.getMessage()});
+			MessageUtil.showError("survey.export_survey.error", e.getMessage());
 		}
 	}
 	
@@ -268,7 +267,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			Filedownload.save(is, contentType, outputFileName);
 		} catch(Exception e) {
 			LOG.error(e);
-			MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
+			MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", e.getMessage());
 		}
 	}
 

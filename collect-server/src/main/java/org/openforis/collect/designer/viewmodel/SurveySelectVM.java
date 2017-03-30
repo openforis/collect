@@ -173,7 +173,7 @@ public class SurveySelectVM extends BaseVM {
 	public void jobFailed(@BindingParam("job") Job job) {
 		if ( isJobStartedByThis(job)) {
 			String errorMessage = job.getErrorMessage();
-			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
+			MessageUtil.showError("global.job_status.failed.message", errorMessage);
 			onJobEnd(job);
 		}
 	}
@@ -308,8 +308,7 @@ public class SurveySelectVM extends BaseVM {
 			selectedSurvey = null;
 			notifyChange("selectedSurvey");
 			reloadSurveySummaries(binder);
-			Object[] args = new String[] { survey.getName() };
-			MessageUtil.showInfo("survey.successfully_published", args);
+			MessageUtil.showInfo("survey.successfully_published", survey.getName());
 			User user = getLoggedUser();
 			surveyManager.validateRecords(survey.getId(), user);
 		} catch (SurveyStoreException e) {
@@ -324,8 +323,7 @@ public class SurveySelectVM extends BaseVM {
 			selectedSurvey = null;
 			notifyChange("selectedSurvey");
 			reloadSurveySummaries(binder);
-			Object[] args = new String[] { temporarySurvey.getName() };
-			MessageUtil.showInfo("survey.successfully_unpublished", args);
+			MessageUtil.showInfo("survey.successfully_unpublished", temporarySurvey.getName());
 		} catch (SurveyStoreException e) {
 			throw new RuntimeException(e);
 		}

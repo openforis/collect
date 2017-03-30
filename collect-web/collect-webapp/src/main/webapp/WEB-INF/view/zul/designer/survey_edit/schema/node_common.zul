@@ -23,7 +23,7 @@
   					<textbox width="200px" maxlength="40"
   						id="nodeNameTextbox"
   						value="@bind(fx.name)"
-  						readonly="@load(vm.rootEntity and vm.collectEarthSurvey)"
+  						readonly="@load(vm.collectEarthSurvey and (vm.rootEntity or vm.predefinedCollectEarthAttribute))"
   						onChange="@command('nameChanged', name=self.value)" />
   				</fieldErrorHandler>
   			</row>
