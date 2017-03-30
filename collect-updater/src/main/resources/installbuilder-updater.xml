@@ -287,6 +287,38 @@ check_for_updates = 1</text>
 			<showMessageOnError>0</showMessageOnError>
   		</deleteFile>
 	</readyToInstallActionList>
+	<finalPageActionList>
+		<showWarning>
+			<title>WARNING: new startup procedure!</title>
+			<text>Startup:
+From this version on, you will have to use the new "Open Foris Collect" shortcut from the Start menu to startup Collect: 
+a new Control Panel will appear.
+
+The old shortcuts (Startup Open Foris Collect, Shutdown Open Foris Collect) won't work anymore.
+ 
+More information: 
+http://www.openforis.org/tools/collect/tutorials/installation.html</text>
+			<ruleList>
+        		<platformTest type="windows" />
+			</ruleList>
+		</showWarning>
+		<showWarning>
+			<title>WARNING: new startup procedure!</title>
+			<text>Startup:
+From this version on, you will have to use the new "Open Foris Collect" shortcut on your desktop to startup Collect: 
+a new Control Panel will appear.
+
+The old shortcuts (Startup Open Foris Collect, Shutdown Open Foris Collect) won't work anymore.
+ 
+More information: 
+http://www.openforis.org/tools/collect/tutorials/installation.html</text>
+			<ruleList>
+        		<platformTest type="linux" />
+        		<platformTest type="linux-x64"/>
+        		<platformTest type="osx"/>
+			</ruleList>
+		</showWarning>
+	</finalPageActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
 	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
 	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>
