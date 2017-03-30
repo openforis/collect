@@ -56,7 +56,7 @@
             <allowEmptyValue>1</allowEmptyValue>
             <width>40</width>
         </stringParameter>
-        <stringParameter name="java_launcher_startmenu_shortcut_name" value="Launch ${project.fullName}" ask="0">
+        <stringParameter name="java_launcher_startmenu_shortcut_name" value="${project.fullName}" ask="0">
             <description></description>
             <explanation></explanation>
             <default></default>
@@ -101,27 +101,19 @@
         </booleanParameter>
     </parameterList>
     
-    <componentList>
-    	<component name="default">
-    		<description>Default Component</description>
-			<canBeEdited>1</canBeEdited>
-			<selected>1</selected>
-			<show>1</show>
-			
-    		<desktopShortcutList>
-				<shortcut>
-					<name>Open Foris Collect</name>
-					<comment>Launch Open Foris Collect</comment>
-					<exec>${java_launcher_destination}/${java_launcher_binary_name}</exec>
-					<path>${java_launcher_destination}</path>
-					<icon>${java_launcher_startmenu_shortcut_icon}</icon>
-					<platforms>linux linux-x64</platforms>
-					<runAsAdmin>0</runAsAdmin>
-					<runInTerminal>0</runInTerminal>
-				</shortcut>
-			</desktopShortcutList>
-    	</component>
-    </componentList>
+   	<!-- create launcher shortcut for Linux -->
+   	<desktopShortcutList>
+		<shortcut>
+			<name>Open Foris Collect</name>
+			<comment>Launch Open Foris Collect</comment>
+			<exec>${java_launcher_destination}/${java_launcher_binary_name}</exec>
+			<path>${java_launcher_destination}</path>
+			<icon>${java_launcher_startmenu_shortcut_icon}</icon>
+			<platforms>linux linux-x64</platforms>
+			<runAsAdmin>0</runAsAdmin>
+			<runInTerminal>0</runInTerminal>
+		</shortcut>
+	</desktopShortcutList>
     
     <postInstallationActionList>
         <!-- create Java launcher using preferred JRE -->

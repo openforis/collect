@@ -13,17 +13,6 @@
 			<show>1</show>
 			<folderList>
 				<folder>
-					<name>webapps</name>
-					<description>Webapps</description>
-					<destination>${webapps_dir}</destination>
-					<platforms>all</platforms>
-					<distributionFileList>
-						<distributionFile>
-							<origin>collect.war</origin>
-						</distributionFile>
-					</distributionFileList>
-				</folder>
-				<folder>
 					<name>programfiles</name>
 					<description>Program Files</description>
 					<destination>${installdir}</destination>
@@ -34,6 +23,9 @@
 						</distributionDirectory>
 						<distributionDirectory>
 							<origin>lib</origin>
+						</distributionDirectory>
+						<distributionDirectory>
+							<origin>webapps</origin>
 						</distributionDirectory>
 						<distributionFile>
 							<origin>launcher.properties</origin>
@@ -80,53 +72,57 @@
         		</renameFile>
         		<!-- end of rename launcher.properties -->
         		
-        		<!-- start of rename old startup/shutdown files -->
-        		<renameFile>
-        			<origin>../start.bat</origin>
-        			<destination>../start.bat.old</destination>
+        		<copyFile>
+        			<origin>${old_webapps_dir}/saiku.war</origin>
+        			<destination>${webapps_dir}</destination>
         			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<renameFile>
-        			<origin>../start.sh</origin>
-        			<destination>../start.sh.old</destination>
+        			<showMessageOnError>0</showMessageOnError>
+        		</copyFile>
+        		<copyFile>
+        			<origin>${old_webapps_dir}/saiku</origin>
+        			<destination>${webapps_dir}</destination>
         			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<renameFile>
-        			<origin>../start.cmd</origin>
-        			<destination>../start.cmd.old</destination>
+        			<showMessageOnError>0</showMessageOnError>
+        		</copyFile>
+        		
+        		<!-- start of move old startup/shutdown files into old_scripts folder -->
+        		<createDirectory>
+        			<path>${installdir}/old_scripts</path>
+        		</createDirectory>
+        		<copyFile>
+        			<origin>${installdir}/*.bat</origin>
+        			<destination>${installdir}/old_scripts</destination>
         			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<renameFile>
-        			<origin>../startup-windows.cmd</origin>
-        			<destination>../startup-windows.cmd.old</destination>
+        			<showMessageOnError>0</showMessageOnError>
+        		</copyFile>
+        		<copyFile>
+        			<origin>${installdir}/*.cmd</origin>
+        			<destination>${installdir}/old_scripts</destination>
         			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<renameFile>
-        			<origin>../startup-linux.sh</origin>
-        			<destination>../startup-linux.sh.old</destination>
+        			<showMessageOnError>0</showMessageOnError>
+        		</copyFile>
+        		<copyFile>
+        			<origin>${installdir}/*.bat</origin>
+        			<destination>${installdir}/old_scripts</destination>
         			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<renameFile>
-        			<origin>../stop.bat</origin>
-        			<destination>../stop.bat.old</destination>
+        			<showMessageOnError>0</showMessageOnError>
+        		</copyFile>
+        		<deleteFile>
+        			<path>${installdir}/*.bat</path>
         			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<renameFile>
-        			<origin>../stop.cmd</origin>
-        			<destination>../stop.cmd.old</destination>
+        			<showMessageOnError>0</showMessageOnError>
+        		</deleteFile>
+        		<deleteFile>
+        			<path>${installdir}/*.cmd</path>
         			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<renameFile>
-        			<origin>../shutdown-windows.cmd</origin>
-        			<destination>../shutdown-windows.cmd.old</destination>
+        			<showMessageOnError>0</showMessageOnError>
+        		</deleteFile>
+        		<deleteFile>
+        			<path>${installdir}/*.sh</path>
         			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<renameFile>
-        			<origin>../shutdown-linux.sh</origin>
-        			<destination>../shutdown-linux.sh.old</destination>
-        			<abortOnError>0</abortOnError>
-        		</renameFile>
-        		<!-- end of rename old startup/shutdown files -->
+        			<showMessageOnError>0</showMessageOnError>
+        		</deleteFile>
+        		<!-- end of move old script file into old_scripts folder -->
         		
         		<!-- create Log folder -->
 				<createDirectory>
@@ -147,44 +143,58 @@ check_for_updates = 1</text>
 			<file>java_launcher_updater.xml</file>
 		</include>
 	</componentList>
+	
     <preInstallationActionList>
-   		<!-- define installdir variable -->
-		<if>
-        	<actionList>
-        		<setInstallerVariable>
-        			<name>installdir</name>
-        			<value>${env(SYSTEMDRIVE)}/OpenForis/Collect</value> 
-        		</setInstallerVariable>
-        	</actionList>
-        	<conditionRuleList>
-        		<platformTest type="windows" />
-			</conditionRuleList> 
-			<elseActionList>
-				<setInstallerVariable>
-					<name>installdir</name>
-					<value>~/OpenForis/Collect</value>
-				</setInstallerVariable>
-			</elseActionList>
-		</if>
-        <createTimeStamp>
+  		<createTimeStamp>
 			<variable>timestamp</variable>
 			<format>%Y%m%d%H%M%S</format>
 		</createTimeStamp>
-    	<setInstallerVariable name="server_http_port" 
-    			value="8380"/>
-    	<setInstallerVariable name="collect_root_user_dir" 
-				value="${user_home_directory}/OpenForis/Collect" />
-		<setInstallerVariable name="backup_dir" 
-				value="${collect_root_user_dir}/backup/${timestamp}" />
-		<setInstallerVariable name="data_dir" 
-				value="${collect_root_user_dir}/data" />
-		<setInstallerVariable name="old_data_dir" 
-				value="../tomcat/data" />
-    	<setInstallerVariable name="webapps_dir" 
-    			value="../webapps"/>
-		<setInstallerVariable name="old_webapps_dir" 
-    			value="../tomcat/webapps"/>
+		<pathManipulation>
+			<action>absolutize</action>
+			<path>..</path>
+			<variable>installdir</variable>
+		</pathManipulation>
+  		<setInstallerVariable>
+			<name>server_http_port</name>
+			<value>8380</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>collect_root_user_dir</name>
+			<value>${user_home_directory}/OpenForis/Collect</value>
+		</setInstallerVariable>
+    	<setInstallerVariable>
+			<name>backup_dir</name>
+			<value>${collect_root_user_dir}/backup/${timestamp}</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>data_dir</name>
+			<value>${collect_root_user_dir}/data</value>
+		</setInstallerVariable>
+        <setInstallerVariable>
+  			<name>log_dir</name>
+  			<value>${collect_root_user_dir}/log</value> 
+  		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>webapps_dir</name>
+			<value>${installdir}/webapps</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>old_tomcat_dir</name>
+			<value>../tomcat</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>old_data_dir</name>
+			<value>${old_tomcat_dir}/data</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>old_webapps_dir</name>
+			<value>${old_tomcat_dir}/webapps</value>
+		</setInstallerVariable>
     	<!--  Java Launcher variables -->
+    	<setInstallerVariable>
+			<name>java_launcher_binary_name</name>
+			<value>OpenForisCollect-launcher.${platform_exec_suffix}</value>
+		</setInstallerVariable>
 		<setInstallerVariable>
 			<name>java_launcher_mainClass</name>
 			<value>org.openforis.collect.controlpanel.CollectControlPanel</value>
@@ -247,7 +257,7 @@ check_for_updates = 1</text>
         </copyFile>
 		<!-- Backup old data and webapp -->
         <copyFile>
-			<origin>../tomcat/conf/Catalina/localhost/collect.xml</origin>
+			<origin>${old_tomcat_dir}/conf/Catalina/localhost/collect.xml</origin>
 			<destination>${backup_dir}/collect.xml</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
@@ -282,6 +292,7 @@ check_for_updates = 1</text>
 	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>
 	<defaultUnixFilePermissions>777</defaultUnixFilePermissions>
 	<enableRollback>1</enableRollback>
+	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
 	<enableTimestamp>1</enableTimestamp>
 	<installationType>upgrade</installationType>
 	<overwritePolicy>always</overwritePolicy>

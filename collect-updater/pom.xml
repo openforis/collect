@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.openforis.collect</groupId>
@@ -9,9 +10,10 @@
 	<packaging>pom</packaging>
 	<name>Open Foris Collect Updater</name>
 	<description>Module to create the updaters for Open Foris Collect</description>
-	
+
 	<properties>
-		<!-- to avoid replacing relative path to images and other resources used by the installer -->
+		<!-- to avoid replacing relative path to images and other resources used 
+			by the installer -->
 		<installer-build-path>${project.build.directory}/installer</installer-build-path>
 		<installbuilder-updater-file-name>installbuilder-updater.xml</installbuilder-updater-file-name>
 		<autoupdate-xml-file-name>update.xml</autoupdate-xml-file-name>
@@ -21,16 +23,16 @@
 		<linux-x64-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-x64-installer.run</linux-x64-updater-file-name>
 		<osx-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-osx-installer.dmg</osx-updater-file-name>
 	</properties>
-	
+
 	<build>
 		<plugins>
 			<!-- 1. copy webapp war file -->
 			<plugin>
-                      <groupId>org.apache.maven.plugins</groupId>
-                      <artifactId>maven-dependency-plugin</artifactId>
-                      <version>2.6</version>
-                      <executions>
-                  		<execution>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
 						<id>copy-collect-webapp</id>
 						<phase>process-sources</phase>
 						<goals>
@@ -99,12 +101,11 @@
 						</goals>
 						<configuration>
 							<outputDirectory>${installer-build-path}/lib</outputDirectory>
-							<includeScope>compile</includeScope>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- 2. copy resource files -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -122,17 +123,18 @@
 								<resource>
 									<directory>src/main/resources</directory>
 									<includes>
-						                <include>**</include>
-						            </includes>
+										<include>**</include>
+									</includes>
 								</resource>
 							</resources>
-				            <overwrite>true</overwrite>
+							<overwrite>true</overwrite>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 
-			<!-- 3. replace application version into the xml installbuilder source file -->
+			<!-- 3. replace application version into the xml installbuilder source 
+				file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>maven-replacer-plugin</artifactId>
@@ -154,21 +156,21 @@
 					<regex>false</regex>
 					<replacements>
 						<replacement>
-	                        <token>PROJECT_VERSION</token>
-	                        <value>${project.version}</value>
-	                    </replacement>
-	                    <replacement>
-	                        <token>VERSION_ID</token>
-	                        <value>${installer-version-id}</value>
-	                    </replacement>
-	                    <replacement>
-	                        <token>UPDATE_XML_URL</token>
-	                        <value>${collect.update_2.url}</value>
-	                    </replacement>
-	                </replacements>      
+							<token>PROJECT_VERSION</token>
+							<value>${project.version}</value>
+						</replacement>
+						<replacement>
+							<token>VERSION_ID</token>
+							<value>${installer-version-id}</value>
+						</replacement>
+						<replacement>
+							<token>UPDATE_XML_URL</token>
+							<value>${collect.update_2.url}</value>
+						</replacement>
+					</replacements>
 				</configuration>
 			</plugin>
-			
+
 			<!-- 4. execute installbuilder to produce the installers -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -241,8 +243,8 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!--  5. move the udpaters into the target folder -->
+
+			<!-- 5. move the udpaters into the target folder -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -255,62 +257,68 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<move file="${installbuilder-home}/output/${linux-updater-file-name}" 
-									tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
-								<move file="${installbuilder-home}/output/${linux-x64-updater-file-name}" 
-									tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
-								<move file="${installbuilder-home}/output/${osx-updater-file-name}" 
-									tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
-								<move file="${installbuilder-home}/output/${windows-updater-file-name}" 
-									tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
+								<move file="${installbuilder-home}/output/${linux-updater-file-name}"
+									tofile="${project.build.directory}/${linux-updater-file-name}"
+									failonerror="false" />
+								<move
+									file="${installbuilder-home}/output/${linux-x64-updater-file-name}"
+									tofile="${project.build.directory}/${linux-x64-updater-file-name}"
+									failonerror="false" />
+								<move file="${installbuilder-home}/output/${osx-updater-file-name}"
+									tofile="${project.build.directory}/${osx-updater-file-name}"
+									failonerror="false" />
+								<move
+									file="${installbuilder-home}/output/${windows-updater-file-name}"
+									tofile="${project.build.directory}/${windows-updater-file-name}"
+									failonerror="false" />
 							</tasks>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 
-	    	<!-- 6. attach updaters as artifact -->
+			<!-- 6. attach updaters as artifact -->
 			<plugin>
-			    <groupId>org.codehaus.mojo</groupId>
-			    <artifactId>build-helper-maven-plugin</artifactId>
-			    <executions>
-			        <execution>
-			            <id>attach-updater-artifacts</id>
-			            <phase>package</phase>
-			            <goals>
-			                <goal>attach-artifact</goal>
-			            </goals>
-			            <configuration>
-			                <artifacts>
-			                    <artifact>
-			                        <file>${project.build.directory}/${linux-updater-file-name}</file>
-			                        <classifier>linux</classifier>
-			                        <type>run</type>
-			                    </artifact>
-			                    <artifact>
-			                        <file>${project.build.directory}/${linux-x64-updater-file-name}</file>
-			                        <classifier>linux-x64</classifier>
-			                        <type>run</type>
-			                    </artifact>
-			                    <artifact>
-			                        <file>${project.build.directory}/${osx-updater-file-name}</file>
-			                        <classifier>osx</classifier>
-			                        <type>zip</type>
-			                    </artifact>
-			                    <artifact>
-			                        <file>${project.build.directory}/${windows-updater-file-name}</file>
-			                        <classifier>windows</classifier>
-			                        <type>exe</type>
-			                    </artifact>
-			                </artifacts>
-			            </configuration>
-			        </execution>
-			    </executions>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-updater-artifacts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/${linux-updater-file-name}</file>
+									<classifier>linux</classifier>
+									<type>run</type>
+								</artifact>
+								<artifact>
+									<file>${project.build.directory}/${linux-x64-updater-file-name}</file>
+									<classifier>linux-x64</classifier>
+									<type>run</type>
+								</artifact>
+								<artifact>
+									<file>${project.build.directory}/${osx-updater-file-name}</file>
+									<classifier>osx</classifier>
+									<type>zip</type>
+								</artifact>
+								<artifact>
+									<file>${project.build.directory}/${windows-updater-file-name}</file>
+									<classifier>windows</classifier>
+									<type>exe</type>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
-	
-	<profiles>		
+
+	<profiles>
 		<profile>
 			<id>publishupdater</id>
 			<build>
@@ -319,7 +327,8 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
-							<!-- 7 Upload the XML file that defines the presence of updates to the FTP directory -->
+							<!-- 7 Upload the XML file that defines the presence of updates to 
+								the FTP directory -->
 							<execution>
 								<phase>install</phase>
 								<configuration>
@@ -327,7 +336,8 @@
 										<property name="host" value="${collect.autoupdater.ftp.host}" />
 										<property name="username" value="${collect.autoupdater.ftp.username}" />
 										<property name="password" value="${collect.autoupdater.ftp.password}" />
-										<property name="remote_folder" value="${collect.autoupdater.ftp.remotefolder}" />
+										<property name="remote_folder"
+											value="${collect.autoupdater.ftp.remotefolder}" />
 										<property name="local_folder" value="${installer-build-path}" />
 										<property name="file_name" value="${autoupdate-xml-file-name}" />
 										<ant antfile="${installer-build-path}/ant_ftp_upload.xml" />
@@ -355,5 +365,12 @@
 			</build>
 		</profile>
 	</profiles>
-
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.openforis.collect</groupId>
+			<artifactId>collect-control-panel</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>
