@@ -132,7 +132,43 @@
 				</executions>
 			</plugin>
 
-			<!-- 3. replace application version into the xml installbuilder source 
+			<!-- 3.a replace application version into the autoupdate xml file (remotely uploaded) -->
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>maven-replacer-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<basedir>${installer-build-path}</basedir>
+					<includes>
+						<include>${autoupdate-xml-file-name}</include>
+					</includes>
+					<regex>false</regex>
+					<replacements>
+						<replacement>
+							<token>PROJECT_VERSION</token>
+							<value>${project.version}</value>
+						</replacement>
+						<replacement>
+							<token>VERSION_ID</token>
+							<value>${installer-version-id}</value>
+						</replacement>
+						<replacement>
+	                        <token>VERSION</token>
+	                        <value>${project.version}</value>
+	                    </replacement>
+					</replacements>
+				</configuration>
+			</plugin>
+			
+			<!-- 3.b replace application version into the xml installbuilder source 
 				file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -150,7 +186,6 @@
 					<basedir>${installer-build-path}</basedir>
 					<includes>
 						<include>${installbuilder-updater-file-name}</include>
-						<include>${autoupdate-xml-file-name}</include>
 					</includes>
 					<regex>false</regex>
 					<replacements>
@@ -168,12 +203,12 @@
 	                    </replacement>
 						<replacement>
 							<token>UPDATE_XML_URL</token>
-							<value>${collect.update_2.url}</value>
+							<value>${collect.update_2.url}</value> <!-- use new url in update.ini -->
 						</replacement>
 					</replacements>
 				</configuration>
 			</plugin>
-
+			
 			<!-- 4. execute installbuilder to produce the installers -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
