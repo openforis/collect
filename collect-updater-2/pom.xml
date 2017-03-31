@@ -111,6 +111,10 @@
 	                        <value>${installer-version-id}</value>
 	                    </replacement>
 	                    <replacement>
+	                        <token>VERSION</token>
+	                        <value>${project.version}</value>
+	                    </replacement>
+	                    <replacement>
 	                        <token>UPDATE_XML_URL</token>
 	                        <value>${collect.update_2.url}</value>
 	                    </replacement>
