@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.31-SNAPSHOT</version>
+		<version>3.12.31</version>
 	</parent>
 	<artifactId>collect-updater</artifactId>
 	<packaging>pom</packaging>
@@ -261,20 +260,10 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<move file="${installbuilder-home}/output/${linux-updater-file-name}"
-									tofile="${project.build.directory}/${linux-updater-file-name}"
-									failonerror="false" />
-								<move
-									file="${installbuilder-home}/output/${linux-x64-updater-file-name}"
-									tofile="${project.build.directory}/${linux-x64-updater-file-name}"
-									failonerror="false" />
-								<move file="${installbuilder-home}/output/${osx-updater-file-name}"
-									tofile="${project.build.directory}/${osx-updater-file-name}"
-									failonerror="false" />
-								<move
-									file="${installbuilder-home}/output/${windows-updater-file-name}"
-									tofile="${project.build.directory}/${windows-updater-file-name}"
-									failonerror="false" />
+								<move file="${installbuilder-home}/output/${linux-updater-file-name}" tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
+								<move file="${installbuilder-home}/output/${linux-x64-updater-file-name}" tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
+								<move file="${installbuilder-home}/output/${osx-updater-file-name}" tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
+								<move file="${installbuilder-home}/output/${windows-updater-file-name}" tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
 							</tasks>
 						</configuration>
 					</execution>
@@ -340,8 +329,7 @@
 										<property name="host" value="${collect.autoupdater.ftp.host}" />
 										<property name="username" value="${collect.autoupdater.ftp.username}" />
 										<property name="password" value="${collect.autoupdater.ftp.password}" />
-										<property name="remote_folder"
-											value="${collect.autoupdater.ftp.remotefolder}" />
+										<property name="remote_folder" value="${collect.autoupdater.ftp.remotefolder}" />
 										<property name="local_folder" value="${installer-build-path}" />
 										<property name="file_name" value="${autoupdate-xml-file-name}" />
 										<ant antfile="${installer-build-path}/ant_ftp_upload.xml" />
