@@ -1,12 +1,27 @@
+Default built modules:
+- collect-core
+- collect-rdb
+- collect-server
+- collect-web
+
 Available Maven profiles:
 
-- assembly: 	builds a zip file containing Tomcat + collect-webapp among its webapps
-- autoupdater: 	builds the auto-udpater executable files
-- installer:	builds the installers
-- updater: 		builds the updaters (used by the autoupdater)
-- publishupdater: publish the updaters using the specified parameters
+- installer: 		builds the all the modules 
+					(including collect-assembly, collect-control-panel, collect-autoupdater, 
+					collect-installer, collect-updater, collect-updater-2, collect-saiku-updater)
+- publishupdater:	publish the autoupdater in the specified collect.autoupdater.ftp.host/remotefolder
  
-Release a new version:
+
+Required Maven properties:
+
+- installbuilder-home							BitRock InstallBuilder home path (used by collect-installer and collect-udpater modules)
+- collect.autoupdater.ftp.host				FTP server host name (used by collect-updater module to upload the update.xml file)
+- collect.autoupdater.ftp.username 			FTP server username
+- collect.autoupdater.ftp.password			FTP server password
+- collect.autoupdater.ftp.remotefolder		FTP server remote folder (where to store the update.xml file)
+- collect.wiki.idm.expression-language.url	URL to be opened to have information on the IDM expression language
+ 
+How to release a new version:
 
 mvn release:prepare
 mvn release:perform
