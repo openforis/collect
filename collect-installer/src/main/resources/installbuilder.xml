@@ -51,7 +51,7 @@
 			<!-- start of Linux desktop shortcuts -->
 			<desktopShortcutList>
 				<shortcut>
-					<name>Launch Open Foris Collect</name>
+					<name>Open Foris Collect</name>
 					<comment>Launch Open Foris Collect</comment>
 					<exec>${java_launcher_destination}/${java_launcher_binary_name}</exec>
 					<path>${java_launcher_destination}</path>
@@ -113,6 +113,14 @@
         		</renameFile>
         		<!-- end of rename launcher.properties -->
         		
+        		<!-- create launcher shortcut for MacOS -->
+		        <createSymLink target="${java_launcher_destination}/${java_launcher_binary_name}" 
+			        	linkName="~/Desktop/${java_launcher_startmenu_shortcut_name}">
+		        	<ruleList>
+		        		<platformTest type="osx" />
+					</ruleList>
+	        	</createSymLink>
+        		
 				<!-- create Data folder -->
 				<createDirectory>
 					<path>${data_dir}</path>
@@ -133,14 +141,6 @@
 		        	<key>collect.http_port</key>
 		        	<value>${http_port}</value>
 		        </propertiesFileSet>
-        		
-        		<!-- create launcher shortcut for MacOS -->
-		        <createSymLink target="${java_launcher_destination}/${java_launcher_binary_name}" 
-			        	linkName="~/Desktop/${java_launcher_startmenu_shortcut_name}">
-		        	<ruleList>
-		        		<platformTest type="osx" />
-					</ruleList>
-	        	</createSymLink>
         	</postInstallationActionList>
 		</component>
 		<component>
@@ -218,6 +218,7 @@ check_for_updates = 1</text>
 			<name>log_dir</name>
 			<value>${collect_root_user_dir}/log</value>
 		</setInstallerVariable>
+		<!--  Java Launcher variables -->
 		<setInstallerVariable>
 			<name>java_launcher_mainClass</name>
 			<value>org.openforis.collect.controlpanel.CollectControlPanel</value>
@@ -238,6 +239,11 @@ check_for_updates = 1</text>
 			<name>java_launcher_osx_icon</name>
 			<value>${installdir}/images/of-collect-logo.icns</value>
 		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>java_launcher_startmenu_shortcut_name</name>
+			<value>${project.fullName}</value>
+		</setInstallerVariable>
+		<!-- End of Java Launcher variables -->
 		<throwError>
 			<explanation>Open Foris Collect has been already installed</explanation>
 			<text>Open Foris Collect has been already installed.

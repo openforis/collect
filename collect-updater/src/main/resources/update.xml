@@ -1,5 +1,6 @@
 <installerInformation>
 	<versionId>VERSION_ID</versionId>
+	<version>VERSION</version>
 	<platformFileList>
 		<platformFile>
 			<filename>collect-updater-PROJECT_VERSION-windows.exe</filename>
