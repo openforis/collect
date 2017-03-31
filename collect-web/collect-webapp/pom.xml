@@ -11,26 +11,115 @@
 	<artifactId>collect-webapp</artifactId>
 	<packaging>war</packaging>
 	
+	<properties>
+		<dev.jetty.port>8580</dev.jetty.port>
+	</properties>
+	
 	<build>
 		<finalName>collect</finalName>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.sonatype.flexmojos</groupId>
-				<artifactId>flexmojos-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-flex-resources</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-flex-resources</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <configuration>
+                    <connectors>
+                        <connector implementation="org.mortbay.jetty.bio.SocketConnector">
+                            <port>${dev.jetty.port}</port>
+                        </connector>
+                    </connectors>
+                    <contextPath>/collect</contextPath>
+                    <overrideWebXml>dev_override_web.xml</overrideWebXml>
+                    <jettyEnvXml>jetty-env.xml</jettyEnvXml>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.4</version>
+
+                <configuration>
+                    <nodeVersion>v6.10.1</nodeVersion>
+                    <npmVersion>4.5.0</npmVersion>
+                    <installDirectory>.</installDirectory>
+                    <workingDirectory>.</workingDirectory>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>webpack</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source><![CDATA[
+                                /*
+                                 * If running in Jetty - compile jsx files when they change
+                                 * Otherwise just compile them once
+                                 */
+                                boolean isJettyRun = false
+                                List<String> goals = session.getGoals()
+                                for (String s : goals)
+                                    if (s.equals('jetty:run'))
+                                        isJettyRun = true
+                                if (isJettyRun) {
+                                    def proc_webpack = new ProcessBuilder(["node/node", "node_modules/webpack-dev-server/bin/webpack-dev-server.js", "--inline", "--hot", "--stdin", "--port", "9090"]).inheritIO().directory(project.getBasedir()).start()
+                                } else {
+                                    println "Compiling client code..."
+                                    def webpack = new ProcessBuilder(["node/node", "node_modules/webpack/bin/webpack.js", "-p", "--progress", "--bail"]).inheritIO().directory(project.getBasedir())
+                                    def env = webpack.environment()
+                                    env.put("WAR_NAME", project.build.finalName)
+                                    def proc_webpack = webpack.start()
+                                    proc_webpack.waitForOrKill(120000)
+                                    if(proc_webpack.exitValue() != 0)
+                                        throw new org.apache.maven.plugin.MojoFailureException("Error compiling clinet code")
+                                }
+                                ]]></source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-compiler-plugin</artifactId> -->
+<!-- 			</plugin> -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.sonatype.flexmojos</groupId> -->
+<!-- 				<artifactId>flexmojos-maven-plugin</artifactId> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>copy-flex-resources</id> -->
+<!-- 						<phase>prepare-package</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>copy-flex-resources</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -85,12 +174,12 @@
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-server</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-client</artifactId>
-			<type>swf</type>
-			<scope>runtime</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.openforis.collect</groupId> -->
+<!-- 			<artifactId>collect-client</artifactId> -->
+<!-- 			<type>swf</type> -->
+<!-- 			<scope>runtime</scope> -->
+<!-- 		</dependency> -->
 		<!-- JSTL -->
 		<dependency>
 			<groupId>javax.servlet.jsp.jstl</groupId>
@@ -116,13 +205,27 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-		</dependency>
+            <groupId>org.mitre.dsmiley.httpproxy</groupId>
+            <artifactId>smiley-http-proxy-servlet</artifactId>
+            <version>1.7</version>
+            <scope>compile</scope>
+        </dependency>
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.193</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 	

@@ -1,3 +1,5 @@
 /logs
 /target/
-/target/
+/node/
+/node_modules/
+/etc/
