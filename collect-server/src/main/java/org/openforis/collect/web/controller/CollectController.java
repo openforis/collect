@@ -5,7 +5,7 @@ package org.openforis.collect.web.controller;
 
 import org.openforis.collect.CollectCompleteInfo;
 import org.openforis.collect.CollectInfo;
-import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.ClientUserManager;
 import org.openforis.collect.remoting.service.CollectInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class CollectController extends BasicController {
 
 	@Autowired
-	private UserManager userManager;
+	private ClientUserManager userManager;
 	@Autowired
 	private CollectInfoService infoService;
 	
