@@ -29,8 +29,8 @@ function Login(props, context) {
   return (
     <div className="col-md-4 col-md-offset-4">
       <div className="text-center">
-        <h1 className="login-brand-text">SB Admin React</h1>
-        <h3 className="text-muted">Created by <a href="http://startreact.com">StartReact.com</a> team</h3>
+        <h1 className="login-brand-text">Open Foris Collect</h1>
+        <h3 className="text-muted">Created by <a href="http://www.openforis.org">Open Foris</a> team</h3>
       </div>
 
       <Panel header={<h3>Please Sign In</h3>} className="login-panel">
