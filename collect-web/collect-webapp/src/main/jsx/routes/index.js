@@ -8,12 +8,12 @@
  */
 
 import React from 'react';
-import App from '../components/App';
+import App from '../components/app';
 
 // Child routes
 import home from './home';
 import login from './login';
-import blank from './dashboardPages/blank';
+import blank from './dashboard_pages/blank';
 import error from './error';
 import dataCleansing from './data_cleansing';
 import dataManagement from './data_management';

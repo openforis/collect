@@ -19,7 +19,7 @@ import {
   CartesianGrid, AreaChart, Bar, BarChart,
   ResponsiveContainer } from '../../vendor/recharts';
 
-const title = 'Sb Admin React';
+const title = 'Open Foris Collect';
 
 
 const data = [

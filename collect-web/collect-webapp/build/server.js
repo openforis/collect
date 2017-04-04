@@ -124,7 +124,7 @@ module.exports =
   
   var _routes2 = _interopRequireDefault(_routes);
   
-  var _assets = __webpack_require__(168);
+  var _assets = __webpack_require__(175);
   
   var _assets2 = _interopRequireDefault(_assets);
   
@@ -432,7 +432,7 @@ module.exports =
         _react2.default.createElement('meta', { name: 'description', content: description }),
         _react2.default.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }),
         _react2.default.createElement('link', { rel: 'stylesheet', href: '/css/bootstrap.min.css' }),
-        _react2.default.createElement('link', { rel: 'apple-touch-icon', href: 'apple-touch-icon.png' }),
+        _react2.default.createElement('link', { rel: 'shortcut icon', href: 'of-collect-logo.ico' }),
         _react2.default.createElement('link', { rel: 'stylesheet', href: '/css/bootstrap-social.css' }),
         _react2.default.createElement('link', { rel: 'stylesheet', href: '/css/font-awesome.min.css' }),
         _react2.default.createElement('link', { rel: 'stylesheet', href: '/css/sb-admin.css' }),
@@ -1434,9 +1434,9 @@ module.exports =
   
   var _react2 = _interopRequireDefault(_react);
   
-  var _App = __webpack_require__(39);
+  var _app = __webpack_require__(39);
   
-  var _App2 = _interopRequireDefault(_App);
+  var _app2 = _interopRequireDefault(_app);
   
   var _home = __webpack_require__(58);
   
@@ -1454,15 +1454,15 @@ module.exports =
   
   var _error2 = _interopRequireDefault(_error);
   
-  var _data_cleansing = __webpack_require__(178);
+  var _data_cleansing = __webpack_require__(168);
   
   var _data_cleansing2 = _interopRequireDefault(_data_cleansing);
   
-  var _data_management = __webpack_require__(175);
+  var _data_management = __webpack_require__(170);
   
   var _data_management2 = _interopRequireDefault(_data_management);
   
-  var _header = __webpack_require__(169);
+  var _header = __webpack_require__(48);
   
   var _header2 = _interopRequireDefault(_header);
   
@@ -1498,7 +1498,7 @@ module.exports =
   
               case 5:
                 return _context.abrupt('return', render(_react2.default.createElement(
-                  _App2.default,
+                  _app2.default,
                   { context: context },
                   component
                 )));
@@ -1553,7 +1553,7 @@ module.exports =
                     'div',
                     { id: 'page-wrapper', className: 'page-wrapper' },
                     _react2.default.createElement(
-                      _App2.default,
+                      _app2.default,
                       { context: context },
                       component
                     )
@@ -1598,7 +1598,7 @@ module.exports =
   
               case 5:
                 return _context3.abrupt('return', render(_react2.default.createElement(
-                  _App2.default,
+                  _app2.default,
                   { context: context },
                   component
                 )));
@@ -1665,7 +1665,7 @@ module.exports =
   
   var _App2 = _interopRequireDefault(_App);
   
-  var _header = __webpack_require__(169);
+  var _header = __webpack_require__(48);
   
   var _header2 = _interopRequireDefault(_header);
   
@@ -1819,13 +1819,530 @@ module.exports =
   
   
   // module
-  exports.push([module.id, "/**\n * React Starter Kit (https://www.reactstarterkit.com/)\n *\n * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE.txt file in the root directory of this source tree.\n */\n\n/*! normalize.css v4.1.1 | MIT License | github.com/necolas/normalize.css */\n\n/**\n * 1. Change the default font family in all browsers (opinionated).\n * 2. Correct the line height in all browsers.\n * 3. Prevent adjustments of font size after orientation changes in IE and iOS.\n */\n\nhtml {\n  font-family: sans-serif; /* 1 */\n  line-height: 1.15; /* 2 */\n  -ms-text-size-adjust: 100%; /* 3 */\n  -webkit-text-size-adjust: 100%; /* 3 */\n}\n\n/**\n * Remove the margin in all browsers (opinionated).\n */\n\nbody {\n  margin: 0;\n}\n\n/* HTML5 display definitions\n   ========================================================================== */\n\n/**\n * Add the correct display in IE 9-.\n * 1. Add the correct display in Edge, IE, and Firefox.\n * 2. Add the correct display in IE.\n */\n\narticle,\naside,\ndetails, /* 1 */\nfigcaption,\nfigure,\nfooter,\nheader,\nmain, /* 2 */\nmenu,\nnav,\nsection,\nsummary { /* 1 */\n  display: block;\n}\n\n/**\n * Add the correct display in IE 9-.\n */\n\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n}\n\n/**\n * Add the correct display in iOS 4-7.\n */\n\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n\n/**\n * Add the correct vertical alignment in Chrome, Firefox, and Opera.\n */\n\nprogress {\n  vertical-align: baseline;\n}\n\n/**\n * Add the correct display in IE 10-.\n * 1. Add the correct display in IE.\n */\n\ntemplate, /* 1 */\n[hidden] {\n  display: none;\n}\n\n/* Links\n   ========================================================================== */\n\n/**\n * 1. Remove the gray background on active links in IE 10.\n * 2. Remove gaps in links underline in iOS 8+ and Safari 8+.\n */\n\na {\n  background-color: transparent; /* 1 */\n  -webkit-text-decoration-skip: objects; /* 2 */\n}\n\n/**\n * Remove the outline on focused links when they are also active or hovered\n * in all browsers (opinionated).\n */\n\na:active,\na:hover {\n  outline-width: 0;\n}\n\n/* Text-level semantics\n   ========================================================================== */\n\n/**\n * 1. Remove the bottom border in Firefox 39-.\n * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.\n */\n\nabbr[title] {\n  border-bottom: none; /* 1 */\n  text-decoration: underline; /* 2 */\n  text-decoration: underline dotted; /* 2 */\n}\n\n/**\n * Prevent the duplicate application of `bolder` by the next rule in Safari 6.\n */\n\nb,\nstrong {\n  font-weight: inherit;\n}\n\n/**\n * Add the correct font weight in Chrome, Edge, and Safari.\n */\n\nb,\nstrong {\n  font-weight: bolder;\n}\n\n/**\n * Add the correct font style in Android 4.3-.\n */\n\ndfn {\n  font-style: italic;\n}\n\n/**\n * Correct the font size and margin on `h1` elements within `section` and\n * `article` contexts in Chrome, Firefox, and Safari.\n */\n\nh1 {\n  font-size: 2em;\n  margin: 0.67em 0;\n}\n\n/**\n * Add the correct background and color in IE 9-.\n */\n\nmark {\n  background-color: #ff0;\n  color: #000;\n}\n\n/**\n * Add the correct font size in all browsers.\n */\n\nsmall {\n  font-size: 80%;\n}\n\n/**\n * Prevent `sub` and `sup` elements from affecting the line height in\n * all browsers.\n */\n\nsub,\nsup {\n  font-size: 75%;\n  line-height: 0;\n  position: relative;\n  vertical-align: baseline;\n}\n\nsub {\n  bottom: -0.25em;\n}\n\nsup {\n  top: -0.5em;\n}\n\n/* Embedded content\n   ========================================================================== */\n\n/**\n * Remove the border on images inside links in IE 10-.\n */\n\nimg {\n  border-style: none;\n}\n\n/**\n * Hide the overflow in IE.\n */\n\nsvg:not(:root) {\n  overflow: hidden;\n}\n\n/* Grouping content\n   ========================================================================== */\n\n/**\n * 1. Correct the inheritance and scaling of font size in all browsers.\n * 2. Correct the odd `em` font sizing in all browsers.\n */\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace; /* 1 */\n  font-size: 1em; /* 2 */\n}\n\n/**\n * Add the correct margin in IE 8.\n */\n\nfigure {\n  margin: 1em 40px;\n}\n\n/**\n * 1. Add the correct box sizing in Firefox.\n * 2. Show the overflow in Edge and IE.\n */\n\nhr {\n  -webkit-box-sizing: content-box;\n          box-sizing: content-box; /* 1 */\n  height: 0; /* 1 */\n  overflow: visible; /* 2 */\n}\n\n/* Forms\n   ========================================================================== */\n\n/**\n * 1. Change font properties to `inherit` in all browsers (opinionated).\n * 2. Remove the margin in Firefox and Safari.\n */\n\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  font: inherit; /* 1 */\n  margin: 0; /* 2 */\n}\n\n/**\n * Restore the font weight unset by the previous rule.\n */\n\noptgroup {\n  font-weight: bold;\n}\n\n/**\n * Show the overflow in IE.\n * 1. Show the overflow in Edge.\n */\n\nbutton,\ninput { /* 1 */\n  overflow: visible;\n}\n\n/**\n * Remove the inheritance of text transform in Edge, Firefox, and IE.\n * 1. Remove the inheritance of text transform in Firefox.\n */\n\nbutton,\nselect { /* 1 */\n  text-transform: none;\n}\n\n/**\n * 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`\n *    controls in Android 4.\n * 2. Correct the inability to style clickable types in iOS and Safari.\n */\n\nbutton,\nhtml [type=\"button\"], /* 1 */\n[type=\"reset\"],\n[type=\"submit\"] {\n  -webkit-appearance: button; /* 2 */\n}\n\n/**\n * Remove the inner border and padding in Firefox.\n */\n\nbutton::-moz-focus-inner,\n[type=\"button\"]::-moz-focus-inner,\n[type=\"reset\"]::-moz-focus-inner,\n[type=\"submit\"]::-moz-focus-inner {\n  border-style: none;\n  padding: 0;\n}\n\n/**\n * Restore the focus styles unset by the previous rule.\n */\n\nbutton:-moz-focusring,\n[type=\"button\"]:-moz-focusring,\n[type=\"reset\"]:-moz-focusring,\n[type=\"submit\"]:-moz-focusring {\n  outline: 1px dotted ButtonText;\n}\n\n/**\n * Change the border, margin, and padding in all browsers (opinionated).\n */\n\nfieldset {\n  border: 1px solid #c0c0c0;\n  margin: 0 2px;\n  padding: 0.35em 0.625em 0.75em;\n}\n\n/**\n * 1. Correct the text wrapping in Edge and IE.\n * 2. Correct the color inheritance from `fieldset` elements in IE.\n * 3. Remove the padding so developers are not caught out when they zero out\n *    `fieldset` elements in all browsers.\n */\n\nlegend {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box; /* 1 */\n  color: inherit; /* 2 */\n  display: table; /* 1 */\n  max-width: 100%; /* 1 */\n  padding: 0; /* 3 */\n  white-space: normal; /* 1 */\n}\n\n/**\n * Remove the default vertical scrollbar in IE.\n */\n\ntextarea {\n  overflow: auto;\n}\n\n/**\n * 1. Add the correct box sizing in IE 10-.\n * 2. Remove the padding in IE 10-.\n */\n\n[type=\"checkbox\"],\n[type=\"radio\"] {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box; /* 1 */\n  padding: 0; /* 2 */\n}\n\n/**\n * Correct the cursor style of increment and decrement buttons in Chrome.\n */\n\n[type=\"number\"]::-webkit-inner-spin-button,\n[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\n\n/**\n * 1. Correct the odd appearance in Chrome and Safari.\n * 2. Correct the outline style in Safari.\n */\n\n[type=\"search\"] {\n  -webkit-appearance: textfield; /* 1 */\n  outline-offset: -2px; /* 2 */\n}\n\n/**\n * Remove the inner padding and cancel buttons in Chrome and Safari on OS X.\n */\n\n[type=\"search\"]::-webkit-search-cancel-button,\n[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\n\n/**\n * Correct the text style of placeholders in Chrome, Edge, and Safari.\n */\n\n::-webkit-input-placeholder {\n  color: inherit;\n  opacity: 0.54;\n}\n\n/**\n * 1. Correct the inability to style clickable types in iOS and Safari.\n * 2. Change font properties to `inherit` in Safari.\n */\n\n::-webkit-file-upload-button {\n  -webkit-appearance: button; /* 1 */\n  font: inherit; /* 2 */\n}\n\n/*! React Starter Kit | MIT License | https://www.reactstarterkit.com/ */\n\n/**\n * React Starter Kit (https://www.reactstarterkit.com/)\n *\n * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE.txt file in the root directory of this source tree.\n */\n\n:root {\n  /*\n   * Typography\n   * ======================================================================== */\n\n  /*\n   * Layout\n   * ======================================================================== */\n\n  /*\n   * Media queries breakpoints\n   * ======================================================================== */  /* Extra small screen / phone */  /* Small screen / tablet */  /* Medium screen / desktop */ /* Large screen / wide desktop */\n}\n\n/*\n * Base styles\n * ========================================================================== */\n\nhtml {\n  color: #222;\n  font-size: 1em; /* ~16px; */\n  font-family: 'Segoe UI', 'HelveticaNeue-Light', sans-serif;\n  line-height: 1.375; /* ~22px */\n}\n\na {\n  color: #0074c2;\n}\n\n/*\n * Remove text-shadow in selection highlight:\n * https://twitter.com/miketaylr/status/12228805301\n *\n * These selection rule sets have to be separate.\n * Customize the background color to match your design.\n */\n\n::-moz-selection {\n  background: #b3d4fc;\n  text-shadow: none;\n}\n\n::selection {\n  background: #b3d4fc;\n  text-shadow: none;\n}\n\n/*\n * A better looking default horizontal rule\n */\n\nhr {\n  display: block;\n  height: 1px;\n  border: 0;\n  border-top: 1px solid #ccc;\n  margin: 1em 0;\n  padding: 0;\n}\n\n/*\n * Remove the gap between audio, canvas, iframes,\n * images, videos and the bottom of their containers:\n * https://github.com/h5bp/html5-boilerplate/issues/440\n */\n\naudio,\ncanvas,\niframe,\nimg,\nsvg,\nvideo {\n  vertical-align: middle;\n}\n\n/*\n * Remove default fieldset styles.\n */\n\nfieldset {\n  border: 0;\n  margin: 0;\n  padding: 0;\n}\n\n/*\n * Allow only vertical resizing of textareas.\n */\n\ntextarea {\n  resize: vertical;\n}\n\n/*\n * Browser upgrade prompt\n * ========================================================================== */\n\n.browserupgrade {\n  margin: 0.2em 0;\n  background: #ccc;\n  color: #000;\n  padding: 0.2em 0;\n}\n\n/*\n * Print styles\n * Inlined to avoid the additional HTTP request:\n * http://www.phpied.com/delay-loading-your-print-css/\n * ========================================================================== */\n\n@media print {\n  *,\n  *::before,\n  *::after {\n    background: transparent !important;\n    color: #000 !important; /* Black prints faster: http://www.sanbeiji.com/archives/953 */\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n    text-shadow: none !important;\n  }\n\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n\n  a[href]::after {\n    content: ' (' attr(href) ')';\n  }\n\n  abbr[title]::after {\n    content: ' (' attr(title) ')';\n  }\n\n  /*\n   * Don't show links that are fragment identifiers,\n   * or use the `javascript:` pseudo protocol\n   */\n\n  a[href^='#']::after,\n  a[href^='javascript:']::after {\n    content: '';\n  }\n\n  pre,\n  blockquote {\n    border: 1px solid #999;\n    page-break-inside: avoid;\n  }\n\n  /*\n   * Printing Tables:\n   * http://css-discuss.incutio.com/wiki/Printing_Tables\n   */\n\n  thead {\n    display: table-header-group;\n  }\n\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n\n  img {\n    max-width: 100% !important;\n  }\n\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n}\n", "", {"version":3,"sources":["/./components/App/App.css","/../../../node_modules/normalize.css/normalize.css","/./components/variables.css"],"names":[],"mappings":"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","file":"App.css","sourcesContent":["/**\n * React Starter Kit (https://www.reactstarterkit.com/)\n *\n * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE.txt file in the root directory of this source tree.\n */\n\n@import '../../../../../node_modules/normalize.css/normalize.css';\n\n/*! React Starter Kit | MIT License | https://www.reactstarterkit.com/ */\n\n@import '../variables.css';\n\n/*\n * Base styles\n * ========================================================================== */\n\nhtml {\n  color: #222;\n  font-size: 1em; /* ~16px; */\n  font-family: var(--font-family-base);\n  line-height: 1.375; /* ~22px */\n}\n\na {\n  color: #0074c2;\n}\n\n/*\n * Remove text-shadow in selection highlight:\n * https://twitter.com/miketaylr/status/12228805301\n *\n * These selection rule sets have to be separate.\n * Customize the background color to match your design.\n */\n\n::-moz-selection {\n  background: #b3d4fc;\n  text-shadow: none;\n}\n\n::selection {\n  background: #b3d4fc;\n  text-shadow: none;\n}\n\n/*\n * A better looking default horizontal rule\n */\n\nhr {\n  display: block;\n  height: 1px;\n  border: 0;\n  border-top: 1px solid #ccc;\n  margin: 1em 0;\n  padding: 0;\n}\n\n/*\n * Remove the gap between audio, canvas, iframes,\n * images, videos and the bottom of their containers:\n * https://github.com/h5bp/html5-boilerplate/issues/440\n */\n\naudio,\ncanvas,\niframe,\nimg,\nsvg,\nvideo {\n  vertical-align: middle;\n}\n\n/*\n * Remove default fieldset styles.\n */\n\nfieldset {\n  border: 0;\n  margin: 0;\n  padding: 0;\n}\n\n/*\n * Allow only vertical resizing of textareas.\n */\n\ntextarea {\n  resize: vertical;\n}\n\n/*\n * Browser upgrade prompt\n * ========================================================================== */\n\n:global(.browserupgrade) {\n  margin: 0.2em 0;\n  background: #ccc;\n  color: #000;\n  padding: 0.2em 0;\n}\n\n/*\n * Print styles\n * Inlined to avoid the additional HTTP request:\n * http://www.phpied.com/delay-loading-your-print-css/\n * ========================================================================== */\n\n@media print {\n  *,\n  *::before,\n  *::after {\n    background: transparent !important;\n    color: #000 !important; /* Black prints faster: http://www.sanbeiji.com/archives/953 */\n    box-shadow: none !important;\n    text-shadow: none !important;\n  }\n\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n\n  a[href]::after {\n    content: ' (' attr(href) ')';\n  }\n\n  abbr[title]::after {\n    content: ' (' attr(title) ')';\n  }\n\n  /*\n   * Don't show links that are fragment identifiers,\n   * or use the `javascript:` pseudo protocol\n   */\n\n  a[href^='#']::after,\n  a[href^='javascript:']::after {\n    content: '';\n  }\n\n  pre,\n  blockquote {\n    border: 1px solid #999;\n    page-break-inside: avoid;\n  }\n\n  /*\n   * Printing Tables:\n   * http://css-discuss.incutio.com/wiki/Printing_Tables\n   */\n\n  thead {\n    display: table-header-group;\n  }\n\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n\n  img {\n    max-width: 100% !important;\n  }\n\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n}\n","/*! normalize.css v4.1.1 | MIT License | github.com/necolas/normalize.css */\n\n/**\n * 1. Change the default font family in all browsers (opinionated).\n * 2. Correct the line height in all browsers.\n * 3. Prevent adjustments of font size after orientation changes in IE and iOS.\n */\n\nhtml {\n  font-family: sans-serif; /* 1 */\n  line-height: 1.15; /* 2 */\n  -ms-text-size-adjust: 100%; /* 3 */\n  -webkit-text-size-adjust: 100%; /* 3 */\n}\n\n/**\n * Remove the margin in all browsers (opinionated).\n */\n\nbody {\n  margin: 0;\n}\n\n/* HTML5 display definitions\n   ========================================================================== */\n\n/**\n * Add the correct display in IE 9-.\n * 1. Add the correct display in Edge, IE, and Firefox.\n * 2. Add the correct display in IE.\n */\n\narticle,\naside,\ndetails, /* 1 */\nfigcaption,\nfigure,\nfooter,\nheader,\nmain, /* 2 */\nmenu,\nnav,\nsection,\nsummary { /* 1 */\n  display: block;\n}\n\n/**\n * Add the correct display in IE 9-.\n */\n\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n}\n\n/**\n * Add the correct display in iOS 4-7.\n */\n\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n\n/**\n * Add the correct vertical alignment in Chrome, Firefox, and Opera.\n */\n\nprogress {\n  vertical-align: baseline;\n}\n\n/**\n * Add the correct display in IE 10-.\n * 1. Add the correct display in IE.\n */\n\ntemplate, /* 1 */\n[hidden] {\n  display: none;\n}\n\n/* Links\n   ========================================================================== */\n\n/**\n * 1. Remove the gray background on active links in IE 10.\n * 2. Remove gaps in links underline in iOS 8+ and Safari 8+.\n */\n\na {\n  background-color: transparent; /* 1 */\n  -webkit-text-decoration-skip: objects; /* 2 */\n}\n\n/**\n * Remove the outline on focused links when they are also active or hovered\n * in all browsers (opinionated).\n */\n\na:active,\na:hover {\n  outline-width: 0;\n}\n\n/* Text-level semantics\n   ========================================================================== */\n\n/**\n * 1. Remove the bottom border in Firefox 39-.\n * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.\n */\n\nabbr[title] {\n  border-bottom: none; /* 1 */\n  text-decoration: underline; /* 2 */\n  text-decoration: underline dotted; /* 2 */\n}\n\n/**\n * Prevent the duplicate application of `bolder` by the next rule in Safari 6.\n */\n\nb,\nstrong {\n  font-weight: inherit;\n}\n\n/**\n * Add the correct font weight in Chrome, Edge, and Safari.\n */\n\nb,\nstrong {\n  font-weight: bolder;\n}\n\n/**\n * Add the correct font style in Android 4.3-.\n */\n\ndfn {\n  font-style: italic;\n}\n\n/**\n * Correct the font size and margin on `h1` elements within `section` and\n * `article` contexts in Chrome, Firefox, and Safari.\n */\n\nh1 {\n  font-size: 2em;\n  margin: 0.67em 0;\n}\n\n/**\n * Add the correct background and color in IE 9-.\n */\n\nmark {\n  background-color: #ff0;\n  color: #000;\n}\n\n/**\n * Add the correct font size in all browsers.\n */\n\nsmall {\n  font-size: 80%;\n}\n\n/**\n * Prevent `sub` and `sup` elements from affecting the line height in\n * all browsers.\n */\n\nsub,\nsup {\n  font-size: 75%;\n  line-height: 0;\n  position: relative;\n  vertical-align: baseline;\n}\n\nsub {\n  bottom: -0.25em;\n}\n\nsup {\n  top: -0.5em;\n}\n\n/* Embedded content\n   ========================================================================== */\n\n/**\n * Remove the border on images inside links in IE 10-.\n */\n\nimg {\n  border-style: none;\n}\n\n/**\n * Hide the overflow in IE.\n */\n\nsvg:not(:root) {\n  overflow: hidden;\n}\n\n/* Grouping content\n   ========================================================================== */\n\n/**\n * 1. Correct the inheritance and scaling of font size in all browsers.\n * 2. Correct the odd `em` font sizing in all browsers.\n */\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace; /* 1 */\n  font-size: 1em; /* 2 */\n}\n\n/**\n * Add the correct margin in IE 8.\n */\n\nfigure {\n  margin: 1em 40px;\n}\n\n/**\n * 1. Add the correct box sizing in Firefox.\n * 2. Show the overflow in Edge and IE.\n */\n\nhr {\n  box-sizing: content-box; /* 1 */\n  height: 0; /* 1 */\n  overflow: visible; /* 2 */\n}\n\n/* Forms\n   ========================================================================== */\n\n/**\n * 1. Change font properties to `inherit` in all browsers (opinionated).\n * 2. Remove the margin in Firefox and Safari.\n */\n\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  font: inherit; /* 1 */\n  margin: 0; /* 2 */\n}\n\n/**\n * Restore the font weight unset by the previous rule.\n */\n\noptgroup {\n  font-weight: bold;\n}\n\n/**\n * Show the overflow in IE.\n * 1. Show the overflow in Edge.\n */\n\nbutton,\ninput { /* 1 */\n  overflow: visible;\n}\n\n/**\n * Remove the inheritance of text transform in Edge, Firefox, and IE.\n * 1. Remove the inheritance of text transform in Firefox.\n */\n\nbutton,\nselect { /* 1 */\n  text-transform: none;\n}\n\n/**\n * 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`\n *    controls in Android 4.\n * 2. Correct the inability to style clickable types in iOS and Safari.\n */\n\nbutton,\nhtml [type=\"button\"], /* 1 */\n[type=\"reset\"],\n[type=\"submit\"] {\n  -webkit-appearance: button; /* 2 */\n}\n\n/**\n * Remove the inner border and padding in Firefox.\n */\n\nbutton::-moz-focus-inner,\n[type=\"button\"]::-moz-focus-inner,\n[type=\"reset\"]::-moz-focus-inner,\n[type=\"submit\"]::-moz-focus-inner {\n  border-style: none;\n  padding: 0;\n}\n\n/**\n * Restore the focus styles unset by the previous rule.\n */\n\nbutton:-moz-focusring,\n[type=\"button\"]:-moz-focusring,\n[type=\"reset\"]:-moz-focusring,\n[type=\"submit\"]:-moz-focusring {\n  outline: 1px dotted ButtonText;\n}\n\n/**\n * Change the border, margin, and padding in all browsers (opinionated).\n */\n\nfieldset {\n  border: 1px solid #c0c0c0;\n  margin: 0 2px;\n  padding: 0.35em 0.625em 0.75em;\n}\n\n/**\n * 1. Correct the text wrapping in Edge and IE.\n * 2. Correct the color inheritance from `fieldset` elements in IE.\n * 3. Remove the padding so developers are not caught out when they zero out\n *    `fieldset` elements in all browsers.\n */\n\nlegend {\n  box-sizing: border-box; /* 1 */\n  color: inherit; /* 2 */\n  display: table; /* 1 */\n  max-width: 100%; /* 1 */\n  padding: 0; /* 3 */\n  white-space: normal; /* 1 */\n}\n\n/**\n * Remove the default vertical scrollbar in IE.\n */\n\ntextarea {\n  overflow: auto;\n}\n\n/**\n * 1. Add the correct box sizing in IE 10-.\n * 2. Remove the padding in IE 10-.\n */\n\n[type=\"checkbox\"],\n[type=\"radio\"] {\n  box-sizing: border-box; /* 1 */\n  padding: 0; /* 2 */\n}\n\n/**\n * Correct the cursor style of increment and decrement buttons in Chrome.\n */\n\n[type=\"number\"]::-webkit-inner-spin-button,\n[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\n\n/**\n * 1. Correct the odd appearance in Chrome and Safari.\n * 2. Correct the outline style in Safari.\n */\n\n[type=\"search\"] {\n  -webkit-appearance: textfield; /* 1 */\n  outline-offset: -2px; /* 2 */\n}\n\n/**\n * Remove the inner padding and cancel buttons in Chrome and Safari on OS X.\n */\n\n[type=\"search\"]::-webkit-search-cancel-button,\n[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\n\n/**\n * Correct the text style of placeholders in Chrome, Edge, and Safari.\n */\n\n::-webkit-input-placeholder {\n  color: inherit;\n  opacity: 0.54;\n}\n\n/**\n * 1. Correct the inability to style clickable types in iOS and Safari.\n * 2. Change font properties to `inherit` in Safari.\n */\n\n::-webkit-file-upload-button {\n  -webkit-appearance: button; /* 1 */\n  font: inherit; /* 2 */\n}\n","/**\n * React Starter Kit (https://www.reactstarterkit.com/)\n *\n * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE.txt file in the root directory of this source tree.\n */\n\n:root {\n  /*\n   * Typography\n   * ======================================================================== */\n\n  --font-family-base: 'Segoe UI', 'HelveticaNeue-Light', sans-serif;\n\n  /*\n   * Layout\n   * ======================================================================== */\n\n  --max-content-width: 1000px;\n\n  /*\n   * Media queries breakpoints\n   * ======================================================================== */\n\n  --screen-xs-min: 480px;  /* Extra small screen / phone */\n  --screen-sm-min: 768px;  /* Small screen / tablet */\n  --screen-md-min: 992px;  /* Medium screen / desktop */\n  --screen-lg-min: 1200px; /* Large screen / wide desktop */\n}\n"],"sourceRoot":"webpack://"}]);
+  exports.push([module.id, "/**\n * React Starter Kit (https://www.reactstarterkit.com/)\n *\n * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE.txt file in the root directory of this source tree.\n */\n\n/*! normalize.css v4.1.1 | MIT License | github.com/necolas/normalize.css */\n\n/**\n * 1. Change the default font family in all browsers (opinionated).\n * 2. Correct the line height in all browsers.\n * 3. Prevent adjustments of font size after orientation changes in IE and iOS.\n */\n\nhtml {\n  font-family: sans-serif; /* 1 */\n  line-height: 1.15; /* 2 */\n  -ms-text-size-adjust: 100%; /* 3 */\n  -webkit-text-size-adjust: 100%; /* 3 */\n}\n\n/**\n * Remove the margin in all browsers (opinionated).\n */\n\nbody {\n  margin: 0;\n}\n\n/* HTML5 display definitions\n   ========================================================================== */\n\n/**\n * Add the correct display in IE 9-.\n * 1. Add the correct display in Edge, IE, and Firefox.\n * 2. Add the correct display in IE.\n */\n\narticle,\naside,\ndetails, /* 1 */\nfigcaption,\nfigure,\nfooter,\nheader,\nmain, /* 2 */\nmenu,\nnav,\nsection,\nsummary { /* 1 */\n  display: block;\n}\n\n/**\n * Add the correct display in IE 9-.\n */\n\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n}\n\n/**\n * Add the correct display in iOS 4-7.\n */\n\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n\n/**\n * Add the correct vertical alignment in Chrome, Firefox, and Opera.\n */\n\nprogress {\n  vertical-align: baseline;\n}\n\n/**\n * Add the correct display in IE 10-.\n * 1. Add the correct display in IE.\n */\n\ntemplate, /* 1 */\n[hidden] {\n  display: none;\n}\n\n/* Links\n   ========================================================================== */\n\n/**\n * 1. Remove the gray background on active links in IE 10.\n * 2. Remove gaps in links underline in iOS 8+ and Safari 8+.\n */\n\na {\n  background-color: transparent; /* 1 */\n  -webkit-text-decoration-skip: objects; /* 2 */\n}\n\n/**\n * Remove the outline on focused links when they are also active or hovered\n * in all browsers (opinionated).\n */\n\na:active,\na:hover {\n  outline-width: 0;\n}\n\n/* Text-level semantics\n   ========================================================================== */\n\n/**\n * 1. Remove the bottom border in Firefox 39-.\n * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.\n */\n\nabbr[title] {\n  border-bottom: none; /* 1 */\n  text-decoration: underline; /* 2 */\n  text-decoration: underline dotted; /* 2 */\n}\n\n/**\n * Prevent the duplicate application of `bolder` by the next rule in Safari 6.\n */\n\nb,\nstrong {\n  font-weight: inherit;\n}\n\n/**\n * Add the correct font weight in Chrome, Edge, and Safari.\n */\n\nb,\nstrong {\n  font-weight: bolder;\n}\n\n/**\n * Add the correct font style in Android 4.3-.\n */\n\ndfn {\n  font-style: italic;\n}\n\n/**\n * Correct the font size and margin on `h1` elements within `section` and\n * `article` contexts in Chrome, Firefox, and Safari.\n */\n\nh1 {\n  font-size: 2em;\n  margin: 0.67em 0;\n}\n\n/**\n * Add the correct background and color in IE 9-.\n */\n\nmark {\n  background-color: #ff0;\n  color: #000;\n}\n\n/**\n * Add the correct font size in all browsers.\n */\n\nsmall {\n  font-size: 80%;\n}\n\n/**\n * Prevent `sub` and `sup` elements from affecting the line height in\n * all browsers.\n */\n\nsub,\nsup {\n  font-size: 75%;\n  line-height: 0;\n  position: relative;\n  vertical-align: baseline;\n}\n\nsub {\n  bottom: -0.25em;\n}\n\nsup {\n  top: -0.5em;\n}\n\n/* Embedded content\n   ========================================================================== */\n\n/**\n * Remove the border on images inside links in IE 10-.\n */\n\nimg {\n  border-style: none;\n}\n\n/**\n * Hide the overflow in IE.\n */\n\nsvg:not(:root) {\n  overflow: hidden;\n}\n\n/* Grouping content\n   ========================================================================== */\n\n/**\n * 1. Correct the inheritance and scaling of font size in all browsers.\n * 2. Correct the odd `em` font sizing in all browsers.\n */\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace; /* 1 */\n  font-size: 1em; /* 2 */\n}\n\n/**\n * Add the correct margin in IE 8.\n */\n\nfigure {\n  margin: 1em 40px;\n}\n\n/**\n * 1. Add the correct box sizing in Firefox.\n * 2. Show the overflow in Edge and IE.\n */\n\nhr {\n  -webkit-box-sizing: content-box;\n          box-sizing: content-box; /* 1 */\n  height: 0; /* 1 */\n  overflow: visible; /* 2 */\n}\n\n/* Forms\n   ========================================================================== */\n\n/**\n * 1. Change font properties to `inherit` in all browsers (opinionated).\n * 2. Remove the margin in Firefox and Safari.\n */\n\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  font: inherit; /* 1 */\n  margin: 0; /* 2 */\n}\n\n/**\n * Restore the font weight unset by the previous rule.\n */\n\noptgroup {\n  font-weight: bold;\n}\n\n/**\n * Show the overflow in IE.\n * 1. Show the overflow in Edge.\n */\n\nbutton,\ninput { /* 1 */\n  overflow: visible;\n}\n\n/**\n * Remove the inheritance of text transform in Edge, Firefox, and IE.\n * 1. Remove the inheritance of text transform in Firefox.\n */\n\nbutton,\nselect { /* 1 */\n  text-transform: none;\n}\n\n/**\n * 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`\n *    controls in Android 4.\n * 2. Correct the inability to style clickable types in iOS and Safari.\n */\n\nbutton,\nhtml [type=\"button\"], /* 1 */\n[type=\"reset\"],\n[type=\"submit\"] {\n  -webkit-appearance: button; /* 2 */\n}\n\n/**\n * Remove the inner border and padding in Firefox.\n */\n\nbutton::-moz-focus-inner,\n[type=\"button\"]::-moz-focus-inner,\n[type=\"reset\"]::-moz-focus-inner,\n[type=\"submit\"]::-moz-focus-inner {\n  border-style: none;\n  padding: 0;\n}\n\n/**\n * Restore the focus styles unset by the previous rule.\n */\n\nbutton:-moz-focusring,\n[type=\"button\"]:-moz-focusring,\n[type=\"reset\"]:-moz-focusring,\n[type=\"submit\"]:-moz-focusring {\n  outline: 1px dotted ButtonText;\n}\n\n/**\n * Change the border, margin, and padding in all browsers (opinionated).\n */\n\nfieldset {\n  border: 1px solid #c0c0c0;\n  margin: 0 2px;\n  padding: 0.35em 0.625em 0.75em;\n}\n\n/**\n * 1. Correct the text wrapping in Edge and IE.\n * 2. Correct the color inheritance from `fieldset` elements in IE.\n * 3. Remove the padding so developers are not caught out when they zero out\n *    `fieldset` elements in all browsers.\n */\n\nlegend {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box; /* 1 */\n  color: inherit; /* 2 */\n  display: table; /* 1 */\n  max-width: 100%; /* 1 */\n  padding: 0; /* 3 */\n  white-space: normal; /* 1 */\n}\n\n/**\n * Remove the default vertical scrollbar in IE.\n */\n\ntextarea {\n  overflow: auto;\n}\n\n/**\n * 1. Add the correct box sizing in IE 10-.\n * 2. Remove the padding in IE 10-.\n */\n\n[type=\"checkbox\"],\n[type=\"radio\"] {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box; /* 1 */\n  padding: 0; /* 2 */\n}\n\n/**\n * Correct the cursor style of increment and decrement buttons in Chrome.\n */\n\n[type=\"number\"]::-webkit-inner-spin-button,\n[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\n\n/**\n * 1. Correct the odd appearance in Chrome and Safari.\n * 2. Correct the outline style in Safari.\n */\n\n[type=\"search\"] {\n  -webkit-appearance: textfield; /* 1 */\n  outline-offset: -2px; /* 2 */\n}\n\n/**\n * Remove the inner padding and cancel buttons in Chrome and Safari on OS X.\n */\n\n[type=\"search\"]::-webkit-search-cancel-button,\n[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\n\n/**\n * Correct the text style of placeholders in Chrome, Edge, and Safari.\n */\n\n::-webkit-input-placeholder {\n  color: inherit;\n  opacity: 0.54;\n}\n\n/**\n * 1. Correct the inability to style clickable types in iOS and Safari.\n * 2. Change font properties to `inherit` in Safari.\n */\n\n::-webkit-file-upload-button {\n  -webkit-appearance: button; /* 1 */\n  font: inherit; /* 2 */\n}\n\n/*! React Starter Kit | MIT License | https://www.reactstarterkit.com/ */\n\n/**\n * React Starter Kit (https://www.reactstarterkit.com/)\n *\n * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE.txt file in the root directory of this source tree.\n */\n\n:root {\n  /*\n   * Typography\n   * ======================================================================== */\n\n  /*\n   * Layout\n   * ======================================================================== */\n\n  /*\n   * Media queries breakpoints\n   * ======================================================================== */  /* Extra small screen / phone */  /* Small screen / tablet */  /* Medium screen / desktop */ /* Large screen / wide desktop */\n}\n\n/*\n * Base styles\n * ========================================================================== */\n\nhtml {\n  color: #222;\n  font-size: 1em; /* ~16px; */\n  font-family: 'Segoe UI', 'HelveticaNeue-Light', sans-serif;\n  line-height: 1.375; /* ~22px */\n}\n\na {\n  color: #0074c2;\n}\n\n/*\n * Remove text-shadow in selection highlight:\n * https://twitter.com/miketaylr/status/12228805301\n *\n * These selection rule sets have to be separate.\n * Customize the background color to match your design.\n */\n\n::-moz-selection {\n  background: #b3d4fc;\n  text-shadow: none;\n}\n\n::selection {\n  background: #b3d4fc;\n  text-shadow: none;\n}\n\n/*\n * A better looking default horizontal rule\n */\n\nhr {\n  display: block;\n  height: 1px;\n  border: 0;\n  border-top: 1px solid #ccc;\n  margin: 1em 0;\n  padding: 0;\n}\n\n/*\n * Remove the gap between audio, canvas, iframes,\n * images, videos and the bottom of their containers:\n * https://github.com/h5bp/html5-boilerplate/issues/440\n */\n\naudio,\ncanvas,\niframe,\nimg,\nsvg,\nvideo {\n  vertical-align: middle;\n}\n\n/*\n * Remove default fieldset styles.\n */\n\nfieldset {\n  border: 0;\n  margin: 0;\n  padding: 0;\n}\n\n/*\n * Allow only vertical resizing of textareas.\n */\n\ntextarea {\n  resize: vertical;\n}\n\n/*\n * Browser upgrade prompt\n * ========================================================================== */\n\n.browserupgrade {\n  margin: 0.2em 0;\n  background: #ccc;\n  color: #000;\n  padding: 0.2em 0;\n}\n\n/*\n * Print styles\n * Inlined to avoid the additional HTTP request:\n * http://www.phpied.com/delay-loading-your-print-css/\n * ========================================================================== */\n\n@media print {\n  *,\n  *::before,\n  *::after {\n    background: transparent !important;\n    color: #000 !important; /* Black prints faster: http://www.sanbeiji.com/archives/953 */\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n    text-shadow: none !important;\n  }\n\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n\n  a[href]::after {\n    content: ' (' attr(href) ')';\n  }\n\n  abbr[title]::after {\n    content: ' (' attr(title) ')';\n  }\n\n  /*\n   * Don't show links that are fragment identifiers,\n   * or use the `javascript:` pseudo protocol\n   */\n\n  a[href^='#']::after,\n  a[href^='javascript:']::after {\n    content: '';\n  }\n\n  pre,\n  blockquote {\n    border: 1px solid #999;\n    page-break-inside: avoid;\n  }\n\n  /*\n   * Printing Tables:\n   * http://css-discuss.incutio.com/wiki/Printing_Tables\n   */\n\n  thead {\n    display: table-header-group;\n  }\n\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n\n  img {\n    max-width: 100% !important;\n  }\n\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n}\n", "", {"version":3,"sources":["/./components/app/App.css","/../../../node_modules/normalize.css/normalize.css","/./components/variables.css"],"names":[],"mappings":"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","file":"App.css","sourcesContent":["/**\n * React Starter Kit (https://www.reactstarterkit.com/)\n *\n * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE.txt file in the root directory of this source tree.\n */\n\n@import '../../../../../node_modules/normalize.css/normalize.css';\n\n/*! React Starter Kit | MIT License | https://www.reactstarterkit.com/ */\n\n@import '../variables.css';\n\n/*\n * Base styles\n * ========================================================================== */\n\nhtml {\n  color: #222;\n  font-size: 1em; /* ~16px; */\n  font-family: var(--font-family-base);\n  line-height: 1.375; /* ~22px */\n}\n\na {\n  color: #0074c2;\n}\n\n/*\n * Remove text-shadow in selection highlight:\n * https://twitter.com/miketaylr/status/12228805301\n *\n * These selection rule sets have to be separate.\n * Customize the background color to match your design.\n */\n\n::-moz-selection {\n  background: #b3d4fc;\n  text-shadow: none;\n}\n\n::selection {\n  background: #b3d4fc;\n  text-shadow: none;\n}\n\n/*\n * A better looking default horizontal rule\n */\n\nhr {\n  display: block;\n  height: 1px;\n  border: 0;\n  border-top: 1px solid #ccc;\n  margin: 1em 0;\n  padding: 0;\n}\n\n/*\n * Remove the gap between audio, canvas, iframes,\n * images, videos and the bottom of their containers:\n * https://github.com/h5bp/html5-boilerplate/issues/440\n */\n\naudio,\ncanvas,\niframe,\nimg,\nsvg,\nvideo {\n  vertical-align: middle;\n}\n\n/*\n * Remove default fieldset styles.\n */\n\nfieldset {\n  border: 0;\n  margin: 0;\n  padding: 0;\n}\n\n/*\n * Allow only vertical resizing of textareas.\n */\n\ntextarea {\n  resize: vertical;\n}\n\n/*\n * Browser upgrade prompt\n * ========================================================================== */\n\n:global(.browserupgrade) {\n  margin: 0.2em 0;\n  background: #ccc;\n  color: #000;\n  padding: 0.2em 0;\n}\n\n/*\n * Print styles\n * Inlined to avoid the additional HTTP request:\n * http://www.phpied.com/delay-loading-your-print-css/\n * ========================================================================== */\n\n@media print {\n  *,\n  *::before,\n  *::after {\n    background: transparent !important;\n    color: #000 !important; /* Black prints faster: http://www.sanbeiji.com/archives/953 */\n    box-shadow: none !important;\n    text-shadow: none !important;\n  }\n\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n\n  a[href]::after {\n    content: ' (' attr(href) ')';\n  }\n\n  abbr[title]::after {\n    content: ' (' attr(title) ')';\n  }\n\n  /*\n   * Don't show links that are fragment identifiers,\n   * or use the `javascript:` pseudo protocol\n   */\n\n  a[href^='#']::after,\n  a[href^='javascript:']::after {\n    content: '';\n  }\n\n  pre,\n  blockquote {\n    border: 1px solid #999;\n    page-break-inside: avoid;\n  }\n\n  /*\n   * Printing Tables:\n   * http://css-discuss.incutio.com/wiki/Printing_Tables\n   */\n\n  thead {\n    display: table-header-group;\n  }\n\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n\n  img {\n    max-width: 100% !important;\n  }\n\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n}\n","/*! normalize.css v4.1.1 | MIT License | github.com/necolas/normalize.css */\n\n/**\n * 1. Change the default font family in all browsers (opinionated).\n * 2. Correct the line height in all browsers.\n * 3. Prevent adjustments of font size after orientation changes in IE and iOS.\n */\n\nhtml {\n  font-family: sans-serif; /* 1 */\n  line-height: 1.15; /* 2 */\n  -ms-text-size-adjust: 100%; /* 3 */\n  -webkit-text-size-adjust: 100%; /* 3 */\n}\n\n/**\n * Remove the margin in all browsers (opinionated).\n */\n\nbody {\n  margin: 0;\n}\n\n/* HTML5 display definitions\n   ========================================================================== */\n\n/**\n * Add the correct display in IE 9-.\n * 1. Add the correct display in Edge, IE, and Firefox.\n * 2. Add the correct display in IE.\n */\n\narticle,\naside,\ndetails, /* 1 */\nfigcaption,\nfigure,\nfooter,\nheader,\nmain, /* 2 */\nmenu,\nnav,\nsection,\nsummary { /* 1 */\n  display: block;\n}\n\n/**\n * Add the correct display in IE 9-.\n */\n\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n}\n\n/**\n * Add the correct display in iOS 4-7.\n */\n\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n\n/**\n * Add the correct vertical alignment in Chrome, Firefox, and Opera.\n */\n\nprogress {\n  vertical-align: baseline;\n}\n\n/**\n * Add the correct display in IE 10-.\n * 1. Add the correct display in IE.\n */\n\ntemplate, /* 1 */\n[hidden] {\n  display: none;\n}\n\n/* Links\n   ========================================================================== */\n\n/**\n * 1. Remove the gray background on active links in IE 10.\n * 2. Remove gaps in links underline in iOS 8+ and Safari 8+.\n */\n\na {\n  background-color: transparent; /* 1 */\n  -webkit-text-decoration-skip: objects; /* 2 */\n}\n\n/**\n * Remove the outline on focused links when they are also active or hovered\n * in all browsers (opinionated).\n */\n\na:active,\na:hover {\n  outline-width: 0;\n}\n\n/* Text-level semantics\n   ========================================================================== */\n\n/**\n * 1. Remove the bottom border in Firefox 39-.\n * 2. Add the correct text decoration in Chrome, Edge, IE, Opera, and Safari.\n */\n\nabbr[title] {\n  border-bottom: none; /* 1 */\n  text-decoration: underline; /* 2 */\n  text-decoration: underline dotted; /* 2 */\n}\n\n/**\n * Prevent the duplicate application of `bolder` by the next rule in Safari 6.\n */\n\nb,\nstrong {\n  font-weight: inherit;\n}\n\n/**\n * Add the correct font weight in Chrome, Edge, and Safari.\n */\n\nb,\nstrong {\n  font-weight: bolder;\n}\n\n/**\n * Add the correct font style in Android 4.3-.\n */\n\ndfn {\n  font-style: italic;\n}\n\n/**\n * Correct the font size and margin on `h1` elements within `section` and\n * `article` contexts in Chrome, Firefox, and Safari.\n */\n\nh1 {\n  font-size: 2em;\n  margin: 0.67em 0;\n}\n\n/**\n * Add the correct background and color in IE 9-.\n */\n\nmark {\n  background-color: #ff0;\n  color: #000;\n}\n\n/**\n * Add the correct font size in all browsers.\n */\n\nsmall {\n  font-size: 80%;\n}\n\n/**\n * Prevent `sub` and `sup` elements from affecting the line height in\n * all browsers.\n */\n\nsub,\nsup {\n  font-size: 75%;\n  line-height: 0;\n  position: relative;\n  vertical-align: baseline;\n}\n\nsub {\n  bottom: -0.25em;\n}\n\nsup {\n  top: -0.5em;\n}\n\n/* Embedded content\n   ========================================================================== */\n\n/**\n * Remove the border on images inside links in IE 10-.\n */\n\nimg {\n  border-style: none;\n}\n\n/**\n * Hide the overflow in IE.\n */\n\nsvg:not(:root) {\n  overflow: hidden;\n}\n\n/* Grouping content\n   ========================================================================== */\n\n/**\n * 1. Correct the inheritance and scaling of font size in all browsers.\n * 2. Correct the odd `em` font sizing in all browsers.\n */\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace; /* 1 */\n  font-size: 1em; /* 2 */\n}\n\n/**\n * Add the correct margin in IE 8.\n */\n\nfigure {\n  margin: 1em 40px;\n}\n\n/**\n * 1. Add the correct box sizing in Firefox.\n * 2. Show the overflow in Edge and IE.\n */\n\nhr {\n  box-sizing: content-box; /* 1 */\n  height: 0; /* 1 */\n  overflow: visible; /* 2 */\n}\n\n/* Forms\n   ========================================================================== */\n\n/**\n * 1. Change font properties to `inherit` in all browsers (opinionated).\n * 2. Remove the margin in Firefox and Safari.\n */\n\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  font: inherit; /* 1 */\n  margin: 0; /* 2 */\n}\n\n/**\n * Restore the font weight unset by the previous rule.\n */\n\noptgroup {\n  font-weight: bold;\n}\n\n/**\n * Show the overflow in IE.\n * 1. Show the overflow in Edge.\n */\n\nbutton,\ninput { /* 1 */\n  overflow: visible;\n}\n\n/**\n * Remove the inheritance of text transform in Edge, Firefox, and IE.\n * 1. Remove the inheritance of text transform in Firefox.\n */\n\nbutton,\nselect { /* 1 */\n  text-transform: none;\n}\n\n/**\n * 1. Prevent a WebKit bug where (2) destroys native `audio` and `video`\n *    controls in Android 4.\n * 2. Correct the inability to style clickable types in iOS and Safari.\n */\n\nbutton,\nhtml [type=\"button\"], /* 1 */\n[type=\"reset\"],\n[type=\"submit\"] {\n  -webkit-appearance: button; /* 2 */\n}\n\n/**\n * Remove the inner border and padding in Firefox.\n */\n\nbutton::-moz-focus-inner,\n[type=\"button\"]::-moz-focus-inner,\n[type=\"reset\"]::-moz-focus-inner,\n[type=\"submit\"]::-moz-focus-inner {\n  border-style: none;\n  padding: 0;\n}\n\n/**\n * Restore the focus styles unset by the previous rule.\n */\n\nbutton:-moz-focusring,\n[type=\"button\"]:-moz-focusring,\n[type=\"reset\"]:-moz-focusring,\n[type=\"submit\"]:-moz-focusring {\n  outline: 1px dotted ButtonText;\n}\n\n/**\n * Change the border, margin, and padding in all browsers (opinionated).\n */\n\nfieldset {\n  border: 1px solid #c0c0c0;\n  margin: 0 2px;\n  padding: 0.35em 0.625em 0.75em;\n}\n\n/**\n * 1. Correct the text wrapping in Edge and IE.\n * 2. Correct the color inheritance from `fieldset` elements in IE.\n * 3. Remove the padding so developers are not caught out when they zero out\n *    `fieldset` elements in all browsers.\n */\n\nlegend {\n  box-sizing: border-box; /* 1 */\n  color: inherit; /* 2 */\n  display: table; /* 1 */\n  max-width: 100%; /* 1 */\n  padding: 0; /* 3 */\n  white-space: normal; /* 1 */\n}\n\n/**\n * Remove the default vertical scrollbar in IE.\n */\n\ntextarea {\n  overflow: auto;\n}\n\n/**\n * 1. Add the correct box sizing in IE 10-.\n * 2. Remove the padding in IE 10-.\n */\n\n[type=\"checkbox\"],\n[type=\"radio\"] {\n  box-sizing: border-box; /* 1 */\n  padding: 0; /* 2 */\n}\n\n/**\n * Correct the cursor style of increment and decrement buttons in Chrome.\n */\n\n[type=\"number\"]::-webkit-inner-spin-button,\n[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\n\n/**\n * 1. Correct the odd appearance in Chrome and Safari.\n * 2. Correct the outline style in Safari.\n */\n\n[type=\"search\"] {\n  -webkit-appearance: textfield; /* 1 */\n  outline-offset: -2px; /* 2 */\n}\n\n/**\n * Remove the inner padding and cancel buttons in Chrome and Safari on OS X.\n */\n\n[type=\"search\"]::-webkit-search-cancel-button,\n[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\n\n/**\n * Correct the text style of placeholders in Chrome, Edge, and Safari.\n */\n\n::-webkit-input-placeholder {\n  color: inherit;\n  opacity: 0.54;\n}\n\n/**\n * 1. Correct the inability to style clickable types in iOS and Safari.\n * 2. Change font properties to `inherit` in Safari.\n */\n\n::-webkit-file-upload-button {\n  -webkit-appearance: button; /* 1 */\n  font: inherit; /* 2 */\n}\n","/**\n * React Starter Kit (https://www.reactstarterkit.com/)\n *\n * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.\n *\n * This source code is licensed under the MIT license found in the\n * LICENSE.txt file in the root directory of this source tree.\n */\n\n:root {\n  /*\n   * Typography\n   * ======================================================================== */\n\n  --font-family-base: 'Segoe UI', 'HelveticaNeue-Light', sans-serif;\n\n  /*\n   * Layout\n   * ======================================================================== */\n\n  --max-content-width: 1000px;\n\n  /*\n   * Media queries breakpoints\n   * ======================================================================== */\n\n  --screen-xs-min: 480px;  /* Extra small screen / phone */\n  --screen-sm-min: 768px;  /* Small screen / tablet */\n  --screen-md-min: 992px;  /* Medium screen / desktop */\n  --screen-lg-min: 1200px; /* Large screen / wide desktop */\n}\n"],"sourceRoot":"webpack://"}]);
   
   // exports
 
 
 /***/ },
-/* 48 */,
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+  'use strict';
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  
+  var _react = __webpack_require__(12);
+  
+  var _react2 = _interopRequireDefault(_react);
+  
+  var _withStyles = __webpack_require__(19);
+  
+  var _withStyles2 = _interopRequireDefault(_withStyles);
+  
+  var _reactBootstrap = __webpack_require__(49);
+  
+  var _Navbar = __webpack_require__(50);
+  
+  var _Navbar2 = _interopRequireDefault(_Navbar);
+  
+  var _history = __webpack_require__(51);
+  
+  var _history2 = _interopRequireDefault(_history);
+  
+  var _jquery = __webpack_require__(55);
+  
+  var _jquery2 = _interopRequireDefault(_jquery);
+  
+  var _sidebar = __webpack_require__(56);
+  
+  var _sidebar2 = _interopRequireDefault(_sidebar);
+  
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  
+  var logo = __webpack_require__(57); /**
+                                     * React Starter Kit (https://www.reactstarterkit.com/)
+                                     *
+                                     * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.
+                                     *
+                                     * This source code is licensed under the MIT license found in the
+                                     * LICENSE.txt file in the root directory of this source tree.
+                                     */
+  
+  function Header() {
+    return _react2.default.createElement(
+      'div',
+      { id: 'wrapper', className: 'content' },
+      _react2.default.createElement(
+        _Navbar2.default,
+        { fluid: true, style: { margin: 0 } },
+        _react2.default.createElement(
+          _Navbar.Brand,
+          null,
+          _react2.default.createElement(
+            'span',
+            null,
+            _react2.default.createElement('img', { src: logo, alt: 'Open Foris Collect', title: 'Open Foris Collect' }),
+            _react2.default.createElement(
+              'span',
+              null,
+              '\xA0Open Foris Collect'
+            ),
+            _react2.default.createElement(
+              'button',
+              { type: 'button', className: 'navbar-toggle', onClick: function onClick() {
+                  toggleMenu();
+                }, style: { position: 'absolute', right: 0, top: 0 } },
+              _react2.default.createElement(
+                'span',
+                { className: 'sr-only' },
+                'Toggle navigation'
+              ),
+              _react2.default.createElement('span', { className: 'icon-bar' }),
+              _react2.default.createElement('span', { className: 'icon-bar' }),
+              _react2.default.createElement('span', { className: 'icon-bar' })
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'ul',
+          { className: 'nav navbar-top-links navbar-right' },
+          _react2.default.createElement(
+            _reactBootstrap.NavDropdown,
+            { bsClass: 'dropdown', title: _react2.default.createElement(
+                'span',
+                null,
+                _react2.default.createElement('i', { className: 'fa fa-envelope fa-fw' })
+              ), id: 'navDropdown1' },
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { style: { width: 300 }, eventKey: '1' },
+              _react2.default.createElement(
+                'div',
+                null,
+                ' ',
+                _react2.default.createElement(
+                  'strong',
+                  null,
+                  'John Smith'
+                ),
+                ' ',
+                _react2.default.createElement(
+                  'span',
+                  { className: 'pull-right text-muted' },
+                  ' ',
+                  _react2.default.createElement(
+                    'em',
+                    null,
+                    'Yesterday'
+                  ),
+                  ' '
+                ),
+                ' '
+              ),
+              _react2.default.createElement(
+                'div',
+                null,
+                ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...'
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '2' },
+              _react2.default.createElement(
+                'div',
+                null,
+                ' ',
+                _react2.default.createElement(
+                  'strong',
+                  null,
+                  'John Smith'
+                ),
+                ' ',
+                _react2.default.createElement(
+                  'span',
+                  { className: 'pull-right text-muted' },
+                  ' ',
+                  _react2.default.createElement(
+                    'em',
+                    null,
+                    'Yesterday'
+                  ),
+                  ' '
+                ),
+                ' '
+              ),
+              _react2.default.createElement(
+                'div',
+                null,
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...'
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '3' },
+              _react2.default.createElement(
+                'div',
+                null,
+                ' ',
+                _react2.default.createElement(
+                  'strong',
+                  null,
+                  'John Smith'
+                ),
+                ' ',
+                _react2.default.createElement(
+                  'span',
+                  { className: 'pull-right text-muted' },
+                  ' ',
+                  _react2.default.createElement(
+                    'em',
+                    null,
+                    'Yesterday'
+                  ),
+                  ' '
+                ),
+                ' '
+              ),
+              _react2.default.createElement(
+                'div',
+                null,
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...'
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '4', className: 'text-center' },
+              _react2.default.createElement(
+                'strong',
+                null,
+                'Read All Messages'
+              ),
+              ' ',
+              _react2.default.createElement('i', { className: 'fa fa-angle-right' })
+            )
+          ),
+          _react2.default.createElement(
+            _reactBootstrap.NavDropdown,
+            { title: _react2.default.createElement(
+                'span',
+                null,
+                _react2.default.createElement('i', { className: 'fa fa-tasks fa-fw' }),
+                ' '
+              ), id: 'navDropdown2222' },
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '1', style: { width: 300 } },
+              _react2.default.createElement(
+                'div',
+                null,
+                _react2.default.createElement(
+                  'p',
+                  null,
+                  ' ',
+                  _react2.default.createElement(
+                    'strong',
+                    null,
+                    'Task 1'
+                  ),
+                  ' ',
+                  _react2.default.createElement(
+                    'span',
+                    { className: 'pull-right text-muted' },
+                    '40% Complete'
+                  ),
+                  ' '
+                ),
+                _react2.default.createElement(
+                  'div',
+                  null,
+                  _react2.default.createElement(_reactBootstrap.ProgressBar, { bsStyle: 'success', now: 40 })
+                )
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '2' },
+              _react2.default.createElement(
+                'div',
+                null,
+                _react2.default.createElement(
+                  'p',
+                  null,
+                  ' ',
+                  _react2.default.createElement(
+                    'strong',
+                    null,
+                    'Task 2'
+                  ),
+                  ' ',
+                  _react2.default.createElement(
+                    'span',
+                    { className: 'pull-right text-muted' },
+                    '20% Complete'
+                  ),
+                  ' '
+                ),
+                _react2.default.createElement(
+                  'div',
+                  null,
+                  _react2.default.createElement(_reactBootstrap.ProgressBar, { bsStyle: 'info', now: 20 })
+                )
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '3' },
+              _react2.default.createElement(
+                'div',
+                null,
+                _react2.default.createElement(
+                  'p',
+                  null,
+                  ' ',
+                  _react2.default.createElement(
+                    'strong',
+                    null,
+                    'Task 3'
+                  ),
+                  ' ',
+                  _react2.default.createElement(
+                    'span',
+                    { className: 'pull-right text-muted' },
+                    '60% Complete'
+                  ),
+                  ' '
+                ),
+                _react2.default.createElement(
+                  'div',
+                  null,
+                  _react2.default.createElement(_reactBootstrap.ProgressBar, { bsStyle: 'warning', now: 60 })
+                )
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '4' },
+              _react2.default.createElement(
+                'div',
+                null,
+                _react2.default.createElement(
+                  'p',
+                  null,
+                  ' ',
+                  _react2.default.createElement(
+                    'strong',
+                    null,
+                    'Task 4'
+                  ),
+                  ' ',
+                  _react2.default.createElement(
+                    'span',
+                    { className: 'pull-right text-muted' },
+                    '80% Complete'
+                  ),
+                  ' '
+                ),
+                _react2.default.createElement(
+                  'div',
+                  null,
+                  _react2.default.createElement(_reactBootstrap.ProgressBar, { bsStyle: 'danger', now: 80 })
+                )
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '5' },
+              _react2.default.createElement(
+                'strong',
+                null,
+                'See All Tasks'
+              ),
+              ' ',
+              _react2.default.createElement('i', { className: 'fa fa-angle-right' })
+            )
+          ),
+          _react2.default.createElement(
+            _reactBootstrap.NavDropdown,
+            { title: _react2.default.createElement('i', { className: 'fa fa-bell fa-fw' }), id: 'navDropdown3' },
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '1', style: { width: 300 } },
+              _react2.default.createElement(
+                'div',
+                null,
+                ' ',
+                _react2.default.createElement('i', { className: 'fa fa-comment fa-fw' }),
+                ' New Comment ',
+                _react2.default.createElement(
+                  'span',
+                  { className: 'pull-right text-muted small' },
+                  '4 minutes ago'
+                ),
+                ' '
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '2' },
+              _react2.default.createElement(
+                'div',
+                null,
+                ' ',
+                _react2.default.createElement('i', { className: 'fa fa-twitter fa-fw' }),
+                ' 3 New Followers ',
+                _react2.default.createElement(
+                  'span',
+                  { className: 'pull-right text-muted small' },
+                  '12 minutes ago'
+                ),
+                ' '
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '3' },
+              _react2.default.createElement(
+                'div',
+                null,
+                ' ',
+                _react2.default.createElement('i', { className: 'fa fa-envelope fa-fw' }),
+                ' Message Sent ',
+                _react2.default.createElement(
+                  'span',
+                  { className: 'pull-right text-muted small' },
+                  '4 minutes ago'
+                ),
+                ' '
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '4' },
+              _react2.default.createElement(
+                'div',
+                null,
+                ' ',
+                _react2.default.createElement('i', { className: 'fa fa-tasks fa-fw' }),
+                ' New Task ',
+                _react2.default.createElement(
+                  'span',
+                  { className: 'pull-right text-muted small' },
+                  '4 minutes ago'
+                ),
+                ' '
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '5' },
+              _react2.default.createElement(
+                'div',
+                null,
+                ' ',
+                _react2.default.createElement('i', { className: 'fa fa-upload fa-fw' }),
+                ' Server Rebooted ',
+                _react2.default.createElement(
+                  'span',
+                  { className: 'pull-right text-muted small' },
+                  '4 minutes ago'
+                ),
+                ' '
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '6' },
+              _react2.default.createElement(
+                'strong',
+                null,
+                'See All Alerts'
+              ),
+              ' ',
+              _react2.default.createElement('i', { className: 'fa fa-angle-right' })
+            )
+          ),
+          _react2.default.createElement(
+            _reactBootstrap.NavDropdown,
+            { title: _react2.default.createElement('i', { className: 'fa fa-user fa-fw' }), id: 'navDropdown4' },
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '1' },
+              _react2.default.createElement(
+                'span',
+                null,
+                ' ',
+                _react2.default.createElement('i', { className: 'fa fa-user fa-fw' }),
+                ' User Profile '
+              )
+            ),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '2' },
+              _react2.default.createElement(
+                'span',
+                null,
+                _react2.default.createElement('i', { className: 'fa fa-gear fa-fw' }),
+                ' Settings '
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '3', href: 'http://www.strapui.com' },
+              _react2.default.createElement(
+                'span',
+                null,
+                ' ',
+                _react2.default.createElement('i', { className: 'fa fa-eye fa-fw' }),
+                ' Premium React Themes '
+              )
+            ),
+            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
+            _react2.default.createElement(
+              _reactBootstrap.MenuItem,
+              { eventKey: '4', onClick: function onClick(event) {
+                  _history2.default.push('/login');
+                } },
+              _react2.default.createElement(
+                'span',
+                null,
+                ' ',
+                _react2.default.createElement('i', { className: 'fa fa-sign-out fa-fw' }),
+                ' Logout '
+              )
+            )
+          )
+        ),
+        _react2.default.createElement(_sidebar2.default, null)
+      )
+    );
+  }
+  function toggleMenu() {
+    if ((0, _jquery2.default)(".navbar-collapse").hasClass('collapse')) {
+      (0, _jquery2.default)(".navbar-collapse").removeClass('collapse');
+    } else {
+      (0, _jquery2.default)(".navbar-collapse").addClass('collapse');
+    }
+  }
+  
+  exports.default = Header;
+
+/***/ },
 /* 49 */
 /***/ function(module, exports) {
 
@@ -1897,8 +2414,146 @@ module.exports =
   module.exports = require("jquery");
 
 /***/ },
-/* 56 */,
-/* 57 */,
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+  'use strict';
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  
+  var _getPrototypeOf = __webpack_require__(40);
+  
+  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+  
+  var _classCallCheck2 = __webpack_require__(41);
+  
+  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+  
+  var _createClass2 = __webpack_require__(42);
+  
+  var _createClass3 = _interopRequireDefault(_createClass2);
+  
+  var _possibleConstructorReturn2 = __webpack_require__(43);
+  
+  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+  
+  var _inherits2 = __webpack_require__(44);
+  
+  var _inherits3 = _interopRequireDefault(_inherits2);
+  
+  var _react = __webpack_require__(12);
+  
+  var _react2 = _interopRequireDefault(_react);
+  
+  var _history = __webpack_require__(51);
+  
+  var _history2 = _interopRequireDefault(_history);
+  
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  
+  var Sidebar = function (_Component) {
+    (0, _inherits3.default)(Sidebar, _Component);
+  
+    function Sidebar(props) {
+      (0, _classCallCheck3.default)(this, Sidebar);
+  
+      var _this = (0, _possibleConstructorReturn3.default)(this, (Sidebar.__proto__ || (0, _getPrototypeOf2.default)(Sidebar)).call(this, props));
+  
+      _this.state = {
+        uiElementsCollapsed: true,
+        chartsElementsCollapsed: true,
+        multiLevelDropdownCollapsed: true,
+        thirdLevelDropdownCollapsed: true,
+        samplePagesCollapsed: true
+      };
+      return _this;
+    }
+  
+    (0, _createClass3.default)(Sidebar, [{
+      key: 'render',
+      value: function render() {
+        return _react2.default.createElement(
+          'div',
+          { className: 'navbar-default sidebar', style: { marginLeft: '-20px' }, role: 'navigation' },
+          _react2.default.createElement(
+            'div',
+            { className: 'sidebar-nav navbar-collapse collapse' },
+            _react2.default.createElement(
+              'ul',
+              { className: 'nav in', id: 'side-menu' },
+              _react2.default.createElement(
+                'li',
+                { className: 'sidebar-search' },
+                _react2.default.createElement(
+                  'div',
+                  { className: 'input-group custom-search-form' },
+                  _react2.default.createElement('input', { type: 'text', className: 'form-control', placeholder: 'Search...' }),
+                  _react2.default.createElement(
+                    'span',
+                    { className: 'input-group-btn' },
+                    _react2.default.createElement(
+                      'button',
+                      { className: 'btn btn-default', type: 'button' },
+                      _react2.default.createElement('i', { className: 'fa fa-search' })
+                    )
+                  )
+                )
+              ),
+              _react2.default.createElement(
+                'li',
+                null,
+                _react2.default.createElement(
+                  'a',
+                  { href: '', onClick: function onClick(e) {
+                      e.preventDefault();_history2.default.push('/');
+                    } },
+                  _react2.default.createElement('i', { className: 'fa fa-dashboard fa-fw' }),
+                  ' \xA0Dashboard'
+                )
+              ),
+              _react2.default.createElement(
+                'li',
+                null,
+                _react2.default.createElement(
+                  'a',
+                  { href: '', onClick: function onClick(e) {
+                      e.preventDefault();_history2.default.push('/data_management');
+                    } },
+                  'Data Management'
+                )
+              ),
+              _react2.default.createElement(
+                'li',
+                null,
+                _react2.default.createElement(
+                  'a',
+                  { href: '', onClick: function onClick(e) {
+                      e.preventDefault();_history2.default.push('/data_cleansing');
+                    } },
+                  'Data Cleansing'
+                )
+              )
+            )
+          )
+        );
+      }
+    }]);
+    return Sidebar;
+  }(_react.Component);
+  // import classNames from 'classnames';
+  
+  
+  exports.default = Sidebar;
+
+/***/ },
+/* 57 */
+/***/ function(module, exports) {
+
+  module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGUAAABlCAYAAABUfC3PAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAIUFJREFUeNrsnQl0XNWVrv9b8zyqNFuDZUvGAxa2AWNjWwFjO0Bimw7d0HQw6Q5hTCCh33sZWB13r5eVZPVbj2S9tToEmtgO0NDp7mAIDQQC2AmYwWDLGI+SbNmax5on1XDfPufWLZWGkkpSSdjEJ7lUWarh1v3uv/e/9zm3JIiiiEvjwhqKS4fgEpRL4xKUS1AujTwN1cW2w883HbLRTT3bVApFnVJQXMN+Hk8mihOiWDTOU47Q5kltjfLtbQtX7LtQP6NwobsvBkGnVP21UqH4clJM1ofj8aI8vvyRFKi9BGnvJShZxrff3NqQFBUNNo19RW3BLSuU6tIym0YHo1oDK92yUai3TPgavWEfvw3GY/BGw/AMRXJ9+xcZoBQkz58tlEfeuqlBhGKbSCAgCsuTlOboPpyaAtxYcyeuLF+Tl/fpDvrgjobQHwmgI+ib7OFe2nbT9jOC0/pnAeWRt75YRR7j4RSMStoNkDokGFoXNlVuxzWVm2bt/WPJOM753OgKeXMB9GIKzr7PJZS/f3tLgygqHxZFYSsECUJSFLgJ1CmM2FyxHdct2D6nJwgDdGKwG+cCbgRjsYkeuoe2nXOhnDmBIsFQ7KRtAwQhBYO5cen++pJN+GLt7TBqzJ9pKG329OGEp3syOP+YUo7nooRCMGykCorNiq1iKldQ3kBm3rht8b2oc9VfUGYjBzjnaNtGYBovKiiUN+4iGD8jGFYxpQo5b7Bwtb7kBlLHbZ+5OiYLa8fdvROqhsDsvOChSOpQ7KZtTN5g93VKPbbX/M2sJvJ8DnckhA96Wiey1azWachnOMsrlEfeurGewtVeglE5Om+w8MXC1dcu/zYq7QsvutbHx73n0eTtn5NwljcoVG/cJbJwJSqsI0OVwIGU6Svwzav+4YINV7nmmiMDHRTaktlqm4Z8gMkLlO+89SWyuYrHxoNBykGZoRLfuurRixpIZjh7p7tlIhPwNQKz+zOF8p23vszyx47hvCHBQCpklZJCHrr6B58LIJkm4M220xPlmRmBmRGUb7+5dTdZ3B2yxR1Wh5RPyg0yEBM+byMHMNun2+ScNpRvv7ltJx34H8oWV+QJXeAKSUJJOWQeHl79/c8lkBzBTDvHTGuS66E/bL8rKSoJiJJgKFN5hN2qaFNCqzDhb5b97ecaCBtqhQrXz6ul23EPIxke7Hu+6VDVrEN56A+3kO1V7mIHX0xt7H4yKd1PEJivLt5BtnfBZ3rAjp4bQEu3b07AXFc2IZi9qYm5nMeUZh6/9cZX6MWV+0a2TJQj7t9UuQUrylZ/JiCCkTj2/OkkDnUNIhBP8J+ZVErcsKAEN6+ohlE3OxOtdp0By51l+KivbbxfL2e9MtrumhWlUKjaS6qwiklJHUwVmfdrLbX48uJbPxMgH5zuwUO/OYA/tvWBZUmTWgW1oECEaopXmzr479482jFr77/A5kKl2Z7t1ztILTlDyTnRf/P129j8x2PJVDKXc4lUsSuhVxrw6NrvwWUqmlMY3Z4wnjlwCh91u/m/XXoNtCoBl9XoUGBXwR9K4vDpEPp8Q7S/gEOjwdZllbh+WdmsJP7Xzp/IVsOwxF+fS+s/JygPvn57FQFoJBhWFrqSsuNiuQQSpC9VbcTWJX8xp0Be/rgVe4+d56HKoFRASXG9pliLBZVaqNXCSHj9MZxoDSMQTSAwlMRihxnbr6jGskpnXvepzT+Id7uzHvf9BKUhL1Du//1X9/IGY2YOyajeK4yl+OEXHp1TdTyx7xiOD/r5vwtJHSpSx5KUOiYaXQTn6NkwokPDcO5YXUswLXnbvzfbTqEvEsxaTRCYn80Iyn2v3dlASnh7uEBUSPMhyRQYuv/3q+7FkuIlc64Os1pJeyBgfhZ1TAinbwhHWyOIkHKCsSTWz3PhlitrUGzTz3gfA7EoXm49lu3XLIxVTdRVntSOUO2xU84bcqjiFTskx1VnrZ4TIMzePvmnE2j1h/i/zZTIzTplTuoYb5S4NCgu0KClLYLT7REc6hnAH3/bhy3zS3Dr6gUzcmomtZYn/XN+dzab/DBtO6ellHte/Tu2sOEFGcBwO17BAbF//6+rvkFQLptVIP9+oAkvnGyXPpGGHB/t8nTUkdVV0utxOB2kHFINc20ztdEzUYtq4p1VPpzZ9U2mFSI1GyuNxbMKZLQ6GBCzVpl2VvkaAnFdUKFDdbmWwznXO4TXmjvwRnMXbr+iZlpObSZqyfrJvv7KvfViUrVBzhtcIaLU45LBbKxaO2tF4H+834zXznTxf1tSuaO6KHd1JJLDEUCpyE1N7HG1lXpUlupwvCWEHl8cuz9uQngohptXTrlbgmqzMxsUpIrJqUGhovBhOWwlUzB42OL9LgWKtFZsqFmTdyCsPfLku6fQG4lCq1BCSW9rphCyOEd1sFAUiSVoP2mP+coZ6VarUuQMR0vQr7zMAkPUjKZOL4LR2LQ+S7HRApfOmM2JVVJB2TDeerJxP+XXfvegjQDsGOG40rWJlE+WF9TNqjpYe0RFB7FqCuoYiouIJRIcArPI0jMErhoGikHR0OtOxqZc50C1xYWn9p1Ai9dH1fr07XKl2TGRPWZqyQ0K1SLb5LwxxnGlEvy6qpWzog49SUNBidaqH6uOGyuXQE3qiSUTeOXcsRGhaiieRIJUoeLPHxuWqLbkjwsPxekxCmhoE0Y9zqk1YKltHrrdYfzvlw8hTCCD9Lohes60oVjsE00hb8s5fFGC3yarY7iCl+ZLGJhiCl3zCyrzoo5fvPVpukWipwOlpW1q6kjyTUEHXp1WR/acwZq5ySQ70EmuGjVB1CvVWGYvQ4nZguffbcIfW3vSBiBGIOUidbpd5FKjNWvCpxBWP3rOZQyUO196xEa1yVYRGQvn5BUpqX+vcM28Lc8aiE++f4oXgRqFBMNCdUemOtiZa0mttD/rHxyhDqOSwJkLUaA3wT0UwJHBDoTjk8d+IQNOnBRXrnfgypJKuAMR/Oilj9HhD488qKRao25mtrs8OxQ2WNtlYigEpEFMw8hM9HJtImBR4fy8qcOgYpNiZK+LNGPUcW3pMHwGRU7kXBmUO2w6A398odqMG4yLcM43iNPe3inBWVpYgiiFqZ+82ki1RZxCn5A1xE63TzaP8oq693y2ENaQau1nh5IQlQ1y3khmrNmSF0aw26XFNTNukbBJId046sgcn/S3U7KXfq4SlJT8tTxhi8IQQmIUb3edQp3VhRqbKxW/HXw76e7GGQLElDDZOE+PY8///s1X4I0jbfh9UydXrZCCo2b5SDnzAnWCEFY/aU4hCPViOp8MLxOSC8daowMmCiszaSDqlUoOZLQ6rnRVUoyXpng+7DmfVgcrObSCGiudFRAIpor2WlbFMQbAP4BaayEHwsYiezEWEKxmb9+kcNjzu8M+1FAo3HZ1NdYuKsHT755GizvAw6o8jncMzqij7NKZskGpnBQK1SEbMvNIWiFc8FTAWQqmrQ4jhaolBRaU2fUoK9FBqRuWczQRh16l5rN4UlhTw0eqiCWYs0ogjDia/b1YaGeqUKZV0eLpwymvtEiOQbqioIzyjJlCkxJ1tmKUmxw47elBeyD7qtKBSIi2Vjj9Bg7nOzdejkMtfXj6YAt3con4zNfGMReWZWYSo5P9CCi3/vYf66XJqwyFpCcnmTUGKmxF01LHfKsRC51mFDu1cLmUqZCgTD9eR+pp9ffTJv9bhYXmasQpd4SSUZwJ9KHJ14f2kGeEKljoYfdlVbzTfRZOjZHUQibAYIJRrUa9sxy1tN/HBzvRHfJPCsfi1aHM6sA/f2U1nv7TSTT2DuJUr3dGUJgLY5cJZln5YsuqlAQUNqTUIYUuIQ1DTIGptOcGhc0GMiAWtQpLXFYUW7VcHUajMGlFztSRiAu8f6Q1KMgpmVBjd6Iz6MUpCjefDEqqWOIo4bFaRapgIWu+2YWjg+1oo8cd6DmLYlLMEmcZB2NUqLGKwuNAJMCfywBk64OFyCicinWTMvuwtMaMSjqZ9jd3z1gtVq1+6lCSSZbkWajCGBjyMKh1ORWDsrtaWmhFhcuI8lLVpAkzQW/MnBADQ04UzYEulBltcOiMUi/J4kSF2Y42is2fDnbhI3I0Tgp3TDlOitlqFdn1wgrUxWIcXnvQg+72k2RJbagjaAwOUw97LIPTODDSRrOZSyVRicaSdGJQLUNO8a1mN0JR2rHkzJP9BHmFJfu940NJVewjYbBNTINZ4Cqf/M2tBt4mYXmk2x+Bw6BFN9VjxUXjg5Ftbjwh8rdRqlhVTmohC3mekn13yItigxVFBgvtoUBgHHTfTMrx8WtI2PRrAcGpd82TVEHbisJ5qIkW4NOBLglO2E9KcmCBrZCUpeBwrtfVkWp6KPQNcBisTxYaSnAo5zuGqLKnip6KTNZHe/y2mTdfnamTa7IxajWL0CABEUaoQ74vJf0cGnE2Pe5eLfXGzviC2E8VcktXEKdboujtSyCREEeogx0IBoSpgzkxBoSfMRSWWFuFuS8GhwFgYYe1Weic5l3YjRWLsNJVxn/2JqniUG9beuECCxdrS+djTVE1rKTw05R3Xm87iZODUihi71ekt/DaJM5aMKTStu4hvP9JCIEA5U+TgddQujzM2bAhm5jJhmr0GTsMQ8hwZNJ9s1Kd8w5cXVuEH2hVePbDZj4f8l7nAMmXLLDfDJdbB4dNBZNFSL+VrA5kTLophJF7EohF4PdGyMVpuHIcejpoVL/UkP1lBdppdw+/oJTBqaWfZaqCbbKNZnDYJidgnuQ9bGFFBL5QEmUmPSxauT4iYLQHZ3q8eVlkwVQ8yTWVoy2xYkSoSo6CtNA8tZ1iH+IntLH1Vi8ePccbjn0Ep1ivRU3ARGegCi6nCiXFmjQMuWhjoYRVwOngKUhhlYGKkH1uISc2GDXQAbRx+6whRS11lpITc+IMHfAW3wDVL4MjQhZzaQwoMwHyiAzFcfZ8HG19Q6iw6lGkFRCJp/IavZdOrUSQ9cqi8byoxaDUjAfFM0lDUhgFA7zVwm8wPRmzSaJQPJ7aKQXMWjWO9flIzmokRAP8gTgKC9QodGjTz2FAGBgxBYX9h4UyuQuiIIV4h8JwD4Rgp2KWHXANnfVmcmzLC8pRSSfQMbLA7OqrNsop84ySwQllJPae/gSOnYnw11yzwIkvLa/mHeQPm3rxblMPPw6q1Pu19vu4+mc6bBRSx2nlT9b7GgtDMgGCnP2nXcnPtxhxdUUB7BYNXIVqnDjnxTtNA3BoNYgOiRgcSKCoQAObTZWxP8NWNcEXOCnSGU/FrqmkOwzO0f5O3pwsMVooD6j4h19bUkNuZxCH+zvS4YqDiYj4tCkCN50MVoMaa5daYCRTebDvnNS+J3XXldnw9tFOHO/xIBkTMRCM5kUpWdYcZw9faSCjYYxK+LnOkfx8/7HUUiAVVpeTnS2gfEKK0OukHVtSZcOCMjM+JjBHO3wSHDoAXX1RcmoEx6zmb8mBiNJ8SVJM8MSsFEbBods+clj94QDlGwuHwx7DJpnYV3/0h4PwUvg80xZBc9cQf//F5QYsmW/MMB1J9NLz++lMLtFbsW4RhUOnBc8dbkZ/MIJZHK0TKGVYDWNg0M+DsaGc34VNWjEgtTYTVhIQF1XydrtqTBdWSzF7zeJCLCNAB07041DnIMotBg7HbSTluDQwGhT8ADM3TUGNH7zYBHA6KVwxQIlUnmJ210hh8lBTCG3eBA+bbLrXalaMKRxZ45M9/qzHTY5sECpRhVVlTjR25OfiX/ZlP6MvAx+9lHUkFBGtBGPDGGWIEqTjgdx2jM2VsKTOm4NUPDrtWjgdEzs3g06Fay5zonaeGQdO9qOdLHSNw4xAiJRmUKHQpYbJyIwwmwtRIi5K9QNTjgRMSO8xt9Fgv0tiiOB29wzB56eag4rAtZUF2FRfwefhWT+sLeBOhxVmwVnR6A7FwLJZd28MH7cOIBoXUWuftWtt9k8cviC0jgcD6RIyt/DFEmLVkVZuhT/pcvNKOxxJwm5Twmwa6y3C0RifpuULsClkbV9Tgo6+MD5q9qLNF8I8Uk4grIHDouZwWC3DVAEe1qSDn+TObBgO04/byw7sEHpoPzqDYaxeZMPa6iIYtMp0q5/VMi2pfMMcFqtVvD6qVyjE2ckl6ik/xRRx/MO2VbMFpXGyLrFn/BAmpHN8l9eNEqt90ne6e91l+PHrjRxM6/EQFtnNuKLMARMlVqdTyitxOisDkRi/ZflPp5VmBNkoc+mxsMSOY60evNc8gC5/GNUxIwZ9MQ6npFjNuwMqQUhdrDQMh0XZzq4YguEEmgf8pFYLrltRiIFYAEepwmezmaxnxtTB1MY+nDc8RPZYxLmOKDz+OBYX2lBgNqB1MACBlMLWoOVzvXHGmGzhhNCYTR0C7xgDvYHcoLAP8PO/XIOXD53li9pOuv04T9V9ncOCupAVKo0AvZ5AEBx25qvV4/XCElhUacGiCjOFxH4KJV46szWoiBngJedU4NDQpkzDiScU6KJQ1ece4u2dATrQX6mvwuXVjtTrOXHK04PBSAi+VGNQp5LynJ9U1dROhSkVjWurCug1pbPDodPCzSz9NJcZzRgKua/GTBhiutIX0r2wcwN9WF6W23QwW/L5V2sWYsPicjz60kGe+A/3eai4C2BxgRUukxYWs4ryjYqD0aSqa7b8IZqM8U0eKxfasbKmgDu1T9r9dLDUiMT0cHuUZKO1HEx3bxR+UkcTqcNiVOL6VVZAH4Y3GiKYBt5wLCOFDGZ0iHsIYBepSiSgNy6Zh1KHCac6PVy9bGhUEpxz/f68XzZB48h4S1dHQPn9bQ97Nj//83NiajZMHKfXdcY9MKV3lZcPyZe7bZjnwopKF867fThLBVlBQo8YJWMtxfl5FJLYChPumCiBMxs8PE2dhJbOaubUVi504sDxPhzqINWadOj1R/nZzqaK+0JDuG1lDeqrC9Ad9FLx2EdFZDefQGOGQH5N1ms71x5Fv4dqFb0a1y4pQI3LxOGx3t3pLh/aCATLKywkBmdHKT/Loc0iJR4KVZXJcWoTtnNnvYM5L5DIXFxXRcl6Y20pygtMsJiUqKIa4YqwEx8396Olz49Six5xygVm+h0zBGSESDlqrlkR0lVS0cQQP7BqOsBfWF6MVQsd3EazfMDcllWvwYPX1qHEbOJtmVKTjS+uOErFY5BePJQc4u2TTnJVnRTm2DqwpeVWLKuWwjGrZdjGck5NsRnlTjIYR4Z4Z2Gmk1xZxt6coJA69tF+bx1u2Q+HMPaT4wEvAtEITNqJ51VkIGwt17UVLlxdU8zrDYNheLbRTGdowzJyWgMhHDrTj95+LwojOrKvGpgITrFTBZWsHKof4gQmzhSUiPJ6wkjP37yydISaPJTMg54ohTcDn71UK5VU3RuhodsebwQnz1IRGY7DoFHgmtoCFNrHXo/C8g3bWJ9sw5JSNHYO5o2C/KWjNPZMYdW9QPTExzL7YMKoVv4n7a1YU7NowvaKrJA7Vy1Aid3A1aFUjW+py+iMLHNW4GxPAB809cJDZ76LwlowmESBXUPKkZKxRkl2mHY5lojzOiVOcFiXl9UXbB95vaLUcIPQHfJwZ8ULTPpf2KdEf5fIndk1FUVYVmNDkJ6fnOBSkN5AAL/76DQVouTI8tSQzBg7c+wSA6/f/s3WTc/9v3MEo1KAAGFUZc8+wwdtZyeEEowMx99YnGxqkt2KWaHIo7rIxLejrYM4RLmIXeEbTxp4MnfYpJ6YDEfF2y4JvlKFbaxgVMpw2H36H4PjDsTQ2xfi1ttL21foJKkuMqfCsci/hZVdSzJ6HGzqx75T/YhQwrdrNPjB9YvzQmJQ6qHtmeiCVOXOnWOB/frowSqqGFZntu2Hkz5LqDFsW7w86xs7yFUlKEScpER+uGuQirEI7GQtmcNhC+BUk8ApokR7WZmNzwA29/r4bZISs5+KOrVaAa1GWpel5C0RyR1x5fDJL2ktcpxOhr6+BHzeBDo9QeYcsH5pAQx6BQ9pUsdZ4C19X8a8eZ8ngmffaUVjh48D2VRdgm/dsIznwpmOdqp5/mnfYZzvi+zYtrimJ2elpA78bvrPQ5nqyAxfbWQpG0kt9fOqs+4As8JssBqlkWxwE9Upq0ocuGp+ES8gDZRfNBPM6LGe2KqFBaijRMzMwGmCU0hOi80Qat0KFDq1lKOUHABbrJ1IQYlS3vEORhH0i1wd/YEorierW1tq5UncQ/Y45PdI9Qm/1kZMrU8Q8cejPXjrzABXY4VJjzuuWpBXG/zap2fgDgtt/3n7pk8melzWy+tu+Ld/aaRfLR/pwIRU6wW4ubwa32nYnJMLY98Cwb50QJpPUeLKUgfW1ZXys34yOPLwh2N472Q3uilZu+iA2Q1amPSsxtGku86sldPbH4WPHttGJ4HdqMFWssd2/bApYaGqMzDSSbX3hvHS4XZKwjEe0rYvKk+fVPkcG556hbWHvv/m32758RRmHkdMDZOHFnZlzq0kMwC9092BuyMRmHW6SQvI+29Yilso+f/2YAuHs5+2oz0eqpwLsbyigMMxs2bjBGGNObVNV8xLO7XTvR6UWQ0cupmUx/prfn8c7lAUg7Q1XDYPNqod+yI+ssNhbo2VfC5+2OyHIwm80diNj7o8PBdVmPX4xrrLZqWd8rvGMxiMsVot8dxkj82qlI3P/sIm9fkF6/CVaiOT/jeXrcT25VO7ToUVky8cPpue+HJo1PjiojJUF1qpgFRQaFNQjTK5cmQ4LEQZ1GredmcrYorNBty0sopP47JeGFto4R61xouFqtPn/Xj50y746UAZCOimBSWzog55bN3zBtn1ROv+r2+pnjYUDuaZx3fSefXD0TCSqQ5ypc6IPbfeMa2dZHDkRRVycbmuugiVLsuU4DAbPeCTErXTokNdiQ0mAi0viGCfryvI1BLludFLanrraDcO93i5OhY5TLinYUlerp/PNl4ilXzv/ePs7teO3Xvz7hlBue6ZX6bUAuv4iymA7628BpsXL532DmcuqpDhfGlpBayUM3Q6JUxGIb2YYipD7qOxMUTJny1reudYF/5AdRBTBytqb6H3mc4FplMZfqq5/vo3+9EdjUUPfuNGXS7PmfQbJ6575gnmmX84ZjFF6r5Fpcaz2/9q0tySC5znDreke2T1LhvWLSyGzagjG8s6yoppweHzEb4YXj/Sjk97vXzReJ3dhHu/MLvqSM/A7v8Ujx1vhVOt+umfvr7lu3mB0vDMEzZK8im1DMNIZszl3169APet2zDjD8CSttzqz2xgMhut06g4nMw2zWSDzToeb/Xg7dOd6AkN8T2/55q6vKxKyWWc6HTjL158FwaFMhpIJotP3neTJy9QOJinn3yYHvpYGsaIlS1Szf/k5ptQW5SfDzu6mSnbaAZHr1XxHppOl31VCPtMPQND2H+iE8dIHQzw5QVWPEhF4Gx9Edt446vPvo2DvhCcKtVP371783dzfV7O3/e1/ul/baSHL8coJybPsyw1WfCLW/L71VLdGTZadmqyjWZdAaNROabGiUZFvH+yFx/Rc5g6mA2eS3XI47E3DuOXzZ2wK5UD7nhywcn7b/TkH8qvn2Irww9nqiOZMZcvh7H716/L+wdkU7HPvn96hI2+nixsXak9XeOwdNNJhePbxzvQRI/zxuK4rrIId6ytnVN1sMH24b59R+R/bicgU/oq3Cl9Be76X/9qp8CS/pgQNtyO+fHatZSgZ8fvj65xmFO7usIFB5mBbm8IB0kdfeR22BVj91EROAszhTnlka//94cYIENhV6veeO/uTVP+SwtT/l7idb/e1UjPWC6II2FIghFoR9T4vxs3Un4pnLUPPtpGj3CLFYW449q6OVeH3Aq677cHcJBOEL1CiASTYknT/V/0zD6UPbuYsWf5xZoJg/8/ZZsrdHr8ctuXySZrZ/UgMDinut189WJdoRWryAjM0oqTKQAJymF9OwGZu2/wXrdndwM97W0xY9VLutJPWeXLLRb8801bZh3MhTAkIO8RkAAHYlMqHz94z6b7pvt60/5a9bW799xFMHaNqVvklYr0sksJzP+5afPnGgwH8l8H8IFPahcVqJQfv/eNTTNauTftvx387l07dtOh35NEamH4KCDsjDni8+ORl19Hh9v3uQVybwYQp1LV0hdLbpzp6874T3Ws2fX0boKxIxOGfNmRHN4cKjUeu6EBdcWuzw2Q4x1u/N1/H0Q/6zzQCWlXKQcG44kFzQ9s8XzmUHgo2/XMboKxI51Sxrk0j42dV16BG5ctuuiBvHSoFT/+qAn9MakVpFMI4WASa848sPnC+vNPq3c9y8LZjvFgZELaUliI/3n9Wpj1F1+e8VK4+tGrh/BC1yDk9dUOUgipZeOZB7bk7c8L5vUPpa3e9W93kZR3JcdTDOsCpN7KqVLhB6tXYH1d9UUD5M1jHXj03eNcHfIRIyAt/fHkKlJIXv8QZ97/pOBVv3puG8HYTTisYoZVlmsYOd+wn6132PE/GlajzH7h/mmo9sEgfvRGI/7Q7093lNi+l2rU+zqH4tvzDWRWoLBx5a+er2crYpLpyl/IuOY4Y1V/6pr9W+eV4s6rll1QcBiMXx04hafP9WbAkOyLS6X66Qf3bPzubL33rP1F1FVP/buNXn4n3X1oWB0jYciFZ1K6Jhu3lpfgluV1WFTi/MxgHDzTi1ePtxOMHgxflyMtRdIKilBUFG8ideybzX2Y9T/ovOqp3zQk+d92FyoFcWSuSb+1IDc3pZ/Xm03YPL8M6xZWzIl62CK5/ae68EpLJz5kNYc4fBmI3Hw1KhSvBJPJO2YjXM05FDZWPPUfNgLyMMFg31ptHQGDd5vFMblHHlcQoGvLC7G2Zh4WlTryqojDfLlTvwRC7khk5A22HyaFoieQTN422+qYcyjyWPmv/1lFoWqnXGxmqkMcswYA6S9+E8ThjLTeaUORQYcapwULCyVIxVYjyh2mcSruIZzskk5sBqDHH8Ypb5B3cdmbD88HjZywY6FKLyjCYVG8n2DsnusQOqdQ0mf/k/9Vlco3O8aDkU01woim53AYzFwkmAk4s0Ga8bRRk3MjQ5VJoWTK+An9cPeZB2c/VF0wUORR/8QLbAkTC2l3IXX12LA6MD6MjPmbTCc3JRip32XCsCqUH3iTycc/C2VcUFAyx+VP7GU2+i7aoW3MFIwHA/y7WoSxMEblJYzpJowfqvQKxYlgUnyC7u4lGK0Xih2/YKBkjuW/fLFeZN89xr+zl30HmWgdL1SNhTHqdyNg8N+x6zkpYQv7KG/sO/PAllZcgOOChDJ6LHv8d1V00FkeYos3WMirot2umiRUsQMubaLQ2vTAln24SMZFAeXPbSguHYJLUC6NS1AuQbk08jT+vwADAL4lQ5FZesZZAAAAAElFTkSuQmCC"
+
+/***/ },
 /* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1985,11 +2640,11 @@ module.exports =
   
   var _Home2 = _interopRequireDefault(_Home);
   
-  var _widget = __webpack_require__(172);
+  var _widget = __webpack_require__(62);
   
   var _widget2 = _interopRequireDefault(_widget);
   
-  var _donut = __webpack_require__(174);
+  var _donut = __webpack_require__(67);
   
   var _donut2 = _interopRequireDefault(_donut);
   
@@ -1997,7 +2652,7 @@ module.exports =
   
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
   
-  var title = 'Sb Admin React';
+  var title = 'Open Foris Collect';
   
   var data = [{ name: 'Page A', uv: 4000, pv: 2400, amt: 2400, value: 600 }, { name: 'Page B', uv: 3000, pv: 1398, amt: 2210, value: 300 }, { name: 'Page C', uv: 2000, pv: 9800, amt: 2290, value: 500 }, { name: 'Page D', uv: 2780, pv: 3908, amt: 2000, value: 400 }, { name: 'Page E', uv: 1890, pv: 4800, amt: 2181, value: 200 }, { name: 'Page F', uv: 2390, pv: 3800, amt: 2500, value: 700 }, { name: 'Page G', uv: 3490, pv: 4300, amt: 2100, value: 100 }];
   
@@ -2587,14 +3242,258 @@ module.exports =
   };
 
 /***/ },
-/* 62 */,
+/* 62 */
+/***/ function(module, exports, __webpack_require__) {
+
+  'use strict';
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  
+  var _defineProperty2 = __webpack_require__(63);
+  
+  var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+  
+  var _getPrototypeOf = __webpack_require__(40);
+  
+  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+  
+  var _classCallCheck2 = __webpack_require__(41);
+  
+  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+  
+  var _createClass2 = __webpack_require__(42);
+  
+  var _createClass3 = _interopRequireDefault(_createClass2);
+  
+  var _possibleConstructorReturn2 = __webpack_require__(43);
+  
+  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+  
+  var _inherits2 = __webpack_require__(44);
+  
+  var _inherits3 = _interopRequireDefault(_inherits2);
+  
+  var _react = __webpack_require__(12);
+  
+  var _react2 = _interopRequireDefault(_react);
+  
+  var _reactBootstrap = __webpack_require__(49);
+  
+  var _link = __webpack_require__(64);
+  
+  var _link2 = _interopRequireDefault(_link);
+  
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  
+  var StatWidget = function (_Component) {
+    (0, _inherits3.default)(StatWidget, _Component);
+  
+    function StatWidget() {
+      (0, _classCallCheck3.default)(this, StatWidget);
+      return (0, _possibleConstructorReturn3.default)(this, (StatWidget.__proto__ || (0, _getPrototypeOf2.default)(StatWidget)).apply(this, arguments));
+    }
+  
+    (0, _createClass3.default)(StatWidget, [{
+      key: 'render',
+      value: function render() {
+        var _React$createElement;
+  
+        return _react2.default.createElement(_reactBootstrap.Panel, (_React$createElement = {
+          className: 'stat'
+        }, (0, _defineProperty3.default)(_React$createElement, 'className', this.props.style), (0, _defineProperty3.default)(_React$createElement, 'header', _react2.default.createElement(
+          'div',
+          { className: 'row' },
+          _react2.default.createElement(
+            'div',
+            { className: 'col-xs-3' },
+            _react2.default.createElement('i', {
+              className: this.props.icon
+            })
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'col-xs-9 text-right' },
+            _react2.default.createElement(
+              'div',
+              { className: 'huge' },
+              this.props.count
+            ),
+            _react2.default.createElement(
+              'div',
+              null,
+              this.props.headerText
+            )
+          )
+        )), (0, _defineProperty3.default)(_React$createElement, 'footer', _react2.default.createElement(
+          _link2.default,
+          {
+            to: this.props.linkTo // eslint-disable-line
+  
+          },
+          _react2.default.createElement(
+            'span',
+            { className: 'pull-left' },
+            this.props.footerText
+          ),
+          _react2.default.createElement(
+            'span',
+            { className: 'pull-right' },
+            _react2.default.createElement('i', { className: 'fa fa-arrow-circle-right' })
+          ),
+          _react2.default.createElement('div', { className: 'clearfix' })
+        )), _React$createElement));
+      } // eslint-disable-line
+  
+    }]);
+    return StatWidget;
+  }(_react.Component);
+  
+  StatWidget.propTypes = {
+    style: _react2.default.PropTypes.string,
+    count: _react2.default.PropTypes.string,
+    headerText: _react2.default.PropTypes.string,
+    icon: _react2.default.PropTypes.string,
+    footerText: _react2.default.PropTypes.string
+  };
+  exports.default = StatWidget;
+
+/***/ },
 /* 63 */
 /***/ function(module, exports) {
 
   module.exports = require("babel-runtime/helpers/defineProperty");
 
 /***/ },
-/* 64 */,
+/* 64 */
+/***/ function(module, exports, __webpack_require__) {
+
+  'use strict';
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  
+  var _extends2 = __webpack_require__(65);
+  
+  var _extends3 = _interopRequireDefault(_extends2);
+  
+  var _objectWithoutProperties2 = __webpack_require__(66);
+  
+  var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+  
+  var _getPrototypeOf = __webpack_require__(40);
+  
+  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+  
+  var _classCallCheck2 = __webpack_require__(41);
+  
+  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+  
+  var _createClass2 = __webpack_require__(42);
+  
+  var _createClass3 = _interopRequireDefault(_createClass2);
+  
+  var _possibleConstructorReturn2 = __webpack_require__(43);
+  
+  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+  
+  var _inherits2 = __webpack_require__(44);
+  
+  var _inherits3 = _interopRequireDefault(_inherits2);
+  
+  var _react = __webpack_require__(12);
+  
+  var _react2 = _interopRequireDefault(_react);
+  
+  var _history = __webpack_require__(51);
+  
+  var _history2 = _interopRequireDefault(_history);
+  
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  
+  /**
+   * React Starter Kit (https://www.reactstarterkit.com/)
+   *
+   * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE.txt file in the root directory of this source tree.
+   */
+  
+  function isLeftClickEvent(event) {
+    return event.button === 0;
+  }
+  
+  function isModifiedEvent(event) {
+    return !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
+  }
+  
+  var Link = function (_Component) {
+    (0, _inherits3.default)(Link, _Component);
+  
+    function Link() {
+      var _ref;
+  
+      var _temp, _this, _ret;
+  
+      (0, _classCallCheck3.default)(this, Link);
+  
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+  
+      return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Link.__proto__ || (0, _getPrototypeOf2.default)(Link)).call.apply(_ref, [this].concat(args))), _this), _this.handleClick = function (event) {
+        var allowTransition = true;
+  
+        if (_this.props.onClick) {
+          _this.props.onClick(event);
+        }
+  
+        if (isModifiedEvent(event) || !isLeftClickEvent(event)) {
+          return;
+        }
+  
+        if (event.defaultPrevented === true) {
+          allowTransition = false;
+        }
+  
+        event.preventDefault();
+  
+        if (allowTransition) {
+          if (_this.props.to) {
+            _history2.default.push(_this.props.to);
+          } else {
+            _history2.default.push({
+              pathname: event.currentTarget.pathname,
+              search: event.currentTarget.search
+            });
+          }
+        }
+      }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
+    } // eslint-disable-line react/prefer-stateless-function
+  
+    (0, _createClass3.default)(Link, [{
+      key: 'render',
+      value: function render() {
+        var _props = this.props,
+            to = _props.to,
+            props = (0, _objectWithoutProperties3.default)(_props, ['to']); // eslint-disable-line no-use-before-define
+  
+        return _react2.default.createElement('a', (0, _extends3.default)({ href: _history2.default.createHref(to) }, props, { onClick: this.handleClick }));
+      }
+    }]);
+    return Link;
+  }(_react.Component);
+  
+  Link.propTypes = {
+    to: _react.PropTypes.oneOfType([_react.PropTypes.string, _react.PropTypes.object]).isRequired,
+    onClick: _react.PropTypes.func
+  };
+  exports.default = Link;
+
+/***/ },
 /* 65 */
 /***/ function(module, exports) {
 
@@ -2607,7 +3506,190 @@ module.exports =
   module.exports = require("babel-runtime/helpers/objectWithoutProperties");
 
 /***/ },
-/* 67 */,
+/* 67 */
+/***/ function(module, exports, __webpack_require__) {
+
+  'use strict';
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  
+  var _getPrototypeOf = __webpack_require__(40);
+  
+  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+  
+  var _classCallCheck2 = __webpack_require__(41);
+  
+  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+  
+  var _createClass2 = __webpack_require__(42);
+  
+  var _createClass3 = _interopRequireDefault(_createClass2);
+  
+  var _possibleConstructorReturn2 = __webpack_require__(43);
+  
+  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+  
+  var _inherits2 = __webpack_require__(44);
+  
+  var _inherits3 = _interopRequireDefault(_inherits2);
+  
+  var _react = __webpack_require__(12);
+  
+  var _react2 = _interopRequireDefault(_react);
+  
+  var _PieChart = __webpack_require__(68);
+  
+  var _PieChart2 = _interopRequireDefault(_PieChart);
+  
+  var _Pie = __webpack_require__(96);
+  
+  var _Pie2 = _interopRequireDefault(_Pie);
+  
+  var _Sector = __webpack_require__(99);
+  
+  var _Sector2 = _interopRequireDefault(_Sector);
+  
+  var _ResponsiveContainer = __webpack_require__(108);
+  
+  var _ResponsiveContainer2 = _interopRequireDefault(_ResponsiveContainer);
+  
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  
+  // import { PieCharts, Pie, Sector, ResponsiveContainer } from '../../vendor/recharts';
+  var renderActiveShape = function renderActiveShape(props) {
+    var RADIAN = Math.PI / 180;
+    var cx = props.cx,
+        cy = props.cy,
+        midAngle = props.midAngle,
+        innerRadius = props.innerRadius,
+        outerRadius = props.outerRadius,
+        startAngle = props.startAngle,
+        endAngle = props.endAngle,
+        fill = props.fill,
+        payload = props.payload,
+        percent = props.percent,
+        value = props.value;
+  
+    var sin = Math.sin(-RADIAN * midAngle);
+    var cos = Math.cos(-RADIAN * midAngle);
+    var sx = cx + (outerRadius + 5) * cos;
+    var sy = cy + (outerRadius + 5) * sin;
+    var mx = cx + (outerRadius + 10) * cos;
+    var my = cy + (outerRadius + 10) * sin;
+    var ex = mx + (cos >= 0 ? 1 : -1) * 11;
+    var ey = my;
+    var textAnchor = cos >= 0 ? 'start' : 'end';
+  
+    return _react2.default.createElement(
+      'g',
+      null,
+      _react2.default.createElement(
+        'text',
+        { x: cx, y: cy, dy: 8, textAnchor: 'middle', fill: fill },
+        payload.name
+      ),
+      _react2.default.createElement(_Sector2.default, {
+        cx: cx,
+        cy: cy,
+        innerRadius: innerRadius,
+        outerRadius: outerRadius,
+        startAngle: startAngle,
+        endAngle: endAngle,
+        fill: fill
+      }),
+      _react2.default.createElement(_Sector2.default, {
+        cx: cx,
+        cy: cy,
+        startAngle: startAngle,
+        endAngle: endAngle,
+        innerRadius: outerRadius + 6,
+        outerRadius: outerRadius + 10,
+        fill: fill
+      }),
+      _react2.default.createElement('path', { d: 'M' + sx + ',' + sy + 'L' + mx + ',' + my + 'L' + ex + ',' + ey, stroke: fill, fill: 'none' }),
+      _react2.default.createElement('circle', { cx: ex, cy: ey, r: 2, fill: fill, stroke: 'none' }),
+      _react2.default.createElement(
+        'text',
+        {
+          x: ex + (cos >= 0 ? 1 : -1) * 12,
+          y: ey,
+          textAnchor: textAnchor,
+          fill: '#333'
+        },
+        'Value ' + value
+      ),
+      _react2.default.createElement(
+        'text',
+        { x: ex + (cos >= 0 ? 1 : -1) * 12, y: ey, dy: 18, textAnchor: textAnchor, fill: 'red' },
+        '(Rate ' + (percent * 100).toFixed(2) + '%)'
+      )
+    );
+  };
+  
+  var Donut = function (_Component) {
+    (0, _inherits3.default)(Donut, _Component);
+  
+    function Donut(props) {
+      (0, _classCallCheck3.default)(this, Donut);
+  
+      var _this = (0, _possibleConstructorReturn3.default)(this, (Donut.__proto__ || (0, _getPrototypeOf2.default)(Donut)).call(this, props));
+  
+      _this.state = {
+        activeIndex: 0
+      };
+      // this.onPieEnter = this.onPieEnter.bind(this);
+      return _this;
+    }
+  
+    (0, _createClass3.default)(Donut, [{
+      key: 'onPieEnter',
+      value: function onPieEnter(data, index) {
+        this.setState({
+          activeIndex: index
+        });
+      }
+    }, {
+      key: 'render',
+      value: function render() {
+        var _this2 = this;
+  
+        return _react2.default.createElement(
+          _ResponsiveContainer2.default,
+          { width: '100%', aspect: 2 },
+          _react2.default.createElement(
+            _PieChart2.default,
+            {
+              margin: { top: 10, right: 30, left: 0, bottom: 0 },
+              onMouseEnter: function onMouseEnter(data, index) {
+                _this2.onPieEnter(data, index);
+              }
+            },
+            _react2.default.createElement(_Pie2.default, {
+              activeIndex: this.state.activeIndex,
+              activeShape: renderActiveShape,
+              data: this.props.data,
+              innerRadius: this.props.innerRadius,
+              outerRadius: this.props.outerRadius,
+              fill: this.props.color
+            })
+          )
+        );
+      }
+    }]);
+    return Donut;
+  }(_react.Component);
+  
+  Donut.propTypes = {
+    data: _react2.default.PropTypes.array,
+    innerRadius: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.string, _react2.default.PropTypes.number]),
+    outerRadius: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.string, _react2.default.PropTypes.number]),
+    color: _react2.default.PropTypes.string
+  };
+  exports.default = Donut;
+
+/***/ },
 /* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -19944,7 +21026,7 @@ module.exports =
         _react2.default.createElement(
           'h1',
           { className: 'login-brand-text' },
-          'SB Admin React'
+          'Open Foris Collect'
         ),
         _react2.default.createElement(
           'h3',
@@ -19952,8 +21034,8 @@ module.exports =
           'Created by ',
           _react2.default.createElement(
             'a',
-            { href: 'http://startreact.com' },
-            'StartReact.com'
+            { href: 'http://www.openforis.org' },
+            'Open Foris'
           ),
           ' team'
         )
@@ -20172,9 +21254,9 @@ module.exports =
   
   var _react2 = _interopRequireDefault(_react);
   
-  var _App = __webpack_require__(39);
+  var _app = __webpack_require__(39);
   
-  var _App2 = _interopRequireDefault(_App);
+  var _app2 = _interopRequireDefault(_app);
   
   var _ErrorPage = __webpack_require__(18);
   
@@ -20193,7 +21275,7 @@ module.exports =
   
       // console.log('error obj inside error index.js', error);
       return render(_react2.default.createElement(
-        _App2.default,
+        _app2.default,
         { context: context, error: error },
         _react2.default.createElement(_ErrorPage2.default, { error: error })
       ), error.status || 500);
@@ -20209,12 +21291,6 @@ module.exports =
 
 /***/ },
 /* 168 */
-/***/ function(module, exports) {
-
-  module.exports = require("./assets");
-
-/***/ },
-/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
   'use strict';
@@ -20227,1168 +21303,7 @@ module.exports =
   
   var _react2 = _interopRequireDefault(_react);
   
-  var _withStyles = __webpack_require__(19);
-  
-  var _withStyles2 = _interopRequireDefault(_withStyles);
-  
-  var _reactBootstrap = __webpack_require__(49);
-  
-  var _Navbar = __webpack_require__(50);
-  
-  var _Navbar2 = _interopRequireDefault(_Navbar);
-  
-  var _history = __webpack_require__(51);
-  
-  var _history2 = _interopRequireDefault(_history);
-  
-  var _jquery = __webpack_require__(55);
-  
-  var _jquery2 = _interopRequireDefault(_jquery);
-  
-  var _sidebar = __webpack_require__(170);
-  
-  var _sidebar2 = _interopRequireDefault(_sidebar);
-  
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  
-  var logo = __webpack_require__(171); /**
-                                     * React Starter Kit (https://www.reactstarterkit.com/)
-                                     *
-                                     * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.
-                                     *
-                                     * This source code is licensed under the MIT license found in the
-                                     * LICENSE.txt file in the root directory of this source tree.
-                                     */
-  
-  function Header() {
-    return _react2.default.createElement(
-      'div',
-      { id: 'wrapper', className: 'content' },
-      _react2.default.createElement(
-        _Navbar2.default,
-        { fluid: true, style: { margin: 0 } },
-        _react2.default.createElement(
-          _Navbar.Brand,
-          null,
-          _react2.default.createElement(
-            'span',
-            null,
-            _react2.default.createElement('img', { src: logo, alt: 'Open Foris Collect', title: 'Open Foris Collect' }),
-            _react2.default.createElement(
-              'span',
-              null,
-              '\xA0Open Foris Collect'
-            ),
-            _react2.default.createElement(
-              'button',
-              { type: 'button', className: 'navbar-toggle', onClick: function onClick() {
-                  toggleMenu();
-                }, style: { position: 'absolute', right: 0, top: 0 } },
-              _react2.default.createElement(
-                'span',
-                { className: 'sr-only' },
-                'Toggle navigation'
-              ),
-              _react2.default.createElement('span', { className: 'icon-bar' }),
-              _react2.default.createElement('span', { className: 'icon-bar' }),
-              _react2.default.createElement('span', { className: 'icon-bar' })
-            )
-          )
-        ),
-        _react2.default.createElement(
-          'ul',
-          { className: 'nav navbar-top-links navbar-right' },
-          _react2.default.createElement(
-            _reactBootstrap.NavDropdown,
-            { bsClass: 'dropdown', title: _react2.default.createElement(
-                'span',
-                null,
-                _react2.default.createElement('i', { className: 'fa fa-envelope fa-fw' })
-              ), id: 'navDropdown1' },
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { style: { width: 300 }, eventKey: '1' },
-              _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement(
-                  'strong',
-                  null,
-                  'John Smith'
-                ),
-                ' ',
-                _react2.default.createElement(
-                  'span',
-                  { className: 'pull-right text-muted' },
-                  ' ',
-                  _react2.default.createElement(
-                    'em',
-                    null,
-                    'Yesterday'
-                  ),
-                  ' '
-                ),
-                ' '
-              ),
-              _react2.default.createElement(
-                'div',
-                null,
-                ' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...'
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '2' },
-              _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement(
-                  'strong',
-                  null,
-                  'John Smith'
-                ),
-                ' ',
-                _react2.default.createElement(
-                  'span',
-                  { className: 'pull-right text-muted' },
-                  ' ',
-                  _react2.default.createElement(
-                    'em',
-                    null,
-                    'Yesterday'
-                  ),
-                  ' '
-                ),
-                ' '
-              ),
-              _react2.default.createElement(
-                'div',
-                null,
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...'
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '3' },
-              _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement(
-                  'strong',
-                  null,
-                  'John Smith'
-                ),
-                ' ',
-                _react2.default.createElement(
-                  'span',
-                  { className: 'pull-right text-muted' },
-                  ' ',
-                  _react2.default.createElement(
-                    'em',
-                    null,
-                    'Yesterday'
-                  ),
-                  ' '
-                ),
-                ' '
-              ),
-              _react2.default.createElement(
-                'div',
-                null,
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...'
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '4', className: 'text-center' },
-              _react2.default.createElement(
-                'strong',
-                null,
-                'Read All Messages'
-              ),
-              ' ',
-              _react2.default.createElement('i', { className: 'fa fa-angle-right' })
-            )
-          ),
-          _react2.default.createElement(
-            _reactBootstrap.NavDropdown,
-            { title: _react2.default.createElement(
-                'span',
-                null,
-                _react2.default.createElement('i', { className: 'fa fa-tasks fa-fw' }),
-                ' '
-              ), id: 'navDropdown2222' },
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '1', style: { width: 300 } },
-              _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                  'p',
-                  null,
-                  ' ',
-                  _react2.default.createElement(
-                    'strong',
-                    null,
-                    'Task 1'
-                  ),
-                  ' ',
-                  _react2.default.createElement(
-                    'span',
-                    { className: 'pull-right text-muted' },
-                    '40% Complete'
-                  ),
-                  ' '
-                ),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  _react2.default.createElement(_reactBootstrap.ProgressBar, { bsStyle: 'success', now: 40 })
-                )
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '2' },
-              _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                  'p',
-                  null,
-                  ' ',
-                  _react2.default.createElement(
-                    'strong',
-                    null,
-                    'Task 2'
-                  ),
-                  ' ',
-                  _react2.default.createElement(
-                    'span',
-                    { className: 'pull-right text-muted' },
-                    '20% Complete'
-                  ),
-                  ' '
-                ),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  _react2.default.createElement(_reactBootstrap.ProgressBar, { bsStyle: 'info', now: 20 })
-                )
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '3' },
-              _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                  'p',
-                  null,
-                  ' ',
-                  _react2.default.createElement(
-                    'strong',
-                    null,
-                    'Task 3'
-                  ),
-                  ' ',
-                  _react2.default.createElement(
-                    'span',
-                    { className: 'pull-right text-muted' },
-                    '60% Complete'
-                  ),
-                  ' '
-                ),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  _react2.default.createElement(_reactBootstrap.ProgressBar, { bsStyle: 'warning', now: 60 })
-                )
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '4' },
-              _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                  'p',
-                  null,
-                  ' ',
-                  _react2.default.createElement(
-                    'strong',
-                    null,
-                    'Task 4'
-                  ),
-                  ' ',
-                  _react2.default.createElement(
-                    'span',
-                    { className: 'pull-right text-muted' },
-                    '80% Complete'
-                  ),
-                  ' '
-                ),
-                _react2.default.createElement(
-                  'div',
-                  null,
-                  _react2.default.createElement(_reactBootstrap.ProgressBar, { bsStyle: 'danger', now: 80 })
-                )
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '5' },
-              _react2.default.createElement(
-                'strong',
-                null,
-                'See All Tasks'
-              ),
-              ' ',
-              _react2.default.createElement('i', { className: 'fa fa-angle-right' })
-            )
-          ),
-          _react2.default.createElement(
-            _reactBootstrap.NavDropdown,
-            { title: _react2.default.createElement('i', { className: 'fa fa-bell fa-fw' }), id: 'navDropdown3' },
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '1', style: { width: 300 } },
-              _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement('i', { className: 'fa fa-comment fa-fw' }),
-                ' New Comment ',
-                _react2.default.createElement(
-                  'span',
-                  { className: 'pull-right text-muted small' },
-                  '4 minutes ago'
-                ),
-                ' '
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '2' },
-              _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement('i', { className: 'fa fa-twitter fa-fw' }),
-                ' 3 New Followers ',
-                _react2.default.createElement(
-                  'span',
-                  { className: 'pull-right text-muted small' },
-                  '12 minutes ago'
-                ),
-                ' '
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '3' },
-              _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement('i', { className: 'fa fa-envelope fa-fw' }),
-                ' Message Sent ',
-                _react2.default.createElement(
-                  'span',
-                  { className: 'pull-right text-muted small' },
-                  '4 minutes ago'
-                ),
-                ' '
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '4' },
-              _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement('i', { className: 'fa fa-tasks fa-fw' }),
-                ' New Task ',
-                _react2.default.createElement(
-                  'span',
-                  { className: 'pull-right text-muted small' },
-                  '4 minutes ago'
-                ),
-                ' '
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '5' },
-              _react2.default.createElement(
-                'div',
-                null,
-                ' ',
-                _react2.default.createElement('i', { className: 'fa fa-upload fa-fw' }),
-                ' Server Rebooted ',
-                _react2.default.createElement(
-                  'span',
-                  { className: 'pull-right text-muted small' },
-                  '4 minutes ago'
-                ),
-                ' '
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '6' },
-              _react2.default.createElement(
-                'strong',
-                null,
-                'See All Alerts'
-              ),
-              ' ',
-              _react2.default.createElement('i', { className: 'fa fa-angle-right' })
-            )
-          ),
-          _react2.default.createElement(
-            _reactBootstrap.NavDropdown,
-            { title: _react2.default.createElement('i', { className: 'fa fa-user fa-fw' }), id: 'navDropdown4' },
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '1' },
-              _react2.default.createElement(
-                'span',
-                null,
-                ' ',
-                _react2.default.createElement('i', { className: 'fa fa-user fa-fw' }),
-                ' User Profile '
-              )
-            ),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '2' },
-              _react2.default.createElement(
-                'span',
-                null,
-                _react2.default.createElement('i', { className: 'fa fa-gear fa-fw' }),
-                ' Settings '
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '3', href: 'http://www.strapui.com' },
-              _react2.default.createElement(
-                'span',
-                null,
-                ' ',
-                _react2.default.createElement('i', { className: 'fa fa-eye fa-fw' }),
-                ' Premium React Themes '
-              )
-            ),
-            _react2.default.createElement(_reactBootstrap.MenuItem, { divider: true }),
-            _react2.default.createElement(
-              _reactBootstrap.MenuItem,
-              { eventKey: '4', onClick: function onClick(event) {
-                  _history2.default.push('/login');
-                } },
-              _react2.default.createElement(
-                'span',
-                null,
-                ' ',
-                _react2.default.createElement('i', { className: 'fa fa-sign-out fa-fw' }),
-                ' Logout '
-              )
-            )
-          )
-        ),
-        _react2.default.createElement(_sidebar2.default, null)
-      )
-    );
-  }
-  function toggleMenu() {
-    if ((0, _jquery2.default)(".navbar-collapse").hasClass('collapse')) {
-      (0, _jquery2.default)(".navbar-collapse").removeClass('collapse');
-    } else {
-      (0, _jquery2.default)(".navbar-collapse").addClass('collapse');
-    }
-  }
-  
-  exports.default = Header;
-
-/***/ },
-/* 170 */
-/***/ function(module, exports, __webpack_require__) {
-
-  'use strict';
-  
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  
-  var _getPrototypeOf = __webpack_require__(40);
-  
-  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-  
-  var _classCallCheck2 = __webpack_require__(41);
-  
-  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-  
-  var _createClass2 = __webpack_require__(42);
-  
-  var _createClass3 = _interopRequireDefault(_createClass2);
-  
-  var _possibleConstructorReturn2 = __webpack_require__(43);
-  
-  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-  
-  var _inherits2 = __webpack_require__(44);
-  
-  var _inherits3 = _interopRequireDefault(_inherits2);
-  
-  var _react = __webpack_require__(12);
-  
-  var _react2 = _interopRequireDefault(_react);
-  
-  var _history = __webpack_require__(51);
-  
-  var _history2 = _interopRequireDefault(_history);
-  
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  
-  var Sidebar = function (_Component) {
-    (0, _inherits3.default)(Sidebar, _Component);
-  
-    function Sidebar(props) {
-      (0, _classCallCheck3.default)(this, Sidebar);
-  
-      var _this = (0, _possibleConstructorReturn3.default)(this, (Sidebar.__proto__ || (0, _getPrototypeOf2.default)(Sidebar)).call(this, props));
-  
-      _this.state = {
-        uiElementsCollapsed: true,
-        chartsElementsCollapsed: true,
-        multiLevelDropdownCollapsed: true,
-        thirdLevelDropdownCollapsed: true,
-        samplePagesCollapsed: true
-      };
-      return _this;
-    }
-  
-    (0, _createClass3.default)(Sidebar, [{
-      key: 'render',
-      value: function render() {
-        return _react2.default.createElement(
-          'div',
-          { className: 'navbar-default sidebar', style: { marginLeft: '-20px' }, role: 'navigation' },
-          _react2.default.createElement(
-            'div',
-            { className: 'sidebar-nav navbar-collapse collapse' },
-            _react2.default.createElement(
-              'ul',
-              { className: 'nav in', id: 'side-menu' },
-              _react2.default.createElement(
-                'li',
-                { className: 'sidebar-search' },
-                _react2.default.createElement(
-                  'div',
-                  { className: 'input-group custom-search-form' },
-                  _react2.default.createElement('input', { type: 'text', className: 'form-control', placeholder: 'Search...' }),
-                  _react2.default.createElement(
-                    'span',
-                    { className: 'input-group-btn' },
-                    _react2.default.createElement(
-                      'button',
-                      { className: 'btn btn-default', type: 'button' },
-                      _react2.default.createElement('i', { className: 'fa fa-search' })
-                    )
-                  )
-                )
-              ),
-              _react2.default.createElement(
-                'li',
-                null,
-                _react2.default.createElement(
-                  'a',
-                  { href: '', onClick: function onClick(e) {
-                      e.preventDefault();_history2.default.push('/');
-                    } },
-                  _react2.default.createElement('i', { className: 'fa fa-dashboard fa-fw' }),
-                  ' \xA0Dashboard'
-                )
-              ),
-              _react2.default.createElement(
-                'li',
-                null,
-                _react2.default.createElement(
-                  'a',
-                  { href: '', onClick: function onClick(e) {
-                      e.preventDefault();_history2.default.push('/data_management');
-                    } },
-                  'Data Management'
-                )
-              ),
-              _react2.default.createElement(
-                'li',
-                null,
-                _react2.default.createElement(
-                  'a',
-                  { href: '', onClick: function onClick(e) {
-                      e.preventDefault();_history2.default.push('/data_cleansing');
-                    } },
-                  'Data Cleansing'
-                )
-              )
-            )
-          )
-        );
-      }
-    }]);
-    return Sidebar;
-  }(_react.Component);
-  // import classNames from 'classnames';
-  
-  
-  exports.default = Sidebar;
-
-/***/ },
-/* 171 */
-/***/ function(module, exports) {
-
-  module.exports = "data:image/png;base64,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"
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-  'use strict';
-  
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  
-  var _defineProperty2 = __webpack_require__(63);
-  
-  var _defineProperty3 = _interopRequireDefault(_defineProperty2);
-  
-  var _getPrototypeOf = __webpack_require__(40);
-  
-  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-  
-  var _classCallCheck2 = __webpack_require__(41);
-  
-  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-  
-  var _createClass2 = __webpack_require__(42);
-  
-  var _createClass3 = _interopRequireDefault(_createClass2);
-  
-  var _possibleConstructorReturn2 = __webpack_require__(43);
-  
-  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-  
-  var _inherits2 = __webpack_require__(44);
-  
-  var _inherits3 = _interopRequireDefault(_inherits2);
-  
-  var _react = __webpack_require__(12);
-  
-  var _react2 = _interopRequireDefault(_react);
-  
-  var _reactBootstrap = __webpack_require__(49);
-  
-  var _link = __webpack_require__(173);
-  
-  var _link2 = _interopRequireDefault(_link);
-  
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  
-  var StatWidget = function (_Component) {
-    (0, _inherits3.default)(StatWidget, _Component);
-  
-    function StatWidget() {
-      (0, _classCallCheck3.default)(this, StatWidget);
-      return (0, _possibleConstructorReturn3.default)(this, (StatWidget.__proto__ || (0, _getPrototypeOf2.default)(StatWidget)).apply(this, arguments));
-    }
-  
-    (0, _createClass3.default)(StatWidget, [{
-      key: 'render',
-      value: function render() {
-        var _React$createElement;
-  
-        return _react2.default.createElement(_reactBootstrap.Panel, (_React$createElement = {
-          className: 'stat'
-        }, (0, _defineProperty3.default)(_React$createElement, 'className', this.props.style), (0, _defineProperty3.default)(_React$createElement, 'header', _react2.default.createElement(
-          'div',
-          { className: 'row' },
-          _react2.default.createElement(
-            'div',
-            { className: 'col-xs-3' },
-            _react2.default.createElement('i', {
-              className: this.props.icon
-            })
-          ),
-          _react2.default.createElement(
-            'div',
-            { className: 'col-xs-9 text-right' },
-            _react2.default.createElement(
-              'div',
-              { className: 'huge' },
-              this.props.count
-            ),
-            _react2.default.createElement(
-              'div',
-              null,
-              this.props.headerText
-            )
-          )
-        )), (0, _defineProperty3.default)(_React$createElement, 'footer', _react2.default.createElement(
-          _link2.default,
-          {
-            to: this.props.linkTo // eslint-disable-line
-  
-          },
-          _react2.default.createElement(
-            'span',
-            { className: 'pull-left' },
-            this.props.footerText
-          ),
-          _react2.default.createElement(
-            'span',
-            { className: 'pull-right' },
-            _react2.default.createElement('i', { className: 'fa fa-arrow-circle-right' })
-          ),
-          _react2.default.createElement('div', { className: 'clearfix' })
-        )), _React$createElement));
-      } // eslint-disable-line
-  
-    }]);
-    return StatWidget;
-  }(_react.Component);
-  
-  StatWidget.propTypes = {
-    style: _react2.default.PropTypes.string,
-    count: _react2.default.PropTypes.string,
-    headerText: _react2.default.PropTypes.string,
-    icon: _react2.default.PropTypes.string,
-    footerText: _react2.default.PropTypes.string
-  };
-  exports.default = StatWidget;
-
-/***/ },
-/* 173 */
-/***/ function(module, exports, __webpack_require__) {
-
-  'use strict';
-  
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  
-  var _extends2 = __webpack_require__(65);
-  
-  var _extends3 = _interopRequireDefault(_extends2);
-  
-  var _objectWithoutProperties2 = __webpack_require__(66);
-  
-  var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
-  
-  var _getPrototypeOf = __webpack_require__(40);
-  
-  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-  
-  var _classCallCheck2 = __webpack_require__(41);
-  
-  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-  
-  var _createClass2 = __webpack_require__(42);
-  
-  var _createClass3 = _interopRequireDefault(_createClass2);
-  
-  var _possibleConstructorReturn2 = __webpack_require__(43);
-  
-  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-  
-  var _inherits2 = __webpack_require__(44);
-  
-  var _inherits3 = _interopRequireDefault(_inherits2);
-  
-  var _react = __webpack_require__(12);
-  
-  var _react2 = _interopRequireDefault(_react);
-  
-  var _history = __webpack_require__(51);
-  
-  var _history2 = _interopRequireDefault(_history);
-  
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  
-  /**
-   * React Starter Kit (https://www.reactstarterkit.com/)
-   *
-   * Copyright © 2014-2016 Kriasoft, LLC. All rights reserved.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE.txt file in the root directory of this source tree.
-   */
-  
-  function isLeftClickEvent(event) {
-    return event.button === 0;
-  }
-  
-  function isModifiedEvent(event) {
-    return !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
-  }
-  
-  var Link = function (_Component) {
-    (0, _inherits3.default)(Link, _Component);
-  
-    function Link() {
-      var _ref;
-  
-      var _temp, _this, _ret;
-  
-      (0, _classCallCheck3.default)(this, Link);
-  
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-  
-      return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Link.__proto__ || (0, _getPrototypeOf2.default)(Link)).call.apply(_ref, [this].concat(args))), _this), _this.handleClick = function (event) {
-        var allowTransition = true;
-  
-        if (_this.props.onClick) {
-          _this.props.onClick(event);
-        }
-  
-        if (isModifiedEvent(event) || !isLeftClickEvent(event)) {
-          return;
-        }
-  
-        if (event.defaultPrevented === true) {
-          allowTransition = false;
-        }
-  
-        event.preventDefault();
-  
-        if (allowTransition) {
-          if (_this.props.to) {
-            _history2.default.push(_this.props.to);
-          } else {
-            _history2.default.push({
-              pathname: event.currentTarget.pathname,
-              search: event.currentTarget.search
-            });
-          }
-        }
-      }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
-    } // eslint-disable-line react/prefer-stateless-function
-  
-    (0, _createClass3.default)(Link, [{
-      key: 'render',
-      value: function render() {
-        var _props = this.props,
-            to = _props.to,
-            props = (0, _objectWithoutProperties3.default)(_props, ['to']); // eslint-disable-line no-use-before-define
-  
-        return _react2.default.createElement('a', (0, _extends3.default)({ href: _history2.default.createHref(to) }, props, { onClick: this.handleClick }));
-      }
-    }]);
-    return Link;
-  }(_react.Component);
-  
-  Link.propTypes = {
-    to: _react.PropTypes.oneOfType([_react.PropTypes.string, _react.PropTypes.object]).isRequired,
-    onClick: _react.PropTypes.func
-  };
-  exports.default = Link;
-
-/***/ },
-/* 174 */
-/***/ function(module, exports, __webpack_require__) {
-
-  'use strict';
-  
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  
-  var _getPrototypeOf = __webpack_require__(40);
-  
-  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-  
-  var _classCallCheck2 = __webpack_require__(41);
-  
-  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-  
-  var _createClass2 = __webpack_require__(42);
-  
-  var _createClass3 = _interopRequireDefault(_createClass2);
-  
-  var _possibleConstructorReturn2 = __webpack_require__(43);
-  
-  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-  
-  var _inherits2 = __webpack_require__(44);
-  
-  var _inherits3 = _interopRequireDefault(_inherits2);
-  
-  var _react = __webpack_require__(12);
-  
-  var _react2 = _interopRequireDefault(_react);
-  
-  var _PieChart = __webpack_require__(68);
-  
-  var _PieChart2 = _interopRequireDefault(_PieChart);
-  
-  var _Pie = __webpack_require__(96);
-  
-  var _Pie2 = _interopRequireDefault(_Pie);
-  
-  var _Sector = __webpack_require__(99);
-  
-  var _Sector2 = _interopRequireDefault(_Sector);
-  
-  var _ResponsiveContainer = __webpack_require__(108);
-  
-  var _ResponsiveContainer2 = _interopRequireDefault(_ResponsiveContainer);
-  
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  
-  // import { PieCharts, Pie, Sector, ResponsiveContainer } from '../../vendor/recharts';
-  var renderActiveShape = function renderActiveShape(props) {
-    var RADIAN = Math.PI / 180;
-    var cx = props.cx,
-        cy = props.cy,
-        midAngle = props.midAngle,
-        innerRadius = props.innerRadius,
-        outerRadius = props.outerRadius,
-        startAngle = props.startAngle,
-        endAngle = props.endAngle,
-        fill = props.fill,
-        payload = props.payload,
-        percent = props.percent,
-        value = props.value;
-  
-    var sin = Math.sin(-RADIAN * midAngle);
-    var cos = Math.cos(-RADIAN * midAngle);
-    var sx = cx + (outerRadius + 5) * cos;
-    var sy = cy + (outerRadius + 5) * sin;
-    var mx = cx + (outerRadius + 10) * cos;
-    var my = cy + (outerRadius + 10) * sin;
-    var ex = mx + (cos >= 0 ? 1 : -1) * 11;
-    var ey = my;
-    var textAnchor = cos >= 0 ? 'start' : 'end';
-  
-    return _react2.default.createElement(
-      'g',
-      null,
-      _react2.default.createElement(
-        'text',
-        { x: cx, y: cy, dy: 8, textAnchor: 'middle', fill: fill },
-        payload.name
-      ),
-      _react2.default.createElement(_Sector2.default, {
-        cx: cx,
-        cy: cy,
-        innerRadius: innerRadius,
-        outerRadius: outerRadius,
-        startAngle: startAngle,
-        endAngle: endAngle,
-        fill: fill
-      }),
-      _react2.default.createElement(_Sector2.default, {
-        cx: cx,
-        cy: cy,
-        startAngle: startAngle,
-        endAngle: endAngle,
-        innerRadius: outerRadius + 6,
-        outerRadius: outerRadius + 10,
-        fill: fill
-      }),
-      _react2.default.createElement('path', { d: 'M' + sx + ',' + sy + 'L' + mx + ',' + my + 'L' + ex + ',' + ey, stroke: fill, fill: 'none' }),
-      _react2.default.createElement('circle', { cx: ex, cy: ey, r: 2, fill: fill, stroke: 'none' }),
-      _react2.default.createElement(
-        'text',
-        {
-          x: ex + (cos >= 0 ? 1 : -1) * 12,
-          y: ey,
-          textAnchor: textAnchor,
-          fill: '#333'
-        },
-        'Value ' + value
-      ),
-      _react2.default.createElement(
-        'text',
-        { x: ex + (cos >= 0 ? 1 : -1) * 12, y: ey, dy: 18, textAnchor: textAnchor, fill: 'red' },
-        '(Rate ' + (percent * 100).toFixed(2) + '%)'
-      )
-    );
-  };
-  
-  var Donut = function (_Component) {
-    (0, _inherits3.default)(Donut, _Component);
-  
-    function Donut(props) {
-      (0, _classCallCheck3.default)(this, Donut);
-  
-      var _this = (0, _possibleConstructorReturn3.default)(this, (Donut.__proto__ || (0, _getPrototypeOf2.default)(Donut)).call(this, props));
-  
-      _this.state = {
-        activeIndex: 0
-      };
-      // this.onPieEnter = this.onPieEnter.bind(this);
-      return _this;
-    }
-  
-    (0, _createClass3.default)(Donut, [{
-      key: 'onPieEnter',
-      value: function onPieEnter(data, index) {
-        this.setState({
-          activeIndex: index
-        });
-      }
-    }, {
-      key: 'render',
-      value: function render() {
-        var _this2 = this;
-  
-        return _react2.default.createElement(
-          _ResponsiveContainer2.default,
-          { width: '100%', aspect: 2 },
-          _react2.default.createElement(
-            _PieChart2.default,
-            {
-              margin: { top: 10, right: 30, left: 0, bottom: 0 },
-              onMouseEnter: function onMouseEnter(data, index) {
-                _this2.onPieEnter(data, index);
-              }
-            },
-            _react2.default.createElement(_Pie2.default, {
-              activeIndex: this.state.activeIndex,
-              activeShape: renderActiveShape,
-              data: this.props.data,
-              innerRadius: this.props.innerRadius,
-              outerRadius: this.props.outerRadius,
-              fill: this.props.color
-            })
-          )
-        );
-      }
-    }]);
-    return Donut;
-  }(_react.Component);
-  
-  Donut.propTypes = {
-    data: _react2.default.PropTypes.array,
-    innerRadius: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.string, _react2.default.PropTypes.number]),
-    outerRadius: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.string, _react2.default.PropTypes.number]),
-    color: _react2.default.PropTypes.string
-  };
-  exports.default = Donut;
-
-/***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-  'use strict';
-  
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  
-  var _react = __webpack_require__(12);
-  
-  var _react2 = _interopRequireDefault(_react);
-  
-  var _DataManagement = __webpack_require__(177);
-  
-  var _DataManagement2 = _interopRequireDefault(_DataManagement);
-  
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  
-  exports.default = {
-    path: '/data_management',
-  
-    action: function action() {
-      return _react2.default.createElement(_DataManagement2.default, null);
-    }
-  };
-
-/***/ },
-/* 176 */,
-/* 177 */
-/***/ function(module, exports, __webpack_require__) {
-
-  'use strict';
-  
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  
-  var _react = __webpack_require__(12);
-  
-  var _react2 = _interopRequireDefault(_react);
-  
-  var _reactBootstrap = __webpack_require__(49);
-  
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-  
-  var title = 'Data Management';
-  
-  function displayBlank(props, context) {
-    context.setTitle(title);
-    return _react2.default.createElement(
-      'div',
-      null,
-      _react2.default.createElement(
-        'div',
-        { className: 'row' },
-        _react2.default.createElement(
-          'div',
-          { className: 'col-lg-12' },
-          _react2.default.createElement(
-            _reactBootstrap.PageHeader,
-            null,
-            'Data Management'
-          )
-        )
-      )
-    );
-  }
-  
-  displayBlank.contextTypes = { setTitle: _react.PropTypes.func.isRequired };
-  exports.default = displayBlank;
-
-/***/ },
-/* 178 */
-/***/ function(module, exports, __webpack_require__) {
-
-  'use strict';
-  
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  
-  var _react = __webpack_require__(12);
-  
-  var _react2 = _interopRequireDefault(_react);
-  
-  var _DataCleansing = __webpack_require__(179);
+  var _DataCleansing = __webpack_require__(169);
   
   var _DataCleansing2 = _interopRequireDefault(_DataCleansing);
   
@@ -21403,7 +21318,7 @@ module.exports =
   };
 
 /***/ },
-/* 179 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
   'use strict';
@@ -21445,6 +21360,232 @@ module.exports =
   
   displayBlank.contextTypes = { setTitle: _react.PropTypes.func.isRequired };
   exports.default = displayBlank;
+
+/***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+  'use strict';
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  
+  var _react = __webpack_require__(12);
+  
+  var _react2 = _interopRequireDefault(_react);
+  
+  var _DataManagement = __webpack_require__(171);
+  
+  var _DataManagement2 = _interopRequireDefault(_DataManagement);
+  
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  
+  exports.default = {
+    path: '/data_management',
+  
+    action: function action() {
+      return _react2.default.createElement(_DataManagement2.default, null);
+    }
+  };
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+  'use strict';
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  
+  var _react = __webpack_require__(12);
+  
+  var _react2 = _interopRequireDefault(_react);
+  
+  var _reactBootstrap = __webpack_require__(49);
+  
+  var _RecordDataTable = __webpack_require__(172);
+  
+  var _RecordDataTable2 = _interopRequireDefault(_RecordDataTable);
+  
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  
+  var title = 'Data Management';
+  
+  function displayBlank(props, context) {
+    context.setTitle(title);
+    return _react2.default.createElement(
+      'div',
+      null,
+      _react2.default.createElement(
+        'div',
+        { className: 'row' },
+        _react2.default.createElement(
+          'div',
+          { className: 'col-lg-12' },
+          _react2.default.createElement(
+            _reactBootstrap.PageHeader,
+            null,
+            'Data Management'
+          ),
+          _react2.default.createElement(_RecordDataTable2.default, null)
+        )
+      )
+    );
+  }
+  
+  displayBlank.contextTypes = { setTitle: _react.PropTypes.func.isRequired };
+  exports.default = displayBlank;
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+  'use strict';
+  
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  
+  var _getPrototypeOf = __webpack_require__(40);
+  
+  var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+  
+  var _classCallCheck2 = __webpack_require__(41);
+  
+  var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+  
+  var _createClass2 = __webpack_require__(42);
+  
+  var _createClass3 = _interopRequireDefault(_createClass2);
+  
+  var _possibleConstructorReturn2 = __webpack_require__(43);
+  
+  var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+  
+  var _inherits2 = __webpack_require__(44);
+  
+  var _inherits3 = _interopRequireDefault(_inherits2);
+  
+  var _react = __webpack_require__(12);
+  
+  var _react2 = _interopRequireDefault(_react);
+  
+  var _reactBootstrapTable = __webpack_require__(173);
+  
+  var _axios = __webpack_require__(174);
+  
+  var _axios2 = _interopRequireDefault(_axios);
+  
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  
+  var RecordDataTable = function (_Component) {
+    (0, _inherits3.default)(RecordDataTable, _Component);
+  
+    function RecordDataTable(props) {
+      (0, _classCallCheck3.default)(this, RecordDataTable);
+  
+      var _this = (0, _possibleConstructorReturn3.default)(this, (RecordDataTable.__proto__ || (0, _getPrototypeOf2.default)(RecordDataTable)).call(this, props));
+  
+      _this.state = {
+        items: [],
+        totalSize: 0,
+        page: 1,
+        sizePerPage: 20
+      };
+      _this.fetchData = _this.fetchData.bind(_this);
+      _this.handlePageChange = _this.handlePageChange.bind(_this);
+      _this.handleSizePerPageChange = _this.handleSizePerPageChange.bind(_this);
+      return _this;
+    }
+  
+    (0, _createClass3.default)(RecordDataTable, [{
+      key: 'componentDidMount',
+      value: function componentDidMount() {
+        this.fetchData();
+      }
+    }, {
+      key: 'fetchData',
+      value: function fetchData() {
+        var _this2 = this;
+  
+        var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.state.page;
+        var sizePerPage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.state.sizePerPage;
+  
+        var surveyId = 74;
+        _axios2.default.get('http://localhost:8380/collect/survey/' + surveyId + '/data/records/summary.json', {
+          params: {
+            maxNumberOfRows: sizePerPage,
+            offset: (page - 1) * sizePerPage
+          }
+        }).then(function (res) {
+          _this2.setState({ items: res.data.records, totalSize: res.data.count, page: page, sizePerPage: sizePerPage });
+        });
+      }
+    }, {
+      key: 'handlePageChange',
+      value: function handlePageChange(page, sizePerPage) {
+        this.fetchData(page, sizePerPage);
+      }
+    }, {
+      key: 'handleSizePerPageChange',
+      value: function handleSizePerPageChange(sizePerPage) {
+        // When changing the size per page always navigating to the first page
+        this.fetchData(1, sizePerPage);
+      }
+    }, {
+      key: 'render',
+      value: function render() {
+        var options = {
+          onPageChange: this.handlePageChange,
+          onSizePerPageList: this.handleSizePerPageChange,
+          page: this.state.page,
+          sizePerPage: this.state.sizePerPage
+        };
+  
+        return _react2.default.createElement(
+          _reactBootstrapTable.BootstrapTable,
+          {
+            data: this.state.items,
+            options: options,
+            fetchInfo: { dataTotalSize: this.state.totalSize },
+            remote: true,
+            pagination: true,
+            striped: true,
+            hover: true,
+            condensed: true
+          },
+          _react2.default.createElement(
+            _reactBootstrapTable.TableHeaderColumn,
+            { dataField: 'id', isKey: true, dataAlign: 'center' },
+            'Id'
+          )
+        );
+      }
+    }]);
+    return RecordDataTable;
+  }(_react.Component);
+  
+  exports.default = RecordDataTable;
+
+/***/ },
+/* 173 */
+/***/ function(module, exports) {
+
+  module.exports = require("react-bootstrap-table");
+
+/***/ },
+/* 174 */
+/***/ function(module, exports) {
+
+  module.exports = require("axios");
+
+/***/ },
+/* 175 */
+/***/ function(module, exports) {
+
+  module.exports = require("./assets");
 
 /***/ }
 /******/ ]);
