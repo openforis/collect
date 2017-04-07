@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.32-SNAPSHOT</version>
+		<version>3.12.32</version>
 	</parent>
 	<artifactId>collect-autoupdater</artifactId>
 	<packaging>pom</packaging>
@@ -116,9 +116,7 @@
 									<goal>run</goal>
 									<configuration>
 										<tasks>
-											<move file="${installbuilder-home}/autoupdate/output/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" 
-												tofile="${project.build.directory}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" 
-												failonerror="true" />
+											<move file="${installbuilder-home}/autoupdate/output/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" tofile="${project.build.directory}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" failonerror="true" />
 										</tasks>
 									</configuration>
 								</pluginExecutor>

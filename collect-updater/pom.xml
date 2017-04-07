@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.32-SNAPSHOT</version>
+		<version>3.12.32</version>
 	</parent>
 	<artifactId>collect-updater</artifactId>
 	<packaging>pom</packaging>
@@ -257,10 +257,7 @@
 									<configuration>
 										<skip>${installer.skip}</skip>
 										<target>
-											<move
-												file="${installbuilder-home}/output/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}"
-												tofile="${project.build.directory}/${installer.classifier}-updater.${installer.extension}"
-												failonerror="true" />
+											<move file="${installbuilder-home}/output/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-updater.${installer.extension}" failonerror="true" />
 										</target>
 									</configuration>
 								</pluginExecutor>
