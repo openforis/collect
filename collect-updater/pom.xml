@@ -16,29 +16,26 @@
 		<installer-build-path>${project.build.directory}/installer</installer-build-path>
 		<installbuilder-updater-file-name>installbuilder-updater.xml</installbuilder-updater-file-name>
 		<autoupdate-xml-file-name>update.xml</autoupdate-xml-file-name>
-		<!-- updater file names -->
-		<windows-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-windows-installer.exe</windows-updater-file-name>
-		<linux-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-installer.run</linux-updater-file-name>
-		<linux-x64-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-x64-installer.run</linux-x64-updater-file-name>
-		<osx-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-osx-installer.dmg</osx-updater-file-name>
+		<installbuilder.project.name>OpenForisCollectUpdater</installbuilder.project.name>
 	</properties>
 
 	<build>
 		<plugins>
-			<!-- 1. copy webapp war file -->
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.6</version>
 				<executions>
+					<!-- 2. copy autoupdater and contolpanel -->
 					<execution>
-						<id>copy-collect-webapp</id>
+						<id>copy-other-artifacts</id>
 						<phase>process-sources</phase>
 						<goals>
 							<goal>copy</goal>
 						</goals>
 						<configuration>
 							<artifactItems>
+								<!-- Collect WebApp -->
 								<artifactItem>
 									<groupId>org.openforis.collect</groupId>
 									<artifactId>collect-webapp-jetty</artifactId>
@@ -100,6 +97,7 @@
 						</goals>
 						<configuration>
 							<outputDirectory>${installer-build-path}/lib</outputDirectory>
+							<includeScope>compile</includeScope>
 						</configuration>
 					</execution>
 				</executions>
@@ -132,213 +130,159 @@
 				</executions>
 			</plugin>
 
-			<!-- 3.a replace application version into the autoupdate xml file (remotely uploaded) -->
+			<!-- 3.a replace application version and jre version into the autoupdate xml file (remotely uploaded)
+				and into the xml installbuilder source file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>maven-replacer-plugin</artifactId>
-				<version>1.4.0</version>
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>
 						<goals>
 							<goal>replace</goal>
 						</goals>
+						<configuration>
+							<basedir>${installer-build-path}</basedir>
+							<includes>
+								<include>${autoupdate-xml-file-name}</include>
+								<include>${installbuilder-updater-file-name}</include>
+								<include>java.xml</include>
+							</includes>
+							<regex>false</regex>
+							<replacements>
+			                    <replacement>
+									<token><![CDATA[%JRE_VERSION_FULL%]]></token>
+									<value>${installer.jre.version.full}</value>
+								</replacement>
+								<replacement>
+									<token><![CDATA[%JRE_VERSION_MAJOR%]]></token>
+									<value>${installer.jre.version.major}</value>
+								</replacement>
+								<replacement>
+									<token><![CDATA[%JRE_VERSION%]]></token>
+									<value>${installer.jre.version}</value>
+								</replacement>
+								<replacement>
+									<token>PROJECT_VERSION</token>
+									<value>${project.version}</value>
+								</replacement>
+								<replacement>
+									<token>VERSION_ID</token>
+									<value>${installer-version-id}</value>
+								</replacement>
+								<replacement>
+			                        <token>VERSION</token>
+			                        <value>${project.version}</value>
+			                    </replacement>
+			                    <replacement>
+									<token>UPDATE_XML_URL</token>
+									<value>${collect.update_2.url}</value> <!-- use new url in update.ini -->
+								</replacement>
+							</replacements>
+						</configuration>
 					</execution>
 				</executions>
-				<configuration>
-					<basedir>${installer-build-path}</basedir>
-					<includes>
-						<include>${autoupdate-xml-file-name}</include>
-					</includes>
-					<regex>false</regex>
-					<replacements>
-						<replacement>
-							<token>PROJECT_VERSION</token>
-							<value>${project.version}</value>
-						</replacement>
-						<replacement>
-							<token>VERSION_ID</token>
-							<value>${installer-version-id}</value>
-						</replacement>
-						<replacement>
-	                        <token>VERSION</token>
-	                        <value>${project.version}</value>
-	                    </replacement>
-					</replacements>
-				</configuration>
 			</plugin>
 			
-			<!-- 3.b replace application version into the xml installbuilder source 
-				file -->
+			<!-- 4. iterate over platforms and generate updaters -->
 			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>maven-replacer-plugin</artifactId>
-				<version>1.4.0</version>
+				<groupId>com.soebes.maven.plugins</groupId>
+				<artifactId>iterator-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<phase>prepare-package</phase>
+						<id>download-jre</id>
+						<phase>process-sources</phase>
 						<goals>
-							<goal>replace</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<basedir>${installer-build-path}</basedir>
-					<includes>
-						<include>${installbuilder-updater-file-name}</include>
-					</includes>
-					<regex>false</regex>
-					<replacements>
-						<replacement>
-							<token>PROJECT_VERSION</token>
-							<value>${project.version}</value>
-						</replacement>
-						<replacement>
-							<token>VERSION_ID</token>
-							<value>${installer-version-id}</value>
-						</replacement>
-						<replacement>
-	                        <token>VERSION</token>
-	                        <value>${project.version}</value>
-	                    </replacement>
-						<replacement>
-							<token>UPDATE_XML_URL</token>
-							<value>${collect.update_2.url}</value> <!-- use new url in update.ini -->
-						</replacement>
-					</replacements>
-				</configuration>
-			</plugin>
-			
-			<!-- 4. execute installbuilder to produce the installers -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<!-- Linux -->
-					<execution>
-						<id>linux-udpater</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>exec</goal>
+							<goal>iterator</goal>
 						</goals>
 						<configuration>
-							<executable>${installbuilder-home}/bin/builder</executable>
-							<arguments>
-								<argument>build</argument>
-								<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
-								<argument>linux</argument>
-							</arguments>
+							<pluginExecutors>
+								<!-- download and extract jre -->
+								<pluginExecutor>
+									<plugin>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-dependency-plugin</artifactId>
+									</plugin>
+									<goal>unpack</goal>
+									<configuration>
+										<artifactItems>
+											<artifactItem>
+												<groupId>com.oracle.java</groupId>
+												<artifactId>jre</artifactId>
+												<version>${installer.jre.version.full}</version>
+												<classifier>${jre.classifier}</classifier>
+												<type>zip</type>
+												<overWrite>false</overWrite>
+												<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
+											</artifactItem>
+										</artifactItems>
+									</configuration>
+								</pluginExecutor>
+							</pluginExecutors>
 						</configuration>
 					</execution>
-					<!-- Linux x64 -->
 					<execution>
-						<id>linux-x64-udpater</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${installbuilder-home}/bin/builder</executable>
-							<arguments>
-								<argument>build</argument>
-								<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
-								<argument>linux-x64</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<!-- Windows -->
-					<execution>
-						<id>windows-udpater</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${installbuilder-home}/bin/builder</executable>
-							<arguments>
-								<argument>build</argument>
-								<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
-								<argument>windows</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<!-- OS X -->
-					<execution>
-						<id>osx-udpater</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${installbuilder-home}/bin/builder</executable>
-							<arguments>
-								<argument>build</argument>
-								<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
-								<argument>osx</argument>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- 5. move the udpaters into the target folder -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>run-ant-move-updaters-into-build-directory</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<move file="${installbuilder-home}/output/${linux-updater-file-name}" tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
-								<move file="${installbuilder-home}/output/${linux-x64-updater-file-name}" tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
-								<move file="${installbuilder-home}/output/${osx-updater-file-name}" tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
-								<move file="${installbuilder-home}/output/${windows-updater-file-name}" tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- 6. attach updaters as artifact -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-updater-artifacts</id>
+						<id>execute-installer</id>
 						<phase>package</phase>
 						<goals>
-							<goal>attach-artifact</goal>
+							<goal>iterator</goal>
 						</goals>
 						<configuration>
-							<artifacts>
-								<artifact>
-									<file>${project.build.directory}/${linux-updater-file-name}</file>
-									<classifier>linux</classifier>
-									<type>run</type>
-								</artifact>
-								<artifact>
-									<file>${project.build.directory}/${linux-x64-updater-file-name}</file>
-									<classifier>linux-x64</classifier>
-									<type>run</type>
-								</artifact>
-								<artifact>
-									<file>${project.build.directory}/${osx-updater-file-name}</file>
-									<classifier>osx</classifier>
-									<type>zip</type>
-								</artifact>
-								<artifact>
-									<file>${project.build.directory}/${windows-updater-file-name}</file>
-									<classifier>windows</classifier>
-									<type>exe</type>
-								</artifact>
-							</artifacts>
+							<pluginExecutors>
+								<!-- 4. execute InstallBuilder to produce the updaters -->
+								<pluginExecutor>
+									<plugin>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>exec-maven-plugin</artifactId>
+										<version>1.1</version>
+									</plugin>
+									<goal>exec</goal>
+									<configuration>
+										<skip>${installer.skip}</skip>
+										<executable>${installbuilder-home}/bin/builder</executable>
+										<arguments>
+											<argument>build</argument>
+											<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
+											<argument>@item@</argument>
+										</arguments>
+									</configuration>
+								</pluginExecutor>
+								<!-- 5. move generated updaters into the target folder -->
+								<pluginExecutor>
+									<plugin>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+									</plugin>
+									<goal>run</goal>
+									<configuration>
+										<skip>${installer.skip}</skip>
+										<target>
+											<move
+												file="${installbuilder-home}/output/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}"
+												tofile="${project.build.directory}/${installer.classifier}-updater.${installer.extension}"
+												failonerror="true" />
+										</target>
+									</configuration>
+								</pluginExecutor>
+								<!-- 6. attach updaters as artifact -->
+								<pluginExecutor>
+									<plugin>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>build-helper-maven-plugin</artifactId>
+									</plugin>
+									<goal>attach-artifact</goal>
+									<configuration>
+										<skipAttach>${installer.skip}</skipAttach>
+										<artifacts>
+											<artifact>
+												<file>${project.build.directory}/${installer.classifier}-updater.${installer.extension}</file>
+												<classifier>${installer.classifier}</classifier>
+												<type>${installer.extension}</type>
+											</artifact>
+										</artifacts>
+									</configuration>
+								</pluginExecutor>
+							</pluginExecutors>
 						</configuration>
 					</execution>
 				</executions>

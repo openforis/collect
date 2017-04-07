@@ -29,6 +29,9 @@
 		<spring-security.version>4.0.3.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
 		<jetty.version>9.4.2.v20170220</jetty.version>
+		<installer.jre.version.major>1.8</installer.jre.version.major>
+		<installer.jre.version>1.8.0</installer.jre.version>
+		<installer.jre.version.full>1.8.0_121</installer.jre.version.full>
 	</properties>
 
 	<distributionManagement>
@@ -183,11 +186,6 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<version>1.4</version>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.10</version>
-		    </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -248,6 +246,85 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>1.9</version>
+				</plugin>
+				<plugin>
+					<groupId>com.soebes.maven.plugins</groupId>
+				    <artifactId>iterator-maven-plugin</artifactId>
+				    <version>0.5.0</version>
+				    <configuration>
+						<itemsWithProperties>
+							<itemWithProperty>
+								<name>linux</name>
+								<properties>
+									<jre.classifier>linux</jre.classifier>
+									<installer.skip>false</installer.skip>
+									<installer.classifier>linux</installer.classifier>
+									<installer.artifact.type>run</installer.artifact.type>
+									<installer.autoupdater.extension>run</installer.autoupdater.extension>
+									<installer.extension>run</installer.extension>
+								</properties>
+							</itemWithProperty>
+							<itemWithProperty>
+								<name>linux-x64</name>
+								<properties>
+									<jre.classifier>linux-x64</jre.classifier>
+									<installer.skip>false</installer.skip>
+									<installer.classifier>linux-x64</installer.classifier>
+									<installer.artifact.type>run</installer.artifact.type>
+									<installer.autoupdater.extension>run</installer.autoupdater.extension>
+									<installer.extension>run</installer.extension>
+								</properties>
+							</itemWithProperty>
+							<itemWithProperty>
+								<name>osx</name>
+								<properties>
+									<jre.classifier>osx</jre.classifier>
+									<installer.skip>false</installer.skip>
+									<installer.classifier>osx</installer.classifier>
+									<installer.artifact.type>zip</installer.artifact.type>
+									<installer.autoupdater.extension>app.zip</installer.autoupdater.extension>
+									<installer.extension>dmg</installer.extension>
+								</properties>
+							</itemWithProperty>
+							<itemWithProperty>
+								<name>windows</name>
+								<properties>
+									<jre.classifier>windows-i386</jre.classifier>
+									<installer.skip>false</installer.skip>
+									<installer.classifier>windows</installer.classifier>
+									<installer.artifact.type>exe</installer.artifact.type>
+									<installer.autoupdater.extension>exe</installer.autoupdater.extension>
+									<installer.extension>exe</installer.extension>
+								</properties>
+							</itemWithProperty>
+							<itemWithProperty>
+								<name>windows-x64</name>
+								<properties>
+									<jre.classifier>windows-x64</jre.classifier>
+									<installer.skip>true</installer.skip>
+									<installer.classifier>windows</installer.classifier>
+									<installer.artifact.type>exe</installer.artifact.type>
+									<installer.autoupdater.extension>exe</installer.autoupdater.extension>
+									<installer.extension>exe</installer.extension>
+								</properties>
+							</itemWithProperty>
+						</itemsWithProperties>
+					</configuration>
+			    </plugin>
+			    <plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.10</version>
+			    </plugin>
+			    <plugin>
+					<groupId>com.google.code.maven-replacer-plugin</groupId>
+					<artifactId>maven-replacer-plugin</artifactId>
+					<version>1.4.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

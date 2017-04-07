@@ -29,7 +29,6 @@
 			<plugin>
                       <groupId>org.apache.maven.plugins</groupId>
                       <artifactId>maven-dependency-plugin</artifactId>
-                      <version>2.6</version>
                       <executions>
                   		<execution>
 						<id>copy-collect-webapp</id>
@@ -85,7 +84,6 @@
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>maven-replacer-plugin</artifactId>
-				<version>1.4.0</version>
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>

@@ -47,6 +47,28 @@
 			</folderList>
 			
 			<postInstallationActionList>
+        		<if>
+        			<conditionRuleList>
+				        <platformTest type="windows-x86" />
+				        <platformTest type="linux-x86" />
+				    </conditionRuleList>
+				    <conditionRuleEvaluationLogic>or</conditionRuleEvaluationLogic>
+	        		<actionList>
+		        		<propertiesFileSet>
+		        			<file>${installdir}/launcher.properties</file>
+		        			<key>additional_vm_parameters</key>
+		        			<value>-Xmx1024m -Duser.language=en -Duser.country=US</value>
+		        		</propertiesFileSet>
+	        		</actionList>
+	        		<elseActionList>
+		        		<propertiesFileSet>
+		        			<file>${installdir}/launcher.properties</file>
+		        			<key>additional_vm_parameters</key>
+		        			<value>-Xmx2048m -Duser.language=en -Duser.country=US</value>
+		        		</propertiesFileSet>
+	        		</elseActionList>
+        		</if>
+				
 				<!-- rename launcher.properties file according to the current platform -->
         		<renameFile>
         			<origin>${installdir}/launcher.properties</origin>
@@ -140,7 +162,7 @@ check_for_updates = 1</text>
 			</postInstallationActionList>
 		</component>
 		<include>
-			<file>java_launcher_updater.xml</file>
+			<file>java.xml</file>
 		</include>
 	</componentList>
 	
@@ -154,10 +176,6 @@ check_for_updates = 1</text>
 			<path>..</path>
 			<variable>installdir</variable>
 		</pathManipulation>
-  		<setInstallerVariable>
-			<name>server_http_port</name>
-			<value>8380</value>
-		</setInstallerVariable>
 		<setInstallerVariable>
 			<name>collect_root_user_dir</name>
 			<value>${user_home_directory}/OpenForis/Collect</value>
@@ -224,13 +242,41 @@ check_for_updates = 1</text>
 			<value>${project.fullName}</value>
 		</setInstallerVariable>
 		<!-- End of Java Launcher variables -->
-    	<propertiesFileGet>
-		   <file>${collect_root_user_dir}/collect.properties</file>
-		   <key>collect.http_port</key>
-		   <variable>server_http_port</variable>
-		   <showMessageOnError>0</showMessageOnError>
-		   <abortOnError>0</abortOnError>
-		</propertiesFileGet>
+		
+		<!-- guess Collect HTTP port and set it to server_http_port variable (default 8080),
+			block the update if the port is already in use -->
+		<if>
+			<conditionRuleList>
+				<fileExists path="${collect_root_user_dir}/collect.properties" />
+			</conditionRuleList>
+			<actionList>
+		    	<propertiesFileGet>
+				   <file>${collect_root_user_dir}/collect.properties</file>
+				   <key>collect.http_port</key>
+				   <variable>server_http_port</variable>
+				</propertiesFileGet>
+			</actionList>
+			<elseActionList>
+				<if>
+					<conditionRuleList>
+						<fileExists path="${installdir}/collect.properties" />
+					</conditionRuleList>
+					<actionList>
+				    	<propertiesFileGet>
+						   <file>${installdir}/collect.properties</file>
+						   <key>tomcat_http_port</key>
+						   <variable>server_http_port</variable>
+						</propertiesFileGet>
+					</actionList>
+					<elseActionList>
+						<setInstallerVariable>
+							<name>server_http_port</name>
+							<value>8080</value>
+						</setInstallerVariable>
+					</elseActionList>
+				</if>
+			</elseActionList>
+		</if>
 		<throwError>
 			<explanation>${project.fullName} is running</explanation>
 			<text>${project.fullName} is running on port ${server_http_port}. Shutdown ${project.fullName} before updating it.</text>

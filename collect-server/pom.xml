@@ -99,11 +99,10 @@
 				</executions>
 			</plugin>
 			
-			<!-- copy Desginer options from user settings into the options.properties file -->
+			<!-- copy Designer options from user settings into the options.properties file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>maven-replacer-plugin</artifactId>
-				<version>1.4.0</version>
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>
