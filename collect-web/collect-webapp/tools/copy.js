@@ -22,10 +22,10 @@ async function copy({ watch } = {}) {
   await Promise.all([
     ncp('node_modules/bootstrap/dist/css', 'build/public/css'),
     ncp('node_modules/bootstrap/dist/fonts', 'build/public/fonts'),
-    ncp('src/main/jsx/public', 'build/public'),
+    ncp('frontend/public', 'build/public'),
   ]);
   await Promise.all([
-    ncp('src/main/jsx/components/common/styles', 'build/public/css'),
+    ncp('frontend/components/common/styles', 'build/public/css'),
   ]);
 
   await Promise.all([
@@ -49,12 +49,12 @@ async function copy({ watch } = {}) {
 
   if (watch) {
     const watcher = await new Promise((resolve, reject) => {
-      gaze('src/main/jsx/content/**/*.*', (err, val) => err ? reject(err) : resolve(val));
+      gaze('frontend/content/**/*.*', (err, val) => err ? reject(err) : resolve(val));
     });
 
     const cp = async (file) => {
-      const relPath = file.substr(path.join(__dirname, '../src/main/jsx/content/').length);
-      await ncp(`src/main/jsx/content/${relPath}`, `build/content/${relPath}`);
+      const relPath = file.substr(path.join(__dirname, '../frontend/content/').length);
+      await ncp(`frontend/content/${relPath}`, `build/content/${relPath}`);
     };
 
     watcher.on('changed', cp);

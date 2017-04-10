@@ -35,7 +35,7 @@ const GLOBALS = {
 // -----------------------------------------------------------------------------
 
 const config = {
-  context: path.resolve(__dirname, '../src/main/jsx'),
+  context: path.resolve(__dirname, '../frontend'),
 
   output: {
     path: path.resolve(__dirname, '../build/public/assets'),
@@ -49,7 +49,7 @@ const config = {
         test: /\.jsx?$/,
         loader: 'babel-loader',
         include: [
-          path.resolve(__dirname, '../src/main/jsx'),
+          path.resolve(__dirname, '../frontend'),
         ],
         query: {
           // https://github.com/babel/babel-loader#options
@@ -123,7 +123,7 @@ const config = {
   },
 
   resolve: {
-    root: path.resolve(__dirname, '../src/main/jsx'),
+    root: path.resolve(__dirname, '../frontend'),
     modulesDirectories: ['node_modules'],
     extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.json'],
   },
