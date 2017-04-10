@@ -88,6 +88,28 @@
 			<!-- end of Windows start menu shortcuts -->
 			
         	<postInstallationActionList>
+        		<if>
+        			<conditionRuleList>
+				        <platformTest type="windows-x86" />
+				        <platformTest type="linux-x86" />
+				    </conditionRuleList>
+				    <conditionRuleEvaluationLogic>or</conditionRuleEvaluationLogic>
+	        		<actionList>
+		        		<propertiesFileSet>
+		        			<file>${installdir}/launcher.properties</file>
+		        			<key>additional_vm_parameters</key>
+		        			<value>-Xmx1024m -Duser.language=en -Duser.country=US</value>
+		        		</propertiesFileSet>
+	        		</actionList>
+	        		<elseActionList>
+		        		<propertiesFileSet>
+		        			<file>${installdir}/launcher.properties</file>
+		        			<key>additional_vm_parameters</key>
+		        			<value>-Xmx2048m -Duser.language=en -Duser.country=US</value>
+		        		</propertiesFileSet>
+	        		</elseActionList>
+        		</if>
+        		
         		<!-- rename launcher.properties file according to the current platform -->
         		<renameFile>
         			<origin>${installdir}/launcher.properties</origin>
@@ -131,8 +153,8 @@
 				</createDirectory>
 				<!-- Find free http port -->
 		        <getFreePort>
-		            <finalPort>8399</finalPort>
 		            <initialPort>8380</initialPort>
+		            <finalPort>8399</finalPort>
 		            <variable>http_port</variable>
 		        </getFreePort>
 		        <!-- Write the ports configuration in collect.properties file -->

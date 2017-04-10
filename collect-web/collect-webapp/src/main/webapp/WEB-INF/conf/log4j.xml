@@ -15,7 +15,7 @@
 
 	<!-- the following appenders write to files -->
 	<appender name="openforis" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${collect.root}/logs/collect.log" />
+		<param name="File" value="logs/collect.log" />
 		<param name="Encoding" value="UTF-8" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">

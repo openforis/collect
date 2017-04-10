@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-web</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.12.32-SNAPSHOT</version>
+		<version>3.12.33-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	
@@ -147,7 +147,6 @@
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>replacer</artifactId>
-				<version>1.5.3</version>
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>

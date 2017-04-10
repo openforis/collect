@@ -24,6 +24,7 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.AbstractSingleCRS;
 import org.openforis.idm.geospatial.CoordinateOperationException;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
 import org.opengis.geometry.DirectPosition;
@@ -40,7 +41,7 @@ import org.opengis.util.InternationalString;
 /**
  * @author M. Togna
  */
-public class GeoToolsCoordinateOperations {
+public class GeoToolsCoordinateOperations extends CoordinateOperations {
 
 	private static final Log LOG = LogFactory.getLog(GeoToolsCoordinateOperations.class);
 
@@ -50,11 +51,14 @@ public class GeoToolsCoordinateOperations {
 	private Map<String, CoordinateReferenceSystem> CRS_BY_SRS_ID;
 
 	public GeoToolsCoordinateOperations() {
+		transformCache = new TransformCache();
+		CRS_BY_SRS_ID = new HashMap<String, CoordinateReferenceSystem>();
+	}
+	
+	@Override
+	public void initialize() {
+		super.initialize();
 		try {
-			// SYSTEMS = new HashMap<String, CoordinateReferenceSystem>();
-			transformCache = new TransformCache();
-			CRS_BY_SRS_ID = new HashMap<String, CoordinateReferenceSystem>();
-			
 			CRS_BY_SRS_ID.put(WGS84_SRS_ID, WGS84);
 			CoordinateReferenceSystem webMercatorCrs = CRS.decode(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
 			CRS_BY_SRS_ID.put(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, webMercatorCrs);
