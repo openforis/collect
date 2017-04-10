@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.12.32-SNAPSHOT</version>
+		<version>3.12.33-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-server</artifactId>
@@ -99,11 +99,10 @@
 				</executions>
 			</plugin>
 			
-			<!-- copy Desginer options from user settings into the options.properties file -->
+			<!-- copy Designer options from user settings into the options.properties file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>maven-replacer-plugin</artifactId>
-				<version>1.4.0</version>
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>
@@ -413,12 +412,6 @@
 			<version>${geotools.version}</version>
 		</dependency>
 		<!-- end of GeoTools dependencies -->
-		<dependency>
-			<groupId>de.micromata.jak</groupId>
-			<artifactId>JavaAPIforKml</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-	
 		<dependency>
 			<groupId>org.gbif</groupId>
 			<artifactId>ecat-common</artifactId>

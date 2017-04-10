@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.32-SNAPSHOT</version>
+		<version>3.12.33-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-control-panel</artifactId>
 	<name>Open Foris Collect Control Panel</name>
@@ -14,36 +14,41 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jetty.version>9.4.2.v20170220</jetty.version>
 	</properties>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>org.openforis.collect.controlpanel.CollectControlPanel</mainClass>
-						</manifest>
-					</archive>
-					<excludes>
-						<exclude>collect.properties*</exclude>
-						<exclude>logs/**</exclude>
-					</excludes>
-				</configuration>
-      		</plugin>
-		</plugins>
-	</build>
+	
+	<profiles>
+		<profile>
+			<id>installer</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+							<encoding>${project.build.sourceEncoding}</encoding>
+						</configuration>
+					</plugin>
+					<plugin>
+				        <groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<configuration>
+							<archive>
+								<manifest>
+									<addClasspath>true</addClasspath>
+									<mainClass>org.openforis.collect.controlpanel.CollectControlPanel</mainClass>
+								</manifest>
+							</archive>
+							<excludes>
+								<exclude>collect.properties*</exclude>
+								<exclude>logs/**</exclude>
+							</excludes>
+						</configuration>
+		      		</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>

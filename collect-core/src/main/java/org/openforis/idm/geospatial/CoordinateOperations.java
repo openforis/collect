@@ -14,7 +14,7 @@ public class CoordinateOperations {
 
 	private Map<String, SpatialReferenceSystem> spatialReferenceSystemsById = new ConcurrentHashMap<String, SpatialReferenceSystem>();
 
-	public CoordinateOperations() {
+	public void initialize() {
 		registerSRS(SpatialReferenceSystem.LAT_LON_SRS);
 		registerSRS(SpatialReferenceSystem.WEB_MARCATOR_SRS);
 	}

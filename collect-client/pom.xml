@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.32-SNAPSHOT</version>
+		<version>3.12.33-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-client</artifactId>
@@ -41,7 +41,6 @@
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>maven-replacer-plugin</artifactId>
-				<version>1.4.0</version>
 				<executions>
 					<execution>
 						<!-- the replace should happen before the app is compiled -->
@@ -202,7 +201,6 @@
 			<plugin>
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-dependency-plugin</artifactId>
-			    <version>2.4</version>
 			    <executions>
 			        <execution>
 			            <id>copy-theme-file</id>
