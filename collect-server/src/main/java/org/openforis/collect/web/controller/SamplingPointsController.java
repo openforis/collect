@@ -19,6 +19,7 @@ import org.geojson.MultiPoint;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.samplingdesign.SamplingDesignExportProcess;
+import org.openforis.collect.metamodel.SamplingPointDataKmlGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SamplingDesignItem;
@@ -32,10 +33,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import de.micromata.opengis.kml.v_2_2_0.Document;
-import de.micromata.opengis.kml.v_2_2_0.Kml;
-import de.micromata.opengis.kml.v_2_2_0.KmlFactory;
 
 @Controller
 public class SamplingPointsController extends BasicController {
@@ -69,17 +66,9 @@ public class SamplingPointsController extends BasicController {
 	@RequestMapping(value = "survey/{surveyId}/sampling-point-data.kml", method=GET, produces=KML_CONTENT_TYPE)
 	public void loadSamplingPointKmlData(@PathVariable int surveyId, HttpServletResponse response) throws Exception {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-		Kml kml = KmlFactory.createKml();
-		Document doc = kml.createAndSetDocument();
-		CoordinateOperations coordinateOperations = getCoordinateOperations(survey);
-		List<SamplingDesignItem> samplingDesignItems = loadSamplingDesignItems(survey);
-		for (SamplingDesignItem item : samplingDesignItems) {
-			Coordinate coordinate = new Coordinate(item.getX(), item.getY(), item.getSrsId());
-			LngLatAlt lngLatAlt = createLngLatAlt(coordinateOperations, coordinate);
-			doc.createAndAddPlacemark().withName(item.getLevelCode(1)).withOpen(true).createAndSetPoint()
-					.addToCoordinates(lngLatAlt.getLongitude(), lngLatAlt.getLatitude());
-		}
-		kml.marshal(response.getOutputStream());
+		SamplingPointDataKmlGenerator samplingPointDataKmlGenerator = new SamplingPointDataKmlGenerator(samplingDesignManager, survey);
+		samplingPointDataKmlGenerator.generate();
+		samplingPointDataKmlGenerator.write(response.getOutputStream());
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/sampling-point-data-features.json", method=GET)

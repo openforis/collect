@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.geospatial.GeoToolsCoordinateOperations;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -16,11 +17,11 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeProcessor;
+import org.openforis.collect.model.RecordCoordinatesKmlGeneratorJob;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.model.AbstractValue;
 import org.openforis.idm.model.Attribute;
@@ -39,9 +40,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
-import de.micromata.opengis.kml.v_2_2_0.Document;
-import de.micromata.opengis.kml.v_2_2_0.Kml;
-
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
 public class GeoDataController {
@@ -50,6 +48,8 @@ public class GeoDataController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private CollectJobManager jobManager;
 	
 	@RequestMapping(value = "survey/{surveyId}/data/coordinatevalues.json", method=GET)
 	public @ResponseBody List<CoordinateAttributePoint> loadCoordinateValues(
@@ -98,23 +98,21 @@ public class GeoDataController {
 			@RequestParam int stepNum,
 			@RequestParam int coordinateAttributeId,
 			HttpServletResponse response) throws Exception {
-		Kml kml = new Kml();
-		
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		CoordinateAttributeDefinition nodeDef = (CoordinateAttributeDefinition) survey.getSchema().getDefinitionById(coordinateAttributeId);
 		
-		final Document kmlDoc = kml.createAndSetDocument().withName(survey.getName());
+		RecordCoordinatesKmlGeneratorJob job = new RecordCoordinatesKmlGeneratorJob();
+		job.setRecordManager(recordManager);
 		
-		extractAllRecordCoordinates(survey, null, null, coordinateAttributeId, 
-				SpatialReferenceSystem.WGS84_SRS_ID, new CoordinateProcessor() {
-			public void process(CollectRecord record, CoordinateAttribute coordAttr, Coordinate wgs84Coordinate) {
-				kmlDoc.createAndAddPlacemark()
-					.withName(record.getRootEntityKeyValues().toString())
-					.withOpen(Boolean.TRUE)
-					.createAndSetPoint()
-					.addToCoordinates(wgs84Coordinate.getY(), wgs84Coordinate.getX());
-			}
-		});
-		kml.marshal(response.getOutputStream());
+		RecordFilter filter = new RecordFilter(survey);
+		job.setRecordFilter(filter);
+		job.setNodeDefinition(nodeDef);
+		job.setOutput(response.getOutputStream());
+		GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
+		coordinateOperations.registerSRS(survey.getSpatialReferenceSystems());
+		job.setCoordinateOperations(coordinateOperations);
+		
+		jobManager.start(job, false);
 	}
 	
 	private void extractAllRecordCoordinates(CollectSurvey survey, Integer recordOffset, Integer maxNumberOfRecords, 
@@ -144,6 +142,7 @@ public class GeoDataController {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setOffset(recordOffset);
 		filter.setMaxNumberOfRecords(maxNumberOfRecords);
+		
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
 		for (CollectRecord summary : summaries) {
 			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), false);

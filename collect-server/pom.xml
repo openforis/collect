@@ -378,12 +378,6 @@
 		</dependency>
 		<!-- end of GeoTools dependencies -->
 		<dependency>
-			<groupId>de.micromata.jak</groupId>
-			<artifactId>JavaAPIforKml</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-	
-		<dependency>
 			<groupId>org.gbif</groupId>
 			<artifactId>ecat-common</artifactId>
 			<version>1.6</version>
