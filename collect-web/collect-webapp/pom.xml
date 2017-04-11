@@ -64,62 +64,6 @@
                     </execution>
                 </executions>
             </plugin>
-            
-            <plugin>
-                <groupId>org.codehaus.groovy.maven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>webpack</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <source><![CDATA[
-                                /*
-                                 * If running in Jetty - compile jsx files when they change
-                                 * Otherwise just compile them once
-                                 */
-                                boolean isJettyRun = false
-                                List<String> goals = session.getGoals()
-                                for (String s : goals)
-                                    if (s.equals('jetty:run'))
-                                        isJettyRun = true
-                                if (isJettyRun) {
-                                    def proc_webpack = new ProcessBuilder(["node/node", "node_modules/webpack-dev-server/bin/webpack-dev-server.js", "--inline", "--hot", "--stdin", "--port", "9090"]).inheritIO().directory(project.getBasedir()).start()
-                                } else {
-                                    println "Compiling client code..."
-                                    def webpack = new ProcessBuilder(["node/node", "node_modules/webpack/bin/webpack.js", "-p", "--progress", "--bail"]).inheritIO().directory(project.getBasedir())
-                                    def env = webpack.environment()
-                                    env.put("WAR_NAME", project.build.finalName)
-                                    def proc_webpack = webpack.start()
-                                    proc_webpack.waitForOrKill(120000)
-                                    if(proc_webpack.exitValue() != 0)
-                                        throw new org.apache.maven.plugin.MojoFailureException("Error compiling clinet code")
-                                }
-                                ]]></source>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-compiler-plugin</artifactId> -->
-<!-- 			</plugin> -->
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.sonatype.flexmojos</groupId> -->
-<!-- 				<artifactId>flexmojos-maven-plugin</artifactId> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>copy-flex-resources</id> -->
-<!-- 						<phase>prepare-package</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>copy-flex-resources</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
