@@ -50,7 +50,7 @@
 										<artifactItem>
 											<groupId>meteorite.bi</groupId>
 											<artifactId>saiku-webapp-full</artifactId>
-											<version>2.6</version>
+											<version>2.6_b</version>
 											<type>war</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/webapps</outputDirectory>

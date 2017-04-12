@@ -124,20 +124,20 @@
 	<component:LoadingContent includeIn="loading" />
 	
 	<s:VGroup gap="30" horizontalAlign="center" width="100%">
-		<container:FieldSet legend="{Message.get('saiku.relational_database')}" width="100%">
+		<!-- <container:FieldSet legend="{Message.get('saiku.relational_database')}" width="100%"> -->
 			<s:Form width="100%" height="100%" includeIn="loadComplete" >
 				<s:FormItem label="{Message.get('saiku.generate_rdb_for_survey')}">
 					<s:DropDownList id="surveyList" labelField="name" width="250"
 						change="surveyChangeHandler(event)" />
+				</s:FormItem>
+				<s:FormItem label="{Message.get('saiku.preferred_language')}">
+					<s:DropDownList id="languageList" labelFunction="languageLabelFunction" width="60" />
 				</s:FormItem>
 				<s:FormItem label="{Message.get('saiku.rdb_last_update_time')}:">
 					<s:layout>
 						<s:HorizontalLayout />
 					</s:layout>
 					<s:Label id="rdbLastUpdateTimestampLabel" text="..." width="200" />
-				</s:FormItem>
-				<s:FormItem label="{Message.get('saiku.preferred_language')}">
-					<s:DropDownList id="languageList" labelFunction="languageLabelFunction" width="60" />
 				</s:FormItem>
 				<s:FormItem label="{Message.get('saiku.updated_records_since_last_rdb_generation')}:">
 					<s:layout>
@@ -148,7 +148,7 @@
 							  click="generateRdbClickHandler(event)"/>
 				</s:FormItem>
 			</s:Form>
-		</container:FieldSet>
+		<!-- </container:FieldSet> -->
 		<s:Button id="launchSaikuBtn" click="launchSaikuClickHandler(event)" label="{Message.get('saiku.launch')}" />
 	</s:VGroup>
 
