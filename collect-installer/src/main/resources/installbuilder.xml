@@ -246,7 +246,7 @@ check_for_updates = 1</text>
 		</setInstallerVariable>
 		<setInstallerVariable>
 			<name>log_dir</name>
-			<value>${collect_root_user_dir}/log</value>
+			<value>${installdir}/logs</value>
 		</setInstallerVariable>
 		<!--  Java Launcher variables -->
 		<setInstallerVariable>
@@ -282,7 +282,7 @@ or delete the folder ${installdir} and try again.</text>
 			<ruleEvaluationLogic>or</ruleEvaluationLogic>
 			<ruleList>
 				<fileTest path="${installdir}" condition="is_not_empty" />
-				<fileTest path="${old_installdir}" condition="is_not_emtpy" />
+				<fileTest path="${old_installdir}" condition="is_not_empty" />
 			</ruleList>
         </throwError>
 	</preInstallationActionList>

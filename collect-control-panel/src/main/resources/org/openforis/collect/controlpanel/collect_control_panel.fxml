@@ -21,7 +21,7 @@
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="applicationPane"
 	fx:controller="org.openforis.collect.controlpanel.CollectControlPanelController"
-	minHeight="230.0" maxHeight="550.0" prefHeight="230.0" 
+	minHeight="220.0" maxHeight="550.0" prefHeight="220.0" 
 	maxWidth="600.0" minWidth="600.0" prefWidth="600.0" 
 	styleClass="main-pane"
 	stylesheets="@org/openforis/collect/controlpanel/collect_control_panel.css">
@@ -62,7 +62,29 @@
 				onMouseClicked="#toggleLog" text="Log" />
 		</HBox>
 	</HBox>
-	<TextArea fx:id="console" editable="false"
-		prefWidth="560.0" prefHeight="400"
-		wrapText="true" />
+	<TabPane prefWidth="560.0" prefHeight="400" tabClosingPolicy="UNAVAILABLE">
+		<tabs>
+			<Tab text="Server">
+				<content>
+					<TextArea fx:id="serverConsole" editable="false"
+						prefWidth="550.0" prefHeight="370"
+						wrapText="true" />
+				</content>
+			</Tab>
+			<Tab text="Collect">
+				<content>
+					<TextArea fx:id="collectConsole" editable="false"
+						prefWidth="550.0" prefHeight="370"
+						wrapText="true" />
+				</content>
+			</Tab>
+			<Tab text="Saiku">
+				<content>
+					<TextArea fx:id="saikuConsole" editable="false"
+						prefWidth="550.0" prefHeight="370"
+						wrapText="true" />
+				</content>
+			</Tab>
+		</tabs>
+	</TabPane>
 </VBox>
