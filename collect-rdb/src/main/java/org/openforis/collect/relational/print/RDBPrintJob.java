@@ -218,7 +218,7 @@ public class RDBPrintJob extends Job {
 		protected void execute() throws Throwable {
 			recordManager.visitSummaries(recordFilter, null, new Visitor<CollectRecord>() {
 				public void visit(CollectRecord summary) {
-					CollectRecord record = recordManager.load((CollectSurvey) summary.getSurvey(), summary.getId(), recordFilter.getStep());
+					CollectRecord record = recordManager.load((CollectSurvey) summary.getSurvey(), summary.getId(), summary.getStep());
 					if (record != null) {
 						for (DataTable table : schema.getDataTables()) {
 							if(!isRunning()) {
