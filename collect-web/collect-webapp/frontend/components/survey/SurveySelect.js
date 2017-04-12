@@ -1,4 +1,5 @@
 import React from 'react';
+import Axios from 'axios'
 
 class SurveySelect extends React.Component {
     constructor( props ) {
@@ -7,23 +8,16 @@ class SurveySelect extends React.Component {
         this.handleSubmit = this.handleSubmit.bind( this );
         this.state = {
         	value: '',
-    		options: []
+        	surveySummaries: []
         }
     }
     componentDidMount() {
-        $.ajax({
-            url: 'http://localhost:8380/collect/surveys/summary.json',
-            success: this.propsLoadSuccessHandler
-        })
-    }
-    propsLoadSuccessHandler(data) {
-        for (var i = 0; i < data.length; i++) {
-            var option = data[i];
-            this.state.options.push(
-                <option key={i} value={option.id}>{option.name}</option>
-            );
-        }
-        this.forceUpdate();
+    	Axios.get('http://localhost:8380/collect/survey/summaries.json')
+        	.then((res) => {
+        		var summaries = res.data;
+        		this.state.surveySummaries = summaries;
+                this.forceUpdate();
+        	});
     }
     handleChange(event) {
         this.setState( { value: event.target.value } );
@@ -33,8 +27,13 @@ class SurveySelect extends React.Component {
         event.preventDefault();
     }
     render() {
-        return <select value={this.state.value} 
-        	onChange={this.handleChange}>{this.state.options}</select>
+    	var options = [];
+    	for (var i=0; i < this.state.surveySummaries.length; i++) {
+    		var summary = this.state.surveySummaries[i];
+    		options.push(<option key={i} value={summary.id}>{summary.name}</option>);
+    	}
+    	return <select value={this.state.value} 
+        	onChange={this.handleChange}>{options}</select>
     }
 }
 export default SurveySelect;

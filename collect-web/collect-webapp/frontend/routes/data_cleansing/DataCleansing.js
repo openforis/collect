@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 import { PageHeader } from 'react-bootstrap';
 
-const title = 'Data Management';
+const title = 'Data Cleansing';
 
-function displayBlank(props, context) {
+function DataCleansing(props, context) {
   context.setTitle(title);
   return (
     <div>
@@ -17,5 +17,5 @@ function displayBlank(props, context) {
 }
 
 
-displayBlank.contextTypes = { setTitle: PropTypes.func.isRequired };
-export default displayBlank;
+DataCleansing.contextTypes = { setTitle: PropTypes.func.isRequired };
+export default DataCleansing;

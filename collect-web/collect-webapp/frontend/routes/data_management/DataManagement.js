@@ -4,7 +4,7 @@ import RecordDataTable from './RecordDataTable';
 
 const title = 'Data Management';
 
-function displayBlank(props, context) {
+function DataManagement(props, context) {
   context.setTitle(title);
   return (
     <div>
@@ -17,7 +17,5 @@ function displayBlank(props, context) {
     </div>
   );
 }
-
-
-displayBlank.contextTypes = { setTitle: PropTypes.func.isRequired };
-export default displayBlank;
+DataManagement.contextTypes = { setTitle: PropTypes.func.isRequired };
+export default DataManagement;

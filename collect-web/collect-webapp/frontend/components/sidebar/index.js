@@ -32,7 +32,13 @@ class Sidebar extends Component {
                 </span>
               </div>
             </li>
-            */}
+          	 */}
+          	<li className="sidebar-search">
+          		<label for="sidebar-survey-select">Preferred survey:</label>
+          		<div className="input-group">
+          			<SurveySelect id="sidebar-survey-select" />
+          		</div>
+          	</li>
             <li>
               <a href="" onClick={(e) => { e.preventDefault(); history.push('/'); }} >
                 <i className="fa fa-dashboard fa-fw" /> &nbsp;Dashboard

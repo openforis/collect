@@ -15,8 +15,8 @@ import home from './home';
 import login from './login';
 import blank from './dashboard_pages/blank';
 import error from './error';
-import dataCleansing from './data_cleansing';
-import dataManagement from './data_management';
+import DataCleansing from './data_cleansing';
+import DataManagement from './data_management';
 
 import Header from '../components/header';
 
@@ -43,8 +43,8 @@ export default [
   // keep in mind, routes are evaluated in order
     children: [
       home,
-      dataManagement,
-      dataCleansing,
+      DataManagement,
+      DataCleansing,
       // place new routes before...
       error,
     ],
