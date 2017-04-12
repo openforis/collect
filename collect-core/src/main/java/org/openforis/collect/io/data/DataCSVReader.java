@@ -53,6 +53,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 
 	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataImport.parsingError.missing_required_columns.message";
 	private static final String INVALID_NODE_POSITION_VALUE_MESSAGE_KEY = "csvDataImport.error.invalidNodePosition";
+	private static final String ROW_IDENTIFIER_NOT_SPECIFIED_MESSAGE_KEY = "csvDataImport.error.row_identifier_not_specified";
 
 	//input variables
 	private EntityDefinition parentEntityDefinition;
@@ -298,6 +299,11 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 					List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
 					for (AttributeDefinition keyDefn : keyDefns) {
 						Value value = extractValue(line, keyDefn);
+						if (value == null) {
+							String columnName = keyDefn.hasMainField() ? line.getColumnName(keyDefn.getMainFieldDefinition()): "";
+							throw new ParsingException(new ParsingError(ErrorType.INVALID_VALUE, 
+									line.getLineNumber(), columnName, ROW_IDENTIFIER_NOT_SPECIFIED_MESSAGE_KEY));
+						}
 						((EntityKeysIdentifier) identifier).addKeyValue(keyDefn.getId(), value);
 					}
 					line.addAncestorIdentifier(identifier);
