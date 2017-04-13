@@ -15,13 +15,16 @@ public class CollectTestSurveyContext implements SurveyContext {
 	private ExpressionFactory expressionFactory;
 	public TestLookupProviderImpl lookupProvider;
 	private ExpressionEvaluator expressionEvaluator;
-	private CoordinateOperations coordinateOperations = new CoordinateOperations();	
+	private CoordinateOperations coordinateOperations;	
 
 	public CollectTestSurveyContext() {
 		expressionFactory = new ExpressionFactory();
 		lookupProvider = new TestLookupProviderImpl();
 		expressionFactory.setLookupProvider(lookupProvider);
 		expressionEvaluator = new ExpressionEvaluator(expressionFactory);
+		
+		coordinateOperations = new CoordinateOperations();
+		coordinateOperations.initialize();
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	private transient ExternalCodeListProvider externalCodeListProvider;
 	private transient CodeListService codeListService;
 	private transient SpeciesListService speciesListService;
-	private transient CoordinateOperations coordinateOperations = new CoordinateOperations();
+	private transient CoordinateOperations coordinateOperations;
 
 	public CollectSurveyContext() {
 		this(new ExpressionFactory(), new CollectValidator());
@@ -52,6 +52,8 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		this.validator = validator;
 		this.codeListService = codeListService;
 		this.expressionEvaluator = new ExpressionEvaluator(expressionFactory);
+		this.coordinateOperations = new CoordinateOperations();
+		this.coordinateOperations.initialize();
 	}
 	
 	@Override
@@ -114,4 +116,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		return coordinateOperations;
 	}
 	
+	public void setCoordinateOperations(CoordinateOperations coordinateOperations) {
+		this.coordinateOperations = coordinateOperations;
+	}
 }

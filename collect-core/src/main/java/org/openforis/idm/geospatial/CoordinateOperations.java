@@ -14,12 +14,12 @@ public class CoordinateOperations {
 
 	private Map<String, SpatialReferenceSystem> spatialReferenceSystemsById = new ConcurrentHashMap<String, SpatialReferenceSystem>();
 
-	public CoordinateOperations() {
+	public void initialize() {
 		registerSRS(SpatialReferenceSystem.LAT_LON_SRS);
 		registerSRS(SpatialReferenceSystem.WEB_MARCATOR_SRS);
 	}
 	
-	public void registerSrs(List<SpatialReferenceSystem> list) {
+	public void registerSRS(List<SpatialReferenceSystem> list) {
 		for (SpatialReferenceSystem srs : list)
 			registerSRS(srs);
 	}

@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.33-SNAPSHOT</version>
+		<version>3.12.34-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
@@ -50,7 +50,7 @@
 										<artifactItem>
 											<groupId>meteorite.bi</groupId>
 											<artifactId>saiku-webapp-full</artifactId>
-											<version>2.6</version>
+											<version>2.6_b</version>
 											<type>war</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/webapps</outputDirectory>

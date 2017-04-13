@@ -217,6 +217,10 @@ check_for_updates = 1</text>
         			<name>installdir</name>
         			<value>${env(SYSTEMDRIVE)}/OpenForis/Collect</value> 
         		</setInstallerVariable>
+        		<setInstallerVariable>
+        			<name>old_installdir</name>
+        			<value>${env(SYSTEMDRIVE)}/opt/openforis/collect</value> 
+        		</setInstallerVariable>
         	</actionList>
         	<conditionRuleList>
         		<platformTest type="windows" />
@@ -225,6 +229,10 @@ check_for_updates = 1</text>
 				<setInstallerVariable>
 					<name>installdir</name>
 					<value>~/OpenForis/Collect</value>
+				</setInstallerVariable>
+				<setInstallerVariable>
+					<name>old_installdir</name>
+					<value>/opt/openforis/collect</value>
 				</setInstallerVariable>
 			</elseActionList>
 		</if>
@@ -238,7 +246,7 @@ check_for_updates = 1</text>
 		</setInstallerVariable>
 		<setInstallerVariable>
 			<name>log_dir</name>
-			<value>${collect_root_user_dir}/log</value>
+			<value>${installdir}/logs</value>
 		</setInstallerVariable>
 		<!--  Java Launcher variables -->
 		<setInstallerVariable>
@@ -271,10 +279,10 @@ check_for_updates = 1</text>
 			<text>Open Foris Collect has been already installed.
 Please run Update Open Foris Collect if you want to update it
 or delete the folder ${installdir} and try again.</text>
-			<ruleEvaluationLogic>and</ruleEvaluationLogic>
+			<ruleEvaluationLogic>or</ruleEvaluationLogic>
 			<ruleList>
-				<fileTest path="${installdir}" condition="exists" />
 				<fileTest path="${installdir}" condition="is_not_empty" />
+				<fileTest path="${old_installdir}" condition="is_not_empty" />
 			</ruleList>
         </throwError>
 	</preInstallationActionList>

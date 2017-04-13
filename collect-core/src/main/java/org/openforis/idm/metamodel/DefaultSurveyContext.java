@@ -16,7 +16,7 @@ public class DefaultSurveyContext implements SurveyContext {
 	private ExpressionFactory expressionFactory;
 	private ExpressionEvaluator expressionEvaluator;
 	private Validator validator;
-	private static CoordinateOperations coordinateOperations = new CoordinateOperations();
+	private CoordinateOperations coordinateOperations;
 
 	public DefaultSurveyContext() {
 		expressionFactory = new ExpressionFactory();
@@ -24,6 +24,9 @@ public class DefaultSurveyContext implements SurveyContext {
 		expressionFactory.setLookupProvider(lookupProvider);
 		expressionEvaluator = new ExpressionEvaluator(expressionFactory);
 		validator = new Validator();
+		
+		coordinateOperations = new CoordinateOperations();
+		coordinateOperations.initialize();
 	}
 
 	@Override

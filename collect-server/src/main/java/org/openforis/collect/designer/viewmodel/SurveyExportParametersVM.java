@@ -35,7 +35,6 @@ import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.metamodel.SurveyTarget;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SurveySummary;
@@ -234,7 +233,6 @@ public class SurveyExportParametersVM extends BaseVM {
 		rdbExportJob.setTargetSchemaName(survey.getName());
 		rdbExportJob.setRecordManager(recordManager);
 		RecordFilter recordFilter = new RecordFilter(survey);
-		recordFilter.setStep(Step.ANALYSIS);
 		rdbExportJob.setRecordFilter(recordFilter);
 		rdbExportJob.setIncludeData(parameters.isIncludeData());
 		rdbExportJob.setDialect(parameters.getRdbDialectEnum());

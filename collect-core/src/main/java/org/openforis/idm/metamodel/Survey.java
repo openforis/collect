@@ -97,7 +97,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	
 	private void initCoordinateOperations() {
 		CoordinateOperations coordinateOperations = getContext().getCoordinateOperations();
-		coordinateOperations.registerSrs(getSpatialReferenceSystems());
+		coordinateOperations.registerSRS(getSpatialReferenceSystems());
 	}
 	
 	public Record createRecord() {

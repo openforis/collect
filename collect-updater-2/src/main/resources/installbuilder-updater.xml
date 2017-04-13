@@ -23,16 +23,28 @@
 						</distributionFile>
 					</distributionFileList>
 				</folder>
+				<folder>
+					<name>lib</name>
+					<description>Libs</description>
+					<destination>${installdir}/lib</destination>
+					<platforms>all</platforms>
+					<distributionFileList>
+						<distributionFile>
+							<origin>lib/collect-control-panel-PROJECT_VERSION.jar</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
 			</folderList>
+			
 			<postInstallationActionList>
-				<!-- Delete Collect temporary files (if the previous delete has not been fully completed) -->
-		        <deleteFile>
-		  			<path>${webapps_dir}/collect</path>
-					<abortOnError>1</abortOnError>
-					<showMessageOnError>1</showMessageOnError>
-					<customErrorMessage>Cannot delete the folder "${webapps_dir}/collect": 
-						please shutdown Collect, delete it and try to run again the updater.</customErrorMessage>
-		  		</deleteFile>
+		  		<!-- create logs folder -->
+				<createDirectory path="${installdir}/logs" abortOnError="0" />
+
+				<!-- delete old log folder -->
+		  		<deleteFile path="${installdir}/log" abortOnError="0" />
+		  		<deleteFile path="${collect_root_user_dir}/log" abortOnError="0" />
+		  		
+		  		<!-- Update update.ini file -->
 				<writeFile>
 					<path>update.ini</path>
 					<text>[Update]
@@ -49,6 +61,8 @@ check_for_updates = 1</text>
 			<variable>timestamp</variable>
 			<format>%Y%m%d%H%M%S</format>
 		</createTimeStamp>
+    	<setInstallerVariable name="installdir" 
+    			value=".."/>
     	<setInstallerVariable name="server_http_port" 
     			value="8380"/>
     	<setInstallerVariable name="collect_root_user_dir" 
@@ -58,7 +72,7 @@ check_for_updates = 1</text>
 		<setInstallerVariable name="data_dir" 
 				value="${collect_root_user_dir}/data" />
     	<setInstallerVariable name="webapps_dir" 
-    			value="../webapps"/>
+    			value="${installdir}/webapps"/>
 		<propertiesFileGet>
 		   <file>${collect_root_user_dir}/collect.properties</file>
 		   <key>collect.http_port</key>
@@ -81,7 +95,7 @@ check_for_updates = 1</text>
 		<createDirectory>
 			<path>${backup_dir}</path>
 		</createDirectory>
-		<!-- Backup old data and webapp -->
+		<!-- Backup data and webapp -->
 		<copyFile>
 			<origin>${webapps_dir}/collect.war</origin>
 			<destination>${backup_dir}/collect.war</destination>
@@ -94,11 +108,27 @@ check_for_updates = 1</text>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
         </copyFile>
+        <copyFile>
+			<origin>${installdir}/lib/collect-control-panel-*.jar</origin>
+			<destination>${backup_dir}</destination>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+        </copyFile>
+        <copyFile>
+			<origin>${collect_root_user_dir}/collect.properties</origin>
+			<destination>${backup_dir}</destination>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+        </copyFile>
         <!-- Delete temporary files -->
         <deleteFile>
   			<path>${webapps_dir}/collect</path>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
+  		</deleteFile>
+  		<!-- delete old Control Panel files -->
+  		<deleteFile>
+  			<path>${installdir}/lib/collect-control-panel-*.jar</path>
   		</deleteFile>
 	</readyToInstallActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>

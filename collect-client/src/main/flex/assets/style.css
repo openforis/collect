@@ -156,6 +156,7 @@ component|BlockingMessagePopUp,
 	component|SelectVersionPopUp, component|SpeciesImportPopUp, 
 	component|SurveySelectionPopUp,
 	component|ConfigurationPopUp,
+	component|SaikuPopUp,
 	input|CodeListDialog,
 	user|UserManagementPopUp,
 	user|ChangePasswordPopUp {
