@@ -6,14 +6,15 @@
   <custom-attributes newItem="${arg.newItem}" />
   <window id="attributeDefaultPopUp"
     title="${labels.survey.schema.attribute.attribute_default.popup.title}"
-    width="600px" border="normal" position="center" closable="false"
+    width="600px" border="normal" position="center"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.AttributeDefaultVM')"
     validationMessages="@id('vmsgs')"
     form="@id('fx') 
             @load(vm.formObject) 
             @save(vm.formObject, before={'validate','applyChanges'})
-            @validator('org.openforis.collect.designer.form.validator.AttributeDefaultFormValidator', parentDefinition=parentDefinition)">
+            @validator('org.openforis.collect.designer.form.validator.AttributeDefaultFormValidator', parentDefinition=parentDefinition)"
+    closable="true" onClose="@command('close')">
 
     <vlayout id="formContainer">
       <grid>
@@ -60,10 +61,10 @@
       <box width="100%" align="center">
         <hbox>
           <button label="${labels.global.apply}"
-            onClick="@command('commitChanges')" />
+            onClick="@command('apply')" />
           <separator width="30px" />
           <button label="${labels.global.cancel}"
-            onClick="@global-command('cancelChangesToEditedAttributeDefault')" />
+            onClick="@command('cancel')" />
         </hbox>
       </box>
     </vlayout>

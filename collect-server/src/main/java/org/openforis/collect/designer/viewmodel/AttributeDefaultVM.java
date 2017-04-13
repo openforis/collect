@@ -12,7 +12,6 @@ import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
@@ -22,9 +21,10 @@ import org.zkoss.bind.annotation.Init;
  * @author S. Ricci
  *
  */
-public class AttributeDefaultVM extends SurveyObjectBaseVM<AttributeDefault> {
+public class AttributeDefaultVM extends SurveyObjectPopUpVM<AttributeDefault> {
 
 	private static final String APPLY_CHANGES_TO_EDITED_ATTRIBUTE_DEFAULT_GLOBAL_COMMAND = "applyChangesToEditedAttributeDefault";
+	private static final String CANCEL_CHANGES_TO_EDITED_ATTRIBUTE_DEFAULT_GLOBAL_COMMAND = "cancelChangesToEditedAttributeDefault";
 	
 	protected AttributeDefinition parentDefinition;
 
@@ -74,13 +74,13 @@ public class AttributeDefaultVM extends SurveyObjectBaseVM<AttributeDefault> {
 	}
 	
 	@Override
-	@Command
-	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
-		dispatchApplyChangesCommand(binder);
-		if ( checkCanLeaveForm() ) {
-			super.commitChanges(binder);
-			BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_ATTRIBUTE_DEFAULT_GLOBAL_COMMAND, null);
-		}
+	protected void dispatchChangesAppliedCommand(boolean ignoreUnsavedChanges) {
+		BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_ATTRIBUTE_DEFAULT_GLOBAL_COMMAND, null);		
 	}
 	
+	@Override
+	protected void dispatchChangesCancelledCommand() {
+		BindUtils.postGlobalCommand(null, null, CANCEL_CHANGES_TO_EDITED_ATTRIBUTE_DEFAULT_GLOBAL_COMMAND, null);
+	}
+
 }

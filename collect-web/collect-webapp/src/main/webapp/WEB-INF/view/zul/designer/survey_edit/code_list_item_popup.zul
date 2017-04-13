@@ -5,7 +5,7 @@
 
 	<window id="codeListItemManagerPopUp"
 		title="${labels.survey.code_list.item.manager.title}" width="600px"
-		height="450px" border="normal" position="center"
+		height="460px" border="normal" position="center"
 		sclass="form" apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListItemVM')"
 		validationMessages="@id('vmsgs')"
@@ -13,7 +13,7 @@
 			@load(vm.formObject) 
             @save(vm.formObject, before={'validate','applyChanges','commitChanges'})
             @validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator', codeListManager=vm.codeListManager, parentItem=parentItem)"
-        closable="false">
+        closable="true" onClose="@command('close')">
         <borderlayout>
         	<center autoscroll="true">
 				<grid>

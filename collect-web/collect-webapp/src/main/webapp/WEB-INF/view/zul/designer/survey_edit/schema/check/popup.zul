@@ -19,7 +19,7 @@
 		width="750px"
 		border="normal"
 		position="center" 
-		closable="false"
+		closable="true" onClose="@command('close')"
         apply="org.openforis.collect.designer.composer.CheckPopUpComposer">
     
         <vlayout>
