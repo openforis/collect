@@ -16,16 +16,16 @@ public class DefaultSurveyContext implements SurveyContext {
 	private ExpressionFactory expressionFactory;
 	private ExpressionEvaluator expressionEvaluator;
 	private Validator validator;
-	private static CoordinateOperations coordinateOperations;
+	private CoordinateOperations coordinateOperations;
 
 	public DefaultSurveyContext() {
-		coordinateOperations = new CoordinateOperations();
 		expressionFactory = new ExpressionFactory();
 		LookupProvider lookupProvider = new UnspecifiedLookupProvider();
 		expressionFactory.setLookupProvider(lookupProvider);
 		expressionEvaluator = new ExpressionEvaluator(expressionFactory);
 		validator = new Validator();
 		
+		coordinateOperations = new CoordinateOperations();
 		coordinateOperations.initialize();
 	}
 

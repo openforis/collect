@@ -11,6 +11,7 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.LngLat;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
+import org.openforis.commons.lang.Strings;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.model.Coordinate;
 
@@ -38,7 +39,10 @@ public class SamplingPointDataKmlGenerator {
 		for (SamplingDesignItem item : samplingDesignItems) {
 			Coordinate coordinate = new Coordinate(item.getX(), item.getY(), item.getSrsId());
 			LngLat lngLatAlt = createLngLat(coordinate);
-			doc.createAndAddPlacemark().withName(item.getLevelCode(1)).withOpen(true).createAndSetPoint()
+			doc.createAndAddPlacemark()
+					.withName(Strings.joinNotBlank(item.getLevelCodes(), "|"))
+					.withOpen(true)
+					.createAndSetPoint()
 					.addToCoordinates(lngLatAlt.getLongitude(), lngLatAlt.getLatitude());
 		}
 		this.kml = kml;
@@ -71,7 +75,7 @@ public class SamplingPointDataKmlGenerator {
 			CollectSurveyContext surveyContext = survey.getContext();
 			CoordinateOperations coordOpts = surveyContext.getCoordinateOperations();
 			Coordinate wgs84Coord = coordOpts.convertToWgs84(coord);
-			return new LngLat(new Double(wgs84Coord.getX()).longValue(), new Double(wgs84Coord.getY()).longValue());
+			return new LngLat(wgs84Coord.getX(), wgs84Coord.getY());
 		} catch(Exception e) {
 			return null;
 		}

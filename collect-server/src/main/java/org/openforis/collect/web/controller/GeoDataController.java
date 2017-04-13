@@ -9,7 +9,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.concurrency.CollectJobManager;
-import org.openforis.collect.geospatial.GeoToolsCoordinateOperations;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
@@ -19,6 +18,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordCoordinatesKmlGeneratorJob;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -108,23 +108,22 @@ public class GeoDataController {
 		job.setRecordFilter(filter);
 		job.setNodeDefinition(nodeDef);
 		job.setOutput(response.getOutputStream());
-		GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
+		
+		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
 		coordinateOperations.registerSRS(survey.getSpatialReferenceSystems());
 		job.setCoordinateOperations(coordinateOperations);
 		
 		jobManager.start(job, false);
 	}
 	
-	private void extractAllRecordCoordinates(CollectSurvey survey, Integer recordOffset, Integer maxNumberOfRecords, 
+	private void extractAllRecordCoordinates(final CollectSurvey survey, Integer recordOffset, Integer maxNumberOfRecords, 
 			int coordinateAttributeId, final String toSrsId, final CoordinateProcessor coordinateProcessor) throws Exception {
-		final GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
-		coordinateOperations.registerSRS(survey.getSpatialReferenceSystems());
-		
 		processNodes(survey, recordOffset, maxNumberOfRecords, coordinateAttributeId, new NodeProcessor() {
 			public void process(Node<?> node) throws Exception {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
 				if (coordAttr.isFilled()) {
 					Coordinate coordinate = coordAttr.getValue();
+					CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
 					Coordinate projectedCoord = coordinateOperations.convertTo(coordinate, toSrsId);
 					coordinateProcessor.process((CollectRecord) node.getRecord(), coordAttr, projectedCoord);
 				}
@@ -134,9 +133,6 @@ public class GeoDataController {
 	
 	private void processNodes(CollectSurvey survey, Integer recordOffset, Integer maxNumberOfRecords, 
 			int attributeId, NodeProcessor nodeProcessor) throws Exception {
-		GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
-		coordinateOperations.registerSRS(survey.getSpatialReferenceSystems());
-		
 		NodeDefinition nodeDef = survey.getSchema().getDefinitionById(attributeId);
 
 		RecordFilter filter = new RecordFilter(survey);

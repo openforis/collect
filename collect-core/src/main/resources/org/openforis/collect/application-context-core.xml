@@ -139,8 +139,6 @@
 		init-method="init" />
 	<bean id="userManager" 				class="org.openforis.collect.manager.UserManager" />
 
-	
-	
 	<!--  Services -->
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />
 	<bean id="speciesListService"	 	class="org.openforis.collect.service.CollectSpeciesListService" />

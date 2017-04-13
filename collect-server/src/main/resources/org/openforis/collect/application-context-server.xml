@@ -104,6 +104,18 @@
 	
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
 	
+	<!-- Survey Context -->
+	<bean id="coordinateOperations" class="org.openforis.collect.geospatial.GeoToolsCoordinateOperations"
+		init-method="initialize" />
+	
+	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
+	    <constructor-arg ref="expressionFactory" />
+	    <constructor-arg ref="validator" />
+	    <property name="externalCodeListProvider" ref="externalCodeListProvider" />
+   		<property name="codeListService" ref="codeListService" />
+   		<property name="speciesListService" ref="speciesListService" />
+   		<property name="coordinateOperations" ref="coordinateOperations" />
+	</bean>
 	
 	<!-- ===================================== -->
 	<!-- =============== RDB ================= -->

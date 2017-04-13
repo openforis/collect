@@ -197,12 +197,6 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 		registerSRS(srss);
 	}
 	
-	public void registerSRS(List<SpatialReferenceSystem> srss) {
-		for (SpatialReferenceSystem srs : srss) {
-			registerSRS(srs);
-		}
-	}
-	
 	/**
 	 * @deprecated Use {@linkplain registerSRS} instead
 	 * @param srs
@@ -211,6 +205,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 		registerSRS(srs);
 	}
 	
+	@Override
 	public void registerSRS(SpatialReferenceSystem srs) {
 		String srsId = srs.getId();
 		MathTransform latLonTransform = transformCache.get(SpatialReferenceSystem.WGS84_SRS_ID, srsId);
