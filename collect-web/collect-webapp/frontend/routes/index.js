@@ -8,6 +8,11 @@
  */
 
 import React from 'react';
+import { createStore, applyMiddleware } from 'redux'
+import { Provider } from 'react-redux'
+import thunk from 'redux-thunk'
+import { createLogger } from 'redux-logger'
+import reducer from '../reducers'
 import App from '../components/app';
 
 // Child routes
@@ -20,6 +25,16 @@ import DataManagement from './data_management';
 
 import Header from '../components/header';
 
+const middleware = [ thunk ]
+if (process.env.NODE_ENV !== 'production') {
+  middleware.push(createLogger())
+}
+
+const store = createStore(
+  reducer,
+  applyMiddleware(...middleware)
+)
+
 export default [
 
   {
@@ -31,7 +46,9 @@ export default [
       const component = await next();
       if (component === undefined) return component;
       return render(
-        <App context={context}>{component}</App>
+        <Provider store={store}>
+          <App context={context}>{component}</App>
+        </Provider>
       );
     },
   },
@@ -55,12 +72,14 @@ export default [
       // console.log('inside dasdboard component', component);
       if (component === undefined) return component;
       return render(
-        <div>
-          <Header />
-          <div id="page-wrapper" className="page-wrapper">
-            <App context={context}>{component}</App>
-          </div>
-        </div>
+        <Provider store={store}>
+	        <div>
+	          <Header />
+	          <div id="page-wrapper" className="page-wrapper">
+	            <App context={context}>{component}</App>
+	          </div>
+	        </div>
+        </Provider>
       );
     },
   },
@@ -75,7 +94,9 @@ export default [
       // console.log('inside error with component', component);
       if (component === undefined) return component;
       return render(
-        <App context={context}>{component}</App>
+        <Provider store={store}>
+          <App context={context}>{component}</App>
+        </Provider>
       );
     },
   },
