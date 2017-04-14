@@ -2,9 +2,9 @@ export const INVALIDATE_SURVEY_SUMMARIES = 'INVALIDATE_SURVEY_SUMMARIES'
 export const REQUEST_SURVEY_SUMMARIES = 'REQUEST_SURVEY_SUMMARIES'
 export const RECEIVE_SURVEY_SUMMARIES = 'RECEIVE_SURVEY_SUMMARIES'
 export const SELECT_PREFERRED_SURVEY = 'SELECT_PREFERRED_SURVEY'
+export const INVALIDATE_PREFERRED_SURVEY = 'INVALIDATE_PREFERRED_SURVEY'
 export const REQUEST_RECORDS = 'REQUEST_RECORDS'
 export const RECEIVE_RECORDS = 'RECEIVE_RECORDS'
-export const INVALIDATE_SURVEY = 'INVALIDATE_SURVEY'
 
 export const requestSurveySummaries = () => ({
   type: REQUEST_SURVEY_SUMMARIES
@@ -16,7 +16,7 @@ export const receiveSurveySummaries = json => ({
   receivedAt: Date.now()
 })
 
-export const fetchSurveySummaries = reddit => dispatch => {
+export const fetchSurveySummaries = () => dispatch => {
   dispatch(requestRecords(survey))
   var url = 'http://localhost:8380/collect/survey/summaries.json';
   return fetch(url)
@@ -24,9 +24,8 @@ export const fetchSurveySummaries = reddit => dispatch => {
     .then(json => dispatch(receiveSurveySummaries(json)))
 }
 
-export const invalidateSurveySummaries = reddit => ({
-  type: INVALIDATE_SURVEY_SUMMARIES,
-  reddit
+export const invalidateSurveySummaries = () => ({
+  type: INVALIDATE_SURVEY_SUMMARIES
 })
 	
 export const selectPreferredSurvey = survey => ({
@@ -34,9 +33,8 @@ export const selectPreferredSurvey = survey => ({
   survey
 })
 
-export const invalidateSurvey = reddit => ({
-  type: INVALIDATE_SURVEY,
-  reddit
+export const invalidatePreferredSurvey = () => ({
+  type: INVALIDATE_PREFERRED_SURVEY
 })
 
 export const requestRecords = survey => ({
@@ -51,7 +49,7 @@ export const receiveRecords = (survey, json) => ({
   receivedAt: Date.now()
 })
 
-const fetchRecords = reddit => dispatch => {
+const fetchRecords = survey => dispatch => {
   dispatch(requestRecords(survey))
   var url = '';
   return fetch(url)
@@ -59,7 +57,7 @@ const fetchRecords = reddit => dispatch => {
     .then(json => dispatch(receiveRecords(survey, json)))
 }
 
-const shouldFetchRecords = (state, reddit) => {
+const shouldFetchRecords = (state, survey) => {
   const records = state.recordsBySurvey[survey]
   if (!records) {
     return true

@@ -1,5 +1,6 @@
 import React from 'react';
 import Axios from 'axios'
+import { selectPreferredSurvey, fetchRecordsIfNeeded, invalidateSurvey } from '../../actions'
 
 class SurveySelect extends React.Component {
     constructor( props ) {
@@ -11,25 +12,38 @@ class SurveySelect extends React.Component {
         	surveySummaries: []
         }
     }
-    componentDidMount() {
-    	Axios.get('http://localhost:8380/collect/survey/summaries.json')
-        	.then((res) => {
-        		var summaries = res.data;
-        		this.state.surveySummaries = summaries;
-                this.forceUpdate();
-        	});
+    static propTypes = {
+        surveySummaries: PropTypes.array.isRequired,
+        isFetching: PropTypes.bool.isRequired,
+        lastUpdated: PropTypes.number,
+        dispatch: PropTypes.func.isRequired
     }
+    componentDidMount() {
+        const { dispatch } = this.props
+        dispatch(fetchSurveySummaries())
+    }
+//    componentDidMount() {
+//    	Axios.get('http://localhost:8380/collect/survey/summaries.json')
+//        	.then((res) => {
+//        		var summaries = res.data;
+//        		this.state.surveySummaries = summaries;
+//                this.forceUpdate();
+//        	});
+//    }
     handleChange(event) {
-        this.setState( { value: event.target.value } );
+    	var survey = this.state.surveySummaries[event.target.value];
+    	this.props.dispatch(selectPreferredSurvey(event.target.value));
+        //this.setState( { value: event.target.value } );
     }
     handleSubmit(event) {
         alert( 'The selected survey is: ' + this.state.value );
         event.preventDefault();
     }
     render() {
+    	const { preferredSurvey, surveySummaries, isFetching, lastUpdated } = this.props
     	var options = [];
-    	for (var i=0; i < this.state.surveySummaries.length; i++) {
-    		var summary = this.state.surveySummaries[i];
+    	for (var i=0; i < surveySummaries.length; i++) {
+    		var summary = surveySummaries[i];
     		options.push(<option key={i} value={summary.id}>{summary.name}</option>);
     	}
     	return <select value={this.state.value} 
