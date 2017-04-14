@@ -34,7 +34,7 @@ class Sidebar extends Component {
             </li>
           	 */}
           	<li className="sidebar-search">
-          		<label for="sidebar-survey-select">Preferred survey:</label>
+          		<label htmlFor="sidebar-survey-select">Preferred survey:</label>
           		<div className="input-group">
           			<SurveySelect id="sidebar-survey-select" />
           		</div>
