@@ -55,15 +55,15 @@ Collect.Metamodel.Survey.prototype.getRooEntityKeyDefinitions = function() {
 
 Collect.Metamodel.Survey.prototype.getKeyDefinitions = function(rootEntity) {
 	var result = new Array();
-	var stack = new Array();
-	stack.push(rootEntity);
-	while (stack.length > 0) {
-		var nodeDef = stack.pop();
+	var queue = new Array();
+	queue.push(rootEntity);
+	while (queue.length > 0) {
+		var nodeDef = queue.shift();
 		if (nodeDef instanceof Collect.Metamodel.AttributeDefinition && nodeDef.key) {
 			result.push(nodeDef);
 		} else if(nodeDef instanceof Collect.Metamodel.EntityDefinition && (nodeDef.root || ! nodeDef.multiple)) {
 			nodeDef.children.forEach(function(childDef) {
-				stack.push(childDef);
+				queue.push(childDef);
 			});
 		}
 	}

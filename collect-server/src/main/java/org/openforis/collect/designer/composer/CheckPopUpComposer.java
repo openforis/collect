@@ -51,6 +51,11 @@ public class CheckPopUpComposer extends BindComposer<Window> {
 	public void cancelChanges() {
 		BindUtils.postGlobalCommand(null, null, CANCEL_CHANGES_TO_EDITED_CHECK_COMMAND, null);
 	}
+	
+	@Command
+	public void close() {
+		cancelChanges();
+	}
 
 	public String getTypeShort() {
 		if ( check == null ) {

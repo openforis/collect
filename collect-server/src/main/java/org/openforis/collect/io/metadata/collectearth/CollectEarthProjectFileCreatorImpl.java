@@ -63,7 +63,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	private static final double HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR = 10000d;
 	private static final String README_FILE = "README.txt";
-//	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
 	private static final String GRID_FOLDER_NAME = "grid";
 	
 	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
@@ -167,7 +166,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
 		p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
 		p.put("inner_point_side", "2");
-		p.put("use_browser", "chrome");
 		p.put("ui_language", language);
 		p.put("bing_maps_key", getBingMapsKey(survey));
 		p.put("open_bing_maps", isBingMapsEnabled(survey));
@@ -175,6 +173,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
 		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
 		p.put("open_street_view", isStreetViewEnabled(survey));
+		p.put("extra_map_url_UNCOMMENT", "http://url?lat=LATITUDE&long=LONGITUDE");
 		p.put("coordinates_reference_system", getSRSUsed(survey));
 
 		File file = File.createTempFile("collect-earth-project", ".properties");

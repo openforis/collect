@@ -136,6 +136,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 	
 	public void undoLastChanges() {
+		dispatchCurrentFormValidatedCommand();
+	}
+	
+	public void dispatchCurrentFormValidatedCommand() {
 		dispatchCurrentFormValidatedCommand(true);
 	}
 	

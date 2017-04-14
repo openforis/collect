@@ -17,7 +17,6 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
-import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -34,7 +33,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
  * @author S. Ricci
  *
  */
-public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
+public class CodeListItemVM extends SurveyObjectPopUpVM<CodeListItem> {
 
 	public static final String ITEM_ARG = "item";
 	public static final String PARENT_ITEM_ARG = "parentItem";
@@ -104,24 +103,17 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 		return new CodeListItemFormObject();
 	}
 	
-	@Command
-	public void apply(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( isCurrentFormValid() ) {
-			commitChanges(binder);
-			postClosePopUpCommand(false, imageModified, newImageFileWrapper);
+	@Override
+	protected void dispatchChangesAppliedCommand(boolean ignoreUnsavedChanges) {
+		if (ignoreUnsavedChanges) {
+			postClosePopUpCommand(true);
 		} else {
-			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-				@Override
-				public void onOk(boolean confirmed) {
-					postClosePopUpCommand(confirmed);
-				}
-			});
+			postClosePopUpCommand(false, imageModified, newImageFileWrapper);
 		}
 	}
 	
-	@Command
-	public void cancel(@ContextParam(ContextType.BINDER) Binder binder) {
-		undoLastChanges(binder.getView());
+	@Override
+	protected void dispatchChangesCancelledCommand() {
 		postClosePopUpCommand(true);
 	}
 	

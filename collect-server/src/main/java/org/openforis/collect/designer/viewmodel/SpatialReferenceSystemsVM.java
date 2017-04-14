@@ -76,7 +76,8 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 		for (SpatialReferenceSystem srs : currentSRSs) {
 			insertedSRSCodes.add(srs.getId());
 		}
-		GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
+		GeoToolsCoordinateOperations coordinateOperations = 
+				(GeoToolsCoordinateOperations) survey.getContext().getCoordinateOperations();
 		Set<String> availableSRSs = coordinateOperations.getAvailableSRSs();
 		
 		List<String> result = new ArrayList<String>(availableSRSs);
@@ -91,9 +92,10 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
-				GeoToolsCoordinateOperations coordinateOperations = new GeoToolsCoordinateOperations();
 				Set<String> languages = new HashSet<String>(survey.getLanguages());
 				
+				GeoToolsCoordinateOperations coordinateOperations = 
+						(GeoToolsCoordinateOperations) survey.getContext().getCoordinateOperations();
 				SpatialReferenceSystem srs = coordinateOperations.fetchSRS(selectedPredefinedSrsCode, languages);
 				
 				survey.addSpatialReferenceSystem(srs);

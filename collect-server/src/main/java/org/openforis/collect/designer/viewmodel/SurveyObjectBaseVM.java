@@ -126,6 +126,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	@Command
 	public void applyChanges(@ContextParam(ContextType.BINDER) Binder binder) {
+		changed = true;
 		if ( commitChangesOnApply ) {
 			commitChanges(binder);
 		}

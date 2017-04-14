@@ -116,4 +116,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		return coordinateOperations;
 	}
 	
+	public void setCoordinateOperations(CoordinateOperations coordinateOperations) {
+		this.coordinateOperations = coordinateOperations;
+	}
 }
