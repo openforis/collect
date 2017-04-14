@@ -28,7 +28,6 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Window;
 
@@ -37,7 +36,7 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
-public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
+public class VersioningVM extends SurveyObjectPopUpVM<ModelVersion> {
 	
 	@WireVariable
 	private SurveyManager surveyManager;
@@ -183,20 +182,21 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 		return version.equals(sinceVersion) || version.equals(deprecatedVersion);
 	}
 	
-	protected void dispatchVersionsUpdatedCommand() {
+	private void dispatchVersionsUpdatedCommand() {
 		BindUtils.postGlobalCommand(null, null, VERSIONS_UPDATED_GLOBAL_COMMAND, null);
 	}
 
-	@Command
-	public void apply(@ContextParam(ContextType.VIEW) final Component view) {
-		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				if ( confirmed ) {
-					undoLastChanges(view);
-				}
-				BindUtils.postGlobalCommand(null, null, "closeVersioningManagerPopUp", null);
-			}
-		});
+	@Override
+	protected void dispatchChangesAppliedCommand(boolean ignoreUnsavedChanges) {
+		postCloseVersioningManagerPopUpCommand();
+	}
+	
+	@Override
+	protected void dispatchChangesCancelledCommand() {
+		postCloseVersioningManagerPopUpCommand();
+	}
+	
+	private void postCloseVersioningManagerPopUpCommand() {
+		BindUtils.postGlobalCommand(null, null, "closeVersioningManagerPopUp", null);
 	}
 }

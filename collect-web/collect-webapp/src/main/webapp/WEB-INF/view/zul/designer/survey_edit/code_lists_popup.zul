@@ -9,7 +9,7 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListsPopUpVM')"
 		validationMessages="@id('vmsgs')"
-		closable="false">
+		closable="true" onClose="@command('close')">
 		<borderlayout vflex="true" hflex="true">
 			<center>
 				<include id="codeListsInclude" 

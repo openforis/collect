@@ -8,7 +8,7 @@
 		height="300px"
 		border="normal"
 		position="center" 
-		closable="false">
+		closable="true" onClose="@command('close')">
 		<borderlayout>
 			<north>
 				<box pack="center" align="center" height="30px" hflex="1">

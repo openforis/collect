@@ -70,6 +70,8 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	}
 
 	private void confirmCodeListChange(final Binder binder, final CodeList list) {
+		CodeList oldList = ((CodeAttributeDefinitionFormObject) getFormObject()).getList();
+		
 		ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
@@ -78,13 +80,8 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		}, "survey.schema.attribute.code.confirm_change_list.message");
 		confirmParams.setOkLabelKey("global.change");
 		confirmParams.setCancelLabelKey("global.leave_original_value");
-		
-		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
-		CodeList oldList = fo.getList();
-		if (oldList != null) {
-			confirmParams.setMessageArgs(new String[] {oldList.getName(), list.getName()});
-			MessageUtil.showConfirm(confirmParams);
-		}
+		confirmParams.setMessageArgs(new String[] {oldList.getName(), list.getName()});
+		MessageUtil.showConfirm(confirmParams);
 	}
 
 	private void confirmParentCodeListChange(final Binder binder, final CodeList list) {
@@ -137,14 +134,14 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	public void codeListsPopUpClosed(@ContextParam(ContextType.BINDER) Binder binder, 
 			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
 			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
-		if ( editingAttribute ) {
+		if ( editingAttribute && selectedCodeList != null ) {
 			CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
 			CodeList oldList = fo.getList();
 			if (oldList != null && ! oldList.equals(selectedCodeList)) {
 				if (oldList != survey.getSamplingDesignCodeList()) {
 					confirmCodeListChange(binder, selectedCodeList);
 				}
-			} else if ( selectedCodeList != null ) {
+			} else {
 				onListChanged(binder, selectedCodeList);
 				validateForm(binder);
 			}

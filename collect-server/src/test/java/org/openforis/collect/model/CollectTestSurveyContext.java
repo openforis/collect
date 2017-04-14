@@ -18,12 +18,12 @@ public class CollectTestSurveyContext implements SurveyContext {
 	private CoordinateOperations coordinateOperations;	
 
 	public CollectTestSurveyContext() {
-		coordinateOperations = new CoordinateOperations();
 		expressionFactory = new ExpressionFactory();
 		lookupProvider = new TestLookupProviderImpl();
 		expressionFactory.setLookupProvider(lookupProvider);
 		expressionEvaluator = new ExpressionEvaluator(expressionFactory);
 		
+		coordinateOperations = new CoordinateOperations();
 		coordinateOperations.initialize();
 	}
 

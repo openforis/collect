@@ -18,6 +18,7 @@ import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 /**
@@ -47,18 +48,33 @@ public class CodeListsPopUpVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void apply(@ContextParam(ContextType.BINDER) final Binder binder) {
+	public void apply(@ContextParam(ContextType.VIEW) final Component view,
+			@ContextParam(ContextType.BINDER) final Binder binder) {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
-				Map<String, Object> params = new HashMap<String, Object>();
-				params.put("editingAttribute", editingAttribute);
-				params.put("selectedCodeList", getSelectedCodeList(binder));
-				BindUtils.postGlobalCommand((String) null, (String) null, "closeCodeListsManagerPopUp", params);
+				if (confirmed) {
+					undoLastChanges(view);
+				}
+				postCodeListsManagerPopUpCommand(getSelectedCodeList(binder));
 			}
 		});
 	}
 	
+	@Command
+	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
+		event.stopPropagation();
+		dispatchCurrentFormValidatedCommand();
+		postCodeListsManagerPopUpCommand(null);
+	}
+	
+	private void postCodeListsManagerPopUpCommand(CodeList selectedCodeList) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("editingAttribute", editingAttribute);
+		params.put("selectedCodeList", selectedCodeList);
+		BindUtils.postGlobalCommand((String) null, (String) null, "closeCodeListsManagerPopUp", params);		
+	}
+
 	private CodeList getSelectedCodeList(Binder binder) {
 		Component view = binder.getView();
 		IdSpace spaceOwner = view.getSpaceOwner();

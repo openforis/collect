@@ -19,7 +19,7 @@ public class CoordinateOperations {
 		registerSRS(SpatialReferenceSystem.WEB_MARCATOR_SRS);
 	}
 	
-	public void registerSrs(List<SpatialReferenceSystem> list) {
+	public void registerSRS(List<SpatialReferenceSystem> list) {
 		for (SpatialReferenceSystem srs : list)
 			registerSRS(srs);
 	}
