@@ -27,10 +27,17 @@ public class EntityDefinition extends NodeDefinition {
 	private static final long serialVersionUID = 1L;
 
 	private List<NodeDefinition> childDefinitions;
+	private boolean virtual; //if true, the entity data comes from another entity
+	/**
+	 * Used when "virtual" is true to generate the data belonging to this entity.
+	 * The expression must always give a node set of entities with attributes compatible
+	 * with the attributes defined as child nodes of this entity.
+	 */
+	private String generatorExpression; 
+	
+	//cache
     private Map<String, NodeDefinition> childDefinitionByName;
     private Map<Integer, NodeDefinition> childDefinitionById;
-
-    //cache of child definition names
     private String[] childDefinitionNames;
     
 	public enum TraversalType {
@@ -375,6 +382,22 @@ public class EntityDefinition extends NodeDefinition {
 	private void updateChildDefinitionNames() {
 		Set<String> names = childDefinitionByName.keySet();
 		childDefinitionNames = names.toArray(new String[names.size()]);
+	}
+	
+	public boolean isVirtual() {
+		return virtual;
+	}
+	
+	public void setVirtual(boolean virtual) {
+		this.virtual = virtual;
+	}
+	
+	public String getGeneratorExpression() {
+		return generatorExpression;
+	}
+	
+	public void setGeneratorExpression(String generatorExpression) {
+		this.generatorExpression = generatorExpression;
 	}
 
 	@Override

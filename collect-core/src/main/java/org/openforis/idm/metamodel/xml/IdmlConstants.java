@@ -68,6 +68,10 @@ public interface IdmlConstants {
 	static String SINCE = "since";
 	static String DEPRECATED = "deprecated";
 	
+	// Entities
+	static String VIRTUAL = "virtual";
+	static String GENERATOR_EXPRESSION = "generatorExpression";
+	
 	// Attributes
 	static String FIELD = "field";
 	static String FIELD_LABEL = "fieldLabel";

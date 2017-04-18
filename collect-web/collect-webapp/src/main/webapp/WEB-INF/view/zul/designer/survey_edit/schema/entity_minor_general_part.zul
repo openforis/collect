@@ -1,3 +1,5 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="expressionInfoIcon" class="org.openforis.collect.designer.component.ExpressionInfoIcon"?>
 <zk>
   <grid class="inner">
     <columns>
@@ -14,6 +16,30 @@
         <label value="${labels.survey.schema.entity.count_in_record_summary}:" />
         <checkbox checked="@bind(fx.countInRecordSummary)"
           onCheck="@command('applyChanges')" />
+      </row>
+      <row visible="${not vm.rootEntity}">
+        <fieldErrorHandler message="@load(vmsgs['virtual'])">
+			<label value="${labels.survey.schema.entity.virtual.$}:" />
+			<image popup="virtualEntityInfoTooltip" style="cursor:pointer"
+				src="/assets/images/info-small.png" />
+		</fieldErrorHandler>
+		<fieldErrorHandler message="@load(vmsgs['virtual'])">
+        	<checkbox checked="@bind(fx.virtual)" disabled="true"
+          		onCheck="@command('applyChanges')" />
+         </fieldErrorHandler>
+      </row>
+      <row visible="${not (vm.rootEntity) and fx.virtual eq true}">
+        <fieldErrorHandler
+			message="@load(vmsgs['generatorExpression'])">
+			<label value="${labels.survey.schema.entity.generatorExpression.$}:" />
+		</fieldErrorHandler>
+		<fieldErrorHandler
+			message="@load(vmsgs['generatorExpression'])">
+			<textbox width="250px" rows="4"
+				value="@bind(fx.generatorExpression)"
+				onChange="@command('applyChanges')" />
+			<expressionInfoIcon />
+		</fieldErrorHandler>
       </row>
     </rows>
   </grid>

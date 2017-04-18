@@ -27,4 +27,11 @@ public class EntityDefinitionXS extends NodeDefinitionXS<EntityDefinition, Schem
 		List<EntityDefinition> roots = schema.getRootEntityDefinitions();
 		marshal(roots);
 	}
+	
+	@Override
+	protected void attributes(EntityDefinition defn) throws IOException {
+		super.attributes(defn);
+		attribute(VIRTUAL, defn.isVirtual(), false);
+		attribute(GENERATOR_EXPRESSION, defn.getGeneratorExpression());
+	}
 }

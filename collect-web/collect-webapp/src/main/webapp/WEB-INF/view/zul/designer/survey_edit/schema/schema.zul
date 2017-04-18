@@ -111,15 +111,21 @@
     		<menupopup>
     			<menuitem
     				label="${labels.survey.schema.add_single_entity}"
-    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/grouping-small.png" />
+		    	<menuseparator />
     			<menuitem
     				label="${labels.survey.schema.add_multiple_form_entity}"
-    				onClick="@command('addChildEntity', multiple=true, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=true, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/form-small.png" />
     			<menuitem
     				label="${labels.survey.schema.add_multiple_table_entity}"
-    				onClick="@command('addChildEntity', multiple=true, layout='TABLE')"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=false)"
+    				image="/assets/images/node_types/table-small.png" />
+    			<menuseparator />
+    			<menuitem
+    				label="${labels.survey.schema.add_virtual_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=true)"
     				image="/assets/images/node_types/table-small.png" />
     		</menupopup>
     	</menu>
@@ -149,15 +155,21 @@
     		<menupopup>
     			<menuitem
     				label="${labels.survey.schema.add_single_entity}"
-    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/grouping-small.png" />
+		    	<menuseparator />
     			<menuitem
     				label="${labels.survey.schema.add_multiple_form_entity}"
-    				onClick="@command('addChildEntity', multiple=true, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=true, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/form-small.png" />
     			<menuitem
     				label="${labels.survey.schema.add_multiple_table_entity}"
-    				onClick="@command('addChildEntity', multiple=true, layout='TABLE')"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=false)"
+    				image="/assets/images/node_types/table-small.png" />
+    			<menuseparator />
+    			<menuitem
+    				label="${labels.survey.schema.add_virtual_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=true)"
     				image="/assets/images/node_types/table-small.png" />
     		</menupopup>
     	</menu>
@@ -187,15 +199,21 @@
     		<menupopup>
     			<menuitem
     				label="${labels.survey.schema.add_single_entity}"
-    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/grouping-small.png" />
+		    	<menuseparator />
     			<menuitem
     				label="${labels.survey.schema.add_multiple_form_entity}"
-    				onClick="@command('addChildEntity', multiple=true, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=true, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/form-small.png" />
     			<menuitem
     				label="${labels.survey.schema.add_multiple_table_entity}"
-    				onClick="@command('addChildEntity', multiple=true, layout='TABLE')"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=false)"
+    				image="/assets/images/node_types/table-small.png" />
+    			<menuseparator />
+    			<menuitem
+    				label="${labels.survey.schema.add_virtual_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=true)"
     				image="/assets/images/node_types/table-small.png" />
     		</menupopup>
     	</menu>
@@ -235,15 +253,21 @@
     		<menupopup>
     			<menuitem
     				label="${labels.survey.schema.add_single_entity}"
-    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/grouping-small.png" />
+		    	<menuseparator />
     			<menuitem
     				label="${labels.survey.schema.add_multiple_form_entity}"
-    				onClick="@command('addChildEntity', multiple=true, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=true, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/form-small.png" />
     			<menuitem
     				label="${labels.survey.schema.add_multiple_table_entity}"
-    				onClick="@command('addChildEntity', multiple=true, layout='TABLE')"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=false)"
+    				image="/assets/images/node_types/table-small.png" />
+    			<menuseparator />
+    			<menuitem
+    				label="${labels.survey.schema.add_virtual_entity}"
+    				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=true)"
     				image="/assets/images/node_types/table-small.png" />
     		</menupopup>
     	</menu>
@@ -278,7 +302,7 @@
     		<menupopup>
     			<menuitem
     				label="${labels.survey.schema.add_single_entity}"
-    				onClick="@command('addChildEntity', multiple=false, layout='FORM')"
+    				onClick="@command('addChildEntity', multiple=false, layout='FORM', virtual=false)"
     				image="/assets/images/node_types/grouping-small.png" />
     		</menupopup>
     	</menu>

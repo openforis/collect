@@ -276,18 +276,21 @@ public class SchemaVM extends SurveyBaseVM {
 	public void addEntity(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("multiple") boolean multiple, @BindingParam("layout") String layout) {
 		resetNodeSelection();
-		addChildEntity(binder, multiple, layout);
+		addChildEntity(binder, multiple, layout, false);
 	}
 
 	@Command
 	public void addChildEntity(@ContextParam(ContextType.BINDER) final Binder binder,
-			@BindingParam("multiple") final boolean multiple, @BindingParam("layout") final String layout) {
+			@BindingParam("multiple") final boolean multiple, 
+			@BindingParam("layout") final String layout,
+			@BindingParam("virtual") final boolean virtual) {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
 				EntityDefinition parentEntity = getSelectedNodeParentEntity();
 				EntityDefinition newNode = createEntityDefinition();
 				newNode.setMultiple(multiple);
+				newNode.setVirtual(virtual);
 				UIOptions uiOptions = survey.getUIOptions();
 				Layout layoutEnum = Layout.valueOf(layout);
 				SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();

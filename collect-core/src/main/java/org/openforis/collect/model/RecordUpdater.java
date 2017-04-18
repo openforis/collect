@@ -450,6 +450,14 @@ public class RecordUpdater {
 		}
 		return updatedPointers;
 	}
+	
+	public NodeChangeSet deleteChildren(Entity entity, NodeDefinition childDef) {
+		NodeChangeMap changeMap = new NodeChangeMap();
+		while(entity.getCount(childDef) > 0) {
+			changeMap.addMergeChanges(deleteNode(entity.getLastChild(childDef)));
+		}
+		return changeMap;
+	}
 
 	/**
 	 * Deletes a node from the record.
@@ -702,7 +710,9 @@ public class RecordUpdater {
 	}
 
 	public NodeChangeSet initializeRecord(Record record) {
-		return initializeEntity(record.getRootEntity(), false);
+		NodeChangeMap result = initializeEntity(record.getRootEntity(), false);
+		result.addMergeChanges(populateVirtualEntitites(record));
+		return result;
 	}
 	
 	public NodeChangeSet initializeNewRecord(Record record) {
@@ -981,6 +991,69 @@ public class RecordUpdater {
 		}
 	}
 
+	private NodeChangeSet populateVirtualEntitites(final Record record) {
+		final NodeChangeMap result = new NodeChangeMap();
+		Entity rootEntity = record.getRootEntity();
+		rootEntity.traverse(new NodeVisitor() {
+			public void visit(Node<? extends NodeDefinition> node, int idx) {
+				if (node instanceof Entity) {
+					Entity parentEntity = (Entity) node;
+					EntityDefinition parentEntityDef = parentEntity.getDefinition();
+					List<NodeDefinition> childDefs = parentEntityDef.getChildDefinitions();
+					for (NodeDefinition childDef : childDefs) {
+						if (childDef instanceof EntityDefinition) {
+							EntityDefinition childEntityDef = (EntityDefinition) childDef;
+							if (childEntityDef.isVirtual()) {
+								result.addMergeChanges(deleteChildren(parentEntity, childEntityDef));
+								result.addMergeChanges(populateVirtualEntity(parentEntity, childEntityDef));
+							}
+						}
+					}
+				}
+			}
+		});
+		return result;
+	}
+
+	/**
+	 * Populates a virtual entity cloning entities according to it's generatorExpression
+	 */
+	private NodeChangeSet populateVirtualEntity(Entity parentEntity, EntityDefinition entityDef) {
+		NodeChangeMap result = new NodeChangeMap();
+		String generatorExpression = entityDef.getGeneratorExpression();
+		ExpressionEvaluator expressionEvaluator = parentEntity.getSurvey().getContext().getExpressionEvaluator();
+		try {
+			List<Node<?>> entities = expressionEvaluator.evaluateNodes(parentEntity, null, generatorExpression);
+			for (Node<?> entity : entities) {
+				result.addMergeChanges(duplicateEntity(parentEntity, entityDef, (Entity) entity));
+			}
+		} catch (InvalidExpressionException e) {
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+	
+	private NodeChangeSet duplicateEntity(Entity parentDestEntity, EntityDefinition destEntityDef, Entity sourceEntity) {
+		NodeChangeMap result = new NodeChangeMap();
+		result.addMergeChanges(addEntity(parentDestEntity, destEntityDef.getName()));
+		Entity newEntity = parentDestEntity.getLastChild(destEntityDef.getName());
+		List<Node<?>> children = ((Entity) sourceEntity).getChildren();
+		for (Node<?> child : children) {
+			if (destEntityDef.containsChildDefinition(child.getName())
+					&& destEntityDef.getChildDefinition(child.getName()).getClass().isAssignableFrom(child.getDefinition().getClass())) {
+				if (child instanceof Entity) {
+					result.addMergeChanges(duplicateEntity(newEntity, (EntityDefinition) destEntityDef.getChildDefinition(child.getName()), (Entity) child));
+				} else {
+					//duplicate attribute
+					result.addMergeChanges(addAttribute(newEntity, child.getName()));
+					Attribute<?, Value> newAttr = newEntity.getLastChild(child.getName());
+					result.addMergeChanges(updateAttribute(newAttr, ((Attribute<?, ?>) child).getValue()));
+				}
+			}
+		}
+		return result;
+	}
+	
 	private UIOptions getUIOptions(Survey survey) {
 		UIOptions uiOptions = survey instanceof CollectSurvey ? ((CollectSurvey) survey).getUIOptions(): null;
 		return uiOptions;

@@ -23,11 +23,17 @@ import org.zkoss.util.resource.Labels;
  */
 public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 
+	private static final String VIRTUAL_FIELD = "virtual";
+	private static final String GENERATOR_EXPRESSION_FIELD = "generatorExpression";
 	protected static final String LAYOUT_FIELD = "layoutType";
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
+		Object virtual = getValue(ctx, VIRTUAL_FIELD);
+		if (Boolean.TRUE.equals(virtual)) {
+			validateRequired(ctx, GENERATOR_EXPRESSION_FIELD);
+		}
 		validateLayout(ctx);
 	}
 
