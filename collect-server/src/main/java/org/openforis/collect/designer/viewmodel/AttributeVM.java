@@ -28,6 +28,8 @@ import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEv
 import org.openforis.collect.manager.validation.SurveyValidator.ReferenceableKeyAttributeHelper;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -418,6 +420,38 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 				}
 			});
 		}
+	}
+	
+	@Command
+	public void generateEntityAlias() {
+		AttributeDefinitionFormObject<?> fo = (AttributeDefinitionFormObject<?>) formObject;
+		String referencedAttributePath = fo.getReferencedAttributePath();
+		EntityDefinition sourceDef = editedItem.getParentEntityDefinition();
+		
+		String aliasName = sourceDef + "_alias";
+
+		NodeDefinition referencedAttributeDef = editedItem.getDefinitionByPath(referencedAttributePath);
+		EntityDefinition parentDef = referencedAttributeDef.getParentEntityDefinition();
+		if (parentDef.containsChildDefinition(aliasName)) {
+			MessageUtil.showError("survey.schema.attribute.generate_entity_alias.error.alias_already_existing", aliasName, parentDef.getName());
+		} else {
+			EntityDefinition aliasDef = generateAlias(sourceDef, parentDef, editedItem.getName());
+			aliasDef.rename(aliasName);
+			dispatchSchemaChangedCommand();
+			MessageUtil.showInfo("survey.schema.attribute.generate_entity_alias.generation_successfull", aliasName, parentDef.getName());
+		}
+	}
+	
+	private EntityDefinition generateAlias(EntityDefinition sourceDef, EntityDefinition targetParentDef, String filterAttributeName) {
+		EntityDefinition aliasDef = editedItem.getSchema().cloneDefinition(sourceDef, filterAttributeName);
+		targetParentDef.addChildDefinition(aliasDef);
+		aliasDef.setVirtual(true);
+		aliasDef.setGeneratorExpression(targetParentDef.getRelativePath(sourceDef) + 
+				String.format("[%s=$context/%s]", editedItem.getName(), filterAttributeName));
+		UIOptions uiOptions = survey.getUIOptions();
+		uiOptions.setLayout(aliasDef, Layout.FORM); //prevent layout errors
+		uiOptions.setHidden(aliasDef, true);
+		return aliasDef;
 	}
 	
 	public List<AttributeDefault> getAttributeDefaults() {

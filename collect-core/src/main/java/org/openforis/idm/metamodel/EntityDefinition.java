@@ -4,6 +4,8 @@
 package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +50,29 @@ public class EntityDefinition extends NodeDefinition {
 
 	EntityDefinition(Survey survey, int id) {
 		super(survey, id);
+		initializeCache();
+	}
+
+	EntityDefinition(EntityDefinition def, int nextId, String... ignoreChildDefinitions) {
+		super(def, nextId);
+		initializeCache();
+		this.virtual = def.virtual;
+		this.generatorExpression = def.generatorExpression;
+		List<NodeDefinition> childDefs = def.getChildDefinitions();
+		List<String> ignoreChildDefList;
+		if (ignoreChildDefinitions == null) {
+			ignoreChildDefList = Collections.emptyList();
+		} else {
+			ignoreChildDefList = Arrays.asList(ignoreChildDefinitions);
+		}
+		for (NodeDefinition childDef : childDefs) {
+			if (! ignoreChildDefList.contains(childDef.getName())) {
+				addChildDefinition(getSchema().cloneDefinition(childDef));
+			}
+		}
+	}
+	
+	private void initializeCache() {
 		childDefinitionNames = new String[0];
 		childDefinitions = new ArrayList<NodeDefinition>();
 		childDefinitionByName = new TreeMap<String, NodeDefinition>();

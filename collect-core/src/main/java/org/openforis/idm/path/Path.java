@@ -30,6 +30,7 @@ public final class Path implements Axis, Iterable<PathElement> {
 													THIS_FUNCTION, 
 													THIS_SYMBOL,
 													THIS_VARIABLE));
+	public static final String CONTEXT_VARIABLE = "$context";
 	public static final String PARENT_FUNCTION = "parent()";
 	public static final String PARENT_SYMBOL = "..";
 	public static final String NORMALIZED_PARENT_FUNCTION = "__parent";
