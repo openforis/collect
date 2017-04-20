@@ -122,11 +122,12 @@
     				label="${labels.survey.schema.add_multiple_table_entity}"
     				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=false)"
     				image="/assets/images/node_types/table-small.png" />
-    			<menuseparator />
+    			<menuseparator visible="@load(not vm.collectEarthSurvey)" />
     			<menuitem
     				label="${labels.survey.schema.add_virtual_entity}"
     				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=true)"
-    				image="/assets/images/node_types/table-small.png" />
+    				image="/assets/images/node_types/table-small.png"
+    				visible="@load(not vm.collectEarthSurvey)" />
     		</menupopup>
     	</menu>
     	<menuseparator />
@@ -166,11 +167,12 @@
     				label="${labels.survey.schema.add_multiple_table_entity}"
     				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=false)"
     				image="/assets/images/node_types/table-small.png" />
-    			<menuseparator />
+    			<menuseparator visible="@load(not vm.collectEarthSurvey)" />
     			<menuitem
     				label="${labels.survey.schema.add_virtual_entity}"
     				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=true)"
-    				image="/assets/images/node_types/table-small.png" />
+    				image="/assets/images/node_types/table-small.png"
+    				visible="@load(not vm.collectEarthSurvey)" />
     		</menupopup>
     	</menu>
     	<menuseparator />
@@ -210,11 +212,12 @@
     				label="${labels.survey.schema.add_multiple_table_entity}"
     				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=false)"
     				image="/assets/images/node_types/table-small.png" />
-    			<menuseparator />
+    			<menuseparator visible="@load(not vm.collectEarthSurvey)" />
     			<menuitem
     				label="${labels.survey.schema.add_virtual_entity}"
     				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=true)"
-    				image="/assets/images/node_types/table-small.png" />
+    				image="/assets/images/node_types/table-small.png"
+    				visible="@load(not vm.collectEarthSurvey)" />
     		</menupopup>
     	</menu>
     	<menuseparator />
@@ -264,11 +267,12 @@
     				label="${labels.survey.schema.add_multiple_table_entity}"
     				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=false)"
     				image="/assets/images/node_types/table-small.png" />
-    			<menuseparator />
+    			<menuseparator visible="@load(not vm.collectEarthSurvey)" />
     			<menuitem
     				label="${labels.survey.schema.add_virtual_entity}"
     				onClick="@command('addChildEntity', multiple=true, layout='TABLE', virtual=true)"
-    				image="/assets/images/node_types/table-small.png" />
+    				image="/assets/images/node_types/table-small.png"
+    				visible="@load(not vm.collectEarthSurvey)" />
     		</menupopup>
     	</menu>
     	<menuseparator />

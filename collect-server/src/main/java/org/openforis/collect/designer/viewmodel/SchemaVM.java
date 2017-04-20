@@ -1421,9 +1421,19 @@ public class SchemaVM extends SurveyBaseVM {
 		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
 			@Override
 			public boolean evaluate(SurveyObject item) {
-				return item instanceof UITab
-						|| item instanceof EntityDefinition && !(selectedItem instanceof EntityDefinition
-								&& ((NodeDefinition) item).isDescendantOf((EntityDefinition) selectedItem));
+				if (item instanceof UITab) {
+					return true;
+				} else if (item instanceof EntityDefinition) {
+					if (((EntityDefinition) item).isVirtual()) {
+						return false;
+					} else if (((NodeDefinition) item).isDescendantOf((EntityDefinition) selectedItem)) {
+						return false;
+					} else {
+						return true;
+					}
+				} else {
+					return false;
+				}
 			}
 		};
 		Predicate<SurveyObject> disabledPredicate = new Predicate<SurveyObject>() {

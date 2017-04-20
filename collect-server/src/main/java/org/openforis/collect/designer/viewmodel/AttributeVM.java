@@ -35,6 +35,7 @@ import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.SurveyObject;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
@@ -435,7 +436,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		if (parentDef.containsChildDefinition(aliasName)) {
 			MessageUtil.showError("survey.schema.attribute.generate_entity_alias.error.alias_already_existing", aliasName, parentDef.getName());
 		} else {
-			EntityDefinition aliasDef = generateAlias(sourceDef, parentDef, editedItem.getName());
+			EntityDefinition aliasDef = generateAlias(sourceDef, parentDef, referencedAttributeDef.getName());
 			aliasDef.rename(aliasName);
 			dispatchSchemaChangedCommand();
 			MessageUtil.showInfo("survey.schema.attribute.generate_entity_alias.generation_successfull", aliasName, parentDef.getName());
@@ -444,6 +445,10 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	private EntityDefinition generateAlias(EntityDefinition sourceDef, EntityDefinition targetParentDef, String filterAttributeName) {
 		EntityDefinition aliasDef = editedItem.getSchema().cloneDefinition(sourceDef, filterAttributeName);
+		//add "Alias" suffix to labels
+		for (NodeLabel nodeLabel : aliasDef.getLabels()) {
+			aliasDef.setLabel(nodeLabel.getType(), nodeLabel.getLanguage(), nodeLabel.getText() + " Alias");
+		}
 		targetParentDef.addChildDefinition(aliasDef);
 		aliasDef.setVirtual(true);
 		aliasDef.setGeneratorExpression(targetParentDef.getRelativePath(sourceDef) + 
