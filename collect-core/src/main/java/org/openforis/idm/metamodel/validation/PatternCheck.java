@@ -56,4 +56,8 @@ public class PatternCheck extends Check<Attribute<?,?>> {
 		resetExpression();
 	}
 
+	@Override
+	public String toString() {
+		return "PATTERN - " + super.toString();
+	}
 }

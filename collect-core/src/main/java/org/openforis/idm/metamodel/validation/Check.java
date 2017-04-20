@@ -208,5 +208,11 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "(" + flag + ")" 
+				+ " - Expression: " + getExpression() 
+				+ (condition == null ? "" : " - Apply when: " + condition);
+	}
 }
