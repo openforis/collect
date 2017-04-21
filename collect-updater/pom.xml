@@ -136,7 +136,7 @@
 						and into the xml installbuilder source file -->
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
+						<artifactId>replacer</artifactId>
 						<executions>
 							<execution>
 								<phase>prepare-package</phase>

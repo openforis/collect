@@ -53,7 +53,7 @@
 						file -->
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
+						<artifactId>replacer</artifactId>
 						<executions>
 							<execution>
 								<phase>prepare-package</phase>
@@ -118,9 +118,9 @@
 											</plugin>
 											<goal>run</goal>
 											<configuration>
-												<tasks>
+												<target>
 													<move file="${installbuilder-home}/autoupdate/output/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" tofile="${project.build.directory}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" failonerror="true" />
-												</tasks>
+												</target>
 											</configuration>
 										</pluginExecutor>
 									</pluginExecutors>

@@ -102,7 +102,7 @@
 			<!-- copy Designer options from user settings into the options.properties file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>maven-replacer-plugin</artifactId>
+				<artifactId>replacer</artifactId>
 				<executions>
 					<execution>
 						<phase>prepare-package</phase>
@@ -112,8 +112,9 @@
 					</execution>
 				</executions>
 				<configuration>
+					<basedir>${project.build.outputDirectory}</basedir>
 					<includes>
-						<include>target/classes/org/openforis/collect/designer/options.properties</include>
+						<include>org/openforis/collect/designer/options.properties</include>
 					</includes>
 					<regex>false</regex>
 					<replacements>

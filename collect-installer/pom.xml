@@ -145,7 +145,7 @@
 						file replace Java version into the InstallBuilder java.xml file -->
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
+						<artifactId>replacer</artifactId>
 						<executions>
 							<execution>
 								<phase>prepare-package</phase>

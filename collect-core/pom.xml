@@ -110,7 +110,6 @@
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>replacer</artifactId>
-				<version>1.5.1</version>
 				<executions>
 					<execution>
 						<!-- the replace should happen before the app is packaged -->
@@ -121,9 +120,10 @@
 					</execution>
 				</executions>
 				<configuration>
+					<basedir>${project.build.outputDirectory}</basedir>
 					<includes>
 						<!-- replace the token in this file -->
-						<include>target/classes/org/openforis/collect/info.properties</include>
+						<include>org/openforis/collect/info.properties</include>
 					</includes>
 					<regex>false</regex>
 					<!-- the name of the token to replace -->
@@ -182,7 +182,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.5</version>
 				<executions>
 					<execution>
 						<goals>
@@ -192,70 +191,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!-- Set up Eclipse m2e settings to remove errors show in IDE. This has 
-					no influence on the build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.jooq</groupId>
-										<artifactId>jooq-codegen-maven</artifactId>
-										<versionRange>[${jooq-codegen.version},)</versionRange>
-										<goals>
-											<goal>generate</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>properties-maven-plugin</artifactId>
-										<versionRange>[1.0-alpha-2,)</versionRange>
-										<goals>
-											<goal>
-												read-project-properties
-											</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											com.google.code.maven-replacer-plugin
-										</groupId>
-										<artifactId>
-											replacer
-										</artifactId>
-										<versionRange>
-											[1.5.3,)
-										</versionRange>
-										<goals>
-											<goal>replace</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 	<dependencies>
