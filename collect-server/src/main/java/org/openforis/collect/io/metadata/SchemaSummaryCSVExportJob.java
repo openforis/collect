@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.designer.metamodel.AttributeType;
@@ -17,6 +18,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.validation.Check;
 
 /**
  * 
@@ -25,6 +27,8 @@ import org.openforis.idm.metamodel.Schema;
  */
 public class SchemaSummaryCSVExportJob extends Job {
 
+	private static final String[] HEADERS = new String[] {"id", "path", "type", "attribute_type", "label", 
+			"always_relevant", "relevant_when", "always_required", "required_when", "validation_rules"};
 	//input
 	private CollectSurvey survey;
 	private String labelLanguage;
@@ -45,8 +49,7 @@ public class SchemaSummaryCSVExportJob extends Job {
 				FileOutputStream out = new FileOutputStream(outputFile);
 				final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(new OutputStreamWriter(out, "UTF-8")), ',', '"');
 				try {
-					csvWriter.writeHeaders(new String[] {"id", "path", "type", "attribute_type", "label", 
-							"always_relevant", "relevant_when", "always_required", "required_when"});
+					csvWriter.writeHeaders(HEADERS);
 					
 					Schema schema = survey.getSchema();
 					schema.traverse(new NodeDefinitionVisitor() {
@@ -61,7 +64,8 @@ public class SchemaSummaryCSVExportJob extends Job {
 									String.valueOf(nodeDefn.isAlwaysRelevant()),
 									nodeDefn.isAlwaysRelevant() ? "" : nodeDefn.getRelevantExpression(),
 									String.valueOf(nodeDefn.isAlwaysRequired()),
-									nodeDefn.isAlwaysRequired() ? "" : nodeDefn.getMinCountExpression()
+									nodeDefn.isAlwaysRequired() ? "" : nodeDefn.getMinCountExpression(),
+									extractValidationRules(nodeDefn)
 								});
 						}
 					});
@@ -71,6 +75,22 @@ public class SchemaSummaryCSVExportJob extends Job {
 			}
 		};
 		addTask(task);
+	}
+	
+	private String extractValidationRules(NodeDefinition nodeDefn) {
+		if (! (nodeDefn instanceof AttributeDefinition)) {
+			return "";
+		}
+		StringBuffer sb = new StringBuffer();
+		List<Check<?>> checks = ((AttributeDefinition) nodeDefn).getChecks();
+		for (int i = 0; i < checks.size(); i++) {
+			Check<?> check = checks.get(i);
+			sb.append(check.toString());
+			if (i < checks.size() - 1) {
+				sb.append('\n');
+			}
+		}
+		return sb.toString();
 	}
 	
 	public void setSurvey(CollectSurvey survey) {

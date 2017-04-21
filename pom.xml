@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.12.35-SNAPSHOT</version>
+	<version>3.12.37-SNAPSHOT</version>
 	<organization>
 		<name>Open Foris</name>
 		<url>www.openforis.org</url>
@@ -204,39 +204,6 @@
 						<encoding>${project.build.sourceEncoding}</encoding>
 					</configuration>
 				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.sonatype.flexmojos</groupId>
-										<artifactId>flexmojos-maven-plugin</artifactId>
-										<versionRange>[4.0-pre-alpha-1,)</versionRange>
-										<goals>
-											<goal>compile-swf</goal>
-											<goal>test-compile</goal>
-											<goal>copy-flex-resources</goal>
-											<goal>generate</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-										<!-- 
-										Must ignore since m2e fails on copy-flex-resource
-										https://issues.sonatype.org/browse/MNGECLIPSE-1375
-										 -->
-										<!-- <execute /> -->
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
@@ -323,8 +290,47 @@
 			    </plugin>
 			    <plugin>
 					<groupId>com.google.code.maven-replacer-plugin</groupId>
-					<artifactId>maven-replacer-plugin</artifactId>
-					<version>1.4.1</version>
+					<artifactId>replacer</artifactId>
+					<version>1.5.3</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.0.2</version>
+				</plugin>
+				
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.sonatype.flexmojos</groupId>
+										<artifactId>flexmojos-maven-plugin</artifactId>
+										<versionRange>[4.2-beta,)</versionRange>
+										<goals>
+											<goal>compile-swf</goal>
+											<goal>copy-flex-resources</goal>
+											<goal>generate</goal>
+											<goal>test-compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+										<!-- 
+										Must ignore since m2e fails on copy-flex-resource
+										https://issues.sonatype.org/browse/MNGECLIPSE-1375
+										 -->
+										<!-- <execute /> -->
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>

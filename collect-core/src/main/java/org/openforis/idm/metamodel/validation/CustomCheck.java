@@ -51,4 +51,10 @@ public class CustomCheck extends Check<Attribute<?,?>> {
 		return null;
 	}
 	
+	@Override
+	public String toString() {
+		return "CUSTOM - " + super.toString();
+	}
+
+	
 }

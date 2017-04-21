@@ -146,5 +146,9 @@ public class ComparisonCheck extends Check<Attribute<?,?>> {
 			return expression.toString();
 		}
 	}
-
+	
+	@Override
+	public String toString() {
+		return "COMPARISON - " + super.toString();
+	}
 }

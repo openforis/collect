@@ -44,6 +44,13 @@
 		  		<deleteFile path="${installdir}/log" abortOnError="0" />
 		  		<deleteFile path="${collect_root_user_dir}/log" abortOnError="0" />
 		  		
+  		        <!-- Delete temporary files -->
+		        <deleteFile>
+		  			<path>${webapps_dir}/collect</path>
+					<abortOnError>0</abortOnError>
+					<showMessageOnError>0</showMessageOnError>
+		  		</deleteFile>
+				  		
 		  		<!-- Update update.ini file -->
 				<writeFile>
 					<path>update.ini</path>

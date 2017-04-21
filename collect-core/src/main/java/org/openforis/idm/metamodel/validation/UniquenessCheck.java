@@ -59,4 +59,9 @@ public class UniquenessCheck extends Check<Attribute<?, ?>> {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "UNIQUENESS - " + super.toString();
+	}
+
 }
