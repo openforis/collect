@@ -415,9 +415,9 @@ public class EntityDefinition extends NodeDefinition {
 		traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition definition) {
 				if (definition instanceof AttributeDefinition) {
-					AttributeDefinition attrDef = (AttributeDefinition) definition;
-					if (attrDef.getReferencedAttribute() != null) {
-						EntityDefinition ancestorMultipleEntity = attrDef.getReferencedAttribute().getNearestAncestorMultipleEntity();
+					AttributeDefinition referencedAttribute = ((AttributeDefinition) definition).getReferencedAttribute();
+					if (referencedAttribute != null) {
+						EntityDefinition ancestorMultipleEntity = referencedAttribute.getNearestAncestorMultipleEntity();
 						List<NodeDefinition> childDefinitions = ancestorMultipleEntity.getChildDefinitions();
 						for (NodeDefinition childDef : childDefinitions) {
 							if (childDef instanceof EntityDefinition && ((EntityDefinition) childDef).isVirtual()) {
