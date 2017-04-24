@@ -121,10 +121,16 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 	$this.map.addControl(layerSwitcher);
 
 	var displayFeatureInfo = function(pixel, coordinate) {
-		var feature = $this.map.forEachFeatureAtPixel(pixel, function(feature) {
+		var featureOrLayer = $this.map.forEachFeatureAtPixel(pixel, function(feature) {
 			return feature;
 		});
-		if (feature) {
+		if (featureOrLayer) {
+			var feature;
+			if (featureOrLayer.get('features')) {
+				feature = featureOrLayer.get('features')[0];
+			} else {
+				feature = featureOrLayer;
+			}
 			var survey = feature.get('survey');
 			var htmlContent;
 			
