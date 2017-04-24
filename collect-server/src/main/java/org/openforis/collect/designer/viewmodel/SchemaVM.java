@@ -338,17 +338,16 @@ public class SchemaVM extends SurveyBaseVM {
 	public void addChildAttribute(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("attributeType") final String attributeType) throws Exception {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
 			public void onOk(boolean confirmed) {
 				AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
 				AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey,
 						NodeType.ATTRIBUTE, attributeTypeEnum);
-				EntityDefinition parentEntity = getSelectedNodeParentEntity();
 				SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();
 				if (selectedSurveyObject instanceof UITab) {
 					UIOptions uiOptions = survey.getUIOptions();
 					uiOptions.assignToTab(newNode, (UITab) selectedSurveyObject);
 				}
+				EntityDefinition parentEntity = getSelectedNodeParentEntity();
 				editNode(binder, true, parentEntity, newNode);
 				afterNewNodeCreated(newNode, true);
 			}

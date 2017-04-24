@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -407,6 +408,28 @@ public class EntityDefinition extends NodeDefinition {
 	private void updateChildDefinitionNames() {
 		Set<String> names = childDefinitionByName.keySet();
 		childDefinitionNames = names.toArray(new String[names.size()]);
+	}
+	
+	public Set<EntityDefinition> calculateDependingVirtualEntities() {
+		final Set<EntityDefinition> result = new HashSet<EntityDefinition>();
+		traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition definition) {
+				if (definition instanceof AttributeDefinition) {
+					AttributeDefinition attrDef = (AttributeDefinition) definition;
+					if (attrDef.getReferencedAttribute() != null) {
+						EntityDefinition ancestorMultipleEntity = attrDef.getReferencedAttribute().getNearestAncestorMultipleEntity();
+						List<NodeDefinition> childDefinitions = ancestorMultipleEntity.getChildDefinitions();
+						for (NodeDefinition childDef : childDefinitions) {
+							if (childDef instanceof EntityDefinition && ((EntityDefinition) childDef).isVirtual()) {
+								result.add((EntityDefinition) childDef);
+							}
+							
+						}
+					}
+				}
+			}
+		});
+		return result;
 	}
 	
 	public boolean isVirtual() {

@@ -103,7 +103,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 //				Schema schema = editedItem.getSchema();
 //				schema.addRootEntityDefinition((EntityDefinition) editedItem);
 			} else {
-				parentEntity.addChildDefinition(editedItem);
+				schemaUpdater.addChildDefinition(parentEntity, editedItem);
 				validateForm(binder);
 			}
 			newItem = false;
