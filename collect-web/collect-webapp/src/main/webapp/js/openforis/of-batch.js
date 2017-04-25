@@ -13,11 +13,12 @@ OF.Batch.BatchProcessor = function(totalItems, batchSize, processFn, interval) {
 OF.Batch.BatchProcessor.prototype = {
 	start : function() {
 		var $this = this;
-		this.running = true;
+		$this.running = true;
 		$this.processNextIfPossible();
 	},
 	stop : function() {
-		this.running = false;
+		var $this = this;
+		$this.running = false;
 		if ($this.timeout != null) {
 			clearInterval($this.timeout);
 		}
@@ -30,10 +31,11 @@ OF.Batch.BatchProcessor.prototype = {
 		$this.nextBlockIndex++;
 	},
 	processNextIfPossible : function() {
-		if (this.nextBlockIndex < this.blocks) {
-			this.processNext();
+		var $this = this;
+		if ($this.nextBlockIndex < $this.blocks) {
+			$this.processNext();
 		} else {
-			this.running = false;
+			$this.running = false;
 		}
 	}
 };

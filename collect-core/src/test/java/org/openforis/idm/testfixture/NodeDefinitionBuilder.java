@@ -83,7 +83,7 @@ public abstract class NodeDefinitionBuilder {
 		return new EntityDefinitionBuilder(name, builders);
 	}
 	
-	public static NodeDefinitionBuilder entityDef(String name, NodeDefinitionBuilder... builders) {
+	public static EntityDefinitionBuilder entityDef(String name, NodeDefinitionBuilder... builders) {
 		return new EntityDefinitionBuilder(name, builders);
 	}
 	
@@ -112,6 +112,8 @@ public abstract class NodeDefinitionBuilder {
 	public static class EntityDefinitionBuilder extends NodeDefinitionBuilder {
 		
 		private NodeDefinitionBuilder[] builders;
+		private boolean virtual;
+		private String generatorExpression;
 
 		EntityDefinitionBuilder(String name, NodeDefinitionBuilder... builders) {
 			super(name);
@@ -138,6 +140,16 @@ public abstract class NodeDefinitionBuilder {
 			return (EntityDefinitionBuilder) super.required(expression);
 		}
 		
+		public EntityDefinitionBuilder virtual() {
+			this.virtual = true;
+			return this;
+		}
+
+		public EntityDefinitionBuilder generatorExpression(String generatorExpression) {
+			this.generatorExpression = generatorExpression;
+			return this;
+		}
+
 		@Override
 		protected NodeDefinition buildInternal(Survey survey) {
 			EntityDefinition def = survey.getSchema().createEntityDefinition();
@@ -146,6 +158,8 @@ public abstract class NodeDefinitionBuilder {
 				NodeDefinition childDef = childBuilder.buildInternal(survey);
 				def.addChildDefinition(childDef);
 			}
+			def.setVirtual(virtual);
+			def.setGeneratorExpression(generatorExpression);
 			return def;
 		}
 

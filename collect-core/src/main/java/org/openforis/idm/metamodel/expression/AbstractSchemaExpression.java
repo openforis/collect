@@ -40,6 +40,7 @@ abstract class AbstractSchemaExpression {
 		}
 		JXPathContext jxPathContext = JXPathContext.newContext(CONTEXT, context);
 		Variables variables = jxPathContext.getVariables();
+		variables.declareVariable(AbstractExpression.CONTEXT_NODE_VARIABLE_NAME, context);
 		variables.declareVariable(AbstractExpression.THIS_VARIABLE_NAME, thisNode);
 		
 		String expr = Path.getNormalizedPath(expression);

@@ -64,6 +64,7 @@ OF.JobMonitor.prototype.loadJob = function(onSuccess) {
 
 OF.JobMonitor.prototype.cancelJobHandler = function() {
 	var $this = this;
+	$this.job.cancelled = true;
 	$this.service.send($this.jobRetrievalUrl, null, "DELETE", function() {
 		EventBus.removeEventListener(OF.JobMonitor.CANCEL_JOB, $this.cancelJobHandler);
 	});

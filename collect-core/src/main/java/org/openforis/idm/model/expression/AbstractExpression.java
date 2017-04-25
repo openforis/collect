@@ -38,6 +38,7 @@ public abstract class AbstractExpression {
 
 	public static final String THIS_VARIABLE_NAME = "this";
 	private static final QName THIS = new QName(THIS_VARIABLE_NAME);
+	public static final String CONTEXT_NODE_VARIABLE_NAME = "context";
 	private ModelJXPathContext jxPathContext;
 	private ModelJXPathCompiledExpression compiledExpression;
 
@@ -236,8 +237,9 @@ public abstract class AbstractExpression {
 	 */
 	private JXPathContext createJXPathContext(Node<?> contextNode, Node<?> thisNode) {
 		ModelJXPathContext jxPathContext = ModelJXPathContext.newContext(this.jxPathContext, contextNode);
+		Variables variables = jxPathContext.getVariables();
+		variables.declareVariable(CONTEXT_NODE_VARIABLE_NAME, contextNode);
 		if (thisNode != null) {
-			Variables variables = jxPathContext.getVariables();
 			variables.declareVariable(THIS_VARIABLE_NAME, thisNode);
 		}
 		return jxPathContext;

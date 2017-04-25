@@ -420,6 +420,26 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		}
 	}
 	
+	@Command
+	public void generateEntityAlias() {
+		AttributeDefinitionFormObject<?> fo = (AttributeDefinitionFormObject<?>) formObject;
+		String referencedAttributePath = fo.getReferencedAttributePath();
+		EntityDefinition sourceDef = editedItem.getParentEntityDefinition();
+		
+		String aliasName = sourceDef + "_alias";
+
+		NodeDefinition referencedAttributeDef = editedItem.getDefinitionByPath(referencedAttributePath);
+		EntityDefinition parentDef = referencedAttributeDef.getNearestAncestorMultipleEntity();
+		if (parentDef.containsChildDefinition(aliasName)) {
+			MessageUtil.showError("survey.schema.attribute.generate_entity_alias.error.alias_already_existing", aliasName, parentDef.getName());
+		} else {
+			EntityDefinition aliasDef = schemaUpdater.generateAlias(sourceDef, editedItem.getName(), parentDef, referencedAttributeDef.getName());
+			aliasDef.rename(aliasName);
+			dispatchSchemaChangedCommand();
+			MessageUtil.showInfo("survey.schema.attribute.generate_entity_alias.generation_successfull", aliasName, parentDef.getName());
+		}
+	}
+	
 	public List<AttributeDefault> getAttributeDefaults() {
 		return attributeDefaults;
 	}

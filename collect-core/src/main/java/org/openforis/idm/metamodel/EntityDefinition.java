@@ -4,7 +4,10 @@
 package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +30,17 @@ public class EntityDefinition extends NodeDefinition {
 	private static final long serialVersionUID = 1L;
 
 	private List<NodeDefinition> childDefinitions;
+	private boolean virtual; //if true, the entity data comes from another entity
+	/**
+	 * Used when "virtual" is true to generate the data belonging to this entity.
+	 * The expression must always give a node set of entities with attributes compatible
+	 * with the attributes defined as child nodes of this entity.
+	 */
+	private String generatorExpression; 
+	
+	//cache
     private Map<String, NodeDefinition> childDefinitionByName;
     private Map<Integer, NodeDefinition> childDefinitionById;
-
-    //cache of child definition names
     private String[] childDefinitionNames;
     
 	public enum TraversalType {
@@ -41,6 +51,29 @@ public class EntityDefinition extends NodeDefinition {
 
 	EntityDefinition(Survey survey, int id) {
 		super(survey, id);
+		initializeCache();
+	}
+
+	EntityDefinition(EntityDefinition def, int nextId, String... ignoreChildDefinitions) {
+		super(def, nextId);
+		initializeCache();
+		this.virtual = def.virtual;
+		this.generatorExpression = def.generatorExpression;
+		List<NodeDefinition> childDefs = def.getChildDefinitions();
+		List<String> ignoreChildDefList;
+		if (ignoreChildDefinitions == null) {
+			ignoreChildDefList = Collections.emptyList();
+		} else {
+			ignoreChildDefList = Arrays.asList(ignoreChildDefinitions);
+		}
+		for (NodeDefinition childDef : childDefs) {
+			if (! ignoreChildDefList.contains(childDef.getName())) {
+				addChildDefinition(getSchema().cloneDefinition(childDef));
+			}
+		}
+	}
+	
+	private void initializeCache() {
 		childDefinitionNames = new String[0];
 		childDefinitions = new ArrayList<NodeDefinition>();
 		childDefinitionByName = new TreeMap<String, NodeDefinition>();
@@ -375,6 +408,44 @@ public class EntityDefinition extends NodeDefinition {
 	private void updateChildDefinitionNames() {
 		Set<String> names = childDefinitionByName.keySet();
 		childDefinitionNames = names.toArray(new String[names.size()]);
+	}
+	
+	public Set<EntityDefinition> calculateDependingVirtualEntities() {
+		final Set<EntityDefinition> result = new HashSet<EntityDefinition>();
+		traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition definition) {
+				if (definition instanceof AttributeDefinition) {
+					AttributeDefinition referencedAttribute = ((AttributeDefinition) definition).getReferencedAttribute();
+					if (referencedAttribute != null) {
+						EntityDefinition ancestorMultipleEntity = referencedAttribute.getNearestAncestorMultipleEntity();
+						List<NodeDefinition> childDefinitions = ancestorMultipleEntity.getChildDefinitions();
+						for (NodeDefinition childDef : childDefinitions) {
+							if (childDef instanceof EntityDefinition && ((EntityDefinition) childDef).isVirtual()) {
+								result.add((EntityDefinition) childDef);
+							}
+							
+						}
+					}
+				}
+			}
+		});
+		return result;
+	}
+	
+	public boolean isVirtual() {
+		return virtual;
+	}
+	
+	public void setVirtual(boolean virtual) {
+		this.virtual = virtual;
+	}
+	
+	public String getGeneratorExpression() {
+		return generatorExpression;
+	}
+	
+	public void setGeneratorExpression(String generatorExpression) {
+		this.generatorExpression = generatorExpression;
 	}
 
 	@Override
