@@ -49,13 +49,12 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
  * @author A. Sanchez-Paus Diaz
  *
  */
-public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator{
+public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator {
 
 	private static final String README_FILE_PATH = "org/openforis/collect/designer/templates/collectearth/README.txt";
 	private static final String EARTH_FILES_RESOURCE_PATH = "org/openforis/collect/designer/templates/collectearth/earthFiles/";
 	private static final String EARTH_FILES_FOLDER_NAME = "earthFiles";
 	private static final String KML_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
-	private static final String PLACEMARK_FILE_NAME = "placemark.idm.xml";
 	private static final String BALLOON_FILE_NAME = "balloon.html";
 	private static final String KML_TEMPLATE_FILE_NAME = "kml_template.fmt";
 	private static final String TEST_PLOTS_FILE_NAME = "test_plots.ced";
@@ -158,7 +157,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		Properties p = new Properties();
 		p.put("survey_name", survey.getName());
 		p.put("balloon", "${project_path}/balloon.html");
-		p.put("metadata_file", "${project_path}/placemark.idm.xml");
+		p.put("metadata_file", "${project_path}/" + PLACEMARK_FILE_NAME);
 		p.put("template", "${project_path}/kml_template.fmt");
 		p.put("csv", "${project_path}/" + determineSelectedGridFileName(survey));
 		p.put("sample_shape", "SQUARE");

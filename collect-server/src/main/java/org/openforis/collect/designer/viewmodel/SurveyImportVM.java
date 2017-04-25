@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import static org.openforis.collect.Collect.VERSION;
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator.PLACEMARK_FILE_NAME;
 
 import java.io.File;
 import java.util.HashMap;
@@ -13,15 +14,16 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.designer.form.validator.SurveyNameValidator;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.MessageType;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
+import org.openforis.collect.io.CESurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.SurveyBackupInfoExtractorJob;
 import org.openforis.collect.io.SurveyRestoreJob;
 import org.openforis.collect.io.XMLSurveyRestoreJob;
+import org.openforis.collect.io.ZipFileExtractor;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
@@ -54,15 +56,14 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	private static final Significance VERSION_SIGNIFICANCE = Significance.MINOR;
 	private static final String XML_FILE_EXTENSION = "xml";
+	private static final String CEP_FILE_EXTENSION = "cep";
 
 	private static final String[] ALLOWED_FILE_EXTENSIONS = ArrayUtils.addAll(
 			SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS,
-			new String[] {XML_FILE_EXTENSION}
+			new String[] {XML_FILE_EXTENSION, CEP_FILE_EXTENSION}
 	);
 	
 	private static final String SURVEY_NAME_FIELD = "surveyName";
-	
-	private static final Log log = LogFactory.getLog(SurveyImportVM.class);
 	
 	@WireVariable
 	private SurveyManager surveyManager;
@@ -75,7 +76,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private String uploadedSurveyName;
 	private File uploadedFile;
 	private String uploadedFileName;
-	private boolean xmlFileUploaded;
 	private boolean updatingExistingSurvey;
 	private boolean updatingPublishedSurvey;
 
@@ -99,7 +99,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 		uploadedFileName = null;
 		uploadedSurveyUri = null;
 		uploadedSurveyName = null;
-		xmlFileUploaded = false;
 		updatingExistingSurvey = false;
 		updatingPublishedSurvey = false;
 		updateForm();
@@ -159,7 +158,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		if ( validateBackupFile(fileName) ) {
 			File tempFile;
 			String extension = FilenameUtils.getExtension(fileName);
-			this.xmlFileUploaded = XML_FILE_EXTENSION.equalsIgnoreCase(extension);
+			boolean xmlFileUploaded = XML_FILE_EXTENSION.equalsIgnoreCase(extension);
 			if ( xmlFileUploaded ) {
 				tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
 			} else {
@@ -181,8 +180,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 				return true;
 			}
 		}
-		log.warn("Trying to upload invalid survey backup file. File name: " + fileName);
-		MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
+		MessageUtil.showMessage(MessageType.ERROR, "survey.import_survey.error_file_type_not_supported.message", 
+				new String[]{StringUtils.join(ALLOWED_FILE_EXTENSIONS, ", ")}, 
+				"survey.import.survey.error_file_type_not_supported.title");
 		return false;
 	}
 
@@ -191,14 +191,20 @@ public class SurveyImportVM extends SurveyBaseVM {
 			summaryJob.abort();
 		}
 		summaryJob = jobManager.createJob(SurveyBackupInfoExtractorJob.class);
-		summaryJob.setFile(this.uploadedFile);
+		String extension = FilenameUtils.getExtension(uploadedFileName);
+		if (XML_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+			summaryJob.setFile(this.uploadedFile);
+		} else if (CEP_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+			File idmFile = extractIdmFromCEPFile();
+			summaryJob.setFile(idmFile);
+		}
 		summaryJob.setValidate(validate);
 		
 		jobManager.start(summaryJob);
 		
 		openSummaryCreationStatusPopUp();
 	}
-	
+
 	protected void openSummaryCreationStatusPopUp() {
 		String message = Labels.getLabel("survey.import_survey.unmarshall_process_status_popup.message");
 		jobStatusPopUp = JobStatusPopUpVM.openPopUp(message, summaryJob, true);
@@ -331,8 +337,11 @@ public class SurveyImportVM extends SurveyBaseVM {
 	protected void startSurveyImport() {
 		String surveyName = getFormSurveyName();
 		
-		if ( xmlFileUploaded ) {
+		String uploadedFileNameExtension = FilenameUtils.getExtension(this.uploadedFileName);
+		if ( XML_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension) ) {
 			restoreJob = jobManager.createJob(XMLSurveyRestoreJob.class);
+		} else if (CEP_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension)) {
+			restoreJob = jobManager.createJob(CESurveyRestoreJob.class);
 		} else {
 			restoreJob = jobManager.createJob(SurveyRestoreJob.class);
 		}
@@ -383,8 +392,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 		BindUtils.postGlobalCommand(null, null, SurveySelectVM.CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD, args);
 	}
 	
-	
-	
 	private String suggestSurveyName(String fileName) {
 		//remove extension
 		String result = FilenameUtils.removeExtension(fileName);
@@ -395,6 +402,16 @@ public class SurveyImportVM extends SurveyBaseVM {
 		//remove trailing underscore character
 		result = result.replaceAll("^_+", "");
 		return result;
+	}
+	
+	private File extractIdmFromCEPFile() {
+		try {
+			ZipFileExtractor zipFileExtractor = new ZipFileExtractor(uploadedFile);
+			File idmFile = zipFileExtractor.extract(PLACEMARK_FILE_NAME);
+			return idmFile;
+		} catch (Exception e) {
+			throw new RuntimeException("Error extracting " + PLACEMARK_FILE_NAME + " from cep file", e);
+		}
 	}
 	
 	public boolean isUpdatingPublishedSurvey() {
