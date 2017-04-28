@@ -121,9 +121,9 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 		insertTestTaxonomy();
 		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
 		{
-			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyWorkByName(surveyWork.getId(), "tree");
+			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(surveyWork.getId(), "tree");
 			assertNotNull(taxonomy);
-			TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy.getId());
+			TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(surveyWork, taxonomy.getId());
 			assertEquals(1, summaries.getTotalCount());
 			List<TaxonSummary> taxonSummaryList = summaries.getItems();
 			{

@@ -79,7 +79,8 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		taxonomy.setSurveyId(survey.getId());
 		taxonomy.setName(TEST_TAXONOMY_NAME);
 		speciesManager.save(taxonomy);
-		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomy.getId(), file, new CSVFileOptions(), true);
+		SpeciesImportProcess process = new SpeciesImportProcess(surveyManager, speciesManager, survey, 
+				taxonomy.getId(), file, new CSVFileOptions(), true);
 		process.call();
 		return process;
 	}
@@ -304,8 +305,8 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
-		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
-		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy.getId());
+		Taxonomy taxonomy = taxonomyDao.loadByName(survey.getId(), TEST_TAXONOMY_NAME);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(survey, taxonomy.getId());
 		assertNotNull(summaries);
 	}
 
@@ -324,7 +325,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	protected Taxon findTaxonByCode(String code) {
-		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
+		Taxonomy taxonomy = taxonomyDao.loadByName(survey.getId(), TEST_TAXONOMY_NAME);
 		List<Taxon> results = taxonDao.findByCode(taxonomy.getId(), code, 10);
 		assertNotNull(results);
 		assertEquals(1, results.size());

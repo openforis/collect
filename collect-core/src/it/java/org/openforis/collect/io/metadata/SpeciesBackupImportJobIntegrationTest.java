@@ -107,8 +107,8 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	public void testExport() throws Exception {
 		SpeciesBackupImportJob job = importCSVFile(VALID_TEST_CSV);
 		assertTrue(job.isCompleted());
-		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
-		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy.getId());
+		Taxonomy taxonomy = taxonomyDao.loadByName(survey.getId(), TEST_TAXONOMY_NAME);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(survey, taxonomy.getId());
 		assertNotNull(summaries);
 	}
 
@@ -127,7 +127,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	}
 	
 	protected Taxon findTaxonByCode(String code) {
-		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
+		Taxonomy taxonomy = taxonomyDao.loadByName(survey.getId(), TEST_TAXONOMY_NAME);
 		List<Taxon> results = taxonDao.findByCode(taxonomy.getId(), code, 10);
 		assertNotNull(results);
 		assertEquals(1, results.size());

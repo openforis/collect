@@ -3714,9 +3714,9 @@
 			<attribute name="region" />
 			<attribute name="district" />
 		</samplingPoint>
-		<taxon>
+		<taxonomy name="trees">
 			<attribute name="region" />
-		</taxon>
+		</taxonomy>
 	</referenceDataSchema>
 	<schema>
 		<entity id="727" name="cluster" ui:tab="cluster" ui:tabSet="cluster">

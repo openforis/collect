@@ -3,10 +3,12 @@ package org.openforis.collect.persistence;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
 import org.jooq.Field;
@@ -23,6 +25,7 @@ import org.jooq.impl.DSL;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonRecord;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
@@ -32,7 +35,8 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  */
 public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLContext> {
 	
-	protected static Field<?>[] TAXON_FIELDS = {
+	@SuppressWarnings("rawtypes")
+	private static Field[] GENERIC_FIELDS = {
 			OFC_TAXON.ID,
 			OFC_TAXON.PARENT_ID,
 			OFC_TAXON.CODE,
@@ -42,6 +46,32 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 			OFC_TAXON.TAXON_RANK,
 			OFC_TAXON.TAXONOMY_ID};
 	
+	@SuppressWarnings("rawtypes")
+	private static Field[] INFO_FIELDS = {
+			OFC_TAXON.INFO01,
+			OFC_TAXON.INFO02,
+			OFC_TAXON.INFO03,
+			OFC_TAXON.INFO04,
+			OFC_TAXON.INFO05,
+			OFC_TAXON.INFO06,
+			OFC_TAXON.INFO07,
+			OFC_TAXON.INFO08,
+			OFC_TAXON.INFO09,
+			OFC_TAXON.INFO10,
+			OFC_TAXON.INFO11,
+			OFC_TAXON.INFO12,
+			OFC_TAXON.INFO13,
+			OFC_TAXON.INFO14,
+			OFC_TAXON.INFO15,
+			OFC_TAXON.INFO16,
+			OFC_TAXON.INFO17,
+			OFC_TAXON.INFO18,
+			OFC_TAXON.INFO19,
+			OFC_TAXON.INFO20
+	};
+
+	private static Field<?>[] ALL_FIELDS = ArrayUtils.addAll(GENERIC_FIELDS, INFO_FIELDS);
+
 	public TaxonDao() {
 		super(TaxonDao.TaxonDSLContext.class);
 	}
@@ -160,7 +190,9 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		int nextId = dsl.nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
 		int minId = loadMinId(dsl, oldTaxonomyId);
 		int idShift = nextId - minId;
-		Field<?>[] selectFields = {
+		
+		List<Field<?>> selectFields = new ArrayList<Field<?>>();
+		selectFields.addAll(Arrays.<Field<?>>asList(
 				OFC_TAXON.ID.add(idShift),
 				OFC_TAXON.PARENT_ID.add(idShift),
 				OFC_TAXON.CODE,
@@ -169,12 +201,15 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 				OFC_TAXON.TAXON_ID,
 				OFC_TAXON.TAXON_RANK,
 				DSL.val(newTaxonomyId)
-			};
+		));
+		selectFields.addAll(Arrays.<Field<?>>asList(INFO_FIELDS));
+		
 		Select<?> select = dsl.select(selectFields)
 				.from(OFC_TAXON)
 				.where(OFC_TAXON.TAXONOMY_ID.equal(oldTaxonomyId))
 				.orderBy(OFC_TAXON.PARENT_ID, OFC_TAXON.ID);
-		Insert<OfcTaxonRecord> insert = dsl.insertInto(OFC_TAXON, TAXON_FIELDS).select(select);
+		
+		Insert<OfcTaxonRecord> insert = dsl.insertInto(OFC_TAXON, ALL_FIELDS).select(select);
 		int insertedCount = insert.execute();
 		nextId = nextId + insertedCount;
 		dsl.restartSequence(OFC_TAXON_ID_SEQ, nextId);
@@ -201,6 +236,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 			super(config, OFC_TAXON.ID, OFC_TAXON_ID_SEQ, Taxon.class);
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void fromRecord(Record r, Taxon t) {
 			t.setSystemId(r.getValue(OFC_TAXON.ID));
@@ -213,8 +249,10 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 			t.setTaxonRank(taxonRank);
 			t.setTaxonomyId(r.getValue(OFC_TAXON.TAXONOMY_ID));
 			t.setStep(r.getValue(OFC_TAXON.STEP));
+			t.setInfoAttributes(extractFields(r, (Field<String>[]) INFO_FIELDS));
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void fromObject(Taxon t, StoreQuery<?> q) {
 			q.addValue(OFC_TAXON.ID, t.getSystemId());
@@ -226,16 +264,18 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 			q.addValue(OFC_TAXON.TAXON_RANK, taxonRank != null ? taxonRank.getName(): null);
 			q.addValue(OFC_TAXON.TAXONOMY_ID, t.getTaxonomyId());
 			q.addValue(OFC_TAXON.STEP, t.getStep());
+			addFieldValues(q, INFO_FIELDS, t.getInfoAttributes());
 		}
 
 		protected Insert<OfcTaxonRecord> createInsertStatement() {
-			Object[] valuesPlaceholders = new String[TAXON_FIELDS.length];
+			Object[] valuesPlaceholders = new String[ALL_FIELDS.length];
 			Arrays.fill(valuesPlaceholders, "?");
-			return insertInto(OFC_TAXON, TAXON_FIELDS).values(valuesPlaceholders);
+			return insertInto(OFC_TAXON, ALL_FIELDS).values(valuesPlaceholders);
 		}
 		
 		protected Object[] extractValues(Taxon item) {
-			Object[] values = {
+			@SuppressWarnings("unchecked")
+			List<Object> values = new ArrayList<Object>(Arrays.asList(
 					item.getSystemId(), 
 					item.getParentId(),
 					item.getCode(),
@@ -243,9 +283,10 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 					item.getStep(),
 					item.getTaxonId(),
 					item.getTaxonRank() == null ? null: item.getTaxonRank().getName(),
-					item.getTaxonomyId() 
-					};
-			return values;
+					item.getTaxonomyId()
+					));
+			values.addAll(CollectionUtils.copyAndFillWithNulls(item.getInfoAttributes(), INFO_FIELDS.length));
+			return values.toArray(new Object[values.size()]);
 		}
 
 		@Override

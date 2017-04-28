@@ -15,9 +15,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,31 +29,42 @@ import org.gbif.ecat.parser.NameParser;
 import org.gbif.ecat.parser.UnparsableException;
 import org.gbif.ecat.voc.Rank;
 import org.openforis.collect.io.exception.ParsingException;
-import org.openforis.collect.io.metadata.parsing.CSVDataImportReader;
-import org.openforis.collect.io.metadata.parsing.CSVLineParser;
+import org.openforis.collect.io.metadata.parsing.CSVReferenceDataImportReader;
+import org.openforis.collect.io.metadata.parsing.CSVReferenceDataLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
 import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.idm.metamodel.Languages;
+import org.openforis.idm.metamodel.Languages.Standard;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
 /**
  * @author S. Ricci
  *
  */
-public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
+public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> {
 
 	private static final String HYBRID_MARKER = "×";
 	
 	public SpeciesCSVReader(File file, CSVFileOptions csvFileOptions) throws IOException, ParsingException {
 		super(file, csvFileOptions);
 	}
+	
+	@Override
+	protected boolean isInfoAttribute(String col) {
+		Set<String> predefinedColumnNames = new HashSet<String>();
+		for (SpeciesFileColumn column : SpeciesFileColumn.values()) {
+			predefinedColumnNames.add(column.getColumnName());
+		}
+		return ! (predefinedColumnNames.contains(col) 
+				|| Languages.getCodes(Standard.ISO_639_3).contains(col));
+	}
 
 	@Override
 	protected SpeciesCSVLineParser createLineParserInstance() {
-		SpeciesCSVLineParser lineParser = SpeciesCSVLineParser.createInstance(this, currentCSVLine);
+		SpeciesCSVLineParser lineParser = SpeciesCSVLineParser.createInstance(this, currentCSVLine, infoColumnNames);
 		return lineParser;
 	}
 
@@ -74,7 +87,7 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		return result;
 	}
 	
-	public static class SpeciesCSVLineParser extends CSVLineParser<SpeciesLine> {
+	public static class SpeciesCSVLineParser extends CSVReferenceDataLineParser<SpeciesLine> {
 		
 		private static final String VERNACULAR_NAME_TRIM_EXPRESSION = "^\\s+|\\s+$|;+$|\\.+$";
 		private static final String SYNONYM_COL_NAME = "synonyms";
@@ -89,12 +102,12 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		private transient ParsedName<Object> parsedScientificName;
 		private transient String rawScientificName;
 		
-		SpeciesCSVLineParser(SpeciesCSVReader reader, CsvLine line) {
-			super(reader, line);
+		SpeciesCSVLineParser(SpeciesCSVReader reader, CsvLine line, List<String> infoColumnNames) {
+			super(reader, line, infoColumnNames);
 		}
 		
-		public static SpeciesCSVLineParser createInstance(SpeciesCSVReader reader, CsvLine line) {
-			return new SpeciesCSVLineParser(reader, line);
+		public static SpeciesCSVLineParser createInstance(SpeciesCSVReader reader, CsvLine line, List<String> infoColumnNames) {
+			return new SpeciesCSVLineParser(reader, line, infoColumnNames);
 		}
 	
 		public SpeciesLine parse() throws ParsingException {

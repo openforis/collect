@@ -5,7 +5,7 @@ package org.openforis.collect.remoting.service;
 
 import java.util.List;
 
-import org.openforis.collect.manager.RecordSessionManager;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.metamodel.TaxonSummaries;
@@ -25,6 +25,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.annotation.Secured;
 
 /**
@@ -37,7 +38,8 @@ public class SpeciesService {
 	@Autowired
 	private SpeciesManager speciesManager;
 	@Autowired
-	private RecordSessionManager sessionManager;
+	@Qualifier("sessionManager")
+	private SessionManager sessionManager;
 	
 	@Secured("ROLE_ENTRY")
 	public List<TaxonomyProxy> loadTaxonomiesBySurvey(int surveyId, boolean work) {
@@ -47,7 +49,8 @@ public class SpeciesService {
 	
 	@Secured("ROLE_ADMIN")
 	public TaxonSummariesProxy loadTaxonSummaries(int taxonomyId, int offset, int maxRecords) {
-		TaxonSummaries summaries = speciesManager.loadTaxonSummaries(taxonomyId, offset, maxRecords);
+		CollectSurvey survey = getActiveSurvey();
+		TaxonSummaries summaries = speciesManager.loadTaxonSummaries(survey, taxonomyId, offset, maxRecords);
 		return new TaxonSummariesProxy(summaries);
 	}
 	
@@ -100,16 +103,18 @@ public class SpeciesService {
 
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByFamilyCode(String taxonomyName, String searchString, int maxResults, TaxonSearchParameters parameters) {
-		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByFamilyCode(taxonomy.getId(), searchString, maxResults, parameters);
+		CollectSurvey survey = getActiveSurvey();
+		CollectTaxonomy taxonomy = getTaxonomy(survey, taxonomyName);
+		List<TaxonOccurrence> list = speciesManager.findByFamilyCode(survey, taxonomy.getId(), searchString, maxResults, parameters);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 	
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByFamilyScientificName(String taxonomyName, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
-		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByFamilyScientificName(taxonomy.getId(), searchString, maxResults, parameters);
+		CollectSurvey survey = getActiveSurvey();
+		CollectTaxonomy taxonomy = getTaxonomy(survey, taxonomyName);
+		List<TaxonOccurrence> list = speciesManager.findByFamilyScientificName(survey, taxonomy.getId(), searchString, maxResults, parameters);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
@@ -143,17 +148,20 @@ public class SpeciesService {
 		}
 	}
 	
-	protected CollectTaxonomy getTaxonomyByActiveSurvey(String taxonomyName) {
+	private CollectSurvey getActiveSurvey() {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
-		boolean activeSurveyWork = sessionState.isActiveSurveyWork();
-		Integer surveyId = activeSurvey.getId();
-		CollectTaxonomy taxonomy;
-		if ( activeSurveyWork ) {
-			taxonomy = speciesManager.loadTaxonomyWorkByName(surveyId, taxonomyName);
-		} else {
-			taxonomy = speciesManager.loadTaxonomyByName(surveyId, taxonomyName);
-		}
+		return activeSurvey;
+	}
+
+	protected CollectTaxonomy getTaxonomyByActiveSurvey(String taxonomyName) {
+		CollectSurvey activeSurvey = getActiveSurvey();
+		return getTaxonomy(activeSurvey, taxonomyName);
+	}
+
+	private CollectTaxonomy getTaxonomy(CollectSurvey survey, String name) {
+		Integer surveyId = survey.getId();
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(surveyId, name);
 		return taxonomy;
 	}
 

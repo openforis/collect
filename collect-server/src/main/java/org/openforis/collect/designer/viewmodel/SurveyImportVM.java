@@ -191,12 +191,13 @@ public class SurveyImportVM extends SurveyBaseVM {
 			summaryJob.abort();
 		}
 		summaryJob = jobManager.createJob(SurveyBackupInfoExtractorJob.class);
+		
 		String extension = FilenameUtils.getExtension(uploadedFileName);
-		if (XML_FILE_EXTENSION.equalsIgnoreCase(extension)) {
-			summaryJob.setFile(this.uploadedFile);
-		} else if (CEP_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+		if (CEP_FILE_EXTENSION.equalsIgnoreCase(extension)) {
 			File idmFile = extractIdmFromCEPFile();
 			summaryJob.setFile(idmFile);
+		} else {
+			summaryJob.setFile(this.uploadedFile);
 		}
 		summaryJob.setValidate(validate);
 		

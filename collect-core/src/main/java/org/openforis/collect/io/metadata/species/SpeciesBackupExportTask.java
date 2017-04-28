@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -30,27 +32,42 @@ public class SpeciesBackupExportTask extends Task {
 	
 	//parameters
 	private OutputStream outputStream;
+	private CollectSurvey survey;
 	private int taxonomyId;
+	
+	//temporary variables
+	private String taxonomyName;
+	private List<String> infoAttributeNames;
+	private List<String> vernacularNamesLangCodes;
+	
+	@Override
+	protected void initializeInternalVariables() throws Throwable {
+		super.initializeInternalVariables();
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
+		this.taxonomyName = taxonomy.getName();
+		this.infoAttributeNames = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName).getAttributeNames();
+	}
 	
 	@Override
 	protected void execute() throws Throwable {
 		CsvWriter writer = new CsvWriter(outputStream);
 		
-		TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomyId);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(survey, taxonomyId);
 		
 		List<String> vernacularNamesLangCodes = getNotEmptyValues(summaries.getVernacularNamesLanguageCodes());
 		vernacularNamesLangCodes.remove(LATIN_LANG_CODE); //consider Latin vernacular name as synonym
-
+		this.vernacularNamesLangCodes = vernacularNamesLangCodes;
+		
 		//write headers
-		writeHeaders(writer, vernacularNamesLangCodes);
+		writeHeaders(writer);
 		
 		for (TaxonSummary item : summaries.getItems()) {
-			writeTaxonSummary(writer, vernacularNamesLangCodes, item);
+			writeTaxonSummary(writer, item);
 		}
 		writer.flush();
 	}
 
-	private void writeHeaders(CsvWriter writer,	List<String> vernacularNamesLangCodes) {
+	private void writeHeaders(CsvWriter writer) {
 		ArrayList<String> colNames = new ArrayList<String>();
 		colNames.add(SpeciesBackupFileColumn.ID.getColumnName());
 		colNames.add(SpeciesBackupFileColumn.PARENT_ID.getColumnName());
@@ -60,6 +77,7 @@ public class SpeciesBackupExportTask extends Task {
 		colNames.add(SpeciesBackupFileColumn.SCIENTIFIC_NAME.getColumnName());
 		colNames.add(SpeciesBackupFileColumn.SYNONYMS.getColumnName());
 		colNames.addAll(vernacularNamesLangCodes);
+		colNames.addAll(infoAttributeNames);
 		
 		writer.writeHeaders(colNames);
 	}
@@ -76,8 +94,7 @@ public class SpeciesBackupExportTask extends Task {
 		return result;
 	}
 
-	protected void writeTaxonSummary(CsvWriter writer,
-			List<String> vernacularNamesLangCodes, TaxonSummary item) {
+	protected void writeTaxonSummary(CsvWriter writer, TaxonSummary item) {
 		List<String> lineValues = new ArrayList<String>();
 		lineValues.add(Integer.toString(item.getTaxonSystemId()));
 		lineValues.add(item.getParentSystemId() == null ? null : item.getParentSystemId().toString());
@@ -86,31 +103,28 @@ public class SpeciesBackupExportTask extends Task {
 		lineValues.add(item.getCode());
 		lineValues.add(item.getScientificName());
 		lineValues.add(item.getJointSynonyms(VERNACULAR_NAMES_SEPARATOR));
+		//write vernacular names
 		for (String langCode : vernacularNamesLangCodes) {
 			String jointVernacularNames = item.getJointVernacularNames(langCode, VERNACULAR_NAMES_SEPARATOR);
 			lineValues.add(jointVernacularNames);
 		}
+		//write info attributes
+		for (String infoAttribute : infoAttributeNames) {
+			lineValues.add(item.getInfo(infoAttribute));
+		}
 		writer.writeNext(lineValues);
 	}
 
-	public SpeciesManager getSpeciesManager() {
-		return speciesManager;
-	}
-	
 	public void setSpeciesManager(SpeciesManager speciesManager) {
 		this.speciesManager = speciesManager;
 	}
 	
-	public OutputStream getOutputStream() {
-		return outputStream;
-	}
-
 	public void setOutputStream(OutputStream outputStream) {
 		this.outputStream = outputStream;
 	}
-
-	public int getTaxonomyId() {
-		return taxonomyId;
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
 	}
 
 	public void setTaxonomyId(int taxonomyId) {

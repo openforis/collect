@@ -1,5 +1,10 @@
 package org.openforis.idm.model.species;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openforis.commons.collection.CollectionUtils;
+
 /**
  * @author G. Miceli
  * @author M. Togna
@@ -101,7 +106,8 @@ public class Taxon {
 	private String scientificName;
 	private TaxonRank taxonRank;
 	private int step;
-
+	private List<String> infoAttributes = new ArrayList<String>();
+	
 	public Integer getSystemId() {
 		return systemId;
 	}
@@ -165,7 +171,28 @@ public class Taxon {
 	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
 	}
+	
+	public void addInfoAttribute(String info) {
+		infoAttributes.add(info);
+	}
+	
+	public String getInfoAttribute(int index) {
+		return infoAttributes.get(index);
+	}
+	
+	public List<String> getInfoAttributes() {
+		return CollectionUtils.unmodifiableList(infoAttributes);
+	}
 
+	public void setInfoAttributes(List<String> infos) {
+		this.infoAttributes = infos;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("(%s) %s", code, scientificName);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

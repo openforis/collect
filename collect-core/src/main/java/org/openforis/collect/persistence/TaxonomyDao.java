@@ -23,15 +23,7 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 		super(TaxonomyDao.TaxonomyDSLContext.class);
 	}
 	
-	public CollectTaxonomy load(int surveyId, String name) {
-		return loadBySurvey(surveyId, name, false);
-	}
-
-	public CollectTaxonomy loadBySurveyWork(int surveyId, String name) {
-		return loadBySurvey(surveyId, name, true);
-	}
-	
-	protected CollectTaxonomy loadBySurvey(int surveyId, String name, boolean work) {
+	public CollectTaxonomy loadByName(int surveyId, String name) {
 		TaxonomyDSLContext dsl = dsl();
 		Record r = dsl.selectFrom(OFC_TAXONOMY)
 				.where(OFC_TAXONOMY.SURVEY_ID.equal(surveyId))

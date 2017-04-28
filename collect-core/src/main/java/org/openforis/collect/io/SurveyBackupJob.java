@@ -236,6 +236,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 				SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
 				task.setSpeciesManager(speciesManager);
 				task.setOutputStream(zipOutputStream);
+				task.setSurvey(survey);
 				task.setTaxonomyId(taxonomy.getId());
 				String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
 				task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, entryName));

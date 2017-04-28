@@ -6,6 +6,7 @@ import static org.openforis.idm.path.Path.THIS_SYMBOL;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.jxpath.ExpressionContext;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
@@ -145,6 +147,61 @@ public class IDMFunctions extends CustomFunctions {
 					SpeciesListService speciesListService = getSpeciesListService(expressionContext);
 					return speciesListService.loadSpeciesListData(survey, taxonomyName, attribute, speciesCode);
 				}
+			}
+			@Override
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				//taxonomy name
+				Expression speciesListNameExpr = arguments[0];
+				ExpressionValidationResult validationResult = validateSpeciesListName(contextNodeDef, speciesListNameExpr);
+				if (validationResult.isOk()) {
+					String speciesListName = (String) ((Constant) speciesListNameExpr).computeValue(null);
+					Expression attributeNameExpr = arguments[1];
+					validationResult = validateAttribute(contextNodeDef, speciesListName, attributeNameExpr);
+					if (validationResult.isOk()) {
+						Expression speciesExpr = arguments[2];
+						return validateSpeciesCode(contextNodeDef, speciesExpr);
+					}
+				}
+				return validationResult;
+			}
+			
+			private ExpressionValidationResult validateSpeciesListName(NodeDefinition contextNodeDef,
+					Expression expression) {
+				if (expression instanceof Constant) {
+					Object val = ((Constant) expression).computeValue(null);
+					if (val instanceof String) {
+						Survey survey = contextNodeDef.getSurvey();
+						List<String> speciesListNames = survey.getContext().getSpeciesListService().loadSpeciesListNames(survey);
+						if (speciesListNames.contains((String) val)) {
+							return new ExpressionValidationResult();
+						}
+					}
+				}
+				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, "First argument is not a valid taxonomy name");
+			}
+			
+			private ExpressionValidationResult validateAttribute(NodeDefinition contextNodeDef, String taxonomyName,
+					Expression attributeNameExpr) {
+				if (attributeNameExpr instanceof Constant) {
+					Object val = ((Constant) attributeNameExpr).computeValue(null);
+					if (val instanceof String) {
+						Survey survey = contextNodeDef.getSurvey();
+						TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
+						Attribute attribute = taxonDefinition.getAttribute((String) val);
+						if (attribute != null) {
+							return new ExpressionValidationResult();
+						}
+					}
+				}
+				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+						"Second argument is not a valid attribute for this taxonomy");
+			}
+			
+			private ExpressionValidationResult validateSpeciesCode(NodeDefinition contextNodeDef,
+					Expression expression) {
+				//TODO
+				return new ExpressionValidationResult();
 			}
 		});
 		
