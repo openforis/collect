@@ -14,10 +14,8 @@ import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
-import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
@@ -148,18 +146,6 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
-		//deprecated
-		register("distance", new CustomFunction(2) {
-			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return GeoFunctions.distance(expressionContext, objects[0], objects[1]);
-			}
-			@Override
-			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
-					Expression[] arguments) {
-				return super.performArgumentValidation(contextNodeDef, arguments);
-			}
-		});
-		
 		register("datetime-diff", new CustomFunction(4) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
@@ -174,20 +160,16 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
-		register(LATLONG_FUNCTION_NAME, new CustomFunction(1) {
+		//deprecated geo functions (use "geo" namespace instead)
+		register("distance", new CustomFunction(2) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return latLong(expressionContext, objects[0]);
+				return GeoFunctions.distance(expressionContext, objects[0], objects[1]);
 			}
-			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
-					Expression[] arguments) {
-				Survey survey = contextNodeDef.getSurvey();
-				if(survey.getSpatialReferenceSystem(SpatialReferenceSystem.WGS84_SRS_ID) == null) {
-					String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
-							LATLONG_FUNCTION_NAME, SpatialReferenceSystem.WGS84_SRS_ID);
-					return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
-				} else {
-					return new ExpressionValidationResult();
-				}
+		});
+		
+		register("latlong", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return GeoFunctions.latLong(expressionContext, objects[0]);
 			}
 		});
 	}
@@ -339,30 +321,6 @@ public class IDMFunctions extends CustomFunctions {
 		}
 	}
 	
-	private Coordinate latLong(ExpressionContext expressionContext, Object coordinate) {
-		if (coordinate == null) {
-			return null;
-		}
-		if (coordinate instanceof Coordinate) {
-			return latLong(expressionContext, (Coordinate) coordinate);
-		} else {
-			return latLong(expressionContext, Coordinate.parseCoordinate(coordinate));
-		}
-	}
-
-	private Coordinate latLong(ExpressionContext expressionContext, Coordinate coordinate) {
-		if (coordinate == null || ! coordinate.isComplete()) {
-			return null;
-		}
-		Survey survey = getSurvey(expressionContext);
-		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
-		if (coordinateOperations == null) {
-			return null;
-		} else {
-			return coordinateOperations.convertToWgs84(coordinate);
-		}
-	}
-
 	private static Calendar getCalendar(Date date2, Time time2, TimeUnit timeUnit) {
 		int calendarTruncateField = getCalendarField(timeUnit);
 		Calendar cal2 = Calendar.getInstance(Locale.ENGLISH);
