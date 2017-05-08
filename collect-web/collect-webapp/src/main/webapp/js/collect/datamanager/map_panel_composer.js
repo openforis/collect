@@ -14,7 +14,21 @@ Collect.DataManager.MapPanelComposer = function(panel) {
 	this.startZoom = 4;
 	
 	this.coordinateDataStyleCache = {};
+	this.samplingPointStyleCache = {};
 }
+
+Collect.DataManager.MapPanelComposer.SAMPLING_POINT_STYLE = new ol.style.Style({
+	image : new ol.style.Circle({
+		fill : new ol.style.Fill({
+			color : [0,0,255,0.1] //almost transparent fill
+		}),
+		stroke: new ol.style.Stroke({
+			color : "#0000FF",
+			width: 2
+		}),
+		radius : 5
+	})
+});
 
 Collect.DataManager.MapPanelComposer.DATA_ENTRY_RECORD_STYLE = new ol.style.Style({
 	image : new ol.style.Circle({
@@ -291,18 +305,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				visible : false,
 				type : 'sampling_points',
 				survey : survey,
-				style : new ol.style.Style({
-					image : new ol.style.Circle({
-						fill : new ol.style.Fill({
-							color : [0,0,255,0.1] //almost transparent fill
-						}),
-						stroke: new ol.style.Stroke({
-							color : "#0000FF",
-							width: 2
-						}),
-						radius : 5
-					})
-				})
+				style : $.proxy($this.samplingPointLayerStyleFunction, $this)
 			})
 		]
 	});
@@ -319,6 +322,38 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 	});
 
 	return surveyGroup;
+};
+
+Collect.DataManager.MapPanelComposer.prototype.samplingPointLayerStyleFunction = function(layer) {
+	var $this = this;
+	var size = layer.get('features').length;
+	if (size == 1) {
+		return Collect.DataManager.MapPanelComposer.SAMPLING_POINT_STYLE;
+	} else {
+		var styleCache = $this.samplingPointStyleCache;
+		var style = styleCache[size];
+		if (!style) {
+			style = new ol.style.Style({
+				image: new ol.style.Circle({
+					radius: 10,
+					stroke: new ol.style.Stroke({
+						color: '#00f'
+					}),
+					fill: new ol.style.Fill({
+						color : [0,0,255,0.1] //almost transparent fill
+					})
+				}),
+				text: new ol.style.Text({
+					text: size.toString(),
+					fill: new ol.style.Fill({
+						color: '#fff'
+					})
+				})
+			});
+			styleCache[size] = style;
+		}
+		return style;
+	}
 };
 
 Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunction = function(layer) {
@@ -508,6 +543,7 @@ Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 
 Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback, readyCallback) {
 	var url = OF.Strings.format("survey/{0}/sampling-point-data.kml", survey.id);
+	
 	var source = new ol.source.Vector({
 		url : url,
 		format : new ol.format.KML({
@@ -515,7 +551,12 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 		})
 	});
 	
-	callback(source);
+	var clusterSource = new ol.source.Cluster({
+		distance: 40,
+		source: source
+	});
+	
+	callback(clusterSource);
 	
 	//wait for load complete (change event)
 	source.on('change', function(event) {
@@ -525,13 +566,14 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 	});
 	
 	function onReady() {
+		//add extra info to each feature (survey, type, etc.)
 		source.forEachFeature(function(feature) {
 			feature.setProperties({
 				'type': 'sampling_point',
 				'survey' : survey
 			}, true);
 		});
-		readyCallback(source);
+		readyCallback(clusterSource);
 	}
 	
 	onReady();
