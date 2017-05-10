@@ -4,8 +4,11 @@ package org.openforis.idm.model.expression.internal;
 import static java.util.Arrays.asList;
 import static org.openforis.idm.path.Path.THIS_SYMBOL;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 
 import org.apache.commons.jxpath.ExpressionContext;
@@ -73,6 +76,18 @@ public class IDMFunctions extends CustomFunctions {
 		register("position", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return position((Node<?>) objects[0]);
+			}
+		});
+
+		register("distinct-values", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return distinctValues(objects[0]);
+			}
+		});
+
+		register("count-distinct", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return countDistinct(objects[0]);
 			}
 		});
 
@@ -218,6 +233,30 @@ public class IDMFunctions extends CustomFunctions {
 	 */
 	private static int position(Node<?> node) {
 		return node.getIndex() + 1;
+	}
+
+	private static Object distinctValues(Object obj) {
+		if (obj instanceof Collection) {
+			LinkedHashSet<Object> result = new LinkedHashSet<Object>((Collection<?>) obj);
+			if (result.size() == 1 && result.iterator().next() == null) {
+				return null;
+			} else {
+				return new ArrayList<Object>(result);
+			}
+		} else {
+			return obj;
+		}
+	}
+	
+	private static int countDistinct(Object obj) {
+		Object values = distinctValues(obj);
+		if (values == null) {
+			return 0;
+		} else if (values instanceof Collection) {
+			return ((Collection<?>) values).size();
+		} else {
+			return 1;
+		}
 	}
 
 	private static Date currentDate() {

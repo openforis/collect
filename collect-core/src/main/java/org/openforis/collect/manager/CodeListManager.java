@@ -604,8 +604,8 @@ public class CodeListManager {
 		NodeDefinition attrDefnUsingCodeList = schema.findNodeDefinition(new NodeDefinitionVerifier() {
 			@Override
 			public boolean verify(NodeDefinition definition) {
-				return definition instanceof CodeAttributeDefinition 
-						&& list.getId() == ((CodeAttributeDefinition) definition).getList().getId();
+				return definition instanceof CodeAttributeDefinition && 
+						((CodeAttributeDefinition) definition).getList() == list;
 			}
 		});
 		return attrDefnUsingCodeList != null;
