@@ -9,6 +9,7 @@ import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.StoreQuery;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
@@ -23,58 +24,60 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 		super(TaxonomyDao.TaxonomyDSLContext.class);
 	}
 	
-	public CollectTaxonomy loadByName(int surveyId, String name) {
-		TaxonomyDSLContext dsl = dsl();
+	public CollectTaxonomy loadByName(CollectSurvey survey, String name) {
+		TaxonomyDSLContext dsl = dsl(survey);
 		Record r = dsl.selectFrom(OFC_TAXONOMY)
-				.where(OFC_TAXONOMY.SURVEY_ID.equal(surveyId))
+				.where(OFC_TAXONOMY.SURVEY_ID.equal(survey.getId()))
 				.and(OFC_TAXONOMY.NAME.equal(name))
 				.fetchOne();
-		if ( r == null ) {
-			return null;
-		} else {
-			return dsl.fromRecord(r);
-		}
+		return r == null ? null : dsl.fromRecord(r);
 	}
 	
-	public List<CollectTaxonomy> loadAllBySurvey(int surveyId) {
-		TaxonomyDSLContext dsl = dsl();
+	public List<CollectTaxonomy> loadAllBySurvey(CollectSurvey survey) {
+		TaxonomyDSLContext dsl = dsl(survey);
 		Result<OfcTaxonomyRecord> r = dsl.selectFrom(OFC_TAXONOMY)
-				.where(OFC_TAXONOMY.SURVEY_ID.equal(surveyId))
+				.where(OFC_TAXONOMY.SURVEY_ID.equal(survey.getId()))
 				.orderBy(OFC_TAXONOMY.NAME)
 				.fetch();
-		if ( r == null ) {
-			return null;
-		} else {
-			return dsl.fromResult(r);
-		}
+		return r == null ? null : dsl.fromResult(r);
 	}
 	
-	@Override
-	public CollectTaxonomy loadById(int id) {
-		return super.loadById(id);
+	public CollectTaxonomy loadById(CollectSurvey survey, int id) {
+		return loadById(dsl(survey), id);
 	}
 
 	@Override
 	public void insert(CollectTaxonomy entity) {
-		super.insert(entity);
+		dsl(entity.getSurvey()).insertQuery(entity).execute();
 	}
 
 	@Override
 	public void update(CollectTaxonomy entity) {
-		super.update(entity);
+		dsl(entity.getSurvey()).updateQuery(entity).execute();
+	}
+
+	public void delete(CollectTaxonomy taxonomy) {
+		dsl(taxonomy.getSurvey()).deleteQuery(taxonomy.getId()).execute();
 	}
 
 	@Override
-	public void delete(int id) {
-		super.delete(id);
+	protected TaxonomyDSLContext dsl() {
+		throw new UnsupportedOperationException();
+	}
+	
+	private TaxonomyDSLContext dsl(CollectSurvey survey) {
+		return new TaxonomyDSLContext(getConfiguration(), survey);
 	}
 
 	protected static class TaxonomyDSLContext extends MappingDSLContext<CollectTaxonomy> {
 
 		private static final long serialVersionUID = 1L;
+		
+		private CollectSurvey survey;
 
-		public TaxonomyDSLContext(Configuration config) {
+		public TaxonomyDSLContext(Configuration config, CollectSurvey survey) {
 			super(config, OFC_TAXONOMY.ID, OFC_TAXONOMY_ID_SEQ, CollectTaxonomy.class);
+			this.survey = survey;
 		}
 
 		@Override
@@ -82,6 +85,7 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 			t.setId(r.getValue(OFC_TAXONOMY.ID));
 			t.setSurveyId(r.getValue(OFC_TAXONOMY.SURVEY_ID));
 			t.setName(r.getValue(OFC_TAXONOMY.NAME));
+			t.setSurvey(survey);
 		}
 		
 		@Override

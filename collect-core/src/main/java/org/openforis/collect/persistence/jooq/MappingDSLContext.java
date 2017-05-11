@@ -160,9 +160,9 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 	}
 	
 	protected void addFieldValues(StoreQuery<?> q, Field<Object>[] fields, List<?> values) {
-		for ( int i = 0; i < values.size(); i++ ) {
-			Object value = values.get(i);
+		for ( int i = 0; i < fields.length; i++ ) {
 			Field<Object> field = fields[i];
+			Object value = i < values.size() ? values.get(i) : null;
 			q.addValue(field, value);
 		}
 	}

@@ -181,34 +181,39 @@ public class IDMFunctions extends CustomFunctions {
 			
 			private ExpressionValidationResult validateSpeciesListName(NodeDefinition contextNodeDef,
 					Expression expression) {
+				String taxonomyName = "";
 				if (expression instanceof Constant) {
 					Object val = ((Constant) expression).computeValue(null);
 					if (val instanceof String) {
+						taxonomyName = (String) val;
 						Survey survey = contextNodeDef.getSurvey();
 						List<String> speciesListNames = survey.getContext().getSpeciesListService().loadSpeciesListNames(survey);
-						if (speciesListNames.contains((String) val)) {
+						if (speciesListNames.contains(taxonomyName)) {
 							return new ExpressionValidationResult();
 						}
 					}
 				}
-				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, "First argument is not a valid taxonomy name");
+				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+						String.format("First argument (\"%s\") is not a valid taxonomy name", taxonomyName));
 			}
 			
 			private ExpressionValidationResult validateAttribute(NodeDefinition contextNodeDef, String taxonomyName,
 					Expression attributeNameExpr) {
+				String attributeName = "";
 				if (attributeNameExpr instanceof Constant) {
 					Object val = ((Constant) attributeNameExpr).computeValue(null);
 					if (val instanceof String) {
+						attributeName = (String) val;
 						Survey survey = contextNodeDef.getSurvey();
 						TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
-						Attribute attribute = taxonDefinition.getAttribute((String) val);
+						Attribute attribute = taxonDefinition.getAttribute(attributeName);
 						if (attribute != null) {
 							return new ExpressionValidationResult();
 						}
 					}
 				}
 				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
-						"Second argument is not a valid attribute for this taxonomy");
+						String.format("Second argument (\"%s\") is not a valid attribute for this taxonomy", attributeName));
 			}
 			
 			private ExpressionValidationResult validateSpeciesCode(NodeDefinition contextNodeDef,
@@ -251,11 +256,7 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
-		register("latlong", new CustomFunction(1) {
-			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return GeoFunctions.latLong(expressionContext, objects[0]);
-			}
-		});
+		register("latlong", GeoFunctions.LAT_LONG_FUNCTION);
 	}
 
 	private String[] toStringArray(Object[] objects) {

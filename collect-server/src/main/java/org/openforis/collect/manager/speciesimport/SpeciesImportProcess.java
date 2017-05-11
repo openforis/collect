@@ -91,7 +91,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	@Override
 	public void init() {
 		super.init();
-		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
 		taxonomyName = taxonomy.getName();
 		lines = new ArrayList<SpeciesLine>();
 		validateParameters();
@@ -260,7 +260,8 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 
 	protected void persistTaxa() throws SurveyStoreException {
 		saveSurvey();
-		speciesManager.insertTaxons(taxonomyId, taxonTree, overwriteAll);
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
+		speciesManager.insertTaxons(taxonomy, taxonTree, overwriteAll);
 	}
 	
 	@SuppressWarnings("deprecation")

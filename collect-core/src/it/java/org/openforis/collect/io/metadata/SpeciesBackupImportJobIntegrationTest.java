@@ -29,11 +29,12 @@ import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonomyDao;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
-import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -72,7 +73,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	private SpeciesBackupImportJob importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
 		CollectTaxonomy taxonomy = new CollectTaxonomy();
-		taxonomy.setSurveyId(survey.getId());
+		taxonomy.setSurvey(survey);
 		taxonomy.setName(TEST_TAXONOMY_NAME);
 		speciesManager.save(taxonomy);
 		SpeciesBackupImportJob job = jobManager.createJob(SpeciesBackupImportJob.class);
@@ -89,16 +90,24 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 		assertTrue(job.isCompleted());
 		SpeciesBackupImportTask task = (SpeciesBackupImportTask) job.getTasks().get(0);
 		assertTrue(task.getSkippedRows().isEmpty());
+		
+		TaxonomyDefinition taxonomyDef = survey.getReferenceDataSchema().getTaxonomyDefinition(TEST_TAXONOMY_NAME);
+		assertEquals(Arrays.asList("info1", "info2"), taxonomyDef.getAttributeNames());
+		
 		{
 			String code = "OLE/CAP/macrocarpa";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(code, "Olea capensis ssp. macrocarpa");
+			expected.setInfoAttributes(Arrays.asList("info_value_1", "info_value_2"));
+			expected.setTaxonRank(TaxonRank.SUBSPECIES);
 			assertEquals(expected, occurrence);
 		}
 		{
 			String code = "ALB/ADI";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(code, "Albizia adianthifolia");
+			expected.setInfoAttributes(Arrays.asList("info_value_3", null));
+			expected.setTaxonRank(TaxonRank.SPECIES);
 			assertEquals(expected, occurrence);
 		}
 	}
@@ -107,8 +116,8 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	public void testExport() throws Exception {
 		SpeciesBackupImportJob job = importCSVFile(VALID_TEST_CSV);
 		assertTrue(job.isCompleted());
-		Taxonomy taxonomy = taxonomyDao.loadByName(survey.getId(), TEST_TAXONOMY_NAME);
-		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(survey, taxonomy.getId());
+		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy);
 		assertNotNull(summaries);
 	}
 
@@ -127,8 +136,8 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	}
 	
 	protected Taxon findTaxonByCode(String code) {
-		Taxonomy taxonomy = taxonomyDao.loadByName(survey.getId(), TEST_TAXONOMY_NAME);
-		List<Taxon> results = taxonDao.findByCode(taxonomy.getId(), code, 10);
+		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
+		List<Taxon> results = taxonDao.findByCode(taxonomy, code, 10);
 		assertNotNull(results);
 		assertEquals(1, results.size());
 		Taxon taxon = results.get(0);
@@ -136,7 +145,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	}
 	
 	protected TaxonOccurrence findByCode(String code) {
-		List<TaxonOccurrence> occurrences = speciesManager.findByCode(survey.getId(), TEST_TAXONOMY_NAME, code, 10);
+		List<TaxonOccurrence> occurrences = speciesManager.findByCode(survey, TEST_TAXONOMY_NAME, code, 10);
 		assertNotNull(occurrences);
 		assertEquals(1, occurrences.size());
 		TaxonOccurrence occurrence = occurrences.get(0);

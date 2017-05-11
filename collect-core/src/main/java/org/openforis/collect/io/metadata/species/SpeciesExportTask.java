@@ -47,7 +47,7 @@ public class SpeciesExportTask extends Task {
 	protected void initializeInternalVariables() throws Throwable {
 		super.initializeInternalVariables();
 		this.infoAttributeNames = extractInfoAttributeNames();
-		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
 		this.taxonomyName = taxonomy.getName();
 	}
 	
@@ -55,7 +55,8 @@ public class SpeciesExportTask extends Task {
 	protected void execute() throws Throwable {
 		CsvWriter writer = new CsvWriter(outputStream);
 		
-		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(survey, taxonomyId);
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy);
 		
 		List<String> vernacularNamesLangCodes = getNotEmptyValues(summaries.getVernacularNamesLanguageCodes());
 		vernacularNamesLangCodes.remove(LATIN_LANG_CODE); //consider Latin vernacular name as synonym

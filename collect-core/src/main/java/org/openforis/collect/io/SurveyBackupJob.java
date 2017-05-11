@@ -230,7 +230,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 
 	private void addSpeciesExportTask() {
-		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 //			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
 				SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);

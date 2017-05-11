@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.TaxonSearchParameters;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.SpeciesListService;
@@ -25,7 +26,7 @@ public class CollectSpeciesListService implements SpeciesListService {
 	
 	@Override
 	public List<String> loadSpeciesListNames(Survey survey) {
-		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey((CollectSurvey) survey);
 		List<String> result = new ArrayList<String>(taxonomies.size());
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			result.add(taxonomy.getName());
@@ -35,10 +36,10 @@ public class CollectSpeciesListService implements SpeciesListService {
 	
 	@Override
 	public Object loadSpeciesListData(Survey survey, String taxonomyName, String attribute, String speciesCode) {
-		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(survey.getId(), taxonomyName);
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName((CollectSurvey) survey, taxonomyName);
 		TaxonSearchParameters parameters = new TaxonSearchParameters();
 		parameters.setIncludeAncestorTaxons(true);
-		List<TaxonOccurrence> result = speciesManager.findByCode(taxonomy.getId(), speciesCode, 1, parameters);
+		List<TaxonOccurrence> result = speciesManager.findByCode(taxonomy, speciesCode, 1, parameters);
 		if (result.isEmpty()) {
 			return null;
 		} else {

@@ -22,10 +22,12 @@ import org.jooq.SortField;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonRecord;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
@@ -76,44 +78,47 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		super(TaxonDao.TaxonDSLContext.class);
 	}
 
+	public Taxon loadById(CollectTaxonomy taxonomy, int taxonId) {
+		return super.loadById(dsl(taxonomy), taxonId);
+	}
+
 	@Override
 	public Taxon loadById(int id) {
-		return super.loadById(id);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void insert(Taxon entity) {
-		super.insert(entity);
+		dsl((CollectTaxonomy) entity.getTaxonomy()).insertQuery(entity).execute();
 	}
 	
 	@Override
 	public void update(Taxon entity) {
-		super.update(entity);
+		dsl((CollectTaxonomy) entity.getTaxonomy()).updateQuery(entity).execute();
 	}
 
-	@Override
-	public void delete(int id) {
-		super.delete(id);
+	public void delete(Taxon entity) {
+		dsl((CollectTaxonomy) entity.getTaxonomy()).deleteQuery(entity.getSystemId()).execute();
 	}
 
-	public List<Taxon> findByCode(int taxonomyId, String searchString, int maxResults) {
-		return findStartingWith(OFC_TAXON.CODE, taxonomyId, null, searchString, maxResults);
+	public List<Taxon> findByCode(CollectTaxonomy taxonomy, String searchString, int maxResults) {
+		return findStartingWith(taxonomy, null, OFC_TAXON.CODE, searchString, maxResults);
 	}
 
-	public List<Taxon> findByCode(int taxonomyId, TaxonRank rank, String searchString, int maxResults) {
-		return findStartingWith(OFC_TAXON.CODE, taxonomyId, rank, searchString, maxResults);
+	public List<Taxon> findByCode(CollectTaxonomy taxonomy, TaxonRank rank, String searchString, int maxResults) {
+		return findStartingWith(taxonomy, rank, OFC_TAXON.CODE, searchString, maxResults);
 	}
 	
-	public List<Taxon> findByScientificName(int taxonomyId, String searchString, int maxResults) {
-		return findStartingWith(OFC_TAXON.SCIENTIFIC_NAME, taxonomyId, null, searchString, maxResults);
+	public List<Taxon> findByScientificName(CollectTaxonomy taxonomy, String searchString, int maxResults) {
+		return findStartingWith(taxonomy, null, OFC_TAXON.SCIENTIFIC_NAME, searchString, maxResults);
 	}
 
-	protected List<Taxon> findStartingWith(TableField<?,String> field, int taxonomyId, TaxonRank rank, String searchString, int maxResults) {
-		TaxonDSLContext dsl = dsl();
+	protected List<Taxon> findStartingWith(CollectTaxonomy taxonomy, TaxonRank rank, TableField<?,String> field, String searchString, int maxResults) {
+		TaxonDSLContext dsl = dsl(taxonomy);
 		searchString = searchString.toLowerCase(Locale.ENGLISH) + "%";
 		SelectConditionStep<Record> query = dsl.select()
 			.from(OFC_TAXON)
-			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
+			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomy.getId())
 				.and(DSL.lower(field).like(searchString)));
 		if (rank != null) {
 			query.and(OFC_TAXON.TAXON_RANK.equal(rank.name()));
@@ -124,26 +129,26 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		return entities;
 	}
 	
-	public int countTaxons(int taxonomyId) {
-		SelectQuery<?> q = dsl().selectCountQuery();
-		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
+	public int countTaxons(CollectTaxonomy taxonomy) {
+		SelectQuery<?> q = dsl(taxonomy).selectCountQuery();
+		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomy.getId()));
 		Record r = q.fetchOne();
 		return (Integer) r.getValue(0);
 	}
 	
-	public List<Taxon> loadTaxons(int taxonomyId, int offset, int maxRecords) {
-		return loadTaxons(taxonomyId, offset, maxRecords, OFC_TAXON.SCIENTIFIC_NAME.asc());
+	public List<Taxon> loadTaxons(CollectTaxonomy taxonomy, int offset, int maxRecords) {
+		return loadTaxons(taxonomy, offset, maxRecords, OFC_TAXON.SCIENTIFIC_NAME.asc());
 	}
 	
-	public List<Taxon> loadTaxonsForTreeBuilding(int taxonomyId) {
-		return loadTaxons(taxonomyId, 0, Integer.MAX_VALUE, OFC_TAXON.PARENT_ID.asc().nullsFirst());
+	public List<Taxon> loadTaxonsForTreeBuilding(CollectTaxonomy taxonomy) {
+		return loadTaxons(taxonomy, 0, Integer.MAX_VALUE, OFC_TAXON.PARENT_ID.asc().nullsFirst());
 	}
 	
-	public List<Taxon> loadTaxons(int taxonomyId, int offset, int maxRecords, SortField<?> sortField) {
-		TaxonDSLContext dsl = dsl();
+	public List<Taxon> loadTaxons(CollectTaxonomy taxonomy, int offset, int maxRecords, SortField<?> sortField) {
+		TaxonDSLContext dsl = dsl(taxonomy);
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_TAXON);
-		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
+		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomy.getId()));
 
 		q.addOrderBy(sortField);
 		
@@ -154,20 +159,18 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		return dsl.fromResult(result);
 	}
 	
-	public void deleteByTaxonomy(int taxonomyId) {
-		dsl().delete(OFC_TAXON)
-			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId))
+	public void deleteByTaxonomy(CollectTaxonomy taxonomy) {
+		dsl(taxonomy).delete(OFC_TAXON)
+			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomy.getId()))
 			.execute();
 	}
 	
 	/**
 	 * Inserts the items in batch.
-	 * 
-	 * @param taxa
 	 */
-	public void insert(List<Taxon> items) {
+	public void insert(CollectTaxonomy taxonomy, List<Taxon> items) {
 		if ( items != null && ! items.isEmpty() ) {
-			TaxonDSLContext dsl = dsl();
+			TaxonDSLContext dsl = dsl(taxonomy);
 			int id = dsl.nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
 			int maxId = id;
 			Insert<OfcTaxonRecord> query = dsl.createInsertStatement();
@@ -185,10 +188,10 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		}
 	}
 
-	public int duplicateTaxons(int oldTaxonomyId, Integer newTaxonomyId) {
-		TaxonDSLContext dsl = dsl();
+	public int duplicateTaxons(CollectTaxonomy oldTaxonomy, CollectTaxonomy newTaxonomy) {
+		TaxonDSLContext dsl = dsl(oldTaxonomy);
 		int nextId = dsl.nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
-		int minId = loadMinId(dsl, oldTaxonomyId);
+		int minId = loadMinId(dsl, oldTaxonomy.getId());
 		int idShift = nextId - minId;
 		
 		List<Field<?>> selectFields = new ArrayList<Field<?>>();
@@ -200,13 +203,13 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 				OFC_TAXON.STEP,
 				OFC_TAXON.TAXON_ID,
 				OFC_TAXON.TAXON_RANK,
-				DSL.val(newTaxonomyId)
+				DSL.val(newTaxonomy.getId())
 		));
 		selectFields.addAll(Arrays.<Field<?>>asList(INFO_FIELDS));
 		
 		Select<?> select = dsl.select(selectFields)
 				.from(OFC_TAXON)
-				.where(OFC_TAXON.TAXONOMY_ID.equal(oldTaxonomyId))
+				.where(OFC_TAXON.TAXONOMY_ID.equal(oldTaxonomy.getId()))
 				.orderBy(OFC_TAXON.PARENT_ID, OFC_TAXON.ID);
 		
 		Insert<OfcTaxonRecord> insert = dsl.insertInto(OFC_TAXON, ALL_FIELDS).select(select);
@@ -224,19 +227,29 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		return minId == null ? 0: minId.intValue();
 	}
 
-	public int nextId() {
-		return dsl().nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
+	public int nextId(CollectTaxonomy taxonomy) {
+		return dsl(taxonomy).nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
+	}
+	
+	@Override
+	protected TaxonDSLContext dsl() {
+		throw new UnsupportedOperationException();
+	}
+	
+	private TaxonDSLContext dsl(CollectTaxonomy taxonomy) {
+		return new TaxonDSLContext(getConfiguration(), taxonomy);
 	}
 
 	protected static class TaxonDSLContext extends MappingDSLContext<Taxon> {
 
 		private static final long serialVersionUID = 1L;
+		private CollectTaxonomy taxonomy;
 
-		public TaxonDSLContext(Configuration config) {
+		public TaxonDSLContext(Configuration config, CollectTaxonomy taxonomy) {
 			super(config, OFC_TAXON.ID, OFC_TAXON_ID_SEQ, Taxon.class);
+			this.taxonomy = taxonomy;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public void fromRecord(Record r, Taxon t) {
 			t.setSystemId(r.getValue(OFC_TAXON.ID));
@@ -249,7 +262,8 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 			t.setTaxonRank(taxonRank);
 			t.setTaxonomyId(r.getValue(OFC_TAXON.TAXONOMY_ID));
 			t.setStep(r.getValue(OFC_TAXON.STEP));
-			t.setInfoAttributes(extractFields(r, (Field<String>[]) INFO_FIELDS));
+			t.setInfoAttributes(extractInfoAttributes(r));
+			t.setTaxonomy(taxonomy);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -265,6 +279,13 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 			q.addValue(OFC_TAXON.TAXONOMY_ID, t.getTaxonomyId());
 			q.addValue(OFC_TAXON.STEP, t.getStep());
 			addFieldValues(q, INFO_FIELDS, t.getInfoAttributes());
+		}
+
+		@SuppressWarnings("unchecked")
+		private List<String> extractInfoAttributes(Record r) {
+			List<String> infoAttributes = extractFields(r, (Field<String>[]) INFO_FIELDS);
+			TaxonomyDefinition taxonomyDef = taxonomy.getSurvey().getReferenceDataSchema().getTaxonomyDefinition(taxonomy.getName());
+			return infoAttributes.subList(0, taxonomyDef.getAttributes().size());
 		}
 
 		protected Insert<OfcTaxonRecord> createInsertStatement() {

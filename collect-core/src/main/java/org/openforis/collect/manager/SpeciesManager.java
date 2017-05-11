@@ -33,7 +33,6 @@ import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
-import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,22 +64,22 @@ public class SpeciesManager {
 	
 	private transient Map<Integer, TaxonTree> taxonTreeByTaxonomyIdCache = new HashMap<Integer, TaxonTree>();
 
-	public List<CollectTaxonomy> loadTaxonomiesBySurvey(int surveyId) {
-		return taxonomyDao.loadAllBySurvey(surveyId);
+	public List<CollectTaxonomy> loadTaxonomiesBySurvey(CollectSurvey survey) {
+		return taxonomyDao.loadAllBySurvey(survey);
 	}
 	
-	public CollectTaxonomy loadTaxonomyById(int id) {
-		return taxonomyDao.loadById(id);
+	public CollectTaxonomy loadTaxonomyById(CollectSurvey survey, int id) {
+		return taxonomyDao.loadById(survey, id);
 	}
 
-	public CollectTaxonomy loadTaxonomyByName(int surveyId, String name) {
-		return taxonomyDao.loadByName(surveyId, name);
+	public CollectTaxonomy loadTaxonomyByName(CollectSurvey survey, String name) {
+		return taxonomyDao.loadByName(survey, name);
 	}
 
-	public List<TaxonOccurrence> findByFamilyCode(CollectSurvey survey, int taxonomyId, String searchString, int maxResults, 
+	public List<TaxonOccurrence> findByFamilyCode(CollectTaxonomy taxonomy, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
-		TaxonTree taxonTree = loadTaxonTree(survey, taxonomyId);
+		TaxonTree taxonTree = loadTaxonTree(taxonomy);
 		List<Taxon> families = taxonTree.findTaxaByCodeStartingWith(searchString, TaxonRank.FAMILY);
 		result.addAll(fromTaxonomiesToTaxonOccurrences(families, parameters));
 		for (Taxon familyTaxon : families) {
@@ -90,48 +89,48 @@ public class SpeciesManager {
 		return result;
 	}
 
-	public List<TaxonOccurrence> findByCode(int surveyId, String taxonomyName, String searchString, int maxResults) {
-		return findByCode(surveyId, taxonomyName, searchString, maxResults, new TaxonSearchParameters());
+	public List<TaxonOccurrence> findByCode(CollectSurvey survey, String taxonomyName, String searchString, int maxResults) {
+		return findByCode(survey, taxonomyName, searchString, maxResults, new TaxonSearchParameters());
 	}
 	
-	public List<TaxonOccurrence> findByCode(int surveyId, String taxonomyName, String searchString, int maxResults, 
+	public List<TaxonOccurrence> findByCode(CollectSurvey survey, String taxonomyName, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
-		Taxonomy taxonomy = taxonomyDao.loadByName(surveyId, taxonomyName);
-		return findByCode(taxonomy.getId(), searchString, maxResults, parameters);
+		CollectTaxonomy taxonomy = loadTaxonomyByName(survey, taxonomyName);
+		return findByCode(taxonomy, searchString, maxResults, parameters);
 	}
 
-	public List<TaxonOccurrence> findByCode(int taxonomyId, String searchString, int maxResults) {
-		return findByCode(taxonomyId, searchString, maxResults, new TaxonSearchParameters());
+	public List<TaxonOccurrence> findByCode(CollectTaxonomy taxonomy, String searchString, int maxResults) {
+		return findByCode(taxonomy, searchString, maxResults, new TaxonSearchParameters());
 	}
 	
-	public List<TaxonOccurrence> findByCode(int taxonomyId, TaxonRank rank, String searchString, int maxResults, TaxonSearchParameters parameters) {
-		List<Taxon> list = taxonDao.findByCode(taxonomyId, searchString, maxResults);
+	public List<TaxonOccurrence> findByCode(CollectTaxonomy taxonomy, TaxonRank rank, String searchString, int maxResults, TaxonSearchParameters parameters) {
+		List<Taxon> list = taxonDao.findByCode(taxonomy, rank, searchString, maxResults);
 		return fromTaxonomiesToTaxonOccurrences(list, parameters);
 	}
 
-	public List<TaxonOccurrence> findByCode(int taxonomyId, String searchString, int maxResults, TaxonSearchParameters parameters) {
-		List<Taxon> list = taxonDao.findByCode(taxonomyId, searchString, maxResults);
+	public List<TaxonOccurrence> findByCode(CollectTaxonomy taxonomy, String searchString, int maxResults, TaxonSearchParameters parameters) {
+		List<Taxon> list = taxonDao.findByCode(taxonomy, searchString, maxResults);
 		return fromTaxonomiesToTaxonOccurrences(list, parameters);
 	}
 
-	public List<TaxonOccurrence> findByScientificName(int surveyId, String taxonomyName, String searchString, int maxResults) {
-		Taxonomy taxonomy = taxonomyDao.loadByName(surveyId, taxonomyName);
-		return findByScientificName(taxonomy.getId(), searchString, maxResults);
+	public List<TaxonOccurrence> findByScientificName(CollectSurvey survey, String taxonomyName, String searchString, int maxResults) {
+		CollectTaxonomy taxonomy = loadTaxonomyByName(survey, taxonomyName);
+		return findByScientificName(taxonomy, searchString, maxResults);
 	}
 
-	public List<TaxonOccurrence> findByScientificName(int taxonomyId, String searchString, int maxResults) {
-		return findByScientificName(taxonomyId, searchString, maxResults, new TaxonSearchParameters());
+	public List<TaxonOccurrence> findByScientificName(CollectTaxonomy taxonomy, String searchString, int maxResults) {
+		return findByScientificName(taxonomy, searchString, maxResults, new TaxonSearchParameters());
 	}
 	
-	public List<TaxonOccurrence> findByScientificName(int taxonomyId, String searchString, int maxResults, TaxonSearchParameters parameters) {
-		List<Taxon> list = taxonDao.findByScientificName(taxonomyId, searchString, maxResults);
+	public List<TaxonOccurrence> findByScientificName(CollectTaxonomy taxonomy, String searchString, int maxResults, TaxonSearchParameters parameters) {
+		List<Taxon> list = taxonDao.findByScientificName(taxonomy, searchString, maxResults);
 		return fromTaxonomiesToTaxonOccurrences(list, parameters);
 	}
 
-	public List<TaxonOccurrence> findByFamilyScientificName(CollectSurvey survey, int taxonomyId, String searchString, int maxResults, 
+	public List<TaxonOccurrence> findByFamilyScientificName(CollectTaxonomy taxonomy, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
-		TaxonTree taxonTree = loadTaxonTree(survey, taxonomyId);
+		TaxonTree taxonTree = loadTaxonTree(taxonomy);
 		List<Taxon> families = taxonTree.findTaxaByScientificNameStartingWith(searchString, TaxonRank.FAMILY);
 		result.addAll(fromTaxonomiesToTaxonOccurrences(families, parameters));
 		for (Taxon familyTaxon : families) {
@@ -157,12 +156,12 @@ public class SpeciesManager {
 		return result;
 	}
 	
-	private List<TaxonOccurrence> fromVernacularNamesToTaxonOccurrences(
+	private List<TaxonOccurrence> fromVernacularNamesToTaxonOccurrences(CollectTaxonomy taxonomy,
 			List<TaxonVernacularName> vernacularNames, TaxonSearchParameters parameters) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();
 		for (TaxonVernacularName vernacularName : vernacularNames) {
 			Integer taxonId = vernacularName.getTaxonSystemId();
-			Taxon taxon = taxonDao.loadById(taxonId);
+			Taxon taxon = taxonDao.loadById(taxonomy, taxonId);
 			TaxonOccurrence o = new TaxonOccurrence(taxon, vernacularName);
 			if (parameters.isIncludeAncestorTaxons()) {
 				loadAncestorTaxons(taxon, o);
@@ -185,24 +184,23 @@ public class SpeciesManager {
 	private void loadAncestorTaxons(Taxon taxon, TaxonOccurrence o) {
 		Taxon currentTaxon = taxon;
 		while (currentTaxon.getParentId() != null) {
-			Taxon parentTaxon = taxonDao.loadById(currentTaxon.getParentId());
+			Taxon parentTaxon = taxonDao.loadById((CollectTaxonomy) currentTaxon.getTaxonomy(), currentTaxon.getParentId());
 			TaxonOccurrence parentTaxonOccurrence = new TaxonOccurrence(parentTaxon);
 			o.addAncestorTaxon(parentTaxonOccurrence);
 			currentTaxon = parentTaxon;
 		}
 	}
 
-	public List<TaxonOccurrence> findByVernacularName(int surveyId, String taxonomyName, String searchString, int maxResults) {
-		return findByVernacularName(surveyId, taxonomyName, (TaxonAttribute) null, searchString, maxResults);
+	public List<TaxonOccurrence> findByVernacularName(CollectSurvey survey, String taxonomyName, String searchString, int maxResults) {
+		return findByVernacularName(survey, taxonomyName, (TaxonAttribute) null, searchString, maxResults);
 	}
 	
-	public List<TaxonOccurrence> findByVernacularName(int surveyId, String taxonomyName, TaxonAttribute attr, String searchString, int maxResults) {
-		Taxonomy taxonomy = taxonomyDao.loadByName(surveyId, taxonomyName);
-		Integer taxonomyId = taxonomy.getId();
-		return findByVernacularName(taxonomyId, attr, searchString, maxResults, new TaxonSearchParameters());
+	public List<TaxonOccurrence> findByVernacularName(CollectSurvey survey, String taxonomyName, TaxonAttribute attr, String searchString, int maxResults) {
+		CollectTaxonomy taxonomy = loadTaxonomyByName(survey, taxonomyName);
+		return findByVernacularName(taxonomy, attr, searchString, maxResults, new TaxonSearchParameters());
 	}
 
-	public List<TaxonOccurrence> findByVernacularName(int taxonomyId, TaxonAttribute attr, String searchString, int maxResults, 
+	public List<TaxonOccurrence> findByVernacularName(CollectTaxonomy taxonomy, TaxonAttribute attr, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
 		List<TaxonVernacularName> list = null;
 		String[] qualifierValues = null;
@@ -210,31 +208,29 @@ public class SpeciesManager {
 			qualifierValues = extractQualifierValues(attr);
 		}
 		if (qualifierValues == null){
-			list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, maxResults);
+			list = taxonVernacularNameDao.findByVernacularName(taxonomy.getId(), searchString, maxResults);
 		} else{
-			list = taxonVernacularNameDao.findByVernacularName(taxonomyId, searchString, qualifierValues, maxResults);
+			list = taxonVernacularNameDao.findByVernacularName(taxonomy.getId(), searchString, qualifierValues, maxResults);
 		}
-		List<TaxonOccurrence> result = fromVernacularNamesToTaxonOccurrences(list, parameters);
+		List<TaxonOccurrence> result = fromVernacularNamesToTaxonOccurrences(taxonomy, list, parameters);
 		return result;
 	}
 	
-	public TaxonSummaries loadFullTaxonSummariesOld(CollectSurvey survey, int taxonomyId) {
-		CollectTaxonomy taxonomy = loadTaxonomyById(taxonomyId);
-		TaxonTree tree = loadTaxonTree(survey, taxonomyId);
+	public TaxonSummaries loadFullTaxonSummariesOld(CollectTaxonomy taxonomy) {
+		TaxonTree tree = loadTaxonTree(taxonomy);
 		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.GENUS, false);
 		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
 		Collections.sort(sortedVernacularNamesLanguageCodes);
-		List<String> infoAttributeNames = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomy.getName()).getAttributeNames();
+		List<String> infoAttributeNames = taxonomy.getSurvey().getReferenceDataSchema().getTaxonomyDefinition(taxonomy.getName()).getAttributeNames();
 		return new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes, infoAttributeNames);
 	}
 	
-	public TaxonSummaries loadFullTaxonSummaries(CollectSurvey survey, int taxonomyId) {
-		CollectTaxonomy taxonomy = loadTaxonomyById(taxonomyId);
-		TaxonTree tree = loadTaxonTree(survey, taxonomyId);
+	public TaxonSummaries loadFullTaxonSummaries(CollectTaxonomy taxonomy) {
+		TaxonTree tree = loadTaxonTree(taxonomy);
 		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.FAMILY, true);
 		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
 		Collections.sort(sortedVernacularNamesLanguageCodes);
-		List<String> infoAttributeNames = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomy.getName()).getAttributeNames();
+		List<String> infoAttributeNames = taxonomy.getSurvey().getReferenceDataSchema().getTaxonomyDefinition(taxonomy.getName()).getAttributeNames();
 		return new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes, infoAttributeNames);
 	}
 
@@ -243,14 +239,14 @@ public class SpeciesManager {
 	}
 	
 	public TaxonSummaries loadTaxonSummaries(CollectSurvey survey, int taxonomyId, int offset, int maxRecords) {
-		CollectTaxonomy taxonomy = loadTaxonomyById(taxonomyId);
+		CollectTaxonomy taxonomy = loadTaxonomyById(survey, taxonomyId);
 		String taxonomyName = taxonomy.getName();
-		int totalCount = taxonDao.countTaxons(taxonomyId);
+		int totalCount = taxonDao.countTaxons(taxonomy);
 		Set<String> vernacularNamesLanguageCodes = new HashSet<String>();
 		List<TaxonSummary> items = new ArrayList<TaxonSummary>();
 		TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
 		if ( totalCount > 0 ) {
-			List<Taxon> taxons = taxonDao.loadTaxons(taxonomyId, offset, maxRecords);
+			List<Taxon> taxons = taxonDao.loadTaxons(taxonomy, offset, maxRecords);
 			for (Taxon taxon : taxons) {
 				List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxon.getSystemId());
 				TaxonSummary summary = new TaxonSummary(taxonDefinition, taxon, vernacularNames, null);
@@ -276,16 +272,15 @@ public class SpeciesManager {
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void delete(CollectTaxonomy taxonomy) {
-		Integer id = taxonomy.getId();
-		deleteTaxonsByTaxonomy(id);
-		taxonomyDao.delete(id);
+		deleteTaxonsByTaxonomy(taxonomy);
+		taxonomyDao.delete(taxonomy);
 	}
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void deleteTaxonsByTaxonomy(int id) {
-		taxonVernacularNameDao.deleteByTaxonomy(id);
-		taxonDao.deleteByTaxonomy(id);
-		taxonTreeByTaxonomyIdCache.remove(id);
+	public void deleteTaxonsByTaxonomy(CollectTaxonomy taxonomy) {
+		taxonVernacularNameDao.deleteByTaxonomy(taxonomy.getId());
+		taxonDao.deleteByTaxonomy(taxonomy);
+		taxonTreeByTaxonomyIdCache.remove(taxonomy.getId());
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
@@ -304,39 +299,34 @@ public class SpeciesManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void insertTaxons(final int taxonomyId, TaxonTree tree, boolean overwriteAll) {
-		CollectTaxonomy taxonomy = taxonomyDao.loadById(taxonomyId);
-		if ( taxonomy == null ) {
-			throw new IllegalStateException("Taxonomy not found");
-		}
+	public void insertTaxons(final CollectTaxonomy taxonomy, TaxonTree tree, boolean overwriteAll) {
 		if ( overwriteAll ) {
-			deleteTaxonsByTaxonomy(taxonomyId);
+			deleteTaxonsByTaxonomy(taxonomy);
 		}
 		final List<Taxon> taxonInsertBuffer = new ArrayList<Taxon>();
 		final List<TaxonVernacularName> taxonVernacularNameInsertBuffer = new ArrayList<TaxonVernacularName>();
-		int nextTaxonId = taxonDao.nextId();
+		int nextTaxonId = taxonDao.nextId(taxonomy);
 		int nextTaxonVernacularNameId = taxonVernacularNameDao.nextId();
 		tree.assignSystemIds(nextTaxonId, nextTaxonVernacularNameId);
 		tree.depthFirstVisit(new TaxonTree.NodeVisitor() {
-			@Override
 			public void visit(Node node) {
-				persistTaxonTreeNode(taxonInsertBuffer, taxonVernacularNameInsertBuffer, taxonomyId, node);
+				persistTaxonTreeNode(taxonInsertBuffer, taxonVernacularNameInsertBuffer, taxonomy, node);
 			}
 		});
-		flushTaxonInsertBuffer(taxonInsertBuffer);
+		flushTaxonInsertBuffer(taxonomy, taxonInsertBuffer);
 		flushTaxonVernacularNameInsertBuffer(taxonVernacularNameInsertBuffer);
 		
 		taxonTreeByTaxonomyIdCache.remove(taxonomy.getId());
 	}
 	
 	protected void persistTaxonTreeNode(List<Taxon> taxonInsertBuffer, List<TaxonVernacularName> taxonVernacularNameInsertBuffer, 
-			int taxonomyId, Node node) {
+			CollectTaxonomy taxonomy, Node node) {
 		Taxon taxon = node.getTaxon();
-		taxon.setTaxonomyId(taxonomyId);
+		taxon.setTaxonomyId(taxonomy.getId());
 		taxon.setStep(CONFIRMED_TAXON_STEP_NUMBER);
 		taxonInsertBuffer.add(taxon);
 		if ( taxonInsertBuffer.size() > TAXON_INSERT_BUFFER_SIZE ) {
-			flushTaxonInsertBuffer(taxonInsertBuffer);
+			flushTaxonInsertBuffer(taxonomy, taxonInsertBuffer);
 		}
 		List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
 		for (TaxonVernacularName vernacularName : vernacularNames) {
@@ -347,8 +337,8 @@ public class SpeciesManager {
 		}
 	}
 
-	protected void flushTaxonInsertBuffer(List<Taxon> taxonInsertBuffer) {
-		taxonDao.insert(taxonInsertBuffer);
+	protected void flushTaxonInsertBuffer(CollectTaxonomy taxonomy, List<Taxon> taxonInsertBuffer) {
+		taxonDao.insert(taxonomy, taxonInsertBuffer);
 		taxonInsertBuffer.clear();
 	}
 
@@ -360,7 +350,7 @@ public class SpeciesManager {
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void delete(Taxon taxon) {
-		taxonDao.delete(taxon.getSystemId());
+		taxonDao.delete(taxon);
 	}
 	
 	@Transactional
@@ -378,69 +368,40 @@ public class SpeciesManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void moveTaxonomies(Integer fromSurveyId, int toSurveyId) {
-		deleteTaxonomiesBySurvey(toSurveyId);
-		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(fromSurveyId);
+	public void moveTaxonomies(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
+		deleteTaxonomiesBySurvey(toSurvey);
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(fromSurvey);
 		for (CollectTaxonomy taxonomy : taxonomies) {
-			taxonomy.setSurveyId(toSurveyId);
+			taxonomy.setSurvey(toSurvey);
 			taxonomyDao.update(taxonomy);
 		}
 	}
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void deleteTaxonomiesBySurvey(int surveyId) {
-		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(surveyId);
+	public void deleteTaxonomiesBySurvey(CollectSurvey survey) {
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(survey);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			delete(taxonomy);
 		}
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void copyTaxonomy(int fromSurveyId, int toSurveyId) {
-		List<CollectTaxonomy> taxonomies;
-		taxonomies = taxonomyDao.loadAllBySurvey(fromSurveyId);
-		for (CollectTaxonomy taxonomy : taxonomies) {
-			int oldTaxonomyId = taxonomy.getId();
-			taxonomy.setId(null);
-			taxonomy.setSurveyId(toSurveyId);
-			taxonomyDao.insert(taxonomy);
-			Integer newTaxonomyId = taxonomy.getId();
-			copyTaxons(oldTaxonomyId, newTaxonomyId);
+	public void copyTaxonomy(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(fromSurvey);
+		for (CollectTaxonomy oldTaxonomy : taxonomies) {
+			oldTaxonomy.setSurvey(fromSurvey);
+			CollectTaxonomy newTaxonomy = new CollectTaxonomy(oldTaxonomy);
+			newTaxonomy.setSurvey(toSurvey);
+			taxonomyDao.insert(newTaxonomy);
+			copyTaxons(oldTaxonomy, newTaxonomy);
 		}
 	}
 
-	protected void copyTaxons(int oldTaxonomyId, Integer newTaxonomyId) {
-		int taxonIdShift = taxonDao.duplicateTaxons(oldTaxonomyId, newTaxonomyId);
-		taxonVernacularNameDao.duplicateVernacularNames(oldTaxonomyId, taxonIdShift);
-		/*
-		List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(oldTaxonomyId);
-		Map<Integer, Taxon> oldIdToNewTaxon = new HashMap<Integer, Taxon>();
-		for (Taxon taxon : taxons) {
-			Integer oldId = taxon.getSystemId();
-			Integer oldParentId = taxon.getParentId();
-			if ( oldParentId != null ) {
-				Taxon newParent = oldIdToNewTaxon.get(oldParentId);
-				taxon.setParentId(newParent.getSystemId());
-			}
-			taxon.setSystemId(null);
-			taxon.setTaxonomyId(newTaxonomyId);
-			taxonDao.insert(taxon);
-			int newTaxonId = taxon.getSystemId();
-			duplicateVernacularNames(oldId, newTaxonId);
-			oldIdToNewTaxon.put(oldId, taxon);
-		}
-		*/
+	protected void copyTaxons(CollectTaxonomy oldTaxonomy, CollectTaxonomy newTaxonomy) {
+		int taxonIdShift = taxonDao.duplicateTaxons(oldTaxonomy, newTaxonomy);
+		taxonVernacularNameDao.duplicateVernacularNames(oldTaxonomy.getId(), taxonIdShift);
 	}
-/*
-	protected void duplicateVernacularNames(int oldTaxonId, int newTaxonId) {
-		List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(oldTaxonId);
-		for (TaxonVernacularName vernacularName : vernacularNames) {
-			vernacularName.setId(null);
-			vernacularName.setTaxonSystemId(newTaxonId);
-			taxonVernacularNameDao.insert(vernacularName);
-		}
-	}
-	*/
+	
 	protected String[] extractQualifierValues(TaxonAttribute attr) {
 		TaxonAttributeDefinition defn = attr.getDefinition();
 		List<String> qualifiers = defn.getQualifiers();
@@ -466,13 +427,12 @@ public class SpeciesManager {
 		return qualifierValues;
 	}
 
-	public TaxonTree loadTaxonTree(CollectSurvey survey, int taxonomyId) {
-		TaxonTree tree = taxonTreeByTaxonomyIdCache.get(taxonomyId);
+	public TaxonTree loadTaxonTree(CollectTaxonomy taxonomy) {
+		TaxonTree tree = taxonTreeByTaxonomyIdCache.get(taxonomy.getId());
 		if (tree == null) {
-			CollectTaxonomy taxonomy = loadTaxonomyById(taxonomyId);
 			String taxonomyName = taxonomy.getName();
-			TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
-			List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(taxonomyId);
+			TaxonomyDefinition taxonDefinition = taxonomy.getSurvey().getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
+			List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(taxonomy);
 			tree = new TaxonTree(taxonDefinition);
 			Map<Integer, Taxon> idToTaxon = new HashMap<Integer, Taxon>();
 			for (Taxon taxon : taxons) {
@@ -484,13 +444,13 @@ public class SpeciesManager {
 				tree.addVernacularNames(newNode, vernacularNames);
 				idToTaxon.put(systemId, taxon);
 			}
-			taxonTreeByTaxonomyIdCache.put(taxonomyId, tree);
+			taxonTreeByTaxonomyIdCache.put(taxonomy.getId(), tree);
 		}
 		return tree;
 	}
 
-	public boolean hasTaxons(int taxonomyId) {
-		int count = taxonDao.countTaxons(taxonomyId);
+	public boolean hasTaxons(CollectTaxonomy taxonomy) {
+		int count = taxonDao.countTaxons(taxonomy);
 		return count > 0;
 	}
 	

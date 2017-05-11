@@ -144,7 +144,7 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 
 	private CollectTaxonomy loadTaxonomy() {
 		CollectTaxonomy taxonomy = taxonomyName == null ? null:
-			speciesManager.loadTaxonomyByName(survey.getId(), taxonomyName);
+			speciesManager.loadTaxonomyByName(survey, taxonomyName);
 		return taxonomy;
 	}
 	
@@ -155,7 +155,7 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 				//create and store taxonomy taxonomy
 				taxonomy = new CollectTaxonomy();
 				taxonomy.setName(taxonomyName);
-				taxonomy.setSurveyId(survey.getId());
+				taxonomy.setSurvey(survey);
 				speciesManager.save(taxonomy);
 			} else {
 				throw new RuntimeException("Cannot insert new taxonomy: overwriteAll parameter not specified");
@@ -163,7 +163,7 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 		}
 		saveSurvey(); //taxonomy definition changed
 		
-		speciesManager.insertTaxons(taxonomy.getId(), taxonTree, overwriteAll);
+		speciesManager.insertTaxons(taxonomy, taxonTree, overwriteAll);
 	}
 
 	@SuppressWarnings("deprecation")

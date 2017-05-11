@@ -40,9 +40,9 @@ public class SpeciesExportProcess {
 		CsvWriter writer = null;
 		try {
 			writer = new CsvWriter(out);
-			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
+			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
 			taxonomyName = taxonomy.getName();
-			TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(survey, taxonomyId);
+			TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy);
 			ArrayList<String> colNames = new ArrayList<String>();
 			colNames.add(SpeciesFileColumn.NO.getColumnName());
 			colNames.add(SpeciesFileColumn.CODE.getColumnName());

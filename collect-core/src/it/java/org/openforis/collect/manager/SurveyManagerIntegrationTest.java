@@ -119,11 +119,11 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void publishSurveyTaxonomyTest() throws SurveyImportException {
 		insertTestTaxonomy();
-		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
+		CollectSurvey temporarySurvey = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
 		{
-			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(surveyWork.getId(), "tree");
+			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(temporarySurvey, "tree");
 			assertNotNull(taxonomy);
-			TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(surveyWork, taxonomy.getId());
+			TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy);
 			assertEquals(1, summaries.getTotalCount());
 			List<TaxonSummary> taxonSummaryList = summaries.getItems();
 			{
@@ -202,7 +202,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	private void insertTestTaxonomy() {
 		CollectTaxonomy taxonomy = new CollectTaxonomy();
 		taxonomy.setName("tree");
-		taxonomy.setSurveyId(survey.getId());
+		taxonomy.setSurvey(survey);
 		speciesManager.save(taxonomy);
 		Taxon taxon = new Taxon();
 		taxon.setTaxonomyId(taxonomy.getId());

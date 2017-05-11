@@ -797,7 +797,7 @@ public class SurveyValidator {
 	}
 
 	private CollectTaxonomy findTaxonomy(CollectSurvey survey, String taxonomyName) {
-		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			if (taxonomy.getName().equals(taxonomyName)) {
 				return taxonomy;

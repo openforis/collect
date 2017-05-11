@@ -108,6 +108,8 @@ public class Taxon {
 	private int step;
 	private List<String> infoAttributes = new ArrayList<String>();
 	
+	private Taxonomy taxonomy;
+	
 	public Integer getSystemId() {
 		return systemId;
 	}
@@ -186,6 +188,14 @@ public class Taxon {
 
 	public void setInfoAttributes(List<String> infos) {
 		this.infoAttributes = infos;
+	}
+	
+	public Taxonomy getTaxonomy() {
+		return taxonomy;
+	}
+	
+	public void setTaxonomy(Taxonomy taxonomy) {
+		this.taxonomy = taxonomy;
 	}
 
 	@Override
