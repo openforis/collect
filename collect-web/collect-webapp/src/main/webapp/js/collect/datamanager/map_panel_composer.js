@@ -139,44 +139,60 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			return feature;
 		});
 		if (featureOrLayer) {
+			var features = featureOrLayer.get('features');
 			var feature;
-			if (featureOrLayer.get('features')) {
-				feature = featureOrLayer.get('features')[0];
+			var numberOfFeatures;
+			if (features) {
+				numberOfFeatures = features.length;
+				feature = features[0];
 			} else {
+				numberOfFeatures = 1;
 				feature = featureOrLayer;
 			}
 			var survey = feature.get('survey');
 			var htmlContent;
 			
-			switch (feature.get('type')) {
-			case 'sampling_point':
-				var lonLat = coordinate;
-				var keyDefs = survey.getRooEntityKeyDefinitions();
-				function printLevelCodes(levelCodes) {
-					var result = "";
-					for (var i = 0; i < levelCodes.length; i++) {
-						var keyDef = keyDefs.length > i ? keyDefs[i] : null;
-						var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
-						result += levelName + ": " + levelCodes[i] + "<br>";
-					}
-					return result;
+			if (numberOfFeatures > 1) {
+				htmlContent = "Cluster of " + numberOfFeatures + " ";
+				switch (feature.get('type')) {
+				case 'sampling_point':
+					htmlContent += " sampling points";
+					break;
+				case 'coordinate_attribute_value':
+					htmlContent += " sampling units";
+					break;
 				}
-				var levelCodes = feature.get('name').split('|');
-				htmlContent = OF.Strings.format(
-						//TODO improve level codes formatting
-						"<b>Sampling Point</b>"
-						+ "<br>"
-						+ "{0}"
-						+ "Latitude: {1}"
-						+ "<br>"
-						+ "Longitude: {2}"
-						+ "<br>"
-						, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
-				break;
-			case 'coordinate_attribute_value':
-				var point = feature.get('point');
-				htmlContent = $this.createNodeInfoBalloon(survey, point);
-				break;
+			} else {
+				switch (feature.get('type')) {
+				case 'sampling_point':
+					var lonLat = coordinate;
+					var keyDefs = survey.getRooEntityKeyDefinitions();
+					function printLevelCodes(levelCodes) {
+						var result = "";
+						for (var i = 0; i < levelCodes.length; i++) {
+							var keyDef = keyDefs.length > i ? keyDefs[i] : null;
+							var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
+							result += levelName + ": " + levelCodes[i] + "<br>";
+						}
+						return result;
+					}
+					var levelCodes = feature.get('name').split('|');
+					htmlContent = OF.Strings.format(
+							//TODO improve level codes formatting
+							"<b>Sampling Point</b>"
+							+ "<br>"
+							+ "{0}"
+							+ "Latitude: {1}"
+							+ "<br>"
+							+ "Longitude: {2}"
+							+ "<br>"
+							, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
+					break;
+				case 'coordinate_attribute_value':
+					var point = feature.get('point');
+					htmlContent = $this.createNodeInfoBalloon(survey, point);
+					break;
+				}
 			}
 			$this.popupContent.html(htmlContent);
 			$this.popupContent.find(".accordion").accordion({heightStyle: "content", animate: 0});
@@ -335,18 +351,13 @@ Collect.DataManager.MapPanelComposer.prototype.samplingPointLayerStyleFunction =
 		if (!style) {
 			style = new ol.style.Style({
 				image: new ol.style.Circle({
-					radius: 10,
+					radius: Math.max(size / 5, 10),
 					stroke: new ol.style.Stroke({
-						color: '#00f'
+						color: '#00f',
+						lineDash: [2, 2]
 					}),
 					fill: new ol.style.Fill({
 						color : [0,0,255,0.1] //almost transparent fill
-					})
-				}),
-				text: new ol.style.Text({
-					text: size.toString(),
-					fill: new ol.style.Fill({
-						color: '#fff'
 					})
 				})
 			});
@@ -380,16 +391,11 @@ Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunc
 				image: new ol.style.Circle({
 					radius: 10,
 					stroke: new ol.style.Stroke({
-						color: '#fff'
+						color: '#fff',
+						lineDash: [2,2]
 					}),
 					fill: new ol.style.Fill({
 						color: '#3399CC'
-					})
-				}),
-				text: new ol.style.Text({
-					text: size.toString(),
-					fill: new ol.style.Fill({
-						color: '#fff'
 					})
 				})
 			});
@@ -552,7 +558,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 	});
 	
 	var clusterSource = new ol.source.Cluster({
-		distance: 40,
+		distance: 20,
 		source: source
 	});
 	
