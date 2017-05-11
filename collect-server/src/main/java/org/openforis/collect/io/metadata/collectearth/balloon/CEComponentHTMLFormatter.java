@@ -85,10 +85,16 @@ public class CEComponentHTMLFormatter {
 			for (CEComponent child : row.getChildren()) {
 				XMLBuilder cellBuilder = rowBuilder.e("td"); //$NON-NLS-1$
 				if (child instanceof CEEnumeratingCodeField) {
+					
 					cellBuilder
 						.e("label") //$NON-NLS-1$
 							.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 							.t( row.getLabelOrName() );
+					
+					if(StringUtils.isNotBlank(row.getTooltip())) {
+						cellBuilder.a("title", row.getTooltip()); //$NON-NLS-1$
+					}
+					
 				} else if (child instanceof CEField) {
 					createBuilder((CEField) child, false, cellBuilder);
 				}
@@ -415,8 +421,16 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private String getItemLabel(CodeListItem item) {
-		String itemLabel = item.getLabel(language);
-		if (StringUtils.isBlank(itemLabel) && ! language.equals(item.getSurvey().getDefaultLanguage())) {
+		return getItemLabel(item, language);
+	}
+
+	private String getDescription(CodeListItem item) {
+		return getDescription(item, language);
+	}
+	
+	public static String getItemLabel(CodeListItem item, String lang) {
+		String itemLabel = item.getLabel(lang);
+		if (StringUtils.isBlank(itemLabel) && ! lang.equals(item.getSurvey().getDefaultLanguage())) {
 			itemLabel = item.getLabel();
 		}
 		if (StringUtils.isBlank(itemLabel)) {
@@ -425,9 +439,9 @@ public class CEComponentHTMLFormatter {
 		return   HtmlUnicodeEscaperUtil.escapeHtmlUnicode( itemLabel );
 	}
 
-	private String getDescription(CodeListItem item) {
-		String description = item.getDescription(language);
-		if (StringUtils.isBlank(description) && ! language.equals(item.getSurvey().getDefaultLanguage())) {
+	public static String getDescription(CodeListItem item, String lang) {
+		String description = item.getDescription(lang);
+		if (StringUtils.isBlank(description) && ! lang.equals(item.getSurvey().getDefaultLanguage())) {
 			description = item.getDescription();
 		}
 		return HtmlUnicodeEscaperUtil.escapeHtmlUnicode( description );

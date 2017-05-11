@@ -36,6 +36,19 @@
 		    				onCheck="@command('keyChanged', key=self.checked)" />
 		    		</fieldErrorHandler>
 		    		
+		    		<hbox visible="@load(vm.attribute and vm.parentEntityRoot and fx.key)">
+			    		<fieldErrorHandler message="@load(vmsgs['measurement'])">
+			  				<label value="${labels.survey.schema.attribute.measurement.$}" />
+			  				<image popup="measurementAttributeInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+			  			</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['measurement'])">
+		  					<checkbox
+			  						checked="@bind(fx.measurement)"
+			  						onCheck="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+			    	</hbox>
+			    	
 		    		<hbox visible="@load(vm.collectEarthSurvey and fx.key and vm.parentEntityRoot)">
 			    		<label value="${labels.survey.schema.attribute.collect_earth.hide_key_in_record_list}:" />
 			    		<fieldErrorHandler message="@load(vmsgs['hideKeyInCollectEarthRecordList'])">
@@ -43,18 +56,7 @@
 			    				onCheck="@command('applyChanges')" />
 			    		</fieldErrorHandler>
 		    		</hbox>
-		    		
 	    		</hbox>
-	    	</row>
-	    	<row visible="@load(vm.attribute and vm.parentEntityRoot and fx.key)">
-	    		<fieldErrorHandler message="@load(vmsgs['measurement'])">
-	  				<label value="${labels.survey.schema.attribute.measurement}" />
-	  			</fieldErrorHandler>
-  				<fieldErrorHandler message="@load(vmsgs['measurement'])">
-  					<checkbox
-	  						checked="@bind(fx.measurement)"
-	  						onCheck="@command('applyChanges')" />
-  				</fieldErrorHandler>
 	    	</row>
   		</rows>
   	</grid>
@@ -579,7 +581,12 @@
     		</rows>
     	</grid>
     </groupbox>
-
+	
+    <popup id="measurementAttributeInfoTooltip" width="300px">
+		<html><![CDATA[
+      		${labels.survey.schema.attribute.measurement.info}
+      	]]></html>
+	</popup>
     <popup id="calculatedInfoTooltip" width="300px">
 		<html><![CDATA[
       		${labels.survey.schema.attribute.calculated.info}

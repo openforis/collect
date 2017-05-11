@@ -5,6 +5,7 @@ package org.openforis.idm.model.expression;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.junit.Assert;
@@ -93,4 +94,57 @@ public class IDMFunctionsTest extends AbstractExpressionTest {
 		Assert.assertTrue(currentTime.equals(object));
 	}
 	
+	//start of distinct-values test
+	@Test
+	public void testDistinctValuesFunction() throws InvalidExpressionException {
+		Entity plot1 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot1, "no", new Code("1"));
+		Entity plot2 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot2, "no", new Code("2"));
+		
+		String expr = ExpressionFactory.IDM_PREFIX + ":" + "distinct-values(plot/no)";
+		Object result = evaluateExpression(expr);
+		Assert.assertEquals(Arrays.asList("1","2"), result);
+	}
+	
+	@Test
+	public void testDistinctValuesFunctionWithDuplicates() throws InvalidExpressionException {
+		Entity plot1 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot1, "no", new Code("1"));
+		Entity plot2 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot2, "no", new Code("2"));
+		Entity plot3 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot3, "no", new Code("1")); //duplicate value
+		
+		String expr = ExpressionFactory.IDM_PREFIX + ":" + "distinct-values(plot/no)";
+		Object result = evaluateExpression(expr);
+		Assert.assertEquals(Arrays.asList("1","2"), result);
+	}
+	
+	@Test
+	public void testDistinctValuesFunctionWithEmptyList() throws InvalidExpressionException {
+		Entity plot1 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot1, "no", new Code("1"));
+		Entity plot2 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot2, "no", new Code("2"));
+		Entity plot3 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot3, "no", new Code("1")); //duplicate value
+		
+		String expr = ExpressionFactory.IDM_PREFIX + ":" + "distinct-values(plot/accessibility)";
+		Object result = evaluateExpression(expr);
+		Assert.assertNull(result);
+	}
+	
+	//start of distinct-count test
+	@Test
+	public void testCountDistinctFunction() throws InvalidExpressionException {
+		Entity plot1 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot1, "no", new Code("1"));
+		Entity plot2 = EntityBuilder.addEntity(cluster, "plot");
+		EntityBuilder.addValue(plot2, "no", new Code("2"));
+		
+		String expr = ExpressionFactory.IDM_PREFIX + ":" + "count-distinct(plot/no)";
+		Object result = evaluateExpression(expr);
+		Assert.assertEquals(2, result);
+	}
 }

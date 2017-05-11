@@ -17,14 +17,18 @@ import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResultFlag;
 import org.openforis.idm.model.Coordinate;
 
 import com.jamesmurty.utils.XMLBuilder2;
 
 
 public class GeoFunctions extends CustomFunctions {
+	
+	public static final String LATLONG_FUNCTION_NAME = "latlong";
 	
 	public GeoFunctions(String namespace) {
 		super(namespace);
@@ -65,6 +69,24 @@ public class GeoFunctions extends CustomFunctions {
 				return super.performArgumentValidation(contextNodeDef, arguments);
 			}
 		});
+		
+		register(LATLONG_FUNCTION_NAME, new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return latLong(expressionContext, objects[0]);
+			}
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				Survey survey = contextNodeDef.getSurvey();
+				if(survey.getSpatialReferenceSystem(SpatialReferenceSystem.WGS84_SRS_ID) == null) {
+					String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
+							LATLONG_FUNCTION_NAME, SpatialReferenceSystem.WGS84_SRS_ID);
+					return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
+				} else {
+					return new ExpressionValidationResult();
+				}
+			}
+		});
+
 	}
 
 	private Collection<Coordinate> toListOfCoordinates(Object obj) {
@@ -163,4 +185,27 @@ public class GeoFunctions extends CustomFunctions {
 		}
 	}
 
+	protected static Coordinate latLong(ExpressionContext expressionContext, Object coordinate) {
+		if (coordinate == null) {
+			return null;
+		}
+		if (coordinate instanceof Coordinate) {
+			return latLong(expressionContext, (Coordinate) coordinate);
+		} else {
+			return latLong(expressionContext, Coordinate.parseCoordinate(coordinate));
+		}
+	}
+
+	protected static Coordinate latLong(ExpressionContext expressionContext, Coordinate coordinate) {
+		if (coordinate == null || ! coordinate.isComplete()) {
+			return null;
+		}
+		Survey survey = getSurvey(expressionContext);
+		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
+		if (coordinateOperations == null) {
+			return null;
+		} else {
+			return coordinateOperations.convertToWgs84(coordinate);
+		}
+	}
 }
