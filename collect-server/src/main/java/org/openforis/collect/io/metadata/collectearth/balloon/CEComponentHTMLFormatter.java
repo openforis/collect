@@ -146,6 +146,8 @@ public class CEComponentHTMLFormatter {
 			formGroupBuilder.e("label") //$NON-NLS-1$
 				.a("for", elId) //$NON-NLS-1$
 				.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
+				
+				.a("title", StringUtils.isBlank(comp.getToolTip())?null:comp.getToolTip())
 				.t(  comp.getLabelOrName() ) ;
 		}
 		//form control external container (for grid alignment)

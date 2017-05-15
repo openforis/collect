@@ -7,8 +7,8 @@ public class CERangeField extends CEField {
 	private Integer from;
 	private Integer to;
 
-	public CERangeField(String htmlParameterName, String name, String label, CEFieldType type, boolean multiple, boolean key, Integer from, Integer to) {
-		super(htmlParameterName, name, label, multiple, type, key);
+	public CERangeField(String htmlParameterName, String name, String label, String tooltip, CEFieldType type, boolean multiple, boolean key, Integer from, Integer to) {
+		super(htmlParameterName, name, label, tooltip, multiple, type, key);
 		this.from = from;;
 		this.to = to;;
 	}
