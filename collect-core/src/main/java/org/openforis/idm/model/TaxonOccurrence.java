@@ -23,8 +23,9 @@ public final class TaxonOccurrence extends AbstractValue {
 	private String vernacularName;
 	private String languageCode;
 	private String languageVariety;
-	private List<TaxonOccurrence> ancestorTaxons;
 	private TaxonRank taxonRank;
+	private List<String> infoAttributes = new ArrayList<String>();
+	private List<TaxonOccurrence> ancestorTaxons;
 
 	@Override
 	@SuppressWarnings("serial")
@@ -75,6 +76,8 @@ public final class TaxonOccurrence extends AbstractValue {
 			this.languageCode = vernacularName.getLanguageCode();
 			this.languageVariety = vernacularName.getLanguageVariety();
 		}
+		
+		this.infoAttributes = taxon.getInfoAttributes();
 	}
 	
 	public TaxonOccurrence(Integer taxonId, String code, String scientificName, String vernacularName, 
@@ -161,6 +164,18 @@ public final class TaxonOccurrence extends AbstractValue {
 		this.taxonRank = taxonRank;
 	}
 	
+	public List<String> getInfoAttributes() {
+		return infoAttributes;
+	}
+
+	public String getInfoAttribute(int index) {
+		return infoAttributes.get(index);
+	}
+
+	public void setInfoAttributes(List<String> infos) {
+		this.infoAttributes = infos;
+	}
+	
 	@Override
 	public String toPrettyFormatString() {
 		return toInternalString();
@@ -175,16 +190,15 @@ public final class TaxonOccurrence extends AbstractValue {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((ancestorTaxons == null) ? 0 : ancestorTaxons.hashCode());
 		result = prime * result + ((code == null) ? 0 : code.hashCode());
-		result = prime * result
-				+ ((languageCode == null) ? 0 : languageCode.hashCode());
-		result = prime * result
-				+ ((languageVariety == null) ? 0 : languageVariety.hashCode());
-		result = prime * result
-				+ ((scientificName == null) ? 0 : scientificName.hashCode());
+		result = prime * result + ((infoAttributes == null) ? 0 : infoAttributes.hashCode());
+		result = prime * result + ((languageCode == null) ? 0 : languageCode.hashCode());
+		result = prime * result + ((languageVariety == null) ? 0 : languageVariety.hashCode());
+		result = prime * result + ((scientificName == null) ? 0 : scientificName.hashCode());
 		result = prime * result + ((taxonId == null) ? 0 : taxonId.hashCode());
-		result = prime * result
-				+ ((vernacularName == null) ? 0 : vernacularName.hashCode());
+		result = prime * result + ((taxonRank == null) ? 0 : taxonRank.hashCode());
+		result = prime * result + ((vernacularName == null) ? 0 : vernacularName.hashCode());
 		return result;
 	}
 
@@ -197,10 +211,20 @@ public final class TaxonOccurrence extends AbstractValue {
 		if (getClass() != obj.getClass())
 			return false;
 		TaxonOccurrence other = (TaxonOccurrence) obj;
+		if (ancestorTaxons == null) {
+			if (other.ancestorTaxons != null)
+				return false;
+		} else if (!ancestorTaxons.equals(other.ancestorTaxons))
+			return false;
 		if (code == null) {
 			if (other.code != null)
 				return false;
 		} else if (!code.equals(other.code))
+			return false;
+		if (infoAttributes == null) {
+			if (other.infoAttributes != null)
+				return false;
+		} else if (!infoAttributes.equals(other.infoAttributes))
 			return false;
 		if (languageCode == null) {
 			if (other.languageCode != null)
@@ -221,6 +245,8 @@ public final class TaxonOccurrence extends AbstractValue {
 			if (other.taxonId != null)
 				return false;
 		} else if (!taxonId.equals(other.taxonId))
+			return false;
+		if (taxonRank != other.taxonRank)
 			return false;
 		if (vernacularName == null) {
 			if (other.vernacularName != null)

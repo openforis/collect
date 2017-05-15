@@ -59,6 +59,10 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 	@Transactional
 	public E loadById(int id) {
 		C dsl = dsl();
+		return loadById(dsl, id);
+	}
+
+	protected E loadById(C dsl, int id) {
 		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
 		if ( r == null ) {

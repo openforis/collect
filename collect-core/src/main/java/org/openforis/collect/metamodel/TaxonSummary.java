@@ -5,6 +5,7 @@ package org.openforis.collect.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +13,11 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
+import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
+import org.openforis.idm.model.species.TaxonVernacularName;
 
 /**
  * @author S. Ricci
@@ -31,6 +36,35 @@ public class TaxonSummary {
 	private String scientificName;
 	private TaxonRank rank;
 	private Map<String, List<String>> languageToVernacularNames;
+	private Map<String, String> infoByName = new HashMap<String, String>();
+	
+	public TaxonSummary() {
+	}
+	
+	public TaxonSummary(TaxonomyDefinition taxonDefinition, Taxon taxon, List<TaxonVernacularName> vernacularNames, Taxon familyTaxon) {
+		this.setCode(taxon.getCode());
+		this.setRank(taxon.getTaxonRank());
+		this.setParentSystemId(taxon.getParentId());
+		this.setScientificName(taxon.getScientificName());
+		this.setTaxonId(taxon.getTaxonId());
+		this.setTaxonSystemId(taxon.getSystemId());
+		
+		for (TaxonVernacularName taxonVernacularName : vernacularNames) {
+			//if lang code is blank, vernacular name will be considered as synonym
+			String languageCode = StringUtils.trimToEmpty(taxonVernacularName.getLanguageCode());
+			this.addVernacularName(languageCode, taxonVernacularName.getVernacularName());
+		}
+		
+		List<Attribute> taxonAttributes = taxonDefinition.getAttributes();
+		for (int i = 0; i < taxonAttributes.size(); i++) {
+			Attribute taxonAttr = taxonAttributes.get(i);
+			this.addInfo(taxonAttr.getName(), taxon.getInfoAttribute(i));
+		}
+		
+		if ( familyTaxon != null ) {
+			this.setFamilyName(familyTaxon.getScientificName());
+		}
+	}
 	
 	public List<String> getVernacularLanguages() {
 		if ( languageToVernacularNames == null ) {
@@ -96,6 +130,22 @@ public class TaxonSummary {
 	public String getJointSynonyms(String separator) {
 		List<String> synonyms = getSynonyms();
 		return StringUtils.join(synonyms, separator);
+	}
+	
+	public String getInfo(String name) {
+		return infoByName.get(name);
+	}
+
+	public void addInfo(String name, String value) {
+		infoByName.put(name, value);
+	}
+	
+	public void removeInfo(String name) {
+		infoByName.remove(name);
+	}
+	
+	public Map<String, String> getInfoByName() {
+		return infoByName;
 	}
 	
 	public int getTaxonSystemId() {

@@ -3,7 +3,7 @@ package org.openforis.collect.io.metadata.species;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.io.metadata.parsing.Line;
+import org.openforis.collect.io.metadata.parsing.ReferenceDataLine;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
 /**
@@ -11,7 +11,7 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  * @author S. Ricci
  *
  */
-public class SpeciesBackupLine extends Line {
+public class SpeciesBackupLine extends ReferenceDataLine {
 	
 	private Integer Id;
 	private Integer parentId;

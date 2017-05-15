@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.12.37-SNAPSHOT</version>
+		<version>3.13.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-server</artifactId>
@@ -428,6 +428,11 @@
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
 		    <version>2.6.3</version>
+		</dependency>
+		<dependency>
+			<groupId>de.micromata.jak</groupId>
+			<artifactId>JavaAPIforKml</artifactId>
+			<version>2.2.1</version>
 		</dependency>
 		
 		<dependency>

@@ -5,14 +5,14 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.KEY;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.NAME;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.REFERENCE_DATA_SCHEMA;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.SAMPLING_POINT;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.TAXON;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TAXONOMY;
 
 import java.io.IOException;
 
 import org.openforis.idm.metamodel.ReferenceDataSchema;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
-import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -27,7 +27,7 @@ class ReferenceDataSchemaPR extends IdmlPullReader {
 		super(REFERENCE_DATA_SCHEMA, 1);
 		addChildPullReaders(
 				new SamplingPointPR(),
-				new TaxonPR()
+				new TaxonomyPR()
 			);
 	}
 	
@@ -65,10 +65,10 @@ class ReferenceDataSchemaPR extends IdmlPullReader {
 		}
 	}
 
-	private class TaxonPR extends ReferenceDataPR<TaxonDefinition> {
+	private class TaxonomyPR extends ReferenceDataPR<TaxonomyDefinition> {
 		
-		public TaxonPR() {
-			super(TAXON);
+		public TaxonomyPR() {
+			super(TAXONOMY);
 		}
 		
 		@Override
@@ -76,8 +76,9 @@ class ReferenceDataSchemaPR extends IdmlPullReader {
 				XmlPullParserException, IOException {
 			super.onStartTag();
 			ReferenceDataSchemaPR parentReader = (ReferenceDataSchemaPR) getParentReader();
-			referenceData = new ReferenceDataSchema.TaxonDefinition();
-			parentReader.referenceDataSchema.setTaxonDefinition(referenceData);
+			String taxonomyName = getAttribute(NAME, true);
+			referenceData = new TaxonomyDefinition(taxonomyName);
+			parentReader.referenceDataSchema.addTaxonomyDefinition(referenceData);
 		}
 	}
 
@@ -94,7 +95,5 @@ class ReferenceDataSchemaPR extends IdmlPullReader {
 			ReferenceDataPR<?> parentReader = (ReferenceDataPR<?>) getParentReader();
 			parentReader.referenceData.addAttribute(name, key);
 		}
-
 	}
-
 }

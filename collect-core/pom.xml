@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.37-SNAPSHOT</version>
+		<version>3.13.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
@@ -315,11 +315,6 @@
 			<groupId>com.jamesmurty.utils</groupId>
 			<artifactId>java-xmlbuilder</artifactId>
 			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>de.micromata.jak</groupId>
-			<artifactId>JavaAPIforKml</artifactId>
-			<version>2.2.1</version>
 		</dependency>
 		
 		<!-- TEST DEPENDENCIES -->

@@ -30,6 +30,23 @@ public class GeoFunctions extends CustomFunctions {
 	
 	public static final String LATLONG_FUNCTION_NAME = "latlong";
 	
+	protected static final CustomFunction LAT_LONG_FUNCTION = new CustomFunction(1) {
+		public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+			return latLong(expressionContext, objects[0]);
+		}
+		protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+				Expression[] arguments) {
+			Survey survey = contextNodeDef.getSurvey();
+			if(survey.getSpatialReferenceSystem(SpatialReferenceSystem.WGS84_SRS_ID) == null) {
+				String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
+						LATLONG_FUNCTION_NAME, SpatialReferenceSystem.WGS84_SRS_ID);
+				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
+			} else {
+				return new ExpressionValidationResult();
+			}
+		}
+	};
+	
 	public GeoFunctions(String namespace) {
 		super(namespace);
 	
@@ -63,29 +80,9 @@ public class GeoFunctions extends CustomFunctions {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return distance(expressionContext, objects[0], objects[1]);
 			}
-			@Override
-			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
-					Expression[] arguments) {
-				return super.performArgumentValidation(contextNodeDef, arguments);
-			}
 		});
 		
-		register(LATLONG_FUNCTION_NAME, new CustomFunction(1) {
-			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return latLong(expressionContext, objects[0]);
-			}
-			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
-					Expression[] arguments) {
-				Survey survey = contextNodeDef.getSurvey();
-				if(survey.getSpatialReferenceSystem(SpatialReferenceSystem.WGS84_SRS_ID) == null) {
-					String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
-							LATLONG_FUNCTION_NAME, SpatialReferenceSystem.WGS84_SRS_ID);
-					return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
-				} else {
-					return new ExpressionValidationResult();
-				}
-			}
-		});
+		register(LATLONG_FUNCTION_NAME, LAT_LONG_FUNCTION);
 
 	}
 

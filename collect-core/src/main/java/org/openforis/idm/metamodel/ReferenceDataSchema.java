@@ -1,7 +1,10 @@
 package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.commons.collection.CollectionUtils;
 
@@ -12,12 +15,8 @@ import org.openforis.commons.collection.CollectionUtils;
  */
 public class ReferenceDataSchema {
 	
-	private SamplingPointDefinition samplingPointDefinition;
-	private TaxonDefinition taxonDefinition;
-	
-	public ReferenceDataSchema() {
-		this.samplingPointDefinition = new SamplingPointDefinition();
-	}
+	private SamplingPointDefinition samplingPointDefinition = new SamplingPointDefinition();
+	private Map<String, TaxonomyDefinition> taxonomyDefinitionByName = new HashMap<String, TaxonomyDefinition>();
 	
 	public SamplingPointDefinition getSamplingPointDefinition() {
 		return samplingPointDefinition;
@@ -27,14 +26,24 @@ public class ReferenceDataSchema {
 		this.samplingPointDefinition = samplingPoint;
 	}
 	
-	public TaxonDefinition getTaxonDefinition() {
-		return taxonDefinition;
-	}
-	
-	public void setTaxonDefinition(TaxonDefinition taxon) {
-		this.taxonDefinition = taxon;
+	public List<TaxonomyDefinition> getTaxonomyDefinitions() {
+		return Collections.unmodifiableList(new ArrayList<TaxonomyDefinition>(taxonomyDefinitionByName.values()));
 	}
 
+	public TaxonomyDefinition getTaxonomyDefinition(String name) {
+		TaxonomyDefinition taxonomyDefinition = taxonomyDefinitionByName.get(name);
+		if (taxonomyDefinition == null) {
+			//for backwards compatibility
+			taxonomyDefinition = new TaxonomyDefinition(name);
+			taxonomyDefinitionByName.put(name, taxonomyDefinition);
+		}
+		return taxonomyDefinition;
+	}
+	
+	public void addTaxonomyDefinition(TaxonomyDefinition taxonomyDefinition) {
+		this.taxonomyDefinitionByName.put(taxonomyDefinition.getTaxonomyName(), taxonomyDefinition);
+	}
+	
 	public static abstract class ReferenceDataDefinition {
 
 		private List<ReferenceDataDefinition.Attribute> attributes;
@@ -45,6 +54,14 @@ public class ReferenceDataSchema {
 		
 		public List<ReferenceDataDefinition.Attribute> getAttributes() {
 			return CollectionUtils.unmodifiableList(attributes);
+		}
+		
+		public List<String> getAttributeNames() {
+			List<String> result = new ArrayList<String>();
+			for (Attribute attribute : attributes) {
+				result.add(attribute.name);
+			}
+			return result;
 		}
 		
 		public List<ReferenceDataDefinition.Attribute> getAttributes(boolean key) {
@@ -172,31 +189,36 @@ public class ReferenceDataSchema {
 					return false;
 				return true;
 			}
-		
 		}
-
 	}
-	
-	
 	
 	public static class SamplingPointDefinition extends ReferenceDataDefinition {
-		
 	}
 
-	public static class TaxonDefinition extends ReferenceDataDefinition {
+	public static class TaxonomyDefinition extends ReferenceDataDefinition {
+
+		private String taxonomyName;
+
+		public TaxonomyDefinition(String taxonomyName) {
+			super();
+			this.taxonomyName = taxonomyName;
+		}
+
+		public String getTaxonomyName() {
+			return taxonomyName;
+		}
 		
+		public void setTaxonomyName(String taxonomyName) {
+			this.taxonomyName = taxonomyName;
+		}
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime
-				* result
-				+ ((samplingPointDefinition == null) ? 0
-						: samplingPointDefinition.hashCode());
-		result = prime * result
-				+ ((taxonDefinition == null) ? 0 : taxonDefinition.hashCode());
+		result = prime * result + ((samplingPointDefinition == null) ? 0 : samplingPointDefinition.hashCode());
+		result = prime * result + ((taxonomyDefinitionByName == null) ? 0 : taxonomyDefinitionByName.hashCode());
 		return result;
 	}
 
@@ -212,13 +234,12 @@ public class ReferenceDataSchema {
 		if (samplingPointDefinition == null) {
 			if (other.samplingPointDefinition != null)
 				return false;
-		} else if (!samplingPointDefinition
-				.equals(other.samplingPointDefinition))
+		} else if (!samplingPointDefinition.equals(other.samplingPointDefinition))
 			return false;
-		if (taxonDefinition == null) {
-			if (other.taxonDefinition != null)
+		if (taxonomyDefinitionByName == null) {
+			if (other.taxonomyDefinitionByName != null)
 				return false;
-		} else if (!taxonDefinition.equals(other.taxonDefinition))
+		} else if (!taxonomyDefinitionByName.equals(other.taxonomyDefinitionByName))
 			return false;
 		return true;
 	}

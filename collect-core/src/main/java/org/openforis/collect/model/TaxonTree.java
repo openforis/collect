@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
@@ -29,6 +30,7 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  */
 public class TaxonTree {
 
+	private TaxonomyDefinition taxonDefinition;
 	private List<Node> roots;
 
 	Map<String, Node> scientificNameToNode;
@@ -39,8 +41,9 @@ public class TaxonTree {
 	Integer lastTaxonId;
 	Integer lastTaxonVernacularNameId;
 
-	public TaxonTree() {
+	public TaxonTree(TaxonomyDefinition taxonDefinition) {
 		super();
+		this.taxonDefinition = taxonDefinition;
 		roots = new ArrayList<Node>();
 		scientificNameToNode = new HashMap<String, TaxonTree.Node>();
 		codeToNode = new HashMap<String, TaxonTree.Node>();
@@ -281,7 +284,10 @@ public class TaxonTree {
 				Taxon taxon = node.getTaxon();
 				boolean generated = isGeneratedItem(taxon);
 				if ( taxon.getTaxonRank().compareTo(startFromRank) >= 0 && (includeGeneratedItems || ! generated)) {
-					result.add(createSummary(node));
+					Node familyNode = node.getAncestor(TaxonRank.FAMILY);
+					Taxon familyTaxon = familyNode == null ? null : familyNode.getTaxon();
+					result.add(new TaxonSummary(taxonDefinition, 
+							taxon, node.getVernacularNames(), familyTaxon));
 				}
 			}
 
@@ -311,28 +317,6 @@ public class TaxonTree {
 		return taxon.getTaxonId() == null && StringUtils.isBlank(taxon.getCode());
 	}
 
-	protected TaxonSummary createSummary(Node node) {
-		Taxon taxon = node.getTaxon();
-		TaxonSummary summary = new TaxonSummary();
-		summary.setTaxonSystemId(taxon.getSystemId());
-		summary.setParentSystemId(taxon.getParentId());
-		summary.setTaxonId(taxon.getTaxonId());
-		summary.setCode(taxon.getCode());
-		summary.setRank(taxon.getTaxonRank());
-		summary.setScientificName(taxon.getScientificName());
-		Node familyAncestor = node.getAncestor(TaxonRank.FAMILY);
-		if ( familyAncestor != null ) {
-			Taxon familyTaxon = familyAncestor.getTaxon();
-			summary.setFamilyName(familyTaxon.getScientificName());
-		}
-		for (TaxonVernacularName taxonVernacularName : node.getVernacularNames()) {
-			//if lang code is blank, vernacular name will be considered as synonym
-			String languageCode = StringUtils.trimToEmpty(taxonVernacularName.getLanguageCode());
-			summary.addVernacularName(languageCode, taxonVernacularName.getVernacularName());
-		}
-		return summary;
-	}
-	
 	private List<TaxonOccurrence> taxaToOccurrences(List<Taxon> list, TaxonSearchParameters parameters) {
 		List<Node> nodes = taxaToNodes(list);
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>(nodes.size());
@@ -497,6 +481,11 @@ public class TaxonTree {
 		
 		public List<TaxonVernacularName> getVernacularNames() {
 			return CollectionUtils.unmodifiableList(vernacularNames);
+		}
+		
+		@Override
+		public String toString() {
+			return taxon == null ? "EMPTY" : taxon.toString();
 		}
 		
 	}

@@ -439,11 +439,10 @@ public class CollectEarthBalloonGenerator {
 		int codeItemIdx = 0;
 		for (CodeListItem item : codeItems) {
 			String key = item.getCode();
-			String itemLabel = item.getLabel(language);
-			if (itemLabel == null && ! isDefaultLanguage()) {
-				itemLabel = item.getLabel();
-			}
-			CETableRow row = new CETableRow(key, itemLabel);
+			String itemLabel = CEComponentHTMLFormatter.getItemLabel(item, language);
+			String tooltip = CEComponentHTMLFormatter.getDescription(item, language);
+			
+			CETableRow row = new CETableRow(key, itemLabel, tooltip);
 			for (NodeDefinition child : def.getChildDefinitions()) {
 				if (! uiOptions.isHidden(child)) {
 					row.addChild(createComponent(child, codeItemIdx + 1));

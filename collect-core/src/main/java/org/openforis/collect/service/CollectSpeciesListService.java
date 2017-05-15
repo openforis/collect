@@ -1,10 +1,13 @@
 package org.openforis.collect.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.TaxonSearchParameters;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.TaxonOccurrence;
@@ -22,11 +25,21 @@ public class CollectSpeciesListService implements SpeciesListService {
 	private SpeciesManager speciesManager;
 	
 	@Override
+	public List<String> loadSpeciesListNames(Survey survey) {
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey((CollectSurvey) survey);
+		List<String> result = new ArrayList<String>(taxonomies.size());
+		for (CollectTaxonomy taxonomy : taxonomies) {
+			result.add(taxonomy.getName());
+		}
+		return result;
+	}
+	
+	@Override
 	public Object loadSpeciesListData(Survey survey, String taxonomyName, String attribute, String speciesCode) {
-		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(survey.getId(), taxonomyName);
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName((CollectSurvey) survey, taxonomyName);
 		TaxonSearchParameters parameters = new TaxonSearchParameters();
 		parameters.setIncludeAncestorTaxons(true);
-		List<TaxonOccurrence> result = speciesManager.findByCode(taxonomy.getId(), speciesCode, 1, parameters);
+		List<TaxonOccurrence> result = speciesManager.findByCode(taxonomy, speciesCode, 1, parameters);
 		if (result.isEmpty()) {
 			return null;
 		} else {
@@ -43,7 +56,17 @@ public class CollectSpeciesListService implements SpeciesListService {
 			} else if (SCIENTIFIC_NAME_ATTRIBUTE.equals(attribute)) {
 				return taxonOccurrence.getScientificName();
 			} else {
-				throw new IllegalArgumentException("Unsupported attribute: " + attribute);
+				TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
+				if (taxonDefinition == null) {
+					throw new IllegalArgumentException("No reference data schema found for taxonomy: " + taxonomyName);
+				} else {
+					int attributeIndex = taxonDefinition.getAttributeNames().indexOf(attribute);
+					if (attributeIndex < 0) {
+						throw new IllegalArgumentException("Unsupported attribute: " + attribute);
+					} else {
+						return taxonOccurrence.getInfoAttribute(attributeIndex);
+					}
+				}
 			}
 		}
 	}

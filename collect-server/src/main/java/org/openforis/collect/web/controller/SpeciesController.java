@@ -6,7 +6,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.species.SpeciesExportProcess;
+import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,16 +23,19 @@ public class SpeciesController {
 	
 	@Autowired
 	private SpeciesManager speciesManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	
-	@RequestMapping(value = "/species/export/{taxonomyId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/survey/{surveyId}/taxonomy/{taxonomyId}/export.csv", method = RequestMethod.GET)
 	public @ResponseBody String exportSpecies(HttpServletResponse response,
+			@PathVariable("surveyId") Integer surveyId,
 			@PathVariable("taxonomyId") Integer taxonomyId) throws IOException {
-		SpeciesExportProcess process = new SpeciesExportProcess(speciesManager);
+		response.setHeader("Content-Disposition", "attachment; filename=" + SPECIES_LIST_CSV_FILE_NAME);
 		response.setContentType("text/csv"); 
-		String fileName = SPECIES_LIST_CSV_FILE_NAME;
-		response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
 		ServletOutputStream out = response.getOutputStream();
-		process.exportToCSV(out, taxonomyId);
+		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		SpeciesExportProcess process = new SpeciesExportProcess(speciesManager);
+		process.exportToCSV(out, survey, taxonomyId);
 		return "ok";
 	}
 	

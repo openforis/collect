@@ -30,8 +30,9 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function start(responder:IResponder, tempFileName:String, csvFileOptions:CSVFileOptions, taxonomyId:int, overwriteAll:Boolean):void {
-			var token:AsyncToken = this._startOperation.send(tempFileName, csvFileOptions, taxonomyId, overwriteAll);
+		public function start(responder:IResponder, tempFileName:String, csvFileOptions:CSVFileOptions, surveyId:int,
+				taxonomyId:int, overwriteAll:Boolean):void {
+			var token:AsyncToken = this._startOperation.send(tempFileName, csvFileOptions, surveyId, taxonomyId, overwriteAll);
 			token.addResponder(responder);
 		}
 

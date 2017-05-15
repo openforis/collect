@@ -24,7 +24,7 @@ class TaxonAttributeDefinitionPR extends AttributeDefinitionPR {
 	protected void onStartDefinition() throws XmlParseException, XmlPullParserException, IOException {
 		super.onStartDefinition();
 		TaxonAttributeDefinition defn = (TaxonAttributeDefinition) getDefinition();
-		String taxonomy = getAttribute(TAXONOMY, true);
+		String taxonomy = getAttribute(TAXONOMY, false);
 		String highestRankName = getAttribute(HIGHEST_RANK, false);
 		String qualifiers = getAttribute(QUALIFIERS, false);
 		defn.setTaxonomy(taxonomy);

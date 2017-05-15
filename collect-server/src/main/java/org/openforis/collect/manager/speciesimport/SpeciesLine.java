@@ -3,7 +3,7 @@ package org.openforis.collect.manager.speciesimport;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.io.metadata.parsing.Line;
+import org.openforis.collect.io.metadata.parsing.ReferenceDataLine;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
 /**
@@ -11,7 +11,7 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  * @author S. Ricci
  *
  */
-public class SpeciesLine extends Line {
+public class SpeciesLine extends ReferenceDataLine {
 	
 	private Integer taxonId;
 	private String code;
@@ -22,7 +22,7 @@ public class SpeciesLine extends Line {
 	private String rawScientificName;
 	private String canonicalScientificName;
 	private Map<String, List<String>> languageToVernacularNames;
-
+	
 	public List<String> getVernacularNames(String langCode) {
 		if ( languageToVernacularNames != null ) {
 			return languageToVernacularNames.get(langCode);
@@ -103,5 +103,4 @@ public class SpeciesLine extends Line {
 			Map<String, List<String>> languageToVernacularNames) {
 		this.languageToVernacularNames = languageToVernacularNames;
 	}
-
 }
