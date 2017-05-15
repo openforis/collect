@@ -14,7 +14,21 @@ Collect.DataManager.MapPanelComposer = function(panel) {
 	this.startZoom = 4;
 	
 	this.coordinateDataStyleCache = {};
+	this.samplingPointStyleCache = {};
 }
+
+Collect.DataManager.MapPanelComposer.SAMPLING_POINT_STYLE = new ol.style.Style({
+	image : new ol.style.Circle({
+		fill : new ol.style.Fill({
+			color : [0,0,255,0.1] //almost transparent fill
+		}),
+		stroke: new ol.style.Stroke({
+			color : "#0000FF",
+			width: 2
+		}),
+		radius : 5
+	})
+});
 
 Collect.DataManager.MapPanelComposer.DATA_ENTRY_RECORD_STYLE = new ol.style.Style({
 	image : new ol.style.Circle({
@@ -125,44 +139,60 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			return feature;
 		});
 		if (featureOrLayer) {
+			var features = featureOrLayer.get('features');
 			var feature;
-			if (featureOrLayer.get('features')) {
-				feature = featureOrLayer.get('features')[0];
+			var numberOfFeatures;
+			if (features) {
+				numberOfFeatures = features.length;
+				feature = features[0];
 			} else {
+				numberOfFeatures = 1;
 				feature = featureOrLayer;
 			}
 			var survey = feature.get('survey');
 			var htmlContent;
 			
-			switch (feature.get('type')) {
-			case 'sampling_point':
-				var lonLat = coordinate;
-				var keyDefs = survey.getRooEntityKeyDefinitions();
-				function printLevelCodes(levelCodes) {
-					var result = "";
-					for (var i = 0; i < levelCodes.length; i++) {
-						var keyDef = keyDefs.length > i ? keyDefs[i] : null;
-						var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
-						result += levelName + ": " + levelCodes[i] + "<br>";
-					}
-					return result;
+			if (numberOfFeatures > 1) {
+				htmlContent = "Cluster of " + numberOfFeatures + " ";
+				switch (feature.get('type')) {
+				case 'sampling_point':
+					htmlContent += " sampling points";
+					break;
+				case 'coordinate_attribute_value':
+					htmlContent += " sampling units";
+					break;
 				}
-				var levelCodes = feature.get('name').split('|');
-				htmlContent = OF.Strings.format(
-						//TODO improve level codes formatting
-						"<b>Sampling Point</b>"
-						+ "<br>"
-						+ "{0}"
-						+ "Latitude: {1}"
-						+ "<br>"
-						+ "Longitude: {2}"
-						+ "<br>"
-						, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
-				break;
-			case 'coordinate_attribute_value':
-				var point = feature.get('point');
-				htmlContent = $this.createNodeInfoBalloon(survey, point);
-				break;
+			} else {
+				switch (feature.get('type')) {
+				case 'sampling_point':
+					var lonLat = coordinate;
+					var keyDefs = survey.getRooEntityKeyDefinitions();
+					function printLevelCodes(levelCodes) {
+						var result = "";
+						for (var i = 0; i < levelCodes.length; i++) {
+							var keyDef = keyDefs.length > i ? keyDefs[i] : null;
+							var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
+							result += levelName + ": " + levelCodes[i] + "<br>";
+						}
+						return result;
+					}
+					var levelCodes = feature.get('name').split('|');
+					htmlContent = OF.Strings.format(
+							//TODO improve level codes formatting
+							"<b>Sampling Point</b>"
+							+ "<br>"
+							+ "{0}"
+							+ "Latitude: {1}"
+							+ "<br>"
+							+ "Longitude: {2}"
+							+ "<br>"
+							, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
+					break;
+				case 'coordinate_attribute_value':
+					var point = feature.get('point');
+					htmlContent = $this.createNodeInfoBalloon(survey, point);
+					break;
+				}
 			}
 			$this.popupContent.html(htmlContent);
 			$this.popupContent.find(".accordion").accordion({heightStyle: "content", animate: 0});
@@ -291,18 +321,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				visible : false,
 				type : 'sampling_points',
 				survey : survey,
-				style : new ol.style.Style({
-					image : new ol.style.Circle({
-						fill : new ol.style.Fill({
-							color : [0,0,255,0.1] //almost transparent fill
-						}),
-						stroke: new ol.style.Stroke({
-							color : "#0000FF",
-							width: 2
-						}),
-						radius : 5
-					})
-				})
+				style : $.proxy($this.samplingPointLayerStyleFunction, $this)
 			})
 		]
 	});
@@ -319,6 +338,33 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 	});
 
 	return surveyGroup;
+};
+
+Collect.DataManager.MapPanelComposer.prototype.samplingPointLayerStyleFunction = function(layer) {
+	var $this = this;
+	var size = layer.get('features').length;
+	if (size == 1) {
+		return Collect.DataManager.MapPanelComposer.SAMPLING_POINT_STYLE;
+	} else {
+		var styleCache = $this.samplingPointStyleCache;
+		var style = styleCache[size];
+		if (!style) {
+			style = new ol.style.Style({
+				image: new ol.style.Circle({
+					radius: Math.max(size / 5, 10),
+					stroke: new ol.style.Stroke({
+						color: '#00f',
+						lineDash: [2, 2]
+					}),
+					fill: new ol.style.Fill({
+						color : [0,0,255,0.1] //almost transparent fill
+					})
+				})
+			});
+			styleCache[size] = style;
+		}
+		return style;
+	}
 };
 
 Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunction = function(layer) {
@@ -345,16 +391,11 @@ Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunc
 				image: new ol.style.Circle({
 					radius: 10,
 					stroke: new ol.style.Stroke({
-						color: '#fff'
+						color: '#fff',
+						lineDash: [2,2]
 					}),
 					fill: new ol.style.Fill({
 						color: '#3399CC'
-					})
-				}),
-				text: new ol.style.Text({
-					text: size.toString(),
-					fill: new ol.style.Fill({
-						color: '#fff'
 					})
 				})
 			});
@@ -508,6 +549,7 @@ Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 
 Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback, readyCallback) {
 	var url = OF.Strings.format("survey/{0}/sampling-point-data.kml", survey.id);
+	
 	var source = new ol.source.Vector({
 		url : url,
 		format : new ol.format.KML({
@@ -515,7 +557,12 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 		})
 	});
 	
-	callback(source);
+	var clusterSource = new ol.source.Cluster({
+		distance: 20,
+		source: source
+	});
+	
+	callback(clusterSource);
 	
 	//wait for load complete (change event)
 	source.on('change', function(event) {
@@ -525,13 +572,14 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 	});
 	
 	function onReady() {
+		//add extra info to each feature (survey, type, etc.)
 		source.forEachFeature(function(feature) {
 			feature.setProperties({
 				'type': 'sampling_point',
 				'survey' : survey
 			}, true);
 		});
-		readyCallback(source);
+		readyCallback(clusterSource);
 	}
 	
 	onReady();

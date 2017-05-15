@@ -124,8 +124,7 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	
 	@DependsOn("surveyId")
 	public List<String> getTaxonomyNames() {
-		Integer surveyId = getSurveyId();
-		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(surveyId);
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey);
 		List<String> result = new ArrayList<String>();
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			result.add(taxonomy.getName());

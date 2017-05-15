@@ -15,7 +15,6 @@ import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
-import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -43,7 +42,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, -2, "JUG", "Juglans sp.", TaxonRank.GENUS, 9, family1);
 		testInsertAndLoadTaxon(taxonomy1, -3, "JUG/REG", "Juglans regia", TaxonRank.SPECIES, 9, genus1);
 
-		List<Taxon> results = taxonDao.findByCode(taxonomy1.getId(), match, maxResults);
+		List<Taxon> results = taxonDao.findByCode(taxonomy1, match, maxResults);
 		assertEquals(expectedResults, results.size());
 		match = match.toUpperCase();
 		for (Taxon taxon : results) {
@@ -86,7 +85,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		Taxon genus1 = testInsertAndLoadTaxon(taxonomy1, -2, "JUG", "Juglans sp.",TaxonRank.GENUS, 9, family1);
 		testInsertAndLoadTaxon(taxonomy1, -3, "JUG/REG", "Juglans regia", TaxonRank.SPECIES, 9, genus1);
 		
-		List<Taxon> results = taxonDao.findByScientificName(taxonomy1.getId(), match, maxResults);
+		List<Taxon> results = taxonDao.findByScientificName(taxonomy1, match, maxResults);
 		assertEquals(expectedResults, results.size());
 		match = match.toUpperCase();
 		for (Taxon taxon : results) {
@@ -163,7 +162,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		Stack<Taxon> taxa = new Stack<Taxon>();
 		taxa.push(testInsertAndLoadTaxon(taxonomy1, -1, "JUG","Juglandaceaex", TaxonRank.FAMILY, 9, null));
 		taxa.push(testInsertAndLoadTaxon(taxonomy1, -2, "JUG2", "sJuglans sp.", TaxonRank.GENUS, 0, null));
-		taxa.push(testUpdateAndLoadTaxon(taxa.pop(), "Juglans sp.", TaxonRank.GENUS, 9, taxa.get(0)));
+		taxa.push(testUpdateAndLoadTaxon(taxonomy1, taxa.pop(), "Juglans sp.", TaxonRank.GENUS, 9, taxa.get(0)));
 		taxa.push(testInsertAndLoadTaxon(taxonomy1, -4, "JUG3", "Juglans regia", TaxonRank.SPECIES, 9, taxa.get(1)));
 		
 		// Create vernacular names
@@ -194,21 +193,18 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void testDeleteTaxonByTaxonomy() {
 		CollectSurvey survey = createAndStoreSurvey();
-		Integer surveyId = survey.getId();
 		
 		// Create taxonomy
 		CollectTaxonomy t = new CollectTaxonomy();
-		t.setSurveyId(surveyId);
+		t.setSurvey(survey);
 		
 		t.setName("it_trees");
 		taxonomyDao.insert(t);
-		Integer tId = t.getId();
 		
 		CollectTaxonomy t2 = new CollectTaxonomy();
-		t2.setSurveyId(surveyId);
+		t2.setSurvey(survey);
 		t2.setName("it_bamboos");
 		taxonomyDao.insert(t2);
-		Integer t2Id = t2.getId();
 		
 		Taxon family1 = testInsertAndLoadTaxon(t, -1, "JUGLANDACAE", "Juglandaceae", TaxonRank.FAMILY, 9, null);
 		Taxon genus1 = testInsertAndLoadTaxon(t, -2, "JUG", "Juglans sp.",TaxonRank.GENUS, 9, family1);
@@ -219,32 +215,31 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		testInsertAndLoadTaxon(t2, -3, "JUG/REG", "Juglans regia", TaxonRank.SPECIES, 9, genus2);
 		
 		//verify taxon records present
-		List<Taxon> results = taxonDao.findByCode(tId, "%", 10);
+		List<Taxon> results = taxonDao.findByCode(t, "%", 10);
 		assertEquals(3, results.size());
-		taxonDao.deleteByTaxonomy(tId);
+		taxonDao.deleteByTaxonomy(t);
 		
 		//verify all taxon records deleted for taxonomy 1
-		List<Taxon> results2 = taxonDao.findByCode(tId, "%", 10);
+		List<Taxon> results2 = taxonDao.findByCode(t, "%", 10);
 		assertTrue(results2 == null || results2.size() == 0);
 		
 		//verify all taxon records NOT deleted for taxonomy 2
-		List<Taxon> results3 = taxonDao.findByCode(t2Id, "%", 10);
+		List<Taxon> results3 = taxonDao.findByCode(t2, "%", 10);
 		assertEquals(3, results3.size());
 	}
 
 	private CollectTaxonomy testInsertAndLoadTaxonomy(String name) {
 		CollectSurvey survey = createAndStoreSurvey();
 		
-		Integer surveyId = survey.getId();
 		// Insert
 		CollectTaxonomy t1 = new CollectTaxonomy();
 		t1.setName(name);
-		t1.setSurveyId(surveyId);
+		t1.setSurvey(survey);
 		taxonomyDao.insert(t1);
 		CollectTaxonomy t = t1;
 
 		// Confirm saved
-		CollectTaxonomy t2 = taxonomyDao.loadById(t.getId());
+		CollectTaxonomy t2 = taxonomyDao.loadById(survey, t.getId());
 		assertEquals(t.getId(), t2.getId());
 		assertEquals(t.getName(), t2.getName());
 		return t2;
@@ -257,11 +252,11 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		taxonomyDao.update(t);
 		
 		// Confirm saved
-		t = taxonomyDao.loadById(id);
+		t = taxonomyDao.loadById(t.getSurvey(), id);
 		assertEquals(newName, t.getName());
 	}
 	
-	private Taxon testInsertAndLoadTaxon(Taxonomy taxonomy, int taxonId, String code, String scientificName, TaxonRank rank, int step, Taxon parent) {
+	private Taxon testInsertAndLoadTaxon(CollectTaxonomy taxonomy, int taxonId, String code, String scientificName, TaxonRank rank, int step, Taxon parent) {
 		Integer parentId = parent == null ? null : parent.getSystemId();
 		
 		// Insert
@@ -276,7 +271,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		taxonDao.insert(t);
 		
 		// Confirm saved
-		t = taxonDao.loadById(t.getSystemId());
+		t = taxonDao.loadById((CollectTaxonomy) taxonomy, t.getSystemId());
 		assertNotNull(t);
 		assertEquals((Integer) taxonId, t.getTaxonId());
 		assertEquals(scientificName, t.getScientificName());
@@ -288,7 +283,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 	}
 
 	
-	private Taxon testUpdateAndLoadTaxon(Taxon t, String scientificName, TaxonRank rank, int step, Taxon parent) {
+	private Taxon testUpdateAndLoadTaxon(CollectTaxonomy taxonomy, Taxon t, String scientificName, TaxonRank rank, int step, Taxon parent) {
 		Integer parentId = parent == null ? null : parent.getSystemId();
 		
 		// Insert
@@ -299,7 +294,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		taxonDao.update(t);
 		
 		// Confirm saved
-		t = taxonDao.loadById(t.getSystemId());
+		t = taxonDao.loadById(taxonomy, t.getSystemId());
 		assertNotNull(t);
 		assertEquals(scientificName, t.getScientificName());
 		assertEquals(rank, t.getTaxonRank());
@@ -364,25 +359,25 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 
 	private void testDeleteAndLoadTaxon(Taxon t) {
 		// Delete
-		taxonDao.delete(t.getSystemId());
+		taxonDao.delete(t);
 		
 		// Confirm deleted
-		t = taxonDao.loadById(t.getSystemId());
+		t = taxonDao.loadById((CollectTaxonomy) t.getTaxonomy(), t.getSystemId());
 		assertNull(t);
 	}
 
-	private void testDeleteAndLoadTaxonomy(Taxonomy t) {
+	private void testDeleteAndLoadTaxonomy(CollectTaxonomy t) {
 		// Delete
-		taxonomyDao.delete(t.getId());
+		taxonomyDao.delete(t);
 		
 		// Confirm deleted
-		t = taxonomyDao.loadById(t.getId());
+		t = taxonomyDao.loadById(t.getSurvey(), t.getId());
 		assertNull(t);
 	}
 
 	protected CollectSurvey createAndStoreSurvey() {
 		CollectSurvey survey = createSurvey();
-		survey.setName("surveyTest");
+		survey.setName("survey_test");
 		survey.setUri("http://www.openforis.org/idm/species_dao_it");
 		try {
 			surveyManager.importModel(survey);

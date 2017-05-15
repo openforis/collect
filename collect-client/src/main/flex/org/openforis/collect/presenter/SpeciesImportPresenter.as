@@ -108,7 +108,7 @@ package org.openforis.collect.presenter {
 				return null;
 			} else {
 				var selectedTaxonomyId:Number = _selectedTaxonomy.id;
-				var url:String = ApplicationConstants.getSpeciesExportUrl(selectedTaxonomyId);
+				var url:String = ApplicationConstants.getSpeciesExportUrl(view.surveyId, selectedTaxonomyId);
 				var request:URLRequest = new URLRequest(url);
 				request.method = URLRequestMethod.GET;
 				return request;
@@ -145,19 +145,18 @@ package org.openforis.collect.presenter {
 		override protected function performSummariesLoad(offset:int = 0, recordsPerPage:int = MAX_SUMMARIES_PER_PAGE):void {
 			var surveyId:int = view.surveyId;
 			var taxonomyId:int = _selectedTaxonomy.id;
-			var work:Boolean = view.work;
 			var responder:IResponder = new AsyncResponder(loadSummariesResultHandler, faultHandler);
 			_speciesClient.loadTaxonSummaries(responder, taxonomyId, offset, recordsPerPage);
 		}
 		
 		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {
 			var result:TaxonSummariesProxy = event.result as TaxonSummariesProxy;
-			updateSummaryColumns(result.vernacularNamesLanguageCodes);
+			updateSummaryColumns(result.vernacularNamesLanguageCodes, result.infoAttributes);
 			view.summaryDataGrid.dataProvider = result.summaries;
 			view.paginationBar.totalRecords = result.totalCount;
 		}
 		
-		protected function updateSummaryColumns(vernacularNamesLangCodes:IList):void {
+		protected function updateSummaryColumns(vernacularNamesLangCodes:IList, infoAttributes:IList):void {
 			var columns:IList = view.summaryDataGrid.columns;
 			for (var i:int = columns.length - 1; i > FIXED_SUMMARY_COLUMNS_LENGTH - 1; i --) {
 				columns.removeItemAt(i);
@@ -168,6 +167,14 @@ package org.openforis.collect.presenter {
 				col.headerText = getLanguageCodeHeaderText(langCode);
 				col.dataField = langCode;
 				col.labelFunction = vernacularNamesLabelFunction;
+				col.width = 100;
+				columns.addItem(col);
+			}
+			for each (var infoAttribute:String in infoAttributes) {
+				var col:GridColumn = new GridColumn();
+				col.headerText = infoAttribute;
+				col.dataField = infoAttribute;
+				col.labelFunction = infoAttributeLabelFunction;
 				col.width = 100;
 				columns.addItem(col);
 			}
@@ -193,8 +200,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function vernacularNamesLabelFunction(item:TaxonSummaryProxy, gridColumn:GridColumn):String {
-			var names:IList = item.languageToVernacularNames.get(gridColumn.dataField);
+			var names:IList = item.vernacularNamesByLanguage.get(gridColumn.dataField);
 			return StringUtil.concat(VERANCULAR_NAMES_SEPARATOR, names);
+		}
+		
+		public function infoAttributeLabelFunction(item:TaxonSummaryProxy, gridColumn:GridColumn):String {
+			var info:String = item.infoByName.get(gridColumn.dataField);
+			return info;
 		}
 		
 		protected function newButtonClickHandler(event:MouseEvent):void	{
@@ -340,7 +352,6 @@ package org.openforis.collect.presenter {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
 			var taxonomyId:int = _selectedTaxonomy.id;
 			var surveyId:int = view.surveyId;
-			var work:Boolean = view.work;
 			var csvFileOptions:CSVFileOptions = null;
 			if (view.charsetDropDownList != null) {
 				csvFileOptions = new CSVFileOptions();
@@ -348,7 +359,7 @@ package org.openforis.collect.presenter {
 				csvFileOptions.separator = CSVFileSeparator.valueOf(view.separatorDropDownList.selectedItem.name);
 				csvFileOptions.textDelimiter = CSVFileTextDelimiter.valueOf(view.textDelimiterDropDownList.selectedItem.name);
 			}
-			_speciesImportClient.start(responder, _uploadedTempFileName, csvFileOptions, taxonomyId, true);
+			_speciesImportClient.start(responder, _uploadedTempFileName, csvFileOptions, surveyId, taxonomyId, true);
 		}
 		
 		override protected function updateStatus():void {

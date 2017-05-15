@@ -42,8 +42,16 @@ public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
 					ModelExtensionFunction modelExtensionFun = (ModelExtensionFunction) operation;
 					boolean valid = expressionFactory.isValidFunction(modelExtensionFun.getPrefix(), modelExtensionFun.getName());
 					if (valid) {
-						CustomFunction customFunction = expressionFactory.lookupFunction((ModelExtensionFunction) operation);
-						return customFunction.validateArguments(contextNodeDef, nullToEmpty(operation));
+						CustomFunction customFunction = expressionFactory.lookupFunction(modelExtensionFun);
+						if (customFunction == null) {
+							Expression[] arguments = modelExtensionFun.getArguments();
+							int argumentsSize = arguments == null ? 0 : arguments.length;
+							return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+									String.format("cannot invoke function %s passing %d arguments", 
+											modelExtensionFun.getFullName(), argumentsSize));
+						} else {
+							return customFunction.validateArguments(contextNodeDef, nullToEmpty(operation));
+						}
 					} else {
 						String fullName = modelExtensionFun.getPrefix() == null ? modelExtensionFun.getName() : modelExtensionFun.getFullName();
 						String functionNames = expressionFactory.getFullFunctionNames().toString();

@@ -52,6 +52,7 @@ public interface IdmlConstants {
 	static String REFERENCE_DATA_SCHEMA = "referenceDataSchema";
 	static String SAMPLING_POINT = "samplingPoint";
 	static String ATTRIBUTE = "attribute";
+	static String TAXONOMY_NAME = "taxonomy_name";
 	
 	// Schema
 	static String SCHEMA = "schema";

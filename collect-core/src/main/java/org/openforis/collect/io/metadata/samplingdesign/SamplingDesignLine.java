@@ -4,26 +4,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.openforis.collect.io.metadata.parsing.Line;
+import org.openforis.collect.io.metadata.parsing.ReferenceDataLine;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
-import org.openforis.commons.collection.CollectionUtils;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class SamplingDesignLine extends Line {
+public class SamplingDesignLine extends ReferenceDataLine {
 	
 	private SamplingDesignLineCodeKey key;
 	private String x;
 	private String y;
 	private String srsId;
-	private Map<String, String> infoAttributeByName;
 	
 	public SamplingDesignLineCodeKey getKey() {
 		return key;
@@ -63,22 +60,6 @@ public class SamplingDesignLine extends Line {
 				&& getSrsId().equals(other.getSrsId());
 	}
 
-	public Map<String, String> getInfoAttributeByName() {
-		return CollectionUtils.unmodifiableMap(infoAttributeByName);
-	}
-	
-	public String getInfoAttribute(String name) {
-		if ( infoAttributeByName == null ) {
-			return null;
-		} else {
-			return infoAttributeByName.get(name);
-		}
-	}
-	
-	public void setInfoAttributeByName(Map<String, String> infoAttributeByName) {
-		this.infoAttributeByName = infoAttributeByName;
-	}
-	
 	public SamplingDesignItem toSamplingDesignItem(CollectSurvey survey, List<String> infoColumnNames) {
 		SamplingDesignItem item = new SamplingDesignItem();
 		item.setSurveyId(survey.getId());

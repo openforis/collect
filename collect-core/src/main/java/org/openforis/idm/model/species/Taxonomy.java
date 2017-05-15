@@ -10,6 +10,14 @@ public class Taxonomy {
 	private String name;
 	private String uri;
 	
+	public Taxonomy() {
+	}
+	
+	public Taxonomy(Taxonomy source) {
+		this.name = source.name;
+		this.uri = source.uri;
+	}
+	
 	public Integer getId() {
 		return id;
 	}
@@ -70,5 +78,5 @@ public class Taxonomy {
 			return false;
 		return true;
 	}
-	
+
 }

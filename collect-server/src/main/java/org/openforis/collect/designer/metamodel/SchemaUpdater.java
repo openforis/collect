@@ -3,8 +3,10 @@ package org.openforis.collect.designer.metamodel;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 
 public class SchemaUpdater {
@@ -34,6 +36,18 @@ public class SchemaUpdater {
 		for (NodeLabel nodeLabel : aliasDef.getLabels()) {
 			aliasDef.setLabel(nodeLabel.getType(), nodeLabel.getLanguage(), nodeLabel.getText() + " Alias");
 		}
+		aliasDef.traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if (def instanceof AttributeDefinition) {
+					AttributeDefinition attrDef = (AttributeDefinition) def;
+					attrDef.setCalculated(false);
+					attrDef.removeAllChecks();
+					attrDef.removeAllAttributeDefaults();
+				}
+				def.setRelevantExpression(null);
+				def.setRequiredExpression(null);
+			}
+		});
 		targetParentDef.addChildDefinition(aliasDef);
 		aliasDef.setVirtual(true);
 		aliasDef.setGeneratorExpression(

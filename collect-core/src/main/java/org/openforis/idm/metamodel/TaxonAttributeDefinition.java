@@ -70,6 +70,8 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 
 	TaxonAttributeDefinition(TaxonAttributeDefinition obj, int id) {
 		super(obj, id);
+		this.taxonomy = obj.taxonomy;
+		this.highestTaxonRank = obj.highestTaxonRank;
 	}
 	
 	@Override

@@ -12,12 +12,15 @@ public class TaxonSummaries {
 	private int totalCount;
 	private List<TaxonSummary> items;
 	private List<String> vernacularNamesLanguageCodes;
+	private List<String> infoAttributeNames;
 	
-	public TaxonSummaries(int totalCount, List<TaxonSummary> items, List<String> vernacularNamesLanguageCodes) {
+	public TaxonSummaries(int totalCount, List<TaxonSummary> items, 
+			List<String> vernacularNamesLanguageCodes, List<String> infoAttributeNames) {
 		super();
 		this.totalCount = totalCount;
 		this.items = items;
 		this.vernacularNamesLanguageCodes = vernacularNamesLanguageCodes;
+		this.infoAttributeNames = infoAttributeNames;
 	}
 
 	public int getTotalCount() {
@@ -30,6 +33,10 @@ public class TaxonSummaries {
 
 	public List<String> getVernacularNamesLanguageCodes() {
 		return vernacularNamesLanguageCodes;
+	}
+	
+	public List<String> getInfoAttributeNames() {
+		return infoAttributeNames;
 	}
 
 }
