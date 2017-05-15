@@ -438,11 +438,12 @@ public class SurveyValidator {
 	}
 
 	private void validateTaxonomy(TaxonAttributeDefinition attrDef, List<SurveyValidationResult> results) {
-		boolean surveyIsStored = attrDef.getSurvey().getId() != null;
+		CollectSurvey survey = (CollectSurvey) attrDef.getSurvey();
+		boolean surveyIsStored = survey.getId() != null;
 		if (surveyIsStored) {
 			//validate taxonomies only when survey is stored
 			String taxonomyName = attrDef.getTaxonomy();
-			CollectTaxonomy taxonomy = findTaxonomy((CollectSurvey) attrDef.getSurvey(), taxonomyName);
+			CollectTaxonomy taxonomy = findTaxonomy(survey, taxonomyName);
 			if (taxonomy == null) {
 				results.add(new SurveyValidationResult(attrDef.getPath(), "survey.validation.attribute.taxon.invalid_taxonomy", taxonomyName));
 			}
