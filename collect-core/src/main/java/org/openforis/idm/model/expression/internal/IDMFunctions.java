@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.ri.compiler.Constant;
@@ -23,6 +24,7 @@ import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.A
 import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResultFlag;
 import org.openforis.idm.metamodel.validation.LookupProvider;
@@ -30,6 +32,7 @@ import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Time;
+import org.openforis.idm.model.expression.ExpressionFactory;
 
 /**
  * Custom xpath functions allowed into IDM
@@ -164,7 +167,6 @@ public class IDMFunctions extends CustomFunctions {
 			@Override
 			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
 					Expression[] arguments) {
-				//taxonomy name
 				Expression speciesListNameExpr = arguments[0];
 				ExpressionValidationResult validationResult = validateSpeciesListName(contextNodeDef, speciesListNameExpr);
 				if (validationResult.isOk()) {
@@ -218,7 +220,17 @@ public class IDMFunctions extends CustomFunctions {
 			
 			private ExpressionValidationResult validateSpeciesCode(NodeDefinition contextNodeDef,
 					Expression expression) {
-				//TODO
+				if (expression instanceof ModelLocationPath) {
+					ExpressionFactory expressionFactory = contextNodeDef.getSurvey().getContext().getExpressionFactory();
+					Set<String> referencedPaths = expressionFactory.getReferencedPathEvaluator().determineReferencedPaths(expression);
+					for (String referencedPath : referencedPaths) {
+						NodeDefinition referencedDef = contextNodeDef.getDefinitionByPath(referencedPath);
+						if (! (referencedDef instanceof TaxonAttributeDefinition)) {
+							return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+									String.format("Third argument (\"%s\") is not a valid path to a taxon attribute", expression.toString()));
+						}
+					}
+				}
 				return new ExpressionValidationResult();
 			}
 		});
