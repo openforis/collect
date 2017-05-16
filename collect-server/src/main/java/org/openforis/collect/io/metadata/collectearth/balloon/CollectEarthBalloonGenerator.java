@@ -359,10 +359,13 @@ public class CollectEarthBalloonGenerator {
 			} else {
 				htmlParameterName = getHtmlParameterName(def);
 			}
+			
+			String tooltip = attrDef.getDescription(language);
+			
 			CEFieldType type = getFieldType(def);
 			boolean key = def instanceof KeyAttributeDefinition ? ((KeyAttributeDefinition) def).isKey(): false;
 			if (insideEnumeratedEntity && key) {
-				comp = new CEEnumeratingCodeField(htmlParameterName, def.getName(), label, multiple, type, key);
+				comp = new CEEnumeratingCodeField(htmlParameterName, def.getName(), label, tooltip, multiple, type, key);
 			} else if (def instanceof CodeAttributeDefinition) {
 				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) def;
 				CodeList list = codeAttrDef.getList();
@@ -370,9 +373,9 @@ public class CollectEarthBalloonGenerator {
 				Map<Integer, List<CodeListItem>> codeItemsByParentCodeItemId = getCodeListItemsByParentId(list, listLevelIndex);
 				CodeAttributeDefinition parentCodeAttributeDef = codeAttrDef.getParentCodeAttributeDefinition();
 				String parentName = parentCodeAttributeDef == null ? null: getHtmlParameterName(parentCodeAttributeDef);
-				comp = new CECodeField(htmlParameterName, def.getName(), label, type, multiple, key, codeItemsByParentCodeItemId, parentName);
+				comp = new CECodeField(htmlParameterName, def.getName(), label, tooltip, type, multiple, key, codeItemsByParentCodeItemId, parentName);
 			} else {
-				comp = new CEField(htmlParameterName, def.getName(), label, multiple, type, key);
+				comp = new CEField(htmlParameterName, def.getName(), label, tooltip,  multiple, type, key);
 			}
 			CollectAnnotations annotations = survey.getAnnotations();
 			if (attrDef.isCalculated() || 

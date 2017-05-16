@@ -19,9 +19,9 @@ class CECodeField extends CEField {
 	private String parentName;
 	private Map<Integer, List<CodeListItem>> codeItemsByParentId = new HashMap<Integer, List<CodeListItem>>();
 
-	public CECodeField(String htmlParameterName, String name, String label, CEFieldType type, boolean multiple, 
+	public CECodeField(String htmlParameterName, String name, String label, String tooltip, CEFieldType type, boolean multiple, 
 			boolean key, Map<Integer, List<CodeListItem>> codeItemsByParentCode, String parentName) {
-		super(htmlParameterName, name, label, multiple, type, key);
+		super(htmlParameterName, name, label, tooltip, multiple, type, key);
 		this.codeItemsByParentId = codeItemsByParentCode;
 		this.parentName = parentName;
 	}

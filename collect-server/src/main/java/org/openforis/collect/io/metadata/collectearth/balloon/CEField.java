@@ -15,11 +15,13 @@ class CEField extends CEComponent {
 	private CEFieldType type;
 	private boolean key;
 	private boolean readOnly = false;
+	private String tooltip;
 	
-	public CEField(String htmlParameterName, String name, String label, boolean multiple, CEField.CEFieldType type, boolean key) {
+	public CEField(String htmlParameterName, String name, String label, String tooltip, boolean multiple, CEField.CEFieldType type, boolean key) {
 		super(htmlParameterName, name, label, multiple);
 		this.type = type;
 		this.key = key;
+		this.tooltip = tooltip;
 	}
 
 	public CEFieldType getType() {
@@ -36,6 +38,14 @@ class CEField extends CEComponent {
 	
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
+	}
+
+	public void setTooltip(String tooltip){
+		this.tooltip = tooltip;
+	}
+	
+	public String getToolTip() {
+		return tooltip;
 	}
 	
 }
