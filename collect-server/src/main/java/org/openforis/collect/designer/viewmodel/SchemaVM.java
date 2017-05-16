@@ -1413,22 +1413,27 @@ public class SchemaVM extends SurveyBaseVM {
 		UIOptions uiOptions = survey.getUIOptions();
 		final Set<UITab> assignableTabs = new HashSet<UITab>(
 				uiOptions.getAssignableTabs(editedNodeParentEntity, selectedItem));
-		final NodeDefinition parentDefn = selectedItem.getParentDefinition();
-		UITab inheritedTab = uiOptions.getAssignedTab(parentDefn);
+		final EntityDefinition selectedItemParentDefn = selectedItem.getParentEntityDefinition();
+		UITab inheritedTab = uiOptions.getAssignedTab(selectedItemParentDefn);
 		assignableTabs.add(inheritedTab);
 
 		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
-			@Override
 			public boolean evaluate(SurveyObject item) {
 				if (item instanceof UITab) {
 					return true;
-				} else if (item instanceof EntityDefinition) {
-					if (((EntityDefinition) item).isVirtual()) {
-						return false;
-					} else if (((NodeDefinition) item).isDescendantOf((EntityDefinition) selectedItem)) {
-						return false;
+				} else if (item instanceof NodeDefinition) {
+					if (item instanceof EntityDefinition) {
+						EntityDefinition entityItemDef = (EntityDefinition) item;
+						if (entityItemDef.isVirtual()) {
+							return false;
+						} else if (selectedItem instanceof EntityDefinition
+								&& entityItemDef.isDescendantOf((EntityDefinition) selectedItem)) {
+							return false;
+						} else {
+							return true;
+						}
 					} else {
-						return true;
+						return false;
 					}
 				} else {
 					return false;
@@ -1441,14 +1446,15 @@ public class SchemaVM extends SurveyBaseVM {
 				if (item instanceof UITab) {
 					return survey.isPublished() && !assignableTabs.contains(item);
 				} else if (item instanceof NodeDefinition) {
-					if (item.equals(parentDefn)) {
+					NodeDefinition itemNodeDef = (NodeDefinition) item;
+					if (itemNodeDef.equals(selectedItemParentDefn)) {
 						return false;
 					} else if (selectedItem instanceof EntityDefinition
-							&& ((NodeDefinition) item).isDescendantOf((EntityDefinition) selectedItem)) {
+							&& itemNodeDef.isDescendantOf((EntityDefinition) selectedItem)) {
 						// is descendant of the selected item
 						return true;
-					} else if (!survey.isPublished() && item instanceof EntityDefinition
-							&& !item.equals(selectedItem)) {
+					} else if (!survey.isPublished() && itemNodeDef instanceof EntityDefinition
+							&& !itemNodeDef.equals(selectedItem)) {
 						// allow reparenting node only if survey is not
 						// published
 						return false;
