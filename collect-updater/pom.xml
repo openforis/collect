@@ -241,7 +241,7 @@
 											<goal>exec</goal>
 											<configuration>
 												<skip>${installer.skip}</skip>
-												<executable>${installbuilder-home}/bin/builder</executable>
+												<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 												<arguments>
 													<argument>build</argument>
 													<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
@@ -259,7 +259,7 @@
 											<configuration>
 												<skip>${installer.skip}</skip>
 												<target>
-													<move file="${installbuilder-home}/output/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-updater.${installer.extension}" failonerror="true" />
+													<move file="${installbuilder.home}/output/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-updater.${installer.extension}" failonerror="true" />
 												</target>
 											</configuration>
 										</pluginExecutor>
