@@ -125,7 +125,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
@@ -141,7 +141,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
@@ -157,7 +157,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
@@ -181,9 +181,9 @@
 								</goals>
 								<configuration>
 									<target>
-										<move file="${installbuilder-home}/output/${windows-saiku-installer-file-name}" tofile="${project.build.directory}/${windows-saiku-installer-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-saiku-installer-file-name}" tofile="${project.build.directory}/${linux-saiku-installer-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${osx-saiku-installer-file-name}" tofile="${project.build.directory}/${osx-saiku-installer-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${windows-saiku-installer-file-name}" tofile="${project.build.directory}/${windows-saiku-installer-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${linux-saiku-installer-file-name}" tofile="${project.build.directory}/${linux-saiku-installer-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${osx-saiku-installer-file-name}" tofile="${project.build.directory}/${osx-saiku-installer-file-name}" failonerror="false" />
 									</target>
 								</configuration>
 							</execution>
