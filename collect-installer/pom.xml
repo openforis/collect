@@ -290,7 +290,7 @@
 											<configuration>
 												<skip>${installer.skip}</skip>
 												<target>
-													<move file="${installbuilder.home}/output/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-installer.${installer.extension}" failonerror="true" />
+													<move file="${installbuilder.builder.output}/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-installer.${installer.extension}" failonerror="true" />
 												</target>
 											</configuration>
 										</pluginExecutor>
