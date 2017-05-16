@@ -288,24 +288,6 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			addFieldValues(q, INFO_FIELDS, s.getInfoAttributes());
 		}
 
-		private void addFieldValues(StoreQuery<?> q, TableField<?, Object>[] fields, List<String> values) {
-			for ( int i = 0; i < values.size(); i++ ) {
-				String value = values.get(i);
-				Field<Object> field = fields[i];
-				q.addValue(field, value);
-			}
-		}
-		
-		private <T extends Object> List<T> extractFields(Record r, TableField<?, T>[] fields) {
-			List<T> result = new ArrayList<T>(fields.length);
-			for (int i = 0; i < fields.length; i++) {
-				Field<T> field = fields[i];
-				T value = r.getValue(field);
-				result.add(value);
-			}
-			return result;
-		}
-		
 		protected Insert<OfcSamplingDesignRecord> createInsertStatement() {
 			Object[] valuesPlaceholders = new String[FIELDS.length];
 			Arrays.fill(valuesPlaceholders, "?");

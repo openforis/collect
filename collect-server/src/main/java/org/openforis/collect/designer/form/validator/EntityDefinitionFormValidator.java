@@ -13,6 +13,7 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -23,19 +24,31 @@ import org.zkoss.util.resource.Labels;
  */
 public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 
+	private static final String VIRTUAL_FIELD = "virtual";
+	private static final String GENERATOR_EXPRESSION_FIELD = "generatorExpression";
 	protected static final String LAYOUT_FIELD = "layoutType";
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
+		Object virtual = getValue(ctx, VIRTUAL_FIELD);
+		if (Boolean.TRUE.equals(virtual)) {
+			if (validateRequired(ctx, GENERATOR_EXPRESSION_FIELD)) {
+				validateExpressionField(ctx, ExpressionType.SCHEMA_PATH, GENERATOR_EXPRESSION_FIELD, getEditedNode(ctx));
+			}
+		}
 		validateLayout(ctx);
 	}
 
 	protected void validateLayout(ValidationContext ctx) {
+		EntityDefinition editedNode = (EntityDefinition) getEditedNode(ctx);
+		if (editedNode.isVirtual()) {
+			//skip check
+			return;
+		}
 		String field = LAYOUT_FIELD;
 		String layoutValue = getValue(ctx, field);
 		Layout layout = Layout.valueOf(layoutValue);
-		EntityDefinition editedNode = (EntityDefinition) getEditedNode(ctx);
 		EntityDefinition parentEntity = getParentEntity(ctx);
 		CollectSurvey survey = (CollectSurvey) editedNode.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();

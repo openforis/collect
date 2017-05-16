@@ -14,6 +14,9 @@ import org.openforis.idm.metamodel.EntityDefinition;
  */
 public class EntityDefinitionFormObject<T extends EntityDefinition> extends NodeDefinitionFormObject<T> {
 
+	private boolean virtual;
+	private String generatorExpression;
+	
 	private boolean showRowNumbers;
 	private boolean countInRecordSummary;
 	private String direction;
@@ -31,6 +34,8 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
+		dest.setVirtual(virtual);
+		dest.setGeneratorExpression(virtual ? generatorExpression: null);
 		UIOptions uiOptions = getUIOptions(dest);
 		Layout layout = Layout.valueOf(layoutType);
 		uiOptions.setLayout(dest, layout);
@@ -45,6 +50,8 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 	@Override
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
+		virtual = source.isVirtual();
+		generatorExpression = source.getGeneratorExpression();
 		UIOptions uiOptions = getUIOptions(source);
 		Layout layout = uiOptions.getLayout(source);
 		layoutType = layout.name();
@@ -57,6 +64,22 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 	protected void reset() {
 		super.reset();
 		layoutType = null;
+	}
+	
+	public boolean isVirtual() {
+		return virtual;
+	}
+	
+	public void setVirtual(boolean virtual) {
+		this.virtual = virtual;
+	}
+	
+	public String getGeneratorExpression() {
+		return generatorExpression;
+	}
+	
+	public void setGeneratorExpression(String generatorExpression) {
+		this.generatorExpression = generatorExpression;
 	}
 	
 	public String getLayoutType() {

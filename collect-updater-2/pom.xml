@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.35-SNAPSHOT</version>
+		<version>3.13.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-updater-2</artifactId>
 	<packaging>pom</packaging>
@@ -94,7 +94,7 @@
 					<!-- 3. replace application version into the xml installbuilder source file -->
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
+						<artifactId>replacer</artifactId>
 						<executions>
 							<execution>
 								<phase>prepare-package</phase>
@@ -145,7 +145,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
@@ -161,7 +161,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
@@ -177,7 +177,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
@@ -193,7 +193,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-updater-file-name}</argument>
@@ -216,12 +216,12 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<tasks>
-										<move file="${installbuilder-home}/output/${windows-updater-file-name}" tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-updater-file-name}" tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-x64-updater-file-name}" tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${osx-updater-file-name}" tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
-									</tasks>
+									<target>
+										<move file="${installbuilder.builder.output}/${windows-updater-file-name}" tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${linux-updater-file-name}" tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${linux-x64-updater-file-name}" tofile="${project.build.directory}/${linux-x64-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${osx-updater-file-name}" tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
+									</target>
 								</configuration>
 							</execution>
 						</executions>
@@ -258,7 +258,7 @@
 					                    <artifact>
 					                        <file>${project.build.directory}/${osx-updater-file-name}</file>
 					                        <classifier>osx</classifier>
-					                        <type>zip</type>
+					                        <type>dmg</type>
 					                    </artifact>
 					                </artifacts>
 					            </configuration>

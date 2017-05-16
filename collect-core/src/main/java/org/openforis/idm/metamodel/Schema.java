@@ -310,7 +310,7 @@ public class Schema extends SurveyObject {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends NodeDefinition> T cloneDefinition(T def) {
+	public <T extends NodeDefinition> T cloneDefinition(T def, String... ignoreChildDefinitions) {
 		if (def instanceof BooleanAttributeDefinition) {
 			return index((T) new BooleanAttributeDefinition((BooleanAttributeDefinition) def, nextId()));
 		} else if (def instanceof CodeAttributeDefinition) {
@@ -331,6 +331,8 @@ public class Schema extends SurveyObject {
 			return index((T) new TextAttributeDefinition((TextAttributeDefinition) def, nextId()));
 		} else if (def instanceof TimeAttributeDefinition) {
 			return index((T) new TimeAttributeDefinition((TimeAttributeDefinition) def, nextId()));
+		} else if (def instanceof EntityDefinition) {
+			return index((T) new EntityDefinition((EntityDefinition) def, nextId(), ignoreChildDefinitions));
 		} else {
 			throw new UnsupportedOperationException("Clone not supported for node type: " + def.getClass().getName());
 		}

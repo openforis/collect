@@ -822,7 +822,7 @@ public class SurveyManager {
 		int toSurveyId = toSurvey.getId();
 		int fromSurveyId = fromSurvey.getId();
 		samplingDesignManager.copySamplingDesign(fromSurveyId, toSurveyId);
-		speciesManager.copyTaxonomy(fromSurveyId, toSurveyId);
+		speciesManager.copyTaxonomy(fromSurvey, toSurvey);
 		codeListManager.copyCodeLists(fromSurvey, toSurvey);
 		surveyFileDao.copyItems(fromSurvey.getId(), toSurvey.getId());
 		
@@ -857,13 +857,13 @@ public class SurveyManager {
 		int newSurveyId = survey.getId();
 		
 		if (newSurveyId != temporarySurveyId) {
+			CollectSurvey temporarySurvey = surveyDao.loadById(temporarySurveyId);
 			if (dataCleansingManager != null) {
 				//do not overwrite published cleansing metadata
-				CollectSurvey temporarySurvey = surveyDao.loadById(temporarySurveyId);
 				dataCleansingManager.moveMetadata(temporarySurvey, survey);
 			}
 			samplingDesignManager.moveSamplingDesign(temporarySurveyId, newSurveyId);
-			speciesManager.moveTaxonomies(temporarySurveyId, newSurveyId);
+			speciesManager.moveTaxonomies(temporarySurvey, survey);
 			codeListManager.moveCodeLists(temporarySurveyId, newSurveyId);
 			surveyFileDao.deleteBySurvey(newSurveyId);
 			surveyFileDao.moveItems(temporarySurveyId, newSurveyId);
@@ -954,14 +954,15 @@ public class SurveyManager {
 			recordDao.deleteBySurvey(id);
 		}
 
+		CollectSurvey survey = loadSurvey(id);
+		
 		//delete metadata
-		speciesManager.deleteTaxonomiesBySurvey(id);
+		speciesManager.deleteTaxonomiesBySurvey(survey);
 		samplingDesignManager.deleteBySurvey(id);
 		codeListManager.deleteAllItemsBySurvey(id, temporary);
 		surveyFileDao.deleteBySurvey(id);
 		
 		if (dataCleansingManager != null) {
-			CollectSurvey survey = loadSurvey(id);
 			dataCleansingManager.deleteMetadata(survey);
 		}
 		

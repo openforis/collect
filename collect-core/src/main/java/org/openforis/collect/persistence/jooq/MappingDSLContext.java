@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jooq.Configuration;
 import org.jooq.DeleteQuery;
+import org.jooq.Field;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -157,5 +158,23 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
+	protected void addFieldValues(StoreQuery<?> q, Field<Object>[] fields, List<?> values) {
+		for ( int i = 0; i < fields.length; i++ ) {
+			Field<Object> field = fields[i];
+			Object value = i < values.size() ? values.get(i) : null;
+			q.addValue(field, value);
+		}
+	}
+	
+	protected <T extends Object> List<T> extractFields(Record r, Field<T>[] fields) {
+		List<T> result = new ArrayList<T>(fields.length);
+		for (int i = 0; i < fields.length; i++) {
+			Field<T> field = fields[i];
+			T value = r.getValue(field);
+			result.add(value);
+		}
+		return result;
+	}
+	
 }

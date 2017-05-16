@@ -42,8 +42,13 @@ public class TaxonSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Map<String, List<String>> getLanguageToVernacularNames() {
+	public Map<String, List<String>> getVernacularNamesByLanguage() {
 		return summary.getLanguageToVernacularNames();
+	}
+	
+	@ExternalizedProperty
+	public Map<String, String> getInfoByName() {
+		return summary.getInfoByName();
 	}
 
 	@ExternalizedProperty

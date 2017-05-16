@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.35-SNAPSHOT</version>
+		<version>3.13.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-saiku-installer</artifactId>
 	<packaging>pom</packaging>
@@ -87,7 +87,7 @@
 						file -->
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
+						<artifactId>replacer</artifactId>
 						<executions>
 							<execution>
 								<phase>prepare-package</phase>
@@ -125,7 +125,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
@@ -141,7 +141,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
@@ -157,7 +157,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${installbuilder-home}/bin/builder</executable>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 									<arguments>
 										<argument>build</argument>
 										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
@@ -180,11 +180,11 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<tasks>
-										<move file="${installbuilder-home}/output/${windows-saiku-installer-file-name}" tofile="${project.build.directory}/${windows-saiku-installer-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-saiku-installer-file-name}" tofile="${project.build.directory}/${linux-saiku-installer-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${osx-saiku-installer-file-name}" tofile="${project.build.directory}/${osx-saiku-installer-file-name}" failonerror="false" />
-									</tasks>
+									<target>
+										<move file="${installbuilder.builder.output}/${windows-saiku-installer-file-name}" tofile="${project.build.directory}/${windows-saiku-installer-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${linux-saiku-installer-file-name}" tofile="${project.build.directory}/${linux-saiku-installer-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${osx-saiku-installer-file-name}" tofile="${project.build.directory}/${osx-saiku-installer-file-name}" failonerror="false" />
+									</target>
 								</configuration>
 							</execution>
 						</executions>

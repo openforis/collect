@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.35-SNAPSHOT</version>
+		<version>3.13.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
@@ -110,7 +110,6 @@
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>replacer</artifactId>
-				<version>1.5.1</version>
 				<executions>
 					<execution>
 						<!-- the replace should happen before the app is packaged -->
@@ -121,9 +120,10 @@
 					</execution>
 				</executions>
 				<configuration>
+					<basedir>${project.build.outputDirectory}</basedir>
 					<includes>
 						<!-- replace the token in this file -->
-						<include>target/classes/org/openforis/collect/info.properties</include>
+						<include>org/openforis/collect/info.properties</include>
 					</includes>
 					<regex>false</regex>
 					<!-- the name of the token to replace -->
@@ -182,7 +182,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.5</version>
 				<executions>
 					<execution>
 						<goals>
@@ -192,70 +191,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!-- Set up Eclipse m2e settings to remove errors show in IDE. This has 
-					no influence on the build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.jooq</groupId>
-										<artifactId>jooq-codegen-maven</artifactId>
-										<versionRange>[${jooq-codegen.version},)</versionRange>
-										<goals>
-											<goal>generate</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>properties-maven-plugin</artifactId>
-										<versionRange>[1.0-alpha-2,)</versionRange>
-										<goals>
-											<goal>
-												read-project-properties
-											</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											com.google.code.maven-replacer-plugin
-										</groupId>
-										<artifactId>
-											replacer
-										</artifactId>
-										<versionRange>
-											[1.5.3,)
-										</versionRange>
-										<goals>
-											<goal>replace</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 	<dependencies>
@@ -385,11 +320,6 @@
 			<groupId>com.jamesmurty.utils</groupId>
 			<artifactId>java-xmlbuilder</artifactId>
 			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>de.micromata.jak</groupId>
-			<artifactId>JavaAPIforKml</artifactId>
-			<version>2.2.1</version>
 		</dependency>
 		
 		<!-- TEST DEPENDENCIES -->

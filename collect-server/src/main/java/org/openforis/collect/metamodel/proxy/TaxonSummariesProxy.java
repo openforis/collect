@@ -37,4 +37,8 @@ public class TaxonSummariesProxy implements Proxy {
 		return taxonSummaries.getVernacularNamesLanguageCodes();
 	}
 	
+	@ExternalizedProperty
+	public List<String> getInfoAttributes() {
+		return taxonSummaries.getInfoAttributeNames();
+	}
 }

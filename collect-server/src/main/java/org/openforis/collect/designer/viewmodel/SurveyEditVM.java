@@ -22,7 +22,6 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.designer.util.SuccessHandler;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
@@ -270,20 +269,29 @@ public class SurveyEditVM extends SurveyBaseVM {
 			}
 		});
 	}
-	
+
+	/**
+	 * Returns true if there wasn't any error and the survey has been saved immediately without showing any confirm PopUp
+	 */
 	@Command
-	public void save(@ContextParam(ContextType.BINDER) Binder binder) throws SurveyStoreException {
+	public boolean save(@ContextParam(ContextType.BINDER) Binder binder, 
+			final Runnable runAfterSave) throws SurveyStoreException {
 		dispatchValidateAllCommand();
 		if ( checkCanSave() ) {
-			checkValidity(true, new SuccessHandler() {
-				public void onSuccess() {
+			return checkValidity(true, new Runnable() {
+				public void run() {
 					try {
 						backgroundSurveySave();
+						if (runAfterSave != null) {
+							runAfterSave.run();
+						}
 					} catch (SurveyStoreException e) {
 						throw new RuntimeException(e);
 					}
 				}
 			}, Labels.getLabel("survey.save.confirm_save_with_errors"), false);
+		} else {
+			return false;
 		}
 	}
 	
@@ -340,14 +348,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void validate() {
-		checkValidity(false, new SuccessHandler() {
-			public void onSuccess() {
+		checkValidity(false, new Runnable() {
+			public void run() {
 				MessageUtil.showInfo("survey.successfully_validated");
 			}
 		}, null, true);
 	}
 	
-	private void checkValidity(boolean showConfirm, final SuccessHandler successHandler, 
+	/**
+	 * Returns true if the validation didn't give any errors, false if a confirm PopUp will be shown
+	 */
+	private boolean checkValidity(boolean showConfirm, final Runnable runIfValid, 
 			String confirmButtonLabel, boolean showWarnings) {
 		SurveyValidator surveyValidator = getSurveyValidator(survey);
 		ValidationParameters validationParameters = new ValidationParameters();
@@ -359,12 +370,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 					confirmButtonLabel);
 			validationResultsPopUp.addEventListener(SurveyValidationResultsVM.CONFIRM_EVENT_NAME, new EventListener<ConfirmEvent>() {
 				public void onEvent(ConfirmEvent event) throws Exception {
-					successHandler.onSuccess();
+					runIfValid.run();
 					closePopUp(validationResultsPopUp);
 				}
 			});
+			return false;
 		} else {
-			successHandler.onSuccess();;
+			runIfValid.run();
+			return true;
 		}
 	}
 	
@@ -530,15 +543,19 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	public void showPreview(Step recordStep) throws SurveyStoreException {
-		if (survey.getId() == null || changed)  {
-			save(null);
-		}
-		previewStep = recordStep;
-		checkValidity(true, new SuccessHandler() {
-			public void onSuccess() {
+		Runnable runAfterSave = new Runnable() {
+			public void run() {
 				openPreviewPopUp();
 			}
-		}, Labels.getLabel("survey.preview.show_preview"), false);
+		};
+		boolean confirmPopUpShown = false;
+		if (survey.getId() == null || changed)  {
+			confirmPopUpShown = !save(null, runAfterSave);
+		}
+		previewStep = recordStep;
+		if (! confirmPopUpShown) {
+			checkValidity(true, runAfterSave, Labels.getLabel("survey.preview.show_preview"), false);
+		}
 	}
 
 	protected void openPreviewPreferencesPopUp() {

@@ -276,18 +276,21 @@ public class SchemaVM extends SurveyBaseVM {
 	public void addEntity(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("multiple") boolean multiple, @BindingParam("layout") String layout) {
 		resetNodeSelection();
-		addChildEntity(binder, multiple, layout);
+		addChildEntity(binder, multiple, layout, false);
 	}
 
 	@Command
 	public void addChildEntity(@ContextParam(ContextType.BINDER) final Binder binder,
-			@BindingParam("multiple") final boolean multiple, @BindingParam("layout") final String layout) {
+			@BindingParam("multiple") final boolean multiple, 
+			@BindingParam("layout") final String layout,
+			@BindingParam("virtual") final boolean virtual) {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
 				EntityDefinition parentEntity = getSelectedNodeParentEntity();
 				EntityDefinition newNode = createEntityDefinition();
 				newNode.setMultiple(multiple);
+				newNode.setVirtual(virtual);
 				UIOptions uiOptions = survey.getUIOptions();
 				Layout layoutEnum = Layout.valueOf(layout);
 				SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();
@@ -335,17 +338,16 @@ public class SchemaVM extends SurveyBaseVM {
 	public void addChildAttribute(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("attributeType") final String attributeType) throws Exception {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
 			public void onOk(boolean confirmed) {
 				AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
 				AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey,
 						NodeType.ATTRIBUTE, attributeTypeEnum);
-				EntityDefinition parentEntity = getSelectedNodeParentEntity();
 				SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();
 				if (selectedSurveyObject instanceof UITab) {
 					UIOptions uiOptions = survey.getUIOptions();
 					uiOptions.assignToTab(newNode, (UITab) selectedSurveyObject);
 				}
+				EntityDefinition parentEntity = getSelectedNodeParentEntity();
 				editNode(binder, true, parentEntity, newNode);
 				afterNewNodeCreated(newNode, true);
 			}
@@ -1418,9 +1420,19 @@ public class SchemaVM extends SurveyBaseVM {
 		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
 			@Override
 			public boolean evaluate(SurveyObject item) {
-				return item instanceof UITab
-						|| item instanceof EntityDefinition && !(selectedItem instanceof EntityDefinition
-								&& ((NodeDefinition) item).isDescendantOf((EntityDefinition) selectedItem));
+				if (item instanceof UITab) {
+					return true;
+				} else if (item instanceof EntityDefinition) {
+					if (((EntityDefinition) item).isVirtual()) {
+						return false;
+					} else if (((NodeDefinition) item).isDescendantOf((EntityDefinition) selectedItem)) {
+						return false;
+					} else {
+						return true;
+					}
+				} else {
+					return false;
+				}
 			}
 		};
 		Predicate<SurveyObject> disabledPredicate = new Predicate<SurveyObject>() {

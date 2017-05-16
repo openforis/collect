@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.path.Path;
 
 /**
@@ -216,6 +217,16 @@ public class Record implements DeepComparable {
 		@SuppressWarnings("unchecked")
 		List<N> result = (List<N>) p.evaluate(this);
 		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <N extends Node<?>> List<N> findNodesByExpression(String expression) {
+		try {
+			return (List<N>) getSurveyContext().getExpressionEvaluator()
+					.evaluateNodes(getRootEntity(), getRootEntity(), expression);
+		} catch (InvalidExpressionException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**

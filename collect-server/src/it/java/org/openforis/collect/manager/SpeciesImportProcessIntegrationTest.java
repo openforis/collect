@@ -38,8 +38,8 @@ import org.openforis.collect.persistence.TaxonomyDao;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
-import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -67,6 +67,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	private CollectSurvey survey;
 	
+	@SuppressWarnings("deprecation")
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException, SurveyValidationException {
 		survey = loadSurvey();
@@ -76,10 +77,11 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	public SpeciesImportProcess importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
 		CollectTaxonomy taxonomy = new CollectTaxonomy();
-		taxonomy.setSurveyId(survey.getId());
+		taxonomy.setSurvey(survey);
 		taxonomy.setName(TEST_TAXONOMY_NAME);
 		speciesManager.save(taxonomy);
-		SpeciesImportProcess process = new SpeciesImportProcess(speciesManager, taxonomy.getId(), file, new CSVFileOptions(), true);
+		SpeciesImportProcess process = new SpeciesImportProcess(surveyManager, speciesManager, survey, 
+				taxonomy.getId(), file, new CSVFileOptions(), true);
 		process.call();
 		return process;
 	}
@@ -94,36 +96,42 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			String code = "OLE/CAP/macrocarpa";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(5, code, "Olea capensis subsp. macrocarpa");
+			expected.setTaxonRank(TaxonRank.SUBSPECIES);
 			assertEquals(expected, occurrence);
 		}
 		{
 			String code = "OLE/EUR/cuspidata";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(7, code, "Olea europaea subsp. cuspidata");
+			expected.setTaxonRank(TaxonRank.SUBSPECIES);
 			assertEquals(expected, occurrence);
 		}
 		{
 			String code = "AFZ/QUA";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(8, code, "Afzelia quanzensis");
+			expected.setTaxonRank(TaxonRank.SPECIES);
 			assertEquals(expected, occurrence);
 		}
 		{
 			String code = "ALB/GLA";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(11, code, "Albizia glaberrima");
+			expected.setTaxonRank(TaxonRank.SPECIES);
 			assertEquals(expected, occurrence);
 		}
 		{
 			String code = "ALB/SCH/amaniensis";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(12, code, "Albizia schimperiana var. amaniensis");
+			expected.setTaxonRank(TaxonRank.VARIETY);
 			assertEquals(expected, occurrence);
 		}
 		{
 			String code = "AMA/EUC/GRF";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(15, code, "Eucharis ×grandiflora");
+			expected.setTaxonRank(TaxonRank.SPECIES);
 			assertEquals(expected, occurrence);
 		}
 	}
@@ -134,21 +142,30 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
-		
-		String code = "AFZ/QUA";
-		TaxonOccurrence occurrence = findByCode(code);
-		TaxonOccurrence expected = new TaxonOccurrence(8, code, "Afzelia quanzensis");
-		assertEquals(expected, occurrence);
-
-		String code2 = "ALB/GLA";
-		TaxonOccurrence occurrence2 = findByCode(code2);
-		TaxonOccurrence expected2 = new TaxonOccurrence(11, code2, "Albizia glaberrima");
-		assertEquals(expected2, occurrence2);
-		
-		String code3 = "ALB/SCH/amaniensis";
-		TaxonOccurrence occurrence3 = findByCode(code3);
-		TaxonOccurrence expected3 = new TaxonOccurrence(12, code3, "Albizia schimperiana var. amaniensis");
-		assertEquals(expected3, occurrence3);
+		{
+			String code = "AFZ/QUA";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(8, code, "Afzelia quanzensis");
+			expected.setInfoAttributes(Arrays.asList("TEST 3"));
+			expected.setTaxonRank(SPECIES);
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "ALB/GLA";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(11, code, "Albizia glaberrima");
+			expected.setInfoAttributes(Arrays.asList((String) null));
+			expected.setTaxonRank(SPECIES);
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "ALB/SCH/amaniensis";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(12, code, "Albizia schimperiana var. amaniensis");
+			expected.setInfoAttributes(Arrays.asList("TEST 1"));
+			expected.setTaxonRank(VARIETY);
+			assertEquals(expected, occurrence);
+		}
 	}
 	
 	@Test
@@ -156,21 +173,22 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
-		int surveyId = survey.getId();
 		{
-			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(surveyId, TEST_TAXONOMY_NAME, "Mbamba", 10);
+			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(survey, TEST_TAXONOMY_NAME, "Mbamba", 10);
 			assertNotNull(occurrences);
 			assertEquals(1, occurrences.size());
 			TaxonOccurrence stored = occurrences.get(0);
 			TaxonOccurrence expected = new TaxonOccurrence(8, "AFZ/QUA", "Afzelia quanzensis", "Mbambakofi", "swh", null);
+			expected.setTaxonRank(SPECIES);
 			assertEquals(expected, stored);
 		}
 		{
-			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(surveyId, TEST_TAXONOMY_NAME, "Mshai-mamba", 10);
+			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(survey, TEST_TAXONOMY_NAME, "Mshai-mamba", 10);
 			assertNotNull(occurrences);
 			assertEquals(1, occurrences.size());
 			TaxonOccurrence stored = occurrences.get(0);
 			TaxonOccurrence expected = new TaxonOccurrence(10, "ALB/ADI", "Albizia adianthifolia", "Mshai-mamba", "ksb", null);
+			expected.setTaxonRank(SPECIES);
 			assertEquals(expected, stored);
 		}
 		{
@@ -211,6 +229,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
+		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
 		{
 			Taxon variety = findTaxonByCode("ALB/SCH/amaniensis");
 			assertNotNull(variety);
@@ -218,7 +237,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			
 			Integer speciesId = variety.getParentId();
 			assertNotNull(speciesId);
-			Taxon species = taxonDao.loadById(speciesId);
+			Taxon species = taxonDao.loadById(taxonomy, speciesId);
 			assertNotNull(species);
 			assertNull(species.getCode());
 			assertEquals(SPECIES, species.getTaxonRank());
@@ -226,7 +245,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			
 			Integer genusId = species.getParentId();
 			assertNotNull(genusId);
-			Taxon genus = taxonDao.loadById(genusId);
+			Taxon genus = taxonDao.loadById(taxonomy, genusId);
 			assertNotNull(genus);
 			assertEquals("ALB", genus.getCode());
 			assertEquals(GENUS, genus.getTaxonRank());
@@ -234,7 +253,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			
 			Integer familyId = genus.getParentId();
 			assertNotNull(familyId);
-			Taxon family = taxonDao.loadById(familyId);
+			Taxon family = taxonDao.loadById(taxonomy, familyId);
 			assertNotNull(family);
 			assertNull(family.getParentId());
 			assertEquals(FAMILY, family.getTaxonRank());
@@ -247,7 +266,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			
 			Integer speciesId = subspecies.getParentId();
 			assertNotNull(speciesId);
-			Taxon species = taxonDao.loadById(speciesId);
+			Taxon species = taxonDao.loadById(taxonomy, speciesId);
 			assertNotNull(species);
 			assertEquals(SPECIES, species.getTaxonRank());
 			assertEquals("OLE/EUR", species.getCode());
@@ -304,8 +323,8 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
-		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
-		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy.getId());
+		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy);
 		assertNotNull(summaries);
 	}
 
@@ -324,8 +343,8 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	protected Taxon findTaxonByCode(String code) {
-		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
-		List<Taxon> results = taxonDao.findByCode(taxonomy.getId(), code, 10);
+		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
+		List<Taxon> results = taxonDao.findByCode(taxonomy, code, 10);
 		assertNotNull(results);
 		assertEquals(1, results.size());
 		Taxon taxon = results.get(0);
@@ -333,7 +352,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	protected TaxonOccurrence findByCode(String code) {
-		List<TaxonOccurrence> occurrences = speciesManager.findByCode(survey.getId(), TEST_TAXONOMY_NAME, code, 10);
+		List<TaxonOccurrence> occurrences = speciesManager.findByCode(survey, TEST_TAXONOMY_NAME, code, 10);
 		assertNotNull(occurrences);
 		assertEquals(1, occurrences.size());
 		TaxonOccurrence occurrence = occurrences.get(0);

@@ -11,7 +11,6 @@ import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.model.expression.ValueExpression;
-import org.openforis.idm.path.Path;
 
 /**
  * Verifies that the expressions defined in a survey are valid
@@ -86,8 +85,7 @@ public class ExpressionValidator {
 			AbstractExpression pathExpression = expressionFactory.createModelPathExpression(expression);
 			Set<String> referencedPaths = pathExpression.getReferencedPaths();
 			for (String path : referencedPaths) {
-				String normalizedPath = getNormalizedPath(path);
-				SchemaPathExpression schemaExpression = new SchemaPathExpression(normalizedPath);
+				SchemaPathExpression schemaExpression = new SchemaPathExpression(path);
 				try {
 					schemaExpression.evaluate(contextNodeDef, thisNodeDef);
 				} catch (Exception e) {
@@ -199,10 +197,6 @@ public class ExpressionValidator {
 //		return referencedNodes;
 //	}
 //	
-	private String getNormalizedPath(String path) {
-		return Path.removeThisVariableToken(path);
-	}
-	
 	private ExpressionValidationResult createErrorValidationResult(Exception e) {
 		ExpressionValidationResult result = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
 		if (e instanceof InvalidExpressionException) {

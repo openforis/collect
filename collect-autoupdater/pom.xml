@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.35-SNAPSHOT</version>
+		<version>3.13.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-autoupdater</artifactId>
 	<packaging>pom</packaging>
@@ -53,7 +53,7 @@
 						file -->
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
+						<artifactId>replacer</artifactId>
 						<executions>
 							<execution>
 								<phase>prepare-package</phase>
@@ -102,7 +102,7 @@
 											</plugin>
 											<goal>exec</goal>
 											<configuration>
-												<executable>${installbuilder-home}/autoupdate/bin/customize.run</executable>
+												<executable>${installbuilder.home}/autoupdate/bin/${installbuilder.autoupdate.executable}</executable>
 												<arguments>
 													<argument>build</argument>
 													<argument>${installer-build-path}/${installbuilder-autoupdate-configuration-file-name}</argument>
@@ -118,9 +118,11 @@
 											</plugin>
 											<goal>run</goal>
 											<configuration>
-												<tasks>
-													<move file="${installbuilder-home}/autoupdate/output/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" tofile="${project.build.directory}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" failonerror="true" />
-												</tasks>
+												<target>
+													<move file="${installbuilder.autoupdate.output}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" 
+														tofile="${project.build.directory}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" 
+														failonerror="true" />
+												</target>
 											</configuration>
 										</pluginExecutor>
 									</pluginExecutors>

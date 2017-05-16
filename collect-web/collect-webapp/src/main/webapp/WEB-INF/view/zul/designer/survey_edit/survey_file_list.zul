@@ -5,8 +5,10 @@
       width="900px"
       rows="3">
       <listhead>
-        <listheader label="${labels.survey.file.type.$}" width="200px" />
-        <listheader label="${labels.survey.file.filename}" />
+        <listheader label="${labels.survey.file.type.$}" width="200px"
+        	sort="auto(type)" />
+        <listheader label="${labels.survey.file.filename}"
+        	sort="auto(filename)" />
       </listhead>
       <template name="model">
         <listitem>

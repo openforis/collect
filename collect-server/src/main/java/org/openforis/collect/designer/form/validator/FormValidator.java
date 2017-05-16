@@ -91,22 +91,22 @@ public abstract class FormValidator extends BaseValidator {
 		return validateExpressionField(ctx, ExpressionType.BOOLEAN, field, contextNode);
 	}
 
-	private boolean validateExpressionField(ValidationContext ctx, ExpressionType type, String field,
+	protected boolean validateExpressionField(ValidationContext ctx, ExpressionType type, String field,
 			NodeDefinition contextNode) {
 		return validateExpressionField(ctx, type, field, contextNode.getParentDefinition(), contextNode);
 	}
 	
-	private boolean validateExpressionField(ValidationContext ctx, ExpressionType type, String field,
+	protected boolean validateExpressionField(ValidationContext ctx, ExpressionType type, String field,
 			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef) {
 		if (contextNodeDef == null) {
 			return true;
 		}
 		String epression = (String) getValue(ctx, field);
-		return validateExpression(ctx, type, contextNodeDef, thisNodeDef, field, epression);
+		return validateExpression(ctx, type, field, contextNodeDef, thisNodeDef, epression);
 	}
 
-	protected boolean validateExpression(ValidationContext ctx, ExpressionType type, NodeDefinition contextNodeDef,
-			NodeDefinition thisNodeDef, String field, String epression) {
+	protected boolean validateExpression(ValidationContext ctx, ExpressionType type, String field, 
+			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, String epression) {
 		if ( StringUtils.isNotBlank(epression) ) {
 			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
 			ExpressionValidationResult result = expressionValidator.validateExpression(type, contextNodeDef, thisNodeDef, epression);

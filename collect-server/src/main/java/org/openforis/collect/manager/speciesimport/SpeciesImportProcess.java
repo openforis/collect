@@ -24,9 +24,17 @@ import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
 import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.process.AbstractProcess;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.TaxonTree;
 import org.openforis.collect.model.TaxonTree.Node;
+import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -52,19 +60,28 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 
 	private static Log LOG = LogFactory.getLog(SpeciesImportProcess.class);
 
+	//input
 	private SpeciesManager speciesManager;
+	private SurveyManager surveyManager;
+	private CollectSurvey survey;
 	private int taxonomyId;
 	private File file;
 	private CSVFileOptions csvFileOptions;
 	private boolean overwriteAll;
 	
+	//temp variables
+	private String taxonomyName;
 	private TaxonTree taxonTree;
 	private SpeciesCSVReader reader;
 	private List<SpeciesLine> lines;
 	
-	public SpeciesImportProcess(SpeciesManager speciesManager, int taxonomyId, File file, CSVFileOptions csvFileOptions, boolean overwriteAll) {
+	public SpeciesImportProcess(SurveyManager surveyManager, SpeciesManager speciesManager, 
+			CollectSurvey survey, int taxonomyId, 
+			File file, CSVFileOptions csvFileOptions, boolean overwriteAll) {
 		super();
+		this.surveyManager = surveyManager;
 		this.speciesManager = speciesManager;
+		this.survey = survey;
 		this.taxonomyId = taxonomyId;
 		this.file = file;
 		this.csvFileOptions = csvFileOptions;
@@ -74,7 +91,8 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	@Override
 	public void init() {
 		super.init();
-		taxonTree = new TaxonTree();
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
+		taxonomyName = taxonomy.getName();
 		lines = new ArrayList<SpeciesLine>();
 		validateParameters();
 	}
@@ -100,7 +118,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		processFile();
 	}
 
-	protected void processFile() throws IOException {
+	protected void processFile() throws IOException, SurveyStoreException {
 		parseTaxonCSVLines(file);
 		if ( status.isRunning() ) {
 			processLines();
@@ -137,6 +155,11 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		try {
 			reader = new SpeciesCSVReader(file, csvFileOptions);
 			reader.init();
+			
+			TaxonomyDefinition taxonomyDefinition = initializeTaxonomyDefinition();
+
+			taxonTree = new TaxonTree(taxonomyDefinition);
+			
 			status.addProcessedRow(1);
 			currentRowNumber = 2;
 			while ( status.isRunning() ) {
@@ -165,6 +188,15 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}
+	}
+
+	private TaxonomyDefinition initializeTaxonomyDefinition() {
+		List<String> infoColumnNames = reader.getInfoColumnNames();
+		TaxonomyDefinition taxonomyDefinition = new TaxonomyDefinition(taxonomyName);
+		taxonomyDefinition.setAttributes(ReferenceDataDefinition.Attribute.fromNames(infoColumnNames));
+		ReferenceDataSchema referenceDataSchema = survey.getReferenceDataSchema();
+		referenceDataSchema.addTaxonomyDefinition(taxonomyDefinition);
+		return taxonomyDefinition;
 	}
 	
 	protected void processLines() {
@@ -226,8 +258,19 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		}
 	}
 
-	protected void persistTaxa() {
-		speciesManager.insertTaxons(taxonomyId, taxonTree, overwriteAll);
+	protected void persistTaxa() throws SurveyStoreException {
+		saveSurvey();
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
+		speciesManager.insertTaxons(taxonomy, taxonTree, overwriteAll);
+	}
+	
+	@SuppressWarnings("deprecation")
+	private void saveSurvey() throws SurveyStoreException {
+		if ( survey.isTemporary() ) {
+			surveyManager.save(survey);
+		} else {
+			surveyManager.updateModel(survey);
+		}
 	}
 
 	private Taxon findParentTaxon(SpeciesLine line) throws ParsingException {
@@ -303,6 +346,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			taxon = new Taxon();
 			taxon.setTaxonRank(rank);
 			taxon.setScientificName(normalizedScientificName);
+			
 			Node node = taxonTree.addNode(parent, taxon);
 			node.addMetadata(LINE_NUMBER_TREE_NODE_METADATA, line.getLineNumber());
 			node.addMetadata(RAW_SCIENTIFIC_NAME_TREE_NODE_METADATA, line.getRawScientificName());
@@ -315,6 +359,13 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			checkDuplicates(line, code, taxonId);
 			taxon.setCode(code);
 			taxon.setTaxonId(taxonId);
+			
+			TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
+			List<Attribute> taxonAttributes = taxonDefinition.getAttributes();
+			for (Attribute attribute : taxonAttributes) {
+				String value = line.getInfoAttribute(attribute.getName());
+				taxon.addInfoAttribute(value);
+			}
 			taxonTree.updateNodeInfo(taxon);
 			processVernacularNames(line, taxon);
 		}

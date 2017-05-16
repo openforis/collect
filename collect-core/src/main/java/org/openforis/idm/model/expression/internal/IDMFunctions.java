@@ -4,9 +4,14 @@ package org.openforis.idm.model.expression.internal;
 import static java.util.Arrays.asList;
 import static org.openforis.idm.path.Path.THIS_SYMBOL;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.ri.compiler.Constant;
@@ -14,12 +19,12 @@ import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
-import org.openforis.idm.metamodel.SpatialReferenceSystem;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResultFlag;
 import org.openforis.idm.metamodel.validation.LookupProvider;
@@ -27,6 +32,7 @@ import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Time;
+import org.openforis.idm.model.expression.ExpressionFactory;
 
 /**
  * Custom xpath functions allowed into IDM
@@ -75,6 +81,18 @@ public class IDMFunctions extends CustomFunctions {
 		register("position", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return position((Node<?>) objects[0]);
+			}
+		});
+
+		register("distinct-values", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return distinctValues(objects[0]);
+			}
+		});
+
+		register("count-distinct", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return countDistinct(objects[0]);
 			}
 		});
 
@@ -146,6 +164,75 @@ public class IDMFunctions extends CustomFunctions {
 					return speciesListService.loadSpeciesListData(survey, taxonomyName, attribute, speciesCode);
 				}
 			}
+			@Override
+			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
+					Expression[] arguments) {
+				Expression speciesListNameExpr = arguments[0];
+				ExpressionValidationResult validationResult = validateSpeciesListName(contextNodeDef, speciesListNameExpr);
+				if (validationResult.isOk()) {
+					String speciesListName = (String) ((Constant) speciesListNameExpr).computeValue(null);
+					Expression attributeNameExpr = arguments[1];
+					validationResult = validateAttribute(contextNodeDef, speciesListName, attributeNameExpr);
+					if (validationResult.isOk()) {
+						Expression speciesExpr = arguments[2];
+						return validateSpeciesCode(contextNodeDef, speciesExpr);
+					}
+				}
+				return validationResult;
+			}
+			
+			private ExpressionValidationResult validateSpeciesListName(NodeDefinition contextNodeDef,
+					Expression expression) {
+				String taxonomyName = "";
+				if (expression instanceof Constant) {
+					Object val = ((Constant) expression).computeValue(null);
+					if (val instanceof String) {
+						taxonomyName = (String) val;
+						Survey survey = contextNodeDef.getSurvey();
+						List<String> speciesListNames = survey.getContext().getSpeciesListService().loadSpeciesListNames(survey);
+						if (speciesListNames.contains(taxonomyName)) {
+							return new ExpressionValidationResult();
+						}
+					}
+				}
+				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+						String.format("First argument (\"%s\") is not a valid taxonomy name", taxonomyName));
+			}
+			
+			private ExpressionValidationResult validateAttribute(NodeDefinition contextNodeDef, String taxonomyName,
+					Expression attributeNameExpr) {
+				String attributeName = "";
+				if (attributeNameExpr instanceof Constant) {
+					Object val = ((Constant) attributeNameExpr).computeValue(null);
+					if (val instanceof String) {
+						attributeName = (String) val;
+						Survey survey = contextNodeDef.getSurvey();
+						TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
+						Attribute attribute = taxonDefinition.getAttribute(attributeName);
+						if (attribute != null) {
+							return new ExpressionValidationResult();
+						}
+					}
+				}
+				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+						String.format("Second argument (\"%s\") is not a valid attribute for this taxonomy", attributeName));
+			}
+			
+			private ExpressionValidationResult validateSpeciesCode(NodeDefinition contextNodeDef,
+					Expression expression) {
+				if (expression instanceof ModelLocationPath) {
+					ExpressionFactory expressionFactory = contextNodeDef.getSurvey().getContext().getExpressionFactory();
+					Set<String> referencedPaths = expressionFactory.getReferencedPathEvaluator().determineReferencedPaths(expression);
+					for (String referencedPath : referencedPaths) {
+						NodeDefinition referencedDef = contextNodeDef.getDefinitionByPath(referencedPath);
+						if (! (referencedDef instanceof TaxonAttributeDefinition)) {
+							return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+									String.format("Third argument (\"%s\") is not a valid path to a taxon attribute", expression.toString()));
+						}
+					}
+				}
+				return new ExpressionValidationResult();
+			}
 		});
 		
 		//deprecated
@@ -174,22 +261,14 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
-		register(LATLONG_FUNCTION_NAME, new CustomFunction(1) {
+		//deprecated geo functions (use "geo" namespace instead)
+		register("distance", new CustomFunction(2) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return latLong(expressionContext, objects[0]);
-			}
-			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
-					Expression[] arguments) {
-				Survey survey = contextNodeDef.getSurvey();
-				if(survey.getSpatialReferenceSystem(SpatialReferenceSystem.WGS84_SRS_ID) == null) {
-					String message = String.format("%s function requires a lat long Spatial Reference System defined with id '%s'", 
-							LATLONG_FUNCTION_NAME, SpatialReferenceSystem.WGS84_SRS_ID);
-					return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
-				} else {
-					return new ExpressionValidationResult();
-				}
+				return GeoFunctions.distance(expressionContext, objects[0], objects[1]);
 			}
 		});
+		
+		register("latlong", GeoFunctions.LAT_LONG_FUNCTION);
 	}
 
 	private String[] toStringArray(Object[] objects) {
@@ -236,6 +315,30 @@ public class IDMFunctions extends CustomFunctions {
 	 */
 	private static int position(Node<?> node) {
 		return node.getIndex() + 1;
+	}
+
+	private static Object distinctValues(Object obj) {
+		if (obj instanceof Collection) {
+			LinkedHashSet<Object> result = new LinkedHashSet<Object>((Collection<?>) obj);
+			if (result.size() == 1 && result.iterator().next() == null) {
+				return null;
+			} else {
+				return new ArrayList<Object>(result);
+			}
+		} else {
+			return obj;
+		}
+	}
+	
+	private static int countDistinct(Object obj) {
+		Object values = distinctValues(obj);
+		if (values == null) {
+			return 0;
+		} else if (values instanceof Collection) {
+			return ((Collection<?>) values).size();
+		} else {
+			return 1;
+		}
 	}
 
 	private static Date currentDate() {
@@ -339,30 +442,6 @@ public class IDMFunctions extends CustomFunctions {
 		}
 	}
 	
-	private Coordinate latLong(ExpressionContext expressionContext, Object coordinate) {
-		if (coordinate == null) {
-			return null;
-		}
-		if (coordinate instanceof Coordinate) {
-			return latLong(expressionContext, (Coordinate) coordinate);
-		} else {
-			return latLong(expressionContext, Coordinate.parseCoordinate(coordinate));
-		}
-	}
-
-	private Coordinate latLong(ExpressionContext expressionContext, Coordinate coordinate) {
-		if (coordinate == null || ! coordinate.isComplete()) {
-			return null;
-		}
-		Survey survey = getSurvey(expressionContext);
-		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
-		if (coordinateOperations == null) {
-			return null;
-		} else {
-			return coordinateOperations.convertToWgs84(coordinate);
-		}
-	}
-
 	private static Calendar getCalendar(Date date2, Time time2, TimeUnit timeUnit) {
 		int calendarTruncateField = getCalendarField(timeUnit);
 		Calendar cal2 = Calendar.getInstance(Locale.ENGLISH);
