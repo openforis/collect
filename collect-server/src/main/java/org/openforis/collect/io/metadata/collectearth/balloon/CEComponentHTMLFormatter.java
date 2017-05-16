@@ -91,9 +91,9 @@ public class CEComponentHTMLFormatter {
 							.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 							.t( row.getLabelOrName() );
 					
-					if(StringUtils.isNotBlank(row.getTooltip())) {
-						cellBuilder.a("title", row.getTooltip()); //$NON-NLS-1$
-					}
+					
+					String tooltip = row.getTooltip();
+					addTooltip(cellBuilder, tooltip);
 					
 				} else if (child instanceof CEField) {
 					createBuilder((CEField) child, false, cellBuilder);
@@ -142,13 +142,18 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder formGroupBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div"); //$NON-NLS-1$ //$NON-NLS-2$
 		formGroupBuilder.a("class", "form-group"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (includeLabel) {
+			
+						
 			//label element
 			formGroupBuilder.e("label") //$NON-NLS-1$
 				.a("for", elId) //$NON-NLS-1$
 				.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
-				
-				.a("title", StringUtils.isBlank(comp.getToolTip())?null:comp.getToolTip())
-				.t(  comp.getLabelOrName() ) ;
+				.t(  comp.getLabelOrName() );
+			
+			String tooltip = comp.getToolTip();
+			
+			addTooltip(formGroupBuilder, tooltip);
+			
 		}
 		//form control external container (for grid alignment)
 		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
@@ -273,6 +278,15 @@ public class CEComponentHTMLFormatter {
 			}
 		}
 		return formGroupBuilder;
+	}
+
+	public void addTooltip(XMLBuilder formGroupBuilder, String tooltip) {
+		if( !StringUtils.isBlank(tooltip)  ){
+			formGroupBuilder.e("span")
+				.a( "class", "ui-icon  ui-icon-info" )
+				.a( "style", "display:inline-block")
+				.a( "title", tooltip);
+		}
 	}
 
 	private void buildCodeSelect(XMLBuilder builder, CECodeField comp) {
