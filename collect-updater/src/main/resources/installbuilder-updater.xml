@@ -190,7 +190,7 @@ check_for_updates = 1</text>
 		</setInstallerVariable>
         <setInstallerVariable>
   			<name>log_dir</name>
-  			<value>${collect_root_user_dir}/log</value> 
+  			<value>${installdir}/logs</value> 
   		</setInstallerVariable>
 		<setInstallerVariable>
 			<name>webapps_dir</name>

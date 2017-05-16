@@ -230,12 +230,13 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 
 	private void addSpeciesExportTask() {
-		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 //			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
 				SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
 				task.setSpeciesManager(speciesManager);
 				task.setOutputStream(zipOutputStream);
+				task.setSurvey(survey);
 				task.setTaxonomyId(taxonomy.getId());
 				String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
 				task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, entryName));

@@ -6,46 +6,29 @@ package org.openforis.collect.io.metadata.samplingdesign;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.exception.ParsingException;
-import org.openforis.collect.io.metadata.parsing.CSVDataImportReader;
-import org.openforis.collect.io.metadata.parsing.CSVLineParser;
+import org.openforis.collect.io.metadata.parsing.CSVReferenceDataImportReader;
+import org.openforis.collect.io.metadata.parsing.CSVReferenceDataLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignLine.SamplingDesignLineCodeKey;
-import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.commons.io.csv.CsvLine;
 
 /**
  * @author S. Ricci
  *
  */
-public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignLine> {
+public class SamplingDesignCSVReader extends CSVReferenceDataImportReader<SamplingDesignLine> {
 
-	private List<String> infoColumnNames;
-	
 	public SamplingDesignCSVReader(File file) throws IOException, ParsingException {
 		super(file);
-		this.infoColumnNames = new ArrayList<String>();
 	}
 	
 	@Override
-	public void init() throws IOException, ParsingException {
-		super.init();
-		List<String> columnNames = csvReader.getColumnNames();
-		for (String col : columnNames) {
-			String adjustedName = SurveyObjects.adjustInternalName(col);
-			if ( isInfoAttribute(adjustedName) ) {
-				infoColumnNames.add(adjustedName);
-			}
-		}
-	}
-
-	private boolean isInfoAttribute(String col) {
+	protected boolean isInfoAttribute(String col) {
 		for (SamplingDesignFileColumn column : SamplingDesignFileColumn.values()) {
 			if ( column.getColumnName().equalsIgnoreCase(col) ) {
 				return false;
@@ -56,7 +39,7 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 
 	@Override
 	protected SamplingDesignCSVLineParser createLineParserInstance() {
-		SamplingDesignCSVLineParser lineParser = SamplingDesignCSVLineParser.createInstance(this, currentCSVLine);
+		SamplingDesignCSVLineParser lineParser = SamplingDesignCSVLineParser.createInstance(this, currentCSVLine, infoColumnNames);
 		return lineParser;
 	}
 
@@ -67,18 +50,15 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 		return true;
 	}
 
-	public List<String> getInfoColumnNames() {
-		return infoColumnNames;
-	}
-	
-	private static class SamplingDesignCSVLineParser extends CSVLineParser<SamplingDesignLine> {
+	private static class SamplingDesignCSVLineParser extends CSVReferenceDataLineParser<SamplingDesignLine> {
 
-		SamplingDesignCSVLineParser(SamplingDesignCSVReader reader, CsvLine line) {
-			super(reader, line);
+		SamplingDesignCSVLineParser(SamplingDesignCSVReader reader, CsvLine line, List<String> infoColumnNames) {
+			super(reader, line, infoColumnNames);
 		}
 		
-		public static SamplingDesignCSVLineParser createInstance(SamplingDesignCSVReader reader, CsvLine line) {
-			return new SamplingDesignCSVLineParser(reader, line);
+		public static SamplingDesignCSVLineParser createInstance(SamplingDesignCSVReader reader, 
+				CsvLine line, List<String> infoColumnNames) {
+			return new SamplingDesignCSVLineParser(reader, line, infoColumnNames);
 		}
 	
 		public SamplingDesignLine parse() throws ParsingException {
@@ -88,8 +68,6 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 			line.setSrsId(getColumnValue(SamplingDesignFileColumn.SRS_ID.getColumnName(), true, String.class));
 			List<String> levelCodes = parseLevelCodes(line);
 			line.setKey(new SamplingDesignLineCodeKey(levelCodes));
-			Map<String, String> infos = parseInfos(line);
-			line.setInfoAttributeByName(infos);
 			return line;
 		}
 
@@ -113,18 +91,6 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 				}
 			}
 			return levelCodes;
-		}
-		
-		protected Map<String, String> parseInfos(SamplingDesignLine line) throws ParsingException {
-			Map<String, String> result = new HashMap<String, String>();
-			SamplingDesignCSVReader reader = (SamplingDesignCSVReader) getReader();
-			for (String columnName : reader.infoColumnNames ) {
-				String value = getColumnValue(columnName, false, String.class);
-				if ( StringUtils.isNotBlank(value) ) {
-					result.put(columnName, value);
-				}
-			}
-			return result;
 		}
 	}
 	

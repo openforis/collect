@@ -5,14 +5,15 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.KEY;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.NAME;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.REFERENCE_DATA_SCHEMA;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.SAMPLING_POINT;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.TAXON;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TAXONOMY;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.openforis.idm.metamodel.ReferenceDataSchema;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
-import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.Survey;
 
 /**
@@ -26,7 +27,7 @@ class ReferenceDataSchemaXS extends XmlSerializerSupport<ReferenceDataSchema, Su
 		super(REFERENCE_DATA_SCHEMA);
 		addChildMarshallers(
 			new SamplingPointXS(),
-			new TaxonXS()
+			new TaxonomyXS()
 		);
 	}
 
@@ -53,10 +54,10 @@ class ReferenceDataSchemaXS extends XmlSerializerSupport<ReferenceDataSchema, Su
 
 	}
 
-	private class TaxonXS extends XmlSerializerSupport<TaxonDefinition, ReferenceDataSchema> {
+	private class TaxonomyXS extends XmlSerializerSupport<TaxonomyDefinition, ReferenceDataSchema> {
 		
-		public TaxonXS() {
-			super(TAXON);
+		public TaxonomyXS() {
+			super(TAXONOMY);
 			addChildMarshallers(
 				new AttributeXS()
 			);
@@ -64,10 +65,14 @@ class ReferenceDataSchemaXS extends XmlSerializerSupport<ReferenceDataSchema, Su
 		
 		@Override
 		protected void marshalInstances(ReferenceDataSchema schema) throws IOException {
-			TaxonDefinition taxon = schema.getTaxonDefinition();
-			marshal(taxon);
+			List<TaxonomyDefinition> taxonDefinitions = schema.getTaxonomyDefinitions();
+			marshal(taxonDefinitions);
 		}
-
+		
+		@Override
+		protected void attributes(TaxonomyDefinition taxonDefinition) throws IOException {
+			attribute(NAME, taxonDefinition.getTaxonomyName());
+		}
 	}
 
 	private class AttributeXS extends XmlSerializerSupport<ReferenceDataDefinition.Attribute, ReferenceDataDefinition> {

@@ -1,10 +1,10 @@
-"id","parent_id","rank","code","scientific_name","swh","eng","ksb"
-1,,"family",,"Oleaceae",,,
-2,1,"genus","OLE","Olea ssp.",,,
-4,2,"species","OLE/CAP","Olea capensis",,,
-5,4,"subspecies","OLE/CAP/macrocarpa","Olea capensis ssp. macrocarpa",,,
-6,2,"species","OLE/EUR","Olea europaea",,,
-7,6,"subspecies","OLE/EUR/cuspidata","Olea europaea subsp. cuspidata",,,
-8,,"family",,"Fabaceae",,,
-9,8,"genus","ALB","Albizia spp.",,,
-10,9,"species","ALB/ADI","Albizia adianthifolia",,,"Mchao / Mkengemshaa / Msai / Mshai / Mshai-mamba"
+id,parent_id,rank,code,scientific_name,swh,eng,ksb,info1,info2
+1,,family,,Oleaceae,,,,,
+2,1,genus,OLE,Olea ssp.,,,,,
+4,2,species,OLE/CAP,Olea capensis,,,,,
+5,4,subspecies,OLE/CAP/macrocarpa,Olea capensis ssp. macrocarpa,,,,info_value_1,info_value_2
+6,2,species,OLE/EUR,Olea europaea,,,,,
+7,6,subspecies,OLE/EUR/cuspidata,Olea europaea subsp. cuspidata,,,,,
+8,,family,,Fabaceae,,,,,
+9,8,genus,ALB,Albizia spp.,,,,,
+10,9,species,ALB/ADI,Albizia adianthifolia,,,Mchao / Mkengemshaa / Msai / Mshai / Mshai-mamba,info_value_3,

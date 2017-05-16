@@ -43,7 +43,8 @@ public class ReferencedPathEvaluator {
 			for (Expression predicate : step.getPredicates()) {
 				Set<String> predicatePaths = determineReferencedPaths(predicate);
 				for (String predicateReferencePath : predicatePaths) {
-					if (predicateReferencePath.startsWith(Path.THIS_VARIABLE)) {
+					if (predicateReferencePath.startsWith(Path.THIS_VARIABLE)
+							|| predicateReferencePath.startsWith(Path.CONTEXT_VARIABLE)) {
 						paths.add(predicateReferencePath);
 					} else {
 						paths.add(predicateBasePathSB.toString() + predicateReferencePath);

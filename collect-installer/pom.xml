@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.12.35-SNAPSHOT</version>
+		<version>3.13.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
@@ -145,7 +145,7 @@
 						file replace Java version into the InstallBuilder java.xml file -->
 					<plugin>
 						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>maven-replacer-plugin</artifactId>
+						<artifactId>replacer</artifactId>
 						<executions>
 							<execution>
 								<phase>prepare-package</phase>
@@ -272,7 +272,7 @@
 											<goal>exec</goal>
 											<configuration>
 												<skip>${installer.skip}</skip>
-												<executable>${installbuilder-home}/bin/builder</executable>
+												<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
 												<arguments>
 													<argument>build</argument>
 													<argument>${installer-build-path}/${installbuilder-file-name}</argument>
@@ -290,7 +290,7 @@
 											<configuration>
 												<skip>${installer.skip}</skip>
 												<target>
-													<move file="${installbuilder-home}/output/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-installer.${installer.extension}" failonerror="true" />
+													<move file="${installbuilder.builder.output}/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-installer.${installer.extension}" failonerror="true" />
 												</target>
 											</configuration>
 										</pluginExecutor>

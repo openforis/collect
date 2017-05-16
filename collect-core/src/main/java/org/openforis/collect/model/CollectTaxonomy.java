@@ -9,7 +9,17 @@ import org.openforis.idm.model.species.Taxonomy;
  */
 public class CollectTaxonomy extends Taxonomy {
 
+	private CollectSurvey survey;
 	private Integer surveyId;
+	
+	public CollectTaxonomy() {
+	}
+	
+	public CollectTaxonomy(CollectTaxonomy source) {
+		super(source);
+		this.survey = source.survey;
+		this.surveyId = source.surveyId;
+	}
 	
 	public Integer getSurveyId() {
 		return surveyId;
@@ -17,6 +27,15 @@ public class CollectTaxonomy extends Taxonomy {
 	
 	public void setSurveyId(Integer surveyId) {
 		this.surveyId = surveyId;
+	}
+	
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+		this.surveyId = survey == null ? null : survey.getId();
 	}
 	
 	@Override

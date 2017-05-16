@@ -194,4 +194,9 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 		resetExpression();
 	}
 
+	@Override
+	public String toString() {
+		return "DISTANCE - " + super.toString();
+	}
+
 }

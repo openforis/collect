@@ -5,8 +5,9 @@ package org.openforis.collect.remoting.service;
 
 import java.util.List;
 
-import org.openforis.collect.manager.RecordSessionManager;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
@@ -25,6 +26,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.annotation.Secured;
 
 /**
@@ -35,30 +37,37 @@ import org.springframework.security.access.annotation.Secured;
 public class SpeciesService {
 
 	@Autowired
+	private SurveyManager surveyManager;
+	@Autowired
 	private SpeciesManager speciesManager;
 	@Autowired
-	private RecordSessionManager sessionManager;
+	@Qualifier("sessionManager")
+	private SessionManager sessionManager;
+
 	
 	@Secured("ROLE_ENTRY")
 	public List<TaxonomyProxy> loadTaxonomiesBySurvey(int surveyId, boolean work) {
-		List<CollectTaxonomy> result = speciesManager.loadTaxonomiesBySurvey(surveyId);
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		List<CollectTaxonomy> result = speciesManager.loadTaxonomiesBySurvey(survey);
 		return Proxies.fromList(result, TaxonomyProxy.class);
 	}
 	
 	@Secured("ROLE_ADMIN")
 	public TaxonSummariesProxy loadTaxonSummaries(int taxonomyId, int offset, int maxRecords) {
-		TaxonSummaries summaries = speciesManager.loadTaxonSummaries(taxonomyId, offset, maxRecords);
+		CollectSurvey survey = getActiveSurvey();
+		TaxonSummaries summaries = speciesManager.loadTaxonSummaries(survey, taxonomyId, offset, maxRecords);
 		return new TaxonSummariesProxy(summaries);
 	}
 	
 	@Secured("ROLE_ADMIN")
 	public TaxonomyProxy saveTaxonomy(TaxonomyProxy proxy) {
+		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
 		CollectTaxonomy taxonomy;
 		Integer taxonomyId = proxy.getId();
 		if ( taxonomyId == null ) {
 			taxonomy = new CollectTaxonomy();
 		} else {
-			taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
+			taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
 		}
 		String oldName = taxonomy.getName();
 		String newName = proxy.getName();
@@ -92,50 +101,51 @@ public class SpeciesService {
 	
 	@Secured("ROLE_ADMIN")
 	public void deleteTaxonomy(TaxonomyProxy proxy) {
+		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
 		Integer taxonomyId = proxy.getId();
-		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(survey, taxonomyId);
 		speciesManager.delete(taxonomy);
 		deleteReferencingAttributes(taxonomy);
 	}
 
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByFamilyCode(String taxonomyName, String searchString, int maxResults, TaxonSearchParameters parameters) {
-		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByFamilyCode(taxonomy.getId(), searchString, maxResults, parameters);
+		CollectTaxonomy taxonomy = loadTaxonomyByActiveSurvey(taxonomyName);
+		List<TaxonOccurrence> list = speciesManager.findByFamilyCode(taxonomy, searchString, maxResults, parameters);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 	
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByFamilyScientificName(String taxonomyName, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
-		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByFamilyScientificName(taxonomy.getId(), searchString, maxResults, parameters);
+		CollectTaxonomy taxonomy = loadTaxonomyByActiveSurvey(taxonomyName);
+		List<TaxonOccurrence> list = speciesManager.findByFamilyScientificName(taxonomy, searchString, maxResults, parameters);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByCode(String taxonomyName, String searchString, int maxResults, TaxonSearchParameters parameters) {
-		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByCode(taxonomy.getId(), searchString, maxResults, parameters);
+		CollectTaxonomy taxonomy = loadTaxonomyByActiveSurvey(taxonomyName);
+		List<TaxonOccurrence> list = speciesManager.findByCode(taxonomy, searchString, maxResults, parameters);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByScientificName(String taxonomyName, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
-		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
-		List<TaxonOccurrence> list = speciesManager.findByScientificName(taxonomy.getId(), searchString, maxResults, parameters);
+		CollectTaxonomy taxonomy = loadTaxonomyByActiveSurvey(taxonomyName);
+		List<TaxonOccurrence> list = speciesManager.findByScientificName(taxonomy, searchString, maxResults, parameters);
 		return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 	}
 
 	@Secured("ROLE_ENTRY")
 	public List<TaxonOccurrenceProxy> findByVernacularName(String taxonomyName, int nodeId, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
-		CollectTaxonomy taxonomy = getTaxonomyByActiveSurvey(taxonomyName);
+		CollectTaxonomy taxonomy = loadTaxonomyByActiveSurvey(taxonomyName);
 		CollectRecord activeRecord = sessionManager.getActiveRecord();
 		Node<? extends NodeDefinition> attr = activeRecord.getNodeByInternalId(nodeId);
 		if ( attr instanceof TaxonAttribute ) {
-			List<TaxonOccurrence> list = speciesManager.findByVernacularName(taxonomy.getId(), (TaxonAttribute) attr, searchString, 
+			List<TaxonOccurrence> list = speciesManager.findByVernacularName(taxonomy, (TaxonAttribute) attr, searchString, 
 					maxResults, parameters);
 			return Proxies.fromList(list, TaxonOccurrenceProxy.class);
 		} else {
@@ -143,18 +153,19 @@ public class SpeciesService {
 		}
 	}
 	
-	protected CollectTaxonomy getTaxonomyByActiveSurvey(String taxonomyName) {
+	private CollectSurvey getActiveSurvey() {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
-		boolean activeSurveyWork = sessionState.isActiveSurveyWork();
-		Integer surveyId = activeSurvey.getId();
-		CollectTaxonomy taxonomy;
-		if ( activeSurveyWork ) {
-			taxonomy = speciesManager.loadTaxonomyWorkByName(surveyId, taxonomyName);
-		} else {
-			taxonomy = speciesManager.loadTaxonomyByName(surveyId, taxonomyName);
-		}
-		return taxonomy;
+		return activeSurvey;
+	}
+
+	protected CollectTaxonomy loadTaxonomyByActiveSurvey(String taxonomyName) {
+		CollectSurvey activeSurvey = getActiveSurvey();
+		return loadTaxonomy(activeSurvey, taxonomyName);
+	}
+
+	private CollectTaxonomy loadTaxonomy(CollectSurvey survey, String name) {
+		return speciesManager.loadTaxonomyByName(survey, name);
 	}
 
 	protected List<TaxonAttributeDefinition> getTaxonAttributeDefinitionsForDesignerSurvey(String oldName) {

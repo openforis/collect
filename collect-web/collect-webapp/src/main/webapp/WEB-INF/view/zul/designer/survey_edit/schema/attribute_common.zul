@@ -88,13 +88,18 @@
 	      	<rows>
 	      		<row>
 		    		<cell>
-	    				<textbox width="500px"
+	    				<textbox width="400px"
 	    					value="@bind(fx.referencedAttributePath)"
 	    					readonly="true" />
 	    				<button sclass="icon"
 	    					tooltiptext="${labels.survey.schema.attribute.select_referenced_attribute}"
 	    					onClick="@command('openReferencedAttributeSelector')"
 	    					image="/assets/images/tree-small.png" />
+	    				<button
+	    					label="${labels.survey.schema.attribute.generate_entity_alias.$}"
+	    					tooltiptext="${labels.survey.schema.attribute.generate_entity_alias.tooltip}"
+	    					onClick="@command('generateEntityAlias')"
+	    					disabled="@load(empty fx.referencedAttributePath)" />
 		    		</cell>
 	      		</row>
 	      	</rows>

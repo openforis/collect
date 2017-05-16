@@ -61,6 +61,7 @@ import org.openforis.idm.metamodel.validation.CustomCheck;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.metamodel.validation.PatternCheck;
 import org.openforis.idm.metamodel.validation.UniquenessCheck;
+import org.openforis.idm.path.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
@@ -370,21 +371,48 @@ public class SurveyValidator {
 		return fullInternalName;
 	}
 	
-	private List<SurveyValidationResult> validateEntity(EntityDefinition entity) {
+	private List<SurveyValidationResult> validateEntity(EntityDefinition entityDef) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
-		List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
+		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		if ( childDefinitions.size() == 0 ) {
 			//empty entity
-			results.add(new SurveyValidationResult(entity.getPath(), "survey.validation.error.empty_entity"));
+			results.add(new SurveyValidationResult(entityDef.getPath(), "survey.validation.error.empty_entity"));
 		}
-		if (entity.isMultiple()) {
-			UIOptions uiOptions = ((CollectSurvey) entity.getSurvey()).getUIOptions();
-			EntityDefinition parentEntity = entity.getParentEntityDefinition();
+		if (entityDef.isMultiple()) {
+			UIOptions uiOptions = ((CollectSurvey) entityDef.getSurvey()).getUIOptions();
+			EntityDefinition parentEntity = entityDef.getParentEntityDefinition();
 			if (parentEntity != null && parentEntity.isMultiple()) {
-				Layout layout = uiOptions.getLayout(entity);
+				Layout layout = uiOptions.getLayout(entityDef);
 				Layout parentLayout = uiOptions.getLayout(parentEntity);
 				if (TABLE == layout && TABLE == parentLayout) {
-					results.add(new SurveyValidationResult(entity.getPath(), "survey.validation.error.nested_tables"));
+					results.add(new SurveyValidationResult(entityDef.getPath(), "survey.validation.error.nested_tables"));
+				}
+			}
+		}
+		if (entityDef.isVirtual()) {
+			String generatorExpression = entityDef.getGeneratorExpression();
+			String sourceEntityPath = Path.getAbsolutePath(generatorExpression);
+			EntityDefinition sourceEntityDef = (EntityDefinition) entityDef.getParentDefinition().getDefinitionByPath(sourceEntityPath);
+			for (NodeDefinition sourceChildDef : sourceEntityDef.getChildDefinitions()) {
+				boolean skipNode = sourceChildDef instanceof AttributeDefinition && ((AttributeDefinition) sourceChildDef).getReferencedAttribute() != null;
+				if (! skipNode) {
+					if (entityDef.containsChildDefinition(sourceChildDef.getName())) {
+						NodeDefinition foundChildDef = entityDef.getChildDefinition(sourceChildDef.getName());
+						if (foundChildDef.getClass() != sourceChildDef.getClass()) {
+							results.add(new SurveyValidationResult(Flag.ERROR, entityDef.getPath(), 
+									"survey.validation.entity.error.invalid_virtual_node_type", foundChildDef.getName()));
+						}
+					} else {
+						results.add(new SurveyValidationResult(Flag.WARNING, entityDef.getPath(), 
+								"survey.validation.entity.error.missing_virtual_node", sourceChildDef.getName()));
+					}
+				}
+			}
+			for (NodeDefinition virtualChildDef : entityDef.getChildDefinitions()) {
+				if (! sourceEntityDef.containsChildDefinition(virtualChildDef.getName())) {
+					results.add(new SurveyValidationResult(Flag.WARNING, entityDef.getPath(), 
+							"survey.validation.entity.error.source_node_not_found_for_virtual_node", 
+							virtualChildDef.getName(), sourceEntityDef.getName()));
 				}
 			}
 		}
@@ -410,11 +438,12 @@ public class SurveyValidator {
 	}
 
 	private void validateTaxonomy(TaxonAttributeDefinition attrDef, List<SurveyValidationResult> results) {
-		boolean surveyIsStored = attrDef.getSurvey().getId() != null;
+		CollectSurvey survey = (CollectSurvey) attrDef.getSurvey();
+		boolean surveyIsStored = survey.getId() != null;
 		if (surveyIsStored) {
 			//validate taxonomies only when survey is stored
 			String taxonomyName = attrDef.getTaxonomy();
-			CollectTaxonomy taxonomy = findTaxonomy((CollectSurvey) attrDef.getSurvey(), taxonomyName);
+			CollectTaxonomy taxonomy = findTaxonomy(survey, taxonomyName);
 			if (taxonomy == null) {
 				results.add(new SurveyValidationResult(attrDef.getPath(), "survey.validation.attribute.taxon.invalid_taxonomy", taxonomyName));
 			}
@@ -451,6 +480,18 @@ public class SurveyValidator {
 		if ( node instanceof AttributeDefinition ) {
 			List<SurveyValidationResult> attributeValidationResults = validateAttributeExpressions((AttributeDefinition) node);
 			results.addAll(attributeValidationResults);
+		} else {
+			List<SurveyValidationResult> entityValidationResults = validateEntityExpressions((EntityDefinition) node);
+			results.addAll(entityValidationResults);
+		}
+		return results;
+	}
+
+	private List<SurveyValidationResult> validateEntityExpressions(EntityDefinition node) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		if (node.isVirtual()) {
+			addSchemaPathExpressionValidationResult(results, node, node.getGeneratorExpression(),
+					"survey.validation.entity.error.generator_expression");
 		}
 		return results;
 	}
@@ -757,7 +798,7 @@ public class SurveyValidator {
 	}
 
 	private CollectTaxonomy findTaxonomy(CollectSurvey survey, String taxonomyName) {
-		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			if (taxonomy.getName().equals(taxonomyName)) {
 				return taxonomy;

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-species-list-info-columns" author="ricci" dbms="sqlite">
+		<comment>Add 20 species list info columns</comment>
+		
+		<sql>
+			alter table ofc_taxon add column info01 varchar(255);
+			alter table ofc_taxon add column info02 varchar(255);
+			alter table ofc_taxon add column info03 varchar(255);
+			alter table ofc_taxon add column info04 varchar(255);
+			alter table ofc_taxon add column info05 varchar(255);
+			alter table ofc_taxon add column info06 varchar(255);
+			alter table ofc_taxon add column info07 varchar(255);			
+			alter table ofc_taxon add column info08 varchar(255);			
+			alter table ofc_taxon add column info09 varchar(255);			
+			alter table ofc_taxon add column info10 varchar(255);			
+			alter table ofc_taxon add column info11 varchar(255);
+			alter table ofc_taxon add column info12 varchar(255);
+			alter table ofc_taxon add column info13 varchar(255);
+			alter table ofc_taxon add column info14 varchar(255);
+			alter table ofc_taxon add column info15 varchar(255);
+			alter table ofc_taxon add column info16 varchar(255);
+			alter table ofc_taxon add column info17 varchar(255);			
+			alter table ofc_taxon add column info18 varchar(255);			
+			alter table ofc_taxon add column info19 varchar(255);			
+			alter table ofc_taxon add column info20 varchar(255);			
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>

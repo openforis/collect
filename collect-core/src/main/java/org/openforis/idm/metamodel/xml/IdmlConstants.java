@@ -52,6 +52,7 @@ public interface IdmlConstants {
 	static String REFERENCE_DATA_SCHEMA = "referenceDataSchema";
 	static String SAMPLING_POINT = "samplingPoint";
 	static String ATTRIBUTE = "attribute";
+	static String TAXONOMY_NAME = "taxonomy_name";
 	
 	// Schema
 	static String SCHEMA = "schema";
@@ -67,6 +68,10 @@ public interface IdmlConstants {
 	static String REQUIRED = "required";
 	static String SINCE = "since";
 	static String DEPRECATED = "deprecated";
+	
+	// Entities
+	static String VIRTUAL = "virtual";
+	static String GENERATOR_EXPRESSION = "generatorExpression";
 	
 	// Attributes
 	static String FIELD = "field";

@@ -57,7 +57,7 @@ public abstract class CheckFormValidator extends FormValidator {
 		Check<?> check = getEditedCheck(ctx);
 		List<String> expressions = check.extractExpressionsFromMessage(message);
 		for (String expr : expressions) {
-			boolean result = validateExpression(ctx, ExpressionType.VALUE, nodeDef.getParentEntityDefinition(), nodeDef, MESSAGE_FIELD, expr);
+			boolean result = validateExpression(ctx, ExpressionType.VALUE, MESSAGE_FIELD, nodeDef.getParentEntityDefinition(), nodeDef, expr);
 			if (! result) {
 				return false;
 			}

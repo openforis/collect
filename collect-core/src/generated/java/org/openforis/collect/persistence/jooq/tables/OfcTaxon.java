@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcTaxon extends TableImpl<OfcTaxonRecord> {
 
-	private static final long serialVersionUID = -1986413438;
+	private static final long serialVersionUID = 864863638;
 
 	/**
 	 * The reference instance of <code>collect.ofc_taxon</code>
@@ -87,6 +87,106 @@ public class OfcTaxon extends TableImpl<OfcTaxonRecord> {
 	 * The column <code>collect.ofc_taxon.parent_id</code>.
 	 */
 	public final TableField<OfcTaxonRecord, Integer> PARENT_ID = createField("parent_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info01</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO01 = createField("info01", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info02</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO02 = createField("info02", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info03</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO03 = createField("info03", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info04</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO04 = createField("info04", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info05</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO05 = createField("info05", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info06</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO06 = createField("info06", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info07</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO07 = createField("info07", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info08</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO08 = createField("info08", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info09</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO09 = createField("info09", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info10</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO10 = createField("info10", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info11</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO11 = createField("info11", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info12</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO12 = createField("info12", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info13</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO13 = createField("info13", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info14</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO14 = createField("info14", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info15</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO15 = createField("info15", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info16</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO16 = createField("info16", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info17</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO17 = createField("info17", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info18</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO18 = createField("info18", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info19</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO19 = createField("info19", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_taxon.info20</code>.
+	 */
+	public final TableField<OfcTaxonRecord, String> INFO20 = createField("info20", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_taxon</code> table reference

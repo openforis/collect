@@ -12,7 +12,48 @@ Collect.DataManager.MapPanelComposer = function(panel) {
 	this.startLat = 30;
 	this.startLon = 0;
 	this.startZoom = 4;
+	
+	this.coordinateDataStyleCache = {};
+	this.samplingPointStyleCache = {};
 }
+
+Collect.DataManager.MapPanelComposer.SAMPLING_POINT_STYLE = new ol.style.Style({
+	image : new ol.style.Circle({
+		fill : new ol.style.Fill({
+			color : [0,0,255,0.1] //almost transparent fill
+		}),
+		stroke: new ol.style.Stroke({
+			color : "#0000FF",
+			width: 2
+		}),
+		radius : 5
+	})
+});
+
+Collect.DataManager.MapPanelComposer.DATA_ENTRY_RECORD_STYLE = new ol.style.Style({
+	image : new ol.style.Circle({
+		fill : new ol.style.Fill({
+			color : "#FF0000"
+		}),
+		radius : 5
+	})
+});
+Collect.DataManager.MapPanelComposer.DATA_CLEANSING_RECORD_STYLE = new ol.style.Style({
+	image : new ol.style.Circle({
+		fill : new ol.style.Fill({
+			color : "#FF9933"
+		}),
+		radius : 5
+	})
+});
+Collect.DataManager.MapPanelComposer.DATA_ANALYSIS_RECORD_STYLE = new ol.style.Style({
+	image : new ol.style.Circle({
+		fill : new ol.style.Fill({
+			color : "#00FF00"
+		}),
+		radius : 5
+	})
+});
 
 Collect.DataManager.MapPanelComposer.prototype.init = function(onComplete) {
 	var $this = this;
@@ -94,42 +135,64 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 	$this.map.addControl(layerSwitcher);
 
 	var displayFeatureInfo = function(pixel, coordinate) {
-		var feature = $this.map.forEachFeatureAtPixel(pixel, function(feature) {
+		var featureOrLayer = $this.map.forEachFeatureAtPixel(pixel, function(feature) {
 			return feature;
 		});
-		if (feature) {
+		if (featureOrLayer) {
+			var features = featureOrLayer.get('features');
+			var feature;
+			var numberOfFeatures;
+			if (features) {
+				numberOfFeatures = features.length;
+				feature = features[0];
+			} else {
+				numberOfFeatures = 1;
+				feature = featureOrLayer;
+			}
 			var survey = feature.get('survey');
 			var htmlContent;
 			
-			switch (feature.get('type')) {
-			case 'sampling_point':
-				var lonLat = coordinate;
-				var keyDefs = survey.getRooEntityKeyDefinitions();
-				function printLevelCodes(levelCodes) {
-					var result = "";
-					for (var i = 0; i < levelCodes.length; i++) {
-						var keyDef = keyDefs.length > i ? keyDefs[i] : null;
-						var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
-						result += levelName + ": " + levelCodes[i] + "<br>";
-					}
-					return result;
+			if (numberOfFeatures > 1) {
+				htmlContent = "Cluster of " + numberOfFeatures + " ";
+				switch (feature.get('type')) {
+				case 'sampling_point':
+					htmlContent += " sampling points";
+					break;
+				case 'coordinate_attribute_value':
+					htmlContent += " sampling units";
+					break;
 				}
-				var levelCodes = feature.get('name').split('|');
-				htmlContent = OF.Strings.format(
-						//TODO improve level codes formatting
-						"<b>Sampling Point</b>"
-						+ "<br>"
-						+ "{0}"
-						+ "Latitude: {1}"
-						+ "<br>"
-						+ "Longitude: {2}"
-						+ "<br>"
-						, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
-				break;
-			case 'coordinate_attribute_value':
-				var point = feature.get('point');
-				htmlContent = $this.createNodeInfoBalloon(survey, point);
-				break;
+			} else {
+				switch (feature.get('type')) {
+				case 'sampling_point':
+					var lonLat = coordinate;
+					var keyDefs = survey.getRooEntityKeyDefinitions();
+					function printLevelCodes(levelCodes) {
+						var result = "";
+						for (var i = 0; i < levelCodes.length; i++) {
+							var keyDef = keyDefs.length > i ? keyDefs[i] : null;
+							var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
+							result += levelName + ": " + levelCodes[i] + "<br>";
+						}
+						return result;
+					}
+					var levelCodes = feature.get('name').split('|');
+					htmlContent = OF.Strings.format(
+							//TODO improve level codes formatting
+							"<b>Sampling Point</b>"
+							+ "<br>"
+							+ "{0}"
+							+ "Latitude: {1}"
+							+ "<br>"
+							+ "Longitude: {2}"
+							+ "<br>"
+							, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
+					break;
+				case 'coordinate_attribute_value':
+					var point = feature.get('point');
+					htmlContent = $this.createNodeInfoBalloon(survey, point);
+					break;
+				}
 			}
 			$this.popupContent.html(htmlContent);
 			$this.popupContent.find(".accordion").accordion({heightStyle: "content", animate: 0});
@@ -229,7 +292,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				survey : survey,
 				coordinate_attribute_def : nodeDef,
 				source : null,
-				style : $this.coordinateAttributeLayerStyleFunction
+				style : $.proxy($this.coordinateAttributeLayerStyleFunction, $this)
 			});
 			dataLayers.push(dataLayer);
 		} else if (nodeDef.type == 'ATTRIBUTE' && nodeDef.geometry) {
@@ -258,18 +321,7 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 				visible : false,
 				type : 'sampling_points',
 				survey : survey,
-				style : new ol.style.Style({
-					image : new ol.style.Circle({
-						fill : new ol.style.Fill({
-							color : [0,0,255,0.1] //almost transparent fill
-						}),
-						stroke: new ol.style.Stroke({
-							color : "#0000FF",
-							width: 2
-						}),
-						radius : 5
-					})
-				})
+				style : $.proxy($this.samplingPointLayerStyleFunction, $this)
 			})
 		]
 	});
@@ -288,30 +340,69 @@ Collect.DataManager.MapPanelComposer.prototype.createSurveyLayerGroup = function
 	return surveyGroup;
 };
 
-Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunction = function(feature) {
-	var point = feature.get('point');
-	var step = point.recStep;
-	var color;
-	switch (step) {
-	case 'ENTRY':
-		color = "#FF0000";
-		break;
-	case 'CLEANSING':
-		color = "#FF9933";
-		break;
-	case 'ANALYSIS':
-		color = "#00FF00";
-		break;
+Collect.DataManager.MapPanelComposer.prototype.samplingPointLayerStyleFunction = function(layer) {
+	var $this = this;
+	var size = layer.get('features').length;
+	if (size == 1) {
+		return Collect.DataManager.MapPanelComposer.SAMPLING_POINT_STYLE;
+	} else {
+		var styleCache = $this.samplingPointStyleCache;
+		var style = styleCache[size];
+		if (!style) {
+			style = new ol.style.Style({
+				image: new ol.style.Circle({
+					radius: Math.max(size / 5, 10),
+					stroke: new ol.style.Stroke({
+						color: '#00f',
+						lineDash: [2, 2]
+					}),
+					fill: new ol.style.Fill({
+						color : [0,0,255,0.1] //almost transparent fill
+					})
+				})
+			});
+			styleCache[size] = style;
+		}
+		return style;
 	}
-	var style = new ol.style.Style({
-		image : new ol.style.Circle({
-			fill : new ol.style.Fill({
-				color : color
-			}),
-			radius : 5
-		})
-	});
-	return [style];
+};
+
+Collect.DataManager.MapPanelComposer.prototype.coordinateAttributeLayerStyleFunction = function(layer) {
+	var $this = this;
+	var size = layer.get('features').length;
+	if (size == 1) {
+		var feature = layer.get('features')[0];
+		var point = feature.get('point');
+		var step = point.recStep;
+		var color;
+		switch (step) {
+		case 'ENTRY':
+			return Collect.DataManager.MapPanelComposer.DATA_ENTRY_RECORD_STYLE;
+		case 'CLEANSING':
+			return Collect.DataManager.MapPanelComposer.DATA_CLEANSING_RECORD_STYLE;
+		case 'ANALYSIS':
+			return Collect.DataManager.MapPanelComposer.DATA_ANALYSIS_RECORD_STYLE;
+		}
+	} else {
+		var styleCache = $this.coordinateDataStyleCache;
+		var style = styleCache[size];
+		if (!style) {
+			style = new ol.style.Style({
+				image: new ol.style.Circle({
+					radius: 10,
+					stroke: new ol.style.Stroke({
+						color: '#fff',
+						lineDash: [2,2]
+					}),
+					fill: new ol.style.Fill({
+						color: '#3399CC'
+					})
+				})
+			});
+			styleCache[size] = style;
+		}
+		return style;
+	}
 };
 
 Collect.DataManager.MapPanelComposer.prototype.geometryLayerStyleFunction = function(feature) {
@@ -458,6 +549,7 @@ Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 
 Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback, readyCallback) {
 	var url = OF.Strings.format("survey/{0}/sampling-point-data.kml", survey.id);
+	
 	var source = new ol.source.Vector({
 		url : url,
 		format : new ol.format.KML({
@@ -465,7 +557,12 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 		})
 	});
 	
-	callback(source);
+	var clusterSource = new ol.source.Cluster({
+		distance: 20,
+		source: source
+	});
+	
+	callback(clusterSource);
 	
 	//wait for load complete (change event)
 	source.on('change', function(event) {
@@ -475,13 +572,14 @@ Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = f
 	});
 	
 	function onReady() {
+		//add extra info to each feature (survey, type, etc.)
 		source.forEachFeature(function(feature) {
 			feature.setProperties({
 				'type': 'sampling_point',
 				'survey' : survey
 			}, true);
 		});
-		readyCallback(source);
+		readyCallback(clusterSource);
 	}
 	
 	onReady();
@@ -497,7 +595,7 @@ Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = functi
 			return;
 		}
 		var batchSize = 200;
-		var maxProcessableItems = 1000 * 1000 * 1000;
+		var maxProcessableItems = 1000;
 		var totalItems = Math.min(recordCount, maxProcessableItems);
 
 		var jobDialog = new OF.UI.JobDialog();
@@ -575,12 +673,17 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 	
 	var source = new ol.source.Vector();
 	
+	var clusterSource = new ol.source.Cluster({
+		distance: 40,
+		source: source
+	});
+	
 	collect.dataService.countRecords(survey.id, rootEntityDefinitionId, function(recordCount) {
 		if (recordCount == 0) {
 			return;
 		}
 		var batchSize = 200;
-		var maxProcessableItems = 1000000000;
+		var maxProcessableItems = 1000 * 1000; //1 million
 		var totalItems = Math.min(recordCount, maxProcessableItems);
 
 		var jobDialog = new OF.UI.JobDialog();
@@ -604,12 +707,12 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 				processCoordinateValue(coordinateAttributePoints[i]);
 			}
 			
-			callback(source);
+			callback(clusterSource);
 			
 			if (batchProcessor.progressPercent == 100) {
 				jobDialog.close();
-				readyCallback(source);
-			} else {
+				readyCallback(clusterSource);
+			} else if (batchProcessor.running) {
 				var fakeProgressJob = {
 					status : "RUNNING",
 					elapsedTime : new Date().getTime() - startTime,
