@@ -15,6 +15,7 @@ function Html({ title, description, style, script, children }) {
         <link rel="stylesheet" href="/css/bootstrap-social.css" />
         <link rel="stylesheet" href="/css/font-awesome.min.css" />
         <link rel="stylesheet" href="/css/sb-admin.css" />
+        <link rel="stylesheet" href="/bootstrap-table/react-bootstrap-table-all.min.css" />
         <style id="css" dangerouslySetInnerHTML={{ __html: style }} />
       </head>
       <body>

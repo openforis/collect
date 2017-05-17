@@ -12,7 +12,7 @@ import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 import { createLogger } from 'redux-logger'
-import reducer from '../reducers'
+import rootReducer from '../reducers'
 import App from '../components/app';
 
 // Child routes
@@ -31,7 +31,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const store = createStore(
-  reducer,
+  rootReducer,
   applyMiddleware(...middleware)
 )
 

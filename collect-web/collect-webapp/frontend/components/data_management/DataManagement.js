@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { PageHeader } from 'react-bootstrap';
 import RecordDataTable from './RecordDataTable';
+import RecordEditor from './RecordEditor';
 
 const title = 'Data Management';
 
