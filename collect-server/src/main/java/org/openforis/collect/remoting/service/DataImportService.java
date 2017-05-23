@@ -1,5 +1,7 @@
 package org.openforis.collect.remoting.service;
 
+import static org.openforis.collect.model.UserRoles.CLEANSING;
+
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
@@ -44,7 +46,7 @@ public class DataImportService {
 	private DataRestoreSummaryJob summaryJob;
 	private DataRestoreJob dataRestoreJob;
 	
-	@Secured("ROLE_ADMIN")
+	@Secured(CLEANSING)
 	public JobProxy startSummaryCreation(String filePath, String selectedSurveyUri, boolean overwriteAll,
 			boolean fullSummary) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
@@ -72,7 +74,7 @@ public class DataImportService {
 		return getCurrentJob();
 	}
 	
-	@Secured("ROLE_ADMIN")
+	@Secured(CLEANSING)
 	public JobProxy startImport(List<Integer> entryIdsToImport, boolean validateRecords, boolean processInTransaction) throws Exception {
 		if ( dataRestoreJob == null || ! dataRestoreJob.isRunning() ) {
 			log.info("Starting data restore");
@@ -103,7 +105,7 @@ public class DataImportService {
 		return getCurrentJob();
 	}
 
-	@Secured("ROLE_ADMIN")
+	@Secured(CLEANSING)
 	public JobProxy getCurrentJob() {
 		JobProxy proxy = null;
 		if ( summaryJob != null ) {
@@ -114,7 +116,7 @@ public class DataImportService {
 		return proxy;
 	}
 	
-	@Secured("ROLE_ADMIN")
+	@Secured(CLEANSING)
 	public DataImportSummaryProxy getSummary() {
 		if ( summaryJob != null ) {
 			DataImportSummary summary = summaryJob.getSummary();
@@ -127,7 +129,7 @@ public class DataImportService {
 		}
 	}
 
-	@Secured("ROLE_ADMIN")
+	@Secured(CLEANSING)
 	public void cancel() {
 		if ( summaryJob != null ) {
 			summaryJob.abort();

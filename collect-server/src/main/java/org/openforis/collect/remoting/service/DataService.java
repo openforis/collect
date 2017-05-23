@@ -4,7 +4,6 @@
 package org.openforis.collect.remoting.service;
 
 
-import static org.openforis.collect.model.UserRoles.ADMIN;
 import static org.openforis.collect.model.UserRoles.ANALYSIS;
 import static org.openforis.collect.model.UserRoles.CLEANSING;
 import static org.openforis.collect.model.UserRoles.ENTRY;
@@ -535,7 +534,7 @@ public class DataService {
 				recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
 	}
 	
-	@Secured(ADMIN)
+	@Secured(CLEANSING)
 	public SurveyLockingJobProxy moveRecords(String rootEntity, int fromStepNumber, final boolean promote) {
 		BulkRecordMoveJob job = collectJobManager.createJob(BulkRecordMoveJob.class);
 		SessionState sessionState = getSessionState();
