@@ -31,9 +31,17 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  *
  */
 public class SpeciesBackupCSVReader extends CSVReferenceDataImportReader<SpeciesBackupLine> {
+	
+	private List<String> languageColumnNames;
 
 	public SpeciesBackupCSVReader(File file) throws IOException, ParsingException {
 		super(file);
+	}
+	
+	@Override
+	public void init() throws IOException, ParsingException {
+		super.init();
+		this.languageColumnNames = extractLanguageColumnNames();
 	}
 
 	@Override
@@ -59,7 +67,7 @@ public class SpeciesBackupCSVReader extends CSVReferenceDataImportReader<Species
 		return true;
 	}
 	
-	public List<String> getLanguageColumnNames() {
+	public List<String> extractLanguageColumnNames() {
 		List<String> columnNames = getColumnNames();
 		List<String> result = new ArrayList<String>();
 		for (String colName : columnNames) {
@@ -69,6 +77,10 @@ public class SpeciesBackupCSVReader extends CSVReferenceDataImportReader<Species
 			}
 		}
 		return result;
+	}
+	
+	protected List<String> getLanguageColumnNames() {
+		return languageColumnNames;
 	}
 	
 	public static class SpeciesCSVLineParser extends CSVReferenceDataLineParser<SpeciesBackupLine> {

@@ -99,6 +99,8 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		ZipEntry samplingDesignEntry = backupFileExtractor.findEntry(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
 		if ( samplingDesignEntry != null && samplingDesignEntry.getSize() > 0 ) {
 			addTask(SamplingDesignImportTask.class);
+		} else {
+			addTask(SamplingDesignCleanTask.class);
 		}
 		//add species import tasks
 		if ( backupFileExtractor.containsEntriesInPath(SurveyBackupJob.SPECIES_FOLDER) ) {
@@ -139,6 +141,9 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setCodeListManager(codeListManager);
 			t.setZipFile(zipFile);
 			t.setSurvey(survey);
+		} else if ( task instanceof SamplingDesignCleanTask) {
+			SamplingDesignCleanTask t = (SamplingDesignCleanTask) task;
+			t.setSurveyId(survey.getId());
 		} else if ( task instanceof SamplingDesignImportTask ) {
 			SamplingDesignImportTask t = (SamplingDesignImportTask) task;
 			File samplingDesignFile = backupFileExtractor.extract(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
@@ -303,6 +308,25 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	
 	public SurveyBackupInfo getBackupInfo() {
 		return backupInfo;
+	}
+	
+	@Component
+	private static class SamplingDesignCleanTask extends Task {
+		
+		@Autowired
+		private SamplingDesignManager samplingDesignManager;
+		
+		private int surveyId;
+		
+		@Override
+		protected void execute() throws Throwable {
+			samplingDesignManager.deleteBySurvey(surveyId);
+		}
+		
+		public void setSurveyId(int surveyId) {
+			this.surveyId = surveyId;
+		}
+		
 	}
 
 }
