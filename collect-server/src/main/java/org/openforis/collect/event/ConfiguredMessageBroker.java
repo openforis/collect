@@ -19,10 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.jooq.impl.DataSourceConnectionProvider;
-import org.jooq.impl.DialectAwareJooqConfiguration;
-import org.openforis.collect.persistence.DbUtils;
-import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.rmb.MessageBroker;
 import org.openforis.rmb.MessageQueue.Builder;
 import org.openforis.rmb.metrics.MetricsMonitor;
@@ -59,18 +55,19 @@ public class ConfiguredMessageBroker implements MessageBroker {
 	public ConfiguredMessageBroker(DataSource dataSource) throws Exception {
 		messageBroker = new SpringJdbcMessageBroker(dataSource);
 		messageBroker.setMessageSerializer(new XStreamMessageSerializer());
-		messageBroker.setTablePrefix(determineFullTablePrefix());
+		//messageBroker.setTablePrefix(determineFullTablePrefix(dataSource));
+		messageBroker.setTablePrefix(TABLE_PREFIX);
 		initMonitors();
 		messageBroker.afterPropertiesSet();
 	}
 
-	private String determineFullTablePrefix() {
-		DataSourceConnectionProvider connectionProvider = new DataSourceConnectionProvider(DbUtils.getDataSource());
-		DialectAwareJooqConfiguration jooqConf = new DialectAwareJooqConfiguration(connectionProvider);
-		CollectDSLContext dslContext = new CollectDSLContext(jooqConf);
-		String fullPrefix = (! (dslContext.isSchemaLess()) ? DbUtils.SCHEMA_NAME + ".": "") + TABLE_PREFIX;
-		return fullPrefix;
-	}
+//	private String determineFullTablePrefix(DataSource dataSource) {
+//		ConnectionProvider connectionProvider = new DataSourceConnectionProvider(dataSource);
+//		DialectAwareJooqConfiguration jooqConf = new DialectAwareJooqConfiguration(connectionProvider);
+//		CollectDSLContext dslContext = new CollectDSLContext(jooqConf);
+//		String fullPrefix = (! (dslContext.isSchemaLess()) ? DbUtils.SCHEMA_NAME + ".": "") + TABLE_PREFIX;
+//		return fullPrefix;
+//	}
 
 	private void initMonitors() {
 		List<Monitor<Event>> monitors = new ArrayList<Monitor<Event>>();
