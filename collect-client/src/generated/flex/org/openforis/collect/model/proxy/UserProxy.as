@@ -77,7 +77,7 @@ package org.openforis.collect.model.proxy {
 					result = hasEffectiveRole(ROLE_ENTRY);
 					break;
 				case CollectRecord$Step.CLEANSING:
-					result = hasEffectiveRole(UserProxy.ROLE_CLEANSING);
+					result = hasEffectiveRole(ROLE_CLEANSING);
 					break;
 				case CollectRecord$Step.ANALYSIS:
 					result = false
@@ -87,7 +87,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get canDeleteNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN);
+			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 		
 		public function get canEditRecords():Boolean {
@@ -95,7 +95,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get canEditNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN);
+			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 		
 		public function get canViewAllRecords():Boolean {
@@ -103,15 +103,15 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get canViewNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN) || hasRole(ROLE_VIEW);
+			return hasEffectiveRole(ROLE_CLEANSING) || hasRole(ROLE_VIEW);
 		}
 		
 		public function get canRunSaikuAnalysis():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN) || hasRole(ROLE_VIEW);
+			return hasEffectiveRole(ROLE_CLEANSING) || hasRole(ROLE_VIEW);
 		}
 		
 		public function get canCancelApplicationLockingJob():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN);
+			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 	}
 }

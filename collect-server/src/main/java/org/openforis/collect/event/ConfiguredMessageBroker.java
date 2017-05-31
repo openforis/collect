@@ -55,11 +55,19 @@ public class ConfiguredMessageBroker implements MessageBroker {
 	public ConfiguredMessageBroker(DataSource dataSource) throws Exception {
 		messageBroker = new SpringJdbcMessageBroker(dataSource);
 		messageBroker.setMessageSerializer(new XStreamMessageSerializer());
+		//messageBroker.setTablePrefix(determineFullTablePrefix(dataSource));
 		messageBroker.setTablePrefix(TABLE_PREFIX);
-		
 		initMonitors();
 		messageBroker.afterPropertiesSet();
 	}
+
+//	private String determineFullTablePrefix(DataSource dataSource) {
+//		ConnectionProvider connectionProvider = new DataSourceConnectionProvider(dataSource);
+//		DialectAwareJooqConfiguration jooqConf = new DialectAwareJooqConfiguration(connectionProvider);
+//		CollectDSLContext dslContext = new CollectDSLContext(jooqConf);
+//		String fullPrefix = (! (dslContext.isSchemaLess()) ? DbUtils.SCHEMA_NAME + ".": "") + TABLE_PREFIX;
+//		return fullPrefix;
+//	}
 
 	private void initMonitors() {
 		List<Monitor<Event>> monitors = new ArrayList<Monitor<Event>>();

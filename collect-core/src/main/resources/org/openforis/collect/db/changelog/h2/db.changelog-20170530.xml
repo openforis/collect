@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="taxon-indexes" author="ricci" dbms="h2">
+
+	    <comment>Indexes on ofc_taxon and ofc_taxon_vernacular_name table</comment>
+	    
+		<createIndex
+            indexName="ofc_taxon_taxonomy_idx"
+            tableName="ofc_taxon">
+	        <column name="taxonomy_id" type="int4"/>
+    	</createIndex>
+    	
+		<createIndex
+            indexName="ofc_taxon_parent_idx"
+            tableName="ofc_taxon">
+	        <column name="parent_id" type="int4"/>
+    	</createIndex>
+    	
+    	<createIndex
+            indexName="ofc_taxon_vernacular_name_taxonomy_idx"
+            tableName="ofc_taxon_vernacular_name">
+	        <column name="taxon_id" type="int4"/>
+    	</createIndex>
+	</changeSet>
+	
+</databaseChangeLog>

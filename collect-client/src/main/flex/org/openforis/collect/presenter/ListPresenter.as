@@ -178,7 +178,7 @@ package org.openforis.collect.presenter {
 		protected function createAdvancedFunctionMenu():void {
 			var result:ArrayCollection = new ArrayCollection();
 			result.addItem(EXPORT_DATA_MENU_ITEM);
-			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_CLEANSING) ) {
 				result.addItem(IMPORT_DATA_MENU_ITEM);
 			}
 			result.addItem({type: "separator"});

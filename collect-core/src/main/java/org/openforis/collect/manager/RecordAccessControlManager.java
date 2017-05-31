@@ -13,7 +13,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 public class RecordAccessControlManager {
 
 	public boolean canEdit(User user, CollectRecord record) {
-		return record.getOwner() == null || record.getOwner().getId().equals(user.getId()) || user.hasRole(UserRole.ADMIN);
+		return record.getOwner() == null || record.getOwner().getId().equals(user.getId()) || user.hasRole(UserRole.CLEANSING);
 	}
 	
 	public boolean isOwnerToBeResetAfterPromoting(User user, Step step) {
