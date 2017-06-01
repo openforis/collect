@@ -353,6 +353,21 @@
 	      					onChange="@command('applyChanges')" />
 	      			</fieldErrorHandler>
 	      		</row>
+	      		<row>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['pcPromptLabel'])">
+	      				<label
+	      					use="org.openforis.collect.designer.component.FieldLabel"
+	      					value="${labels.survey.schema.node.reporting_notes}"
+	      					languageCode="@load(vm.currentLanguageCode)" />
+	      			</fieldErrorHandler>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['pcPromptLabel'])">
+	      				<textbox width="250px"
+	      					value="@bind(fx.pcPromptLabel)"
+	      					onChange="@command('applyChanges')" />
+	      			</fieldErrorHandler>
+	      		</row>
       			<row>
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['interviewPromptLabel'])">
