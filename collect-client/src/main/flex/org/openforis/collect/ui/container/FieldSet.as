@@ -13,12 +13,16 @@ package org.openforis.collect.ui.container
 {
 	import flash.events.Event;
 	
+	import mx.core.UIComponent;
+	import mx.controls.Alert;
+	
 	import mx.graphics.IFill;
 	import mx.graphics.IStroke;
 	
 	import spark.components.Label;
 	import spark.components.SkinnableContainer;
 	import spark.components.supportClasses.GroupBase;
+	import spark.layouts.VerticalLayout;
 	
 	//--------------------------------------
 	//  Styles
@@ -135,6 +139,39 @@ package org.openforis.collect.ui.container
 		 */
 		public var legendDisplay:Label;
 		
+		//----------------------------------
+		//  notesDisplay
+		//---------------------------------- 
+		
+		[SkinPart(required="true")]
+		/**
+		 *  The skin part that defines the appearance of the 
+		 *  notes text in the container.
+		 */
+		public var notesDisplay:Label;
+		
+		//----------------------------------
+		//  notesLabelDisplay
+		//---------------------------------- 
+		
+		[SkinPart(required="true")]
+		/**
+		 *  The skin part that defines the appearance of the 
+		 *  notes label in the container.
+		 */
+		public var notesLabelDisplay:Label;
+		
+		//----------------------------------
+		//  notesContainer
+		//---------------------------------- 
+		
+		[SkinPart(required="true")]
+		/**
+		 *  The skin part that defines the container of the
+		 *  notes in the main container.
+		 */
+		public var notesContainer:UIComponent;
+		
 		//--------------------------------------------------------------------------
 		//
 		//  Properties
@@ -179,6 +216,88 @@ package org.openforis.collect.ui.container
 				legendDisplay.text = legend;
 			
 			dispatchEvent(new Event("legendChange"));
+		}
+		
+		//----------------------------------
+		//  notes
+		//----------------------------------
+		
+		/**
+		 *  @private
+		 */
+		private var _notes:String = "";
+		
+		[Bindable("notesChange")]
+		[Inspectable(category="General", defaultValue="")]
+		
+		/**
+		 *  Text displayed in the notes bar. 
+		 *
+		 *  @default ""
+		 */
+		public function get notes():String 
+		{
+			return _notes;
+		}
+		
+		/**
+		 *  @private
+		 */
+		public function set notes(value:String):void 
+		{
+			if (_notes == value)
+				return;
+			
+			_notes = value;
+			
+			invalidateSize();
+			invalidateDisplayList();
+			
+			if (notesDisplay) {
+				notesDisplay.text = notes;
+				checkNotesContainerVisibility();
+			}
+			dispatchEvent(new Event("notesChange"));
+		}
+		
+		//----------------------------------
+		//  notes label
+		//----------------------------------
+		
+		/**
+		 *  @private
+		 */
+		private var _notesLabel:String = "";
+		
+		[Bindable("notesLabelChange")]
+		[Inspectable(category="General", defaultValue="Notes:")]
+		
+		/**
+		 *  Text displayed in the notes label bar. 
+		 *
+		 *  @default "Notes:"
+		 */
+		public function get notesLabel():String 
+		{
+			return _notesLabel;
+		}
+		
+		/**
+		 *  @private
+		 */
+		public function set notesLabel(value:String):void 
+		{
+			if (_notesLabel == value)
+				return;
+			
+			_notesLabel = value;
+			invalidateSize();
+			invalidateDisplayList();
+			
+			if (notesLabelDisplay) {
+				notesLabelDisplay.text = notesLabel;
+			}
+			dispatchEvent(new Event("notesLabelChange"));
 		}
 		
 		//--------------------------------------
@@ -315,13 +434,27 @@ package org.openforis.collect.ui.container
 			var gap:Number = getStyle("gap");
 			var paddingLeft:Number = getStyle("paddingLeft");
 			var paddingRight:Number = getStyle("paddingRight");
+			var paddingTop:Number = getStyle("paddingTop");
+			var paddingBottom:Number = getStyle("paddingBottom");
+			
 			var legendWidth:Number = legendDisplay.getPreferredBoundsWidth(false);
 			var legendHeight:Number = legendDisplay.getPreferredBoundsHeight(false);
 			var availableWidth:Number = unscaledWidth - cornerRadius * 2;
 			availableWidth -= gap * 2 + paddingLeft + paddingRight;
 			
+			var availableHeight:Number = unscaledHeight - cornerRadius * 2;
+			availableHeight -= gap * 2 + paddingTop + paddingBottom;
+			
 			legendGroup.width = Math.min(legendWidth, availableWidth);
 			legendGroup.setLayoutBoundsPosition(cornerRadius + gap + paddingLeft, 0);
+			
+			var contentLayout:VerticalLayout = VerticalLayout(contentGroup.layout);
+			contentLayout.paddingTop = legendGroup.height - 10;
+			
+			var notesWidth:Number = notesDisplay.getPreferredBoundsWidth(false);
+			notesContainer.width = Math.min(notesWidth, availableWidth);
+			
+			contentLayout.paddingBottom = notesContainer.visible ? notesContainer.height: 0;
 		}
 		
 		/**
@@ -354,11 +487,21 @@ package org.openforis.collect.ui.container
 		{
 			super.partAdded(partName, instance);
 			
-			if (instance == legendDisplay)
-			{
+			if (instance == legendDisplay) {
 				legendDisplay.text = _legend;
+			} else if (instance == notesDisplay) {
+				notesDisplay.text = _notes;
+			} else if (instance == notesLabelDisplay) {
+				notesLabelDisplay.text = _notesLabel;
 			}
+			checkNotesContainerVisibility();
 		}
 		
+		private function checkNotesContainerVisibility():void {
+			if (notesContainer) {
+				notesContainer.visible = notesContainer.includeInLayout = _notes != null && _notes != '';
+			}
+		}
+	
 	}
 }

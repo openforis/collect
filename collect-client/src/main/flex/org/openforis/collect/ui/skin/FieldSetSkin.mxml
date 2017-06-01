@@ -211,7 +211,7 @@ in accordance with the terms of the license agreement accompanying it.
 	</s:Path>
 	
 	<s:Group id="legendGroup">
-		<s:Label id="legendDisplay" left="0" right="0" maxDisplayedLines="1" fontWeight="bold"/>
+		<s:Label id="legendDisplay" left="0" right="0" maxDisplayedLines="-1" lineBreak="toFit" fontWeight="bold"/>
 	</s:Group>
 	
 	<!--
@@ -219,14 +219,19 @@ in accordance with the terms of the license agreement accompanying it.
 	size will not be thwarted by this skin part's minimum size.   This is a compromise,
 	more about it here: http://bugs.adobe.com/jira/browse/SDK-21143
 	-->
+	
 	<!--- @copy spark.components.SkinnableContainer#contentGroup -->
 	<s:Group id="contentGroup" left="0" right="0" top="0" bottom="0" minWidth="0" minHeight="0">
 		<s:layout>
-			<s:VerticalLayout paddingTop="20" 
-							  paddingBottom="10" 
-							  paddingLeft="20" 
-							  paddingRight="20" />
+			<s:VerticalLayout paddingTop="10" 
+							  paddingBottom="5" 
+							  paddingLeft="5" 
+							  paddingRight="5" />
 		</s:layout>
 	</s:Group>
 	
+	<s:HGroup id="notesContainer" left="0" right="0" bottom="0" >
+		<s:Label id="notesLabelDisplay" text="Notes:" />
+		<s:Label id="notesDisplay" maxDisplayedLines="-1" lineBreak="toFit" width="100%" />
+	</s:HGroup>
 </s:Skin>

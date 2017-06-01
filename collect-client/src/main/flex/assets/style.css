@@ -18,13 +18,14 @@ container|TitleBorderBox {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.TitleBorderBoxSkin');
 }
 
+/* FieldSet */
 container|FieldSet {
 	cornerRadius: 4;
 	gap: 6;
-	paddingLeft: 10;
+	paddingLeft: 2;
 	paddingRight: 0;
-	paddingTop: 10;
-	paddingBottom: 10;
+	paddingTop: 2;
+	paddingBottom: 2;
 	skin-class: ClassReference('org.openforis.collect.ui.skin.FieldSetSkin');
 }
 
@@ -32,6 +33,16 @@ container|FieldSet #legendDisplay {
 	fontSize: 14;
 	fontWeight: bold;
 }
+
+container|FieldSet #notesLabelDisplay {
+	fontSize: 12;
+	fontStyle: italic;
+}
+
+container|FieldSet #notesDisplay {
+	fontSize: 12; 
+}
+/* end of FieldSet */
 
 container|CollapsiblePanel s|Label.title {
 	fontWeight: bold;
