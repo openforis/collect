@@ -496,6 +496,11 @@ package org.openforis.collect.presenter {
 			filter.offset = offset;
 			filter.maxNumberOfRecords = recordsPerPage;
 			filter.rootEntityId = Application.activeRootEntity == null ? NaN : Application.activeRootEntity.id;
+			
+			if (! Application.user.canViewNotOwnedRecords) {
+				filter.ownerId = Application.user.id;
+			}
+			
 			_dataClient.loadRecordSummaries(responder, filter, currentSortFields);
 		}
 		

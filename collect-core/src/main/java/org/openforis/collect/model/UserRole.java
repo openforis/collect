@@ -3,10 +3,11 @@ package org.openforis.collect.model;
 public enum UserRole {
 	
 	VIEW(UserRoles.VIEW, 0),
-	ENTRY(UserRoles.ENTRY, 1),
-	CLEANSING(UserRoles.CLEANSING, 2),
-	ANALYSIS(UserRoles.ANALYSIS, 3),
-	ADMIN(UserRoles.ADMIN, 4);
+	ENTRY_LIMITED(UserRoles.ENTRY_LIMITED, 1),
+	ENTRY(UserRoles.ENTRY, 2),
+	CLEANSING(UserRoles.CLEANSING, 3),
+	ANALYSIS(UserRoles.ANALYSIS, 4),
+	ADMIN(UserRoles.ADMIN, 5);
 	
 	
 	public static UserRole fromCode(String code) {
