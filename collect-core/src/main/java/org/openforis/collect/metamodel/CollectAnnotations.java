@@ -79,7 +79,9 @@ public class CollectAnnotations {
 		LABEL_WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_WIDTH)),
 		LABEL_ORIENTATION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_ORIENTATION), Orientation.HORIZONTAL),
 		AUTO_UPPERCASE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTO_UPPERCASE), false),
-
+		BACKGROUND_COLOR(new QName(UI_NAMESPACE_URI, UIOptionsConstants.BACKGROUND_COLOR)),
+		BACKGROUND_ALPHA(new QName(UI_NAMESPACE_URI, UIOptionsConstants.BACKGROUND_ALPHA), 0.5),
+		
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
 		COLLECT_EARTH_HIDE_IN_RECORD_LIST(new QName(COLLECT_EARTH_NAMESPACE_URI, "hideinrecordlist"), false),
@@ -347,6 +349,22 @@ public class CollectAnnotations {
 	
 	public void setShowInMapBalloon(AttributeDefinition def, boolean showInMapBalloon) {
 		setAnnotationValue(def, Annotation.SHOW_IN_MAP_BALLOON, showInMapBalloon);
+	}
+	
+	public String getBackgroundColor(NodeDefinition def) {
+		return def.getAnnotation(Annotation.BACKGROUND_COLOR.qName);
+	}
+
+	public void setBackgroundColor(NodeDefinition def, String color) {
+		def.setAnnotation(Annotation.BACKGROUND_COLOR.qName, color);
+	}
+	
+	public Double getBackgroundAlpha(NodeDefinition def) {
+		return getAnnotationDoubleValue(def, Annotation.BACKGROUND_ALPHA);
+	}
+
+	public void setBackgroundAlpha(NodeDefinition def, Double alpha) {
+		setAnnotationValue(def, Annotation.BACKGROUND_ALPHA, alpha);
 	}
 
 	private <T extends Enum<T>> Enum<T> getAnnotationEnumValue(AttributeDefinition def, Annotation annotation, Class<T> enumType) {

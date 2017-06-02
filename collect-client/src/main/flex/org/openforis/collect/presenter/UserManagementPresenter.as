@@ -176,6 +176,9 @@ package org.openforis.collect.presenter {
 					case UserProxy.ROLE_ENTRY:
 						view.usersListContainer.roleEntryCheckBox.selected = true;
 						break;
+					case UserProxy.ROLE_ENTRY_LIMITED:
+						view.usersListContainer.roleEntryLimitedCheckBox.selected = true;
+						break;
 					case UserProxy.ROLE_CLEANSING:
 						view.usersListContainer.roleCleansingCheckBox.selected = true;
 						break;
@@ -192,7 +195,8 @@ package org.openforis.collect.presenter {
 		protected function getAllCheckBoxes():Array {
 			var checkBoxes:Array = [
 				view.usersListContainer.roleViewCheckBox,
-				view.usersListContainer.roleEntryCheckBox, 
+				view.usersListContainer.roleEntryCheckBox,
+				view.usersListContainer.roleEntryLimitedCheckBox,  
 				view.usersListContainer.roleCleansingCheckBox, 
 				view.usersListContainer.roleAnalysisCheckBox, 
 				view.usersListContainer.roleAdminCheckBox
@@ -219,6 +223,9 @@ package org.openforis.collect.presenter {
 							break;
 						case view.usersListContainer.roleEntryCheckBox:
 							role = UserProxy.ROLE_ENTRY;
+							break;
+						case view.usersListContainer.roleEntryLimitedCheckBox:
+							role = UserProxy.ROLE_ENTRY_LIMITED;
 							break;
 						case view.usersListContainer.roleCleansingCheckBox:
 							role = UserProxy.ROLE_CLEANSING;

@@ -25,7 +25,8 @@ import org.zkoss.util.resource.Labels;
  */
 public abstract class NodeDefinitionFormValidator extends FormValidator {
 
-	protected static final String NODE_NAME_ALREADY_DEFINED_MESSAGE_KEY = "survey.schema.node.validation.name_already_defined";
+	protected static final String 	NODE_NAME_ALREADY_DEFINED_MESSAGE_KEY = "survey.schema.node.validation.name_already_defined";
+	private static final String 	BACKGROUND_COLOR_FORMAT_ERROR_MESSAGE_KEY = "survey.schema.node.validation.background_color";
 
 	protected static final String 	DESCRIPTION_FIELD = "description";
 	protected static final String 	NAME_FIELD = "name";
@@ -38,8 +39,12 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 	protected static final String 	RELEVANT_EXPR_FIELD = "relevantExpression";
 	protected static final String 	COLUMN_FIELD = "column";
 	protected static final String 	COLUMN_SPAN_FIELD = "columnSpan";
+	protected static final String 	BACKGROUND_COLOR = "backgroundColor";
+	protected static final String 	BACKGROUND_TRANSPARENCY = "backgroundTransparency";
 	
 	protected static final int 		MAX_COUNT_MIN_VALUE = 2;
+	
+	private static final String 	HEX_PATTERN = "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$";
 
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
@@ -70,6 +75,12 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 		}
 		
 		validateColumn(ctx);
+		
+		validateRegEx(ctx, HEX_PATTERN, BACKGROUND_COLOR, BACKGROUND_COLOR_FORMAT_ERROR_MESSAGE_KEY);
+		if (validateRequired(ctx, BACKGROUND_TRANSPARENCY)) {
+			validateGreaterThan(ctx, BACKGROUND_TRANSPARENCY, 0, false);
+			validateLessThan(ctx, BACKGROUND_TRANSPARENCY, 100, false);
+		}
 	}
 
 	protected boolean validateName(ValidationContext ctx) {

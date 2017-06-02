@@ -5,6 +5,11 @@
 	width: 100%;
 }
 
+body {
+	font-family: "Trebuchet MS", "Helvetica", "Arial", "Verdana",
+		"sans-serif";
+}
+
 .capsuleCat {
 	/* border: 1px solid #AED0EA; */
 	color: #222222;
@@ -182,6 +187,11 @@ table.independentToggle button, .independentToggle button {
 	margin-bottom: 2px;
 }
 
+.wizard > .content > .body .form-group.has-error input {
+	color: #a94442;
+	border-color: #a94442;
+}
+
 form input[type='text'] {
 	width: 200px;
 }
@@ -249,7 +259,7 @@ a.btn-finish:active {
 
 #contentDiv {
 	height: 567px;
-	width: 100%;
+	width: 400px;
 }
 
 .earthDiv {

@@ -42,5 +42,9 @@ package org.openforis.collect.util
 			var result:Number = Number(item);
 			return result;
 		}
+		
+		public static function defaultIfNull(value:Object, defaultValue:Object):* {
+			return value == null ? defaultValue : value;
+		}
 	}
 }

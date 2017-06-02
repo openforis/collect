@@ -118,6 +118,8 @@
 						<mx:FormItem label="{Message.get('usersManagement.roles')}">
 							<mx:CheckBox id="roleViewCheckBox"
 										 label="{Message.get('roles.view')}" />
+							<mx:CheckBox id="roleEntryLimitedCheckBox"
+										label="{Message.get('roles.entry_limited')}" />
 							<mx:CheckBox id="roleEntryCheckBox"
 										label="{Message.get('roles.entry')}" />
 							<mx:CheckBox id="roleCleansingCheckBox" 

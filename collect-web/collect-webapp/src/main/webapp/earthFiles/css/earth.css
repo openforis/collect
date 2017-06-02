@@ -43,6 +43,17 @@ body {
 	width: 60px !important;
 }
 
+div.ancillary-data {
+	padding: 10px 16px;
+	font-size: 11px;
+	line-height: 1.33;
+	border-radius: 6px;
+	font-weight: bold;
+	display: inline-block;
+	text-align: left;
+}
+
+
 .input-prepend .add-on, .input-prepend .btn {
 	margin-left: 4px;
 }
@@ -106,10 +117,6 @@ hr {
 		rgba(0, 0, 0, 0.8), inset -5px -5px 5px 5px rgba(0, 0, 0, 0.8);
 	color: rgba(255, 255, 255, 1) !important;
 	text-shadow: 0px 0px 6px rgba(0, 0, 0, 1);
-}
-
-.earthDiv {
-	width: 400px;
 }
 
 .btn-lg {
@@ -180,6 +187,11 @@ table.independentToggle button, .independentToggle button {
 	margin-bottom: 2px;
 }
 
+.wizard > .content > .body .form-group.has-error input {
+	color: #a94442;
+	border-color: #a94442;
+}
+
 form input[type='text'] {
 	width: 200px;
 }
@@ -214,6 +226,10 @@ table.table td {
 	display: none;
 }
 
+.steps ul li a {
+	background-color: #eee;
+}
+
 .notrelevant {
 	display: none;
 }
@@ -237,10 +253,28 @@ a.btn-finish:active {
 	font-size: 12px;
 }
 
+#loadingPanel, 
+#collectEarthNotRunningPanel {
+}
+
+#contentDiv {
+	height: 567px;
+	width: 400px;
+}
+
+.earthDiv {
+	width: 400px;
+}
+
 div.content{
 	padding-left:12px !important;
 }
 
 div.actions.clearfix{
 	background-image: url("../img/bottombanner.png");
+	background-repeat: no-repeat;
+}
+
+.boolean-group {
+  padding-left: 10px;
 }

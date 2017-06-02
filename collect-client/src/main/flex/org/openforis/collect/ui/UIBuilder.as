@@ -196,6 +196,9 @@ package org.openforis.collect.ui {
 				entityFormItem = new SingleEntityFormItem();
 			}
 			entityFormItem.entityDefinition = definition;
+			if (definition.width != NaN) {
+				entityFormItem.width = definition.width;
+			}
 			return entityFormItem;
 		}
 		

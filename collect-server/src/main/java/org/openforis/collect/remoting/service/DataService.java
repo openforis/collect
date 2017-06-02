@@ -6,6 +6,7 @@ package org.openforis.collect.remoting.service;
 
 import static org.openforis.collect.model.UserRoles.ANALYSIS;
 import static org.openforis.collect.model.UserRoles.CLEANSING;
+import static org.openforis.collect.model.UserRoles.ENTRY_LIMITED;
 import static org.openforis.collect.model.UserRoles.ENTRY;
 import static org.openforis.collect.model.UserRoles.USER;
 
@@ -121,8 +122,8 @@ public class DataService {
 		sessionManager.setActiveRecord(record);
 		return toProxy(record);
 	}
-
-	@Secured(ENTRY)
+	
+	@Secured(ENTRY_LIMITED)
 	public RecordProxy checkoutRecord(int id, Integer stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
@@ -180,7 +181,8 @@ public class DataService {
 	 * @return map with "count" and "records" items
 	 */
 	@Secured(USER)
-	public Map<String, Object> loadRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String[] keyValues) {
+	public Map<String, Object> loadRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, 
+			List<RecordSummarySortField> sortFields, String[] keyValues) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		
 		SessionState sessionState = sessionManager.getSessionState();
@@ -244,7 +246,7 @@ public class DataService {
 	}
 
 	@Transactional
-	@Secured(ENTRY)
+	@Secured(ENTRY_LIMITED)
 	public void saveActiveRecord() throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
@@ -265,7 +267,7 @@ public class DataService {
 	}
 
 	@Transactional
-	@Secured(ENTRY)
+	@Secured(ENTRY_LIMITED)
 	public NodeChangeSetProxy updateActiveRecord(NodeUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		CollectRecord activeRecord = getActiveRecord();
@@ -355,7 +357,7 @@ public class DataService {
 	}
 	
 	@Transactional
-	@Secured(ENTRY)
+	@Secured(ENTRY_LIMITED)
 	public void promoteToCleansing() throws RecordPersistenceException, RecordPromoteException  {
 		promote(Step.CLEANSING);
 	}
@@ -432,7 +434,7 @@ public class DataService {
 	 * @throws RecordPersistenceException 
 	 * @throws RecordIndexException 
 	 */
-	@Secured(ENTRY)
+	@Secured(ENTRY_LIMITED)
 	public void clearActiveRecord() {
 		try {
 			sessionManager.releaseRecord();
@@ -444,7 +446,7 @@ public class DataService {
 		}
 	}
 	
-	@Secured(ENTRY)
+	@Secured(ENTRY_LIMITED)
 	public void moveNode(int nodeId, int index) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
