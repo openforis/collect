@@ -41,4 +41,7 @@ public interface UIOptionsConstants {
 	String LABEL_ORIENTATION = "labelOrientation";
 	
 	String AUTO_UPPERCASE = "autoUppercase";
+	
+	String BACKGROUND_COLOR = "backgroundColor";
+	String BACKGROUND_ALPHA = "backgroundAlpha";
 }

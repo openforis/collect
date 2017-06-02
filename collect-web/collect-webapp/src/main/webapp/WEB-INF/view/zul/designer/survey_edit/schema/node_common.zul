@@ -1,6 +1,6 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <?component name="expressionInfoIcon" class="org.openforis.collect.designer.component.ExpressionInfoIcon"?>
-<zk>
+<zk xmlns:w="client">
   <custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
   <custom-attributes otherMinorGeneralDetailsForm="${arg.otherMinorGeneralDetailsForm}"/>
   <custom-attributes otherLabelsForm="${arg.otherLabelsForm}"/>
@@ -542,7 +542,41 @@
 		  			</row>
     			</rows>
     		</grid>
-
+			
+			<grid class="inner">
+    			<columns>
+    				<column width="150px" />
+    				<column />
+    				<column />
+    				<column />
+    			</columns>
+    			<rows>
+    				<row visible="@load(not (vm.collectEarthSurvey or vm.attribute))">
+		  				<fieldErrorHandler message="@load(vmsgs['backgroundColor'])">
+		  					<label value="${labels.survey.schema.node.layout.background_color}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['backgroundColor'])">
+		  					<textbox id="backgroundColorHiddenField" visible="false" 
+		  						value="@bind(fx.backgroundColor)"
+		  						onChange="@command('applyChanges')" />
+		  					<colorbox id="backgroundColorBox" 
+		  						value="@load(backgroundColorHiddenField.value)"
+		  						w:onChange="var t = zk.Widget.$('$backgroundColorHiddenField'); t.setValue(event.value); t.fireOnChange();"
+		  						hash="true" pickerPosition="right" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['backgroundTransparency'])">
+		  					<label value="${labels.survey.schema.node.layout.background_transparency}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['backgroundTransparency'])">
+		  					<spinner
+		  						value="@bind(fx.backgroundTransparency)"
+		  						onChange="@command('applyChanges')"
+		  						width="50px" />
+		  				</fieldErrorHandler>
+		  			</row>
+    			</rows>
+    		</grid>
+    		
     		<include src="${arg.otherLayoutForm}" />
 
     	</vlayout>

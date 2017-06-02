@@ -223,14 +223,15 @@ in accordance with the terms of the license agreement accompanying it.
 	<!--- @copy spark.components.SkinnableContainer#contentGroup -->
 	<s:Group id="contentGroup" left="0" right="0" top="0" bottom="0" minWidth="0" minHeight="0">
 		<s:layout>
-			<s:VerticalLayout paddingTop="10" 
+			<s:VerticalLayout paddingTop="20" 
 							  paddingBottom="5" 
 							  paddingLeft="5" 
 							  paddingRight="5" />
 		</s:layout>
 	</s:Group>
 	
-	<s:HGroup id="notesContainer" left="0" right="0" bottom="0" >
+	<s:HGroup id="notesContainer" left="0" right="0" bottom="0" 
+			paddingLeft="5" paddingRight="5">
 		<s:Label id="notesLabelDisplay" text="Notes:" />
 		<s:Label id="notesDisplay" maxDisplayedLines="-1" lineBreak="toFit" width="100%" />
 	</s:HGroup>

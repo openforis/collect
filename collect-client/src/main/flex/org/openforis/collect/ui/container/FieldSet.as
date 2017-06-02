@@ -449,7 +449,7 @@ package org.openforis.collect.ui.container
 			legendGroup.setLayoutBoundsPosition(cornerRadius + gap + paddingLeft, 0);
 			
 			var contentLayout:VerticalLayout = VerticalLayout(contentGroup.layout);
-			contentLayout.paddingTop = legendGroup.height - 10;
+			contentLayout.paddingTop = legendGroup.height;
 			
 			var notesWidth:Number = notesDisplay.getPreferredBoundsWidth(false);
 			notesContainer.width = Math.min(notesWidth, availableWidth);
