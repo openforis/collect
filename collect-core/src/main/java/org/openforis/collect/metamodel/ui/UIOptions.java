@@ -67,6 +67,9 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			VERNACULAR_NAME_FIELD_NAME
 		},
 		new String[] {
+			SCIENTIFIC_NAME_FIELD_NAME
+		},
+		new String[] {
 			VERNACULAR_NAME_FIELD_NAME
 		}
 	);
