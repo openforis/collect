@@ -258,5 +258,12 @@
 			<version>0.93</version>
 			<type>swc</type>
 		</dependency>
+		<!-- Debug -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.flexspy</groupId> -->
+<!-- 			<artifactId>flexspy</artifactId> -->
+<!-- 			<version>1.4</version> -->
+<!-- 			<type>swc</type> -->
+<!-- 		</dependency> -->
 	</dependencies>
 </project>
