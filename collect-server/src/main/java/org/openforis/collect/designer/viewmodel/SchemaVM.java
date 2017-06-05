@@ -318,15 +318,10 @@ public class SchemaVM extends SurveyBaseVM {
 			return selectedRootEntity;
 		} else {
 			SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-			if (surveyObject instanceof EntityDefinition) {
-				return (EntityDefinition) surveyObject;
-			} else {
-				EntityDefinition parentEntity = treeModel.getNearestParentEntityDefinition(surveyObject);
-				return parentEntity;
-			}
+			return getNearestEntity(surveyObject);
 		}
 	}
-
+	
 	@Command
 	public void addAttribute(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("attributeType") final String attributeType) throws Exception {
@@ -1358,9 +1353,8 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 		SurveyObject selectedItem = selectedTreeNode.getSurveyObject();
 
-		if (selectedItem instanceof AttributeDefinition) {
-			AttributeDefinition selectedNode = (AttributeDefinition) selectedItem;
-			openSelectParentNodePopupForDuplicate(selectedNode);
+		if (selectedItem instanceof NodeDefinition) {
+			openSelectParentNodePopupForDuplicate((NodeDefinition) selectedItem);
 		}
 	}
 
@@ -1579,6 +1573,15 @@ public class SchemaVM extends SurveyBaseVM {
 			return newParentEntityDef;
 		} else {
 			return (EntityDefinition) obj;
+		}
+	}
+
+	private EntityDefinition getNearestEntity(SurveyObject surveyObject) {
+		if (surveyObject instanceof EntityDefinition) {
+			return (EntityDefinition) surveyObject;
+		} else {
+			EntityDefinition parentEntity = treeModel.getNearestParentEntityDefinition(surveyObject);
+			return parentEntity;
 		}
 	}
 
