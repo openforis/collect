@@ -23,8 +23,8 @@ container|FieldSet {
 	cornerRadius: 4;
 	gap: 6;
 	paddingLeft: 2;
-	paddingRight: 0;
-	paddingTop: 2;
+	paddingRight: 2;
+	paddingTop: 10;
 	paddingBottom: 2;
 	skin-class: ClassReference('org.openforis.collect.ui.skin.FieldSetSkin');
 }
@@ -41,6 +41,7 @@ container|FieldSet #notesLabelDisplay {
 
 container|FieldSet #notesDisplay {
 	fontSize: 12; 
+	textAlign: justify;
 }
 /* end of FieldSet */
 
