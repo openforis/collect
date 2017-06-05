@@ -113,7 +113,7 @@
 	</detail:states>
 	
 	<detail:layout>
-		<s:VerticalLayout />
+		<s:VerticalLayout paddingTop.verticalFormLayout="10" />
 	</detail:layout>
 
 	<container:FieldSet id="fieldSet" legend="{instanceLabelText}" 
