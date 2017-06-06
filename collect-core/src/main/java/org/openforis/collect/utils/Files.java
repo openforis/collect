@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 public class Files {
 	
 	public static final String CSV_CONTENT_TYPE = "text/csv";
+	public static final String CSV_FILE_EXTENSION = "csv";
 	private static final String PATH_SEPARATOR_PATTERN = "[\\\\|/]";
 	public static final String JAVA_IO_TMPDIR_SYS_PROP = "java.io.tmpdir";
 	public static final File TEMP_FOLDER = getReadableSysPropLocation(JAVA_IO_TMPDIR_SYS_PROP, null);

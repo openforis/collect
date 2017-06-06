@@ -20,6 +20,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvLine;
@@ -94,7 +95,13 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 	public void fileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
  		Media media = event.getMedia();
 		String fileName = media.getName();
-		File tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), FilenameUtils.getExtension(fileName));
+		String extension = FilenameUtils.getExtension(fileName);
+		File tempFile;
+		if (Files.CSV_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
+		} else {
+			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
+		}
 		this.uploadedFile = tempFile;
 		this.uploadedFileName = fileName;
 		notifyChange("uploadedFileName");

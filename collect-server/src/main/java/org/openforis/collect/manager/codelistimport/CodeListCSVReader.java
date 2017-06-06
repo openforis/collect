@@ -25,6 +25,8 @@ import org.openforis.commons.io.csv.CsvLine;
  */
 public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 
+	public static final String FLAT_LIST_CODE_COLUMN_NAME = "code";
+	public static final String FLAT_LIST_LABEL_COLUMN_NAME = "label";
 	public static final String CODE_COLUMN_SUFFIX = "_code";
 	public static final String LABEL_COLUMN_SUFFIX = "_label";
 	public static final String DESCRIPTION_COLUMN_SUFFIX = "_description";
