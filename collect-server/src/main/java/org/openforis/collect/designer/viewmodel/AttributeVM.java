@@ -513,6 +513,10 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 			return null;
 		}
 	}
+	
+	public String getCheckCondition(Check<?> check) {
+		return check.getCondition();
+	}
 
 	private String getDistanceCheckExpressionPreview(DistanceCheck dc) {
 		List<String> parts = new ArrayList<String>();
