@@ -19,6 +19,7 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
@@ -351,22 +352,26 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):Object {
-			var result:Object = null;
-			var f:FieldProxy = attribute.getField(0);
-			var value:Object = f.value;
-			if(ObjectUtil.isNotNull(value)) {
-				if(attributeDefn is NumberAttributeDefinitionProxy) {
-					var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(attributeDefn);
-					if ( numberDefn.integer ) {
-						result = int(value);
-					} else {
-						result = Number(value);
-					}
+			if(attribute.empty) {
+				return null;
+			} else if(attributeDefn is NumberAttributeDefinitionProxy) {
+				var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(attributeDefn);
+				var f:FieldProxy = attribute.getField(0);
+				var value:Object = f.value;
+				if ( numberDefn.integer ) {
+					return int(value);
 				} else {
-					result = value;
+					return Number(value);
 				}
+			} else if (attributeDefn is TaxonAttributeDefinitionProxy) {
+				var visibleFieldIndexes:IList = attributeDefn.visibleFieldIndexes;
+				var firstVisibleFieldIdx:int = int(visibleFieldIndexes.getItemAt(0));
+				var f:FieldProxy = attribute.getField(firstVisibleFieldIdx);
+				return f.value;
+			} else {
+				var f:FieldProxy = attribute.getField(0);
+				return f.value;
 			}
-			return result;
 		}
 		
 		public function updateChildrenMinCountValiditation(map:IMap):void {
