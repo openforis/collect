@@ -81,6 +81,7 @@ public class CollectAnnotations {
 		AUTO_UPPERCASE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTO_UPPERCASE), false),
 		BACKGROUND_COLOR(new QName(UI_NAMESPACE_URI, UIOptionsConstants.BACKGROUND_COLOR)),
 		BACKGROUND_ALPHA(new QName(UI_NAMESPACE_URI, UIOptionsConstants.BACKGROUND_ALPHA), 0.5),
+		COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_SRS_FIELD), true),
 		
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
@@ -365,6 +366,14 @@ public class CollectAnnotations {
 
 	public void setBackgroundAlpha(NodeDefinition def, Double alpha) {
 		setAnnotationValue(def, Annotation.BACKGROUND_ALPHA, alpha);
+	}
+	
+	public boolean isShowSrsField(CoordinateAttributeDefinition def) {
+		return getAnnotationBooleanValue(def, Annotation.COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD);
+	}
+	
+	public void setShowSrsField(CoordinateAttributeDefinition def, boolean showSrsField) {
+		setAnnotationValue(def, Annotation.COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD, showSrsField);
 	}
 
 	private <T extends Enum<T>> Enum<T> getAnnotationEnumValue(AttributeDefinition def, Annotation annotation, Class<T> enumType) {

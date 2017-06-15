@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.form;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CoordinateAttributeFieldsOrder;
 import org.openforis.collect.model.CollectSurvey;
@@ -21,6 +22,7 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	private String yFieldLabel;
 	private String srsFieldLabel;
 	private boolean allowOnlyDeviceCoordinate;
+	private boolean showSrsField;
 	
 	CoordinateAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -34,7 +36,9 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		dest.setFieldLabel(CoordinateAttributeDefinition.Y_FIELD_NAME, languageCode, yFieldLabel);
 		dest.setFieldLabel(CoordinateAttributeDefinition.SRS_FIELD_NAME, languageCode, srsFieldLabel);
 
-		((CollectSurvey) dest.getSurvey()).getAnnotations().setAllowOnlyDeviceCoordinate(dest, allowOnlyDeviceCoordinate);
+		CollectAnnotations annotations = ((CollectSurvey) dest.getSurvey()).getAnnotations();
+		annotations.setAllowOnlyDeviceCoordinate(dest, allowOnlyDeviceCoordinate);
+		annotations.setShowSrsField(dest, showSrsField);
 	}
 
 	protected void saveFieldOrderValue(T dest) {
@@ -57,7 +61,9 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		yFieldLabel = source.getFieldLabel(CoordinateAttributeDefinition.Y_FIELD_NAME, languageCode);
 		srsFieldLabel = source.getFieldLabel(CoordinateAttributeDefinition.SRS_FIELD_NAME, languageCode);
 		
-		allowOnlyDeviceCoordinate = ((CollectSurvey) source.getSurvey()).getAnnotations().isAllowOnlyDeviceCoordinate(source);
+		CollectAnnotations annotations = ((CollectSurvey) source.getSurvey()).getAnnotations();
+		allowOnlyDeviceCoordinate = annotations.isAllowOnlyDeviceCoordinate(source);
+		showSrsField = annotations.isShowSrsField(source);
 	}
 
 	protected void loadFieldsOrderValue(T source) {
@@ -105,5 +111,13 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	
 	public void setAllowOnlyDeviceCoordinate(boolean allowOnlyDeviceCoordinate) {
 		this.allowOnlyDeviceCoordinate = allowOnlyDeviceCoordinate;
+	}
+	
+	public boolean isShowSrsField() {
+		return showSrsField;
+	}
+	
+	public void setShowSrsField(boolean showSrsField) {
+		this.showSrsField = showSrsField;
 	}
 }
