@@ -319,7 +319,7 @@ package org.openforis.collect.model.proxy {
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
 					var keyAttr:AttributeProxy = getSingleAttribute(def);
 					if(keyAttr != null) {
-						var keyValue:Object = getKeyLabelPart(def, keyAttr);
+						var keyValue:Object = getKeyValue(keyAttr);
 						if(keyValue != null && StringUtil.isNotBlank(keyValue.toString())) {
 							shortKeyParts.push(keyValue.toString());
 							var label:String = def.getInstanceOrHeadingLabelText();
@@ -344,17 +344,19 @@ package org.openforis.collect.model.proxy {
 			if(keyDefs.length > 0) {
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
 					var keyAttr:AttributeProxy = getSingleAttribute(def);
-					var keyValue:Object = getKeyLabelPart(def, keyAttr);
+					var keyValue:Object = getKeyValue(keyAttr);
 					result.push(keyValue);
 				}
 			}
 			return result;
 		}
 		
-		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):Object {
-			if(attribute.empty) {
+		private function getKeyValue(attribute:AttributeProxy):Object {
+			var attributeDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(attribute.definition);
+			if(attributeDefn.editable && attribute.userSpecified && attribute.empty) {
 				return null;
-			} else if(attributeDefn is NumberAttributeDefinitionProxy) {
+			}
+			if (attributeDefn is NumberAttributeDefinitionProxy) {
 				var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(attributeDefn);
 				var f:FieldProxy = attribute.getField(0);
 				var value:Object = f.value;
