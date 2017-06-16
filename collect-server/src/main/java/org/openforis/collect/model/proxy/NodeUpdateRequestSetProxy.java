@@ -27,17 +27,21 @@ public class NodeUpdateRequestSetProxy implements Proxy {
 		NodeUpdateRequestSet result = new NodeUpdateRequestSet();
 		List<NodeUpdateRequest> convertedRequests = new ArrayList<NodeUpdateRequest>();
 		for (NodeUpdateRequestProxy<?> proxy : requests) {
-			NodeUpdateRequest converted;
-			if ( proxy instanceof BaseAttributeUpdateRequestProxy<?> ) {
-				converted = ((BaseAttributeUpdateRequestProxy<?>) proxy).toAttributeUpdateRequest(
-						codeListManager, sessionManager, record);
-			} else {
-				converted = proxy.toNodeUpdateRequest(record);
-			}
+			NodeUpdateRequest converted = toNodeUpdateRequest(codeListManager, sessionManager, record, proxy);
 			convertedRequests.add(converted);
 		}
 		result.setRequests(convertedRequests);
 		return result;
+	}
+
+	private NodeUpdateRequest toNodeUpdateRequest(CodeListManager codeListManager, RecordSessionManager sessionManager,
+			CollectRecord record, NodeUpdateRequestProxy<?> proxy) {
+		if ( proxy instanceof BaseAttributeUpdateRequestProxy<?> ) {
+			return ((BaseAttributeUpdateRequestProxy<?>) proxy).toAttributeUpdateRequest(
+					codeListManager, sessionManager, record);
+		} else {
+			return proxy.toNodeUpdateRequest(record);
+		}
 	}
 	
 	public List<NodeUpdateRequestProxy<?>> getRequests() {

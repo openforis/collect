@@ -48,7 +48,7 @@
 	<s:Label text="{entityDefinition.getInstanceOrHeadingLabelText()}" styleName="bold" />
 	<s:DropDownList id="dropDownList"
 					prompt="{Message.get('global.dropDownPrompt')}" 
-					width="{Math.max(0, entityDefinition.keyAttributeDefinitions.length - 1) * 100 + 150}" 
+					width="{Math.max(0, entityDefinition.keyAttributeDefinitions.length - 1) * 150 + 200}" 
 					labelField="fullKeyText"
 					dataProvider="{entities}"
 					visible="{entities != null &amp;&amp; entities.length &gt; 0}"

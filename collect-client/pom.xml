@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.13.3-SNAPSHOT</version>
+		<version>3.13.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-client</artifactId>
@@ -259,5 +259,12 @@
 			<version>0.93</version>
 			<type>swc</type>
 		</dependency>
+		<!-- Debug -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.flexspy</groupId> -->
+<!-- 			<artifactId>flexspy</artifactId> -->
+<!-- 			<version>1.4</version> -->
+<!-- 			<type>swc</type> -->
+<!-- 		</dependency> -->
 	</dependencies>
 </project>

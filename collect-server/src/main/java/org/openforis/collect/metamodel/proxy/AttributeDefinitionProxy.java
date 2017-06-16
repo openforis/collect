@@ -11,7 +11,6 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
@@ -58,8 +57,12 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 		UIOptions uiOptions = getUIOptions();
 		String[] fieldNames = uiOptions.getVisibleFields(attributeDefinition);
 		for (String fieldName : fieldNames) {
-			FieldDefinition<?> field = attributeDefinition.getFieldDefinition(fieldName);
-			result.add(field.getIndex());
+			int fieldIdx = attributeDefinition.getFieldNames().indexOf(fieldName);
+			if (fieldIdx < 0) {
+				throw new IllegalStateException(String.format("Field %s not found in attribute definition %s", 
+						fieldName, attributeDefinition.getName()));
+			}
+			result.add(fieldIdx);
 		}
 		return result;
 	}
