@@ -25,6 +25,11 @@
 			public static const STATE_VERTICAL_FORM_Y_X_SRS:String = "vertical_form_y_x_srs";
 			public static const STATE_VERTICAL_FORM_X_Y_SRS:String = "vertical_form_x_y_srs";
 			
+			[Bindable]
+			private var _singleSrs:Boolean = false;
+			[Bindable]
+			private var _showSrsField:Boolean = true;
+			
 			override protected function initPresenter():void {
 				this.presenter = new CoordinateAttributePresenter(this);
 				this.presenter.init();
@@ -47,6 +52,24 @@
 					return item.label;
 				}
 			}
+			
+			[Bindable]
+			public function get singleSrs():Boolean {
+				return this._singleSrs;
+			}
+			
+			public function set singleSrs(value:Boolean):void {
+				this._singleSrs = value;
+			}
+			
+			[Bindable]
+			public function get showSrsField():Boolean {
+				return this._showSrsField;
+			}
+			
+			public function set showSrsField(value:Boolean):void {
+				this._showSrsField = value;
+			}
 		]]>
 	</fx:Script>
 	
@@ -66,13 +89,21 @@
 	</detail:states>
 	
 	<s:HGroup includeIn="horizontal_srs_x_y" gap="6">
-		<input:DropDownInputField id="srsDropDownList" includeIn="horizontal_srs_x_y" width="100"
-								  attribute="{attribute}"
-								  attributeDefinition="{attributeDefinition}" dataField="id"
-								  dataProvider="{Application.activeSurvey.spatialReferenceSystems}"
-								  dropDownLabelFunction="{srsDropDownLabelFunction}" fieldIndex="2"
-								  itemCreationPolicy="immediate" labelFunction="{srsLabelFunction}"
-								  parentEntity="{parentEntity}"/>
+		<s:Group id="srsSelectionContainer" width="100"
+		 		includeIn="horizontal_srs_x_y" itemCreationPolicy="immediate"
+		 		visible="{showSrsField}" includeInLayout="{showSrsField}" >
+			<s:Label id="singleSrsLabel" width="90" visible="{singleSrs}" includeInLayout="{singleSrs}" />
+			<input:DropDownInputField id="srsDropDownList"
+									  attribute="{attribute}"
+									  attributeDefinition="{attributeDefinition}" 
+									  dataProvider="{Application.activeSurvey.spatialReferenceSystems}"
+									  dataField="id"
+									  labelFunction="{srsLabelFunction}"
+									  dropDownLabelFunction="{srsDropDownLabelFunction}" 
+									  fieldIndex="2"
+									  parentEntity="{parentEntity}"
+									  visible="{! singleSrs}" includeInLayout="{! singleSrs}" />
+		</s:Group>
 		<input:NumericInputField id="xTextInput" includeIn="horizontal_srs_x_y" width="70"
 								 attribute="{attribute}" attributeDefinition="{attributeDefinition}"
 								 fieldIndex="0" itemCreationPolicy="immediate"
@@ -85,7 +116,7 @@
 	
 	<s:HGroup includeIn="horizontal_srs_y_x" gap="6">
 		<s:HGroup>
-			<fx:Reparent includeIn="horizontal_srs_y_x" target="srsDropDownList"/>
+			<fx:Reparent includeIn="horizontal_srs_y_x" target="srsSelectionContainer"/>
 		</s:HGroup>
 		<s:HGroup>
 			<fx:Reparent includeIn="horizontal_srs_y_x" target="yTextInput"/>
@@ -103,7 +134,7 @@
 			<fx:Reparent includeIn="horizontal_x_y_srs" target="yTextInput"/>
 		</s:HGroup>
 		<s:HGroup>
-			<fx:Reparent includeIn="horizontal_x_y_srs" target="srsDropDownList"/>
+			<fx:Reparent includeIn="horizontal_x_y_srs" target="srsSelectionContainer"/>
 		</s:HGroup>
 	</s:HGroup>
 	
@@ -115,7 +146,7 @@
 			<fx:Reparent includeIn="horizontal_y_x_srs" target="yTextInput"/>
 		</s:HGroup>
 		<s:HGroup>
-			<fx:Reparent includeIn="horizontal_y_x_srs" target="srsDropDownList"/>
+			<fx:Reparent includeIn="horizontal_y_x_srs" target="srsSelectionContainer"/>
 		</s:HGroup>
 	</s:HGroup>
 	
@@ -123,10 +154,11 @@
 		<s:VGroup>
 			<s:HGroup gap="0">
 				<detail:AttributeFieldLabel includeIn="vertical_form_srs_x_y" width="{subLabelWidth}"
+											visible="{showSrsField}" includeInLayout="{showSrsField}" 
 											attributeDefinition="{attributeDefinition}"
 											defaultText="{Message.get('edit.coordinate.srs')}"
-											field="srs" showTruncationTip="true" styleName="bold"/>
-				<fx:Reparent includeIn="vertical_srs_x_y" target="srsDropDownList"/>
+											field="srs" showTruncationTip="true" styleName="bold" />
+				<fx:Reparent includeIn="vertical_srs_x_y" target="srsSelectionContainer"/>
 			</s:HGroup>
 			<s:HGroup gap="0">
 				<detail:AttributeFieldLabel includeIn="vertical_form_srs_x_y" width="{subLabelWidth}"
@@ -148,14 +180,15 @@
 	<s:VGroup includeIn="vertical_srs_y_x, vertical_form_srs_y_x" gap="2">
 		<s:VGroup>
 			<s:HGroup gap="0">
-				<detail:AttributeFieldLabel includeIn="vertical_form_srs_y_x" 
+				<detail:AttributeFieldLabel includeIn="vertical_form_srs_y_x"
+											visible="{showSrsField}" includeInLayout="{showSrsField}"  
 											attributeDefinition="{attributeDefinition}"
 											defaultText="{Message.get('edit.coordinate.srs')}"
 											field="srs" 
 											width="{subLabelWidth}"
 											showTruncationTip="true" 
 											styleName="bold" />
-				<fx:Reparent includeIn="vertical_srs_y_x" target="srsDropDownList"/>
+				<fx:Reparent includeIn="vertical_srs_y_x" target="srsSelectionContainer"/>
 			</s:HGroup>
 			<s:HGroup gap="0">
 				<detail:AttributeFieldLabel includeIn="vertical_form_srs_y_x" 
@@ -204,13 +237,14 @@
 			</s:HGroup>
 			<s:HGroup gap="0">
 				<detail:AttributeFieldLabel includeIn="vertical_form_y_x_srs" 
+											visible="{showSrsField}" includeInLayout="{showSrsField}" 
 											attributeDefinition="{attributeDefinition}"
 											defaultText="{Message.get('edit.coordinate.srs')}"
 											field="srs" 
 											width="{subLabelWidth}"
 											showTruncationTip="true" 
 											styleName="bold" />
-				<fx:Reparent includeIn="vertical_y_x_srs" target="srsDropDownList"/>
+				<fx:Reparent includeIn="vertical_y_x_srs" target="srsSelectionContainer"/>
 			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>
@@ -239,13 +273,14 @@
 			</s:HGroup>
 			<s:HGroup gap="0">
 				<detail:AttributeFieldLabel includeIn="vertical_form_x_y_srs" 
+											visible="{showSrsField}" includeInLayout="{showSrsField}" 
 											attributeDefinition="{attributeDefinition}"
 											defaultText="{Message.get('edit.coordinate.srs')}"
 											field="srs" 
 											width="{subLabelWidth}"
 											showTruncationTip="true" 
 											styleName="bold" />
-				<fx:Reparent includeIn="vertical_x_y_srs" target="srsDropDownList"/>
+				<fx:Reparent includeIn="vertical_x_y_srs" target="srsSelectionContainer"/>
 			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>

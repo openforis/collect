@@ -1,3 +1,4 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
   <custom-attributes parentEntity="${arg.parentEntity}" />
   
@@ -7,6 +8,13 @@
       <column width="100%" />
     </columns>
     <rows>
+      <row>
+      	<label value="${labels.survey.schema.attribute.coordinate.show_srs}:" />
+        <fieldErrorHandler message="@load(vmsgs['showSrs'])">
+			<checkbox checked="@load(fx.showSrsField eq true) @save(fx.showSrsField)"
+				onCheck="@command('applyChanges')" />
+		</fieldErrorHandler>
+      </row>
       <row>
         <label value="${labels.survey.schema.attribute.fields_order.label}:" />
         <listbox width="200px" model="@load(vm.fieldsOrderValues)"

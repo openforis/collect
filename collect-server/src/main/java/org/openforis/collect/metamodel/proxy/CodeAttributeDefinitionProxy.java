@@ -65,5 +65,5 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		UIOptions uiOptions = getUIOptions();
 		return uiOptions.getShowCode(attributeDefinition);
 	}
-
+	
 }
