@@ -4,9 +4,11 @@ package org.openforis.collect.ui.component.detail
 	import mx.core.UIComponent;
 	
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
@@ -79,8 +81,17 @@ package org.openforis.collect.ui.component.detail
 		
 		private function isAllNodesEmptyAndNotRelevant(nodes:IList):Boolean {
 			for each (var node:NodeProxy in nodes) {
-				if ( node.relevant || (node.userSpecified && ! node.empty)) {
+				if (node.relevant) {
 					return false;
+				} else if (node.userSpecified) {
+					if (node.definition is BooleanAttributeDefinitionProxy 
+						&& BooleanAttributeDefinitionProxy(node.definition).affirmativeOnly) {
+						if (AttributeProxy(node).getField(0).value == true) {
+							return false;
+						}
+					} else if (! node.empty) {
+						return false;
+					}
 				}
 			}
 			return true;
