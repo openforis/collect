@@ -182,7 +182,7 @@ component|BlockingMessagePopUp,
 	background-alpha: 1.0;
 }
 
-component|BlockingMessagePopUp, concurrency|CollectJobStatusPopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, 
+component|BlockingMessagePopUp, concurrency|CollectJobStatusPopUp, component|SelectVersionPopUp, 
 	component|DataExportPopUp, component|BackupView, component|SpeciesImportPopUp {
 	showCloseButton: false;
 }
