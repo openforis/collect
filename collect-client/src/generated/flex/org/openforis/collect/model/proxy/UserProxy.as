@@ -95,6 +95,12 @@ package org.openforis.collect.model.proxy {
 			return hasEffectiveRole(ROLE_ENTRY_LIMITED);
 		}
 		
+		public function get canEditOnlyOwnedRecords():Boolean {
+			var highest:int = calculateHighestRoleIndex();
+			var index:int = ROLES_HIERARCHY.indexOf(ROLE_ENTRY_LIMITED);
+			return highest == index;
+		}
+		
 		public function get canEditNotOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_CLEANSING);
 		}
@@ -105,6 +111,10 @@ package org.openforis.collect.model.proxy {
 		
 		public function get canViewNotOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_CLEANSING) || hasRole(ROLE_VIEW);
+		}
+		
+		public function get canViewMap():Boolean {
+			return canViewAllRecords;
 		}
 		
 		public function get canRunSaikuAnalysis():Boolean {

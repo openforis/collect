@@ -6,8 +6,8 @@ package org.openforis.collect.remoting.service;
 
 import static org.openforis.collect.model.UserRoles.ANALYSIS;
 import static org.openforis.collect.model.UserRoles.CLEANSING;
-import static org.openforis.collect.model.UserRoles.ENTRY_LIMITED;
 import static org.openforis.collect.model.UserRoles.ENTRY;
+import static org.openforis.collect.model.UserRoles.ENTRY_LIMITED;
 import static org.openforis.collect.model.UserRoles.USER;
 
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
@@ -35,6 +36,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SessionEventDispatcher;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -87,6 +89,8 @@ public class DataService {
 	private RecordSessionManager sessionManager;
 	@Autowired
 	private transient RecordManager recordManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	@Autowired
 	private transient CodeListManager codeListManager;
 	@Autowired
@@ -143,17 +147,21 @@ public class DataService {
 	}
 	
 	@Secured(USER)
-	public Map<String, Object> loadRecordSummaries(RecordFilterProxy filterProxy, List<RecordSummarySortField> sortFields) {
+	public Map<String, Object> loadRecordSummaries(RecordFilterProxy filterProxy, List<RecordSummarySortField> sortFields, String localeStr) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
-		
-		RecordFilter filter = filterProxy.toFilter(activeSurvey);
+		CollectSurvey survey;
+		if (filterProxy.getSurveyId() > 0) {
+			survey = surveyManager.getById(filterProxy.getSurveyId());
+		} else {
+			SessionState sessionState = sessionManager.getSessionState();
+			survey = sessionState.getActiveSurvey();
+		}
+		RecordFilter filter = filterProxy.toFilter(survey);
 		
 		//load summaries
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter, sortFields);
-		Locale locale = sessionState.getLocale();
+		Locale locale = LocaleUtils.toLocale(localeStr);
 		List<RecordProxy> proxies = RecordProxy.fromList(summaries, locale);
 		
 		result.put("records", proxies);
