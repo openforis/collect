@@ -10,6 +10,10 @@
 @namespace codelist "org.openforis.collect.ui.component.input.codelist.*";
 @namespace concurrency "org.openforis.collect.concurrency.*";
 
+input|CodeListItemRenderer s|CheckBox {
+	fontSize: 12;
+}
+
 container|CollapsiblePanel {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.CollapsiblePanelSkin');
 }
@@ -276,6 +280,7 @@ detail|CompositeAttributeRenderer.warning,
 
 input|TextInput, mx|TextArea {
 	borderSkin: ClassReference("org.openforis.collect.ui.skin.TextInputBorderSkin");
+	fontSize: 12;
 }
 
 input|TextInput.error, input|TextInput.warning, mx|TextArea.error, mx|TextArea.warning {

@@ -49,21 +49,8 @@
 	                onChange="@command('applyChanges')" />
             </fieldErrorHandler>
           </row>
-          <row visible="@load(not(vm.collectEarthSurvey))">
-           <fieldErrorHandler message="@load(vmsgs['keyChangeAllowed'])">
-	            <label value="${labels.survey.key_change_allowed.$}" />
-              	<image popup="keyChangeAllowedInfoTooltip" 
-              	 	style="cursor:pointer" src="/assets/images/info-small.png" />
-	        </fieldErrorHandler>
-          	<fieldErrorHandler
-				message="@load(vmsgs['keyChangeAllowed'])">
-				<checkbox
-					checked="@bind(fx.keyChangeAllowed)"
-					onCheck="@command('applyChanges')" />
-			</fieldErrorHandler>
-          </row>
-         </rows>
-	   </grid>
+        </rows>
+      </grid>
     </groupbox>
     
     <hlayout spacing="30px" style="padding: 30px">
@@ -88,6 +75,19 @@
               onClick="@global-command('openUnitsManagerPopUp')"
               image="/assets/images/edit-small.png" />
          </hlayout>
+    	 <hlayout visible="@load(not(vm.collectEarthSurvey))">
+            <fieldErrorHandler message="@load(vmsgs['keyChangeAllowed'])">
+	            <label value="${labels.survey.key_change_allowed.$}" />
+              	<image popup="keyChangeAllowedInfoTooltip" 
+              	 	style="cursor:pointer" src="/assets/images/info-small.png" />
+	        </fieldErrorHandler>
+          	<fieldErrorHandler
+				message="@load(vmsgs['keyChangeAllowed'])">
+				<checkbox
+					checked="@bind(fx.keyChangeAllowed)"
+					onCheck="@command('applyChanges')" />
+			</fieldErrorHandler>
+	     </hlayout>
     </hlayout>
     
     <groupbox width="100%" closable="false" class="tableFieldSet">
