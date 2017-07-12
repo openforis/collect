@@ -28,6 +28,7 @@ public class RecordProxy implements Proxy {
 	private transient CollectRecord record;
 	private transient Locale locale;
 
+	private boolean newRecord;
 	private Integer errors;
 	private Integer skipped;
 	private Integer missing;
@@ -37,8 +38,13 @@ public class RecordProxy implements Proxy {
 	private UserProxy owner;
 	
 	public RecordProxy(CollectRecord record, Locale locale) {
+		this(record, locale, false);
+	}
+	
+	public RecordProxy(CollectRecord record, Locale locale, boolean newRecord) {
 		this.record = record;
 		this.locale = locale;
+		this.newRecord = newRecord;
 		
 		errors = record.getErrors();
 		skipped = record.getSkipped();
@@ -58,6 +64,11 @@ public class RecordProxy implements Proxy {
 			}
 		}
 		return result;
+	}
+	
+	@ExternalizedProperty
+	public boolean isNewRecord() {
+		return newRecord;
 	}
 	
 	@ExternalizedProperty

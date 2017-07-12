@@ -569,7 +569,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateView():void {
-			view.editable = Application.activeRecordEditable && ! view.attributeDefinition.calculated && view.attributeDefinition.editable;
+			view.editable = Application.activeRecordEditable 
+				&& ! view.attributeDefinition.calculated 
+				&& view.attributeDefinition.editable
+				&& (Application.activeRecord.newRecord 
+					|| ! view.attributeDefinition.key 
+					|| Application.activeSurvey.keyChangeAllowed);
 
 			//update view according to attribute (generic text value)
 			view.text = getTextFromValue();

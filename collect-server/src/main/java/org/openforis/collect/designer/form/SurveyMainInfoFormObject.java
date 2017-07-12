@@ -27,12 +27,18 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String defaultDescription;
 	private String defaultProjectName;
 	
+	private boolean keyChangeAllowed;
+	
 	@Override
 	public void loadFrom(CollectSurvey source, String languageCode) {
 		name = source.getName();
 		description = source.getDescription(languageCode);
 		published = source.isPublished();
 		projectName = source.getProjectName(languageCode);
+		
+		defaultProjectName = source.getProjectName();
+		defaultDescription = source.getDescription();
+		
 		CollectAnnotations annotations = source.getAnnotations();
 		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
@@ -42,9 +48,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		openStreetView = annotations.isStreetViewEnabled();
 		openGEEExplorer = annotations.isGEEExplorerEnabled();
 		openGEECodeEditor = annotations.isGEECodeEditorEnabled();
-		
-		defaultProjectName = source.getProjectName();
-		defaultDescription = source.getDescription();
+		keyChangeAllowed = annotations.isKeyChangeAllowed();
 	}
 
 	protected String toListitemValue(Double number) {
@@ -67,6 +71,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		annotations.setStreetViewEnabled( openStreetView );
 		annotations.setGEECodeEditorEnabled( openGEECodeEditor );
 		annotations.setGEEExplorerEnabled(openGEEExplorer );
+		annotations.setKeyChangeAllowed(keyChangeAllowed);
 	}
 
 	protected double fromListitemValueToDouble(String value) {
@@ -180,5 +185,13 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	
 	public String getDefaultDescription() {
 		return defaultDescription;
+	}
+	
+	public boolean isKeyChangeAllowed() {
+		return keyChangeAllowed;
+	}
+	
+	public void setKeyChangeAllowed(boolean keyChangeAllowed) {
+		this.keyChangeAllowed = keyChangeAllowed;
 	}
 }

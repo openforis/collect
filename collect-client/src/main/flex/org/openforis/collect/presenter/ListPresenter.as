@@ -543,10 +543,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			var recordEditButtons:Array = [view.addButton, view.editButton, view.deleteButton];
-			for each (var button:UIComponent in recordEditButtons) {
-				button.visible = button.includeInLayout = Application.user.canEditRecords;
-			}
+			view.addButton.visible = view.addButton.includeInLayout = Application.user.canAddRecords;
+			view.editButton.visible = view.editButton.includeInLayout = Application.user.canEditRecords;
+			view.deleteButton.visible = view.deleteButton.includeInLayout = Application.user.canDeleteRecords;
 			view.viewButton.visible = view.viewButton.includeInLayout = Application.user.canViewAllRecords;
 		}
 		

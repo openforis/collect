@@ -85,4 +85,9 @@ public class SurveyProxy implements Proxy {
 		return survey.getLanguages().get(0);
 	}
 	
+	@ExternalizedProperty
+	public boolean isKeyChangeAllowed() {
+		return survey.getAnnotations().isKeyChangeAllowed();
+	}
+	
 }

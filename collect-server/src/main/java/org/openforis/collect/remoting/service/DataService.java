@@ -230,7 +230,7 @@ public class DataService {
 		prepareRecordIndexing();
 		
 		
-		RecordProxy recordProxy = new RecordProxy(record, sessionState.getLocale());
+		RecordProxy recordProxy = new RecordProxy(record, sessionState.getLocale(), true);
 		return recordProxy;
 	}
 	

@@ -49,6 +49,19 @@
 	                onChange="@command('applyChanges')" />
             </fieldErrorHandler>
           </row>
+          <row visible="@load(not(vm.collectEarthSurvey))">
+           <fieldErrorHandler message="@load(vmsgs['keyChangeAllowed'])">
+	            <label value="${labels.survey.key_change_allowed.$}" />
+              	<image popup="keyChangeAllowedInfoTooltip" 
+              	 	style="cursor:pointer" src="/assets/images/info-small.png" />
+	        </fieldErrorHandler>
+          	<fieldErrorHandler
+				message="@load(vmsgs['keyChangeAllowed'])">
+				<checkbox
+					checked="@bind(fx.keyChangeAllowed)"
+					onCheck="@command('applyChanges')" />
+			</fieldErrorHandler>
+          </row>
          </rows>
 	   </grid>
     </groupbox>
@@ -147,7 +160,7 @@
 	  		
 	  		<space width="30px" />
 	  		
-	  		 <fieldErrorHandler message="@load(vmsgs['openGEEExplorer'])">
+	  		<fieldErrorHandler message="@load(vmsgs['openGEEExplorer'])">
 		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />  					
 	  					<checkbox
 	  						checked="@load(fx.openGEEExplorer eq true) @save(fx.openGEEExplorer)"
@@ -184,5 +197,11 @@
             
      </groupbox>
   </div>
+
+    <popup id="keyChangeAllowedInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.key_change_allowed.tooltip}
+        ]]></html>
+    </popup>
 
 </zk>
