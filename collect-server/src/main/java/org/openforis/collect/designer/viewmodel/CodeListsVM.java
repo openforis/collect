@@ -449,7 +449,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		} else {
 			String errorMessageKey = job.getErrorMessage();
 			String errorMessage = StringUtils.defaultIfBlank(Labels.getLabel(errorMessageKey), errorMessageKey);
-			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
+			MessageUtil.showError("global.job_status.failed.message", errorMessage);
 		}
 		clearJob(job);
 	}
