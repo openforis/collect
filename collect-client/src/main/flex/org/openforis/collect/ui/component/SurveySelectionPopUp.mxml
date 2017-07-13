@@ -3,7 +3,7 @@
 				 xmlns:s="library://ns.adobe.com/flex/spark" 
 				 xmlns:mx="library://ns.adobe.com/flex/mx"
 				 xmlns:component="org.openforis.collect.ui.component.*"
-				 width="450" height="230"
+				 width="500"
 				 title="{Message.get('surveySelection.popUp.title')}"
 				 >
 	
@@ -15,9 +15,10 @@
 			import org.openforis.collect.presenter.SurveySelectionPresenter;
 			
 			public static const DEFAULT_STATE:String = "default";
-			public static const LOADING_ROOT_ENTITIES_STATE:String = "loadingRootEntities";
-			public static const ROOT_ENTITIES_LOADED_STATE:String = "rootEntitiesLoaded";
 			public static const LOADING_STATE:String = "loading";
+			public static const LOADING_ROOT_ENTITIES_STATE:String = "loadingRootEntities";
+			public static const SINGLE_ROOT_ENTITY_LOADED_STATE:String = "singleRootEntityLoaded";
+			public static const MULTIPLE_ROOT_ENTITIES_LOADED_STATE:String = "multipleRootEntitiesLoaded";
 			
 			private var _presenter:SurveySelectionPresenter;
 			
@@ -48,7 +49,8 @@
 		<s:State name="default" />
 		<s:State name="loading" />
 		<s:State name="loadingRootEntities" />
-		<s:State name="rootEntitiesLoaded" />
+		<s:State name="singleRootEntityLoaded" />
+		<s:State name="multipleRootEntitiesLoaded" />
 	</component:states>
 	
 	<component:LoadingContent width="100%" height="100%" includeIn="loading" 
@@ -59,23 +61,23 @@
 			<s:Form>
 				<s:FormItem label="{Message.get('surveySelection.survey')}">
 					<s:DropDownList id="surveyDDL" labelField="name"
-									width="300" />
+									width="350" />
 				</s:FormItem>
-				<s:FormItem label="{Message.get('surveySelection.rootEntity')}">
+				<s:FormItem id="rootEntityFormItem"
+					label="{Message.get('surveySelection.rootEntity')}" 
+					includeInLayout="false" 
+					includeInLayout.multipleRootEntitiesLoaded="true"
+					visible="false"
+					visible.multipleRootEntitiesLoaded="true" >
 					<s:DropDownList id="rootEntityDDL" labelField="name"
 									width="200" />
 				</s:FormItem>
 			</s:Form>
-			<s:HGroup gap="30">
+			<s:HGroup gap="30" paddingBottom="30">
 				<s:Button id="okButton" label="{Message.get('surveySelection.ok')}"
 						  useHandCursor="true" buttonMode="true"
 						  enabled.loadingRootEntities="false"
 						  />
-				<s:Button id="cancelButton"
-						   label="{Message.get('global.cancel')}"
-						   useHandCursor="true" 
-						   buttonMode="true"
-						   />
 			</s:HGroup>
 		</s:VGroup>
 	</s:Group>

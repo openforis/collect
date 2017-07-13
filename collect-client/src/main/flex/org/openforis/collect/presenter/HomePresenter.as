@@ -103,8 +103,9 @@ package org.openforis.collect.presenter {
 		protected function createFunctionsList():IList {
 			var result:IList = new ArrayList();
 			result.addItem(DATA_MANAGEMENT_MENU_ITEM);
-			result.addItem(MAP_VISUALIZER_MENU_ITEM);
-			
+			if ( Application.user.canViewMap ) {
+				result.addItem(MAP_VISUALIZER_MENU_ITEM);
+			}
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(DESIGNER_MENU_ITEM);
 				result.addItem(BACKUP_RESTORE_MENU_ITEM);
@@ -112,7 +113,7 @@ package org.openforis.collect.presenter {
 				result.addItem(SAIKU_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
 				result.addItem(CONFIGURATION_MENU_ITEM);
-			} else if ( Application.user.hasEffectiveRole(UserProxy.ROLE_VIEW) ) {
+			} else if ( Application.user.canRunSaikuAnalysis ) {
 				result.addItem(SAIKU_MENU_ITEM);
 			}
 			return result;

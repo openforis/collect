@@ -257,9 +257,7 @@ public abstract class BaseValidator extends AbstractValidator {
 	}
 
 	protected Map<String, Property> getProperties(ValidationContext ctx) {
-		Object base = ctx.getProperty().getBase();
-		Map<String, Property> properties = ctx.getProperties(base);
-		return properties;
+		return ctx.getProperties(ctx.getProperty().getBase());
 	}
 
 	protected Object getVM(ValidationContext ctx) {

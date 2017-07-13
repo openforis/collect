@@ -136,6 +136,20 @@ package org.openforis.collect.util
 			}
 		}
 		
+		public static function endsWith(string:String, endsWith:String, ignoreCase:Boolean = false):Boolean {
+			if ( string == null && endsWith == null ) {
+				return true;
+			} else if ( string == null ) {
+				return false;
+			} else {
+				if ( ignoreCase ) {
+					string = string.toLowerCase();
+					endsWith = endsWith.toLowerCase();
+				}
+				return string.indexOf(endsWith) == string.length - endsWith.length;
+			}
+		}
+		
 		public static function pad(str:String, length:int, pad:String):String {
 			var result:String = str;
 			while ( result.length < length ) {

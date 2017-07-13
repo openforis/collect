@@ -59,6 +59,10 @@ package org.openforis.collect.metamodel.proxy {
 			return result;
 		}
 		
+		public function get mainRootEntityDefinition():EntityDefinitionProxy {
+			return rootEntityDefinitions.getItemAt(0) as EntityDefinitionProxy;
+		}
+		
 		public function get survey():SurveyProxy {
 			return _survey;
 		}

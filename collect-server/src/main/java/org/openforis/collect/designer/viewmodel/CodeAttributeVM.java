@@ -114,7 +114,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		fo.setList(list);
 		setFormFieldValue(binder, "list", list);
 		setFormFieldValue(binder, "list.hierarchical", list != null && list.isHierarchical());
-		setFormFieldValue(binder, "parentCodeAttributeDefinition.path", null);
+		setFormFieldValue(binder, "parentCodeAttributeDefinitionPath", null);
 		setFormFieldValue(binder, "hierarchicalLevel", null);
 		dispatchApplyChangesCommand(binder);
 		notifyChange("dependentCodePaths");

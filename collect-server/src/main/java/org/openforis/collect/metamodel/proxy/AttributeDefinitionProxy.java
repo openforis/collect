@@ -11,7 +11,6 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
@@ -29,11 +28,7 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 
 	@ExternalizedProperty
 	public boolean isKey() {
-		if(this.attributeDefinition instanceof KeyAttributeDefinition) {
-			return ((KeyAttributeDefinition) this.attributeDefinition).isKey(); 
-		} else {
-			return false;
-		}
+		return this.attributeDefinition.isKey();
 	}
 	
 	@ExternalizedProperty

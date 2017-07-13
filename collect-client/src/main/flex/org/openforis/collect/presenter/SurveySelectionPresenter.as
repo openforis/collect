@@ -52,7 +52,6 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			view.surveyDDL.addEventListener(IndexChangeEvent.CHANGE, surveySelectedHandler);
 			view.okButton.addEventListener(MouseEvent.CLICK, okButtonClickHandler);
-			view.cancelButton.addEventListener(MouseEvent.CLICK, closeHandler);
 		}
 		
 		protected function surveySelectedHandler(event:IndexChangeEvent):void {
@@ -72,8 +71,8 @@ package org.openforis.collect.presenter {
 		protected function getRootEntitiesSummariesResultHandler(event:ResultEvent, token:Object = null):void {
 			var rootEntities:IList = event.result as IList;
 			view.rootEntityDDL.dataProvider = rootEntities;
-			view.currentState = SurveySelectionPopUp.ROOT_ENTITIES_LOADED_STATE;
-			if ( rootEntities != null && rootEntities.length == 1 ) {
+			if ( rootEntities.length == 1 ) {
+				view.currentState = SurveySelectionPopUp.SINGLE_ROOT_ENTITY_LOADED_STATE;
 				view.rootEntityDDL.selectedIndex = 0;
 				if ( Application.surveySummaries.length == 1 && view.automaticallySelect ) {
 					okButtonClickHandler(null);
@@ -81,7 +80,7 @@ package org.openforis.collect.presenter {
 					view.visible = true;
 				}
 			} else {
-				view.visible = true;
+				view.currentState = SurveySelectionPopUp.MULTIPLE_ROOT_ENTITIES_LOADED_STATE;
 			}
 		}
 		

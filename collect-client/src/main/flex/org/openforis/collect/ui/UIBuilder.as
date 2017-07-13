@@ -69,6 +69,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TextCodeInputField;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.Group;
@@ -554,13 +555,10 @@ package org.openforis.collect.ui {
 				result.addElement(compositeAttributeLabelsGroup);
 			} else if (defn is NumberAttributeDefinitionProxy && NumberAttributeDefinitionProxy(defn).defaultUnit != null || 
 				defn is RangeAttributeDefinitionProxy && RangeAttributeDefinitionProxy(defn).defaultUnit != null ) {
-				var defaultUnit:UnitProxy;
-				if (defn is NumberAttributeDefinitionProxy) {
-					defaultUnit = NumberAttributeDefinitionProxy(defn).defaultUnit;
-				} else {
-					defaultUnit = RangeAttributeDefinitionProxy(defn).defaultUnit;
-				}
-				var labStr:String = defnLabel + " (" + defaultUnit.getAbbreviation() + ")";
+				var defaultUnit:UnitProxy = NumericAttributeDefinitionProxy(defn).defaultUnit;
+				var defaultUnitSuffix:String = "(" + defaultUnit.getAbbreviation() + ")";
+				var labStr:String = StringUtil.endsWith(defnLabel, defaultUnitSuffix) ? defnLabel :
+					defnLabel + " " + defaultUnitSuffix;
 				l = getLabel(labStr, labelWidth, HEADER_LABEL_STYLE, directionByColumns || ! horizontalOrientation);
 				l.rotation = labelRotation;
 				result.addElement(l);

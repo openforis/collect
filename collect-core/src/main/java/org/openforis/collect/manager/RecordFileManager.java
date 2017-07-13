@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -63,23 +62,20 @@ public class RecordFileManager extends BaseStorageManager {
 	
 	/**
 	 * Moves a file into the repository and associates the file name to the corresponding file attribute node 
-	 * (it deletes the old attribute repository file, if any).
 	 * Returns true if the record is modified (file name or size different from the old one).
 	 */
 	public boolean moveFileIntoRepository(CollectRecord record, int nodeId, java.io.File newFile) throws IOException {
 		boolean recordUpdated = false;
 		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
 
-		deleteRepositoryFile(fileAttribute);
-		
 		FileAttributeDefinition defn = fileAttribute.getDefinition();
 		
 		String repositoryFileName = generateUniqueRepositoryFileName(fileAttribute, newFile);
 		File repositoryFile = new java.io.File(getRepositoryDir(defn), repositoryFileName);
 		
-		long repositoryFileSize = repositoryFile.length();
+		long repositoryFileSize = newFile.length();
 		if ( ! repositoryFileName.equals(fileAttribute.getFilename() ) || 
-				! new Long(repositoryFileSize).equals(fileAttribute.getSize()) ) {
+				! Long.valueOf(repositoryFileSize).equals(fileAttribute.getSize()) ) {
 			recordUpdated = true;
 			fileAttribute.setFilename(repositoryFileName);
 			fileAttribute.setSize(repositoryFileSize);
@@ -104,21 +100,9 @@ public class RecordFileManager extends BaseStorageManager {
 	private String generateNewRepositoryFilename(FileAttribute fileAttribute, String tempFileName) {
 		Record record = fileAttribute.getRecord();
 		String extension = FilenameUtils.getExtension(tempFileName);
-		String result = String.format("%d_%s.%s", record.getId(), UUID.randomUUID().toString(), extension);
-		return result;
+		return String.format("%d_%d.%s", record.getId(), System.currentTimeMillis(), extension);
 	}
 
-	protected String generateUniqueFilename(java.io.File parentDir, String originalFileName) {
-		String extension = FilenameUtils.getExtension(originalFileName);
-		String fileName;
-		java.io.File file;
-		do {
-			fileName = UUID.randomUUID().toString() + "." + extension;
-			file = new java.io.File(parentDir, fileName);
-		} while ( file.exists() );
-		return fileName;
-	}
-	
 	protected java.io.File getRepositoryDir(FileAttributeDefinition defn) {
 		java.io.File baseDirectory = storageDirectory;
 		String relativePath = getRepositoryRelativePath(defn);

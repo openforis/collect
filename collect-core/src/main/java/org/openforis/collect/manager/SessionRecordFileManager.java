@@ -51,8 +51,7 @@ public class SessionRecordFileManager implements Serializable {
 	}
 	
 	public java.io.File saveToTempFile(byte[] data, String originalFileName, CollectRecord record, int nodeId) throws RecordFileException {
-		java.io.File file = saveToTempFile(new ByteArrayInputStream(data), originalFileName, record, nodeId);
-		return file;
+		return saveToTempFile(new ByteArrayInputStream(data), originalFileName, record, nodeId);
 	}
 	
 	public java.io.File saveToTempFile(InputStream is, String originalFileName, CollectRecord record, int nodeId) throws RecordFileException {
@@ -77,16 +76,16 @@ public class SessionRecordFileManager implements Serializable {
 	
 	protected boolean moveTempFilesToRepository(CollectRecord record) throws RecordFileException {
 		try {
-			boolean result = false;
+			boolean recordChanged = false;
 			for (Entry<Integer, String> entry : nodeIdToTempFilePath.entrySet()) {
 				int nodeId = entry.getKey();
 				String fileName = entry.getValue();
 				java.io.File tempFile = new java.io.File(fileName);
-				boolean recordChanged = recordFileManager.moveFileIntoRepository(record, nodeId, tempFile);
-				result = result || recordChanged;
+				boolean currentRecordChanged = recordFileManager.moveFileIntoRepository(record, nodeId, tempFile);
+				recordChanged = recordChanged || currentRecordChanged;
 			}
 			nodeIdToTempFilePath.clear();
-			return result;
+			return recordChanged;
 		} catch (IOException e) {
 			throw new RecordFileException(e);
 		}

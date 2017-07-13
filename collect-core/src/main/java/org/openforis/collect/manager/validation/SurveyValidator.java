@@ -421,23 +421,28 @@ public class SurveyValidator {
 	
 	protected List<SurveyValidationResult> validateAttribute(AttributeDefinition attrDef) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
-		if (attrDef instanceof TaxonAttributeDefinition) {
-			validateTaxonomy((TaxonAttributeDefinition) attrDef, results);
+		if (attrDef instanceof CodeAttributeDefinition) {
+			addIfNotOk(results, validateCodeAttribute((CodeAttributeDefinition) attrDef));
+		} else if (attrDef instanceof TaxonAttributeDefinition) {
+			addIfNotOk(results, validateTaxonomy((TaxonAttributeDefinition) attrDef));
 		}
-		if ( attrDef instanceof KeyAttributeDefinition ) {
-			SurveyValidationResult result = validateKeyAttribute((KeyAttributeDefinition) attrDef);
-			if ( result != null ) {
-				results.add(result);
-			}
-		}
-		SurveyValidationResult referencedAttributeValidationResult = validateReferencedKeyAttribute(attrDef);
-		if (referencedAttributeValidationResult.getFlag() != Flag.OK) {
-			results.add(referencedAttributeValidationResult);
-		}
+		addIfNotOk(results, validateKeyAttribute(attrDef));
+		addIfNotOk(results, validateReferencedKeyAttribute(attrDef));
 		return results;
 	}
 
-	private void validateTaxonomy(TaxonAttributeDefinition attrDef, List<SurveyValidationResult> results) {
+	private SurveyValidationResult validateCodeAttribute(CodeAttributeDefinition attrDef) {
+		//validate hierarchical level in code list
+		try {
+			attrDef.getHierarchicalLevel();
+			return new SurveyValidationResult();
+		} catch (Exception e) {
+			return new SurveyValidationResult(attrDef.getPath(), 
+					"survey.validation.attribute.code.invalid_parent_attribute_relation");
+		}
+	}
+
+	private SurveyValidationResult validateTaxonomy(TaxonAttributeDefinition attrDef) {
 		CollectSurvey survey = (CollectSurvey) attrDef.getSurvey();
 		boolean surveyIsStored = survey.getId() != null;
 		if (surveyIsStored) {
@@ -445,17 +450,19 @@ public class SurveyValidator {
 			String taxonomyName = attrDef.getTaxonomy();
 			CollectTaxonomy taxonomy = findTaxonomy(survey, taxonomyName);
 			if (taxonomy == null) {
-				results.add(new SurveyValidationResult(attrDef.getPath(), "survey.validation.attribute.taxon.invalid_taxonomy", taxonomyName));
+				return new SurveyValidationResult(attrDef.getPath(), "survey.validation.attribute.taxon.invalid_taxonomy", taxonomyName);
 			}
 		}
+		return new SurveyValidationResult();
 	}
 
 	protected SurveyValidationResult validateKeyAttribute(KeyAttributeDefinition keyDefn) {
 		if ( keyDefn.isKey() && ((NodeDefinition) keyDefn).isMultiple() ) {
 			return new SurveyValidationResult(((NodeDefinition) keyDefn).getPath(), 
 					"survey.validation.attribute.key_attribute_cannot_be_multiple");
+		} else {
+			return new SurveyValidationResult();
 		}
-		return null;
 	}
 	
 	public SurveyValidationResult validateReferencedKeyAttribute(AttributeDefinition attrDef) {
@@ -807,7 +814,12 @@ public class SurveyValidator {
 		return null;
 	}
 	
-	
+	private void addIfNotOk(List<SurveyValidationResult> results, SurveyValidationResult result) {
+		if (result.getFlag() != Flag.OK) {
+			results.add(result);
+		}
+	}
+
 	public void setCodeListManager(CodeListManager codeListManager) {
 		this.codeListManager = codeListManager;
 	}

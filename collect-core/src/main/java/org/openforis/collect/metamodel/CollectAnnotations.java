@@ -54,6 +54,7 @@ public class CollectAnnotations {
 		COLLECT_VERSION(new QName(COLLECT_NAMESPACE_URI, "collectVersion"), "3.4.0"),
 		GEOMETRY(new QName(COLLECT_NAMESPACE_URI, "geometry"), false),
 		SHOW_IN_MAP_BALLOON(new QName(COLLECT_NAMESPACE_URI, "showInMapBalloon"), true),
+		KEY_CHANGE_ALLOWED(new QName(COLLECT_NAMESPACE_URI, "keyChangeAllowed"), true),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -170,6 +171,14 @@ public class CollectAnnotations {
 	public void setSurveyTarget(SurveyTarget target) {
 		String val = target == null || target == Annotation.TARGET.defaultValue ? null: target.getCode();
 		survey.setAnnotation(Annotation.TARGET.getQName(), val);
+	}
+	
+	public boolean isKeyChangeAllowed() {
+		return getAnnotationBooleanValue(survey, Annotation.KEY_CHANGE_ALLOWED);
+	}
+	
+	public void setKeyChangeAllowed(boolean value) {
+		setAnnotationValue(survey, Annotation.KEY_CHANGE_ALLOWED, value);
 	}
 
 	public Step getPhaseToApplyDefaultValue(AttributeDefinition def) {
