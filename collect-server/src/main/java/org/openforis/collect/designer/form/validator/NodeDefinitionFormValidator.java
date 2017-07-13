@@ -183,13 +183,7 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 	}
 	
 	protected NodeDefinition getEditedNode(ValidationContext ctx) {
-		Object vmObject = getVM(ctx);
-		if (vmObject instanceof NodeDefinitionVM) {
-			return (NodeDefinition) ((NodeDefinitionVM<?>) vmObject).getEditedItem();
-		} else {
-			throw new IllegalArgumentException("Unsupported View Model Standard: " +
-					vmObject.getClass().getName());
-		}
+		return (NodeDefinition) ((NodeDefinitionVM<?>) getVM(ctx)).getEditedItem();
 	}
 	
 	protected EntityDefinition getParentEntity(ValidationContext ctx) {

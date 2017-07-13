@@ -47,7 +47,7 @@ public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeLis
 	}
 
 	protected boolean validateCodeUniqueness(ValidationContext ctx) {
-		SurveyObjectBaseVM<CodeListItem> viewModel = getSurveyObjectVM(ctx);
+		SurveyObjectBaseVM<CodeListItem> viewModel = getVM(ctx);
 		CodeListItem editedItem = viewModel.getEditedItem();
 		String code = (String) getValue(ctx, CODE_FIELD);
 		CodeListItem existingItem = getExistingCodeListItem(ctx, code);
@@ -61,7 +61,7 @@ public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeLis
 	}
 	
 	protected CodeListItem getExistingCodeListItem(ValidationContext ctx, String code) {
-		SurveyObjectBaseVM<CodeListItem> viewModel = getSurveyObjectVM(ctx);
+		SurveyObjectBaseVM<CodeListItem> viewModel = getVM(ctx);
 		CodeListItem editedItem = viewModel.getEditedItem();
 		CodeList codeList = editedItem.getCodeList();
 		CodeListItem parentItem = getParentItem(ctx);
