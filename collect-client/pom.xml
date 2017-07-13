@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.13.6</version>
+		<version>3.13.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-client</artifactId>
