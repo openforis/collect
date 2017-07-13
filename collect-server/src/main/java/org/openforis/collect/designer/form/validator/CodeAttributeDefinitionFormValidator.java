@@ -26,25 +26,27 @@ public class CodeAttributeDefinitionFormValidator extends AttributeDefinitionFor
 
 	private void validateParentAttributeDefinition(ValidationContext ctx) {
 		String parentCodeAttributeDefPath = getValue(ctx, PARENT_CODE_ATTRIBUTE_DEFINITION_PATH_FIELD);
-		CodeAttributeVM vm = (CodeAttributeVM) getVM(ctx);
-		CollectSurvey survey = vm.getSurvey();
-		CodeAttributeDefinition parentDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionByPath(parentCodeAttributeDefPath);
-		if (parentDef != null) {
-			CodeList list = getValue(ctx, LIST_FIELD);
-			if (list.isHierarchical()) {
-				try {
-					Integer parentHierarchicalLevelIdx = parentDef.getListLevelIndex();
-					if (parentHierarchicalLevelIdx + 1 >= list.getHierarchy().size()) {
+		if (parentCodeAttributeDefPath != null) {
+			CodeAttributeVM vm = getVM(ctx);
+			CollectSurvey survey = vm.getSurvey();
+			CodeAttributeDefinition parentDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionByPath(parentCodeAttributeDefPath);
+			if (parentDef != null) {
+				CodeList list = getValue(ctx, LIST_FIELD);
+				if (list.isHierarchical()) {
+					try {
+						Integer parentHierarchicalLevelIdx = parentDef.getListLevelIndex();
+						if (parentHierarchicalLevelIdx + 1 >= list.getHierarchy().size()) {
+							addInvalidMessage(ctx, PARENT_CODE_ATTRIBUTE_DEFINITION_PATH_FIELD, 
+									Labels.getLabel("survey.validation.attribute.code.invalid_parent_attribute_relation"));
+						}
+					} catch (Exception e) {
 						addInvalidMessage(ctx, PARENT_CODE_ATTRIBUTE_DEFINITION_PATH_FIELD, 
-								Labels.getLabel("survey.validation.attribute.code.invalid_parent_attribute_relation"));
+								Labels.getLabel("survey.validation.attribute.code.invalid_parent_attribute_relation_in_referenced_parent_attribute"));
 					}
-				} catch (Exception e) {
+				} else {
 					addInvalidMessage(ctx, PARENT_CODE_ATTRIBUTE_DEFINITION_PATH_FIELD, 
-							Labels.getLabel("survey.validation.attribute.code.invalid_parent_attribute_relation_in_referenced_parent_attribute"));
+							Labels.getLabel("survey.validation.attribute.code.parent_attribute_specified_for_a_flat_list"));
 				}
-			} else {
-				addInvalidMessage(ctx, PARENT_CODE_ATTRIBUTE_DEFINITION_PATH_FIELD, 
-						Labels.getLabel("survey.validation.attribute.code.parent_attribute_specified_for_a_flat_list"));
 			}
 		}
 	}
