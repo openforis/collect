@@ -38,12 +38,14 @@
     			onCheck="@command('applyChanges')" />
     	</row>
     	<row visible="@load(fx.list.hierarchical)">
-    		<label
-    			value="${labels.survey.schema.attribute.code.parent_path}:" />
+    		<fieldErrorHandler message="@load(vmsgs['parentCodeAttributeDefinitionPath'])">
+	    		<label
+	    			value="${labels.survey.schema.attribute.code.parent_path}:" />
+	    	</fieldErrorHandler>
     		<cell>
     			<hlayout>
     				<textbox width="150px"
-    					value="@load(fx.parentCodeAttributeDefinition.path)"
+    					value="@bind(fx.parentCodeAttributeDefinitionPath)"
     					readonly="true" />
     				<button sclass="icon"
     					tooltiptext="${labels.survey.schema.attribute.code.select_parent}"

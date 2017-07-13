@@ -141,6 +141,11 @@ public class CodeListTables {
 		}
 		if ( codeList.isHierarchical() && levelIdx != null ) {
 			List<CodeListLevel> hierarchy = codeList.getHierarchy();
+			if (levelIdx >= hierarchy.size()) {
+				throw new IllegalArgumentException(String.format(
+						"The hierarchy of code list '%s' has %d levels, but level %d has been asked", 
+						codeList.getName(), hierarchy.size(), levelIdx + 1));
+			}
 			CodeListLevel currentLevel = hierarchy.get(levelIdx);
 			sb.append("_");
 			sb.append(currentLevel.getName());
