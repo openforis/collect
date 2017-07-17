@@ -122,7 +122,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get canViewMap():Boolean {
-			return canViewAllRecords;
+			return hasRole(ROLE_VIEW) || hasEffectiveRole(ROLE_ENTRY);
 		}
 		
 		public function get canRunSaikuAnalysis():Boolean {
