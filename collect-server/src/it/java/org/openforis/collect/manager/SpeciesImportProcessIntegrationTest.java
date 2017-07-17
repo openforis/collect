@@ -128,9 +128,23 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertEquals(expected, occurrence);
 		}
 		{
-			String code = "AMA/EUC/GRF";
+			String code = "RUT/CIT/RETxPAR";
 			TaxonOccurrence occurrence = findByCode(code);
-			TaxonOccurrence expected = new TaxonOccurrence(15, code, "Eucharis ×grandiflora");
+			TaxonOccurrence expected = new TaxonOccurrence(15, code, "Citrus reticulata x Citrus paradisi");
+			expected.setTaxonRank(TaxonRank.SPECIES);
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "IRI/IRI/GER";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(16, code, "Iris ×germanica");
+			expected.setTaxonRank(TaxonRank.SPECIES);
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "IRI/IRI/BUI";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(17, code, "Iris x buiana");
 			expected.setTaxonRank(TaxonRank.SPECIES);
 			assertEquals(expected, occurrence);
 		}
@@ -209,18 +223,16 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertEquals("Bourreria petiolaris", taxon.getScientificName());
 			Integer taxonId = taxon.getSystemId();
 			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
-			assertEquals(2, vernacularNames.size());
+			assertEquals(1, vernacularNames.size());
 			assertTrue(contains(vernacularNames, "swh", "Mpanda jongoo"));
-			assertTrue(contains(vernacularNames, "lat", "Ehretia petiolaris"));
 		}
 		{
 			Taxon taxon = findTaxonByCode("BOM/RHO");
 			assertEquals("Bombax rhodognaphalon", taxon.getScientificName());
 			Integer taxonId = taxon.getSystemId();
 			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
-			assertEquals(2, vernacularNames.size());
+			assertEquals(1, vernacularNames.size());
 			assertTrue(contains(vernacularNames, "swh", "Msufi mwitu"));
-			assertTrue(contains(vernacularNames, "lat", "Rhodognaphalon schumannianum"));
 		}
 	}
 
@@ -313,7 +325,6 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertTrue(containsError(errors, 7, SpeciesFileColumn.FAMILY, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 8, SpeciesFileColumn.NO, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 9, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 11, "swh", ErrorType.INVALID_VALUE));
 	}

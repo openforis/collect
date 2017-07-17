@@ -25,10 +25,6 @@
 			<id>zk repository</id>
 			<url>http://mavensync.zkoss.org/maven2</url>
 		</repository>
-		<repository>
-			<id>gbif-all</id>
-			<url>http://repository.gbif.org/content/groups/gbif</url>
-		</repository>
 	</repositories>
 	
 	<build>
@@ -292,6 +288,11 @@
 			<artifactId>commons-validator</artifactId>
 			<version>1.4.0</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-compress</artifactId>
+		    <version>1.14</version>
+		</dependency>
 
 		<!-- ZK dependencies -->
 		<dependency>
@@ -378,11 +379,6 @@
 			<version>${geotools.version}</version>
 		</dependency>
 		<!-- end of GeoTools dependencies -->
-		<dependency>
-			<groupId>org.gbif</groupId>
-			<artifactId>ecat-common</artifactId>
-			<version>1.6</version>
-		</dependency>
 		<dependency>
 			<groupId>javax.media</groupId>
 			<artifactId>jai_core</artifactId>

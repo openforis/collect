@@ -52,7 +52,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
 	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
 	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSpeciesName";
-	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificNameName";
+	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
 	
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY, FORM};
@@ -132,23 +132,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			status.complete();
 		}
 	}
-	/*
-	protected void processPackagedFile() throws IOException {
-		File unzippedCsvFile = null;
-		ZipFile zipFile = new ZipFile(file);
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-			InputStream is = zipFile.getInputStream(zipEntry);
-			String unzippedPath = file.getAbsolutePath() + "_unzipped.csv";
-			FileOutputStream os = new FileOutputStream(unzippedPath);
-			IOUtils.copy(is, os);
-			unzippedCsvFile = new File(unzippedPath);
-			processCSV(unzippedCsvFile);
-		}
-		zipFile.close();
-	}
-	*/
 
 	protected void parseTaxonCSVLines(File file) {
 		long currentRowNumber = 0;
