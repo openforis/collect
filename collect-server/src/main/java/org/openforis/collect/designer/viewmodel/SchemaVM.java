@@ -83,8 +83,6 @@ import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
 
-import com.google.common.collect.Sets;
-
 /**
  * 
  * @author S. Ricci
@@ -111,8 +109,8 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_REFERENCED_ATTRIBUTE_MESSAGE_KEY = "survey.schema.attribute.confirm_remove_referenced_attribute";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
 
-	private static final Set<AttributeType> SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES = Sets.immutableEnumSet(BOOLEAN,
-			CODE, DATE, NUMBER, TEXT, TIME);
+	private static final Set<AttributeType> SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES = Collections.unmodifiableSet(
+			new HashSet<AttributeType>(Arrays.asList(BOOLEAN, CODE, DATE, NUMBER, TEXT, TIME)));
 
 	private static final Pattern CLONED_NAME_PATTERN = Pattern.compile("(.*)(\\d+)");
 

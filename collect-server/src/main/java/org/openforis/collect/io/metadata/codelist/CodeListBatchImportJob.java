@@ -9,6 +9,7 @@ import java.util.Enumeration;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -49,20 +50,25 @@ public class CodeListBatchImportJob extends Job {
 		if (!validateExtension(file.getName(), ZIP)) {
 			throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_extension");
 		}
-		ZipFile zipFile = new ZipFile(file);
-		Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
-		if (!entries.hasMoreElements()) {
-			throw new IllegalArgumentException("survey.code_list.import_data.error.empty_file");
-		} else {
-			while (entries.hasMoreElements()) {
-				ZipArchiveEntry entry = (ZipArchiveEntry) entries.nextElement();
-				String entryName = entry.getName();
-				if (!validateExtension(entryName, CSV)) {
-					throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_extension");
-				} else if (!FilenameUtils.getBaseName(entryName).matches(Survey.INTERNAL_NAME_REGEX) ) {
-					throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_filename");
+		ZipFile zipFile = null;
+		try {
+			zipFile = new ZipFile(file);
+			Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
+			if (!entries.hasMoreElements()) {
+				throw new IllegalArgumentException("survey.code_list.import_data.error.empty_file");
+			} else {
+				while (entries.hasMoreElements()) {
+					ZipArchiveEntry entry = (ZipArchiveEntry) entries.nextElement();
+					String entryName = entry.getName();
+					if (!validateExtension(entryName, CSV)) {
+						throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_extension");
+					} else if (!FilenameUtils.getBaseName(entryName).matches(Survey.INTERNAL_NAME_REGEX) ) {
+						throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_filename");
+					}
 				}
 			}
+		} finally {
+			IOUtils.closeQuietly(zipFile);
 		}
 	}
 
