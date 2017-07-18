@@ -148,6 +148,13 @@
 					 verticalCenter="0"
 					 horizontalCenter="150"
 					 styleName="updateStatusLabel" />
+			<s:Button id="exportButton"
+					width="20"
+					height="20"
+					verticalCenter="0"
+					horizontalCenter="250"
+					styleName="exportToExcelButton"
+					toolTip="{Message.get('global.exportToCSV')}" />
 		</s:Group>
 	</s:VGroup>
 	

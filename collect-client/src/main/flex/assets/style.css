@@ -352,6 +352,10 @@ s|Button.checked {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.CheckedButtonSkin");
 }
 
+s|Button.exportToExcelButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.ExportToExcelButtonSkin");
+}
+
 .dialogHeaderStyle {
 	font-size: 11;
 	font-weight: bold;

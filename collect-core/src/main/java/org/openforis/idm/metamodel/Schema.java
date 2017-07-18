@@ -48,6 +48,10 @@ public class Schema extends SurveyObject {
 	public List<EntityDefinition> getRootEntityDefinitions() {
 		return CollectionUtils.unmodifiableList(rootEntityDefinitions);
 	}
+	
+	public EntityDefinition getMainRootEntityDefinition() {
+		return rootEntityDefinitions == null || rootEntityDefinitions.isEmpty() ? null : rootEntityDefinitions.get(0);
+	}
 
 	public void addRootEntityDefinition(EntityDefinition defn) {
 		if ( defn.isDetached() ) {
