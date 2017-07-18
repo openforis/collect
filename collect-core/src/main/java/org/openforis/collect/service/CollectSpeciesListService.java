@@ -51,36 +51,35 @@ public class CollectSpeciesListService implements SpeciesListService {
 		Taxon taxon = taxonTree.findTaxonByCode(speciesCode);
 		if (taxon == null) {
 			return null;
+		}
+		Node taxonNode = taxonTree.getNodeBySystemId(taxon.getSystemId());
+		if (FAMILY_ATTRIBUTE.equals(attribute) || 
+				FAMILY_NAME_ATTRIBUTE.equals(attribute) ||
+				FAMILY_SCIENTIFIC_NAME_ATTRIBUTE.equals(attribute)) {
+			//family name
+			Node familyNode = taxonNode.getAncestor(TaxonRank.FAMILY);
+			return familyNode == null ? null : familyNode.getTaxon().getScientificName();
+		} else if (GENUS_ATTRIBUTE.equals(attribute)) {
+			Node genusNode = taxonNode.getAncestor(TaxonRank.GENUS);
+			return genusNode == null ? null : genusNode.getTaxon().getScientificName();
+		} else if (SCIENTIFIC_NAME_ATTRIBUTE.equals(attribute)) {
+			return taxon.getScientificName();
+		} else if (CODE_ATTRIBUTE.equals(attribute)) {
+			return taxon.getCode();
+		} else if (Languages.exists(Standard.ISO_639_3, attribute)) {
+			TaxonVernacularName vernacularName = taxonNode.getVernacularName(attribute);
+			return vernacularName == null ? null : vernacularName.getVernacularName();
 		} else {
-			Node taxonNode = taxonTree.getNodeByTaxonId(taxon.getTaxonId());
-			if (FAMILY_ATTRIBUTE.equals(attribute) || 
-					FAMILY_NAME_ATTRIBUTE.equals(attribute) ||
-					FAMILY_SCIENTIFIC_NAME_ATTRIBUTE.equals(attribute)) {
-				//family name
-				Node familyNode = taxonNode.getAncestor(TaxonRank.FAMILY);
-				return familyNode == null ? null : familyNode.getTaxon().getScientificName();
-			} else if (GENUS_ATTRIBUTE.equals(attribute)) {
-				Node genusNode = taxonNode.getAncestor(TaxonRank.GENUS);
-				return genusNode == null ? null : genusNode.getTaxon().getScientificName();
-			} else if (SCIENTIFIC_NAME_ATTRIBUTE.equals(attribute)) {
-				return taxon.getScientificName();
-			} else if (CODE_ATTRIBUTE.equals(attribute)) {
-				return taxon.getCode();
-			} else if (Languages.exists(Standard.ISO_639_3, attribute)) {
-				TaxonVernacularName vernacularName = taxonNode.getVernacularName(attribute);
-				return vernacularName == null ? null : vernacularName.getVernacularName();
+			//info (extra) attribute
+			TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
+			if (taxonDefinition == null) {
+				throw new IllegalArgumentException("No reference data schema found for taxonomy: " + taxonomyName);
 			} else {
-				//info (extra) attribute
-				TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
-				if (taxonDefinition == null) {
-					throw new IllegalArgumentException("No reference data schema found for taxonomy: " + taxonomyName);
+				int attributeIndex = taxonDefinition.getAttributeNames().indexOf(attribute);
+				if (attributeIndex < 0) {
+					throw new IllegalArgumentException("Unsupported attribute: " + attribute);
 				} else {
-					int attributeIndex = taxonDefinition.getAttributeNames().indexOf(attribute);
-					if (attributeIndex < 0) {
-						throw new IllegalArgumentException("Unsupported attribute: " + attribute);
-					} else {
-						return taxon.getInfoAttribute(attributeIndex);
-					}
+					return taxon.getInfoAttribute(attributeIndex);
 				}
 			}
 		}
