@@ -35,6 +35,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
+import org.openforis.collect.utils.Files;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Job;
@@ -467,7 +468,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	private void downloadFile(File file, String fileName) {
 		try {
-			Filedownload.save(new FileInputStream(file), "application/zip", fileName);
+			Filedownload.save(new FileInputStream(file), Files.ZIP_CONTENT_TYPE, fileName);
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
