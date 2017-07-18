@@ -62,6 +62,7 @@ package org.openforis.collect.presenter {
 			view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
 			view.resizeBtn.addEventListener(MouseEvent.CLICK, toggleViewSizeClickHandler);
 			view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			view.showErrorsListButton.addEventListener(MouseEvent.CLICK, showErrorsListButtonClickHandler);
 			
 			view.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDownHandler);
 		}
@@ -246,6 +247,19 @@ package org.openforis.collect.presenter {
 			var req:URLRequest = new URLRequest(url);
 			req.data = new URLVariables();
 			navigateToURL(req, "_new");
+		}
+		
+		protected function showErrorsListButtonClickHandler(event:MouseEvent):void {
+			var r:RecordProxy = Application.activeRecord;
+			r.showErrors();
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.ASK_FOR_SUBMIT)); //to update validation feedback
+			
+			var totalErrors:int = r.errors + r.missingErrors + r.skipped;
+			if ( totalErrors > 0 ) {
+				openErrorsListPopUp();
+			} else {
+				AlertUtil.showMessage("edit.no_errors_found");
+			}
 		}
 		
 		protected function performSubmitToClenasing():void {
