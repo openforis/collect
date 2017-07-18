@@ -45,7 +45,7 @@ public class CollectControlPanelController implements Initializable {
 	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
 	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), DEFAULT_WEBAPPS_FOLDER_NAME);
 	private static final int LOG_OPENED_WINDOW_HEIGHT = 550;
-	private static final int LOG_CLOSED_WINDOW_HEIGHT = 220;
+	private static final int LOG_CLOSED_WINDOW_HEIGHT = 210;
 	private static final String CATALINA_BASE = "catalina.base";
 	
 	public enum Status {
@@ -224,8 +224,9 @@ public class CollectControlPanelController implements Initializable {
 		setLogVisible(false);
 	}
 
-	private void setLogVisible(boolean value) {
-		logOpened = value;
+	private void setLogVisible(boolean visible) {
+		logOpened = visible;
+		logBtn.setText(visible ? "Hide Log" : "Show Log");
 		updateUI();
 	}
 	
