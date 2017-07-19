@@ -19,11 +19,15 @@ import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.openforis.collect.service.CollectSpeciesListService;
+import org.openforis.idm.metamodel.Languages;
+import org.openforis.idm.metamodel.Languages.Standard;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
 import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.SurveyObject;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResultFlag;
@@ -201,21 +205,45 @@ public class IDMFunctions extends CustomFunctions {
 			
 			private ExpressionValidationResult validateAttribute(NodeDefinition contextNodeDef, String taxonomyName,
 					Expression attributeNameExpr) {
-				String attributeName = "";
-				if (attributeNameExpr instanceof Constant) {
-					Object val = ((Constant) attributeNameExpr).computeValue(null);
-					if (val instanceof String) {
-						attributeName = (String) val;
-						Survey survey = contextNodeDef.getSurvey();
-						TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
-						Attribute attribute = taxonDefinition.getAttribute(attributeName);
-						if (attribute != null) {
-							return new ExpressionValidationResult();
-						}
+				try {
+					String attributeName = extractConstantValue(attributeNameExpr);
+					if (Arrays.binarySearch(CollectSpeciesListService.GENERIC_ATTRIBUTES, attributeName) >= 0 
+							|| isExtraAttribute(contextNodeDef, taxonomyName, attributeName)
+							|| isLanguageCode(attributeName)) {
+						return new ExpressionValidationResult();
+					} else {
+						return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+								String.format("Second argument (\"%s\") is not a valid attribute for this taxonomy."
+										+ "\nExpected values are: \n%s", 
+										attributeName, Arrays.asList(
+												StringUtils.join(CollectSpeciesListService.GENERIC_ATTRIBUTES, ", "),
+												"\n",
+												getExtraAttributeNames(contextNodeDef, taxonomyName),
+												"\n",
+												"ISO 639-3 language code (for vernacular names. E.g. eng, swa, fra)"
+								)));
 					}
+				} catch (Exception e) {
+					return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+							String.format("Error in second argument: %s", e.getMessage()));
 				}
-				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
-						String.format("Second argument (\"%s\") is not a valid attribute for this taxonomy", attributeName));
+			}
+			
+			private boolean isLanguageCode(String value) {
+				return Languages.exists(Standard.ISO_639_3, value);
+			}
+			
+			private boolean isExtraAttribute(SurveyObject contextNodeDef, String taxonomyName, String attributeName) {
+				Survey survey = contextNodeDef.getSurvey();
+				TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
+				Attribute attribute = taxonDefinition.getAttribute(attributeName);
+				return attribute != null;
+			}
+			
+			private List<String> getExtraAttributeNames(SurveyObject contextNodeDef, String taxonomyName) {
+				Survey survey = contextNodeDef.getSurvey();
+				TaxonomyDefinition taxonDefinition = survey.getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
+				return taxonDefinition.getAttributeNames();
 			}
 			
 			private ExpressionValidationResult validateSpeciesCode(NodeDefinition contextNodeDef,
@@ -232,6 +260,16 @@ public class IDMFunctions extends CustomFunctions {
 					}
 				}
 				return new ExpressionValidationResult();
+			}
+			
+			private String extractConstantValue(Expression expr) throws IllegalArgumentException {
+				if (expr instanceof Constant) {
+					Object val = ((Constant) expr).computeValue(null);
+					if (val instanceof String) {
+						return (String) val;
+					}
+				}
+				throw new IllegalArgumentException("Expected Constant, found " + expr.getClass().getName());
 			}
 		});
 		

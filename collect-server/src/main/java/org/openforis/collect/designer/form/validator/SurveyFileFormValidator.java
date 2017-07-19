@@ -129,7 +129,7 @@ public class SurveyFileFormValidator extends FormValidator {
 	
 	private List<SurveyFile> loadSurveyFilesDifferentFromThis(ValidationContext ctx) {
 		List<SurveyFile> result = new ArrayList<SurveyFile>();
-		SurveyFileVM vm = (SurveyFileVM) getVM(ctx);
+		SurveyFileVM vm = getVM(ctx);
 		CollectSurvey survey = vm.getSurvey();
 		SurveyManager surveyManager = getSurveyManager(ctx);
 		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);

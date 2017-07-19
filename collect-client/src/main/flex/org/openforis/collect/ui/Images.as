@@ -154,6 +154,12 @@ package org.openforis.collect.ui {
 
 		[Embed("/assets/images/warning-red-small.png")]
 		public static const WARNING_RED_SMALL:Class;	
+		
+		[Embed("/assets/images/export_excel_32x32.png")]
+		public static const EXPORT_EXCEL:Class;	
+
+		[Embed("/assets/images/export_excel_16x16.png")]
+		public static const EXPORT_EXCEL_SMALL:Class;	
 
 	}
 }
