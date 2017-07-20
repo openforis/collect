@@ -53,10 +53,6 @@ public class Schema extends SurveyObject {
 		return rootEntityDefinitions == null || rootEntityDefinitions.isEmpty() ? null : rootEntityDefinitions.get(0);
 	}
 
-	public EntityDefinition getFirstRootEntityDefinition() {
-		return rootEntityDefinitions == null || rootEntityDefinitions.isEmpty() ? null: rootEntityDefinitions.get(0);
-	}
-	
 	public void addRootEntityDefinition(EntityDefinition defn) {
 		if ( defn.isDetached() ) {
 			throw new IllegalArgumentException("Detached definitions cannot be added");
