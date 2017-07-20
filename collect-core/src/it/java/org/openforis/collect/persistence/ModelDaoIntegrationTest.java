@@ -176,7 +176,7 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 //	@Test
 	public void testLoadRecordSummaries() {
 		//get the first root entity
-		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
+		EntityDefinition rootEntity = survey.getSchema().getFirstRootEntityDefinition();
 		String rootEntityName = rootEntity.getName();
 		int offset = 0;
 		int maxNumberOfRecords = 1;

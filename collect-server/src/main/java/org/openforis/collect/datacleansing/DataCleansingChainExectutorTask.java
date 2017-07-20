@@ -150,7 +150,7 @@ public class DataCleansingChainExectutorTask extends Task {
 	
 	private RecordFilter createRecordsFilter() {
 		CollectSurvey survey = input.chain.getSurvey();
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		Integer rootEntityId = rootEntityDef.getId();
 
 		RecordFilter filter = new RecordFilter(survey);

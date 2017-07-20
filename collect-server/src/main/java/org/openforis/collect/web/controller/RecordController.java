@@ -131,7 +131,7 @@ public class RecordController extends BasicController implements Serializable {
 			RecordFilter recordFilter = new RecordFilter(survey);
 			recordFilter.setRecordId(recordId);
 			recordFilter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
-			recordFilter.setRootEntityId(survey.getSchema().getMainRootEntityDefinition().getId());
+			recordFilter.setRootEntityId(survey.getSchema().getFirstRootEntityDefinition().getId());
 			job.setRecordFilter(recordFilter);
 			File outputFile = File.createTempFile("record_export", ".zip");
 			job.setOutputFile(outputFile);

@@ -16,7 +16,6 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.springframework.stereotype.Component;
 
@@ -131,10 +130,7 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 	}
 	
 	protected EntityDefinition getMainRootEntityDefinition(CollectSurvey survey) {
-		Schema schema = survey.getSchema();
-		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
-		EntityDefinition rootEntityDef = rootEntityDefinitions.get(0);
-		return rootEntityDef;
+		return survey.getSchema().getFirstRootEntityDefinition();
 	}
 
 }

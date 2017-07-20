@@ -81,7 +81,7 @@ public class NewMondrianSchemaGenerator {
 
 	private Schema generateSchema() {
 		final Schema schema = new Schema(survey.getName());
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		rootEntityDef.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
 				if (def instanceof EntityDefinition && def.isMultiple()) {

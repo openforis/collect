@@ -81,7 +81,7 @@ public class CollectEarthGridTemplateGenerator  {
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER, headerSB.toString());
 		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES, valuesSB.toString());
 		
-		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		String keyAttributes = "";
 		for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
 			keyAttributes += keyAttributeDefinition.getName() + ",";
@@ -176,7 +176,7 @@ public class CollectEarthGridTemplateGenerator  {
 	private boolean lineContainsHeaders(CollectSurvey survey, List<String> firstLineValues) {
 		// The CSV files should contain first the headers of the KEY ATTRIBUTES of the survey, then the latitude and longitude column!
 		// If the latitude and longitude columns are not numbers, then this means that the line is a column header, otherwise it is just sample data!
-		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		int headingColumns = keyAttributeDefinitions.size();
 		
 		// The line contains headers if the second or third columns are NOT number ( the CSV columns should always contain a latitude and a longitude value at those positions)
@@ -338,7 +338,7 @@ public class CollectEarthGridTemplateGenerator  {
 				
 		List<AttributeDefinition> expectedColumns = new ArrayList<AttributeDefinition>();
 		
-		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		expectedColumns.addAll(keyAttributeDefinitions);
 		NumberAttributeDefinition latAttribute = survey.getSchema().createNumberAttributeDefinition();
 		latAttribute.setType(Type.REAL);

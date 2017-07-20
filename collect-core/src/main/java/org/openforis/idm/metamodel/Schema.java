@@ -49,7 +49,7 @@ public class Schema extends SurveyObject {
 		return CollectionUtils.unmodifiableList(rootEntityDefinitions);
 	}
 	
-	public EntityDefinition getMainRootEntityDefinition() {
+	public EntityDefinition getFirstRootEntityDefinition() {
 		return rootEntityDefinitions == null || rootEntityDefinitions.isEmpty() ? null : rootEntityDefinitions.get(0);
 	}
 

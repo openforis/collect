@@ -136,7 +136,7 @@ public class CollectEarthBalloonGenerator {
 	private String getIdAttributesSurvey() {
 		
 		String jsArrayKeys = "[";
-		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		BalloonInputFieldsUtils balloonUtils = new BalloonInputFieldsUtils();
 		
 		// TODO Fix better in the future, this is very very dirty!!
@@ -152,7 +152,7 @@ public class CollectEarthBalloonGenerator {
 	
 	private String getIdPlaceholdersSurvey() {
 		
-		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		StringBuilder sb = new StringBuilder();
 		for (AttributeDefinition def : keyAttributeDefinitions) {
 			sb.append(def.getName()).
@@ -316,9 +316,7 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private EntityDefinition getRootEntity() {
-		Schema schema = survey.getSchema();
-		EntityDefinition rootEntityDef = schema.getRootEntityDefinitions().get(0);
-		return rootEntityDef;
+		return survey.getSchema().getFirstRootEntityDefinition();
 	}
 	
 	private CEComponent createComponent(NodeDefinition def) {
