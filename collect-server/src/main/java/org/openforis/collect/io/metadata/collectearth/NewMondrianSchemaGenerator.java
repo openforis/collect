@@ -341,6 +341,9 @@ public class NewMondrianSchemaGenerator {
 		} else if (nodeDef instanceof TaxonAttributeDefinition) {
 			DataColumn dataColumn = dataTable.getDataColumn(((TaxonAttributeDefinition) nodeDef).getCodeFieldDefinition());
 			level.column = dataColumn.getName();
+		} else if (nodeDef.isMultiple()) {
+			//TODO skip multiple attributes?
+			level.column = nodeDef.getName();
 		} else {
 			DataColumn dataColumn = dataTable.getDataColumn(nodeDef.getMainFieldDefinition());
 			level.column = dataColumn.getName();
