@@ -582,6 +582,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges, 
 			@BindingParam("imageModified") boolean imageModified, 
 			@BindingParam("imageFileWrapper") FileWrapper imageFileWrapper) {
+		if (codeListItemPopUp == null) {
+			//handling code list from node editor form?
+			return;
+		}
 		closePopUp(codeListItemPopUp);
 		codeListItemPopUp = null;
 		if ( undoChanges ) {
