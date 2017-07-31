@@ -19,6 +19,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.CollectCompleteInfo;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.client.ModelClient;
 	import org.openforis.collect.client.SessionClient;
 	import org.openforis.collect.event.ApplicationEvent;
@@ -27,6 +28,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.SurveySummary;
+	import org.openforis.collect.model.proxy.RecordFilterProxy;
 	import org.openforis.collect.ui.view.ListView;
 	import mx.rpc.events.FaultEvent;
 	import org.openforis.collect.ui.component.BlockingMessagePopUp;
@@ -74,6 +76,7 @@ package org.openforis.collect.presenter {
 		
 		private static const MOUSE_WHEEL_BUMP_DELTA:Number = 30;
 		
+		private var _dataClient:DataClient;
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
 		//private var _contextMenuPresenter:ContextMenuPresenter;
@@ -85,6 +88,7 @@ package org.openforis.collect.presenter {
 		public function CollectPresenter(view:collect) {
 			super(view);
 			
+			this._dataClient = ClientFactory.dataClient;
 			this._modelClient = ClientFactory.modelClient;
 			this._sessionClient = ClientFactory.sessionClient;
 		}
@@ -106,29 +110,35 @@ package org.openforis.collect.presenter {
 			_keepAliveTimer.start();
 
 			updateApplicationVersionInfo();
-
-			var params:Object = FlexGlobals.topLevelApplication.parameters;
-			var preview:Boolean = params.preview == "true";
-			var edit:Boolean = params.edit == "true";
-			var speciesImport:Boolean = params.species_import == "true";
-			var codeListImport:Boolean = params.code_list_import == "true";
-			var samplingDesignImport:Boolean = params.sampling_design_import == "true";
 			
-			var localeString:String = params.locale as String;
-			if ( preview ) {
-				initPreview(params, localeString);
-			} else if ( edit ) {
-				initEditRecord(params, localeString);
-			} else if ( speciesImport ) {
-				initSpeciesImport();
-			} else if ( samplingDesignImport ) {
-				initSamplingDesignImport();
-			} else if ( codeListImport ) {
-				initCodeListImport();
-			} else {
-				var responder:IResponder = new AsyncResponder(initSessionResultHandler, faultHandler);
-				this._sessionClient.initSession(responder, localeString);
-			}
+			initSession(function():void {
+				initSurveySummaries(function():void {
+					var params:Object = FlexGlobals.topLevelApplication.parameters;
+					var preview:Boolean = params.preview == "true";
+					var edit:Boolean = params.edit == "true";
+					var limitedDataEntry:Boolean = Application.user.canEditOnlyOwnedRecords;
+					var speciesImport:Boolean = params.species_import == "true";
+					var codeListImport:Boolean = params.code_list_import == "true";
+					var samplingDesignImport:Boolean = params.sampling_design_import == "true";
+					
+					var localeString:String = params.locale as String;
+					if ( preview ) {
+						initPreview(params, localeString);
+					} else if ( limitedDataEntry ) {
+						initLimitedDataEntry();
+					} else if ( edit ) {
+						initEditRecord(int(params.surveyId), int(params.recordId), localeString);
+					} else if ( speciesImport ) {
+						initSpeciesImport();
+					} else if ( samplingDesignImport ) {
+						initSamplingDesignImport();
+					} else if ( codeListImport ) {
+						initCodeListImport();
+					} else {
+						showListOfRecordsOrHomePage();
+					}
+				});
+			});
 		}
 			
 		override protected function initEventListeners():void {
@@ -143,7 +153,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.CHECK_VIEW_SIZE, checkViewSizeHandler);
 			eventDispatcher.addEventListener(UIEvent.RELOAD_SURVEYS, reloadSurveysHandler);
 			
-			//add uncaught error hanlder
+			//add uncaught error handler
 			view.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 			
 			CONFIG::debugging {
@@ -168,6 +178,25 @@ package org.openforis.collect.presenter {
 			ClientFactory.collectInfoClient.getCompleteInfo(new AsyncResponder(resultHandler, faultHandler));
 		}
 
+		protected function initSession(onComplete:Function):void {
+			var params:Object = FlexGlobals.topLevelApplication.parameters;
+			var localeString:String = params.locale as String;
+			var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+				Application.user = event.result.user;
+				Application.sessionId = event.result.sessionId;
+				onComplete();
+			}, faultHandler);
+			this._sessionClient.initSession(responder, localeString);
+		}
+
+		protected function initSurveySummaries(onComplete:Function):void {
+			_modelClient.getSurveySummaries(new ItemResponder(function(event:ResultEvent, token:Object = null):void {
+				var summaries:IList =  event.result as IList;
+				Application.surveySummaries = summaries;
+				onComplete();
+			}, faultHandler));
+		}
+		
 		protected function initPreview(params:Object, localeString:String):void {
 			Application.preview = true;
 			var surveyId:int = int(params.surveyId);
@@ -179,16 +208,41 @@ package org.openforis.collect.presenter {
 			var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
 			this._sessionClient.initSession(previewResp, localeString);
 		}
-
-		protected function initEditRecord(params:Object, localeString:String):void {
-			Application.onlyOneRecordEdit = true;
-			
-			function initSessionForEditResultHandler(event:ResultEvent, token:Object = null):void {
-				initSessionCommonResultHandler(event, token);
-				var surveyId:int = token.surveyId;
-				var responder:IResponder = new AsyncResponder(setActiveSurveyResultHandler, faultHandler, token);
-				ClientFactory.sessionClient.setActiveSurveyById(responder, surveyId);
+		
+		protected function initLimitedDataEntry():void {
+			if (Application.surveySummaries.length == 1) {
+				var surveySummary:SurveySummary = SurveySummary(Application.surveySummaries.getItemAt(0));
+				var surveyId:int = surveySummary.id;
+				
+				setActiveSurvey(surveySummary.id, function():void {
+					var filter:RecordFilterProxy = new RecordFilterProxy();
+					filter.surveyId = surveyId;
+					filter.maxNumberOfRecords = 10;
+					filter.rootEntityId = Application.activeSurvey.schema.mainRootEntityDefinition.id;
+					filter.ownerId = Application.user.id;
+					var loadRecordsResponder:IResponder = new AsyncResponder(loadRecordsSummaryResultHandler, faultHandler);
+					_dataClient.loadRecordSummaries(loadRecordsResponder, filter, null, Application.localeString);
+					
+					function loadRecordsSummaryResultHandler(loadRecordsResultEvent:ResultEvent, token:Object = null):void {
+						var records:IList = IList(loadRecordsResultEvent.result.records);
+						
+						if (records.length == 1) {
+							var record:RecordProxy = RecordProxy(records.getItemAt(0));
+							initEditRecord(surveyId, record.id, Application.localeString, false);
+						} else {
+							showListOfRecordsOrHomePage();
+						}
+					}
+				});
+			} else {
+				showListOfRecordsOrHomePage();
 			}
+		}
+		
+		protected function setActiveSurvey(surveyId:int, onComplete:Function):void {
+			var responder:IResponder = new AsyncResponder(setActiveSurveyResultHandler, faultHandler);
+			ClientFactory.sessionClient.setActiveSurveyById(responder, surveyId);
+			
 			function setActiveSurveyResultHandler(event:ResultEvent, token:Object):void {
 				//set active survey
 				var survey:SurveyProxy = event.result as SurveyProxy;
@@ -197,25 +251,23 @@ package org.openforis.collect.presenter {
 				survey.init();
 				
 				//set active root entity
-				var schema:SchemaProxy = survey.schema;
-				var rootEntityDefinitions:ListCollectionView = schema.rootEntityDefinitions;
-				var mainRootEntityDef:EntityDefinitionProxy = EntityDefinitionProxy(schema.rootEntityDefinitions.getItemAt(0));
-				Application.activeRootEntity = mainRootEntityDef;
+				Application.activeRootEntity = survey.schema.mainRootEntityDefinition;
 				
+				onComplete();
+			}
+		}
+
+		protected function initEditRecord(surveyId:int, recordId:int, localeString:String, onlyOneRecordEdit:Boolean = true):void {
+			Application.onlyOneRecordEdit = onlyOneRecordEdit;
+			
+			setActiveSurvey(surveyId, function():void {
 				//dispatch edit record event
 				var editEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_FOR_EDIT);
 				editEvent.obj = {
-					recordId: token.recordId
+					recordId: recordId
 				};
 				eventDispatcher.dispatchEvent(editEvent);
-			}
-			
-			var token:Object = {
-				surveyId: int(params.surveyId), 
-				recordId: int(params.recordId)
-			};
-			var resp:IResponder = new AsyncResponder(initSessionForEditResultHandler, faultHandler, token);
-			this._sessionClient.initSession(resp, localeString);
+			});
 		}
 
 		protected function initSpeciesImport():void {
@@ -252,8 +304,17 @@ package org.openforis.collect.presenter {
 			if ( token == null ) {
 				AlertUtil.showError("referenceDataImport.saveSurveyBefore");
 			} else {
-				var sessionInitResponder:IResponder = new AsyncResponder(initSessionForReferenceDataImportResultHandler, faultHandler, token);
-				this._sessionClient.initSession(sessionInitResponder, token.localeString);
+				var surveyId:int = token.surveyId;
+				var work:Boolean = token.work;
+				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:ReferenceDataImportToken):void {
+					var survey:SurveyProxy = event.result as SurveyProxy;
+					Application.activeSurvey = survey;
+					var uiEvent:UIEvent = new UIEvent(token.uiEventName);
+					uiEvent.obj = token;
+					eventDispatcher.dispatchEvent(uiEvent);
+				}, faultHandler, token);
+
+				ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
 			}
 		}
 		
@@ -323,7 +384,7 @@ package org.openforis.collect.presenter {
 		
 		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
 			initSessionCommonResultHandler(event, token);
-			getSurveySummaries();
+			showListOfRecordsOrHomePage();
 		}
 		
 		internal function initSessionForPreviewResultHandler(event:ResultEvent, token:Object = null):void {
@@ -332,22 +393,6 @@ package org.openforis.collect.presenter {
 			var work:Boolean = token.work;
 			var responder:IResponder = new AsyncResponder(setActivePreviewSurveyResultHandler, faultHandler, token);
 			ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
-		}
-		
-		internal function initSessionForReferenceDataImportResultHandler(event:ResultEvent, token:ReferenceDataImportToken):void {
-			initSessionCommonResultHandler(event, token);
-			var surveyId:int = token.surveyId;
-			var work:Boolean = token.work;
-			var responder:IResponder = new AsyncResponder(setDesignerSurveyAsActiveResultHandler, faultHandler, token);
-			ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
-			
-			function setDesignerSurveyAsActiveResultHandler(event:ResultEvent, token:ReferenceDataImportToken):void {
-				var survey:SurveyProxy = event.result as SurveyProxy;
-				Application.activeSurvey = survey;
-				var uiEvent:UIEvent = new UIEvent(token.uiEventName);
-				uiEvent.obj = token;
-				eventDispatcher.dispatchEvent(uiEvent);
-			}
 		}
 		
 		internal function showSamplingDesignImport(token:Object):void {
@@ -418,18 +463,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		/**
-		 * Get Survey Summaries
-		 * 
-		 * */
-		internal function getSurveySummaries():void {
-			var responder:IResponder = new ItemResponder(getSurveySummariesResultHandler, faultHandler);
-			_modelClient.getSurveySummaries(responder);
-		}
-		
-		internal function getSurveySummariesResultHandler(event:ResultEvent, token:Object = null):void {
-			var summaries:IList =  event.result as IList;
-			Application.surveySummaries = summaries;
+		protected function showListOfRecordsOrHomePage():void {
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) || Application.user.hasRole(UserProxy.ROLE_VIEW)) {
 				showHomePage();
 			} else if ( CollectionUtil.isEmpty(Application.surveySummaries) ) {

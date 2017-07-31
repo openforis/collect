@@ -398,7 +398,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 		job.setOutputFile(File.createTempFile("data-import-template", ".zip"));
 		RecordFilter recordFilter = new RecordFilter(survey);
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		recordFilter.setRootEntityId(rootEntityDef.getId());
 		job.setRecordFilter(recordFilter);
 		job.setAlwaysGenerateZipFile(true);
@@ -424,7 +424,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 		job.setOutputFile(File.createTempFile("ce-data-import-template-" + survey.getName(), ".csv"));
 		RecordFilter recordFilter = new RecordFilter(survey);
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		recordFilter.setRootEntityId(rootEntityDef.getId());
 		job.setRecordFilter(recordFilter);
 		job.setEntityId(rootEntityDef.getId());
@@ -485,7 +485,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private void openPreviewPopUp() {
 		if ( isSingleRootEntityDefined() && survey.getVersions().size() <= 1 ) {
 			ModelVersion version = survey.getVersions().isEmpty() ? null: survey.getVersions().get(0);
-			openPreviewPopUp(version, survey.getSchema().getRootEntityDefinitions().get(0));
+			openPreviewPopUp(version, survey.getSchema().getFirstRootEntityDefinition());
 		} else {
 			openPreviewPreferencesPopUp();
 		}
@@ -497,7 +497,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			@BindingParam("rootEntity") EntityDefinition rootEntity) {
 		if ( validateShowPreview(rootEntity, formVersion) ) {
 			if ( rootEntity == null ) {
-				rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
+				rootEntity = survey.getSchema().getFirstRootEntityDefinition();
 			}
 			survey.refreshSurveyDependencies();
 			

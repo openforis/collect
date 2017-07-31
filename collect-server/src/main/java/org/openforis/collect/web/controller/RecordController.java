@@ -1,11 +1,21 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.utils.URIBuilder;
+import org.openforis.collect.io.data.CSVDataExportJob;
+import org.openforis.collect.manager.RecordAccessControlManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -15,16 +25,16 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.Files;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.concurrency.JobManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import static org.springframework.http.MediaType.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
@@ -48,6 +58,8 @@ public class RecordController extends BasicController implements Serializable {
 	private SurveyManager surveyManager;
 	@Autowired
 	private RecordSessionManager sessionManager;
+	@Autowired
+	private JobManager jobManager;
 	
 	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/binary_data.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
@@ -104,4 +116,32 @@ public class RecordController extends BasicController implements Serializable {
 		return new RecordProxy(record, sessionState.getLocale());
 	}
 	
+	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=Files.ZIP_CONTENT_TYPE)
+	public void exportRecord(
+			@PathVariable(value="survey_id") int surveyId, 
+			@PathVariable(value="record_id") int recordId,
+			@PathVariable(value="step") int stepNumber,
+			HttpServletResponse response
+			) throws RecordPersistenceException, IOException {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		CollectRecord record = recordManager.load(survey, recordId);
+		RecordAccessControlManager accessControlManager = new RecordAccessControlManager();
+		if (accessControlManager.canEdit(sessionManager.getSessionState().getUser(), record)) {
+			CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
+			RecordFilter recordFilter = new RecordFilter(survey);
+			recordFilter.setRecordId(recordId);
+			recordFilter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
+			recordFilter.setRootEntityId(survey.getSchema().getFirstRootEntityDefinition().getId());
+			job.setRecordFilter(recordFilter);
+			File outputFile = File.createTempFile("record_export", ".zip");
+			job.setOutputFile(outputFile);
+			job.setAlwaysGenerateZipFile(true);
+			jobManager.start(job, false);
+			if (job.isCompleted()) {
+				String fileName = String.format("record_data_%s.zip", Dates.formatDate(new Date()));
+				writeFileToResponse(outputFile, Files.ZIP_CONTENT_TYPE, Long.valueOf(outputFile.length()).intValue(), 
+						response, fileName);
+			}
+		}
+	}
 }

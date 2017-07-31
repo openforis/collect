@@ -46,6 +46,12 @@ public abstract class BasicController {
 				outputFileName);
 	}
 
+	protected void writeFileToResponse(File file,
+			String contentType, int fileSize, HttpServletResponse response,
+			String outputFileName) throws IOException {
+		writeFileToResponse(new FileInputStream(file), contentType, fileSize, response, outputFileName);
+	}
+	
 	protected void writeFileToResponse(InputStream is,
 			String contentType, int fileSize, HttpServletResponse response,
 			String outputFileName) throws IOException {

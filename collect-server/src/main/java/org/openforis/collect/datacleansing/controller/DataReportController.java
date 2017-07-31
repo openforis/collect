@@ -486,7 +486,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 			
 			@Override
 			protected void execute() throws Throwable {
-				EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinitions().get(0);
+				EntityDefinition rootEntityDefinition = survey.getSchema().getFirstRootEntityDefinition();
 				CSVWriterDataReportItemProcessor itemProcessor = Objects.newInstance(itemProcessorType, 
 						rootEntityDefinition);
 				itemProcessor.init();

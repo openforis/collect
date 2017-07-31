@@ -87,15 +87,29 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		public function get canDeleteNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_CLEANSING);
+		public function get canAddRecords():Boolean {
+			return hasEffectiveRole(ROLE_ENTRY);
 		}
 		
 		public function get canEditRecords():Boolean {
 			return hasEffectiveRole(ROLE_ENTRY_LIMITED);
 		}
 		
+		public function get canEditOnlyOwnedRecords():Boolean {
+			var highest:int = calculateHighestRoleIndex();
+			var index:int = ROLES_HIERARCHY.indexOf(ROLE_ENTRY_LIMITED);
+			return highest == index;
+		}
+		
 		public function get canEditNotOwnedRecords():Boolean {
+			return hasEffectiveRole(ROLE_CLEANSING);
+		}
+		
+		public function get canDeleteRecords():Boolean {
+			return hasEffectiveRole(ROLE_ENTRY);
+		}
+		
+		public function get canDeleteNotOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 		
@@ -105,6 +119,10 @@ package org.openforis.collect.model.proxy {
 		
 		public function get canViewNotOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_CLEANSING) || hasRole(ROLE_VIEW);
+		}
+		
+		public function get canViewMap():Boolean {
+			return hasRole(ROLE_VIEW) || hasEffectiveRole(ROLE_ENTRY);
 		}
 		
 		public function get canRunSaikuAnalysis():Boolean {

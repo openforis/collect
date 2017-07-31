@@ -312,10 +312,9 @@ package org.openforis.collect.presenter {
 				//update family scientific name
 				view.familyScientificNameTextInput.text = taxonOccurrence.familyScientificName;
 			}
-			if ( defn.codeVisible ) {
-				//update code
-				view.codeTextInput.text = taxonOccurrence.code;
-			}
+			//always update code
+			view.codeTextInput.text = taxonOccurrence.code;
+			
 			//when searching by code or unlisted/unknown item has been selected, replace fields text
 			if ( _lastSearchType == SEARCH_BY_CODE || 
 					( taxonOccurrence != UNKNOWN_ITEM && taxonOccurrence != UNLISTED_ITEM ) ) {

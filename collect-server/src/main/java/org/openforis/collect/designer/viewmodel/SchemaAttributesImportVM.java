@@ -66,7 +66,7 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 	@Init(superclass=false)
 	public void init() {
 		super.init();
-		parentEntityDefinition = survey.getSchema().getRootEntityDefinitions().get(0);
+		parentEntityDefinition = survey.getSchema().getFirstRootEntityDefinition();
 		notifyChange("parentEntityDefinitionPath");
 	}
 

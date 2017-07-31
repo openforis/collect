@@ -36,7 +36,7 @@ public class ModelVersionFormValidator extends SurveyObjectFormValidator<ModelVe
 	}
 
 	private boolean validateDateUniqueness(ValidationContext ctx) {
-		SurveyObjectBaseVM<ModelVersion> viewModel = getSurveyObjectVM(ctx);
+		SurveyObjectBaseVM<ModelVersion> viewModel = getVM(ctx);
 		ModelVersion editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		Date date = getValue(ctx, DATE_FIELD);
@@ -59,7 +59,7 @@ public class ModelVersionFormValidator extends SurveyObjectFormValidator<ModelVe
 	}
 
 	protected boolean validateNameUniqueness(ValidationContext ctx) {
-		SurveyObjectBaseVM<ModelVersion> viewModel = getSurveyObjectVM(ctx);
+		SurveyObjectBaseVM<ModelVersion> viewModel = getVM(ctx);
 		ModelVersion editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		String name = getValue(ctx, NAME_FIELD);

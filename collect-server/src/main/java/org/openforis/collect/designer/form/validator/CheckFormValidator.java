@@ -33,17 +33,8 @@ public abstract class CheckFormValidator extends FormValidator {
 		return result;
 	}
 	
-	protected CheckVM<?> getCheckVM(ValidationContext ctx) {
-		Object vm = getVM(ctx);
-		if ( vm instanceof CheckVM ) {
-			return (CheckVM<?>) vm;
-		} else {
-			throw new IllegalStateException("Unexpected view model class: " + vm.getClass().getName());
-		}
-	}
-	
 	protected Check<?> getEditedCheck(ValidationContext ctx) {
-		CheckVM<?> vm = getCheckVM(ctx);
+		CheckVM<?> vm = getVM(ctx);
 		Check<?> check = vm.getEditedItem();
 		return check;
 	}

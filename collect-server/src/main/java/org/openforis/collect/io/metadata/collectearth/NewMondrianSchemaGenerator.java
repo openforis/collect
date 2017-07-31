@@ -13,6 +13,7 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.CodeValueFKColumn;
+import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
@@ -81,7 +82,7 @@ public class NewMondrianSchemaGenerator {
 
 	private Schema generateSchema() {
 		final Schema schema = new Schema(survey.getName());
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		rootEntityDef.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
 				if (def instanceof EntityDefinition && def.isMultiple()) {
@@ -318,7 +319,8 @@ public class NewMondrianSchemaGenerator {
 	}
 
 	private Level generateLevel(AttributeDefinition nodeDef) {
-		String attrName = nodeDef.getName();
+		DataTable dataTable = rdbSchema.getDataTable(nodeDef.getParentDefinition());
+		
 		Level level = new Level(determineDimensionName(nodeDef), determineLevelCaption(nodeDef));
 		level.levelType = "Regular";
 		if (nodeDef instanceof NumericAttributeDefinition) {
@@ -337,9 +339,14 @@ public class NewMondrianSchemaGenerator {
 			level.column = codeListTable.getPrimaryKeyConstraint().getPrimaryKeyColumn().getName();
 			level.nameColumn = CodeListTables.getLabelColumnName(rdbConfig, codeDef.getList(), codeDef.getLevelIndex(), language);
 		} else if (nodeDef instanceof TaxonAttributeDefinition) {
-			level.column = attrName + "_code";
+			DataColumn dataColumn = dataTable.getDataColumn(((TaxonAttributeDefinition) nodeDef).getCodeFieldDefinition());
+			level.column = dataColumn.getName();
+		} else if (nodeDef.isMultiple()) {
+			//TODO skip multiple attributes?
+			level.column = nodeDef.getName();
 		} else {
-			level.column = attrName;
+			DataColumn dataColumn = dataTable.getDataColumn(nodeDef.getMainFieldDefinition());
+			level.column = dataColumn.getName();
 		}
 		return level;
 	}

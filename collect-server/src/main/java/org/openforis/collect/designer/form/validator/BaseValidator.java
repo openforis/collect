@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.idm.metamodel.Survey;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.Binder;
@@ -257,19 +258,18 @@ public abstract class BaseValidator extends AbstractValidator {
 	}
 
 	protected Map<String, Property> getProperties(ValidationContext ctx) {
-		Object base = ctx.getProperty().getBase();
-		Map<String, Property> properties = ctx.getProperties(base);
-		return properties;
+		return ctx.getProperties(ctx.getProperty().getBase());
 	}
 
-	protected Object getVM(ValidationContext ctx) {
+	@SuppressWarnings("unchecked")
+	protected <T extends BaseVM> T getVM(ValidationContext ctx) {
 		BindContext bindContext = ctx.getBindContext();
 		Binder binder = bindContext.getBinder();
 		Object vmObject = binder.getViewModel();
 		if ( vmObject == null ) {
 			throw new IllegalStateException("Unable to find view model instance");
 		}
-		return vmObject;
+		return (T) vmObject;
 	}
 
 }

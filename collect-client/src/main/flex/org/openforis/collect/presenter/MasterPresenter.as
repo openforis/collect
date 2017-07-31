@@ -183,7 +183,6 @@ package org.openforis.collect.presenter {
 			var record:RecordProxy = RecordProxy(event.result);
 			record.survey = Application.activeSurvey;
 			record.init();
-			record.showErrors();
 			setActiveRecord(record);
 		}
 		

@@ -6,6 +6,9 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
+	import flash.net.URLVariables;
+	import flash.net.navigateToURL;
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
@@ -31,6 +34,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.view.DetailView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 
@@ -57,7 +61,9 @@ package org.openforis.collect.presenter {
 			view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
 			view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
 			view.resizeBtn.addEventListener(MouseEvent.CLICK, toggleViewSizeClickHandler);
-	
+			view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			view.showErrorsListButton.addEventListener(MouseEvent.CLICK, showErrorsListButtonClickHandler);
+			
 			view.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDownHandler);
 		}
 		
@@ -231,6 +237,31 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected function exportButtonClickHandler(event:MouseEvent):void {
+			var recordId:int = Application.activeRecord.id;
+			var surveyId:int = Application.activeRecord.survey.id;
+			var step:int = toStepNumber(Application.activeRecord.step);
+			
+			var url:String = ApplicationConstants.URL + "surveys/" + surveyId + "/records/" + recordId + "/steps/" + step + "/csv_content.zip";
+			
+			var req:URLRequest = new URLRequest(url);
+			req.data = new URLVariables();
+			navigateToURL(req, "_new");
+		}
+		
+		protected function showErrorsListButtonClickHandler(event:MouseEvent):void {
+			var r:RecordProxy = Application.activeRecord;
+			r.showErrors();
+			eventDispatcher.dispatchEvent(new ApplicationEvent(ApplicationEvent.ASK_FOR_SUBMIT)); //to update validation feedback
+			
+			var totalErrors:int = r.errors + r.missingErrors + r.skipped;
+			if ( totalErrors > 0 ) {
+				openErrorsListPopUp();
+			} else {
+				AlertUtil.showMessage("edit.no_errors_found");
+			}
+		}
+		
 		protected function performSubmitToClenasing():void {
 			var responder:AsyncResponder = new AsyncResponder(promoteRecordResultHandler, faultHandler);
 			_dataClient.promoteToCleansing(responder);
@@ -358,5 +389,18 @@ package org.openforis.collect.presenter {
 					return null;
 			}
 		}
+
+		private function toStepNumber(step:CollectRecord$Step):int {
+			switch(step) {
+			case CollectRecord$Step.ENTRY:
+				return 1;
+			case CollectRecord$Step.CLEANSING:
+				return 2;
+			case CollectRecord$Step.ANALYSIS:
+				return 3;
+			}
+			return -1;
+		}
+		
 	}
 }

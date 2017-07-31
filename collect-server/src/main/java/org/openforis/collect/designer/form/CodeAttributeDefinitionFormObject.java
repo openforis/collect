@@ -19,6 +19,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	
 	private CodeList list;
 	private CodeAttributeDefinition parentCodeAttributeDefinition;
+	private String parentCodeAttributeDefinitionPath;
 	private boolean strict;
 	private boolean allowValuesSorting;
 	private String layoutType;
@@ -58,8 +59,8 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	public void loadFrom(CodeAttributeDefinition source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		list = source.getList();
-		parentCodeAttributeDefinition = source.getParentCodeAttributeDefinition();
-		hierarchicalLevel = source.getList() == null ? null : source.getHierarchicalLevel();
+		setParentCodeAttributeDefinition(source.getParentCodeAttributeDefinition());
+		hierarchicalLevel = extractHierarchicalLevel(source);
 		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 		
@@ -70,6 +71,18 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		layoutType = uiOptions.getLayoutType(source).toString();
 		layoutDirection = uiOptions.getLayoutDirection(source);
 		showCode = uiOptions.getShowCode(source);
+	}
+
+	private String extractHierarchicalLevel(CodeAttributeDefinition source) {
+		if (source.getList() == null) {
+			return null;
+		} else {
+			try {
+				return source.getHierarchicalLevel();
+			} catch (Exception e) {
+				return "---ERROR---";
+			}
+		}
 	}
 	
 	public CodeList getList() {
@@ -102,6 +115,15 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	
 	public void setParentCodeAttributeDefinition(CodeAttributeDefinition parentCodeAttributeDefinition) {
 		this.parentCodeAttributeDefinition = parentCodeAttributeDefinition;
+		this.parentCodeAttributeDefinitionPath = parentCodeAttributeDefinition == null ? null : parentCodeAttributeDefinition.getPath();
+	}
+	
+	public String getParentCodeAttributeDefinitionPath() {
+		return parentCodeAttributeDefinitionPath;
+	}
+	
+	public void setParentCodeAttributeDefinitionPath(String parentCodeAttributeDefinitionPath) {
+		this.parentCodeAttributeDefinitionPath = parentCodeAttributeDefinitionPath;
 	}
 	
 	public String getHierarchicalLevel() {

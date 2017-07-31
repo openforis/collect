@@ -35,6 +35,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
+import org.openforis.collect.utils.Files;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Job;
@@ -449,7 +450,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		} else {
 			String errorMessageKey = job.getErrorMessage();
 			String errorMessage = StringUtils.defaultIfBlank(Labels.getLabel(errorMessageKey), errorMessageKey);
-			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
+			MessageUtil.showError("global.job_status.failed.message", errorMessage);
 		}
 		clearJob(job);
 	}
@@ -467,7 +468,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	private void downloadFile(File file, String fileName) {
 		try {
-			Filedownload.save(new FileInputStream(file), "application/zip", fileName);
+			Filedownload.save(new FileInputStream(file), Files.ZIP_CONTENT_TYPE, fileName);
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -581,6 +582,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges, 
 			@BindingParam("imageModified") boolean imageModified, 
 			@BindingParam("imageFileWrapper") FileWrapper imageFileWrapper) {
+		if (codeListItemPopUp == null) {
+			//handling code list from node editor form?
+			return;
+		}
 		closePopUp(codeListItemPopUp);
 		codeListItemPopUp = null;
 		if ( undoChanges ) {

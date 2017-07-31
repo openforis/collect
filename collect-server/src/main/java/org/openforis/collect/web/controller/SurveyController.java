@@ -84,8 +84,7 @@ public class SurveyController extends BasicController {
 	protected List<Integer> getRecordIds(SurveySummary s) {
 		List<Integer> recordIds = new ArrayList<Integer>();
 		CollectSurvey survey = surveyManager.getById(s.getId());
-		List<EntityDefinition> rootEntities = survey.getSchema().getRootEntityDefinitions();
-		EntityDefinition rootEntity = rootEntities.get(0);
+		EntityDefinition rootEntity = survey.getSchema().getFirstRootEntityDefinition();
 		String rootEntityName = rootEntity.getName();
 		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityName);
 		for (CollectRecord r : recordSummaries) {

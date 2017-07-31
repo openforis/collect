@@ -483,9 +483,18 @@ public class TaxonTree {
 			return CollectionUtils.unmodifiableList(vernacularNames);
 		}
 		
+		public TaxonVernacularName getVernacularName(String langCode) {
+			for (TaxonVernacularName vernacularName: vernacularNames) {
+				if (langCode.equalsIgnoreCase(vernacularName.getLanguageCode())) {
+					return vernacularName;
+				}
+			}
+			return null;
+		}
+		
 		@Override
 		public String toString() {
-			return taxon == null ? "EMPTY" : taxon.toString();
+			return taxon == null ? "---EMPTY---" : taxon.toString();
 		}
 		
 	}

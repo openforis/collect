@@ -211,12 +211,9 @@ public abstract class SurveyBaseVM extends BaseVM {
 				MessageUtil.showWarning(ERRORS_IN_PAGE);
 			} else {
 				MessageUtil.showConfirm(new MessageUtil.CompleteConfirmHandler() {
-					@Override
 					public void onOk() {
 						confirmHandler.onOk(true);
 					}
-					
-					@Override
 					public void onCancel() {
 						if ( confirmHandler instanceof CanLeaveFormCompleteConfirmHandler ) {
 							((CanLeaveFormCompleteConfirmHandler) confirmHandler).onCancel();

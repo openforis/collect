@@ -276,7 +276,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		StringBuffer extraHolders = addExtraDataHolders(fromCsvAttributes, nameOfField);
 		
 		nameOfField = "idColumns";
-		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		extraHolders.append( addExtraDataHolders( keyAttributeDefinitions, nameOfField) );
 		
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, extraHolders.toString());
