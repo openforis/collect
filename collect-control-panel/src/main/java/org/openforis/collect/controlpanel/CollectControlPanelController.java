@@ -196,15 +196,6 @@ public class CollectControlPanelController implements Initializable {
 		closeQuietly(saikuLogFileLinesProcessor);
 	}
 	
-	void closeQuietly(Closeable closeable) {
-		if (closeable != null) {
-			try {
-				closeable.close();
-			} catch (IOException e) {
-			}
-		}
-	}
-	
 	@FXML
 	void openBrowserFromLink(MouseEvent event) {
 		openBrowser();
@@ -329,19 +320,24 @@ public class CollectControlPanelController implements Initializable {
 		return status;
 	}
 
+	static void closeQuietly(Closeable closeable) {
+		if (closeable != null) {
+			try {
+				closeable.close();
+			} catch (IOException e) {
+			}
+		}
+	}
 	
 	/**
 	 * Reads a file and process it's content with a TextProcessor
-	 * 
-	 * @author S. Ricci
-	 *
 	 */
 	private static class FileLinesProcessor implements Closeable {
 
 		private File file;
 		private TextProcessor lineProcessor;
 		private int readLines;
-		private Scanner scanner;
+		private boolean closed;
 
 		public FileLinesProcessor(File file, TextProcessor lineProcessor) {
 			this.file = file;
@@ -349,17 +345,25 @@ public class CollectControlPanelController implements Initializable {
 		}
 
 		public void processNextLines() {
+			if (this.closed) {
+				return;
+			}
+			Scanner scanner = null;
 			try {
-				if (scanner == null) {
-					initScanner();
-				}
+				scanner = new Scanner(this.file);
 				int count = 0;
 				while (scanner.hasNextLine() && count < readLines) {
+					if (this.closed) {
+						return;
+					}
 					scanner.nextLine();
 					count ++;
 				}
 				//process only new lines
 				while (scanner.hasNextLine()) {
+					if (this.closed) {
+						return;
+					}
 					String line = scanner.nextLine();
 					lineProcessor.process(line);
 					readLines ++;
@@ -368,18 +372,13 @@ public class CollectControlPanelController implements Initializable {
 				//ignore it, file not ready
 			} catch (Exception e) {
 				e.printStackTrace();
+			} finally {
+				closeQuietly(scanner);
 			}
 		}
 
-		private void initScanner() throws FileNotFoundException {
-			this.scanner = new Scanner(this.file);
-		}
-
-		@Override
 		public void close() throws IOException {
-			if (scanner != null) {
-				scanner.close();
-			}
+			this.closed = true;
 		}
 	}
 	
