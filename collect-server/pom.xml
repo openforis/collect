@@ -149,7 +149,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.commons</groupId>
-			<artifactId>commons-web</artifactId>
+			<artifactId>of-commons-web-spring</artifactId>
 		</dependency>
 		<dependency>
 	        <groupId>org.openforis.rmb</groupId>

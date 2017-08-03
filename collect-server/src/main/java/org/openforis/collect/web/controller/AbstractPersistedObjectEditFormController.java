@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.manager.AbstractPersistedObjectManager;
-import org.openforis.commons.web.AbstractFormUpdateResponse;
+import org.openforis.commons.web.AbstractFormUpdateValidationResponse;
 import org.openforis.commons.web.PersistedObjectForm;
 import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.PersistedObject;
@@ -135,7 +135,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		this.itemManager = itemManager;
 	}
 
-	public class SimpleFormUpdateResponse extends AbstractFormUpdateResponse<F> {
+	public class SimpleFormUpdateResponse extends AbstractFormUpdateValidationResponse<F> {
 
 		public SimpleFormUpdateResponse(F form) {
 			super(form);

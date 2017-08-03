@@ -196,23 +196,23 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.openforis.commons</groupId>
-			<artifactId>commons-lang</artifactId>
+			<artifactId>of-commons-lang</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.commons</groupId>
-			<artifactId>commons-io</artifactId>
+			<artifactId>of-commons-io</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.commons</groupId>
-			<artifactId>commons-concurrency</artifactId>
+			<artifactId>of-commons-concurrency-spring</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.commons</groupId>
-			<artifactId>commons-collections</artifactId>
+			<artifactId>of-commons-collections</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.commons</groupId>
-			<artifactId>commons-versioning</artifactId>
+			<artifactId>of-commons-versioning</artifactId>
 		</dependency>
 		<!-- Apache commons -->
 		<dependency>
