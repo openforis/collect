@@ -143,6 +143,12 @@
 			<span>Loading...</span>
 		</div>
 		
+		<div id="errorPanel" style="display: none">
+			<span><b>An error occurred!</b><span>
+			<br /> <br />
+			<span>Please try to open again the same plot or restart Collect Earth.</span>
+		</div>
+		
 		<div id="collectEarthNotRunningPanel" style="display: none">
 			<span>PLACEHOLDER_COLLECT_NOT_RUNNING</span>
 		</div>

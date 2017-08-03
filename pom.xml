@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.13.8-SNAPSHOT</version>
+	<version>3.13.10-SNAPSHOT</version>
 	<organization>
 		<name>Open Foris</name>
 		<url>www.openforis.org</url>
@@ -24,7 +24,7 @@
 		<installer-version-id>${buildNumber}</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.1.27</openforis.commons.version>
+		<openforis.commons.version>0.1.1</openforis.commons.version>
 		<spring.version>4.2.2.RELEASE</spring.version>
 		<spring-security.version>4.0.3.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
@@ -403,12 +403,12 @@
 		<dependencies>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
-				<artifactId>commons-io</artifactId>
+				<artifactId>of-commons-io</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
-				<artifactId>commons-concurrency</artifactId>
+				<artifactId>of-commons-concurrency-spring</artifactId>
 				<version>${openforis.commons.version}</version>
 				<exclusions>
 					<exclusion>
@@ -423,22 +423,22 @@
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
-				<artifactId>commons-lang</artifactId>
+				<artifactId>of-commons-lang</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
-				<artifactId>commons-collections</artifactId>
+				<artifactId>of-commons-collections</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
-				<artifactId>commons-versioning</artifactId>
+				<artifactId>of-commons-versioning</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
-				<artifactId>commons-web</artifactId>
+				<artifactId>of-commons-web-spring</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
 			<dependency>

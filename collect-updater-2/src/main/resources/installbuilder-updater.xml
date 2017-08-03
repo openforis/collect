@@ -4,6 +4,7 @@
 	<vendor>Open Foris Initiative</vendor>
 	<version>VERSION_ID</version>
 	<logoImage>images/of-collect-logo-small.png</logoImage>
+	<installationLogFile>${installdir}/autoupdate/update.log</installationLogFile>
 	<componentList>
 		<component>
 			<name>default</name>
@@ -47,10 +48,8 @@
   		        <!-- Delete temporary files -->
 		        <deleteFile>
 		  			<path>${webapps_dir}/collect</path>
-					<abortOnError>0</abortOnError>
-					<showMessageOnError>0</showMessageOnError>
 		  		</deleteFile>
-				  		
+		  		
 		  		<!-- Update update.ini file -->
 				<writeFile>
 					<path>update.ini</path>
@@ -60,6 +59,8 @@ version_id = VERSION_ID
 update_download_location = ${system_temp_directory}
 check_for_updates = 1</text>
 				</writeFile>
+				<!-- delete temporary rollaback files -->
+				<deleteFile path="${project.rollbackBackupDirectory}"/>
 			</postInstallationActionList>
 		</component>
 	</componentList>
@@ -127,7 +128,7 @@ check_for_updates = 1</text>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
         </copyFile>
-        <!-- Delete temporary files -->
+        <!-- delete temporary files -->
         <deleteFile>
   			<path>${webapps_dir}/collect</path>
 			<abortOnError>0</abortOnError>

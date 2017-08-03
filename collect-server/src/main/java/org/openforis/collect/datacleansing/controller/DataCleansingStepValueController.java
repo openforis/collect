@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.openforis.collect.datacleansing.form.DataCleansingStepValueForm;
 import org.openforis.collect.datacleansing.form.validation.DataCleansingStepValueValidator;
-import org.openforis.commons.web.AbstractFormUpdateResponse;
+import org.openforis.commons.web.AbstractFormUpdateValidationResponse;
 import org.openforis.commons.web.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -39,7 +39,7 @@ public class DataCleansingStepValueController {
 		return new SimpleFormUpdateResponse(errors);
 	}
 	
-	private static class SimpleFormUpdateResponse extends AbstractFormUpdateResponse<DataCleansingStepValueForm> {
+	private static class SimpleFormUpdateResponse extends AbstractFormUpdateValidationResponse<DataCleansingStepValueForm> {
 
 		public SimpleFormUpdateResponse(DataCleansingStepValueForm form) {
 			super(form);
