@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -13,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.openforis.utils.Files;
 import org.openforis.web.server.ApplicationServer;
 
@@ -99,6 +102,8 @@ public class CollectControlPanelController implements Initializable {
 			File webappsFolder = new File(webappsLocation);
 			File serverLogFile = new File(SERVER_LOG_FILE_LOCATION);
 
+			deleteBrokenTemporaryFiles();
+			
 			//if running on a Jetty server, set catalina.base system property to current location
 			//to prevent Saiku from storing log files in a wrong location
 			if (System.getProperty(CATALINA_BASE) == null) {
@@ -113,7 +118,7 @@ public class CollectControlPanelController implements Initializable {
 			initLogFileReaders();
 			
 			urlHyperlink.setText(server.getUrl());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -312,6 +317,24 @@ public class CollectControlPanelController implements Initializable {
 		return properties;
 	}
 	
+	private void deleteBrokenTemporaryFiles() throws IOException {
+		File webappsFolder = new File(webappsLocation);
+		File collectWebappFolder = new File(webappsFolder, CollectJettyServer.WEBAPP_NAME);
+		if (collectWebappFolder.exists() && collectWebappFolder.isDirectory()) {
+			String[] folderContent = collectWebappFolder.list();
+			if (folderContent.length == 0 || ! new HashSet<String>(Arrays.<String>asList(folderContent)).contains("index.jsp")) {
+				try {
+					FileUtils.forceDelete(collectWebappFolder);
+				} catch(IOException e) {
+					throw new IOException(
+							String.format("Error deleting folder %s. Please delete it manually and start Collect again",
+									collectWebappFolder.getAbsolutePath()));
+				}
+			}
+		}
+		
+	}
+	
 	public void setApp(CollectControlPanel app) {
 		this.app = app;
 	}
@@ -387,11 +410,11 @@ public class CollectControlPanelController implements Initializable {
 		public ConsoleLogFileProcessor(File file, TextArea textArea) {
 			super(file, text -> {
 				textArea.appendText(text);
-				textArea.appendText("\n");
 				int extraCharacters = textArea.getLength() - LOG_TEXT_MAX_LENGTH;
 				if (extraCharacters > 0) {
 					textArea.deleteText(0, extraCharacters);
 				}
+				textArea.appendText("\n");
 			});
 		}
 	}
