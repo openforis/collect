@@ -288,7 +288,8 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 			});
 		}
 	});
-	OF.UI.Forms.Validation.updateErrors($form, errors);
+	
+	OF.UI.Forms.Validation.updateErrors($form, errors, false, {doNotIncludeFieldLabel: true});
 
 	updateStepsErrorFeedback();
 
