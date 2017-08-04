@@ -25,9 +25,9 @@ OF.UI.Forms.Validation.removeErrorFromElement = function ($el) {
  * @param $form
  * @param errors
  */
-OF.UI.Forms.Validation.updateErrors = function (form, errors, considerOnlyVisitedFields) {
+OF.UI.Forms.Validation.updateErrors = function (form, errors, considerOnlyVisitedFields, options) {
 	form.find('.form-group').each(function() {
-		OF.UI.Forms.Validation.updateErrorInFormGroup($(this), errors, considerOnlyVisitedFields);
+		OF.UI.Forms.Validation.updateErrorInFormGroup($(this), errors, considerOnlyVisitedFields, options);
 	});
 };
 
