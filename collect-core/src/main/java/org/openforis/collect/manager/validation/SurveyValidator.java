@@ -371,7 +371,7 @@ public class SurveyValidator {
 		return fullInternalName;
 	}
 	
-	private List<SurveyValidationResult> validateEntity(EntityDefinition entityDef) {
+	protected List<SurveyValidationResult> validateEntity(EntityDefinition entityDef) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		if ( childDefinitions.size() == 0 ) {

@@ -61,11 +61,35 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 		}
 	}
 	
-	public SurveyValidationResults validate(CollectSurvey survey) {
-		final SurveyValidationResults results = super.validate(survey);
+	@Override
+	public SurveyValidationResults validate(CollectSurvey survey, ValidationParameters parameters) {
+		SurveyValidationResults results = super.validate(survey, parameters);
+		results.addResults(validateAllRequiredFieldsDefined(survey));
+		return results;
+	}
+	
+	/**
+	 * Only single entities or multiple enumerated entities are supported
+	 */
+	@Override
+	protected List<SurveyValidationResult> validateEntity(EntityDefinition def) {
+		List<SurveyValidationResult> results = super.validateEntity(def);
+		EntityDefinition rootEntityDef = def.getRootEntity();
+		if (def != rootEntityDef && def.isMultiple()) {
+			if (! def.isEnumerable()) {
+				results.add(new SurveyValidationResult(def.getPath(), 
+						"survey.validation.collect_earth.multiple_entities_not_supported"));
+			} else if (def.getNearestAncestorMultipleEntity() != rootEntityDef) {
+				results.add(new SurveyValidationResult(def.getPath(), 
+						"survey.validation.collect_earth.nested_entities_not_supported"));
+			}
+		}
+		return results;
+	}
 
-		//check all required fields defined
-		EntityDefinition rootEntityDef = getMainRootEntityDefinition(survey);
+	private List<SurveyValidationResult> validateAllRequiredFieldsDefined(CollectSurvey survey) {
+		final List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		final EntityDefinition rootEntityDef = getMainRootEntityDefinition(survey);
 		for (CollectEarthField field: REQUIRED_FIELDS) {
 			String fieldName = field.getName();
 			try {
@@ -82,35 +106,12 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 					} else {
 						foundType = NodeType.ENTITY.getLabel();
 					}
-					results.addResult(new SurveyValidationResult(rootEntityDef.getPath() + "/" + fieldName, 
+					results.add(new SurveyValidationResult(rootEntityDef.getPath() + "/" + fieldName, 
 							"survey.validation.collect_earth.unexpected_field_type", expectedType, foundType));
 				}
 			} catch(Exception e) {
-				results.addResult(new SurveyValidationResult(rootEntityDef.getPath() + "/" + fieldName, 
+				results.add(new SurveyValidationResult(rootEntityDef.getPath() + "/" + fieldName, 
 						"survey.validation.collect_earth.missing_required_field"));
-			}
-		}
-		
-		//check valid node definitions (not nested multiple entities, only enumerable entities)
-		List<NodeDefinition> nextLevelDefs = new ArrayList<NodeDefinition>();
-		nextLevelDefs.addAll(rootEntityDef.getChildDefinitions());
-		
-		for (int currentLevelIndex = 0; currentLevelIndex < 2; currentLevelIndex ++) {
-			List<NodeDefinition> currentLevelDefs = nextLevelDefs;
-			nextLevelDefs = new ArrayList<NodeDefinition>();
-			for (NodeDefinition nodeDef : currentLevelDefs) {
-				if (nodeDef instanceof EntityDefinition) {
-					EntityDefinition entityDef = (EntityDefinition) nodeDef;
-					if (currentLevelIndex == 0) {
-						if (nodeDef.isMultiple() && ! entityDef.isEnumerable()) {
-							results.addResult(new SurveyValidationResult(entityDef.getPath(), "survey.validation.collect_earth.multiple_entities_not_supported"));
-						} else {
-							nextLevelDefs.addAll(entityDef.getChildDefinitions());
-						}
-					} else {
-						results.addResult(new SurveyValidationResult(nodeDef.getPath(), "survey.validation.collect_earth.nested_entities_not_supported"));
-					}
-				}
 			}
 		}
 		return results;
