@@ -75,13 +75,13 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 	protected List<SurveyValidationResult> validateEntity(EntityDefinition def) {
 		List<SurveyValidationResult> results = super.validateEntity(def);
 		EntityDefinition rootEntityDef = def.getRootEntity();
-		if (def != rootEntityDef && def.isMultiple()) {
-			if (! def.isEnumerable()) {
-				results.add(new SurveyValidationResult(def.getPath(), 
-						"survey.validation.collect_earth.multiple_entities_not_supported"));
-			} else if (def.getNearestAncestorMultipleEntity() != rootEntityDef) {
+		if (def != rootEntityDef) {
+			if (def.getAncestorEntityDefinitions().size() > 1) {
 				results.add(new SurveyValidationResult(def.getPath(), 
 						"survey.validation.collect_earth.nested_entities_not_supported"));
+			} else if (def.isMultiple() && ! def.isEnumerable()) {
+				results.add(new SurveyValidationResult(def.getPath(), 
+						"survey.validation.collect_earth.multiple_entities_not_supported"));
 			}
 		}
 		return results;
