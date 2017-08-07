@@ -98,6 +98,8 @@ package org.openforis.collect.presenter {
 		 */
 		private const MAX_RECORDS_PER_PAGE:int = 20;
 		
+		private var dataGridInitialized:Boolean = false;
+		
 		public function ListPresenter(view:ListView) {
 			super(view);
 			this._newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
@@ -178,7 +180,7 @@ package org.openforis.collect.presenter {
 		protected function createAdvancedFunctionMenu():void {
 			var result:ArrayCollection = new ArrayCollection();
 			result.addItem(EXPORT_DATA_MENU_ITEM);
-			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
+			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_CLEANSING) ) {
 				result.addItem(IMPORT_DATA_MENU_ITEM);
 			}
 			result.addItem({type: "separator"});
@@ -316,7 +318,7 @@ package org.openforis.collect.presenter {
 				if ( Application.user.canReject(selectedRecord) ) {
 					AlertUtil.showError("list.error.cannotDelete.rejectBeforeDeletePromotedRecord", [rootEntityLabel, stepName]);
 				} else {
-					AlertUtil.showError("list.error.cannoDeletePromotedRecord", [rootEntityLabel, stepName]);
+					AlertUtil.showError("list.error.cannotDeletePromotedRecord", [rootEntityLabel, stepName]);
 				}
 			} else if ( ! selectedRecord.unassigned && ! Application.user.isOwner(selectedRecord) &&
 					! Application.user.canDeleteNotOwnedRecords ) {
@@ -459,7 +461,7 @@ package org.openforis.collect.presenter {
 			var surveyProjectName:String = Application.activeSurvey.getProjectName();
 			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
 			view.titleLabel.text = Message.get("list.title", [surveyProjectName, rootEntityLabel]);
-			updateDataGrid();
+			initializeDataGrid();
 			loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
 		}
 		
@@ -476,10 +478,12 @@ package org.openforis.collect.presenter {
 			view.openFilterPopUpButton.label = Message.get('list.filterOff');
 		}
 		
-		protected function updateDataGrid():void {
+		protected function initializeDataGrid():void {
+			view.dataGrid.dataProvider = null;
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			var columns:IList = UIBuilder.getRecordSummaryListColumns(rootEntity);
 			view.dataGrid.columns = columns;
+			this.dataGridInitialized = true;
 		}
 		
 		protected function loadRecordSummaries(offset:int = 0, recordsPerPage:int = MAX_RECORDS_PER_PAGE):void {
@@ -491,17 +495,25 @@ package org.openforis.collect.presenter {
 			view.currentState = ListView.INACTIVE_STATE;
 			view.paginationBar.currentState = PaginationBar.LOADING_STATE;
 			
-			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
 			var filter:RecordFilterProxy = (! filterEnabled || currentFilter == null) ? new RecordFilterProxy(): ObjectUtil.clone(currentFilter) as RecordFilterProxy;
 			filter.offset = offset;
 			filter.maxNumberOfRecords = recordsPerPage;
 			filter.rootEntityId = Application.activeRootEntity == null ? NaN : Application.activeRootEntity.id;
-			_dataClient.loadRecordSummaries(responder, filter, currentSortFields);
+			
+			if (! Application.user.canViewNotOwnedRecords) {
+				filter.ownerId = Application.user.id;
+			}
+			
+			_dataClient.loadRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), 
+				filter, currentSortFields, Application.localeString);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:Object = event.result;
 			
+			if (! dataGridInitialized) {
+				initializeDataGrid();
+			}
 			view.dataGrid.dataProvider = IList(result.records);
 			view.dataGrid.setSortedColumns(currentSortFields);
 			view.currentState = ListView.DEFAULT_STATE;
@@ -531,10 +543,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			var recordEditButtons:Array = [view.addButton, view.editButton, view.deleteButton];
-			for each (var button:UIComponent in recordEditButtons) {
-				button.visible = button.includeInLayout = Application.user.canEditRecords;
-			}
+			view.addButton.visible = view.addButton.includeInLayout = Application.user.canAddRecords;
+			view.editButton.visible = view.editButton.includeInLayout = Application.user.canEditRecords;
+			view.deleteButton.visible = view.deleteButton.includeInLayout = Application.user.canDeleteRecords;
 			view.viewButton.visible = view.viewButton.includeInLayout = Application.user.canViewAllRecords;
 		}
 		

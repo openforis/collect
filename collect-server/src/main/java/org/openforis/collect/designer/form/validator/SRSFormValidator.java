@@ -39,7 +39,7 @@ public class SRSFormValidator extends FormValidator {
 	}
 
 	protected boolean validateIdUniqueness(ValidationContext ctx) {
-		SurveyObjectBaseVM<SpatialReferenceSystem> viewModel = getSurveyItemEditVM(ctx);
+		SurveyObjectBaseVM<SpatialReferenceSystem> viewModel = getVM(ctx);
 		SpatialReferenceSystem editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		String id = (String) getValue(ctx, ID_FIELD);
@@ -69,18 +69,9 @@ public class SRSFormValidator extends FormValidator {
 	}
 	
 	private CollectSurvey getSurvey(ValidationContext ctx) {
-		SurveyObjectBaseVM<SpatialReferenceSystem> viewModel = getSurveyItemEditVM(ctx);
+		SurveyObjectBaseVM<SpatialReferenceSystem> viewModel = getVM(ctx);
 		CollectSurvey survey = viewModel.getSurvey();
 		return survey;
 	}
 	
-	@SuppressWarnings("unchecked")
-	protected SurveyObjectBaseVM<SpatialReferenceSystem> getSurveyItemEditVM(ValidationContext ctx) {
-		Object vm = getVM(ctx);
-		if ( vm instanceof SurveyObjectBaseVM ) {
-			return (SurveyObjectBaseVM<SpatialReferenceSystem>) vm;
-		} else {
-			throw new  IllegalStateException("Unexpected view model class: " + vm.getClass().getName());
-		}
-	}
 }

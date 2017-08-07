@@ -378,16 +378,20 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	}
 	
 	public Integer getListLevelIndex() {
-		if ( list.isHierarchical() ) {
-			int idx = -1;
-			CodeAttributeDefinition currCode = this;
-			while ( currCode != null ) {
-				idx++;
-				currCode = currCode.getParentCodeAttributeDefinition();
-			}
-			return idx;
-		} else {
+		int idx = -1;
+		CodeAttributeDefinition currCode = this;
+		while ( currCode != null ) {
+			idx++;
+			currCode = currCode.getParentCodeAttributeDefinition();
+		}
+		if (idx > 0 && (! list.isHierarchical() || idx >= list.getHierarchy().size())) {
+			throw new IllegalStateException(String.format(
+					"Invalid parent code attribute relation for attribute %s in survey %s", 
+					this.getPath(), this.getSurvey().getName()));
+		} else if (! list.isHierarchical()) {
 			return null;
+		} else {
+			return idx;
 		}
 	}
 

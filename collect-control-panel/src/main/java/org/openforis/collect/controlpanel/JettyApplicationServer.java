@@ -35,6 +35,8 @@ import net.lingala.zip4j.core.ZipFile;
 
 public abstract class JettyApplicationServer implements ApplicationServer {
 
+	private static final String LOCALHOST_ADDRESS = "127.0.0.1";
+	
 	protected int port;
 	protected JndiDataSourceConfiguration[] jndiDsConfigurations;
 
@@ -145,7 +147,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 
 	@Override
 	public String getUrl() {
-		return String.format("%s://%s:%d/%s", "http", "localhost", port, getMainWebAppName());
+		return String.format("%s://%s:%d/%s", "http", LOCALHOST_ADDRESS, port, getMainWebAppName());
 	}
 	
 	@Override
@@ -191,7 +193,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 	}
 	
 	private boolean portAvailable() {
-	    try (Socket ignored = new Socket("localhost", port)) {
+	    try (Socket ignored = new Socket(LOCALHOST_ADDRESS, port)) {
 	        return false;
 	    } catch (IOException ignored) {
 	        return true;

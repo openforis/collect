@@ -30,7 +30,9 @@ public class DistanceCheckFormValidator extends CheckFormValidator {
 			validateValueExpressionField(ctx, contextNode, MAX_DISTANCE_FIELD);
 		}
 		validateValueExpressionField(ctx, contextNode, SOURCE_POINT_EXPRESSION_FIELD);
-		validateValueExpressionField(ctx, contextNode, DESTINATION_POINT_EXPRESSION_FIELD);
+		if (validateRequired(ctx, DESTINATION_POINT_EXPRESSION_FIELD)) {
+			validateValueExpressionField(ctx, contextNode, DESTINATION_POINT_EXPRESSION_FIELD);
+		}
 	}
 
 	protected boolean validateMinOrMaxExpressionRequireness(ValidationContext ctx) {

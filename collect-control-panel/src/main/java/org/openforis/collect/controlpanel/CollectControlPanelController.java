@@ -1,18 +1,21 @@
 package org.openforis.collect.controlpanel;
 
-import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.openforis.utils.Files;
 import org.openforis.web.server.ApplicationServer;
 
@@ -31,7 +34,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Window;
 
-@SuppressWarnings("restriction")
 public class CollectControlPanelController implements Initializable {
 
 	private static final String COLLECT_USER_HOME_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis", "Collect");
@@ -45,7 +47,8 @@ public class CollectControlPanelController implements Initializable {
 	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
 	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), DEFAULT_WEBAPPS_FOLDER_NAME);
 	private static final int LOG_OPENED_WINDOW_HEIGHT = 550;
-	private static final int LOG_CLOSED_WINDOW_HEIGHT = 220;
+	private static final int LOG_CLOSED_WINDOW_HEIGHT = 210;
+	private static final int LOG_TEXT_MAX_LENGTH = 5000;
 	private static final String CATALINA_BASE = "catalina.base";
 	
 	public enum Status {
@@ -82,6 +85,9 @@ public class CollectControlPanelController implements Initializable {
 	private Status status = Status.INITIALIZING;
 	private String errorMessage;
 	private boolean logOpened = false;
+	private FileLinesProcessor serverLogFileLinesProcessor;
+	private FileLinesProcessor collectLogFileLinesProcessor;
+	private FileLinesProcessor saikuLogFileLinesProcessor;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -96,6 +102,8 @@ public class CollectControlPanelController implements Initializable {
 			File webappsFolder = new File(webappsLocation);
 			File serverLogFile = new File(SERVER_LOG_FILE_LOCATION);
 
+			deleteBrokenTemporaryFiles();
+			
 			//if running on a Jetty server, set catalina.base system property to current location
 			//to prevent Saiku from storing log files in a wrong location
 			if (System.getProperty(CATALINA_BASE) == null) {
@@ -107,10 +115,10 @@ public class CollectControlPanelController implements Initializable {
 					collectProperties.getCollectDataSourceConfiguration());
 			server.initialize();
 			
-			initializeLogFileReaders();
+			initLogFileReaders();
 			
 			urlHyperlink.setText(server.getUrl());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -120,22 +128,14 @@ public class CollectControlPanelController implements Initializable {
 	 * 
 	 * @throws IOException
 	 */
-	private void initializeLogFileReaders() throws IOException {
-		FileLinesProcessor serverLogFileLinesProcessor = new FileLinesProcessor(
-			server.getLogFile(), (String text) -> {
-				serverConsole.appendText(text);
-				serverConsole.appendText("\n");
-		});
-		FileLinesProcessor collectLogFileLinesProcessor = new FileLinesProcessor(
-			new File(COLLECT_LOG_FILE_LOCATION), (String text) -> {
-				collectConsole.appendText(text);
-				collectConsole.appendText("\n");
-		});
-		FileLinesProcessor saikuLogFileLinesProcessor = new FileLinesProcessor(
-			new File(SAIKU_LOG_FILE_LOCATION), (String text) -> {
-				saikuConsole.appendText(text);
-				saikuConsole.appendText("\n");
-		});
+	private void initLogFileReaders() throws IOException {
+		this.serverLogFileLinesProcessor = new ConsoleLogFileProcessor(
+				server.getLogFile(), serverConsole);
+		this.collectLogFileLinesProcessor = new ConsoleLogFileProcessor(
+				new File(COLLECT_LOG_FILE_LOCATION), collectConsole);
+		this.saikuLogFileLinesProcessor = new ConsoleLogFileProcessor(
+				new File(SAIKU_LOG_FILE_LOCATION), saikuConsole);
+		
 		//write logging info to console
 		executorService.scheduleWithFixedDelay(() -> {
 			Platform.runLater(() -> {
@@ -143,7 +143,7 @@ public class CollectControlPanelController implements Initializable {
 				collectLogFileLinesProcessor.processNextLines();
 				saikuLogFileLinesProcessor.processNextLines();
 			});
-		}, 1, 1, TimeUnit.SECONDS);
+		}, 3, 3, TimeUnit.SECONDS);
 	}
 	
 	public void startServer(MouseEvent event) throws Exception {
@@ -196,6 +196,9 @@ public class CollectControlPanelController implements Initializable {
 	void stop() throws Exception {
 		stopServer();
 		executorService.shutdownNow();
+		closeQuietly(serverLogFileLinesProcessor);
+		closeQuietly(collectLogFileLinesProcessor);
+		closeQuietly(saikuLogFileLinesProcessor);
 	}
 	
 	@FXML
@@ -224,8 +227,9 @@ public class CollectControlPanelController implements Initializable {
 		setLogVisible(false);
 	}
 
-	private void setLogVisible(boolean value) {
-		logOpened = value;
+	private void setLogVisible(boolean visible) {
+		logOpened = visible;
+		logBtn.setText(visible ? "Hide Log" : "Show Log");
 		updateUI();
 	}
 	
@@ -313,6 +317,24 @@ public class CollectControlPanelController implements Initializable {
 		return properties;
 	}
 	
+	private void deleteBrokenTemporaryFiles() throws IOException {
+		File webappsFolder = new File(webappsLocation);
+		File collectWebappFolder = new File(webappsFolder, CollectJettyServer.WEBAPP_NAME);
+		if (collectWebappFolder.exists() && collectWebappFolder.isDirectory()) {
+			String[] folderContent = collectWebappFolder.list();
+			if (folderContent.length == 0 || ! new HashSet<String>(Arrays.<String>asList(folderContent)).contains("index.jsp")) {
+				try {
+					FileUtils.forceDelete(collectWebappFolder);
+				} catch(IOException e) {
+					throw new IOException(
+							String.format("Error deleting folder %s. Please delete it manually and start Collect again",
+									collectWebappFolder.getAbsolutePath()));
+				}
+			}
+		}
+		
+	}
+	
 	public void setApp(CollectControlPanel app) {
 		this.app = app;
 	}
@@ -321,18 +343,24 @@ public class CollectControlPanelController implements Initializable {
 		return status;
 	}
 
+	static void closeQuietly(Closeable closeable) {
+		if (closeable != null) {
+			try {
+				closeable.close();
+			} catch (IOException e) {
+			}
+		}
+	}
 	
 	/**
 	 * Reads a file and process it's content with a TextProcessor
-	 * 
-	 * @author S. Ricci
-	 *
 	 */
-	private static class FileLinesProcessor {
+	private static class FileLinesProcessor implements Closeable {
 
 		private File file;
 		private TextProcessor lineProcessor;
 		private int readLines;
+		private boolean closed;
 
 		public FileLinesProcessor(File file, TextProcessor lineProcessor) {
 			this.file = file;
@@ -340,17 +368,26 @@ public class CollectControlPanelController implements Initializable {
 		}
 
 		public void processNextLines() {
-			BufferedReader br = null;
+			if (this.closed) {
+				return;
+			}
+			Scanner scanner = null;
 			try {
-				FileInputStream inputStream = new FileInputStream(file);
-				br = new BufferedReader(new InputStreamReader(inputStream));
-				for (int i = 0; i < readLines; i++) {
-					br.readLine();
+				scanner = new Scanner(this.file);
+				int count = 0;
+				while (scanner.hasNextLine() && count < readLines) {
+					if (this.closed) {
+						return;
+					}
+					scanner.nextLine();
+					count ++;
 				}
-				
 				//process only new lines
-				String line = null;
-				while ((line = br.readLine()) != null) {
+				while (scanner.hasNextLine()) {
+					if (this.closed) {
+						return;
+					}
+					String line = scanner.nextLine();
 					lineProcessor.process(line);
 					readLines ++;
 				}
@@ -359,12 +396,26 @@ public class CollectControlPanelController implements Initializable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				if (br != null) {
-					try {
-						br.close();
-					} catch (IOException e) {}
-				}
+				closeQuietly(scanner);
 			}
+		}
+
+		public void close() throws IOException {
+			this.closed = true;
+		}
+	}
+	
+	private static class ConsoleLogFileProcessor extends FileLinesProcessor {
+
+		public ConsoleLogFileProcessor(File file, TextArea textArea) {
+			super(file, text -> {
+				textArea.appendText(text);
+				int extraCharacters = textArea.getLength() - LOG_TEXT_MAX_LENGTH;
+				if (extraCharacters > 0) {
+					textArea.deleteText(0, extraCharacters);
+				}
+				textArea.appendText("\n");
+			});
 		}
 	}
 	

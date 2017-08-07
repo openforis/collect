@@ -15,7 +15,6 @@ import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 
 /**
@@ -114,7 +113,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	public List<String> extractValues(Node<?> axis) {
 		List<String> values = super.extractValues(axis);
 		if (hasExpandedItems) {
-			List<Node<?>> attributes = ((Entity) axis).getChildren(attributeDefinition);
+			List<Node<?>> attributes = extractNodes(axis);
 			for (CodeListItem item : expandedItems) {
 				CodeAttribute attr = findAttributeByCode(attributes, item.getCode());
 				values.add(Boolean.valueOf(attr != null).toString());

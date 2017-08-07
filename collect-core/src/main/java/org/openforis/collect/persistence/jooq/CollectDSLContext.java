@@ -82,7 +82,11 @@ public class CollectDSLContext extends DefaultDSLContext {
 		if (type == Date.class) {
 			jooqType = java.sql.Date.class;
 		} else if (type == Double.class) {
-			jooqType = BigDecimal.class;
+			if (dialect() == SQLDialect.SQLITE) {
+				jooqType = Float.class; //it will be translated into an SQL REAL data type
+			} else {
+				jooqType = BigDecimal.class;
+			}
 		} else {
 			jooqType = type;
 		}

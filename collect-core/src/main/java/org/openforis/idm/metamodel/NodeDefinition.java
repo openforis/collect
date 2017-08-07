@@ -356,6 +356,19 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		}
 		return result;
 	}
+
+	/**
+	 * Returns the ancestor entity definitions (from bottom to top) up to the specified one (exclusive).
+	 */
+	public List<EntityDefinition> getAncestorEntityDefinitionsUpTo(EntityDefinition upToEntityDef) {
+		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		EntityDefinition currentParent = getParentEntityDefinition();
+		while ( currentParent != null && currentParent != upToEntityDef ) {
+			result.add(currentParent);
+			currentParent = currentParent.getParentEntityDefinition();
+		}
+		return result;
+	}
 	
 	/**
 	 * Returns the ancestor definitions from the root to the nearest parent entity

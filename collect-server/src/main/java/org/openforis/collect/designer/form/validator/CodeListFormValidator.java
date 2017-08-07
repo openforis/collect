@@ -36,7 +36,7 @@ public class CodeListFormValidator extends SurveyObjectFormValidator<CodeList> {
 	}
 
 	protected boolean validateNameUniqueness(ValidationContext ctx) {
-		SurveyObjectBaseVM<CodeList> viewModel = getSurveyObjectVM(ctx);
+		SurveyObjectBaseVM<CodeList> viewModel = getVM(ctx);
 		CodeList editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		String name = (String) getValue(ctx, NAME_FIELD);

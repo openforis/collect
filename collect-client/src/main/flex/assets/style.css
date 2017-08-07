@@ -10,6 +10,10 @@
 @namespace codelist "org.openforis.collect.ui.component.input.codelist.*";
 @namespace concurrency "org.openforis.collect.concurrency.*";
 
+input|CodeListItemRenderer s|CheckBox {
+	fontSize: 12;
+}
+
 container|CollapsiblePanel {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.CollapsiblePanelSkin');
 }
@@ -18,13 +22,14 @@ container|TitleBorderBox {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.TitleBorderBoxSkin');
 }
 
+/* FieldSet */
 container|FieldSet {
 	cornerRadius: 4;
 	gap: 6;
-	paddingLeft: 10;
-	paddingRight: 0;
+	paddingLeft: 2;
+	paddingRight: 2;
 	paddingTop: 10;
-	paddingBottom: 10;
+	paddingBottom: 2;
 	skin-class: ClassReference('org.openforis.collect.ui.skin.FieldSetSkin');
 }
 
@@ -32,6 +37,17 @@ container|FieldSet #legendDisplay {
 	fontSize: 14;
 	fontWeight: bold;
 }
+
+container|FieldSet #notesLabelDisplay {
+	fontSize: 12;
+	fontStyle: italic;
+}
+
+container|FieldSet #notesDisplay {
+	fontSize: 12; 
+	textAlign: justify;
+}
+/* end of FieldSet */
 
 container|CollapsiblePanel s|Label.title {
 	fontWeight: bold;
@@ -170,7 +186,7 @@ component|BlockingMessagePopUp,
 	background-alpha: 1.0;
 }
 
-component|BlockingMessagePopUp, concurrency|CollectJobStatusPopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, 
+component|BlockingMessagePopUp, concurrency|CollectJobStatusPopUp, component|SelectVersionPopUp, 
 	component|DataExportPopUp, component|BackupView, component|SpeciesImportPopUp {
 	showCloseButton: false;
 }
@@ -264,6 +280,7 @@ detail|CompositeAttributeRenderer.warning,
 
 input|TextInput, mx|TextArea {
 	borderSkin: ClassReference("org.openforis.collect.ui.skin.TextInputBorderSkin");
+	fontSize: 12;
 }
 
 input|TextInput.error, input|TextInput.warning, mx|TextArea.error, mx|TextArea.warning {
@@ -333,6 +350,14 @@ s|Button.error {
 
 s|Button.checked {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.CheckedButtonSkin");
+}
+
+s|Button.exportToExcelButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.ExportToExcelButtonSkin");
+}
+
+s|Button.showErrorsListButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.ErrorsListButtonSkin");
 }
 
 .dialogHeaderStyle {

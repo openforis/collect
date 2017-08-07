@@ -1,11 +1,13 @@
-no,code,family,scientific_name,swh,eng
-5,OLE/CAP/macrocarpa,Oleaceae,Olea capensis ssp. macrocarpa,,
-6,OLE/EUR,Oleaceae,Olea europaea,,
-7,OLE/EUR/cuspidata,Oleaceae,Olea europaea subsp. cuspidata,,
-12,ALB/SCH/amaniensis,Fabaceae,Albizia schimperiana var. amaniensis,,
-9,ALB,Fabaceae,Albizia spp.,,
-8,AFZ/QUA,Fabaceae,Afzelia quanzensis Welw.,Mbambakofi ,Mahogany
-10,ALB/ADI,Fabaceae,Albizia adianthifolia,,
-11,ALB/GLA,Fabaceae,Albizia glaberrima (Shumach.&Thonn)Benth,Mgerenge / Mchani,
-13,BOU/PET,Boraginaceae,Bourreria petiolaris(Lam.)Thulin / Syn.Ehretia petiolaris Lam.,Mpanda jongoo,
-14,BOM/RHO,Bombacaceae,Bombax rhodognaphalon K.Schum. / Syn:Rhodognaphalon schumannianum A.Robyns,Msufi mwitu,
+"code","family","scientific_name","swh","eng"
+"AFZ/QUA","Fabaceae","Afzelia quanzensis","Mbambakofi ","Mahogany"
+"ALB","Fabaceae","Albizia spp.",,
+"ALB/ADI","Fabaceae","Albizia adianthifolia",,
+"ALB/GLA","Fabaceae","Albizia glaberrima","Mgerenge / Mchani",
+"ALB/SCH","Fabaceae","Albizia schimperiana",,
+"ALB/SCH/amaniensis","Fabaceae","Albizia schimperiana var. amaniensis",,
+"BOU/PET","Boraginaceae","Bourreria petiolaris","Mpanda jongoo",
+"BOM/RHO","Bombacaceae","Bombax rhodognaphalon","Msufi mwitu",
+"OLE/CAP","Oleaceae","Olea capensis",,
+"OLE/CAP/macrocarpa","Oleaceae","Olea capensis subsp. macrocarpa",,
+"OLE/EUR","Oleaceae","Olea europaea",,
+"OLE/EUR/cuspidata","Oleaceae","Olea europaea subsp. cuspidata",,

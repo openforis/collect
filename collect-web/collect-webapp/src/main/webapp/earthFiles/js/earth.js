@@ -288,7 +288,8 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 			});
 		}
 	});
-	OF.UI.Forms.Validation.updateErrors($form, errors);
+	
+	OF.UI.Forms.Validation.updateErrors($form, errors, false, {doNotIncludeFieldLabel: true});
 
 	updateStepsErrorFeedback();
 
@@ -348,7 +349,6 @@ var toggleStepVisibility = function(index, visible) {
 		stepBody.hide();
 	}
 };
-
 
 var showCurrentStep = function() {
 	if (currentStepIndex != null && currentStepIndex > 0) {

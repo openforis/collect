@@ -78,8 +78,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function loadRecordSummaries(responder:IResponder, filter:RecordFilterProxy, sortFields:IList=null):void {
-			var token:AsyncToken = this._loadRecordSummariesOperation.send(filter, sortFields);
+		public function loadRecordSummaries(responder:IResponder, filter:RecordFilterProxy, sortFields:IList=null, locale:String = null):void {
+			var token:AsyncToken = this._loadRecordSummariesOperation.send(filter, sortFields, locale);
 			token.addResponder(responder);
 		}
 		

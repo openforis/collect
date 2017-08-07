@@ -126,7 +126,7 @@ public class SpeciesManager {
 		List<Taxon> list = taxonDao.findByScientificName(taxonomy, searchString, maxResults);
 		return fromTaxonomiesToTaxonOccurrences(list, parameters);
 	}
-
+	
 	public List<TaxonOccurrence> findByFamilyScientificName(CollectTaxonomy taxonomy, String searchString, int maxResults, 
 			TaxonSearchParameters parameters) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -92,7 +93,7 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	@Override
 	public List<String> extractValues(Node<?> axis) {
 		checkValidAxis(axis);
-		List<Node<?>> attributes = ((Entity) axis).getChildren(attributeDefinition);
+		List<Node<?>> attributes = extractNodes(axis);
 		int maxAttributeValues = getMaxAttributeValues();
 		int totHeadings = fieldNames.length * maxAttributeValues;
 		List<String> values = new ArrayList<String>(totHeadings);
@@ -114,6 +115,29 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 			}
 		}
 		return values;
+	}
+	
+	protected List<Node<?>> extractNodes(Node<?> axis) {
+		Entity parentEntity = findNodesParentEntity((Entity) axis);
+		return parentEntity.getChildren(attributeDefinition);
+	}
+
+	private Entity findNodesParentEntity(Entity axis) {
+		List<EntityDefinition> ancestorEntityDefs = attributeDefinition.getAncestorEntityDefinitionsUpTo(axis.getDefinition());
+		Entity currentParentEntity = axis;
+		if (! ancestorEntityDefs.isEmpty()) {
+			for (int i = ancestorEntityDefs.size() - 1; i >= 0; i--) {
+				EntityDefinition ancestorEntityDef = ancestorEntityDefs.get(i);
+				if (ancestorEntityDef.isMultiple()) {
+					throw new IllegalStateException(String.format(
+							"Error extracting values for composite attribute %s in survey %s: single entity expected but multiple found: %s", 
+							attributeDefinition.getPath(), attributeDefinition.getSurvey().getName(), ancestorEntityDef.getPath()));
+				} else {
+					currentParentEntity = currentParentEntity.getChild(ancestorEntityDef);
+				}
+			}
+		}
+		return currentParentEntity;
 	}
 
 	protected void checkValidAxis(Node<?> axis) {

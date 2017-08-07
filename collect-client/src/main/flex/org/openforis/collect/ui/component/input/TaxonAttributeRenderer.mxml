@@ -16,7 +16,7 @@
 			
 			public static const FAMILY_SCIENTIFIC_NAME_WIDTH:int = 100;
 			public static const CODE_WIDTH:int 				= 80;
-			public static const SCIENTIFIC_NAME_WIDTH:int 	= 100;
+			public static const SCIENTIFIC_NAME_WIDTH:int 	= 150;
 			public static const VERNACULAR_NAME_WIDTH:int 	= 100;
 			public static const LANGUAGE_CODE_WIDTH:int 	= 100;
 			public static const LANGUAGE_VARIETY_WIDTH:int 	= 100;
@@ -119,9 +119,6 @@
 	</s:HGroup>
 	
 	<s:VGroup includeIn="vertical, vertical_form">
-		<s:Label styleName="bold" 
-				 text="{attributeDefinition.getInstanceOrHeadingLabelText()}"
-				 includeIn="vertical_form" />
 		<s:VGroup>
 			<s:HGroup visible="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
 					  includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}">

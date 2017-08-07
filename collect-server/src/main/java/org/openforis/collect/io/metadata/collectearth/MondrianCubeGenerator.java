@@ -81,7 +81,7 @@ public class MondrianCubeGenerator {
 
 	private Cube generateCube() {
 		Cube cube = new Cube("Collect Earth Plot");
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		Table table = new Table(rootEntityDef.getName());
 		cube.table = table;
 		
@@ -361,7 +361,6 @@ public class MondrianCubeGenerator {
 	
 	private List<Level> generateLevel(NodeDefinition nodeDef) {
 		List<Level> levels = new ArrayList<Level>();
-		String attrName = nodeDef.getName();
 		String attrLabel = extractFailsafeLabel(nodeDef);
 		Level level = new Level(attrLabel);
 		levels.add(level);
@@ -387,13 +386,9 @@ public class MondrianCubeGenerator {
 			levelId.nameColumn =  extractCodeListName(codeDef);
 			
 			levels.add(levelId);
-			
 		} else {
-			level.column = attrName;
+			level.column = nodeDef.getName();
 		}
-		
-		
-		
 		return levels;
 	}
 

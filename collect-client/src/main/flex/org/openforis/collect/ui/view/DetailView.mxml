@@ -76,7 +76,23 @@
 			<s:HGroup right="0"
 					  verticalAlign="middle"
 					  horizontalAlign="right">
-	
+				
+				<s:Button id="exportButton"
+					width="20"
+					height="20"
+					verticalCenter="0"
+					horizontalCenter="250"
+					styleName="exportToExcelButton"
+					toolTip="{Message.get('global.exportToCSV')}" />
+				
+				<s:Button id="showErrorsListButton"
+					width="20"
+					height="20"
+					verticalCenter="0"
+					horizontalCenter="210"
+					styleName="showErrorsListButton"
+					toolTip="{Message.get('edit.show_errors_list')}" />
+				
 				<s:Button 
 					id="rejectButton"
 					icon="{Images.REJECT}" 

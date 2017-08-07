@@ -187,6 +187,11 @@ public final class TaxonOccurrence extends AbstractValue {
 	}
 	
 	@Override
+	public String toString() {
+		return toPrettyFormatString();
+	}
+	
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

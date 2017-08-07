@@ -3,6 +3,10 @@
  */
 package org.openforis.collect.io.data.csv;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
@@ -23,10 +27,10 @@ public class TaxonColumnProvider extends CompositeAttributeColumnProvider<TaxonA
 			TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME
 	};
 	
-	private static final String[] SHOW_FAMILY_FIELDS = ArrayUtils.addAll(DEFAULT_FIELDS, new String[] {
+	private static final String[] FAMILY_FIELDS = new String[] {
 			TaxonAttributeDefinition.FAMILY_CODE_FIELD_NAME,
 			TaxonAttributeDefinition.FAMILY_SCIENTIFIC_NAME_FIELD_NAME
-	});
+	};
 
 	public TaxonColumnProvider(CSVExportConfiguration config, TaxonAttributeDefinition defn) {
 		super(config, defn);
@@ -36,8 +40,16 @@ public class TaxonColumnProvider extends CompositeAttributeColumnProvider<TaxonA
 	protected String[] getFieldNames() {
 		CollectSurvey survey = attributeDefinition.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
+		List<String> visibleFields = new ArrayList<String>(Arrays.asList(
+				survey.getUIOptions().getVisibleFields(attributeDefinition)));
 		boolean showFamily = annotations.isShowFamily(attributeDefinition);
-		return showFamily ? SHOW_FAMILY_FIELDS : DEFAULT_FIELDS;
+		if (! visibleFields.contains(TaxonAttributeDefinition.CODE_FIELD_NAME)) {
+			//always include CODE field
+			visibleFields.add(0, TaxonAttributeDefinition.CODE_FIELD_NAME);
+		}
+		if (! showFamily) {
+			visibleFields.removeAll(Arrays.asList(FAMILY_FIELDS));
+		}
+		return visibleFields.toArray(new String[visibleFields.size()]);
 	}
-
 }

@@ -82,4 +82,13 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		}
 	}
 	
+	@ExternalizedProperty
+	public String getBackgroundColor() {
+		return getAnnotations().getBackgroundColor(entityDefinition);
+	}
+	
+	@ExternalizedProperty
+	public Double getBackgroundAlpha() {
+		return getAnnotations().getBackgroundAlpha(entityDefinition);
+	}
 }

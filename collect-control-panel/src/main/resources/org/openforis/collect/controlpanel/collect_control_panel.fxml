@@ -21,7 +21,7 @@
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="applicationPane"
 	fx:controller="org.openforis.collect.controlpanel.CollectControlPanelController"
-	minHeight="220.0" maxHeight="550.0" prefHeight="220.0" 
+	minHeight="210.0" maxHeight="550.0" prefHeight="210.0" 
 	maxWidth="600.0" minWidth="600.0" prefWidth="600.0" 
 	styleClass="main-pane"
 	stylesheets="@org/openforis/collect/controlpanel/collect_control_panel.css">
@@ -51,15 +51,16 @@
 	<HBox minWidth="580" alignment="TOP_LEFT">
 		<Region minWidth="30" />
 		
-		<VBox fx:id="runningAtUrlBox" minWidth="500">
+		<VBox fx:id="runningAtUrlBox" minWidth="450">
 			<Label text="Collect running in default web browser at:" />
 			<Hyperlink fx:id="urlHyperlink" onMouseClicked="#openBrowserFromLink" />
 		</VBox>
 		
 		<HBox alignment="BOTTOM_RIGHT">
 			<Button fx:id="logBtn" 
+				minWidth="100"
 				mnemonicParsing="false"
-				onMouseClicked="#toggleLog" text="Log" />
+				onMouseClicked="#toggleLog" text="Show Log" />
 		</HBox>
 	</HBox>
 	<TabPane prefWidth="560.0" prefHeight="400" tabClosingPolicy="UNAVAILABLE">

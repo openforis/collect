@@ -4,6 +4,7 @@
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:detail="org.openforis.collect.ui.component.detail.*"
+		xmlns:container="org.openforis.collect.ui.container.*"
 		width="100%"
 		>
 	
@@ -11,16 +12,44 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
+			import mx.controls.Alert;
+			import org.openforis.collect.util.ObjectUtil;
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 			import org.openforis.collect.util.UIUtil;
 			
 			private static const STATE_HORIZONTAL:String = "horizontal";
 			private static const STATE_VERTICAL:String = "vertical";
 			private static const STATE_VERTICAL_FORM_LAYOUT:String = "verticalFormLayout";
+			private static const DEFAULT_BACKGROUND_COLOR:String = "#FFFFFF";
 
+			[Bindable("instanceLabelTextChange")]
+			private var _instanceLabelText:String;
+			[Bindable("reportingNotesChange")]
+			private var _reportingNotes:String;
+			[Bindable("fieldSetPercentWidthChange")]
+			private var _fieldSetPercentWidth:Number;
+			[Bindable("backgroundColorChange")]
+			private var _backgroundColor:uint;
+			[Bindable("backgroundAlphaChange")]
+			private var _backgroundAlpha:Number;
+			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
 				checkState();
+				
+				_instanceLabelText = entityDefinition.getInstanceOrHeadingLabelText();
+				dispatchEvent(new Event("instanceLabelTextChange"));
+				
+				_reportingNotes = entityDefinition.getReportingNotes();
+				dispatchEvent(new Event("reportingNotesChange"));
+				
+				var backgroundColorHex = ObjectUtil.defaultIfNull(entityDefinition.backgroundColor, DEFAULT_BACKGROUND_COLOR);
+				_backgroundColor = fromHexToInt(backgroundColorHex);
+				dispatchEvent(new Event("backgroundColorChange"));
+				
+				_backgroundAlpha = entityDefinition.backgroundAlpha;
+				dispatchEvent(new Event("backgroundAlphaChange"));
 			}
 
 			protected function checkState(event:Event = null):void {
@@ -35,6 +64,44 @@
 				}
 			}
 			
+			private function fromHexToInt(hex:String):int {
+				var noHashHex = hex.charAt(0) == '#' ? hex.substring(1) : hex;
+				return parseInt(noHashHex, 16);
+			}
+			
+			override public function set entityDefinition(entityDefinition:EntityDefinitionProxy):void {
+				super.entityDefinition = entityDefinition;
+				if (entityDefinition != null && ! isNaN(entityDefinition.width)) {
+					_fieldSetPercentWidth = 100;
+				} else {
+					_fieldSetPercentWidth = NaN;
+				}
+			}
+			
+			[Bindable("fieldSetPercentWidthChange")]
+			public function get fieldSetPercentWidth():Number {
+				return _fieldSetPercentWidth;
+			}
+			
+			[Bindable("reportingNotesChange")]
+			public function get reportingNotes():String {
+				return _reportingNotes;
+			}
+			
+			[Bindable("instanceLabelTextChange")]
+			public function get instanceLabelText():String {
+				return _instanceLabelText;
+			}
+			
+			[Bindable("backgroundColorChange")]
+			public function get backgroundColor():uint {
+				return _backgroundColor;
+			}
+
+			[Bindable("backgroundAlphaChange")]
+			public function get backgroundAlpha():Number {
+				return _backgroundAlpha;
+			}
 		]]>
 	</fx:Script>
 	
@@ -46,15 +113,19 @@
 	</detail:states>
 	
 	<detail:layout>
-		<s:VerticalLayout />
+		<s:VerticalLayout paddingTop.verticalFormLayout="10" />
 	</detail:layout>
 
-	<detail:FormItemLabel id="formItemLabel"
-		  				  nodeDefinition="{entityDefinition}" 
-						  includeIn="verticalFormLayout" />
-	
-	<s:HGroup 
-			paddingLeft.verticalFormLayout="20">
+	<container:FieldSet id="fieldSet" legend="{instanceLabelText}" 
+		notesLabel="Notes for reporting:" notes="{reportingNotes}" 
+		includeIn="verticalFormLayout" percentWidth="{fieldSetPercentWidth}">
+		<container:backgroundFill>
+			<s:SolidColor color="{backgroundColor}" alpha="{backgroundAlpha}" />
+		</container:backgroundFill>
+		<fx:Reparent includeIn="verticalFormLayout" target="innerFormContainer"/>
+	</container:FieldSet>
+
+	<s:HGroup excludeFrom="verticalFormLayout" id="innerFormContainer">
 		<detail:InnerFormContainer 
 			id="definitionsPerCurrentTabContainer"
 			entityDefinition="{entityDefinition}"
@@ -63,5 +134,5 @@
 			modelVersion="{modelVersion}"
 			 />
 	</s:HGroup>
-
+	
 </detail:EntityFormItem>

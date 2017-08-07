@@ -14,13 +14,14 @@ package org.openforis.collect.model.proxy {
     public class UserProxy extends UserProxyBase {
 		
 		public static const ROLE_VIEW:String = "ROLE_VIEW";
+		public static const ROLE_ENTRY_LIMITED:String = "ROLE_ENTRY_LIMITED";
 		public static const ROLE_ENTRY:String = "ROLE_ENTRY";
 		public static const ROLE_CLEANSING:String = "ROLE_CLEANSING";
 		public static const ROLE_ANALYSIS:String = "ROLE_ANALYSIS";
 		public static const ROLE_ADMIN:String = "ROLE_ADMIN";
-		public static const ROLES:Array = [ROLE_VIEW, ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
+		public static const ROLES:Array = [ROLE_VIEW, ROLE_ENTRY_LIMITED, ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
 		
-		protected static const ROLES_HIERARCHY:Array = [ROLE_VIEW, ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
+		protected static const ROLES_HIERARCHY:Array = [ROLE_VIEW, ROLE_ENTRY_LIMITED, ROLE_ENTRY, ROLE_CLEANSING, ROLE_ANALYSIS, ROLE_ADMIN];
 		
 		private function calculateHighestRoleIndex():int {
 			var max:int = -1;
@@ -60,7 +61,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function canSubmit(record:RecordProxy):Boolean {
-			return hasEffectiveRole(ROLE_ENTRY) && record.step == CollectRecord$Step.ENTRY || 
+			return hasEffectiveRole(ROLE_ENTRY_LIMITED) && record.step == CollectRecord$Step.ENTRY || 
 				hasEffectiveRole(ROLE_CLEANSING) && record.step == CollectRecord$Step.CLEANSING;
 		}
 
@@ -74,10 +75,10 @@ package org.openforis.collect.model.proxy {
 			var result:Boolean = false;
 			switch ( step ) {
 				case CollectRecord$Step.ENTRY:
-					result = hasEffectiveRole(ROLE_ENTRY);
+					result = hasEffectiveRole(ROLE_ENTRY_LIMITED);
 					break;
 				case CollectRecord$Step.CLEANSING:
-					result = hasEffectiveRole(UserProxy.ROLE_CLEANSING);
+					result = hasEffectiveRole(ROLE_CLEANSING);
 					break;
 				case CollectRecord$Step.ANALYSIS:
 					result = false
@@ -86,16 +87,30 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		public function get canDeleteNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN);
-		}
-		
-		public function get canEditRecords():Boolean {
+		public function get canAddRecords():Boolean {
 			return hasEffectiveRole(ROLE_ENTRY);
 		}
 		
+		public function get canEditRecords():Boolean {
+			return hasEffectiveRole(ROLE_ENTRY_LIMITED);
+		}
+		
+		public function get canEditOnlyOwnedRecords():Boolean {
+			var highest:int = calculateHighestRoleIndex();
+			var index:int = ROLES_HIERARCHY.indexOf(ROLE_ENTRY_LIMITED);
+			return highest == index;
+		}
+		
 		public function get canEditNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN);
+			return hasEffectiveRole(ROLE_CLEANSING);
+		}
+		
+		public function get canDeleteRecords():Boolean {
+			return hasEffectiveRole(ROLE_ENTRY);
+		}
+		
+		public function get canDeleteNotOwnedRecords():Boolean {
+			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 		
 		public function get canViewAllRecords():Boolean {
@@ -103,15 +118,19 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get canViewNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN) || hasRole(ROLE_VIEW);
+			return hasEffectiveRole(ROLE_CLEANSING) || hasRole(ROLE_VIEW);
+		}
+		
+		public function get canViewMap():Boolean {
+			return hasRole(ROLE_VIEW) || hasEffectiveRole(ROLE_ENTRY);
 		}
 		
 		public function get canRunSaikuAnalysis():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN) || hasRole(ROLE_VIEW);
+			return hasEffectiveRole(ROLE_CLEANSING) || hasRole(ROLE_VIEW);
 		}
 		
 		public function get canCancelApplicationLockingJob():Boolean {
-			return hasEffectiveRole(ROLE_ADMIN);
+			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 	}
 }

@@ -54,6 +54,10 @@ package org.openforis.collect.metamodel.proxy {
 			return getSpecificLabelText(labelTypes, false);
 		}
 		
+		public function getReportingNotes():String {
+			return getPromptText(PromptProxy$Type.PC);
+		}
+		
 		public function getSpecificLabelText(typesStack:Array, nameIfNotFound:Boolean = true):String {
 			var label:NodeLabelProxy = null;
 			for each (var type:NodeLabelProxy$Type in typesStack) {
@@ -99,6 +103,48 @@ package org.openforis.collect.metamodel.proxy {
 			}
 			result = TextUtil.trimLeadingWhitespace(result);
 			return result;
+		}
+		
+		public function getPromptText(type:PromptProxy$Type):String {
+			var prompt:PromptProxy = getPromptByType(type);
+			return prompt == null ? null : prompt.text;
+		}
+		
+		public function getPromptByType(type:PromptProxy$Type):PromptProxy {
+			if( CollectionUtil.isNotEmpty(prompts) ) {
+				var promptsPerType:IList = getPromptsByType(type);
+				var langCode:String = Application.localeLanguageCode;
+				var isDefaultLang:Boolean = langCode == Application.activeSurvey.defaultLanguageCode;
+				for each(var prompt:PromptProxy in promptsPerType) {
+					if ( prompt.language == null && isDefaultLang || prompt.language == langCode) {
+						return prompt;
+					}
+				}
+				return getDefaultLanguagePromptByType(type);
+			} else {
+				return null;
+			}
+		}
+		
+		public function getPromptsByType(type:PromptProxy$Type):IList {
+			var result:IList = new ArrayCollection();
+			for each(var prompt:PromptProxy in prompts) {
+				if ( prompt.type == type ) {
+					result.addItem(prompt);
+				}
+			}
+			return result;
+		}
+		
+		public function getDefaultLanguagePromptByType(type:PromptProxy$Type):PromptProxy {
+			var promptsPerType:IList = getPromptsByType(type);
+			var defaultLangCode:String = Application.activeSurvey.defaultLanguageCode;
+			for each(var prompt:PromptProxy in promptsPerType) {
+				if ( prompt.language == null || prompt.language == defaultLangCode) {
+					return prompt;
+				}
+			}
+			return null;
 		}
 		
 		public function get rootEntity():EntityDefinitionProxy {

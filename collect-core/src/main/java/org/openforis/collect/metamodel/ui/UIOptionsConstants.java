@@ -32,6 +32,7 @@ public interface UIOptionsConstants {
 	String SHOW_ALLOWED_VALUES_PREVIEW = "showAllowedValuesPreview";
 	String SHOW_CODE = "showCode";
 	String SHOW_FAMILY = "showFamily";
+	String SHOW_SRS_FIELD = "showSrsField";
 	String INCLUDE_UNIQUE_VERNACULAR_NAME = "includeUniqueVernacularName";
 	String HIDE = "hide";
 	String COLUMN = "column";
@@ -41,4 +42,7 @@ public interface UIOptionsConstants {
 	String LABEL_ORIENTATION = "labelOrientation";
 	
 	String AUTO_UPPERCASE = "autoUppercase";
+	
+	String BACKGROUND_COLOR = "backgroundColor";
+	String BACKGROUND_ALPHA = "backgroundAlpha";
 }

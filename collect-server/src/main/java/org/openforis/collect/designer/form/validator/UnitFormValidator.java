@@ -34,7 +34,7 @@ public class UnitFormValidator extends SurveyObjectFormValidator<Unit> {
 	}
 
 	protected boolean validateNameUniqueness(ValidationContext ctx) {
-		SurveyObjectBaseVM<Unit> viewModel = getSurveyObjectVM(ctx);
+		SurveyObjectBaseVM<Unit> viewModel = getVM(ctx);
 		Unit editedItem = viewModel.getEditedItem();
 		CollectSurvey survey = viewModel.getSurvey();
 		String name = (String) getValue(ctx, NAME_FIELD);

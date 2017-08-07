@@ -57,7 +57,7 @@ public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidato
 	protected void validateAttributeDefaults(ValidationContext ctx) {
 		boolean calculated = isCalculated(ctx);
 		if (calculated) {
-			AttributeVM<?> vm = (AttributeVM<?>) getVM(ctx);
+			AttributeVM<?> vm = getVM(ctx);
 			List<AttributeDefault> attributeDefaults = vm.getAttributeDefaults();
 			validateRequired(ctx, ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
 		}
@@ -66,7 +66,7 @@ public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidato
 	protected void validateChecks(ValidationContext ctx) {
 		boolean calculated = isCalculated(ctx);
 		if (calculated) {
-			AttributeVM<?> vm = (AttributeVM<?>) getVM(ctx);
+			AttributeVM<?> vm = getVM(ctx);
 			List<Check<?>> checks = vm.getChecks();
 			if (checks != null && !checks.isEmpty()) {
 				addInvalidMessage(ctx, CHECKS_FIELD,

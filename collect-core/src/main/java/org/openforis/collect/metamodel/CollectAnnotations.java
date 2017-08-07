@@ -54,6 +54,7 @@ public class CollectAnnotations {
 		COLLECT_VERSION(new QName(COLLECT_NAMESPACE_URI, "collectVersion"), "3.4.0"),
 		GEOMETRY(new QName(COLLECT_NAMESPACE_URI, "geometry"), false),
 		SHOW_IN_MAP_BALLOON(new QName(COLLECT_NAMESPACE_URI, "showInMapBalloon"), true),
+		KEY_CHANGE_ALLOWED(new QName(COLLECT_NAMESPACE_URI, "keyChangeAllowed"), true),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -79,7 +80,10 @@ public class CollectAnnotations {
 		LABEL_WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_WIDTH)),
 		LABEL_ORIENTATION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_ORIENTATION), Orientation.HORIZONTAL),
 		AUTO_UPPERCASE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTO_UPPERCASE), false),
-
+		BACKGROUND_COLOR(new QName(UI_NAMESPACE_URI, UIOptionsConstants.BACKGROUND_COLOR)),
+		BACKGROUND_ALPHA(new QName(UI_NAMESPACE_URI, UIOptionsConstants.BACKGROUND_ALPHA), 0.5),
+		COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_SRS_FIELD), true),
+		
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
 		COLLECT_EARTH_HIDE_IN_RECORD_LIST(new QName(COLLECT_EARTH_NAMESPACE_URI, "hideinrecordlist"), false),
@@ -167,6 +171,14 @@ public class CollectAnnotations {
 	public void setSurveyTarget(SurveyTarget target) {
 		String val = target == null || target == Annotation.TARGET.defaultValue ? null: target.getCode();
 		survey.setAnnotation(Annotation.TARGET.getQName(), val);
+	}
+	
+	public boolean isKeyChangeAllowed() {
+		return getAnnotationBooleanValue(survey, Annotation.KEY_CHANGE_ALLOWED);
+	}
+	
+	public void setKeyChangeAllowed(boolean value) {
+		setAnnotationValue(survey, Annotation.KEY_CHANGE_ALLOWED, value);
 	}
 
 	public Step getPhaseToApplyDefaultValue(AttributeDefinition def) {
@@ -347,6 +359,30 @@ public class CollectAnnotations {
 	
 	public void setShowInMapBalloon(AttributeDefinition def, boolean showInMapBalloon) {
 		setAnnotationValue(def, Annotation.SHOW_IN_MAP_BALLOON, showInMapBalloon);
+	}
+	
+	public String getBackgroundColor(NodeDefinition def) {
+		return def.getAnnotation(Annotation.BACKGROUND_COLOR.qName);
+	}
+
+	public void setBackgroundColor(NodeDefinition def, String color) {
+		def.setAnnotation(Annotation.BACKGROUND_COLOR.qName, color);
+	}
+	
+	public Double getBackgroundAlpha(NodeDefinition def) {
+		return getAnnotationDoubleValue(def, Annotation.BACKGROUND_ALPHA);
+	}
+
+	public void setBackgroundAlpha(NodeDefinition def, Double alpha) {
+		setAnnotationValue(def, Annotation.BACKGROUND_ALPHA, alpha);
+	}
+	
+	public boolean isShowSrsField(CoordinateAttributeDefinition def) {
+		return getAnnotationBooleanValue(def, Annotation.COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD);
+	}
+	
+	public void setShowSrsField(CoordinateAttributeDefinition def, boolean showSrsField) {
+		setAnnotationValue(def, Annotation.COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD, showSrsField);
 	}
 
 	private <T extends Enum<T>> Enum<T> getAnnotationEnumValue(AttributeDefinition def, Annotation annotation, Class<T> enumType) {

@@ -19,6 +19,7 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
@@ -318,7 +319,7 @@ package org.openforis.collect.model.proxy {
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
 					var keyAttr:AttributeProxy = getSingleAttribute(def);
 					if(keyAttr != null) {
-						var keyValue:Object = getKeyLabelPart(def, keyAttr);
+						var keyValue:Object = getKeyValue(keyAttr);
 						if(keyValue != null && StringUtil.isNotBlank(keyValue.toString())) {
 							shortKeyParts.push(keyValue.toString());
 							var label:String = def.getInstanceOrHeadingLabelText();
@@ -343,30 +344,36 @@ package org.openforis.collect.model.proxy {
 			if(keyDefs.length > 0) {
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
 					var keyAttr:AttributeProxy = getSingleAttribute(def);
-					var keyValue:Object = getKeyLabelPart(def, keyAttr);
+					var keyValue:Object = getKeyValue(keyAttr);
 					result.push(keyValue);
 				}
 			}
 			return result;
 		}
 		
-		private function getKeyLabelPart(attributeDefn:AttributeDefinitionProxy, attribute:AttributeProxy):Object {
-			var result:Object = null;
-			var f:FieldProxy = attribute.getField(0);
-			var value:Object = f.value;
-			if(ObjectUtil.isNotNull(value)) {
-				if(attributeDefn is NumberAttributeDefinitionProxy) {
-					var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(attributeDefn);
-					if ( numberDefn.integer ) {
-						result = int(value);
-					} else {
-						result = Number(value);
-					}
-				} else {
-					result = value;
-				}
+		private function getKeyValue(attribute:AttributeProxy):Object {
+			var attributeDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(attribute.definition);
+			if(attributeDefn.editable && attribute.userSpecified && attribute.empty) {
+				return null;
 			}
-			return result;
+			if (attributeDefn is NumberAttributeDefinitionProxy) {
+				var numberDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(attributeDefn);
+				var f:FieldProxy = attribute.getField(0);
+				var value:Object = f.value;
+				if ( numberDefn.integer ) {
+					return int(value);
+				} else {
+					return Number(value);
+				}
+			} else if (attributeDefn is TaxonAttributeDefinitionProxy) {
+				var visibleFieldIndexes:IList = attributeDefn.visibleFieldIndexes;
+				var firstVisibleFieldIdx:int = int(visibleFieldIndexes.getItemAt(0));
+				var f:FieldProxy = attribute.getField(firstVisibleFieldIdx);
+				return f.value;
+			} else {
+				var f:FieldProxy = attribute.getField(0);
+				return f.value;
+			}
 		}
 		
 		public function updateChildrenMinCountValiditation(map:IMap):void {

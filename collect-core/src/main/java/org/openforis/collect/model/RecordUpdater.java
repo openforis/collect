@@ -197,7 +197,7 @@ public class RecordUpdater {
 		setMissingValueApproved(parentEntity, attribute.getName(), false);
 		
 		if (value == null) {
-			applyInitialValue(attribute, true);
+			applyInitialValue(attribute);
 		}
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
@@ -289,7 +289,7 @@ public class RecordUpdater {
 			updatedAttributes.addAll(updatedCodeAttributes);
 			changeMap.addValueChanges(updatedCodeAttributes);
 		}
-		
+
 		if (validateAfterUpdate) {
 			// relevance
 			Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedAttributes);
@@ -298,10 +298,25 @@ public class RecordUpdater {
 			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
 			RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
 			Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
+			Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
+			
+			//apply default values to relevant nodes (if not applied yet)
+			for (Node<?> updatedRelevanceNode: updatedRelevanceNodes) {
+				if (updatedRelevanceNode instanceof Attribute) {
+					Attribute<?, ?> updatedRelevanceAttr = (Attribute<?, ?>) updatedRelevanceNode;
+					if (! updatedRelevanceAttr.getDefinition().isCalculated()) {
+						if (updatedRelevanceAttr.isEmpty() || isDefaultValueApplied(updatedRelevanceAttr)) {
+							Value appliedValue = applyInitialValue(updatedRelevanceAttr);
+							if (appliedValue != null) {
+								updatedAttributes.add((Attribute<?, ?>) updatedRelevanceNode);
+							}
+						}
+					}
+				}
+			}
 			changeMap.addRelevanceChanges(updatedRelevancePointers);
 			
 			if (clearNotRelevantAttributes) {
-				Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
 				Set<Attribute<?, ?>> noMoreRelevantAttributes = retainNotRelevantAttributes(updatedRelevanceNodes);
 				Set<Attribute<?, ?>> clearedAttributes = clearUserSpecifiedAttributes(noMoreRelevantAttributes);
 				updatedAttributes.addAll(clearedAttributes);
@@ -348,7 +363,7 @@ public class RecordUpdater {
 			// validate attributes
 			Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(updatedAttributes);
 			nodesToCheckValidationFor.add(attribute);
-			nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
+			nodesToCheckValidationFor.addAll(updatedRelevanceNodes);
 			nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 			
 			Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
@@ -653,6 +668,10 @@ public class RecordUpdater {
 		}
 	}
 	
+	private boolean isDefaultValueApplied(Attribute<?, ?> attribute) {
+		return attribute.getField(0).getState().get(DEFAULT_APPLIED_POSITION);
+	}
+	
 	/**
 	 * Applies the first default value (if any) that is applicable to the attribute.
 	 * The condition of the corresponding DefaultValue will be verified.
@@ -767,7 +786,7 @@ public class RecordUpdater {
 
 		addEmptyNodes(entity);
 		
-		applyInitialValues(entity, newEntity);
+		applyInitialValues(entity);
 		
 		//recalculate attributes
 		//TODO exclude this when exporting for backup (not for Calc)
@@ -795,7 +814,8 @@ public class RecordUpdater {
 			pointersToRecalculateRelevanceFor.addAll(getChildNodePointers(entity));
 			pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodes(calculatedAttributes));
 			if (entity.getParent() != null) {
-				pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodePointers(Arrays.asList(new NodePointer(entity.getParent(), entity.getDefinition()))));
+				pointersToRecalculateRelevanceFor.addAll(record.determineRelevanceDependentNodePointers(
+						Arrays.asList(new NodePointer(entity))));
 			}
 			
 			Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
@@ -867,26 +887,26 @@ public class RecordUpdater {
 		return count;
 	}
 	
-	private List<Attribute<?, ?>> applyInitialValues(Entity entity, final boolean newEntity) {
-		final List<Attribute<?, ?>> attributes = new ArrayList<Attribute<?,?>>();
+	private List<Attribute<?, ?>> applyInitialValues(Entity entity) {
+		final List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		entity.traverse(new NodeVisitor() {
 			public void visit(Node<?> node, int idx) {
 				if (node instanceof Attribute && node.isEmpty()) {
 					Attribute<?, ?> attr = (Attribute<?, ?>) node;
-					Value value = applyInitialValue(attr, newEntity);
+					Value value = applyInitialValue(attr);
 					if (value != null) {
-						attributes.add(attr);
+						updatedAttributes.add(attr);
 					}
 				}
 			}
 		});
-		return attributes;
+		return updatedAttributes;
 	}
 
-	private Value applyInitialValue(Attribute<?, ?> attr, boolean newEntity) {
+	private Value applyInitialValue(Attribute<?, ?> attr) {
 		Value value = null;
 		if (! attr.getDefinition().isCalculated()) {
-			if (newEntity && isDefaultValueToBeApplied(attr)) {
+			if (attr.isEmpty() && isDefaultValueToBeApplied(attr)) {
 				value = performDefaultValueApply(attr);
 			}
 			if(attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly() && attr.isEmpty()) {

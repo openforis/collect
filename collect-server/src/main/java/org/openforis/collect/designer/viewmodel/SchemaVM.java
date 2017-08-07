@@ -83,8 +83,6 @@ import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
 
-import com.google.common.collect.Sets;
-
 /**
  * 
  * @author S. Ricci
@@ -111,8 +109,8 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_REFERENCED_ATTRIBUTE_MESSAGE_KEY = "survey.schema.attribute.confirm_remove_referenced_attribute";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
 
-	private static final Set<AttributeType> SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES = Sets.immutableEnumSet(BOOLEAN,
-			CODE, DATE, NUMBER, TEXT, TIME);
+	private static final Set<AttributeType> SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES = Collections.unmodifiableSet(
+			new HashSet<AttributeType>(Arrays.asList(BOOLEAN, CODE, DATE, NUMBER, TEXT, TIME)));
 
 	private static final Pattern CLONED_NAME_PATTERN = Pattern.compile("(.*)(\\d+)");
 
@@ -318,15 +316,10 @@ public class SchemaVM extends SurveyBaseVM {
 			return selectedRootEntity;
 		} else {
 			SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-			if (surveyObject instanceof EntityDefinition) {
-				return (EntityDefinition) surveyObject;
-			} else {
-				EntityDefinition parentEntity = treeModel.getNearestParentEntityDefinition(surveyObject);
-				return parentEntity;
-			}
+			return getNearestEntity(surveyObject);
 		}
 	}
-
+	
 	@Command
 	public void addAttribute(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("attributeType") final String attributeType) throws Exception {
@@ -1358,9 +1351,8 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 		SurveyObject selectedItem = selectedTreeNode.getSurveyObject();
 
-		if (selectedItem instanceof AttributeDefinition) {
-			AttributeDefinition selectedNode = (AttributeDefinition) selectedItem;
-			openSelectParentNodePopupForDuplicate(selectedNode);
+		if (selectedItem instanceof NodeDefinition) {
+			openSelectParentNodePopupForDuplicate((NodeDefinition) selectedItem);
 		}
 	}
 
@@ -1579,6 +1571,15 @@ public class SchemaVM extends SurveyBaseVM {
 			return newParentEntityDef;
 		} else {
 			return (EntityDefinition) obj;
+		}
+	}
+
+	private EntityDefinition getNearestEntity(SurveyObject surveyObject) {
+		if (surveyObject instanceof EntityDefinition) {
+			return (EntityDefinition) surveyObject;
+		} else {
+			EntityDefinition parentEntity = treeModel.getNearestParentEntityDefinition(surveyObject);
+			return parentEntity;
 		}
 	}
 

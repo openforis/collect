@@ -1,7 +1,6 @@
 package org.openforis.idm.metamodel;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -9,6 +8,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * 
@@ -57,16 +58,8 @@ public abstract class Languages {
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
 		} finally {
-			if ( is != null ) {
-				try {
-					is.close();
-				} catch (IOException e) {}
-			}
-			if ( br != null ) {
-				try {
-					br.close();
-				} catch (IOException e) {}
-			}
+			IOUtils.closeQuietly(is);
+			IOUtils.closeQuietly(br);
 		}
 		return temp;
 	}

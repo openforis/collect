@@ -77,7 +77,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Integer width;
 	private Integer labelWidth;
 	private String labelOrientation;
+	private String backgroundColor;
+	private Integer backgroundTransparency;
 
+	
 	NodeDefinitionFormObject() {
 	}
 	
@@ -198,6 +201,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			
 			includeInDataExport = annotations.isIncludedInDataExport(source);
 		}
+		backgroundColor = annotations.getBackgroundColor(source);
+		backgroundTransparency = fromAlphaToTransparency(annotations.getBackgroundAlpha(source));
 	}
 
 	@Override
@@ -284,6 +289,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			//show in ui
 			uiOptions.setHidden(dest, ! showInUI);
 		}
+		annotations.setBackgroundColor(dest, backgroundColor);
+		annotations.setBackgroundAlpha(dest, fromTransparencyToAlpha(backgroundTransparency));
 	}
 
 	@Override
@@ -301,6 +308,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setParentDefinition(EntityDefinition parentDefinition) {
 		this.parentDefinition = parentDefinition;
+	}
+
+	private static int fromAlphaToTransparency(double backgroundAlpha) {
+		return Double.valueOf(Math.floor(100 * (1 - backgroundAlpha))).intValue();
+	}
+
+	private static double fromTransparencyToAlpha(int transparency) {
+		return 1 - ((double) (transparency / 100d));
 	}
 
 	public String getName() {
@@ -585,5 +600,21 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setMeasurement(boolean measurement) {
 		this.measurement = measurement;
+	}
+	
+	public Integer getBackgroundTransparency() {
+		return backgroundTransparency;
+	}
+	
+	public void setBackgroundTransparency(Integer backgroundTransparency) {
+		this.backgroundTransparency = backgroundTransparency;
+	}
+	
+	public String getBackgroundColor() {
+		return backgroundColor;
+	}
+	
+	public void setBackgroundColor(String backgroundColor) {
+		this.backgroundColor = backgroundColor;
 	}
 }

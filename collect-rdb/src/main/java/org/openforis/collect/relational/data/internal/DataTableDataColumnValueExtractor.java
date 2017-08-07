@@ -2,7 +2,6 @@ package org.openforis.collect.relational.data.internal;
 
 import java.util.List;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
@@ -44,9 +43,13 @@ public class DataTableDataColumnValueExtractor<C extends DataColumn> extends Col
 				val = ((String) val).substring(0, colLength);
 			}
 		}
-		return ObjectUtils.defaultIfNull(val, column.getDefaultValue());
+		if (isNullOrNaN(val)) {
+			return column.getDefaultValue();
+		} else {
+			return val;
+		}
 	}
-	
+
 	protected Node<?> extractValueNode(Node<?> context) {
 		List<Node<?>> vals = column.getRelativePath().evaluate(context);
 		if ( vals.size() > 1 ) {
@@ -87,4 +90,11 @@ public class DataTableDataColumnValueExtractor<C extends DataColumn> extends Col
 			return null;
 		}
 	}
+	
+	private static boolean isNullOrNaN(Object val) {
+		return val == null 
+				|| val instanceof Double && Double.isNaN((Double) val) 
+				|| val instanceof Float && Float.isNaN((Float) val);
+	}
+	
 }
