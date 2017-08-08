@@ -20,6 +20,7 @@ import Navbar, {Brand} from 'react-bootstrap/lib/Navbar';
 import history from '../../core/history';
 import $ from "jquery";
 import Sidebar from '../sidebar';
+import SurveySelect from '../survey/SurveySelect';
 
 const logo = require('./logo.png');
 
@@ -40,7 +41,14 @@ function Header() {
             </span>
           </Brand>
           <ul className="nav navbar-top-links navbar-right">
-
+		          <li>
+		          	<div className="form-group">
+		          		<label htmlFor="survey-select">Preferred survey:</label>
+		          		<div className="input-group">
+		          			<SurveySelect id="survey-select" />
+	          			</div>
+		          	</div>
+		    	</li>
               <NavDropdown bsClass="dropdown" title={<span><i className="fa fa-envelope fa-fw"></i></span>} id="navDropdown1">
                 <MenuItem style={ {width: 300} } eventKey="1">
                   <div> <strong>John Smith</strong> <span className="pull-right text-muted"> <em>Yesterday</em> </span> </div>

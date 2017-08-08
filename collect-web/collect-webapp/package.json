@@ -1,9 +1,7 @@
 {
+  "name": "open-foris-collect",
+  "version": "4.0.0",
   "private": true,
-  "engines": {
-    "node": ">=5.0 <7",
-    "npm": ">=3.3 <4"
-  },
   "dependencies": {
     "axios": "^0.16.0",
     "babel-polyfill": "6.13.0",
@@ -37,11 +35,11 @@
     "passport": "0.3.2",
     "passport-facebook": "2.1.1",
     "pretty-error": "2.0.0",
-    "react": "^15.4.2",
+    "react": "^15.6.1",
     "react-bootstrap": "^0.30.3",
     "react-bootstrap-table": "^3.3.5",
     "react-chartjs": "^0.8.0",
-    "react-dom": "^15.4.2",
+    "react-dom": "^15.6.1",
     "react-redux": "^5.0.4",
     "recharts": "^0.15.1",
     "redux": "^3.6.0",
@@ -49,7 +47,7 @@
     "redux-thunk": "^2.2.0",
     "sequelize": "3.24.1",
     "source-map-support": "0.4.2",
-    "sqlite3": "3.1.4",
+    "sqlite3": "^3.1.9",
     "universal-router": "1.2.2",
     "whatwg-fetch": "1.0.0"
   },

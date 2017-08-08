@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 // import classNames from 'classnames';
 import history from '../../core/history';
-import SurveySelect from '../survey/SurveySelect';
 
 class Sidebar extends Component {
 
@@ -33,12 +32,6 @@ class Sidebar extends Component {
               </div>
             </li>
           	 */}
-          	<li className="sidebar-search">
-          		<label htmlFor="sidebar-survey-select">Preferred survey:</label>
-          		<div className="input-group">
-          			<SurveySelect id="sidebar-survey-select" />
-          		</div>
-          	</li>
             <li>
               <a href="" onClick={(e) => { e.preventDefault(); history.push('/'); }} >
                 <i className="fa fa-dashboard fa-fw" /> &nbsp;Dashboard
