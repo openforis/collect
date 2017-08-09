@@ -43,8 +43,8 @@
                 <configuration>
                     <nodeVersion>${node.version}</nodeVersion>
                     <npmVersion>${npm.version}</npmVersion>
-                    <installDirectory>.</installDirectory>
-                    <workingDirectory>.</workingDirectory>
+                    <workingDirectory>${basedir}/frontend</workingDirectory>
+					<installDirectory>${project.build.directory}</installDirectory>
                 </configuration>
 
                 <executions>
@@ -54,7 +54,6 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                     </execution>
-
                     <execution>
                         <id>npm install</id>
                         <goals>
@@ -64,6 +63,17 @@
                             <arguments>install</arguments>
                         </configuration>
                     </execution>
+                    <execution>
+                    	<!-- builds the app for production -->
+						<id>npm run build</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
                 </executions>
             </plugin>
 			<plugin>
@@ -110,6 +120,40 @@
 						<include>${project.build.finalName}/datacleansing/main.html</include>
 						<include>${project.build.finalName}/js/collect/collect.js</include>
 					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/${project.build.finalName}/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>frontend/build</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- CLEAN -->
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>frontend/build</directory>
+						</fileset>
+					</filesets>
 				</configuration>
 			</plugin>
 		</plugins>

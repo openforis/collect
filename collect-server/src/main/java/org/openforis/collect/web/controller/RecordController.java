@@ -47,6 +47,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,6 +63,7 @@ import org.springframework.web.servlet.ModelAndView;
  * 
  */
 @Controller
+@Scope("session")
 public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
