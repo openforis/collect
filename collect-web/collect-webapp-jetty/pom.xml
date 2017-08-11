@@ -22,7 +22,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.6</version>
 				<executions>
 					<execution>
 						<id>unpack-webapp</id>
@@ -143,12 +142,6 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-client</artifactId>
-			<type>swf</type>
-			<scope>runtime</scope>
 		</dependency>
 		<!-- JSTL -->
 		<dependency>
