@@ -24,12 +24,15 @@ class Login extends Component {
                       <div className="col-6">
                         <button type="button" className="btn btn-primary px-4">Login</button>
                       </div>
+                      {/*
                       <div className="col-6 text-right">
                         <button type="button" className="btn btn-link px-0">Forgot password?</button>
                       </div>
+                      */}
                     </div>
                   </div>
                 </div>
+                {/*
                 <div className="card card-inverse card-primary py-5 d-md-down-none" style={{ width: 44 + '%' }}>
                   <div className="card-block text-center">
                     <div>
@@ -39,6 +42,7 @@ class Login extends Component {
                     </div>
                   </div>
                 </div>
+                */}
               </div>
             </div>
           </div>
