@@ -7555,8 +7555,8 @@ base-chart.chart {
     background-color: #fff;
     background-image: url("../img/logo.png");
     background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 70px auto;
+    background-position: left center;
+    background-size: 50px;
     border-bottom: 1px solid #cfd8dc; }
   .app-header.navbar .navbar-nav {
     flex-direction: row;
@@ -8575,7 +8575,7 @@ app-root {
     flex: 1;
     min-width: 0; }
   .app-body .sidebar {
-    flex: 0 0 200px;
+    flex: 0 0 400px;
     order: -1; }
   .app-body .aside-menu {
     flex: 0 0 250px; }

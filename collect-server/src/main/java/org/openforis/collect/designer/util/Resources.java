@@ -12,12 +12,12 @@ public class Resources {
 	
 	public enum Page {
 	
-		INDEX("index.htm"),
+		INDEX("/"),
 		LOGOUT("logout.htm"),
 		DESIGNER("designer.htm"),
 		SURVEY_EDIT("editSurvey.htm"),
 		COLLECT_SWF("collect.swf"),
-		PREVIEW_PATH("index.htm");
+		PREVIEW_PATH("old_client.htm");
 		
 		private String location;
 	

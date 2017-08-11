@@ -1,5 +1,7 @@
 <?page title="Open Foris Collect - Survey Designer - Select Survey"?>
 
+<?header name="X-Frame-Options" value="ALLOWALL"?> 
+
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
 <?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveySelectBox"?>
 
@@ -17,19 +19,6 @@
 
 	<space height="10px" />
 
-	<hbox hflex="1">
-		<box hflex="1">
-			<button id="goToIndexBtn"
-				image="/assets/images/back-small.png"
-				label="${labels.surveys_list.go_to_index_page}"
-				onClick="@command('goToIndex')" />
-		</box>
-		<box hflex="2" align="center">
-			<label sclass="mainTitle" value="${labels.designer_title}" />
-		</box>
-		<box hflex="1"></box>
-	</hbox>
-	
 	<listbox id="surveysListbox" width="900px" vflex="true"
 		model="@load(vm.surveySummaries)"
 		selectedItem="@bind(vm.selectedSurvey)">

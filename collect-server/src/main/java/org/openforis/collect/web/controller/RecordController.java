@@ -68,6 +68,8 @@ public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final String OLD_CLIENT_URL = "old_client.htm";
+
 	// private static Log LOG = LogFactory.getLog(DataController.class);
 
 	@Autowired
@@ -149,7 +151,7 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/edit.htm", method=GET)
 	public ModelAndView editRecord(@PathVariable int surveyId, @PathVariable int recordId ) throws Exception {
-		URIBuilder uriBuilder = new URIBuilder("redirect:/index.htm");
+		URIBuilder uriBuilder = new URIBuilder("redirect:/" + OLD_CLIENT_URL);
 		uriBuilder.addParameter("edit", "true");
 		uriBuilder.addParameter("surveyId", Integer.toString(surveyId));
 		uriBuilder.addParameter("recordId", Integer.toString(recordId));

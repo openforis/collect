@@ -12,7 +12,9 @@ import Aside from '../../components/Aside/';
 import Footer from '../../components/Footer/';
 
 import Dashboard from '../../views/Dashboard/'
+import DataCleansing from '../../views/DataCleansing/'
 import DataManagement from '../../views/DataManagement/'
+import SurveyDesigner from '../../views/SurveyDesigner/'
 
 import { fetchSurveySummaries } from '../../actions'
 import rootReducer from '../../reducers'
@@ -43,6 +45,8 @@ class Full extends Component {
                 <Switch>
                   <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                   <Route path="/datamanagement" name="DataManagement" component={DataManagement}/>
+                  <Route path="/datacleansing" name="DataCleansing" component={DataCleansing}/>
+                  <Route path="/surveydesigner" name="Survey Designer" component={SurveyDesigner}/>
                   <Redirect from="/" to="/dashboard"/>
                 </Switch>
               </div>

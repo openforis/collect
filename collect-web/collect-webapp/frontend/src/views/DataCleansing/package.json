@@ -1,0 +1,6 @@
+{
+  "name": "DataCleansing",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./DataCleansing.js"
+}
