@@ -21,10 +21,6 @@
 		<finalName>collect</finalName>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-            <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>1.4</version>
@@ -181,12 +177,6 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-client</artifactId>
-			<type>swf</type>
-			<scope>runtime</scope>
 		</dependency>
 		<!-- JSTL -->
 		<dependency>
