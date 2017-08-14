@@ -3,7 +3,7 @@ package org.openforis.collect.remoting.service.io.data.restore;
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.apache.poi.util.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
