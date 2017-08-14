@@ -3,6 +3,7 @@ const routes = {
   '/dashboard': 'Dashboard',
   '/datamanagement': 'Data Management',
   '/surveydesigner': 'Survey Designer',
-  '/datacleansing': 'Data Cleansing'
+  '/datacleansing': 'Data Cleansing',
+  '/map': 'Map'
 };
 export default routes;

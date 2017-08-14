@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import Constants from '../utils/Constants'
 
 export const INVALIDATE_SURVEY_SUMMARIES = 'INVALIDATE_SURVEY_SUMMARIES'
 export const REQUEST_SURVEY_SUMMARIES = 'REQUEST_SURVEY_SUMMARIES'
@@ -8,7 +9,7 @@ export const REQUEST_FULL_PREFERRED_SURVEY = 'REQUEST_FULL_PREFERRED_SURVEY'
 export const RECEIVE_FULL_PREFERRED_SURVEY = 'RECEIVE_FULL_PREFERRED_SURVEY'
 export const INVALIDATE_PREFERRED_SURVEY = 'INVALIDATE_PREFERRED_SURVEY'
 
-let CONTEXT_PATH = 'http://localhost:8480/collect/'
+let CONTEXT_PATH = Constants.SERVICES_URL;
 	
 function requestSurveySummaries() {
 	return {

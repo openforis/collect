@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, Switch, Route, Redirect } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import thunkMiddleware from 'redux-thunk'
 import { createLogger } from 'redux-logger'
@@ -14,6 +14,7 @@ import Footer from '../../components/Footer/';
 import Dashboard from '../../views/Dashboard/'
 import DataCleansing from '../../views/DataCleansing/'
 import DataManagement from '../../views/DataManagement/'
+import Map from '../../views/Map/'
 import SurveyDesigner from '../../views/SurveyDesigner/'
 
 import { fetchSurveySummaries } from '../../actions'
@@ -46,6 +47,7 @@ class Full extends Component {
                   <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                   <Route path="/datamanagement" name="DataManagement" component={DataManagement}/>
                   <Route path="/datacleansing" name="DataCleansing" component={DataCleansing}/>
+                  <Route path="/map" name="Map" component={Map}/>
                   <Route path="/surveydesigner" name="Survey Designer" component={SurveyDesigner}/>
                   <Redirect from="/" to="/dashboard"/>
                 </Switch>

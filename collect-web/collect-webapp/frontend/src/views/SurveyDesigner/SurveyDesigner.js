@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import Constants from '../../utils/Constants';
 
 class SurveyDesigner extends Component {
   render() {
 	  return (
 	    <div>
-	      <iframe src="http://localhost:8480/collect/designer.htm" width="100%" height="500px" />
+	      <iframe src={Constants.SERVICES_URL + 'designer.htm'} width="100%" height="500px" />
 	    </div>
 	  );
   }

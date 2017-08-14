@@ -31,7 +31,10 @@ class Sidebar extends Component {
               <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Survey Designer</NavLink>
 	          </li>
             <li className="nav-item">
-              <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Data Cleansing</NavLink>
+              <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="icon-diamond"></i>Data Cleansing</NavLink>
+	          </li>
+            <li className="nav-item">
+              <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="icon-map"></i>Map</NavLink>
 	          </li>
             <li className="divider"></li>
             <li className="nav-title">
