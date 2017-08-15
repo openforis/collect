@@ -38,14 +38,16 @@
         <constructor-arg ref="transactionAwareDataSource" />
     </bean>
 
- 	<!-- Configure the DSL object, optionally overriding jOOQ Exceptions with Spring Exceptions -->
-    <bean id="dsl" class="org.openforis.collect.persistence.jooq.CollectDSLContext">
-        <constructor-arg>
-			 <bean autowire="no" class="org.jooq.impl.DialectAwareJooqConfiguration" >
-			 	<constructor-arg ref="connectionProvider" />
-			 </bean>
-		</constructor-arg>
-    </bean>
+ 	<bean id="jooqConfiguration" autowire="no"
+		class="org.jooq.impl.DialectAwareJooqConfiguration">
+		<constructor-arg ref="connectionProvider" />
+	</bean>
+
+	<!-- Configure the DSL object, optionally overriding jOOQ Exceptions with 
+		Spring Exceptions -->
+	<bean id="dsl" class="org.openforis.collect.persistence.jooq.CollectDSLContext">
+		<constructor-arg ref="jooqConfiguration" />
+	</bean>
     
     <!-- End of JOOQ configuration -->
 	
@@ -117,6 +119,10 @@
   		<property name="dsl" ref="dsl" />
 	</bean>
 	
+	<bean id="userGroupDao" class="org.openforis.collect.persistence.UserGroupDao">
+  		<constructor-arg ref="jooqConfiguration" />
+	</bean>
+	
 	<!--  Managers -->
 	<bean id="codeListManager" 			class="org.openforis.collect.manager.CodeListManager" />
 	<bean id="configurationManager" 	class="org.openforis.collect.manager.ConfigurationManager" 
@@ -138,6 +144,7 @@
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" 
 		init-method="init" />
 	<bean id="userManager" 				class="org.openforis.collect.manager.LocalUserManager" />
+	<bean id="userGroupManager" 		class="org.openforis.collect.manager.UserGroupManager" />
 
 	<!--  Services -->
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />

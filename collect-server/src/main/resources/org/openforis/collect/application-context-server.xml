@@ -26,7 +26,6 @@
 	</bean>
 	
 	<!-- Override scope for Collect core sessionRecordFileManager bean, use "session" scope -->
-	<bean id="institutionManager" 	class="org.openforis.collect.manager.ClientInstitutionManager" />
 	<bean id="recordSessionManager" class="org.openforis.collect.manager.RecordSessionManager"
 		scope="session" />
 	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />

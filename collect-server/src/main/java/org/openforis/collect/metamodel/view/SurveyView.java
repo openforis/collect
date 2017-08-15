@@ -7,7 +7,7 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.uiconfiguration.view.UIConfigurationView;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Institution;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.xml.CeoApplicationOptions;
 
 public class SurveyView {
@@ -16,7 +16,7 @@ public class SurveyView {
 	private String name;
 	private boolean temporary;
 	private SurveyTarget target;
-	private Institution institution;
+	private UserGroup userGroup;
 	private SchemaView schema;
 	private List<CodeListView> codeLists = new ArrayList<CodeListView>();
 	private CeoApplicationOptions ceoApplicationOptions;
@@ -31,7 +31,7 @@ public class SurveyView {
 	
 	public SurveyView(CollectSurvey survey) {
 		this(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
-		this.institution = survey.getInstitution();
+		this.userGroup = survey.getUserGroup();
 		this.schema = new SchemaView();
 		this.uiConfiguration = survey.getUIConfiguration();
 		this.ceoApplicationOptions = survey.getApplicationOptions(CeoApplicationOptions.TYPE);
@@ -69,12 +69,12 @@ public class SurveyView {
 		this.target = target;
 	}
 	
-	public Institution getInstitution() {
-		return institution;
+	public UserGroup getUserGroup() {
+		return userGroup;
 	}
 	
-	public void setInstitution(Institution institution) {
-		this.institution = institution;
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
 	}
 	
 	public List<CodeListView> getCodeLists() {

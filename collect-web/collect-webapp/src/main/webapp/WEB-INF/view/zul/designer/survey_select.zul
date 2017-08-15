@@ -41,6 +41,8 @@
 			<listheader label="${labels.survey.published}" width="70px"
 				id="surveysListPublishedHeader"
 				sort="auto(published, temporary, name)" />
+			<!-- <listheader label="${labels.survey.usergroup}" width="70px"
+				sort="auto(userGroupLabel, name)" /> -->
 		</listhead>
 		<template name="model">
 			<listitem>
@@ -78,16 +80,11 @@
 						<image src="/assets/images/tick-small.png" />
 					</box>
 				</listcell>
-				<listcell>
-					<hlayout hflex="1"
-						visible="@load(each.recordValidationInProgress)">
-						<label
-							value="@load(each.recordValidationProgressPercent)" />
-						%
-						<progressmeter
-							value="@load(each.recordValidationProgressPercent)" hflex="1" />
-					</hlayout>
+				<!--
+				<listcell label="@load(each.userGroupLabel)"
+					onDoubleClick="@command('editSelectedSurvey')">
 				</listcell>
+				-->
 			</listitem>
 		</template>
 	</listbox>

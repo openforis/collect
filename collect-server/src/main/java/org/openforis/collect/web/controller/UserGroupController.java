@@ -5,8 +5,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 import java.util.List;
 
-import org.openforis.collect.manager.InstitutionManager;
-import org.openforis.collect.model.Institution;
+import org.openforis.collect.manager.UserGroupManager;
+import org.openforis.collect.model.UserGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,25 +15,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/institution/")
-public class InstitutionController {
+@RequestMapping("/usergroup/")
+public class UserGroupController {
 
 	@Autowired
-	private InstitutionManager institutionManager;
+	private UserGroupManager userGroupManager;
 
 	@RequestMapping(value = "summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody List<Institution> loadPublicInstitutions() {
-		return institutionManager.findPublicInstitutions();
+	public @ResponseBody List<UserGroup> loadPublicUserGroups() {
+		return userGroupManager.findPublicUserGroups();
 	}
 	
 	@RequestMapping(method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody Institution insertInstitution(@RequestBody Institution institution) {
-		return institutionManager.save(institution);
+	public @ResponseBody UserGroup insertUserGroup(@RequestBody UserGroup userGroup) {
+		userGroupManager.save(userGroup);
+		return userGroup;
 	}
 	
 	@RequestMapping(value = "/{id}", method=DELETE, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody void deleteInstitution(@PathVariable Long id) {
-		institutionManager.delete(id);
+	public @ResponseBody void deleteUserGroup(@PathVariable int id) {
+		userGroupManager.delete(id);
 	}
 	
 }
