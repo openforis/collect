@@ -40,6 +40,8 @@ public class CollectSurvey extends Survey {
 	private Version collectVersion;
 	private SurveyTarget target;
 	private Integer publishedId;
+	private Integer userGroupId;
+	private UserGroup userGroup;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -204,4 +206,21 @@ public class CollectSurvey extends Survey {
 		this.uiConfiguration = uiConfiguration;
 	}
 	
+
+	public Integer getUserGroupId() {
+		return userGroupId;
+	}
+	
+	public void setUserGroupId(Integer userGroupId) {
+		this.userGroupId = userGroupId;
+	}
+	
+	public UserGroup getUserGroup() {
+		return userGroup;
+	}
+	
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
+		this.userGroupId = userGroup == null ? null: userGroup.getId();
+	}
 }

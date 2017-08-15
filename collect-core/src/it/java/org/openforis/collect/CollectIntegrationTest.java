@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
@@ -24,10 +25,13 @@ public abstract class CollectIntegrationTest extends CollectTest {
 	protected CollectSurveyContext collectSurveyContext;
 	@Autowired
 	protected SurveyManager surveyManager;
+	@Autowired
+	protected UserGroupManager userGroupManager;
 	
 	protected CollectSurvey loadSurvey() throws IdmlParseException, SurveyValidationException {
 		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
 		CollectSurvey survey = surveyManager.unmarshalSurvey(is);
+		survey.setUserGroup(userGroupManager.getDefaultPublicUserGroup());
 		survey.setName("archenland1");
 		return survey;
 	}

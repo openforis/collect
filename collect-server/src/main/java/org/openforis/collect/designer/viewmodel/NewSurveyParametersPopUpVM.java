@@ -21,6 +21,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
@@ -45,6 +46,9 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
 	private static final String SURVEY_NAME_FIELD = "name";
+	private static final String TEMPLATE_FIELD_NAME = "template";
+	private static final String LANGUAGE_FIELD_NAME = "language";
+	private static final String USER_GROUP_FIELD_NAME = "userGroup";
 
 	private enum TemplateType {
 		BLANK,
@@ -70,6 +74,8 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		nameValidator = new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, true);
 		initLanguageModel();
 		initTemplatesModel();
+		initUserGroupsModel();
+		form.put(USER_GROUP_FIELD_NAME, getDefaultPublicUserGroupItem());
 	}
 
 	private void initTemplatesModel() {
@@ -81,9 +87,9 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		templateModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(templates));
 		templateModel.setMultiple(false);
 		LabelledItem defaultTemplate = LabelledItem.getByCode(templates, TemplateType.BLANK.name());
-		form.put("template", defaultTemplate);
+		form.put(TEMPLATE_FIELD_NAME, defaultTemplate);
 	}
-
+	
 	private void initLanguageModel() {
 		List<LabelledItem> languages = new ArrayList<LabelledItem>();
 		List<String> codes = Languages.getCodes(Standard.ISO_639_1);
@@ -94,18 +100,16 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		Collections.sort(languages, new LabelComparator());
 		languageModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(languages));
 		LabelledItem defaultLanguage = LabelledItem.getByCode(languages, Locale.ENGLISH.getLanguage());
-		form.put("language", defaultLanguage);
-	}
-	
-	public BindingListModelListModel<LabelledItem> getTemplateModel() {
-		return templateModel;
+		form.put(LANGUAGE_FIELD_NAME, defaultLanguage);
 	}
 	
 	@Command
 	public void ok() throws IdmlParseException, SurveyValidationException, SurveyStoreException {
-		String name = (String) form.get("name");
-		String langCode = ((LabelledItem) form.get("language")).getCode();
-		String templateCode = ((LabelledItem) form.get("template")).getCode();
+		String name = (String) form.get(SURVEY_NAME_FIELD);
+		String langCode = ((LabelledItem) form.get(LANGUAGE_FIELD_NAME)).getCode();
+		String templateCode = ((LabelledItem) form.get(TEMPLATE_FIELD_NAME)).getCode();
+		String userGroupName = ((LabelledItem) form.get(USER_GROUP_FIELD_NAME)).getCode();
+		
 		TemplateType templateType = TemplateType.valueOf(templateCode);
 		
 		CollectSurvey survey;
@@ -116,6 +120,8 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		default:
 			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
+		UserGroup userGroup = userGroupManager.loadByName(userGroupName);
+		survey.setUserGroupId(userGroup.getId());
 		surveyManager.save(survey);
 		//put survey in session and redirect into survey edit page
 		SessionStatus sessionStatus = getSessionStatus();
@@ -168,9 +174,6 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
 		surveyObjectsGenerator.addPredefinedObjects(survey);
 		
-		if ( survey.getSamplingDesignCodeList() == null ) {
-			survey.addSamplingDesignCodeList();
-		}
 		return survey;
 	}
 	
@@ -178,10 +181,14 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		return nameValidator;
 	}
 
+	public BindingListModelListModel<LabelledItem> getTemplateModel() {
+		return templateModel;
+	}
+	
 	public BindingListModelListModel<LabelledItem> getLanguageModel() {
 		return languageModel;
 	}
-
+	
 	public Map<String, Object> getForm() {
 		return form;
 	}

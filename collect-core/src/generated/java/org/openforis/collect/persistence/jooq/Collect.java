@@ -40,6 +40,8 @@ import org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName;
 import org.openforis.collect.persistence.jooq.tables.OfcTaxonomy;
 import org.openforis.collect.persistence.jooq.tables.OfcUser;
 import org.openforis.collect.persistence.jooq.tables.OfcUserRole;
+import org.openforis.collect.persistence.jooq.tables.OfcUserUsergroup;
+import org.openforis.collect.persistence.jooq.tables.OfcUsergroup;
 
 
 /**
@@ -55,7 +57,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcUserRole;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends SchemaImpl {
 
-	private static final long serialVersionUID = -996986;
+	private static final long serialVersionUID = -1267388592;
 
 	/**
 	 * The reference instance of <code>collect</code>
@@ -95,6 +97,7 @@ public class Collect extends SchemaImpl {
 			Sequences.OFC_TAXON_ID_SEQ,
 			Sequences.OFC_TAXONOMY_ID_SEQ,
 			Sequences.OFC_TAXON_VERNACULAR_NAME_ID_SEQ,
+			Sequences.OFC_USERGROUP_ID_SEQ,
 			Sequences.OFC_USER_ID_SEQ,
 			Sequences.OFC_USER_ROLE_ID_SEQ);
 	}
@@ -133,6 +136,8 @@ public class Collect extends SchemaImpl {
 			OfcTaxonomy.OFC_TAXONOMY,
 			OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME,
 			OfcUser.OFC_USER,
-			OfcUserRole.OFC_USER_ROLE);
+			OfcUsergroup.OFC_USERGROUP,
+			OfcUserRole.OFC_USER_ROLE,
+			OfcUserUsergroup.OFC_USER_USERGROUP);
 	}
 }

@@ -62,6 +62,8 @@
 							<inputSchema>collect</inputSchema>
 						</database>
 						<generate>
+							<daos>true</daos>
+							<pojos>true</pojos>
 							<relations>true</relations>
 							<deprecated>false</deprecated>
 						</generate>
