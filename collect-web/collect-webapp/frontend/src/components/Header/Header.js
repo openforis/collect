@@ -50,19 +50,10 @@ class Header extends Component {
             <button className="nav-link navbar-toggler sidebar-toggler" type="button" onClick={this.sidebarToggle}>&#9776;</button>
           </li>
           <li className="nav-item px-3">
-            <a className="nav-link" href="#">Dashboard</a>
-          </li>
-          <li className="nav-item px-3">
-            <a className="nav-link" href="#">Users</a>
-          </li>
-          <li className="nav-item px-3">
-            <a className="nav-link" href="#">Settings</a>
+  	        <SurveySelect />
           </li>
         </ul>
         <ul className="nav navbar-nav ml-auto">
-	      <li className="nav-item">
-	        <SurveySelect />
-	      </li>
 	      <li className="nav-item d-md-down-none">
             <a className="nav-link" href="#"><i className="icon-bell"></i><span className="badge badge-pill badge-danger">5</span></a>
           </li>

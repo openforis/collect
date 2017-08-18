@@ -1,16 +1,124 @@
 import fetch from 'isomorphic-fetch'
 import Constants from '../utils/Constants'
+import UserService from '../services/UserService'
 
-export const INVALIDATE_SURVEY_SUMMARIES = 'INVALIDATE_SURVEY_SUMMARIES'
+export const LOG_IN_PENDING = 'LOG_IN_PENDING'
+export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'
+export const LOG_IN_FAILED = 'LOG_IN_FAILED'
+
+export const REQUEST_CURRENT_USER = 'REQUEST_CURRENT_USER'
+export const RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER'
+
 export const REQUEST_SURVEY_SUMMARIES = 'REQUEST_SURVEY_SUMMARIES'
 export const RECEIVE_SURVEY_SUMMARIES = 'RECEIVE_SURVEY_SUMMARIES'
+export const INVALIDATE_SURVEY_SUMMARIES = 'INVALIDATE_SURVEY_SUMMARIES'
+
 export const SELECT_PREFERRED_SURVEY = 'SELECT_PREFERRED_SURVEY'
 export const REQUEST_FULL_PREFERRED_SURVEY = 'REQUEST_FULL_PREFERRED_SURVEY'
 export const RECEIVE_FULL_PREFERRED_SURVEY = 'RECEIVE_FULL_PREFERRED_SURVEY'
 export const INVALIDATE_PREFERRED_SURVEY = 'INVALIDATE_PREFERRED_SURVEY'
 
-let CONTEXT_PATH = Constants.SERVICES_URL;
+export const REQUEST_USERS = 'REQUEST_USERS'
+export const RECEIVE_USERS = 'RECEIVE_USERS'
+export const INVALIDATE_USERS = 'INVALIDATE_USERS'
+
+let BASE_URL = Constants.API_BASE_URL;
+
+let userService = new UserService();		
+
+//LOGIN
+function loginPending() {
+	return {
+		type: LOG_IN_PENDING
+	}
+}
+
+function loginSuccess() {  
+	return {
+		type: LOG_IN_SUCCESS
+	}
+}
+
+function loginFailed() {  
+	return {
+		type: LOG_IN_FAILED
+	}
+}
+
+export function logInUser(credentials) {  
+	return function(dispatch) {
+		dispatch(loginPending());
+
+		let params = {
+			"username": credentials.username,
+			"password": credentials.password
+		}
+		let query = Object.keys(params)
+			.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+			.join('&')
 	
+		function handleErrors(response) {
+			if (!response.ok) {
+				throw Error(response.statusText);
+			}
+			return response;
+		}
+		fetch(Constants.BASE_URL + "login", {
+			method: 'POST',
+			credentials: 'include', //pass cookies, for authentication
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: query.toString()
+		})
+		.then(handleErrors)
+		.then(response => {
+			if (!response.ok || response.url.indexOf("login_error") > 0) {
+				dispatch(loginFailed());
+			} else {
+				let newCookie = response.headers.get("Set-Cookie");
+				dispatch(loginSuccess());
+				dispatch(fetchCurrentUser());
+			}
+		})
+		.catch(error => {
+			throw(error);
+		})
+	};
+}
+
+function requestCurrentUser() {
+	return {
+		type: REQUEST_CURRENT_USER
+	}
+}
+
+export function fetchCurrentUser() {
+	return function (dispatch) {
+		dispatch(requestCurrentUser())
+		var url = BASE_URL + 'session/user';
+		return fetch(url, {
+			headers: {
+				credentials: 'same-origin'
+			}
+		})
+		.then(response => response.json(),
+			error => console.log('An error occured.', error))
+		.then(json => {
+			dispatch(receiveCurrentUser(json));
+			dispatch(fetchSurveySummaries(json));
+		})
+	}
+}
+
+function receiveCurrentUser(json) {
+	return {
+	    type: RECEIVE_CURRENT_USER,
+	    user: json //TODO map into User object
+	}
+}
+
+//SURVEY SUMMARIES
 function requestSurveySummaries() {
 	return {
 		type: REQUEST_SURVEY_SUMMARIES
@@ -28,7 +136,7 @@ function receiveSurveySummaries(json) {
 export function fetchSurveySummaries() {
 	return function (dispatch) {
 		dispatch(requestSurveySummaries())
-		var url = CONTEXT_PATH + 'survey/summaries.json';
+		var url = BASE_URL + 'survey/summaries.json';
 		return fetch(url)
 		    .then(response => response.json(),
 	    		error => console.log('An error occured.', error))
@@ -42,12 +150,13 @@ export function invalidateSurveySummaries(summaries) {
 		summaries
 	}
 }
-	
+
+//PREFERRED SURVEY
 export function selectPreferredSurvey(preferredSurveySummary) {
 	let surveyId = preferredSurveySummary.id;
 	return function (dispatch) {
 		dispatch(requestFullPreferredSurvey(surveyId))
-		var url = CONTEXT_PATH + 'survey/' + surveyId + '.json';
+		var url = BASE_URL + 'survey/' + surveyId + '.json';
 		return fetch(url)
 		    .then(response => response.json(),
 	    		error => console.log('An error occured.', error))
@@ -76,5 +185,34 @@ export function invalidatePreferredSurvey(preferredSurvey) {
 	return {
 		type: INVALIDATE_PREFERRED_SURVEY,
 		preferredSurvey
+	}
+}
+
+//USERS
+function requestUsers() {
+	return {
+		type: REQUEST_USERS
+	}
+}
+
+function receiveUsers(json) {
+	return {
+	    type: RECEIVE_USERS,
+	    users: json.map(user => user), //TODO map into User object
+	    receivedAt: Date.now()
+	}
+}
+
+export function fetchUsers() {
+	return function (dispatch) {
+		dispatch(requestUsers())
+		userService.fetchUsers().then(json => dispatch(receiveUsers(json)))
+	}
+}
+
+export function invalidateUsers(users) {
+	return {
+		type: INVALIDATE_USERS,
+		users
 	}
 }

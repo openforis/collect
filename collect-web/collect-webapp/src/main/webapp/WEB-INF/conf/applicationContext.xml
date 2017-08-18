@@ -8,13 +8,13 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="
 	    http://www.springframework.org/schema/beans
-	    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	    http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
 	    http://www.springframework.org/schema/context
-	    http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	    http://www.springframework.org/schema/context/spring-context-4.2.xsd
 	    http://www.springframework.org/schema/mvc
-	    http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+	    http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
 	    http://www.springframework.org/schema/util
-	    http://www.springframework.org/schema/util/spring-util-4.1.xsd"
+	    http://www.springframework.org/schema/util/spring-util-4.2.xsd"
 	default-lazy-init="true">
 	
 	<import resource="classpath:org/openforis/collect/application-context-server.xml"/>
@@ -24,7 +24,7 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
 
 	<mvc:annotation-driven />
-
+	
 	<mvc:resources mapping="index.html" location="index.html" />
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
 	<mvc:resources mapping="/assets/**" location="/assets/" />
@@ -46,6 +46,7 @@
 
 	<util:map id="urlMappings">
 		<!-- <entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
+		<entry key="/api/**" value-ref="fileNameViewController" />
 		<entry key="/old_client.htm" value-ref="fileNameViewController" />
 		<entry key="/error.htm" value-ref="fileNameViewController" />
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
@@ -56,8 +57,6 @@
 		<entry key="/logout.htm" value-ref="fileNameViewController" />
 		<entry key="/logoUpload" value-ref="fileNameViewController" />
 
-		<entry key="/command/**" value-ref="fileNameViewController" />
-		<entry key="/survey/**" value-ref="fileNameViewController" />
 		<entry key="/speciesImport" value-ref="fileNameViewController" />
 		<entry key="/species/export/*" value-ref="fileNameViewController" />
 		<entry key="/samplingdesign/export/*" value-ref="fileNameViewController" />

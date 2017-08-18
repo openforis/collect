@@ -37,23 +37,14 @@ class Sidebar extends Component {
               <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="icon-map"></i>Map</NavLink>
 	          </li>
             <li className="divider"></li>
-            <li className="nav-title">
-              Extras
-            </li>
             <li className="nav-item nav-dropdown">
-              <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="icon-star"></i> Pages</a>
+              <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="icon-people"></i>Users Management</a>
               <ul className="nav-dropdown-items">
                 <li className="nav-item">
-                  <NavLink to={'/login'} className="nav-link" activeClassName="active"><i className="icon-star"></i> Login</NavLink>
+                  <NavLink to={'/users'} className="nav-link" activeClassName="active"><i className="icon-user"></i> Users</NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink to={'/register'} className="nav-link" activeClassName="active"><i className="icon-star"></i> Register</NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to={'/404'} className="nav-link" activeClassName="active"><i className="icon-star"></i> Error 404</NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to={'/500'} className="nav-link" activeClassName="active"><i className="icon-star"></i> Error 500</NavLink>
+                  <NavLink to={'/usergroups'} className="nav-link" activeClassName="active"><i className="icon-people"></i> Groups</NavLink>
                 </li>
               </ul>
             </li>

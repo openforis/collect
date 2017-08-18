@@ -8,8 +8,7 @@ const mapStateToProps = state => {
 }
 
 const SelectedSurveyRecordDataTable = connect(
-  mapStateToProps,
-//  mapDispatchToProps
+  mapStateToProps
 )(RecordDataTable)
 
 export default SelectedSurveyRecordDataTable

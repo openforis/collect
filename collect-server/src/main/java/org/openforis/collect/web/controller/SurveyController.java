@@ -35,7 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
-@RequestMapping("/survey/")
+@RequestMapping("/api/survey/")
 public class SurveyController extends BasicController {
 
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";

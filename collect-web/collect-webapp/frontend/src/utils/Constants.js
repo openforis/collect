@@ -2,13 +2,15 @@ import React, { Component, PropTypes } from 'react'
 
 class Constants {
 
-    static SERVICES_URL = Constants.determineServicesURL();
+    static BASE_URL = Constants.determineBaseURL();
+    static API_BASE_URL = Constants.BASE_URL + "api/";
 
-    static determineServicesURL() {
+    static determineBaseURL() {
         if (Constants.isDevReact()) {
-            return "http://127.0.0.1:8480/collect/";
+            return "http://127.0.0.1:8080/collect/";
         } else {
-            return this.props.location.URL;
+            let l = window.location;
+            return l.origin + l.pathname;
         }
     }
 

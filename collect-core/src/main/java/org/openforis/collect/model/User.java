@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.commons.lang.DeepComparable;
+import org.openforis.idm.metamodel.PersistedObject;
+
 /**
  * @author M. Togna
  * @author S. Ricci
  * 
  */
-public class User {
+public class User implements PersistedObject, Comparable<User>, DeepComparable {
 
 	private Boolean enabled;
 	private Integer id;
@@ -129,16 +132,34 @@ public class User {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((enabled == null) ? 0 : enabled.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
-		result = prime * result + ((password == null) ? 0 : password.hashCode());
-		result = prime * result + ((roles == null) ? 0 : roles.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int compareTo(User u) {
+		return this.username.compareTo(u.username);
+	}
+	
+	@Override
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)

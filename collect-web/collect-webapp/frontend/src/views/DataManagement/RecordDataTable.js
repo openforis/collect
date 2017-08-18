@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Axios from 'axios'
 import Moment from 'moment';
+import Constants from '../../utils/Constants'
 
 class RecordDataTable extends Component {
   constructor(props) {
@@ -44,7 +45,7 @@ class RecordDataTable extends Component {
 		  surveyId = this.props.survey == null ? null: this.props.survey.id) {
 	  if (surveyId == null)
 		  return;
-	  Axios.get('http://localhost:8480/collect/survey/' + surveyId + '/data/records/summary.json', {
+	  Axios.get(Constants.BASE_URL + 'survey/' + surveyId + '/data/records/summary.json', {
 		  params: {
 			  maxNumberOfRows: recordsPerPage,
 			  offset: (page - 1) * recordsPerPage,

@@ -5,14 +5,18 @@ package org.openforis.collect.manager;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.UserDao;
@@ -25,12 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
-public class LocalUserManager implements UserManager {
+public class LocalUserManager extends AbstractPersistedObjectManager<User, UserDao> implements UserManager {
 
 	@Autowired
 	private UserDao userDao;
 	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private UserGroupManager groupManager;
 	
 	//cache
 	private Map<Integer, User> userById = new TreeMap<Integer, User>();
@@ -73,9 +79,25 @@ public class LocalUserManager implements UserManager {
 	public List<User> loadAll() {
 		return userDao.loadAll();
 	}
+	
+	@Override
+	public List<User> loadAllAvailableUsers(User availableTo) {
+		if (availableTo.getRoles().contains(UserRole.ADMIN)) {
+			return loadAll();
+		} else {
+			Set<User> users = new TreeSet<User>();
+			List<UserGroup> userGroups = groupManager.findByUser(availableTo);
+			for (UserGroup userGroup : userGroups) {
+				List<User> groupUsers = groupManager.findUsersByGroup(userGroup);
+				users.addAll(groupUsers);
+			}
+			//sorted by username by default (see User.compareTo)
+			return new ArrayList<User>(users);
+		}
+	}
 
 	@Transactional
-	public void save(User user) throws UserPersistenceException {
+	public void save(User user) {
 		Integer userId = user.getId();
 		String password = user.getPassword();
 		if (StringUtils.isBlank(password)) {

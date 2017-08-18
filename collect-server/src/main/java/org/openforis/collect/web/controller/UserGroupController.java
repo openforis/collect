@@ -21,7 +21,7 @@ public class UserGroupController {
 	@Autowired
 	private UserGroupManager userGroupManager;
 
-	@RequestMapping(value = "summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "list.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody List<UserGroup> loadPublicUserGroups() {
 		return userGroupManager.findPublicUserGroups();
 	}

@@ -60,3 +60,4 @@
 				onClick="@command('ok')" />
 		</box>
 	</window>
+</zk>

@@ -12,13 +12,14 @@ class SurveySelect extends Component {
     static propTypes = {
         summaries: PropTypes.array.isRequired,
         selectedSurvey: PropTypes.object,
-        isFetching: PropTypes.bool.isRequired,
+		isFetchingSummaries: PropTypes.bool.isRequired,
+		isFetchingPreferredSurvey: PropTypes.bool.isRequired,
         lastUpdated: PropTypes.number,
         dispatch: PropTypes.func.isRequired
     }
     componentDidMount() {
         const { dispatch } = this.props
-        dispatch(fetchSurveySummaries())
+        //dispatch(fetchSurveySummaries())
     }
     handleChange(event) {
     	const { isFetchingPreferredSurvey, selectedSurvey, lastPreferredSurveyUpdate, 

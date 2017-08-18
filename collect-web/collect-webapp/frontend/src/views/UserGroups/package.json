@@ -1,0 +1,6 @@
+{
+  "name": "UserGroups",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./UserGroups.js"
+}

@@ -62,6 +62,7 @@ public abstract class BaseVM {
 	private BindingListModelListModel<LabelledItem> userGroupsModel;
 	
 	void init() {
+		initUserGroupsModel();
 	}
 	
 	protected void initUserGroupsModel() {

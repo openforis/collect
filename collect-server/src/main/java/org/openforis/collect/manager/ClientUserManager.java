@@ -49,6 +49,12 @@ public class ClientUserManager extends AbstractClient implements UserManager  {
 	}
 
 	@Override
+	public List<User> loadAllAvailableUsers(User availableTo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
 	public void save(User user) throws UserPersistenceException {
 		User result = post(getUsersRestfulApiUrl() + "/user", user, User.class);
 		user.setId(result.getId()); //if user was new

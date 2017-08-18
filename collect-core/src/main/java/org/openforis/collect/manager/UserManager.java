@@ -20,6 +20,8 @@ public interface UserManager {
 	User loadAdminUser();
 
 	List<User> loadAll();
+	
+	List<User> loadAllAvailableUsers(User availableTo);
 
 	void save(User user) throws UserPersistenceException;
 	

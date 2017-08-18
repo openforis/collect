@@ -476,12 +476,13 @@ textarea {
   overflow: auto;
   resize: vertical; }
 
+/*
 fieldset {
   min-width: 0;
   padding: 0;
   margin: 0;
   border: 0; }
-
+*/
 legend {
   display: block;
   width: 100%;
