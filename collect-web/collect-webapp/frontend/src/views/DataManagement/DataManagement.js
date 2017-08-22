@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import SelectedSurveyRecordDataTable from './SelectedSurveyRecordDataTable';
-import RecordEditor from './RecordEditor';
+import RecordDataTable from './RecordDataTable';
+//import RecordEditor from './RecordEditor';
 
 class DataManagement extends Component {
   render() {
@@ -8,7 +8,7 @@ class DataManagement extends Component {
 	    <div>
 	      <div className="row">
 	        <div className="col-lg-12">
-	          <SelectedSurveyRecordDataTable />
+	          <RecordDataTable />
 	        </div>
 	      </div>
 	    </div>

@@ -1,15 +1,10 @@
-import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
-import { Redirect } from 'react-router'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 
-import Constants from '../../../utils/Constants';
 import { logInUser } from '../../../actions';
 
 class Signin extends Component {
-  constructor( props ) {
-    super( props );
-  }
 
   static propTypes = {
     dispatch: PropTypes.func.isRequired

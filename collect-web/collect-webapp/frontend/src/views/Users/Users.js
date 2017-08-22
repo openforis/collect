@@ -43,7 +43,7 @@ class Users extends Component {
 		let newSelectedUsers = this.state.selectedUsers.concat([user]);
 		return { ...this.state, 
 			selectedUsers: newSelectedUsers,
-			editedUser: newSelectedUsers.length == 1 ? newSelectedUsers[0] : null
+			editedUser: this.getUniqueItemOrNull(newSelectedUsers)
 		}
 	}
 
@@ -52,11 +52,15 @@ class Users extends Component {
 		let newSelectedUsers = this.state.selectedUsers.slice(idx, 0);
 		return { ...this.state, 
 			selectedUsers: newSelectedUsers,
-			editedUser: newSelectedUsers.length == 1 ? newSelectedUsers[0] : null
+			editedUser: this.getUniqueItemOrNull(newSelectedUsers)
 		}
 	}
+
+	getUniqueItemOrNull(items) {
+		return items.length === 1 ? items[0] : null;
+	}
 	
-  render() {
+  	render() {
 		const { isFetching, lastUpdated, users} = this.props
 		
 		let editedUserForm = null;
@@ -95,7 +99,7 @@ class Users extends Component {
 				</Row>
 	    </Container>
 		);
-  }
+  	}
 }
 
 const mapStateToProps = state => {

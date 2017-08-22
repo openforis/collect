@@ -76,7 +76,6 @@ export function logInUser(credentials) {
 			if (!response.ok || response.url.indexOf("login_error") > 0) {
 				dispatch(loginFailed());
 			} else {
-				let newCookie = response.headers.get("Set-Cookie");
 				dispatch(loginSuccess());
 				dispatch(fetchCurrentUser());
 			}

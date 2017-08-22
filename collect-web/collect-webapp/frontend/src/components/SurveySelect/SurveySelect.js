@@ -1,7 +1,8 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { FormControl } from 'react-bootstrap';
-import { fetchSurveySummaries, selectPreferredSurvey, invalidateSurvey } from '../../actions'
+import { selectPreferredSurvey } from '../../actions'
 
 class SurveySelect extends Component {
     constructor( props ) {
@@ -18,24 +19,14 @@ class SurveySelect extends Component {
         dispatch: PropTypes.func.isRequired
     }
     componentDidMount() {
-        const { dispatch } = this.props
+        //const { dispatch } = this.props
         //dispatch(fetchSurveySummaries())
     }
     handleChange(event) {
-    	const { isFetchingPreferredSurvey, selectedSurvey, lastPreferredSurveyUpdate, 
-    			isFetchingSummaries, summaries, lastSummariesUpdate} = this.props
-    	var survey = getItem(summaries, 'id', event.target.value);
+    	const { summaries } = this.props
+    	var survey = summaries.find(summary => summary.id === parseInt(event.target.value, 10));
     	if (survey) {
     		this.props.dispatch(selectPreferredSurvey(survey));
-    	}
-    	function getItem(arr, prop, value) {
-    	    for(var i = 0; i < arr.length; i++) {
-    	    	var item = arr[i];
-    	        if(item[prop] == value) {
-    	            return item;
-    	        }
-    	    }
-    	    return null;
     	}
     }
     handleSubmit(event) {
@@ -43,8 +34,7 @@ class SurveySelect extends Component {
     }
 
     render() {
-    	const { isFetchingPreferredSurvey, selectedSurvey, lastPreferredSurveyUpdate, 
-			isFetchingSummaries, summaries, lastSummariesUpdate} = this.props
+    	const { selectedSurvey, isFetchingSummaries, summaries } = this.props
     	const isEmpty = summaries.length === 0
     	
     	var options = [];

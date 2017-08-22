@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import Axios from 'axios'
@@ -110,49 +111,55 @@ class RecordDataTable extends Component {
   }
   
   findKeyAttributes(survey) {
-	  var keyAttributes = [];
-	  var queue = [];
-	  var rootEntity = survey.schema.rootEntities[0];
-	  for (var i=0; i < rootEntity.children.length; i++) {
+	  let keyAttributes = [];
+	  let queue = [];
+	  let rootEntity = survey.schema.rootEntities[0];
+	  for (let i=0; i < rootEntity.children.length; i++) {
 		  queue.push(rootEntity.children[i]);
 	  }
 	  while (queue.length > 0) {
-		  var node = queue.shift();
-		  switch(node.type) {
-		  case 'ENTITY':
-			  if (! node.multiple) {
-				  for (var i=0; i < node.children.length; i++) {
-					  var child = node.children[i];
-					  queue.push(child);
-				  }
-			  }
-			  break;
-		  case 'ATTRIBUTE':
+		let node = queue.shift();
+		switch(node.type) {
+		case 'ENTITY':
+			if (! node.multiple) {
+				for (let i=0; i < node.children.length; i++) {
+					let child = node.children[i];
+					queue.push(child);
+				}
+			}
+			break;
+		default:
 			  if (node.key) {
 				  keyAttributes.push(node);
 			  }
-			  break;
 		  }
 	  }
 	  return keyAttributes;
   }
   
   visitNodes(survey, visitFunction) {
-	  var stack = [];
+	  let stack = [];
 	  stack.push(survey.schema.rootEntities[0]);
 	  while (stack.length > 0) {
-		  var node = stack.pop();
-		  visitFunction(node);
-		  switch(node.type) {
-		  case 'ENTITY':
-			  for (var i=0; i < node.children.length; i++) {
-			    var child = node.children[i];
-			    stack.push(child);
-			  }
-			  break;
-		  }
+		let node = stack.pop();
+		visitFunction(node);
+		switch(node.type) {
+		case 'ENTITY':
+			for (let i=0; i < node.children.length; i++) {
+			let child = node.children[i];
+			stack.push(child);
+			}
+			break;
+		default:
+		}
 	  }
   }
 }
 
-export default RecordDataTable
+const mapStateToProps = state => {
+	return {
+	  survey: state.preferredSurvey ? state.preferredSurvey.survey : null
+	}
+  }
+  
+  export default connect(mapStateToProps)(RecordDataTable)

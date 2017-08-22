@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react'
+import createReactClass from 'create-react-class';
 
 class Constants {
 
@@ -16,7 +16,7 @@ class Constants {
 
     static isDevReact() {
         try {
-          React.createClass({});
+          createReactClass();
         } catch(e) {
           if (e.message.indexOf('render') >= 0) {
             return true;  // A nice, specific error message

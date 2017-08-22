@@ -6,15 +6,13 @@ import {
 } from '../actions'
 
 const initialState = {
+	isFetching: false,
+	didInvalidate: false,
 	survey: null
 }
 
 function preferredSurvey(
-    state = {
-	  isFetching: false,
-	  didInvalidate: false,
-	  survey: null
-	},
+	state = initialState,
 	action
 ) {
   switch (action.type) {
