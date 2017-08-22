@@ -18,6 +18,7 @@ class Users extends Component {
 		super( props );
 
 		this.handleRowSelect = this.handleRowSelect.bind(this);
+		this.handleNewClick = this.handleNewClick.bind(this);
 	}
 
 	static propTypes = {
@@ -60,6 +61,10 @@ class Users extends Component {
 		return items.length === 1 ? items[0] : null;
 	}
 	
+	handleNewClick() {
+		this.setState({...this.state, editedUser: {}})
+	}
+
   	render() {
 		const { isFetching, lastUpdated, users} = this.props
 		
@@ -75,7 +80,7 @@ class Users extends Component {
 			<Container>
 				<Row>
 					<Col>
-						<Button color="success">New</Button>
+						<Button color="success" onClick={this.handleNewClick}>New</Button>
 					</Col>
 				</Row>
 				<Row>

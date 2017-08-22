@@ -24,7 +24,7 @@ export const INVALIDATE_USERS = 'INVALIDATE_USERS'
 
 let BASE_URL = Constants.API_BASE_URL;
 
-let userService = new UserService();		
+let userService = new UserService();
 
 //LOGIN
 function loginPending() {
@@ -49,40 +49,23 @@ export function logInUser(credentials) {
 	return function(dispatch) {
 		dispatch(loginPending());
 
-		let params = {
-			"username": credentials.username,
-			"password": credentials.password
-		}
-		let query = Object.keys(params)
-			.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-			.join('&')
-	
 		function handleErrors(response) {
 			if (!response.ok) {
 				throw Error(response.statusText);
 			}
 			return response;
 		}
-		fetch(Constants.BASE_URL + "login", {
-			method: 'POST',
-			credentials: 'include', //pass cookies, for authentication
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: query.toString()
-		})
-		.then(handleErrors)
-		.then(response => {
-			if (!response.ok || response.url.indexOf("login_error") > 0) {
-				dispatch(loginFailed());
-			} else {
-				dispatch(loginSuccess());
-				dispatch(fetchCurrentUser());
-			}
-		})
-		.catch(error => {
-			throw(error);
-		})
+		
+		userService.login(credentials)
+			.then(handleErrors)
+			.then(response => {
+				if (!response.ok || response.url.indexOf("login_error") > 0) {
+					dispatch(loginFailed());
+				} else {
+					dispatch(loginSuccess());
+					dispatch(fetchCurrentUser());
+				}
+			})
 	};
 }
 

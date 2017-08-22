@@ -5,13 +5,17 @@ export default class UserService extends AbstractService {
 
     fetchUsers() {
         var url = Constants.API_BASE_URL + 'user';
-        return this.getJson(url)
+        return this.get(url)
     }
 
-    updateUser(user) {
+    update(user) {
         var url = Constants.API_BASE_URL + 'user';
-        return this.postJson(url, user);
+        return this.post(url, user);
     }
 
+    login(credentials) {
+        var url = Constants.API_BASE_URL + 'login';
+        return this.post(url, credentials);
+    }
 
 }

@@ -1,5 +1,6 @@
 package org.openforis.collect.manager;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -108,5 +109,37 @@ public class UserGroupManager {
 	public void delete(int id) {
 		dao.deleteById(id);
 	}
+	
+	public static class UserGroupTree {
+		
+		private List<UserGroupTreeNode> roots = new ArrayList<UserGroupTreeNode>();
+		
+		public List<UserGroupTreeNode> getRoots() {
+			return roots;
+		}
+		
+		public static class UserGroupTreeNode {
+			
+			private UserGroup userGroup;
+			private List<UserGroupTreeNode> children = new ArrayList<UserGroupTreeNode>();
+			
+			public UserGroupTreeNode(UserGroup userGroup) {
+				super();
+				this.userGroup = userGroup;
+			}
+			
+			public UserGroup getUserGroup() {
+				return userGroup;
+			}
+			
+			public List<UserGroupTreeNode> getChildren() {
+				return children;
+			}
+			
+		}
+		
+	}
+	
+	
 
 }
