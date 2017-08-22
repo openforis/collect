@@ -128,9 +128,9 @@ public class OfcSurveyDao extends DAOImpl<OfcSurveyRecord, org.openforis.collect
 	}
 
 	/**
-	 * Fetch records that have <code>group_id IN (values)</code>
+	 * Fetch records that have <code>usergroup_id IN (values)</code>
 	 */
-	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSurvey> fetchByGroupId(Integer... values) {
-		return fetch(OfcSurvey.OFC_SURVEY.GROUP_ID, values);
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSurvey> fetchByUsergroupId(Integer... values) {
+		return fetch(OfcSurvey.OFC_SURVEY.USERGROUP_ID, values);
 	}
 }

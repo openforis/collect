@@ -65,6 +65,13 @@ public class OfcUsergroupDao extends DAOImpl<OfcUsergroupRecord, org.openforis.c
 	}
 
 	/**
+	 * Fetch records that have <code>parent_id IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup> fetchByParentId(Integer... values) {
+		return fetch(OfcUsergroup.OFC_USERGROUP.PARENT_ID, values);
+	}
+
+	/**
 	 * Fetch records that have <code>name IN (values)</code>
 	 */
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup> fetchByName(String... values) {

@@ -23,9 +23,10 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcUsergroup implements Serializable {
 
-	private static final long serialVersionUID = 1099757145;
+	private static final long serialVersionUID = 407995688;
 
 	private Integer   id;
+	private Integer   parentId;
 	private String    name;
 	private String    label;
 	private String    description;
@@ -39,6 +40,7 @@ public class OfcUsergroup implements Serializable {
 
 	public OfcUsergroup(OfcUsergroup value) {
 		this.id = value.id;
+		this.parentId = value.parentId;
 		this.name = value.name;
 		this.label = value.label;
 		this.description = value.description;
@@ -51,6 +53,7 @@ public class OfcUsergroup implements Serializable {
 
 	public OfcUsergroup(
 		Integer   id,
+		Integer   parentId,
 		String    name,
 		String    label,
 		String    description,
@@ -61,6 +64,7 @@ public class OfcUsergroup implements Serializable {
 		Boolean   systemDefined
 	) {
 		this.id = id;
+		this.parentId = parentId;
 		this.name = name;
 		this.label = label;
 		this.description = description;
@@ -77,6 +81,14 @@ public class OfcUsergroup implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Integer getParentId() {
+		return this.parentId;
+	}
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
 	}
 
 	public String getName() {

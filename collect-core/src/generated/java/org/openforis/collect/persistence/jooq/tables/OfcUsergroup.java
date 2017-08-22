@@ -34,7 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcUsergroupRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcUsergroup extends TableImpl<OfcUsergroupRecord> {
 
-	private static final long serialVersionUID = 1213982475;
+	private static final long serialVersionUID = 1824590049;
 
 	/**
 	 * The reference instance of <code>collect.ofc_usergroup</code>
@@ -53,6 +53,11 @@ public class OfcUsergroup extends TableImpl<OfcUsergroupRecord> {
 	 * The column <code>collect.ofc_usergroup.id</code>.
 	 */
 	public final TableField<OfcUsergroupRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_usergroup.parent_id</code>.
+	 */
+	public final TableField<OfcUsergroupRecord, Integer> PARENT_ID = createField("parent_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * The column <code>collect.ofc_usergroup.name</code>.
@@ -137,7 +142,7 @@ public class OfcUsergroup extends TableImpl<OfcUsergroupRecord> {
 	 */
 	@Override
 	public List<ForeignKey<OfcUsergroupRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<OfcUsergroupRecord, ?>>asList(Keys.OFC_USERGROUP__OFC_USERGROUP_CREATED_BY_FKEY);
+		return Arrays.<ForeignKey<OfcUsergroupRecord, ?>>asList(Keys.OFC_USERGROUP__OFC_USERGROUP_PARENT_FKEY, Keys.OFC_USERGROUP__OFC_USERGROUP_CREATED_BY_FKEY);
 	}
 
 	/**

@@ -12,6 +12,11 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_usergroup_pkey" />
 			</column>
+			<column name="parent_id" type="INTEGER">
+				<constraints nullable="true" 
+					foreignKeyName="ofc_usergroup_parent_fkey" 
+					references="ofc_usergroup(id)" />
+			</column>
 			<column name="name" type="VARCHAR(63)">
 				<constraints nullable="false" unique="true" />
 			</column>
@@ -38,6 +43,12 @@
             	<constraints nullable="false"/>
            	</column>
 		</createTable>
+		
+		<createIndex
+            indexName="ofc_usergroup_parent_idx"
+            tableName="ofc_usergroup">
+	        <column name="parent_id" type="int4"/>
+    	</createIndex>
     	
     	<createSequence sequenceName="ofc_usergroup_id_seq" />
 		
@@ -73,9 +84,34 @@
 			columnNames="user_id, group_id"
             constraintName="ofc_user_usergroup_pkey" />
 		
+		<createIndex
+            indexName="ofc_user_usergroup_user_idx"
+            tableName="ofc_user_usergroup">
+	        <column name="user_id" type="INTEGER"/>
+    	</createIndex>
+
+		<createIndex
+            indexName="ofc_user_usergroup_group_idx"
+            tableName="ofc_user_usergroup">
+	        <column name="group_id" type="INTEGER"/>
+    	</createIndex>
+	
+	</changeSet>
+	
+	<changeSet id="survey-usergroup-column" author="ricci" dbms="postgresql">
 		<addColumn tableName="ofc_survey">
-            <column name="group_id" type="INTEGER" />
+            <column name="usergroup_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_survey_usergroup_fkey" 
+					references="ofc_usergroup(id)" />
+			</column>
 	    </addColumn>
+	    
+	    <createIndex
+            indexName="ofc_survey_usergroup_idx"
+            tableName="ofc_survey">
+	        <column name="usergroup_id" type="INTEGER"/>
+    	</createIndex>
 	</changeSet>
 	
 	<changeSet id="user-groups-default-values" author="ricci" dbms="postgresql">
@@ -233,7 +269,7 @@
   		 	
   		 	-- Assign all existing survey to the Default group
   		 	
-  		 	UPDATE collect.ofc_survey SET group_id = (SELECT ug.id FROM collect.ofc_usergroup ug WHERE ug.name = 'default_public_group');
+  		 	UPDATE collect.ofc_survey SET usergroup_id = (SELECT ug.id FROM collect.ofc_usergroup ug WHERE ug.name = 'default_public_group');
   		 	
    		 </sql>
     	
