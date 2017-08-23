@@ -20,12 +20,23 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.Sequences;
 import org.openforis.collect.persistence.jooq.tables.daos.OfcUsergroupDao;
 
-public class UserGroupDao extends OfcUsergroupDao {
+public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<UserGroup, Integer> {
 
 	public UserGroupDao(Configuration configuration) {
 		super(configuration);
 	}
+	
+	@Override
+	public void update(UserGroup item) {
+		super.update(item);
+	}
 
+	@Override
+	public void delete(Integer id) {
+		super.deleteById(id);
+	}
+
+	@Override
 	public List<UserGroup> loadAll() {
 		return dsl()
 			.selectFrom(OFC_USERGROUP)
@@ -33,6 +44,46 @@ public class UserGroupDao extends OfcUsergroupDao {
 			.fetchInto(UserGroup.class);
 	}
 
+	@Override
+	public UserGroup loadById(Integer id) {
+		return dsl()
+			.selectFrom(OFC_USERGROUP)
+			.where(OFC_USERGROUP.ID.eq(id))
+			.fetchOneInto(UserGroup.class);
+	}
+	
+	@Override
+	public void insert(UserGroup userGroup) {
+		DSLContext dsl = dsl();
+		int id;
+		if (dsl.dialect() == SQLDialect.SQLITE) {
+			int maxId = (Integer) dsl.select(DSL.max(OFC_USERGROUP.ID)).from(OFC_USERGROUP).fetchOne().getValue(0);
+			id = maxId + 1;
+		} else {
+			id = dsl.nextval(Sequences.OFC_USERGROUP_ID_SEQ).intValue();
+		}
+		userGroup.setId(id);
+		super.insert(userGroup);
+	}
+	
+	public void save(UserGroup userGroup) {
+		if (userGroup.getId() == null) {
+			insert(userGroup);
+		} else {
+			update(userGroup);
+		}
+	}
+	
+	public void insertRelation(User user, UserGroup group, UserGrupJoinRequestStatus joinStatus, Date memberSince) {
+		dsl().insertInto(OFC_USER_USERGROUP, OFC_USER_USERGROUP.GROUP_ID, OFC_USER_USERGROUP.USER_ID, 
+				OFC_USER_USERGROUP.REQUEST_DATE, OFC_USER_USERGROUP.MEMBER_SINCE, 
+				OFC_USER_USERGROUP.STATUS_CODE, OFC_USER_USERGROUP.ROLE_CODE)
+			.values(group.getId(), user.getId(), new Timestamp(System.currentTimeMillis()),
+					memberSince == null ? null : new Timestamp(memberSince.getTime()), String.valueOf(joinStatus.getCode()),
+					String.valueOf(UserGroupRole.OPERATOR.getCode()))
+			.execute();
+	}
+	
 	public List<User> findUsersByGroup(UserGroup userGroup) {
 		DSLContext dsl = dsl();
 		List<User> result = dsl.selectFrom(OFC_USER)
@@ -48,7 +99,7 @@ public class UserGroupDao extends OfcUsergroupDao {
 		return result;
 	}
 	
-	public List<UserGroup> findGroupByUser(User user) {
+	public List<UserGroup> findByUser(User user) {
 		DSLContext dsl = dsl();
 		List<UserGroup> result = dsl.selectFrom(OFC_USERGROUP)
 			.where(
@@ -73,6 +124,14 @@ public class UserGroupDao extends OfcUsergroupDao {
 				.where(OFC_USERGROUP.VISIBILITY_CODE.eq(String.valueOf(Visibility.PUBLIC.getCode())))
 				.fetchInto(UserGroup.class);
 	}
+	
+	public List<UserGroup> findPublicUserDefinedGroups() {
+		return dsl()
+				.selectFrom(OFC_USERGROUP)
+				.where(OFC_USERGROUP.SYSTEM_DEFINED.eq(false)
+					.and(OFC_USERGROUP.VISIBILITY_CODE.eq(String.valueOf(Visibility.PUBLIC.getCode()))))
+				.fetchInto(UserGroup.class);
+	}
 
 	public void acceptJoinRequest(User user, UserGroup userGroup) {
 		dsl().update(OFC_USER_USERGROUP)
@@ -86,40 +145,6 @@ public class UserGroupDao extends OfcUsergroupDao {
 			.selectFrom(OFC_USERGROUP)
 			.where(OFC_USERGROUP.NAME.eq(name))
 			.fetchOneInto(UserGroup.class);
-	}
-
-	public UserGroup loadById(int id) {
-		return dsl()
-			.selectFrom(OFC_USERGROUP)
-			.where(OFC_USERGROUP.ID.eq(id))
-			.fetchOneInto(UserGroup.class);
-	}
-	
-	public void save(UserGroup userGroup) {
-		DSLContext dsl = dsl();
-		if (userGroup.getId() == null) {
-			int id;
-			if (dsl.dialect() == SQLDialect.SQLITE) {
-				int maxId = (Integer) dsl.select(DSL.max(OFC_USERGROUP.ID)).from(OFC_USERGROUP).fetchOne().getValue(0);
-				id = maxId + 1;
-			} else {
-				id = ((Integer) dsl.select(Sequences.OFC_USERGROUP_ID_SEQ.nextval()).fetchOne().getValue(0));
-			}
-			userGroup.setId(id);
-			insert(userGroup);
-		} else {
-			update(userGroup);
-		}
-	}
-	
-	public void insertRelation(User user, UserGroup group, UserGrupJoinRequestStatus joinStatus, Date memberSince) {
-		dsl().insertInto(OFC_USER_USERGROUP, OFC_USER_USERGROUP.GROUP_ID, OFC_USER_USERGROUP.USER_ID, 
-				OFC_USER_USERGROUP.REQUEST_DATE, OFC_USER_USERGROUP.MEMBER_SINCE, 
-				OFC_USER_USERGROUP.STATUS_CODE, OFC_USER_USERGROUP.ROLE_CODE)
-			.values(group.getId(), user.getId(), new Timestamp(System.currentTimeMillis()),
-					memberSince == null ? null : new Timestamp(memberSince.getTime()), String.valueOf(joinStatus.getCode()),
-					String.valueOf(UserGroupRole.OPERATOR.getCode()))
-			.execute();
 	}
 	
 	private DSLContext dsl() {

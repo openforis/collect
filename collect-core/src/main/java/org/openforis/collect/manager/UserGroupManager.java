@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  */
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
-public class UserGroupManager {
+public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, Integer, UserGroupDao> {
 
 	private static final String DEFAULT_PUBLIC_USER_GROUP_NAME = "default_public_group";
 	private static final String DEFAULT_PRIVATE_USER_GROUP_SUFFIX = "_default_private_group";
@@ -28,9 +28,12 @@ public class UserGroupManager {
 	
 	private static UserGroup DEFAULT_PUBLIC_USER_GROUP = null;
 	
+	@Override
 	@Autowired
-	private UserGroupDao dao;
-
+	public void setDao(UserGroupDao dao) {
+		super.setDao(dao);
+	}
+	
 	@Transactional(propagation=Propagation.REQUIRED)
 	public UserGroup createDefaultPrivateUserGroup(User user) {
 		UserGroup userGroup = new UserGroup();
@@ -83,12 +86,16 @@ public class UserGroupManager {
 		if (userRoles.contains(UserRole.ADMIN)) {
 			return dao.loadAll();
 		} else {
-			return dao.findGroupByUser(user);
+			return dao.findByUser(user);
 		}
 	}
 	
-	public List<UserGroup> findPublicUserGroups() {
+	public List<UserGroup> findPublicGroups() {
 		return dao.findPublicGroups();
+	}
+
+	public List<UserGroup> findPublicUserDefinedGroups() {
+		return dao.findPublicUserDefinedGroups();
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED)

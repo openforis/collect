@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 public abstract class AbstractPersistedObjectEditFormController<T extends PersistedObject, 
 											F extends PersistedObjectForm<T>, 
-											M extends AbstractPersistedObjectManager<T, ?>> {
+											M extends AbstractPersistedObjectManager<T, Integer, ?>> {
 	
 	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate", "uuid"};
 	

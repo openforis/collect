@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch'
 import Constants from '../utils/Constants'
 import UserService from '../services/UserService'
+import UserGroupService from '../services/UserGroupService'
 
 export const LOG_IN_PENDING = 'LOG_IN_PENDING'
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'
@@ -22,9 +23,14 @@ export const REQUEST_USERS = 'REQUEST_USERS'
 export const RECEIVE_USERS = 'RECEIVE_USERS'
 export const INVALIDATE_USERS = 'INVALIDATE_USERS'
 
+export const REQUEST_USER_GROUPS = 'REQUEST_USER_GROUPS'
+export const RECEIVE_USER_GROUPS = 'RECEIVE_USER_GROUPS'
+export const INVALIDATE_USER_GROUPS = 'INVALIDATE_USER_GROUPS'
+
 let BASE_URL = Constants.API_BASE_URL;
 
 let userService = new UserService();
+let userGroupService = new UserGroupService();
 
 //LOGIN
 function loginPending() {
@@ -196,5 +202,34 @@ export function invalidateUsers(users) {
 	return {
 		type: INVALIDATE_USERS,
 		users
+	}
+}
+
+//USER GROUPS
+function requestUserGroups() {
+	return {
+		type: REQUEST_USER_GROUPS
+	}
+}
+
+function receiveUserGroups(json) {
+	return {
+	    type: RECEIVE_USER_GROUPS,
+	    userGroups: json, //TODO map into UserGroup object
+	    receivedAt: Date.now()
+	}
+}
+
+export function fetchUserGroups() {
+	return function (dispatch) {
+		dispatch(requestUserGroups())
+		userGroupService.fetchAllAvailableGroups().then(json => dispatch(receiveUserGroups(json)))
+	}
+}
+
+export function invalidateUserGroups(userGroups) {
+	return {
+		type: INVALIDATE_USER_GROUPS,
+		userGroups
 	}
 }

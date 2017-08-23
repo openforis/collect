@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class AbstractSurveyObjectManager
 		<T extends PersistedSurveyObject, D extends SurveyObjectMappingJooqDaoSupport<T, ?>> 
-		extends AbstractPersistedObjectManager<T, D> {
+		extends AbstractPersistedObjectManager<T, Integer, D> {
 
 	protected D dao;
 //	private PersistedSurveyObjectCache<T> cache;
 	
 	@Override
-	public T loadById(int id) {
+	public T loadById(Integer id) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -81,7 +81,7 @@ public abstract class AbstractSurveyObjectManager
 	}
 
 	@Override
-	public void delete(int id) {
+	public void delete(Integer id) {
 		dao.delete(id);
 	}
 	

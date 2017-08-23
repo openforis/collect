@@ -7,7 +7,6 @@ import java.util.List;
 import org.openforis.collect.manager.LocalUserManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.web.controller.UserController.UserForm;
@@ -37,8 +36,6 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private UserManager userManager;
-	@Autowired
 	private SessionManager sessionManager;
 	@Autowired
 	private UserValidator validator;
@@ -58,14 +55,14 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 	@RequestMapping(value = "{userId}/surveys/summaries.json", method=GET)
 	public @ResponseBody
 	List<SurveySummary> loadSummariesByUser(@PathVariable int userId) {
-		User user = userManager.loadById(userId);
+		User user = itemManager.loadById(userId);
 		return surveyManager.getSurveySummaries(user);
 	}
 	
 	@Override
 	protected List<User> loadAllItems() {
 		User loggedUser = sessionManager.getSessionState().getUser();
-		return userManager.loadAllAvailableUsers(loggedUser);
+		return itemManager.loadAllAvailableUsers(loggedUser);
 	}
 	
 	@Override
@@ -81,7 +78,6 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 	public static class UserForm extends PersistedObjectForm<User> {
 		
 		private boolean enabled = true;
-		private Integer id;
 		private String username;
 		private String rawPassword;
 		private String retypedPassword;
@@ -91,25 +87,6 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 		
 		public UserForm(User user) {
 			super(user);
-			this.enabled = user.getEnabled();
-			this.username = user.getUsername();
-		}
-		
-		public User toUser() {
-			User user = new User();
-			user.setId(id);
-			user.setEnabled(enabled);
-			user.setUsername(username);
-			user.setRawPassword(rawPassword);
-			return user;
-		}
-		
-		public Integer getId() {
-			return id;
-		}
-		
-		public void setId(Integer id) {
-			this.id = id;
 		}
 		
 		public boolean isEnabled() {

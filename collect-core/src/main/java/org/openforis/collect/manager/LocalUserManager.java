@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
-public class LocalUserManager extends AbstractPersistedObjectManager<User, UserDao> implements UserManager {
+public class LocalUserManager extends AbstractPersistedObjectManager<User, Integer, UserDao> implements UserManager {
 
 	@Autowired
 	private UserDao userDao;
@@ -42,15 +42,21 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, UserD
 	private Map<Integer, User> userById = new TreeMap<Integer, User>();
 	private Map<String, User> userByName = new TreeMap<String, User>();
 	
-	public User loadById(int userId) {
-		User user = userById.get(userId);
+	@Override
+	public User loadById(Integer id) {
+		User user = userById.get(id);
 		if (user == null) {
-			user = userDao.loadById(userId);
+			user = userDao.loadById(id);
 			updateCache(user);
 		}
 		return user;
 	}
-
+	
+	@Override
+	public User loadById(int userId) {
+		return loadById(Integer.valueOf(userId));
+	}
+	
 	public User loadByUserName(String userName) {
 		return loadByUserName(userName, null);
 	}
@@ -99,15 +105,17 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, UserD
 	@Transactional
 	public void save(User user) {
 		Integer userId = user.getId();
-		String password = user.getPassword();
-		if (StringUtils.isBlank(password)) {
-			if (userId != null) {
+		String rawPassword = user.getRawPassword();
+		if (StringUtils.isBlank(rawPassword)) {
+			if (userId == null) {
+				throw new IllegalArgumentException("Blank password specified for a new user");
+			} else {
 				// preserve old password
 				User oldUser = userDao.loadById(userId);
 				user.setPassword(oldUser.getPassword());
 			}
 		} else {
-			String encodedPassword = checkAndEncodePassword(password);
+			String encodedPassword = checkAndEncodePassword(rawPassword);
 			user.setPassword(encodedPassword);
 		}
 		if (userId == null) {

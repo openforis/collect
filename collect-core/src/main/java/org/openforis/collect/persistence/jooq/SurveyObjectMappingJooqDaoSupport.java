@@ -9,6 +9,7 @@ import org.jooq.Configuration;
 import org.jooq.Record;
 import org.jooq.ResultQuery;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.PersistedObjectDao;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
@@ -16,7 +17,7 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
  *
  */
 public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurveyObject, C extends SurveyObjectMappingDSLContext<T>> 
-	extends MappingJooqDaoSupport<T, C>  {
+	extends MappingJooqDaoSupport<T, C> implements PersistedObjectDao<T, Integer>  {
 
 	public SurveyObjectMappingJooqDaoSupport(Class<C> jooqFactoryClass) {
 		super(jooqFactoryClass);
@@ -34,6 +35,11 @@ public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurve
 	public abstract void deleteBySurvey(CollectSurvey survey);
 	
 	@Override
+	public T loadById(Integer id) {
+		return super.loadById(id);
+	}
+	
+	@Override
 	public void insert(T item) {
 		C dsl = dsl((CollectSurvey) item.getSurvey());
 		dsl.insertQuery(item).execute();
@@ -43,6 +49,11 @@ public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurve
 	public void update(T item) {
 		C dsl = dsl((CollectSurvey) item.getSurvey());
 		dsl.updateQuery(item).execute();
+	}
+	
+	@Override
+	public void delete(Integer id) {
+		super.delete(id);
 	}
 	
 	protected C dsl(CollectSurvey survey) {

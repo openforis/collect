@@ -30,17 +30,17 @@ public class UserValidator extends SimpleValidator<UserForm> {
 	
 	@Override
 	public void validateForm(UserForm target, Errors errors) {
+		String rawPassword = (String) errors.getFieldValue(RAW_PASSWORD_FIELD);
+		String retypedPassword = (String) errors.getFieldValue(RETYPED_PASSWORD_FIELD);
+		
 		if (validateRequiredFields(errors, USERNAME_FIELD)) {
-			String rawPassword = (String) errors.getFieldValue(RAW_PASSWORD_FIELD);
 			if (StringUtils.isNotBlank(rawPassword)) {
-				if (validatePassword(errors, rawPassword)) {
-					String retypedPassword = (String) errors.getFieldValue(RETYPED_PASSWORD_FIELD);
-					if (! rawPassword.equals(retypedPassword)) {
-						errors.rejectValue(RETYPED_PASSWORD_FIELD, WRONG_RETYPED_PASSWORD_MESSAGE_KEY);
-					}
-				}
+				validatePassword(errors, rawPassword);
 			}
 			validateUniqueness(target, errors);
+		}
+		if (! StringUtils.equals(rawPassword, retypedPassword)) {
+			errors.rejectValue(RETYPED_PASSWORD_FIELD, WRONG_RETYPED_PASSWORD_MESSAGE_KEY);
 		}
 	}
 

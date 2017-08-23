@@ -6,74 +6,36 @@ import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactst
 
 import { fetchUsers } from '../../actions';
 import UserDetails from './UserDetails';
+import ItemsList from '../../components/MasterDetail/ItemsList';
 
-class Users extends Component {
-
-	state = { 
-		selectedUsers: [],
-		editedUser: null
-	};
-
-	constructor( props ) {
-		super( props );
-
-		this.handleRowSelect = this.handleRowSelect.bind(this);
-		this.handleNewClick = this.handleNewClick.bind(this);
-	}
+class Users extends ItemsList {
 
 	static propTypes = {
-			users: PropTypes.array.isRequired,
-			isFetching: PropTypes.bool.isRequired,
-			lastUpdated: PropTypes.number,
-			dispatch: PropTypes.func.isRequired
+		users: PropTypes.array.isRequired,
+		isFetching: PropTypes.bool.isRequired,
+		lastUpdated: PropTypes.number,
+		dispatch: PropTypes.func.isRequired
 	}
 
 	componentDidMount() {
 		this.props.dispatch(fetchUsers());
 	}
 
-	handleRowSelect(row, isSelected, e) {
-		if (isSelected) {
-			this.setState(this.addSelectedUser(row));
-		} else {
-			this.setState(this.removeSelectedUser(row));
-		}
-	}
-
-	addSelectedUser(user) {
-		let newSelectedUsers = this.state.selectedUsers.concat([user]);
-		return { ...this.state, 
-			selectedUsers: newSelectedUsers,
-			editedUser: this.getUniqueItemOrNull(newSelectedUsers)
-		}
-	}
-
-	removeSelectedUser(user) {
-		let idx = this.state.selectedUsers.indexOf(user);
-		let newSelectedUsers = this.state.selectedUsers.slice(idx, 0);
-		return { ...this.state, 
-			selectedUsers: newSelectedUsers,
-			editedUser: this.getUniqueItemOrNull(newSelectedUsers)
-		}
-	}
-
-	getUniqueItemOrNull(items) {
-		return items.length === 1 ? items[0] : null;
-	}
-	
-	handleNewClick() {
-		this.setState({...this.state, editedUser: {}})
+	createNewItem() {
+		return {id: null, username: '', enabled: true};
 	}
 
   	render() {
 		const { isFetching, lastUpdated, users} = this.props
 		
-		let editedUserForm = null;
-		if (this.state.editedUser != null) {
-			editedUserForm = 
+		let editedItemContainer = null;
+		if (this.state.editedItem != null) {
+			let editedItemForm = <UserDetails user={this.state.editedItem} />;
+			let editedItemLegendText = this.state.editedItem.id == null ? 'New user': 'Edit user: ' + this.state.editedItem.username;
+			editedItemContainer = 
 				<fieldset>
-					<legend>Edit user: {this.state.editedUser.username}</legend>
-					<UserDetails user={this.state.editedUser} />
+					<legend>{editedItemLegendText}</legend>
+					{editedItemForm}
 				</fieldset>
 		}
 		return (
@@ -91,7 +53,10 @@ class Users extends Component {
 							striped
 							hover
 							condensed
-							selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', onSelect: this.handleRowSelect} }
+							selectRow={ 
+								{mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', onSelect: this.handleRowSelect,
+									selected: this.state.selectedItemIds} 
+							}
 							>
 							<TableHeaderColumn dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>
 							<TableHeaderColumn dataField="username">Username</TableHeaderColumn>
@@ -99,10 +64,10 @@ class Users extends Component {
 						</BootstrapTable>
 					</Col>
 					<Col>
-						{editedUserForm}
+						{editedItemContainer}
 					</Col>
 				</Row>
-	    </Container>
+	    	</Container>
 		);
   	}
 }
