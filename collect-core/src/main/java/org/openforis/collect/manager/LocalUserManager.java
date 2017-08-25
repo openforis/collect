@@ -17,6 +17,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.UserDao;
@@ -94,8 +95,10 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 			Set<User> users = new TreeSet<User>();
 			List<UserGroup> userGroups = groupManager.findByUser(availableTo);
 			for (UserGroup userGroup : userGroups) {
-				List<User> groupUsers = groupManager.findUsersByGroup(userGroup);
-				users.addAll(groupUsers);
+				List<UserInGroup> groupUsers = groupManager.findUsersByGroup(userGroup);
+				for (UserInGroup userInGroup : groupUsers) {
+					users.add(userInGroup.getUser());
+				}
 			}
 			//sorted by username by default (see User.compareTo)
 			return new ArrayList<User>(users);

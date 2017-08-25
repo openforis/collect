@@ -10,6 +10,7 @@ class Startup extends Component {
     }
     componentDidMount() {
         this.props.actions.fetchCurrentUser();
+        this.props.actions.fetchUsers();
     }
     render() {
         return this.props.session

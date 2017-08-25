@@ -3,6 +3,7 @@ package org.openforis.collect.web.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +64,7 @@ import org.springframework.web.servlet.ModelAndView;
  * 
  */
 @Controller
-@Scope("session")
+@Scope(SCOPE_SESSION)
 public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;

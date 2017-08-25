@@ -10,8 +10,8 @@ import { fetchUserGroups } from '../../actions';
 class UserGroups extends ItemsList {
 	static propTypes = {
 		userGroups: PropTypes.array.isRequired,
-		isFetching: PropTypes.bool.isRequired,
-		lastUpdated: PropTypes.number,
+		isFetchingUserGroups: PropTypes.bool.isRequired,
+		lastUpdatedUserGroups: PropTypes.number,
 		dispatch: PropTypes.func.isRequired
 	}
 
@@ -20,11 +20,11 @@ class UserGroups extends ItemsList {
 	}
 
 	createNewItem() {
-		return {id: null, name: '', label: '', description: '', visibilityCode: 'P', enabled: true};
+		return {id: null, name: '', label: '', description: '', visibilityCode: 'P', enabled: true, users: []};
 	}
 
   render() {
-		const { isFetching, lastUpdated, userGroups} = this.props
+		const { userGroups } = this.props
 		
 		let editedItemContainer = null;
 		if (this.state.editedItem != null) {
@@ -46,10 +46,10 @@ class UserGroups extends ItemsList {
 				<Row>
 					<Col>
 						<BootstrapTable
-							data={this.props.userGroups}
+							data={userGroups}
 							striped	hover	condensed
 							selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', onSelect: this.handleRowSelect,
-								selectedRows: this.state.selectedItemIds} }
+								selecte: this.state.selectedItemIds} }
 							>
 							<TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
 							<TableHeaderColumn dataField="name">Name</TableHeaderColumn>
@@ -57,6 +57,8 @@ class UserGroups extends ItemsList {
 							<TableHeaderColumn dataField="description">Description</TableHeaderColumn>
 						</BootstrapTable>
 					</Col>
+				</Row>
+				<Row>
 					<Col>
 						{editedItemContainer}
 					</Col>
@@ -69,18 +71,18 @@ class UserGroups extends ItemsList {
 
 const mapStateToProps = state => {
   const {
-    isFetching,
-    lastUpdated,
+    isFetching: isFetchingUserGroups,
+    lastUpdated: lastUpdatedUserGroups,
     userGroups
   } = state.userGroups || {
-    isFetching: true,
+    isFetchingUserGroups: true,
     userGroups: []
-  }
-  return {
-    isFetching,
-    lastUpdated,
-    userGroups
-  }
+	}
+	return {
+    isFetchingUserGroups,
+    lastUpdatedUserGroups,
+		userGroups
+	}
 }
 
 export default connect(mapStateToProps)(UserGroups);

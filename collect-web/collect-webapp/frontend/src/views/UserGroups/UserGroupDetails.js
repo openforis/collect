@@ -1,12 +1,33 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
-import ItemDetails from '../../components/MasterDetail/ItemDetails'
+import { connect } from 'react-redux'
 import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
     Form, FormGroup, Label, Input, FormText, FormFeedback } from 'reactstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import ItemDetails from '../../components/MasterDetail/ItemDetails'
 import UserGroupService from '../../services/UserGroupService';
 
-export default class UserGroupDetails extends ItemDetails {
+class UserGroupDetails extends ItemDetails {
+
+    constructor( props ) {
+		super( props );
+
+        this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
+        this.handleAvailableUsersRowSelect = this.handleAvailableUsersRowSelect.bind(this);
+        this.handleUsersInGroupRowSelect = this.handleUsersInGroupRowSelect.bind(this);
+        this.handleAddSelectedUsersToGroup = this.handleAddSelectedUsersToGroup.bind(this);
+        this.handleRemoveSelectedUsersToGroup = this.handleRemoveSelectedUsersToGroup.bind(this);
+        this.handleRoleSelect = this.handleRoleSelect.bind(this);
+    }
+    
+    static propTypes = {
+		users: PropTypes.array.isRequired,
+		isFetchingUsers: PropTypes.bool.isRequired,
+		lastUpdatedUsers: PropTypes.number,
+		dispatch: PropTypes.func.isRequired
+	}
 
     userGroupService = new UserGroupService();
 
@@ -20,8 +41,23 @@ export default class UserGroupDetails extends ItemDetails {
             visibilityCode: props.userGroup.visibilityCode,
             enabled: props.userGroup.enabled,
             errorFeedback: [],
-            alertMessageOpen: false
+            alertMessageOpen: false,
+            availableUsers: this.getAvailableUsers(props.users, props.userGroup.users),
+            usersInGroup: props.userGroup.users,
+            selectedAvailableUsers: [],
+            selectedAvailableUsersIds: [],
+            selectedUsersInGroup: [],
+            selectedUsersInGroupIds: []
         }
+    }
+
+    getAvailableUsers(allUsers, groupUsers) {
+        return allUsers.filter((user) => {
+            let groupUser = groupUsers.find((u) => {
+                return u.userId === user.id
+            });
+            return groupUser === undefined
+        });
     }
 
     extractFormObject() {
@@ -40,6 +76,74 @@ export default class UserGroupDetails extends ItemDetails {
         this.userGroupService.save(formObject).then(this.updateStateFromResponse);
     }
     
+    handleAvailableUsersRowSelect(user, isSelected, e) {
+        let newSelectedUsers;
+        if (isSelected) {
+            newSelectedUsers = this.state.selectedAvailableUsers.concat([user]);
+        } else {
+            let idx = this.state.selectedAvailableUsers.indexOf(user);
+            newSelectedUsers = this.state.selectedAvailableUsers.slice(idx, 0);
+        }
+        this.setState({ ...this.state, 
+            selectedAvailableUsers: newSelectedUsers,
+            selectedAvailableUsersIds: newSelectedUsers.map(u => u.id)
+		})
+    }
+
+    handleUsersInGroupRowSelect(user, isSelected, e) {
+        let newSelectedUsers;
+        if (isSelected) {
+            newSelectedUsers = this.state.selectedUsersInGroup.concat([user]);
+        } else {
+            let idx = this.state.selectedAvailableUsers.indexOf(user);
+            newSelectedUsers = this.state.selectedUsersInGroup.slice(idx, 0);
+        }
+        this.setState({ ...this.state, 
+            selectedUsersInGroup: newSelectedUsers,
+            selectedUsersInGroupIds: newSelectedUsers.map(u => u.userId)
+		})
+    }
+
+    handleAddSelectedUsersToGroup() {
+        let selectedUsers = this.state.selectedAvailableUsers
+        let newUsersInGroup = []
+        let role = 'OPERATOR'
+        selectedUsers.forEach(user => {
+            newUsersInGroup.push({userId: user.id, username: user.username, enabled: user.enabled, role: role});
+        })
+        let newAvailableUsers = this.state.availableUsers.filter(u => selectedUsers.indexOf(u) < 0)
+
+        this.setState({ ...this.state, 
+            usersInGroup: this.state.usersInGroup.concat(newUsersInGroup),
+            availableUsers: newAvailableUsers,
+            selectedAvailableUsers: [],
+            selectedAvailableUsersIds: [],
+		})
+    }
+
+    handleRemoveSelectedUsersToGroup() {
+        let selectedUsers = this.state.selectedUsersInGroup.map(userInGroup => {
+            return {
+                id: userInGroup.userId,
+                username: userInGroup.username,
+                enabled: userInGroup.enabled
+            }
+        })
+        let notSelectedUsersInGroup = this.state.usersInGroup.filter(u => this.state.selectedUsersInGroup.indexOf(u) < 0)
+        let newUsersInGroup = notSelectedUsersInGroup
+        
+        this.setState({ ...this.state, 
+            selectedUsersInGroup: [],
+            selectedUsersInGroupIds: [],
+            availableUsers: this.state.availableUsers.concat(selectedUsers),
+            usersInGroup: newUsersInGroup
+		})
+    }
+
+    handleRoleSelect() {
+        console.log(arguments)
+    }
+
     render() {
 		return (
             <div>
@@ -117,6 +221,45 @@ export default class UserGroupDetails extends ItemDetails {
                             }
                         </Col>
                     </FormGroup>
+                    
+                    <FormGroup row>
+                        <Col sm={5}>
+                            <BootstrapTable
+                                data={this.state.availableUsers}
+                                striped	hover	condensed
+                                selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
+                                    onSelect: this.handleAvailableUsersRowSelect, selected: this.state.selectedAvailableUsersIds} }
+                                >
+                                <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
+                                <TableHeaderColumn dataField="username">Username</TableHeaderColumn>
+                                <TableHeaderColumn dataField="enabled">Enabled</TableHeaderColumn>
+                            </BootstrapTable>
+                        </Col>
+                        <Col sm={2}>
+                            <DropdownButton>
+                                <MenuItem eventKey="A">Administrator</MenuItem>
+                                <MenuItem eventKey="D">Data analyzer</MenuItem>
+                                <MenuItem eventKey="O">Operator</MenuItem>
+                                <MenuItem eventKey="V">Viewer</MenuItem>
+                            </DropdownButton>
+                            <Button onClick={this.handleAddSelectedUsersToGroup}>&gt;</Button>
+                            <Button onClick={this.handleRemoveSelectedUsersToGroup}>&lt;</Button>
+                        </Col>
+                        <Col sm={5}>
+                            <BootstrapTable
+                                data={this.state.usersInGroup}
+                                striped	hover	condensed
+                                selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
+                                    onSelect: this.handleUsersInGroupRowSelect, selected: this.state.selectedUsersInGroupIds} }
+                                >
+                                <TableHeaderColumn dataField="userId" isKey hidden>Id</TableHeaderColumn>
+                                <TableHeaderColumn dataField="username">Username</TableHeaderColumn>
+                                <TableHeaderColumn dataField="enabled">Enabled</TableHeaderColumn>
+                                <TableHeaderColumn dataField="role">Role</TableHeaderColumn>
+                            </BootstrapTable>
+                        </Col>
+                    </FormGroup>
+
                     <FormGroup check row>
                         <Col sm={{ size: 10, offset: 2 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
@@ -128,3 +271,21 @@ export default class UserGroupDetails extends ItemDetails {
 		);
     }
 }
+
+const mapStateToProps = state => {
+    const {
+      isFetching: isFetchingUsers,
+      lastUpdated: lastUpdatedUsers,
+      users
+    } = state.users || {
+      isFetchingUsers: true,
+      userGroups: []
+    }
+    return {
+      isFetchingUsers,
+      lastUpdatedUsers,
+      users
+    }
+  }
+  
+  export default connect(mapStateToProps)(UserGroupDetails);

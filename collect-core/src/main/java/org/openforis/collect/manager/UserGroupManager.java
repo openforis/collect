@@ -2,11 +2,14 @@ package org.openforis.collect.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserGroupRole;
 import org.openforis.collect.model.UserGroup.UserGrupJoinRequestStatus;
+import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.UserGroup.Visibility;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.UserGroupDao;
@@ -41,7 +44,7 @@ public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, 
 		userGroup.setLabel(user.getUsername() + DEFAULT_PRIVATE_USER_GROUP_LABEL_SUFFIX);
 		userGroup.setVisibility(Visibility.PRIVATE);
 		dao.insert(userGroup);
-		insertRelation(user, userGroup, UserGrupJoinRequestStatus.ACCEPTED, new Date());
+		insertRelation(user, userGroup, UserGroupRole.OWNER, UserGrupJoinRequestStatus.ACCEPTED, new Date());
 		return userGroup;
 	}
 
@@ -77,34 +80,36 @@ public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, 
 		return dao.loadById(id);
 	}
 
-	public List<User> findUsersByGroup(UserGroup userGroup) {
+	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
 		return dao.findUsersByGroup(userGroup);
 	}
 	
 	public List<UserGroup> findByUser(User user) {
+		List<UserGroup> result;
 		List<UserRole> userRoles = user.getRoles();
 		if (userRoles.contains(UserRole.ADMIN)) {
-			return dao.loadAll();
+			result = dao.loadAll();
 		} else {
-			return dao.findByUser(user);
+			result = dao.findByUser(user);
 		}
+		return fillLazyLoadedFields(result);
 	}
 	
 	public List<UserGroup> findPublicGroups() {
-		return dao.findPublicGroups();
+		return fillLazyLoadedFields(dao.findPublicGroups());
 	}
 
 	public List<UserGroup> findPublicUserDefinedGroups() {
-		return dao.findPublicUserDefinedGroups();
+		return fillLazyLoadedFields(dao.findPublicUserDefinedGroups());
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED)
-	public void requestJoin(User user, UserGroup userGroup) {
-		insertRelation(user, userGroup, UserGrupJoinRequestStatus.PENDING, null);
+	public void requestJoin(User user, UserGroup userGroup, UserGroupRole role) {
+		insertRelation(user, userGroup, role, UserGrupJoinRequestStatus.PENDING, null);
 	}
 
-	private void insertRelation(User user, UserGroup userGroup, UserGrupJoinRequestStatus joinStatus, Date memberSince) {
-		dao.insertRelation(user, userGroup, joinStatus, memberSince);
+	private void insertRelation(User user, UserGroup userGroup, UserGroupRole role, UserGrupJoinRequestStatus joinStatus, Date memberSince) {
+		dao.insertRelation(user, userGroup, role, joinStatus, memberSince);
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
@@ -117,6 +122,14 @@ public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, 
 		dao.deleteById(id);
 	}
 	
+	private List<UserGroup> fillLazyLoadedFields(List<UserGroup> groups) {
+		for (UserGroup group : groups) {
+			List<UserInGroup> usersInGroup = dao.findUsersByGroup(group);
+			group.setUsers(new HashSet<UserInGroup>(usersInGroup));
+		}
+		return groups;
+	}
+
 	public static class UserGroupTree {
 		
 		private List<UserGroupTreeNode> roots = new ArrayList<UserGroupTreeNode>();

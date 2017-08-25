@@ -1,5 +1,7 @@
 package org.openforis.collect.model;
 
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup;
 import org.openforis.idm.metamodel.PersistedObject;
@@ -63,6 +65,10 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 			this.code = code;
 		}
 		
+		public static UserGroupRole fromCode(String code) {
+			return fromCode(code.charAt(0));
+		}
+		
 		public static UserGroupRole fromCode(char code) {
 			for (UserGroupRole value : values()) {
 				if (value.code == code) {
@@ -98,5 +104,68 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 	public void setVisibility(Visibility visibility) {
 		setVisibilityCode(visibility == null ? null : String.valueOf(visibility.getCode()));
 	}
+	
+	private Set<UserInGroup> users;
+	
+	public Set<UserInGroup> getUsers() {
+		return users;
+	}
+	
+	public void setUsers(Set<UserInGroup> users) {
+		this.users = users;
+	}
 
+	public static class UserInGroup {
+		
+		private User user;
+		private UserGroupRole role;
+		
+		public UserInGroup(User user, UserGroupRole role) {
+			super();
+			this.user = user;
+			this.role = role;
+		}
+		
+		public User getUser() {
+			return user;
+		}
+
+		public void setUser(User user) {
+			this.user = user;
+		}
+
+		public UserGroupRole getRole() {
+			return role;
+		}
+
+		public void setRole(UserGroupRole role) {
+			this.role = role;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((user == null) ? 0 : user.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			UserInGroup other = (UserInGroup) obj;
+			if (user == null) {
+				if (other.user != null)
+					return false;
+			} else if (!user.equals(other.user))
+				return false;
+			return true;
+		}
+		
+	}
 }

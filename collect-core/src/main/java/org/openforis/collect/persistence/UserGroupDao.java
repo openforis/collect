@@ -1,22 +1,26 @@
 package org.openforis.collect.persistence;
 
-import static org.openforis.collect.persistence.jooq.tables.OfcUsergroup.OFC_USERGROUP;
 import static org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
 import static org.openforis.collect.persistence.jooq.tables.OfcUserUsergroup.OFC_USER_USERGROUP;
+import static org.openforis.collect.persistence.jooq.tables.OfcUsergroup.OFC_USERGROUP;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordHandler;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
-import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserGroup.UserGrupJoinRequestStatus;
-import org.openforis.collect.model.UserGroup.Visibility;
-import org.openforis.collect.model.UserGroup.UserGroupRole;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserGroupRole;
+import org.openforis.collect.model.UserGroup.UserGrupJoinRequestStatus;
+import org.openforis.collect.model.UserGroup.UserInGroup;
+import org.openforis.collect.model.UserGroup.Visibility;
 import org.openforis.collect.persistence.jooq.Sequences;
 import org.openforis.collect.persistence.jooq.tables.daos.OfcUsergroupDao;
 
@@ -74,28 +78,36 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 		}
 	}
 	
-	public void insertRelation(User user, UserGroup group, UserGrupJoinRequestStatus joinStatus, Date memberSince) {
+	public void insertRelation(User user, UserGroup group, UserGroupRole role, UserGrupJoinRequestStatus joinStatus, Date memberSince) {
 		dsl().insertInto(OFC_USER_USERGROUP, OFC_USER_USERGROUP.GROUP_ID, OFC_USER_USERGROUP.USER_ID, 
 				OFC_USER_USERGROUP.REQUEST_DATE, OFC_USER_USERGROUP.MEMBER_SINCE, 
 				OFC_USER_USERGROUP.STATUS_CODE, OFC_USER_USERGROUP.ROLE_CODE)
 			.values(group.getId(), user.getId(), new Timestamp(System.currentTimeMillis()),
 					memberSince == null ? null : new Timestamp(memberSince.getTime()), String.valueOf(joinStatus.getCode()),
-					String.valueOf(UserGroupRole.OPERATOR.getCode()))
+					String.valueOf(role.getCode()))
 			.execute();
 	}
 	
-	public List<User> findUsersByGroup(UserGroup userGroup) {
-		DSLContext dsl = dsl();
-		List<User> result = dsl.selectFrom(OFC_USER)
-			.where(
-				OFC_USER.ID.in(
-					dsl.select(OFC_USER_USERGROUP.USER_ID)
-						.from(OFC_USER_USERGROUP)
-						.where(OFC_USER_USERGROUP.GROUP_ID.eq(userGroup.getId()))
-					)
-				)
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
+		final List<UserInGroup> result = new ArrayList<UserInGroup>();
+		
+		dsl().select(OFC_USER_USERGROUP.USER_ID, OFC_USER_USERGROUP.ROLE_CODE, 
+				OFC_USER.USERNAME, OFC_USER.ENABLED)
+			.from(OFC_USER_USERGROUP).join(OFC_USER).on(OFC_USER.ID.eq(OFC_USER_USERGROUP.USER_ID))
+			.where(OFC_USER_USERGROUP.GROUP_ID.eq(userGroup.getId())
+					.and(OFC_USER_USERGROUP.STATUS_CODE.eq(String.valueOf(UserGroup.UserGrupJoinRequestStatus.ACCEPTED.getCode()))))
 			.orderBy(OFC_USER.USERNAME)
-			.fetchInto(User.class);
+			.fetchInto(new RecordHandler() {
+				public void next(Record record) {
+					User user = new User();
+					user.setId(record.getValue(OFC_USER_USERGROUP.USER_ID));
+					user.setUsername(record.getValue(OFC_USER.USERNAME));
+					user.setEnabled(record.getValue(OFC_USER.ENABLED).equalsIgnoreCase("Y"));
+					UserGroupRole role = UserGroupRole.fromCode(record.getValue(OFC_USER_USERGROUP.ROLE_CODE));
+					result.add(new UserInGroup(user, role));
+				}
+			});
 		return result;
 	}
 	
