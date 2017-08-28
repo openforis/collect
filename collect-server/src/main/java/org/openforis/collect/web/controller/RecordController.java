@@ -56,12 +56,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.web.context.WebApplicationContext;
+
+
 /**
  * 
  * @author S. Ricci
  * 
  */
 @Controller
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
