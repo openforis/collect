@@ -1,6 +1,8 @@
 package org.openforis.collect.web.controller;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +12,7 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
 import org.openforis.collect.model.UserGroup.UserGroupRole;
 import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.web.controller.UserController.UserForm;
@@ -70,14 +73,14 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		private String    description;
 		private String    visibilityCode;
 		private Boolean   enabled;
-		private Set<UserInGroupForm> users = new HashSet<UserInGroupForm>();
+		private List<UserInGroupForm> users = new ArrayList<UserInGroupForm>();
 		
 		public UserGroupForm() {
 		}
 		
 		public UserGroupForm(UserGroup userGroup) {
 			BeanUtils.copyProperties(userGroup, this, "users");
-			this.users = new HashSet<UserInGroupForm>();
+			this.users.clear();
 			for (UserInGroup user: userGroup.getUsers()) {
 				this.users.add(new UserInGroupForm(user));
 			}
@@ -89,10 +92,15 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 			Set<UserInGroup> users = new HashSet<UserGroup.UserInGroup>();
 			for (UserInGroupForm userInGroupForm : this.users) {
 				User user = new User();
-				user.setId(userInGroupForm.getId());
+				user.setId(userInGroupForm.getUserId());
 				user.setUsername(userInGroupForm.getUsername());
-				users.add(new UserInGroup(user, userInGroupForm.getRole()));
+				UserInGroup userInGroup = new UserInGroup();
+				userInGroup.setUser(user);
+				userInGroup.setRole(userInGroupForm.getRole());
+				userInGroup.setJoinStatus(userInGroupForm.getJoinStatus());
+				users.add(userInGroup);
 			}
+			target.setUsers(users);
 		}
 		
 		public String getName() {
@@ -134,35 +142,61 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 			this.enabled = enabled;
 		}
 
-		public Set<UserInGroupForm> getUsers() {
+		public List<UserInGroupForm> getUsers() {
 			return users;
 		}
 
-		public void setUsers(Set<UserInGroupForm> users) {
+		public void setUsers(List<UserInGroupForm> users) {
 			this.users = users;
 		}
 	}
 	
 	public static class UserInGroupForm extends UserForm {
 		
-		private UserForm user;
 		private UserGroupRole role;
+		private Integer userId;
+		private String username;
+		private Boolean userEnabled;
+		private UserGroupJoinRequestStatus joinStatus;
+		private Date joinRequestDate;
+		private Date memberSince;
 
+		public UserInGroupForm() {
+		}
+		
 		public UserInGroupForm(UserInGroup userInGroup) {
-			this.user = new UserForm(userInGroup.getUser());
+			User user = userInGroup.getUser();
+			this.userId = user.getId();
+			this.username = user.getUsername();
+			this.userEnabled = user.getEnabled();
 			this.role = userInGroup.getRole();
+			this.joinStatus = userInGroup.getJoinStatus();
+			this.joinRequestDate = userInGroup.getRequestDate();
+			this.memberSince = userInGroup.getMemberSince();
 		}
 		
 		public Integer getUserId() {
-			return user.getId();
+			return userId;
 		}
 
-		public boolean isUserEnabled() {
-			return user.isEnabled();
+		public void setUserId(Integer userId) {
+			this.userId = userId;
 		}
 
 		public String getUsername() {
-			return user.getUsername();
+			return username;
+		}
+
+		public void setUsername(String username) {
+			this.username = username;
+		}
+
+		public Boolean getUserEnabled() {
+			return userEnabled;
+		}
+
+		public void setUserEnabled(Boolean userEnabled) {
+			this.userEnabled = userEnabled;
 		}
 
 		public UserGroupRole getRole() {
@@ -172,6 +206,22 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		public void setRole(UserGroupRole role) {
 			this.role = role;
 		}
+		
+		public UserGroupJoinRequestStatus getJoinStatus() {
+			return joinStatus;
+		}
+		
+		public void setJoinStatus(UserGroupJoinRequestStatus joinStatus) {
+			this.joinStatus = joinStatus;
+		}
+		
+		public Date getJoinRequestDate() {
+			return joinRequestDate;
+		}
+		
+		public Date getMemberSince() {
+			return memberSince;
+		}
+		
 	}
-
 }

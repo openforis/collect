@@ -8,7 +8,6 @@ class SurveySelect extends Component {
     constructor( props ) {
         super( props );
         this.handleChange = this.handleChange.bind( this );
-        this.handleSubmit = this.handleSubmit.bind( this );
     }
     static propTypes = {
         summaries: PropTypes.array.isRequired,
@@ -29,10 +28,7 @@ class SurveySelect extends Component {
     		this.props.dispatch(selectPreferredSurvey(survey));
     	}
     }
-    handleSubmit(event) {
-        event.preventDefault();
-    }
-
+	
     render() {
     	const { selectedSurvey, isFetchingSummaries, summaries } = this.props
     	const isEmpty = summaries.length === 0
@@ -47,7 +43,7 @@ class SurveySelect extends Component {
 			{
 			isEmpty ? (isFetchingSummaries ? <span>Loading...</span> : <span>No published surveys found</span>)
             : <div style={{ opacity: isFetchingSummaries ? 0.5 : 1 }}>
-	            <FormControl componentClass="select" value={selectedSurvey == null ? '': selectedSurvey.id} 
+	            <FormControl componentClass="select" bsClass="btn btn-info" value={selectedSurvey == null ? '': selectedSurvey.id} 
 	        		onChange={this.handleChange}>{options}</FormControl>
               </div>
 			}

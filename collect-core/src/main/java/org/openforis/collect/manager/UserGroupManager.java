@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserGroup.UserGroupRole;
-import org.openforis.collect.model.UserGroup.UserGrupJoinRequestStatus;
+import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
 import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.UserGroup.Visibility;
 import org.openforis.collect.model.UserRole;
@@ -44,7 +47,13 @@ public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, 
 		userGroup.setLabel(user.getUsername() + DEFAULT_PRIVATE_USER_GROUP_LABEL_SUFFIX);
 		userGroup.setVisibility(Visibility.PRIVATE);
 		dao.insert(userGroup);
-		insertRelation(user, userGroup, UserGroupRole.OWNER, UserGrupJoinRequestStatus.ACCEPTED, new Date());
+		UserInGroup userInGroup = new UserInGroup();
+		userInGroup.setUser(user);
+		userInGroup.setRole(UserGroupRole.OWNER);
+		userInGroup.setJoinStatus(UserGroupJoinRequestStatus.ACCEPTED);
+		userInGroup.setRequestDate(new Date());
+		userInGroup.setMemberSince(new Date());
+		dao.insertRelation(userGroup, userInGroup);
 		return userGroup;
 	}
 
@@ -66,6 +75,46 @@ public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, 
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void save(UserGroup userGroup) {
 		dao.save(userGroup);
+		List<UserInGroup> oldUsersInGroup = dao.findUsersByGroup(userGroup);
+		Set<UserInGroup> parameterUsersInGroup = userGroup.getUsers();
+		Set<UserInGroup> removedUsersInGroup = new HashSet<UserInGroup>();
+		Set<UserInGroup> updatedUsersInGroup = new HashSet<UserInGroup>();
+		Set<UserInGroup> newUsersInGroup = new HashSet<UserInGroup>();
+
+		for (UserInGroup oldUserInGroup : oldUsersInGroup) {
+			if (parameterUsersInGroup.contains(oldUserInGroup)) {
+				final User user = oldUserInGroup.getUser();
+				UserInGroup modifiedUserInGroup = (UserInGroup) CollectionUtils.find(parameterUsersInGroup, new Predicate() {
+					public boolean evaluate(Object parameterUserInGroup) {
+						return user.equals(((UserInGroup) parameterUserInGroup).getUser());
+					}
+				});
+				oldUserInGroup.setJoinStatus(modifiedUserInGroup.getJoinStatus());
+				updatedUsersInGroup.add(oldUserInGroup);
+			} else {
+				removedUsersInGroup.add(oldUserInGroup);
+			}
+		}
+
+		for (UserInGroup newUserInGroup : parameterUsersInGroup) {
+			if (! oldUsersInGroup.contains(newUserInGroup)) {
+				newUserInGroup.setRequestDate(new Date());
+				if (newUserInGroup.getJoinStatus() == UserGroupJoinRequestStatus.ACCEPTED) {
+					newUserInGroup.setMemberSince(new Date());
+				}
+				newUsersInGroup.add(newUserInGroup);
+			}
+		}
+
+		for (UserInGroup userInGroup : removedUsersInGroup) {
+			dao.deleteRelation(userInGroup.getUser(), userGroup);
+		}
+		for (UserInGroup userInGroup : updatedUsersInGroup) {
+			dao.updateRelation(userGroup, userInGroup);
+		}
+		for (UserInGroup userInGroup : newUsersInGroup) {
+			dao.insertRelation(userGroup, userInGroup);
+		}
 	}
 	
 	public List<UserGroup> loadAll() {
@@ -105,16 +154,17 @@ public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, 
 
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void requestJoin(User user, UserGroup userGroup, UserGroupRole role) {
-		insertRelation(user, userGroup, role, UserGrupJoinRequestStatus.PENDING, null);
+		UserInGroup userInGroup = new UserInGroup();
+		userInGroup.setUser(user);
+		userInGroup.setRole(role);
+		userInGroup.setRequestDate(new Date());
+		userInGroup.setJoinStatus(UserGroupJoinRequestStatus.PENDING);
+		dao.insertRelation(userGroup, userInGroup);
 	}
 
-	private void insertRelation(User user, UserGroup userGroup, UserGroupRole role, UserGrupJoinRequestStatus joinStatus, Date memberSince) {
-		dao.insertRelation(user, userGroup, role, joinStatus, memberSince);
-	}
-	
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void acceptJoinRequest(User user, UserGroup userGroup) {
-		dao.acceptJoinRequest(user, userGroup);
+		dao.acceptRelation(user, userGroup);
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED)
@@ -139,7 +189,6 @@ public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, 
 		}
 		
 		public static class UserGroupTreeNode {
-			
 			private UserGroup userGroup;
 			private List<UserGroupTreeNode> children = new ArrayList<UserGroupTreeNode>();
 			

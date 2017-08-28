@@ -8,6 +8,7 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import ItemDetails from '../../components/MasterDetail/ItemDetails'
 import UserGroupService from '../../services/UserGroupService';
+import UserRoleEditor from './UserRoleEditor';
 
 class UserGroupDetails extends ItemDetails {
 
@@ -19,7 +20,6 @@ class UserGroupDetails extends ItemDetails {
         this.handleUsersInGroupRowSelect = this.handleUsersInGroupRowSelect.bind(this);
         this.handleAddSelectedUsersToGroup = this.handleAddSelectedUsersToGroup.bind(this);
         this.handleRemoveSelectedUsersToGroup = this.handleRemoveSelectedUsersToGroup.bind(this);
-        this.handleRoleSelect = this.handleRoleSelect.bind(this);
     }
     
     static propTypes = {
@@ -47,7 +47,8 @@ class UserGroupDetails extends ItemDetails {
             selectedAvailableUsers: [],
             selectedAvailableUsersIds: [],
             selectedUsersInGroup: [],
-            selectedUsersInGroupIds: []
+            selectedUsersInGroupIds: [],
+            newUserRoleCode: "OPERATOR"
         }
     }
 
@@ -67,7 +68,8 @@ class UserGroupDetails extends ItemDetails {
             label: this.state.label,
             description: this.state.description,
             visibilityCode: this.state.visibilityCode,
-            enabled: this.state.enabled
+            enabled: this.state.enabled,
+            users: this.state.usersInGroup
         }
     }
 
@@ -107,9 +109,16 @@ class UserGroupDetails extends ItemDetails {
     handleAddSelectedUsersToGroup() {
         let selectedUsers = this.state.selectedAvailableUsers
         let newUsersInGroup = []
-        let role = 'OPERATOR'
+        let role = this.state.newUserRoleCode
+
         selectedUsers.forEach(user => {
-            newUsersInGroup.push({userId: user.id, username: user.username, enabled: user.enabled, role: role});
+            newUsersInGroup.push({
+                userId: user.id, 
+                username: user.username, 
+                userEnabled: user.enabled, 
+                role: role,
+                joinStatus: 'ACCEPTED'
+            });
         })
         let newAvailableUsers = this.state.availableUsers.filter(u => selectedUsers.indexOf(u) < 0)
 
@@ -126,7 +135,7 @@ class UserGroupDetails extends ItemDetails {
             return {
                 id: userInGroup.userId,
                 username: userInGroup.username,
-                enabled: userInGroup.enabled
+                enabled: userInGroup.userEnabled
             }
         })
         let notSelectedUsersInGroup = this.state.usersInGroup.filter(u => this.state.selectedUsersInGroup.indexOf(u) < 0)
@@ -140,11 +149,22 @@ class UserGroupDetails extends ItemDetails {
 		})
     }
 
-    handleRoleSelect() {
-        console.log(arguments)
-    }
-
     render() {
+        let roles = ['OWNER', 'ADMINISTRATOR', 'OPERATOR', 'VIEWER']
+        let joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
+
+        let createRoleEditor = (onUpdate, props) => (<UserRoleEditor onUpdate={ onUpdate } {...props}/>);
+        
+        let isNotDescendantOf = function(group1, group2) {
+            return false;
+        }
+        let editedUserGroup = this.props.userGroup;
+        let availableParentGroups = this.props.userGroups.filter(group => {
+            return group.id != editedUserGroup.id && (editedUserGroup.id == null || isNotDescendantOf(group, editedUserGroup))
+        })
+        let parentGroupOptions = [<option value="">---</option>]
+            .concat(availableParentGroups.map(group => <option value={group.id}>{group.label}</option>))
+
 		return (
             <div>
                 <Alert color={this.state.alertMessageColor} isOpen={this.state.alertMessageOpen}>
@@ -209,6 +229,18 @@ class UserGroupDetails extends ItemDetails {
                             }
                         </Col>
                     </FormGroup>
+                    <FormGroup row color={this.getFieldState('parentGroup')}>
+                        <Label for="parentGroupSelect" sm={2}>Parent Group</Label>
+                        <Col sm={10}>
+                            <Input type="select" name="parentGroup" id="parentGroupSelect"
+                                state={this.getFieldState('parentGroup')}
+                                onChange={(event) => this.setState({...this.state, parentGroupId: event.target.value})}
+                                >{parentGroupOptions}</Input>
+                            {this.state.errorFeedback['parentGroup'] &&
+                                <FormFeedback>{this.state.errorFeedback['parentGroup']}</FormFeedback>
+                            }
+                        </Col>
+                    </FormGroup>
                     <FormGroup row color={this.getFieldState('enabled')}>
                         <Label for="enabled" sm={2}>Enabled</Label>
                         <Col sm={10}>
@@ -222,46 +254,68 @@ class UserGroupDetails extends ItemDetails {
                         </Col>
                     </FormGroup>
                     
-                    <FormGroup row>
-                        <Col sm={5}>
-                            <BootstrapTable
-                                data={this.state.availableUsers}
-                                striped	hover	condensed
-                                selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
-                                    onSelect: this.handleAvailableUsersRowSelect, selected: this.state.selectedAvailableUsersIds} }
-                                >
-                                <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
-                                <TableHeaderColumn dataField="username">Username</TableHeaderColumn>
-                                <TableHeaderColumn dataField="enabled">Enabled</TableHeaderColumn>
-                            </BootstrapTable>
+                    <Row>
+                        <Col sm="2">
+                            <fieldset className="secondary">
+                                <legend>Add/Remove Users</legend>
+                                <Row>
+                                    <Col sm="2">
+                                        <BootstrapTable
+                                            data={this.state.availableUsers}
+                                            striped	hover	condensed
+                                            selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
+                                                onSelect: this.handleAvailableUsersRowSelect, selected: this.state.selectedAvailableUsersIds} }
+                                            >
+                                            <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
+                                            <TableHeaderColumn dataField="username">Username</TableHeaderColumn>
+                                            <TableHeaderColumn dataField="enabled">Enabled</TableHeaderColumn>
+                                        </BootstrapTable>
+                                    </Col>
+                                    <Col sm="3">
+                                        <Row>
+                                            <Col sm="5">
+                                                <Input type="select" name="newUserRole" id="newUserRoleSelect" 
+                                                        onChange={(event) => this.setState({...this.state, newUserRoleCode: event.target.value})}
+                                                        value={this.state.newUserRoleCode}>
+                                                    {roles.map(role => <option key={role} value={role}>{role}</option>)}
+                                                </Input>
+                                            </Col>
+                                            <Col sm="2">
+                                                <Button onClick={this.handleAddSelectedUsersToGroup}>&gt;</Button>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col sm={{ size: 2, offset: 6 }}>
+                                                <Button onClick={this.handleRemoveSelectedUsersToGroup}>&lt;</Button>
+                                            </Col>
+                                        </Row>
+                                    </Col>
+                                </Row>
+                            </fieldset>
                         </Col>
-                        <Col sm={2}>
-                            <DropdownButton>
-                                <MenuItem eventKey="A">Administrator</MenuItem>
-                                <MenuItem eventKey="D">Data analyzer</MenuItem>
-                                <MenuItem eventKey="O">Operator</MenuItem>
-                                <MenuItem eventKey="V">Viewer</MenuItem>
-                            </DropdownButton>
-                            <Button onClick={this.handleAddSelectedUsersToGroup}>&gt;</Button>
-                            <Button onClick={this.handleRemoveSelectedUsersToGroup}>&lt;</Button>
+                        <Col sm="6">
+                            <fieldset className="secondary">
+                                <legend>Selected Users</legend>
+                                <BootstrapTable
+                                    data={this.state.usersInGroup}
+                                    striped	hover	condensed
+                                    cellEdit={ { mode: 'click' } }
+                                    selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
+                                        onSelect: this.handleUsersInGroupRowSelect, selected: this.state.selectedUsersInGroupIds} }
+                                    >
+                                    <TableHeaderColumn dataField="userId" isKey hidden>Id</TableHeaderColumn>
+                                    <TableHeaderColumn dataField="username" editable={false}>Username</TableHeaderColumn>
+                                    <TableHeaderColumn dataField="userEnabled" editable={false}>Enabled</TableHeaderColumn>
+                                    <TableHeaderColumn dataField="role" editable={ { type: 'select', options: { values: roles } } }
+                                        >Role</TableHeaderColumn>
+                                    <TableHeaderColumn dataField="joinStatus" editable={ { type: 'select', options: { values: joinStatuses } } }>Status</TableHeaderColumn>
+                                </BootstrapTable>
+                            </fieldset>
                         </Col>
-                        <Col sm={5}>
-                            <BootstrapTable
-                                data={this.state.usersInGroup}
-                                striped	hover	condensed
-                                selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
-                                    onSelect: this.handleUsersInGroupRowSelect, selected: this.state.selectedUsersInGroupIds} }
-                                >
-                                <TableHeaderColumn dataField="userId" isKey hidden>Id</TableHeaderColumn>
-                                <TableHeaderColumn dataField="username">Username</TableHeaderColumn>
-                                <TableHeaderColumn dataField="enabled">Enabled</TableHeaderColumn>
-                                <TableHeaderColumn dataField="role">Role</TableHeaderColumn>
-                            </BootstrapTable>
-                        </Col>
-                    </FormGroup>
+                    </Row>
 
                     <FormGroup check row>
-                        <Col sm={{ size: 10, offset: 2 }}>
+                        <Col sm={{ size: 2, offset: 5 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
                             <Button color="danger" onClick={this.handleDeleteBtnClick}>Delete</Button>
                         </Col>
@@ -274,17 +328,28 @@ class UserGroupDetails extends ItemDetails {
 
 const mapStateToProps = state => {
     const {
-      isFetching: isFetchingUsers,
-      lastUpdated: lastUpdatedUsers,
-      users
+        isFetching: isFetchingUserGroups,
+        lastUpdated: lastUpdatedUserGroups,
+        userGroups
+    } = state.userGroups || {
+        isFetchingUserGroups: true,
+        userGroups: []
+    }
+    const {
+        isFetching: isFetchingUsers,
+        lastUpdated: lastUpdatedUsers,
+        users
     } = state.users || {
-      isFetchingUsers: true,
-      userGroups: []
+        isFetchingUsers: true,
+        userGroups: []
     }
     return {
-      isFetchingUsers,
-      lastUpdatedUsers,
-      users
+        isFetchingUsers,
+        lastUpdatedUsers,
+        users,
+        isFetchingUserGroups,
+        lastUpdatedUserGroups,
+        userGroups
     }
   }
   

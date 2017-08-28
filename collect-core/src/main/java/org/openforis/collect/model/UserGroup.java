@@ -1,5 +1,7 @@
 package org.openforis.collect.model;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,17 +35,21 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 		}
 	}
 	
-	public enum UserGrupJoinRequestStatus {
+	public enum UserGroupJoinRequestStatus {
 		ACCEPTED('A'), REJECTED('R'), PENDING('P');
 		
 		private char code;
 		
-		UserGrupJoinRequestStatus(char code) {
+		UserGroupJoinRequestStatus(char code) {
 			this.code = code;
 		}
 		
-		public static UserGrupJoinRequestStatus fromCode(char code) {
-			for (UserGrupJoinRequestStatus value : values()) {
+		public static UserGroupJoinRequestStatus fromCode(String code) {
+			return fromCode(code.charAt(0));
+		}
+		
+		public static UserGroupJoinRequestStatus fromCode(char code) {
+			for (UserGroupJoinRequestStatus value : values()) {
 				if (value.code == code) {
 					return value;
 				}
@@ -105,7 +111,7 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 		setVisibilityCode(visibility == null ? null : String.valueOf(visibility.getCode()));
 	}
 	
-	private Set<UserInGroup> users;
+	private Set<UserInGroup> users = new HashSet<UserInGroup>();
 	
 	public Set<UserInGroup> getUsers() {
 		return users;
@@ -119,13 +125,13 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 		
 		private User user;
 		private UserGroupRole role;
+		private UserGroup.UserGroupJoinRequestStatus joinStatus;
+		private Date memberSince;
+		private Date requestDate;
 		
-		public UserInGroup(User user, UserGroupRole role) {
-			super();
-			this.user = user;
-			this.role = role;
+		public UserInGroup() {
 		}
-		
+
 		public User getUser() {
 			return user;
 		}
@@ -140,6 +146,30 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 
 		public void setRole(UserGroupRole role) {
 			this.role = role;
+		}
+		
+		public UserGroup.UserGroupJoinRequestStatus getJoinStatus() {
+			return joinStatus;
+		}
+		
+		public void setJoinStatus(UserGroup.UserGroupJoinRequestStatus joinStatus) {
+			this.joinStatus = joinStatus;
+		}
+		
+		public Date getMemberSince() {
+			return memberSince;
+		}
+		
+		public void setMemberSince(Date memberSince) {
+			this.memberSince = memberSince;
+		}
+		
+		public Date getRequestDate() {
+			return requestDate;
+		}
+		
+		public void setRequestDate(Date date) {
+			this.requestDate = date;
 		}
 
 		@Override
@@ -166,6 +196,6 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 				return false;
 			return true;
 		}
-		
+
 	}
 }

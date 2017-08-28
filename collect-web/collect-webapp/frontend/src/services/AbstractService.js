@@ -16,18 +16,33 @@ export default class AbstractService {
     }
 
     post(url, data) {
-        const queryData = Object.keys(data).map((key) => {
-            let val = data[key];
-            let encodedVal = val === null ? '' : encodeURIComponent(val);
-            return encodeURIComponent(key) + '=' + encodedVal;
-          }).join('&');
-          
+        let toQueryData = function(data, propPrefix) {
+            return Object.keys(data).map((key) => {
+                let val = data[key];
+                if (val === null) {
+                    return '';
+                } else {
+                    if (val instanceof Array) {
+                        let arrQueryDataParts = []
+                        for(let i=0; i<val.length; i++) {
+                            let nestedPropPrefix = encodeURIComponent(key) + '[' + i +'].';
+                            arrQueryDataParts.push(toQueryData(val[i], nestedPropPrefix))
+                        }
+                        return arrQueryDataParts.join('&');
+                    } else {
+                        return (propPrefix ? propPrefix : '') + encodeURIComponent(key) + '=' + encodeURIComponent(val)
+                    }
+                }
+              }).join('&');
+        }
+        let body = toQueryData(data);
+
         return fetch(this.BASE_URL + url, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
             },
-            body: queryData
+            body: body
         }).then(response => response.json(),
             error => console.log('An error occured.', error))
         .catch(error => {
