@@ -49,7 +49,7 @@ public class SurveyViewGenerator {
 			codeListView.setId(codeList.getId());
 			codeListView.setName(codeList.getName());
 
-			if (includeCodeListValues) {
+			if (includeCodeListValues && ! codeList.isExternal()) {
 				CodeListService service = survey.getContext().getCodeListService();
 				List<CodeListItem> items = service.loadRootItems(codeList);
 				for (CodeListItem item : items) {
