@@ -202,7 +202,7 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 	@Transactional
 	public User insertUser(String name, String password, UserRole role) throws UserPersistenceException {
 		User user = new User(name);
-		user.setPassword(password);
+		user.setRawPassword(password);
 		user.addRole(role);
 		save(user);
 		return user;
