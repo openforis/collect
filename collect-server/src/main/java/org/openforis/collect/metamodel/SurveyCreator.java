@@ -9,7 +9,9 @@ import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters.ListItem;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
@@ -133,6 +135,9 @@ public class SurveyCreator {
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
 		mainTab.setLabel(languageCode, singleAttributeSurveyTabLabel);
 		
+		UIConfiguration uiConfiguration = new UIOptionsMigrator().migrateToUIConfiguration(uiOptions);
+		survey.setUIConfiguration(uiConfiguration);
+
 		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
 		surveyObjectsGenerator.addPredefinedObjects(survey);
 		
