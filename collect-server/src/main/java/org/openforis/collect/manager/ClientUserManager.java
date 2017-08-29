@@ -103,7 +103,7 @@ public class ClientUserManager extends AbstractClient implements UserManager  {
 
 	private void setGenericRoles(User user) {
 		if (user != null) {
-			UserRole role = ADMIN_USER_NAME.equals(user.getUsername()) ? UserRole.ADMIN : UserRole.ANALYSIS;
+			UserRole role = UserRole.ADMIN;
 			user.setRoles(Arrays.asList(role));
 		}
 	}

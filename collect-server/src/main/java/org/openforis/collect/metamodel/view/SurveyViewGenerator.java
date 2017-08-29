@@ -3,7 +3,6 @@ package org.openforis.collect.metamodel.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
@@ -25,12 +24,12 @@ import org.openforis.idm.metamodel.NodeLabel.Type;
  */
 public class SurveyViewGenerator {
 
-	private Locale locale;
 	private boolean includeCodeLists = false;
+	private String languageCode;
 	
-	public SurveyViewGenerator(Locale locale) {
+	public SurveyViewGenerator(String languageCode) {
 		super();
-		this.locale = locale;
+		this.languageCode = languageCode;
 	}
 
 	public List<SurveyView> generateViews(List<CollectSurvey> surveys) {
@@ -95,13 +94,12 @@ public class SurveyViewGenerator {
 	}
 	
 	private CodeListItemView createCodeListItemView(CodeListItem item) {
-		String langCode = locale.getLanguage();
 		CodeListService service = item.getSurvey().getContext().getCodeListService();
 		
 		CodeListItemView itemView = new CodeListItemView();
 		itemView.id = item.getId();
 		itemView.code = item.getCode();
-		itemView.label = item.getLabel(langCode);
+		itemView.label = item.getLabel(languageCode);
 		
 		List<CodeListItemView> childItemsView = new ArrayList<CodeListItemView>();
 		List<CodeListItem> childItems = service.loadChildItems(item);
@@ -113,9 +111,8 @@ public class SurveyViewGenerator {
 	}
 
 	private String getLabel(NodeDefinition def) {
-		String langCode = locale.getLanguage();
-		String label = def.getLabel(Type.INSTANCE, langCode);
-		if (label == null && ! def.getSurvey().isDefaultLanguage(langCode)) {
+		String label = def.getLabel(Type.INSTANCE, languageCode);
+		if (label == null && ! def.getSurvey().isDefaultLanguage(languageCode)) {
 			label = def.getLabel(Type.INSTANCE);
 		}
 		return label;

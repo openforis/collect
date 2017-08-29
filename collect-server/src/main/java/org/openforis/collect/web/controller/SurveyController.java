@@ -3,17 +3,20 @@ package org.openforis.collect.web.controller;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
 import org.openforis.collect.metamodel.SurveyCreator;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.model.User;
 import org.openforis.collect.web.validator.SimpleSurveyParametersValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,7 +38,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
-@RequestMapping("/api/survey/")
+@RequestMapping("/api/survey")
 public class SurveyController extends BasicController {
 
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
@@ -46,33 +49,39 @@ public class SurveyController extends BasicController {
 	private SurveyManager surveyManager;
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
+	@Autowired
+	private UserManager userManager;
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(validator);
 	}
 
-	@RequestMapping(value="summaries.json", method=GET)
+	@RequestMapping(method=GET)
 	public @ResponseBody
-	List<SurveySummary> loadSummaries(
-			@RequestParam(value="include-temporary", required=false) boolean includeTemporary) throws Exception {
-		String language = Locale.ENGLISH.getLanguage();
-		if (includeTemporary) {
-			return surveyManager.loadCombinedSummaries(language, true);
+	List<?> loadSurveys(
+			@RequestParam(value="userId", required=false) Integer userId,
+			@RequestParam(value="full", required=false) boolean fullSurveys,
+			@RequestParam(value="includeTemporary", required=false) boolean includeTemporary) throws Exception {
+		String languageCode = Locale.ENGLISH.getLanguage();
+		User avalableToUser = userId == null ? null : userManager.loadById(userId);
+		List<SurveySummary> summaries = surveyManager.getSurveySummaries(languageCode, avalableToUser);
+		
+		if (fullSurveys) {
+			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(languageCode);
+			List<SurveyView> views = new ArrayList<SurveyView>();
+			for (SurveySummary surveySummary : summaries) {
+				CollectSurvey survey = surveyManager.getById(surveySummary.getId());
+				views.add(viewGenerator.generateView(survey));
+			}
+			return views;
+		} else if (includeTemporary) {
+			return surveyManager.loadCombinedSummaries(languageCode, true); //TODO fix it, filter by user
 		} else {
-			return surveyManager.getSurveySummaries(language);
+			return summaries;
 		}
 	}
 	
-	@RequestMapping(value = "/published/full-list.json", method=GET)
-	public @ResponseBody
-	List<SurveyView> loadFullList() throws Exception {
-		Locale locale = Locale.ENGLISH;
-		List<CollectSurvey> result = surveyManager.getAll();
-		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
-		return viewGenerator.generateViews(result);
-	}
-
 	@RequestMapping(value="{id}.json", method=GET)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
@@ -104,7 +113,7 @@ public class SurveyController extends BasicController {
 	}
 	
 	private SurveyView generateView(CollectSurvey survey, boolean includeCodeLists) {
-		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH);
+		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH.getLanguage());
 		viewGenerator.setIncludeCodeLists(includeCodeLists);
 		SurveyView view = viewGenerator.generateView(survey);
 		return view;

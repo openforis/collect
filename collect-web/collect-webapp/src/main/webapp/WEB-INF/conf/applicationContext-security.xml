@@ -35,8 +35,8 @@
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
 		<intercept-url access="permitAll" pattern="/info.json" />
 		<intercept-url access="permitAll" pattern="/keepSessionAlive.htm" />
+		<intercept-url access="permitAll" pattern="/login" />
 		<intercept-url access="permitAll" pattern="/logout.htm" />
-		<intercept-url access="permitAll" pattern="/session/**" />
 		<intercept-url access="permitAll" pattern="/zkau" />
 <!-- 		security disabled for these urls because of an issue with flash player -->
 <!-- 		for netscape compatible browser and uplaod to a secured url -->
@@ -58,13 +58,14 @@
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/export/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/import/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/speciesImport" />
+
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/validateAllRecords.htm" />
 
 		<intercept-url access="hasRole('ROLE_USER')" pattern="/**" />
 
-		<form-login login-page="/login.htm" 
-			default-target-url="/index.html" 
-			authentication-failure-url="/login.htm?login_error=1" />
+		<form-login login-page="/login" 
+			default-target-url="/index.htm"
+			authentication-failure-url="/login?login_error=1" />
 		
 		<logout logout-url="/j_spring_security_logout" />
 	</http>
@@ -74,7 +75,7 @@
 			<password-encoder hash="md5" />
 		</authentication-provider>
 	</authentication-manager>
-	
+
 	<!-- See 15.3.2 Built-In Expression @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator -->
 	<b:bean id="expressionHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
 		<!-- To use hasPermission() in expressions, configure a PermissionEvaluator -->

@@ -31,7 +31,6 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 @Scope(WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/api/session/")
 public class SessionController extends BasicController {
 	
 	@Autowired
@@ -47,7 +46,7 @@ public class SessionController extends BasicController {
 		return new Response();
 	}
 	
-	@RequestMapping(value = "survey.json", method = RequestMethod.POST)
+	@RequestMapping(value = "survey", method = RequestMethod.POST)
 	public @ResponseBody Response setActiveSurvey(@RequestParam int surveyId) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		sessionManager.setActiveSurvey(survey);
@@ -65,7 +64,7 @@ public class SessionController extends BasicController {
 			if (locale == null) {
 				locale = Locale.ENGLISH;
 			}
-			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
+			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale.getLanguage());
 			SurveyView view = viewGenerator.generateView(survey);
 			return view;
 		}
