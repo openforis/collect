@@ -44,9 +44,9 @@
 					</radiogroup>
 				</row>
 				<row>
-					<label value="${labels.survey.template.institution.$}:" />
-					<listbox model="@load(vm.institutionModel)" mold="select"
-						selectedItem="@bind(fx.institution)">
+					<label value="${labels.survey.template.usergroup.$}:" />
+					<listbox model="@load(vm.userGroupModel)" mold="select"
+						selectedItem="@bind(fx.userGroup)">
 						<template name="model">
 							<listitem label="${each.label}" value="${each.code}" />
 						</template>

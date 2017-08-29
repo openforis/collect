@@ -192,10 +192,20 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 	
 	public String getProjectName(String language) {
-		if ( language == null ) {
-			language = getDefaultLanguage();
+		return getProjectName(language, false);
+	}
+	
+	public String getProjectName(String language, boolean defaultToDefaultLanguage) {
+		if (projectNames == null) {
+			return null;
 		}
-		return projectNames == null ? null: projectNames.getText(language);
+		if ( language != null && projectNames.hasText(language)) {
+			return projectNames.getText(language);
+		} else if (defaultToDefaultLanguage) {
+			return projectNames.getText(getDefaultLanguage());
+		} else {
+			return null;
+		}
 	}
 	
 	public void setProjectName(String language, String text) {

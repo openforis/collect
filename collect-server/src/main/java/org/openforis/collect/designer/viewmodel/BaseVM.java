@@ -16,9 +16,9 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
-import org.openforis.collect.manager.InstitutionManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.model.Institution;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,40 +54,41 @@ public abstract class BaseVM {
 	@WireVariable
 	protected CollectJobManager jobManager;
 	@WireVariable
-	protected InstitutionManager institutionManager;
+	protected UserGroupManager userGroupManager;
 
-	private BindingListModelListModel<LabelledItem> institutionModel;
+	private BindingListModelListModel<LabelledItem> userGroupModel;
 
 	void init() {
-		initInstitutionsModel();
+		initUserGroupsModel();
 	}
 	
-	protected void initInstitutionsModel() {
+	protected void initUserGroupsModel() {
 		List<LabelledItem> items = new ArrayList<LabelledItem>();
 		User loggedUser = getLoggedUser();
-		List<Institution> institutions = institutionManager.findByUser(loggedUser);
+		List<UserGroup> userGroups = userGroupManager.findByUser(loggedUser);
 
-		String defaultPublicInstitutionName = InstitutionManager.DEFAULT_PUBLIC_INSTITUTION_NAME;
-		LabelledItem publicInstitutionItem = new LabelledItem(defaultPublicInstitutionName, Labels.getLabel("survey.template.institution.public"));
-		items.add(publicInstitutionItem);
+		String defaultPublicUserGroupName = UserGroupManager.DEFAULT_PUBLIC_USER_GROUP_NAME;
+		LabelledItem publicUserGroupItem = new LabelledItem(defaultPublicUserGroupName, 
+				Labels.getLabel("survey.template.usergroup.public"));
+		items.add(publicUserGroupItem);
 		
-		String defaultPrivateInstitutionName = institutionManager.getDefaultPrivateInstitutionName(loggedUser);
-		items.add(new LabelledItem(defaultPrivateInstitutionName, Labels.getLabel("survey.template.institution.private")));
+		String defaultPrivateUserGroupName = userGroupManager.getDefaultPrivateUserGroupName(loggedUser);
+		items.add(new LabelledItem(defaultPrivateUserGroupName, Labels.getLabel("survey.template.usergroup.private")));
 
-		List<String> predefinedInstitutionNames = Arrays.asList(new String[]{defaultPrivateInstitutionName, defaultPublicInstitutionName});
+		List<String> predefinedUserGroupNames = Arrays.asList(new String[]{defaultPrivateUserGroupName, defaultPublicUserGroupName});
 		
-		for (Institution institution : institutions) {
-			String label = institution.getLabel();
-			if (! predefinedInstitutionNames.contains(institution.getName())) {
-				items.add(new LabelledItem(institution.getName(), label));
+		for (UserGroup userGroup : userGroups) {
+			String label = userGroup.getLabel();
+			if (! predefinedUserGroupNames.contains(userGroup.getName())) {
+				items.add(new LabelledItem(userGroup.getName(), label));
 			}
 		}
-		institutionModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
-		institutionModel.setMultiple(false);
+		userGroupModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
+		userGroupModel.setMultiple(false);
 	}
 	
-	protected LabelledItem getDefaultPublicInstitutionItem() {
-		return institutionModel.getElementAt(0);
+	protected LabelledItem getDefaultPublicUserGroupItem() {
+		return userGroupModel.getElementAt(0);
 	}
 	
 	public String getComponentsPath() {
@@ -181,8 +182,8 @@ public abstract class BaseVM {
 		return PRETTY_DATE_FORMAT.format(date);
 	}
 	
-	public BindingListModelListModel<LabelledItem> getInstitutionModel() {
-		return institutionModel;
+	public BindingListModelListModel<LabelledItem> getUserGroupModel() {
+		return userGroupModel;
 	}
 }
 

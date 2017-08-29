@@ -26,7 +26,7 @@
 	</bean>
 	
 	<!-- Override scope for Collect core sessionRecordFileManager bean, use "session" scope -->
-	<bean id="institutionManager" 	class="org.openforis.collect.manager.ClientInstitutionManager" />
+	<bean id="userGroupManager" 	class="org.openforis.collect.manager.ClientUserGroupManager" />
 	<bean id="recordSessionManager" class="org.openforis.collect.manager.RecordSessionManager"
 		scope="session" />
 	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
@@ -128,8 +128,7 @@
         <constructor-arg ref="dataSource" />
     </bean>
 
-	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue"
-			lazy-init="false">
+	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue">
 		<constructor-arg>
 			 <bean class="org.openforis.rmb.spring.SpringMessageQueue">
 		        <constructor-arg ref="messageBroker"/>
@@ -154,7 +153,7 @@
 	</bean>
 	
 	<bean id="reportingRepositories" class="org.openforis.collect.relational.RDBReportingRepositories"
-			lazy-init="false" init-method="init">
+			init-method="init" depends-on="userGroupManager">
 		<constructor-arg ref="surveyManager" />
 		<constructor-arg ref="recordManager" />
 		<constructor-arg ref="collectLocalRDBStorageManager" />
@@ -163,7 +162,7 @@
 	</bean>
 	
 	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
-			lazy-init="false" init-method="init" />
+			init-method="init" />
 
 	<bean id="sessionEventDispatcher" class="org.openforis.collect.manager.SessionEventDispatcher"
 		scope="session">

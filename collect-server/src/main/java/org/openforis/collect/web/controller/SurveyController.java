@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
@@ -51,6 +52,8 @@ public class SurveyController extends BasicController {
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private UserManager userManager;
+	@Autowired
+	private UserGroupManager userGroupManager;
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -62,17 +65,17 @@ public class SurveyController extends BasicController {
 	List<?> loadSurveys(
 			@RequestParam(value="userId", required=false) Integer userId,
 			@RequestParam(value="full", required=false) boolean fullSurveys,
+			@RequestParam(value="includeCodeListValues", required=false) boolean includeCodeListValues,
 			@RequestParam(value="includeTemporary", required=false) boolean includeTemporary) throws Exception {
 		String languageCode = Locale.ENGLISH.getLanguage();
 		User avalableToUser = userId == null ? null : userManager.loadById(userId);
 		List<SurveySummary> summaries = surveyManager.getSurveySummaries(languageCode, avalableToUser);
 		
 		if (fullSurveys) {
-			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(languageCode);
 			List<SurveyView> views = new ArrayList<SurveyView>();
 			for (SurveySummary surveySummary : summaries) {
 				CollectSurvey survey = surveyManager.getById(surveySummary.getId());
-				views.add(viewGenerator.generateView(survey));
+				views.add(generateView(survey, includeCodeListValues));
 			}
 			return views;
 		} else if (includeTemporary) {
@@ -95,7 +98,7 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value="simple", method=POST)
 	public @ResponseBody
 	SurveyView insertSurvey(@RequestBody SimpleSurveyCreationParameters parameters, BindingResult bindingResult) throws Exception {
-		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager);
+		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager, userGroupManager);
 		CollectSurvey survey = surveyCreator.generateAndPublishSurvey(parameters);
 		return generateView(survey, false);
 	}
@@ -112,9 +115,9 @@ public class SurveyController extends BasicController {
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	private SurveyView generateView(CollectSurvey survey, boolean includeCodeLists) {
+	private SurveyView generateView(CollectSurvey survey, boolean includeCodeListValues) {
 		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH.getLanguage());
-		viewGenerator.setIncludeCodeLists(includeCodeLists);
+		viewGenerator.setIncludeCodeListValues(includeCodeListValues);
 		SurveyView view = viewGenerator.generateView(survey);
 		return view;
 	}

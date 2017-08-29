@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
@@ -15,6 +16,7 @@ import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
@@ -31,6 +33,7 @@ public class SurveyCreator {
 
 	private SurveyManager surveyManager;
 	private SamplingDesignManager samplingDesignManager;
+	private UserGroupManager userGroupManager;
 	//TODO make it configurable
 	private String languageCode = Locale.ENGLISH.getLanguage();
 	private String singleAttributeSurveyCodeListName = "values";
@@ -43,10 +46,12 @@ public class SurveyCreator {
 	private String singleAttributeSurveyOperatorAttributeName = "operator";
 	private String singleAttributeSurveyOperatorAttributeLabel = "Operator";
 	
-	public SurveyCreator(SurveyManager surveyManager, SamplingDesignManager samplingDesignManager) {
+	public SurveyCreator(SurveyManager surveyManager, SamplingDesignManager samplingDesignManager,
+			UserGroupManager userGroupManager) {
 		super();
 		this.surveyManager = surveyManager;
 		this.samplingDesignManager = samplingDesignManager;
+		this.userGroupManager = userGroupManager;
 	}
 
 	public CollectSurvey generateAndPublishSurvey(SimpleSurveyCreationParameters parameters)
@@ -58,7 +63,9 @@ public class SurveyCreator {
 			throw new IllegalArgumentException(String.format("Survey with name %s already existing", name));
 		}
 		CollectSurvey survey = createTemporarySingleAttributeSurvey(name, parameters.getValues());
-		
+		UserGroup userGroup = userGroupManager.findById(parameters.getUserGroupId());
+		survey.setUserGroup(userGroup);
+	
 		CeoApplicationOptions ceoApplicationOptions = new CeoApplicationOptions();
 		ceoApplicationOptions.setSamplingPointDataConfiguration(parameters.getSamplingPointGenerationSettings());
 		survey.addApplicationOptions(ceoApplicationOptions);

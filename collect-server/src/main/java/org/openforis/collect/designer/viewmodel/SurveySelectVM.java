@@ -18,6 +18,7 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
@@ -27,6 +28,7 @@ import org.openforis.collect.metamodel.SurveySummarySortField;
 import org.openforis.collect.metamodel.SurveySummarySortField.Sortable;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyStoreException;
@@ -509,6 +511,18 @@ public class SurveySelectVM extends BaseVM {
 	public String getSurveyTooltip(SurveySummary summary) {
 		return Labels.getLabel("surveys_list.tooltip", 
 				new String[] {prettyDateFormat(summary.getCreationDate()), prettyDateFormat(summary.getModifiedDate())});
+	}
+	
+	public String getUserGroupLabel(UserGroup userGroup) {
+		if (userGroup == null) {
+			return null;
+		} else if (UserGroupManager.DEFAULT_PUBLIC_USER_GROUP_NAME.equals(userGroup.getName())) { 
+			return "Public";
+		} else if (userGroupManager.getDefaultPrivateUserGroupName(getLoggedUser()).equals(userGroup.getName())) {
+			return "Private";
+		} else {
+			return userGroup.getLabel();
+		}
 	}
 	
 	public SurveySummary getSelectedSurvey() {

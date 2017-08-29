@@ -30,7 +30,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Institution;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.versioning.Version;
@@ -67,7 +67,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	);
 	
 	private static final String SURVEY_NAME_FIELD = "surveyName";
-	private static final String INSTITUTION_FIELD_NAME = "institution";
+	private static final String USER_GROUP_FIELD_NAME = "userGroup";
 	
 	@WireVariable
 	private SurveyManager surveyManager;
@@ -109,7 +109,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		updatingExistingSurvey = false;
 		updatingPublishedSurvey = false;
 		
-		form.put(INSTITUTION_FIELD_NAME, getDefaultPublicInstitutionItem());
+		form.put(USER_GROUP_FIELD_NAME, getDefaultPublicUserGroupItem());
 		updateForm();
 		notifyChange("uploadedFileName","uploadedSurveyUri");
 	}
@@ -346,8 +346,8 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	protected void startSurveyImport() {
 		String surveyName = getFormSurveyName();
-		LabelledItem institutionItem = (LabelledItem) form.get(INSTITUTION_FIELD_NAME);
-		Institution institution = institutionManager.findByName(institutionItem.getCode());
+		LabelledItem userGroupItem = (LabelledItem) form.get(USER_GROUP_FIELD_NAME);
+		UserGroup userGroup = userGroupManager.findByName(userGroupItem.getCode());
 		
 		String uploadedFileNameExtension = FilenameUtils.getExtension(this.uploadedFileName);
 		if ( XML_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension) ) {
@@ -360,7 +360,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		restoreJob.setFile(uploadedFile);
 		restoreJob.setSurveyName(surveyName);
 		restoreJob.setSurveyUri(uploadedSurveyUri);
-		restoreJob.setInstitution(institution);
+		restoreJob.setUserGroup(userGroup);
 		restoreJob.setRestoreIntoPublishedSurvey(false);
 		restoreJob.setValidateSurvey(false);
 		jobManager.start(restoreJob);

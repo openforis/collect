@@ -46,6 +46,8 @@
 			<listheader label="${labels.survey.target.$}" width="50px"
 				id="surveysListTargetHeader"
 				sort="auto(target)" />
+			<listheader label="${labels.survey.usergroup}" width="80px"
+				sort="auto(usergroupLabel, name)" />
 			<listheader label="${labels.survey.modified}" width="60px"
 				id="surveysListModifiedHeader"
 				sort="auto(temporary, published, name)" />
@@ -74,6 +76,9 @@
 						<image src="/assets/images/of_collect_icon.png"
 							height="25px" width="25px" />
 					</box>
+				</listcell>
+				<listcell label="@load(vm.getUserGroupLabel(each.userGroup))"
+					onDoubleClick="@command('editSelectedSurvey')">
 				</listcell>
 				<listcell
 					onDoubleClick="@command('editSelectedSurvey')">

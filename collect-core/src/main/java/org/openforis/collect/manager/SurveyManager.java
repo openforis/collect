@@ -40,7 +40,7 @@ import org.openforis.collect.metamodel.SurveySummarySortField;
 import org.openforis.collect.metamodel.SurveySummarySortField.Sortable;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
-import org.openforis.collect.model.Institution;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
@@ -101,7 +101,7 @@ public class SurveyManager {
 	@Autowired(required=false)
 	private SurveyDataCleansingManager dataCleansingManager;
 	@Autowired(required=false)
-	private InstitutionManager institutionManager;
+	private UserGroupManager userGroupManager;
 	
 	private Map<Integer, ProcessStatus> recordValidationStatusBySurvey;
 	
@@ -112,6 +112,7 @@ public class SurveyManager {
 	}
 
 	public void init() {
+		this.publishedSurveyCache = new SurveyCache();
 	}
 
 	public List<CollectSurvey> getAll() {
@@ -376,15 +377,15 @@ public class SurveyManager {
 	public List<SurveySummary> getSurveySummaries(String lang, User availableToUser) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		
-		List<Long> userInstitutionIds;
-		if (institutionManager == null || availableToUser == null) {
-			userInstitutionIds = Collections.emptyList();
+		List<Long> userGroupIds;
+		if (userGroupManager == null || availableToUser == null) {
+			userGroupIds = Collections.emptyList();
 		} else {
-			List<Institution> userInstitutions = institutionManager.findByUser(availableToUser);
-			userInstitutionIds = CollectionUtils.project(userInstitutions, "id");
+			List<UserGroup> userGroups = userGroupManager.findByUser(availableToUser);
+			userGroupIds = CollectionUtils.project(userGroups, "id");
 		}
 		for (CollectSurvey survey : getPublishedSurveyCache().surveys) {
-			if (availableToUser == null || userInstitutionIds.contains(survey.getInstitutionId())) {
+			if (availableToUser == null || userGroupIds.contains(survey.getUserGroupId())) {
 				SurveySummary summary = SurveySummary.createFromSurvey(survey, lang);
 				if ( summary.isPublished() ) {
 					int publishedSurveyId = summary.isTemporary() ? summary.getPublishedId(): summary.getId();
@@ -679,13 +680,8 @@ public class SurveyManager {
 		if ( includeDetails ) {
 			for (SurveySummary summary : summaries) {
 				CollectSurvey survey = surveyDao.loadById(summary.getId());
-				String projectName = survey.getProjectName(labelLang);
-				if ( projectName == null && labelLang != null && ! labelLang.equals(survey.getDefaultLanguage()) ) {
-					projectName = survey.getProjectName();
-				}
-				summary.setProjectName(projectName);
-				summary.setDefaultLanguage(survey.getDefaultLanguage());
-				summary.setLanguages(survey.getLanguages());
+				fillReferencedItems(survey);
+				summary.fillFromSurvey(survey, labelLang);
 			}
 		}
 		return summaries;
@@ -1036,15 +1032,15 @@ public class SurveyManager {
 	}
 	
 	private void fillReferencedItems(CollectSurvey survey) {
-		if (institutionManager != null) {
-			Institution institution = null;
-			if (survey.getInstitutionId() == null) {
+		if (userGroupManager != null) {
+			UserGroup userGroup = null;
+			if (survey.getUserGroupId() == null) {
 				//use default public institution
-				institution = institutionManager.findByName(InstitutionManager.DEFAULT_PUBLIC_INSTITUTION_NAME);
+				userGroup = userGroupManager.findByName(UserGroupManager.DEFAULT_PUBLIC_USER_GROUP_NAME);
 			} else {
-				institution = institutionManager.findById(survey.getInstitutionId());
+				userGroup = userGroupManager.findById(survey.getUserGroupId());
 			}
-			survey.setInstitution(institution);
+			survey.setUserGroup(userGroup);
 		}
 	}
 
@@ -1077,6 +1073,9 @@ public class SurveyManager {
 	private SurveyCache getPublishedSurveyCache() {
 		if (publishedSurveyCache == null) {
 			publishedSurveyCache = new SurveyCache();
+		}
+		if (! publishedSurveyCache.isInitialized()) {
+			publishedSurveyCache.init();
 		}
 		return publishedSurveyCache;
 	}
@@ -1147,12 +1146,16 @@ public class SurveyManager {
 		private Map<Integer, CollectSurvey> surveysById = new HashMap<Integer, CollectSurvey>();
 		private Map<String, CollectSurvey> surveysByName = new HashMap<String, CollectSurvey>();
 		private Map<String, CollectSurvey> surveysByUri = new HashMap<String, CollectSurvey>();
+		private boolean initialized = false;
 		
 		public SurveyCache() {
-			populate();
 		}
 		
-		private void populate() {
+		public boolean isInitialized() {
+			return initialized;
+		}
+
+		public void init() {
 			surveys = surveyDao.loadAllPublished();
 			fillReferencedItems(surveys);
 			for (CollectSurvey survey : surveys) {

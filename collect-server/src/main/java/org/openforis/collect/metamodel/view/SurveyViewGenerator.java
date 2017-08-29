@@ -24,7 +24,7 @@ import org.openforis.idm.metamodel.NodeLabel.Type;
  */
 public class SurveyViewGenerator {
 
-	private boolean includeCodeLists = false;
+	private boolean includeCodeListValues = false;
 	private String languageCode;
 	
 	public SurveyViewGenerator(String languageCode) {
@@ -42,22 +42,21 @@ public class SurveyViewGenerator {
 	
 	public SurveyView generateView(CollectSurvey survey) {
 		final SurveyView surveyView = new SurveyView(survey);
-		
-		if (includeCodeLists) {
-			List<CodeList> codeLists = survey.getCodeLists();
-			for (CodeList codeList : codeLists) {
-				CodeListView codeListView = new CodeListView();
-				codeListView.setId(codeList.getId());
-				codeListView.setName(codeList.getName());
-				
+
+		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList codeList : codeLists) {
+			CodeListView codeListView = new CodeListView();
+			codeListView.setId(codeList.getId());
+			codeListView.setName(codeList.getName());
+
+			if (includeCodeListValues) {
 				CodeListService service = survey.getContext().getCodeListService();
 				List<CodeListItem> items = service.loadRootItems(codeList);
 				for (CodeListItem item : items) {
 					codeListView.items.add(createCodeListItemView(item));
 				}
-				
-				surveyView.addCodeList(codeListView);
 			}
+			surveyView.addCodeList(codeListView);
 		}
 		
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();
@@ -118,8 +117,8 @@ public class SurveyViewGenerator {
 		return label;
 	}
 	
-	public void setIncludeCodeLists(boolean includeCodeLists) {
-		this.includeCodeLists = includeCodeLists;
+	public void setIncludeCodeListValues(boolean includeCodeListValues) {
+		this.includeCodeListValues = includeCodeListValues;
 	}
 	
 }

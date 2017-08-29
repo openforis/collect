@@ -40,8 +40,8 @@ public class CollectSurvey extends Survey {
 	private Version collectVersion;
 	private SurveyTarget target;
 	private Integer publishedId;
-	private Long institutionId;
-	private Institution institution;
+	private Long userGroupId;
+	private UserGroup userGroup;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -198,21 +198,21 @@ public class CollectSurvey extends Survey {
 		}
 	}
 	
-	public Long getInstitutionId() {
-		return institutionId;
+	public Long getUserGroupId() {
+		return userGroupId;
 	}
 	
-	public void setInstitutionId(Long institutionId) {
-		this.institutionId = institutionId;
+	public void setUserGroupId(Long userGroupId) {
+		this.userGroupId = userGroupId;
 	}
 	
-	public Institution getInstitution() {
-		return institution;
+	public UserGroup getUserGroup() {
+		return userGroup;
 	}
 	
-	public void setInstitution(Institution institution) {
-		this.institution = institution;
-		this.institutionId = institution == null ? null : institution.getId();
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
+		this.userGroupId = userGroup == null ? null : userGroup.getId();
 	}
 	
 	public UIConfiguration getUIConfiguration() {

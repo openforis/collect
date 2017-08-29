@@ -20,6 +20,7 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	private List<ListItem> values = new ArrayList<ListItem>();
 	private List<String> imagery = new ArrayList<String>();
 	private SamplingPointGenerationSettings samplingPointGenerationSettings;
+	private long userGroupId;
 	
 	public String getName() {
 		return name;
@@ -59,6 +60,14 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	
 	public void setSamplingPointGenerationSettings(SamplingPointGenerationSettings samplingPointGenerationSettings) {
 		this.samplingPointGenerationSettings = samplingPointGenerationSettings;
+	}
+	
+	public long getUserGroupId() {
+		return userGroupId;
+	}
+	
+	public void setUserGroupId(long userGroupId) {
+		this.userGroupId = userGroupId;
 	}
 	
 	public static class ListItem {

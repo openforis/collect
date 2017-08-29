@@ -9,7 +9,7 @@ import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Institution;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public abstract class AbstractSurveyRestoreJob extends Job {
 	 */
 	protected boolean validateSurvey;
 
-	protected Institution institution;
+	protected UserGroup userGroup;
 
 	//output
 	protected CollectSurvey survey;
@@ -116,8 +116,8 @@ public abstract class AbstractSurveyRestoreJob extends Job {
 		return survey;
 	}
 
-	public void setInstitution(Institution institution) {
-		this.institution = institution;
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
 	}
 	
 }

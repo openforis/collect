@@ -18,7 +18,7 @@ public class SurveySummary {
 
 	private Integer id;
 	private Integer publishedId;
-	private Long institutionId;
+	private Long userGroupId;
 	private String name;
 	private String uri;
 	private String projectName;
@@ -27,9 +27,13 @@ public class SurveySummary {
 	private Date creationDate;
 	private Date modifiedDate;
 	private SurveyTarget target;
+	private UserGroup userGroup;
 	private ProcessStatus recordValidationProcessStatus;
 	private String defaultLanguage;
 	private List<String> languages;
+	
+	public SurveySummary() {
+	}
 	
 	public SurveySummary(Integer id, String name, String uri) {
 		this(id, name, uri, null);
@@ -50,18 +54,21 @@ public class SurveySummary {
 	}
 	
 	public static SurveySummary createFromSurvey(CollectSurvey survey, String lang) {
-		Integer id = survey.getId();
-		String projectName = survey.getProjectName(lang);
-		String name = survey.getName();
-		String uri = survey.getUri();
-		SurveySummary summary = new SurveySummary(id, name, uri, projectName);
-		summary.setTemporary(survey.isTemporary());
-		summary.setCreationDate(survey.getCreationDate());
-		summary.setModifiedDate(survey.getModifiedDate());
-		summary.setTarget(survey.getTarget());
-		summary.setDefaultLanguage(survey.getDefaultLanguage());
-		summary.setLanguages(survey.getLanguages());
+		SurveySummary summary = new SurveySummary(survey.getId(), survey.getName(), survey.getUri());
+		summary.fillFromSurvey(survey, lang);
 		return summary;
+	}
+
+	public void fillFromSurvey(CollectSurvey survey, String lang) {
+		this.setProjectName(survey.getProjectName(lang, true));
+		this.setTemporary(survey.isTemporary());
+		this.setCreationDate(survey.getCreationDate());
+		this.setModifiedDate(survey.getModifiedDate());
+		this.setTarget(survey.getTarget());
+		this.setDefaultLanguage(survey.getDefaultLanguage());
+		this.setLanguages(survey.getLanguages());
+		this.setUserGroupId(survey.getUserGroupId());
+		this.setUserGroup(survey.getUserGroup());
 	}
 	
 	public boolean isRecordValidationInProgress() {
@@ -70,6 +77,10 @@ public class SurveySummary {
 	
 	public int getRecordValidationProgressPercent() {
 		return recordValidationProcessStatus == null ? 0: recordValidationProcessStatus.getProgressPercent();
+	}
+	
+	public String getUserGroupLabel() {
+		return userGroup == null ? null : userGroup.getLabel();
 	}
 
 	public Integer getId() {
@@ -116,12 +127,20 @@ public class SurveySummary {
 		this.publishedId = publishedId;
 	}
 
-	public Long getInstitutionId() {
-		return institutionId;
+	public Long getUserGroupId() {
+		return userGroupId;
 	}
 	
-	public void setInstitutionId(Long institutionId) {
-		this.institutionId = institutionId;
+	public void setUserGroupId(Long userGroupId) {
+		this.userGroupId = userGroupId;
+	}
+	
+	public UserGroup getUserGroup() {
+		return userGroup;
+	}
+	
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
 	}
 	
 	public ProcessStatus getRecordValidationProcessStatus() {

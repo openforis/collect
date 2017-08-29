@@ -235,7 +235,7 @@ public class SurveyDao extends JooqDaoSupport {
 		storeQuery.addValue(OFC_SURVEY.COLLECT_VERSION, survey.getCollectVersion().toString());
 		storeQuery.addValue(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()));
 		storeQuery.addValue(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()));
-		storeQuery.addValue(OFC_SURVEY.INSTITUTION_ID, survey.getInstitutionId());
+		storeQuery.addValue(OFC_SURVEY.INSTITUTION_ID, survey.getUserGroupId());
 	}
 
 	private void addNewSurveyValues(StoreQuery<OfcSurveyRecord> storeQuery,
@@ -256,7 +256,7 @@ public class SurveyDao extends JooqDaoSupport {
 			survey.setCollectVersion(new Version(row.getValue(OFC_SURVEY.COLLECT_VERSION)));
 			survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
 			survey.setId(row.getValue(OFC_SURVEY.ID));
-			survey.setInstitutionId(row.getValue(OFC_SURVEY.INSTITUTION_ID));
+			survey.setUserGroupId(row.getValue(OFC_SURVEY.INSTITUTION_ID));
 			survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
 			survey.setName(row.getValue(OFC_SURVEY.NAME));
 			survey.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
@@ -282,7 +282,7 @@ public class SurveyDao extends JooqDaoSupport {
 		summary.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
 		summary.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
 		summary.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
-		summary.setInstitutionId(row.getValue(OFC_SURVEY.INSTITUTION_ID));
+		summary.setUserGroupId(row.getValue(OFC_SURVEY.INSTITUTION_ID));
 		return summary;
 	}
 	

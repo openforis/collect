@@ -56,6 +56,10 @@ public abstract class LanguageSpecificTextAbstractMap<T extends LanguageSpecific
 		return CollectionUtils.unmodifiableList(new ArrayList<T>(result));
 	}
 	
+	public boolean hasText(String language) {
+		return map.containsKey(getMapKey(language));
+	}
+	
 	public String getText(String language) {
 		T languageSpecificText = get(language);
 		return languageSpecificText != null ? languageSpecificText.getText(): null;

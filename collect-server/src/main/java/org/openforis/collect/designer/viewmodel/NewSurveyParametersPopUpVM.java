@@ -21,7 +21,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Institution;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
@@ -48,7 +48,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	private static final String SURVEY_NAME_FIELD = "name";
 	private static final String TEMPLATE_FIELD_NAME = "template";
 	private static final String LANGUAGE_FIELD_NAME = "language";
-	private static final String INSTITUTION_FIELD_NAME = "institution";
+	private static final String USER_GROUP_FIELD_NAME = "userGroup";
 
 
 	private enum TemplateType {
@@ -76,7 +76,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		nameValidator = new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, true);
 		initLanguageModel();
 		initTemplatesModel();
-		form.put(INSTITUTION_FIELD_NAME, getDefaultPublicInstitutionItem());
+		form.put(USER_GROUP_FIELD_NAME, getDefaultPublicUserGroupItem());
 	}
 
 	private void initTemplatesModel() {
@@ -114,7 +114,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		String langCode = ((LabelledItem) form.get(LANGUAGE_FIELD_NAME)).getCode();
 		String templateCode = ((LabelledItem) form.get(TEMPLATE_FIELD_NAME)).getCode();
 		TemplateType templateType = TemplateType.valueOf(templateCode);
-		String institutionName = ((LabelledItem) form.get(INSTITUTION_FIELD_NAME)).getCode();
+		String userGroupName = ((LabelledItem) form.get(USER_GROUP_FIELD_NAME)).getCode();
 		
 		CollectSurvey survey;
 		switch (templateType) {
@@ -124,8 +124,8 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		default:
 			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
-		Institution institution = institutionManager.findByName(institutionName);
-		survey.setInstitutionId(institution.getId());
+		UserGroup userGroup = userGroupManager.findByName(userGroupName);
+		survey.setUserGroupId(userGroup.getId());
 		surveyManager.save(survey);
 		//put survey in session and redirect into survey edit page
 		SessionStatus sessionStatus = getSessionStatus();

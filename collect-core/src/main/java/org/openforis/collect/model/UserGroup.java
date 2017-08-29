@@ -5,7 +5,7 @@ package org.openforis.collect.model;
  * @author S. Ricci
  *
  */
-public class Institution {
+public class UserGroup {
 
 	private Long id;
 	private String name;
