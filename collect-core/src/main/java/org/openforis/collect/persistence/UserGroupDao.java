@@ -43,7 +43,7 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 	public List<UserGroup> loadAll() {
 		return dsl()
 			.selectFrom(OFC_USERGROUP)
-			.orderBy(OFC_USERGROUP.NAME)
+			.orderBy(OFC_USERGROUP.PARENT_ID, OFC_USERGROUP.LABEL)
 			.fetchInto(UserGroup.class);
 	}
 
@@ -172,7 +172,7 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 						)
 					)
 				)
-			.orderBy(OFC_USERGROUP.LABEL)
+			.orderBy(OFC_USERGROUP.PARENT_ID, OFC_USERGROUP.NAME)
 			.fetchInto(UserGroup.class);
 		return result;
 	}
