@@ -90,7 +90,7 @@ public class SurveyController extends BasicController {
 		}
 	}
 
-	@RequestMapping(value="{id}.json", method=GET)
+	@RequestMapping(value="{id}", method=GET)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
 			@RequestParam(value="include-code-lists", required=false, defaultValue="true") boolean includeCodeLists) 
