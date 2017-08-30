@@ -16,7 +16,7 @@ public class CoordinateOperations {
 
 	public void initialize() {
 		registerSRS(SpatialReferenceSystem.LAT_LON_SRS);
-		registerSRS(SpatialReferenceSystem.WEB_MARCATOR_SRS);
+		registerSRS(SpatialReferenceSystem.WEB_MERCATOR_SRS);
 	}
 	
 	public void registerSRS(List<SpatialReferenceSystem> list) {

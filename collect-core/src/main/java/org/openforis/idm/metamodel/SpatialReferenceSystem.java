@@ -34,9 +34,10 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 	            "        AUTHORITY[\"EPSG\",\"8901\"]],\n" +
 	            "    UNIT[\"degree\",0.01745329251994328,\n" +
 	            "        AUTHORITY[\"EPSG\",\"9122\"]],\n" +
-	            "    AUTHORITY[\"EPSG\",\"4326\"]]", "Lat Lon");
+	            "    AUTHORITY[\"EPSG\",\"4326\"]]", 
+	            "Lat Lon");
 
-	public static final SpatialReferenceSystem WEB_MARCATOR_SRS = new SpatialReferenceSystem(
+	public static final SpatialReferenceSystem WEB_MERCATOR_SRS = new SpatialReferenceSystem(
 			WEB_MARCATOR_SRS_ID,
 			"   GEOGCS[\"WGS 84\",\n"
 			+ "        DATUM[\"WGS_1984\",\n"
@@ -59,7 +60,7 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 			+ "    AXIS[\"Y\",NORTH],\n"
 			+ "    EXTENSION[\"PROJ4\",\"+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs\"],\n"
 			+ "    AUTHORITY[\"EPSG\",\"3857\"]]"
-		    , "Web Marcator");
+		    , "Web Mercator");
 	
 	private String id;
 	private LanguageSpecificTextMap labels;
