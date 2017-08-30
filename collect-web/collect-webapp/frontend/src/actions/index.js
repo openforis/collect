@@ -124,7 +124,7 @@ function receiveSurveySummaries(json) {
 export function fetchSurveySummaries() {
 	return function (dispatch) {
 		dispatch(requestSurveySummaries())
-		var url = BASE_URL + 'survey/summaries.json';
+		var url = BASE_URL + 'survey';
 		return fetch(url)
 		    .then(response => response.json(),
 	    		error => console.log('An error occured.', error))

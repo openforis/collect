@@ -4,6 +4,7 @@ import {
 
 function userGroups(
   state = {
+    isInitialized: false,
 	  isFetching: false,
 	  didInvalidate: false,
 	  userGroups: []
@@ -22,6 +23,7 @@ function userGroups(
         })
     case RECEIVE_USER_GROUPS:
       return Object.assign({}, state, {
+        isInitialized: true,
 		    isFetching: false,
 		    didInvalidate: false,
 		    userGroups: action.userGroups,

@@ -101,7 +101,7 @@
 	<changeSet id="survey-usergroup-column" author="ricci" dbms="h2">
 		<addColumn tableName="ofc_survey">
             <column name="usergroup_id" type="INTEGER">
-				<constraints nullable="false" 
+				<constraints nullable="true" 
 					foreignKeyName="ofc_survey_usergroup_fkey" 
 					references="ofc_usergroup(id)" />
 			</column>

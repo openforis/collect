@@ -3,7 +3,22 @@ import { Route, Link } from 'react-router-dom';
 import { Breadcrumb, BreadcrumbItem } from 'reactstrap';
 import routes from '../../routes';
 
-const findRouteName = url => routes[url];
+const findRouteName = function(match) {
+  let route = routes.find(route => {
+    if (route.path === match.path) {
+      return true;
+    } else if (route.pathRegExp && route.pathRegExp.test(match.path)) {
+        return true;
+    } else {
+      return false;
+    }
+  });
+  if (route === undefined) {
+    return "Undefined";
+  } else {
+    return route.name;
+  }
+};
 
 const getPaths = (pathname) => {
   const paths = ['/'];
@@ -15,12 +30,11 @@ const getPaths = (pathname) => {
     paths.push(currPath);
     return currPath;
   });
-  console.log(paths);
   return paths;
 };
 
 const BreadcrumbsItem = ({ ...rest, match }) => {
-  const routeName = findRouteName(match.url);
+  const routeName = findRouteName(match);
   if (routeName) {
     return (
       match.isExact ?

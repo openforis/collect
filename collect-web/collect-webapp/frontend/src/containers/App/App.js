@@ -14,6 +14,7 @@ import Map from '../../views/Map/'
 import SurveyDesigner from '../../views/SurveyDesigner/'
 import Users from '../../views/Users/'
 import UserGroups from '../../views/UserGroups/'
+import UserGroupDetails from '../../views/UserGroups/UserGroupDetails'
 
 class App extends Component {
   render() {
@@ -32,7 +33,8 @@ class App extends Component {
                   <Route path="/map" name="Map" component={Map}/>
                   <Route path="/surveydesigner" name="Survey Designer" component={SurveyDesigner}/>
                   <Route path="/users" name="Users" component={Users}/>
-                  <Route path="/usergroups" name="User Groups" component={UserGroups}/>
+                  <Route path="/usergroups" exact name="User Groups" component={UserGroups}/>
+                  <Route path="/usergroups/:id" name="User Group" component={UserGroupDetails}/>
                   <Redirect from="/" to="/dashboard"/>
                 </Switch>
               </div>

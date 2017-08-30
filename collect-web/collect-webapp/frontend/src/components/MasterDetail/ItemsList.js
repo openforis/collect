@@ -13,7 +13,7 @@ class ItemsList extends Component {
         };
         
 		this.handleRowSelect = this.handleRowSelect.bind(this);
-		this.handleNewClick = this.handleNewClick.bind(this);
+		this.handleNewButtonClick = this.handleNewButtonClick.bind(this);
     }
     
     handleRowSelect(row, isSelected, e) {
@@ -49,7 +49,7 @@ class ItemsList extends Component {
 		return items.length === 1 ? items[0] : null;
 	}
 	
-	handleNewClick() {
+	handleNewButtonClick() {
 		this.setState({...this.state, 
 			editedItem: this.createNewItem(),
 			selectedItems: [],

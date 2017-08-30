@@ -34,7 +34,7 @@ class ItemDetails extends Component {
         }
         let alertMessageOpen = true;
         let alertMessageColor = isError ? 'danger' : 'success';
-        let alertMessageText = isError ? 'user.save.errors_in_form' : 'user.save.success';
+        let alertMessageText = isError ? 'global.save.errors_in_form' : 'global.save.success';
         
         this.setState({...this.state, 
             errorFeedback: errorFeedback, 

@@ -32,23 +32,39 @@ class UserGroupDetails extends ItemDetails {
     userGroupService = new UserGroupService();
 
     updateStateFromProps(props) {
-        this.state = {
-            newItem: ! props.userGroup.id,
-            id: props.userGroup.id,
-            name: props.userGroup.name,
-            label: props.userGroup.label,
-            description: props.userGroup.description,
-            visibilityCode: props.userGroup.visibilityCode,
-            enabled: props.userGroup.enabled,
-            errorFeedback: [],
-            alertMessageOpen: false,
-            availableUsers: this.getAvailableUsers(props.users, props.userGroup.users),
-            usersInGroup: props.userGroup.users,
-            selectedAvailableUsers: [],
-            selectedAvailableUsersIds: [],
-            selectedUsersInGroup: [],
-            selectedUsersInGroupIds: [],
-            newUserRoleCode: "OPERATOR"
+        if (! props.isUserGroupsInitialized || props.isFetchingUserGroups) {
+            this.state = {
+                ready: false
+            }
+        } else {
+            let idParam = props.match.params.id;
+            let userGroup;
+            if (idParam == 'new') {
+                userGroup = {id: null, name: '', label: '', description: '', visibilityCode: 'P', enabled: true, users: []}
+            } else {
+                let userGroupId = parseInt(idParam)
+                userGroup = props.userGroups.find(group => group.id === userGroupId)
+            }
+            this.state = {
+                ready: true,
+                editedUserGroup: userGroup,
+                newItem: ! userGroup.id,
+                id: userGroup.id,
+                name: userGroup.name,
+                label: userGroup.label,
+                description: userGroup.description,
+                visibilityCode: userGroup.visibilityCode,
+                enabled: userGroup.enabled,
+                errorFeedback: [],
+                alertMessageOpen: false,
+                availableUsers: this.getAvailableUsers(props.users, userGroup.users),
+                usersInGroup: userGroup.users,
+                selectedAvailableUsers: [],
+                selectedAvailableUsersIds: [],
+                selectedUsersInGroup: [],
+                selectedUsersInGroupIds: [],
+                newUserRoleCode: "OPERATOR"
+            }
         }
     }
 
@@ -150,6 +166,10 @@ class UserGroupDetails extends ItemDetails {
     }
 
     render() {
+        if (! this.state.ready) {
+            return <div>Loading...</div>;
+        }
+
         let roles = ['OWNER', 'ADMINISTRATOR', 'OPERATOR', 'VIEWER']
         let joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
 
@@ -158,12 +178,12 @@ class UserGroupDetails extends ItemDetails {
         let isNotDescendantOf = function(group1, group2) {
             return false;
         }
-        let editedUserGroup = this.props.userGroup;
+        let editedUserGroup = this.state.editedUserGroup;
         let availableParentGroups = this.props.userGroups.filter(group => {
             return group.id != editedUserGroup.id && (editedUserGroup.id == null || isNotDescendantOf(group, editedUserGroup))
         })
-        let parentGroupOptions = [<option value="">---</option>]
-            .concat(availableParentGroups.map(group => <option value={group.id}>{group.label}</option>))
+        let parentGroupOptions = [<option key="0" value="">---</option>]
+            .concat(availableParentGroups.map(group => <option key={group.id} value={group.id}>{group.label}</option>))
 
 		return (
             <div>
@@ -328,10 +348,12 @@ class UserGroupDetails extends ItemDetails {
 
 const mapStateToProps = state => {
     const {
+        isInitialized: isUserGroupsInitialized,
         isFetching: isFetchingUserGroups,
         lastUpdated: lastUpdatedUserGroups,
         userGroups
     } = state.userGroups || {
+        isUserGroupsInitialized: false,
         isFetchingUserGroups: true,
         userGroups: []
     }
@@ -347,6 +369,7 @@ const mapStateToProps = state => {
         isFetchingUsers,
         lastUpdatedUsers,
         users,
+        isUserGroupsInitialized,
         isFetchingUserGroups,
         lastUpdatedUserGroups,
         userGroups

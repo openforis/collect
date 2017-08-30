@@ -42,7 +42,7 @@ class Users extends ItemsList {
 			<Container>
 				<Row>
 					<Col>
-						<Button color="success" onClick={this.handleNewClick}>New</Button>
+						<Button color="success" onClick={this.handleNewButtonClick}>New</Button>
 					</Col>
 				</Row>
 				<Row>
