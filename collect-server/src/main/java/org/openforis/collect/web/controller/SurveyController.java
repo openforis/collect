@@ -93,10 +93,10 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value="{id}", method=GET)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
-			@RequestParam(value="include-code-lists", required=false, defaultValue="true") boolean includeCodeLists) 
+			@RequestParam(value="includeCodeListValues", required=false, defaultValue="true") boolean includeCodeListValues) 
 			throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		return generateView(survey, includeCodeLists);
+		return generateView(survey, includeCodeListValues);
 	}
 	
 	@Transactional
@@ -105,7 +105,7 @@ public class SurveyController extends BasicController {
 	SurveyView insertSurvey(@RequestBody SimpleSurveyCreationParameters parameters, BindingResult bindingResult) throws Exception {
 		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager, userGroupManager);
 		CollectSurvey survey = surveyCreator.generateAndPublishSurvey(parameters);
-		return generateView(survey, false);
+		return generateView(survey, true);
 	}
 
 	@RequestMapping(value="temp/{surveyId}/edit.htm", method=GET)
