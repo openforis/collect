@@ -39,5 +39,7 @@
 	<bean class="org.jooq.impl.SingleConnectionDataSourceConnectionProvider" name="connectionProvider">
         <constructor-arg ref="transactionAwareDataSource" />
     </bean>
+    
+    <bean id="userGroupManager" class="org.openforis.collect.manager.LocalUserGroupManager" />
 	
 </beans>
