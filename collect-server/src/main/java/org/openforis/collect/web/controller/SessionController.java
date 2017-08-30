@@ -31,6 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 @Scope(WebApplicationContext.SCOPE_SESSION)
+@RequestMapping("api/session")
 public class SessionController extends BasicController {
 	
 	@Autowired
