@@ -18,8 +18,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -40,10 +42,10 @@ import org.openforis.collect.metamodel.SurveySummarySortField;
 import org.openforis.collect.metamodel.SurveySummarySortField.Sortable;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
-import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyFileDao;
@@ -367,7 +369,7 @@ public class SurveyManager {
 	}
 
 	public List<SurveySummary> getSurveySummaries(String lang) {
-		return getSurveySummaries(lang, null);
+		return getSurveySummaries(lang, (User) null);
 	}
 	
 	public List<SurveySummary> getSurveySummaries(User availableToUser) {
@@ -375,17 +377,14 @@ public class SurveyManager {
 	}
 	
 	public List<SurveySummary> getSurveySummaries(String lang, User availableToUser) {
+		Set<UserGroup> userGroups = getAvailableUserGroups(availableToUser);
+		return getSurveySummaries(lang, (Set<UserGroup>) userGroups);
+	}
+
+	public List<SurveySummary> getSurveySummaries(String lang, Set<UserGroup> userGroups) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
-		
-		List<Long> userGroupIds;
-		if (userGroupManager == null || availableToUser == null) {
-			userGroupIds = Collections.emptyList();
-		} else {
-			List<UserGroup> userGroups = userGroupManager.findByUser(availableToUser);
-			userGroupIds = CollectionUtils.project(userGroups, "id");
-		}
 		for (CollectSurvey survey : getPublishedSurveyCache().surveys) {
-			if (availableToUser == null || userGroupIds.contains(survey.getUserGroupId())) {
+			if (userGroups == null || userGroups.contains(survey.getUserGroup())) {
 				SurveySummary summary = SurveySummary.createFromSurvey(survey, lang);
 				if ( summary.isPublished() ) {
 					int publishedSurveyId = summary.isTemporary() ? summary.getPublishedId(): summary.getId();
@@ -1080,6 +1079,15 @@ public class SurveyManager {
 		return publishedSurveyCache;
 	}
 	
+	private Set<UserGroup> getAvailableUserGroups(User availableToUser) {
+		if (userGroupManager != null && availableToUser != null) {
+			List<UserGroup> userGroups = userGroupManager.findByUser(availableToUser);
+			return new LinkedHashSet<UserGroup>(userGroups);
+		} else {
+			return null;
+		}
+	}
+
 	/*
 	 * Getters and setters
 	 * 

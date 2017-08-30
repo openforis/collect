@@ -4,8 +4,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.SamplingDesignManager;
@@ -18,6 +21,7 @@ import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.web.validator.SimpleSurveyParametersValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -64,12 +68,13 @@ public class SurveyController extends BasicController {
 	public @ResponseBody
 	List<?> loadSurveys(
 			@RequestParam(value="userId", required=false) Integer userId,
+			@RequestParam(value="groupId", required=false) Integer groupId,
 			@RequestParam(value="full", required=false) boolean fullSurveys,
 			@RequestParam(value="includeCodeListValues", required=false) boolean includeCodeListValues,
 			@RequestParam(value="includeTemporary", required=false) boolean includeTemporary) throws Exception {
 		String languageCode = Locale.ENGLISH.getLanguage();
-		User avalableToUser = userId == null ? null : userManager.loadById(userId);
-		List<SurveySummary> summaries = surveyManager.getSurveySummaries(languageCode, avalableToUser);
+		Set<UserGroup> groups = getAvailableUserGrups(userId, groupId);
+		List<SurveySummary> summaries = surveyManager.getSurveySummaries(languageCode, groups);
 		
 		if (fullSurveys) {
 			List<SurveyView> views = new ArrayList<SurveyView>();
@@ -84,7 +89,7 @@ public class SurveyController extends BasicController {
 			return summaries;
 		}
 	}
-	
+
 	@RequestMapping(value="{id}.json", method=GET)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
@@ -122,4 +127,17 @@ public class SurveyController extends BasicController {
 		return view;
 	}
 	
+	private Set<UserGroup> getAvailableUserGrups(Integer userId, Integer groupId) {
+		if (groupId != null) {
+			UserGroup group = userGroupManager.findById(groupId);
+			Set<UserGroup> groups = Collections.singleton(group);
+			return groups;
+		} else if (userId != null) {
+			User availableToUser = userId == null ? null : userManager.loadById(userId);
+			List<UserGroup> groups = userGroupManager.findByUser(availableToUser);
+			return new HashSet<UserGroup>(groups);
+		} else {
+			return null;
+		}
+	}
 }
