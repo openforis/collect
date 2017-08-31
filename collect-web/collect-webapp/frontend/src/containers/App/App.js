@@ -10,7 +10,7 @@ import Footer from '../../components/Footer/';
 import Dashboard from '../../views/Dashboard/'
 import DataCleansing from '../../views/DataCleansing/'
 import DataManagement from '../../views/DataManagement/'
-import Map from '../../views/Map/'
+import MapView from '../../views/MapView/'
 import SurveyDesigner from '../../views/SurveyDesigner/'
 import Users from '../../views/Users/'
 import UserGroups from '../../views/UserGroups/'
@@ -30,7 +30,7 @@ class App extends Component {
                   <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                   <Route path="/datamanagement" name="DataManagement" component={DataManagement}/>
                   <Route path="/datacleansing" name="DataCleansing" component={DataCleansing}/>
-                  <Route path="/map" name="Map" component={Map}/>
+                  <Route path="/map" name="Map" component={MapView}/>
                   <Route path="/surveydesigner" name="Survey Designer" component={SurveyDesigner}/>
                   <Route path="/users" name="Users" component={Users}/>
                   <Route path="/usergroups" exact name="User Groups" component={UserGroups}/>

@@ -215,7 +215,12 @@ function requestUserGroups() {
 function receiveUserGroups(json) {
 	return {
 	    type: RECEIVE_USER_GROUPS,
-	    userGroups: json, //TODO map into UserGroup object
+	    userGroups: json.map(g => {
+			if (g.parentId != null) {
+				g.parent = json.find(g2 => g2.id === g.parentId);
+			}
+			return g;
+		}), //TODO map into UserGroup object
 	    receivedAt: Date.now()
 	}
 }

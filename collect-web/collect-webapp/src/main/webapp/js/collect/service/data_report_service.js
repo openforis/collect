@@ -1,6 +1,6 @@
 Collect.DataReportService = function() {
 	Collect.AbstractService.apply(this, arguments);
-	this.contextPath = "datacleansing/datareports/";
+	this.contextPath = "api/datacleansing/datareports/";
 };
 
 Collect.DataReportService.prototype = Object.create(Collect.AbstractService.prototype);

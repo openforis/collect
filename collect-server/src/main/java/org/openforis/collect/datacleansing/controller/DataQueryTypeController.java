@@ -17,7 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/dataquerytypes")
+@RequestMapping(value = "api/datacleansing/dataquerytypes")
 public class DataQueryTypeController extends AbstractSurveyObjectEditFormController<DataQueryType, DataQueryTypeForm, DataQueryTypeManager> {
 	
 	@Autowired

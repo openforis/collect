@@ -62,7 +62,7 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 	}
 	
 	return {
-	    url: "datacleansing/datacleansingchains/list.json",
+	    url: "api/datacleansing/datacleansingchains",
 	    detailView: true,
 	    detailFormatter: detailFormatter,
 	    onExpandRow: onExpandRow,

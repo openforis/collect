@@ -10,7 +10,7 @@ Collect.DataCleansing.DataCleansingStepPanelController.prototype = Object.create
 Collect.DataCleansing.DataCleansingStepPanelController.prototype.getDataGridOptions = function() {
 	var $this = this;
 	return {
-	    url: "datacleansing/datacleansingsteps/list.json",
+	    url: "api/datacleansing/datacleansingsteps",
 	    columns: [
 			{field: "title", title: OF.i18n.prop("collect.global.title"), width: 400, sortable: true},
 			{field: "queryTitle", title: OF.i18n.prop("collect.data_cleansing.data_cleansing_step.query_title"), 

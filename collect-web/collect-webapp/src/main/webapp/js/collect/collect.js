@@ -37,34 +37,7 @@ Collect.prototype.initI18n = function() {
 };
 
 Collect.prototype.initView = function() {
-	var $this = this;
-	var versionLabel = $.find(".applicationVersion");
-	$(versionLabel).text(Collect.VERSION);
 	
-	$("#headerLink").click(function(){
-		window.open("./", "_self")
-	});
-	$this.loadViewImages();
-};
-
-Collect.prototype.loadViewImages = function() {
-	var DOWNLOAD_LOGO_URL = "downloadLogo.htm";
-
-	var loadImage = function ( elId, position, defaultImageUrl ) {
-		var imgEl = document.getElementById(elId);
-		var tmpImg = new Image();
-		tmpImg.onerror = function() {
-			imgEl.src = defaultImageUrl;
-		};
-		tmpImg.onload = function() {
-			imgEl.src = this.height > 0 ? this.src : defaultImageUrl;
-		};
-		tmpImg.src = DOWNLOAD_LOGO_URL + "?position=" + position + "&time=" + new Date().getTime();
-	};
-
-	loadImage("headerImg", "header", "assets/images/header.jpg");
-	loadImage("logoImg", "top_right", "assets/images/default-logo.png");
-	loadImage("footerImg", "footer", "assets/images/footer.jpg");
 };
 
 Collect.prototype.checkActiveSurveySelected = function() {

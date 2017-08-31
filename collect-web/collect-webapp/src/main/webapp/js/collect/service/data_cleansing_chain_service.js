@@ -1,6 +1,6 @@
 Collect.DataCleansingChainService = function() {
 	Collect.AbstractService.apply(this, arguments);
-	this.contextPath = "datacleansing/datacleansingchains/";
+	this.contextPath = "api/datacleansing/datacleansingchains/";
 };
 
 Collect.DataCleansingChainService.prototype = Object.create(Collect.AbstractService.prototype);

@@ -3,27 +3,27 @@ Collect.AbstractService = function() {
 };
 
 Collect.AbstractService.prototype.loadAll = function(onSuccess, onError) {
-	this.send("list.json", null, "GET", onSuccess, onError);
+	this.send("", null, "GET", onSuccess, onError);
 };
 
 Collect.AbstractService.prototype.loadById = function(id, onSuccess, onError) {
-	this.send(id + ".json", null, "GET", onSuccess, onError);
+	this.send("/" + id, null, "GET", onSuccess, onError);
 };
 
 Collect.AbstractService.prototype.save = function(data, onSuccess, onError) {
-	this.send("save.json", data, "POST", onSuccess, onError);
+	this.send("", data, "POST", onSuccess, onError);
 };
 
 Collect.AbstractService.prototype.duplicate = function(itemId, onSuccess, onError) {
-	this.send("duplicate.json", itemId, "POST", onSuccess, onError);
+	this.send("/duplicate.json", itemId, "POST", onSuccess, onError);
 };
 
 Collect.AbstractService.prototype.validate = function(data, onSuccess, onError) {
-	this.send("validate.json", data, "POST", onSuccess, onError);
+	this.send("/validate.json", data, "POST", onSuccess, onError);
 };
 
 Collect.AbstractService.prototype.remove = function(id, onSuccess, onError) {
-	this.send(id + ".json", null, "DELETE", onSuccess, onError);
+	this.send("/" + id, null, "DELETE", onSuccess, onError);
 };
 
 Collect.AbstractService.prototype.send = function(url, data, method, onSuccess, onError) {

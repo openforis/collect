@@ -34,7 +34,7 @@ Collect.DataCleansing.DataQueryPanelController.prototype.getDataGridOptions = fu
 	}
 	
 	var options = {
-	    url: "datacleansing/dataqueries/list.json",
+	    url: "api/datacleansing/dataqueries",
 	    detailView: true,
 	    detailFormatter: detailFormatter,
 	    columns: [
