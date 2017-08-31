@@ -37,6 +37,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao.RecordDSLContext;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
+import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -118,6 +119,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		} else {
 			update(record);
 		}
+	}
+
+	public int loadSurveyId(int recordId) {
+		OfcRecordRecord record = dsl().selectFrom(OFC_RECORD).where(OFC_RECORD.ID.eq(recordId)).fetchAny();
+		return record.getSurveyId();
 	}
 
 	public boolean hasAssociatedRecords(int userId) {

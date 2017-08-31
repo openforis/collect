@@ -44,7 +44,7 @@ class UserGroups extends ItemsList {
 		this.props.history.push('/usergroups/' + itemId)
 	}
 
-  render() {
+  	render() {
 		const { userGroups } = this.props
 	
 	  return (

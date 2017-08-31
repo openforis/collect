@@ -18,31 +18,29 @@ class ItemsList extends Component {
     
     handleRowSelect(row, isSelected, e) {
 		if (isSelected) {
-			this.setState(this.addSelectedItemToState(row));
+			this.handleItemSelected(row);
 		} else {
-			this.setState(this.removeSelectedItemFromState(row));
+			this.handleItemUnselected(row);
 		}
 	}
 
-	addSelectedItemToState(user) {
-		let newSelectedItems = this.state.selectedItems.concat([user]);
-		let newSelectedItemIds = this.state.selectedItemIds.concat([user.id]);
-		return { ...this.state, 
-			selectedItems: newSelectedItems,
-			selectedItemIds: newSelectedItemIds,
-			editedItem: this.getUniqueItemOrNull(newSelectedItems)
-		}
+	handleItemSelected(item) {
+		let newSelectedItems = this.state.selectedItems.concat([item]);
+		this.handleItemsSelection(newSelectedItems)
 	}
 
-	removeSelectedItemFromState(user) {
-		let idx = this.state.selectedItems.indexOf(user);
+	handleItemUnselected(item) {
+		let idx = this.state.selectedItems.indexOf(item);
 		let newSelectedItems = this.state.selectedItems.slice(idx, 0);
-		let newSelectedItemIds = this.state.selectedItemIds.slice(idx, 0);
-		return { ...this.state, 
-			selectedItems: newSelectedItems,
-			selectedItemIds: newSelectedItemIds,
-			editedItem: this.getUniqueItemOrNull(newSelectedItems)
-		}
+		this.handleItemsSelection(newSelectedItems)
+	}
+
+	handleItemsSelection(selectedItems) {
+		this.setState({ ...this.state, 
+			selectedItems: selectedItems,
+			selectedItemIds: selectedItems.map(item => item.id),
+			editedItem: this.getUniqueItemOrNull(selectedItems)
+		})
 	}
 
 	getUniqueItemOrNull(items) {

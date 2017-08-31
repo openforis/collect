@@ -11,7 +11,7 @@ export default class UserService extends AbstractService {
     }
 
     login(credentials) {
-    return this.post('login', credentials);
+        return this.post('login', credentials);
     }
 
 }

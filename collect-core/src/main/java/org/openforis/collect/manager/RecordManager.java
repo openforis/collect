@@ -116,7 +116,9 @@ public class RecordManager {
 	public void save(CollectRecord record, User lockingUser, String sessionId) throws RecordPersistenceException {
 		record.updateSummaryFields();
 
-		checkAllKeysSpecified(record);
+		if (record.getId() != null) {
+			checkAllKeysSpecified(record);
+		}
 		
 		Integer id = record.getId();
 		if(id == null) {
@@ -285,6 +287,10 @@ public class RecordManager {
 	}
 	
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate) {
+		if (survey == null) {
+			int surveyId = recordDao.loadSurveyId(recordId);
+			survey = surveyManager.getOrLoadSurveyById(surveyId);
+		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber(), validate);
 		loadDetachedObjects(record);
 		recordConverter.convertToLatestVersion(record);
@@ -385,6 +391,10 @@ public class RecordManager {
 		return loadSummaries(filter);
 	}
 	
+	public int loadSurveyId(int recordId) {
+		return recordDao.loadSurveyId(recordId);
+	}
+
 	public int countRecords(CollectSurvey survey) {
 		return recordDao.countRecords(survey);
 	}

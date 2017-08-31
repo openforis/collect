@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.event.EventProducer;
@@ -65,6 +66,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @Scope(SCOPE_SESSION)
+@RequestMapping("api")
 public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -161,7 +163,7 @@ public class RecordController extends BasicController implements Serializable {
 		return new ModelAndView(url);
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/content.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	RecordProxy loadRecord(
 			@PathVariable int surveyId, 
@@ -174,6 +176,20 @@ public class RecordController extends BasicController implements Serializable {
 	}
 
 	@Transactional
+	@RequestMapping(value = "survey/{surveyId}/data/records", method=POST, consumes=APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	RecordProxy newRecord(@PathVariable int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
+		String sessionId = sessionManager.getSessionState().getSessionId();
+		User user = sessionManager.getSessionState().getUser();
+		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		String rootEntityName = ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName());
+		String versionName = ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null);
+		CollectRecord record = recordManager.create(survey, rootEntityName, user, versionName, sessionId);
+		recordManager.save(record, user, sessionId);
+		return toProxy(record);
+	}
+	
+	@Transactional
 	@RequestMapping(value = "survey/{surveyId}/data/records/random.json", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<RecordEvent> createRandomRecord(@PathVariable int surveyId, @RequestBody Parameters params) throws RecordPersistenceException {
@@ -183,7 +199,7 @@ public class RecordController extends BasicController implements Serializable {
 		return events;
 	}
 	
-	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=Files.ZIP_CONTENT_TYPE)
+	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=Files.ZIP_CONTENT_TYPE)
 	public void exportRecord(
 			@PathVariable(value="survey_id") int surveyId, 
 			@PathVariable(value="record_id") int recordId,
@@ -209,6 +225,11 @@ public class RecordController extends BasicController implements Serializable {
 				Controllers.writeFileToResponse(response, outputFile, fileName, Files.ZIP_CONTENT_TYPE);
 			}
 		}
+	}
+	
+	@RequestMapping(value="data/records/{recordId}/surveyId", method=GET)
+	public @ResponseBody int loadSurveyId(@PathVariable int recordId) {
+		return recordManager.loadSurveyId(recordId);
 	}
 	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
@@ -283,6 +304,28 @@ public class RecordController extends BasicController implements Serializable {
 
 		public void setKeyValues(String[] keyValues) {
 			this.keyValues = keyValues;
+		}
+	}
+	
+	public static class NewRecordParameters {
+		
+		private String rootEntityName;
+		private String versionName;
+		
+		public String getRootEntityName() {
+			return rootEntityName;
+		}
+		
+		public void setRootEntityName(String rootEntityName) {
+			this.rootEntityName = rootEntityName;
+		}
+
+		public String getVersionName() {
+			return versionName;
+		}
+
+		public void setVersionName(String versionName) {
+			this.versionName = versionName;
 		}
 	}
 }

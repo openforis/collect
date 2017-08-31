@@ -15,6 +15,7 @@ import SurveyDesigner from '../../views/SurveyDesigner/'
 import Users from '../../views/Users/'
 import UserGroups from '../../views/UserGroups/'
 import UserGroupDetails from '../../views/UserGroups/UserGroupDetails'
+import RecordEditor from '../../views/DataManagement/RecordEditor'
 
 class App extends Component {
   render() {
@@ -28,7 +29,8 @@ class App extends Component {
               <div className="container-fluid">
                 <Switch>
                   <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
-                  <Route path="/datamanagement" name="DataManagement" component={DataManagement}/>
+                  <Route path="/datamanagement" exact name="DataManagement" component={DataManagement}/>
+                  <Route path="/datamanagement/:id" name="RecordDetails" component={RecordEditor}/>
                   <Route path="/datacleansing" name="DataCleansing" component={DataCleansing}/>
                   <Route path="/map" name="Map" component={MapView}/>
                   <Route path="/surveydesigner" name="Survey Designer" component={SurveyDesigner}/>

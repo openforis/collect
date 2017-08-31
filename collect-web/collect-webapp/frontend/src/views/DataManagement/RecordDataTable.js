@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import Axios from 'axios'
 import Moment from 'moment';
-import Constants from '../../utils/Constants'
+import RecordService from '../../services/RecordService'
 
 class RecordDataTable extends Component {
+	recordService = new RecordService();
+
   constructor(props) {
     super(props);
     
@@ -14,7 +15,7 @@ class RecordDataTable extends Component {
       records: [],
       totalSize: 0,
       page: 1,
-      recordsPerPage: 25,
+			recordsPerPage: 25
     };
     this.fetchData = this.fetchData.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
@@ -33,7 +34,7 @@ class RecordDataTable extends Component {
 	  this.fetchData(1, this.state.recordsPerPage, nextProps.survey.id);
   }
 
-  handlePageChange(page, recordsPerPage) {
+	handlePageChange(page, recordsPerPage) {
     this.fetchData(page, recordsPerPage);
   }
 
@@ -46,15 +47,8 @@ class RecordDataTable extends Component {
 		  surveyId = this.props.survey == null ? null: this.props.survey.id) {
 	  if (surveyId == null)
 		  return;
-	  Axios.get(Constants.BASE_URL + 'survey/' + surveyId + '/data/records/summary.json', {
-		  params: {
-			  maxNumberOfRows: recordsPerPage,
-			  offset: (page - 1) * recordsPerPage,
-			  //sorting: state.sorting,
-			  //filtering: state.filtering
-		  }
-	  }).then((res) => {
-		  this.setState({records: res.data.records, totalSize: res.data.count, page, recordsPerPage});
+	  this.recordService.fetchRecordSummaries(surveyId, recordsPerPage, page).then((res) => {
+		  this.setState({records: res.records, totalSize: res.count, page, recordsPerPage});
 	  });
   }
 
@@ -102,7 +96,10 @@ class RecordDataTable extends Component {
 				  striped
 				  hover
 				  condensed
-				  selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue'} }
+				  selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
+						onSelect: this.props.handleRowSelect,
+						selected: this.props.selectedItemIds} }
+					options={{ onRowDoubleClick: this.props.handleRowDoubleClick}}
 				  >{columns}
 			  </BootstrapTable>
 		  );
@@ -160,6 +157,6 @@ const mapStateToProps = state => {
 	return {
 	  survey: state.preferredSurvey ? state.preferredSurvey.survey : null
 	}
-  }
+}
   
-  export default connect(mapStateToProps)(RecordDataTable)
+export default connect(mapStateToProps)(RecordDataTable)

@@ -2,6 +2,7 @@ import fetch from 'isomorphic-fetch'
 import Constants from '../utils/Constants'
 import UserService from '../services/UserService'
 import UserGroupService from '../services/UserGroupService'
+import { Survey } from '../model/Survey';
 
 export const LOG_IN_PENDING = 'LOG_IN_PENDING'
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'
@@ -154,9 +155,11 @@ export function selectPreferredSurvey(preferredSurveySummary) {
 
 
 export function receiveFullPreferredSurvey(json) {
+	let survey = new Survey();
+	survey.fillFromJSON(json)
 	return {
 		type: RECEIVE_FULL_PREFERRED_SURVEY,
-		survey: json,
+		survey: survey,
 		receivedAt: Date.now()
 	}
 }

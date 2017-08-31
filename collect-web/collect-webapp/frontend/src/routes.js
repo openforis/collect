@@ -16,6 +16,11 @@ const routes = [
     name: "Data Management"
   },
   {
+    path: '/datamanagement/:id',
+    name: 'Record',
+    pathRegExp: new RegExp('/datamanagement/(\\d)+')
+  },
+  {
     path: '/surveydesigner',
     name: "Survey Designer"
   },

@@ -82,13 +82,13 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value="{id}.json", method=GET)
+	@RequestMapping(value="{id}", method=GET)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id, 
-			@RequestParam(value="include-code-lists", required=false, defaultValue="true") boolean includeCodeLists) 
+			@RequestParam(value="includeCodeListValues", required=false, defaultValue="true") boolean includeCodeListValues) 
 			throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		return generateView(survey, includeCodeLists);
+		return generateView(survey, includeCodeListValues);
 	}
 	
 	@Transactional
