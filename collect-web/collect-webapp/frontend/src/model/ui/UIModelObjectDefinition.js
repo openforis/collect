@@ -1,10 +1,9 @@
-import { Identifiable } from '../Identifiable';
-import { Serializable } from '../Serializable';
+import Serializable from '../Serializable';
 import { UIConfiguration } from './UIConfiguration';
 import { TabSetDefinition } from './TabSetDefinition';
 import { Survey } from '../Survey';
 
-export class UIModelObjectDefinition extends Serializable implements Identifiable {
+export class UIModelObjectDefinition extends Serializable {
     parent;
     id;
     hidden;

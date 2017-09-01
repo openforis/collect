@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
+import { Container, TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 import FormItem from './FormItem'
 
@@ -12,12 +12,12 @@ export default class FormItems extends Component {
     render() {
         let itemDefs = this.props.itemDefs
         let formItems = itemDefs.map(itemDef => 
-            <FormItem parentEntity={this.props.parentEntity} itemDef={itemDef} />
+            <FormItem key={itemDef.id} parentEntity={this.props.parentEntity} itemDef={itemDef} />
         )
         return (
-            <div>
+            <Container className="formItems">
                 {formItems}
-            </div>
+            </Container>
         )
     }
 }

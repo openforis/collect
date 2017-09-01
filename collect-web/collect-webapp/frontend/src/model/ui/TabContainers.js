@@ -1,4 +1,4 @@
-import { Serializable } from '../Serializable';
+import Serializable from '../Serializable';
 import { CodeFieldDefinition } from './CodeFieldDefinition';
 import { FieldDefinition } from './FieldDefinition';
 import { FieldsetDefinition } from './FieldsetDefinition';
@@ -24,7 +24,7 @@ export class TabContainers {
         let items = [];
         for (var i = 0; i < jsonObj.length; i++) {
             var itemJsonObj = jsonObj[i];
-            var item:Serializable;
+            var item;
             switch(itemJsonObj.type) {
             case 'FIELD':
                 if (itemJsonObj.attributeType == 'CODE') {

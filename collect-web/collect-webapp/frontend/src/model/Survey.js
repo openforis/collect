@@ -1,4 +1,4 @@
-import { Serializable } from './Serializable';
+import Serializable from './Serializable';
 import { UIConfiguration } from './ui/UIConfiguration';
 
 export class SurveyObject extends Serializable {

@@ -8921,3 +8921,36 @@ hr.transparent {
     border-right-color: #f86c6b; }
   *[dir="rtl"] .callout-success {
     border-right-color: #4dbd74; }
+
+/**
+* Customuzation for OF Collect
+**/
+.container.formItems {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+@media (min-width: 576px) {
+  .container.formItems {
+    width: 540px;
+    max-width: 100%; } }
+@media (min-width: 768px) {
+  .container.formItems {
+    width: 720px;
+    max-width: 100%; } }
+@media (min-width: 992px) {
+  .container.formItems {
+    width: 960px;
+    max-width: 100%; } }
+@media (min-width: 1200px) {
+  .container.formItems {
+    width: 1140px;
+    max-width: 100%; } }
+@media (min-width: 1400px) {
+    .container.formItems {
+      width: 1380px;
+      max-width: 100%; } }
+@media (min-width: 1600px) {
+  .container.formItems {
+    width: 1580px;
+    max-width: 100%; } }

@@ -1,19 +1,20 @@
 import React, { Component, PropTypes } from 'react'
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
-import Tab from './Tab'
+import FormItems from './FormItems'
 
-export default class TabSet extends Component {
+export default class Tab extends Component {
 
     constructor(props) {
         super(props)
 
-        let tabs = props.tabSetDef.tabs
+        let tabs = props.tabDef.tabs
         let firstTabId = tabs.length > 0 ? tabs[0].id : null
-        this.toggle = this.toggle.bind(this);
         this.state = {
-          activeTab: firstTabId
+            activeTab: firstTabId
         };
+        
+        this.toggle = this.toggle.bind(this);
     }
 
     toggle(tabId) {
@@ -25,21 +26,28 @@ export default class TabSet extends Component {
     }
 
     render() {
-        let tabSetDef = this.props.tabSetDef
-        let navItems = tabSetDef.tabs.map(tabDef => 
-            <NavItem>
+        let rootTabDef = this.props.tabDef
+        let parentEntity = this.props.parentEntity
+
+        if (! parentEntity) {
+            return <div>Loading...</div>
+        }
+        
+        let navItems = rootTabDef.tabs.map(tabDef => 
+            <NavItem key={tabDef.id}>
                 <NavLink className={classnames({ active: this.state.activeTab === tabDef.id })}
                     onClick={() => { this.toggle(tabDef.id); }} 
                 >{tabDef.label}</NavLink>
             </NavItem>
         )
-        let tabPanes = tabSetDef.tabs.map(tabDef => 
+        let tabPanes = rootTabDef.tabs.map(tabDef => 
             <TabPane key={tabDef.id} tabId={tabDef.id}>
-                <Tab tabDef={tabDef} parentEntity={this.props.record.rootEntity} />
+                <Tab tabDef={tabDef} parentEntity={this.props.parentEntity} />
             </TabPane>
         )
         return (
             <div>
+                <FormItems itemDefs={rootTabDef.items} parentEntity={this.props.parentEntity} />
                 <Nav tabs>
                     {navItems}
                 </Nav>

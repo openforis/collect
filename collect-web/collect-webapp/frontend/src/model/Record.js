@@ -1,4 +1,4 @@
-import { Serializable } from './Serializable';
+import Serializable from './Serializable';
 import { Survey, NodeDefinition, EntityDefinition } from './Survey';
 
 export class Record extends Serializable {
@@ -27,10 +27,15 @@ export class Record extends Serializable {
             
         this.rootEntity = new Entity(this, rootEntityDef, null);
         this.rootEntity.fillFromJSON(jsonObj.rootEntity);
+        this.index(this.rootEntity)
     }
     
     getNodeById(nodeId: number): Node {
         return this.nodeById[nodeId];
+    }
+
+    index(node) {
+        this.nodeById[node.id] = node
     }
 }
 
@@ -55,7 +60,7 @@ export class Node extends Serializable {
 
 export class Entity extends Node {
     
-    childrenByDefinitionId;
+    childrenByDefinitionId = [];
     
     constructor(record, definition, parent) {
         super(record, definition, parent);
@@ -69,33 +74,31 @@ export class Entity extends Node {
         super.fillFromJSON(jsonObj);
         
         let $this = this;
+        $this.record.index($this);
+
         this.childrenByDefinitionId = [];
         for (var defIdStr in jsonObj.childrenByDefinitionId) {
             let defId = parseInt(defIdStr);
             let def = this.record.survey.schema.getDefinitionById(defId);
             let childrenJsonObj = jsonObj.childrenByDefinitionId[defId];
-            let children = [];
-            for (var i = 0; i < childrenJsonObj.length; i++) {
-                let childJsonObj = childrenJsonObj[i];
-                let node;
+            childrenJsonObj.forEach(childJsonObj => {
+                let child;
                 if (def instanceof EntityDefinition) {
-                    node = new Entity(this.record, def, this);
+                    child = new Entity(this.record, def, this);
                 } else {
-                    node = new Attribute(this.record, def, this);
+                    child = new Attribute(this.record, def, this);
                 }
-                node.fillFromJSON(childJsonObj);
-                children.push(node);
-                $this.record.nodeById[node.id] = node;
-            }
-            $this.childrenByDefinitionId[defId] = children;
+                child.fillFromJSON(childJsonObj);
+                this.addChild(child)
+            })
         }
     }
     
-    getDescendants(ancestorDefIds) {
+    getDescendants(descendantDefIds) {
         let currentEntity = this;
         let descendants;
-        for (var ancestorDefId in ancestorDefIds) {
-            descendants = currentEntity.childrenByDefinitionId[ancestorDefId];
+        for (var descendantDefId in descendantDefIds) {
+            descendants = currentEntity.childrenByDefinitionId[descendantDefId];
         }
         return descendants;
     } 
@@ -112,6 +115,7 @@ export class Entity extends Node {
             this.childrenByDefinitionId[child.definition.id] = children;
         }
         children.push(child);
+        this.record.index(child)
     }
 }
 

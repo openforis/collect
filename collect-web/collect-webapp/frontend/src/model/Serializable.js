@@ -1,17 +1,19 @@
-export class Serializable {
+export default class Serializable {
     fillFromJSON(jsonObj) {
         for (var propName in jsonObj) {
-            if (this[propName] == null) {
-                this[propName] = jsonObj[propName]
+            let newVal = jsonObj[propName]
+            let oldVal = this[propName]
+            if ((oldVal === null || oldVal === undefined) && newVal != null) {
+                this[propName] = newVal
             }
         }
     }
     
-    static createArrayFromJSON(jsonArr, itemClassName: any): Array<any> {
-        let result: Array<any> = [];
+    static createArrayFromJSON(jsonArr, itemClassName: any) {
+        let result = [];
         for (var i = 0; i < jsonArr.length; i++) {
             var itemJsonObj = jsonArr[i];
-            var item: any = new itemClassName();
+            var item = new itemClassName();
             item.fillFromJSON(itemJsonObj);
             result.push(item);
         }
