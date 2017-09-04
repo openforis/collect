@@ -11,10 +11,12 @@ export default class CodeField extends AbstractField {
 
         this.state = {
             value: '',
-            items: []
+            items: [],
+            uncommittedChanges: false
         }
 
         this.handleInputChange = this.handleInputChange.bind(this)
+        this.sendAttributeUpdateCommand = this.sendAttributeUpdateCommand.bind(this)
     }
 
     componentDidMount() {
@@ -65,6 +67,7 @@ export default class CodeField extends AbstractField {
     handleAttributeUpdatedEvent(event) {
         super.handleAttributeUpdatedEvent(event)
         this.updateStateValue(event.code)
+        this.setState({uncommittedChanges: false})
     }
 
     handleInputChange(event) {
@@ -72,8 +75,18 @@ export default class CodeField extends AbstractField {
         if (attr) {
             const val = event.target.value
             this.updateStateValue(val)
+            this.setState({uncommittedChanges: true})
+            if (event.target.type != 'text') {
+                this.sendAttributeUpdateCommand()
+            }
+        }
+    }
+
+    sendAttributeUpdateCommand() {
+        if (this.state.uncommittedChanges) {
+            const attr = this.getSingleAttribute()
             ServiceFactory.commandService.updateAttribute(attr, 'CODE', {
-                code: val
+                code: this.state.value
             })
         }
     }
@@ -114,7 +127,7 @@ export default class CodeField extends AbstractField {
             )
             return <div>{radioBoxes}</div>
         default:
-            return <Input value={this.state.value} onChange={this.handleInputChange} style={{maxWidth: '100px'}} />
+            return <Input value={this.state.value} onChange={this.handleInputChange} onBlur={this.sendAttributeUpdateCommand} style={{maxWidth: '100px'}} />
         }
     }
 }
