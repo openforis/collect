@@ -118,18 +118,18 @@ public class CommandController {
 		private static final long serialVersionUID = 1L;
 		
 		AttributeType attributeType;
-		Map<String, Object> value;
+		Map<String, Object> valueByField;
 
 		void setValueInCommand(NodeCommand c) {
 			switch(attributeType) {
 			case BOOLEAN:
-				((UpdateBooleanAttributeCommand) c).setValue((Boolean) value.get("value"));
+				((UpdateBooleanAttributeCommand) c).setValue((Boolean) valueByField.get("value"));
 				break;
 			case CODE:
-				((UpdateCodeAttributeCommand) c).setCode((String) value.get("code"));
+				((UpdateCodeAttributeCommand) c).setCode((String) valueByField.get("code"));
 				break;
 			case DATE:
-				((UpdateDateAttributeCommand) c).setValue((Date) value.get("value"));
+				((UpdateDateAttributeCommand) c).setValue((Date) valueByField.get("value"));
 				break;
 			default:
 				throw new IllegalStateException("Unsupported command type: " + attributeType);
@@ -170,12 +170,12 @@ public class CommandController {
 			this.attributeType = attributeType;
 		}
 
-		public Map<String, Object> getValue() {
-			return value;
+		public Map<String, Object> getValueByField() {
+			return valueByField;
 		}
-
-		public void setValue(Map<String, Object> value) {
-			this.value = value;
+		
+		public void setValueByField(Map<String, Object> valueByField) {
+			this.valueByField = valueByField;
 		}
 	}
 	

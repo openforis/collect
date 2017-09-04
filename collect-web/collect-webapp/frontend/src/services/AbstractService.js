@@ -46,6 +46,20 @@ export default class AbstractService {
         })
     }
 
+    patchJson(url, data) {
+        return fetch(this.BASE_URL + url, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify(data)
+        }).then(response => response.json(),
+            error => console.log('An error occured.', error))
+        .catch(error => {
+            throw(error);
+        })
+    }
+
     _toQueryData(data, propPrefix) {
         if (! data) {
             return ''

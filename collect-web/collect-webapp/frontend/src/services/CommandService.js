@@ -24,6 +24,23 @@ export default class CommandService extends AbstractService {
             .then(this._handleEventResponse)
     }
 
+    updateAttribute(attribute, attributeType, valueByField) {
+        let username = "admin";
+
+        let command = {
+            username: username,
+            surveyId: attribute.record.survey.id,
+            recordId: attribute.record.id,
+            parentEntityId: attribute.parent.id,
+            nodeDefId: attribute.definition.id,
+            nodeId: attribute.id,
+            attributeType: attributeType,
+            valueByField: valueByField
+        }
+        return this.patchJson('command/record/attribute', command) 
+            .then(this._handleEventResponse)
+    }
+
     addEntity(record, parentEntityId, entityDef) {
         let username = "admin";
 

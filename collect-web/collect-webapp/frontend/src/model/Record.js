@@ -30,7 +30,7 @@ export class Record extends Serializable {
         this.index(this.rootEntity)
     }
     
-    getNodeById(nodeId: number): Node {
+    getNodeById(nodeId) {
         return this.nodeById[nodeId];
     }
 
@@ -131,12 +131,11 @@ export class Attribute extends Node {
         super.fillFromJSON(jsonObj);
         
         this.fields = [];
-        for (var i = 0; i < jsonObj.fields.length; i++) {
-            let fieldJsonObj = jsonObj.fields[i];
+        jsonObj.fields.forEach(fieldJsonObj => {
             let field = new Field();
             field.fillFromJSON(fieldJsonObj);
             this.fields.push(field);
-        }
+        })
     }
     
     get allFieldsFilled() {
@@ -162,8 +161,8 @@ export class Attribute extends Node {
 
 export class Field extends Serializable {
     
-    value;
-    remarks;
+    value = null;
+    remarks = null;
     
     constructor() {
         super();
