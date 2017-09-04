@@ -4,13 +4,13 @@ import { connect } from 'react-redux'
 import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
     Form, FormGroup, Label, Input, FormText, FormFeedback } from 'reactstrap';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
-
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import ItemDetails from '../../components/MasterDetail/ItemDetails'
-import UserGroupService from '../../services/UserGroupService';
-import UserRoleEditor from './UserRoleEditor';
 
-class UserGroupDetails extends ItemDetails {
+import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage'
+import UserGroupService from 'services/UserGroupService';
+import UserRoleDetailsPage from './UserRoleDetailsPage';
+
+class UserGroupDetailsPage extends AbstractItemDetailsPage {
 
     constructor( props ) {
 		super( props );
@@ -173,7 +173,7 @@ class UserGroupDetails extends ItemDetails {
         let roles = ['OWNER', 'ADMINISTRATOR', 'OPERATOR', 'VIEWER']
         let joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
 
-        let createRoleEditor = (onUpdate, props) => (<UserRoleEditor onUpdate={ onUpdate } {...props}/>);
+        let createRoleEditor = (onUpdate, props) => (<UserRoleDetailsPage onUpdate={ onUpdate } {...props}/>);
         
         let isNotDescendantOf = function(group1, group2) {
             return false;
@@ -376,4 +376,4 @@ const mapStateToProps = state => {
     }
   }
   
-  export default connect(mapStateToProps)(UserGroupDetails);
+  export default connect(mapStateToProps)(UserGroupDetailsPage);

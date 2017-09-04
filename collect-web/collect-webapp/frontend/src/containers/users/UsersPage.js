@@ -4,11 +4,11 @@ import { connect } from 'react-redux'
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap';
 
-import { fetchUsers } from '../../actions';
-import UserDetails from './UserDetails';
-import ItemsList from '../../components/MasterDetail/ItemsList';
+import { fetchUsers } from 'actions';
+import UserDetailsPage from './UserDetailsPage';
+import AbstractItemsListPage from 'components/AbstractItemsListPage';
 
-class Users extends ItemsList {
+class UsersPage extends AbstractItemsListPage {
 
 	static propTypes = {
 		users: PropTypes.array.isRequired,
@@ -30,7 +30,7 @@ class Users extends ItemsList {
 		
 		let editedItemContainer = null;
 		if (this.state.editedItem != null) {
-			let editedItemForm = <UserDetails user={this.state.editedItem} />;
+			let editedItemForm = <UserDetailsPage user={this.state.editedItem} />;
 			let editedItemLegendText = this.state.editedItem.id == null ? 'New user': 'Edit user: ' + this.state.editedItem.username;
 			editedItemContainer = 
 				<fieldset>
@@ -88,4 +88,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(Users);
+export default connect(mapStateToProps)(UsersPage);

@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
     Form, FormGroup, Label, Input, FormText, FormFeedback } from 'reactstrap';
-import UserService from '../../services/UserService';
-import ItemDetails from '../../components/MasterDetail/ItemDetails';
 
-class UserDetails extends ItemDetails {
+import UserService from 'services/UserService';
+import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage';
+
+export default class UserDetailsPage extends AbstractItemDetailsPage {
    
     userService = new UserService();
     
@@ -112,5 +113,3 @@ class UserDetails extends ItemDetails {
 		);
     }
 }
-
-export default UserDetails;

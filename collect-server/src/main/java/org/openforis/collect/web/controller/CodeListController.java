@@ -13,7 +13,6 @@ import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
-import org.openforis.collect.metamodel.uiconfiguration.view.Views;
 import org.openforis.collect.metamodel.view.CodeListItemView;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;

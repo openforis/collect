@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import Constants from '../../utils/Constants';
-import MaxAvailableSpaceContainer from '../../containers/MaxAvailableSpaceContainer';
 
-class DataCleansing extends Component {
+import Constants from 'utils/Constants';
+import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
+
+class DataCleansingPage extends Component {
   render() {
 	  return (
 	    <MaxAvailableSpaceContainer>
@@ -14,4 +15,4 @@ class DataCleansing extends Component {
   }
 }
 
-export default DataCleansing;
+export default DataCleansingPage;

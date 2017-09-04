@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Constants from '../../utils/Constants';
-import MaxAvailableSpaceContainer from '../../containers/MaxAvailableSpaceContainer';
+import Constants from 'utils/Constants';
+import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
 
-class MapView extends Component {
+class MapPage extends Component {
 
   render() {
 	  return (
@@ -15,4 +15,4 @@ class MapView extends Component {
   }
 }
 
-export default MapView;
+export default MapPage;

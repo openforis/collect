@@ -4,11 +4,11 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap';
-import ItemsList from '../../components/MasterDetail/ItemsList';
-import UserGroupDetails from './UserGroupDetails';
-import { fetchUserGroups } from '../../actions';
 
-class UserGroups extends ItemsList {
+import AbstractItemsListPage from 'components/AbstractItemsListPage';
+import { fetchUserGroups } from 'actions';
+
+class UserGroupsPage extends AbstractItemsListPage {
 
 	constructor(props) {
 		super(props)
@@ -96,4 +96,4 @@ const mapStateToProps = state => {
 	}
 }
 
-export default connect(mapStateToProps)(withRouter(UserGroups));
+export default connect(mapStateToProps)(withRouter(UserGroupsPage));

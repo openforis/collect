@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Constants from '../../utils/Constants';
-import MaxAvailableSpaceContainer from '../../containers/MaxAvailableSpaceContainer';
+import Constants from 'utils/Constants';
+import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
 
-class SurveyDesigner extends Component {
+class SurveyDesignerPage extends Component {
   render() {
 	  return (
 	    <MaxAvailableSpaceContainer>
@@ -14,4 +14,4 @@ class SurveyDesigner extends Component {
   }
 }
 
-export default SurveyDesigner;
+export default SurveyDesignerPage;

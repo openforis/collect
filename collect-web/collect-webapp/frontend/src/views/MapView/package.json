@@ -1,6 +1,0 @@
-{
-  "name": "MapView",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./MapView.js"
-}

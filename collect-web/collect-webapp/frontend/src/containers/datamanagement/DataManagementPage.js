@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import RecordDataTable from './RecordDataTable';
+import RecordDataTable from 'components/datamanagement/RecordDataTable';
 import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux'
 
-import RecordService from '../../services/RecordService'
-//import RecordEditor from './RecordEditor';
+import ServiceFactory from 'services/ServiceFactory'
 
-class DataManagement extends Component {
+class DataManagementPage extends Component {
 
-	recordService = new RecordService()
+	recordService = ServiceFactory.recordService
 
 	constructor(props) {
 		super(props)
@@ -110,4 +109,4 @@ const mapStateToProps = state => {
 	}
 }
   
-export default connect(mapStateToProps)(DataManagement)
+export default connect(mapStateToProps)(DataManagementPage)

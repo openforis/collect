@@ -8,7 +8,7 @@ import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 
 // Containers
-import App from './containers/App/'
+import App from './App'
 
 // Views
 import Signin from './views/Pages/Signin/'

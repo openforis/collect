@@ -1,15 +1,15 @@
 import React, { Component, PropTypes } from 'react'
 
-import TabSet from './recordeditor/TabSet'
-import { Record } from '../../model/Record'
-import RecordService from '../../services/RecordService'
-import SurveyService from '../../services/SurveyService'
-import EventQueue from '../../model/event/EventQueue'
+import TabSet from 'components/datamanagement/recordeditor/TabSet'
+import { Record } from 'model/Record'
+import EventQueue from 'model/event/EventQueue'
 import { AttributeUpdatedEvent, EntityCreatedEvent, CodeAttributeUpdatedEvent, 
-  CoordinateAttributeUpdatedEvent, DateAttributeUpdatedEvent, TextAttributeUpdatedEvent }  from '../../model/event/RecordEvent'
-import { Attribute, Entity } from '../../model/Record'
+  CoordinateAttributeUpdatedEvent, DateAttributeUpdatedEvent, TextAttributeUpdatedEvent }  from 'model/event/RecordEvent'
+import { Attribute, Entity } from 'model/Record'
+import RecordService from 'services/RecordService'
+import SurveyService from 'services/SurveyService'
 
-export default class RecordEditor extends Component {
+export default class RecordEditPage extends Component {
 
   recordService = new RecordService()
   surveyService = new SurveyService()

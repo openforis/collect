@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
-
-class ItemDetails extends Component {
+export default class AbstractItemDetailsPage extends Component {
 
     constructor(props) {
         super(props);
@@ -50,5 +49,3 @@ class ItemDetails extends Component {
     handleDeleteBtnClick() {
     }
 }
-
-export default ItemDetails;

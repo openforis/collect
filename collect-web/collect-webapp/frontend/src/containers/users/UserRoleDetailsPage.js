@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-export default class UserRoleEditor extends Component {
+export default class UserRoleDetailsPage extends Component {
     constructor(props) {
         super(props);
         this.updateData = this.updateData.bind(this);

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
-
-class ItemsList extends Component {
+export default class AbstractItemsListPage extends Component {
 
     constructor( props ) {
 		super( props );
@@ -60,5 +59,3 @@ class ItemsList extends Component {
         return {};
     }
 }
-
-export default ItemsList;
