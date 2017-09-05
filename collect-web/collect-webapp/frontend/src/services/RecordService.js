@@ -28,4 +28,10 @@ export default class RecordService extends AbstractService {
             }
         )
     }
+
+    updateOwner(record, owner) {
+        return this.patchJson('survey/' + record.surveyId + '/data/records/' + record.id, {
+            ownerId: owner.id
+        })
+    }
 }

@@ -22,7 +22,7 @@ class UsersPage extends AbstractItemsListPage {
 	}
 
 	createNewItem() {
-		return {id: null, username: '', enabled: true};
+		return {id: null, username: '', enabled: true, role: '-1'};
 	}
 
   	render() {
@@ -61,6 +61,7 @@ class UsersPage extends AbstractItemsListPage {
 							<TableHeaderColumn dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>
 							<TableHeaderColumn dataField="username">Username</TableHeaderColumn>
 							<TableHeaderColumn dataField="enabled">Enabled</TableHeaderColumn>
+							<TableHeaderColumn dataField="role">Role</TableHeaderColumn>
 						</BootstrapTable>
 					</Col>
 					<Col>

@@ -17,6 +17,7 @@
     "react": "^15.5.4",
     "react-addons-css-transition-group": "^15.6.0",
     "react-addons-transition-group": "^15.6.0",
+    "react-addons-update": "^15.6.0",
     "react-bootstrap": "^0.31.2",
     "react-bootstrap-table": "^4.0.0",
     "react-chartjs-2": "^2.5.6",

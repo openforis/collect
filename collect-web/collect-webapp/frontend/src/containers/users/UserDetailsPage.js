@@ -2,14 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
     Form, FormGroup, Label, Input, FormText, FormFeedback } from 'reactstrap';
-
-import UserService from 'services/UserService';
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+    
+import * as Actions from 'actions';
+import ServiceFactory from 'services/ServiceFactory';
 import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage';
 
-export default class UserDetailsPage extends AbstractItemDetailsPage {
+class UserDetailsPage extends AbstractItemDetailsPage {
    
-    userService = new UserService();
-    
 	static propTypes = {
 		user: PropTypes.object.isRequired,
     }
@@ -21,6 +22,7 @@ export default class UserDetailsPage extends AbstractItemDetailsPage {
             username: props.user.username,
             rawPassword: '',
             retypedPassword: '',
+            role: props.user.role,
             enabled: props.user.enabled,
             errorFeedback: [],
             alertMessageOpen: false
@@ -33,20 +35,35 @@ export default class UserDetailsPage extends AbstractItemDetailsPage {
             username: this.state.username,
             rawPassword: this.state.rawPassword,
             retypedPassword: this.state.retypedPassword,
-            enabled: this.state.enabled
+            enabled: this.state.enabled,
+            role: this.state.role
         }
     }
 
     handleSaveBtnClick() {
         let formObject = this.extractFormObject();
-        this.userService.save(formObject).then(this.updateStateFromResponse);
+        ServiceFactory.userService.save(formObject).then(this.updateStateFromResponse);
+    }
+
+    updateStateFromResponse(res) {
+        super.updateStateFromResponse(res)
+        if (res.statusOk) {
+            this.setState({
+                newItem: false,
+                id: res.form.id
+            })
+            this.props.actions.receiveUser(res.form);
+        }
     }
 
     handleDeleteBtnClick() {
-
+        
     }
 
     render() {
+        const roles = ['VIEW', 'ENTRY_LIMITED', 'ENTRY', 'CLEANSING', 'ANALYSIS', 'ADMIN']
+        const EMPTY_OPTION = <option key="-1" value="">--- Select one ---</option>
+        
 		return (
             <div>
                 <Alert color={this.state.alertMessageColor} isOpen={this.state.alertMessageOpen}>
@@ -78,6 +95,19 @@ export default class UserDetailsPage extends AbstractItemDetailsPage {
                             }
                         </Col>
                     </FormGroup>
+                    <FormGroup row color={this.getFieldState('role')}>
+                        <Label for="role" sm={2}>Role</Label>
+                        <Col sm={10}>
+                            <Input type="select" name="role" id="roleSelect" 
+                                onChange={(event) => this.setState({...this.state, role: event.target.value})}
+                                value={this.state.role}>
+                                {[EMPTY_OPTION].concat(roles.map(role => <option key={role} value={role}>{role}</option>))}
+                            </Input>
+                            {this.state.errorFeedback['role'] &&
+                                <FormFeedback>{this.state.errorFeedback['role']}</FormFeedback>
+                            }
+                        </Col>
+                    </FormGroup>
                     <FormGroup row color={this.getFieldState('rawPassword')}>
                         <Label for="rawPassword" sm={2}>Password</Label>
                         <Col sm={10}>
@@ -105,7 +135,7 @@ export default class UserDetailsPage extends AbstractItemDetailsPage {
                     <FormGroup check row>
                         <Col sm={{ size: 10, offset: 2 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
-                            <Button color="danger" onClick={this.handleDeleteBtnClick}>Delete</Button>
+                            <Button color="danger" onClick={this.handleDeleteBtnClick}><span className="icon-trash"/></Button>
                         </Col>
                     </FormGroup>
                 </Form>
@@ -113,3 +143,18 @@ export default class UserDetailsPage extends AbstractItemDetailsPage {
 		);
     }
 }
+
+function mapStateToProps(state) {
+    return {}
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(Actions, dispatch)
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(UserDetailsPage);

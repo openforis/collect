@@ -8954,3 +8954,13 @@ hr.transparent {
   .container.formItems {
     width: 1580px;
     max-width: 100%; } }
+
+span.checked {
+  display: block;
+  background-image: url('../img/generic/tick_mark_32x32.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 32px;
+  width: 100%;
+  height: 32px;
+}

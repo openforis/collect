@@ -9,6 +9,7 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.web.controller.UserController.UserForm;
 import org.openforis.collect.web.validator.UserValidator;
 import org.openforis.commons.web.PersistedObjectForm;
@@ -79,6 +80,7 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 		
 		private boolean enabled = true;
 		private String username;
+		private UserRole role;
 		private String rawPassword;
 		private String retypedPassword;
 		
@@ -95,6 +97,14 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 		
 		public void setEnabled(boolean enabled) {
 			this.enabled = enabled;
+		}
+		
+		public UserRole getRole() {
+			return role;
+		}
+		
+		public void setRole(UserRole role) {
+			this.role = role;
 		}
 		
 		public String getUsername() {

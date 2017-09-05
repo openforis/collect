@@ -67,6 +67,11 @@ public class RecordProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
+	public int getSurveyId() {
+		return record.getSurvey().getId();
+	}
+	
+	@ExternalizedProperty
 	public boolean isNewRecord() {
 		return newRecord;
 	}

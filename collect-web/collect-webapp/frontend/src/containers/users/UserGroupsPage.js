@@ -25,7 +25,6 @@ class UserGroupsPage extends AbstractItemsListPage {
 	}
 
 	componentDidMount() {
-		this.props.dispatch(fetchUserGroups())
 	}
 
 	handleRowDoubleClick(row) {
@@ -47,8 +46,8 @@ class UserGroupsPage extends AbstractItemsListPage {
   	render() {
 		const { userGroups } = this.props
 	
-	  return (
-	    <Container>
+	  	return (
+			<Container>
 				<Row>
 					<Col>
 						<Button color="success" onClick={this.handleNewButtonClick}>New</Button>
@@ -74,7 +73,7 @@ class UserGroupsPage extends AbstractItemsListPage {
 						</BootstrapTable>
 					</Col>
 				</Row>
-	    	</Container>
+			</Container>
 	  );
   }
 }

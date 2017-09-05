@@ -6,6 +6,7 @@ import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
+import { receiveUserGroup } from 'actions/' 
 import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage'
 import UserGroupService from 'services/UserGroupService';
 import UserRoleDetailsPage from './UserRoleDetailsPage';
@@ -20,6 +21,10 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         this.handleUsersInGroupRowSelect = this.handleUsersInGroupRowSelect.bind(this);
         this.handleAddSelectedUsersToGroup = this.handleAddSelectedUsersToGroup.bind(this);
         this.handleRemoveSelectedUsersToGroup = this.handleRemoveSelectedUsersToGroup.bind(this);
+
+        this.state = {
+            ready: false
+        }
     }
     
     static propTypes = {
@@ -33,37 +38,46 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
 
     updateStateFromProps(props) {
         if (! props.isUserGroupsInitialized || props.isFetchingUserGroups) {
-            this.state = {
+            this.setState({
                 ready: false
-            }
+            })
         } else {
+            const loggedUser = this.props.loggedUser
             let idParam = props.match.params.id;
             let userGroup;
             if (idParam == 'new') {
-                userGroup = {id: null, name: '', label: '', description: '', visibilityCode: 'P', enabled: true, users: []}
+                userGroup = {id: null, name: '', label: '', description: '', visibilityCode: 'P', enabled: true, users: [{
+                    userId: loggedUser.id, 
+                    username: loggedUser.username, 
+                    userEnabled: loggedUser.enabled, 
+                    role: 'OWNER',
+                    joinStatus: 'ACCEPTED'
+                }]}
             } else {
                 let userGroupId = parseInt(idParam)
                 userGroup = props.userGroups.find(group => group.id === userGroupId)
             }
-            this.state = {
-                ready: true,
-                editedUserGroup: userGroup,
-                newItem: ! userGroup.id,
-                id: userGroup.id,
-                name: userGroup.name,
-                label: userGroup.label,
-                description: userGroup.description,
-                visibilityCode: userGroup.visibilityCode,
-                enabled: userGroup.enabled,
-                errorFeedback: [],
-                alertMessageOpen: false,
-                availableUsers: this.getAvailableUsers(props.users, userGroup.users),
-                usersInGroup: userGroup.users,
-                selectedAvailableUsers: [],
-                selectedAvailableUsersIds: [],
-                selectedUsersInGroup: [],
-                selectedUsersInGroupIds: [],
-                newUserRoleCode: "OPERATOR"
+            if (! this.state.ready || this.state.id != userGroup.id) {
+                this.setState({
+                    ready: true,
+                    editedUserGroup: userGroup,
+                    newItem: ! userGroup.id,
+                    id: userGroup.id,
+                    name: userGroup.name,
+                    label: userGroup.label,
+                    description: userGroup.description,
+                    visibilityCode: userGroup.visibilityCode,
+                    enabled: userGroup.enabled,
+                    errorFeedback: [],
+                    alertMessageOpen: false,
+                    availableUsers: this.getAvailableUsers(props.users, userGroup.users),
+                    usersInGroup: userGroup.users,
+                    selectedAvailableUsers: [],
+                    selectedAvailableUsersIds: [],
+                    selectedUsersInGroup: [],
+                    selectedUsersInGroupIds: [],
+                    newUserRoleCode: "OPERATOR"
+                })
             }
         }
     }
@@ -165,24 +179,38 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
 		})
     }
 
+    updateStateFromResponse(res) {
+        super.updateStateFromResponse(res)
+        if (res.statusOk) {
+            this.setState({
+                newItem: false,
+                id: res.form.id
+            })
+            this.props.dispatch(receiveUserGroup(res.form));
+        }
+    }
+
+
     render() {
         if (! this.state.ready) {
             return <div>Loading...</div>;
         }
 
-        let roles = ['OWNER', 'ADMINISTRATOR', 'OPERATOR', 'VIEWER']
-        let joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
+        const roles = ['OWNER', 'ADMINISTRATOR', 'OPERATOR', 'VIEWER']
+        const joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
 
-        let createRoleEditor = (onUpdate, props) => (<UserRoleDetailsPage onUpdate={ onUpdate } {...props}/>);
+        const createRoleEditor = (onUpdate, props) => (<UserRoleDetailsPage onUpdate={ onUpdate } {...props}/>);
         
-        let isNotDescendantOf = function(group1, group2) {
+        const isNotDescendantOf = function(group1, group2) {
             return false;
         }
-        let editedUserGroup = this.state.editedUserGroup;
-        let availableParentGroups = this.props.userGroups.filter(group => {
+        const editedUserGroup = this.state.editedUserGroup;
+        const ownerId = 0//this.state.usersInGroup.find(u => u.role == 'OWNER').userId
+        
+        const availableParentGroups = this.props.userGroups.filter(group => {
             return group.id != editedUserGroup.id && (editedUserGroup.id == null || isNotDescendantOf(group, editedUserGroup))
         })
-        let parentGroupOptions = [<option key="0" value="">---</option>]
+        const parentGroupOptions = [<option key="0" value="">---</option>]
             .concat(availableParentGroups.map(group => <option key={group.id} value={group.id}>{group.label}</option>))
 
 		return (
@@ -291,25 +319,27 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                             <TableHeaderColumn dataField="enabled">Enabled</TableHeaderColumn>
                                         </BootstrapTable>
                                     </Col>
-                                    <Col sm="3">
-                                        <Row>
-                                            <Col sm="5">
-                                                <Input type="select" name="newUserRole" id="newUserRoleSelect" 
-                                                        onChange={(event) => this.setState({...this.state, newUserRoleCode: event.target.value})}
-                                                        value={this.state.newUserRoleCode}>
-                                                    {roles.map(role => <option key={role} value={role}>{role}</option>)}
-                                                </Input>
-                                            </Col>
-                                            <Col sm="2">
-                                                <Button onClick={this.handleAddSelectedUsersToGroup}>&gt;</Button>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col sm={{ size: 2, offset: 6 }}>
-                                                <Button onClick={this.handleRemoveSelectedUsersToGroup}>&lt;</Button>
-                                            </Col>
-                                        </Row>
-                                    </Col>
+                                    {this.state.selectedAvailableUsers.length > 0 ?
+                                        <Col sm="3">
+                                            <Row>
+                                                <Col sm="5">
+                                                    <Input type="select" name="newUserRole" id="newUserRoleSelect" 
+                                                            onChange={(event) => this.setState({...this.state, newUserRoleCode: event.target.value})}
+                                                            value={this.state.newUserRoleCode}>
+                                                        {roles.map(role => <option key={role} value={role}>{role}</option>)}
+                                                    </Input>
+                                                </Col>
+                                                <Col sm="2">
+                                                    <Button onClick={this.handleAddSelectedUsersToGroup}>&gt;</Button>
+                                                </Col>
+                                            </Row>
+                                            <Row>
+                                                <Col sm={{ size: 2, offset: 6 }}>
+                                                    <Button onClick={this.handleRemoveSelectedUsersToGroup}>&lt;</Button>
+                                                </Col>
+                                            </Row>
+                                        </Col>
+                                    : ''}
                                 </Row>
                             </fieldset>
                         </Col>
@@ -321,7 +351,8 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                     striped	hover	condensed
                                     cellEdit={ { mode: 'click' } }
                                     selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
-                                        onSelect: this.handleUsersInGroupRowSelect, selected: this.state.selectedUsersInGroupIds} }
+                                        onSelect: this.handleUsersInGroupRowSelect, selected: this.state.selectedUsersInGroupIds,
+                                        unselectable: [ownerId]} }
                                     >
                                     <TableHeaderColumn dataField="userId" isKey hidden>Id</TableHeaderColumn>
                                     <TableHeaderColumn dataField="username" editable={false}>Username</TableHeaderColumn>
@@ -365,7 +396,12 @@ const mapStateToProps = state => {
         isFetchingUsers: true,
         userGroups: []
     }
+    const {
+        loggedUser
+    } = state.session
+
     return {
+        loggedUser,
         isFetchingUsers,
         lastUpdatedUsers,
         users,

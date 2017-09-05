@@ -191,6 +191,13 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 					.and(OFC_USERGROUP.VISIBILITY_CODE.eq(String.valueOf(Visibility.PUBLIC.getCode()))))
 				.fetchInto(UserGroup.class);
 	}
+	
+	public List<UserGroup> findUserDefinedGroups() {
+		return dsl()
+				.selectFrom(OFC_USERGROUP)
+				.where(OFC_USERGROUP.SYSTEM_DEFINED.eq(false))
+				.fetchInto(UserGroup.class);
+	}
 
 	public UserGroup loadByName(String name) {
 		return dsl()

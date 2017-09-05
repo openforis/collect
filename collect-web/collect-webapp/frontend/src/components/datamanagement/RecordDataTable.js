@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import Moment from 'moment';
-import RecordService from '../../services/RecordService'
+import RecordService from 'services/RecordService'
+import * as Formatters from 'components/datatable/formatters'
+import OwnerColumnEditor from './OwnerColumnEditor'
 
 class RecordDataTable extends Component {
 	recordService = new RecordService();
@@ -16,10 +17,11 @@ class RecordDataTable extends Component {
       totalSize: 0,
       page: 1,
 			recordsPerPage: 25
-    };
-    this.fetchData = this.fetchData.bind(this);
-    this.handlePageChange = this.handlePageChange.bind(this);
-    this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this);
+    }
+    this.fetchData = this.fetchData.bind(this)
+		this.handlePageChange = this.handlePageChange.bind(this)
+		this.handleCellEdit = this.handleCellEdit.bind(this)
+    this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
   }
 
   static propTypes = {
@@ -48,9 +50,20 @@ class RecordDataTable extends Component {
 	  if (surveyId == null)
 		  return;
 	  this.recordService.fetchRecordSummaries(surveyId, recordsPerPage, page).then((res) => {
-		  this.setState({records: res.records, totalSize: res.count, page, recordsPerPage});
+			this.setState({records: res.records, totalSize: res.count, page, recordsPerPage});
 	  });
   }
+
+	handleCellEdit(row, fieldName, value) {
+		if (fieldName == 'owner') {
+			const recordId = row.id
+			const newOwner = value.owner
+			this.recordService.updateOwner(row, newOwner).then(res => {
+				const newRecords = this.state.records.map(r => r.id == recordId ? {...r, owner: newOwner} : r)
+				this.setState({records: newRecords})
+			})
+		}
+	}
 
   render() {
 	  const noSurveySelected = this.props.survey == null;
@@ -65,26 +78,41 @@ class RecordDataTable extends Component {
 			  page: this.state.page,
 			  sizePerPage: this.state.recordsPerPage,
 		  };
-		  
-		  function dateFormatter(cell, row) {
-			  return Moment(new Date(cell)).format('DD/MM/YYYY');
-		  }
+			
+			const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={ onUpdate } {...props}/>);
+
 		  function rootEntityKeyFormatter(cell, row) {
-			  var keyIdx = this.name.substring(3);
+				var keyIdx = this.name.substring(3);
 			  return row.rootEntityKeys[keyIdx];
-		  }
+			}
+			
+			function usernameFormatter(cell, row) {
+				return cell ? cell.username : ''
+			}
+
 		  var columns = [];
 		  columns.push(<TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>);
 		  
 		  var keyAttributes = this.findKeyAttributes(survey);
 		  for (var i=0; i < keyAttributes.length; i++) {
 	    		var keyAttr = keyAttributes[i];
-	    		columns.push(<TableHeaderColumn key={'key' + i} dataField={'key' + i} dataFormat={rootEntityKeyFormatter}>{keyAttr.label}</TableHeaderColumn>);
-		  }
-		  columns.push(<TableHeaderColumn key="creationDate" dataField="creationDate" dataFormat={dateFormatter} 
-		    dataAlign="center" width="150">Created</TableHeaderColumn>);
-		  columns.push(<TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={dateFormatter} 
-		    dataAlign="center" width="150">Modified</TableHeaderColumn>);
+	    		columns.push(<TableHeaderColumn key={'key' + i} dataField={'key' + i} dataFormat={rootEntityKeyFormatter}
+						editable={ false }>{keyAttr.label}</TableHeaderColumn>);
+			}
+
+			columns.push(
+				<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter} 
+					customEditor={ { getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } } }
+					dataAlign="center" width="150">Owner</TableHeaderColumn>,
+				<TableHeaderColumn key="entryComplete" dataField="entryComplete" dataFormat={Formatters.checkedIconFormatter}
+					dataAlign="center" width="100" editable={ false }>Entered</TableHeaderColumn>,
+				<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
+					dataAlign="center" width="100" editable={ false }>Cleansed</TableHeaderColumn>,
+				<TableHeaderColumn key="creationDate" dataField="creationDate" dataFormat={Formatters.dateFormatter} 
+					dataAlign="center" width="150" editable={ false }>Created</TableHeaderColumn>,
+				<TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateFormatter} 
+		    	dataAlign="center" width="150" editable={ false }>Modified</TableHeaderColumn>
+			);
 		  
 		  return (
 			  <BootstrapTable
@@ -99,7 +127,8 @@ class RecordDataTable extends Component {
 				  selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
 						onSelect: this.props.handleRowSelect,
 						selected: this.props.selectedItemIds} }
-					options={{ onRowDoubleClick: this.props.handleRowDoubleClick}}
+					options={{ onRowDoubleClick: this.props.handleRowDoubleClick, onCellEdit: this.handleCellEdit}}
+					cellEdit={ { mode: 'click' } }
 				  >{columns}
 			  </BootstrapTable>
 		  );
@@ -155,7 +184,8 @@ class RecordDataTable extends Component {
 
 const mapStateToProps = state => {
 	return {
-	  survey: state.preferredSurvey ? state.preferredSurvey.survey : null
+		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
+		users: state.users ? state.users.users: null
 	}
 }
   

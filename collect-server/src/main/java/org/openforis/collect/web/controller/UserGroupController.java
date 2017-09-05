@@ -15,10 +15,10 @@ import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
 import org.openforis.collect.model.UserGroup.UserGroupRole;
 import org.openforis.collect.model.UserGroup.UserInGroup;
-import org.openforis.collect.web.controller.UserController.UserForm;
 import org.openforis.collect.web.controller.UserGroupController.UserGroupForm;
 import org.openforis.collect.web.validator.UserGroupValidator;
 import org.openforis.commons.web.PersistedObjectForm;
+import org.openforis.commons.web.SimpleObjectForm;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -63,7 +63,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	
 	@Override
 	protected List<UserGroup> loadAllItems() {
-		return itemManager.findPublicUserDefinedGroups();
+		return itemManager.findUserDefinedGroups();
 	}
 		
 	public static class UserGroupForm extends PersistedObjectForm<UserGroup> {
@@ -151,7 +151,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		}
 	}
 	
-	public static class UserInGroupForm extends UserForm {
+	public static class UserInGroupForm extends SimpleObjectForm<UserInGroup> {
 		
 		private UserGroupRole role;
 		private Integer userId;

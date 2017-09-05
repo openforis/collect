@@ -8,12 +8,10 @@ export default class AbstractItemDetailsPage extends Component {
         this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
         this.handleDeleteBtnClick = this.handleDeleteBtnClick.bind(this);
         this.updateStateFromResponse = this.updateStateFromResponse.bind(this);
-
-        this.updateStateFromProps(props);
     }
 
-    getFieldState(field) {
-        return this.state.errorFeedback[field] ? 'danger' : ''
+    componentDidMount() {
+        this.updateStateFromProps(this.props)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -48,4 +46,9 @@ export default class AbstractItemDetailsPage extends Component {
 
     handleDeleteBtnClick() {
     }
+
+    getFieldState(field) {
+        return this.state.errorFeedback[field] ? 'danger' : ''
+    }
+
 }

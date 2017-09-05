@@ -20,6 +20,7 @@ import org.springframework.validation.Errors;
 public class UserValidator extends SimpleValidator<UserForm> {
 
 	private static final String USERNAME_FIELD = "username";
+	private static final String ROLE_FIELD = "role";
 	private static final String RAW_PASSWORD_FIELD = "rawPassword";
 	private static final String RETYPED_PASSWORD_FIELD = "retypedPassword";
 	private static final String PASSWORD_PATTERN_MESSAGE_KEY = "user.validation.wrong_password_pattern";
@@ -39,6 +40,8 @@ public class UserValidator extends SimpleValidator<UserForm> {
 			}
 			validateUniqueness(target, errors);
 		}
+		validateRequiredField(errors, ROLE_FIELD);
+		
 		if (! StringUtils.equals(rawPassword, retypedPassword)) {
 			errors.rejectValue(RETYPED_PASSWORD_FIELD, WRONG_RETYPED_PASSWORD_MESSAGE_KEY);
 		}

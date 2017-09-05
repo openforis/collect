@@ -2,6 +2,7 @@ package org.openforis.collect.web.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
@@ -40,10 +41,14 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.persistence.MultipleEditException;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
+import org.openforis.collect.web.session.SessionState;
+import org.openforis.commons.web.Response;
 import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -173,6 +178,16 @@ public class RecordController extends BasicController implements Serializable {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		CollectRecord record = recordManager.load(survey, recordId, Step.valueOf(stepNumber));
 		return toProxy(record);
+	}
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=PATCH, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody Response updateOwner(@PathVariable int surveyId, @PathVariable int recordId,
+			@RequestBody Map<String, String> body) throws RecordLockedException, MultipleEditException {
+		int ownerId = Integer.parseInt(body.get("ownerId"));
+		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		SessionState sessionState = sessionManager.getSessionState();
+		recordManager.assignOwner(survey, recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
+		return new Response();
 	}
 
 	@Transactional

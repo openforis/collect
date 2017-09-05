@@ -1,8 +1,8 @@
 import fetch from 'isomorphic-fetch'
-import Constants from '../utils/Constants'
-import UserService from '../services/UserService'
-import UserGroupService from '../services/UserGroupService'
-import { Survey } from '../model/Survey';
+import Constants from 'utils/Constants'
+import UserService from 'services/UserService'
+import UserGroupService from 'services/UserGroupService'
+import { Survey } from 'model/Survey';
 
 export const LOG_IN_PENDING = 'LOG_IN_PENDING'
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'
@@ -23,9 +23,12 @@ export const INVALIDATE_PREFERRED_SURVEY = 'INVALIDATE_PREFERRED_SURVEY'
 export const REQUEST_USERS = 'REQUEST_USERS'
 export const RECEIVE_USERS = 'RECEIVE_USERS'
 export const INVALIDATE_USERS = 'INVALIDATE_USERS'
+export const UDPATE_USER = 'UDPATE_USER'
+export const RECEIVE_USER = 'RECEIVE_USER'
 
 export const REQUEST_USER_GROUPS = 'REQUEST_USER_GROUPS'
 export const RECEIVE_USER_GROUPS = 'RECEIVE_USER_GROUPS'
+export const RECEIVE_USER_GROUP = 'RECEIVE_USER_GROUP'
 export const INVALIDATE_USER_GROUPS = 'INVALIDATE_USER_GROUPS'
 
 let BASE_URL = Constants.API_BASE_URL;
@@ -189,7 +192,15 @@ function requestUsers() {
 function receiveUsers(json) {
 	return {
 	    type: RECEIVE_USERS,
-	    users: json.map(user => user), //TODO map into User object
+		users: json, //TODO map into User object ?
+	    receivedAt: Date.now()
+	}
+}
+
+export function receiveUser(json) {
+	return {
+	    type: RECEIVE_USER,
+	    user: json, //TODO map into User object ?
 	    receivedAt: Date.now()
 	}
 }
@@ -224,6 +235,14 @@ function receiveUserGroups(json) {
 			}
 			return g;
 		}), //TODO map into UserGroup object
+	    receivedAt: Date.now()
+	}
+}
+
+export function receiveUserGroup(json) {
+	return {
+	    type: RECEIVE_USER_GROUP,
+	    userGroup: json,
 	    receivedAt: Date.now()
 	}
 }

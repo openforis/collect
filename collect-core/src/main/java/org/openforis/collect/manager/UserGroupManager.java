@@ -148,6 +148,10 @@ public class UserGroupManager extends AbstractPersistedObjectManager<UserGroup, 
 		return fillLazyLoadedFields(dao.findPublicGroups());
 	}
 
+	public List<UserGroup> findUserDefinedGroups() {
+		return fillLazyLoadedFields(dao.findUserDefinedGroups());
+	}
+
 	public List<UserGroup> findPublicUserDefinedGroups() {
 		return fillLazyLoadedFields(dao.findPublicUserDefinedGroups());
 	}

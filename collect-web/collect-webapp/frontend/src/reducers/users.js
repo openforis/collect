@@ -1,5 +1,7 @@
+import update from 'react-addons-update';
+
 import {
-  REQUEST_USERS, RECEIVE_USERS, INVALIDATE_USERS
+  REQUEST_USERS, RECEIVE_USERS, RECEIVE_USER, INVALIDATE_USERS
 } from '../actions'
 
 function users(
@@ -26,7 +28,17 @@ function users(
 		    didInvalidate: false,
 		    users: action.users,
 		    lastUpdated: action.receivedAt
-		  })
+      })
+    case RECEIVE_USER:
+      let users = state.users
+      const userIdx = users.findIndex(u => u.id === action.user.id)
+      var newUsers = update(users, {
+        $splice: [[userIdx, 1, action.user]]
+      });
+      return Object.assign({}, state, {
+        users: newUsers,
+        lastUpdated: action.receivedAt
+      })
     default:
       return state
   }

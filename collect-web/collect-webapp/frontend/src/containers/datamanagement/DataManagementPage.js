@@ -92,8 +92,9 @@ class DataManagementPage extends Component {
 				</Row>
 	      <Row>
 					<Col>
-	          <RecordDataTable handlRowDoubleClick={this.handleRowDoubleClick} 
+	          <RecordDataTable 
 							selectedItemIds={this.state.selectedItemIds} 
+			  				handlRowDoubleClick={this.handleRowDoubleClick} 
 							handleRowSelect={this.handleRowSelect} 
 							handleRowDoubleClick={this.handleRowDoubleClick} />
 					</Col>

@@ -63,7 +63,11 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 	}
 	
 	public enum UserGroupRole {
-		OWNER('O'), ADMINISTRATOR('A'), DATA_ANALYZER('D'), OPERATOR('U'), VIEWER('V');
+		OWNER('O'), 
+		ADMINISTRATOR('A'), 
+		DATA_ANALYZER('D'), 
+		OPERATOR('U'), 
+		VIEWER('V');
 		
 		private char code;
 		

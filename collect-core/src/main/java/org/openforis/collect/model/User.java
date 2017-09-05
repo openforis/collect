@@ -44,6 +44,26 @@ public class User implements PersistedObject, Comparable<User>, DeepComparable {
 		return roles.contains(role);
 	}
 	
+	/**
+	 * Returns the highest role (according to the hierarchy)
+	 */
+	public UserRole getRole() {
+		int max = -1;
+		for (UserRole role : roles) {
+			max = Math.max(max, role.getHierarchicalOrder());
+		}
+		if (max >= 0) {
+			return UserRole.fromHierarchicalOrder(max);
+		} else {
+			return null;
+		}
+	}
+	
+	public void setRole(UserRole role) {
+		this.roles.clear();
+		this.roles.add(role);
+	}
+	
 	public boolean hasEffectiveRole(UserRole role) {
 		int maxHiearachicalOrder = calculateHighestRoleHierarchicalOrder();
 		return role.getHierarchicalOrder() <= maxHiearachicalOrder;
