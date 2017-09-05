@@ -108,7 +108,7 @@ package org.openforis.collect.presenter {
 				if(user.roles.length > 1) {
 					return true;
 				} else {
-					AlertUtil.showError('usersManagement.error.userMustHaveAtLeastOneRole', [user.name]);
+					AlertUtil.showError('usersManagement.error.userMustHaveAtLeastOneRole', [user.username]);
 					return false;
 				}
 			}
@@ -123,7 +123,7 @@ package org.openforis.collect.presenter {
 			/* workaround flex bug on inherited states: reset currentState before changing from child to parent state */
 			view.usersListContainer.currentState = UsersListContainer.STATE_DEFAULT; 
 			if ( selectedUser != null ) {
-				if ( selectedUser.name == ADMIN_USER_NAME ) {
+				if ( selectedUser.username == ADMIN_USER_NAME ) {
 					view.usersListContainer.currentState = UsersListContainer.STATE_ADMIN_SELECTED;
 				} else {
 					view.usersListContainer.currentState = UsersListContainer.STATE_SELECTED;
@@ -163,7 +163,7 @@ package org.openforis.collect.presenter {
 		
 		protected function fillForm(user:UserProxy):void {
 			view.usersListContainer.enabledCheckBox.selected = user.enabled;
-			view.usersListContainer.nameTextInput.text = user.name;
+			view.usersListContainer.nameTextInput.text = user.username;
 			view.usersListContainer.passwordTextInput.text = "";
 			view.usersListContainer.repeatPasswordTextInput.text = "";
 			resetRolesCheckBoxes();
@@ -249,7 +249,7 @@ package org.openforis.collect.presenter {
 			name = StringUtil.trim(name);
 			view.usersListContainer.nameTextInput.text = name;
 			var selectedUser:UserProxy = view.usersListContainer.dataGrid.selectedItem as UserProxy;
-			if ( (selectedUser == null || selectedUser.name != name) && existsUsername(name) ) {
+			if ( (selectedUser == null || selectedUser.username != name) && existsUsername(name) ) {
 				AlertUtil.showError("usersManagement.error.duplicatedUsername");
 				return false;
 			}
@@ -286,7 +286,7 @@ package org.openforis.collect.presenter {
 				user.id = selectedUser.id;
 			}
 			user.enabled = view.usersListContainer.enabledCheckBox.selected;
-			user.name = view.usersListContainer.nameTextInput.text;
+			user.username = view.usersListContainer.nameTextInput.text;
 			user.rawPassword = view.usersListContainer.passwordTextInput.text;
 			var roles:ListCollectionView = getSelectedRoles();
 			user.roles = roles;

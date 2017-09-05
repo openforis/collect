@@ -88,16 +88,6 @@ public class UserProxy implements Proxy {
 		this.username = username;
 	}
 	
-	@Deprecated
-	public String getName() {
-		return username;
-	}
-
-	@Deprecated
-	public void setName(String name) {
-		this.username = name;
-	}
-
 	public List<String> getRoles() {
 		return roles;
 	}

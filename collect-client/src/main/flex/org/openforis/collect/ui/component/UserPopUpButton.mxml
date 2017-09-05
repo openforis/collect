@@ -23,7 +23,7 @@
 		]]>
 	</fx:Script>
 	
-	<s:Label text="{Message.get('global.loggedAsLabel') + ' ' + Application.user.name}" styleName="loggedAsLabel" />
+	<s:Label text="{Message.get('global.loggedAsLabel') + ' ' + Application.user.username}" styleName="loggedAsLabel" />
 	
 	<mx:PopUpMenuButton id="loggedPopUpButton"
 						openAlways="true"

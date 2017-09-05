@@ -322,7 +322,7 @@ package org.openforis.collect.presenter {
 				}
 			} else if ( ! selectedRecord.unassigned && ! Application.user.isOwner(selectedRecord) &&
 					! Application.user.canDeleteNotOwnedRecords ) {
-				AlertUtil.showError("list.error.cannotDelete.differentOwner", [selectedRecord.owner.name]);
+				AlertUtil.showError("list.error.cannotDelete.differentOwner", [selectedRecord.owner.username]);
 			} else {
 				AlertUtil.showConfirm("list.delete.confirm", [rootEntityLabel], "list.delete.confirmTitle", executeDelete, [selectedRecord]);
 			}

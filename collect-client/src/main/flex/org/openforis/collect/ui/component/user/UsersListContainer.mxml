@@ -65,7 +65,7 @@
 					<s:columns>
 						<s:ArrayList>
 							<s:GridColumn headerText="{Message.get('usersManagement.name')}"
-										  dataField="name"
+										  dataField="username"
 										  width="150"
 										  />
 							<s:GridColumn headerText="{Message.get('usersManagement.roles')}"
