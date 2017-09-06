@@ -18,6 +18,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.lucene.util.IOUtils;
+import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
@@ -28,7 +29,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.commons.io.OpenForisIOUtils;
-import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class CSVDataExportJob extends Job {
+public class CSVDataExportJob extends SurveyLockingJob {
 	
 //	private static Log LOG = LogFactory.getLog(CSVDataExportJob.class);
 

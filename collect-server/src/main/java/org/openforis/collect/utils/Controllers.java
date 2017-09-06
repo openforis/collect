@@ -23,6 +23,7 @@ public class Controllers {
 
 	public static final String KML_CONTENT_TYPE = "application/vnd.google-earth.kml+xml";
 	public static final String CSV_CONTENT_TYPE = "text/csv";
+	public static final String ZIP_CONTENT_TYPE = "application/zip";
 
 	public static void writeFileToResponse(HttpServletResponse response, File file) throws IOException {
 		writeFileToResponse(response, file, file.getName());

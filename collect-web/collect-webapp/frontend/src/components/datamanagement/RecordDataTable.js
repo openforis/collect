@@ -128,7 +128,7 @@ class RecordDataTable extends Component {
 						onSelect: this.props.handleRowSelect,
 						selected: this.props.selectedItemIds} }
 					options={{ onRowDoubleClick: this.props.handleRowDoubleClick, onCellEdit: this.handleCellEdit}}
-					cellEdit={ { mode: 'click' } }
+					cellEdit={ { mode: 'click', blurToSave: true } }
 				  >{columns}
 			  </BootstrapTable>
 		  );

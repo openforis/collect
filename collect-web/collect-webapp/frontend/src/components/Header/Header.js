@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Dropdown, DropdownMenu, DropdownItem } from 'reactstrap';
+import { FormGroup, Label, Col, Dropdown, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import SurveySelect from '../SurveySelect/';
 
@@ -54,10 +54,16 @@ class Header extends Component {
           <li className="nav-item">
             <button className="nav-link navbar-toggler sidebar-toggler" type="button" onClick={this.sidebarToggle}>&#9776;</button>
           </li>
-          <li className="nav-item px-3">
-  	        <SurveySelect />
+          <li className="nav-item">
+            <FormGroup row>
+              <Label sm={4}>Preferred survey: </Label>
+              <Col sm={8}>
+                <SurveySelect />
+              </Col>
+            </FormGroup>
           </li>
         </ul>
+        
         <ul className="nav navbar-nav ml-auto">
 	        <li className="nav-item">
             <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>

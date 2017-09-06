@@ -16,6 +16,14 @@ const routes = [
     name: "Data Management"
   },
   {
+    path: '/datamanagement/export',
+    name: "Export Data"
+  },
+  {
+    path: '/datamanagement/import',
+    name: "Import Data"
+  },
+  {
     path: '/datamanagement/:id',
     name: 'Record',
     pathRegExp: new RegExp('/datamanagement/(\\d)+')

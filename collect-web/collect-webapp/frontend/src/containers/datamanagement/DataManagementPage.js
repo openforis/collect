@@ -23,6 +23,8 @@ class DataManagementPage extends Component {
 		this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
 		this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
 		this.navigateToItemEditView = this.navigateToItemEditView.bind(this)
+		this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
+		this.handleImportButtonClick = this.handleImportButtonClick.bind(this)
 	}
 
 	handleNewButtonClick() {
@@ -64,7 +66,8 @@ class DataManagementPage extends Component {
 	}
 
 	handleItemsSelection(selectedItems) {
-		this.setState({ ...this.state, 
+		this.setState({
+			...this.state,
 			selectedItems: selectedItems,
 			selectedItemIds: selectedItems.map(item => item.id),
 			selectedItem: this.getUniqueItemOrNull(selectedItems)
@@ -75,39 +78,53 @@ class DataManagementPage extends Component {
 		return items.length === 1 ? items[0] : null;
 	}
 
-  render() {
-		if (! this.props.survey) {
+	handleExportButtonClick() {
+		this.props.history.push('/datamanagement/export')
+	}
+
+	handleImportButtonClick() {
+		this.props.history.push('/datamanagement/import')
+	}
+
+	render() {
+		if (!this.props.survey) {
 			return <div>Select a survey first</div>
 		}
-	  return (
-	    <Container>
+		return (
+			<Container>
 				<Row>
 					<Col>
-						<Button color="success" onClick={this.handleNewButtonClick}>New</Button>
-						<Button disabled={! this.state.selectedItem} color={this.state.selectedItem ? "warning": "disabled"} 
-								onClick={this.handleEditButtonClick}>Edit</Button>
-						<Button disabled={! this.state.selectedItem} color={this.state.selectedItem ? "danger": "disabled"} 
-								onClick={this.handleDeleteButtonClick}>Delete</Button>
+						<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
+						<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "success" : "disabled"}
+							onClick={this.handleEditButtonClick}>Edit</Button>
+						<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "danger" : "disabled"}
+							onClick={this.handleDeleteButtonClick}>Delete</Button>
 					</Col>
 				</Row>
-	      <Row>
+				<Row>
 					<Col>
-	          <RecordDataTable 
-							selectedItemIds={this.state.selectedItemIds} 
-			  				handlRowDoubleClick={this.handleRowDoubleClick} 
-							handleRowSelect={this.handleRowSelect} 
+						<RecordDataTable
+							selectedItemIds={this.state.selectedItemIds}
+							handlRowDoubleClick={this.handleRowDoubleClick}
+							handleRowSelect={this.handleRowSelect}
 							handleRowDoubleClick={this.handleRowDoubleClick} />
 					</Col>
 				</Row>
+				<Row>
+					<Col>
+						<Button color="info" onClick={this.handleExportButtonClick}>Export</Button>
+						<Button color="info" onClick={this.handleImportButtonClick}>Import</Button>
+					</Col>
+				</Row>
 			</Container>
-	  );
-  }
+		);
+	}
 }
 
 const mapStateToProps = state => {
 	return {
-	  survey: state.preferredSurvey ? state.preferredSurvey.survey : null
+		survey: state.preferredSurvey ? state.preferredSurvey.survey : null
 	}
 }
-  
+
 export default connect(mapStateToProps)(DataManagementPage)

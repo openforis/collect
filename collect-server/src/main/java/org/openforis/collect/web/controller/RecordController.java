@@ -7,6 +7,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.ProxyContext;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
@@ -47,9 +49,10 @@ import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
+import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
-import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -95,7 +98,9 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
-	private JobManager jobManager;
+	private CollectJobManager jobManager;
+
+	private CSVDataExportJob csvDataExportJob;
 	
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
 	public @ResponseBody
@@ -183,7 +188,8 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=PATCH, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody Response updateOwner(@PathVariable int surveyId, @PathVariable int recordId,
 			@RequestBody Map<String, String> body) throws RecordLockedException, MultipleEditException {
-		int ownerId = Integer.parseInt(body.get("ownerId"));
+		String ownerIdStr = body.get("ownerId");
+		Integer ownerId = ownerIdStr == null ? null : Integer.parseInt(ownerIdStr);
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		SessionState sessionState = sessionManager.getSessionState();
 		recordManager.assignOwner(survey, recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
@@ -234,7 +240,7 @@ public class RecordController extends BasicController implements Serializable {
 			File outputFile = File.createTempFile("record_export", ".zip");
 			job.setOutputFile(outputFile);
 			job.setAlwaysGenerateZipFile(true);
-			jobManager.start(job, false);
+			jobManager.startSurveyJob(job);
 			if (job.isCompleted()) {
 				String fileName = String.format("record_data_%s.zip", Dates.formatDate(new Date()));
 				Controllers.writeFileToResponse(response, outputFile, fileName, Files.ZIP_CONTENT_TYPE);
@@ -245,6 +251,46 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value="data/records/{recordId}/surveyId", method=GET)
 	public @ResponseBody int loadSurveyId(@PathVariable int recordId) {
 		return recordManager.loadSurveyId(recordId);
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/startcsvexport", method=POST)
+	public @ResponseBody JobView startDataExportJob(
+			@PathVariable Integer surveyId,
+			@RequestBody CSVDataExportParameters parameters) throws IOException {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		
+		csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
+		csvDataExportJob.setSurvey(survey);
+
+		csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
+		
+		RecordFilter recordFilter = new RecordFilter(survey, parameters.rootEntityId);
+		csvDataExportJob.setRecordFilter(recordFilter);
+		recordFilter.setStepGreaterOrEqual(parameters.step);
+		csvDataExportJob.setEntityId(parameters.entityId);
+		csvDataExportJob.setAlwaysGenerateZipFile(true);
+		jobManager.start(csvDataExportJob);
+		
+		return new JobView(csvDataExportJob);
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/currentcsvexport", method=GET)
+	public @ResponseBody JobView getCsvDataExportJob(HttpServletResponse response) {
+		if (csvDataExportJob == null) {
+			HttpResponses.setNoContentStatus(response);
+			return null;
+		} else {
+			return new JobView(csvDataExportJob);
+		}
+	}
+	
+	@RequestMapping(value="survey/{survey_id}/data/records/csvexportresult.zip", method=GET)
+	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
+		File file = csvDataExportJob.getOutputFile();
+		String surveyName = csvDataExportJob.getRecordFilter().getSurvey().getName();
+		Controllers.writeFileToResponse(response, file, 
+				String.format("collect-data-export-%s-%s.zip", surveyName, Dates.formatDate(new Date())), 
+				Controllers.ZIP_CONTENT_TYPE);
 	}
 	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
@@ -342,5 +388,12 @@ public class RecordController extends BasicController implements Serializable {
 		public void setVersionName(String versionName) {
 			this.versionName = versionName;
 		}
+	}
+	
+	public static class CSVDataExportParameters {
+		
+		public Integer rootEntityId;
+		public Integer entityId;
+		public Step step;
 	}
 }

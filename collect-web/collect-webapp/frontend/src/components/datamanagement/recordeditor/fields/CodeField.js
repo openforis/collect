@@ -1,5 +1,4 @@
-import React, { Component, PropTypes } from 'react'
-import classnames from 'classnames';
+import React from 'react'
 import { Label, Input, FormGroup } from 'reactstrap';
 import ServiceFactory from 'services/ServiceFactory'
 import AbstractField from './AbstractField'

@@ -21,17 +21,27 @@ export default class RecordService extends AbstractService {
     }
 
     createRecord(surveyId, rootEntityName = null, versionName = null) {
-        return this.postJson('survey/' + surveyId + '/data/records', 
-            {
-                rootEntityName: rootEntityName,
-                versionName: versionName
-            }
-        )
+        return this.postJson('survey/' + surveyId + '/data/records', {
+            rootEntityName: rootEntityName,
+            versionName: versionName
+        })
+    }
+    
+    startCSVDataExport(surveyId, rootEntityId, entityId, step) {
+        return this.postJson('survey/' + surveyId + '/data/records/startcsvexport', {
+            rootEntityId: rootEntityId,
+            entityId: entityId,
+            step: step
+        })
+    }
+
+    downloadCSVDataExportResult(surveyId) {
+        window.open(this.BASE_URL + 'survey/' + surveyId + '/data/records/csvexportresult.zip', '_blank')
     }
 
     updateOwner(record, owner) {
         return this.patchJson('survey/' + record.surveyId + '/data/records/' + record.id, {
-            ownerId: owner.id
+            ownerId: owner == null ? null : owner.id
         })
     }
 }

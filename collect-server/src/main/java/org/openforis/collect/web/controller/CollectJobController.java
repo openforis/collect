@@ -17,6 +17,7 @@ import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *
  */
 @Controller
+@RequestMapping("api/job")
 public class CollectJobController extends BasicController {
 
 	@Autowired
@@ -58,9 +60,9 @@ public class CollectJobController extends BasicController {
 		return abortJob(response, job);
 	}
 	
-	@RequestMapping(value="job.json", method = RequestMethod.GET)
+	@RequestMapping(value="{jobId}", method = RequestMethod.GET)
 	public @ResponseBody
-	JobView getJob(HttpServletResponse response, @RequestParam("jobId") String jobId) {
+	JobView getJob(HttpServletResponse response, @PathVariable("jobId") String jobId) {
 		Job job = jobManager.getJob(jobId);
 		return createJobView(response, job);
 	}
@@ -92,12 +94,14 @@ public class CollectJobController extends BasicController {
 		private long elapsedTime;
 		private Long remainingTime;
 		private Integer remainingMinutes;
+		private boolean ended;
 
 		public JobView(Job job) {
 			id = job.getId().toString();
 			name = job.getName();
 			progressPercent = job.getProgressPercent();
 			status = job.getStatus();
+			ended = job.isEnded();
 			errorMessage = job.getErrorMessage();
 			elapsedTime = calculateElapsedTime(job);
 			remainingTime = calculateRemainingTime();
@@ -125,6 +129,10 @@ public class CollectJobController extends BasicController {
 				return null;
 			}
 			return Double.valueOf(Math.ceil((double) remainingTime / 60000)).intValue();
+		}
+		
+		public boolean isEnded() {
+			return ended;
 		}
 		
 		public String getId() {

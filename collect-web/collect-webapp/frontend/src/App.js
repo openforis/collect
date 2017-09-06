@@ -15,6 +15,8 @@ import UsersPage from 'containers/users/UsersPage'
 import UserGroupsPage from 'containers/users/UserGroupsPage'
 import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
 import DataManagementPage from 'containers/datamanagement/DataManagementPage'
+import DataExportPage from 'containers/datamanagement/DataExportPage'
+import DataImportPage from 'containers/datamanagement/DataImportPage'
 import RecordEditPage from 'containers/datamanagement/RecordEditPage'
 
 class App extends Component {
@@ -30,6 +32,8 @@ class App extends Component {
                 <Switch>
                   <Route path="/dashboard" name="Dashboard" component={DashboardPage}/>
                   <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage}/>
+                  <Route path="/datamanagement/export" exact name="DataExport" component={DataExportPage}/>
+                  <Route path="/datamanagement/import" exact name="DataImport" component={DataImportPage}/>
                   <Route path="/datamanagement/:id" name="RecordDetails" component={RecordEditPage}/>
                   <Route path="/datacleansing" name="DataCleansing" component={DataCleansingPage}/>
                   <Route path="/map" name="Map" component={MapPage}/>
