@@ -144,7 +144,7 @@
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" 
 		init-method="init" />
 	<bean id="userManager" 				class="org.openforis.collect.manager.LocalUserManager" />
-	<bean id="userGroupManager" 		class="org.openforis.collect.manager.UserGroupManager" />
+	<bean id="userGroupManager" 		class="org.openforis.collect.manager.LocalUserGroupManager" />
 
 	<!--  Services -->
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />
