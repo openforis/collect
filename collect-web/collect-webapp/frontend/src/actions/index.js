@@ -29,8 +29,6 @@ export const RECEIVE_USER_GROUPS = 'RECEIVE_USER_GROUPS'
 export const RECEIVE_USER_GROUP = 'RECEIVE_USER_GROUP'
 export const INVALIDATE_USER_GROUPS = 'INVALIDATE_USER_GROUPS'
 
-let BASE_URL = Constants.API_BASE_URL;
-
 //LOGIN
 function loginPending() {
 	return {

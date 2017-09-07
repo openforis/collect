@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress } from 'reactstrap';
 import ServiceFactory from 'services/ServiceFactory'
 
@@ -9,7 +10,9 @@ export default class JobMonitorModal extends Component {
 
         this.handleJobReceived = this.handleJobReceived.bind(this)
         this.handleTimeout = this.handleTimeout.bind(this)
-        
+        this.handleOkButtonClick = this.handleOkButtonClick.bind(this)
+        this.handleCancelButtonClick = this.handleCancelButtonClick.bind(this)
+
         this.state = {
             loading: true,
             open: props.open,
@@ -19,13 +22,22 @@ export default class JobMonitorModal extends Component {
         this.timer = setInterval(this.handleTimeout, 2000);
     }
 
+    static propTypes = {
+        jobId: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        okButtonLabel: PropTypes.string,
+		handleJobCompleted: PropTypes.func,
+        handleOkButtonClick: PropTypes.func,
+        handleCancelButtonClick: PropTypes.func
+	}
+
     handleTimeout() {
         this.loadJob()
     }
 
     loadJob() {
         const jobId = this.props.jobId
-        ServiceFactory.jobService.fetchById(jobId).then(this.handleJobReceived)
+        ServiceFactory.jobService.fetch(jobId).then(this.handleJobReceived)
     }
 
     handleJobReceived(job) {
@@ -36,17 +48,43 @@ export default class JobMonitorModal extends Component {
         if (job.ended) {
             clearInterval(this.timer)
         }
-        if (job.status == 'COMPLETED') {
-            if (this.props.handleJobCompleted) {
-                this.props.handleJobCompleted(job)
-            }
+        switch (job.status) {
+            case 'COMPLETED':
+                if (this.props.handleJobCompleted) {
+                    this.props.handleJobCompleted(job)
+                }
+                break
+            case 'ABORTED':
+                this.setState({
+                    open: false
+                })
         }
     }
 
+    handleOkButtonClick() {
+        if (this.props.handleOkButtonClick) {
+            this.props.handleOkButtonClick()
+        }
+    }
+
+    handleCancelButtonClick() {
+        const jobId = this.props.jobId
+        
+        ServiceFactory.jobService.cancel(jobId).then(() => {
+            if (this.props.handleCancelButtonClick) {
+                this.props.handleCancelButtonClick()
+            }
+            this.setState({
+                open: false
+            })
+        })
+    }
+
     render() {
+        const okButtonLabel = this.props.okButtonLabel ? this.props.okButtonLabel : 'Ok'
         return (
             <Modal isOpen={this.state.open} >
-                <ModalHeader  >Job status</ModalHeader>
+                <ModalHeader>{this.props.title}</ModalHeader>
                 <ModalBody>
                     {this.state.loading ? 'Loading...'
                         : this.state.job.running ? 
@@ -55,8 +93,9 @@ export default class JobMonitorModal extends Component {
                     }
                 </ModalBody>
                 <ModalFooter>
-                    {this.state.loading || ! this.state.job.ended ? '' : <Button color="primary">Ok</Button>} {' '}
-                    <Button color="secondary">Cancel</Button>
+                    {this.state.loading || ! this.state.job.ended ? '' : <Button color="primary"
+                        onClick={this.handleOkButtonClick}>{okButtonLabel}</Button>} {' '}
+                    <Button color="secondary" onClick={this.handleCancelButtonClick}>Cancel</Button>
                 </ModalFooter>
             </Modal>
         )

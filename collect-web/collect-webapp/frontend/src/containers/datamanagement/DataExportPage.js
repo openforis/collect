@@ -17,7 +17,7 @@ class DataExportPage extends Component {
         }
 
         this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
-        this.handleCsvDataExportCompleted = this.handleCsvDataExportCompleted.bind(this)
+        this.handleCsvDataExportModalOkButtonClick = this.handleCsvDataExportModalOkButtonClick.bind(this)
     }
 
     handleExportButtonClick() {
@@ -40,7 +40,7 @@ class DataExportPage extends Component {
         }
     }
 
-    handleCsvDataExportCompleted(job) {
+    handleCsvDataExportModalOkButtonClick(job) {
         const survey = this.props.survey
         const surveyId = survey.id
         ServiceFactory.recordService.downloadCSVDataExportResult(surveyId)
@@ -51,8 +51,12 @@ class DataExportPage extends Component {
         if (!this.props.survey) {
             return <div>Select survey first</div>
         }
-        const jobStatusMonitor = this.state.jobStatusModalOpen ? <JobMonitorModal jobId={this.state.csvDataExportJobId} open={true}
-            handleJobCompleted={this.handleCsvDataExportCompleted} /> : null
+        const jobStatusMonitor = this.state.jobStatusModalOpen ? <JobMonitorModal 
+            title="Exporting CSV data"
+            jobId={this.state.csvDataExportJobId} open={true}
+            okButtonLabel={'Download'}
+            handleOkButtonClick={this.handleCsvDataExportModalOkButtonClick}
+            /> : null
         return (
             <Form>
                 <FormGroup row>

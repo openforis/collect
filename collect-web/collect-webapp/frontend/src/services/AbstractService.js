@@ -16,6 +16,18 @@ export default class AbstractService {
         })
     }
 
+    delete(url) {
+        return fetch(this.BASE_URL + url, {
+            credentials: 'include',
+            method: 'DELETE'
+        })
+        .then(response => response.json(),
+            error => console.log('An error occured.', error))
+        .catch(error => {
+            throw(error);
+        })
+    }
+
     post(url, data) {
         let body = this._toQueryData(data);
 

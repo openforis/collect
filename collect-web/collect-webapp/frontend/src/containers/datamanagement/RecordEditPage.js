@@ -29,7 +29,7 @@ export default class RecordEditPage extends Component {
     let idParam = this.props.match.params.id;
     let recordId = parseInt(idParam);
 
-    this.recordService.fetchSurveyId(recordId).then(res => {
+    ServiceFactory.recordService.fetchSurveyId(recordId).then(res => {
       let surveyId = parseInt(res);
       ServiceFactory.surveyService.fetchById(surveyId).then(survey => {
         ServiceFactory.recordService.fetchById(survey, recordId).then(record => {

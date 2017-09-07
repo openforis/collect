@@ -4,6 +4,10 @@ const routes = [
     name: 'Home'
   },
   {
+    path: '/home',
+    name: 'Home'
+  },
+  {
     path: '/signin',
     name: "Signin"
   },

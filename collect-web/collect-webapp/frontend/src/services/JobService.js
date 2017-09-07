@@ -3,8 +3,11 @@ import { Survey } from '../model/Survey';
 
 export default class JobService extends AbstractService {
 
-    fetchById(jobId) {
+    fetch(jobId) {
         return this.get('job/' + jobId)
     }
-    
+
+    cancel(jobId) {
+        return this.delete('job/' + jobId)
+    }
 }

@@ -7,6 +7,7 @@ import Breadcrumb from 'components/Breadcrumb';
 import Aside from 'components/Aside';
 import Footer from 'components/Footer';
 
+import HomePage from 'containers/HomePage'
 import DashboardPage from 'containers/DashboardPage'
 import DataCleansingPage from 'containers/DataCleansingPage'
 import MapPage from 'containers/MapPage'
@@ -30,18 +31,18 @@ class App extends Component {
               <Breadcrumb />
               <div className="container-fluid">
                 <Switch>
-                  <Route path="/dashboard" name="Dashboard" component={DashboardPage}/>
+                  <Route path="/" exact name="HomePage" component={HomePage}/>
+                  <Route path="/dashboard" exact name="Dashboard" component={DashboardPage}/>
                   <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage}/>
                   <Route path="/datamanagement/export" exact name="DataExport" component={DataExportPage}/>
                   <Route path="/datamanagement/import" exact name="DataImport" component={DataImportPage}/>
                   <Route path="/datamanagement/:id" name="RecordDetails" component={RecordEditPage}/>
-                  <Route path="/datacleansing" name="DataCleansing" component={DataCleansingPage}/>
-                  <Route path="/map" name="Map" component={MapPage}/>
-                  <Route path="/surveydesigner" name="Survey Designer" component={SurveyDesignerPage}/>
-                  <Route path="/users" name="Users" component={UsersPage}/>
+                  <Route path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage}/>
+                  <Route path="/map" exact name="Map" component={MapPage}/>
+                  <Route path="/surveydesigner" exact name="Survey Designer" component={SurveyDesignerPage}/>
+                  <Route path="/users" exact name="Users" component={UsersPage}/>
                   <Route path="/usergroups" exact name="User Groups" component={UserGroupsPage}/>
                   <Route path="/usergroups/:id" name="User Group" component={UserGroupDetailsPage}/>
-                  <Redirect from="/" to="/dashboard"/>
                 </Switch>
               </div>
             </main>

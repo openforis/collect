@@ -113,6 +113,8 @@ class DataManagementPage extends Component {
 				<Row>
 					<Col>
 						<Button color="info" onClick={this.handleExportButtonClick}>Export</Button>
+					</Col>
+					<Col>
 						<Button color="info" onClick={this.handleImportButtonClick}>Import</Button>
 					</Col>
 				</Row>
