@@ -10,13 +10,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.webapp.HttpGraniteContext;
+import org.openforis.collect.config.CollectConfiguration;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.SurveyStoreException;
-import org.openforis.collect.utils.HttpSessions;
 import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class SessionManager {
 	
 	public void createSessionState(HttpSession session) {
 		String sessionId = session.getId();
-		boolean developmentMode = HttpSessions.isDevelopmentMode(session);
+		boolean developmentMode = CollectConfiguration.isDevelopmentMode();
 		SessionState sessionState = new SessionState(sessionId);
 		if (developmentMode) {
 			sessionState.setUser(userManager.loadAdminUser());

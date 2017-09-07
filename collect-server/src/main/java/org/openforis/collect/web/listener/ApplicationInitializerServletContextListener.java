@@ -25,19 +25,21 @@ import org.openforis.collect.persistence.DbUtils;
 public class ApplicationInitializerServletContextListener implements ServletContextListener {
 
 	private final Log LOG = LogFactory.getLog(ApplicationInitializerServletContextListener.class);
+	private static final String DEVELOPMENT_MODE_INIT_PARAMETER_NAME = "developmentMode";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		LOG.info("========Open Foris Collect - Starting initialization ==========");
 		initDB();
+		CollectConfiguration.setDevelopmentMode(determineIsDevelopmentMode(sce));
 		configureOfUsersModule(sce);
 		LOG.info("========Open Foris Collect - Initialized ======================");
 	}
-	
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-	}
 
+	private boolean determineIsDevelopmentMode(ServletContextEvent sce) {
+		return Boolean.parseBoolean(sce.getServletContext().getInitParameter(DEVELOPMENT_MODE_INIT_PARAMETER_NAME));
+	}
+	
 	private void configureOfUsersModule(ServletContextEvent sce) {
 		LOG.info("======== Starting OF-Users module configuration ========");
 		ServletContext sc = sce.getServletContext();
@@ -85,4 +87,8 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 		}
 	}
 	
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+	}
+
 }

@@ -1,10 +1,8 @@
 package org.openforis.collect.config;
 
-import org.springframework.stereotype.Component;
+public abstract class CollectConfiguration {
 
-@Component
-public class CollectConfiguration {
-
+	private static boolean developmentMode;
 	private static String usersRestfulApiUrl;
 	
 	public static void initUsersServiceConfiguration(ServiceConfiguration usersServiceConfiguration) {
@@ -13,6 +11,14 @@ public class CollectConfiguration {
 	
 	public static String getUsersRestfulApiUrl() {
 		return usersRestfulApiUrl;
+	}
+	
+	public static boolean isDevelopmentMode() {
+		return developmentMode;
+	}
+	
+	public static void setDevelopmentMode(boolean developmentMode) {
+		CollectConfiguration.developmentMode = developmentMode;
 	}
 	
 	public static class ServiceConfiguration {

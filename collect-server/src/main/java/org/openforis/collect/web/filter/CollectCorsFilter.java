@@ -7,27 +7,22 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.stereotype.Component;
+import org.openforis.collect.config.CollectConfiguration;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@Component
 public class CollectCorsFilter extends OncePerRequestFilter {
 
-	private String getAllowedOrigins() {
-		return "http://localhost:3000";
-	}
-
-	@Override
-	public void destroy() {
-	}
+	private static final String ALLOWED_DEV_ORIGINS = "http://localhost:3000";
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		response.addHeader("Access-Control-Allow-Origin", getAllowedOrigins());
-		response.setHeader("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, PATCH, POST, PUT");
-		response.setHeader("Access-Control-Allow-Credentials", "true");
-		response.setHeader("Access-Control-Allow-Headers", "credentials, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+		if (CollectConfiguration.isDevelopmentMode()) {
+			response.addHeader("Access-Control-Allow-Origin", ALLOWED_DEV_ORIGINS);
+			response.setHeader("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, PATCH, POST, PUT");
+			response.setHeader("Access-Control-Allow-Credentials", "true");
+			response.setHeader("Access-Control-Allow-Headers", "credentials, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+		}
 		filterChain.doFilter(request, response);
 	}
 }
