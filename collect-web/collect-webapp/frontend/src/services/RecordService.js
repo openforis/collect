@@ -36,7 +36,7 @@ export default class RecordService extends AbstractService {
     }
 
     downloadCSVDataExportResult(surveyId) {
-        window.open(this.BASE_URL + 'survey/' + surveyId + '/data/records/csvexportresult.zip', '_blank')
+        this.downloadFile(this.BASE_URL + 'survey/' + surveyId + '/data/records/csvexportresult.zip')
     }
 
     updateOwner(record, owner) {

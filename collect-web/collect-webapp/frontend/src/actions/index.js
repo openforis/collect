@@ -1,7 +1,5 @@
-import fetch from 'isomorphic-fetch'
 import Constants from 'utils/Constants'
-import UserService from 'services/UserService'
-import UserGroupService from 'services/UserGroupService'
+import ServiceFactory from 'services/ServiceFactory'
 import { Survey } from 'model/Survey';
 
 export const LOG_IN_PENDING = 'LOG_IN_PENDING'
@@ -33,9 +31,6 @@ export const INVALIDATE_USER_GROUPS = 'INVALIDATE_USER_GROUPS'
 
 let BASE_URL = Constants.API_BASE_URL;
 
-let userService = new UserService();
-let userGroupService = new UserGroupService();
-
 //LOGIN
 function loginPending() {
 	return {
@@ -66,7 +61,7 @@ export function logInUser(credentials) {
 			return response;
 		}
 		
-		userService.login(credentials)
+		ServiceFactory.userService.login(credentials)
 			.then(handleErrors)
 			.then(response => {
 				if (!response.ok || response.url.indexOf("login_error") > 0) {
@@ -88,15 +83,7 @@ function requestCurrentUser() {
 export function fetchCurrentUser() {
 	return function (dispatch) {
 		dispatch(requestCurrentUser())
-		var url = BASE_URL + 'session/user';
-		return fetch(url, {
-			headers: {
-				credentials: 'same-origin'
-			}
-		})
-		.then(response => response.json(),
-			error => console.log('An error occured.', error))
-		.then(json => {
+		ServiceFactory.sessionService.fetchCurrentUser().then(json => {
 			dispatch(receiveCurrentUser(json));
 			dispatch(fetchSurveySummaries(json));
 		})
@@ -128,11 +115,9 @@ function receiveSurveySummaries(json) {
 export function fetchSurveySummaries() {
 	return function (dispatch) {
 		dispatch(requestSurveySummaries())
-		var url = BASE_URL + 'survey';
-		return fetch(url)
-		    .then(response => response.json(),
-	    		error => console.log('An error occured.', error))
-		    .then(json => dispatch(receiveSurveySummaries(json)))
+		ServiceFactory.surveyService.fetchAllSummaries().then(json => 
+			dispatch(receiveSurveySummaries(json))
+		)
 	}
 }
 
@@ -148,11 +133,9 @@ export function selectPreferredSurvey(preferredSurveySummary) {
 	let surveyId = preferredSurveySummary.id;
 	return function (dispatch) {
 		dispatch(requestFullPreferredSurvey(surveyId))
-		var url = BASE_URL + 'survey/' + surveyId + '.json';
-		return fetch(url)
-		    .then(response => response.json(),
-	    		error => console.log('An error occured.', error))
-		    .then(json => dispatch(receiveFullPreferredSurvey(json)))
+		ServiceFactory.surveyService.fetchById(surveyId).then(json => 
+			dispatch(receiveFullPreferredSurvey(json))
+		)
 	}
 }
 
@@ -208,7 +191,7 @@ export function receiveUser(json) {
 export function fetchUsers() {
 	return function (dispatch) {
 		dispatch(requestUsers())
-		userService.fetchUsers().then(json => dispatch(receiveUsers(json)))
+		ServiceFactory.userService.fetchUsers().then(json => dispatch(receiveUsers(json)))
 	}
 }
 
@@ -250,7 +233,7 @@ export function receiveUserGroup(json) {
 export function fetchUserGroups() {
 	return function (dispatch) {
 		dispatch(requestUserGroups())
-		userGroupService.fetchAllAvailableGroups().then(json => dispatch(receiveUserGroups(json)))
+		ServiceFactory.userGroupService.fetchAllAvailableGroups().then(json => dispatch(receiveUserGroups(json)))
 	}
 }
 

@@ -20,7 +20,8 @@ class SurveySelect extends Component {
     componentDidMount() {
         //const { dispatch } = this.props
         //dispatch(fetchSurveySummaries())
-    }
+	}
+	
     handleChange(event) {
     	const { summaries } = this.props
     	var survey = summaries.find(summary => summary.id === parseInt(event.target.value, 10));

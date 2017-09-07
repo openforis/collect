@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
 import TabSet from 'components/datamanagement/recordeditor/TabSet'
 import { Record } from 'model/Record'
@@ -6,13 +7,10 @@ import EventQueue from 'model/event/EventQueue'
 import { AttributeUpdatedEvent, EntityCreatedEvent, CodeAttributeUpdatedEvent, 
   CoordinateAttributeUpdatedEvent, DateAttributeUpdatedEvent, TextAttributeUpdatedEvent }  from 'model/event/RecordEvent'
 import { Attribute, Entity } from 'model/Record'
-import RecordService from 'services/RecordService'
-import SurveyService from 'services/SurveyService'
+import ServiceFactory from 'services/ServiceFactory'
 
 export default class RecordEditPage extends Component {
 
-  recordService = new RecordService()
-  surveyService = new SurveyService()
   recordUpdater = null;
 
   constructor(props) {
@@ -33,8 +31,8 @@ export default class RecordEditPage extends Component {
 
     this.recordService.fetchSurveyId(recordId).then(res => {
       let surveyId = parseInt(res);
-      this.surveyService.fetchById(surveyId).then(survey => {
-        this.recordService.fetchById(survey, recordId).then(record => {
+      ServiceFactory.surveyService.fetchById(surveyId).then(survey => {
+        ServiceFactory.recordService.fetchById(survey, recordId).then(record => {
           this.recordUpdater = new RecordUpdater(record)
           this.setState({...this.state, record: record});
         });

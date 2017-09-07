@@ -7,7 +7,7 @@ export default class AbstractService {
     get(url, data) {
         let queryData = this._toQueryData(data);
         return fetch(this.BASE_URL + url + '?' + queryData, {
-            credentials: 'same-origin'
+            credentials: 'include'
         })
         .then(response => response.json(),
             error => console.log('An error occured.', error))
@@ -20,6 +20,7 @@ export default class AbstractService {
         let body = this._toQueryData(data);
 
         return fetch(this.BASE_URL + url, {
+            credentials: 'include',
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
@@ -33,8 +34,17 @@ export default class AbstractService {
     }
 
     postJson(url, data) {
+        return this._sendJson(url, data, 'POST')
+    }
+
+    patchJson(url, data) {
+        return this._sendJson(url, data, 'PATCH')
+    }
+
+    _sendJson(url, data, method) {
         return fetch(this.BASE_URL + url, {
-            method: 'POST',
+            credentials: 'include',
+            method: method,
             headers: {
               'Content-Type': 'application/json;charset=UTF-8'
             },
@@ -46,18 +56,8 @@ export default class AbstractService {
         })
     }
 
-    patchJson(url, data) {
-        return fetch(this.BASE_URL + url, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify(data)
-        }).then(response => response.json(),
-            error => console.log('An error occured.', error))
-        .catch(error => {
-            throw(error);
-        })
+    downloadFile(url, windowName) {
+        window.open(url, windowName ? windowName : '_blank')
     }
 
     _toQueryData(data, propPrefix) {
@@ -82,6 +82,6 @@ export default class AbstractService {
             }
           }).join('&');
     }
-
+    
 }
     

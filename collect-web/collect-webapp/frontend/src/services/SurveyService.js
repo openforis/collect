@@ -7,4 +7,7 @@ export default class SurveyService extends AbstractService {
         return this.get('survey/' + surveyId).then(res => new Survey(res))
     }
     
+    fetchAllSummaries() {
+        return this.get('survey')
+    }
 }
