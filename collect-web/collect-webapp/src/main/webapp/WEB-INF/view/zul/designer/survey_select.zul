@@ -17,19 +17,6 @@
 
 	<space height="10px" />
 
-	<hbox hflex="1">
-		<box hflex="1">
-			<button id="goToIndexBtn"
-				image="/assets/images/back-small.png"
-				label="${labels.surveys_list.go_to_index_page}"
-				onClick="@command('goToIndex')" />
-		</box>
-		<box hflex="2" align="center">
-			<label sclass="mainTitle" value="${labels.designer_title}" />
-		</box>
-		<box hflex="1"></box>
-	</hbox>
-	
 	<listbox id="surveysListbox" width="900px" vflex="true"
 		model="@load(vm.surveySummaries)"
 		selectedItem="@bind(vm.selectedSurvey)">
@@ -93,16 +80,6 @@
 						visible="${each.published}">
 						<image src="/assets/images/tick-small.png" />
 					</box>
-				</listcell>
-				<listcell>
-					<hlayout hflex="1"
-						visible="@load(each.recordValidationInProgress)">
-						<label
-							value="@load(each.recordValidationProgressPercent)" />
-						%
-						<progressmeter
-							value="@load(each.recordValidationProgressPercent)" hflex="1" />
-					</hlayout>
 				</listcell>
 			</listitem>
 		</template>

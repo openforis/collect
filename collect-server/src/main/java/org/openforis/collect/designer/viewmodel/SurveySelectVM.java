@@ -18,9 +18,9 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
@@ -28,9 +28,9 @@ import org.openforis.collect.metamodel.SurveySummarySortField;
 import org.openforis.collect.metamodel.SurveySummarySortField.Sortable;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
@@ -465,7 +465,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	private List<SurveySummary> loadSurveySummaries(List<SurveySummarySortField> sortFields) {
-		return surveyManager.loadCombinedSummaries(null, true, sortFields);
+		return surveyManager.loadCombinedSummaries(null, true, getLoggedUser(), sortFields);
 	}
 	
 	private SurveySummary findSummary(Integer id, boolean published, boolean work) {

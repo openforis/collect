@@ -18,7 +18,6 @@ public class SurveySummary {
 
 	private Integer id;
 	private Integer publishedId;
-	private Long userGroupId;
 	private String name;
 	private String uri;
 	private String projectName;
@@ -27,10 +26,11 @@ public class SurveySummary {
 	private Date creationDate;
 	private Date modifiedDate;
 	private SurveyTarget target;
-	private UserGroup userGroup;
 	private ProcessStatus recordValidationProcessStatus;
 	private String defaultLanguage;
 	private List<String> languages;
+	private Integer userGroupId;
+	private UserGroup userGroup;
 	
 	public SurveySummary() {
 	}
@@ -79,10 +79,6 @@ public class SurveySummary {
 		return recordValidationProcessStatus == null ? 0: recordValidationProcessStatus.getProgressPercent();
 	}
 	
-	public String getUserGroupLabel() {
-		return userGroup == null ? null : userGroup.getLabel();
-	}
-
 	public Integer getId() {
 		return id;
 	}
@@ -127,22 +123,6 @@ public class SurveySummary {
 		this.publishedId = publishedId;
 	}
 
-	public Long getUserGroupId() {
-		return userGroupId;
-	}
-	
-	public void setUserGroupId(Long userGroupId) {
-		this.userGroupId = userGroupId;
-	}
-	
-	public UserGroup getUserGroup() {
-		return userGroup;
-	}
-	
-	public void setUserGroup(UserGroup userGroup) {
-		this.userGroup = userGroup;
-	}
-	
 	public ProcessStatus getRecordValidationProcessStatus() {
 		return recordValidationProcessStatus;
 	}
@@ -195,5 +175,25 @@ public class SurveySummary {
 	public void setLanguages(List<String> languages) {
 		this.languages = languages;
 	}
+	
+	public Integer getUserGroupId() {
+		return userGroupId;
+	}
+	
+	public void setUserGroupId(Integer userGroupId) {
+		this.userGroupId = userGroupId;
+	}
 
+	public UserGroup getUserGroup() {
+		return userGroup;
+	}
+	
+	public String getUserGroupLabel() {
+		return userGroup == null ? null : userGroup.getLabel();
+	}
+
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
+		this.userGroupId = userGroup == null ? null: userGroup.getId();
+	}
 }

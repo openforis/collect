@@ -43,7 +43,7 @@ Collect.DataCleansing.DataReportPanelController.prototype.getDataGridOptions = f
 	}
 	
 	return {
-	    url: "datacleansing/datareports/list.json",
+	    url: "api/datacleansing/datareports",
 	    detailView: true,
 	    detailFormatter: detailFormatter,
 	    onExpandRow: onExpandRow,

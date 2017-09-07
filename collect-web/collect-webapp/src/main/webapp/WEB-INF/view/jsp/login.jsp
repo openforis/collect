@@ -1,6 +1,7 @@
 <%@page import="org.openforis.collect.Collect"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page pageEncoding="UTF-8" %>
+<% response.setHeader("X-Frame-Options", "ALLOWALL"); %>
 
 <html>
   <head>

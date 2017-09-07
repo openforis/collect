@@ -36,6 +36,7 @@
 		class="org.openforis.collect.remoting.service.recordindex.VolatileRecordIndexManager"
 		init-method="init" scope="session" lazy-init="false" autowire="byName" />
 	<bean id="userManager" 			class="org.openforis.collect.manager.ClientUserManager" />
+<!-- 	<bean id="userManager" 			class="org.openforis.collect.manager.LocalUserManager" /> -->
 	
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
@@ -153,7 +154,7 @@
 	</bean>
 	
 	<bean id="reportingRepositories" class="org.openforis.collect.relational.RDBReportingRepositories"
-			init-method="init" depends-on="userGroupManager">
+			lazy-init="false" init-method="init">
 		<constructor-arg ref="surveyManager" />
 		<constructor-arg ref="recordManager" />
 		<constructor-arg ref="collectLocalRDBStorageManager" />
@@ -162,7 +163,7 @@
 	</bean>
 	
 	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
-			init-method="init" />
+			lazy-init="false" init-method="init" />
 
 	<bean id="sessionEventDispatcher" class="org.openforis.collect.manager.SessionEventDispatcher"
 		scope="session">

@@ -1,6 +1,6 @@
 Collect.DataQueryService = function() {
 	Collect.AbstractService.apply(this, arguments);
-	this.contextPath = "datacleansing/dataqueries/";
+	this.contextPath = "api/datacleansing/dataqueries/";
 };
 
 Collect.DataQueryService.prototype = Object.create(Collect.AbstractService.prototype);

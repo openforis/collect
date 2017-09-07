@@ -50,7 +50,6 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	private static final String LANGUAGE_FIELD_NAME = "language";
 	private static final String USER_GROUP_FIELD_NAME = "userGroup";
 
-
 	private enum TemplateType {
 		BLANK,
 		BIOPHYSICAL, 
@@ -76,6 +75,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		nameValidator = new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, true);
 		initLanguageModel();
 		initTemplatesModel();
+		initUserGroupsModel();
 		form.put(USER_GROUP_FIELD_NAME, getDefaultPublicUserGroupItem());
 	}
 
@@ -88,9 +88,9 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		templateModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(templates));
 		templateModel.setMultiple(false);
 		LabelledItem defaultTemplate = LabelledItem.getByCode(templates, TemplateType.BLANK.name());
-		form.put("template", defaultTemplate);
+		form.put(TEMPLATE_FIELD_NAME, defaultTemplate);
 	}
-
+	
 	private void initLanguageModel() {
 		List<LabelledItem> languages = new ArrayList<LabelledItem>();
 		List<String> codes = Languages.getCodes(Standard.ISO_639_1);
@@ -101,11 +101,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		Collections.sort(languages, new LabelComparator());
 		languageModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(languages));
 		LabelledItem defaultLanguage = LabelledItem.getByCode(languages, Locale.ENGLISH.getLanguage());
-		form.put("language", defaultLanguage);
-	}
-	
-	public BindingListModelListModel<LabelledItem> getTemplateModel() {
-		return templateModel;
+		form.put(LANGUAGE_FIELD_NAME, defaultLanguage);
 	}
 	
 	@Command
@@ -115,7 +111,6 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		String templateCode = ((LabelledItem) form.get(TEMPLATE_FIELD_NAME)).getCode();
 		TemplateType templateType = TemplateType.valueOf(templateCode);
 		String userGroupName = ((LabelledItem) form.get(USER_GROUP_FIELD_NAME)).getCode();
-		
 		CollectSurvey survey;
 		switch (templateType) {
 		case BLANK:
@@ -185,10 +180,14 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		return nameValidator;
 	}
 
+	public BindingListModelListModel<LabelledItem> getTemplateModel() {
+		return templateModel;
+	}
+	
 	public BindingListModelListModel<LabelledItem> getLanguageModel() {
 		return languageModel;
 	}
-
+	
 	public Map<String, Object> getForm() {
 		return form;
 	}

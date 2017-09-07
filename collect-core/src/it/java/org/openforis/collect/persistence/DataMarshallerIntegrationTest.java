@@ -14,6 +14,7 @@ import java.util.GregorianCalendar;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.manager.LocalUserManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.CollectRecord;
@@ -48,7 +49,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	@Autowired
 	private DataMarshaller dataMarshaller;
 	@Autowired
-	private UserManager userManager;
+	private LocalUserManager userManager;
 
 	@Before
 	public void init() throws UserPersistenceException {

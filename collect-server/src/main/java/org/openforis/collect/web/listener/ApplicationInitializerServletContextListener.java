@@ -43,12 +43,12 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 		ServletContext sc = sce.getServletContext();
 		String usersServiceProtocol = ObjectUtils.defaultIfNull(sc.getInitParameter("of_users.service.protocol"), "http");
 		String usersServiceHost = ObjectUtils.defaultIfNull(sc.getInitParameter("of_users.service.host"), determineHostName());
-		int usersServicePort = Integer.parseInt(ObjectUtils.defaultIfNull(sc.getInitParameter("of_users.service.port"), determineConnectorProperty("port")));
+		int usersServicePort = Integer.parseInt(ObjectUtils.defaultIfNull(sc.getInitParameter("of_users.service.port"), determineLocalPort()));
 		
 		CollectConfiguration.initUsersServiceConfiguration(new ServiceConfiguration(usersServiceProtocol, usersServiceHost, usersServicePort));
 		LOG.info("======== End of OF-Users module configuration ========");
 	}
-	
+
 	private void initDB() {
 		LOG.info("========Open Foris Collect - Starting DB initialization ========");
 		DataSourceConnectionProvider connectionProvider = new DataSourceConnectionProvider(DbUtils.getDataSource());
@@ -62,6 +62,14 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 			return hostName;
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	private String determineLocalPort() {
+		try {
+			return determineConnectorProperty("port");
+		} catch(Exception e) {
+			return "8380";
 		}
 	}
 	

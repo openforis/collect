@@ -48,7 +48,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fillForm():void {
-			view.nameTextInput.text = Application.user.name;
+			view.nameTextInput.text = Application.user.username;
 		}
 
 		protected function validateForm():Boolean {

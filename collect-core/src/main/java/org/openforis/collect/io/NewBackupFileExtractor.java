@@ -13,7 +13,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.poi.util.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
 import org.openforis.commons.versioning.Version;

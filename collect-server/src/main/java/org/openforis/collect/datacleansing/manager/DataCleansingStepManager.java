@@ -69,12 +69,13 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	
 	@Override
 	@Transactional
-	public void save(DataCleansingStep step) {
+	public DataCleansingStep save(DataCleansingStep step) {
 		super.save(step);
 		dao.deleteStepValues(step.getId());
 		if (step.getType() == DataCleansingStepType.ATTRIBUTE_UPDATE && ! step.getUpdateValues().isEmpty()) {
 			dao.insertStepValues(step.getId(), step.getUpdateValues());
 		}
+		return step;
 	}
 	
 	private void initializeQuery(DataCleansingStep step) {

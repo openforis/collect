@@ -44,6 +44,9 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class BaseVM {
 	
+	private static final String PUBLIC_USER_GROUP_LABEL_KEY = "survey.template.user_group.public";
+	private static final String PRIVATE_USER_GROUP_LABEL_KEY = "survey.template.user_group.private";
+
 	private static final SimpleDateFormat PRETTY_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	
 	protected static final ServiceLoader<CollectEarthProjectFileCreator> COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER = 
@@ -56,7 +59,7 @@ public abstract class BaseVM {
 	@WireVariable
 	protected UserGroupManager userGroupManager;
 
-	private BindingListModelListModel<LabelledItem> userGroupModel;
+	private BindingListModelListModel<LabelledItem> userGroupsModel;
 
 	void init() {
 		initUserGroupsModel();
@@ -68,12 +71,11 @@ public abstract class BaseVM {
 		List<UserGroup> userGroups = userGroupManager.findByUser(loggedUser);
 
 		String defaultPublicUserGroupName = UserGroupManager.DEFAULT_PUBLIC_USER_GROUP_NAME;
-		LabelledItem publicUserGroupItem = new LabelledItem(defaultPublicUserGroupName, 
-				Labels.getLabel("survey.template.usergroup.public"));
+		LabelledItem publicUserGroupItem = new LabelledItem(defaultPublicUserGroupName, Labels.getLabel(PUBLIC_USER_GROUP_LABEL_KEY));
 		items.add(publicUserGroupItem);
 		
 		String defaultPrivateUserGroupName = userGroupManager.getDefaultPrivateUserGroupName(loggedUser);
-		items.add(new LabelledItem(defaultPrivateUserGroupName, Labels.getLabel("survey.template.usergroup.private")));
+		items.add(new LabelledItem(defaultPrivateUserGroupName, Labels.getLabel(PRIVATE_USER_GROUP_LABEL_KEY)));
 
 		List<String> predefinedUserGroupNames = Arrays.asList(new String[]{defaultPrivateUserGroupName, defaultPublicUserGroupName});
 		
@@ -83,12 +85,12 @@ public abstract class BaseVM {
 				items.add(new LabelledItem(userGroup.getName(), label));
 			}
 		}
-		userGroupModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
-		userGroupModel.setMultiple(false);
+		userGroupsModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
+		userGroupsModel.setMultiple(false);
 	}
 	
 	protected LabelledItem getDefaultPublicUserGroupItem() {
-		return userGroupModel.getElementAt(0);
+		return userGroupsModel.getElementAt(0);
 	}
 	
 	public String getComponentsPath() {
@@ -182,8 +184,7 @@ public abstract class BaseVM {
 		return PRETTY_DATE_FORMAT.format(date);
 	}
 	
-	public BindingListModelListModel<LabelledItem> getUserGroupModel() {
-		return userGroupModel;
+	public BindingListModelListModel<LabelledItem> getUserGroupsModel() {
+		return userGroupsModel;
 	}
 }
-

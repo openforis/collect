@@ -10,9 +10,22 @@ import java.util.Map;
 import org.apache.commons.beanutils.BeanUtils;
 import org.openforis.collect.client.AbstractClient;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.User;
 
 public class ClientUserGroupManager extends AbstractClient implements UserGroupManager {
+
+	@Override
+	public UserGroup getDefaultPublicUserGroup() {
+		return findByName(DEFAULT_PUBLIC_USER_GROUP_NAME);
+	}
+
+	@Override
+	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 	@Override
 	public String getDefaultPrivateUserGroupName(User user) {
@@ -35,7 +48,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public UserGroup findById(long id) {
+	public UserGroup findById(int id) {
 		return getOne(getUsersRestfulApiUrl() + "/group/" + id, UserGroup.class);
 	}
 	
@@ -68,7 +81,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	
 	@Override
 	public UserGroup save(UserGroup userGroup) {
-		Long id = userGroup.getId();
+		Integer id = userGroup.getId();
 		if (id == null) {
 			return post(getUsersRestfulApiUrl() + "/group", userGroup, UserGroup.class);
 		} else {
@@ -77,7 +90,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public void delete(long userGroupId) {
+	public void delete(int userGroupId) {
 		delete(getUsersRestfulApiUrl() + "/group/" + userGroupId);
 	}
 	
@@ -88,24 +101,25 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		if (result == null) {
 			return null;
 		} else {
-			Long userGroupId = (Long) result.get("groupId");
+			String groupIdStr = (String) result.get("groupId");
+			int userGroupId = Integer.parseInt(groupIdStr);
 			return findById(userGroupId);
 		}
 	}
 	
 	@Override
-	public List<String> findResourcesByUserGroup(long userGroupId, String resourceType) {
+	public List<String> findResourcesByUserGroup(int userGroupId, String resourceType) {
 		return getList(getUsersRestfulApiUrl() + "/group" + userGroupId + "/resource/" + resourceType, String.class);
 	}
 	
 	@Override
-	public void associateResource(long userGroupId, String resourceType, String resourceId) {
+	public void associateResource(int userGroupId, String resourceType, String resourceId) {
 		String url = getUsersRestfulApiUrl() + "/group" + userGroupId + "/resource/" + resourceType + "/" + resourceId;
 		post(url, null, Boolean.class);
 	}
 	
 	@Override
-	public void disassociateResource(long userGroupId, String resourceType, String resourceId) {
+	public void disassociateResource(int userGroupId, String resourceType, String resourceId) {
 		String url = getUsersRestfulApiUrl() + "/group" + userGroupId + "/resource/" + resourceType + "/" + resourceId;
 		super.delete(url);
 	}

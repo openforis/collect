@@ -11,6 +11,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -33,7 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurvey extends TableImpl<OfcSurveyRecord> {
 
-	private static final long serialVersionUID = 466673817;
+	private static final long serialVersionUID = 1740932685;
 
 	/**
 	 * The reference instance of <code>collect.ofc_survey</code>
@@ -99,9 +100,9 @@ public class OfcSurvey extends TableImpl<OfcSurveyRecord> {
 	public final TableField<OfcSurveyRecord, Integer> PUBLISHED_ID = createField("published_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
-	 * The column <code>collect.ofc_survey.institution_id</code>.
+	 * The column <code>collect.ofc_survey.usergroup_id</code>.
 	 */
-	public final TableField<OfcSurveyRecord, Long> INSTITUTION_ID = createField("institution_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+	public final TableField<OfcSurveyRecord, Integer> USERGROUP_ID = createField("usergroup_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_survey</code> table reference
@@ -139,6 +140,14 @@ public class OfcSurvey extends TableImpl<OfcSurveyRecord> {
 	@Override
 	public List<UniqueKey<OfcSurveyRecord>> getKeys() {
 		return Arrays.<UniqueKey<OfcSurveyRecord>>asList(Keys.OFC_SURVEY_PKEY, Keys.OFC_SURVEY_NAME_KEY, Keys.OFC_SURVEY_URI_KEY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<ForeignKey<OfcSurveyRecord, ?>> getReferences() {
+		return Arrays.<ForeignKey<OfcSurveyRecord, ?>>asList(Keys.OFC_SURVEY__OFC_SURVEY_USERGROUP_FKEY);
 	}
 
 	/**

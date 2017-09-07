@@ -110,6 +110,11 @@ public class Sequences {
 	public static final Sequence<Long> OFC_TAXON_VERNACULAR_NAME_ID_SEQ = new SequenceImpl<Long>("ofc_taxon_vernacular_name_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>collect.ofc_usergroup_id_seq</code>
+	 */
+	public static final Sequence<Long> OFC_USERGROUP_ID_SEQ = new SequenceImpl<Long>("ofc_usergroup_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>collect.ofc_user_id_seq</code>
 	 */
 	public static final Sequence<Long> OFC_USER_ID_SEQ = new SequenceImpl<Long>("ofc_user_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

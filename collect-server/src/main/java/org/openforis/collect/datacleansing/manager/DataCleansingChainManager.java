@@ -42,7 +42,7 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 	
 	@Override
 	@Transactional
-	public void save(DataCleansingChain chain) {
+	public DataCleansingChain save(DataCleansingChain chain) {
 		List<Integer> stepIds = new ArrayList<Integer>();
 		for (DataCleansingStep step : chain.getSteps()) {
 			stepIds.add(step.getId());
@@ -55,6 +55,8 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 		dao.insertStepAssociations(chain, stepIds);
 		
 		initializeItem(chain);
+		
+		return chain;
 	}
 	
 	@Override

@@ -34,7 +34,7 @@ Collect.DataCleansing.DataQueryGroupPanelController.prototype.getDataGridOptions
 	}
 	
 	return {
-	    url: "datacleansing/dataquerygroups/list.json",
+	    url: "api/datacleansing/dataquerygroups",
 	    detailView: true,
 	    detailFormatter: detailFormatter,
 	    onExpandRow: onExpandRow,

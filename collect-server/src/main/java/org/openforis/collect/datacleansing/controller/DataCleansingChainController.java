@@ -32,7 +32,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/datacleansingchains")
+@RequestMapping(value = "api/datacleansing/datacleansingchains")
 public class DataCleansingChainController extends AbstractSurveyObjectEditFormController<DataCleansingChain, DataCleansingChainForm, DataCleansingChainManager> {
 	
 	@Autowired

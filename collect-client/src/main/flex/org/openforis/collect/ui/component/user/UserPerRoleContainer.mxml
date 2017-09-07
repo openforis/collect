@@ -79,8 +79,8 @@
 											]]>
 										</fx:Script>
 										<s:CheckBox selected="{data.selected}"
-													label="{data.user.name}"
-													enabled="{! (data.role == UserProxy.ROLE_ADMIN &amp;&amp; data.user.name == UserManagementPresenter.ADMIN_USER_NAME)}"
+													label="{data.user.username}"
+													enabled="{! (data.role == UserProxy.ROLE_ADMIN &amp;&amp; data.user.username == UserManagementPresenter.ADMIN_USER_NAME)}"
 													change="{
 														data.selected = event.target.selected; 
 														EventDispatcherFactory.getEventDispatcher().dispatchEvent(

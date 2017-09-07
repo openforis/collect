@@ -118,6 +118,7 @@
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>\
                                 <includeClass>org.openforis.collect.model.SurveySummary</includeClass>
+                                <includeClass>org.openforis.collect.model.User</includeClass>
                                 <includeClass>org.openforis.collect.model.UserGroup</includeClass>
                                 <includeClass>org.openforis.collect.model.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.remoting.SurveyBackupInfo</includeClass>

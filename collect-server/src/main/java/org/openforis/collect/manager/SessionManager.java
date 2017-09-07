@@ -16,6 +16,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.collect.utils.HttpSessions;
 import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,11 @@ public class SessionManager {
 	
 	public void createSessionState(HttpSession session) {
 		String sessionId = session.getId();
+		boolean developmentMode = HttpSessions.isDevelopmentMode(session);
 		SessionState sessionState = new SessionState(sessionId);
+		if (developmentMode) {
+			sessionState.setUser(userManager.loadAdminUser());
+		}
 		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
 	}
 

@@ -5,14 +5,19 @@ package org.openforis.collect.manager;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.UserDao;
@@ -25,26 +30,34 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
-public class LocalUserManager implements UserManager {
+public class LocalUserManager extends AbstractPersistedObjectManager<User, Integer, UserDao> implements UserManager {
 
 	@Autowired
 	private UserDao userDao;
 	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private UserGroupManager groupManager;
 	
 	//cache
 	private Map<Integer, User> userById = new TreeMap<Integer, User>();
 	private Map<String, User> userByName = new TreeMap<String, User>();
 	
-	public User loadById(int userId) {
-		User user = userById.get(userId);
+	@Override
+	public User loadById(Integer id) {
+		User user = userById.get(id);
 		if (user == null) {
-			user = userDao.loadById(userId);
+			user = userDao.loadById(id);
 			updateCache(user);
 		}
 		return user;
 	}
-
+	
+	@Override
+	public User loadById(int userId) {
+		return loadById(Integer.valueOf(userId));
+	}
+	
 	public User loadByUserName(String userName) {
 		return loadByUserName(userName, null);
 	}
@@ -73,19 +86,39 @@ public class LocalUserManager implements UserManager {
 	public List<User> loadAll() {
 		return userDao.loadAll();
 	}
+	
+	@Override
+	public List<User> loadAllAvailableUsers(User availableTo) {
+		if (availableTo.getRoles().contains(UserRole.ADMIN)) {
+			return loadAll();
+		} else {
+			Set<User> users = new TreeSet<User>();
+			List<UserGroup> userGroups = groupManager.findByUser(availableTo);
+			for (UserGroup userGroup : userGroups) {
+				List<UserInGroup> groupUsers = groupManager.findUsersByGroup(userGroup);
+				for (UserInGroup userInGroup : groupUsers) {
+					users.add(userInGroup.getUser());
+				}
+			}
+			//sorted by username by default (see User.compareTo)
+			return new ArrayList<User>(users);
+		}
+	}
 
 	@Transactional
-	public void save(User user) throws UserPersistenceException {
+	public User save(User user) {
 		Integer userId = user.getId();
-		String password = user.getPassword();
-		if (StringUtils.isBlank(password)) {
-			if (userId != null) {
+		String rawPassword = user.getRawPassword();
+		if (StringUtils.isBlank(rawPassword)) {
+			if (userId == null) {
+				throw new IllegalArgumentException("Blank password specified for a new user");
+			} else {
 				// preserve old password
 				User oldUser = userDao.loadById(userId);
 				user.setPassword(oldUser.getPassword());
 			}
 		} else {
-			String encodedPassword = checkAndEncodePassword(password);
+			String encodedPassword = checkAndEncodePassword(rawPassword);
 			user.setPassword(encodedPassword);
 		}
 		if (userId == null) {
@@ -94,6 +127,7 @@ public class LocalUserManager implements UserManager {
 			userDao.update(user);
 		}
 		updateCache(user);
+		return user;
 	}
 	
 	@Transactional
@@ -169,7 +203,7 @@ public class LocalUserManager implements UserManager {
 	@Transactional
 	public User insertUser(String name, String password, UserRole role) throws UserPersistenceException {
 		User user = new User(name);
-		user.setPassword(password);
+		user.setRawPassword(password);
 		user.addRole(role);
 		save(user);
 		return user;

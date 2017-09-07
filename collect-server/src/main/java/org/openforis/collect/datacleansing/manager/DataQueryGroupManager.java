@@ -42,7 +42,7 @@ public class DataQueryGroupManager extends AbstractSurveyObjectManager<DataQuery
 	
 	@Override
 	@Transactional
-	public void save(DataQueryGroup group) {
+	public DataQueryGroup save(DataQueryGroup group) {
 		List<Integer> queryIds = CollectionUtils.project(group.getQueries(), "id");
 		if (group.getId() != null) {
 			dao.deleteQueryAssociations(group);
@@ -52,6 +52,8 @@ public class DataQueryGroupManager extends AbstractSurveyObjectManager<DataQuery
 		dao.insertQueryAssociations(group, queryIds);
 		
 		initializeItem(group);
+		
+		return group;
 	}
 	
 	@Override

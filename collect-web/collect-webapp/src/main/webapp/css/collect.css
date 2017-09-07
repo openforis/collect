@@ -70,8 +70,8 @@ html, body {
 body .content {
 	position: fixed;
 	width: 100%;
-	bottom: 30px;
-	top: 102px;
+	bottom: 0px;
+	top: 0px;
 }
 
 /* Set the fixed height of the footer here */

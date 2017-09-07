@@ -21,7 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/dataquerygroups")
+@RequestMapping(value = "api/datacleansing/dataquerygroups")
 public class DataQueryGroupController extends AbstractSurveyObjectEditFormController<DataQueryGroup, DataQueryGroupForm, DataQueryGroupManager> {
 	
 	@Autowired

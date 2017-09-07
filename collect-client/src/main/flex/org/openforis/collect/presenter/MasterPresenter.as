@@ -154,7 +154,7 @@ package org.openforis.collect.presenter {
 					_dataClient.loadRecord(responder, record.id, record.step);
 				}
 			} else {
-				AlertUtil.showError("list.error.cannotEdit.differentOwner", [record.owner.name]);
+				AlertUtil.showError("list.error.cannotEdit.differentOwner", [record.owner.username]);
 			}
 		}
 		

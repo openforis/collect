@@ -2,6 +2,7 @@ package org.openforis.collect.web.controller;
 
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.manager.RecordSessionManager;
@@ -9,7 +10,10 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.collect.web.controller.UserController.UserForm;
+import org.openforis.collect.web.session.SessionState;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +31,15 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 @Scope(WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/session/")
-public class SessionController {
+@RequestMapping("api/session")
+public class SessionController extends BasicController {
 	
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value = "ping.json", method = RequestMethod.GET)
+	@RequestMapping(value = "ping", method = RequestMethod.GET)
 	public @ResponseBody Response ping(@RequestParam(value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
 		if ( editing ) {
 			sessionManager.checkIsActiveRecordLocked();
@@ -43,14 +47,14 @@ public class SessionController {
 		return new Response();
 	}
 	
-	@RequestMapping(value = "survey.json", method = RequestMethod.POST)
+	@RequestMapping(value = "survey", method = RequestMethod.POST)
 	public @ResponseBody Response setActiveSurvey(@RequestParam int surveyId) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		sessionManager.setActiveSurvey(survey);
 		return new Response();
 	}
 	
-	@RequestMapping(value = "survey.json", method = RequestMethod.GET)
+	@RequestMapping(value = "survey", method = RequestMethod.GET)
 	public @ResponseBody SurveyView getActiveSurvey(HttpServletResponse response) {
 		CollectSurvey survey = getUpdatedActiveSurvey();
 		if (survey == null) {
@@ -65,6 +69,17 @@ public class SessionController {
 			SurveyView view = viewGenerator.generateView(survey);
 			return view;
 		}
+	}
+	
+	@RequestMapping(value="user", method=RequestMethod.GET)
+	public @ResponseBody UserForm getActiveUser(HttpServletRequest request, HttpServletResponse response) {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		if (user == null) {
+			HttpResponses.setNoContentStatus(response);
+			return null;
+		}
+		return new UserController.UserForm(user);
 	}
 	
 	private CollectSurvey getUpdatedActiveSurvey() {

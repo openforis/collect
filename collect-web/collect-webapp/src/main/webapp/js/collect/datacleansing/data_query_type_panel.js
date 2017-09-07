@@ -10,7 +10,7 @@ Collect.DataCleansing.DataQueryTypePanelController.prototype = Object.create(Col
 Collect.DataCleansing.DataQueryTypePanelController.prototype.getDataGridOptions = function() {
 	var $this = this;
 	return {
-	    url: "datacleansing/dataquerytypes/list.json",
+	    url: "api/datacleansing/dataquerytypes",
 	    columns: [
 			{field: "code", title: "Code", width: "200px", sortable: true},
 			{field: "label", title: "Label", width: "400px", sortable: true},

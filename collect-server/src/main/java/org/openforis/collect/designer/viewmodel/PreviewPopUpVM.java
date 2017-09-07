@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.openforis.collect.designer.util.Resources;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 
@@ -29,7 +30,7 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 			@ExecutionArgParam("recordStep") String recordStep
 			) throws URISyntaxException {
 		super.init();
-		URIBuilder uriBuilder = new URIBuilder("/index.htm");
+		URIBuilder uriBuilder = new URIBuilder(Resources.Page.PREVIEW_PATH.getLocation());
 		uriBuilder.addParameter("preview", "true");
 		uriBuilder.addParameter("surveyId", surveyId);
 		uriBuilder.addParameter("work", work);

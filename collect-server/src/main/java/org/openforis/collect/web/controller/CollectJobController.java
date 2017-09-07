@@ -17,8 +17,9 @@ import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -27,44 +28,52 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *
  */
 @Controller
+@RequestMapping("api/job")
 public class CollectJobController extends BasicController {
 
 	@Autowired
 	private CollectJobManager jobManager;
 	
-	@RequestMapping(value = "application-job.json", method = RequestMethod.GET)
+	@RequestMapping(value = "application-job.json", method=GET)
 	public @ResponseBody JobView getApplicationJob(HttpServletResponse response) {
 		ApplicationLockingJob job = jobManager.getApplicationJob();
 		return createJobView(response, job);
 	}
 	
-	@RequestMapping(value="application-job.json", method = RequestMethod.DELETE)
+	@RequestMapping(value="application-job.json", method=DELETE)
 	public @ResponseBody
 	JobView abortApplicationJob(HttpServletResponse response) {
 		ApplicationLockingJob job = jobManager.getApplicationJob();
 		return abortJob(response, job);
 	}
 
-	@RequestMapping(value = "survey-job.json", method = RequestMethod.GET)
+	@RequestMapping(value = "survey-job.json", method=GET)
 	public @ResponseBody JobView getSurveyJob(HttpServletResponse response, @RequestParam("surveyId") int surveyId) {
 		SurveyLockingJob job = jobManager.getSurveyJob(surveyId);
 		return createJobView(response, job);
 	}
 	
-	@RequestMapping(value="survey-job.json", method = RequestMethod.DELETE)
+	@RequestMapping(value="survey-job.json", method=DELETE)
 	public @ResponseBody
 	JobView abortSurveyJob(HttpServletResponse response, @RequestParam("surveyId") int surveyId) {
 		SurveyLockingJob job = jobManager.getSurveyJob(surveyId);
 		return abortJob(response, job);
 	}
 	
-	@RequestMapping(value="job.json", method = RequestMethod.GET)
+	@RequestMapping(value="{jobId}", method=GET)
 	public @ResponseBody
-	JobView getJob(HttpServletResponse response, @RequestParam("jobId") String jobId) {
+	JobView getJob(HttpServletResponse response, @PathVariable("jobId") String jobId) {
 		Job job = jobManager.getJob(jobId);
 		return createJobView(response, job);
 	}
 
+	@RequestMapping(value="{jobId}", method=DELETE)
+	public @ResponseBody
+	JobView abortJob(HttpServletResponse response, @PathVariable("jobId") String jobId) {
+		Job job = jobManager.getJob(jobId);
+		return abortJob(response, job);
+	}
+	
 	private JobView abortJob(HttpServletResponse response, Job job) {
 		if (job != null) {
 			job.abort();
@@ -92,12 +101,14 @@ public class CollectJobController extends BasicController {
 		private long elapsedTime;
 		private Long remainingTime;
 		private Integer remainingMinutes;
+		private boolean ended;
 
 		public JobView(Job job) {
 			id = job.getId().toString();
 			name = job.getName();
 			progressPercent = job.getProgressPercent();
 			status = job.getStatus();
+			ended = job.isEnded();
 			errorMessage = job.getErrorMessage();
 			elapsedTime = calculateElapsedTime(job);
 			remainingTime = calculateRemainingTime();
@@ -125,6 +136,10 @@ public class CollectJobController extends BasicController {
 				return null;
 			}
 			return Double.valueOf(Math.ceil((double) remainingTime / 60000)).intValue();
+		}
+		
+		public boolean isEnded() {
+			return ended;
 		}
 		
 		public String getId() {

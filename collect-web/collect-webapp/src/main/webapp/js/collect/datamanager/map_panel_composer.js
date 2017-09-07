@@ -802,7 +802,7 @@ Collect.DataManager.MapPanelComposer.prototype.onSurveyChanged = function() {
 }
 
 Collect.DataManager.MapPanelComposer.prototype.resizeMapContainer = function() {
-	$("#map").height($(window).height() - this.verticalPadding);
+	$("#map").height($(window).height());
 	$("#map").width($(window).width() - this.horizontalPadding);
 }
 

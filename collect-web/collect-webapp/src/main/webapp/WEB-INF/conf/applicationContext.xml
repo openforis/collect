@@ -24,17 +24,21 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
 
 	<mvc:annotation-driven />
-
+	
+	<mvc:resources mapping="index.html" location="index.html" />
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
 	<mvc:resources mapping="/assets/**" location="/assets/" />
 	<mvc:resources mapping="/css/**" location="/css/" />
 	<mvc:resources mapping="/datacleansing/**" location="/datacleansing/" />
 	<mvc:resources mapping="/datamanager/**" location="/datamanager/" />
 	<mvc:resources mapping="/earthFiles/**" location="/earthFiles/" />
+	<mvc:resources mapping="/fonts/**" location="/fonts/" />
+	<mvc:resources mapping="/img/**" location="/img/" />
 	<mvc:resources mapping="/images/**" location="/images/" />
 	<mvc:resources mapping="/js/**" location="/js/" />
 	<mvc:resources mapping="/script/**" location="/script/" />
 	<mvc:resources mapping="/org/**" location="/org/" />
+	<mvc:resources mapping="/static/**" location="/static/" />
 	
 	<mvc:view-controller path="/" view-name="index" />
 	
@@ -44,6 +48,8 @@
 
 	<util:map id="urlMappings">
 		<!-- <entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
+		<entry key="/api/**" value-ref="fileNameViewController" />
+		<entry key="/old_client.htm" value-ref="fileNameViewController" />
 		<entry key="/index.htm" value-ref="fileNameViewController" />
 		<entry key="/error.htm" value-ref="fileNameViewController" />
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
@@ -53,8 +59,6 @@
 		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
 		<entry key="/logout.htm" value-ref="fileNameViewController" />
 		<entry key="/logoUpload" value-ref="fileNameViewController" />
-
-		<entry key="/api/**" value-ref="fileNameViewController" />
 		<entry key="/speciesImport" value-ref="fileNameViewController" />
 		<entry key="/species/export/*" value-ref="fileNameViewController" />
 		<entry key="/samplingdesign/export/*" value-ref="fileNameViewController" />

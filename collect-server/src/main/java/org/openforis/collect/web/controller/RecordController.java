@@ -2,9 +2,12 @@ package org.openforis.collect.web.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,8 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.ProxyContext;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
@@ -38,15 +43,21 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.persistence.MultipleEditException;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
-import org.openforis.concurrency.JobManager;
+import org.openforis.collect.web.controller.CollectJobController.JobView;
+import org.openforis.collect.web.session.SessionState;
+import org.openforis.commons.web.HttpResponses;
+import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,20 +67,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.web.context.WebApplicationContext;
-
-
 /**
  * 
  * @author S. Ricci
  * 
  */
 @Controller
-@Scope(WebApplicationContext.SCOPE_SESSION)
+@Scope(SCOPE_SESSION)
+@RequestMapping("api")
 public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final String OLD_CLIENT_URL = "old_client.htm";
 
 	// private static Log LOG = LogFactory.getLog(DataController.class);
 
@@ -88,7 +98,9 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
-	private JobManager jobManager;
+	private CollectJobManager jobManager;
+
+	private CSVDataExportJob csvDataExportJob;
 	
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
 	public @ResponseBody
@@ -152,7 +164,7 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/edit.htm", method=GET)
 	public ModelAndView editRecord(@PathVariable int surveyId, @PathVariable int recordId ) throws Exception {
-		URIBuilder uriBuilder = new URIBuilder("redirect:/index.htm");
+		URIBuilder uriBuilder = new URIBuilder("redirect:/" + OLD_CLIENT_URL);
 		uriBuilder.addParameter("edit", "true");
 		uriBuilder.addParameter("surveyId", Integer.toString(surveyId));
 		uriBuilder.addParameter("recordId", Integer.toString(recordId));
@@ -161,7 +173,7 @@ public class RecordController extends BasicController implements Serializable {
 		return new ModelAndView(url);
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/content.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	RecordProxy loadRecord(
 			@PathVariable int surveyId, 
@@ -173,6 +185,31 @@ public class RecordController extends BasicController implements Serializable {
 		return toProxy(record);
 	}
 
+	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=PATCH, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody Response updateOwner(@PathVariable int surveyId, @PathVariable int recordId,
+			@RequestBody Map<String, String> body) throws RecordLockedException, MultipleEditException {
+		String ownerIdStr = body.get("ownerId");
+		Integer ownerId = ownerIdStr == null ? null : Integer.parseInt(ownerIdStr);
+		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		SessionState sessionState = sessionManager.getSessionState();
+		recordManager.assignOwner(survey, recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
+		return new Response();
+	}
+
+	@Transactional
+	@RequestMapping(value = "survey/{surveyId}/data/records", method=POST, consumes=APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	RecordProxy newRecord(@PathVariable int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
+		String sessionId = sessionManager.getSessionState().getSessionId();
+		User user = sessionManager.getSessionState().getUser();
+		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		String rootEntityName = ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName());
+		String versionName = ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null);
+		CollectRecord record = recordManager.create(survey, rootEntityName, user, versionName, sessionId);
+		recordManager.save(record, user, sessionId);
+		return toProxy(record);
+	}
+	
 	@Transactional
 	@RequestMapping(value = "survey/{surveyId}/data/records/random.json", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
@@ -183,7 +220,7 @@ public class RecordController extends BasicController implements Serializable {
 		return events;
 	}
 	
-	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=Files.ZIP_CONTENT_TYPE)
+	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=Files.ZIP_CONTENT_TYPE)
 	public void exportRecord(
 			@PathVariable(value="survey_id") int surveyId, 
 			@PathVariable(value="record_id") int recordId,
@@ -203,12 +240,57 @@ public class RecordController extends BasicController implements Serializable {
 			File outputFile = File.createTempFile("record_export", ".zip");
 			job.setOutputFile(outputFile);
 			job.setAlwaysGenerateZipFile(true);
-			jobManager.start(job, false);
+			jobManager.startSurveyJob(job);
 			if (job.isCompleted()) {
 				String fileName = String.format("record_data_%s.zip", Dates.formatDate(new Date()));
 				Controllers.writeFileToResponse(response, outputFile, fileName, Files.ZIP_CONTENT_TYPE);
 			}
 		}
+	}
+	
+	@RequestMapping(value="data/records/{recordId}/surveyId", method=GET)
+	public @ResponseBody int loadSurveyId(@PathVariable int recordId) {
+		return recordManager.loadSurveyId(recordId);
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/startcsvexport", method=POST)
+	public @ResponseBody JobView startDataExportJob(
+			@PathVariable Integer surveyId,
+			@RequestBody CSVDataExportParameters parameters) throws IOException {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		
+		csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
+		csvDataExportJob.setSurvey(survey);
+
+		csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
+		
+		RecordFilter recordFilter = new RecordFilter(survey, parameters.rootEntityId);
+		csvDataExportJob.setRecordFilter(recordFilter);
+		recordFilter.setStepGreaterOrEqual(parameters.step);
+		csvDataExportJob.setEntityId(parameters.entityId);
+		csvDataExportJob.setAlwaysGenerateZipFile(true);
+		jobManager.start(csvDataExportJob);
+		
+		return new JobView(csvDataExportJob);
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/currentcsvexport", method=GET)
+	public @ResponseBody JobView getCsvDataExportJob(HttpServletResponse response) {
+		if (csvDataExportJob == null) {
+			HttpResponses.setNoContentStatus(response);
+			return null;
+		} else {
+			return new JobView(csvDataExportJob);
+		}
+	}
+	
+	@RequestMapping(value="survey/{survey_id}/data/records/csvexportresult.zip", method=GET)
+	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
+		File file = csvDataExportJob.getOutputFile();
+		String surveyName = csvDataExportJob.getRecordFilter().getSurvey().getName();
+		Controllers.writeFileToResponse(response, file, 
+				String.format("collect-data-export-%s-%s.zip", surveyName, Dates.formatDate(new Date())), 
+				Controllers.ZIP_CONTENT_TYPE);
 	}
 	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
@@ -284,5 +366,34 @@ public class RecordController extends BasicController implements Serializable {
 		public void setKeyValues(String[] keyValues) {
 			this.keyValues = keyValues;
 		}
+	}
+	
+	public static class NewRecordParameters {
+		
+		private String rootEntityName;
+		private String versionName;
+		
+		public String getRootEntityName() {
+			return rootEntityName;
+		}
+		
+		public void setRootEntityName(String rootEntityName) {
+			this.rootEntityName = rootEntityName;
+		}
+
+		public String getVersionName() {
+			return versionName;
+		}
+
+		public void setVersionName(String versionName) {
+			this.versionName = versionName;
+		}
+	}
+	
+	public static class CSVDataExportParameters {
+		
+		public Integer rootEntityId;
+		public Integer entityId;
+		public Step step;
 	}
 }

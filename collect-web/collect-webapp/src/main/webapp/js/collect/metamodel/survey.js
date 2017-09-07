@@ -32,7 +32,7 @@ Collect.Metamodel.Survey.prototype.init = function() {
 		return node;
 	}
 	
-	this.rootEntities = toNodeDefinitions(this.rootEntities);
+	this.rootEntities = toNodeDefinitions(this.schema.rootEntities);
 	
 	//index node definitions
 	this.traverse(function(nodeDef) {

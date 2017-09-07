@@ -7,7 +7,7 @@ package org.openforis.collect.manager;
  * @author S. Ricci
  *
  */
-public class UserPersistenceException extends Exception {
+public class UserPersistenceException extends RuntimeException {
 
 	/**
 	 * 

@@ -29,13 +29,14 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcUserRoleRecord;
  * @author S. Ricci
  * 
  */
-public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
+public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> implements PersistedObjectDao<User, Integer> {
 
 	public UserDao() {
 		super(UserDao.UserDSLContext.class);
 	}
 
-	public User loadById(int id){
+	@Override
+	public User loadById(Integer id){
 		UserDSLContext dsl = dsl();
 		SelectQuery<?> query = dsl.selectByIdQuery(id);
 		Record r = query.fetchOne();
@@ -57,6 +58,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 		return user;
 	}
 	
+	@Override
 	public List<User> loadAll() {
 		UserDSLContext dsl = dsl();
 		Result<OfcUserRecord> r = 
@@ -92,7 +94,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 	}
 
 	@Override
-	public void delete(int id) {
+	public void delete(Integer id) {
 		dsl().deleteRoles(id);
 		super.delete(id);
 	}

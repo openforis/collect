@@ -53,7 +53,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/dataqueries/")
+@RequestMapping(value = "api/datacleansing/dataqueries")
 public class DataQueryController extends AbstractSurveyObjectEditFormController<DataQuery, DataQueryForm, DataQueryManager> {
 
 	private static final int TEST_MAX_RECORDS = 100;

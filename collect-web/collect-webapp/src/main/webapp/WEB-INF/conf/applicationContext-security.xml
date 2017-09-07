@@ -17,12 +17,14 @@
 <!-- 		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER" /> -->
 <!-- 	</global-method-security> -->
 	
-	<http access-decision-manager-ref="accessDecisionManager">
+	<http access-decision-manager-ref="accessDecisionManager" use-expressions="true">
 		<csrf disabled="true"/>
 		<headers>
-			<frame-options policy="SAMEORIGIN"/>
+			<frame-options policy="ALLOW-FROM" strategy="static" value="*"  />
 		</headers>
 		
+		<intercept-url pattern="/login*" access="isAnonymous()" />
+      
 		<intercept-url access="permitAll" pattern="collect.swf" />
 		<intercept-url access="permitAll" pattern="/assets/**" />
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
@@ -35,14 +37,12 @@
 		<intercept-url access="permitAll" pattern="/keepSessionAlive.htm" />
 		<intercept-url access="permitAll" pattern="/login" />
 		<intercept-url access="permitAll" pattern="/logout.htm" />
-		<intercept-url access="permitAll" pattern="/session/**" />
-		<intercept-url access="permitAll" pattern="/survey/summaries.json" />
 		<intercept-url access="permitAll" pattern="/zkau" />
 <!-- 		security disabled for these urls because of an issue with flash player -->
 <!-- 		for netscape compatible browser and uplaod to a secured url -->
 		<intercept-url access="permitAll" pattern="/uploadData.htm" />
 		<intercept-url access="permitAll" pattern="/uploadFile.htm" />
-		
+
 		<intercept-url access="hasRole('ROLE_USER') or hasIpAddress('127.0.0.1')" pattern="/api/**" />
 
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/export/**/*" />
@@ -58,9 +58,9 @@
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/export/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/import/*" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/speciesImport" />
-		<intercept-url access="hasRole('ROLE_ADMIN') or hasIpAddress('127.0.0.1')" pattern="/survey/**" />
+
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/validateAllRecords.htm" />
-		
+
 		<intercept-url access="hasRole('ROLE_USER')" pattern="/**" />
 
 		<form-login login-page="/login" 
