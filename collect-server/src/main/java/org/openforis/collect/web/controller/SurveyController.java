@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.ArrayList;
@@ -10,9 +11,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
 import org.openforis.collect.metamodel.SurveyCreator;
@@ -22,6 +23,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.web.validator.SimpleSurveyParametersValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -104,10 +106,17 @@ public class SurveyController extends BasicController {
 	public @ResponseBody
 	SurveyView insertSurvey(@RequestBody SimpleSurveyCreationParameters parameters, BindingResult bindingResult) throws Exception {
 		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager, userGroupManager);
-		CollectSurvey survey = surveyCreator.generateAndPublishSurvey(parameters);
+		CollectSurvey survey = surveyCreator.generateSimpleSurvey(parameters);
 		return generateView(survey, true);
 	}
 
+	@RequestMapping(value="publish/{id}", method=PATCH)
+	public @ResponseBody SurveyView publishSurvey(@PathVariable int id) throws SurveyImportException {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
+		surveyManager.publish(survey);
+		return generateView(survey, false);
+	}
+	
 	@RequestMapping(value="temp/{surveyId}/edit.htm", method=GET)
 	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("temp_id", surveyId);

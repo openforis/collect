@@ -54,7 +54,7 @@ public class SurveyCreator {
 		this.userGroupManager = userGroupManager;
 	}
 
-	public CollectSurvey generateAndPublishSurvey(SimpleSurveyCreationParameters parameters)
+	public CollectSurvey generateSimpleSurvey(SimpleSurveyCreationParameters parameters)
 			throws SurveyStoreException, SurveyImportException {
 		String name = parameters.getName();
 		CollectSurvey existingSurvey = surveyManager.get(name);
@@ -71,7 +71,6 @@ public class SurveyCreator {
 		survey.addApplicationOptions(ceoApplicationOptions);
 		
 		surveyManager.save(survey);
-		surveyManager.publish(survey);
 		
 		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(
 				survey,	parameters.getSamplingPointGenerationSettings());

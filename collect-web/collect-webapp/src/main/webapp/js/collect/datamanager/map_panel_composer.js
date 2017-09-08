@@ -548,7 +548,7 @@ Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 }
 
 Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback, readyCallback) {
-	var url = OF.Strings.format("survey/{0}/sampling-point-data.kml", survey.id);
+	var url = OF.Strings.format("survey/{0}/sampling_point_data.kml", survey.id);
 	
 	var source = new ol.source.Vector({
 		url : url,

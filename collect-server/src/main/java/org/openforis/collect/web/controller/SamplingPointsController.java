@@ -44,7 +44,7 @@ public class SamplingPointsController extends BasicController {
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value="survey/{surveyId}/sampling-point-data.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="survey/{surveyId}/sampling_point_data.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SamplingDesignItem> loadSamplingPoints(
 			@PathVariable int surveyId, 
@@ -52,7 +52,7 @@ public class SamplingPointsController extends BasicController {
 		return samplingDesignManager.loadChildItems(surveyId, parentKeys);
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/sampling-point-data.csv", method=GET)
+	@RequestMapping(value = "survey/{surveyId}/sampling_point_data.csv", method=GET)
 	public @ResponseBody String exportWorkSamplingDesign(HttpServletResponse response,
 			@PathVariable("surveyId") Integer surveyId) throws IOException {
 		SamplingDesignExportProcess process = new SamplingDesignExportProcess(samplingDesignManager);
@@ -63,7 +63,7 @@ public class SamplingPointsController extends BasicController {
 		return "ok";
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/sampling-point-data.kml", method=GET, produces=KML_CONTENT_TYPE)
+	@RequestMapping(value = "survey/{surveyId}/sampling_point_data.kml", method=GET, produces=KML_CONTENT_TYPE)
 	public void loadSamplingPointKmlData(@PathVariable int surveyId, HttpServletResponse response) throws Exception {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		SamplingPointDataKmlGenerator samplingPointDataKmlGenerator = new SamplingPointDataKmlGenerator(samplingDesignManager, survey);
@@ -71,7 +71,7 @@ public class SamplingPointsController extends BasicController {
 		samplingPointDataKmlGenerator.write(response.getOutputStream());
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/sampling-point-data-features.json", method=GET)
+	@RequestMapping(value = "survey/{surveyId}/sampling_point_data_features.json", method=GET)
 	public @ResponseBody FeatureCollection loadSamplingPointData(@PathVariable int surveyId) {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		return loadSamplingPointDataFeatures(survey);
@@ -111,7 +111,7 @@ public class SamplingPointsController extends BasicController {
 		return surveyContext.getCoordinateOperations();
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/samplingpointbounds.json", method=GET)
+	@RequestMapping(value = "survey/{surveyId}/sampling_point_bounds.json", method=GET)
 	public @ResponseBody Bounds loadSamplingPointBounds(@PathVariable int surveyId) {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 
