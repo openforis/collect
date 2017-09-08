@@ -25,7 +25,7 @@ import org.openforis.collect.persistence.DbUtils;
 public class ApplicationInitializerServletContextListener implements ServletContextListener {
 
 	private final Log LOG = LogFactory.getLog(ApplicationInitializerServletContextListener.class);
-	private static final String DEVELOPMENT_MODE_INIT_PARAMETER_NAME = "developmentMode";
+	private static final String DEV_MODE_INIT_PARAMETER_NAME = "devMode";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -37,7 +37,7 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 	}
 
 	private boolean determineIsDevelopmentMode(ServletContextEvent sce) {
-		return Boolean.parseBoolean(sce.getServletContext().getInitParameter(DEVELOPMENT_MODE_INIT_PARAMETER_NAME));
+		return Boolean.parseBoolean(sce.getServletContext().getInitParameter(DEV_MODE_INIT_PARAMETER_NAME));
 	}
 	
 	private void configureOfUsersModule(ServletContextEvent sce) {

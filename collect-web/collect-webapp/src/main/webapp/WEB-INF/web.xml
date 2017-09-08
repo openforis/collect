@@ -7,10 +7,6 @@
 	<display-name>collect</display-name>
 
 	<context-param>
-		<param-name>developmentMode</param-name>
-		<param-value>true</param-value>
-	</context-param>
-	<context-param>
 		<param-name>webAppRootKey</param-name>
 		<param-value>collect.root</param-value>
 	</context-param>
