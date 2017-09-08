@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.openforis.collect.manager.LocalUserGroupManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
@@ -31,7 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/api/usergroup")
 @Scope(WebApplicationContext.SCOPE_SESSION)
-public class UserGroupController extends AbstractPersistedObjectEditFormController<UserGroup, UserGroupForm, LocalUserGroupManager> {
+public class UserGroupController extends AbstractPersistedObjectEditFormController<UserGroup, UserGroupForm, UserGroupManager> {
 
 	@Autowired
 	private UserGroupValidator validator;
@@ -40,7 +40,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 
 	@Override
 	@Autowired
-	public void setItemManager(LocalUserGroupManager itemManager) {
+	public void setItemManager(UserGroupManager itemManager) {
 		super.setItemManager(itemManager);
 	}
 	

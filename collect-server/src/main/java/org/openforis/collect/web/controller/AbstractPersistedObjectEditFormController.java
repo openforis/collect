@@ -3,7 +3,7 @@ package org.openforis.collect.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.manager.AbstractPersistedObjectManager;
+import org.openforis.collect.manager.ItemManager;
 import org.openforis.commons.web.AbstractFormUpdateValidationResponse;
 import org.openforis.commons.web.PersistedObjectForm;
 import org.openforis.commons.web.Response;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 public abstract class AbstractPersistedObjectEditFormController<T extends PersistedObject, 
 											F extends PersistedObjectForm<T>, 
-											M extends AbstractPersistedObjectManager<T, Integer, ?>> {
+											M extends ItemManager<T, Integer>> {
 	
 	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate", "uuid"};
 	

@@ -78,11 +78,11 @@ public abstract class AbstractSurveyObjectManager
 	
 	@Override
 	public void delete(T obj) {
-		delete(obj.getId());
+		deleteById(obj.getId());
 	}
 
 	@Override
-	public void delete(Integer id) {
+	public void deleteById(Integer id) {
 		dao.delete(id);
 	}
 	

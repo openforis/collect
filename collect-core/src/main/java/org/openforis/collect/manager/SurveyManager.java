@@ -1061,7 +1061,7 @@ public class SurveyManager {
 			if (survey.getUserGroupId() == null) {
 				userGroup = userGroupManager.getDefaultPublicUserGroup();
 			} else {
-				userGroup = userGroupManager.findById(survey.getUserGroupId());
+				userGroup = userGroupManager.loadById(survey.getUserGroupId());
 			}
 			survey.setUserGroup(userGroup);
 		}
@@ -1080,7 +1080,7 @@ public class SurveyManager {
 				//use default public user group
 				userGroup = userGroupManager.getDefaultPublicUserGroup();
 			} else {
-				userGroup = userGroupManager.findById(summary.getUserGroupId());
+				userGroup = userGroupManager.loadById(summary.getUserGroupId());
 			}
 			summary.setUserGroup(userGroup);
 		}

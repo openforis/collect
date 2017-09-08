@@ -11,19 +11,31 @@ import org.openforis.idm.metamodel.PersistedObject;
  *
  */
 public abstract class AbstractPersistedObjectManager<T extends PersistedObject, I extends Object, 
-		D extends PersistedObjectDao<T, I>> {
+		D extends PersistedObjectDao<T, I>> implements ItemManager<T, I> {
 
 	protected D dao;
 	
+	/* (non-Javadoc)
+	 * @see org.openforis.collect.manager.ItemManager#loadAll()
+	 */
+	@Override
 	public List<T> loadAll() {
 		return dao.loadAll();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.openforis.collect.manager.ItemManager#loadById(I)
+	 */
+	@Override
 	public T loadById(I id) {
 		T obj = dao.loadById(id);
 		return obj;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.openforis.collect.manager.ItemManager#save(T)
+	 */
+	@Override
 	public T save(T obj) {
 		if (obj.getId() == null) {
 			dao.insert(obj);
@@ -33,12 +45,20 @@ public abstract class AbstractPersistedObjectManager<T extends PersistedObject, 
 		return obj;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.openforis.collect.manager.ItemManager#delete(T)
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void delete(T obj) {
-		delete((I) obj.getId());
+		deleteById((I) obj.getId());
 	}
 
-	public void delete(I id) {
+	/* (non-Javadoc)
+	 * @see org.openforis.collect.manager.ItemManager#delete(I)
+	 */
+	@Override
+	public void deleteById(I id) {
 		dao.delete(id);
 	}
 	

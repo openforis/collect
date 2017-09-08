@@ -112,22 +112,17 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		return userGroup;
 	}
 	
-	public List<UserGroup> loadAll() {
-		return dao.loadAll();
-	}
-
-	public UserGroup loadByName(String userGroupName) {
+	@Override
+	public UserGroup findByName(String userGroupName) {
 		return dao.loadByName(userGroupName);
 	}
 
-	public UserGroup loadById(int id) {
-		return dao.loadById(id);
-	}
-
+	@Override
 	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
 		return dao.findUsersByGroup(userGroup);
 	}
 	
+	@Override
 	public List<UserGroup> findByUser(User user) {
 		List<UserGroup> result;
 		List<UserRole> userRoles = user.getRoles();
@@ -139,6 +134,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		return fillLazyLoadedFields(result);
 	}
 	
+	@Override
 	public List<UserGroup> findPublicUserGroups() {
 		return fillLazyLoadedFields(dao.findPublicGroups());
 	}
@@ -206,21 +202,6 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 			
 		}
 		
-	}
-
-	@Override
-	public UserGroup findById(int id) {
-		return loadById(id);
-	}
-
-	@Override
-	public UserGroup findByName(String name) {
-		return loadByName(name);
-	}
-
-	@Override
-	public List<UserGroup> findAll() {
-		return loadAll();
 	}
 
 	@Override

@@ -21,22 +21,26 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 
 	@Override
-	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
 	public String getDefaultPrivateUserGroupName(User user) {
 		return user.getUsername() + DEFAULT_PRIVATE_USER_GROUP_NAME_SUFFIX;
 	}
 	
 	@Override
-	public List<UserGroup> findAll() {
+	public UserGroup loadById(Integer id) {
+		return getOne(getUsersRestfulApiUrl() + "/group/" + id, UserGroup.class);
+	}
+	
+	@Override
+	public List<UserGroup> loadAll() {
 		return getList(getUsersRestfulApiUrl() + "/group", UserGroup.class);
 	}
 	
+	@Override
+	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public UserGroup findByName(final String name) {
 		@SuppressWarnings("serial")
@@ -45,11 +49,6 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		}};
 		List<UserGroup> list = getList(getUsersRestfulApiUrl() + "/group", params, UserGroup.class);
 		return list.isEmpty() ? null : list.get(0);
-	}
-	
-	@Override
-	public UserGroup findById(int id) {
-		return getOne(getUsersRestfulApiUrl() + "/group/" + id, UserGroup.class);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -80,6 +79,16 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
+	public List<UserGroup> findUserDefinedGroups() {
+		@SuppressWarnings("serial")
+		List<UserGroup> result = getList(getUsersRestfulApiUrl() + "/group", new HashMap<String, Object>(){{
+			put("visibility", "PUBLIC");
+			put("systemDefined", "false");
+		}}, UserGroup.class);
+		return result;
+	}
+	
+	@Override
 	public UserGroup save(UserGroup userGroup) {
 		Integer id = userGroup.getId();
 		if (id == null) {
@@ -90,7 +99,12 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public void delete(int userGroupId) {
+	public void delete(UserGroup obj) {
+		deleteById(obj.getId());
+	}
+	
+	@Override
+	public void deleteById(Integer userGroupId) {
 		delete(getUsersRestfulApiUrl() + "/group/" + userGroupId);
 	}
 	
@@ -103,7 +117,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		} else {
 			String groupIdStr = (String) result.get("groupId");
 			int userGroupId = Integer.parseInt(groupIdStr);
-			return findById(userGroupId);
+			return loadById(userGroupId);
 		}
 	}
 	

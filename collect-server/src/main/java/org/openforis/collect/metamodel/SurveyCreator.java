@@ -5,10 +5,10 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
-import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters.ListItem;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -16,8 +16,8 @@ import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.SamplingDesignItem;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.persistence.xml.CeoApplicationOptions;
@@ -25,9 +25,9 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
-import org.openforis.idm.metamodel.NodeLabel.Type;
 
 public class SurveyCreator {
 
@@ -63,7 +63,7 @@ public class SurveyCreator {
 			throw new IllegalArgumentException(String.format("Survey with name %s already existing", name));
 		}
 		CollectSurvey survey = createTemporarySingleAttributeSurvey(name, parameters.getValues());
-		UserGroup userGroup = userGroupManager.findById(parameters.getUserGroupId());
+		UserGroup userGroup = userGroupManager.loadById(parameters.getUserGroupId());
 		survey.setUserGroup(userGroup);
 	
 		CeoApplicationOptions ceoApplicationOptions = new CeoApplicationOptions();

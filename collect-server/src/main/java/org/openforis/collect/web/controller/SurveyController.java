@@ -129,7 +129,7 @@ public class SurveyController extends BasicController {
 	
 	private Set<UserGroup> getAvailableUserGrups(Integer userId, Integer groupId) {
 		if (groupId != null) {
-			UserGroup group = userGroupManager.findById(groupId);
+			UserGroup group = userGroupManager.loadById(groupId);
 			Set<UserGroup> groups = Collections.singleton(group);
 			return groups;
 		} else if (userId != null) {
