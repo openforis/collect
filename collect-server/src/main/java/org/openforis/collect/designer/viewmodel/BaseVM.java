@@ -44,8 +44,8 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class BaseVM {
 	
-	private static final String PUBLIC_USER_GROUP_LABEL_KEY = "survey.template.user_group.public";
-	private static final String PRIVATE_USER_GROUP_LABEL_KEY = "survey.template.user_group.private";
+	private static final String PUBLIC_USER_GROUP_LABEL_KEY = "survey.template.usergroup.public";
+	private static final String PRIVATE_USER_GROUP_LABEL_KEY = "survey.template.usergroup.private";
 
 	private static final SimpleDateFormat PRETTY_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	

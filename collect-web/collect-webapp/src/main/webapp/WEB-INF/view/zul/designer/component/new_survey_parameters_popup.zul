@@ -45,7 +45,7 @@
 				</row>
 				<row>
 					<label value="${labels.survey.template.usergroup.$}:" />
-					<listbox model="@load(vm.userGroupModel)" mold="select"
+					<listbox model="@load(vm.userGroupsModel)" mold="select"
 						selectedItem="@bind(fx.userGroup)">
 						<template name="model">
 							<listitem label="${each.label}" value="${each.code}" />
