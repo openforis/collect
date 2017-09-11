@@ -59,22 +59,24 @@ class DataExportPage extends Component {
             /> : null
         return (
             <Form>
-                <FormGroup row>
-                    <Col sm={2}>
-                        <Label for="exportFormat">Export Format</Label>
-                    </Col>
-                    <Col sm={4}>
-                        <Input type="radio" value="CSV" name="exportFormat" id="exportFormatCSVRadioButton"
-                            checked={this.state.exportFormat === 'CSV'}
-                            onChange={(event) => this.setState({ ...this.state, exportFormat: event.target.value })} />
-                        <Label for="exportFormatCSVRadioButton">CSV</Label>
-                    </Col>
-                    <Col sm={4}>
-                        <Input type="radio" value="BACKUP" name="exportFormat" id="exportFormatBackupRadioButton"
-                            checked={this.state.exportFormat === 'BACKUP'}
-                            onChange={(event) => this.setState({ ...this.state, exportFormat: event.target.value })} />
-                        <Label for="exportFormatBackupRadioButton">Backup (.collect-data)</Label>
-                    </Col>
+                <FormGroup tag="fieldset">
+                    <legend>Export Format</legend>
+                    <FormGroup check>
+                        <Label check>
+                            <Input type="radio" value="CSV" name="exportFormat" id="exportFormatCSVRadioButton"
+                                checked={this.state.exportFormat === 'CSV'}
+                                onChange={(event) => this.setState({ ...this.state, exportFormat: event.target.value })} />{' '}
+                            CSV
+                        </Label>
+                    </FormGroup>
+                    <FormGroup check>
+                        <Label check>
+                            <Input type="radio" value="BACKUP" name="exportFormat" id="exportFormatBackupRadioButton"
+                                checked={this.state.exportFormat === 'BACKUP'}
+                                onChange={(event) => this.setState({ ...this.state, exportFormat: event.target.value })} />{' '}
+                            Backup (.collect-data)
+                        </Label>
+                    </FormGroup>
                 </FormGroup>
                 <Row>
                     <Col sm={4} colSpan={4}>
