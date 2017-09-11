@@ -5,6 +5,7 @@ package org.openforis.idm.metamodel;
 
 import java.util.List;
 
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.model.CodeAttribute;
 
 
@@ -23,5 +24,9 @@ public interface ExternalCodeListProvider {
 	List<ExternalCodeListItem> getRootItems(CodeList list);
 	
 	List<ExternalCodeListItem> getChildItems(ExternalCodeListItem item);
+
+	void visitItems(CodeList list, Visitor<CodeListItem> visitor);
+	
+	void visitChildItems(ExternalCodeListItem item, Visitor<CodeListItem> visitor);
 
 }

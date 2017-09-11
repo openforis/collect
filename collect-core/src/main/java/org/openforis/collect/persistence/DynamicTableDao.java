@@ -9,17 +9,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
+import org.jooq.Cursor;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Result;
 import org.jooq.SelectJoinStep;
 import org.jooq.TableField;
 import org.openforis.collect.model.NameValueEntry;
@@ -27,6 +26,7 @@ import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
+import org.openforis.commons.collection.Visitor;
 
 /**
  * @author M. Togna
@@ -59,6 +59,16 @@ public class DynamicTableDao extends JooqDaoSupport {
 	}
 	
 	public List<Map<String, String>> loadRows(String table, NameValueEntry[] filters, String[] notNullColumns) {
+		final List<Map<String, String>> result = new ArrayList<Map<String,String>>();
+		visitRows(table, filters, notNullColumns, new Visitor<Map<String,String>>() {
+			public void visit(Map<String, String> item) {
+				result.add(item);
+			}
+		});
+		return result;
+	}
+	
+	public void visitRows(String table, NameValueEntry[] filters, String[] notNullColumns, Visitor<Map<String, String>> visitor) {
 		Lookup lookupTable = getLookupTable(table);
 		CollectDSLContext dsl = dsl();
 		Field<?>[] fields = lookupTable.fields();
@@ -67,16 +77,18 @@ public class DynamicTableDao extends JooqDaoSupport {
 		addFilterConditions(lookupTable, select, filters);
 		addNotNullConditions(lookupTable, select, notNullColumns);
 		
-		Result<Record> selectResult = select.fetch();
-		if (selectResult == null) {
-			return Collections.emptyList();
-		} else {
-			List<Map<String, String>> result = new ArrayList<Map<String, String>>(selectResult.size());
-			for (Record record : selectResult) {
-				Map<String, String> rowMap = parseRecord(record, fields);
-				result.add(rowMap);
+		Cursor<Record> cursor = null;
+		try {
+			cursor = select.fetchLazy();
+			while (cursor.hasNext()) {
+				Record r = cursor.fetchOne();
+				Map<String, String> rowMap = parseRecord(r, fields);
+				visitor.visit(rowMap);
 			}
-			return result;
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+		    }
 		}
 	}
 

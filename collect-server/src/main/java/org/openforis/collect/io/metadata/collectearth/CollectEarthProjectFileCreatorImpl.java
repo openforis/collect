@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,6 +26,7 @@ import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.Zip4jFiles;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -315,30 +314,25 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
 	}
 
-	private void addCodeListImages(ZipFile zipFile, CollectSurvey survey, ZipParameters zipParameters) throws FileNotFoundException, IOException, ZipException {
+	private void addCodeListImages(final ZipFile zipFile, CollectSurvey survey, final ZipParameters zipParameters) {
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList codeList : codeLists) {
 			if (! codeList.isExternal()) {
-				Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
-				List<CodeListItem> rootItems = codeListManager.loadRootItems(codeList);
-				stack.addAll(rootItems);
-				while (! stack.isEmpty()) {
-					CodeListItem item = stack.pop();
-					if (item.hasUploadedImage()) {
-						FileWrapper imageFileWrapper = codeListManager.loadImageContent((PersistedCodeListItem) item);
-						byte[] content = imageFileWrapper.getContent();
-						
-						File imageFile = copyToTempFile(content, item.getImageFileName());
-						
-						String zipImageFileName = getCodeListImageFilePath(item);
-						
-						Zip4jFiles.addFile(zipFile, imageFile, zipImageFileName, zipParameters);
+				codeListManager.visitItems(codeList, new Visitor<CodeListItem>() {
+					public void visit(CodeListItem item) {
+						if (item.hasUploadedImage()) {
+							FileWrapper imageFileWrapper = codeListManager.loadImageContent((PersistedCodeListItem) item);
+							byte[] content = imageFileWrapper.getContent();
+							try {
+								File imageFile = copyToTempFile(content, item.getImageFileName());
+								String zipImageFileName = getCodeListImageFilePath(item);
+								Zip4jFiles.addFile(zipFile, imageFile, zipImageFileName, zipParameters);
+							} catch(Exception e) {
+								throw new RuntimeException(e);
+							}
+						}
 					}
-					List<CodeListItem> childItems = codeListManager.loadChildItems(item);
-					for (CodeListItem childItem : childItems) {
-						stack.push(childItem);
-					}
-				}
+				});
 			}
 		}
 	}
