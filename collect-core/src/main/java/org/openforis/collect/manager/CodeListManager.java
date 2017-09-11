@@ -23,6 +23,7 @@ import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.CodeListItemDao;
 import org.openforis.collect.persistence.DatabaseExternalCodeListProvider;
 import org.openforis.collect.service.CollectCodeListService;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -447,6 +448,21 @@ public class CodeListManager {
 			}
 		} else {
 			return (T) item.getParentItem();
+		}
+	}
+	
+	public void visitItems(CodeList list, Visitor<CodeListItem> visitor) {
+		visitItems(list, visitor, (ModelVersion) null);
+	}
+	
+	public void visitItems(CodeList list, Visitor<CodeListItem> visitor, ModelVersion version) {
+		boolean persistedSurvey = list.getSurvey().getId() != null;
+		if ( persistedSurvey && list.isExternal() ) {
+			provider.visitItems(list, visitor);
+		} else if ( persistedSurvey && list.isEmpty() ) {
+			codeListItemDao.visitItems(list, visitor, version);
+		} else {
+			list.visitItems(visitor, version);
 		}
 	}
 	

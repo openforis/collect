@@ -696,8 +696,8 @@ var loadPlacemarkData = function(reloadingAfterError) {
 			// change event listeners for the inputs
 			interpretJsonSaveResponse(json, false);
 				
-			currentStepIndex = json.currentStep == null ? 0
-					: parseInt(json.currentStep);
+			currentStepIndex = parseInteger(json.currentStep, 0);
+			
 			showCurrentStep();
 			updateStepsErrorFeedback();
 
@@ -1001,5 +1001,18 @@ var defaultIfNull = function(obj, defaultValue) {
 		return defaultValue;
 	} else {
 		return obj;
+	}
+};
+
+var parseInteger = function(str, defaultValue) {
+	if (str == null || str.length == 0) {
+		return defaultValue;
+	} else {
+		var value = parseInt(str);
+		if (isNaN(value)) {
+			return defaultValue;
+		} else {
+			return value;
+		}
 	}
 };

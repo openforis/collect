@@ -16,8 +16,10 @@ import java.util.Set;
 
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NameValueEntry;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
@@ -118,7 +120,7 @@ public class DatabaseExternalCodeListProvider implements
 		}
 		return result;
 	}
-
+	
 	public ExternalCodeListItem getRootItem(CodeList list, String code) {
 		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		addSurveyFilter(list, filters);
@@ -192,6 +194,44 @@ public class DatabaseExternalCodeListProvider implements
 		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, childrenLevel);
 		filters.addAll(emptyNextLevelsFilters);
 		return filters;
+	}
+	
+	@Override
+	public void visitItems(final CodeList list, final Visitor<CodeListItem> visitor) {
+		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
+		addSurveyFilter(list, filters);
+		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
+		filters.addAll(emptyNextLevelsFilters);
+		dynamicTableDao.visitRows(list.getLookupTable(), 
+			filters.toArray(new NameValueEntry[0]), (String[]) null, new Visitor<Map<String, String>>() {
+				public void visit(Map<String, String> row) {
+					ExternalCodeListItem item = parseRow(row, list, 1);
+					visitor.visit(item);
+					visitChildItems(item, visitor);
+				}
+			}
+		);
+	}
+	
+	@Override
+	public void visitChildItems(final ExternalCodeListItem item, final Visitor<CodeListItem> visitor) {
+		final CodeList list = item.getCodeList();
+		int itemLevel = item.getLevel();
+		final int childrenLevel = itemLevel + 1;
+		if (childrenLevel > list.getHierarchy().size()) {
+			return;
+		}
+		List<NameValueEntry> filters = createChildItemsFilters(item);
+		String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
+		String[] notNullColumns = new String[]{childrenKeyColName};
+		dynamicTableDao.visitRows(list.getLookupTable(), 
+				filters.toArray(new NameValueEntry[filters.size()]),
+				notNullColumns, new Visitor<Map<String,String>>() {
+					public void visit(Map<String, String> row) {
+						ExternalCodeListItem item = parseRow(row, list, childrenLevel);
+						visitor.visit(item);
+					}
+				});
 	}
 	
 	protected ExternalCodeListItem parseRow(Map<String, String> row, CodeList list, int levelIndex) {
