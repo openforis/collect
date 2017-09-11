@@ -9,14 +9,10 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Stack;
-
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +38,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 /**
  * 
@@ -317,24 +318,26 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private void addCodeListImages(ZipFile zipFile, CollectSurvey survey, ZipParameters zipParameters) throws FileNotFoundException, IOException, ZipException {
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList codeList : codeLists) {
-			Stack<CodeListItem> stack = new Stack<CodeListItem>();
-			List<CodeListItem> rootItems = codeListManager.loadRootItems(codeList);
-			stack.addAll(rootItems);
-			while (! stack.isEmpty()) {
-				CodeListItem item = stack.pop();
-				if (item.hasUploadedImage()) {
-					FileWrapper imageFileWrapper = codeListManager.loadImageContent((PersistedCodeListItem) item);
-					byte[] content = imageFileWrapper.getContent();
-					
-					File imageFile = copyToTempFile(content, item.getImageFileName());
-					
-					String zipImageFileName = getCodeListImageFilePath(item);
-					
-					Zip4jFiles.addFile(zipFile, imageFile, zipImageFileName, zipParameters);
-				}
-				List<CodeListItem> childItems = codeListManager.loadChildItems(item);
-				for (CodeListItem childItem : childItems) {
-					stack.push(childItem);
+			if (! codeList.isExternal()) {
+				Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
+				List<CodeListItem> rootItems = codeListManager.loadRootItems(codeList);
+				stack.addAll(rootItems);
+				while (! stack.isEmpty()) {
+					CodeListItem item = stack.pop();
+					if (item.hasUploadedImage()) {
+						FileWrapper imageFileWrapper = codeListManager.loadImageContent((PersistedCodeListItem) item);
+						byte[] content = imageFileWrapper.getContent();
+						
+						File imageFile = copyToTempFile(content, item.getImageFileName());
+						
+						String zipImageFileName = getCodeListImageFilePath(item);
+						
+						Zip4jFiles.addFile(zipFile, imageFile, zipImageFileName, zipParameters);
+					}
+					List<CodeListItem> childItems = codeListManager.loadChildItems(item);
+					for (CodeListItem childItem : childItems) {
+						stack.push(childItem);
+					}
 				}
 			}
 		}
