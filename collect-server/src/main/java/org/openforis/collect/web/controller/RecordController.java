@@ -28,6 +28,7 @@ import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
+import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
 import org.openforis.collect.manager.RandomRecordGenerator.Parameters;
@@ -395,5 +396,6 @@ public class RecordController extends BasicController implements Serializable {
 		public Integer rootEntityId;
 		public Integer entityId;
 		public Step step;
+		public CSVExportConfiguration additionalParameters;
 	}
 }
