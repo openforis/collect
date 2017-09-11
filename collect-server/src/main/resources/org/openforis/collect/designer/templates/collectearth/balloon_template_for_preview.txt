@@ -114,6 +114,11 @@
 			  src: url('$[host]generated/earthFiles/fonts/Phetsarath_OT.ttf');
 			}
 		
+			@font-face {
+		      font-family: 'mn'; 
+			  src: url('$[host]generated/earthFiles/fonts/arhangai.ttf');
+			}
+		
 			body {
 				font-family: "PLACEHOLDER_UI_LANGUAGE","Trebuchet MS", "Helvetica", "Arial", "Verdana",
 					"sans-serif";
@@ -174,6 +179,6 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 			</form>
 		</div>
 	</div>
-	<iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/openAuxiliaryWindows?latLongCoordinates=$[latitude],$[longitude]" height="0" width="0"></iframe>
+	<!-- <iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/ancillaryWindows?PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST" height="0" width="0"></iframe> -->
 </body>
 </html>
