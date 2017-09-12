@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -28,7 +29,8 @@ import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
 import org.openforis.collect.manager.RandomRecordGenerator.Parameters;
@@ -233,14 +235,16 @@ public class RecordController extends BasicController implements Serializable {
 		RecordAccessControlManager accessControlManager = new RecordAccessControlManager();
 		if (accessControlManager.canEdit(sessionManager.getSessionState().getUser(), record)) {
 			CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
+			CSVDataExportParameters parameters = new CSVDataExportParameters();
 			RecordFilter recordFilter = new RecordFilter(survey);
 			recordFilter.setRecordId(recordId);
 			recordFilter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
 			recordFilter.setRootEntityId(survey.getSchema().getFirstRootEntityDefinition().getId());
-			job.setRecordFilter(recordFilter);
+			parameters.setRecordFilter(recordFilter);
+			parameters.setAlwaysGenerateZipFile(true);
+			job.setParameters(parameters);
 			File outputFile = File.createTempFile("record_export", ".zip");
 			job.setOutputFile(outputFile);
-			job.setAlwaysGenerateZipFile(true);
 			jobManager.startSurveyJob(job);
 			if (job.isCompleted()) {
 				String fileName = String.format("record_data_%s.zip", Dates.formatDate(new Date()));
@@ -257,7 +261,8 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value="survey/{surveyId}/data/records/startcsvexport", method=POST)
 	public @ResponseBody JobView startDataExportJob(
 			@PathVariable Integer surveyId,
-			@RequestBody CSVDataExportParameters parameters) throws IOException {
+			@RequestBody CSVExportParametersForm parameters) throws IOException {
+		User user = sessionManager.getSessionState().getUser();
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		
 		csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
@@ -265,11 +270,9 @@ public class RecordController extends BasicController implements Serializable {
 
 		csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
 		
-		RecordFilter recordFilter = new RecordFilter(survey, parameters.rootEntityId);
-		csvDataExportJob.setRecordFilter(recordFilter);
-		recordFilter.setStepGreaterOrEqual(parameters.step);
-		csvDataExportJob.setEntityId(parameters.entityId);
-		csvDataExportJob.setAlwaysGenerateZipFile(true);
+		CSVDataExportParameters exportParameters = parameters.toExportParameters(survey, user);
+		csvDataExportJob.setParameters(exportParameters);
+		
 		jobManager.start(csvDataExportJob);
 		
 		return new JobView(csvDataExportJob);
@@ -288,7 +291,9 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value="survey/{survey_id}/data/records/csvexportresult.zip", method=GET)
 	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		File file = csvDataExportJob.getOutputFile();
-		String surveyName = csvDataExportJob.getRecordFilter().getSurvey().getName();
+		RecordFilter recordFilter = csvDataExportJob.getParameters().getRecordFilter();
+		CollectSurvey survey = recordFilter.getSurvey();
+		String surveyName = survey.getName();
 		Controllers.writeFileToResponse(response, file, 
 				String.format("collect-data-export-%s-%s.zip", surveyName, Dates.formatDate(new Date())), 
 				Controllers.ZIP_CONTENT_TYPE);
@@ -391,11 +396,212 @@ public class RecordController extends BasicController implements Serializable {
 		}
 	}
 	
-	public static class CSVDataExportParameters {
+	public static class CSVExportParametersForm {
 		
-		public Integer rootEntityId;
-		public Integer entityId;
-		public Step step;
-		public CSVExportConfiguration additionalParameters;
+		private Integer surveyId;
+		private Integer rootEntityId;
+		private Integer entityId;
+		private Integer recordId;
+		private Step stepGreaterOrEqual;
+		private boolean exportOnlyOwnedRecords = false;
+		private boolean alwaysGenerateZipFile = false;
+		private String multipleAttributeValueSeparator = ", ";
+		private String fieldHeadingSeparator = "_";
+		private boolean includeAllAncestorAttributes = false;
+		private boolean includeCodeItemPositionColumn = false;
+		private boolean includeKMLColumnForCoordinates = false;
+		private boolean includeEnumeratedEntities = true;
+		private boolean includeCompositeAttributeMergedColumn = false;
+		private boolean includeCodeItemLabelColumn = false;
+		private boolean includeGroupingLabels = true;
+		private boolean codeAttributeExpanded = false;
+		private int maxMultipleAttributeValues = 10;
+		private int maxExpandedCodeAttributeItems = 30;
+		private HeadingSource headingSource = HeadingSource.ATTRIBUTE_NAME;
+		private String languageCode = null;
+		
+		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user) {
+			CSVDataExportParameters result = new CSVDataExportParameters();
+			RecordFilter recordFilter = new RecordFilter(survey);
+			recordFilter.setRootEntityId(rootEntityId);
+			result.setRecordFilter(recordFilter);
+			if (exportOnlyOwnedRecords) {
+				recordFilter.setOwnerId(user.getId());
+			}
+			try {
+				BeanUtils.copyProperties(result, this);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			return result;
+		}
+
+		public Integer getSurveyId() {
+			return surveyId;
+		}
+
+		public void setSurveyId(Integer surveyId) {
+			this.surveyId = surveyId;
+		}
+
+		public Integer getRootEntityId() {
+			return rootEntityId;
+		}
+
+		public void setRootEntityId(Integer rootEntityId) {
+			this.rootEntityId = rootEntityId;
+		}
+
+		public Integer getEntityId() {
+			return entityId;
+		}
+
+		public void setEntityId(Integer entityId) {
+			this.entityId = entityId;
+		}
+
+		public Integer getRecordId() {
+			return recordId;
+		}
+
+		public void setRecordId(Integer recordId) {
+			this.recordId = recordId;
+		}
+
+		public Step getStepGreaterOrEqual() {
+			return stepGreaterOrEqual;
+		}
+
+		public void setStepGreaterOrEqual(Step stepGreaterOrEqual) {
+			this.stepGreaterOrEqual = stepGreaterOrEqual;
+		}
+
+		public boolean isExportOnlyOwnedRecords() {
+			return exportOnlyOwnedRecords;
+		}
+		
+		public void setExportOnlyOwnedRecords(boolean exportOnlyOwnedRecords) {
+			this.exportOnlyOwnedRecords = exportOnlyOwnedRecords;
+		}
+		
+		public boolean isAlwaysGenerateZipFile() {
+			return alwaysGenerateZipFile;
+		}
+
+		public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
+			this.alwaysGenerateZipFile = alwaysGenerateZipFile;
+		}
+
+		public String getMultipleAttributeValueSeparator() {
+			return multipleAttributeValueSeparator;
+		}
+
+		public void setMultipleAttributeValueSeparator(String multipleAttributeValueSeparator) {
+			this.multipleAttributeValueSeparator = multipleAttributeValueSeparator;
+		}
+
+		public String getFieldHeadingSeparator() {
+			return fieldHeadingSeparator;
+		}
+
+		public void setFieldHeadingSeparator(String fieldHeadingSeparator) {
+			this.fieldHeadingSeparator = fieldHeadingSeparator;
+		}
+
+		public boolean isIncludeAllAncestorAttributes() {
+			return includeAllAncestorAttributes;
+		}
+
+		public void setIncludeAllAncestorAttributes(boolean includeAllAncestorAttributes) {
+			this.includeAllAncestorAttributes = includeAllAncestorAttributes;
+		}
+
+		public boolean isIncludeCodeItemPositionColumn() {
+			return includeCodeItemPositionColumn;
+		}
+
+		public void setIncludeCodeItemPositionColumn(boolean includeCodeItemPositionColumn) {
+			this.includeCodeItemPositionColumn = includeCodeItemPositionColumn;
+		}
+
+		public boolean isIncludeKMLColumnForCoordinates() {
+			return includeKMLColumnForCoordinates;
+		}
+
+		public void setIncludeKMLColumnForCoordinates(boolean includeKMLColumnForCoordinates) {
+			this.includeKMLColumnForCoordinates = includeKMLColumnForCoordinates;
+		}
+
+		public boolean isIncludeEnumeratedEntities() {
+			return includeEnumeratedEntities;
+		}
+
+		public void setIncludeEnumeratedEntities(boolean includeEnumeratedEntities) {
+			this.includeEnumeratedEntities = includeEnumeratedEntities;
+		}
+
+		public boolean isIncludeCompositeAttributeMergedColumn() {
+			return includeCompositeAttributeMergedColumn;
+		}
+
+		public void setIncludeCompositeAttributeMergedColumn(boolean includeCompositeAttributeMergedColumn) {
+			this.includeCompositeAttributeMergedColumn = includeCompositeAttributeMergedColumn;
+		}
+
+		public boolean isIncludeCodeItemLabelColumn() {
+			return includeCodeItemLabelColumn;
+		}
+
+		public void setIncludeCodeItemLabelColumn(boolean includeCodeItemLabelColumn) {
+			this.includeCodeItemLabelColumn = includeCodeItemLabelColumn;
+		}
+
+		public boolean isIncludeGroupingLabels() {
+			return includeGroupingLabels;
+		}
+
+		public void setIncludeGroupingLabels(boolean includeGroupingLabels) {
+			this.includeGroupingLabels = includeGroupingLabels;
+		}
+
+		public boolean isCodeAttributeExpanded() {
+			return codeAttributeExpanded;
+		}
+
+		public void setCodeAttributeExpanded(boolean codeAttributeExpanded) {
+			this.codeAttributeExpanded = codeAttributeExpanded;
+		}
+
+		public int getMaxMultipleAttributeValues() {
+			return maxMultipleAttributeValues;
+		}
+
+		public void setMaxMultipleAttributeValues(int maxMultipleAttributeValues) {
+			this.maxMultipleAttributeValues = maxMultipleAttributeValues;
+		}
+
+		public int getMaxExpandedCodeAttributeItems() {
+			return maxExpandedCodeAttributeItems;
+		}
+
+		public void setMaxExpandedCodeAttributeItems(int maxExpandedCodeAttributeItems) {
+			this.maxExpandedCodeAttributeItems = maxExpandedCodeAttributeItems;
+		}
+
+		public HeadingSource getHeadingSource() {
+			return headingSource;
+		}
+
+		public void setHeadingSource(HeadingSource headingSource) {
+			this.headingSource = headingSource;
+		}
+
+		public String getLanguageCode() {
+			return languageCode;
+		}
+
+		public void setLanguageCode(String languageCode) {
+			this.languageCode = languageCode;
+		}
 	}
 }

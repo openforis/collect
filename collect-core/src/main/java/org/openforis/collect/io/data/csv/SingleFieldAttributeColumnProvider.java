@@ -18,7 +18,7 @@ import org.openforis.idm.model.Node;
  */
 public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProvider<AttributeDefinition> {
 	
-	public SingleFieldAttributeColumnProvider(CSVExportConfiguration config, AttributeDefinition defn) {
+	public SingleFieldAttributeColumnProvider(CSVDataExportParameters config, AttributeDefinition defn) {
 		super(config, defn);
 	}
 	

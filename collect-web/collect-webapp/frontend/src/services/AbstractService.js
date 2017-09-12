@@ -58,7 +58,7 @@ export default class AbstractService {
             credentials: 'include',
             method: method,
             headers: {
-              'Content-Type': 'application/json;charset=UTF-8'
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         }).then(response => response.json(),

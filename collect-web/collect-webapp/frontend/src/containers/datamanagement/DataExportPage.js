@@ -7,7 +7,33 @@ import ServiceFactory from 'services/ServiceFactory'
 import JobMonitorModal from 'containers/job/JobMonitorModal'
 import SchemaTreeView from './SchemaTreeView'
 
+
+const additionalOptions = [
+    {
+        name: 'includeKMLColumnForCoordinates',
+        label: 'Include KML column for coordinate attributes (for Fusion Tables)*'
+    },
+    {
+        name: 'includeAllAncestorAttributes',
+        label: 'Include all ancestor attributes*'
+    },
+    {
+        name: 'includeCompositeAttributeMergedColumn',
+        label: 'Include composite attributes merged column (e.g. date, time, coordinate)*'
+    },
+    {
+        name: 'codeAttributeExpanded',
+        label: 'Expand code attributes (add boolean columns for each code value)*'
+    },
+    {
+        name: 'includeCodeItemLabelColumn',
+        label: 'Include code item label column*'
+    }
+]
+
 class DataExportPage extends Component {
+
+    
 
     constructor(props) {
         super(props)
@@ -17,8 +43,11 @@ class DataExportPage extends Component {
             jobStatusModalOpen: false,
             csvDataExportJobId: null,
             allEntitiesSelected: false,
+            stepGreaterOrEqual: 'ENTRY',
             selectedEntityDefinition: null,
-            additionalCsvExportOption: null
+            entityId: null,
+            exportOnlyOwnedRecords: false,
+            headingSource: 'ATTRIBUTE_NAME',
         }
 
         this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
@@ -31,10 +60,19 @@ class DataExportPage extends Component {
             case 'CSV':
                 const survey = this.props.survey
                 const surveyId = survey.id
-                const rootEntityId = survey.schema.defaultRootEntity.id
-                const entityId = this.state.selectedEntityDefinition ? this.state.selectedEntityDefinition.id: null
-                const step = this.state.step
-                ServiceFactory.recordService.startCSVDataExport(surveyId, rootEntityId, entityId, step).then(job => {
+                const parameters = {
+                    surveyId: survey.id,
+                    rootEntityId: survey.schema.defaultRootEntity.id,
+                    stepGreaterOrEqual: this.state.step,
+                    entityId: this.state.selectedEntityDefinition ? this.state.selectedEntityDefinition.id: null,
+                    exportOnlyOwnedRecords: this.state.exportOnlyOwnedRecords,
+                    headingSource: this.state.headingSource,
+                    alwaysGenerateZipFile: true
+                }
+                additionalOptions.forEach(o => {
+                    parameters[o.name] = this.state[o.name]
+                })
+                ServiceFactory.recordService.startCSVDataExport(surveyId, parameters).then(job => {
                     this.setState({
                         jobStatusModalOpen: true,
                         csvDataExportJobId: job.id
@@ -61,47 +99,14 @@ class DataExportPage extends Component {
         if (!this.props.survey) {
             return <div>Select survey first</div>
         }
-        const jobStatusMonitor = this.state.jobStatusModalOpen ? <JobMonitorModal
-            title="Exporting CSV data"
-            jobId={this.state.csvDataExportJobId} open={true}
-            okButtonLabel={'Download'}
-            handleOkButtonClick={this.handleCsvDataExportModalOkButtonClick}
-        /> : null
-
-        const additionalOptions = [
-            {
-                name: 'includeKMLColumnForCoordinates',
-                label: 'Include KML column for coordinate attributes (for Fusion Tables)*'
-            },
-            {
-                name: 'includeAllAncestorAttributes',
-                label: 'Include all ancestor attributes'
-            },
-            {
-                name: 'includeCompositeAttributeMergedColumn',
-                label: 'Include composite attributes merged column (e.g. date, time, coordinate)*'
-            },
-            {
-                name: 'codeAttributeExpanded',
-                label: 'Expand code attributes (add boolean columns for each code value)*'
-            },
-            {
-                name: 'includeCodeItemLabelColumn',
-                label: 'Include code item label column'
-            }
-        ]
-
         const additionalOptionsFormGroups = additionalOptions.map(o => {
-            const createNewAdditionalCsvExportOptions = function(value) {
-                let newAdditionalCsvExportOptions = {...this.state.additionalCsvExportOption}
-                newAdditionalCsvExportOptions[o.name] = value
-            }
-            
-            return <FormGroup check>
+            return <FormGroup check key={o.name}>
                 <Label check>
-                    <Input type="checkbox" onChange={event => this.setState(
-                            {additionalCsvExportOptions: createNewAdditionalCsvExportOptions.apply(this, [event.target.checked])}
-                        )} />{' '}
+                    <Input type="checkbox" onChange={event => {
+                        const newProp = new Object()
+                        newProp[o.name] = event.target.checked
+                        this.setState(newProp)
+                     }} />{' '}
                     {o.label}
                 </Label>
             </FormGroup>
@@ -141,6 +146,27 @@ class DataExportPage extends Component {
                         </FormGroup>
                         <FormGroup row>
                             <Collapsible trigger="Additional options">
+                                <FormGroup row>
+                                    <Col sm={{size: 12}}>
+                                        <Label check>
+                                            <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} />{' '}
+                                            Export only owned records
+                                        </Label>
+                                    </Col>
+                                </FormGroup>
+                                <FormGroup row>
+                                    <Col sm={4}>
+                                        <Label for="headingsSourceSelect">Source for file headings:</Label>
+                                    </Col>
+                                    <Col sm={8}>
+                                        <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
+                                            onChange={e => this.setState({headingSource: e.target.value})}>
+                                            <option value="ATTRIBUTE_NAME">Attribute name</option>
+                                            <option value="INSTANCE_LABEL">Attribute label</option>
+                                            <option value="REPORTING_LABEL">Reporting label (Saiku)</option>
+                                        </Input>
+                                    </Col>
+                                </FormGroup>
                                 {additionalOptionsFormGroups}
                             </Collapsible>
                         </FormGroup>
@@ -180,7 +206,13 @@ class DataExportPage extends Component {
                         <Button onClick={this.handleExportButtonClick}>Export</Button>
                     </Col>
                 </Row>
-                {jobStatusMonitor}
+                <JobMonitorModal
+                    open={this.state.jobStatusModalOpen}
+                    title="Exporting CSV data"
+                    jobId={this.state.csvDataExportJobId}
+                    okButtonLabel={'Download'}
+                    handleOkButtonClick={this.handleCsvDataExportModalOkButtonClick}
+                />
             </Form>
         )
     }

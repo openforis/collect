@@ -14,7 +14,7 @@ import org.openforis.idm.metamodel.RangeAttributeDefinition;
  */
 public class RangeColumnProvider extends CompositeAttributeColumnProvider<RangeAttributeDefinition> {
 	
-	public RangeColumnProvider(CSVExportConfiguration config, RangeAttributeDefinition defn) {
+	public RangeColumnProvider(CSVDataExportParameters config, RangeAttributeDefinition defn) {
 		super(config, defn);
 	}
 

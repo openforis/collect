@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.io.data.csv.AutomaticColumnProvider;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.ColumnProvider;
 import org.openforis.collect.io.data.csv.ColumnProviderChain;
 import org.openforis.collect.io.data.csv.ColumnProviders;
@@ -25,9 +25,9 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
 public class CSVDataExportColumnProviderGenerator {
 	
 	private CollectSurvey survey;
-	private CSVExportConfiguration configuration;
+	private CSVDataExportParameters configuration;
 	
-	public CSVDataExportColumnProviderGenerator(CollectSurvey survey, CSVExportConfiguration configuration) {
+	public CSVDataExportColumnProviderGenerator(CollectSurvey survey, CSVDataExportParameters configuration) {
 		this.survey = survey;
 		this.configuration = configuration;
 	}

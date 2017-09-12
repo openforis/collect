@@ -13,7 +13,7 @@ import org.openforis.idm.metamodel.NodeLabel.Type;
 
 public class ColumnProviders {
 
-	public static ColumnProvider createAttributeProvider(CSVExportConfiguration config, AttributeDefinition defn) {
+	public static ColumnProvider createAttributeProvider(CSVDataExportParameters config, AttributeDefinition defn) {
 		if ( defn instanceof CodeAttributeDefinition ) {
 			return new CodeColumnProvider(config, (CodeAttributeDefinition) defn);
 		} else if(defn instanceof CoordinateAttributeDefinition){
@@ -33,7 +33,7 @@ public class ColumnProviders {
 		}
 	}
 
-	public static String generateHeadingPrefix(NodeDefinition nodeDefinition, CSVExportConfiguration config) {
+	public static String generateHeadingPrefix(NodeDefinition nodeDefinition, CSVDataExportParameters config) {
 		String result = null;
 		switch(config.getHeadingSource()) {
 		case ATTRIBUTE_NAME:

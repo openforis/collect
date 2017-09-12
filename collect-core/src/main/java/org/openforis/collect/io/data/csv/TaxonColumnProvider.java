@@ -32,7 +32,7 @@ public class TaxonColumnProvider extends CompositeAttributeColumnProvider<TaxonA
 			TaxonAttributeDefinition.FAMILY_SCIENTIFIC_NAME_FIELD_NAME
 	};
 
-	public TaxonColumnProvider(CSVExportConfiguration config, TaxonAttributeDefinition defn) {
+	public TaxonColumnProvider(CSVDataExportParameters config, TaxonAttributeDefinition defn) {
 		super(config, defn);
 	}
 

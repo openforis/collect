@@ -19,7 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
 import org.openforis.collect.manager.RecordManager;
@@ -55,15 +55,10 @@ public class CSVDataExportJob extends SurveyLockingJob {
 	private RecordManager recordManager;
 	
 	private File outputFile;
-	private RecordFilter recordFilter;
-	private NodeFilter nodeFilter;
-	private Integer entityId;
-	private boolean alwaysGenerateZipFile;
-	private CSVExportConfiguration configuration;
+	private CSVDataExportParameters parameters;
 	
 	public CSVDataExportJob() {
-		alwaysGenerateZipFile = false;
-		configuration = new CSVExportConfiguration();
+		parameters = new CSVDataExportParameters();
 	}
 	
 	@Override
@@ -79,40 +74,12 @@ public class CSVDataExportJob extends SurveyLockingJob {
 		this.outputFile = outputFile;
 	}
 
-	public RecordFilter getRecordFilter() {
-		return recordFilter;
+	public CSVDataExportParameters getParameters() {
+		return parameters;
 	}
 	
-	public void setRecordFilter(RecordFilter recordFilter) {
-		this.recordFilter = recordFilter;
-	}
-	
-	public Integer getEntityId() {
-		return entityId;
-	}
-
-	public void setEntityId(Integer entityId) {
-		this.entityId = entityId;
-	}
-	
-	public CSVExportConfiguration getConfiguration() {
-		return configuration;
-	}
-	
-	public void setConfiguration(CSVExportConfiguration configuration) {
-		this.configuration = configuration;
-	}
-
-	public boolean isAlwaysGenerateZipFile() {
-		return alwaysGenerateZipFile;
-	}
-
-	public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
-		this.alwaysGenerateZipFile = alwaysGenerateZipFile;
-	}
-
-	public void setNodeFilter(NodeFilter nodeFilter) {
-		this.nodeFilter = nodeFilter;
+	public void setParameters(CSVDataExportParameters parameters) {
+		this.parameters = parameters;
 	}
 	
 	private class CSVDataExportTask extends Task {
@@ -124,7 +91,7 @@ public class CSVDataExportJob extends SurveyLockingJob {
 		
 		@Override
 		protected long countTotalItems() {
-			int totalRecords = recordManager.countRecords(recordFilter);
+			int totalRecords = recordManager.countRecords(parameters.getRecordFilter());
 			Collection<EntityDefinition> entitiesToExport = getEntitiesToExport();
 			int result = totalRecords * entitiesToExport.size();
 			return result;
@@ -140,7 +107,7 @@ public class CSVDataExportJob extends SurveyLockingJob {
 				
 				Collection<EntityDefinition> entities = getEntitiesToExport();
 				
-				if ( entities.size() == 1 && ! alwaysGenerateZipFile ) {
+				if ( entities.size() == 1 && ! parameters.isAlwaysGenerateZipFile() ) {
 					//export entity into a single csv file 
 					EntityDefinition entity = entities.iterator().next();
 					exportData(bufferedOutputStream, entity.getId());
@@ -166,12 +133,13 @@ public class CSVDataExportJob extends SurveyLockingJob {
 		
 		private void exportData(OutputStream outputStream, int entityDefId) throws InvalidExpressionException, IOException, RecordPersistenceException {
 			Writer outputWriter = new OutputStreamWriter(outputStream, OpenForisIOUtils.UTF_8);
-			CSVDataExportColumnProviderGenerator csvDataExportColumnProviderGenerator = new CSVDataExportColumnProviderGenerator(recordFilter.getSurvey(), configuration);
+			RecordFilter recordFilter = parameters.getRecordFilter();
+			CSVDataExportColumnProviderGenerator csvDataExportColumnProviderGenerator = new CSVDataExportColumnProviderGenerator(recordFilter.getSurvey(), parameters);
 			DataTransformation transform = csvDataExportColumnProviderGenerator.generateDataTransformation(entityDefId);
 			
 			@SuppressWarnings("resource")
 			//closing modelWriter will close referenced output stream
-			ModelCsvWriter modelWriter = new ModelCsvWriter(outputWriter, transform, nodeFilter);
+			ModelCsvWriter modelWriter = new ModelCsvWriter(outputWriter, transform, parameters.getNodeFilter());
 			modelWriter.printColumnHeadings();
 			
 			CollectSurvey survey = recordFilter.getSurvey();
@@ -191,8 +159,9 @@ public class CSVDataExportJob extends SurveyLockingJob {
 		
 		private Collection<EntityDefinition> getEntitiesToExport() {
 			final Collection<EntityDefinition> result = new ArrayList<EntityDefinition>();
+			RecordFilter recordFilter = parameters.getRecordFilter();
 			Schema schema = recordFilter.getSurvey().getSchema();
-			if ( entityId == null ) {
+			if ( parameters.getEntityId() == null ) {
 				EntityDefinition rootEntity = schema.getRootEntityDefinition(recordFilter.getRootEntityId());
 				rootEntity.traverse(new NodeDefinitionVisitor() {
 					@Override
@@ -203,7 +172,7 @@ public class CSVDataExportJob extends SurveyLockingJob {
 					}
 				});
 			} else {
-				EntityDefinition entity = (EntityDefinition) schema.getDefinitionById(entityId);
+				EntityDefinition entity = (EntityDefinition) schema.getDefinitionById(parameters.getEntityId());
 				result.add(entity);
 			}
 			return result;

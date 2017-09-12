@@ -12,8 +12,8 @@ import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.CSVDataExportProcess;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration.HeadingSource;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 import org.openforis.collect.manager.RecordManager;
@@ -89,7 +89,7 @@ public class DataExportService {
 			process.setEntityId(entityId);
 			process.setAlwaysGenerateZipFile(true);
 			
-			CSVExportConfiguration config = new CSVExportConfiguration();
+			CSVDataExportParameters config = new CSVDataExportParameters();
 			config.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
 			config.setIncludeEnumeratedEntities(includeEnumeratedEntities);
 			config.setIncludeCompositeAttributeMergedColumn(includeCompositeAttributeMergedColumn);

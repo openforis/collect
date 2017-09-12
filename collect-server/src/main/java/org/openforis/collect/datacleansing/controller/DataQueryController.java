@@ -21,6 +21,7 @@ import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.DescendantNodeFilter;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -102,12 +103,14 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		
 		exportJob = collectJobManager.createJob(CSVDataExportJob.class);
 		exportJob.setOutputFile(File.createTempFile("data-query-export", ".csv"));
+		CSVDataExportParameters parameters = new CSVDataExportParameters();
 		RecordFilter recordFilter = new RecordFilter(survey);
-		exportJob.setRecordFilter(recordFilter);
 		recordFilter.setStepGreaterOrEqual(recordStep);
-		exportJob.setEntityId(query.getEntityDefinitionId());
-		exportJob.setAlwaysGenerateZipFile(false);
-		exportJob.setNodeFilter(new DescendantNodeFilter(query.getAttributeDefinition(), query.getConditions()));
+		parameters.setRecordFilter(recordFilter);
+		parameters.setEntityId(query.getEntityDefinitionId());
+		parameters.setAlwaysGenerateZipFile(false);
+		parameters.setNodeFilter(new DescendantNodeFilter(query.getAttributeDefinition(), query.getConditions()));
+		exportJob.setParameters(parameters);
 		collectJobManager.start(exportJob);
 		
 		/*

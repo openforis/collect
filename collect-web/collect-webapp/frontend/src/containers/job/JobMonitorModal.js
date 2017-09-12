@@ -16,10 +16,13 @@ export default class JobMonitorModal extends Component {
         this.state = {
             loading: true,
             open: props.open,
-            job: null
+            job: null,
+            jobId: props.jobId
         }
 
-        this.timer = setInterval(this.handleTimeout, 2000);
+        if (props.jobId && props.open) {
+           this.startTimer()
+        }
     }
 
     static propTypes = {
@@ -31,12 +34,28 @@ export default class JobMonitorModal extends Component {
         handleCancelButtonClick: PropTypes.func
 	}
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.jobId && nextProps.open && nextProps.jobId != this.props.jobId) {
+            this.startTimer()
+            this.setState({
+                jobId: nextProps.jobId, 
+                job: null, 
+                open: true,
+                loading: true
+            })
+        }
+    }
+
+    startTimer() {
+        this.timer = setInterval(this.handleTimeout, 2000);
+    }
+
     handleTimeout() {
         this.loadJob()
     }
 
     loadJob() {
-        const jobId = this.props.jobId
+        const jobId = this.state.jobId
         ServiceFactory.jobService.fetch(jobId).then(this.handleJobReceived)
     }
 
@@ -58,6 +77,7 @@ export default class JobMonitorModal extends Component {
                 this.setState({
                     open: false
                 })
+                break
         }
     }
 
@@ -73,10 +93,11 @@ export default class JobMonitorModal extends Component {
         ServiceFactory.jobService.cancel(jobId).then(() => {
             if (this.props.handleCancelButtonClick) {
                 this.props.handleCancelButtonClick()
+            } else {
+                this.setState({
+                    open: false
+                })
             }
-            this.setState({
-                open: false
-            })
         })
     }
 

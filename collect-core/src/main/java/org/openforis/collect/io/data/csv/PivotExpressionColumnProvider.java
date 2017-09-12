@@ -15,15 +15,15 @@ import org.openforis.idm.model.expression.ModelPathExpression;
 public class PivotExpressionColumnProvider extends ColumnProviderChain {
 	private ModelPathExpression expression;
 
-	public PivotExpressionColumnProvider(CSVExportConfiguration config, String expression, ColumnProvider... providers) {
+	public PivotExpressionColumnProvider(CSVDataExportParameters config, String expression, ColumnProvider... providers) {
 		this(config, expression, "", Arrays.asList(providers));
 	}
 
-	public PivotExpressionColumnProvider(CSVExportConfiguration config, String expression, String headingPrefix, ColumnProvider... providers) {
+	public PivotExpressionColumnProvider(CSVDataExportParameters config, String expression, String headingPrefix, ColumnProvider... providers) {
 		this(config, expression, headingPrefix, Arrays.asList(providers));
 	}
 	
-	public PivotExpressionColumnProvider(CSVExportConfiguration config, String expression, String headingPrefix, List<ColumnProvider> providers) {
+	public PivotExpressionColumnProvider(CSVDataExportParameters config, String expression, String headingPrefix, List<ColumnProvider> providers) {
 		super(config, null, headingPrefix, providers);
 		try {
 			ExpressionFactory ef = new ExpressionFactory();

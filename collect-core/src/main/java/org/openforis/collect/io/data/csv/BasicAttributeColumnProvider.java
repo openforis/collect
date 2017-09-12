@@ -19,7 +19,7 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 	protected T attributeDefinition;
 	private List<String> columnHeadings;
 
-	public BasicAttributeColumnProvider(CSVExportConfiguration config, T attrDefn) {
+	public BasicAttributeColumnProvider(CSVDataExportParameters config, T attrDefn) {
 		super(config);
 		this.attributeDefinition = attrDefn;
 	}

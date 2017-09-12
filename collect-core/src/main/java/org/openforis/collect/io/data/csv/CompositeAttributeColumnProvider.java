@@ -25,7 +25,7 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 
 	private String[] fieldNames;
 
-	public CompositeAttributeColumnProvider(CSVExportConfiguration config, T defn) {
+	public CompositeAttributeColumnProvider(CSVDataExportParameters config, T defn) {
 		super(config, defn);
 		init();
 	}

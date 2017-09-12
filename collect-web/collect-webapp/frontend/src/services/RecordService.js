@@ -27,12 +27,8 @@ export default class RecordService extends AbstractService {
         })
     }
     
-    startCSVDataExport(surveyId, rootEntityId, entityId, step) {
-        return this.postJson('survey/' + surveyId + '/data/records/startcsvexport', {
-            rootEntityId: rootEntityId,
-            entityId: entityId,
-            step: step
-        })
+    startCSVDataExport(surveyId, parameters) {
+        return this.postJson('survey/' + surveyId + '/data/records/startcsvexport', parameters)
     }
 
     downloadCSVDataExportResult(surveyId) {

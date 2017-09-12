@@ -24,7 +24,7 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
 import org.openforis.collect.manager.SurveyManager;
@@ -397,14 +397,13 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void exportCsvDataImportTemplate() throws IOException {
 		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 		job.setOutputFile(File.createTempFile("data-import-template", ".zip"));
-		RecordFilter recordFilter = new RecordFilter(survey);
+		CSVDataExportParameters parameters = new CSVDataExportParameters();
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
-		recordFilter.setRootEntityId(rootEntityDef.getId());
-		job.setRecordFilter(recordFilter);
-		job.setAlwaysGenerateZipFile(true);
-		CSVExportConfiguration configuration = new CSVExportConfiguration();
-		configuration.setIncludeEnumeratedEntities(false);
-		job.setConfiguration(configuration);
+		RecordFilter recordFilter = new RecordFilter(survey, rootEntityDef.getId());
+		parameters.setRecordFilter(recordFilter);
+		parameters.setAlwaysGenerateZipFile(true);
+		parameters.setIncludeEnumeratedEntities(false);
+		job.setParameters(parameters);
 		jobManager.start(job, false);
 		if (job.isCompleted()) {
 			File outputFile = job.getOutputFile();
@@ -426,12 +425,12 @@ public class SurveyEditVM extends SurveyBaseVM {
 		RecordFilter recordFilter = new RecordFilter(survey);
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		recordFilter.setRootEntityId(rootEntityDef.getId());
-		job.setRecordFilter(recordFilter);
-		job.setEntityId(rootEntityDef.getId());
-		job.setAlwaysGenerateZipFile(false);
-		CSVExportConfiguration configuration = new CSVExportConfiguration();
-		configuration.setIncludeEnumeratedEntities(true);
-		job.setConfiguration(configuration);
+		CSVDataExportParameters parameters = new CSVDataExportParameters();
+		parameters.setRecordFilter(recordFilter);
+		parameters.setEntityId(rootEntityDef.getId());
+		parameters.setAlwaysGenerateZipFile(false);
+		parameters.setIncludeEnumeratedEntities(true);
+		job.setParameters(parameters);
 		jobManager.start(job, false);
 		if (job.isCompleted()) {
 			File outputFile = job.getOutputFile();
