@@ -129,7 +129,7 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 		
 		private User user;
 		private UserGroupRole role;
-		private UserGroup.UserGroupJoinRequestStatus joinStatus;
+		private UserGroupJoinRequestStatus joinStatus;
 		private Date memberSince;
 		private Date requestDate;
 		
@@ -152,11 +152,11 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 			this.role = role;
 		}
 		
-		public UserGroup.UserGroupJoinRequestStatus getJoinStatus() {
+		public UserGroupJoinRequestStatus getJoinStatus() {
 			return joinStatus;
 		}
 		
-		public void setJoinStatus(UserGroup.UserGroupJoinRequestStatus joinStatus) {
+		public void setJoinStatus(UserGroupJoinRequestStatus joinStatus) {
 			this.joinStatus = joinStatus;
 		}
 		

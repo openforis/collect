@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 class Sidebar extends Component {
 
@@ -17,6 +18,10 @@ class Sidebar extends Component {
   // }
 
   render() {
+    if (this.props.isFetchingLoggedUser) {
+      return <div>Loading...</div>
+    }
+    const loggedUser = this.props.loggedUser
     return (
       <div className="sidebar">
         <nav className="sidebar-nav">
@@ -29,27 +34,33 @@ class Sidebar extends Component {
             <li className="nav-item">
               <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Data Management</NavLink>
 	          </li>
-            <li className="nav-item">
-              <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Survey Designer</NavLink>
-	          </li>
-            <li className="nav-item">
-              <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="icon-diamond"></i>Data Cleansing</NavLink>
-	          </li>
+            {loggedUser.canAccessSurveyDesigner ?
+              <li className="nav-item">
+                <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Survey Designer</NavLink>
+              </li>
+              : ''}
+            {loggedUser.canAccessDataCleansing ?
+              <li className="nav-item">
+                <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="icon-diamond"></i>Data Cleansing</NavLink>
+              </li>
+            : ''}
             <li className="nav-item">
               <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="icon-map"></i>Map</NavLink>
 	          </li>
             <li className="divider"></li>
-            <li className="nav-item nav-dropdown">
-              <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="icon-people"></i>Users Management</a>
-              <ul className="nav-dropdown-items">
-                <li className="nav-item">
-                  <NavLink to={'/users'} className="nav-link" activeClassName="active"><i className="icon-user"></i> Users</NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to={'/usergroups'} className="nav-link" activeClassName="active"><i className="icon-people"></i> Groups</NavLink>
-                </li>
-              </ul>
-            </li>
+            {loggedUser.canAccessUsersManagement ?
+              <li className="nav-item nav-dropdown">
+                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="icon-people"></i>Users Management</a>
+                <ul className="nav-dropdown-items">
+                  <li className="nav-item">
+                    <NavLink to={'/users'} className="nav-link" activeClassName="active"><i className="icon-user"></i> Users</NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to={'/usergroups'} className="nav-link" activeClassName="active"><i className="icon-people"></i> Groups</NavLink>
+                  </li>
+                </ul>
+              </li>
+            : ''}
           </ul>
         </nav>
       </div>
@@ -57,4 +68,12 @@ class Sidebar extends Component {
   }
 }
 
-export default Sidebar;
+function mapStateToProps(state) {
+  const {
+    loggedUser
+  } = state.session || {
+    isFetchingLoggedUser: true
+  }
+  return loggedUser ? {loggedUser} : {isFetchingLoggedUser: true}
+}
+export default connect(mapStateToProps)(Sidebar);

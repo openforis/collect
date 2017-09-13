@@ -23,7 +23,6 @@ import javax.validation.Valid;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
@@ -68,7 +67,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * 
@@ -81,8 +79,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final String OLD_CLIENT_URL = "old_client.htm";
 
 	// private static Log LOG = LogFactory.getLog(DataController.class);
 
@@ -165,17 +161,6 @@ public class RecordController extends BasicController implements Serializable {
 		return result;
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/edit.htm", method=GET)
-	public ModelAndView editRecord(@PathVariable int surveyId, @PathVariable int recordId ) throws Exception {
-		URIBuilder uriBuilder = new URIBuilder("redirect:/" + OLD_CLIENT_URL);
-		uriBuilder.addParameter("edit", "true");
-		uriBuilder.addParameter("surveyId", Integer.toString(surveyId));
-		uriBuilder.addParameter("recordId", Integer.toString(recordId));
-		String url = uriBuilder.toString();
-		//String url = String.format("redirect:/index.htm?edit=true&surveyId=%d&recordId=%d", surveyId, recordId);
-		return new ModelAndView(url);
-	}
-	
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	RecordProxy loadRecord(

@@ -7,7 +7,8 @@ export default class AbstractItemsListPage extends Component {
 
         this.state = { 
             selectedItems: [],
-            selectedItemIds: [],
+			selectedItemIds: [],
+			singleSelection: props.singleSelection,
             editedItem: null
         };
         
@@ -24,7 +25,7 @@ export default class AbstractItemsListPage extends Component {
 	}
 
 	handleItemSelected(item) {
-		let newSelectedItems = this.state.selectedItems.concat([item]);
+		let newSelectedItems = this.state.singleSelection ? [item] : this.state.selectedItems.concat([item]);
 		this.handleItemsSelection(newSelectedItems)
 	}
 

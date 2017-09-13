@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap';
 
-import { fetchUsers } from 'actions';
 import UserDetailsPage from './UserDetailsPage';
 import AbstractItemsListPage from 'components/AbstractItemsListPage';
 
@@ -17,8 +16,11 @@ class UsersPage extends AbstractItemsListPage {
 		dispatch: PropTypes.func.isRequired
 	}
 
+	constructor(props) {
+		super({...props, singleSelection: true})
+	}
+
 	componentDidMount() {
-		this.props.dispatch(fetchUsers());
 	}
 
 	createNewItem() {
@@ -54,7 +56,7 @@ class UsersPage extends AbstractItemsListPage {
 							hover
 							condensed
 							selectRow={ 
-								{mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', onSelect: this.handleRowSelect,
+								{mode: 'radio', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', onSelect: this.handleRowSelect,
 									selected: this.state.selectedItemIds} 
 							}
 							>

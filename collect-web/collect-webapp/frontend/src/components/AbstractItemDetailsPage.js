@@ -8,6 +8,17 @@ export default class AbstractItemDetailsPage extends Component {
         this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
         this.handleDeleteBtnClick = this.handleDeleteBtnClick.bind(this);
         this.updateStateFromResponse = this.updateStateFromResponse.bind(this);
+
+        this.state = this.getInitialState()
+    }
+
+    getInitialState() {
+        return {
+            errorFeedback: [], 
+            alertMessageOpen: false, 
+            alertMessageColor: 'success', 
+            alertMessageText: null
+        }
     }
 
     componentDidMount() {

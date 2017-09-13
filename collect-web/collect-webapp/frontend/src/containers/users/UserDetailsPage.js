@@ -15,8 +15,22 @@ class UserDetailsPage extends AbstractItemDetailsPage {
 		user: PropTypes.object.isRequired,
     }
     
+    getInitialState() {
+        let s = super.getInitialState()
+        s = {...s, 
+            newItem: true,
+            id: null,
+            username: '',
+            rawPassword: '',
+            retypedPassword: '',
+            role: null,
+            enabled: false,
+        }
+        return s
+    }
+
     updateStateFromProps(props) {
-        this.state = {
+        this.setState({
             newItem: ! props.user.id,
             id: props.user.id,
             username: props.user.username,
@@ -26,7 +40,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
             enabled: props.user.enabled,
             errorFeedback: [],
             alertMessageOpen: false
-        }
+        })
     }
 
     extractFormObject() {

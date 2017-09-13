@@ -1,6 +1,7 @@
 import Constants from 'utils/Constants'
 import ServiceFactory from 'services/ServiceFactory'
 import { Survey } from 'model/Survey';
+import User from 'model/User';
 
 export const LOG_IN_PENDING = 'LOG_IN_PENDING'
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'
@@ -91,7 +92,7 @@ export function fetchCurrentUser() {
 function receiveCurrentUser(json) {
 	return {
 	    type: RECEIVE_CURRENT_USER,
-	    user: json //TODO map into User object
+	    user: new User(json) //TODO map into User object
 	}
 }
 
@@ -173,7 +174,7 @@ function requestUsers() {
 function receiveUsers(json) {
 	return {
 	    type: RECEIVE_USERS,
-		users: json, //TODO map into User object ?
+		users: json.map(u => new User(u)), 
 	    receivedAt: Date.now()
 	}
 }

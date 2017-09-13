@@ -18,7 +18,7 @@ import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
 import DataManagementPage from 'containers/datamanagement/DataManagementPage'
 import DataExportPage from 'containers/datamanagement/DataExportPage'
 import DataImportPage from 'containers/datamanagement/DataImportPage'
-import RecordEditPage from 'containers/datamanagement/RecordEditPage'
+import OldClientRecordEditPage from 'containers/datamanagement/OldClientRecordEditPage'
 
 class App extends Component {
   render() {
@@ -36,7 +36,7 @@ class App extends Component {
                   <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage}/>
                   <Route path="/datamanagement/export" exact name="DataExport" component={DataExportPage}/>
                   <Route path="/datamanagement/import" exact name="DataImport" component={DataImportPage}/>
-                  <Route path="/datamanagement/:id" name="RecordDetails" component={RecordEditPage}/>
+                  <Route path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage}/>
                   <Route path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage}/>
                   <Route path="/map" exact name="Map" component={MapPage}/>
                   <Route path="/surveydesigner" exact name="Survey Designer" component={SurveyDesignerPage}/>
