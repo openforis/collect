@@ -210,7 +210,7 @@ class DataExportPage extends Component {
                 {parametersForm}
                 <Row>
                     <Col sm={{offset: 1, size: 4}} colSpan={4}>
-                        <Button onClick={this.handleExportButtonClick}>Export</Button>
+                        <Button onClick={this.handleExportButtonClick} className="btn btn-success">Export</Button>
                     </Col>
                 </Row>
                 <JobMonitorModal
