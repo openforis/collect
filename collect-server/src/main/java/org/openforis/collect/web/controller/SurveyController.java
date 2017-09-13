@@ -117,6 +117,20 @@ public class SurveyController extends BasicController {
 		return generateView(survey, false);
 	}
 	
+	@RequestMapping(value="close/{id}", method=PATCH)
+	public @ResponseBody SurveyView closeSurvey(@PathVariable int id) throws SurveyImportException {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
+		surveyManager.close(survey);
+		return generateView(survey, false);
+	}
+	
+	@RequestMapping(value="archive/{id}", method=PATCH)
+	public @ResponseBody SurveyView archiveSurvey(@PathVariable int id) throws SurveyImportException {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
+		surveyManager.archive(survey);
+		return generateView(survey, false);
+	}
+	
 	@RequestMapping(value="temp/{surveyId}/edit.htm", method=GET)
 	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("temp_id", surveyId);

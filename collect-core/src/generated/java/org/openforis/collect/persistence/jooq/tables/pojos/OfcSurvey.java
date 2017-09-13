@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurvey implements Serializable {
 
-	private static final long serialVersionUID = 1811137723;
+	private static final long serialVersionUID = -1911362416;
 
 	private Integer   id;
 	private String    name;
@@ -36,6 +36,7 @@ public class OfcSurvey implements Serializable {
 	private Boolean   temporary;
 	private Integer   publishedId;
 	private Integer   usergroupId;
+	private String    availability;
 
 	public OfcSurvey() {}
 
@@ -51,6 +52,7 @@ public class OfcSurvey implements Serializable {
 		this.temporary = value.temporary;
 		this.publishedId = value.publishedId;
 		this.usergroupId = value.usergroupId;
+		this.availability = value.availability;
 	}
 
 	public OfcSurvey(
@@ -64,7 +66,8 @@ public class OfcSurvey implements Serializable {
 		String    collectVersion,
 		Boolean   temporary,
 		Integer   publishedId,
-		Integer   usergroupId
+		Integer   usergroupId,
+		String    availability
 	) {
 		this.id = id;
 		this.name = name;
@@ -77,6 +80,7 @@ public class OfcSurvey implements Serializable {
 		this.temporary = temporary;
 		this.publishedId = publishedId;
 		this.usergroupId = usergroupId;
+		this.availability = availability;
 	}
 
 	public Integer getId() {
@@ -165,5 +169,13 @@ public class OfcSurvey implements Serializable {
 
 	public void setUsergroupId(Integer usergroupId) {
 		this.usergroupId = usergroupId;
+	}
+
+	public String getAvailability() {
+		return this.availability;
+	}
+
+	public void setAvailability(String availability) {
+		this.availability = availability;
 	}
 }

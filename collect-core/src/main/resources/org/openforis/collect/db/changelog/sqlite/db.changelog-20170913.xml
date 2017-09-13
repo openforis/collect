@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-survey-availability-column" author="ricci" dbms="sqlite">
+		<sql>
+			alter table ofc_survey add column availability char(1);			
+		</sql>
+	</changeSet>
+	
+	<changeSet id="survey-availability-default-values" author="ricci" dbms="sqlite">
+		<sql>
+			UPDATE ofc_survey SET availability = 'P' WHERE temporary != 1;
+			UPDATE ofc_survey SET availability = 'U' WHERE temporary = 1;
+		 </sql>
+	</changeSet>
+	
+</databaseChangeLog>

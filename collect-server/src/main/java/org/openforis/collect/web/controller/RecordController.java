@@ -199,7 +199,7 @@ public class RecordController extends BasicController implements Serializable {
 	}
 	
 	@Transactional
-	@RequestMapping(value = "survey/{surveyId}/data/records/random.json", method=POST, consumes=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/records/random", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<RecordEvent> createRandomRecord(@PathVariable int surveyId, @RequestBody Parameters params) throws RecordPersistenceException {
 		CollectRecord record = randomRecordGenerator.generate(surveyId, params);

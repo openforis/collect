@@ -133,4 +133,11 @@ public class OfcSurveyDao extends DAOImpl<OfcSurveyRecord, org.openforis.collect
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSurvey> fetchByUsergroupId(Integer... values) {
 		return fetch(OfcSurvey.OFC_SURVEY.USERGROUP_ID, values);
 	}
+
+	/**
+	 * Fetch records that have <code>availability IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSurvey> fetchByAvailability(String... values) {
+		return fetch(OfcSurvey.OFC_SURVEY.AVAILABILITY, values);
+	}
 }

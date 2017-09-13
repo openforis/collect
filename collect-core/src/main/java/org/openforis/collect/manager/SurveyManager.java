@@ -46,6 +46,7 @@ import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.CollectSurvey.Availability;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyFileDao;
@@ -739,6 +740,7 @@ public class SurveyManager {
 		survey.setUri(generateSurveyUri(name));
 		survey.addLanguage(language);
 		survey.setTemporary(true);
+		survey.setAvailability(Availability.UNPUBLISHED);
 		if (survey.getSamplingDesignCodeList() == null) {
 			survey.addSamplingDesignCodeList();
 		}
@@ -787,6 +789,7 @@ public class SurveyManager {
 			temporarySurvey.setId(null);
 			temporarySurvey.setPublished(markCopyAsPublished);
 			temporarySurvey.setTemporary(true);
+			temporarySurvey.setAvailability(Availability.UNPUBLISHED);
 			temporarySurvey.setPublishedId(preserveReferenceToPublishedSurvey ? publishedSurveyId : null);
 			if ( temporarySurvey.getSamplingDesignCodeList() == null ) {
 				temporarySurvey.addSamplingDesignCodeList();
@@ -814,6 +817,7 @@ public class SurveyManager {
 			newSurvey.setId(null);
 			newSurvey.setPublished(false);
 			newSurvey.setTemporary(true);
+			newSurvey.setAvailability(Availability.UNPUBLISHED);
 			newSurvey.setPublishedId(null);
 			newSurvey.setName(newName);
 			newSurvey.setUri(generateSurveyUri(newName));
@@ -868,6 +872,7 @@ public class SurveyManager {
 			survey.setId(oldPublishedSurveyId);
 		}
 		survey.setTemporary(false);
+		survey.setAvailability(Availability.PUBLISHED);
 		survey.setPublished(true);
 		survey.setPublishedId(null);
 		survey.setModifiedDate(new Date());
@@ -928,6 +933,19 @@ public class SurveyManager {
 		deleteSurvey(surveyId);
 		
 		return temporarySurvey;
+	}
+	
+	public void close(CollectSurvey survey) throws SurveyImportException {
+		updateAvailability(survey, Availability.CLOSED);
+	}
+
+	public void archive(CollectSurvey survey) throws SurveyImportException {
+		updateAvailability(survey, Availability.ARCHIVED);
+	}
+	
+	private void updateAvailability(CollectSurvey survey, Availability availability) throws SurveyImportException {
+		survey.setAvailability(availability);
+		surveyDao.update(survey);
 	}
 	
 	public void cancelRecordValidation(int surveyId) {

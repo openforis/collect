@@ -36,5 +36,6 @@
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170530.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170815.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170816.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170913.xml" />
 	
 </databaseChangeLog>
