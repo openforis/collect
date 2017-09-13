@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, ButtonToolbar, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
-import { connect } from 'react-redux'
-import Collapsible from 'react-collapsible';
+import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { connect } from 'react-redux';
 
 import ServiceFactory from 'services/ServiceFactory'
 import JobMonitorModal from 'containers/job/JobMonitorModal'
@@ -48,6 +47,7 @@ class DataExportPage extends Component {
             entityId: null,
             exportOnlyOwnedRecords: false,
             headingSource: 'ATTRIBUTE_NAME',
+            additionalOptionsOpen: false
         }
 
         this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
@@ -145,30 +145,37 @@ class DataExportPage extends Component {
                             </Col>
                         </FormGroup>
                         <FormGroup row>
-                            <Collapsible trigger="Additional options">
-                                <FormGroup row>
-                                    <Col sm={{size: 12}}>
-                                        <Label check>
-                                            <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} />{' '}
-                                            Export only owned records
-                                        </Label>
-                                    </Col>
-                                </FormGroup>
-                                <FormGroup row>
-                                    <Col sm={4}>
-                                        <Label for="headingsSourceSelect">Source for file headings:</Label>
-                                    </Col>
-                                    <Col sm={8}>
-                                        <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
-                                            onChange={e => this.setState({headingSource: e.target.value})}>
-                                            <option value="ATTRIBUTE_NAME">Attribute name</option>
-                                            <option value="INSTANCE_LABEL">Attribute label</option>
-                                            <option value="REPORTING_LABEL">Reporting label (Saiku)</option>
-                                        </Input>
-                                    </Col>
-                                </FormGroup>
-                                {additionalOptionsFormGroups}
-                            </Collapsible>
+                            <div>
+                                <Button onClick={e => this.setState({additionalOptionsOpen: ! this.state.additionalOptionsOpen})}>Additional Options</Button>
+                                <Collapse isOpen={this.state.additionalOptionsOpen}>
+                                    <Card>
+                                        <CardBlock>
+                                            <FormGroup row>
+                                                <Col sm={{size: 12}}>
+                                                    <Label check>
+                                                        <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} />{' '}
+                                                        Export only owned records
+                                                    </Label>
+                                                </Col>
+                                            </FormGroup>
+                                            <FormGroup row>
+                                                <Col sm={4}>
+                                                    <Label for="headingsSourceSelect">Source for file headings:</Label>
+                                                </Col>
+                                                <Col sm={8}>
+                                                    <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
+                                                        onChange={e => this.setState({headingSource: e.target.value})}>
+                                                        <option value="ATTRIBUTE_NAME">Attribute name</option>
+                                                        <option value="INSTANCE_LABEL">Attribute label</option>
+                                                        <option value="REPORTING_LABEL">Reporting label (Saiku)</option>
+                                                    </Input>
+                                                </Col>
+                                            </FormGroup>
+                                            {additionalOptionsFormGroups}
+                                        </CardBlock>
+                                    </Card>
+                                </Collapse>
+                            </div>
                         </FormGroup>
                     </FormGroup>
                 break
