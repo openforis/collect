@@ -20,13 +20,13 @@ export default class JobMonitorModal extends Component {
             jobId: props.jobId
         }
 
-        if (props.jobId && props.open) {
+        if (props.open && props.jobId) {
            this.startTimer()
         }
     }
 
     static propTypes = {
-        jobId: PropTypes.string.isRequired,
+        jobId: PropTypes.string,
         title: PropTypes.string.isRequired,
         okButtonLabel: PropTypes.string,
 		handleJobCompleted: PropTypes.func,
