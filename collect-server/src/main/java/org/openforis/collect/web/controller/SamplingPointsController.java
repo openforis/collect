@@ -4,9 +4,11 @@ import static org.openforis.collect.utils.Controllers.CSV_CONTENT_TYPE;
 import static org.openforis.collect.utils.Controllers.KML_CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletOutputStream;
@@ -30,6 +32,7 @@ import org.openforis.idm.model.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -48,8 +51,14 @@ public class SamplingPointsController extends BasicController {
 	public @ResponseBody
 	List<SamplingDesignItem> loadSamplingPoints(
 			@PathVariable int surveyId, 
-			@RequestParam(value="parent_keys", required=false) String[] parentKeys) {
-		return samplingDesignManager.loadChildItems(surveyId, parentKeys);
+			@RequestParam(value="parent_keys", required=false) String[] parentKeys, 
+			@RequestParam(value="only_parent_item", required=false, defaultValue="false") boolean onlyParentItem) {
+		if (onlyParentItem) {
+			SamplingDesignItem item = samplingDesignManager.loadItem(surveyId, parentKeys);
+			return Arrays.asList(item);
+		} else {
+			return samplingDesignManager.loadChildItems(surveyId, parentKeys);
+		}
 	}
 	
 	@RequestMapping(value = "survey/{surveyId}/sampling_point_data.csv", method=GET)
@@ -63,6 +72,13 @@ public class SamplingPointsController extends BasicController {
 		return "ok";
 	}
 	
+	@RequestMapping(value="survey/{surveyId}/sampling_point_data", method=PATCH, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	SamplingDesignItem updateSamplingPointItem(@PathVariable int surveyId, @RequestBody SamplingDesignItem item) {
+		samplingDesignManager.save(item);
+		return item;
+	}
+
 	@RequestMapping(value = "survey/{surveyId}/sampling_point_data.kml", method=GET, produces=KML_CONTENT_TYPE)
 	public void loadSamplingPointKmlData(@PathVariable int surveyId, HttpServletResponse response) throws Exception {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);

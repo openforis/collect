@@ -138,23 +138,15 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 	}
 
 	/**
-	 * Returns the items in the level next to the one defined by the parent keys
-	 * @param surveyId
-	 * @param parentKeys
-	 * @return
+	 * Return the items in the level next to the one defined by the parent keys with level codes different from null
+	 * 
 	 */
 	public List<SamplingDesignItem> loadChildItems(int surveyId, String... parentKeys) {
 		SamplingDesignDSLContext dsl = dsl();
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_SAMPLING_DESIGN);
 		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
-		if (parentKeys != null) {
-			for (int levelIdx = 0; levelIdx < parentKeys.length; levelIdx ++) {
-				@SuppressWarnings("unchecked")
-				Field<String> tableField = LEVEL_CODE_FIELDS[levelIdx];
-				q.addConditions(tableField.eq(parentKeys[levelIdx]));
-			}
-		}
+		addParentKeysConditions(q, parentKeys);
 		int nextLevelIndex = parentKeys == null ? 0: parentKeys.length;
 		
 		//not null value for the "next" level
@@ -170,6 +162,30 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		Result<Record> result = q.fetch();
 		
 		return dsl.fromResult(result);
+	}
+	
+	public SamplingDesignItem loadItem(int surveyId, String... parentKeys) {
+		SamplingDesignDSLContext dsl = dsl();
+		SelectQuery<Record> q = dsl.selectQuery();	
+		q.addFrom(OFC_SAMPLING_DESIGN);
+		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
+		addParentKeysConditions(q, parentKeys);
+		int nextLevelIndex = parentKeys == null ? 0: parentKeys.length;
+		
+		addLevelKeyNullConditions(q, nextLevelIndex);
+
+		Record r = q.fetchAny();
+		return dsl.fromRecord(r);
+	}
+
+	private void addParentKeysConditions(SelectQuery<Record> q, String... parentKeys) {
+		if (parentKeys != null) {
+			for (int levelIdx = 0; levelIdx < parentKeys.length; levelIdx ++) {
+				@SuppressWarnings("unchecked")
+				Field<String> tableField = LEVEL_CODE_FIELDS[levelIdx];
+				q.addConditions(tableField.eq(parentKeys[levelIdx]));
+			}
+		}
 	}
 	
 	/**

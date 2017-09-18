@@ -104,7 +104,7 @@ public class SurveyController extends BasicController {
 	@Transactional
 	@RequestMapping(value="simple", method=POST)
 	public @ResponseBody
-	SurveyView insertSurvey(@RequestBody SimpleSurveyCreationParameters parameters, BindingResult bindingResult) throws Exception {
+	SurveyView createSimpleSurvey(@RequestBody SimpleSurveyCreationParameters parameters, BindingResult bindingResult) throws Exception {
 		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager, userGroupManager);
 		CollectSurvey survey = surveyCreator.generateSimpleSurvey(parameters);
 		return generateView(survey, true);

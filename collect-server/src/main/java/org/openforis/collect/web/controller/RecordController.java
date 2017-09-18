@@ -25,19 +25,17 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
-import org.openforis.collect.event.EventProducer;
-import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
-import org.openforis.collect.manager.RandomRecordGenerator.Parameters;
 import org.openforis.collect.manager.RecordAccessControlManager;
+import org.openforis.collect.manager.RecordGenerator;
+import org.openforis.collect.manager.RecordGenerator.NewRecordParameters;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -89,11 +87,11 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private SurveyContext surveyContext;
 	@Autowired
-	private UserManager userManager;
-	@Autowired
 	private MessageSource messageSource;
 	@Autowired
 	private RandomRecordGenerator randomRecordGenerator;
+	@Autowired
+	private RecordGenerator recordGenerator;
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
@@ -134,7 +132,7 @@ public class RecordController extends BasicController implements Serializable {
 		return count;
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/data/records/summary.json", method=GET)
+	@RequestMapping(value = "survey/{surveyId}/data/records/summary", method=GET)
 	public @ResponseBody Map<String, Object> loadRecordSummaries(
 			@PathVariable int surveyId,
 			@Valid RecordSummarySearchParameters params) {
@@ -178,7 +176,7 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestBody Map<String, String> body) throws RecordLockedException, MultipleEditException {
 		String ownerIdStr = body.get("ownerId");
 		Integer ownerId = ownerIdStr == null ? null : Integer.parseInt(ownerIdStr);
-		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
+		CollectSurvey survey = surveyManager.getById(surveyId);
 		SessionState sessionState = sessionManager.getSessionState();
 		recordManager.assignOwner(survey, recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
 		return new Response();
@@ -188,26 +186,23 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	RecordProxy newRecord(@PathVariable int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
-		String sessionId = sessionManager.getSessionState().getSessionId();
 		User user = sessionManager.getSessionState().getUser();
-		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-		String rootEntityName = ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName());
-		String versionName = ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null);
-		CollectRecord record = recordManager.create(survey, rootEntityName, user, versionName, sessionId);
-		recordManager.save(record, user, sessionId);
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName()));
+		params.setVersionName(ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null));
+		params.setUserId(user.getId());
+		CollectRecord record = recordGenerator.generate(surveyId, params, params.getRecordKey());
 		return toProxy(record);
 	}
 	
 	@Transactional
 	@RequestMapping(value = "survey/{surveyId}/data/records/random", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	List<RecordEvent> createRandomRecord(@PathVariable int surveyId, @RequestBody Parameters params) throws RecordPersistenceException {
+	RecordProxy createRandomRecord(@PathVariable int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
 		CollectRecord record = randomRecordGenerator.generate(surveyId, params);
-		User user = userManager.loadById(params.getUserId());
-		List<RecordEvent> events = new EventProducer().produceFor(record, user.getUsername());
-		return events;
+		return toProxy(record);
 	}
-	
+
 	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=Files.ZIP_CONTENT_TYPE)
 	public void exportRecord(
 			@PathVariable(value="survey_id") int surveyId, 
@@ -248,7 +243,7 @@ public class RecordController extends BasicController implements Serializable {
 			@PathVariable Integer surveyId,
 			@RequestBody CSVExportParametersForm parameters) throws IOException {
 		User user = sessionManager.getSessionState().getUser();
-		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		CollectSurvey survey = surveyManager.getById(surveyId);
 		
 		csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
 		csvDataExportJob.setSurvey(survey);
@@ -356,28 +351,6 @@ public class RecordController extends BasicController implements Serializable {
 
 		public void setKeyValues(String[] keyValues) {
 			this.keyValues = keyValues;
-		}
-	}
-	
-	public static class NewRecordParameters {
-		
-		private String rootEntityName;
-		private String versionName;
-		
-		public String getRootEntityName() {
-			return rootEntityName;
-		}
-		
-		public void setRootEntityName(String rootEntityName) {
-			this.rootEntityName = rootEntityName;
-		}
-
-		public String getVersionName() {
-			return versionName;
-		}
-
-		public void setVersionName(String versionName) {
-			this.versionName = versionName;
 		}
 	}
 	

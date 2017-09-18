@@ -38,8 +38,8 @@ public class SurveyCreator {
 	private String languageCode = Locale.ENGLISH.getLanguage();
 	private String singleAttributeSurveyCodeListName = "values";
 	private String singleAttributeSurveyRootEntityName = "plot";
-	private String singleAttributeSurveyIdAttributeName = "plot_id";
-	private String singleAttributeSurveyAttributeName = "value";
+	private String singleAttributeSurveyKeyAttributeName = "plot_id";
+	private String singleAttributeSurveyValueAttributeName = "value";
 	private String singleAttributeSurveyTabLabel = "Plot";
 	private String singleAttributeSurveySecondLevelEntityName = "subplot";
 	private String singleAttributeSurveySecondLevelIdAttributeName = "subplot_id";
@@ -101,10 +101,9 @@ public class SurveyCreator {
 		schema.addRootEntityDefinition(rootEntityDef);
 		
 		CodeAttributeDefinition idAttrDef = schema.createCodeAttributeDefinition();
-		idAttrDef.setName(singleAttributeSurveyIdAttributeName);
+		idAttrDef.setName(singleAttributeSurveyKeyAttributeName);
 		idAttrDef.setKey(true);
 		idAttrDef.setList(survey.getSamplingDesignCodeList());
-		
 		rootEntityDef.addChildDefinition(idAttrDef);
 		
 		TextAttributeDefinition operatorAttrDef = schema.createTextAttributeDefinition();
@@ -112,13 +111,11 @@ public class SurveyCreator {
 		operatorAttrDef.setKey(true);
 		operatorAttrDef.setLabel(Type.INSTANCE, languageCode, singleAttributeSurveyOperatorAttributeLabel);
 		survey.getAnnotations().setMeasurementAttribute(operatorAttrDef, true);
-		
 		rootEntityDef.addChildDefinition(operatorAttrDef);
 		
 		EntityDefinition secondLevelEntityDef = schema.createEntityDefinition();
 		secondLevelEntityDef.setName(singleAttributeSurveySecondLevelEntityName);
 		secondLevelEntityDef.setMultiple(true);
-		
 		rootEntityDef.addChildDefinition(secondLevelEntityDef);
 		
 		CodeAttributeDefinition secondLevelIdAttrDef = schema.createCodeAttributeDefinition();
@@ -126,13 +123,11 @@ public class SurveyCreator {
 		secondLevelIdAttrDef.setKey(true);
 		secondLevelIdAttrDef.setList(survey.getSamplingDesignCodeList());
 		secondLevelIdAttrDef.setParentCodeAttributeDefinition(idAttrDef);
-		
 		secondLevelEntityDef.addChildDefinition(secondLevelIdAttrDef);
 		
 		CodeAttributeDefinition valueAttrDef = schema.createCodeAttributeDefinition();
-		valueAttrDef.setName(singleAttributeSurveyAttributeName);
+		valueAttrDef.setName(singleAttributeSurveyValueAttributeName);
 		valueAttrDef.setList(codeList);
-		
 		secondLevelEntityDef.addChildDefinition(valueAttrDef);
 		
 		//create root tab set

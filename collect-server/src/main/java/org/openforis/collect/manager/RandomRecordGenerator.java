@@ -10,120 +10,60 @@ import java.util.Map.Entry;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.EntityAddChange;
-import org.openforis.collect.model.NodeChange;
-import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordFilter;
-import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.model.User;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
-import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NodeDefinitionVisitor;
-import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Value;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class RandomRecordGenerator {
-	
-	@Autowired
-	private RecordManager recordManager;
-	@Autowired
-	private SurveyManager surveyManager;
-	@Autowired
-	private UserManager userManager;
-	@Autowired
-	private SamplingDesignManager samplingDesignManager;
-	
-	private RecordUpdater recordUpdater = new RecordUpdater();
+public class RandomRecordGenerator extends RecordGenerator {
 	
 	@Transactional
-	public CollectRecord generate(int surveyId, Parameters parameters) {
+	public CollectRecord generate(int surveyId, NewRecordParameters parameters) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		User user = userManager.loadById(parameters.getUserId());
-		
-		List<String> recordKey = provideRandomLessMeasuredRecordKey(survey, user);
-		
-		CollectRecord record = createRecord(survey, user);
-		
-		setRecordKeyValues(record, recordKey);
-		
-		if (parameters.isAddSecondLevelEntities()) {
-			addSecondLevelEntities(record, recordKey);
+
+		List<String> recordKey = provideRandomRecordKey(survey, user, parameters.isOnlyUnanalyzedSamplingPoints());
+		if (recordKey == null) {
+			return null;
 		}
-		recordManager.save(record);
-		return record;
+		return this.generate(surveyId, parameters, recordKey);
 	}
 
-	private CollectRecord createRecord(CollectSurvey survey, User user) {
-		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
-		String rootEntityName = rootEntityDef.getName();
-		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
-		return record;
-	}
-
-	private List<String> provideRandomLessMeasuredRecordKey(final CollectSurvey survey, User user) {
+	private List<String> provideRandomRecordKey(CollectSurvey survey, User user, boolean onlyUnanalyzed) {
 		Map<List<String>, Integer> recordMeasurementsByKey = calculateRecordMeasurementsByKey(survey, user);
 		
 		if (recordMeasurementsByKey.isEmpty()) {
 			throw new IllegalStateException(String.format("Sampling design data not defined for survey %s", survey.getName()));
 		}
-		Integer minMeasurements = Collections.min(recordMeasurementsByKey.values());
-		//do not consider measurements different from minimum measurement
-		Iterator<Entry<List<String>, Integer>> iterator = recordMeasurementsByKey.entrySet().iterator();
+		int minMeasurements = onlyUnanalyzed ? 0 : Collections.min(recordMeasurementsByKey.values());
+		return provideRandomRecordKey(recordMeasurementsByKey, minMeasurements);
+	}
+
+	private List<String> provideRandomRecordKey(Map<List<String>, Integer> recordMeasurementsByKey, int measurements) {
+		//do not consider measurements different from specified number of measurement
+		Map<List<String>, Integer> filteredRecordMeasurementsByKey = new HashMap<List<String>, Integer>(recordMeasurementsByKey);
+		Iterator<Entry<List<String>, Integer>> iterator = filteredRecordMeasurementsByKey.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Entry<List<String>, Integer> entry = iterator.next();
-			if (entry.getValue() != minMeasurements) {
+			if (entry.getValue() != measurements) {
 				iterator.remove();
 			}
 		}
+		if (filteredRecordMeasurementsByKey.isEmpty()) {
+			return null;
+		}
 		//randomly select one record key among the ones with minimum measurements
-		List<List<String>> recordKeys = new ArrayList<List<String>>(recordMeasurementsByKey.keySet());
+		List<List<String>> recordKeys = new ArrayList<List<String>>(filteredRecordMeasurementsByKey.keySet());
 		int recordKeyIdx = new Double(Math.floor(Math.random() * recordKeys.size())).intValue();
 		List<String> recordKey = recordKeys.get(recordKeyIdx);
-		return recordKey;
-	}
-
-	private void addSecondLevelEntities(CollectRecord record, List<String> recordKey) {
-		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		List<SamplingDesignItem> secondLevelSamplingPointItems = samplingDesignManager.loadChildItems(survey.getId(), recordKey);
-		List<CodeAttributeDefinition> samplingPointDataCodeAttributeDefs = findSamplingPointCodeAttributes(survey);
-		if (! secondLevelSamplingPointItems.isEmpty() && samplingPointDataCodeAttributeDefs.size() > 1) {
-			int levelIndex = 1;
-			for (SamplingDesignItem samplingDesignItem : secondLevelSamplingPointItems) {
-				CodeAttributeDefinition levelKeyDef = samplingPointDataCodeAttributeDefs.get(levelIndex);
-				EntityDefinition levelEntityDef = levelKeyDef.getParentEntityDefinition();
-				Entity parentLevelEntity = record.getRootEntity();
-				NodeChangeSet addEntityChangeSet = recordUpdater.addEntity(parentLevelEntity, levelEntityDef);
-				Entity entity = getAddedEntity(addEntityChangeSet);
-				CodeAttribute keyAttr = entity.getChild(levelKeyDef);
-				recordUpdater.updateAttribute(keyAttr, new Code(samplingDesignItem.getLevelCode(levelIndex + 1)));
-			}
-		}
-	}
-
-	private CollectSurvey setRecordKeyValues(CollectRecord record, List<String> recordKey) {
-		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		List<AttributeDefinition> keyAttributeDefs = getNonMeasurementKeyDefs(survey);
-		//TODO update measurement attribute with... username?
-		for (int i = 0; i < keyAttributeDefs.size(); i++) {
-			String keyPart = recordKey.get(i);
-			AttributeDefinition keyAttrDef = keyAttributeDefs.get(i);
-			Attribute<?,Value> keyAttribute = record.findNodeByPath(keyAttrDef.getPath());
-			recordUpdater.updateAttribute(keyAttribute, keyAttrDef.createValue(keyPart));
-		}
-		return survey;
+		List<String> result = new ArrayList<String>(recordKey);
+		result.add(String.valueOf(measurements + 1));
+		return result;
 	}
 
 	private Map<List<String>, Integer> calculateRecordMeasurementsByKey(CollectSurvey survey, final User user) {
@@ -164,62 +104,7 @@ public class RandomRecordGenerator {
 		return measurementsByRecordKey;
 	}
 
-	private List<CodeAttributeDefinition> findSamplingPointCodeAttributes(final CollectSurvey survey) {
-		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
-		final List<CodeAttributeDefinition> samplingPointDataCodeAttributeDefs = new ArrayList<CodeAttributeDefinition>();
-		rootEntityDef.traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition def) {
-				if (def instanceof CodeAttributeDefinition 
-						&& ((CodeAttributeDefinition) def).getList().equals(survey.getSamplingDesignCodeList())) {
-					samplingPointDataCodeAttributeDefs.add((CodeAttributeDefinition) def);
-				}
-			}
-		}, TraversalType.BFS);
-		return samplingPointDataCodeAttributeDefs;
-	}
 	
-	private Entity getAddedEntity(NodeChangeSet changeSet) {
-		List<NodeChange<?>> changes = changeSet.getChanges();
-		for (NodeChange<?> nodeChange : changes) {
-			if (nodeChange instanceof EntityAddChange) {
-				Entity entity = (Entity) nodeChange.getNode();
-				return entity;
-			}
-		}
-		throw new IllegalArgumentException("Cannot find added entity in node change set");
-	}
 	
-	private List<AttributeDefinition> getNonMeasurementKeyDefs(CollectSurvey survey) {
-		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
-		List<AttributeDefinition> keyAttrDefs = rootEntityDef.getKeyAttributeDefinitions();
-		List<AttributeDefinition> nonMeasurementKeyAttrDefs = new ArrayList<AttributeDefinition>();
-		for (AttributeDefinition keyAttrDef : keyAttrDefs) {
-			if (! survey.getAnnotations().isMeasurementAttribute(keyAttrDef)) {
-				nonMeasurementKeyAttrDefs.add(keyAttrDef);
-			}
-		}
-		return nonMeasurementKeyAttrDefs;
-	}
 	
-	public static class Parameters {
-		
-		private int userId;
-		private boolean addSecondLevelEntities = false;
-
-		public int getUserId() {
-			return userId;
-		}
-
-		public void setUserId(int userId) {
-			this.userId = userId;
-		}
-		
-		public boolean isAddSecondLevelEntities() {
-			return addSecondLevelEntities;
-		}
-
-		public void setAddSecondLevelEntities(boolean addSecondLevelEntities) {
-			this.addSecondLevelEntities = addSecondLevelEntities;
-		}
-	}
 }
