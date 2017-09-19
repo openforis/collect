@@ -7,8 +7,8 @@ import java.io.File;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.poi.util.IOUtils;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.internal.SurveyBackupVerifierTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;

@@ -9,7 +9,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.poi.util.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.datacleansing.io.DataCleansingImportTask;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.metadata.CodeListImagesImportTask;

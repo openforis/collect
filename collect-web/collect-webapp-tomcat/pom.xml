@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-web</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.13.8-SNAPSHOT</version>
+		<version>3.13.10-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	
@@ -18,7 +18,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.6</version>
 				<executions>
 					<execution>
 						<id>unpack-tomcat</id>
@@ -169,12 +168,6 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-client</artifactId>
-			<type>swf</type>
-			<scope>runtime</scope>
 		</dependency>
 		<!-- JSTL -->
 		<dependency>

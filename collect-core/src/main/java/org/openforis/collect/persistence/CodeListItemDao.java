@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
 import org.jooq.Condition;
 import org.jooq.Configuration;
+import org.jooq.Cursor;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Field;
 import org.jooq.Insert;
@@ -32,7 +33,9 @@ import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Survey;
@@ -598,6 +601,31 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			return null;
 		} else {
 			return filteredByVersion.get(0);
+		}
+	}
+	
+	public void visitItems(CodeList list, Visitor<CodeListItem> visitor, ModelVersion version) {
+		visitChildItems(list, null, visitor, version);
+	}
+	
+	public void visitChildItems(CodeList list, Integer parentItemId, Visitor<CodeListItem> visitor, ModelVersion version) {
+		JooqDSLContext dsl = dsl(list);
+		SelectQuery<Record> q = createSelectChildItemsQuery(dsl, list, parentItemId, true);
+		Cursor<Record> cursor = null;
+		try {
+			cursor = q.fetchLazy();
+			while (cursor.hasNext()) {
+				Record r = cursor.fetchOne();
+				PersistedCodeListItem item = dsl.fromRecord(r);
+				if (version == null || version.isApplicable(item)) {
+					visitor.visit(item);
+					visitChildItems(list, item.getSystemId(), visitor, version);
+				}
+			}
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+		    }
 		}
 	}
 

@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Visitor;
 
 /**
  * @author G. Miceli
@@ -325,6 +326,18 @@ public class CodeList extends VersionableSurveyObject {
 	
 	public void moveItem(CodeListItem item, int indexTo) {
 		CollectionUtils.shiftItem(items, item, indexTo);
+	}
+	
+	public void visitItems(Visitor<CodeListItem> visitor, ModelVersion version) {
+		Deque<CodeListItem> stack = new LinkedList<CodeListItem>();
+		stack.addAll(getItems());
+		while (! stack.isEmpty()) {
+			CodeListItem item = stack.pop();
+			if (version == null || version.isApplicable(item)) {
+				visitor.visit(item);
+				stack.addAll(item.getChildItems());
+			}
+		}
 	}
 
 	public CodeScope getCodeScope() {

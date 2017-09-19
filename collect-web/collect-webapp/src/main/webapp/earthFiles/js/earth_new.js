@@ -6,11 +6,13 @@ var TIME_FORMAT = 'HH:ss';
 var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
 var EXTRA_FIELD_CLASS = "extra";
-var MAX_DATA_UPDATE_RETRY_COUNT = 5;
+var MAX_DATA_UPDATE_RETRY_COUNT = 0;
+var REQUEST_TIMEOUT = 10000;
 
 var DEFAULT_STATE = "default";
 var LOADING_STATE = "loading";
 var COLLECT_EARTH_NOT_RUNNING_STATE = "collectEarthNotRunning";
+var ERROR_STATE = "error";
 
 var $form = null; //to be initialized
 var stateByInputFieldName = {};
@@ -60,7 +62,7 @@ $(function() {
 
 	$(".code-item").tooltip();
 
-	checkIfPlacemarkAlreadyFilled();
+	loadPlacemarkData();
 });
 
 var submitData = function() {
@@ -79,7 +81,7 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	delay = defaultIfNull(delay, 100);
 	retryCount = defaultIfNull(retryCount, 0);
 	if (DEBUG) {
-		log("sending update request (delay=" + delay + ")");
+		log("1/4 sending update request (delay=" + delay + ")");
 	}
 	var inputFieldName = $(inputField).attr("id");
 	if (lastUpdateInputFieldName == inputFieldName) {
@@ -101,13 +103,16 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 	// if the user stops clicking for over one second
 
 	ajaxTimeout = setTimeout(function() {
-		var data = PREVIEW ? createPlacemarkUpdateRequest(null) : createPlacemarkUpdateRequest(inputField);
+		if (DEBUG) {
+			log("2/4 create update request");
+		}
+		var data = createPlacemarkUpdateRequest(PREVIEW ? null : inputField);
 		
 		lastUpdateRequest = $.ajax({
 			data : data,
 			type : "POST",
 			url : $form.attr("action"),
-			timeout: 2000,
+			timeout: REQUEST_TIMEOUT,
 			dataType : 'json',
 			beforeSend : function() {
 				if (blockUI) {
@@ -125,6 +130,9 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 			}
 		})
 		.done(function(json) {
+			if (DEBUG) {
+				log("4/4 json response received");
+			}
 			if (json.success) {
 				handleSuccessfullDataUpdateResponse(json, activelySaved, blockUI);
 			} else {
@@ -147,10 +155,14 @@ var sendDataUpdateRequest = function(inputField, activelySaved, blockUI, delay, 
 			}
 		})
 		.always(function() {
+			ajaxTimeout = null;
 			lastUpdateRequest = null;
 			lastUpdateInputFieldName = null;
 
 		});
+		if (DEBUG) {
+			log("3/4 request sent, waiting for response...");
+		}
 	}, delay);
 	
 	lastUpdateInputFieldName = inputFieldName;
@@ -194,24 +206,11 @@ var handleSuccessfullDataUpdateResponse = function(json, showFeedbackMessage, un
 };
 
 var handleFailureDataUpdateResponse = function(inputField, activelySaved, blockUI, retryCount, errorMessage, xhr, textStatus, errorThrown) {
-	if (retryCount < MAX_DATA_UPDATE_RETRY_COUNT){
-		if (DEBUG) {
-			log("error updating data. retrying for the " + (retryCount+1) + " time");
-		}
-		sendDataUpdateRequest(inputField, activelySaved, blockUI, 1000, retryCount + 1);
-	} else {
-		undoChanges();
-		var logErrorMessage = "error updating data: " + errorMessage;
-		if (xhr) {
-			logErrorMessage += " Status = " + xhr.status + "; Text status = " 
-					+ textStatus + "; error thrown = " + errorThrown + "; response = " + xhr.responseText;
-		}
-		logError(logErrorMessage);
-
-		if (blockUI) {
-			$.unblockUI();
-		}
+	if (DEBUG) {
+		log("error updating data: " + errorMessage);
 	}
+	//reload placemark: shown form could be not consistent with stored data
+	loadPlacemarkData(true);
 };
 
 var createPlacemarkUpdateRequest = function(inputField) {
@@ -237,8 +236,9 @@ var createPlacemarkUpdateRequest = function(inputField) {
 }
 
 var abortLastUpdateRequest = function() {
-	clearTimeout(ajaxTimeout);
-
+	if (ajaxTimeout != null) {
+		clearTimeout(ajaxTimeout);
+	}
 	if (lastUpdateRequest != null) {
 		if (DEBUG) {
 			log("abort last update request");
@@ -253,14 +253,38 @@ var undoChanges = function() {
 };
 
 var interpretJsonSaveResponse = function(json, showFeedbackMessage) {
+	if (DEBUG) {
+		log("Parsing response:")
+	}
+	
+	if (DEBUG) {
+		log("1/4: Update field status cache")
+	}
 	updateFieldStateCache(json.inputFieldInfoByParameterName);
+	
+	if (DEBUG) {
+		log("2/4: Update input field status")
+	}
 	updateInputFieldsState(json.inputFieldInfoByParameterName);
-	fillDataWithJson(json.inputFieldInfoByParameterName);
 
+	if (DEBUG) {
+		log("3/4: Fill data in input fields")
+	}
+	fillDataWithJson(json.inputFieldInfoByParameterName);
+	
+	if (DEBUG) {
+		log("4/4: Update steps error feedback")
+	}
+	updateStepsErrorFeedback();
+
+	if (DEBUG) {
+		log("Response parsed correctly");
+	}
+	
 	if (showFeedbackMessage) { // show feedback message
 		if (json.success) {
 			if (isAnyErrorInForm()) {
-				var message = "";
+				var message = "<ul>";
 				for(var key in stateByInputFieldName) {
 					var info = stateByInputFieldName[key];
 					if (info.inError) {
@@ -271,9 +295,10 @@ var interpretJsonSaveResponse = function(json, showFeedbackMessage) {
 						} else {
 							label = inputField.length > 0 ? OF.UI.Forms.getFieldLabel(inputField): "";
 						}
-						message += label + " : " + info.errorMessage + "<br>";
+						message += "<li>" + label + " : " + info.errorMessage + "</li>";
 					}
 				}
+				message += "</ul>";
 				showErrorMessage(message);
 
 				// Resets the "actively saved" parameter to false so that it is
@@ -305,8 +330,10 @@ var getEnumeratedEntityNestedAttributeErrorMessageLabel = function(inputField) {
 	var rowHeading = rowHeadingEl.text();
 	var attributeHeadingEl = inputField.closest("table").find("thead tr th").eq(columnIndex);
 	var attributeHeading = attributeHeadingEl.text();
-	var entityHeading = inputField.closest("section").find("legend").text();
-	var label = entityHeading + " (" + rowHeading + ") " + attributeHeading;
+	var enumeratorHeadingEl = inputField.closest("table").find("thead tr th").eq(0);
+	var enumeratorHeading = enumeratorHeadingEl.text();
+	var entityHeading = inputField.closest("fieldset").find("legend").text();
+	var label = entityHeading + " [" + enumeratorHeading + " " + rowHeading + "] / " + attributeHeading;
 	return label;
 };
 
@@ -365,9 +392,7 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 			defaultMessage : info.errorMessage
 		});
 	});
-	OF.UI.Forms.Validation.updateErrorMessageInFields($form, changedFieldNames, errors);
-
-	updateStepsErrorFeedback();
+	OF.UI.Forms.Validation.updateErrorMessageInFields($form, changedFieldNames, errors, {doNotIncludeFieldLabel: true});
 
 	if (DEBUG) {
 		log("updating fields relevance");
@@ -433,14 +458,13 @@ var toggleStepVisibility = function(index, visible) {
 };
 
 var showCurrentStep = function() {
-	if (currentStepIndex != null && currentStepIndex > 0) {
-		setStepsAsVisited(currentStepIndex);
-		var stepHeading = getStepHeading(currentStepIndex);
-		var relevant = ! stepHeading.hasClass("notrelevant");
-		if (relevant) {
-			$stepsContainer.steps("setCurrentIndex", currentStepIndex);
-		}
+	setStepsAsVisited(currentStepIndex);
+	var stepHeading = getStepHeading(currentStepIndex);
+	var relevant = ! stepHeading.hasClass("notrelevant");
+	if (relevant) {
+		$stepsContainer.steps("setCurrentIndex", currentStepIndex);
 	}
+	stepHeading.removeClass("done");
 };
 
 var setStepsAsVisited = function(upToStepIndex) {
@@ -451,6 +475,10 @@ var setStepsAsVisited = function(upToStepIndex) {
 		var stepHeading = getStepHeading(stepIndex);
 		stepHeading.addClass("visited");
 		stepHeading.removeClass("disabled");
+		var hasErrors = $(this).find(".form-group.has-error").length > 0;
+		if (! hasErrors && !(upToStepIndex == 0 && stepIndex == 0)) {
+			stepHeading.addClass("done");
+		}
 	}
 };
 
@@ -611,26 +639,40 @@ var findFirstRelevantElementIndex = function(group, startFromIndex, reverseOrder
 	return -1;
 };
 
-var checkIfPlacemarkAlreadyFilled = function(checkCount) {
-	checkCount = defaultIfNull(checkCount, 0);
-	
+var loadPlacemarkData = function(reloadingAfterError) {
 	var placemarkId = getPlacemarkId();
 
 	$.ajax({data : {id : placemarkId},
 		type : "GET",
 		url : HOST + "placemark-info-expanded",
 		dataType : 'json',
-		timeout : 2000
+		timeout : REQUEST_TIMEOUT
 	})
 	.fail(function(xhr, textStatus, errorThrown) {
 		if (isValidResponse(xhr.responseText)) {
 			//valid response but for some (unknown) reason not handled properly by jquery
 			handleValidResponse($.parseJSON(xhr.responseText));
-		} else if (checkCount < 5) {
-			// try again
-			checkIfPlacemarkAlreadyFilled(checkCount + 1);
 		} else {
-			changeState(COLLECT_EARTH_NOT_RUNNING_STATE);
+			if (reloadingAfterError) {
+				changeState(ERROR_STATE);
+
+				var logErrorMessage = "error updating data";
+				if (errorThrown) {
+					logErrorMessage += ": " + errorThrown;
+				}
+				if (xhr) {
+					if (xhr.readyState == 0) {
+						logErrorMessage += "; connection refused;";
+					}
+					logErrorMessage += " status = " + xhr.status 
+							+ "; text status = " + textStatus 
+							+ "; error thrown = " + errorThrown 
+							+ "; response = " + xhr.responseText;
+				}
+				logError(logErrorMessage);
+			} else {
+				changeState(COLLECT_EARTH_NOT_RUNNING_STATE);
+			}
 		}
 	})
 	.done(function(json) {
@@ -650,12 +692,12 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 				}
 			}
 			setStepsAsVisited();
-			// Pre-fills the form and after that initilizes the
+			// Pre-fills the form and after that initializes the
 			// change event listeners for the inputs
 			interpretJsonSaveResponse(json, false);
 				
-			currentStepIndex = json.currentStep == null ? null
-					: parseInt(json.currentStep);
+			currentStepIndex = parseInteger(json.currentStep, 0);
+			
 			showCurrentStep();
 			updateStepsErrorFeedback();
 
@@ -702,27 +744,33 @@ var showErrorMessage = function(message) {
 };
 
 var showMessage = function(message, type) {
-	var color;
+	var color, successIconVisible, title;
 	switch (type) {
 	case "error":
+		title = 'Error';
 		color = "red";
+		successIconVisible = false;
 		break;
 	case "warning":
+		title = 'Warning';
 		color = "yellow";
+		successIconVisible = false;
 		break;
 	case "success":
+		title = 'Success!';
+		successIconVisible = true;
 	default:
 		color = "green";
 	}
 	$('#succ_mess').css("color", color).html(message ? message : "");
+	$("#dialogSuccess").find(".success-icon").toggle(successIconVisible);
+	$("#dialogSuccess").dialog({
+		title: title
+	});
 	$("#dialogSuccess").dialog("open");
 };
 
 var fillDataWithJson = function(inputFieldInfoByParameterName) {
-	if (DEBUG) {
-		log("setting values in input fields...");
-	}
-
 	$.each(inputFieldInfoByParameterName, function(key, info) {
 		var value = info.value;
 		// Do this for every key there might be different
@@ -741,9 +789,6 @@ var fillDataWithJson = function(inputFieldInfoByParameterName) {
 			setValueInInputField(inputField, value);
 		}
 	});
-	if (DEBUG) {
-		log("values set in input fields");
-	}
 }
 
 var setValueInInputField = function(inputField, value) {
@@ -849,16 +894,24 @@ var changeState = function(state) {
 	switch(state) {
 		case LOADING_STATE:
 			$("#scrollingDiv").hide();
+			$("#errorPanel").hide();
 			$("#collectEarthNotRunningPanel").hide();
 			$("#loadingPanel").show();
 			break;
 		case COLLECT_EARTH_NOT_RUNNING_STATE:
 			$("#loadingPanel").hide();
+			$("#errorPanel").hide();
 			$("#scrollingDiv").hide();
 			$("#collectEarthNotRunningPanel").show();
 			break;
+		case ERROR_STATE:
+			$("#loadingPanel").hide();
+			$("#scrollingDiv").hide();
+			$("#errorPanel").show();
+			break;
 		default:
 			$("#loadingPanel").hide();
+			$("#errorPanel").hide();
 			$("#collectEarthNotRunningPanel").hide();
 			$("#scrollingDiv").show();
 	}
@@ -948,5 +1001,18 @@ var defaultIfNull = function(obj, defaultValue) {
 		return defaultValue;
 	} else {
 		return obj;
+	}
+};
+
+var parseInteger = function(str, defaultValue) {
+	if (str == null || str.length == 0) {
+		return defaultValue;
+	} else {
+		var value = parseInt(str);
+		if (isNaN(value)) {
+			return defaultValue;
+		} else {
+			return value;
+		}
 	}
 };

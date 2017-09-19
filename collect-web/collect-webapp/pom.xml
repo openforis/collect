@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-web</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.13.8-SNAPSHOT</version>
+		<version>3.13.10-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	
@@ -14,23 +14,6 @@
 	<build>
 		<finalName>collect</finalName>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.sonatype.flexmojos</groupId>
-				<artifactId>flexmojos-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-flex-resources</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-flex-resources</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -77,6 +60,32 @@
 					</includes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-flex-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.openforis.collect</groupId>
+									<artifactId>collect-client</artifactId>
+									<version>${project.version}</version>
+									<type>swf</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
+									<destFileName>collect.swf</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -84,12 +93,6 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-client</artifactId>
-			<type>swf</type>
-			<scope>runtime</scope>
 		</dependency>
 		<!-- JSTL -->
 		<dependency>
