@@ -164,11 +164,16 @@ public class CollectRecord extends Record {
 	private transient Version applicationVersion;
 	private transient Step step;
 	private transient State state;
+	private transient Integer workflowSequenceNumber;
 
 	private transient Date creationDate;
 	private transient User createdBy;
 	private transient Date modifiedDate;
 	private transient User modifiedBy;
+	private transient Date currentStepCreationDate;
+	private transient User currentStepCreatedBy;
+	private transient Date currentStepModifiedDate;
+	private transient User currentStepModifiedBy;
 	private transient User owner;
 	private transient Integer missing;
 	private transient Integer missingErrors;
@@ -195,15 +200,20 @@ public class CollectRecord extends Record {
 	}
 
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
-		super(survey, versionName, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
+		this(survey, versionName, survey.getSchema().getRootEntityDefinition(rootEntityName), enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
+	}
+	
+	public CollectRecord(CollectSurvey survey, String versionName, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs) {
+		this(survey, versionName, rootEntityDefinition, enableValidationDependencyGraphs, false);
+	}
+	
+	public CollectRecord(CollectSurvey survey, String versionName, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
+		super(survey, versionName, rootEntityDefinition, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
 		this.applicationVersion = Collect.VERSION;
 		this.step = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
-		if (rootEntityName != null) {
-			createRootEntity(rootEntityName);
-		}
 	}
 	
 	@Override
@@ -259,6 +269,14 @@ public class CollectRecord extends Record {
 		this.state = state;
 	}
 	
+	public Integer getWorkflowSequenceNumber() {
+		return workflowSequenceNumber;
+	}
+	
+	public void setWorkflowSequenceNumber(Integer workflowSequenceNumber) {
+		this.workflowSequenceNumber = workflowSequenceNumber;
+	}
+	
 	public Date getCreationDate() {
 		return this.creationDate;
 	}
@@ -289,6 +307,38 @@ public class CollectRecord extends Record {
 
 	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+	
+	public User getCurrentStepCreatedBy() {
+		return currentStepCreatedBy;
+	}
+	
+	public void setCurrentStepCreatedBy(User currentStepCreatedBy) {
+		this.currentStepCreatedBy = currentStepCreatedBy;
+	}
+	
+	public Date getCurrentStepCreationDate() {
+		return currentStepCreationDate;
+	}
+	
+	public void setCurrentStepCreationDate(Date currentStepCreationDate) {
+		this.currentStepCreationDate = currentStepCreationDate;
+	}
+	
+	public User getCurrentStepModifiedBy() {
+		return currentStepModifiedBy;
+	}
+	
+	public void setCurrentStepModifiedBy(User currentStepModifiedBy) {
+		this.currentStepModifiedBy = currentStepModifiedBy;
+	}
+	
+	public Date getCurrentStepModifiedDate() {
+		return currentStepModifiedDate;
+	}
+	
+	public void setCurrentStepModifiedDate(Date currentStepModifiedDate) {
+		this.currentStepModifiedDate = currentStepModifiedDate;
 	}
 	
 	public User getOwner() {

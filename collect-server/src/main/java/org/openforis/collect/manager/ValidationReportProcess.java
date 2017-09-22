@@ -12,6 +12,7 @@ import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordValidationReportGenerator;
@@ -83,13 +84,13 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	@Override
 	public void startProcessing() throws Exception {
 		super.startProcessing();
-		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(recordFilter);
 		if ( summaries != null ) {
 			status.setTotal(summaries.size());
 			try {
 				initWriter();
 				writeHeader();
-				for (CollectRecord summary : summaries) {
+				for (CollectRecordSummary summary : summaries) {
 					//long start = System.currentTimeMillis();
 					//print(outputStream, "Start validating record: " + recordKey);
 					if ( status.isRunning() ) {

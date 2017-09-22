@@ -5,7 +5,6 @@ package org.openforis.collect.io.data;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.manager.UserManager;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;

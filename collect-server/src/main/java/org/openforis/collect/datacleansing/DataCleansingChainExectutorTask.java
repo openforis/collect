@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.openforis.collect.datacleansing.xpath.XPathDataQueryEvaluator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
@@ -73,16 +74,16 @@ public class DataCleansingChainExectutorTask extends Task {
 		CollectSurvey survey = input.chain.getSurvey();
 		
 		RecordFilter filter = createRecordsFilter();
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(filter);
+		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
 		datasetSize = recordSummaries.size();
 		lastRecordModifiedDate = null;
 		
 		//Delete records in bulk if needed
 		Set<Integer> recordIdsToBeDeleted = new TreeSet<Integer>();
 		
-		Iterator<CollectRecord> it = recordSummaries.iterator();
+		Iterator<CollectRecordSummary> it = recordSummaries.iterator();
 		while (it.hasNext() && isRunning()) {
-			CollectRecord recordSummary = (CollectRecord) it.next();
+			CollectRecordSummary recordSummary = (CollectRecordSummary) it.next();
 			udpateLastRecordModifiedDate(recordSummary);
 			
 			CollectRecord record = recordManager.load(survey, recordSummary.getId(), input.step, false);
@@ -130,7 +131,7 @@ public class DataCleansingChainExectutorTask extends Task {
 		return result;
 	}
 
-	private void udpateLastRecordModifiedDate(CollectRecord recordSummary) {
+	private void udpateLastRecordModifiedDate(CollectRecordSummary recordSummary) {
 		Date modifiedDate = recordSummary.getModifiedDate();
 		if (lastRecordModifiedDate == null || lastRecordModifiedDate.compareTo(modifiedDate) < 0) {
 			lastRecordModifiedDate = modifiedDate;

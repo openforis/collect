@@ -26,6 +26,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcDataReportItem;
 import org.openforis.collect.persistence.jooq.tables.OfcLogo;
 import org.openforis.collect.persistence.jooq.tables.OfcMessage;
 import org.openforis.collect.persistence.jooq.tables.OfcRecord;
+import org.openforis.collect.persistence.jooq.tables.OfcRecordStep;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
 import org.openforis.collect.persistence.jooq.tables.OfcSurvey;
 import org.openforis.collect.persistence.jooq.tables.OfcSurveyFile;
@@ -52,6 +53,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord
 import org.openforis.collect.persistence.jooq.tables.records.OfcLogoRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcMessageRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
+import org.openforis.collect.persistence.jooq.tables.records.OfcRecordStepRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
@@ -102,6 +104,7 @@ public class Keys {
 	public static final UniqueKey<OfcLogoRecord> OFC_LOGO_PKEY = UniqueKeys0.OFC_LOGO_PKEY;
 	public static final UniqueKey<OfcMessageRecord> PK_OFC_MESSAGE = UniqueKeys0.PK_OFC_MESSAGE;
 	public static final UniqueKey<OfcRecordRecord> OFC_RECORD_PKEY = UniqueKeys0.OFC_RECORD_PKEY;
+	public static final UniqueKey<OfcRecordStepRecord> OFC_RECORD_STEP_PKEY = UniqueKeys0.OFC_RECORD_STEP_PKEY;
 	public static final UniqueKey<OfcSamplingDesignRecord> PK_OFC_SAMPLING_DESIGN = UniqueKeys0.PK_OFC_SAMPLING_DESIGN;
 	public static final UniqueKey<OfcSurveyRecord> OFC_SURVEY_PKEY = UniqueKeys0.OFC_SURVEY_PKEY;
 	public static final UniqueKey<OfcSurveyRecord> OFC_SURVEY_NAME_KEY = UniqueKeys0.OFC_SURVEY_NAME_KEY;
@@ -145,6 +148,9 @@ public class Keys {
 	public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_CREATED_BY_USER_FKEY = ForeignKeys0.OFC_RECORD__OFC_RECORD_CREATED_BY_USER_FKEY;
 	public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_MODIFIED_BY_USER_FKEY = ForeignKeys0.OFC_RECORD__OFC_RECORD_MODIFIED_BY_USER_FKEY;
 	public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_OWNER_FKEY = ForeignKeys0.OFC_RECORD__OFC_RECORD_OWNER_FKEY;
+	public static final ForeignKey<OfcRecordStepRecord, OfcRecordRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_RECORD_FKEY = ForeignKeys0.OFC_RECORD_STEP__OFC_RECORD_STEP_RECORD_FKEY;
+	public static final ForeignKey<OfcRecordStepRecord, OfcUserRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_CREATED_BY_FKEY = ForeignKeys0.OFC_RECORD_STEP__OFC_RECORD_STEP_CREATED_BY_FKEY;
+	public static final ForeignKey<OfcRecordStepRecord, OfcUserRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_MODIFIED_BY_FKEY = ForeignKeys0.OFC_RECORD_STEP__OFC_RECORD_STEP_MODIFIED_BY_FKEY;
 	public static final ForeignKey<OfcSamplingDesignRecord, OfcSurveyRecord> OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_FKEY = ForeignKeys0.OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_FKEY;
 	public static final ForeignKey<OfcSurveyRecord, OfcUsergroupRecord> OFC_SURVEY__OFC_SURVEY_USERGROUP_FKEY = ForeignKeys0.OFC_SURVEY__OFC_SURVEY_USERGROUP_FKEY;
 	public static final ForeignKey<OfcSurveyFileRecord, OfcSurveyRecord> OFC_SURVEY_FILE__OFC_SURVEY_FILE_SURVEY_FKEY = ForeignKeys0.OFC_SURVEY_FILE__OFC_SURVEY_FILE_SURVEY_FKEY;
@@ -181,6 +187,7 @@ public class Keys {
 		public static final UniqueKey<OfcLogoRecord> OFC_LOGO_PKEY = createUniqueKey(OfcLogo.OFC_LOGO, OfcLogo.OFC_LOGO.POS);
 		public static final UniqueKey<OfcMessageRecord> PK_OFC_MESSAGE = createUniqueKey(OfcMessage.OFC_MESSAGE, OfcMessage.OFC_MESSAGE.SEQUENCE_NO);
 		public static final UniqueKey<OfcRecordRecord> OFC_RECORD_PKEY = createUniqueKey(OfcRecord.OFC_RECORD, OfcRecord.OFC_RECORD.ID);
+		public static final UniqueKey<OfcRecordStepRecord> OFC_RECORD_STEP_PKEY = createUniqueKey(OfcRecordStep.OFC_RECORD_STEP, OfcRecordStep.OFC_RECORD_STEP.RECORD_ID, OfcRecordStep.OFC_RECORD_STEP.SEQ_NUM);
 		public static final UniqueKey<OfcSamplingDesignRecord> PK_OFC_SAMPLING_DESIGN = createUniqueKey(OfcSamplingDesign.OFC_SAMPLING_DESIGN, OfcSamplingDesign.OFC_SAMPLING_DESIGN.ID);
 		public static final UniqueKey<OfcSurveyRecord> OFC_SURVEY_PKEY = createUniqueKey(OfcSurvey.OFC_SURVEY, OfcSurvey.OFC_SURVEY.ID);
 		public static final UniqueKey<OfcSurveyRecord> OFC_SURVEY_NAME_KEY = createUniqueKey(OfcSurvey.OFC_SURVEY, OfcSurvey.OFC_SURVEY.NAME, OfcSurvey.OFC_SURVEY.TEMPORARY);
@@ -222,6 +229,9 @@ public class Keys {
 		public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_CREATED_BY_USER_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecord.OFC_RECORD, OfcRecord.OFC_RECORD.CREATED_BY_ID);
 		public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_MODIFIED_BY_USER_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecord.OFC_RECORD, OfcRecord.OFC_RECORD.MODIFIED_BY_ID);
 		public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_OWNER_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecord.OFC_RECORD, OfcRecord.OFC_RECORD.OWNER_ID);
+		public static final ForeignKey<OfcRecordStepRecord, OfcRecordRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_RECORD_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_RECORD_PKEY, OfcRecordStep.OFC_RECORD_STEP, OfcRecordStep.OFC_RECORD_STEP.RECORD_ID);
+		public static final ForeignKey<OfcRecordStepRecord, OfcUserRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_CREATED_BY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecordStep.OFC_RECORD_STEP, OfcRecordStep.OFC_RECORD_STEP.CREATED_BY);
+		public static final ForeignKey<OfcRecordStepRecord, OfcUserRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_MODIFIED_BY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecordStep.OFC_RECORD_STEP, OfcRecordStep.OFC_RECORD_STEP.MODIFIED_BY);
 		public static final ForeignKey<OfcSamplingDesignRecord, OfcSurveyRecord> OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_SURVEY_PKEY, OfcSamplingDesign.OFC_SAMPLING_DESIGN, OfcSamplingDesign.OFC_SAMPLING_DESIGN.SURVEY_ID);
 		public static final ForeignKey<OfcSurveyRecord, OfcUsergroupRecord> OFC_SURVEY__OFC_SURVEY_USERGROUP_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USERGROUP_PKEY, OfcSurvey.OFC_SURVEY, OfcSurvey.OFC_SURVEY.USERGROUP_ID);
 		public static final ForeignKey<OfcSurveyFileRecord, OfcSurveyRecord> OFC_SURVEY_FILE__OFC_SURVEY_FILE_SURVEY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_SURVEY_PKEY, OfcSurveyFile.OFC_SURVEY_FILE, OfcSurveyFile.OFC_SURVEY_FILE.SURVEY_ID);

@@ -24,6 +24,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcLogo;
 import org.openforis.collect.persistence.jooq.tables.OfcMessage;
 import org.openforis.collect.persistence.jooq.tables.OfcMessageProcessing;
 import org.openforis.collect.persistence.jooq.tables.OfcRecord;
+import org.openforis.collect.persistence.jooq.tables.OfcRecordStep;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
 import org.openforis.collect.persistence.jooq.tables.OfcSurvey;
 import org.openforis.collect.persistence.jooq.tables.OfcSurveyFile;
@@ -138,6 +139,11 @@ public class Tables {
 	 * The table collect.ofc_record
 	 */
 	public static final OfcRecord OFC_RECORD = org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
+
+	/**
+	 * The table collect.ofc_record_step
+	 */
+	public static final OfcRecordStep OFC_RECORD_STEP = org.openforis.collect.persistence.jooq.tables.OfcRecordStep.OFC_RECORD_STEP;
 
 	/**
 	 * The table collect.ofc_sampling_design

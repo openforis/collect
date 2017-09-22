@@ -38,11 +38,13 @@ import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -51,6 +53,7 @@ import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -149,7 +152,7 @@ public class RecordController extends BasicController implements Serializable {
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
 		
 		//load summaries
-		List<CollectRecord> summaries = recordManager.loadSummaries(filter, params.getSortFields());
+		List<CollectRecordSummary> summaries = recordManager.loadFullSummaries(filter, params.getSortFields());
 		result.put("records", toProxies(summaries));
 		
 		//count total records
@@ -279,6 +282,18 @@ public class RecordController extends BasicController implements Serializable {
 				Controllers.ZIP_CONTENT_TYPE);
 	}
 	
+	@RequestMapping(value="survey/{survey_id}/data/records/stats", method=GET)
+	public @ResponseBody RecordsStats generateStats(@PathVariable Integer surveyId) {
+		RecordsStats stats = new RecordsStats();
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		recordManager.visitSummaries(new RecordFilter(survey), null, new Visitor<CollectRecordSummary>() {
+			public void visit(CollectRecordSummary summary) {
+				
+			}
+		});
+		return stats;
+	}
+	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
 		if (stepNumber == null) {
 			stepNumber = Step.ENTRY.getStepNumber();
@@ -293,12 +308,17 @@ public class RecordController extends BasicController implements Serializable {
 		return new RecordProxy(record, context);
 	}
 	
-	private List<RecordProxy> toProxies(List<CollectRecord> summaries) {
-		List<RecordProxy> result = new ArrayList<RecordProxy>(summaries.size());
-		for (CollectRecord summary : summaries) {
-			result.add(toProxy(summary));
+	private List<RecordSummaryProxy> toProxies(List<CollectRecordSummary> summaries) {
+		List<RecordSummaryProxy> result = new ArrayList<RecordSummaryProxy>(summaries.size());
+		for (CollectRecordSummary summary : summaries) {
+			result.add(toSummaryProxy(summary));
 		}
 		return result;
+	}
+	
+	private RecordSummaryProxy toSummaryProxy(CollectRecordSummary summary) {
+		ProxyContext context = new ProxyContext(sessionManager.getSessionState().getLocale(), messageSource, surveyContext);
+		return new RecordSummaryProxy(summary, context);
 	}
 
 	public static class SearchParameters {
@@ -561,5 +581,99 @@ public class RecordController extends BasicController implements Serializable {
 		public void setLanguageCode(String languageCode) {
 			this.languageCode = languageCode;
 		}
+	}
+	
+	public static class RecordsStatsParameters {
+		
+		public enum Unit {
+			DAY, MONTH, YEAR
+		}
+		
+		private Unit unit = Unit.DAY;
+		private Date from;
+		private Date to;
+		
+		public Unit getUnit() {
+			return unit;
+		}
+		
+		public void setUnit(Unit unit) {
+			this.unit = unit;
+		}
+		
+		public Date getFrom() {
+			return from;
+		}
+		
+		public void setFrom(Date from) {
+			this.from = from;
+		}
+		
+		public Date getTo() {
+			return to;
+		}
+
+		public void setTo(Date to) {
+			this.to = to;
+		}
+	}
+	
+	public static class RecordsStats {
+		
+		private List<PointStats> pointStats = new ArrayList<PointStats>();
+		
+		public void addPointStats(PointStats stats) {
+			this.pointStats.add(stats);
+		}
+		
+		public List<PointStats> getPointStats() {
+			return pointStats;
+		}
+		
+		public void setPointStats(List<PointStats> pointStats) {
+			this.pointStats = pointStats;
+		}
+		
+	}
+	
+	public static class PointStats {
+		
+		private int created;
+		private int entered;
+		private int cleansed;
+		private int modified;
+		
+		public int getCreated() {
+			return created;
+		}
+		
+		public void setCreated(int created) {
+			this.created = created;
+		}
+		
+		public int getEntered() {
+			return entered;
+		}
+		
+		public void setEntered(int entered) {
+			this.entered = entered;
+		}
+		
+		public int getCleansed() {
+			return cleansed;
+		}
+		
+		public void setCleansed(int cleansed) {
+			this.cleansed = cleansed;
+		}
+		
+		public int getModified() {
+			return modified;
+		}
+		
+		public void setModified(int modified) {
+			this.modified = modified;
+		}
+		
 	}
 }

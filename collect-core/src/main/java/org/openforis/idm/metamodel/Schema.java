@@ -37,8 +37,9 @@ public class Schema extends SurveyObject {
 		return path.evaluate(this);
 	}
 	
-	public NodeDefinition getDefinitionById(int id) {
-		return definitionsById.get(id);
+	@SuppressWarnings("unchecked")
+	public <N extends NodeDefinition> N getDefinitionById(int id) {
+		return (N) definitionsById.get(id);
 	}
 	
 	public boolean containsDefinitionWithId(int id) {
@@ -348,8 +349,10 @@ public class Schema extends SurveyObject {
 	}
 
 	public void traverse(NodeDefinitionVisitor visitor, TraversalType traversalType) {
-		for (EntityDefinition root : rootEntityDefinitions) {
-			root.traverse(visitor, traversalType);
+		if (rootEntityDefinitions != null) {
+			for (EntityDefinition root : rootEntityDefinitions) {
+				root.traverse(visitor, traversalType);
+			}
 		}
 	}
 	

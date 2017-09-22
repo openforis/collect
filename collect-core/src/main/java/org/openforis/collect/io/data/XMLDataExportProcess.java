@@ -22,8 +22,10 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.model.FileAttribute;
@@ -82,7 +84,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	public void startProcessing() throws Exception {
 		super.startProcessing();
 		try {
-			List<CollectRecord> recordSummaries = loadAllSummaries();
+			List<CollectRecordSummary> recordSummaries = loadAllSummaries();
 			if ( recordSummaries != null && steps != null && steps.length > 0 ) {
 				if (outputFile.exists()) {
 					outputFile.delete();
@@ -101,13 +103,13 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		}
 	}
 
-	private void backup(ZipOutputStream zipOutputStream, List<CollectRecord> recordSummaries) {
+	private void backup(ZipOutputStream zipOutputStream, List<CollectRecordSummary> recordSummaries) {
 		int total = calculateTotal(recordSummaries);
 		status.setTotal(total);
 		if ( includeIdm ) {
 			includeIdml(zipOutputStream);
 		}
-		for (CollectRecord summary : recordSummaries) {
+		for (CollectRecordSummary summary : recordSummaries) {
 			if ( status.isRunning() ) {
 				int recordStepNumber = summary.getStep().getStepNumber();
 				for (Step step : steps) {
@@ -123,14 +125,17 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		}
 	}
 
-	private List<CollectRecord> loadAllSummaries() {
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, modifiedSince);
+	private List<CollectRecordSummary> loadAllSummaries() {
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
+		filter.setModifiedSince(modifiedSince);
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		return summaries;
 	}
 	
-	private int calculateTotal(List<CollectRecord> recordSummaries) {
+	private int calculateTotal(List<CollectRecordSummary> recordSummaries) {
 		int count = 0;
-		for (CollectRecord summary : recordSummaries) {
+		for (CollectRecordSummary summary : recordSummaries) {
 			int recordStepNumber = summary.getStep().getStepNumber();
 			for (Step step: steps) {
 				if ( step.getStepNumber() <= recordStepNumber ) {
@@ -160,7 +165,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		}
 	}
 	
-	private void backup(ZipOutputStream zipOutputStream, CollectRecord summary, Step step) {
+	private void backup(ZipOutputStream zipOutputStream, CollectRecordSummary summary, Step step) {
 		Integer id = summary.getId();
 		try {
 			CollectRecord record = recordManager.load(survey, id, step, false);

@@ -35,6 +35,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeAddChange;
 import org.openforis.collect.model.NodeChange;
@@ -324,7 +325,7 @@ public class CSVDataImportJob extends Job {
 
 		//transient variables
 		private RecordUpdater recordUpdater;
-		private CollectRecord lastModifiedRecordSummary;
+		private CollectRecordSummary lastModifiedRecordSummary;
 		private CollectRecord lastModifiedRecord;
 		private User adminUser;
 		private Set<RecordStepKey> deletedEntitiesRecordKeys;
@@ -418,7 +419,7 @@ public class CSVDataImportJob extends Job {
 			if (! validateRecordKey(line) ) {
 				return;
 			}
-			CollectRecord recordSummary = loadRecordSummary(line);
+			CollectRecordSummary recordSummary = loadRecordSummary(line);
 			if (recordSummary == null && input.settings.isInsertNewRecords() ) {
 				//create new record
 				EntityDefinition rootEntityDefn = input.parentEntityDefinition;
@@ -554,13 +555,15 @@ public class CSVDataImportJob extends Job {
 			}
 		}
 		
-		private CollectRecord loadRecordSummary(DataLine line) {
+		private CollectRecordSummary loadRecordSummary(DataLine line) {
 			EntityDefinition parentEntityDefn = input.parentEntityDefinition;
 			EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 			Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-			List<CollectRecord> recordSummaries = recordManager.loadSummaries(input.survey, rootEntityDefn.getName(), 
-					Values.toStringValues(recordKeyValues));
-			CollectRecord recordSummary = recordSummaries.isEmpty() ? null : recordSummaries.get(0);
+			RecordFilter filter = new RecordFilter(input.survey);
+			filter.setRootEntityId(rootEntityDefn.getId());
+			filter.setKeyValues(Values.toStringValues(recordKeyValues));
+			List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
+			CollectRecordSummary recordSummary = recordSummaries.isEmpty() ? null : recordSummaries.get(0);
 			return recordSummary;
 		}
 
@@ -731,12 +734,6 @@ public class CSVDataImportJob extends Job {
 		private void updateRecord(final CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
 			record.setModifiedDate(new Date());
 			record.setModifiedBy(adminUser);
-			
-			if ( dataStep == Step.ANALYSIS ) {
-				record.setStep(Step.CLEANSING);
-				recordManager.save(record);
-				record.setStep(Step.ANALYSIS);
-			}
 			performRecordSave(record);
 		}
 

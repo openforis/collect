@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
@@ -128,8 +129,8 @@ public class CollectRDBPublisher {
 		final ProcessStepProgressListener insertRecordsProgressListener = new ProcessStepProgressListener(totalProgressListener, progressListener);
 		
 		final AtomicInteger count = new AtomicInteger();
-		recordManager.visitSummaries(recordFilter, null, new Visitor<CollectRecord>() {
-			public void visit(CollectRecord summary) {
+		recordManager.visitSummaries(recordFilter, null, new Visitor<CollectRecordSummary>() {
+			public void visit(CollectRecordSummary summary) {
 				try {
 					CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
 					databaseExporter.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);

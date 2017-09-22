@@ -291,8 +291,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	private CollectRecord createTestRecord(CollectSurvey survey) throws RecordPersistenceException {
-		CollectRecord record = survey.createRecord("2.0");
-		record.createRootEntity("cluster");
+		CollectRecord record = survey.createRecord("2.0", "cluster");
 		String id = "123_456";
 		addTestValues(record.getRootEntity(), id);
 		record.setRootEntityKeyValues(Arrays.asList(id));

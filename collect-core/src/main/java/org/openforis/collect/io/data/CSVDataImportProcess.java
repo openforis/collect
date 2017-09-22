@@ -41,6 +41,7 @@ import org.openforis.collect.model.NodeAddChange;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeChangeBatchProcessor;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -228,8 +229,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		} else {
 			CollectRecordSummary recordSummary = loadRecordSummaryIfAny(line);
 			if (recordSummary != null) {
+				Step originalRecordStep = recordSummary.getStep();
 				if ( step == null ) {
-					Step originalRecordStep = recordSummary.getStep();
 					//set values in each step data
 					for (Step currentStep : Step.values()) {
 						if ( currentStep.beforeEqual(originalRecordStep) ) {
@@ -240,7 +241,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						}
 					}
 				} else {
-					Step originalRecordStep = recordSummary.getStep();
 					if ( step.beforeEqual(originalRecordStep) ) {
 						CollectRecord record;
 						boolean recordChanged = lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() );
@@ -320,7 +320,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 		Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 		String[] recordKeyStringValues = Values.toStringValues(recordKeyValues);
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityDefn.getName(), recordKeyStringValues);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(rootEntityDefn.getId());
+		filter.setKeyValues(recordKeyStringValues);
+		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
 		String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
 				parentEntityDefn,
 				rootEntityDefn.getKeyAttributeDefinitions());

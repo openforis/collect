@@ -16,7 +16,9 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -52,7 +54,7 @@ public class RecordFileBackupTask extends Task {
 	@Override
 	protected long countTotalItems() {
 		if (hasFileAttributeDefinitions()) {
-			List<CollectRecord> recordSummaries = loadAllSummaries();
+			List<CollectRecordSummary> recordSummaries = loadAllSummaries();
 			return recordSummaries.size();
 		} else {
 			return 0;
@@ -64,9 +66,9 @@ public class RecordFileBackupTask extends Task {
 		if (! hasFileAttributeDefinitions()) {
 			return;
 		}
-		List<CollectRecord> recordSummaries = loadAllSummaries();
+		List<CollectRecordSummary> recordSummaries = loadAllSummaries();
 		if ( recordSummaries != null ) {
-			for (CollectRecord summary : recordSummaries) {
+			for (CollectRecordSummary summary : recordSummaries) {
 				if ( isRunning() ) {
 					try {
 						backup(summary);
@@ -82,8 +84,10 @@ public class RecordFileBackupTask extends Task {
 		}
 	}
 
-	private List<CollectRecord> loadAllSummaries() {
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName);
+	private List<CollectRecordSummary> loadAllSummaries() {
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		return summaries;
 	}
 	
@@ -99,7 +103,7 @@ public class RecordFileBackupTask extends Task {
 		return ! defs.isEmpty();
 	}
 	
-	private void backup(CollectRecord summary) throws RecordFileException, IOException {
+	private void backup(CollectRecordSummary summary) throws RecordFileException, IOException {
 		Integer id = summary.getId();
 		CollectRecord record = recordManager.load(survey, id, summary.getStep(), false);
 		List<FileAttribute> fileAttributes = record.getFileAttributes();

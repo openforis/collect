@@ -1,6 +1,5 @@
 package org.openforis.collect.datacleansing;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +12,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordUpdater;
-import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport.CollectStoreQueryBuffer;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.model.Attribute;
@@ -101,12 +100,12 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		private DataCleansingChain chain;
 		private CollectRecord lastRecord;
 		private RecordUpdater recordUpdater;
-		private QueryBuffer queryBuffer;
+		private CollectStoreQueryBuffer queryBuffer;
 		
 		public DataCleansingChainNodeProcessor(DataCleansingChain chain) {
 			this.chain = chain;
 			this.recordUpdater = new RecordUpdater();
-			this.queryBuffer = new QueryBuffer();
+			this.queryBuffer = new CollectStoreQueryBuffer();
 		}
 		
 		@Override
@@ -183,7 +182,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 			if (lastRecord != null) {
 				appendLastRecordUpdate();
 			}
-			queryBuffer.flush();
+			recordManager.execute(queryBuffer.flush());
 		}
 
 		private void appendRecordUpdate(CollectRecord record) {
@@ -206,37 +205,10 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		
 		private void appendRecordUpdateQuery(CollectRecord record, Step step) {
 			record.updateSummaryFields();
-			queryBuffer.append(recordManager.createUpdateQuery(record, step));
+			queryBuffer.appendAll(recordManager.createDataUpdateQuery(record, step));
 		}
 		
-		private class QueryBuffer {
-			
-			private static final int DEFAULT_BATCH_SIZE = 100;
-			
-			private int bufferSize;
-			private List<RecordStoreQuery> buffer;
-			
-			public QueryBuffer() {
-				this(DEFAULT_BATCH_SIZE);
-			}
-			
-			public QueryBuffer(int size) {
-				this.bufferSize = size;
-				this.buffer = new ArrayList<RecordStoreQuery>(size);
-			}
-			
-			void append(RecordStoreQuery query) {
-				buffer.add(query);
-				if (buffer.size() == bufferSize) {
-					flush();
-				}
-			}
-
-			void flush() {
-				recordManager.execute(buffer);
-				buffer.clear();
-			}
-		}
+		
 	}
 
 }

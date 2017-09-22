@@ -32,6 +32,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcLogo;
 import org.openforis.collect.persistence.jooq.tables.OfcMessage;
 import org.openforis.collect.persistence.jooq.tables.OfcMessageProcessing;
 import org.openforis.collect.persistence.jooq.tables.OfcRecord;
+import org.openforis.collect.persistence.jooq.tables.OfcRecordStep;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
 import org.openforis.collect.persistence.jooq.tables.OfcSurvey;
 import org.openforis.collect.persistence.jooq.tables.OfcSurveyFile;
@@ -57,7 +58,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcUsergroup;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends SchemaImpl {
 
-	private static final long serialVersionUID = -1267388592;
+	private static final long serialVersionUID = -1949354386;
 
 	/**
 	 * The reference instance of <code>collect</code>
@@ -129,6 +130,7 @@ public class Collect extends SchemaImpl {
 			OfcMessage.OFC_MESSAGE,
 			OfcMessageProcessing.OFC_MESSAGE_PROCESSING,
 			OfcRecord.OFC_RECORD,
+			OfcRecordStep.OFC_RECORD_STEP,
 			OfcSamplingDesign.OFC_SAMPLING_DESIGN,
 			OfcSurvey.OFC_SURVEY,
 			OfcSurveyFile.OFC_SURVEY_FILE,

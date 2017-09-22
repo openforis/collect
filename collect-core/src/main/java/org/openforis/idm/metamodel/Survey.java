@@ -100,18 +100,19 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		coordinateOperations.registerSRS(getSpatialReferenceSystems());
 	}
 	
-	public Record createRecord() {
-		String version;
-		if (getVersions().isEmpty()) {
-			version = null;
-		} else {
-			version = modelVersions.get(modelVersions.size() - 1).getName();
-		}
-		return createRecord(version);
+	public <R extends Record> R createRecord() {
+		ModelVersion latestVersion = getLatestVersion();
+		String versionName = latestVersion == null ? null : latestVersion.getName();
+		return createRecord(versionName, getSchema().getFirstRootEntityDefinition());
 	}
 	
-	public Record createRecord(String version) {
-		return new Record(this, version);
+	public <R extends Record> R createRecord(String versionName, String rootEntityName) {
+		return createRecord(versionName, getSchema().getRootEntityDefinition(rootEntityName));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <R extends Record> R createRecord(String versionName, EntityDefinition rootEntityDefinition) {
+		return (R) new Record(this, versionName, rootEntityDefinition);
 	}
 
 	public void setLastId(int lastId) {

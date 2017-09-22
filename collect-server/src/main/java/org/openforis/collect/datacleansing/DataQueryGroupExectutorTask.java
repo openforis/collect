@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.openforis.collect.datacleansing.xpath.XPathDataQueryEvaluator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
@@ -64,11 +65,11 @@ public class DataQueryGroupExectutorTask extends Task {
 		
 		RecordFilter filter = createRecordsFilter();
 		
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(filter);
+		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
 		
-		Iterator<CollectRecord> it = recordSummaries.iterator();
+		Iterator<CollectRecordSummary> it = recordSummaries.iterator();
 		while (it.hasNext() && isRunning()) {
-			CollectRecord recordSummary = (CollectRecord) it.next();
+			CollectRecordSummary recordSummary = (CollectRecordSummary) it.next();
 			Date modifiedDate = recordSummary.getModifiedDate();
 			if (lastRecordModifiedDate == null) {
 				lastRecordModifiedDate = modifiedDate;

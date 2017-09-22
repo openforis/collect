@@ -27,7 +27,9 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.concurrency.Worker.Status;
@@ -224,7 +226,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 		assertTrue(process.isCompleted());
 		assertTrue(process.getParsingErrors().isEmpty());
 		
-		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY.getStepNumber());
+		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY);
 		Entity reloadedCluster = reloadedRecord.getRootEntity();
 		{
 			Entity plot = reloadedCluster.findChildEntitiesByKeys("plot", "1", "A").get(0);
@@ -253,7 +255,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 		assertTrue(process.isCompleted());
 		assertTrue(process.getParsingErrors().isEmpty());
 		
-		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY.getStepNumber());
+		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY);
 		
 		assertEquals(2, reloadedRecord.getRootEntity().getCount(plotDefn));
 		
@@ -469,9 +471,12 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	private CollectRecord loadRecord(String key) {
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", key);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(survey.getSchema().getRootEntityDefinition("cluster").getId());
+		filter.setKeyValues(Arrays.asList(key));
+		List<CollectRecordSummary> summaries = recordDao.loadSummaries(filter);
 		assertEquals(1, summaries.size());
-		CollectRecord summary = summaries.get(0);
+		CollectRecordSummary summary = summaries.get(0);
 		CollectRecord reloadedRecord = recordManager.load(survey, summary.getId(), summary.getStep());
 		return reloadedRecord;
 	}
@@ -487,10 +492,9 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 	}
 
 	private CollectRecord createTestRecord(CollectSurvey survey, String id) {
-		CollectRecord record = new CollectRecord(survey, "2.0");
-		Entity cluster = record.createRootEntity("cluster");
+		CollectRecord record = new CollectRecord(survey, "2.0", "cluster");
+		Entity cluster = record.getRootEntity();
 		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
-		record.setStep(Step.ENTRY);
 		EntityBuilder.addValue(cluster, "id", new Code(id));
 		EntityBuilder.addValue(cluster, "region", new Code("001"));
 		EntityBuilder.addValue(cluster, "district", new Code("002"));

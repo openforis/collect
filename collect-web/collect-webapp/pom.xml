@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -7,49 +8,49 @@
 		<version>3.13.10-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-	
+
 	<artifactId>collect-webapp</artifactId>
 	<packaging>war</packaging>
-	
+
 	<properties>
 		<dev.jetty.port>8580</dev.jetty.port>
 		<node.version>v6.11.3</node.version>
 		<npm.version>5.3.0</npm.version>
 	</properties>
-	
+
 	<build>
 		<finalName>collect</finalName>
 		<plugins>
 			<plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.4</version>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.4</version>
 
-                <configuration>
-                    <nodeVersion>${node.version}</nodeVersion>
-                    <npmVersion>${npm.version}</npmVersion>
-                    <workingDirectory>${basedir}/frontend</workingDirectory>
+				<configuration>
+					<nodeVersion>${node.version}</nodeVersion>
+					<npmVersion>${npm.version}</npmVersion>
+					<workingDirectory>${basedir}/frontend</workingDirectory>
 					<installDirectory>${project.build.directory}</installDirectory>
-                </configuration>
+				</configuration>
 
-                <executions>
-                    <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>npm install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                    	<!-- builds the app for production -->
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- builds the app for production -->
 						<id>npm run build</id>
 						<phase>prepare-package</phase>
 						<goals>
@@ -59,8 +60,8 @@
 							<arguments>run build</arguments>
 						</configuration>
 					</execution>
-                </executions>
-            </plugin>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -74,15 +75,15 @@
 						</goals>
 					</execution>
 					<execution>
-			            <id>default-war</id>
-			            <phase>package</phase>
-			            <goals>
-			                <goal>war</goal>
-			            </goals>
-			            <configuration>
-			                <warSourceDirectory>${project.build.directory}/${project.build.finalName}</warSourceDirectory>
-			            </configuration>
-			        </execution>
+						<id>default-war</id>
+						<phase>package</phase>
+						<goals>
+							<goal>war</goal>
+						</goals>
+						<configuration>
+							<warSourceDirectory>${project.build.directory}/${project.build.finalName}</warSourceDirectory>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -203,11 +204,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-            <groupId>org.mitre.dsmiley.httpproxy</groupId>
-            <artifactId>smiley-http-proxy-servlet</artifactId>
-            <version>1.7</version>
-            <scope>compile</scope>
-        </dependency>
+			<groupId>org.mitre.dsmiley.httpproxy</groupId>
+			<artifactId>smiley-http-proxy-servlet</artifactId>
+			<version>1.7</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
@@ -226,5 +227,5 @@
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
-	
+
 </project>

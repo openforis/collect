@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Survey;
@@ -79,8 +80,9 @@ public class CollectSurvey extends Survey {
 	}
 
 	@Override
-	public CollectRecord createRecord(String version) {
-		return new CollectRecord(this, version);
+	@SuppressWarnings("unchecked")
+	public CollectRecord createRecord(String version, EntityDefinition rootEntityDefinition) {
+		return new CollectRecord(this, version, rootEntityDefinition, true);
 	}
 	
 	@Override

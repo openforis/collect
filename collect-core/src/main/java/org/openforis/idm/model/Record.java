@@ -17,7 +17,6 @@ import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.expression.InvalidExpressionException;
@@ -51,15 +50,19 @@ public class Record implements DeepComparable {
 
 	List<DependencyGraph<?>> dependencyGraphs;
 	
-	public Record(Survey survey, String version) {
-		this(survey, version, true);
+	public Record(Survey survey, String version, String rootEntityDefName) {
+		this(survey, version, survey.getSchema().getRootEntityDefinition(rootEntityDefName), true);
 	}
 	
-	public Record(Survey survey, String version, boolean enableValidationDependencyGraphs) {
-		this(survey, version, enableValidationDependencyGraphs, false);
+	public Record(Survey survey, String version, EntityDefinition rootEntityDefinition) {
+		this(survey, version, rootEntityDefinition, true);
 	}
 	
-	public Record(Survey survey, String version, boolean enableValidationDependencyGraphs, boolean ignoreDuplicateRecordKeyValidationErrors) {
+	public Record(Survey survey, String version, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs) {
+		this(survey, version, rootEntityDefinition, enableValidationDependencyGraphs, false);
+	}
+	
+	public Record(Survey survey, String version, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		if (survey == null) {
 			throw new IllegalArgumentException("Survey required");
 		}
@@ -74,21 +77,13 @@ public class Record implements DeepComparable {
 				throw new IllegalArgumentException(String.format("Invalid version name: %s", version));
 			}
 		}
+		if (rootEntityDefinition == null) {
+			rootEntityDefinition = survey.getSchema().getFirstRootEntityDefinition();
+		}
 		this.enableValidationDependencyGraphs = enableValidationDependencyGraphs;
 		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 		reset();
-	}
-
-	public Entity createRootEntity(String name) {
-		Schema schema = survey.getSchema();
-		EntityDefinition def = schema.getRootEntityDefinition(name);
-		return createRootEntity(def);
-	}
-
-	public Entity createRootEntity(int id) {
-		Schema schema = survey.getSchema();
-		EntityDefinition def = schema.getRootEntityDefinition(id);
-		return createRootEntity(def);
+		setRootEntity((Entity) rootEntityDefinition.createNode());
 	}
 
 	protected Entity createRootEntity(EntityDefinition def) {

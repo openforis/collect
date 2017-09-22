@@ -86,9 +86,7 @@ public class DefaultValueTest {
 	}
 	
 	private Record createTestRecord(Survey survey) {
-		Record record = new Record(survey, null);
-		record.createRootEntity("bill");
-		return record;
+		return new Record(survey, null, "bill");
 	}
 
 	protected Entity addItem(Entity rootEntity, Integer qtyValue, Double priceValue) {

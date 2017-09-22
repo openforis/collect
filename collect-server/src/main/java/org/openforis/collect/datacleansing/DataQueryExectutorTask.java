@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.openforis.collect.datacleansing.xpath.XPathDataQueryEvaluator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeProcessor;
@@ -69,11 +70,11 @@ public class DataQueryExectutorTask extends Task {
 
 		RecordFilter filter = createRecordsFilter(true);
 		
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(filter);
+		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
 		
-		Iterator<CollectRecord> it = recordSummaries.iterator();
+		Iterator<CollectRecordSummary> it = recordSummaries.iterator();
 		while (it.hasNext() && isRunning()) {
-			CollectRecord recordSummary = (CollectRecord) it.next();
+			CollectRecordSummary recordSummary = (CollectRecordSummary) it.next();
 			CollectRecord record = recordManager.load(survey, recordSummary.getId(), input.step, false);
 			List<Node<?>> nodes = queryEvaluator.evaluate(record);
 			for (Node<?> node : nodes) {

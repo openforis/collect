@@ -15,16 +15,7 @@ class Constants {
     }
 
     static isDevReact() {
-        try {
-          createReactClass();
-        } catch(e) {
-          if (e.message.indexOf('render') >= 0) {
-            return true;  // A nice, specific error message
-          } else {
-            return false;  // A generic error message
-          }
-        }
-        return false;  // should never happen, but play it safe.
+        return typeof JSON3 !== 'undefined' //TODO improve it
       };
 }
 

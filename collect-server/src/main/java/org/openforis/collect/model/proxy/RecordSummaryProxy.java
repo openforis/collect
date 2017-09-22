@@ -6,14 +6,16 @@ package org.openforis.collect.model.proxy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
+import org.openforis.collect.model.CollectRecordSummary.StepSummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.utils.Proxies;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -25,18 +27,18 @@ import org.openforis.idm.metamodel.ModelVersion;
 public class RecordSummaryProxy implements Proxy {
 
 	private transient CollectRecordSummary summary;
-	private transient Locale locale;
+	private transient ProxyContext context;
 
-	public RecordSummaryProxy(CollectRecordSummary summary, Locale locale) {
+	public RecordSummaryProxy(CollectRecordSummary summary, ProxyContext context) {
 		this.summary = summary;
-		this.locale = locale;
+		this.context = context;
 	}
 
-	public static List<RecordSummaryProxy> fromList(List<CollectRecordSummary> summaries, Locale locale) {
+	public static List<RecordSummaryProxy> fromList(List<CollectRecordSummary> summaries, ProxyContext context) {
 		List<RecordSummaryProxy> result = new ArrayList<RecordSummaryProxy>();
 		if ( summaries != null ) {
 			for (CollectRecordSummary summary : summaries) {
-				result.add(new RecordSummaryProxy(summary, locale));
+				result.add(new RecordSummaryProxy(summary, context));
 			}
 		}
 		return result;
@@ -54,7 +56,8 @@ public class RecordSummaryProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public State getState() {
-		return summary.getState();
+		//return summary.getState();
+		return null;
 	}
 
 	@ExternalizedProperty
@@ -128,38 +131,43 @@ public class RecordSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
+	public Map<Step, StepSummary> getSummaryByStep() {
+		return summary.getSummaryByStep();
+	}
+	
+	@ExternalizedProperty
 	public Integer getTotalErrors() {
-		return summary.getTotalErrors();
+		return summary.getCurrentStepSummary().getTotalErrors();
 	}
 	
 	@ExternalizedProperty
 	public Integer getErrors() {
-		return summary.getErrors();
+		return summary.getCurrentStepSummary().getErrors();
 	}
 
 	@ExternalizedProperty
 	public Integer getSkipped() {
-		return summary.getSkipped();
+		return summary.getCurrentStepSummary().getSkipped();
 	}
 
 	@ExternalizedProperty
 	public Integer getMissing() {
-		return summary.getMissing();
+		return summary.getCurrentStepSummary().getMissing();
 	}
 
 	@ExternalizedProperty
 	public Integer getWarnings() {
-		return summary.getMissingWarnings();
+		return summary.getCurrentStepSummary().getMissingWarnings();
 	}
 
 	@ExternalizedProperty
 	public Integer getMissingErrors() {
-		return summary.getMissingErrors();
+		return summary.getCurrentStepSummary().getMissingErrors();
 	}
 
 	@ExternalizedProperty
 	public Integer getMissingWarnings() {
-		return summary.getMissingWarnings();
+		return summary.getCurrentStepSummary().getMissingWarnings();
 	}
 
 	@ExternalizedProperty

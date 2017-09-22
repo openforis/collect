@@ -37,9 +37,8 @@ public class ProtostuffSerializationTest  {
 		byte[] data = ser.toByteArray(cluster1);
 		
 		// Read
-		Record record2 = new Record(survey, "2.0");
-		Entity cluster2 = record2.createRootEntity("cluster");
-		ser.mergeFrom(data, cluster2);
+		Record record2 = new Record(survey, "2.0", "cluster");
+		ser.mergeFrom(data, record2.getRootEntity());
 
 		// Compare
 		Assert.assertTrue(record1.getRootEntity().deepEquals(record2.getRootEntity()));
@@ -66,9 +65,8 @@ public class ProtostuffSerializationTest  {
 		NodeDefinition mapSheetDefn = clusterDefn.getChildDefinition("map_sheet");
 		clusterDefn.removeChildDefinition(mapSheetDefn);
 		
-		Record record2 = new Record(survey, "2.0");
-		Entity cluster2 = record2.createRootEntity("cluster");
-		ser.mergeFrom(data, cluster2);
+		Record record2 = new Record(survey, "2.0", "cluster");
+		ser.mergeFrom(data, record2.getRootEntity());
 		
 		// Compare
 		Assert.assertTrue(record1.getRootEntity().deepEquals(record2.getRootEntity()));
@@ -95,9 +93,8 @@ public class ProtostuffSerializationTest  {
 		NodeDefinition crewNumDefn = clusterDefn.getChildDefinition("crew_no");
 		clusterDefn.removeChildDefinition(crewNumDefn);
 		
-		Record record2 = new Record(survey, "2.0");
-		Entity cluster2 = record2.createRootEntity("cluster");
-		ser.mergeFrom(data, cluster2);
+		Record record2 = new Record(survey, "2.0", "cluster");
+		ser.mergeFrom(data, record2.getRootEntity());
 		
 		// Compare
 		Assert.assertTrue(record1.getRootEntity().deepEquals(record2.getRootEntity()));
@@ -111,9 +108,8 @@ public class ProtostuffSerializationTest  {
 	}
 	
 	private Record createTestRecord(Survey survey) {
-		Record record = new Record(survey, "2.0");
-		Entity cluster = record.createRootEntity("cluster");
-		addTestValues(cluster, "123_456");
+		Record record = new Record(survey, "2.0", "cluster");
+		addTestValues(record.getRootEntity(), "123_456");
 		return record;
 	}
 

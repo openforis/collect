@@ -19,8 +19,8 @@ import org.openforis.collect.utils.Dates;
 public class DataImportSummaryItem {
 
 	private int entryId;
-	private CollectRecordSummary record;
-	private CollectRecordSummary conflictingRecord;
+	private CollectRecordSummary recordSummary;
+	private CollectRecordSummary conflictingRecordSummary;
 	private List<Step> steps;
 	
 	/**
@@ -29,16 +29,16 @@ public class DataImportSummaryItem {
 	 */
 	private Map<Step, List<NodeUnmarshallingError>> warnings;
 
-	public DataImportSummaryItem(int entryId, CollectRecordSummary record, List<Step> steps) {
+	public DataImportSummaryItem(int entryId, CollectRecordSummary recordSummary, List<Step> steps) {
 		this.entryId = entryId;
-		this.record = record;
+		this.recordSummary = recordSummary;
 		this.steps = steps;
 		this.warnings = new HashMap<CollectRecord.Step, List<NodeUnmarshallingError>>();
 	}
 	
 	public DataImportSummaryItem(int entryId, CollectRecordSummary record, List<Step> steps, CollectRecordSummary conflictingRecord) {
 		this(entryId, record, steps);
-		this.conflictingRecord = conflictingRecord;
+		this.conflictingRecordSummary = conflictingRecord;
 	}
 
 	public int getEntryId() {
@@ -49,20 +49,20 @@ public class DataImportSummaryItem {
 		this.entryId = entryId;
 	}
 
-	public CollectRecordSummary getRecord() {
-		return record;
+	public CollectRecordSummary getRecordSummary() {
+		return recordSummary;
 	}
 
-	public void setRecord(CollectRecordSummary record) {
-		this.record = record;
+	public void setRecordSummary(CollectRecordSummary recordSummary) {
+		this.recordSummary = recordSummary;
 	}
 
-	public CollectRecordSummary getConflictingRecord() {
-		return conflictingRecord;
+	public CollectRecordSummary getConflictingRecordSummary() {
+		return conflictingRecordSummary;
 	}
 
-	public void setConflictingRecord(CollectRecordSummary conflictingRecord) {
-		this.conflictingRecord = conflictingRecord;
+	public void setConflictingRecordSummary(CollectRecordSummary conflictingRecordSummary) {
+		this.conflictingRecordSummary = conflictingRecordSummary;
 	}
 
 	public List<Step> getSteps() {
@@ -82,28 +82,28 @@ public class DataImportSummaryItem {
 	}
 	
 	public int getRecordCompletionPercent() {
-		return record.getCompletionPercent();
+		return recordSummary.getCompletionPercent();
 	}
 
 	public int getRecordFilledAttributesCount() {
-		return record == null ? 0 : record.getFilledAttributesCount();
+		return recordSummary == null ? 0 : recordSummary.getFilledAttributesCount();
 	}
 	
 	public int getConflictingRecordCompletionPercent() {
-		return conflictingRecord == null ? -1 : conflictingRecord.getCompletionPercent();
+		return conflictingRecordSummary == null ? -1 : conflictingRecordSummary.getCompletionPercent();
 	}
 
 	public int getConflictingRecordFilledAttributesCount() {
-		return conflictingRecord == null ? -1 : conflictingRecord.getFilledAttributesCount();
+		return conflictingRecordSummary == null ? -1 : conflictingRecordSummary.getFilledAttributesCount();
 	}
 	
 	public int calculateCompletionDifferencePercent() {
-		if (conflictingRecord == null || record.getFilledAttributesCount() == 0) {
+		if (conflictingRecordSummary == null || recordSummary.getFilledAttributesCount() == 0) {
 			return 100;
 		}
 		double result = (double) (100 * 
-					(record.getFilledAttributesCount() - conflictingRecord.getFilledAttributesCount())
-						/ conflictingRecord.getFilledAttributesCount() );
+					(recordSummary.getFilledAttributesCount() - conflictingRecordSummary.getFilledAttributesCount())
+						/ conflictingRecordSummary.getFilledAttributesCount() );
 		return Double.valueOf(Math.ceil(result)).intValue();
 	}
 
@@ -115,13 +115,13 @@ public class DataImportSummaryItem {
 	 * @return
 	 */
 	public int calculateImportabilityLevel() {
-		if (conflictingRecord == null) {
+		if (conflictingRecordSummary == null) {
 			//new
 			return 1;
 		} else {
 			int modifiedDateCompare = Dates.compareUpToSecondsOnly(
-					ObjectUtils.defaultIfNull(record.getModifiedDate(), record.getCreationDate()), 
-					ObjectUtils.defaultIfNull(conflictingRecord.getModifiedDate(), conflictingRecord.getCreationDate()));
+					ObjectUtils.defaultIfNull(recordSummary.getModifiedDate(), recordSummary.getCreationDate()), 
+					ObjectUtils.defaultIfNull(conflictingRecordSummary.getModifiedDate(), conflictingRecordSummary.getCreationDate()));
 			if (modifiedDateCompare >= 0) {
 				int differencePercent = calculateCompletionDifferencePercent();
 				if (modifiedDateCompare == 0 && differencePercent == 0) {

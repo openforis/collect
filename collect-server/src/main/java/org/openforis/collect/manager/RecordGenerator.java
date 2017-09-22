@@ -3,6 +3,7 @@ package org.openforis.collect.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.EntityAddChange;
@@ -47,7 +48,9 @@ public class RecordGenerator {
 		
 		CollectRecord record = createRecord(survey, user);
 		
-		setRecordKeyValues(record, recordKey);
+		if (CollectionUtils.isNotEmpty(recordKey)) {
+			setRecordKeyValues(record, recordKey);
+		}
 		
 		if (parameters.isAddSecondLevelEntities()) {
 			addSecondLevelEntities(record, recordKey);

@@ -124,11 +124,10 @@ public abstract class DependencyGraphTest {
 	}
 
 	protected void createTestRecord() {
-		record = new Record(survey, null);
 		String rootEntityName;
 		List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
 		rootEntityName = rootEntityDefs.get(rootEntityDefs.size() - 1).getName();
-		record.createRootEntity(rootEntityName);
+		record = new Record(survey, null, rootEntityName);
 		rootEntity = record.getRootEntity();
 		rootEntityDef = rootEntity.getDefinition();
 	}

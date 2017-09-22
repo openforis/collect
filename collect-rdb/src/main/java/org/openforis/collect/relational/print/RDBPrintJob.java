@@ -7,6 +7,7 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.relational.data.DataExtractorFactory;
@@ -216,8 +217,8 @@ public class RDBPrintJob extends Job {
 
 		@Override
 		protected void execute() throws Throwable {
-			recordManager.visitSummaries(recordFilter, null, new Visitor<CollectRecord>() {
-				public void visit(CollectRecord summary) {
+			recordManager.visitSummaries(recordFilter, null, new Visitor<CollectRecordSummary>() {
+				public void visit(CollectRecordSummary summary) {
 					CollectRecord record = recordManager.load((CollectSurvey) summary.getSurvey(), summary.getId(), summary.getStep());
 					if (record != null) {
 						for (DataTable table : schema.getDataTables()) {

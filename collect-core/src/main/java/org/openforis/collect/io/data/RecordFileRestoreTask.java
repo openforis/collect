@@ -15,7 +15,9 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.model.FileAttribute;
@@ -92,9 +94,12 @@ public class RecordFileRestoreTask extends Task {
 
 	protected CollectRecord findStoredRecord(CollectRecord lastStepBackupRecord) {
 		String[] recordKeys = lastStepBackupRecord.getRootEntityKeyValues().toArray(new String[lastStepBackupRecord.getRootEntityKeyValues().size()]);
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, lastStepBackupRecord.getRootEntity().getName(), recordKeys);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(lastStepBackupRecord.getRootEntityDefinitionId());
+		filter.setKeyValues(recordKeys);
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		if ( summaries.size() == 1 ) {
-			CollectRecord summary = summaries.get(0);
+			CollectRecordSummary summary = summaries.get(0);
 			CollectRecord storedRecord = recordManager.load(survey, summary.getId(), summary.getStep(), false);
 			return storedRecord;
 		} else if ( summaries.size() == 0 ) {

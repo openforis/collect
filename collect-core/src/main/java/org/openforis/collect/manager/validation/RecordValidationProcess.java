@@ -5,9 +5,10 @@ import java.util.List;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.process.ProcessStatus;
-import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -46,13 +47,13 @@ public class RecordValidationProcess extends AbstractProcess<Void, ProcessStatus
 	public void startProcessing() throws Exception {
 		super.startProcessing();
 		validateParameters();
-		status.setTotal(recordManager.countRecords(survey));
+		status.setTotal(recordManager.countRecords(new RecordFilter(survey)));
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
-		for (EntityDefinition rootEntity : rootEntities) {
-			String rootEntityName = rootEntity.getName();
-			List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName);
-			for (CollectRecord summary : summaries) {
+		for (EntityDefinition rootEntityDef : rootEntities) {
+			RecordFilter filter = new RecordFilter(survey, rootEntityDef.getId());
+			List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
+			for (CollectRecordSummary summary : summaries) {
 				//long start = System.currentTimeMillis();
 				//print(outputStream, "Start validating record: " + recordKey);
 				if ( status.isRunning() ) {

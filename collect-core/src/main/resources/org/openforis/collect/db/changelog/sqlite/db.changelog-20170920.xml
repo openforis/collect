@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="record-step" author="ricci" dbms="sqlite">
+
+		<comment>Split record table by steps</comment>
+
+		<createTable tableName="ofc_record_step">
+			<column name="record_id" type="INTEGER">
+				<constraints nullable="false" foreignKeyName="ofc_record_step_record_fkey"
+					references="ofc_record(id)" />
+			</column>
+			<column name="seq_num" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="step" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="state" type="char(1)" />
+			<column name="date_created" type="TIMESTAMP" />
+			<column name="created_by" type="INTEGER">
+				<constraints nullable="true" foreignKeyName="ofc_record_step_created_by_fkey"
+					references="ofc_user(id)" />
+			</column>
+			<column name="date_modified" type="TIMESTAMP" />
+			<column name="modified_by" type="INTEGER">
+				<constraints nullable="true" foreignKeyName="ofc_record_step_modified_by_fkey"
+					references="ofc_user(id)" />
+			</column>
+			<column name="skipped" type="INTEGER" />
+			<column name="missing" type="INTEGER" />
+			<column name="errors" type="INTEGER" />
+			<column name="warnings" type="INTEGER" />
+			<column name="count1" type="INTEGER" />
+			<column name="count2" type="INTEGER" />
+			<column name="count3" type="INTEGER" />
+			<column name="count4" type="INTEGER" />
+			<column name="count5" type="INTEGER" />
+			<column name="data" type="bytea">
+				<constraints nullable="false" />
+			</column>
+			<column name="app_version" type="VARCHAR(63)">
+				<constraints nullable="false" />
+			</column>
+			<column name="key1" type="VARCHAR(2048)" />
+			<column name="key2" type="VARCHAR(2048)" />
+			<column name="key3" type="VARCHAR(2048)" />
+		</createTable>
+
+		<createIndex indexName="ofc_record_step_pkey_idx" tableName="ofc_record_step" unique="true">
+			<column name="record_id" type="INTEGER" />
+			<column name="seq_num" type="INTEGER" />
+		</createIndex>
+		
+		<createIndex indexName="ofc_record_step_idx" tableName="ofc_record_step" unique="true">
+			<column name="record_id" type="INTEGER" />
+			<column name="seq_num" type="INTEGER" />
+			<column name="step" type="INTEGER" />
+			<column name="state" type="char(1)" />
+		</createIndex>
+		
+	</changeSet>
+	
+	<changeSet id="populate-record-step-table" author="ricci" dbms="sqlite">
+		<sql>
+			UPDATE ofc_record SET data1 = data2 where step > 1 and data1 is null;
+			UPDATE ofc_record SET data2 = data1 where step > 1 and data2 is null;
+			
+			INSERT INTO ofc_record_step(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
+				state, skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
+				SELECT id, 1, 1, date_created, created_by_id, date_modified, modified_by_id, state, skipped, missing, errors, 
+					warnings, count1, count2, count3, count4, count5, data1, app_version, key1, key2, key3
+				FROM ofc_record 
+				WHERE step >= 1;
+			
+			INSERT INTO ofc_record_step(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
+				state, skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
+				SELECT id, 2, 2, date_created, created_by_id, date_modified, modified_by_id, state, skipped, missing, errors, 
+					warnings, count1, count2, count3, count4, count5, data2, app_version, key1, key2, key3
+				FROM ofc_record 
+				WHERE step >= 2;
+			
+			INSERT INTO ofc_record_step(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
+				state, skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
+				SELECT id, 3, 3, date_created, created_by_id, date_modified, modified_by_id, state, skipped, missing, errors, 
+					warnings, count1, count2, count3, count4, count5, data2, app_version, key1, key2, key3
+				FROM ofc_record 
+				WHERE step = 3;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

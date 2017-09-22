@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
+import org.openforis.collect.model.CollectRecordSummary.StepSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
@@ -111,17 +113,22 @@ public class DataRestoreSummaryTask extends Task {
 					Step step = Step.valueOf(stepVal);
 					
 					CollectRecordSummary recordSummary = new CollectRecordSummary();
-					recordSummary.setStep(step);
+					Integer rootEntityDefId = line.getValue("root_entity_id", Integer.class);
+					recordSummary.setRootEntityDefinitionId(rootEntityDefId);
+					Date creationDate = Dates.parseDateTime(line.getValue("created_on", String.class));
+					Date modifiedDate = Dates.parseDateTime(line.getValue("last_modified", String.class));
+					recordSummary.setCreationDate(creationDate);
+					recordSummary.setModifiedDate(modifiedDate);
+
+					StepSummary stepSummary = new StepSummary(step);
 					List<String> rootEntityKeyValues = Arrays.asList(
 							line.getValue("key1", String.class),
 							line.getValue("key2", String.class),
 							line.getValue("key3", String.class)
 					);
-					recordSummary.setRootEntityKeyValues(rootEntityKeyValues);
-					recordSummary.setCreationDate(Dates.parseDateTime(line.getValue("created_on", String.class)));
-					recordSummary.setModifiedDate(Dates.parseDateTime(line.getValue("last_modified", String.class)));
-					Integer rootEntityDefId = line.getValue("root_entity_id", Integer.class);
-					recordSummary.setRootEntityDefinitionId(rootEntityDefId);
+					stepSummary.setRootEntityKeyValues(rootEntityKeyValues);
+					stepSummary.setCreationDate(creationDate);
+					stepSummary.setModifiedDate(modifiedDate);
 					recordSummaryByEntryId.put(entryId, recordSummary);
 					
 					for (Step s : Step.values()) {
@@ -312,14 +319,12 @@ public class DataRestoreSummaryTask extends Task {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(rootEntityDefId);
 		filter.setKeyValues(rootEntityKeys);
-		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		switch (summaries.size()) {
 		case 0:
 			return null;
 		case 1:
-			CollectRecord summary = summaries.get(0);
-			CollectRecordSummary recordSummary = CollectRecordSummary.fromRecord(summary);
-			return recordSummary;
+			return summaries.get(0);
 		default:
 			String errorMessage = String.format("Data file: %s - multiple records found in survey %s with key(s) %s", 
 					getEntryName(entryId, step), survey.getName(), rootEntityKeys);
@@ -334,11 +339,11 @@ public class DataRestoreSummaryTask extends Task {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(rootEntityDefId);
 		filter.setKeyValues(keyValues);
-		List<CollectRecord> oldRecords = recordManager.loadSummaries(filter);
-		if ( oldRecords == null || oldRecords.isEmpty() ) {
+		List<CollectRecordSummary> oldRecordSummaries = recordManager.loadSummaries(filter);
+		if ( oldRecordSummaries == null || oldRecordSummaries.isEmpty() ) {
 			return null;
-		} else if ( oldRecords.size() == 1 ) {
-			CollectRecord summary = oldRecords.get(0);
+		} else if ( oldRecordSummaries.size() == 1 ) {
+			CollectRecordSummary summary = oldRecordSummaries.get(0);
 			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), fullSummary);
 			CollectRecordSummary recordSummary = CollectRecordSummary.fromRecord(record);
 			recordSummary.setFiles(recordFileManager.getAllFiles(record));

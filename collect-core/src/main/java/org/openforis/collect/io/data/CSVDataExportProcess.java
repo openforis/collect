@@ -26,6 +26,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -151,8 +152,8 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		
 		CollectSurvey survey = recordFilter.getSurvey();
 		Step step = recordFilter.getStepGreaterOrEqual();
-		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
-		for (CollectRecord s : summaries) {
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(recordFilter);
+		for (CollectRecordSummary s : summaries) {
 			if ( status.isRunning() ) {
 				try {
 					CollectRecord record = recordManager.load(survey, s.getId(), step, false);

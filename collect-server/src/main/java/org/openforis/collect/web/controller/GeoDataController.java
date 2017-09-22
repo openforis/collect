@@ -14,6 +14,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordCoordinatesKmlGeneratorJob;
@@ -139,8 +140,8 @@ public class GeoDataController {
 		filter.setOffset(recordOffset);
 		filter.setMaxNumberOfRecords(maxNumberOfRecords);
 		
-		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
-		for (CollectRecord summary : summaries) {
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
+		for (CollectRecordSummary summary : summaries) {
 			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), false);
 			List<Node<?>> nodes = record.findNodesByPath(nodeDef.getPath());
 			for (Node<?> node : nodes) {

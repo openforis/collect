@@ -127,8 +127,7 @@ public class PathTest extends AbstractTest {
 	}
 
 	private Entity getRootEntity() {
-		Record record = new Record(survey, "2.0");
-		Entity entity = record.createRootEntity("cluster");
-		return entity;
+		Record record = new Record(survey, "2.0", "cluster");
+		return record.getRootEntity();
 	}
 }

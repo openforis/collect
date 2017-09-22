@@ -22,18 +22,22 @@ class Sidebar extends Component {
       return <div>Loading...</div>
     }
     const loggedUser = this.props.loggedUser
+    const preferredSurvey = this.props.preferredSurvey
+
     return (
       <div className="sidebar">
         <nav className="sidebar-nav">
           <ul className="nav">
-            {/*
+            {
             <li className="nav-item">
-              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active"><i className="icon-speedometer"></i> Dashboard <span className="badge badge-info">NEW</span></NavLink>
+              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active"><i className="icon-speedometer"></i>Dashboard</NavLink>
             </li>
-            */}
-            <li className="nav-item">
-              <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Data Management</NavLink>
-	          </li>
+            }
+            {preferredSurvey ? 
+              <li className="nav-item">
+                <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Data Management</NavLink>
+              </li>
+            : ''}
             {loggedUser.canAccessSurveyDesigner ?
               <li className="nav-item">
                 <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Survey Designer</NavLink>
@@ -74,6 +78,12 @@ function mapStateToProps(state) {
   } = state.session || {
     isFetchingLoggedUser: true
   }
-  return loggedUser ? {loggedUser} : {isFetchingLoggedUser: true}
+  const preferredSurvey = state.preferredSurvey ? state.preferredSurvey.survey : null
+
+  return {
+    loggedUser: loggedUser,
+    isFetchingLoggedUser: loggedUser === null,
+    preferredSurvey: preferredSurvey
+  }
 }
 export default connect(mapStateToProps)(Sidebar);

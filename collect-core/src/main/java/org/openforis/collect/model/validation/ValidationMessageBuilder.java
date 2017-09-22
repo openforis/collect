@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.ResourceBundleMessageSource;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -349,15 +350,21 @@ public class ValidationMessageBuilder {
 	
 	public String getRecordKey(CollectRecord record) {
 		record.updateSummaryFields();
-		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
+		return getCleanedRecordKey(record.getRootEntityKeyValues());
+	}
+
+	public String getRecordKey(CollectRecordSummary record) {
+		return getCleanedRecordKey(record.getCurrentStepSummary().getRootEntityKeyValues());
+	}
+	
+	private String getCleanedRecordKey(List<String> rootEntityKeyValues) {
 		List<String> cleanedKeys = new ArrayList<String>();
 		for (String key : rootEntityKeyValues) {
 			if ( StringUtils.isNotBlank(key) ) {
 				cleanedKeys.add(key);
 			}
 		}
-		String result = StringUtils.join(cleanedKeys, RECORD_KEYS_LABEL_SEPARATOR);
-		return result;
+		return StringUtils.join(cleanedKeys, RECORD_KEYS_LABEL_SEPARATOR);
 	}
 	
 	public String getInstanceLabelText(NodeDefinition definition, String language) {

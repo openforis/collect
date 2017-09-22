@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SamplingDesignItem;
@@ -69,10 +70,10 @@ public class RandomRecordGenerator extends RecordGenerator {
 	private Map<List<String>, Integer> calculateRecordMeasurementsByKey(CollectSurvey survey, final User user) {
 		final List<AttributeDefinition> nonMeasurementKeyDefs = getNonMeasurementKeyDefs(survey);
 		final Map<List<String>, Integer> measurementsByRecordKey = new HashMap<List<String>, Integer>();
-		recordManager.visitSummaries(new RecordFilter(survey), null, new Visitor<CollectRecord>() {
-			public void visit(CollectRecord summary) {
+		recordManager.visitSummaries(new RecordFilter(survey), null, new Visitor<CollectRecordSummary>() {
+			public void visit(CollectRecordSummary summary) {
 				if (summary.getCreatedBy().getId() != user.getId()) {
-					List<String> keys = summary.getRootEntityKeyValues();
+					List<String> keys = summary.getCurrentStepSummary().getRootEntityKeyValues();
 					List<String> nonMeasurementKeys;
 					if (keys.size() > nonMeasurementKeyDefs.size()) {
 						nonMeasurementKeys = keys.subList(0, nonMeasurementKeyDefs.size() - 1);

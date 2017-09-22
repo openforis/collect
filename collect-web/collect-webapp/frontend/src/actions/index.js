@@ -92,7 +92,7 @@ export function fetchCurrentUser() {
 function receiveCurrentUser(json) {
 	return {
 	    type: RECEIVE_CURRENT_USER,
-	    user: new User(json) //TODO map into User object
+	    user: new User(json)
 	}
 }
 
@@ -140,11 +140,9 @@ export function selectPreferredSurvey(preferredSurveySummary) {
 
 
 export function receiveFullPreferredSurvey(json) {
-	let survey = new Survey();
-	survey.fillFromJSON(json)
 	return {
 		type: RECEIVE_FULL_PREFERRED_SURVEY,
-		survey: survey,
+		survey: new Survey(json),
 		receivedAt: Date.now()
 	}
 }
@@ -182,7 +180,7 @@ function receiveUsers(json) {
 export function receiveUser(json) {
 	return {
 	    type: RECEIVE_USER,
-	    user: json, //TODO map into User object ?
+	    user: new User(json),
 	    receivedAt: Date.now()
 	}
 }

@@ -126,8 +126,7 @@ public class CalculatedAttributeTest {
 //	}
 //	
 	private Record createTestRecord(Survey survey) {
-		Record record = new Record(survey, null);
-		record.createRootEntity("bill");
+		Record record = new Record(survey, null, "bill");
 		recordUpdater.initializeNewRecord(record);
 		return record;
 	}

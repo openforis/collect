@@ -287,6 +287,7 @@ class DashboardPage extends Component {
   render() {
     return (
       <div className="animated fadeIn">
+        {/*
         <div className="row">
           <div className="col-sm-6 col-lg-3">
             <div className="card card-inverse card-primary">
@@ -384,26 +385,26 @@ class DashboardPage extends Component {
             </div>
           </div>
         </div>
-
+        */}
         <div className="card">
           <div className="card-block">
             <div className="row">
               <div className="col-sm-5">
-                <h4 className="card-title mb-0">Traffic</h4>
-                <div className="small text-muted">November 2015</div>
+                <h4 className="card-title mb-0">New records created</h4>
+                <div className="small text-muted">still in data entry phase</div>
               </div>
               <div className="col-sm-7 hidden-sm-down">
                 <button type="button" className="btn btn-primary float-right"><i className="icon-cloud-download"></i></button>
                 <div className="btn-toolbar float-right" role="toolbar" aria-label="Toolbar with button groups">
                   <div className="btn-group mr-3" data-toggle="buttons" aria-label="First group">
                     <label className="btn btn-outline-secondary">
-                      <input type="radio" name="options" id="option1"/> Day
+                      <input type="radio" name="options" value="day" /> Day
                     </label>
                     <label className="btn btn-outline-secondary active">
-                      <input type="radio" name="options" id="option2" defaultChecked/> Month
+                      <input type="radio" name="options" value="month" defaultChecked/> Month
                     </label>
                     <label className="btn btn-outline-secondary">
-                      <input type="radio" name="options" id="option3"/> Year
+                      <input type="radio" name="options" value="year"/> Year
                     </label>
                   </div>
                 </div>

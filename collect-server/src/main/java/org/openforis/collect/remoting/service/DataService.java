@@ -41,6 +41,7 @@ import org.openforis.collect.manager.SessionEventDispatcher;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
@@ -53,6 +54,7 @@ import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 import org.openforis.collect.model.proxy.RecordFilterProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -166,10 +168,10 @@ public class DataService {
 		RecordFilter filter = filterProxy.toFilter(survey);
 		
 		//load summaries
-		List<CollectRecord> summaries = recordManager.loadSummaries(filter, sortFields);
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter, sortFields);
 		Locale locale = LocaleUtils.toLocale(localeStr);
 		ProxyContext proxyContext = new ProxyContext(locale, messageSource, surveyContext);
-		List<RecordProxy> proxies = RecordProxy.fromList(summaries, proxyContext);
+		List<RecordSummaryProxy> proxies = RecordSummaryProxy.fromList(summaries, proxyContext);
 		result.put("records", proxies);
 		
 		//count total records
@@ -205,8 +207,8 @@ public class DataService {
 		filter.setMaxNumberOfRecords(maxNumberOfRows);
 		
 		//load summaries
-		List<CollectRecord> summaries = recordManager.loadSummaries(filter, sortFields);
-		List<RecordProxy> proxies = RecordProxy.fromList(summaries, getProxyContext());
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter, sortFields);
+		List<RecordSummaryProxy> proxies = RecordSummaryProxy.fromList(summaries, getProxyContext());
 		
 		result.put("records", proxies);
 		

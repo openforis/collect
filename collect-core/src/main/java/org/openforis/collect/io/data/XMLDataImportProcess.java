@@ -33,11 +33,12 @@ import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport.CollectStoreQuery;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
@@ -45,7 +46,6 @@ import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.FileAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -102,7 +102,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 	private boolean includesRecordFiles;
 	private Predicate<CollectRecord> includeRecordPredicate;
 	private boolean validateRecords;
-	private List<RecordStoreQuery> queryBuffer;
+	private List<CollectStoreQuery> queryBuffer;
 	private Integer nextRecordId;
 	private NewBackupFileExtractor backupFileExtractor;
 	private RecordUserLoader recordUserLoader;
@@ -114,7 +114,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		this.entryIdsToImport = new ArrayList<Integer>();
 		this.includeRecordPredicate = null;
 		this.validateRecords = true;
-		this.queryBuffer = new ArrayList<RecordStoreQuery>();
+		this.queryBuffer = new ArrayList<CollectStoreQuery>();
 		this.recordUserLoader = new RecordUserLoader(userManager);
 	}
 
@@ -187,7 +187,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			Map<Integer, CollectRecord> packagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, List<Step>> packagedStepsPerRecord = new HashMap<Integer, List<Step>>();
 			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors = new HashMap<String, List<NodeUnmarshallingError>>();
-			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
+			Map<Integer, CollectRecordSummary> conflictingPackagedRecords = new HashMap<Integer, CollectRecordSummary>();
 			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings = new HashMap<Integer, Map<Step,List<NodeUnmarshallingError>>>();
 			
 			state.setTotal(backupFileExtractor.size());
@@ -263,7 +263,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 	
 	private void createSummaryForEntry(String entryName, Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
-			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
+			Map<Integer, CollectRecordSummary> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
 		RecordEntry recordEntry = RecordEntry.parse(entryName);
 		Step step = recordEntry.getStep();
 		InputStream is = backupFileExtractor.findEntryInputStream(entryName);
@@ -285,7 +285,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			stepsPerRecord.add(step);
 			Integer totalPerStep1 = totalPerStep.get(step);
 			totalPerStep.put(step, totalPerStep1 + 1);
-			CollectRecord oldRecord = findAlreadyExistingRecordSummary(parsedRecord);
+			CollectRecordSummary oldRecord = findAlreadyExistingRecordSummary(parsedRecord);
 			if ( oldRecord != null ) {
 				conflictingPackagedRecords.put(entryId, oldRecord);
 			}
@@ -307,7 +307,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			Map<Step, Integer> totalPerStep,
 			Map<Integer, CollectRecord> packagedRecords,
 			Map<Integer, List<Step>> packagedStepsPerRecord,
-			Map<Integer, CollectRecord> conflictingPackagedRecords, 
+			Map<Integer, CollectRecordSummary> conflictingPackagedRecords, 
 			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) {
 		DataImportSummary summary = new DataImportSummary();
 		summary.setSurveyName(surveyName);
@@ -327,10 +327,10 @@ public class XMLDataImportProcess implements Callable<Void> {
 		Set<Integer> conflictingEntryIds = conflictingPackagedRecords.keySet();
 		for (Integer entryId: conflictingEntryIds) {
 			CollectRecord record = packagedRecords.get(entryId);
-			CollectRecord conflictingRecord = conflictingPackagedRecords.get(entryId);
+			CollectRecordSummary conflictingRecord = conflictingPackagedRecords.get(entryId);
 			List<Step> steps = packagedStepsPerRecord.get(entryId);
 			DataImportSummaryItem item = new DataImportSummaryItem(entryId, CollectRecordSummary.fromRecord(record),
-					steps, CollectRecordSummary.fromRecord(conflictingRecord));
+					steps, conflictingRecord);
 			item.setWarnings(warnings.get(entryId));
 			conflictingRecordItems.add(item);
 		}
@@ -411,9 +411,9 @@ public class XMLDataImportProcess implements Callable<Void> {
 					state.addError(entryName, message);
 				} else {
 					parsedRecord.setStep(step);
-					RecordStoreQuery query;
+					List<CollectStoreQuery> queries;
 					if ( lastProcessedRecord == null ) {
-						CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
+						CollectRecordSummary oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
 						if (oldRecordSummary != null) {
 							//overwrite existing record
 							originalRecordStep = oldRecordSummary.getStep();
@@ -421,17 +421,17 @@ public class XMLDataImportProcess implements Callable<Void> {
 							if ( includesRecordFiles ) {
 								recordFileManager.deleteAllFiles(parsedRecord);
 							}
-							query = recordManager.createUpdateQuery(parsedRecord, parsedRecord.getStep());
+							queries = recordManager.createDataUpdateQuery(parsedRecord, parsedRecord.getStep());
 						} else {
 							parsedRecord.setId(nextRecordId ++);
-							query = recordManager.createInsertQuery(parsedRecord);
+							queries = recordManager.createInsertQuery(parsedRecord);
 						}
 						lastProcessedRecord = parsedRecord;
 					} else {
 						replaceData(parsedRecord, lastProcessedRecord);
-						query = recordManager.createUpdateQuery(lastProcessedRecord, lastProcessedRecord.getStep());
+						queries = recordManager.createDataUpdateQuery(lastProcessedRecord, lastProcessedRecord.getStep());
 					}
-					appendQuery(query);
+					appendQueries(queries);
 //					if ( parseRecordResult.hasWarnings() ) {
 //						state.addWarnings(entryName, parseRecordResult.getWarnings());
 //					}
@@ -444,15 +444,15 @@ public class XMLDataImportProcess implements Callable<Void> {
 			CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep, validateRecords);
 			originalRecord.setStep(originalRecordStep);
 			afterRecordUpdate(originalRecord);
-			appendQuery(recordManager.createUpdateQuery(originalRecord, originalRecord.getStep()));
+			appendQueries(recordManager.createDataUpdateQuery(originalRecord, originalRecord.getStep()));
 		}
 		if ( includesRecordFiles ) {
 			importRecordFiles(lastProcessedRecord);
 		}
 	}
 
-	private void appendQuery(RecordStoreQuery query) {
-		queryBuffer.add(query);
+	private void appendQueries(List<CollectStoreQuery> queries) {
+		queryBuffer.addAll(queries);
 		if (queryBuffer.size() == MAX_QUERY_BUFFER_SIZE) {
 			flushQueryBuffer();
 		}
@@ -485,12 +485,13 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 
-	private CollectRecord findAlreadyExistingRecordSummary(CollectRecord parsedRecord) {
+	private CollectRecordSummary findAlreadyExistingRecordSummary(CollectRecord parsedRecord) {
 		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
-		Entity rootEntity = parsedRecord.getRootEntity();
-		String rootEntityName = rootEntity.getName();
-		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[keyValues.size()]));
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(parsedRecord.getRootEntityDefinitionId());
+		filter.setKeyValues(keyValues);
+		List<CollectRecordSummary> oldRecords = recordManager.loadSummaries(filter);
 		if ( oldRecords == null || oldRecords.isEmpty() ) {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {
