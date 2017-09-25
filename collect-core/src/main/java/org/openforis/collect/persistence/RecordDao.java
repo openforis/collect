@@ -3,7 +3,7 @@ package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.Tables.OFC_RECORD;
-import static org.openforis.collect.persistence.jooq.Tables.OFC_RECORD_STEP;
+import static org.openforis.collect.persistence.jooq.Tables.OFC_RECORD_DATA;
 import static org.openforis.collect.persistence.jooq.Tables.OFC_USER;
 
 import java.sql.Timestamp;
@@ -44,8 +44,8 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
+import org.openforis.collect.persistence.jooq.tables.records.OfcRecordDataRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
-import org.openforis.collect.persistence.jooq.tables.records.OfcRecordStepRecord;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -70,15 +70,15 @@ public class RecordDao extends JooqDaoSupport {
 		{OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
 	
 	private static final TableField[] RECORD_STEP_KEY_FIELDS = 
-		{OFC_RECORD_STEP.KEY1, OFC_RECORD_STEP.KEY2, OFC_RECORD_STEP.KEY3};
+		{OFC_RECORD_DATA.KEY1, OFC_RECORD_DATA.KEY2, OFC_RECORD_DATA.KEY3};
 	
 	private static final TableField[] RECORD_STEP_COUNT_FIELDS = 
-		{OFC_RECORD_STEP.COUNT1, OFC_RECORD_STEP.COUNT2, OFC_RECORD_STEP.COUNT3, OFC_RECORD_STEP.COUNT4, OFC_RECORD_STEP.COUNT5};
+		{OFC_RECORD_DATA.COUNT1, OFC_RECORD_DATA.COUNT2, OFC_RECORD_DATA.COUNT3, OFC_RECORD_DATA.COUNT4, OFC_RECORD_DATA.COUNT5};
 	
 	private static final TableField[] SUMMARY_FIELDS = ArrayUtils.addAll(
 			ArrayUtils.addAll(new TableField[]{OFC_RECORD.ID, OFC_RECORD.SURVEY_ID, OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.MODEL_VERSION,
 				OFC_RECORD.DATE_CREATED, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.MODIFIED_BY_ID, 
-				OFC_RECORD.STEP, OFC_RECORD.STATE, 
+				OFC_RECORD.STEP, OFC_RECORD.DATA_SEQ_NUM, OFC_RECORD.STATE, 
 				OFC_RECORD.ERRORS, OFC_RECORD.WARNINGS, OFC_RECORD.MISSING, OFC_RECORD.SKIPPED, 
 				OFC_RECORD.OWNER_ID}, 
 			KEY_FIELDS)
@@ -87,9 +87,9 @@ public class RecordDao extends JooqDaoSupport {
 	private static final TableField[] RECORD_STEP_SUMMARY_FIELDS = ArrayUtils.addAll(
 			ArrayUtils.addAll(new TableField[]{OFC_RECORD.SURVEY_ID, OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.ID,
 				OFC_RECORD.MODEL_VERSION, OFC_RECORD.OWNER_ID, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_CREATED, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.MODIFIED_BY_ID,
-				OFC_RECORD_STEP.RECORD_ID, OFC_RECORD_STEP.DATE_CREATED, OFC_RECORD_STEP.CREATED_BY, OFC_RECORD_STEP.DATE_MODIFIED, OFC_RECORD_STEP.MODIFIED_BY, 
-				OFC_RECORD_STEP.STEP, OFC_RECORD_STEP.SEQ_NUM, OFC_RECORD_STEP.STATE, OFC_RECORD_STEP.ERRORS,
-				OFC_RECORD_STEP.WARNINGS, OFC_RECORD_STEP.MISSING, OFC_RECORD_STEP.SKIPPED},
+				OFC_RECORD_DATA.RECORD_ID, OFC_RECORD_DATA.DATE_CREATED, OFC_RECORD_DATA.CREATED_BY, OFC_RECORD_DATA.DATE_MODIFIED, OFC_RECORD_DATA.MODIFIED_BY, 
+				OFC_RECORD_DATA.STEP, OFC_RECORD_DATA.SEQ_NUM, OFC_RECORD_DATA.STATE, OFC_RECORD_DATA.ERRORS,
+				OFC_RECORD_DATA.WARNINGS, OFC_RECORD_DATA.MISSING, OFC_RECORD_DATA.SKIPPED},
 			RECORD_STEP_KEY_FIELDS)
 		, RECORD_STEP_COUNT_FIELDS);
 	
@@ -97,6 +97,12 @@ public class RecordDao extends JooqDaoSupport {
 	
 	public CollectRecord load(CollectSurvey survey, int id, Step step) {
 		return load(survey, id, step, true);
+	}
+	
+	public CollectRecord load(CollectSurvey survey, int id, int workflowSequenceNumber, boolean toBeUpdated) {
+		SelectQuery query = selectRecordQuery(id, false, null, workflowSequenceNumber);
+		Record r = query.fetchOne();
+		return r == null ? null : fromQueryResult(survey, r, toBeUpdated);
 	}
 	
 	public CollectRecord load(CollectSurvey survey, int id, Step step, boolean toBeUpdated) {
@@ -108,7 +114,7 @@ public class RecordDao extends JooqDaoSupport {
 	public byte[] loadBinaryData(CollectSurvey survey, int id, Step step) {
 		SelectQuery query = selectRecordQuery(id, false, step, null);
 		Record r = query.fetchOne();
-		return r == null ? null : r.getValue(OFC_RECORD_STEP.DATA);
+		return r == null ? null : r.getValue(OFC_RECORD_DATA.DATA);
 	}
 
 	public int loadSurveyId(int recordId) {
@@ -121,11 +127,11 @@ public class RecordDao extends JooqDaoSupport {
 			.from(OFC_RECORD)
 			.where(OFC_RECORD.OWNER_ID.eq(userId)
 				.or(DSL.exists(
-						dsl().select(OFC_RECORD_STEP.RECORD_ID)
-						.from(OFC_RECORD_STEP)
-						.where(OFC_RECORD_STEP.RECORD_ID.eq(OFC_RECORD.ID)
-								.and(OFC_RECORD_STEP.CREATED_BY.eq(userId)
-										.or(OFC_RECORD_STEP.MODIFIED_BY.eq(userId)
+						dsl().select(OFC_RECORD_DATA.RECORD_ID)
+						.from(OFC_RECORD_DATA)
+						.where(OFC_RECORD_DATA.RECORD_ID.eq(OFC_RECORD.ID)
+								.and(OFC_RECORD_DATA.CREATED_BY.eq(userId)
+										.or(OFC_RECORD_DATA.MODIFIED_BY.eq(userId)
 									)
 								)
 							)
@@ -222,9 +228,9 @@ public class RecordDao extends JooqDaoSupport {
 	
 	private List<StepSummary> loadAllStepsSummaries(CollectSurvey survey, int recordId) {
 		Result<Record> result = dsl.select(RECORD_STEP_SUMMARY_FIELDS)
-			.from(OFC_RECORD_STEP).join(OFC_RECORD).on(OFC_RECORD.ID.eq(OFC_RECORD_STEP.RECORD_ID))
-			.where(OFC_RECORD_STEP.RECORD_ID.eq(recordId))
-			.orderBy(OFC_RECORD_STEP.SEQ_NUM)
+			.from(OFC_RECORD_DATA).join(OFC_RECORD).on(OFC_RECORD.ID.eq(OFC_RECORD_DATA.RECORD_ID))
+			.where(OFC_RECORD_DATA.RECORD_ID.eq(recordId))
+			.orderBy(OFC_RECORD_DATA.SEQ_NUM)
 			.fetch();
 		
 		return fromStepSummaryQueryResult(result, survey);
@@ -394,7 +400,7 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	private CollectStoreQuery createRecordStepInsertQuery(CollectRecord r,int recordId) {
-		InsertQuery<OfcRecordStepRecord> recordStepStoreQuery = dsl.insertQuery(OFC_RECORD_STEP);
+		InsertQuery<OfcRecordDataRecord> recordStepStoreQuery = dsl.insertQuery(OFC_RECORD_DATA);
 		Integer nextWorkflowSequenceNumber = getNextWorkflowSequenceNumber(recordId);
 		r.setWorkflowSequenceNumber(nextWorkflowSequenceNumber);
 		fillRecordStepStoreQueryFromObject(recordStepStoreQuery, recordId, r, true);
@@ -410,36 +416,36 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	public void updateStepDataState(CollectSurvey survey, int recordId, Step step, State state) {
-		dsl.update(OFC_RECORD_STEP)
-			.set(OFC_RECORD_STEP.STATE, state == null ? null : state.getCode())
-			.where(OFC_RECORD_STEP.RECORD_ID.eq(recordId)
-					.and(OFC_RECORD_STEP.SEQ_NUM.eq(
+		dsl.update(OFC_RECORD_DATA)
+			.set(OFC_RECORD_DATA.STATE, state == null ? null : state.getCode())
+			.where(OFC_RECORD_DATA.RECORD_ID.eq(recordId)
+					.and(OFC_RECORD_DATA.SEQ_NUM.eq(
 							getLatestWorkflowSequenceNumber(recordId, step, true)
 					))
 			).execute();
 	}
 	
 	public Step duplicateLatestActiveStepData(CollectSurvey survey, int recordId) {
-		Field[] columns = ArrayUtils.addAll(RECORD_STEP_SUMMARY_FIELDS, new Field[] {OFC_RECORD_STEP.DATA, OFC_RECORD_STEP.APP_VERSION});
-		int indexOfSequenceNumberCol = ArrayUtils.indexOf(columns, OFC_RECORD_STEP.SEQ_NUM);
+		Field[] columns = ArrayUtils.addAll(RECORD_STEP_SUMMARY_FIELDS, new Field[] {OFC_RECORD_DATA.DATA, OFC_RECORD_DATA.APP_VERSION});
+		int indexOfSequenceNumberCol = ArrayUtils.indexOf(columns, OFC_RECORD_DATA.SEQ_NUM);
 		Field[] selectColumns = ArrayUtils.clone(columns);
 		Integer latestWorkflowSequenceNumber = getLatestWorkflowSequenceNumber(recordId);
 		Integer nextSequenceNumber = getNextWorkflowSequenceNumber(recordId);
 		selectColumns[indexOfSequenceNumberCol] = DSL.val(nextSequenceNumber);
 		
-		dsl.insertInto(OFC_RECORD_STEP)
+		dsl.insertInto(OFC_RECORD_DATA)
 			.columns(columns)
 			.select(dsl.select(selectColumns)
-				.from(OFC_RECORD_STEP)
-				.where(OFC_RECORD_STEP.RECORD_ID.eq(recordId)
-					.and(OFC_RECORD_STEP.SEQ_NUM.eq(latestWorkflowSequenceNumber))
+				.from(OFC_RECORD_DATA)
+				.where(OFC_RECORD_DATA.RECORD_ID.eq(recordId)
+					.and(OFC_RECORD_DATA.SEQ_NUM.eq(latestWorkflowSequenceNumber))
 				)
 			).execute();
 		
-		String newStepCode = (String) dsl.select(OFC_RECORD_STEP.STEP)
-			.from(OFC_RECORD_STEP)
-			.where(OFC_RECORD_STEP.RECORD_ID.eq(recordId)
-					.and(OFC_RECORD_STEP.SEQ_NUM.eq(nextSequenceNumber)))
+		String newStepCode = (String) dsl.select(OFC_RECORD_DATA.STEP)
+			.from(OFC_RECORD_DATA)
+			.where(OFC_RECORD_DATA.RECORD_ID.eq(recordId)
+					.and(OFC_RECORD_DATA.SEQ_NUM.eq(nextSequenceNumber)))
 			.fetchOne(0);
 		return Step.valueOf(newStepCode);
 	}
@@ -454,15 +460,15 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	private Integer getLatestWorkflowSequenceNumber(int recordId, Step step, boolean notRejected) {
-		Condition condition = OFC_RECORD_STEP.RECORD_ID.eq(recordId);
+		Condition condition = OFC_RECORD_DATA.RECORD_ID.eq(recordId);
 		if (notRejected) {
-			condition = condition.and(OFC_RECORD_STEP.STATE.isNull());
+			condition = condition.and(OFC_RECORD_DATA.STATE.isNull());
 		}
 		if (step != null) {
-			condition = condition.and(OFC_RECORD_STEP.STEP.eq(step.getStepNumber()));
+			condition = condition.and(OFC_RECORD_DATA.STEP.eq(step.getStepNumber()));
 		}
-		Select<Record1<Integer>> query = dsl.select(DSL.max(OFC_RECORD_STEP.SEQ_NUM))
-				.from(OFC_RECORD_STEP)
+		Select<Record1<Integer>> query = dsl.select(DSL.max(OFC_RECORD_DATA.SEQ_NUM))
+				.from(OFC_RECORD_DATA)
 				.where(condition);
 		return (Integer) query.fetchOne(0);
 	}
@@ -496,12 +502,12 @@ public class RecordDao extends JooqDaoSupport {
 	private CollectStoreQuery createRecordStepUpdateQuery(CollectRecord r, boolean storeData) {
 		Integer recordId = r.getId();
 		
-		UpdateQuery<OfcRecordStepRecord> q = dsl.updateQuery(OFC_RECORD_STEP);
+		UpdateQuery<OfcRecordDataRecord> q = dsl.updateQuery(OFC_RECORD_DATA);
 		
 		fillRecordStepStoreQueryFromObject(q, recordId, r, storeData);
 		
-		q.addConditions(OFC_RECORD_STEP.RECORD_ID.eq(recordId)
-			.and(OFC_RECORD_STEP.SEQ_NUM.eq(r.getWorkflowSequenceNumber())));
+		q.addConditions(OFC_RECORD_DATA.RECORD_ID.eq(recordId)
+			.and(OFC_RECORD_DATA.SEQ_NUM.eq(r.getWorkflowSequenceNumber())));
 		return new CollectStoreQuery(q);
 	}
 	
@@ -542,19 +548,19 @@ public class RecordDao extends JooqDaoSupport {
 
 	@SuppressWarnings({"unchecked"})
 	protected void fillRecordStepStoreQueryFromObject(StoreQuery<?> q, int recordId, CollectRecord r, boolean storeData) {
-		q.addValue(OFC_RECORD_STEP.RECORD_ID, recordId);
-		q.addValue(OFC_RECORD_STEP.SEQ_NUM, r.getWorkflowSequenceNumber());
-		q.addValue(OFC_RECORD_STEP.DATE_CREATED, toTimestamp(r.getCurrentStepCreationDate()));
-		q.addValue(OFC_RECORD_STEP.CREATED_BY, getUserId(r.getCurrentStepCreatedBy()));
-		q.addValue(OFC_RECORD_STEP.DATE_MODIFIED, toTimestamp(r.getCurrentStepModifiedDate()));
-		q.addValue(OFC_RECORD_STEP.MODIFIED_BY, getUserId(r.getCurrentStepModifiedBy()));
-		q.addValue(OFC_RECORD_STEP.STEP, r.getStep().getStepNumber());
-		q.addValue(OFC_RECORD_STEP.STATE, r.getState() != null ? r.getState().getCode(): null);
-		q.addValue(OFC_RECORD_STEP.SKIPPED, r.getSkipped());
-		q.addValue(OFC_RECORD_STEP.MISSING, r.getMissing());
-		q.addValue(OFC_RECORD_STEP.ERRORS, r.getErrors());
-		q.addValue(OFC_RECORD_STEP.WARNINGS, r.getWarnings());
-		q.addValue(OFC_RECORD_STEP.APP_VERSION, r.getApplicationVersion().toString());
+		q.addValue(OFC_RECORD_DATA.RECORD_ID, recordId);
+		q.addValue(OFC_RECORD_DATA.SEQ_NUM, r.getWorkflowSequenceNumber());
+		q.addValue(OFC_RECORD_DATA.DATE_CREATED, toTimestamp(r.getCurrentStepCreationDate()));
+		q.addValue(OFC_RECORD_DATA.CREATED_BY, getUserId(r.getCurrentStepCreatedBy()));
+		q.addValue(OFC_RECORD_DATA.DATE_MODIFIED, toTimestamp(r.getCurrentStepModifiedDate()));
+		q.addValue(OFC_RECORD_DATA.MODIFIED_BY, getUserId(r.getCurrentStepModifiedBy()));
+		q.addValue(OFC_RECORD_DATA.STEP, r.getStep().getStepNumber());
+		q.addValue(OFC_RECORD_DATA.STATE, r.getState() != null ? r.getState().getCode(): null);
+		q.addValue(OFC_RECORD_DATA.SKIPPED, r.getSkipped());
+		q.addValue(OFC_RECORD_DATA.MISSING, r.getMissing());
+		q.addValue(OFC_RECORD_DATA.ERRORS, r.getErrors());
+		q.addValue(OFC_RECORD_DATA.WARNINGS, r.getWarnings());
+		q.addValue(OFC_RECORD_DATA.APP_VERSION, r.getApplicationVersion().toString());
 
 		// set keys
 		List<String> keys = r.getRootEntityKeyValues();
@@ -571,7 +577,7 @@ public class RecordDao extends JooqDaoSupport {
 		if (storeData) {
 			Entity rootEntity = r.getRootEntity();
 			byte[] data = new ModelSerializer(SERIALIZATION_BUFFER_SIZE).toByteArray(rootEntity);
-			q.addValue(OFC_RECORD_STEP.DATA, data);
+			q.addValue(OFC_RECORD_DATA.DATA, data);
 		}
 	}
 
@@ -579,15 +585,15 @@ public class RecordDao extends JooqDaoSupport {
 		SelectQuery<Record> query = dsl.selectQuery();
 		query.addSelect(RECORD_STEP_SUMMARY_FIELDS);
 		if (! onlySummary) {
-			query.addSelect(OFC_RECORD_STEP.DATA, OFC_RECORD_STEP.APP_VERSION);
+			query.addSelect(OFC_RECORD_DATA.DATA, OFC_RECORD_DATA.APP_VERSION);
 		}
-		query.addFrom(OFC_RECORD_STEP);
+		query.addFrom(OFC_RECORD_DATA);
 		if (workflowSequenceNumber == null) {
 			workflowSequenceNumber = getLatestWorkflowSequenceNumber(id, step, true);
 		}
 		query.addJoin(OFC_RECORD, 
-			OFC_RECORD_STEP.RECORD_ID.eq(OFC_RECORD.ID)
-			.and(OFC_RECORD_STEP.SEQ_NUM.eq(workflowSequenceNumber))
+			OFC_RECORD_DATA.RECORD_ID.eq(OFC_RECORD.ID)
+			.and(OFC_RECORD_DATA.SEQ_NUM.eq(workflowSequenceNumber))
 		);
 		query.addConditions(OFC_RECORD.ID.equal(id));
 		return query;
@@ -608,16 +614,16 @@ public class RecordDao extends JooqDaoSupport {
 		
 		c.setOwner(createDetachedUser(r.getValue(OFC_RECORD.OWNER_ID)));
 		
-		c.setStep(Step.valueOf(r.getValue(OFC_RECORD_STEP.STEP)));
-		c.setWorkflowSequenceNumber(r.getValue(OFC_RECORD_STEP.SEQ_NUM));
-		c.setCurrentStepCreationDate(r.getValue(OFC_RECORD_STEP.DATE_CREATED));
-		c.setCurrentStepModifiedDate(r.getValue(OFC_RECORD_STEP.DATE_MODIFIED));
-		c.setCurrentStepCreatedBy(createDetachedUser(r.getValue(OFC_RECORD_STEP.CREATED_BY)));
-		c.setCurrentStepModifiedBy(createDetachedUser(r.getValue(OFC_RECORD_STEP.MODIFIED_BY)));
-		c.setWarnings(r.getValue(OFC_RECORD_STEP.WARNINGS));
-		c.setErrors(r.getValue(OFC_RECORD_STEP.ERRORS));
-		c.setSkipped(r.getValue(OFC_RECORD_STEP.SKIPPED));
-		c.setMissing(r.getValue(OFC_RECORD_STEP.MISSING));
+		c.setStep(Step.valueOf(r.getValue(OFC_RECORD_DATA.STEP)));
+		c.setWorkflowSequenceNumber(r.getValue(OFC_RECORD_DATA.SEQ_NUM));
+		c.setCurrentStepCreationDate(r.getValue(OFC_RECORD_DATA.DATE_CREATED));
+		c.setCurrentStepModifiedDate(r.getValue(OFC_RECORD_DATA.DATE_MODIFIED));
+		c.setCurrentStepCreatedBy(createDetachedUser(r.getValue(OFC_RECORD_DATA.CREATED_BY)));
+		c.setCurrentStepModifiedBy(createDetachedUser(r.getValue(OFC_RECORD_DATA.MODIFIED_BY)));
+		c.setWarnings(r.getValue(OFC_RECORD_DATA.WARNINGS));
+		c.setErrors(r.getValue(OFC_RECORD_DATA.ERRORS));
+		c.setSkipped(r.getValue(OFC_RECORD_DATA.SKIPPED));
+		c.setMissing(r.getValue(OFC_RECORD_DATA.MISSING));
 		
 		String state = r.getValue(OFC_RECORD.STATE);
 		c.setState(state == null ? null : State.fromCode(state));
@@ -629,8 +635,8 @@ public class RecordDao extends JooqDaoSupport {
 		}
 		c.setEntityCounts(counts);
 
-		c.setApplicationVersion(new Version(r.getValue(OFC_RECORD_STEP.APP_VERSION)));
-		byte[] data = r.getValue(OFC_RECORD_STEP.DATA);
+		c.setApplicationVersion(new Version(r.getValue(OFC_RECORD_DATA.APP_VERSION)));
+		byte[] data = r.getValue(OFC_RECORD_DATA.DATA);
 		ModelSerializer modelSerializer = new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
 		Entity rootEntity = c.getRootEntity();
 		modelSerializer.mergeFrom(data, rootEntity);
@@ -677,6 +683,7 @@ public class RecordDao extends JooqDaoSupport {
 		s.setModifiedBy(createDetachedUser(r.getValue(OFC_RECORD.MODIFIED_BY_ID)));
 		
 		StepSummary stepSummary = new StepSummary(step);
+		stepSummary.setSequenceNumber(r.getValue(OFC_RECORD.DATA_SEQ_NUM));
 		stepSummary.setErrors(r.getValue(OFC_RECORD.ERRORS));
 		stepSummary.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 		stepSummary.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
@@ -720,16 +727,16 @@ public class RecordDao extends JooqDaoSupport {
 		Step step = Step.valueOf(r.getValue(OFC_RECORD.STEP));
 		StepSummary s = new StepSummary(step);
 
-		s.setCreationDate(r.getValue(OFC_RECORD_STEP.DATE_CREATED));
-		s.setModifiedDate(r.getValue(OFC_RECORD_STEP.DATE_MODIFIED));
-		s.setCreatedBy(createDetachedUser(r.getValue(OFC_RECORD_STEP.CREATED_BY)));
-		s.setModifiedBy(createDetachedUser(r.getValue(OFC_RECORD_STEP.MODIFIED_BY)));
+		s.setCreationDate(r.getValue(OFC_RECORD_DATA.DATE_CREATED));
+		s.setModifiedDate(r.getValue(OFC_RECORD_DATA.DATE_MODIFIED));
+		s.setCreatedBy(createDetachedUser(r.getValue(OFC_RECORD_DATA.CREATED_BY)));
+		s.setModifiedBy(createDetachedUser(r.getValue(OFC_RECORD_DATA.MODIFIED_BY)));
 		
 		StepSummary stepSummary = new StepSummary(step);
-		stepSummary.setErrors(r.getValue(OFC_RECORD_STEP.ERRORS));
-		stepSummary.setWarnings(r.getValue(OFC_RECORD_STEP.WARNINGS));
-		stepSummary.setSkipped(r.getValue(OFC_RECORD_STEP.SKIPPED));
-		stepSummary.setMissing(r.getValue(OFC_RECORD_STEP.MISSING));
+		stepSummary.setErrors(r.getValue(OFC_RECORD_DATA.ERRORS));
+		stepSummary.setWarnings(r.getValue(OFC_RECORD_DATA.WARNINGS));
+		stepSummary.setSkipped(r.getValue(OFC_RECORD_DATA.SKIPPED));
+		stepSummary.setMissing(r.getValue(OFC_RECORD_DATA.MISSING));
 		
 		// create list of entity counts
 		List<Integer> counts = new ArrayList<Integer>(RECORD_STEP_COUNT_FIELDS.length);
@@ -749,7 +756,7 @@ public class RecordDao extends JooqDaoSupport {
 		}
 		stepSummary.setRootEntityKeyValues(keys);
 		
-		String state = r.getValue(OFC_RECORD_STEP.STATE);
+		String state = r.getValue(OFC_RECORD_DATA.STATE);
 		stepSummary.setState(state == null ? null : State.fromCode(state));
 		
 		return s;
@@ -765,8 +772,8 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	public void delete(int id) {
-		dsl().deleteFrom(OFC_RECORD_STEP)
-			.where(OFC_RECORD_STEP.RECORD_ID.eq(id))
+		dsl().deleteFrom(OFC_RECORD_DATA)
+			.where(OFC_RECORD_DATA.RECORD_ID.eq(id))
 			.execute();
 		dsl().deleteFrom(OFC_RECORD)
 			.where(OFC_RECORD.ID.eq(id))
@@ -787,8 +794,8 @@ public class RecordDao extends JooqDaoSupport {
 	}
 
 	public void deleteBySurvey(int id) {
-		dsl().deleteFrom(OFC_RECORD_STEP)
-				.where(OFC_RECORD_STEP.RECORD_ID.in(
+		dsl().deleteFrom(OFC_RECORD_DATA)
+				.where(OFC_RECORD_DATA.RECORD_ID.in(
 			dsl().select(OFC_RECORD.ID)
 				.from(OFC_RECORD)
 				.where(OFC_RECORD.SURVEY_ID.eq(id))

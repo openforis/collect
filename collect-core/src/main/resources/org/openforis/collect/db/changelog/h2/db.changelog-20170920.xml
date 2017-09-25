@@ -3,13 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-	<changeSet id="record-step" author="ricci" dbms="sqlite">
+	<changeSet id="record-data" author="ricci" dbms="h2">
 
 		<comment>Split record table by steps</comment>
 
-		<createTable tableName="ofc_record_step">
+		<createTable tableName="ofc_record_data">
 			<column name="record_id" type="INTEGER">
-				<constraints nullable="false" foreignKeyName="ofc_record_step_record_fkey"
+				<constraints nullable="false" foreignKeyName="ofc_record_data_record_fkey"
 					references="ofc_record(id)" />
 			</column>
 			<column name="seq_num" type="INTEGER">
@@ -21,12 +21,12 @@
 			<column name="state" type="char(1)" />
 			<column name="date_created" type="TIMESTAMP" />
 			<column name="created_by" type="INTEGER">
-				<constraints nullable="true" foreignKeyName="ofc_record_step_created_by_fkey"
+				<constraints nullable="true" foreignKeyName="ofc_record_data_created_by_fkey"
 					references="ofc_user(id)" />
 			</column>
 			<column name="date_modified" type="TIMESTAMP" />
 			<column name="modified_by" type="INTEGER">
-				<constraints nullable="true" foreignKeyName="ofc_record_step_modified_by_fkey"
+				<constraints nullable="true" foreignKeyName="ofc_record_data_modified_by_fkey"
 					references="ofc_user(id)" />
 			</column>
 			<column name="skipped" type="INTEGER" />
@@ -49,12 +49,12 @@
 			<column name="key3" type="VARCHAR(2048)" />
 		</createTable>
 
-		<createIndex indexName="ofc_record_step_pkey_idx" tableName="ofc_record_step" unique="true">
-			<column name="record_id" type="INTEGER" />
-			<column name="seq_num" type="INTEGER" />
-		</createIndex>
+		<addPrimaryKey 
+			tableName="ofc_record_data"
+			columnNames="record_id, seq_num"
+            constraintName="ofc_record_data_pkey" />
 		
-		<createIndex indexName="ofc_record_step_idx" tableName="ofc_record_step" unique="true">
+		<createIndex indexName="ofc_record_data_idx" tableName="ofc_record_data" unique="true">
 			<column name="record_id" type="INTEGER" />
 			<column name="seq_num" type="INTEGER" />
 			<column name="step" type="INTEGER" />
@@ -63,7 +63,7 @@
 		
 	</changeSet>
 	
-	<changeSet id="populate-record-step-table" author="ricci" dbms="sqlite">
+	<changeSet id="populate-record-step-table" author="ricci" dbms="h2">
 		<sql>
 			UPDATE collect.ofc_record SET data1 = data2 where step > 1 and data1 is null;
 			UPDATE collect.ofc_record SET data2 = data1 where step > 1 and data2 is null;
@@ -90,18 +90,22 @@
 				WHERE step = 3;
 		</sql>
 	</changeSet>
-	
-	<changeSet id="add-record-data-seq-num-column" author="ricci" dbms="sqlite">
-		<sql>
-			ALTER TABLE ofc_record ADD COLUMN data_seq_num INTEGER;			
-		</sql>
+
+	<changeSet id="drop-record-table-data-columns" author="ricci" dbms="h2">
+		<dropColumn tableName="ofc_record" columnName="data1" />
+		<dropColumn tableName="ofc_record" columnName="data2" />
 	</changeSet>
 	
-	<changeSet id="update-record-data-seq-num" author="ricci" dbms="sqlite">
+	<changeSet id="add-record-data-seq-num-column" author="ricci" dbms="h2">
+		<addColumn tableName="ofc_record">
+			<column name="data_seq_num" type="INTEGER" />
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="update-record-data-seq-num" author="ricci" dbms="h2">
 		<sql>
 			UPDATE collect.ofc_record SET data_seq_num = step;
 		</sql>
 	</changeSet>
 	
-
 </databaseChangeLog>

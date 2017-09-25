@@ -3,13 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-	<changeSet id="record-step" author="ricci" dbms="postgresql">
+	<changeSet id="record-data" author="ricci" dbms="postgresql">
 
 		<comment>Split record table by steps</comment>
 
-		<createTable tableName="ofc_record_step">
+		<createTable tableName="ofc_record_data">
 			<column name="record_id" type="INTEGER">
-				<constraints nullable="false" foreignKeyName="ofc_record_step_record_fkey"
+				<constraints nullable="false" foreignKeyName="ofc_record_data_record_fkey"
 					references="ofc_record(id)" />
 			</column>
 			<column name="seq_num" type="INTEGER">
@@ -21,12 +21,12 @@
 			<column name="state" type="char(1)" />
 			<column name="date_created" type="TIMESTAMP" />
 			<column name="created_by" type="INTEGER">
-				<constraints nullable="true" foreignKeyName="ofc_record_step_created_by_fkey"
+				<constraints nullable="true" foreignKeyName="ofc_record_data_created_by_fkey"
 					references="ofc_user(id)" />
 			</column>
 			<column name="date_modified" type="TIMESTAMP" />
 			<column name="modified_by" type="INTEGER">
-				<constraints nullable="true" foreignKeyName="ofc_record_step_modified_by_fkey"
+				<constraints nullable="true" foreignKeyName="ofc_record_data_modified_by_fkey"
 					references="ofc_user(id)" />
 			</column>
 			<column name="skipped" type="INTEGER" />
@@ -50,11 +50,11 @@
 		</createTable>
 
 		<addPrimaryKey 
-			tableName="ofc_record_step"
+			tableName="ofc_record_data"
 			columnNames="record_id, seq_num"
-            constraintName="ofc_record_step_pkey" />
+            constraintName="ofc_record_data_pkey" />
 		
-		<createIndex indexName="ofc_record_step_idx" tableName="ofc_record_step" unique="true">
+		<createIndex indexName="ofc_record_data_idx" tableName="ofc_record_data" unique="true">
 			<column name="record_id" type="INTEGER" />
 			<column name="seq_num" type="INTEGER" />
 			<column name="step" type="INTEGER" />
@@ -68,27 +68,44 @@
 			UPDATE collect.ofc_record SET data1 = data2 where step > 1 and data1 is null;
 			UPDATE collect.ofc_record SET data2 = data1 where step > 1 and data2 is null;
 			
-			INSERT INTO collect.ofc_record_step(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
-				state, skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
-				SELECT id, 1, 1, date_created, created_by_id, date_modified, modified_by_id, state, skipped, missing, errors, 
+			INSERT INTO collect.ofc_record_data(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
+				skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
+				SELECT id, 1, 1, date_created, created_by_id, date_modified, modified_by_id, skipped, missing, errors, 
 					warnings, count1, count2, count3, count4, count5, data1, app_version, key1, key2, key3
 				FROM collect.ofc_record 
 				WHERE step >= 1;
 			
-			INSERT INTO collect.ofc_record_step(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
-				state, skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
-				SELECT id, 2, 2, date_created, created_by_id, date_modified, modified_by_id, state, skipped, missing, errors, 
+			INSERT INTO collect.ofc_record_data(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
+				skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
+				SELECT id, 2, 2, date_created, created_by_id, date_modified, modified_by_id, skipped, missing, errors, 
 					warnings, count1, count2, count3, count4, count5, data2, app_version, key1, key2, key3
 				FROM collect.ofc_record 
 				WHERE step >= 2;
 			
-			INSERT INTO collect.ofc_record_step(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
-				state, skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
-				SELECT id, 3, 3, date_created, created_by_id, date_modified, modified_by_id, state, skipped, missing, errors, 
+			INSERT INTO collect.ofc_record_data(record_id, seq_num, step, date_created, created_by, date_modified, modified_by,
+				skipped, missing, errors, warnings, count1, count2, count3, count4, count5, data, app_version, key1, key2, key3) 
+				SELECT id, 3, 3, date_created, created_by_id, date_modified, modified_by_id, skipped, missing, errors, 
 					warnings, count1, count2, count3, count4, count5, data2, app_version, key1, key2, key3
 				FROM collect.ofc_record 
 				WHERE step = 3;
 		</sql>
 	</changeSet>
 
+	<changeSet id="drop-record-table-data-columns" author="ricci" dbms="postgresql">
+		<dropColumn tableName="ofc_record" columnName="data1" />
+		<dropColumn tableName="ofc_record" columnName="data2" />
+	</changeSet>
+	
+	<changeSet id="add-record-data-seq-num-column" author="ricci" dbms="postgresql">
+		<addColumn tableName="ofc_record">
+			<column name="data_seq_num" type="INTEGER" />
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="update-record-data-seq-num" author="ricci" dbms="postgresql">
+		<sql>
+			UPDATE collect.ofc_record SET data_seq_num = step;
+		</sql>
+	</changeSet>
+	
 </databaseChangeLog>

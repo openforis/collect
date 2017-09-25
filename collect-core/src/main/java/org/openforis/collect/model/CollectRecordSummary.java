@@ -182,6 +182,7 @@ public class CollectRecordSummary {
 
 	public static class StepSummary {
 		
+		private int sequenceNumber;
 		private Step step;
 		private State state;
 		private User createdBy;
@@ -202,6 +203,14 @@ public class CollectRecordSummary {
 		
 		public StepSummary(Step step) {
 			this.step = step;
+		}
+		
+		public int getSequenceNumber() {
+			return sequenceNumber;
+		}
+		
+		public void setSequenceNumber(int sequenceNumber) {
+			this.sequenceNumber = sequenceNumber;
 		}
 		
 		public Step getStep() {

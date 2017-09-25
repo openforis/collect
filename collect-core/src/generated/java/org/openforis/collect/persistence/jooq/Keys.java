@@ -26,7 +26,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcDataReportItem;
 import org.openforis.collect.persistence.jooq.tables.OfcLogo;
 import org.openforis.collect.persistence.jooq.tables.OfcMessage;
 import org.openforis.collect.persistence.jooq.tables.OfcRecord;
-import org.openforis.collect.persistence.jooq.tables.OfcRecordStep;
+import org.openforis.collect.persistence.jooq.tables.OfcRecordData;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
 import org.openforis.collect.persistence.jooq.tables.OfcSurvey;
 import org.openforis.collect.persistence.jooq.tables.OfcSurveyFile;
@@ -52,8 +52,8 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcDataReportItemRe
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcLogoRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcMessageRecord;
+import org.openforis.collect.persistence.jooq.tables.records.OfcRecordDataRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
-import org.openforis.collect.persistence.jooq.tables.records.OfcRecordStepRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
@@ -104,7 +104,7 @@ public class Keys {
 	public static final UniqueKey<OfcLogoRecord> OFC_LOGO_PKEY = UniqueKeys0.OFC_LOGO_PKEY;
 	public static final UniqueKey<OfcMessageRecord> PK_OFC_MESSAGE = UniqueKeys0.PK_OFC_MESSAGE;
 	public static final UniqueKey<OfcRecordRecord> OFC_RECORD_PKEY = UniqueKeys0.OFC_RECORD_PKEY;
-	public static final UniqueKey<OfcRecordStepRecord> OFC_RECORD_STEP_PKEY = UniqueKeys0.OFC_RECORD_STEP_PKEY;
+	public static final UniqueKey<OfcRecordDataRecord> OFC_RECORD_DATA_PKEY = UniqueKeys0.OFC_RECORD_DATA_PKEY;
 	public static final UniqueKey<OfcSamplingDesignRecord> PK_OFC_SAMPLING_DESIGN = UniqueKeys0.PK_OFC_SAMPLING_DESIGN;
 	public static final UniqueKey<OfcSurveyRecord> OFC_SURVEY_PKEY = UniqueKeys0.OFC_SURVEY_PKEY;
 	public static final UniqueKey<OfcSurveyRecord> OFC_SURVEY_NAME_KEY = UniqueKeys0.OFC_SURVEY_NAME_KEY;
@@ -112,15 +112,15 @@ public class Keys {
 	public static final UniqueKey<OfcSurveyFileRecord> OFC_SURVEY_FILE_PKEY = UniqueKeys0.OFC_SURVEY_FILE_PKEY;
 	public static final UniqueKey<OfcTaxonRecord> OFC_TAXON_PKEY = UniqueKeys0.OFC_TAXON_PKEY;
 	public static final UniqueKey<OfcTaxonRecord> OFC_TAXON_ID_KEY = UniqueKeys0.OFC_TAXON_ID_KEY;
+	public static final UniqueKey<OfcTaxonVernacularNameRecord> OFC_TAXON_VERNACULAR_NAME_PKEY = UniqueKeys0.OFC_TAXON_VERNACULAR_NAME_PKEY;
 	public static final UniqueKey<OfcTaxonomyRecord> OFC_TAXONOMY_PKEY = UniqueKeys0.OFC_TAXONOMY_PKEY;
 	public static final UniqueKey<OfcTaxonomyRecord> OFC_TAXONOMY_NAME_KEY = UniqueKeys0.OFC_TAXONOMY_NAME_KEY;
-	public static final UniqueKey<OfcTaxonVernacularNameRecord> OFC_TAXON_VERNACULAR_NAME_PKEY = UniqueKeys0.OFC_TAXON_VERNACULAR_NAME_PKEY;
 	public static final UniqueKey<OfcUserRecord> OFC_USER_PKEY = UniqueKeys0.OFC_USER_PKEY;
 	public static final UniqueKey<OfcUserRecord> OFC_USER_USERNAME_KEY = UniqueKeys0.OFC_USER_USERNAME_KEY;
-	public static final UniqueKey<OfcUsergroupRecord> OFC_USERGROUP_PKEY = UniqueKeys0.OFC_USERGROUP_PKEY;
-	public static final UniqueKey<OfcUsergroupRecord> OFC_USERGROUP_NAME_KEY = UniqueKeys0.OFC_USERGROUP_NAME_KEY;
 	public static final UniqueKey<OfcUserRoleRecord> OFC_USER_ROLE_PKEY = UniqueKeys0.OFC_USER_ROLE_PKEY;
 	public static final UniqueKey<OfcUserUsergroupRecord> OFC_USER_USERGROUP_PKEY = UniqueKeys0.OFC_USER_USERGROUP_PKEY;
+	public static final UniqueKey<OfcUsergroupRecord> OFC_USERGROUP_PKEY = UniqueKeys0.OFC_USERGROUP_PKEY;
+	public static final UniqueKey<OfcUsergroupRecord> OFC_USERGROUP_NAME_KEY = UniqueKeys0.OFC_USERGROUP_NAME_KEY;
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
@@ -148,21 +148,21 @@ public class Keys {
 	public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_CREATED_BY_USER_FKEY = ForeignKeys0.OFC_RECORD__OFC_RECORD_CREATED_BY_USER_FKEY;
 	public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_MODIFIED_BY_USER_FKEY = ForeignKeys0.OFC_RECORD__OFC_RECORD_MODIFIED_BY_USER_FKEY;
 	public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_OWNER_FKEY = ForeignKeys0.OFC_RECORD__OFC_RECORD_OWNER_FKEY;
-	public static final ForeignKey<OfcRecordStepRecord, OfcRecordRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_RECORD_FKEY = ForeignKeys0.OFC_RECORD_STEP__OFC_RECORD_STEP_RECORD_FKEY;
-	public static final ForeignKey<OfcRecordStepRecord, OfcUserRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_CREATED_BY_FKEY = ForeignKeys0.OFC_RECORD_STEP__OFC_RECORD_STEP_CREATED_BY_FKEY;
-	public static final ForeignKey<OfcRecordStepRecord, OfcUserRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_MODIFIED_BY_FKEY = ForeignKeys0.OFC_RECORD_STEP__OFC_RECORD_STEP_MODIFIED_BY_FKEY;
+	public static final ForeignKey<OfcRecordDataRecord, OfcRecordRecord> OFC_RECORD_DATA__OFC_RECORD_DATA_RECORD_FKEY = ForeignKeys0.OFC_RECORD_DATA__OFC_RECORD_DATA_RECORD_FKEY;
+	public static final ForeignKey<OfcRecordDataRecord, OfcUserRecord> OFC_RECORD_DATA__OFC_RECORD_DATA_CREATED_BY_FKEY = ForeignKeys0.OFC_RECORD_DATA__OFC_RECORD_DATA_CREATED_BY_FKEY;
+	public static final ForeignKey<OfcRecordDataRecord, OfcUserRecord> OFC_RECORD_DATA__OFC_RECORD_DATA_MODIFIED_BY_FKEY = ForeignKeys0.OFC_RECORD_DATA__OFC_RECORD_DATA_MODIFIED_BY_FKEY;
 	public static final ForeignKey<OfcSamplingDesignRecord, OfcSurveyRecord> OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_FKEY = ForeignKeys0.OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_FKEY;
 	public static final ForeignKey<OfcSurveyRecord, OfcUsergroupRecord> OFC_SURVEY__OFC_SURVEY_USERGROUP_FKEY = ForeignKeys0.OFC_SURVEY__OFC_SURVEY_USERGROUP_FKEY;
 	public static final ForeignKey<OfcSurveyFileRecord, OfcSurveyRecord> OFC_SURVEY_FILE__OFC_SURVEY_FILE_SURVEY_FKEY = ForeignKeys0.OFC_SURVEY_FILE__OFC_SURVEY_FILE_SURVEY_FKEY;
 	public static final ForeignKey<OfcTaxonRecord, OfcTaxonomyRecord> OFC_TAXON__OFC_TAXON_TAXONOMY_FKEY = ForeignKeys0.OFC_TAXON__OFC_TAXON_TAXONOMY_FKEY;
 	public static final ForeignKey<OfcTaxonRecord, OfcTaxonRecord> OFC_TAXON__OFC_TAXON_PARENT_FKEY = ForeignKeys0.OFC_TAXON__OFC_TAXON_PARENT_FKEY;
-	public static final ForeignKey<OfcTaxonomyRecord, OfcSurveyRecord> OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_FKEY = ForeignKeys0.OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_FKEY;
 	public static final ForeignKey<OfcTaxonVernacularNameRecord, OfcTaxonRecord> OFC_TAXON_VERNACULAR_NAME__OFC_TAXON_VERNACULAR_NAME_TAXON_FKEY = ForeignKeys0.OFC_TAXON_VERNACULAR_NAME__OFC_TAXON_VERNACULAR_NAME_TAXON_FKEY;
-	public static final ForeignKey<OfcUsergroupRecord, OfcUsergroupRecord> OFC_USERGROUP__OFC_USERGROUP_PARENT_FKEY = ForeignKeys0.OFC_USERGROUP__OFC_USERGROUP_PARENT_FKEY;
-	public static final ForeignKey<OfcUsergroupRecord, OfcUserRecord> OFC_USERGROUP__OFC_USERGROUP_CREATED_BY_FKEY = ForeignKeys0.OFC_USERGROUP__OFC_USERGROUP_CREATED_BY_FKEY;
+	public static final ForeignKey<OfcTaxonomyRecord, OfcSurveyRecord> OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_FKEY = ForeignKeys0.OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_FKEY;
 	public static final ForeignKey<OfcUserRoleRecord, OfcUserRecord> OFC_USER_ROLE__OFC_USER_USER_ROLE_FKEY = ForeignKeys0.OFC_USER_ROLE__OFC_USER_USER_ROLE_FKEY;
 	public static final ForeignKey<OfcUserUsergroupRecord, OfcUserRecord> OFC_USER_USERGROUP__OFC_USER_USERGROUP_USER_FKEY = ForeignKeys0.OFC_USER_USERGROUP__OFC_USER_USERGROUP_USER_FKEY;
 	public static final ForeignKey<OfcUserUsergroupRecord, OfcUsergroupRecord> OFC_USER_USERGROUP__OFC_USER_USERGROUP_GROUP_FKEY = ForeignKeys0.OFC_USER_USERGROUP__OFC_USER_USERGROUP_GROUP_FKEY;
+	public static final ForeignKey<OfcUsergroupRecord, OfcUsergroupRecord> OFC_USERGROUP__OFC_USERGROUP_PARENT_FKEY = ForeignKeys0.OFC_USERGROUP__OFC_USERGROUP_PARENT_FKEY;
+	public static final ForeignKey<OfcUsergroupRecord, OfcUserRecord> OFC_USERGROUP__OFC_USERGROUP_CREATED_BY_FKEY = ForeignKeys0.OFC_USERGROUP__OFC_USERGROUP_CREATED_BY_FKEY;
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
@@ -187,7 +187,7 @@ public class Keys {
 		public static final UniqueKey<OfcLogoRecord> OFC_LOGO_PKEY = createUniqueKey(OfcLogo.OFC_LOGO, OfcLogo.OFC_LOGO.POS);
 		public static final UniqueKey<OfcMessageRecord> PK_OFC_MESSAGE = createUniqueKey(OfcMessage.OFC_MESSAGE, OfcMessage.OFC_MESSAGE.SEQUENCE_NO);
 		public static final UniqueKey<OfcRecordRecord> OFC_RECORD_PKEY = createUniqueKey(OfcRecord.OFC_RECORD, OfcRecord.OFC_RECORD.ID);
-		public static final UniqueKey<OfcRecordStepRecord> OFC_RECORD_STEP_PKEY = createUniqueKey(OfcRecordStep.OFC_RECORD_STEP, OfcRecordStep.OFC_RECORD_STEP.RECORD_ID, OfcRecordStep.OFC_RECORD_STEP.SEQ_NUM);
+		public static final UniqueKey<OfcRecordDataRecord> OFC_RECORD_DATA_PKEY = createUniqueKey(OfcRecordData.OFC_RECORD_DATA, OfcRecordData.OFC_RECORD_DATA.RECORD_ID, OfcRecordData.OFC_RECORD_DATA.SEQ_NUM);
 		public static final UniqueKey<OfcSamplingDesignRecord> PK_OFC_SAMPLING_DESIGN = createUniqueKey(OfcSamplingDesign.OFC_SAMPLING_DESIGN, OfcSamplingDesign.OFC_SAMPLING_DESIGN.ID);
 		public static final UniqueKey<OfcSurveyRecord> OFC_SURVEY_PKEY = createUniqueKey(OfcSurvey.OFC_SURVEY, OfcSurvey.OFC_SURVEY.ID);
 		public static final UniqueKey<OfcSurveyRecord> OFC_SURVEY_NAME_KEY = createUniqueKey(OfcSurvey.OFC_SURVEY, OfcSurvey.OFC_SURVEY.NAME, OfcSurvey.OFC_SURVEY.TEMPORARY);
@@ -195,15 +195,15 @@ public class Keys {
 		public static final UniqueKey<OfcSurveyFileRecord> OFC_SURVEY_FILE_PKEY = createUniqueKey(OfcSurveyFile.OFC_SURVEY_FILE, OfcSurveyFile.OFC_SURVEY_FILE.ID);
 		public static final UniqueKey<OfcTaxonRecord> OFC_TAXON_PKEY = createUniqueKey(OfcTaxon.OFC_TAXON, OfcTaxon.OFC_TAXON.ID);
 		public static final UniqueKey<OfcTaxonRecord> OFC_TAXON_ID_KEY = createUniqueKey(OfcTaxon.OFC_TAXON, OfcTaxon.OFC_TAXON.TAXON_ID, OfcTaxon.OFC_TAXON.TAXONOMY_ID);
+		public static final UniqueKey<OfcTaxonVernacularNameRecord> OFC_TAXON_VERNACULAR_NAME_PKEY = createUniqueKey(OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME, OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME.ID);
 		public static final UniqueKey<OfcTaxonomyRecord> OFC_TAXONOMY_PKEY = createUniqueKey(OfcTaxonomy.OFC_TAXONOMY, OfcTaxonomy.OFC_TAXONOMY.ID);
 		public static final UniqueKey<OfcTaxonomyRecord> OFC_TAXONOMY_NAME_KEY = createUniqueKey(OfcTaxonomy.OFC_TAXONOMY, OfcTaxonomy.OFC_TAXONOMY.SURVEY_ID, OfcTaxonomy.OFC_TAXONOMY.NAME);
-		public static final UniqueKey<OfcTaxonVernacularNameRecord> OFC_TAXON_VERNACULAR_NAME_PKEY = createUniqueKey(OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME, OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME.ID);
 		public static final UniqueKey<OfcUserRecord> OFC_USER_PKEY = createUniqueKey(OfcUser.OFC_USER, OfcUser.OFC_USER.ID);
 		public static final UniqueKey<OfcUserRecord> OFC_USER_USERNAME_KEY = createUniqueKey(OfcUser.OFC_USER, OfcUser.OFC_USER.USERNAME);
-		public static final UniqueKey<OfcUsergroupRecord> OFC_USERGROUP_PKEY = createUniqueKey(OfcUsergroup.OFC_USERGROUP, OfcUsergroup.OFC_USERGROUP.ID);
-		public static final UniqueKey<OfcUsergroupRecord> OFC_USERGROUP_NAME_KEY = createUniqueKey(OfcUsergroup.OFC_USERGROUP, OfcUsergroup.OFC_USERGROUP.NAME);
 		public static final UniqueKey<OfcUserRoleRecord> OFC_USER_ROLE_PKEY = createUniqueKey(OfcUserRole.OFC_USER_ROLE, OfcUserRole.OFC_USER_ROLE.ID);
 		public static final UniqueKey<OfcUserUsergroupRecord> OFC_USER_USERGROUP_PKEY = createUniqueKey(OfcUserUsergroup.OFC_USER_USERGROUP, OfcUserUsergroup.OFC_USER_USERGROUP.USER_ID, OfcUserUsergroup.OFC_USER_USERGROUP.GROUP_ID);
+		public static final UniqueKey<OfcUsergroupRecord> OFC_USERGROUP_PKEY = createUniqueKey(OfcUsergroup.OFC_USERGROUP, OfcUsergroup.OFC_USERGROUP.ID);
+		public static final UniqueKey<OfcUsergroupRecord> OFC_USERGROUP_NAME_KEY = createUniqueKey(OfcUsergroup.OFC_USERGROUP, OfcUsergroup.OFC_USERGROUP.NAME);
 	}
 
 	private static class ForeignKeys0 extends AbstractKeys {
@@ -229,20 +229,20 @@ public class Keys {
 		public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_CREATED_BY_USER_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecord.OFC_RECORD, OfcRecord.OFC_RECORD.CREATED_BY_ID);
 		public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_MODIFIED_BY_USER_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecord.OFC_RECORD, OfcRecord.OFC_RECORD.MODIFIED_BY_ID);
 		public static final ForeignKey<OfcRecordRecord, OfcUserRecord> OFC_RECORD__OFC_RECORD_OWNER_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecord.OFC_RECORD, OfcRecord.OFC_RECORD.OWNER_ID);
-		public static final ForeignKey<OfcRecordStepRecord, OfcRecordRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_RECORD_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_RECORD_PKEY, OfcRecordStep.OFC_RECORD_STEP, OfcRecordStep.OFC_RECORD_STEP.RECORD_ID);
-		public static final ForeignKey<OfcRecordStepRecord, OfcUserRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_CREATED_BY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecordStep.OFC_RECORD_STEP, OfcRecordStep.OFC_RECORD_STEP.CREATED_BY);
-		public static final ForeignKey<OfcRecordStepRecord, OfcUserRecord> OFC_RECORD_STEP__OFC_RECORD_STEP_MODIFIED_BY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecordStep.OFC_RECORD_STEP, OfcRecordStep.OFC_RECORD_STEP.MODIFIED_BY);
+		public static final ForeignKey<OfcRecordDataRecord, OfcRecordRecord> OFC_RECORD_DATA__OFC_RECORD_DATA_RECORD_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_RECORD_PKEY, OfcRecordData.OFC_RECORD_DATA, OfcRecordData.OFC_RECORD_DATA.RECORD_ID);
+		public static final ForeignKey<OfcRecordDataRecord, OfcUserRecord> OFC_RECORD_DATA__OFC_RECORD_DATA_CREATED_BY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecordData.OFC_RECORD_DATA, OfcRecordData.OFC_RECORD_DATA.CREATED_BY);
+		public static final ForeignKey<OfcRecordDataRecord, OfcUserRecord> OFC_RECORD_DATA__OFC_RECORD_DATA_MODIFIED_BY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcRecordData.OFC_RECORD_DATA, OfcRecordData.OFC_RECORD_DATA.MODIFIED_BY);
 		public static final ForeignKey<OfcSamplingDesignRecord, OfcSurveyRecord> OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_SURVEY_PKEY, OfcSamplingDesign.OFC_SAMPLING_DESIGN, OfcSamplingDesign.OFC_SAMPLING_DESIGN.SURVEY_ID);
 		public static final ForeignKey<OfcSurveyRecord, OfcUsergroupRecord> OFC_SURVEY__OFC_SURVEY_USERGROUP_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USERGROUP_PKEY, OfcSurvey.OFC_SURVEY, OfcSurvey.OFC_SURVEY.USERGROUP_ID);
 		public static final ForeignKey<OfcSurveyFileRecord, OfcSurveyRecord> OFC_SURVEY_FILE__OFC_SURVEY_FILE_SURVEY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_SURVEY_PKEY, OfcSurveyFile.OFC_SURVEY_FILE, OfcSurveyFile.OFC_SURVEY_FILE.SURVEY_ID);
 		public static final ForeignKey<OfcTaxonRecord, OfcTaxonomyRecord> OFC_TAXON__OFC_TAXON_TAXONOMY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY_PKEY, OfcTaxon.OFC_TAXON, OfcTaxon.OFC_TAXON.TAXONOMY_ID);
 		public static final ForeignKey<OfcTaxonRecord, OfcTaxonRecord> OFC_TAXON__OFC_TAXON_PARENT_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_TAXON_PKEY, OfcTaxon.OFC_TAXON, OfcTaxon.OFC_TAXON.PARENT_ID);
-		public static final ForeignKey<OfcTaxonomyRecord, OfcSurveyRecord> OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_SURVEY_PKEY, OfcTaxonomy.OFC_TAXONOMY, OfcTaxonomy.OFC_TAXONOMY.SURVEY_ID);
 		public static final ForeignKey<OfcTaxonVernacularNameRecord, OfcTaxonRecord> OFC_TAXON_VERNACULAR_NAME__OFC_TAXON_VERNACULAR_NAME_TAXON_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_TAXON_PKEY, OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME, OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME.TAXON_ID);
-		public static final ForeignKey<OfcUsergroupRecord, OfcUsergroupRecord> OFC_USERGROUP__OFC_USERGROUP_PARENT_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USERGROUP_PKEY, OfcUsergroup.OFC_USERGROUP, OfcUsergroup.OFC_USERGROUP.PARENT_ID);
-		public static final ForeignKey<OfcUsergroupRecord, OfcUserRecord> OFC_USERGROUP__OFC_USERGROUP_CREATED_BY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcUsergroup.OFC_USERGROUP, OfcUsergroup.OFC_USERGROUP.CREATED_BY);
+		public static final ForeignKey<OfcTaxonomyRecord, OfcSurveyRecord> OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_SURVEY_PKEY, OfcTaxonomy.OFC_TAXONOMY, OfcTaxonomy.OFC_TAXONOMY.SURVEY_ID);
 		public static final ForeignKey<OfcUserRoleRecord, OfcUserRecord> OFC_USER_ROLE__OFC_USER_USER_ROLE_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcUserRole.OFC_USER_ROLE, OfcUserRole.OFC_USER_ROLE.USER_ID);
 		public static final ForeignKey<OfcUserUsergroupRecord, OfcUserRecord> OFC_USER_USERGROUP__OFC_USER_USERGROUP_USER_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcUserUsergroup.OFC_USER_USERGROUP, OfcUserUsergroup.OFC_USER_USERGROUP.USER_ID);
 		public static final ForeignKey<OfcUserUsergroupRecord, OfcUsergroupRecord> OFC_USER_USERGROUP__OFC_USER_USERGROUP_GROUP_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USERGROUP_PKEY, OfcUserUsergroup.OFC_USER_USERGROUP, OfcUserUsergroup.OFC_USER_USERGROUP.GROUP_ID);
+		public static final ForeignKey<OfcUsergroupRecord, OfcUsergroupRecord> OFC_USERGROUP__OFC_USERGROUP_PARENT_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USERGROUP_PKEY, OfcUsergroup.OFC_USERGROUP, OfcUsergroup.OFC_USERGROUP.PARENT_ID);
+		public static final ForeignKey<OfcUsergroupRecord, OfcUserRecord> OFC_USERGROUP__OFC_USERGROUP_CREATED_BY_FKEY = createForeignKey(org.openforis.collect.persistence.jooq.Keys.OFC_USER_PKEY, OfcUsergroup.OFC_USERGROUP, OfcUsergroup.OFC_USERGROUP.CREATED_BY);
 	}
 }

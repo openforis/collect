@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcRecord implements Serializable {
 
-	private static final long serialVersionUID = 290614667;
+	private static final long serialVersionUID = 1863233826;
 
 	private Integer   id;
 	private Integer   surveyId;
@@ -47,10 +47,9 @@ public class OfcRecord implements Serializable {
 	private Integer   count3;
 	private Integer   count4;
 	private Integer   count5;
-	private byte[]    data1;
-	private byte[]    data2;
 	private Integer   ownerId;
 	private String    appVersion;
+	private Integer   dataSeqNum;
 
 	public OfcRecord() {}
 
@@ -77,10 +76,9 @@ public class OfcRecord implements Serializable {
 		this.count3 = value.count3;
 		this.count4 = value.count4;
 		this.count5 = value.count5;
-		this.data1 = value.data1;
-		this.data2 = value.data2;
 		this.ownerId = value.ownerId;
 		this.appVersion = value.appVersion;
+		this.dataSeqNum = value.dataSeqNum;
 	}
 
 	public OfcRecord(
@@ -106,10 +104,9 @@ public class OfcRecord implements Serializable {
 		Integer   count3,
 		Integer   count4,
 		Integer   count5,
-		byte[]    data1,
-		byte[]    data2,
 		Integer   ownerId,
-		String    appVersion
+		String    appVersion,
+		Integer   dataSeqNum
 	) {
 		this.id = id;
 		this.surveyId = surveyId;
@@ -133,10 +130,9 @@ public class OfcRecord implements Serializable {
 		this.count3 = count3;
 		this.count4 = count4;
 		this.count5 = count5;
-		this.data1 = data1;
-		this.data2 = data2;
 		this.ownerId = ownerId;
 		this.appVersion = appVersion;
+		this.dataSeqNum = dataSeqNum;
 	}
 
 	public Integer getId() {
@@ -315,22 +311,6 @@ public class OfcRecord implements Serializable {
 		this.count5 = count5;
 	}
 
-	public byte[] getData1() {
-		return this.data1;
-	}
-
-	public void setData1(byte[] data1) {
-		this.data1 = data1;
-	}
-
-	public byte[] getData2() {
-		return this.data2;
-	}
-
-	public void setData2(byte[] data2) {
-		this.data2 = data2;
-	}
-
 	public Integer getOwnerId() {
 		return this.ownerId;
 	}
@@ -345,5 +325,13 @@ public class OfcRecord implements Serializable {
 
 	public void setAppVersion(String appVersion) {
 		this.appVersion = appVersion;
+	}
+
+	public Integer getDataSeqNum() {
+		return this.dataSeqNum;
+	}
+
+	public void setDataSeqNum(Integer dataSeqNum) {
+		this.dataSeqNum = dataSeqNum;
 	}
 }

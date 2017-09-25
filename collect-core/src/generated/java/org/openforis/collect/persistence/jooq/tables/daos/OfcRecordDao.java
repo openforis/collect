@@ -212,20 +212,6 @@ public class OfcRecordDao extends DAOImpl<OfcRecordRecord, org.openforis.collect
 	}
 
 	/**
-	 * Fetch records that have <code>data1 IN (values)</code>
-	 */
-	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecord> fetchByData1(byte[]... values) {
-		return fetch(OfcRecord.OFC_RECORD.DATA1, values);
-	}
-
-	/**
-	 * Fetch records that have <code>data2 IN (values)</code>
-	 */
-	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecord> fetchByData2(byte[]... values) {
-		return fetch(OfcRecord.OFC_RECORD.DATA2, values);
-	}
-
-	/**
 	 * Fetch records that have <code>owner_id IN (values)</code>
 	 */
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecord> fetchByOwnerId(Integer... values) {
@@ -237,5 +223,12 @@ public class OfcRecordDao extends DAOImpl<OfcRecordRecord, org.openforis.collect
 	 */
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecord> fetchByAppVersion(String... values) {
 		return fetch(OfcRecord.OFC_RECORD.APP_VERSION, values);
+	}
+
+	/**
+	 * Fetch records that have <code>data_seq_num IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecord> fetchByDataSeqNum(Integer... values) {
+		return fetch(OfcRecord.OFC_RECORD.DATA_SEQ_NUM, values);
 	}
 }

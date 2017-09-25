@@ -129,6 +129,7 @@ public class DataRestoreSummaryTask extends Task {
 					stepSummary.setRootEntityKeyValues(rootEntityKeyValues);
 					stepSummary.setCreationDate(creationDate);
 					stepSummary.setModifiedDate(modifiedDate);
+					recordSummary.addStepSummary(stepSummary);
 					recordSummaryByEntryId.put(entryId, recordSummary);
 					
 					for (Step s : Step.values()) {
