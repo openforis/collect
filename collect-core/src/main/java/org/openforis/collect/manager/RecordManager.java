@@ -385,7 +385,17 @@ public class RecordManager {
 	@Transactional(readOnly=true)
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
 			Visitor<CollectRecordSummary> visitor) {
-		recordDao.visitSummaries(filter, sortFields, visitor);
+		visitSummaries(filter, sortFields, visitor, false);
+	}
+	
+	@Transactional(readOnly=true)
+	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
+			Visitor<CollectRecordSummary> visitor, boolean includeStepDetails) {
+		recordDao.visitSummaries(filter, sortFields, visitor, includeStepDetails);
+	}
+	
+	public Date[] findWorkingPeriod(int surveyId) {
+		return recordDao.findWorkingPeriod(surveyId);
 	}
 	
 	public int loadSurveyId(int recordId) {

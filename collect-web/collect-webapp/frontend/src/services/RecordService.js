@@ -20,6 +20,10 @@ export default class RecordService extends AbstractService {
         return this.get('survey/' + survey.id + '/data/records/' + recordId).then(res => new Record(survey, res))
     }
 
+    loadRecordsStats(survey) {
+        return this.get('survey/' + survey.id + '/data/records/stats')
+    }
+
     createRecord(surveyId, rootEntityName = null, versionName = null) {
         return this.postJson('survey/' + surveyId + '/data/records', {
             rootEntityName: rootEntityName,

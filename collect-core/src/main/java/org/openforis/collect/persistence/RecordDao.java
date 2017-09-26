@@ -9,6 +9,7 @@ import static org.openforis.collect.persistence.jooq.Tables.OFC_USER;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -170,6 +171,11 @@ public class RecordDao extends JooqDaoSupport {
 
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
 			Visitor<CollectRecordSummary> visitor) {
+		visitSummaries(filter, sortFields, visitor, false);
+	}
+	
+	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
+			Visitor<CollectRecordSummary> visitor, boolean includeStepDetails) {
 		SelectQuery<Record> q = createSelectSummariesQuery(filter, sortFields);
 
 		Cursor<Record> cursor = null;
@@ -178,6 +184,16 @@ public class RecordDao extends JooqDaoSupport {
 			while (cursor.hasNext()) {
 				Record r = cursor.fetchOne();
 				CollectRecordSummary s = fromSummaryQueryRecord(filter.getSurvey(), r);
+				if (includeStepDetails) {
+					s.clearStepSummaries();
+					Map<Step, StepSummary> summaryByStep = loadLatestStepSummaries(filter.getSurvey(), s.getId());
+					for (Step step : Step.values()) {
+						StepSummary stepSummary = summaryByStep.get(step);
+						if (stepSummary != null) {
+							s.addStepSummary(stepSummary);
+						}
+					}
+				}
 				visitor.visit(s);
 			}
 		} finally {
@@ -236,6 +252,20 @@ public class RecordDao extends JooqDaoSupport {
 		return fromStepSummaryQueryResult(result, survey);
 	}
 	
+	public Date[] findWorkingPeriod(int surveyId) {
+		Date start = (Date) dsl()
+				.select(DSL.min(OFC_RECORD.DATE_CREATED))
+				.from(OFC_RECORD)
+				.fetchOne(0);
+		
+		Date end = (Date) dsl()
+				.select(DSL.max(OFC_RECORD.DATE_MODIFIED))
+				.from(OFC_RECORD)
+				.fetchOne(0);
+		
+		return new Date[]{start, end};
+	}
+
 	private void addRecordSummaryFilterConditions(SelectQuery<?> q, RecordFilter filter) {
 		CollectSurvey survey = filter.getSurvey();
 		//survey

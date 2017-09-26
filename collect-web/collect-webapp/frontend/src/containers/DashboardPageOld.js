@@ -288,51 +288,114 @@ class DashboardPage extends Component {
   }
 
   componentDidMount() {
-    const DAYS_OF_WEEK_ABBREVIATED = ['S','M','T','W','T','F','S']
     const survey = this.props.survey;
     if (survey) {
-      ServiceFactory.recordService.loadRecordsStats(survey.id).then(stats => {
-        const startDate = stats.period[0]
-        const endDate = stats.period[1]
-        
-        const dailyLabels = [];
-
-        const createdRecordsData = {
-          label: 'Entered records',
-          backgroundColor: 'transparent',
-          borderColor: brandDanger,
-          pointHoverBackgroundColor: '#fff',
-          borderWidth: 1,
-          borderDash: [8, 5],
-          data: []
-        }
-
-        let currentDate = startDate
-        while (currentDate.getTime() <= endDate.getTime()) {
-          dailyLabels.push(DAYS_OF_WEEK_ABBREVIATED[currentDate.getDay()])
-          let currentDateKey = currentDate.getYear() * 10000 + currentDate.getMonth() * 100 + currentDate.getDate()
-          let pointStats = stats.daylyStats[currentDateKey]
-          if (pointStats == null) {
-            createdRecordsData.data.push(null)
-          } else {
-            createdRecordsData.data.push(pointStats.entered)
-          }
-        }
-
-        const dailyChartOptions = {
-          labels: dailyLabels,
-          datasets: [createdRecordsData]
-        }
-        this.setState({
-          dailySurveyRecordsChartOptions: dailyChartOptions
-        })
-      })
+      ServiceFactory.recordService.loadRecordsStats(survey.id)
     }
   }
 
   render() {
     return (
       <div className="animated fadeIn">
+        {/*
+        <div className="row">
+          <div className="col-sm-6 col-lg-3">
+            <div className="card card-inverse card-primary">
+              <div className="card-block pb-0">
+                <div className="btn-group float-right">
+                  <Dropdown isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
+                    <button onClick={() => { this.setState({ card1: !this.state.card1 }); }} className="btn btn-transparent active dropdown-toggle p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded={this.state.card1}>
+                      <i className="icon-settings"></i>
+                    </button>
+                    <DropdownMenu>
+                      <DropdownItem>Action</DropdownItem>
+                      <DropdownItem>Another action</DropdownItem>
+                      <DropdownItem>Something else here</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
+                <h4 className="mb-0">9.823</h4>
+                <p>Members online</p>
+              </div>
+              <div className="chart-wrapper px-3">
+                <Line data={cardChartData1} options={cardChartOpts1} height={70}/>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-sm-6 col-lg-3">
+            <div className="card card-inverse card-info">
+              <div className="card-block pb-0">
+                <div className="btn-group float-right">
+                  <Dropdown isOpen={this.state.card2} toggle={() => { this.setState({ card2: !this.state.card2 }); }}>
+                    <button onClick={() => { this.setState({ card2: !this.state.card2 }); }} className="btn btn-transparent active dropdown-toggle p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded={this.state.card2}>
+                      <i className="icon-settings"></i>
+                    </button>
+                    <DropdownMenu>
+                      <DropdownItem>Action</DropdownItem>
+                      <DropdownItem>Another action</DropdownItem>
+                      <DropdownItem>Something else here</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
+                <h4 className="mb-0">9.823</h4>
+                <p>Members online</p>
+              </div>
+              <div className="chart-wrapper px-3">
+                <Line data={cardChartData2} options={cardChartOpts2} height={70}/>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-sm-6 col-lg-3">
+            <div className="card card-inverse card-warning">
+              <div className="card-block pb-0">
+                <div className="btn-group float-right">
+                  <Dropdown isOpen={this.state.card3} toggle={() => { this.setState({ card3: !this.state.card3 }); }}>
+                    <button onClick={() => { this.setState({ card3: !this.state.card3 }); }} className="btn btn-transparent active dropdown-toggle p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded={this.state.card3}>
+                      <i className="icon-settings"></i>
+                    </button>
+                    <DropdownMenu>
+                      <DropdownItem>Action</DropdownItem>
+                      <DropdownItem>Another action</DropdownItem>
+                      <DropdownItem>Something else here</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
+                <h4 className="mb-0">9.823</h4>
+                <p>Members online</p>
+              </div>
+              <div className="chart-wrapper">
+                <Line data={cardChartData3} options={cardChartOpts3} height={70}/>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-sm-6 col-lg-3">
+            <div className="card card-inverse card-danger">
+              <div className="card-block pb-0">
+                <div className="btn-group float-right">
+                  <Dropdown isOpen={this.state.card4} toggle={() => { this.setState({ card4: !this.state.card4 }); }}>
+                    <button onClick={() => { this.setState({ card4: !this.state.card4 }); }} className="btn btn-transparent active dropdown-toggle p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded={this.state.card4}>
+                      <i className="icon-settings"></i>
+                    </button>
+                    <DropdownMenu>
+                      <DropdownItem>Action</DropdownItem>
+                      <DropdownItem>Another action</DropdownItem>
+                      <DropdownItem>Something else here</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
+                <h4 className="mb-0">9.823</h4>
+                <p>Members online</p>
+              </div>
+              <div className="chart-wrapper px-3">
+                <Bar data={cardChartData4} options={cardChartOpts4} height={70}/>
+              </div>
+            </div>
+          </div>
+        </div>
+        */}
         <div className="card">
           <div className="card-block">
             <div className="row">
@@ -358,7 +421,7 @@ class DashboardPage extends Component {
               </div>
             </div>
             <div className="chart-wrapper" style={{height: 300 + 'px', marginTop: 40 + 'px'}}>
-              <Line data={this.state.daylySurveyRecordsChartOptions} options={mainChartOpts} height={300}/>
+              <Line data={mainChart} options={mainChartOpts} height={300}/>
             </div>
           </div>
           <div className="card-footer">
