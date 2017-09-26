@@ -228,6 +228,10 @@ public class CollectRecordSummary {
 		public List<String> getRootEntityKeyValues() {
 			return rootEntityKeyValues;
 		}
+		
+		public void setRootEntityKeyValues(List<String> rootEntityKeyValues) {
+			this.rootEntityKeyValues = rootEntityKeyValues;
+		}
 
 		public int getCompletionPercent() {
 			return completionPercent;
@@ -285,10 +289,6 @@ public class CollectRecordSummary {
 			this.missingWarnings = missingWarnings;
 		}
 		
-		public void setRootEntityKeyValues(List<String> rootEntityKeyValues) {
-			this.rootEntityKeyValues = rootEntityKeyValues;
-		}
-
 		public Integer getSkipped() {
 			return skipped;
 		}

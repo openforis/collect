@@ -234,8 +234,8 @@ public class RecordDao extends JooqDaoSupport {
 	private Map<Step, StepSummary> loadLatestStepSummaries(CollectSurvey survey, int recordId) {
 		Map<Step, StepSummary> summaryByStep = new HashMap<Step, StepSummary>();
 		List<StepSummary> allStepsSummaries = loadAllStepsSummaries(survey, recordId);
-		ListIterator<StepSummary> listIterator = allStepsSummaries.listIterator();
-		while(listIterator.hasPrevious() && summaryByStep.size() != Step.values().length) {
+		ListIterator<StepSummary> listIterator = allStepsSummaries.listIterator(allStepsSummaries.size());
+		while(listIterator.hasPrevious() && summaryByStep.size() < Step.values().length) {
 			StepSummary stepSummary = listIterator.previous();
 			summaryByStep.put(stepSummary.getStep(), stepSummary);
 		}
@@ -424,6 +424,7 @@ public class RecordDao extends JooqDaoSupport {
 		int recordId = nextId();
 		recordStoreQuery.addValue(OFC_RECORD.ID, recordId);
 		r.setId(recordId); //TODO set id here before executing the query?!
+		r.setWorkflowSequenceNumber(1);
 		fillRecordStoreQueryFromObject(recordStoreQuery, r);
 		
 		return Arrays.asList(new CollectStoreQuery(recordStoreQuery), createRecordStepInsertQuery(r, recordId));
@@ -431,8 +432,6 @@ public class RecordDao extends JooqDaoSupport {
 	
 	private CollectStoreQuery createRecordStepInsertQuery(CollectRecord r,int recordId) {
 		InsertQuery<OfcRecordDataRecord> recordStepStoreQuery = dsl.insertQuery(OFC_RECORD_DATA);
-		Integer nextWorkflowSequenceNumber = getNextWorkflowSequenceNumber(recordId);
-		r.setWorkflowSequenceNumber(nextWorkflowSequenceNumber);
 		fillRecordStepStoreQueryFromObject(recordStepStoreQuery, recordId, r, true);
 		return new CollectStoreQuery(recordStepStoreQuery);
 	}
@@ -511,8 +510,8 @@ public class RecordDao extends JooqDaoSupport {
 				//create new step data
 				recordStepStoreQuery = createRecordStepInsertQuery(r, r.getId());
 			} else {
-				recordStepStoreQuery = createRecordStepUpdateQuery(r, true);
 				r.setWorkflowSequenceNumber(latestWorkflowSequenceNumber);
+				recordStepStoreQuery = createRecordStepUpdateQuery(r, true);
 			}
 		} else {
 			recordStepStoreQuery = createRecordStepUpdateQuery(r, true);
@@ -556,6 +555,7 @@ public class RecordDao extends JooqDaoSupport {
 		q.addValue(OFC_RECORD.MODEL_VERSION, r.getVersion() != null ? r.getVersion().getName(): null);
 		q.addValue(OFC_RECORD.STEP, r.getStep().getStepNumber());
 		q.addValue(OFC_RECORD.STATE, r.getState() != null ? r.getState().getCode(): null);
+		q.addValue(OFC_RECORD.DATA_SEQ_NUM, r.getWorkflowSequenceNumber());
 
 		q.addValue(OFC_RECORD.OWNER_ID, getUserId(r.getOwner()));
 
@@ -762,18 +762,17 @@ public class RecordDao extends JooqDaoSupport {
 		s.setCreatedBy(createDetachedUser(r.getValue(OFC_RECORD_DATA.CREATED_BY)));
 		s.setModifiedBy(createDetachedUser(r.getValue(OFC_RECORD_DATA.MODIFIED_BY)));
 		
-		StepSummary stepSummary = new StepSummary(step);
-		stepSummary.setErrors(r.getValue(OFC_RECORD_DATA.ERRORS));
-		stepSummary.setWarnings(r.getValue(OFC_RECORD_DATA.WARNINGS));
-		stepSummary.setSkipped(r.getValue(OFC_RECORD_DATA.SKIPPED));
-		stepSummary.setMissing(r.getValue(OFC_RECORD_DATA.MISSING));
+		s.setErrors(r.getValue(OFC_RECORD_DATA.ERRORS));
+		s.setWarnings(r.getValue(OFC_RECORD_DATA.WARNINGS));
+		s.setSkipped(r.getValue(OFC_RECORD_DATA.SKIPPED));
+		s.setMissing(r.getValue(OFC_RECORD_DATA.MISSING));
 		
 		// create list of entity counts
 		List<Integer> counts = new ArrayList<Integer>(RECORD_STEP_COUNT_FIELDS.length);
 		for (TableField tableField : RECORD_STEP_COUNT_FIELDS) {
 			counts.add((Integer) r.getValue(tableField));
 		}
-		stepSummary.setEntityCounts(counts);
+		s.setEntityCounts(counts);
 
 		// create list of keys
 		int rootEntityDefId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
@@ -784,10 +783,10 @@ public class RecordDao extends JooqDaoSupport {
 			TableField tableField = RECORD_STEP_KEY_FIELDS[i];
 			keys.add((String) r.getValue(tableField));
 		}
-		stepSummary.setRootEntityKeyValues(keys);
+		s.setRootEntityKeyValues(keys);
 		
 		String state = r.getValue(OFC_RECORD_DATA.STATE);
-		stepSummary.setState(state == null ? null : State.fromCode(state));
+		s.setState(state == null ? null : State.fromCode(state));
 		
 		return s;
 	}

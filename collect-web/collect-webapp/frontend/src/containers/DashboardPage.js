@@ -291,7 +291,7 @@ class DashboardPage extends Component {
     const DAYS_OF_WEEK_ABBREVIATED = ['S','M','T','W','T','F','S']
     const survey = this.props.survey;
     if (survey) {
-      ServiceFactory.recordService.loadRecordsStats(survey.id).then(stats => {
+      ServiceFactory.recordService.loadRecordsStats(survey).then(stats => {
         const startDate = stats.period[0]
         const endDate = stats.period[1]
         
@@ -329,6 +329,8 @@ class DashboardPage extends Component {
       })
     }
   }
+
+  
 
   render() {
     return (
