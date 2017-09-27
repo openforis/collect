@@ -182,14 +182,14 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
     updateStateFromResponse(res) {
         super.updateStateFromResponse(res)
         if (res.statusOk) {
-            this.setState({
-                newItem: false,
-                id: res.form.id
-            })
-            this.props.dispatch(receiveUserGroup(res.form));
+            const wasNewItem = this.state.newItem
+            if (wasNewItem) {
+                this.props.dispatch(receiveUserGroup(res.form));
+                const itemId = res.form.id
+                this.props.history.push('/usergroups/' + itemId)
+            }
         }
     }
-
 
     render() {
         if (! this.state.ready) {
@@ -310,7 +310,8 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                     <Col sm="2">
                                         <BootstrapTable
                                             data={this.state.availableUsers}
-                                            striped	hover	condensed
+                                            striped	hover condensed
+                                            height='200'
                                             selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
                                                 onSelect: this.handleAvailableUsersRowSelect, selected: this.state.selectedAvailableUsersIds} }
                                             >
@@ -348,7 +349,8 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                 <legend>Selected Users</legend>
                                 <BootstrapTable
                                     data={this.state.usersInGroup}
-                                    striped	hover	condensed
+                                    striped	hover condensed
+                                    height='200'
                                     cellEdit={ { mode: 'click' } }
                                     selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
                                         onSelect: this.handleUsersInGroupRowSelect, selected: this.state.selectedUsersInGroupIds,

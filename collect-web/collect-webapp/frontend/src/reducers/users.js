@@ -32,9 +32,19 @@ function users(
     case RECEIVE_USER:
       let users = state.users
       const userIdx = users.findIndex(u => u.id === action.user.id)
-      var newUsers = update(users, {
-        $splice: [[userIdx, 1, action.user]]
-      });
+      let newUsers
+      if (userIdx < 0) {
+        newUsers = update(users, {
+          $push: [ action.user]
+        });
+        newUsers.sort((a, b) => {
+          return a.username.localeCompare(b.username)
+        })
+      } else {
+        newUsers = update(users, {
+          $splice: [[userIdx, 1, action.user]]
+        });
+      }
       return Object.assign({}, state, {
         users: newUsers,
         lastUpdated: action.receivedAt

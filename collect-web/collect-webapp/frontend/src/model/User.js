@@ -9,7 +9,6 @@ export default class User extends Serializable {
     
     constructor(jsonData) {
         super()
-        console.log(this)
         this.fillFromJSON(jsonData)
     }
 
