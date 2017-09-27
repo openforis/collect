@@ -36,8 +36,8 @@ public class RecordStatsGenerator {
 				for (Entry<Step, StepSummary> entry : summaryByStep.entrySet()) {
 					Step step = entry.getKey();
 					StepSummary stepSummary = entry.getValue();
-					{
-						PointStats pointStats = stats.getOrCreateDaylyStats(stepSummary.getCreationDate());
+					if (stepSummary.getCreationDate() != null) {
+						PointStats pointStats = stats.getOrCreateDailyStats(stepSummary.getCreationDate());
 						switch (step) {
 						case ENTRY:
 							pointStats.incrementCreated();
@@ -51,12 +51,13 @@ public class RecordStatsGenerator {
 						}
 					}
 				}
-				{
-					PointStats pointStats = stats.getOrCreateDaylyStats(s.getModifiedDate());
+				if (s.getModifiedDate() != null) {
+					PointStats pointStats = stats.getOrCreateDailyStats(s.getModifiedDate());
 					pointStats.incrementModified();
 				}
 			}
 		}, true);
+		stats.finalize();
 		return stats;
 	}
 	
@@ -97,6 +98,8 @@ public class RecordStatsGenerator {
 	
 	public static class RecordsStats {
 		
+		public static final RecordsStats EMPTY = new RecordsStats(null);
+		
 		private Map<Integer, PointStats> dailyStats = new HashMap<Integer, PointStats>();
 		private Map<Integer, PointStats> monthlyStats = new HashMap<Integer, PointStats>();
 		private Map<Integer, PointStats> yearlyStats = new HashMap<Integer, PointStats>();
@@ -106,40 +109,35 @@ public class RecordStatsGenerator {
 			this.period = period;
 		}
 
-		public PointStats getOrCreateDaylyStats(Date date) {
-			int key = generateKey(date, TimeUnit.DAY);
-			PointStats stats = dailyStats.get(key);
-			if (stats == null) {
-				stats = new PointStats();
-				dailyStats.put(key, stats);
-			}
-			return stats;
-		}
-		
 		public void finalize() {
-			this.monthlyStats = generateTimeUnitStats(TimeUnit.MONTH);
-			this.yearlyStats = generateTimeUnitStats(TimeUnit.YEAR);
+			this.monthlyStats = aggregateDailyStats(TimeUnit.MONTH);
+			this.yearlyStats = aggregateDailyStats(TimeUnit.YEAR);
 		}
 
-		private Map<Integer, PointStats> generateTimeUnitStats(TimeUnit unit) {
+		public PointStats getOrCreateDailyStats(Date date) {
+			return getOrCreateStats(date, TimeUnit.DAY, dailyStats);
+		}
+		
+		private PointStats getOrCreateStats(Date date, TimeUnit timeUnit, Map<Integer, PointStats> stats) {
+			int key = generateKey(date, timeUnit);
+			PointStats pointStats = stats.get(key);
+			if (pointStats == null) {
+				pointStats = new PointStats();
+				stats.put(key, pointStats);
+			}
+			return pointStats;
+		}
+		
+		private Map<Integer, PointStats> aggregateDailyStats(TimeUnit unit) {
 			Map<Integer, PointStats> result = new HashMap<Integer, PointStats>();
-			int daysCount = 1;
 			Date periodStart = period[0];
 			Date periodEnd = period[1];
 			Date currentDate = periodStart;
 			while (DateUtils.truncatedCompareTo(currentDate, periodEnd, Calendar.DATE) <= 0) {
-				int currentYearKey = generateKey(currentDate, unit);
-				PointStats currentYearStats = result.get(currentYearKey);
-				if (currentYearStats == null) {
-					currentYearStats = new PointStats();
-					result.put(currentYearKey, currentYearStats);
-				}
-				int dailyKey = generateKey(currentDate, TimeUnit.DAY);
-				PointStats currentDayStats = dailyStats.get(dailyKey);
-				if (currentDayStats != null) {
-					currentYearStats.incrementAll(currentDayStats);
-				}
-				currentDate = DateUtils.addDays(periodStart, daysCount++);
+				PointStats dailyPointStats = getOrCreateStats(currentDate, TimeUnit.DAY, dailyStats);
+				PointStats unitPointStats = getOrCreateStats(currentDate, unit, result);
+				unitPointStats.incrementAll(dailyPointStats);
+				currentDate = DateUtils.addDays(currentDate, 1);
 			}
 			return result;
 		}
@@ -150,9 +148,9 @@ public class RecordStatsGenerator {
 			case YEAR:
 				return cal.get(Calendar.YEAR);
 			case MONTH:
-				return cal.get(Calendar.YEAR) * 100 + cal.get(Calendar.MONTH);
+				return cal.get(Calendar.YEAR) * 100 + (cal.get(Calendar.MONTH) + 1);
 			case DAY:
-				return cal.get(Calendar.YEAR) * 100 * 100 + cal.get(Calendar.MONTH) * 100 + cal.get(Calendar.DAY_OF_MONTH);
+				return cal.get(Calendar.YEAR) * 100 * 100 + (cal.get(Calendar.MONTH) + 1) * 100 + cal.get(Calendar.DAY_OF_MONTH);
 			default:
 				return 0;
 			}

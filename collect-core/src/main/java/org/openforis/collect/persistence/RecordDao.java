@@ -28,6 +28,7 @@ import org.jooq.JoinType;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.SelectQuery;
@@ -253,17 +254,18 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	public Date[] findWorkingPeriod(int surveyId) {
-		Date start = (Date) dsl()
-				.select(DSL.min(OFC_RECORD.DATE_CREATED))
-				.from(OFC_RECORD)
-				.fetchOne(0);
-		
-		Date end = (Date) dsl()
-				.select(DSL.max(OFC_RECORD.DATE_MODIFIED))
-				.from(OFC_RECORD)
-				.fetchOne(0);
-		
-		return new Date[]{start, end};
+		Record2<Timestamp, Timestamp> record = dsl()
+			.select(DSL.min(OFC_RECORD.DATE_CREATED), DSL.max(OFC_RECORD.DATE_MODIFIED))
+			.from(OFC_RECORD)
+			.where(OFC_RECORD.SURVEY_ID.eq(surveyId))
+			.fetchOne();
+		Date start = (Date) record.getValue(0);
+		Date end = (Date) record.getValue(1);
+		if (start == null || end == null) {
+			return null;
+		} else {
+			return new Date[]{start, end};
+		}
 	}
 
 	private void addRecordSummaryFilterConditions(SelectQuery<?> q, RecordFilter filter) {

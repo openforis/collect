@@ -273,7 +273,7 @@ public class RecordController extends BasicController implements Serializable {
 		}
 	}
 	
-	@RequestMapping(value="survey/{survey_id}/data/records/csvexportresult.zip", method=GET)
+	@RequestMapping(value="survey/{surveyId}/data/records/csvexportresult.zip", method=GET)
 	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		File file = csvDataExportJob.getOutputFile();
 		RecordFilter recordFilter = csvDataExportJob.getParameters().getRecordFilter();
@@ -284,9 +284,12 @@ public class RecordController extends BasicController implements Serializable {
 				Controllers.ZIP_CONTENT_TYPE);
 	}
 	
-	@RequestMapping(value="survey/{survey_id}/data/records/stats", method=GET)
+	@RequestMapping(value="survey/{surveyId}/data/records/stats", method=GET)
 	public @ResponseBody RecordsStats generateStats(@PathVariable Integer surveyId) {
 		Date[] period = recordManager.findWorkingPeriod(surveyId);
+		if (period == null) {
+			return RecordsStats.EMPTY;
+		}
 		RecordsStats stats = recordStatsGenerator.generate(surveyId, period);
 		return stats;
 	}
