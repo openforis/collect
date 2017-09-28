@@ -53,7 +53,7 @@ export default class SchemaTreeView extends Component {
 
     buildTreeData(survey) {
         if (survey) {
-            const rootEntityDefinition = survey.schema.defaultRootEntity
+            const rootEntityDefinition = survey.schema.firstRootEntityDefinition
     
             const schemaTree = new SchemaTree()
             schemaTree.build(rootEntityDefinition)

@@ -62,7 +62,7 @@ class DataExportPage extends Component {
                 const surveyId = survey.id
                 const parameters = {
                     surveyId: survey.id,
-                    rootEntityId: survey.schema.defaultRootEntity.id,
+                    rootEntityId: survey.schema.firstRootEntityDefinition.id,
                     stepGreaterOrEqual: this.state.step,
                     entityId: this.state.selectedEntityDefinition ? this.state.selectedEntityDefinition.id: null,
                     exportOnlyOwnedRecords: this.state.exportOnlyOwnedRecords,

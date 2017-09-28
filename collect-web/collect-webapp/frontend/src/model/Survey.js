@@ -106,7 +106,7 @@ export class Schema extends Serializable {
         }
     }
     
-    get defaultRootEntity() {
+    get firstRootEntityDefinition() {
         return this.rootEntities[0];
     }
     
