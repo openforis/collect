@@ -150,6 +150,7 @@ public class RecordController extends BasicController implements Serializable {
 		
 		RecordFilter filter = new RecordFilter(survey, rootEntityDefinition.getId());
 		filter.setKeyValues(params.getKeyValues());
+		filter.setCaseSensitiveKeyValues(params.isCaseSensitiveKeyValues());
 		filter.setOffset(params.getOffset());
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
 		
@@ -348,6 +349,7 @@ public class RecordController extends BasicController implements Serializable {
 		private String rootEntityName;
 		private List<RecordSummarySortField> sortFields;
 		private String[] keyValues;
+		private boolean caseSensitiveKeyValues = false;
 
 		public String getRootEntityName() {
 			return rootEntityName;
@@ -371,6 +373,14 @@ public class RecordController extends BasicController implements Serializable {
 
 		public void setKeyValues(String[] keyValues) {
 			this.keyValues = keyValues;
+		}
+		
+		public boolean isCaseSensitiveKeyValues() {
+			return caseSensitiveKeyValues;
+		}
+		
+		public void setCaseSensitiveKeyValues(boolean caseSensitiveKeyValues) {
+			this.caseSensitiveKeyValues = caseSensitiveKeyValues;
 		}
 	}
 	

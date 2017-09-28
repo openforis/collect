@@ -77,17 +77,21 @@ export default class AbstractService {
             return ''
         }
         return Object.keys(data).map((key) => {
-            let val = data[key];
+            const val = data[key];
             if (val === null || val === '') {
                 return '';
             } else {
                 if (val instanceof Array) {
-                    let arrQueryDataParts = []
+                    const arrQueryDataParts = []
                     for(let i=0; i<val.length; i++) {
-                        let nestedPropPrefix = encodeURIComponent(key) + '[' + i +'].';
-                        let itemVal = val[i]
-                        if (itemVal != null) {
-                            arrQueryDataParts.push(this._toQueryData(itemVal, nestedPropPrefix))
+                        const itemVal = val[i]
+                        if (itemVal !== null && itemVal !== undefined) {
+                            if (typeof itemVal === 'object') {
+                                const nestedPropPrefix = encodeURIComponent(key) + '[' + i +'].'
+                                arrQueryDataParts.push(this._toQueryData(itemVal, nestedPropPrefix))
+                            } else {
+                                arrQueryDataParts.push(encodeURIComponent(key) + '[' + i +']=' + itemVal)
+                            }
                         }
                     }
                     return arrQueryDataParts.join('&');

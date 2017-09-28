@@ -22,6 +22,7 @@ class RecordDataTable extends Component {
 		this.handleCellEdit = this.handleCellEdit.bind(this)
 		this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
 		this.handleSortChange = this.handleSortChange.bind(this)
+		this.handleFilterChange = this.handleFilterChange.bind(this)
 	}
 
 	static propTypes = {
@@ -102,7 +103,20 @@ class RecordDataTable extends Component {
 				break
 		}
 		let sortFields = [{field: sortField, descending: sortOrder === 'desc'}]
-		this.fetchData(this.state.page, this.state.recordsPerPage, this.props.survey, this.state.keyValues, sortFields)
+		this.fetchData(1, this.state.recordsPerPage, this.props.survey, this.state.keyValues, sortFields)
+	}
+
+	handleFilterChange(filterObj) {
+		const keyValuesFilter = []
+		if (Object.keys(filterObj).length > 0) {
+			for (const fieldName in filterObj) {
+				if (fieldName.indexOf('key') === 0) {
+					const keyValueIdx = parseInt(fieldName.substr(3)) - 1
+					keyValuesFilter[keyValueIdx] = filterObj[fieldName].value
+				}
+			}
+		}
+		this.fetchData(1, this.state.recordsPerPage, this.props.survey, keyValuesFilter)
 	}
 
 	render() {
@@ -115,8 +129,8 @@ class RecordDataTable extends Component {
 			const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
 
 			function rootEntityKeyFormatter(cell, row) {
-				var keyIdx = this.name.substring(3);
-				return row.rootEntityKeys[keyIdx - 1];
+				var keyIdx = this.name.substring(3) - 1;
+				return row.rootEntityKeys[keyIdx];
 			}
 
 			function usernameFormatter(cell, row) {
@@ -130,22 +144,27 @@ class RecordDataTable extends Component {
 			for (var i = 0; i < keyAttributes.length; i++) {
 				var keyAttr = keyAttributes[i];
 				columns.push(<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter}
-					editable={false} dataSort>{keyAttr.label}</TableHeaderColumn>);
+					width="80"
+					editable={false} dataSort filter={ { type: 'TextFilter' } }>{keyAttr.label}</TableHeaderColumn>);
 			}
 
 			columns.push(
+				<TableHeaderColumn key="errors" dataField="errors"
+					dataAlign="right" width="80" editable={false} dataSort>Errors</TableHeaderColumn>,
+				<TableHeaderColumn key="warnings" dataField="warnings"
+					dataAlign="right" width="80" editable={false} dataSort>Warnings</TableHeaderColumn>,
+				<TableHeaderColumn key="creationDate" dataField="creationDate" dataFormat={Formatters.dateFormatter}
+					dataAlign="center" width="80" editable={false} dataSort>Created</TableHeaderColumn>,
+				<TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateFormatter}
+					dataAlign="center" width="80" editable={false} dataSort>Modified</TableHeaderColumn>,
+				<TableHeaderColumn key="entryComplete" dataField="entryComplete" dataFormat={Formatters.checkedIconFormatter}
+					dataAlign="center" width="80" editable={false} dataSort>Entered</TableHeaderColumn>,
+				<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
+					dataAlign="center" width="80" editable={false} dataSort>Cleansed</TableHeaderColumn>,
 				<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter}
 					customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
-					dataAlign="center" width="150"  dataSort>Owner</TableHeaderColumn>,
-				<TableHeaderColumn key="entryComplete" dataField="entryComplete" dataFormat={Formatters.checkedIconFormatter}
-					dataAlign="center" width="100" editable={false} dataSort>Entered</TableHeaderColumn>,
-				<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
-					dataAlign="center" width="100" editable={false} dataSort>Cleansed</TableHeaderColumn>,
-				<TableHeaderColumn key="creationDate" dataField="creationDate" dataFormat={Formatters.dateFormatter}
-					dataAlign="center" width="150" editable={false} dataSort>Created</TableHeaderColumn>,
-				<TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateFormatter}
-					dataAlign="center" width="150" editable={false} dataSort>Modified</TableHeaderColumn>
-			);
+					dataAlign="center" width="150"  dataSort>Owner</TableHeaderColumn>
+		);
 
 			return (
 				<BootstrapTable
@@ -156,13 +175,14 @@ class RecordDataTable extends Component {
 						onRowDoubleClick: this.props.handleRowDoubleClick,
 						onCellEdit: this.handleCellEdit,
 						onSortChange: this.handleSortChange,
+						onFilterChange: this.handleFilterChange,
 						page: this.state.page,
 						sizePerPage: this.state.recordsPerPage,
 						sizePerPageList: [25, 50, 100]
 					}}
 					fetchInfo={{ dataTotalSize: this.state.totalSize }}
 					remote pagination striped hover condensed
-					height='500px'
+					height={this.state.recordsPerPage === 25 ? '300px' : '600px'}
 					selectRow={{
 						mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
 						onSelect: this.props.handleRowSelect,
