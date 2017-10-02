@@ -113,6 +113,7 @@ public class DataRestoreSummaryTask extends Task {
 					Step step = Step.valueOf(stepVal);
 					
 					CollectRecordSummary recordSummary = new CollectRecordSummary();
+					recordSummary.setStep(step);
 					Integer rootEntityDefId = line.getValue("root_entity_id", Integer.class);
 					recordSummary.setRootEntityDefinitionId(rootEntityDefId);
 					Date creationDate = Dates.parseDateTime(line.getValue("created_on", String.class));

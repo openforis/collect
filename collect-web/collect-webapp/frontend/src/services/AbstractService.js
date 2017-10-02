@@ -49,6 +49,23 @@ export default class AbstractService {
         return this._sendJson(url, data, 'POST')
     }
 
+    postFormData(url, data) {
+        const formData = new FormData()
+        for(var name in data) {
+            formData.append(name, data[name])
+        }
+
+        return fetch(this.BASE_URL + url, {
+            credentials: 'include',
+            method: 'POST',
+            body: formData
+        }).then(response => response.json(),
+            error => console.log('An error occured.', error))
+        .catch(error => {
+            throw(error);
+        })
+    }
+
     patchJson(url, data) {
         return this._sendJson(url, data, 'PATCH')
     }
@@ -79,12 +96,13 @@ export default class AbstractService {
         return Object.keys(data).map((key) => {
             const val = data[key];
             if (val === null || val === '') {
-                return '';
+                return null;
             } else {
                 if (val instanceof Array) {
+                    const arr = val
                     const arrQueryDataParts = []
-                    for(let i=0; i<val.length; i++) {
-                        const itemVal = val[i]
+                    for(let i=0; i<arr.length; i++) {
+                        const itemVal = arr[i]
                         if (itemVal !== null && itemVal !== undefined) {
                             if (typeof itemVal === 'object') {
                                 const nestedPropPrefix = encodeURIComponent(key) + '[' + i +'].'
@@ -99,7 +117,7 @@ export default class AbstractService {
                     return (propPrefix ? propPrefix : '') + encodeURIComponent(key) + '=' + encodeURIComponent(val)
                 }
             }
-          }).filter(item => item != null && item != '').join('&');
+          }).filter(item => item !== null && item !== '').join('&');
     }
     
 }

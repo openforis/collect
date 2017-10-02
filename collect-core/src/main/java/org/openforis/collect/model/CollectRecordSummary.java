@@ -15,16 +15,17 @@ public class CollectRecordSummary {
 	public static CollectRecordSummary fromRecord(CollectRecord record) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		ModelVersion version = record.getVersion();
-		CollectRecordSummary result = new CollectRecordSummary();
-		result.setCreatedBy(record.getCreatedBy());
-		result.setCreationDate(record.getCreationDate());
-		result.setId(record.getId());
-		result.setModifiedBy(record.getModifiedBy());
-		result.setModifiedDate(record.getModifiedDate());
-		result.setSurvey(survey);
-		result.setVersion(version);
-		result.setOwner(record.getOwner());
-		result.setRootEntityDefinitionId(record.getRootEntityDefinitionId());
+		CollectRecordSummary summary = new CollectRecordSummary();
+		summary.setCreatedBy(record.getCreatedBy());
+		summary.setCreationDate(record.getCreationDate());
+		summary.setId(record.getId());
+		summary.setModifiedBy(record.getModifiedBy());
+		summary.setModifiedDate(record.getModifiedDate());
+		summary.setSurvey(survey);
+		summary.setVersion(version);
+		summary.setOwner(record.getOwner());
+		summary.setRootEntityDefinitionId(record.getRootEntityDefinitionId());
+		summary.setStep(record.getStep());
 		
 		StepSummary stepSummary = new StepSummary(record.getStep());
 		stepSummary.setState(record.getState());
@@ -39,8 +40,8 @@ public class CollectRecordSummary {
 		stepSummary.setRootEntityKeyValues(record.getRootEntityKeyValues());
 		stepSummary.setSkipped(record.getSkipped());
 		
-		result.addStepSummary(stepSummary);
-		return result;
+		summary.addStepSummary(stepSummary);
+		return summary;
 	}
 
 	private Integer id;

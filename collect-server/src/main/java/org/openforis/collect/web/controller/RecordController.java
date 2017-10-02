@@ -22,10 +22,14 @@ import javax.validation.Valid;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.CSVDataExportJob;
+import org.openforis.collect.io.data.DataImportSummary;
+import org.openforis.collect.io.data.DataRestoreJob;
+import org.openforis.collect.io.data.DataRestoreSummaryJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
 import org.openforis.collect.manager.MessageSource;
@@ -48,6 +52,7 @@ import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
@@ -61,6 +66,7 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,6 +74,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
@@ -103,6 +110,7 @@ public class RecordController extends BasicController implements Serializable {
 	private RecordStatsGenerator recordStatsGenerator;
 
 	private CSVDataExportJob csvDataExportJob;
+	private DataRestoreSummaryJob dataRestoreSummaryJob;
 	
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
 	public @ResponseBody
@@ -199,6 +207,51 @@ public class RecordController extends BasicController implements Serializable {
 		params.setUserId(user.getId());
 		CollectRecord record = recordGenerator.generate(surveyId, params, params.getRecordKey());
 		return toProxy(record);
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody
+	JobView generateRecordImportSummary(@PathVariable int surveyId, @RequestParam("file") MultipartFile multipartFile, 
+			@RequestParam String rootEntityName) throws IOException {
+		File file = File.createTempFile("ofc_data_restore", ".collect-data");
+		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
+		job.setFullSummary(true);
+		job.setFile(file);
+		job.setPublishedSurvey(survey);
+		job.setCloseRecordProviderOnComplete(false);
+		jobManager.start(job);
+		this.dataRestoreSummaryJob = job;
+		return new JobView(job);
+	}
+
+	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=GET)
+	public @ResponseBody
+	DataImportSummaryProxy getRecordImportSummary(@PathVariable int surveyId) throws IOException {
+		if (this.dataRestoreSummaryJob == null || ! this.dataRestoreSummaryJob.isCompleted()) {
+			throw new IllegalStateException("Data restore summary not generated or an error occurred during the generation");
+		}
+		DataImportSummary summary = this.dataRestoreSummaryJob.getSummary();
+		return new DataImportSummaryProxy(summary, sessionManager.getSessionState().getLocale());
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/data/import/records", method=POST)
+	public @ResponseBody
+	JobView startRecordImport(@PathVariable int surveyId, @RequestParam List<Integer> entryIdsToImport, 
+			@RequestParam(defaultValue="true") boolean validateRecords) throws IOException {
+		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+		job.setFile(dataRestoreSummaryJob.getFile());
+		job.setValidateRecords(validateRecords);
+		job.setRecordProvider(dataRestoreSummaryJob.getRecordProvider());
+		job.setPackagedSurvey(dataRestoreSummaryJob.getPackagedSurvey());
+		job.setPublishedSurvey(dataRestoreSummaryJob.getPublishedSurvey());
+		job.setEntryIdsToImport(entryIdsToImport);
+		job.setRecordFilesToBeDeleted(dataRestoreSummaryJob.getSummary().getConflictingRecordFiles(entryIdsToImport));
+		job.setRestoreUploadedFiles(true);
+		job.setValidateRecords(validateRecords);
+		jobManager.start(job);
+		return new JobView(job);
 	}
 	
 	@Transactional

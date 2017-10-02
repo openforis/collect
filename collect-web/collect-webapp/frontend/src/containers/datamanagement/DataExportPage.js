@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
+    Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
 import ServiceFactory from 'services/ServiceFactory'
@@ -118,7 +119,8 @@ class DataExportPage extends Component {
         switch (this.state.exportFormat) {
             case 'CSV':
                 parametersForm =
-                    <FormGroup>
+                    <FormGroup tag="fieldset">
+                        <legend>Parameters</legend>
                         <FormGroup row>
                             <Label for="stepSelect">Step:</Label>
                             <Col sm={10}>

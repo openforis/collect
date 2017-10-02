@@ -104,7 +104,7 @@ export default class JobMonitorModal extends Component {
     render() {
         const okButtonLabel = this.props.okButtonLabel ? this.props.okButtonLabel : 'Ok'
         return (
-            <Modal isOpen={this.state.open} >
+            <Modal isOpen={this.state.open} backdrop="static">
                 <ModalHeader>{this.props.title}</ModalHeader>
                 <ModalBody>
                     {this.state.loading ? 'Loading...'

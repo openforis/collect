@@ -83,7 +83,7 @@ class DataManagementPage extends Component {
 	}
 
 	handleImportButtonClick() {
-		this.props.history.push('/datamanagement/import')
+		this.props.history.push('/datamanagement/import/backup')
 	}
 
 	render() {

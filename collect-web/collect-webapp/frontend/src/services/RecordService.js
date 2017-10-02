@@ -52,4 +52,15 @@ export default class RecordService extends AbstractService {
             ownerId: owner == null ? null : owner.id
         })
     }
+
+    generateBackupDataImportSummary(survey, rootEntityName, file) {
+        return this.postFormData('survey/' + survey.id + '/data/import/records/summary', {
+            rootEntityName: rootEntityName,
+            file: file
+        })
+    }
+
+    loadBackupDataImportSummary(survey) {
+        return this.get('survey/' + survey.id + '/data/import/records/summary')
+    }
 }

@@ -140,13 +140,11 @@ class RecordDataTable extends Component {
 			var columns = [];
 			columns.push(<TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>);
 
-			var keyAttributes = this.findKeyAttributes(survey);
-			for (var i = 0; i < keyAttributes.length; i++) {
-				var keyAttr = keyAttributes[i];
-				columns.push(<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter}
-					width="80"
-					editable={false} dataSort filter={ { type: 'TextFilter' } }>{keyAttr.label}</TableHeaderColumn>);
-			}
+			const keyAttributes = survey.schema.firstRootEntityDefinition.keyAttributeDefinitions
+			const keyAttributeColumns = keyAttributes.map((keyAttr, i) => 
+				<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter} width="80"
+					editable={false} dataSort filter={ { type: 'TextFilter' } }>{keyAttr.label}</TableHeaderColumn>)
+			columns = columns.concat(keyAttributeColumns)
 
 			columns.push(
 				<TableHeaderColumn key="errors" dataField="errors"
@@ -194,33 +192,6 @@ class RecordDataTable extends Component {
 			);
 
 		}
-	}
-
-	findKeyAttributes(survey) {
-		let keyAttributes = [];
-		let queue = [];
-		let rootEntity = survey.schema.rootEntities[0];
-		for (let i = 0; i < rootEntity.children.length; i++) {
-			queue.push(rootEntity.children[i]);
-		}
-		while (queue.length > 0) {
-			let node = queue.shift();
-			switch (node.type) {
-				case 'ENTITY':
-					if (!node.multiple) {
-						for (let i = 0; i < node.children.length; i++) {
-							let child = node.children[i];
-							queue.push(child);
-						}
-					}
-					break;
-				default:
-					if (node.key) {
-						keyAttributes.push(node);
-					}
-			}
-		}
-		return keyAttributes;
 	}
 
 	visitNodes(survey, visitFunction) {

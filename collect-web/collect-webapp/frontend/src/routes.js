@@ -28,6 +28,10 @@ const routes = [
     name: "Import Data"
   },
   {
+    path: '/datamanagement/import/backup',
+    name: "Import Backup file"
+  },
+  {
     path: '/datamanagement/:id',
     name: 'Record',
     pathRegExp: new RegExp('/datamanagement/(\\d)+')
