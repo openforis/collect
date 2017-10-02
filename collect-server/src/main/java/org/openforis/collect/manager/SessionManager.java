@@ -76,6 +76,11 @@ public class SessionManager {
 		SessionState sessionState = getSessionState();
 		return sessionState.getActiveRecord();
 	}
+	
+	public User getLoggedUser() {
+		SessionState sessionState = getSessionState();
+		return sessionState.getUser();
+	}
 
 	public CollectSurvey getActiveDesignerSurvey() {
 		SessionStatus designerSessionStatus = getDesignerSessionStatus();

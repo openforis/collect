@@ -36,7 +36,25 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
+	public UserInGroup findUserInGroup(UserGroup userGroup, User user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public List<UserInGroup> findUsersInGroup(UserGroup userGroup) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public List<UserGroup> findDescendantGroups(UserGroup group) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public UserInGroup findUserInGroupOrDescendants(UserGroup userGroup, User user) {
 		// TODO Auto-generated method stub
 		return null;
 	}

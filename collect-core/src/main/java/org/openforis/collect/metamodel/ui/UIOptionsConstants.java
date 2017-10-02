@@ -20,6 +20,8 @@ public interface UIOptionsConstants {
 	String LAYOUT_TYPE = "layoutType";
 	String DIRECTION = "direction";
 	String COUNT = "count";
+	String SUMMARY = "summary";
+	String QUALIFIER = "qualifier";
 	String SHOW_ROW_NUMBERS = "showRowNumbers";
 	String FIELDS_ORDER = "fieldsOrder";
 

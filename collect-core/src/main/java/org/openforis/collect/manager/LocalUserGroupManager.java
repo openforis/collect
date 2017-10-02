@@ -42,6 +42,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		userGroup.setVisibility(Visibility.PRIVATE);
 		dao.insert(userGroup);
 		UserInGroup userInGroup = new UserInGroup();
+		userInGroup.setGroup(userGroup);
 		userInGroup.setUser(user);
 		userInGroup.setRole(UserGroupRole.OWNER);
 		userInGroup.setJoinStatus(UserGroupJoinRequestStatus.ACCEPTED);
@@ -118,8 +119,28 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	}
 
 	@Override
-	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
+	public List<UserInGroup> findUsersInGroup(UserGroup userGroup) {
 		return dao.findUsersByGroup(userGroup);
+	}
+	
+	@Override
+	public UserInGroup findUserInGroup(UserGroup userGroup, User user) {
+		return dao.findUserInGroup(userGroup, user);
+	}
+	
+	@Override
+	public UserInGroup findUserInGroupOrDescendants(UserGroup userGroup, User user) {
+		UserInGroup userInGroup = findUserInGroup(userGroup, user);
+		if (userInGroup == null) {
+			List<UserGroup> descendantGroups = dao.findDescendantGroups(userGroup);
+			for (UserGroup descendantGroup : descendantGroups) {
+				userInGroup = findUserInGroup(descendantGroup, user);
+				if (userInGroup != null) {
+					return userInGroup;
+				}
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -146,10 +167,16 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	public List<UserGroup> findPublicUserDefinedGroups() {
 		return fillLazyLoadedFields(dao.findPublicUserDefinedGroups());
 	}
+	
+	@Override
+	public List<UserGroup> findDescendantGroups(UserGroup group) {
+		return dao.findDescendantGroups(group);
+	}
 
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void requestJoin(User user, UserGroup userGroup, UserGroupRole role) {
 		UserInGroup userInGroup = new UserInGroup();
+		userInGroup.setGroup(userGroup);
 		userInGroup.setUser(user);
 		userInGroup.setRole(role);
 		userInGroup.setRequestDate(new Date());

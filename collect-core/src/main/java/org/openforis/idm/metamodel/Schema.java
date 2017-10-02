@@ -167,14 +167,26 @@ public class Schema extends SurveyObject {
 	 * @return 
 	 */
 	public List<EntityDefinition> getCountableEntitiesInRecordList(EntityDefinition rootEntityDefinition) {
-		final List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.COUNT_IN_SUMMARY_LIST);
+	}
+	
+	public List<AttributeDefinition> getQualifierAttributeDefinitions(EntityDefinition rootEntityDefinition) {
+		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.QUALIFIER);
+	}
+	
+	public List<AttributeDefinition> getSummaryAttributeDefinitions(EntityDefinition rootEntityDefinition) {
+		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.SHOW_IN_SUMMARY_LIST);
+	}
+	
+	public <N extends NodeDefinition> List<N> getAnnotatedAttributeDefinitions(EntityDefinition rootEntityDefinition, 
+			final Annotation annotation) {
+		final List<N> result = new ArrayList<N>();
 		rootEntityDefinition.traverse(new NodeDefinitionVisitor() {
+			@SuppressWarnings("unchecked")
 			public void visit(NodeDefinition def) {
-				if(def instanceof EntityDefinition) {
-					String annotation = def.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
-					if(Boolean.parseBoolean(annotation)) {
-						result.add((EntityDefinition) def);
-					}
+				String annotationVal = def.getAnnotation(annotation.getQName());
+				if(Boolean.parseBoolean(annotationVal)) {
+					result.add((N) def);
 				}
 			}
 		});

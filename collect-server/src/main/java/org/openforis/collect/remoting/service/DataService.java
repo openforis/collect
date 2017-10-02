@@ -39,10 +39,11 @@ import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SessionEventDispatcher;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.NodeChangeMap;
@@ -50,6 +51,8 @@ import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 import org.openforis.collect.model.proxy.RecordFilterProxy;
@@ -71,6 +74,8 @@ import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateReq
 import org.openforis.collect.remoting.service.concurrency.proxy.SurveyLockingJobProxy;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -104,6 +109,8 @@ public class DataService {
 	private transient CodeListManager codeListManager;
 	@Autowired
 	private transient RecordFileManager fileManager;
+	@Autowired
+	private transient UserGroupManager userGroupManager;
 	@Autowired
 	private transient RecordIndexService recordIndexService;
 	@Autowired
@@ -504,10 +511,28 @@ public class DataService {
 	@Secured(USER)
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attrName){
 		CollectRecord record = getActiveRecord();
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		UserGroup surveyUserGroup = survey.getUserGroup();
+		User user = sessionManager.getLoggedUser();
+		final UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
+		if (userInGroup == null) {
+			throw new IllegalStateException(String.format("User %s not allowed to access survey %s", user.getUsername(), survey.getName()));
+		}
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
 		List<CodeListItem> items = codeListManager.loadValidItems(parent, def);
-		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
+		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>(items);
+		
+		//filter by user group qualifier (if any)
+		String qualifierName = userInGroup.getGroup().getQualifier1Name();
+		if (qualifierName != null && qualifierName.equals(def.getList().getName())) {
+			CollectionUtils.filter(filteredItems, new Predicate<CodeListItem>() {
+				public boolean evaluate(CodeListItem item) {
+					return item.getCode().equals(userInGroup.getGroup().getQualifier1Value());
+				}
+			});
+		}
+		List<CodeListItemProxy> result = CodeListItemProxy.fromList(filteredItems);
 		List<Node<?>> selectedCodes = parent.getChildren(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
 		return result;

@@ -157,6 +157,7 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 
 	public static class UserInGroup {
 		
+		private UserGroup group;
 		private User user;
 		private UserGroupRole role;
 		private UserGroupJoinRequestStatus joinStatus;
@@ -166,6 +167,14 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 		public UserInGroup() {
 		}
 
+		public UserGroup getGroup() {
+			return group;
+		}
+		
+		public void setGroup(UserGroup group) {
+			this.group = group;
+		}
+		
 		public User getUser() {
 			return user;
 		}

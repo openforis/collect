@@ -184,6 +184,8 @@ public class CollectRecord extends Record {
 	
 	private List<String> rootEntityKeyValues;
 	private List<Integer> entityCounts;
+	private List<String> summaryValues;
+	private List<String> qualifierValues;
 	
 	private RecordValidationCache validationCache;
 
@@ -214,6 +216,8 @@ public class CollectRecord extends Record {
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
+		this.qualifierValues = new ArrayList<String>();
+		this.summaryValues = new ArrayList<String>();
 	}
 	
 	@Override
@@ -417,7 +421,27 @@ public class CollectRecord extends Record {
 	public List<String> getRootEntityKeyValues() {
 		return rootEntityKeyValues;
 	}
+	
+	public void setRootEntityKeyValues(List<String> keys) {
+		this.rootEntityKeyValues = keys;
+	}
 
+	public List<String> getSummaryValues() {
+		return summaryValues;
+	}
+
+	public void setSummaryValues(List<String> summaryValues) {
+		this.summaryValues = summaryValues;
+	}
+	
+	public List<String> getQualifierValues() {
+		return qualifierValues;
+	}
+	
+	public void setQualifierValues(List<String> qualifierValues) {
+		this.qualifierValues = qualifierValues;
+	}
+	
 	public RecordValidationCache getValidationCache() {
 		return validationCache;
 	}
@@ -495,10 +519,6 @@ public class CollectRecord extends Record {
 		return result;
 	}
 	
-	public void setRootEntityKeyValues(List<String> keys) {
-		this.rootEntityKeyValues = keys;
-	}
-
 	public List<Integer> getEntityCounts() {
 		return entityCounts;
 	}

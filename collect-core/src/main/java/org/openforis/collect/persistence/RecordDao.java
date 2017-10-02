@@ -65,35 +65,55 @@ import org.openforis.idm.model.ModelSerializer;
 @SuppressWarnings("rawtypes")
 public class RecordDao extends JooqDaoSupport {
 	
-	private static final TableField[] KEY_FIELDS = 
+	private static final TableField[] RECORD_KEY_FIELDS = 
 		{OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3};
 	
-	private static final TableField[] COUNT_FIELDS = 
+	private static final TableField[] RECORD_COUNT_FIELDS = 
 		{OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
 	
-	private static final TableField[] RECORD_STEP_KEY_FIELDS = 
+	private static final TableField[] RECORD_SUMMARY_FIELDS = 
+		{OFC_RECORD.SUMMARY1, OFC_RECORD.SUMMARY2, OFC_RECORD.SUMMARY3};
+	
+	private static final TableField[] RECORD_QUALIFIER_FIELDS = 
+		{OFC_RECORD.QUALIFIER1, OFC_RECORD.QUALIFIER2, OFC_RECORD.QUALIFIER3};
+	
+	private static final TableField[] RECORD_DATA_KEY_FIELDS = 
 		{OFC_RECORD_DATA.KEY1, OFC_RECORD_DATA.KEY2, OFC_RECORD_DATA.KEY3};
 	
-	private static final TableField[] RECORD_STEP_COUNT_FIELDS = 
+	private static final TableField[] RECORD_DATA_COUNT_FIELDS = 
 		{OFC_RECORD_DATA.COUNT1, OFC_RECORD_DATA.COUNT2, OFC_RECORD_DATA.COUNT3, OFC_RECORD_DATA.COUNT4, OFC_RECORD_DATA.COUNT5};
 	
+	private static final TableField[] RECORD_DATA_SUMMARY_FIELDS = 
+		{OFC_RECORD_DATA.SUMMARY1, OFC_RECORD_DATA.SUMMARY2, OFC_RECORD_DATA.SUMMARY3};
+	
+	private static final TableField[] RECORD_DATA_QUALIFIER_FIELDS = 
+		{OFC_RECORD_DATA.QUALIFIER1, OFC_RECORD_DATA.QUALIFIER2, OFC_RECORD_DATA.QUALIFIER3};
+	
 	private static final TableField[] SUMMARY_FIELDS = ArrayUtils.addAll(
-			ArrayUtils.addAll(new TableField[]{OFC_RECORD.ID, OFC_RECORD.SURVEY_ID, OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.MODEL_VERSION,
+			new TableField[]{OFC_RECORD.ID, OFC_RECORD.SURVEY_ID, OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.MODEL_VERSION,
 				OFC_RECORD.DATE_CREATED, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.MODIFIED_BY_ID, 
 				OFC_RECORD.STEP, OFC_RECORD.DATA_SEQ_NUM, OFC_RECORD.STATE, 
 				OFC_RECORD.ERRORS, OFC_RECORD.WARNINGS, OFC_RECORD.MISSING, OFC_RECORD.SKIPPED, 
-				OFC_RECORD.OWNER_ID}, 
-			KEY_FIELDS)
-		, COUNT_FIELDS);
+				OFC_RECORD.OWNER_ID},
+			ArrayUtils.addAll(
+					ArrayUtils.addAll(
+							ArrayUtils.addAll(RECORD_KEY_FIELDS, RECORD_COUNT_FIELDS), 
+							RECORD_SUMMARY_FIELDS), 
+					RECORD_QUALIFIER_FIELDS)
+			);
 
-	private static final TableField[] RECORD_STEP_SUMMARY_FIELDS = ArrayUtils.addAll(
-			ArrayUtils.addAll(new TableField[]{OFC_RECORD.SURVEY_ID, OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.ID,
+	private static final TableField[] RECORD_DATA_FULL_SUMMARY_FIELDS = ArrayUtils.addAll(
+			new TableField[]{OFC_RECORD.SURVEY_ID, OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.ID,
 				OFC_RECORD.MODEL_VERSION, OFC_RECORD.OWNER_ID, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_CREATED, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.MODIFIED_BY_ID,
 				OFC_RECORD_DATA.RECORD_ID, OFC_RECORD_DATA.DATE_CREATED, OFC_RECORD_DATA.CREATED_BY, OFC_RECORD_DATA.DATE_MODIFIED, OFC_RECORD_DATA.MODIFIED_BY, 
 				OFC_RECORD_DATA.STEP, OFC_RECORD_DATA.SEQ_NUM, OFC_RECORD_DATA.STATE, OFC_RECORD_DATA.ERRORS,
 				OFC_RECORD_DATA.WARNINGS, OFC_RECORD_DATA.MISSING, OFC_RECORD_DATA.SKIPPED},
-			RECORD_STEP_KEY_FIELDS)
-		, RECORD_STEP_COUNT_FIELDS);
+			ArrayUtils.addAll(
+					ArrayUtils.addAll(
+							ArrayUtils.addAll(RECORD_DATA_KEY_FIELDS, RECORD_DATA_COUNT_FIELDS), 
+							RECORD_DATA_SUMMARY_FIELDS), 
+					RECORD_DATA_QUALIFIER_FIELDS)
+		);
 	
 	private static final int SERIALIZATION_BUFFER_SIZE = 50000;
 	
@@ -244,7 +264,7 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	private List<StepSummary> loadAllStepsSummaries(CollectSurvey survey, int recordId) {
-		Result<Record> result = dsl.select(RECORD_STEP_SUMMARY_FIELDS)
+		Result<Record> result = dsl.select(RECORD_DATA_FULL_SUMMARY_FIELDS)
 			.from(OFC_RECORD_DATA).join(OFC_RECORD).on(OFC_RECORD.ID.eq(OFC_RECORD_DATA.RECORD_ID))
 			.where(OFC_RECORD_DATA.RECORD_ID.eq(recordId))
 			.orderBy(OFC_RECORD_DATA.SEQ_NUM)
@@ -303,6 +323,10 @@ public class RecordDao extends JooqDaoSupport {
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
 			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.isIncludeNullConditionsForKeyValues(), filter.getKeyValues());
 		}
+		
+		if (CollectionUtils.isNotEmpty(filter.getQualifiers())) {
+			addFilterByFieldsConditions(q, RECORD_QUALIFIER_FIELDS, false, false, filter.getQualifiers());
+		}
 	}
 	
 	public int countRecords(CollectSurvey survey) {
@@ -342,13 +366,23 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, boolean includeNullConditions, String... keyValues) {
-		if ( keyValues != null && keyValues.length > 0 ) {
-			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
-				String key = keyValues[i];
+		addFilterByFieldsConditions(q, RECORD_KEY_FIELDS, caseSensitiveKeyValues, includeNullConditions, keyValues);
+	}
+	
+	private void addFilterByFieldsConditions(SelectQuery<?> q, TableField[] fields,
+			boolean caseSensitiveValues, boolean includeNullConditions, List<String> values) {
+		addFilterByFieldsConditions(q, fields, caseSensitiveValues, includeNullConditions, values.toArray(new String[values.size()]));
+	}
+
+	private void addFilterByFieldsConditions(SelectQuery q, TableField[] fields, boolean caseSensitiveValues, boolean includeNullConditions,
+			String... values) {
+		if ( values != null && values.length > 0 ) {
+			for (int i = 0; i < values.length && i < fields.length; i++) {
+				String key = values[i];
 				@SuppressWarnings("unchecked")
-				Field<String> keyField = (Field<String>) KEY_FIELDS[i];
+				Field<String> keyField = (Field<String>) fields[i];
 				if (StringUtils.isNotBlank(key)) {
-					if (caseSensitiveKeyValues) {
+					if (caseSensitiveValues) {
 						q.addConditions(keyField.equal(key));
 					} else {
 						q.addConditions(keyField.upper().equal(key.toUpperCase()));
@@ -457,7 +491,7 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	public Step duplicateLatestActiveStepData(CollectSurvey survey, int recordId) {
-		Field[] columns = ArrayUtils.addAll(RECORD_STEP_SUMMARY_FIELDS, new Field[] {OFC_RECORD_DATA.DATA, OFC_RECORD_DATA.APP_VERSION});
+		Field[] columns = ArrayUtils.addAll(RECORD_DATA_FULL_SUMMARY_FIELDS, new Field[] {OFC_RECORD_DATA.DATA, OFC_RECORD_DATA.APP_VERSION});
 		int indexOfSequenceNumberCol = ArrayUtils.indexOf(columns, OFC_RECORD_DATA.SEQ_NUM);
 		Field[] selectColumns = ArrayUtils.clone(columns);
 		Integer latestWorkflowSequenceNumber = getLatestWorkflowSequenceNumber(recordId);
@@ -569,13 +603,26 @@ public class RecordDao extends JooqDaoSupport {
 		// set keys
 		List<String> keys = r.getRootEntityKeyValues();
 		for (int i = 0; i < keys.size(); i++) {
-			q.addValue(KEY_FIELDS[i], keys.get(i));
+			q.addValue(RECORD_KEY_FIELDS[i], keys.get(i));
 		}
 		// set counts
 		List<Integer> counts = r.getEntityCounts();
 		for (int i = 0; i < counts.size(); i++) {
-			q.addValue(COUNT_FIELDS[i], counts.get(i));
+			q.addValue(RECORD_COUNT_FIELDS[i], counts.get(i));
 		}
+		
+		// set qualifier values
+		List<String> qualifierValues = r.getQualifierValues();
+		for (int i = 0; i < qualifierValues.size(); i++) {
+			q.addValue(RECORD_QUALIFIER_FIELDS[i], qualifierValues.get(i));
+		}
+		
+		// set summary values
+		List<String> summaryValues = r.getSummaryValues();
+		for (int i = 0; i < summaryValues.size(); i++) {
+			q.addValue(RECORD_SUMMARY_FIELDS[i], summaryValues.get(i));
+		}
+		
 	}
 
 	@SuppressWarnings({"unchecked"})
@@ -597,13 +644,25 @@ public class RecordDao extends JooqDaoSupport {
 		// set keys
 		List<String> keys = r.getRootEntityKeyValues();
 		for (int i = 0; i < keys.size(); i++) {
-			q.addValue(RECORD_STEP_KEY_FIELDS[i], keys.get(i));
+			q.addValue(RECORD_DATA_KEY_FIELDS[i], keys.get(i));
 		}
 
 		// set counts
 		List<Integer> counts = r.getEntityCounts();
 		for (int i = 0; i < counts.size(); i++) {
-			q.addValue(RECORD_STEP_COUNT_FIELDS[i], counts.get(i));
+			q.addValue(RECORD_DATA_COUNT_FIELDS[i], counts.get(i));
+		}
+		
+		// set qualifiers
+		List<String> qualifiers = r.getQualifierValues();
+		for (int i = 0; i < qualifiers.size(); i++) {
+			q.addValue(RECORD_DATA_QUALIFIER_FIELDS[i], qualifiers.get(i));
+		}
+		
+		// set summary values
+		List<String> summaryValues = r.getQualifierValues();
+		for (int i = 0; i < summaryValues.size(); i++) {
+			q.addValue(RECORD_DATA_SUMMARY_FIELDS[i], summaryValues.get(i));
 		}
 		
 		if (storeData) {
@@ -615,7 +674,7 @@ public class RecordDao extends JooqDaoSupport {
 
 	public SelectQuery selectRecordQuery(int id, boolean onlySummary, Step step, Integer workflowSequenceNumber) {
 		SelectQuery<Record> query = dsl.selectQuery();
-		query.addSelect(RECORD_STEP_SUMMARY_FIELDS);
+		query.addSelect(RECORD_DATA_FULL_SUMMARY_FIELDS);
 		if (! onlySummary) {
 			query.addSelect(OFC_RECORD_DATA.DATA, OFC_RECORD_DATA.APP_VERSION);
 		}
@@ -661,8 +720,8 @@ public class RecordDao extends JooqDaoSupport {
 		c.setState(state == null ? null : State.fromCode(state));
 		
 		// create list of entity counts
-		List<Integer> counts = new ArrayList<Integer>(COUNT_FIELDS.length);
-		for (TableField tableField : COUNT_FIELDS) {
+		List<Integer> counts = new ArrayList<Integer>(RECORD_COUNT_FIELDS.length);
+		for (TableField tableField : RECORD_COUNT_FIELDS) {
 			counts.add((Integer) r.getValue(tableField));
 		}
 		c.setEntityCounts(counts);
@@ -678,7 +737,7 @@ public class RecordDao extends JooqDaoSupport {
 		List<AttributeDefinition> keyDefs = rootEntityDef.getKeyAttributeDefinitions();
 		List<String> keys = new ArrayList<String>(keyDefs.size());
 		for (int i = 0; i < keyDefs.size(); i++) {
-			TableField tableField = KEY_FIELDS[i];
+			TableField tableField = RECORD_KEY_FIELDS[i];
 			keys.add((String) r.getValue(tableField));
 		}
 		c.setRootEntityKeyValues(keys);
@@ -721,22 +780,39 @@ public class RecordDao extends JooqDaoSupport {
 		stepSummary.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
 		stepSummary.setMissing(r.getValue(OFC_RECORD.MISSING));
 		
-		// create list of entity counts
-		List<Integer> counts = new ArrayList<Integer>(COUNT_FIELDS.length);
-		for (TableField tableField : COUNT_FIELDS) {
-			counts.add((Integer) r.getValue(tableField));
-		}
-		stepSummary.setEntityCounts(counts);
-
-		// create list of keys
 		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinition(rootEntityDefId);
+
+		// create list of entity counts
+		List<EntityDefinition> countableDefs = survey.getSchema().getCountableEntitiesInRecordList(rootEntityDef);
+		List<Integer> entityCounts = new ArrayList<Integer>(countableDefs.size());
+		for (int i = 0; i < countableDefs.size(); i++) {
+			entityCounts.add((Integer) r.getValue(RECORD_COUNT_FIELDS[i]));
+		}
+		stepSummary.setEntityCounts(entityCounts);
+
+		// key values
 		List<AttributeDefinition> keyDefs = rootEntityDef.getKeyAttributeDefinitions();
 		List<String> keys = new ArrayList<String>(keyDefs.size());
 		for (int i = 0; i < keyDefs.size(); i++) {
-			TableField tableField = KEY_FIELDS[i];
-			keys.add((String) r.getValue(tableField));
+			keys.add((String) r.getValue(RECORD_KEY_FIELDS[i]));
 		}
 		stepSummary.setRootEntityKeyValues(keys);
+		
+		// qualifier values
+		List<AttributeDefinition> qualifierDefs = survey.getSchema().getQualifierAttributeDefinitions(rootEntityDef);
+		List<String> qualifiers = new ArrayList<String>(qualifierDefs.size());
+		for (int i = 0; i < qualifierDefs.size(); i++) {
+			qualifiers.add((String) r.getValue(RECORD_QUALIFIER_FIELDS[i]));
+		}
+		stepSummary.setQualifierValues(qualifiers);
+		
+		// summary values
+		List<AttributeDefinition> summaryDefs = survey.getSchema().getSummaryAttributeDefinitions(rootEntityDef);
+		List<String> summaryValues = new ArrayList<String>(summaryDefs.size());
+		for (int i = 0; i < summaryDefs.size(); i++) {
+			summaryValues.add((String) r.getValue(RECORD_SUMMARY_FIELDS[i]));
+		}
+		stepSummary.setSummaryValues(summaryValues);
 		
 		String state = r.getValue(OFC_RECORD.STATE);
 		stepSummary.setState(state == null ? null : State.fromCode(state));
@@ -770,22 +846,39 @@ public class RecordDao extends JooqDaoSupport {
 		s.setMissing(r.getValue(OFC_RECORD_DATA.MISSING));
 		
 		// create list of entity counts
-		List<Integer> counts = new ArrayList<Integer>(RECORD_STEP_COUNT_FIELDS.length);
-		for (TableField tableField : RECORD_STEP_COUNT_FIELDS) {
+		List<Integer> counts = new ArrayList<Integer>(RECORD_DATA_COUNT_FIELDS.length);
+		for (TableField tableField : RECORD_DATA_COUNT_FIELDS) {
 			counts.add((Integer) r.getValue(tableField));
 		}
 		s.setEntityCounts(counts);
 
-		// create list of keys
 		int rootEntityDefId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
-		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinition(rootEntityDefId);
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDef = schema.getRootEntityDefinition(rootEntityDefId);
+		
+		// key values
 		List<AttributeDefinition> keyDefs = rootEntityDef.getKeyAttributeDefinitions();
 		List<String> keys = new ArrayList<String>(keyDefs.size());
 		for (int i = 0; i < keyDefs.size(); i++) {
-			TableField tableField = RECORD_STEP_KEY_FIELDS[i];
-			keys.add((String) r.getValue(tableField));
+			keys.add((String) r.getValue(RECORD_DATA_KEY_FIELDS[i]));
 		}
 		s.setRootEntityKeyValues(keys);
+		
+		// qualifier values
+		List<AttributeDefinition> qualifierDefs = schema.getQualifierAttributeDefinitions(rootEntityDef);
+		List<String> qualifiers = new ArrayList<String>(qualifierDefs.size());
+		for (int i = 0; i < qualifierDefs.size(); i++) {
+			qualifiers.add((String) r.getValue(RECORD_DATA_QUALIFIER_FIELDS[i]));
+		}
+		s.setQualifierValues(qualifiers);
+		
+		// summary values
+		List<AttributeDefinition> summaryDefs = schema.getSummaryAttributeDefinitions(rootEntityDef);
+		List<String> summaryValues = new ArrayList<String>(summaryDefs.size());
+		for (int i = 0; i < summaryDefs.size(); i++) {
+			summaryValues.add((String) r.getValue(RECORD_DATA_SUMMARY_FIELDS[i]));
+		}
+		s.setSummaryValues(summaryValues);
 		
 		String state = r.getValue(OFC_RECORD_DATA.STATE);
 		s.setState(state == null ? null : State.fromCode(state));

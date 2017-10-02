@@ -301,7 +301,30 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                             }
                         </Col>
                     </FormGroup>
-                    
+                    <FormGroup row color={this.getFieldState('qualifierName')}>
+                        <Label for="qualifierName" sm={2}>Qualifier Name</Label>
+                        <Col sm={10}>
+                            <Input type="text" name="qualifierName" id="qualifierName" 
+                                value={this.state.qualifierName}
+                                state={this.getFieldState('qualifierName')}
+                                onChange={(event) => this.setState({...this.state, qualifierName: event.target.value})} />
+                            {this.state.errorFeedback['qualifierName'] &&
+                                <FormFeedback>{this.state.errorFeedback['qualifierName']}</FormFeedback>
+                            }
+                        </Col>
+                    </FormGroup>
+                    <FormGroup row color={this.getFieldState('qualifierValue')}>
+                        <Label for="qualifierValue" sm={2}>Qualifier Value</Label>
+                        <Col sm={10}>
+                            <Input type="text" name="qualifierValue" id="qualifierValue" 
+                                value={this.state.qualifierValue}
+                                state={this.getFieldState('qualifierValue')}
+                                onChange={(event) => this.setState({...this.state, qualifierValue: event.target.value})} />
+                            {this.state.errorFeedback['qualifierValue'] &&
+                                <FormFeedback>{this.state.errorFeedback['qualifierValue']}</FormFeedback>
+                            }
+                        </Col>
+                    </FormGroup>
                     <Row>
                         <Col sm="2">
                             <fieldset className="secondary">
