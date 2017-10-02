@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcRecord implements Serializable {
 
-	private static final long serialVersionUID = 1863233826;
+	private static final long serialVersionUID = 445751774;
 
 	private Integer   id;
 	private Integer   surveyId;
@@ -50,6 +50,12 @@ public class OfcRecord implements Serializable {
 	private Integer   ownerId;
 	private String    appVersion;
 	private Integer   dataSeqNum;
+	private String    qualifier1;
+	private String    qualifier2;
+	private String    qualifier3;
+	private String    summary1;
+	private String    summary2;
+	private String    summary3;
 
 	public OfcRecord() {}
 
@@ -79,6 +85,12 @@ public class OfcRecord implements Serializable {
 		this.ownerId = value.ownerId;
 		this.appVersion = value.appVersion;
 		this.dataSeqNum = value.dataSeqNum;
+		this.qualifier1 = value.qualifier1;
+		this.qualifier2 = value.qualifier2;
+		this.qualifier3 = value.qualifier3;
+		this.summary1 = value.summary1;
+		this.summary2 = value.summary2;
+		this.summary3 = value.summary3;
 	}
 
 	public OfcRecord(
@@ -106,7 +118,13 @@ public class OfcRecord implements Serializable {
 		Integer   count5,
 		Integer   ownerId,
 		String    appVersion,
-		Integer   dataSeqNum
+		Integer   dataSeqNum,
+		String    qualifier1,
+		String    qualifier2,
+		String    qualifier3,
+		String    summary1,
+		String    summary2,
+		String    summary3
 	) {
 		this.id = id;
 		this.surveyId = surveyId;
@@ -133,6 +151,12 @@ public class OfcRecord implements Serializable {
 		this.ownerId = ownerId;
 		this.appVersion = appVersion;
 		this.dataSeqNum = dataSeqNum;
+		this.qualifier1 = qualifier1;
+		this.qualifier2 = qualifier2;
+		this.qualifier3 = qualifier3;
+		this.summary1 = summary1;
+		this.summary2 = summary2;
+		this.summary3 = summary3;
 	}
 
 	public Integer getId() {
@@ -333,5 +357,53 @@ public class OfcRecord implements Serializable {
 
 	public void setDataSeqNum(Integer dataSeqNum) {
 		this.dataSeqNum = dataSeqNum;
+	}
+
+	public String getQualifier1() {
+		return this.qualifier1;
+	}
+
+	public void setQualifier1(String qualifier1) {
+		this.qualifier1 = qualifier1;
+	}
+
+	public String getQualifier2() {
+		return this.qualifier2;
+	}
+
+	public void setQualifier2(String qualifier2) {
+		this.qualifier2 = qualifier2;
+	}
+
+	public String getQualifier3() {
+		return this.qualifier3;
+	}
+
+	public void setQualifier3(String qualifier3) {
+		this.qualifier3 = qualifier3;
+	}
+
+	public String getSummary1() {
+		return this.summary1;
+	}
+
+	public void setSummary1(String summary1) {
+		this.summary1 = summary1;
+	}
+
+	public String getSummary2() {
+		return this.summary2;
+	}
+
+	public void setSummary2(String summary2) {
+		this.summary2 = summary2;
+	}
+
+	public String getSummary3() {
+		return this.summary3;
+	}
+
+	public void setSummary3(String summary3) {
+		this.summary3 = summary3;
 	}
 }

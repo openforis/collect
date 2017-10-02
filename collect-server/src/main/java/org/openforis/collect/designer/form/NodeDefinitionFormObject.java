@@ -54,6 +54,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean hideKeyInCollectEarthRecordList;
 	protected boolean key; //only for AttributeDefinition
 	protected boolean measurement; //only for AttributeDefinition
+	protected boolean qualifier; //only for AttributeDefinition
+	protected boolean showInSummary; //only for AttributeDefinition
 	
 	//labels
 	private String headingLabel;
@@ -192,6 +194,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			includedInCollectEarthHeader =  annotations.isIncludedInCollectEarthHeader((AttributeDefinition) source);
 			showReadOnlyFieldInCollectEarth = annotations.isShowReadOnlyFieldInCollectEarth((AttributeDefinition) source);
 			hideKeyInCollectEarthRecordList = annotations.isHideKeyInCollectEarthRecordList((AttributeDefinition) source);
+			showInSummary = annotations.isShowInSummary((AttributeDefinition) source);
+			qualifier = annotations.isQualifier((AttributeDefinition) source);
 		}
 		
 		if ( source instanceof Calculable ) {
@@ -271,6 +275,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			annotations.setIncludedInCollectEarthHeader(attrDef, includedInCollectEarthHeader);
 			annotations.setShowReadOnlyFieldInCollectEarth(attrDef, showReadOnlyFieldInCollectEarth);
 			annotations.setHideKeyInCollectEarthRecordList(attrDef, hideKeyInCollectEarthRecordList);
+			annotations.setShowInSummary(attrDef, showInSummary);
+			annotations.setQualifier(attrDef, qualifier);
 		}
 		
 		//layout
@@ -340,6 +346,22 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setCalculated(boolean calculated) {
 		this.calculated = calculated;
+	}
+	
+	public boolean isQualifier() {
+		return qualifier;
+	}
+	
+	public void setQualifier(boolean qualifier) {
+		this.qualifier = qualifier;
+	}
+	
+	public boolean isShowInSummary() {
+		return showInSummary;
+	}
+	
+	public void setShowInSummary(boolean showInSummary) {
+		this.showInSummary = showInSummary;
 	}
 	
 	public boolean isIncludeInDataExport() {

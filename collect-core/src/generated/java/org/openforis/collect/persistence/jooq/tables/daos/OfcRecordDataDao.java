@@ -204,4 +204,46 @@ public class OfcRecordDataDao extends DAOImpl<OfcRecordDataRecord, org.openforis
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecordData> fetchByKey3(String... values) {
 		return fetch(OfcRecordData.OFC_RECORD_DATA.KEY3, values);
 	}
+
+	/**
+	 * Fetch records that have <code>qualifier1 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecordData> fetchByQualifier1(String... values) {
+		return fetch(OfcRecordData.OFC_RECORD_DATA.QUALIFIER1, values);
+	}
+
+	/**
+	 * Fetch records that have <code>qualifier2 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecordData> fetchByQualifier2(String... values) {
+		return fetch(OfcRecordData.OFC_RECORD_DATA.QUALIFIER2, values);
+	}
+
+	/**
+	 * Fetch records that have <code>qualifier3 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecordData> fetchByQualifier3(String... values) {
+		return fetch(OfcRecordData.OFC_RECORD_DATA.QUALIFIER3, values);
+	}
+
+	/**
+	 * Fetch records that have <code>summary1 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecordData> fetchBySummary1(String... values) {
+		return fetch(OfcRecordData.OFC_RECORD_DATA.SUMMARY1, values);
+	}
+
+	/**
+	 * Fetch records that have <code>summary2 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecordData> fetchBySummary2(String... values) {
+		return fetch(OfcRecordData.OFC_RECORD_DATA.SUMMARY2, values);
+	}
+
+	/**
+	 * Fetch records that have <code>summary3 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcRecordData> fetchBySummary3(String... values) {
+		return fetch(OfcRecordData.OFC_RECORD_DATA.SUMMARY3, values);
+	}
 }

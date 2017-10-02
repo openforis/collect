@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcUserRoleRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcUserRole extends TableImpl<OfcUserRoleRecord> {
 
-	private static final long serialVersionUID = -1008218908;
+	private static final long serialVersionUID = -1172482075;
 
 	/**
 	 * The reference instance of <code>collect.ofc_user_role</code>
@@ -61,7 +61,7 @@ public class OfcUserRole extends TableImpl<OfcUserRoleRecord> {
 	/**
 	 * The column <code>collect.ofc_user_role.role</code>.
 	 */
-	public final TableField<OfcUserRoleRecord, String> ROLE = createField("role", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+	public final TableField<OfcUserRoleRecord, String> ROLE = createField("role", org.jooq.impl.SQLDataType.VARCHAR.length(256), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_user_role</code> table reference

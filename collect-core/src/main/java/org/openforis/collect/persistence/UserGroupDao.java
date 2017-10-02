@@ -7,6 +7,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcUsergroup.OFC_USE
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -125,11 +126,23 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 			.execute();
 	}
 
+	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
+		return findUsersInGroup(userGroup, null);
+	}
+	
+	public UserInGroup findUserInGroup(UserGroup userGroup, User user) {
+		List<UserInGroup> usersInGroup = findUsersInGroup(userGroup, user);
+		return usersInGroup.isEmpty() ? null : usersInGroup.get(0);
+	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
+	public List<UserInGroup> findUsersInGroup(UserGroup userGroup, User user) {
 		final List<UserInGroup> result = new ArrayList<UserInGroup>();
 		
+		Condition conditions = OFC_USER_USERGROUP.GROUP_ID.eq(userGroup.getId());
+		if (user != null) {
+			conditions = conditions.and(OFC_USER_USERGROUP.USER_ID.eq(user.getId()));
+		}
 		dsl().select(OFC_USER_USERGROUP.USER_ID, 
 				OFC_USER_USERGROUP.ROLE_CODE, 
 				OFC_USER_USERGROUP.STATUS_CODE,
@@ -138,7 +151,7 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 				OFC_USER.USERNAME, 
 				OFC_USER.ENABLED)
 			.from(OFC_USER_USERGROUP).join(OFC_USER).on(OFC_USER.ID.eq(OFC_USER_USERGROUP.USER_ID))
-			.where(OFC_USER_USERGROUP.GROUP_ID.eq(userGroup.getId()))
+			.where(conditions)
 			.orderBy(OFC_USER.USERNAME)
 			.fetchInto(new RecordHandler() {
 				public void next(Record record) {
@@ -206,6 +219,13 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 			.fetchOneInto(UserGroup.class);
 	}
 	
+	public List<UserGroup> findDescendantGroups(UserGroup group) {
+		return dsl()
+				.selectFrom(OFC_USERGROUP)
+				.where(OFC_USERGROUP.PARENT_ID.eq(group.getId()))
+				.fetchInto(UserGroup.class);
+	}
+
 	private DSLContext dsl() {
 		return DSL.using(configuration());
 	}

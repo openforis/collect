@@ -73,6 +73,8 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		private String    description;
 		private String    visibilityCode;
 		private Boolean   enabled;
+		private String    qualifierName;
+		private String    qualifierValue;
 		private List<UserInGroupForm> users = new ArrayList<UserInGroupForm>();
 		
 		public UserGroupForm() {
@@ -142,6 +144,22 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 			this.enabled = enabled;
 		}
 
+		public String getQualifierName() {
+			return qualifierName;
+		}
+		
+		public void setQualifierName(String qualifierName) {
+			this.qualifierName = qualifierName;
+		}
+		
+		public String getQualifierValue() {
+			return qualifierValue;
+		}
+		
+		public void setQualifierValue(String qualifierValue) {
+			this.qualifierValue = qualifierValue;
+		}
+		
 		public List<UserInGroupForm> getUsers() {
 			return users;
 		}

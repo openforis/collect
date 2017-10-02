@@ -21,9 +21,15 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 
 	List<UserGroup> findUserDefinedGroups();
 	
+	List<UserGroup> findDescendantGroups(UserGroup group);
+
 	List<UserGroup> findByUser(User user);
 	
-	List<UserInGroup> findUsersByGroup(UserGroup userGroup);
+	List<UserInGroup> findUsersInGroup(UserGroup userGroup);
+	
+	UserInGroup findUserInGroup(UserGroup userGroup, User user);
+	
+	UserInGroup findUserInGroupOrDescendants(UserGroup userGroup, User user);
 
 	UserGroup findUserGroupByResource(String resourceType, String resourceId);
 	

@@ -34,7 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcUsergroupRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcUsergroup extends TableImpl<OfcUsergroupRecord> {
 
-	private static final long serialVersionUID = 1824590049;
+	private static final long serialVersionUID = -840088141;
 
 	/**
 	 * The reference instance of <code>collect.ofc_usergroup</code>
@@ -98,6 +98,16 @@ public class OfcUsergroup extends TableImpl<OfcUsergroupRecord> {
 	 * The column <code>collect.ofc_usergroup.system_defined</code>.
 	 */
 	public final TableField<OfcUsergroupRecord, Boolean> SYSTEM_DEFINED = createField("system_defined", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>collect.ofc_usergroup.qualifier1_name</code>.
+	 */
+	public final TableField<OfcUsergroupRecord, String> QUALIFIER1_NAME = createField("qualifier1_name", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_usergroup.qualifier1_value</code>.
+	 */
+	public final TableField<OfcUsergroupRecord, String> QUALIFIER1_VALUE = createField("qualifier1_value", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_usergroup</code> table reference

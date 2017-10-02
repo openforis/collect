@@ -62,6 +62,8 @@ public class CollectAnnotations {
 		LAYOUT(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT)),
 		DIRECTION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DIRECTION)),
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
+		SHOW_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SUMMARY), false),
+		QUALIFIER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.QUALIFIER), false),
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
 		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE)),
 		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER)),
@@ -195,6 +197,22 @@ public class CollectAnnotations {
 	
 	public void setEditable(AttributeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.EDITABLE, value);
+	}
+	
+	public boolean isQualifier(AttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.QUALIFIER);
+	}
+	
+	public void setQualifier(AttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.QUALIFIER, value);
+	}
+	
+	public boolean isShowInSummary(AttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.SHOW_IN_SUMMARY_LIST);
+	}
+	
+	public void setShowInSummary(AttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.SHOW_IN_SUMMARY_LIST, value);
 	}
 	
 	public boolean isMeasurementAttribute(AttributeDefinition defn) {

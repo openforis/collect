@@ -24,6 +24,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.CSVDataExportJob;
@@ -40,6 +41,7 @@ import org.openforis.collect.manager.RecordGenerator.NewRecordParameters;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
@@ -47,6 +49,8 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.MultipleEditException;
@@ -105,6 +109,8 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
+	private UserGroupManager userGroupManager;
+	@Autowired
 	private CollectJobManager jobManager;
 	@Autowired
 	private RecordStatsGenerator recordStatsGenerator;
@@ -149,9 +155,14 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody Map<String, Object> loadRecordSummaries(
 			@PathVariable int surveyId,
 			@Valid RecordSummarySearchParameters params) {
-		Map<String, Object> result = new HashMap<String, Object>();
-		
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		User user = sessionManager.getSessionState().getUser();
+		UserGroup surveyUserGroup = survey.getUserGroup();
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
+		if (userInGroup == null) {
+			throw new IllegalArgumentException(String.format("User %s is not allowed to see records for survey %s", user.getUsername(), survey.getName()));
+		}
+		Map<String, Object> result = new HashMap<String, Object>();
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = params.getRootEntityName() == null ? schema.getFirstRootEntityDefinition() : 
 			schema.getRootEntityDefinition(params.getRootEntityName());
@@ -161,6 +172,13 @@ public class RecordController extends BasicController implements Serializable {
 		filter.setCaseSensitiveKeyValues(params.isCaseSensitiveKeyValues());
 		filter.setOffset(params.getOffset());
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
+		
+		String qualifierName = userInGroup.getGroup().getQualifier1Name();
+		if (StringUtils.isNotBlank(qualifierName)) {
+			HashMap<String, String> qualifiersByName = new HashMap<String, String>();
+			qualifiersByName.put(qualifierName, userInGroup.getGroup().getQualifier1Value());
+			filter.setQualifiersByName(qualifiersByName);
+		}
 		
 		//load summaries
 		List<CollectRecordSummary> summaries = recordManager.loadFullSummaries(filter, params.getSortFields());

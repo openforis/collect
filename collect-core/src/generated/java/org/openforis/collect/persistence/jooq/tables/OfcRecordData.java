@@ -34,7 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcRecordDataRecord
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcRecordData extends TableImpl<OfcRecordDataRecord> {
 
-	private static final long serialVersionUID = 314230163;
+	private static final long serialVersionUID = -1540685795;
 
 	/**
 	 * The reference instance of <code>collect.ofc_record_data</code>
@@ -158,6 +158,36 @@ public class OfcRecordData extends TableImpl<OfcRecordDataRecord> {
 	 * The column <code>collect.ofc_record_data.key3</code>.
 	 */
 	public final TableField<OfcRecordDataRecord, String> KEY3 = createField("key3", org.jooq.impl.SQLDataType.VARCHAR.length(2048), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record_data.qualifier1</code>.
+	 */
+	public final TableField<OfcRecordDataRecord, String> QUALIFIER1 = createField("qualifier1", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record_data.qualifier2</code>.
+	 */
+	public final TableField<OfcRecordDataRecord, String> QUALIFIER2 = createField("qualifier2", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record_data.qualifier3</code>.
+	 */
+	public final TableField<OfcRecordDataRecord, String> QUALIFIER3 = createField("qualifier3", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record_data.summary1</code>.
+	 */
+	public final TableField<OfcRecordDataRecord, String> SUMMARY1 = createField("summary1", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record_data.summary2</code>.
+	 */
+	public final TableField<OfcRecordDataRecord, String> SUMMARY2 = createField("summary2", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record_data.summary3</code>.
+	 */
+	public final TableField<OfcRecordDataRecord, String> SUMMARY3 = createField("summary3", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_record_data</code> table reference

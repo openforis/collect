@@ -10,5 +10,6 @@
   <include file="org/openforis/collect/db/changelog/h2/db.changelog-20170816.xml" />
   <include file="org/openforis/collect/db/changelog/h2/db.changelog-20170913.xml" />
   <include file="org/openforis/collect/db/changelog/h2/db.changelog-20170920.xml" />
+  <include file="org/openforis/collect/db/changelog/h2/db.changelog-20171002.xml" />
   
 </databaseChangeLog>

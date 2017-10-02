@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcUsergroup implements Serializable {
 
-	private static final long serialVersionUID = 407995688;
+	private static final long serialVersionUID = -1162590542;
 
 	private Integer   id;
 	private Integer   parentId;
@@ -35,6 +35,8 @@ public class OfcUsergroup implements Serializable {
 	private String    visibilityCode;
 	private Boolean   enabled;
 	private Boolean   systemDefined;
+	private String    qualifier1Name;
+	private String    qualifier1Value;
 
 	public OfcUsergroup() {}
 
@@ -49,6 +51,8 @@ public class OfcUsergroup implements Serializable {
 		this.visibilityCode = value.visibilityCode;
 		this.enabled = value.enabled;
 		this.systemDefined = value.systemDefined;
+		this.qualifier1Name = value.qualifier1Name;
+		this.qualifier1Value = value.qualifier1Value;
 	}
 
 	public OfcUsergroup(
@@ -61,7 +65,9 @@ public class OfcUsergroup implements Serializable {
 		Timestamp creationDate,
 		String    visibilityCode,
 		Boolean   enabled,
-		Boolean   systemDefined
+		Boolean   systemDefined,
+		String    qualifier1Name,
+		String    qualifier1Value
 	) {
 		this.id = id;
 		this.parentId = parentId;
@@ -73,6 +79,8 @@ public class OfcUsergroup implements Serializable {
 		this.visibilityCode = visibilityCode;
 		this.enabled = enabled;
 		this.systemDefined = systemDefined;
+		this.qualifier1Name = qualifier1Name;
+		this.qualifier1Value = qualifier1Value;
 	}
 
 	public Integer getId() {
@@ -153,5 +161,21 @@ public class OfcUsergroup implements Serializable {
 
 	public void setSystemDefined(Boolean systemDefined) {
 		this.systemDefined = systemDefined;
+	}
+
+	public String getQualifier1Name() {
+		return this.qualifier1Name;
+	}
+
+	public void setQualifier1Name(String qualifier1Name) {
+		this.qualifier1Name = qualifier1Name;
+	}
+
+	public String getQualifier1Value() {
+		return this.qualifier1Value;
+	}
+
+	public void setQualifier1Value(String qualifier1Value) {
+		this.qualifier1Value = qualifier1Value;
 	}
 }

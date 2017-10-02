@@ -133,4 +133,18 @@ public class OfcUsergroupDao extends DAOImpl<OfcUsergroupRecord, org.openforis.c
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup> fetchBySystemDefined(Boolean... values) {
 		return fetch(OfcUsergroup.OFC_USERGROUP.SYSTEM_DEFINED, values);
 	}
+
+	/**
+	 * Fetch records that have <code>qualifier1_name IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup> fetchByQualifier1Name(String... values) {
+		return fetch(OfcUsergroup.OFC_USERGROUP.QUALIFIER1_NAME, values);
+	}
+
+	/**
+	 * Fetch records that have <code>qualifier1_value IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup> fetchByQualifier1Value(String... values) {
+		return fetch(OfcUsergroup.OFC_USERGROUP.QUALIFIER1_VALUE, values);
+	}
 }

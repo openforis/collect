@@ -199,6 +199,8 @@ public class CollectRecordSummary {
 		private Integer missingErrors;
 		private Integer missingWarnings;
 		private List<String> rootEntityKeyValues;
+		private List<String> qualifierValues;
+		private List<String> summaryValues;
 		private Integer skipped;
 		private Integer totalErrors;
 		
@@ -234,6 +236,22 @@ public class CollectRecordSummary {
 			this.rootEntityKeyValues = rootEntityKeyValues;
 		}
 
+		public List<String> getQualifierValues() {
+			return qualifierValues;
+		}
+		
+		public void setQualifierValues(List<String> qualifierValues) {
+			this.qualifierValues = qualifierValues;
+		}
+		
+		public List<String> getSummaryValues() {
+			return summaryValues;
+		}
+		
+		public void setSummaryValues(List<String> summaryValues) {
+			this.summaryValues = summaryValues;
+		}
+		
 		public int getCompletionPercent() {
 			return completionPercent;
 		}

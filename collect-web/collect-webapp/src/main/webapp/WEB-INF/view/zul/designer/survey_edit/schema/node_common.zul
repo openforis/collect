@@ -126,6 +126,31 @@
 				 	</hlayout>
 	    		</hlayout>
 	    	</row>
+	    	<row visible="${vm.attribute}">
+	    		<fieldErrorHandler message="@load(vmsgs['qualifier'])">
+		        	<label value="${labels.survey.schema.attribute.qualifier.$}:" />
+		        	<image popup="qualifierInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+		        </fieldErrorHandler>
+	    		<hlayout spacing="20px">
+		    		<fieldErrorHandler message="@load(vmsgs['qualifier'])">
+				        <checkbox checked="@bind(fx.qualifier)"
+				        	onCheck="@command('applyChanges')" />
+				    </fieldErrorHandler>
+				    <hlayout spacing="15px">
+					    <fieldErrorHandler message="@load(vmsgs['showInSummary'])">
+			    			<label value="${labels.survey.schema.attribute.show_in_summary.$}:" />
+							<image popup="showInSummaryInfoTooltip" style="cursor:pointer"
+								src="/assets/images/info-small.png" />
+			    		</fieldErrorHandler>
+			    		<fieldErrorHandler message="@load(vmsgs['showInSummary'])">
+			    			<checkbox
+			    				checked="@bind(fx.showInSummary)"
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
+				 	</hlayout>
+	    		</hlayout>
+	    	</row>
   			<row visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated))">
   				<fieldErrorHandler message="@load(vmsgs['multiple'])">
 	  				<label use="org.openforis.collect.designer.component.FieldLabel" 
@@ -641,6 +666,16 @@
       		${labels.survey.schema.attribute.calculated.info}
       	]]></html>
 	</popup>
+	<popup id="showInSummaryInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.schema.attribute.show_in_summary.info}
+        ]]></html>
+    </popup>
+    <popup id="qualifierInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.schema.attribute.qualifier.info}
+        ]]></html>
+    </popup>
     <popup id="columnInfoTooltip" width="500px">
         <html><![CDATA[
         	${labels.survey.schema.node.layout.column.info}
@@ -656,4 +691,5 @@
     		${labels.survey.schema.attribute.collect_earth.show_readonly_field.tooltip}
         ]]></html>
     </popup>
+    
 </zk>
