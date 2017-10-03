@@ -59,10 +59,9 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 	@Override
 	public void insert(UserGroup userGroup) {
 		DSLContext dsl = dsl();
-		int id;
+		Integer id;
 		if (dsl.dialect() == SQLDialect.SQLITE) {
-			int maxId = (Integer) dsl.select(DSL.max(OFC_USERGROUP.ID)).from(OFC_USERGROUP).fetchOne().getValue(0);
-			id = maxId + 1;
+			id = null; //autoincrement
 		} else {
 			id = dsl.nextval(Sequences.OFC_USERGROUP_ID_SEQ).intValue();
 		}
@@ -136,7 +135,7 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List<UserInGroup> findUsersInGroup(UserGroup userGroup, User user) {
+	public List<UserInGroup> findUsersInGroup(final UserGroup userGroup, final User user) {
 		final List<UserInGroup> result = new ArrayList<UserInGroup>();
 		
 		Condition conditions = OFC_USER_USERGROUP.GROUP_ID.eq(userGroup.getId());
@@ -155,12 +154,17 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 			.orderBy(OFC_USER.USERNAME)
 			.fetchInto(new RecordHandler() {
 				public void next(Record record) {
-					User user = new User();
-					user.setId(record.getValue(OFC_USER_USERGROUP.USER_ID));
-					user.setUsername(record.getValue(OFC_USER.USERNAME));
-					user.setEnabled(record.getValue(OFC_USER.ENABLED).equalsIgnoreCase("Y"));
 					UserInGroup userInGroup = new UserInGroup();
-					userInGroup.setUser(user);
+					if (user == null) {
+						User u = new User();
+						u.setId(record.getValue(OFC_USER_USERGROUP.USER_ID));
+						u.setUsername(record.getValue(OFC_USER.USERNAME));
+						u.setEnabled(record.getValue(OFC_USER.ENABLED).equalsIgnoreCase("Y"));
+						userInGroup.setUser(u);
+					} else {
+						userInGroup.setUser(user);
+					}
+					userInGroup.setGroup(userGroup);
 					userInGroup.setRole(UserGroupRole.fromCode(record.getValue(OFC_USER_USERGROUP.ROLE_CODE)));
 					userInGroup.setMemberSince(record.getValue(OFC_USER_USERGROUP.MEMBER_SINCE));
 					userInGroup.setRequestDate(record.getValue(OFC_USER_USERGROUP.REQUEST_DATE));

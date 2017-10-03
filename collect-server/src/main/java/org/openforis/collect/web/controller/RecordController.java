@@ -31,6 +31,7 @@ import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreSummaryJob;
+import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
 import org.openforis.collect.manager.MessageSource;
@@ -258,7 +259,7 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody
 	JobView startRecordImport(@PathVariable int surveyId, @RequestParam List<Integer> entryIdsToImport, 
 			@RequestParam(defaultValue="true") boolean validateRecords) throws IOException {
-		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+		DataRestoreJob job = jobManager.createJob(TransactionalDataRestoreJob.class);
 		job.setFile(dataRestoreSummaryJob.getFile());
 		job.setValidateRecords(validateRecords);
 		job.setRecordProvider(dataRestoreSummaryJob.getRecordProvider());

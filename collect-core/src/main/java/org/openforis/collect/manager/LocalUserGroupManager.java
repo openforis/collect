@@ -139,8 +139,10 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 					return userInGroup;
 				}
 			}
+			return null;
+		} else {
+			return userInGroup;
 		}
-		return null;
 	}
 	
 	@Override

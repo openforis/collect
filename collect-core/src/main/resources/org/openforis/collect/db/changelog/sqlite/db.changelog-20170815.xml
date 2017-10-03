@@ -113,9 +113,8 @@
 		<sql>
     		-- Create a default public group named default_public_group
 	    	
-    		INSERT INTO ofc_usergroup(id, name, label, created_by, creation_date, visibility_code, system_defined) 
+    		INSERT INTO ofc_usergroup(name, label, created_by, creation_date, visibility_code, system_defined) 
 	    		VALUES (
-	    			(SELECT MAX(ug.id) + 1 FROM ofc_usergroup ug), 
 		    		'default_public_group',
 		    		'Default Public Group',
 		    		(SELECT u.id FROM ofc_user u WHERE u.username = 'admin'),
@@ -138,10 +137,9 @@
     		 
     		-- Create a user group named USERNAME_default_private_group per each user
 	    	
-    		INSERT INTO ofc_usergroup(id, name, label, created_by, creation_date, visibility_code, system_defined) 
+    		INSERT INTO ofc_usergroup(name, label, created_by, creation_date, visibility_code, system_defined) 
     			SELECT 
-	    			(SELECT MAX(ug.id) + 1 FROM ofc_usergroup ug),
-		    		u.username || '_default_private_group',
+	    			u.username || '_default_private_group',
 		    		'Private group of ' || u.username,
 		    		u.id,
 		    		CURRENT_TIMESTAMP,

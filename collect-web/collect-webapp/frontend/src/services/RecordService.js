@@ -63,4 +63,11 @@ export default class RecordService extends AbstractService {
     loadBackupDataImportSummary(survey) {
         return this.get('survey/' + survey.id + '/data/import/records/summary')
     }
+
+    startBackupDataImportFromSummary(survey, entryIdsToImport, validateRecords) {
+        return this.postFormData('survey/' + survey.id + '/data/import/records', {
+            entryIdsToImport: entryIdsToImport,
+            validateRecords: validateRecords
+        })
+    }
 }

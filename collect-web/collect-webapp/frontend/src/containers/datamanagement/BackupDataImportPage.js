@@ -7,6 +7,7 @@ import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
 import ServiceFactory from 'services/ServiceFactory'
 import JobMonitorModal from 'containers/job/JobMonitorModal'
+import Arrays from 'utils/Arrays'
 
 class BackupDataImportPage extends Component {
 
@@ -25,10 +26,10 @@ class BackupDataImportPage extends Component {
             dataImportJobId: null,
             fileToBeImportedPreview: null,
             fileToBeImported: null,
-            selectedRecordsToImport: null,
-            selectedRecordsToImportIds: null,
-            selectedConflictingRecords: null,
-            selectedConflictingRecordsIds: null
+            selectedRecordsToImport: [],
+            selectedRecordsToImportIds: [],
+            selectedConflictingRecords: [],
+            selectedConflictingRecordsIds: []
         }
         this.onFileDrop = this.onFileDrop.bind(this)
         this.handleGenerateSummaryButtonClick = this.handleGenerateSummaryButtonClick.bind(this)
@@ -64,38 +65,28 @@ class BackupDataImportPage extends Component {
         })
     }
 
-    handleDataImportCompleteOkButtonClick() {
-        this.setState({importStep: BackupDataImportPage.SELECT_PARAMETERS})
-    }
-
-    handleImportButtonClick() {
-
-    }
-
     handleRecordsToImportRowSelect(row, isSelected, e) {
-        let newSelectedRecordsToImport
-        if (isSelected) {
-            newSelectedRecordsToImport = this.state.selectedRecordsToImport.concat([row])
-        } else {
-            const oldArray = this.state.selectedRecordsToImport
-            const idx = oldArray.indexOf(row)
-            newSelectedRecordsToImport = oldArray.slice(0, idx).concat(oldArray.slice(idx + 1))
-        }
+        let newSelectedRecordsToImport = Arrays.addOrRemoveItem(this.state.selectedRecordsToImport, row, !isSelected)
         this.setState({selectedRecordsToImport: newSelectedRecordsToImport, 
             selectedRecordsToImportIds: newSelectedRecordsToImport.map(item => item.entryId)})
     }
 
     handleConflictingRecordsRowSelect(row, isSelected, e) {
-        let newSelectedConflictingRecords
-        if (isSelected) {
-            newSelectedConflictingRecords = this.state.selectedConflictingRecords.concat([row])
-        } else {
-            const oldArray = this.state.selectedRecordsToImport
-            const idx = oldArray.indexOf(row)
-            newSelectedConflictingRecords = oldArray.slice(0, idx).concat(oldArray.slice(idx + 1))
-        }
+        let newSelectedConflictingRecords = Arrays.addOrRemoveItem(this.state.selectedConflictingRecords, row, !isSelected)
         this.setState({selectedConflictingRecords : newSelectedConflictingRecords, 
             selectedConflictingRecordsIds: newSelectedConflictingRecords.map(item => item.entryId)})
+    }
+
+    handleImportButtonClick() {
+        ServiceFactory.recordService.startBackupDataImportFromSummary(this.props.survey, 
+            this.state.selectedRecordsToImportIds.concat(this.state.selectedConflictingRecordsIds),
+            true).then(job => {
+                this.setState({dataImportJobStatusModalOpen: true, dataImportJobId: job.id})
+            })
+    }
+
+    handleDataImportCompleteOkButtonClick() {
+        this.setState({dataImportJobStatusModalOpen: false, importStep: BackupDataImportPage.SELECT_PARAMETERS})
     }
 
     render() {
@@ -163,7 +154,8 @@ class BackupDataImportPage extends Component {
                     <TableHeaderColumn key={'conflictingKey'+(i+1)} dataField={'conflictingKey'+(i+1)} 
                         dataFormat={conflictingRecordRootEntityKeyFormatter} width="80" row="1">{keyAttr.label}</TableHeaderColumn>)
             
-                conflictingRecordsColumns = conflictingRecordsColumns.concat(keyAttributeColumns)
+                conflictingRecordsColumns = conflictingRecordsColumns.concat(conflictingRecordKeyAttributeColumns)
+                
                 return (
                     <Form>
                         <FormGroup tag="fieldset">
@@ -202,7 +194,7 @@ class BackupDataImportPage extends Component {
                             </Row>
                         </FormGroup>
                         <JobMonitorModal
-                            open={this.state.jobStatusModalOpen}
+                            open={this.state.dataImportJobStatusModalOpen}
                             title="Importing data"
                             jobId={this.state.dataImportJobId}
                             okButtonLabel={'Done'}
