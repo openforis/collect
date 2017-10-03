@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -421,15 +422,23 @@ public class XMLDataImportProcess implements Callable<Void> {
 							if ( includesRecordFiles ) {
 								recordFileManager.deleteAllFiles(parsedRecord);
 							}
-							queries = recordManager.createDataUpdateQuery(parsedRecord, parsedRecord.getStep());
+							if (step.after(originalRecordStep)) {
+								queries = Arrays.asList(recordManager.createDataInsertQuery(parsedRecord));
+							} else {
+								queries = Arrays.asList(recordManager.createDataUpdateQuery(parsedRecord, step));
+							}
 						} else {
 							parsedRecord.setId(nextRecordId ++);
-							queries = recordManager.createInsertQuery(parsedRecord);
+							queries = recordManager.createNewRecordInsertQueries(parsedRecord);
 						}
 						lastProcessedRecord = parsedRecord;
 					} else {
 						replaceData(parsedRecord, lastProcessedRecord);
-						queries = recordManager.createDataUpdateQuery(lastProcessedRecord, lastProcessedRecord.getStep());
+						if (step.after(originalRecordStep)) {
+							queries = Arrays.asList(recordManager.createDataInsertQuery(lastProcessedRecord));
+						} else {
+							queries = Arrays.asList(recordManager.createDataUpdateQuery(lastProcessedRecord, step));
+						}
 					}
 					appendQueries(queries);
 //					if ( parseRecordResult.hasWarnings() ) {
@@ -444,17 +453,23 @@ public class XMLDataImportProcess implements Callable<Void> {
 			CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep, validateRecords);
 			originalRecord.setStep(originalRecordStep);
 			afterRecordUpdate(originalRecord);
-			appendQueries(recordManager.createDataUpdateQuery(originalRecord, originalRecord.getStep()));
+			appendQuery(recordManager.createSummaryUpdateQuery(originalRecord));
 		}
 		if ( includesRecordFiles ) {
 			importRecordFiles(lastProcessedRecord);
 		}
 	}
 
-	private void appendQueries(List<CollectStoreQuery> queries) {
-		queryBuffer.addAll(queries);
+	private void appendQuery(CollectStoreQuery query) {
+		queryBuffer.add(query);
 		if (queryBuffer.size() == MAX_QUERY_BUFFER_SIZE) {
 			flushQueryBuffer();
+		}
+	}
+	
+	private void appendQueries(List<CollectStoreQuery> queries) {
+		for (CollectStoreQuery query : queries) {
+			appendQuery(query);
 		}
 	}
 

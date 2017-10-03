@@ -31,6 +31,7 @@ public class RecordOperationGenerator {
 		RecordOperations operations = new RecordOperations();
 		boolean firstStepToBeProcessed = true;
 		Integer lastRecordId = null;
+		Step lastRecordOriginalStep = null;
 		for (Step step : Step.values()) {
 			CollectRecord parsedRecord = recordProvider.provideRecord(entryId, step);
 			if (parsedRecord == null || ! isToBeProcessed(parsedRecord)) {
@@ -47,14 +48,15 @@ public class RecordOperationGenerator {
 				} else {
 					// overwrite existing record
 					lastRecordId = oldRecordSummary.getId();
+					lastRecordOriginalStep = oldRecordSummary.getStep();
 					parsedRecord.setId(lastRecordId);
-					operations.setOriginalStep(oldRecordSummary.getStep());
-					operations.addUpdate(parsedRecord, step);
+					operations.setOriginalStep(lastRecordOriginalStep);
+					operations.addUpdate(parsedRecord, step, step.after(lastRecordOriginalStep));
 				}
 				firstStepToBeProcessed = false;
 			} else {
 				parsedRecord.setId(lastRecordId);
-				operations.addUpdate(parsedRecord, step);
+				operations.addUpdate(parsedRecord, step, step.after(lastRecordOriginalStep));
 			}
 		}
 		if (operations.hasMissingSteps()) {
@@ -85,10 +87,10 @@ public class RecordOperationGenerator {
 			record.setStep(previousStep);
 			switch (previousStep) {
 			case ENTRY:
-				operations.addInsert(record, previousStep);
+				operations.addInsert(record);
 				break;
 			default:
-				operations.addUpdate(record, previousStep);
+				operations.addUpdate(record, previousStep, true);
 			}
 		}
 	}

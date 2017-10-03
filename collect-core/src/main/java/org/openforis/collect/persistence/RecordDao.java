@@ -38,12 +38,12 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Result;
-import org.jooq.Row1;
 import org.jooq.Select;
 import org.jooq.SelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.jooq.UpdateQuery;
+import org.jooq.UpdateSetFirstStep;
 import org.openforis.collect.Collect;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
@@ -489,12 +489,13 @@ public class RecordDao extends JooqDaoSupport {
 		r.setWorkflowSequenceNumber(1);
 		fillRecordStoreQueryFromObject(recordStoreQuery, r);
 		
-		return Arrays.asList(new CollectStoreQuery(recordStoreQuery), createRecordStepInsertQuery(r, recordId, Step.ENTRY));
+		return Arrays.asList(new CollectStoreQuery(recordStoreQuery), createRecordDataInsertQuery(r, recordId, Step.ENTRY));
 	}
 	
 	@SuppressWarnings("unchecked")
-	private CollectStoreQuery createRecordStepInsertQuery(CollectRecord r, int recordId, Step step) {
+	public CollectStoreQuery createRecordDataInsertQuery(CollectRecord r, int recordId, Step step) {
 		List<Field<?>> insertFields = new ArrayList<Field<?>>();
+		
 		insertFields.addAll(Arrays.asList(val(recordId), val(toTimestamp(r.getCreationDate())), val(getUserId(r.getCreatedBy())), 
 				val(toTimestamp(r.getModifiedDate())), val(getUserId(r.getModifiedBy())),
 				val(step.getStepNumber()), coalesce(max(OFC_RECORD_DATA.SEQ_NUM), val(1)).add(1), val(null), 
@@ -507,17 +508,15 @@ public class RecordDao extends JooqDaoSupport {
 		insertFields.addAll(getParamsFromFields(RECORD_DATA_SUMMARY_FIELDS, r.getSummaryValues()));
 		insertFields.addAll(getParamsFromFields(RECORD_DATA_QUALIFIER_FIELDS, r.getQualifierValues()));
 		
-		Insert<OfcRecordDataRecord> insertQuery = dsl.insertInto(OFC_RECORD_DATA).columns(RECORD_DATA_INSERT_FIELDS)
-			.select(dsl.select(insertFields).from(OFC_RECORD_DATA)
+		Insert<OfcRecordDataRecord> insertQuery = dsl.insertInto(OFC_RECORD_DATA)
+			.columns(RECORD_DATA_INSERT_FIELDS)
+			.select(dsl.select(insertFields)
+					.from(OFC_RECORD_DATA)
 					.where(OFC_RECORD_DATA.RECORD_ID.eq(recordId))
 			);
 		return new CollectStoreQuery(insertQuery);
-//		InsertQuery<OfcRecordDataRecord> recordStepStoreQuery = dsl.insertQuery(OFC_RECORD_DATA);
-//		recordStepStoreQuery.addValue(OFC_RECORD_DATA.SEQ_NUM, createSelectNextWorkflowSequenceNumber(recordId, step));
-//		fillRecordStepStoreQueryFromObject(recordStepStoreQuery, recordId, sequenceNumber, r, true);
-//		return new CollectStoreQuery(recordStepStoreQuery);
 	}
-
+	
 	public void update(CollectRecord record) {
 		execute(createUpdateQueries(record, record.getStep()));
 	}
@@ -571,6 +570,11 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	private Integer getLatestWorkflowSequenceNumber(int recordId, Step step, boolean notRejected) {
+		Select<Record1<Integer>> query = selectWorkflowSequenceNumber(recordId, step, notRejected);
+		return (Integer) query.fetchOne(0);
+	}
+
+	private Select<Record1<Integer>> selectWorkflowSequenceNumber(int recordId, Step step, boolean notRejected) {
 		Condition condition = OFC_RECORD_DATA.RECORD_ID.eq(recordId);
 		if (notRejected) {
 			condition = condition.and(OFC_RECORD_DATA.STATE.isNull());
@@ -581,27 +585,31 @@ public class RecordDao extends JooqDaoSupport {
 		Select<Record1<Integer>> query = dsl.select(max(OFC_RECORD_DATA.SEQ_NUM))
 				.from(OFC_RECORD_DATA)
 				.where(condition);
-		return (Integer) query.fetchOne(0);
+		return query;
 	}
 
 	public List<CollectStoreQuery> createUpdateQueries(CollectRecord r, Step step) {
 		CollectStoreQuery recordStepStoreQuery;
 		if (r.getWorkflowSequenceNumber() == null) {
+			UpdateSetFirstStep<OfcRecordRecord> updateQuery = dsl.update(OFC_RECORD);
+			
+			
+			
 			Integer latestWorkflowSequenceNumber = getLatestWorkflowSequenceNumber(r.getId(), step, true);
 			if (latestWorkflowSequenceNumber == null) {
 				//create new step data
-				recordStepStoreQuery = createRecordStepInsertQuery(r, r.getId(), step);
+				recordStepStoreQuery = createRecordDataInsertQuery(r, r.getId(), step);
 			} else {
 				r.setWorkflowSequenceNumber(latestWorkflowSequenceNumber);
-				recordStepStoreQuery = createRecordStepUpdateQuery(r, true);
+				recordStepStoreQuery = createRecordDataUpdateQuery(r);
 			}
 		} else {
-			recordStepStoreQuery = createRecordStepUpdateQuery(r, true);
+			recordStepStoreQuery = createRecordDataUpdateQuery(r);
 		}
 		return Arrays.asList(createSummaryUpdateQuery(r), recordStepStoreQuery);
 	}
 
-	private CollectStoreQuery createSummaryUpdateQuery(CollectRecord r) {
+	public CollectStoreQuery createSummaryUpdateQuery(CollectRecord r) {
 		UpdateQuery<OfcRecordRecord> q = dsl.updateQuery(OFC_RECORD);
 		
 		fillRecordStoreQueryFromObject(q, r);
@@ -610,15 +618,16 @@ public class RecordDao extends JooqDaoSupport {
 		return new CollectStoreQuery(q);
 	}
 	
-	private CollectStoreQuery createRecordStepUpdateQuery(CollectRecord r, boolean storeData) {
+	public CollectStoreQuery createRecordDataUpdateQuery(CollectRecord r) {
 		Integer recordId = r.getId();
 		
 		UpdateQuery<OfcRecordDataRecord> q = dsl.updateQuery(OFC_RECORD_DATA);
 
-		fillRecordStepStoreQueryFromObject(q, recordId, r.getWorkflowSequenceNumber(), r, storeData);
+		fillRecordDataStoreQueryFromObject(q, recordId, r.getWorkflowSequenceNumber(), r);
 		
 		q.addConditions(OFC_RECORD_DATA.RECORD_ID.eq(recordId)
-			.and(OFC_RECORD_DATA.SEQ_NUM.eq(r.getWorkflowSequenceNumber())));
+			.and(OFC_RECORD_DATA.SEQ_NUM.eq(selectWorkflowSequenceNumber(recordId, r.getStep(), true)))
+		);
 		return new CollectStoreQuery(q);
 	}
 	
@@ -671,51 +680,57 @@ public class RecordDao extends JooqDaoSupport {
 		
 	}
 
-	@SuppressWarnings({"unchecked"})
-	protected void fillRecordStepStoreQueryFromObject(StoreQuery<?> q, int recordId, int sequenceNumber, CollectRecord r, boolean storeData) {
-		q.addValue(OFC_RECORD_DATA.RECORD_ID, recordId);
-		q.addValue(OFC_RECORD_DATA.SEQ_NUM, sequenceNumber);
-		q.addValue(OFC_RECORD_DATA.DATE_CREATED, toTimestamp(r.getCurrentStepCreationDate()));
-		q.addValue(OFC_RECORD_DATA.CREATED_BY, getUserId(r.getCurrentStepCreatedBy()));
-		q.addValue(OFC_RECORD_DATA.DATE_MODIFIED, toTimestamp(r.getCurrentStepModifiedDate()));
-		q.addValue(OFC_RECORD_DATA.MODIFIED_BY, getUserId(r.getCurrentStepModifiedBy()));
-		q.addValue(OFC_RECORD_DATA.STEP, r.getStep().getStepNumber());
-		q.addValue(OFC_RECORD_DATA.STATE, r.getState() != null ? r.getState().getCode(): null);
-		q.addValue(OFC_RECORD_DATA.SKIPPED, r.getSkipped());
-		q.addValue(OFC_RECORD_DATA.MISSING, r.getMissing());
-		q.addValue(OFC_RECORD_DATA.ERRORS, r.getErrors());
-		q.addValue(OFC_RECORD_DATA.WARNINGS, r.getWarnings());
-		q.addValue(OFC_RECORD_DATA.APP_VERSION, r.getApplicationVersion().toString());
+	protected void fillRecordDataStoreQueryFromObject(StoreQuery<?> q, int recordId, Integer sequenceNumber, CollectRecord r) {
+		q.addValues(createRecordDataFieldValueMap(r, recordId, sequenceNumber));
+	}
+	
+	private Map<Field<?>, Object> createRecordDataFieldValueMap(CollectRecord r, int recordId, Integer sequenceNumber) {
+		Map<Field<?>, Object> map = new HashMap<Field<?>, Object>();
+		map.put(OFC_RECORD_DATA.RECORD_ID, recordId);
+		if (sequenceNumber != null) {
+			map.put(OFC_RECORD_DATA.SEQ_NUM, sequenceNumber);
+		}
+		map.put(OFC_RECORD_DATA.DATE_CREATED, toTimestamp(r.getCurrentStepCreationDate()));
+		map.put(OFC_RECORD_DATA.CREATED_BY, getUserId(r.getCurrentStepCreatedBy()));
+		map.put(OFC_RECORD_DATA.DATE_MODIFIED, toTimestamp(r.getCurrentStepModifiedDate()));
+		map.put(OFC_RECORD_DATA.MODIFIED_BY, getUserId(r.getCurrentStepModifiedBy()));
+		map.put(OFC_RECORD_DATA.STEP, r.getStep().getStepNumber());
+		map.put(OFC_RECORD_DATA.STATE, r.getState() != null ? r.getState().getCode(): null);
+		map.put(OFC_RECORD_DATA.SKIPPED, r.getSkipped());
+		map.put(OFC_RECORD_DATA.MISSING, r.getMissing());
+		map.put(OFC_RECORD_DATA.ERRORS, r.getErrors());
+		map.put(OFC_RECORD_DATA.WARNINGS, r.getWarnings());
+		map.put(OFC_RECORD_DATA.APP_VERSION, r.getApplicationVersion().toString());
 
 		// set keys
 		List<String> keys = r.getRootEntityKeyValues();
 		for (int i = 0; i < keys.size(); i++) {
-			q.addValue(RECORD_DATA_KEY_FIELDS[i], keys.get(i));
+			map.put(RECORD_DATA_KEY_FIELDS[i], keys.get(i));
 		}
 
 		// set counts
 		List<Integer> counts = r.getEntityCounts();
 		for (int i = 0; i < counts.size(); i++) {
-			q.addValue(RECORD_DATA_COUNT_FIELDS[i], counts.get(i));
+			map.put(RECORD_DATA_COUNT_FIELDS[i], counts.get(i));
 		}
 		
 		// set qualifiers
 		List<String> qualifiers = r.getQualifierValues();
 		for (int i = 0; i < qualifiers.size(); i++) {
-			q.addValue(RECORD_DATA_QUALIFIER_FIELDS[i], qualifiers.get(i));
+			map.put(RECORD_DATA_QUALIFIER_FIELDS[i], qualifiers.get(i));
 		}
 		
 		// set summary values
 		List<String> summaryValues = r.getQualifierValues();
 		for (int i = 0; i < summaryValues.size(); i++) {
-			q.addValue(RECORD_DATA_SUMMARY_FIELDS[i], summaryValues.get(i));
+			map.put(RECORD_DATA_SUMMARY_FIELDS[i], summaryValues.get(i));
 		}
 		
-		if (storeData) {
-			Entity rootEntity = r.getRootEntity();
-			byte[] data = new ModelSerializer(SERIALIZATION_BUFFER_SIZE).toByteArray(rootEntity);
-			q.addValue(OFC_RECORD_DATA.DATA, data);
-		}
+		Entity rootEntity = r.getRootEntity();
+		byte[] data = new ModelSerializer(SERIALIZATION_BUFFER_SIZE).toByteArray(rootEntity);
+		map.put(OFC_RECORD_DATA.DATA, data);
+		
+		return map;
 	}
 
 	public SelectQuery selectRecordQuery(int id, boolean onlySummary, Step step, Integer workflowSequenceNumber) {

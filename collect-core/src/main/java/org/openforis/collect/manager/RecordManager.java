@@ -7,6 +7,7 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import static org.springframework.transaction.annotation.Propagation.SUPPORTS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -150,16 +151,26 @@ public class RecordManager {
 		recordDao.restartIdSequence(value);
 	}
 
-	public List<CollectStoreQuery> createInsertQuery(CollectRecord record) {
+	public List<CollectStoreQuery> createNewRecordInsertQueries(CollectRecord record) {
 		List<CollectStoreQuery> result = new ArrayList<CollectStoreQuery>();
 		result.addAll(recordDao.createInsertQueries(record));
 		return result;
 	}
 	
-	public List<CollectStoreQuery> createDataUpdateQuery(CollectRecord record, Step step) {
-		List<CollectStoreQuery> result = new ArrayList<CollectStoreQuery>();
-		result.addAll(recordDao.createUpdateQueries(record, step));
-		return result;
+	public CollectStoreQuery createDataInsertQuery(CollectRecord record) {
+		return recordDao.createRecordDataInsertQuery(record, record.getId(), record.getStep());
+	}
+	
+	public CollectStoreQuery createSummaryUpdateQuery(CollectRecord record) {
+		return recordDao.createSummaryUpdateQuery(record);
+	}
+	
+	public List<CollectStoreQuery> createUpdateQueries(CollectRecord record, Step step) {
+		return Arrays.asList(createDataUpdateQuery(record, step), createSummaryUpdateQuery(record));
+	}
+
+	public CollectStoreQuery createDataUpdateQuery(CollectRecord record, Step step) {
+		return recordDao.createRecordDataUpdateQuery(record);
 	}
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
@@ -181,11 +192,13 @@ public class RecordManager {
 			for (RecordStepOperation operation : operations) {
 				CollectRecord record = operation.getRecord();
 				record.setStep(operation.getStep());
-				if (operation.isInsert()) {
+				if (operation.isNewRecord()) {
 					recordOperations.initializeRecordId(nextId ++);
-					queries.addAll(createInsertQuery(record));
+					queries.addAll(createNewRecordInsertQueries(record));
+				} else if (operation.isNewStep()) {
+					queries.add(createDataInsertQuery(record));
 				} else {
-					queries.addAll(createDataUpdateQuery(record, operation.getStep()));
+					queries.add(createDataUpdateQuery(record, operation.getStep()));
 				}
 				if (consumer != null) {
 					consumer.consume(operation);
@@ -834,25 +847,31 @@ public class RecordManager {
 		
 		private CollectRecord record;
 		private Step step;
-		private boolean insert;
+		private boolean newRecord;
+		private boolean newStep;
 		
-		public RecordStepOperation(CollectRecord record, Step step, boolean insert) {
+		public RecordStepOperation(CollectRecord record, boolean newRecord, Step step, boolean newStep) {
 			super();
 			this.record = record;
+			this.newRecord = newRecord;
 			this.step = step;
-			this.insert = insert;
+			this.newStep = newStep;
 		}
 		
 		public CollectRecord getRecord() {
 			return record;
 		}
 		
+		public boolean isNewRecord() {
+			return newRecord;
+		}
+		
 		private Step getStep() {
 			return step;
 		}
 		
-		public boolean isInsert() {
-			return insert;
+		public boolean isNewStep() {
+			return newStep;
 		}
 		
 		/**
@@ -886,12 +905,12 @@ public class RecordManager {
 			return originalStep != null && originalStep.after(lastUpdatedStep);
 		}
 
-		public void addUpdate(CollectRecord record, Step step) {
-			add(new RecordStepOperation(record, step, false));
+		public void addUpdate(CollectRecord record, Step step, boolean newStep) {
+			add(new RecordStepOperation(record, false, step, newStep));
 		}
 
-		public void addInsert(CollectRecord record, Step step) {
-			add(new RecordStepOperation(record, step, true));
+		public void addInsert(CollectRecord record) {
+			add(new RecordStepOperation(record, true, Step.ENTRY, true));
 		}
 		
 		private void add(RecordStepOperation operation) {

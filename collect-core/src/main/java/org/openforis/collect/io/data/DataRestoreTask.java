@@ -223,7 +223,7 @@ public class DataRestoreTask extends Task {
 			String userName = record.getModifiedBy().getUsername();
 			List<RecordEvent> events = eventProducer.produceFor(record, userName);
 			
-			if (! operation.isInsert()) {
+			if (! operation.isNewRecord()) {
 				events.add(0, new RecordDeletedEvent(surveyName, recordId, new Date(), userName));
 			}
 			eventQueue.publish(new RecordTransaction(surveyName, 
