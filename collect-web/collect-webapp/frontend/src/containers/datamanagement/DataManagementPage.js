@@ -4,6 +4,7 @@ import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactst
 import { connect } from 'react-redux'
 
 import ServiceFactory from 'services/ServiceFactory'
+import Modals from 'components/Modals'
 
 class DataManagementPage extends Component {
 
@@ -22,6 +23,7 @@ class DataManagementPage extends Component {
 		this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
 		this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
 		this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
+		this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
 		this.navigateToItemEditView = this.navigateToItemEditView.bind(this)
 		this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
 		this.handleImportButtonClick = this.handleImportButtonClick.bind(this)
@@ -36,6 +38,14 @@ class DataManagementPage extends Component {
 
 	handleEditButtonClick() {
 		this.navigateToItemEditView(this.state.selectedItem.id)
+	}
+
+	handleDeleteButtonClick() {
+		if (window.confirm('Delete?'))  { 
+			//Modals.confirm('test', 'test', function() {
+				this.recordService.delete(this.state.selectedItem).then(console.log('deleted'))
+			//})
+		}
 	}
 
 	navigateToItemEditView(itemId) {

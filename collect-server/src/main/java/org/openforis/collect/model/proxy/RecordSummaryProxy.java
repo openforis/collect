@@ -45,6 +45,11 @@ public class RecordSummaryProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
+	public int getSurveyId() {
+		return summary.getSurvey().getId();
+	}
+	
+	@ExternalizedProperty
 	public Step getStep() {
 		return summary.getStep();
 	}
@@ -131,8 +136,8 @@ public class RecordSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public Map<Step, StepSummary> getSummaryByStep() {
-		return summary.getSummaryByStep();
+	public Map<Step, StepSummary> getStepSummaries() {
+		return summary.getStepSummaries();
 	}
 	
 	@ExternalizedProperty

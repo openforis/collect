@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
+import * as Formatters from 'components/datatable/formatters'
 import ServiceFactory from 'services/ServiceFactory'
 import JobMonitorModal from 'containers/job/JobMonitorModal'
 import Arrays from 'utils/Arrays'
@@ -94,6 +95,8 @@ class BackupDataImportPage extends Component {
         if (survey == null) {
             return <div>Select a survey first</div>
         }
+        const steps = ['ENTRY', 'CLEANSING', 'ANALYSIS']
+
         switch(this.state.importStep) {
             case BackupDataImportPage.SELECT_PARAMETERS:
                 return (
@@ -128,8 +131,24 @@ class BackupDataImportPage extends Component {
                     var keyIdx = this.name.substring(3) - 1
                     return row.record.rootEntityKeys[keyIdx]
                 }
+                function importabilityFormatter(cell, row) {
+                    let iconClass
+                    switch(cell) {
+                        case -1:
+                            iconClass = "redCircle"
+                            break
+                        case 0:
+                            iconClass = "equalSign"
+                            break
+                        case 1:
+                            iconClass = "greenCircle"
+                            break
+                    }
+                    return <span className={iconClass}></span>
+                }
+
                 let columns = []
-                columns.push(<TableHeaderColumn dataField="entryId" isKey hidden row="0" rowSpan="2">Id</TableHeaderColumn>)
+                columns.push(<TableHeaderColumn dataField="entryId" isKey hidden>Id</TableHeaderColumn>)
                 
                 const keyAttributes = survey.schema.firstRootEntityDefinition.keyAttributeDefinitions
                 columns.push(<TableHeaderColumn row="0" colSpan={keyAttributes.length}>Keys</TableHeaderColumn>)
@@ -138,23 +157,49 @@ class BackupDataImportPage extends Component {
                         width="80" row="1">{keyAttr.label}</TableHeaderColumn>)
                 columns = columns.concat(keyAttributeColumns)
                 
+                columns.push(<TableHeaderColumn row="0" colSpan={3}>Steps</TableHeaderColumn>)
+                const stepPresentColumns = steps.map(s => <TableHeaderColumn key={s} dataField={s.toLowerCase() + 'DataPresent'} 
+                    dataFormat={Formatters.checkedIconFormatter} width="50" row="1">{s}</TableHeaderColumn>)
+                columns = columns.concat(stepPresentColumns)
+                
+                columns.push(<TableHeaderColumn key="recordCreationDate" dataField="recordCreationDate" dataFormat={Formatters.dateFormatter}
+                    dataAlign="center" width="80" row="0" rowSpan="2">Created</TableHeaderColumn>)
+                columns.push(<TableHeaderColumn key="recordModifiedDate" dataField="recordModifiedDate" dataFormat={Formatters.dateFormatter}
+                    dataAlign="center" width="80" row="0" rowSpan="2">Modified</TableHeaderColumn>)
+                
                 function conflictingRecordRootEntityKeyFormatter(cell, row) {
                     var keyIdx = this.name.substring('conflictingKey'.length) - 1;
                     return row.conflictingRecord.rootEntityKeys[keyIdx]
                 }
-                let conflictingRecordsColumns = []
-                conflictingRecordsColumns.push(<TableHeaderColumn dataField="entryId" isKey hidden row="0" rowSpan="2">Id</TableHeaderColumn>)
-               
-                conflictingRecordsColumns.push(<TableHeaderColumn row="0" colSpan={keyAttributes.length}>New Record</TableHeaderColumn>)
-                conflictingRecordsColumns = conflictingRecordsColumns.concat(keyAttributeColumns)
 
-                conflictingRecordsColumns.push(<TableHeaderColumn row="0" colSpan={keyAttributes.length}>Old Record</TableHeaderColumn>)
+                let conflictingRecordsColumns = []
+                conflictingRecordsColumns.push(<TableHeaderColumn dataField="entryId" isKey hidden>Id</TableHeaderColumn>)
+               
+                conflictingRecordsColumns.push(<TableHeaderColumn row="0" colSpan={keyAttributes.length}>Keys</TableHeaderColumn>)
+                conflictingRecordsColumns = conflictingRecordsColumns.concat(keyAttributeColumns)
                 
-                const conflictingRecordKeyAttributeColumns = keyAttributes.map((keyAttr, i) => 
-                    <TableHeaderColumn key={'conflictingKey'+(i+1)} dataField={'conflictingKey'+(i+1)} 
-                        dataFormat={conflictingRecordRootEntityKeyFormatter} width="80" row="1">{keyAttr.label}</TableHeaderColumn>)
+                conflictingRecordsColumns.push(<TableHeaderColumn row="0" colSpan={2 + steps.length}>New Record</TableHeaderColumn>)
+                conflictingRecordsColumns.push(<TableHeaderColumn key="recordCreationDate" dataField="recordCreationDate" dataFormat={Formatters.dateFormatter}
+                    dataAlign="center" width="80" row="1">Created</TableHeaderColumn>)
+                conflictingRecordsColumns.push(<TableHeaderColumn key="recordModifiedDate" dataField="recordModifiedDate" dataFormat={Formatters.dateFormatter}
+                    dataAlign="center" width="80" row="1">Modified</TableHeaderColumn>)
+                conflictingRecordsColumns = conflictingRecordsColumns.concat(stepPresentColumns)
+
+                conflictingRecordsColumns.push(<TableHeaderColumn row="0" colSpan={3}>Old Record</TableHeaderColumn>)
+
+                conflictingRecordsColumns.push(<TableHeaderColumn key="conflictingRecordCreationDate" dataField="conflictingRecordCreationDate" dataFormat={Formatters.dateFormatter}
+                    dataAlign="center" width="80" row="1">Created</TableHeaderColumn>)
+                conflictingRecordsColumns.push(<TableHeaderColumn key="conflictingRecordModifiedDate" dataField="conflictingRecordModifiedDate" dataFormat={Formatters.dateFormatter}
+                    dataAlign="center" width="80" row="1">Modified</TableHeaderColumn>)
+                conflictingRecordsColumns.push(<TableHeaderColumn key="conflictingRecordStep" dataField="conflictingRecordStep"
+                    dataAlign="center" width="80" row="1">Step</TableHeaderColumn>)
             
-                conflictingRecordsColumns = conflictingRecordsColumns.concat(conflictingRecordKeyAttributeColumns)
+                
+                conflictingRecordsColumns.push(<TableHeaderColumn key="importabilityLevel" dataField="importabilityLevel" dataFormat={importabilityFormatter}
+                    dataAlign="center" width="50" row="0" rowSpan="2">Importability</TableHeaderColumn>)
+           
+
+
                 
                 return (
                     <Form>

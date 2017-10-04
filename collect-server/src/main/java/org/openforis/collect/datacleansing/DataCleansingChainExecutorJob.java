@@ -193,22 +193,13 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		}
 
 		private void appendLastRecordUpdate() {
-			if (recordStep == Step.ANALYSIS) {
-				//save the data
-				appendRecordUpdateQuery(lastRecord, Step.CLEANSING);
-				//restore the original record step
-				appendRecordUpdateQuery(lastRecord, Step.ANALYSIS);
-			} else {
-				appendRecordUpdateQuery(lastRecord, lastRecord.getStep());
-			}
+			appendRecordUpdateQuery(lastRecord, lastRecord.getDataStep(), lastRecord.getDataWorkflowSequenceNumber());
 		}
 		
-		private void appendRecordUpdateQuery(CollectRecord record, Step step) {
+		private void appendRecordUpdateQuery(CollectRecord record, Step step, int dataSequenceNumber) {
 			record.updateSummaryFields();
-			queryBuffer.appendAll(recordManager.createDataUpdateQuery(record, step));
+			queryBuffer.append(recordManager.createDataUpdateQuery(record, record.getId(), step, dataSequenceNumber));
 		}
-		
-		
 	}
 
 }

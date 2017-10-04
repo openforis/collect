@@ -8965,3 +8965,23 @@ span.checked {
   width: 100%;
   height: 32px;
 }
+
+span.redCircle, 
+span.greenCircle, 
+span.equalSign {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 32px;
+}
+
+span.redCircle {
+  background-image: url('../img/generic/red_circle_32x32.png');
+}
+
+span.greenCircle {
+  background-image: url('../img/generic/green_circle_32x32.png');
+}
+
+span.equalSign {
+  background-image: url('../img/generic/equal_sign_32x32.png');
+}

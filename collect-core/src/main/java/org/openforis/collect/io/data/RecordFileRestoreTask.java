@@ -92,10 +92,10 @@ public class RecordFileRestoreTask extends Task {
 		importRecordFiles(storedRecord);
 	}
 
-	protected CollectRecord findStoredRecord(CollectRecord lastStepBackupRecord) {
-		String[] recordKeys = lastStepBackupRecord.getRootEntityKeyValues().toArray(new String[lastStepBackupRecord.getRootEntityKeyValues().size()]);
+	protected CollectRecord findStoredRecord(CollectRecord record) {
+		List<String> recordKeys = record.getRootEntityKeyValues();
 		RecordFilter filter = new RecordFilter(survey);
-		filter.setRootEntityId(lastStepBackupRecord.getRootEntityDefinitionId());
+		filter.setRootEntityId(record.getRootEntityDefinitionId());
 		filter.setKeyValues(recordKeys);
 		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		if ( summaries.size() == 1 ) {

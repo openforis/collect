@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -226,6 +227,13 @@ public class RecordController extends BasicController implements Serializable {
 		params.setUserId(user.getId());
 		CollectRecord record = recordGenerator.generate(surveyId, params, params.getRecordKey());
 		return toProxy(record);
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=DELETE, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	Response deleteRecord(@PathVariable int surveyId, @PathVariable int recordId) throws RecordPersistenceException {
+		recordManager.delete(recordId);
+		return new Response();
 	}
 	
 	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -124,8 +124,8 @@ public class RecordManager {
 //		checkAllKeysSpecified(record);
 		
 		record.setModifiedDate(now);
-		record.setCurrentStepModifiedBy(lockingUser);
-		record.setCurrentStepModifiedDate(now);
+		record.setDataModifiedBy(lockingUser);
+		record.setDataModifiedDate(now);
 		
 		Integer id = record.getId();
 		if(id == null) {
@@ -157,20 +157,16 @@ public class RecordManager {
 		return result;
 	}
 	
-	public CollectStoreQuery createDataInsertQuery(CollectRecord record) {
-		return recordDao.createRecordDataInsertQuery(record, record.getId(), record.getStep());
+	public CollectStoreQuery createDataInsertQuery(CollectRecord record, int recordId, Step step, int sequenceNumber) {
+		return recordDao.createRecordDataInsertQuery(record, recordId, step, sequenceNumber);
 	}
 	
 	public CollectStoreQuery createSummaryUpdateQuery(CollectRecord record) {
 		return recordDao.createSummaryUpdateQuery(record);
 	}
 	
-	public List<CollectStoreQuery> createUpdateQueries(CollectRecord record, Step step) {
-		return Arrays.asList(createDataUpdateQuery(record, step), createSummaryUpdateQuery(record));
-	}
-
-	public CollectStoreQuery createDataUpdateQuery(CollectRecord record, Step step) {
-		return recordDao.createRecordDataUpdateQuery(record);
+	public CollectStoreQuery createDataUpdateQuery(CollectRecord record, int recordId, Step step, int sequenceNumber) {
+		return recordDao.createRecordDataUpdateQuery(record, recordId, step, sequenceNumber);
 	}
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
@@ -188,21 +184,30 @@ public class RecordManager {
 		int nextId = nextId();
 		List<CollectStoreQuery> queries = new ArrayList<CollectStoreQuery>();
 		for (RecordOperations recordOperations : operationsForRecords) {
+			CollectRecord lastRecord = null;
+			Step lastOperationStep = null;
 			List<RecordStepOperation> operations = recordOperations.getOperations();
 			for (RecordStepOperation operation : operations) {
 				CollectRecord record = operation.getRecord();
-				record.setStep(operation.getStep());
 				if (operation.isNewRecord()) {
 					recordOperations.initializeRecordId(nextId ++);
 					queries.addAll(createNewRecordInsertQueries(record));
 				} else if (operation.isNewStep()) {
-					queries.add(createDataInsertQuery(record));
+					queries.add(createDataInsertQuery(record, recordOperations.getRecordId(), 
+							operation.getStep(), operation.getDataStepSequenceNumber()));
 				} else {
-					queries.add(createDataUpdateQuery(record, operation.getStep()));
+					queries.add(createDataUpdateQuery(record, recordOperations.getRecordId(), 
+							operation.getStep(), operation.getDataStepSequenceNumber()));
 				}
 				if (consumer != null) {
 					consumer.consume(operation);
 				}
+				lastRecord = record;
+				lastOperationStep = operation.getStep();
+			}
+			if (lastRecord.getStep().beforeEqual(lastOperationStep)) {
+				lastRecord.setStep(lastOperationStep);
+				queries.add(createSummaryUpdateQuery(lastRecord));
 			}
 		}
 		execute(queries);
@@ -338,7 +343,7 @@ public class RecordManager {
 		s.setModifiedBy(loadUser(s.getModifiedBy()));
 		s.setOwner(loadUser(s.getOwner()));
 		
-		Collection<StepSummary> stepSummaries = s.getSummaryByStep().values();
+		Collection<StepSummary> stepSummaries = s.getStepSummaries().values();
 		for (StepSummary stepSummary : stepSummaries) {
 			stepSummary.setCreatedBy(loadUser(stepSummary.getCreatedBy()));
 			stepSummary.setModifiedBy(loadUser(stepSummary.getModifiedBy()));
@@ -363,6 +368,10 @@ public class RecordManager {
 		List<CollectRecordSummary> summaries = recordDao.loadSummaries(filter, sortFields);
 		loadDetachedObjects(summaries);
 		return summaries;
+	}
+	
+	public List<CollectRecordSummary> loadFullSummaries(RecordFilter filter) {
+		return loadFullSummaries(filter, null);
 	}
 	
 	public List<CollectRecordSummary> loadFullSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
@@ -498,11 +507,16 @@ public class RecordManager {
 	 */
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void promote(CollectRecord record, User user) throws RecordPromoteException, MissingRecordKeyException {
+		promote(record, user, false);
+	}
+	
+	@Transactional(readOnly=false, propagation=REQUIRED)
+	public void promote(CollectRecord record, User user, boolean force) throws RecordPromoteException, MissingRecordKeyException {
 		Integer errors = record.getErrors();
 		Integer skipped = record.getSkipped();
 		Integer missing = record.getMissingErrors();
 		int totalErrors = errors + skipped + missing;
-		if( totalErrors > 0 ){
+		if(totalErrors > 0 && !force){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
 		}
 		record.updateSummaryFields();
@@ -528,10 +542,10 @@ public class RecordManager {
 		Date now = new Date();
 		record.setModifiedBy(user);
 		record.setModifiedDate(now);
-		record.setCurrentStepCreatedBy(user);
-		record.setCurrentStepCreationDate(now);
-		record.setCurrentStepModifiedBy(user);
-		record.setCurrentStepModifiedDate(now);
+		record.setDataCreatedBy(user);
+		record.setDataCreationDate(now);
+		record.setDataModifiedBy(user);
+		record.setDataModifiedDate(now);
 		record.setState(null);
 		
 		record.clearNodeStates();
@@ -545,11 +559,15 @@ public class RecordManager {
 		}
 		
 		record.setStep( nextStep );
-		record.setWorkflowSequenceNumber(null); //will be automatically generated
-
+		int workflowSequenceNumber = record.getDataWorkflowSequenceNumber() + 1;
+		record.setDataWorkflowSequenceNumber(workflowSequenceNumber);
+		record.setWorkflowSequenceNumber(workflowSequenceNumber);
+		
 		validate(record);
 		
-		recordDao.update(record);
+		recordDao.execute(Arrays.asList(
+				recordDao.createRecordDataInsertQuery(record, record.getId(), nextStep, workflowSequenceNumber),
+				recordDao.createSummaryUpdateQuery(record)));
 	}
 
 	@Transactional(readOnly=false, propagation=REQUIRED)
@@ -849,13 +867,16 @@ public class RecordManager {
 		private Step step;
 		private boolean newRecord;
 		private boolean newStep;
+		private int dataStepSequenceNumber;
 		
-		public RecordStepOperation(CollectRecord record, boolean newRecord, Step step, boolean newStep) {
+		public RecordStepOperation(CollectRecord record, boolean newRecord, Step step, boolean newStep, 
+				int dataStepSequenceNumber) {
 			super();
 			this.record = record;
 			this.newRecord = newRecord;
 			this.step = step;
 			this.newStep = newStep;
+			this.dataStepSequenceNumber = dataStepSequenceNumber;
 		}
 		
 		public CollectRecord getRecord() {
@@ -872,6 +893,10 @@ public class RecordManager {
 		
 		public boolean isNewStep() {
 			return newStep;
+		}
+		
+		public int getDataStepSequenceNumber() {
+			return dataStepSequenceNumber;
 		}
 		
 		/**
@@ -905,12 +930,12 @@ public class RecordManager {
 			return originalStep != null && originalStep.after(lastUpdatedStep);
 		}
 
-		public void addUpdate(CollectRecord record, Step step, boolean newStep) {
-			add(new RecordStepOperation(record, false, step, newStep));
+		public void addUpdate(CollectRecord record, Step step, boolean newStep, int dataStepSequenceNumber) {
+			add(new RecordStepOperation(record, false, step, newStep, dataStepSequenceNumber));
 		}
 
 		public void addInsert(CollectRecord record) {
-			add(new RecordStepOperation(record, true, Step.ENTRY, true));
+			add(new RecordStepOperation(record, true, Step.ENTRY, true, 1));
 		}
 		
 		private void add(RecordStepOperation operation) {

@@ -423,9 +423,15 @@ public class XMLDataImportProcess implements Callable<Void> {
 								recordFileManager.deleteAllFiles(parsedRecord);
 							}
 							if (step.after(originalRecordStep)) {
-								queries = Arrays.asList(recordManager.createDataInsertQuery(parsedRecord));
+								int sequenceNumber = oldRecordSummary.getWorkflowSequenceNumber() + (step.getStepNumber() - originalRecordStep.getStepNumber());
+								parsedRecord.setDataWorkflowSequenceNumber(sequenceNumber);
+								parsedRecord.setWorkflowSequenceNumber(sequenceNumber);
+								queries = Arrays.asList(recordManager.createDataInsertQuery(parsedRecord, oldRecordSummary.getId(), step, sequenceNumber));
 							} else {
-								queries = Arrays.asList(recordManager.createDataUpdateQuery(parsedRecord, step));
+								int sequenceNumber = oldRecordSummary.getWorkflowSequenceNumber() - (originalRecordStep.getStepNumber() - step.getStepNumber());
+								parsedRecord.setDataWorkflowSequenceNumber(sequenceNumber);
+								parsedRecord.setWorkflowSequenceNumber(sequenceNumber);
+								queries = Arrays.asList(recordManager.createDataUpdateQuery(parsedRecord, oldRecordSummary.getId(), step, sequenceNumber));
 							}
 						} else {
 							parsedRecord.setId(nextRecordId ++);
@@ -434,10 +440,12 @@ public class XMLDataImportProcess implements Callable<Void> {
 						lastProcessedRecord = parsedRecord;
 					} else {
 						replaceData(parsedRecord, lastProcessedRecord);
+						int sequenceNumber = parsedRecord.getWorkflowSequenceNumber() + 1;
+						parsedRecord.setDataWorkflowSequenceNumber(sequenceNumber);
 						if (step.after(originalRecordStep)) {
-							queries = Arrays.asList(recordManager.createDataInsertQuery(lastProcessedRecord));
+							queries = Arrays.asList(recordManager.createDataInsertQuery(lastProcessedRecord, lastProcessedRecord.getId(), step, sequenceNumber));
 						} else {
-							queries = Arrays.asList(recordManager.createDataUpdateQuery(lastProcessedRecord, step));
+							queries = Arrays.asList(recordManager.createDataUpdateQuery(lastProcessedRecord, lastProcessedRecord.getId(), step, sequenceNumber));
 						}
 					}
 					appendQueries(queries);
@@ -506,7 +514,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(parsedRecord.getRootEntityDefinitionId());
 		filter.setKeyValues(keyValues);
-		List<CollectRecordSummary> oldRecords = recordManager.loadSummaries(filter);
+		List<CollectRecordSummary> oldRecords = recordManager.loadFullSummaries(filter);
 		if ( oldRecords == null || oldRecords.isEmpty() ) {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {

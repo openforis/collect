@@ -53,6 +53,10 @@ export default class RecordService extends AbstractService {
         })
     }
 
+    delete(record) {
+        return super.delete('survey/' + record.surveyId + '/data/records/' + record.id)
+    }
+
     generateBackupDataImportSummary(survey, rootEntityName, file) {
         return this.postFormData('survey/' + survey.id + '/data/import/records/summary', {
             rootEntityName: rootEntityName,

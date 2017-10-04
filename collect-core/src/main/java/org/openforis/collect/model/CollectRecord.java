@@ -163,17 +163,19 @@ public class CollectRecord extends Record {
 	
 	private transient Version applicationVersion;
 	private transient Step step;
+	private transient Step dataStep;
 	private transient State state;
 	private transient Integer workflowSequenceNumber;
+	private transient Integer dataWorkflowSequenceNumber;
 
 	private transient Date creationDate;
 	private transient User createdBy;
 	private transient Date modifiedDate;
 	private transient User modifiedBy;
-	private transient Date currentStepCreationDate;
-	private transient User currentStepCreatedBy;
-	private transient Date currentStepModifiedDate;
-	private transient User currentStepModifiedBy;
+	private transient Date dataCreationDate;
+	private transient User dataCreatedBy;
+	private transient Date dataModifiedDate;
+	private transient User dataModifiedBy;
 	private transient User owner;
 	private transient Integer missing;
 	private transient Integer missingErrors;
@@ -184,7 +186,7 @@ public class CollectRecord extends Record {
 	
 	private List<String> rootEntityKeyValues;
 	private List<Integer> entityCounts;
-	private List<String> summaryValues;
+	private List<String> dataSummaryValues;
 	private List<String> qualifierValues;
 	
 	private RecordValidationCache validationCache;
@@ -217,7 +219,7 @@ public class CollectRecord extends Record {
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
 		this.qualifierValues = new ArrayList<String>();
-		this.summaryValues = new ArrayList<String>();
+		this.dataSummaryValues = new ArrayList<String>();
 	}
 	
 	@Override
@@ -265,6 +267,14 @@ public class CollectRecord extends Record {
 		this.step = step;
 	}
 	
+	public Step getDataStep() {
+		return dataStep;
+	}
+	
+	public void setDataStep(Step dataStep) {
+		this.dataStep = dataStep;
+	}
+	
 	public State getState() {
 		return state;
 	}
@@ -279,6 +289,14 @@ public class CollectRecord extends Record {
 	
 	public void setWorkflowSequenceNumber(Integer workflowSequenceNumber) {
 		this.workflowSequenceNumber = workflowSequenceNumber;
+	}
+	
+	public Integer getDataWorkflowSequenceNumber() {
+		return dataWorkflowSequenceNumber;
+	}
+	
+	public void setDataWorkflowSequenceNumber(Integer dataWorkflowSequenceNumber) {
+		this.dataWorkflowSequenceNumber = dataWorkflowSequenceNumber;
 	}
 	
 	public Date getCreationDate() {
@@ -313,36 +331,36 @@ public class CollectRecord extends Record {
 		this.modifiedBy = modifiedBy;
 	}
 	
-	public User getCurrentStepCreatedBy() {
-		return currentStepCreatedBy;
+	public User getDataCreatedBy() {
+		return dataCreatedBy;
 	}
 	
-	public void setCurrentStepCreatedBy(User currentStepCreatedBy) {
-		this.currentStepCreatedBy = currentStepCreatedBy;
+	public void setDataCreatedBy(User dataCreatedBy) {
+		this.dataCreatedBy = dataCreatedBy;
 	}
 	
-	public Date getCurrentStepCreationDate() {
-		return currentStepCreationDate;
+	public Date getDataCreationDate() {
+		return dataCreationDate;
 	}
 	
-	public void setCurrentStepCreationDate(Date currentStepCreationDate) {
-		this.currentStepCreationDate = currentStepCreationDate;
+	public void setDataCreationDate(Date dataCreationDate) {
+		this.dataCreationDate = dataCreationDate;
 	}
 	
-	public User getCurrentStepModifiedBy() {
-		return currentStepModifiedBy;
+	public User getDataModifiedBy() {
+		return dataModifiedBy;
 	}
 	
-	public void setCurrentStepModifiedBy(User currentStepModifiedBy) {
-		this.currentStepModifiedBy = currentStepModifiedBy;
+	public void setDataModifiedBy(User dataModifiedBy) {
+		this.dataModifiedBy = dataModifiedBy;
 	}
 	
-	public Date getCurrentStepModifiedDate() {
-		return currentStepModifiedDate;
+	public Date getDataModifiedDate() {
+		return dataModifiedDate;
 	}
 	
-	public void setCurrentStepModifiedDate(Date currentStepModifiedDate) {
-		this.currentStepModifiedDate = currentStepModifiedDate;
+	public void setDataModifiedDate(Date dataModifiedDate) {
+		this.dataModifiedDate = dataModifiedDate;
 	}
 	
 	public User getOwner() {
@@ -426,12 +444,12 @@ public class CollectRecord extends Record {
 		this.rootEntityKeyValues = keys;
 	}
 
-	public List<String> getSummaryValues() {
-		return summaryValues;
+	public List<String> getDataSummaryValues() {
+		return dataSummaryValues;
 	}
 
-	public void setSummaryValues(List<String> summaryValues) {
-		this.summaryValues = summaryValues;
+	public void setDataSummaryValues(List<String> summaryValues) {
+		this.dataSummaryValues = summaryValues;
 	}
 	
 	public List<String> getQualifierValues() {
@@ -472,26 +490,15 @@ public class CollectRecord extends Record {
 	public void updateSummaryFields() {
 		updateRootEntityKeyValues();
 		updateEntityCounts();
+		updateDataSummaryFields();
+		updateQualifiers();
 	}
 	
 	private void updateRootEntityKeyValues(){
 		Entity rootEntity = getRootEntity();
 		if(rootEntity != null) {
-			List<String> values = new ArrayList<String>();
 			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getDefinition().getKeyAttributeDefinitions();
-			for (AttributeDefinition keyDefn : keyAttributeDefinitions) {
-				Attribute<?, ?> keyNode = this.findNodeByPath(keyDefn.getPath());
-				if ( keyNode == null || keyNode.isEmpty() ) {
-					//TODO throw error in this case?
-					values.add(null);
-				} else {
-					if (! keyNode.isEmpty()) {
-						String keyValue = keyNode.extractTextValue();
-						values.add(keyValue);
-					}
-				}
-			}
-			rootEntityKeyValues = values;
+			rootEntityKeyValues = extractValues(keyAttributeDefinitions);
 		}
 	}
 
@@ -505,6 +512,33 @@ public class CollectRecord extends Record {
 		this.entityCounts = counts;
 	}
 	
+	private void updateDataSummaryFields() {
+		List<AttributeDefinition> attrDefs = getSurvey().getSchema().getSummaryAttributeDefinitions(getRootEntity().getDefinition());
+		this.dataSummaryValues = extractValues(attrDefs);
+	}
+	
+	private void updateQualifiers() {
+		List<AttributeDefinition> attrDefs = getSurvey().getSchema().getQualifierAttributeDefinitions(getRootEntity().getDefinition());
+		this.qualifierValues = extractValues(attrDefs);
+	}
+	
+	private List<String> extractValues(List<AttributeDefinition> attrDefs) {
+		List<String> values = new ArrayList<String>();
+		for (AttributeDefinition keyDefn : attrDefs) {
+			Attribute<?, ?> keyNode = this.findNodeByPath(keyDefn.getPath());
+			if ( keyNode == null || keyNode.isEmpty() ) {
+				//TODO throw error in this case?
+				values.add(null);
+			} else {
+				if (! keyNode.isEmpty()) {
+					String keyValue = keyNode.extractTextValue();
+					values.add(keyValue);
+				}
+			}
+		}
+		return values;
+	}
+
 	public List<FileAttribute> getFileAttributes() {
 		final List<FileAttribute> result = new ArrayList<FileAttribute>();
 		Entity rootEntity = getRootEntity();

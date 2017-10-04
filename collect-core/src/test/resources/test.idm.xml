@@ -3737,10 +3737,10 @@
 				required="true" strict="false">
 				<label>Id</label>
 			</code>
-			<code id="733" list="admin_unit" name="region" required="true">
+			<code id="733" list="admin_unit" name="region" required="true" collect:qualifier="true">
 				<label>Region</label>
 			</code>
-			<code id="734" list="admin_unit" name="district" parent="region"
+			<code id="734" list="admin_unit" name="district" parent="region" collect:qualifier="true"
 				required="true">
 				<label>District</label>
 			</code>
@@ -3810,7 +3810,7 @@
 			<text id="747" name="remarks" type="memo">
 				<label>Remarks</label>
 			</text>
-			<entity collect:count="true" id="748" multiple="true" name="plot"
+			<entity ui:count="true" id="748" multiple="true" name="plot"
 				ui:layout="form" ui:tab="plot">
 				<label>Plot</label>
 				<code id="749" key="true" list="sampling_design" name="no"
@@ -4133,7 +4133,7 @@
 					type="memo" ui:tab="shrubs_regen">
 					<label>Remarks</label>
 				</text>
-				<entity id="822" multiple="true" name="tree" relevant="accessibility = 0"
+				<entity id="822" multiple="true" name="tree" relevant="accessibility = 0" ui:count="true" 
 					ui:tab="tree">
 					<label>Tree Stem</label>
 					<number id="823" key="true" name="tree_no" required="true"

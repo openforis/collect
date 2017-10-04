@@ -55,6 +55,7 @@ public class CollectAnnotations {
 		GEOMETRY(new QName(COLLECT_NAMESPACE_URI, "geometry"), false),
 		SHOW_IN_MAP_BALLOON(new QName(COLLECT_NAMESPACE_URI, "showInMapBalloon"), true),
 		KEY_CHANGE_ALLOWED(new QName(COLLECT_NAMESPACE_URI, "keyChangeAllowed"), true),
+		QUALIFIER(new QName(COLLECT_NAMESPACE_URI, UIOptionsConstants.QUALIFIER), false),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -63,7 +64,6 @@ public class CollectAnnotations {
 		DIRECTION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DIRECTION)),
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
 		SHOW_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SUMMARY), false),
-		QUALIFIER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.QUALIFIER), false),
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
 		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE)),
 		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER)),

@@ -32,8 +32,7 @@ public class RecordStatsGenerator {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		recordManager.visitSummaries(new RecordFilter(survey), null, new Visitor<CollectRecordSummary>() {
 			public void visit(CollectRecordSummary s) {
-				Map<Step, StepSummary> summaryByStep = s.getSummaryByStep();
-				for (Entry<Step, StepSummary> entry : summaryByStep.entrySet()) {
+				for (Entry<Step, StepSummary> entry : s.getStepSummaries().entrySet()) {
 					Step step = entry.getKey();
 					StepSummary stepSummary = entry.getValue();
 					if (stepSummary.getCreationDate() != null) {

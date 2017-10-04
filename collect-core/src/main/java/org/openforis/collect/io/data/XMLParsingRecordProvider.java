@@ -139,7 +139,9 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	private ParseRecordResult parseRecord(Reader reader, Step step) throws IOException {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		if (result.isSuccess()) {
-			result.getRecord().setStep(step);
+			CollectRecord record = result.getRecord();
+			record.setStep(step);
+			record.setDataStep(step);
 		}
 		return result;
 	}

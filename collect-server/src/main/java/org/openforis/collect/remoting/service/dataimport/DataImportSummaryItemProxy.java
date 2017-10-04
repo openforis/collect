@@ -1,6 +1,7 @@
 package org.openforis.collect.remoting.service.dataimport;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -68,6 +69,16 @@ public class DataImportSummaryItemProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
+	public Date getRecordCreationDate() {
+		return item.getRecordSummary() == null ? null : item.getRecordSummary().getCreationDate();
+	}
+	
+	@ExternalizedProperty
+	public Date getRecordModifiedDate() {
+		return item.getRecordSummary() == null ? null : item.getRecordSummary().getCreationDate();
+	}
+	
+	@ExternalizedProperty
 	public int getRecordCompletionPercent() {
 		return item.getRecordCompletionPercent();
 	}
@@ -104,7 +115,21 @@ public class DataImportSummaryItemProxy implements Proxy {
 	public int getConflictingRecordCompletionPercent() {
 		return item.getConflictingRecordCompletionPercent();
 	}
+	
+	@ExternalizedProperty
+	public Date getConflictingRecordCreationDate() {
+		return item.getConflictingRecordSummary() == null ? null : item.getConflictingRecordSummary().getCreationDate();
+	}
+	
+	@ExternalizedProperty
+	public Date getConflictingRecordModifiedDate() {
+		return item.getConflictingRecordSummary() == null ? null : item.getConflictingRecordSummary().getCreationDate();
+	}
 
+	public Step getConflictingRecordStep() {
+		return item.getConflictingRecordSummary() == null ? null : item.getConflictingRecordSummary().getStep();
+	}
+	
 	@ExternalizedProperty
 	public int getConflictingRecordFilledAttributesCount() {
 		return item.getConflictingRecordFilledAttributesCount();
@@ -119,7 +144,7 @@ public class DataImportSummaryItemProxy implements Proxy {
 	public int getImportabilityLevel() {
 		return item.calculateImportabilityLevel();
 	}
-
+	
 	@ExternalizedProperty
 	public List<NodeUnmarshallingErrorProxy> getWarnings() {
 		List<NodeUnmarshallingError> result = new ArrayList<NodeUnmarshallingError>();

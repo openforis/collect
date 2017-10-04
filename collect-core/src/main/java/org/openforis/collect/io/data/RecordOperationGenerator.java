@@ -10,6 +10,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.commons.collection.Predicate;
 
 public class RecordOperationGenerator {
@@ -30,37 +31,43 @@ public class RecordOperationGenerator {
 	public RecordOperations generate() throws IOException, MissingStepsException, RecordParsingException {
 		RecordOperations operations = new RecordOperations();
 		boolean firstStepToBeProcessed = true;
-		Integer lastRecordId = null;
-		Step lastRecordOriginalStep = null;
+		CollectRecordSummary existingRecordSummary = null;
+		int workflowSequenceNumber = -1;
+		boolean newRecord = true;
+
 		for (Step step : Step.values()) {
 			CollectRecord parsedRecord = recordProvider.provideRecord(entryId, step);
 			if (parsedRecord == null || ! isToBeProcessed(parsedRecord)) {
 				continue;
 			}
-			parsedRecord.setStep(step);
 			parsedRecord.setOwner(parsedRecord.getModifiedBy());
 
 			if (firstStepToBeProcessed) {
-				CollectRecordSummary oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
-				boolean newRecord = oldRecordSummary == null;
+				existingRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
+				newRecord = existingRecordSummary == null;
 				if (newRecord) {
 					insertRecordDataUntilStep(operations, parsedRecord, step);
+					workflowSequenceNumber = step.getStepNumber();
 				} else {
-					// overwrite existing record
-					lastRecordId = oldRecordSummary.getId();
-					lastRecordOriginalStep = oldRecordSummary.getStep();
-					parsedRecord.setId(lastRecordId);
-					operations.setOriginalStep(lastRecordOriginalStep);
-					operations.addUpdate(parsedRecord, step, step.after(lastRecordOriginalStep));
+					// overwrite existing record data
+					Step originalStep = existingRecordSummary.getStep();
+					parsedRecord.setId(existingRecordSummary.getId());
+					operations.initializeRecordId(existingRecordSummary.getId());
+					operations.setOriginalStep(originalStep);
+					boolean newStep = step.after(originalStep);
+					if (newStep) {
+						workflowSequenceNumber = existingRecordSummary.getWorkflowSequenceNumber() + (step.getStepNumber() - originalStep.getStepNumber());
+					} else {
+						workflowSequenceNumber = existingRecordSummary.getSummaryByStep(step).getSequenceNumber(); 
+					}
+					operations.addUpdate(parsedRecord, step, newStep, workflowSequenceNumber);
 				}
 				firstStepToBeProcessed = false;
 			} else {
-				parsedRecord.setId(lastRecordId);
-				operations.addUpdate(parsedRecord, step, step.after(lastRecordOriginalStep));
+				boolean newStep = newRecord ? true : step.after(operations.getOriginalStep());
+				operations.addUpdate(parsedRecord, step, newStep, workflowSequenceNumber);
 			}
-		}
-		if (operations.hasMissingSteps()) {
-			throw new MissingStepsException(operations);
+			workflowSequenceNumber ++;
 		}
 		return operations;
 	}
@@ -71,26 +78,40 @@ public class RecordOperationGenerator {
 
 	private CollectRecordSummary findAlreadyExistingRecordSummary(
 			CollectRecord parsedRecord) {
-		return recordManager.loadUniqueRecordSummaryByKeys((CollectSurvey) parsedRecord.getSurvey(), 
-				parsedRecord.getRootEntity().getName(), parsedRecord.getRootEntityKeyValues());
+		CollectSurvey survey = (CollectSurvey) parsedRecord.getSurvey();
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(parsedRecord.getRootEntityDefinitionId());
+		filter.setKeyValues(parsedRecord.getRootEntityKeyValues());
+		List<CollectRecordSummary> summaries = recordManager.loadFullSummaries(filter, null);
+		switch(summaries.size()) {
+		case 0:
+			return null;
+		case 1:
+			return summaries.get(0);
+		default:
+			throw new IllegalArgumentException(String.format("Multiple records with keys %s found for survey %s", 
+					parsedRecord.getRootEntityKeyValues(), survey.getName()));
+		}
 	}
 
 	private void insertRecordDataUntilStep(RecordOperations operations,
-			CollectRecord record, Step step) {
+			CollectRecord record, Step untilStep) {
 		List<Step> previousSteps = new ArrayList<Step>();
 		for (Step s : Step.values()) {
-			if (s.beforeEqual(step)) {
+			if (s.beforeEqual(untilStep)) {
 				previousSteps.add(s);
 			}
 		}
-		for (Step previousStep : previousSteps) {
-			record.setStep(previousStep);
-			switch (previousStep) {
+		int dataStepSequenceNumber = 1;
+		for (Step s : previousSteps) {
+			record.setStep(s);
+			switch (s) {
 			case ENTRY:
 				operations.addInsert(record);
+				dataStepSequenceNumber ++;
 				break;
 			default:
-				operations.addUpdate(record, previousStep, true);
+				operations.addUpdate(record, s, true, dataStepSequenceNumber);
 			}
 		}
 	}

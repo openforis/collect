@@ -26,8 +26,10 @@ public class CollectRecordSummary {
 		summary.setOwner(record.getOwner());
 		summary.setRootEntityDefinitionId(record.getRootEntityDefinitionId());
 		summary.setStep(record.getStep());
+		summary.setWorkflowSequenceNumber(record.getWorkflowSequenceNumber());
 		
 		StepSummary stepSummary = new StepSummary(record.getStep());
+		stepSummary.setSequenceNumber(record.getDataWorkflowSequenceNumber());
 		stepSummary.setState(record.getState());
 		stepSummary.setCompletionPercent(record.calculateCompletionPercent());
 		stepSummary.setEntityCounts(record.getEntityCounts());
@@ -53,20 +55,25 @@ public class CollectRecordSummary {
 	private User modifiedBy;
 	private Date modifiedDate;
 	private Step step;
+	private Integer workflowSequenceNumber;
 	private User owner;
 	private List<File> files;
-	private Map<Step, StepSummary> summaryByStep = new LinkedHashMap<Step, StepSummary>();
+	private Map<Step, StepSummary> stepSummaries = new LinkedHashMap<Step, StepSummary>();
 	
 	public StepSummary getCurrentStepSummary() {
-		return summaryByStep.get(getStep());
+		return stepSummaries.get(getStep());
 	}
 	
 	public void addStepSummary(StepSummary stepSummary) {
-		summaryByStep.put(stepSummary.getStep(), stepSummary);
+		stepSummaries.put(stepSummary.getStep(), stepSummary);
 	}
 	
 	public void clearStepSummaries() {
-		summaryByStep.clear();
+		stepSummaries.clear();
+	}
+	
+	public StepSummary getSummaryByStep(Step step) {
+		return stepSummaries.get(step);
 	}
 	
 	public int getCompletionPercent() {
@@ -85,12 +92,12 @@ public class CollectRecordSummary {
 		return getCurrentStepSummary().getEntityCounts();
 	}
 
-	public Map<Step, StepSummary> getSummaryByStep() {
-		return summaryByStep;
+	public Map<Step, StepSummary> getStepSummaries() {
+		return stepSummaries;
 	}
 	
-	public void setSummaryByStep(Map<Step, StepSummary> summaryByStep) {
-		this.summaryByStep = summaryByStep;
+	public void setStepSummaries(Map<Step, StepSummary> summaryByStep) {
+		this.stepSummaries = summaryByStep;
 	}
 	
 	public Step getStep() {
@@ -101,6 +108,14 @@ public class CollectRecordSummary {
 		this.step = step;
 	}
 
+	public Integer getWorkflowSequenceNumber() {
+		return workflowSequenceNumber;
+	}
+	
+	public void setWorkflowSequenceNumber(Integer workflowSequenceNumber) {
+		this.workflowSequenceNumber = workflowSequenceNumber;
+	}
+	
 	public Integer getRootEntityDefinitionId() {
 		return rootEntityDefinitionId;
 	}
@@ -183,7 +198,7 @@ public class CollectRecordSummary {
 
 	public static class StepSummary {
 		
-		private int sequenceNumber;
+		private Integer sequenceNumber;
 		private Step step;
 		private State state;
 		private User createdBy;
@@ -208,11 +223,11 @@ public class CollectRecordSummary {
 			this.step = step;
 		}
 		
-		public int getSequenceNumber() {
+		public Integer getSequenceNumber() {
 			return sequenceNumber;
 		}
 		
-		public void setSequenceNumber(int sequenceNumber) {
+		public void setSequenceNumber(Integer sequenceNumber) {
 			this.sequenceNumber = sequenceNumber;
 		}
 		
