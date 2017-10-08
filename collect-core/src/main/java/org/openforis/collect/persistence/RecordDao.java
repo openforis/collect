@@ -719,7 +719,6 @@ public class RecordDao extends JooqDaoSupport {
 		return query;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public CollectRecord fromQueryResult(CollectSurvey survey, Record r, boolean recordToBeUpdated) {
 		int rootEntityId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
 		String version = r.getValue(OFC_RECORD.MODEL_VERSION);
@@ -749,13 +748,6 @@ public class RecordDao extends JooqDaoSupport {
 		String state = r.getValue(OFC_RECORD.STATE);
 		c.setState(state == null ? null : State.fromCode(state));
 		
-		// create list of entity counts
-		List<Integer> counts = new ArrayList<Integer>(RECORD_COUNT_FIELDS.length);
-		for (TableField tableField : RECORD_COUNT_FIELDS) {
-			counts.add((Integer) r.getValue(tableField));
-		}
-		c.setEntityCounts(counts);
-
 		c.setApplicationVersion(new Version(r.getValue(OFC_RECORD_DATA.APP_VERSION)));
 		byte[] data = r.getValue(OFC_RECORD_DATA.DATA);
 		ModelSerializer modelSerializer = new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
@@ -779,7 +771,6 @@ public class RecordDao extends JooqDaoSupport {
 		return summaries;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public CollectRecordSummary fromSummaryQueryRecord(CollectSurvey survey, Record r) {
 		int rootEntityDefId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
 		String versionName = r.getValue(OFC_RECORD.MODEL_VERSION);
@@ -808,14 +799,6 @@ public class RecordDao extends JooqDaoSupport {
 		
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDef = schema.getRootEntityDefinition(rootEntityDefId);
-
-		// create list of entity counts
-		List<EntityDefinition> countableDefs = schema.getCountableEntitiesInRecordList(rootEntityDef);
-		List<Integer> entityCounts = new ArrayList<Integer>(countableDefs.size());
-		for (int i = 0; i < countableDefs.size(); i++) {
-			entityCounts.add((Integer) r.getValue(RECORD_COUNT_FIELDS[i]));
-		}
-		stepSummary.setEntityCounts(entityCounts);
 
 		stepSummary.setRootEntityKeyValues(getFieldValues(r, rootEntityDef.getKeyAttributeDefinitions(), RECORD_KEY_FIELDS, String.class));
 		stepSummary.setEntityCounts(getFieldValues(r, schema.getCountableEntitiesInRecordList(rootEntityDef), RECORD_COUNT_FIELDS, Integer.class));

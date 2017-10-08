@@ -18,6 +18,7 @@ import org.openforis.collect.manager.RecordManager.RecordStepOperation;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.collect.utils.Consumer;
@@ -45,7 +46,7 @@ public class DataRestoreTask extends Task {
 
 	//input
 	private RecordProvider recordProvider;
-	
+	private User user;
 	private List<Integer> entryIdsToImport;
 	private boolean overwriteAll;
 	
@@ -99,7 +100,7 @@ public class DataRestoreTask extends Task {
 	private void importEntries(int entryId) throws IOException, MissingStepsException {
 		try {
 			RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, 
-					entryId, includeRecordPredicate);
+					entryId, user, includeRecordPredicate);
 			RecordOperations recordOperations = operationGenerator.generate();
 			if (! recordOperations.isEmpty()) {
 				updateBuffer.append(recordOperations);
@@ -148,6 +149,14 @@ public class DataRestoreTask extends Task {
 		this.userManager = userManager;
 	}
 
+	public User getUser() {
+		return user;
+	}
+	
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
 	public boolean isOverwriteAll() {
 		return overwriteAll;
 	}

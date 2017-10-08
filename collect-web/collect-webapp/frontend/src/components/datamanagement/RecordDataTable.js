@@ -35,6 +35,7 @@ class RecordDataTable extends Component {
 
 	componentWillReceiveProps(nextProps) {
 		if (nextProps.survey != null && (this.props.survey == null || nextProps.survey.id != this.props.survey.id)) {
+			this.setState({records: null})
 			this.fetchData(this.state.page, this.state.recordsPerPage, nextProps.survey);
 		}
 	}
@@ -123,75 +124,72 @@ class RecordDataTable extends Component {
 		const noSurveySelected = this.props.survey == null;
 		if (noSurveySelected) {
 			return <div>Please select a survey first</div>
-		} else {
-			var survey = this.props.survey;
+		}
+		var survey = this.props.survey;
 
-			const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
+		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
 
-			function rootEntityKeyFormatter(cell, row) {
-				var keyIdx = this.name.substring(3) - 1;
-				return row.rootEntityKeys[keyIdx];
-			}
+		function rootEntityKeyFormatter(cell, row) {
+			var keyIdx = this.name.substring(3) - 1;
+			return row.rootEntityKeys[keyIdx];
+		}
 
-			function usernameFormatter(cell, row) {
-				return cell ? cell.username : ''
-			}
+		function usernameFormatter(cell, row) {
+			return cell ? cell.username : ''
+		}
 
-			var columns = [];
-			columns.push(<TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>);
+		var columns = [];
+		columns.push(<TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>);
 
-			const keyAttributes = survey.schema.firstRootEntityDefinition.keyAttributeDefinitions
-			const keyAttributeColumns = keyAttributes.map((keyAttr, i) => 
-				<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter} width="80"
-					editable={false} dataSort filter={ { type: 'TextFilter' } }>{keyAttr.label}</TableHeaderColumn>)
-			columns = columns.concat(keyAttributeColumns)
+		const keyAttributes = survey.schema.firstRootEntityDefinition.keyAttributeDefinitions
+		const keyAttributeColumns = keyAttributes.map((keyAttr, i) => 
+			<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter} width="80"
+				editable={false} dataSort filter={ { type: 'TextFilter' } }>{keyAttr.label}</TableHeaderColumn>)
+		columns = columns.concat(keyAttributeColumns)
 
-			columns.push(
-				<TableHeaderColumn key="errors" dataField="errors"
-					dataAlign="right" width="80" editable={false} dataSort>Errors</TableHeaderColumn>,
-				<TableHeaderColumn key="warnings" dataField="warnings"
-					dataAlign="right" width="80" editable={false} dataSort>Warnings</TableHeaderColumn>,
-				<TableHeaderColumn key="creationDate" dataField="creationDate" dataFormat={Formatters.dateFormatter}
-					dataAlign="center" width="80" editable={false} dataSort>Created</TableHeaderColumn>,
-				<TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateFormatter}
-					dataAlign="center" width="80" editable={false} dataSort>Modified</TableHeaderColumn>,
-				<TableHeaderColumn key="entryComplete" dataField="entryComplete" dataFormat={Formatters.checkedIconFormatter}
-					dataAlign="center" width="80" editable={false} dataSort>Entered</TableHeaderColumn>,
-				<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
-					dataAlign="center" width="80" editable={false} dataSort>Cleansed</TableHeaderColumn>,
-				<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter}
-					customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
-					dataAlign="center" width="150"  dataSort>Owner</TableHeaderColumn>
+		columns.push(
+			<TableHeaderColumn key="errors" dataField="errors"
+				dataAlign="right" width="80" editable={false} dataSort>Errors</TableHeaderColumn>,
+			<TableHeaderColumn key="warnings" dataField="warnings"
+				dataAlign="right" width="80" editable={false} dataSort>Warnings</TableHeaderColumn>,
+			<TableHeaderColumn key="creationDate" dataField="creationDate" dataFormat={Formatters.dateTimeFormatter}
+				dataAlign="center" width="110" editable={false} dataSort>Created</TableHeaderColumn>,
+			<TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateTimeFormatter}
+				dataAlign="center" width="110" editable={false} dataSort>Modified</TableHeaderColumn>,
+			<TableHeaderColumn key="entryComplete" dataField="entryComplete" dataFormat={Formatters.checkedIconFormatter}
+				dataAlign="center" width="80" editable={false} dataSort>Entered</TableHeaderColumn>,
+			<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
+				dataAlign="center" width="80" editable={false} dataSort>Cleansed</TableHeaderColumn>,
+			<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter}
+				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
+				dataAlign="center" width="150"  dataSort>Owner</TableHeaderColumn>
 		);
 
-			return (
-				<BootstrapTable
-					data={this.state.records}
-					options={{
-						onPageChange: this.handlePageChange,
-						onSizePerPageList: this.handleSizePerPageChange,
-						onRowDoubleClick: this.props.handleRowDoubleClick,
-						onCellEdit: this.handleCellEdit,
-						onSortChange: this.handleSortChange,
-						onFilterChange: this.handleFilterChange,
-						page: this.state.page,
-						sizePerPage: this.state.recordsPerPage,
-						sizePerPageList: [25, 50, 100]
-					}}
-					fetchInfo={{ dataTotalSize: this.state.totalSize }}
-					remote pagination striped hover condensed
-					height={this.state.recordsPerPage === 25 ? '300px' : '600px'}
-					selectRow={{
-						mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
-						onSelect: this.props.handleRowSelect,
-						selected: this.props.selectedItemIds
-					}}
-					cellEdit={{ mode: 'click', blurToSave: true }}
-				>{columns}
-				</BootstrapTable>
-			);
-
-		}
+		return (
+			<BootstrapTable
+				data={this.state.records}
+				options={{
+					onPageChange: this.handlePageChange,
+					onSizePerPageList: this.handleSizePerPageChange,
+					onRowDoubleClick: this.props.handleRowDoubleClick,
+					onCellEdit: this.handleCellEdit,
+					onSortChange: this.handleSortChange,
+					onFilterChange: this.handleFilterChange,
+					page: this.state.page,
+					sizePerPage: this.state.recordsPerPage,
+					sizePerPageList: [25, 50, 100]
+				}}
+				fetchInfo={{ dataTotalSize: this.state.totalSize }}
+				remote pagination striped hover condensed
+				height={this.state.recordsPerPage === 25 ? '300px' : '600px'}
+				selectRow={{
+					mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
+					onSelect: this.props.handleRowSelect,
+					selected: this.props.selectedItemIds
+				}}
+				cellEdit={{ mode: 'click', blurToSave: true }}
+			>{columns}</BootstrapTable>
+		);
 	}
 
 	visitNodes(survey, visitFunction) {

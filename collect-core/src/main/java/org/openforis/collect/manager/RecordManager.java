@@ -112,20 +112,22 @@ public class RecordManager {
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void save(CollectRecord record, String sessionId) throws RecordPersistenceException {
 		User lockingUser = record.getModifiedBy();
-		save(record, lockingUser, sessionId);
+		save(record, lockingUser, sessionId, true);
 	}
 
 	@Transactional(readOnly=false, propagation=REQUIRED)
-	public void save(CollectRecord record, User lockingUser, String sessionId) throws RecordPersistenceException {
-		Date now = new Date();
-
+	public void save(CollectRecord record, User lockingUser, String sessionId, boolean updateDateAndUser) throws RecordPersistenceException {
 		record.updateSummaryFields();
 
 //		checkAllKeysSpecified(record);
 		
-		record.setModifiedDate(now);
-		record.setDataModifiedBy(lockingUser);
-		record.setDataModifiedDate(now);
+		if (updateDateAndUser) {
+			Date now = new Date();
+			record.setModifiedDate(now);
+			record.setModifiedBy(lockingUser);
+			record.setDataModifiedDate(now);
+			record.setDataModifiedBy(lockingUser);
+		}
 		
 		Integer id = record.getId();
 		if(id == null) {

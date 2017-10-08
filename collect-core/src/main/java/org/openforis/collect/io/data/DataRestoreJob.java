@@ -120,6 +120,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
 			t.setRecordProvider(recordProvider);
+			t.setUser(user);
 			t.setOverwriteAll(overwriteAll);
 			t.setEntryIdsToImport(entryIdsToImport);
 			t.setIncludeRecordPredicate(includeRecordPredicate);

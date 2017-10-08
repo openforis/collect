@@ -269,6 +269,7 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestParam(defaultValue="true") boolean validateRecords) throws IOException {
 		DataRestoreJob job = jobManager.createJob(TransactionalDataRestoreJob.class);
 		job.setFile(dataRestoreSummaryJob.getFile());
+		job.setUser(sessionManager.getLoggedUser());
 		job.setValidateRecords(validateRecords);
 		job.setRecordProvider(dataRestoreSummaryJob.getRecordProvider());
 		job.setPackagedSurvey(dataRestoreSummaryJob.getPackagedSurvey());

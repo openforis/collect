@@ -248,8 +248,10 @@ public class DataUnmarshaller {
 			record.setState(state);
 
 			Date created = Dates.parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
-			Date modified =  Dates.parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
+			record.setDataCreationDate(created);
 			record.setCreationDate(created);
+			Date modified =  Dates.parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
+			record.setDataModifiedDate(modified);
 			record.setModifiedDate(modified);
 
 			String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);

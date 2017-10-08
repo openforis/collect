@@ -134,12 +134,7 @@ public class RecordFileRestoreTask extends Task {
 			}
 		}
 		if ( sessionRecordFileManager.commitChanges(record) ) {
-			if ( record.getStep() == Step.ANALYSIS ) {
-				record.setStep(Step.CLEANSING);
-				recordManager.save(record);
-				record.setStep(Step.ANALYSIS);
-			}
-			recordManager.save(record);
+			recordManager.save(record, null, null, false);
 		}
 	}
 

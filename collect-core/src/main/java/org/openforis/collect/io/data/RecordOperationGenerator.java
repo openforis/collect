@@ -11,6 +11,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.collect.model.User;
 import org.openforis.commons.collection.Predicate;
 
 public class RecordOperationGenerator {
@@ -18,13 +19,15 @@ public class RecordOperationGenerator {
 	private final RecordManager recordManager;
 	private final int entryId;
 	private Predicate<CollectRecord> includeRecordPredicate;
+	private User user;
 
 	public RecordOperationGenerator(RecordProvider recordProvider,
-			RecordManager recordManager, int entryId, Predicate<CollectRecord> includeRecordPredicate) {
+			RecordManager recordManager, int entryId, User user, Predicate<CollectRecord> includeRecordPredicate) {
 		super();
 		this.recordProvider = recordProvider;
 		this.recordManager = recordManager;
 		this.entryId = entryId;
+		this.user = user;
 		this.includeRecordPredicate = includeRecordPredicate;
 	}
 
@@ -40,7 +43,7 @@ public class RecordOperationGenerator {
 			if (parsedRecord == null || ! isToBeProcessed(parsedRecord)) {
 				continue;
 			}
-			parsedRecord.setOwner(parsedRecord.getModifiedBy());
+			setDefaultValues(parsedRecord);
 
 			if (firstStepToBeProcessed) {
 				existingRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
@@ -70,6 +73,22 @@ public class RecordOperationGenerator {
 			workflowSequenceNumber ++;
 		}
 		return operations;
+	}
+
+	private void setDefaultValues(CollectRecord parsedRecord) {
+		if (parsedRecord.getCreatedBy() == null) {
+			parsedRecord.setCreatedBy(user);
+		}
+		if (parsedRecord.getModifiedBy() == null) {
+			parsedRecord.setModifiedBy(user);
+		}
+		if (parsedRecord.getDataCreatedBy() == null) {
+			parsedRecord.setDataCreatedBy(user);
+		}
+		if (parsedRecord.getDataModifiedBy() == null) {
+			parsedRecord.setDataModifiedBy(user);
+		}
+		parsedRecord.setOwner(parsedRecord.getModifiedBy());
 	}
 
 	private boolean isToBeProcessed(CollectRecord record) {
