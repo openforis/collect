@@ -176,6 +176,10 @@ public class CollectRecord extends Record {
 	private transient User dataCreatedBy;
 	private transient Date dataModifiedDate;
 	private transient User dataModifiedBy;
+	private transient List<String> dataRootEntityKeyValues;
+	private transient List<Integer> dataEntityCounts;
+	private transient List<String> dataQualifierValues;
+	private transient List<String> dataSummaryValues;
 	private transient User owner;
 	private transient Integer missing;
 	private transient Integer missingErrors;
@@ -184,10 +188,10 @@ public class CollectRecord extends Record {
 	private transient Integer errors;
 	private transient Integer warnings;
 	
-	private List<String> rootEntityKeyValues;
-	private List<Integer> entityCounts;
-	private List<String> dataSummaryValues;
-	private List<String> qualifierValues;
+	private transient List<String> rootEntityKeyValues;
+	private transient List<Integer> entityCounts;
+	private transient List<String> qualifierValues;
+	private transient List<String> summaryValues;
 	
 	private RecordValidationCache validationCache;
 
@@ -363,6 +367,38 @@ public class CollectRecord extends Record {
 		this.dataModifiedDate = dataModifiedDate;
 	}
 	
+	public List<Integer> getDataEntityCounts() {
+		return dataEntityCounts;
+	}
+	
+	public void setDataEntityCounts(List<Integer> dataEntityCounts) {
+		this.dataEntityCounts = dataEntityCounts;
+	}
+	
+	public List<String> getDataQualifierValues() {
+		return dataQualifierValues;
+	}
+	
+	public void setDataQualifierValues(List<String> dataQualifierValues) {
+		this.dataQualifierValues = dataQualifierValues;
+	}
+	
+	public List<String> getDataRootEntityKeyValues() {
+		return dataRootEntityKeyValues;
+	}
+	
+	public void setDataRootEntityKeyValues(List<String> dataRootEntityKeyValues) {
+		this.dataRootEntityKeyValues = dataRootEntityKeyValues;
+	}
+	
+	public List<String> getDataSummaryValues() {
+		return dataSummaryValues;
+	}
+
+	public void setDataSummaryValues(List<String> summaryValues) {
+		this.dataSummaryValues = summaryValues;
+	}
+	
 	public User getOwner() {
 		return owner;
 	}
@@ -443,15 +479,15 @@ public class CollectRecord extends Record {
 	public void setRootEntityKeyValues(List<String> keys) {
 		this.rootEntityKeyValues = keys;
 	}
-
-	public List<String> getDataSummaryValues() {
-		return dataSummaryValues;
-	}
-
-	public void setDataSummaryValues(List<String> summaryValues) {
-		this.dataSummaryValues = summaryValues;
+	
+	public List<String> getSummaryValues() {
+		return summaryValues;
 	}
 	
+	public void setSummaryValues(List<String> summaryValues) {
+		this.summaryValues = summaryValues;
+	}
+
 	public List<String> getQualifierValues() {
 		return qualifierValues;
 	}

@@ -107,7 +107,7 @@ public class RecordSummaryProxy implements Proxy {
 	public List<Integer> getEntityCounts() {
 		return summary.getEntityCounts();
 	}
-
+	
 	@ExternalizedProperty
 	public boolean isEntryComplete() {
 		if(summary.getStep() != null) {
@@ -138,6 +138,11 @@ public class RecordSummaryProxy implements Proxy {
 	@ExternalizedProperty
 	public Map<Step, StepSummary> getStepSummaries() {
 		return summary.getStepSummaries();
+	}
+	
+	@ExternalizedProperty
+	public List<String> getSummaryValues() {
+		return summary.getCurrentStepSummary().getSummaryValues();
 	}
 	
 	@ExternalizedProperty

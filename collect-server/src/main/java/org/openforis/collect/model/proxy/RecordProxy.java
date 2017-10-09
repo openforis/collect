@@ -134,6 +134,11 @@ public class RecordProxy implements Proxy {
 	public List<Integer> getEntityCounts() {
 		return record.getEntityCounts();
 	}
+	
+	@ExternalizedProperty
+	public List<String> getSummaryValues() {
+		return record.getSummaryValues();
+	}
 
 	@ExternalizedProperty
 	public boolean isEntryComplete() {

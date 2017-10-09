@@ -9,8 +9,8 @@ public class CodeAttributeDefView extends AttributeDefView {
 	private int codeListId;
 
 	public CodeAttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames,
-			boolean key, boolean multiple, int codeListId) {
-		super(id, name, label, type, fieldNames, key, multiple);
+			boolean key, boolean multiple, boolean showInRecordSummaryList, int codeListId) {
+		super(id, name, label, type, fieldNames, key, multiple, showInRecordSummaryList);
 		this.codeListId = codeListId;
 	}
 	

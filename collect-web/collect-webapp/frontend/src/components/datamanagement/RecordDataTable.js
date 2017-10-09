@@ -130,8 +130,13 @@ class RecordDataTable extends Component {
 		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
 
 		function rootEntityKeyFormatter(cell, row) {
-			var keyIdx = this.name.substring(3) - 1;
-			return row.rootEntityKeys[keyIdx];
+			var idx = this.name.substring(3) - 1;
+			return row.rootEntityKeys[idx];
+		}
+
+		function shownInSummaryListFormatter(cell, row) {
+			var idx = this.name.substring(5) - 1;
+			return row.summaryValues[idx];
 		}
 
 		function usernameFormatter(cell, row) {
@@ -146,6 +151,12 @@ class RecordDataTable extends Component {
 			<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter} width="80"
 				editable={false} dataSort filter={ { type: 'TextFilter' } }>{keyAttr.label}</TableHeaderColumn>)
 		columns = columns.concat(keyAttributeColumns)
+
+		const attributeDefsShownInSummaryList = survey.schema.firstRootEntityDefinition.attributeDefinitionsShownInRecordSummaryList
+		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => 
+			<TableHeaderColumn key={'shown'+(i+1)} dataField={'shown'+(i+1)} dataFormat={shownInSummaryListFormatter} width="80"
+				editable={false} dataSort filter={ { type: 'TextFilter' } }>{attr.label}</TableHeaderColumn>)
+		columns = columns.concat(attributeDefsShownInSummaryListColumns)
 
 		columns.push(
 			<TableHeaderColumn key="errors" dataField="errors"

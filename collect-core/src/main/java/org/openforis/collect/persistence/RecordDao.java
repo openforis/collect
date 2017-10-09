@@ -744,6 +744,10 @@ public class RecordDao extends JooqDaoSupport {
 		c.setDataModifiedDate(r.getValue(OFC_RECORD_DATA.DATE_MODIFIED));
 		c.setDataCreatedBy(createDetachedUser(r.getValue(OFC_RECORD_DATA.CREATED_BY)));
 		c.setDataModifiedBy(createDetachedUser(r.getValue(OFC_RECORD_DATA.MODIFIED_BY)));
+		c.setDataRootEntityKeyValues(getFieldValues(r, rootEntityDefn.getKeyAttributeDefinitions(), RECORD_DATA_KEY_FIELDS, String.class));
+		c.setDataEntityCounts(getFieldValues(r, schema.getCountableEntitiesInRecordList(rootEntityDefn), RECORD_DATA_COUNT_FIELDS, Integer.class));
+		c.setDataQualifierValues(getFieldValues(r, schema.getQualifierAttributeDefinitions(rootEntityDefn), RECORD_DATA_QUALIFIER_FIELDS, String.class));
+		c.setDataSummaryValues(getFieldValues(r, schema.getSummaryAttributeDefinitions(rootEntityDefn), RECORD_DATA_SUMMARY_FIELDS, String.class));
 		
 		String state = r.getValue(OFC_RECORD.STATE);
 		c.setState(state == null ? null : State.fromCode(state));
@@ -754,12 +758,10 @@ public class RecordDao extends JooqDaoSupport {
 		Entity rootEntity = c.getRootEntity();
 		modelSerializer.mergeFrom(data, rootEntity);
 
-		// create list of keys
-		EntityDefinition rootEntityDef = c.getRootEntity().getDefinition();
-		c.setRootEntityKeyValues(getFieldValues(r, rootEntityDef.getKeyAttributeDefinitions(), RECORD_KEY_FIELDS, String.class));
-		c.setEntityCounts(getFieldValues(r, schema.getCountableEntitiesInRecordList(rootEntityDef), RECORD_COUNT_FIELDS, Integer.class));
-		c.setQualifierValues(getFieldValues(r, schema.getQualifierAttributeDefinitions(rootEntityDef), RECORD_QUALIFIER_FIELDS, String.class));
-		c.setDataSummaryValues(getFieldValues(r, schema.getSummaryAttributeDefinitions(rootEntityDef), RECORD_SUMMARY_FIELDS, String.class));
+		c.setRootEntityKeyValues(getFieldValues(r, rootEntityDefn.getKeyAttributeDefinitions(), RECORD_KEY_FIELDS, String.class));
+		c.setEntityCounts(getFieldValues(r, schema.getCountableEntitiesInRecordList(rootEntityDefn), RECORD_COUNT_FIELDS, Integer.class));
+		c.setQualifierValues(getFieldValues(r, schema.getQualifierAttributeDefinitions(rootEntityDefn), RECORD_QUALIFIER_FIELDS, String.class));
+		c.setSummaryValues(getFieldValues(r, schema.getSummaryAttributeDefinitions(rootEntityDefn), RECORD_SUMMARY_FIELDS, String.class));
 		return c;
 	}
 

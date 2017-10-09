@@ -179,27 +179,42 @@ export class EntityDefinition extends NodeDefinition {
     }
     
     get keyAttributeDefinitions() {
-        let result = [];
-        let queue = [];
+        return this.findDefinitions(function(n) {
+            return n instanceof AttributeDefinition && n.key
+        }, true)
+    }
+
+    get attributeDefinitionsShownInRecordSummaryList() {
+        return this.findDefinitions(function(n) {
+            return n instanceof AttributeDefinition && n.showInRecordSummaryList
+        })
+    }
+
+    visit(visitor, onlyInsideSingleEntities) {
+        const queue = [];
         
-        for (var i = 0; i < this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             queue.push(this.children[i]);
         }
         while (queue.length > 0) {
-            let item = queue.shift();
-            if (item instanceof AttributeDefinition) {
-                let attrDef = item;
-                if (attrDef.key) {
-                    result.push(item);
-                }
-            }
-            if (item instanceof EntityDefinition && ! item.multiple) {
-                for (var i = 0; i < item.children.length; i++) {
+            const item = queue.shift();
+            visitor(item)
+            if (item instanceof EntityDefinition && !(onlyInsideSingleEntities && item.multiple)) {
+                for (let i = 0; i < item.children.length; i++) {
                     queue.push(item.children[i]);
                 }
             }
         }
-        return result;
+    }
+
+    findDefinitions(predicate, onlyInsideSingleEntities) {
+        const result = []
+        this.visit(function(n) {
+            if (predicate(n)) {
+                result.push(n)
+            }
+        }, onlyInsideSingleEntities)
+        return result
     }
 }
 
