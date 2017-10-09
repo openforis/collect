@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import { Bar, Line } from 'react-chartjs-2';
-import { Dropdown, DropdownMenu, DropdownItem, Input, Progress } from 'reactstrap';
-import { connect } from 'react-redux'
-import Dates from 'utils/Dates';
+import { Dropdown, DropdownMenu, DropdownItem, Input, Label, Progress, Row, Col } from 'reactstrap';
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+import 'react-datepicker/dist/react-datepicker.css';import { connect } from 'react-redux'
 
+import Dates from 'utils/Dates';
 import ServiceFactory from 'services/ServiceFactory'
 
 const DAYS_OF_WEEK_ABBREVIATED = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Dicember']
 
-const createdRecordsLineColor = '#20a8d8';
-const modifiedRecordsLineColor = '#4dbd74';
-const enteredRecordsLineColor = '#63c2de';
-const brandWarning = '#f8cb00';
-const brandDanger = '#f86c6b';
+const createdRecordsLineColor = '#FF9933';
+const modifiedRecordsLineColor = '#63c2de';
+const enteredRecordsLineColor = '#4dbd74';
 
 class DashboardPage extends Component {
 
@@ -23,14 +23,22 @@ class DashboardPage extends Component {
     this.toggle = this.toggle.bind(this);
     this.loadSurveyStats = this.loadSurveyStats.bind(this)
     this.handleTimeUnitChange = this.handleTimeUnitChange.bind(this)
+    this.handlePeriodFromChange = this.handlePeriodFromChange.bind(this)
+    this.handlePeriodToChange = this.handlePeriodToChange.bind(this)
+    this.handleRecordTypeVisibilityChange = this.handleRecordTypeVisibilityChange.bind(this)
 
     this.state = {
       dropdownOpen: false,
       dailyChartData: null,
       monthlyChartData: null,
       yearlyChartData: null,
-      periodStart: null,
+      periodFrom: null,
+      minPeriodFrom: null,
       periodTo: null,
+      maxPeriodTo: null,
+      createdRecordsVisible: true,
+      modifiedRecordsVisible: true,
+      enteredRecordsVisible: true,
       timeUnit: 'MONTH',
       noRecordsFound: false
     };
@@ -63,11 +71,13 @@ class DashboardPage extends Component {
           noRecordsFound: true
         })
       } else {
-        const periodStart = stats.period[0]
-        const periodTo = stats.period[1]
-        const dailyChartData = this.createChartData('DAY', stats, periodStart, periodTo)
-        const monthlyChartData = this.createChartData('MONTH', stats, periodStart, periodTo)
-        const yearlyChartData = this.createChartData('YEAR', stats, periodStart, periodTo)
+        const minPeriodFrom = stats.period[0]
+        const maxPeriodTo = stats.period[1]
+        const periodFrom = minPeriodFrom
+        const periodTo = maxPeriodTo
+        const dailyChartData = this.createChartData('DAY', stats, periodFrom, periodTo)
+        const monthlyChartData = this.createChartData('MONTH', stats, periodFrom, periodTo)
+        const yearlyChartData = this.createChartData('YEAR', stats, periodFrom, periodTo)
   
         this.setState({
           noRecordsFound: false,
@@ -75,7 +85,9 @@ class DashboardPage extends Component {
           dailyChartData: dailyChartData,
           monthlyChartData: monthlyChartData,
           yearlyChartData: yearlyChartData,
-          periodStart: periodStart,
+          minPeriodFrom: minPeriodFrom,
+          maxPeriodTo: maxPeriodTo,
+          periodFrom: periodFrom,
           periodTo: periodTo
         })
       }
@@ -84,14 +96,15 @@ class DashboardPage extends Component {
 
   updateChartsData() {
     this.setState({
-      ailyChartData: this.createChartData('DAY'),
+      dailyChartData: this.createChartData('DAY'),
       monthlyChartData: this.createChartData('MONTH'),
       yearlyChartData: this.createChartData('YEAR')
     })
   }
 
-  createChartData(timeUnit, stats, periodStart = this.state.periodStart, periodTo = this.state.periodTo) {
-    const startDate = incrementDate(periodStart, -1) //consider one day/month/year less
+  createChartData(timeUnit, stats = this.state.stats, periodFrom = this.state.periodFrom, periodTo = this.state.periodTo,
+      createdRecordsVisible = this.state.createdRecordsVisible, modifiedRecordsVisible = this.state.modifiedRecordsVisible, enteredRecordsVisible = this.state.enteredRecordsVisible ) {
+    const startDate = incrementDate(periodFrom, -1) //consider one day/month/year less
     const endDate = incrementDate(periodTo, 1) //consider one day/month/year more
 
     const createdRecordsData = {
@@ -244,27 +257,53 @@ class DashboardPage extends Component {
       }
     }
 
+    const datasets = []
+    if (createdRecordsVisible) {
+      datasets.push(createdRecordsData)
+    }
+    if (modifiedRecordsVisible) {
+      datasets.push(modifiedRecordsData)
+    }
+    if (enteredRecordsVisible) {
+      datasets.push(enteredRecordsData)
+    }
+
     return {
       data: {
         labels: labels,
-        datasets: [createdRecordsData, modifiedRecordsData, enteredRecordsData]
+        datasets: datasets
       },
       opts: opts
     }
   }
 
   handleTimeUnitChange(event) {
-    this.setState({ timeUnit: event.target.value })
+    this.setState({ timeUnit: event.target.value }, this.updateChartsData)
   }
 
-  handlePeriodStartChange(event) {
-    this.setState({periodStart: new Date(event.target.value)})
+  handlePeriodFromChange(moment) {
+    this.setState({periodFrom: moment.toDate()}, this.updateChartsData)
   }
 
-  handlePeriodToChange(event) {
-    this.setState({periodTo: new Date(event.target.value)})
+  handlePeriodToChange(moment) {
+    this.setState({periodTo: moment.toDate()}, this.updateChartsData)
   }
-   
+  
+  handleRecordTypeVisibilityChange(event) {
+    const checked = event.target.checked
+    switch(event.target.id) {
+      case 'createdRecordsVisibilityCheckBox':
+        this.setState({createdRecordsVisible: checked}, this.updateChartsData)
+        break
+      case 'modifiedRecordsVisibilityCheckBox':
+        this.setState({modifiedRecordsVisible: checked}, this.updateChartsData)
+        break
+      case 'enteredRecordsVisibilityCheckBox':
+        this.setState({enteredRecordsVisible: checked}, this.updateChartsData)
+        break
+    }
+  }
+
   render() {
     if (this.state.noRecordsFound) {
       return <div>No records found</div>
@@ -302,13 +341,38 @@ class DashboardPage extends Component {
         <div className="card">
           <div className="card-block">
             <div className="row">
-              <div className="col-sm-5">
+              <div className="col-sm-3">
                 <h4 className="card-title mb-0">Records statistics</h4>
-                <div>
-                    <Input type="date" name="periodStart" id="periodStart" placeholder="from" onChange={this.handlePeriodStartChange} />
-                    <Input type="date" name="periodTo" id="periodTo" placeholder="to" onChange={this.handlePeriodToChange} />
-                </div>
               </div>
+              <div className="col-sm-9 btn-toolbar float-right">
+                <label>From</label>
+                <DatePicker dateFormat="DD/MM/YYYY"
+                  selected={moment(this.state.periodFrom)} 
+                  minDate={moment(this.state.minPeriodFrom)}
+                  maxDate={moment(this.state.maxPeriodTo)}
+                  onChange={this.handlePeriodFromChange} />
+                <label>To</label>
+                <DatePicker dateFormat="DD/MM/YYYY" 
+                  selected={moment(this.state.periodTo)} 
+                  minDate={moment(this.state.minPeriodFrom)}
+                  maxDate={moment(this.state.maxPeriodTo)}
+                  onChange={this.handlePeriodToChange} />
+
+                <label for="createdRecordsVisibilityCheckBox" style={{color: createdRecordsLineColor}}>
+                  <input id="createdRecordsVisibilityCheckBox" type="checkbox" checked={this.state.createdRecordsVisible}
+                    onChange={this.handleRecordTypeVisibilityChange} />Created
+                </label>
+                <label for="modifiedRecordsVisibilityCheckBox" style={{color: modifiedRecordsLineColor}}>
+                  <input id="modifiedRecordsVisibilityCheckBox" type="checkbox" checked={this.state.modifiedRecordsVisible}
+                    onChange={this.handleRecordTypeVisibilityChange} />Modified
+                </label>
+                <label for="enteredRecordsVisibilityCheckBox" style={{color: enteredRecordsLineColor}}>
+                  <input id="enteredRecordsVisibilityCheckBox" type="checkbox" checked={this.state.enteredRecordsVisible}
+                    onChange={this.handleRecordTypeVisibilityChange} />Entered
+                </label>
+              </div>
+              
+
               {/*
               <div className="col-sm-7 hidden-sm-down">
                 <div className="btn-toolbar float-right" role="toolbar" aria-label="Toolbar with button groups">

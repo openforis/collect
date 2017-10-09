@@ -17,6 +17,7 @@ export default class Dates {
         }
         const d1 = new Date(date1.getTime())
         const d2 = new Date(date2.getTime())
+        
         switch(datePart) {
             case Dates.YEARS:
                 d1.setMonth(0)
@@ -25,6 +26,7 @@ export default class Dates {
                 d1.setDate(1)
                 d2.setDate(1)
             case Dates.DAYS:
+            default:
                 d1.setHours(0, 0, 0, 0)
                 d2.setHours(0, 0, 0, 0)
         }
