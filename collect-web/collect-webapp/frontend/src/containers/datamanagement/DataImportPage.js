@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
 
 import ServiceFactory from 'services/ServiceFactory'
-import JobMonitorModal from 'containers/job/JobMonitorModal'
+import JobMonitorModal from 'components/JobMonitorModal'
 
 class DataImportPage extends Component {
 

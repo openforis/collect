@@ -4,7 +4,7 @@ import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Containe
 import { connect } from 'react-redux';
 
 import ServiceFactory from 'services/ServiceFactory'
-import JobMonitorModal from 'containers/job/JobMonitorModal'
+import JobMonitorModal from 'components/JobMonitorModal'
 import SchemaTreeView from './SchemaTreeView'
 
 

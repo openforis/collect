@@ -11,9 +11,10 @@ import ServiceFactory from 'services/ServiceFactory'
 const DAYS_OF_WEEK_ABBREVIATED = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Dicember']
 
-const createdRecordsLineColor = '#FF9933';
+const createdRecordsLineColor = '#993300';
 const modifiedRecordsLineColor = '#63c2de';
-const enteredRecordsLineColor = '#4dbd74';
+const enteredRecordsLineColor = '#FF9900';
+const cleansedRecordsLineColor = '#009900';
 
 class DashboardPage extends Component {
 
@@ -39,6 +40,7 @@ class DashboardPage extends Component {
       createdRecordsVisible: true,
       modifiedRecordsVisible: true,
       enteredRecordsVisible: true,
+      cleansedRecordsVisible: true,
       timeUnit: 'MONTH',
       noRecordsFound: false
     };
@@ -103,7 +105,8 @@ class DashboardPage extends Component {
   }
 
   createChartData(timeUnit, stats = this.state.stats, periodFrom = this.state.periodFrom, periodTo = this.state.periodTo,
-      createdRecordsVisible = this.state.createdRecordsVisible, modifiedRecordsVisible = this.state.modifiedRecordsVisible, enteredRecordsVisible = this.state.enteredRecordsVisible ) {
+      createdRecordsVisible = this.state.createdRecordsVisible, modifiedRecordsVisible = this.state.modifiedRecordsVisible, 
+      enteredRecordsVisible = this.state.enteredRecordsVisible, cleansedRecordsVisible = this.state.cleansedRecordsVisible ) {
     const startDate = incrementDate(periodFrom, -1) //consider one day/month/year less
     const endDate = incrementDate(periodTo, 1) //consider one day/month/year more
 
@@ -120,6 +123,15 @@ class DashboardPage extends Component {
       label: 'Entered records',
       backgroundColor: 'transparent',
       borderColor: enteredRecordsLineColor,
+      pointHoverBackgroundColor: '#fff',
+      fill: false,
+      data: []
+    }
+
+    const cleansedRecordsData = {
+      label: 'Cleansed records',
+      backgroundColor: 'transparent',
+      borderColor: cleansedRecordsLineColor,
       pointHoverBackgroundColor: '#fff',
       fill: false,
       data: []
@@ -225,6 +237,10 @@ class DashboardPage extends Component {
         const entered = pointStats.entered
         maxEnteredRecords = Math.max(entered, maxEnteredRecords)
         enteredRecordsData.data.push(entered)
+
+        const cleansed = pointStats.cleansed
+        maxCleansedRecords = Math.max(cleansed, maxCleansedRecords)
+        cleansedRecordsData.data.push(cleansed)
       }
       currentDate = incrementDate(currentDate)
     }
@@ -267,6 +283,9 @@ class DashboardPage extends Component {
     if (enteredRecordsVisible) {
       datasets.push(enteredRecordsData)
     }
+    if (cleansedRecordsVisible) {
+      datasets.push(cleansedRecordsData)
+    }
 
     return {
       data: {
@@ -301,6 +320,10 @@ class DashboardPage extends Component {
       case 'enteredRecordsVisibilityCheckBox':
         this.setState({enteredRecordsVisible: checked}, this.updateChartsData)
         break
+      case 'cleansedRecordsVisibilityCheckBox':
+        this.setState({cleansedRecordsVisible: checked}, this.updateChartsData)
+        break
+      
     }
   }
 
@@ -341,35 +364,56 @@ class DashboardPage extends Component {
         <div className="card">
           <div className="card-block">
             <div className="row">
-              <div className="col-sm-3">
+              <div className="col-sm-12">
                 <h4 className="card-title mb-0">Records statistics</h4>
               </div>
-              <div className="col-sm-9 btn-toolbar float-right">
-                <label>From</label>
-                <DatePicker dateFormat="DD/MM/YYYY"
-                  selected={moment(this.state.periodFrom)} 
-                  minDate={moment(this.state.minPeriodFrom)}
-                  maxDate={moment(this.state.maxPeriodTo)}
-                  onChange={this.handlePeriodFromChange} />
-                <label>To</label>
-                <DatePicker dateFormat="DD/MM/YYYY" 
-                  selected={moment(this.state.periodTo)} 
-                  minDate={moment(this.state.minPeriodFrom)}
-                  maxDate={moment(this.state.maxPeriodTo)}
-                  onChange={this.handlePeriodToChange} />
-
-                <label for="createdRecordsVisibilityCheckBox" style={{color: createdRecordsLineColor}}>
-                  <input id="createdRecordsVisibilityCheckBox" type="checkbox" checked={this.state.createdRecordsVisible}
-                    onChange={this.handleRecordTypeVisibilityChange} />Created
-                </label>
-                <label for="modifiedRecordsVisibilityCheckBox" style={{color: modifiedRecordsLineColor}}>
-                  <input id="modifiedRecordsVisibilityCheckBox" type="checkbox" checked={this.state.modifiedRecordsVisible}
-                    onChange={this.handleRecordTypeVisibilityChange} />Modified
-                </label>
-                <label for="enteredRecordsVisibilityCheckBox" style={{color: enteredRecordsLineColor}}>
-                  <input id="enteredRecordsVisibilityCheckBox" type="checkbox" checked={this.state.enteredRecordsVisible}
-                    onChange={this.handleRecordTypeVisibilityChange} />Entered
-                </label>
+              <div className="row">
+                <fieldset>
+                  <legend>Period</legend>
+                  <form className="form-inline">
+                    <label>From: </label>
+                    <DatePicker dateFormat="DD/MM/YYYY"
+                      selected={moment(this.state.periodFrom)} 
+                      minDate={moment(this.state.minPeriodFrom)}
+                      maxDate={moment(this.state.maxPeriodTo)}
+                      onChange={this.handlePeriodFromChange} />
+                    <label>To: </label>
+                    <DatePicker dateFormat="DD/MM/YYYY" 
+                      selected={moment(this.state.periodTo)} 
+                      minDate={moment(this.state.minPeriodFrom)}
+                      maxDate={moment(this.state.maxPeriodTo)}
+                      onChange={this.handlePeriodToChange} />
+                  </form>
+                </fieldset>
+                <fieldset>
+                  <legend>Visible Record Types</legend>
+                  <form className="form-inline">
+                    <label for="createdRecordsVisibilityCheckBox" style={{color: createdRecordsLineColor}}>
+                      <input id="createdRecordsVisibilityCheckBox" type="checkbox"
+                        className="form-control form-check-input" 
+                        checked={this.state.createdRecordsVisible}
+                        onChange={this.handleRecordTypeVisibilityChange} />Created
+                    </label>
+                    <label for="modifiedRecordsVisibilityCheckBox" style={{color: modifiedRecordsLineColor}}>
+                      <input id="modifiedRecordsVisibilityCheckBox" type="checkbox"
+                        className="form-control form-check-input"
+                        checked={this.state.modifiedRecordsVisible}
+                        onChange={this.handleRecordTypeVisibilityChange} />Modified
+                    </label>
+                    <label for="enteredRecordsVisibilityCheckBox" style={{color: enteredRecordsLineColor}}>
+                      <input id="enteredRecordsVisibilityCheckBox" type="checkbox"
+                        className="form-control form-check-input" 
+                        checked={this.state.enteredRecordsVisible}
+                        onChange={this.handleRecordTypeVisibilityChange} />Entered
+                    </label>
+                    <label for="cleansedRecordsVisibilityCheckBox" style={{color: cleansedRecordsLineColor}}>
+                      <input id="cleansedRecordsVisibilityCheckBox" type="checkbox"
+                        className="form-control form-check-input" 
+                        checked={this.state.cleansedRecordsVisible}
+                        onChange={this.handleRecordTypeVisibilityChange} />Cleansed
+                    </label>
+                  </form>
+                </fieldset>
               </div>
               
 

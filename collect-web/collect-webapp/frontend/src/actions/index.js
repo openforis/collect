@@ -30,6 +30,9 @@ export const RECEIVE_USER_GROUPS = 'RECEIVE_USER_GROUPS'
 export const RECEIVE_USER_GROUP = 'RECEIVE_USER_GROUP'
 export const INVALIDATE_USER_GROUPS = 'INVALIDATE_USER_GROUPS'
 
+export const START_JOB_MONITOR = 'START_JOB_MONITOR'
+export const CLOSE_JOB_MONITOR = 'CLOSE_JOB_MONITOR'
+
 //LOGIN
 function loginPending() {
 	return {
@@ -238,5 +241,23 @@ export function invalidateUserGroups(userGroups) {
 	return {
 		type: INVALIDATE_USER_GROUPS,
 		userGroups
+	}
+}
+
+export function startJobMonitor(jobId, title, okButtonLabel = 'Ok', handleOkButtonClick = null, handleCancelButtonClick = null, handleJobCompleted = null) {
+	return {
+		type: START_JOB_MONITOR,
+		jobId: jobId,
+		title: title,
+		okButtonLabel: okButtonLabel,
+		handleOkButtonClick: handleOkButtonClick,
+		handleCancelButtonClick: handleCancelButtonClick,
+		handleJobCompleted: handleJobCompleted
+	}
+}
+
+export function closeJobMonitor() {
+	return {
+		type: CLOSE_JOB_MONITOR
 	}
 }

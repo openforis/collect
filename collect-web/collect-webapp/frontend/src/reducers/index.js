@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+import currentJob from './currentJob'
 import login from './login'
 import session from './session'
 import surveySummaries from './surveySummaries'
@@ -7,6 +8,7 @@ import users from './users'
 import userGroups from './userGroups'
 
 const rootReducer = combineReducers({
+	currentJob,
 	login,
 	session,
 	preferredSurvey,

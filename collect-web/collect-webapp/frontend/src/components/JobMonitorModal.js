@@ -43,6 +43,10 @@ export default class JobMonitorModal extends Component {
                 open: true,
                 loading: true
             })
+        } else if (! nextProps.open) {
+            this.setState({
+                open: false
+            })
         }
     }
 

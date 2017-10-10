@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import RecordDataTable from 'components/datamanagement/RecordDataTable';
 import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 import ServiceFactory from 'services/ServiceFactory'
 import Modals from 'components/Modals'

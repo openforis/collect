@@ -6,6 +6,7 @@ import Sidebar from 'components/Sidebar';
 import Breadcrumb from 'components/Breadcrumb';
 import Aside from 'components/Aside';
 import Footer from 'components/Footer';
+import CurrentJobMonitorModal from 'containers/CurrentJobMonitorModal'
 
 import HomePage from 'containers/HomePage'
 import DashboardPage from 'containers/DashboardPage'
@@ -51,6 +52,7 @@ class App extends Component {
             <Aside />
           </div>
           <Footer />
+          <CurrentJobMonitorModal />
         </div>
     );
   }

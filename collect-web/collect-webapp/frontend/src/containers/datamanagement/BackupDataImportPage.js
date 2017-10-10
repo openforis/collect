@@ -8,8 +8,9 @@ import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import * as Formatters from 'components/datatable/formatters'
 import BackupDataImportSummaryForm from 'components/datamanagement/BackupDataImportSummaryForm'
 import ServiceFactory from 'services/ServiceFactory'
-import JobMonitorModal from 'containers/job/JobMonitorModal'
+import JobMonitorModal from 'components/JobMonitorModal'
 import Arrays from 'utils/Arrays'
+import * as Actions from 'actions';
 
 class BackupDataImportPage extends Component {
 
@@ -46,7 +47,9 @@ class BackupDataImportPage extends Component {
         ServiceFactory.recordService.generateBackupDataImportSummary(this.props.survey, 
             this.props.survey.schema.firstRootEntityDefinition.name,
             this.state.fileToBeImported).then(job => {
-                this.setState({summaryGenerationJobStatusModalOpen: true, dataImportSummaryJobId: job.id})
+                this.props.dispatch(Actions.startJobMonitor(job.id, 'Generating data import summary', 'Done', null, null, this.handleRecordSummaryGenerationComplete))
+
+                //this.setState({summaryGenerationJobStatusModalOpen: true, dataImportSummaryJobId: job.id})
             })
     }
 
@@ -58,7 +61,8 @@ class BackupDataImportPage extends Component {
     handleRecordSummaryGenerationComplete() {
         const $this = this
         ServiceFactory.recordService.loadBackupDataImportSummary(this.props.survey).then(summary => {
-            $this.setState({summaryGenerationJobStatusModalOpen: false, 
+            this.props.dispatch(Actions.closeJobMonitor())
+            $this.setState({ 
                 importStep: BackupDataImportPage.SHOW_IMPORT_SUMMARY, 
                 dataImportSummary: summary,
                 selectedRecordsToImport: summary.recordsToImport,
