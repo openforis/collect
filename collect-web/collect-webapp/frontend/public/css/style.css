@@ -2,7 +2,7 @@
  * CoreUI - Open Source Bootstrap Admin Template
  * @version v1.0.0-alpha.6
  * @link http://coreui.io
- * Copyright (c) 2017 creativeLabs Łukasz Holeczek
+ * Copyright (c) 2017 creativeLabs Å�ukasz Holeczek
  * @license MIT
  */
 /*! normalize.css v5.0.0 | MIT License | github.com/necolas/normalize.css */
@@ -476,13 +476,12 @@ textarea {
   overflow: auto;
   resize: vertical; }
 
-/*
 fieldset {
   min-width: 0;
   padding: 0;
   margin: 0;
   border: 0; }
-*/
+
 legend {
   display: block;
   width: 100%;
@@ -764,9 +763,8 @@ pre {
 .row {
   display: flex;
   flex-wrap: wrap;
-  margin-right: 0px;
-  margin-left: 0px; }
-  /*
+  margin-right: -15px;
+  margin-left: -15px; }
   @media (min-width: 576px) {
     .row {
       margin-right: -15px;
@@ -783,7 +781,7 @@ pre {
     .row {
       margin-right: -15px;
       margin-left: -15px; } }
-      */
+
 .no-gutters {
   margin-right: 0;
   margin-left: 0; }
@@ -7555,10 +7553,10 @@ base-chart.chart {
     padding: 0.5rem 1rem;
     margin-right: 0;
     background-color: #fff;
-    background-image: url("../img/of_collect_logo_horizontal_of.png");
+    background-image: url("../img/logo.png");
     background-repeat: no-repeat;
-    background-position: left center;
-    background-size: 155px;
+    background-position: center center;
+    background-size: 70px auto;
     border-bottom: 1px solid #cfd8dc; }
   .app-header.navbar .navbar-nav {
     flex-direction: row;
@@ -8577,7 +8575,7 @@ app-root {
     flex: 1;
     min-width: 0; }
   .app-body .sidebar {
-    flex: 0 0 400px;
+    flex: 0 0 200px;
     order: -1; }
   .app-body .aside-menu {
     flex: 0 0 250px; }
@@ -8922,75 +8920,3 @@ hr.transparent {
     border-right-color: #f86c6b; }
   *[dir="rtl"] .callout-success {
     border-right-color: #4dbd74; }
-
-/**
-* Customuzation for OF Collect
-**/
-.container.formItems {
-  margin-left: 0px;
-  margin-right: 0px;
-}
-
-@media (min-width: 576px) {
-  .container.formItems {
-    width: 540px;
-    max-width: 100%; } }
-@media (min-width: 768px) {
-  .container.formItems {
-    width: 720px;
-    max-width: 100%; } }
-@media (min-width: 992px) {
-  .container.formItems {
-    width: 960px;
-    max-width: 100%; } }
-@media (min-width: 1200px) {
-  .container.formItems {
-    width: 1140px;
-    max-width: 100%; } }
-@media (min-width: 1400px) {
-    .container.formItems {
-      width: 1380px;
-      max-width: 100%; } }
-@media (min-width: 1600px) {
-  .container.formItems {
-    width: 1580px;
-    max-width: 100%; } }
-
-span.checked,
-span.redCircle,
-span.greenCircle, 
-span.equalSign {
-  display: block;
-  width: 100%;
-  height: 32px;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 16px;
-}
-
-span.checked {
-  background-image: url('../img/generic/tick_mark_32x32.png');
-}
-
-span.checked.large {
-  background-image: url('../img/generic/tick_mark_64x64.png');
-  background-size: 64px;
-  height: 64px;
-}
-
-span.checked.small {
-  height: 16px;
-  background-size: 16px;
-}
-
-span.redCircle {
-  background-image: url('../img/generic/red_circle_32x32.png');
-}
-
-span.greenCircle {
-  background-image: url('../img/generic/green_circle_32x32.png');
-}
-
-span.equalSign {
-  background-image: url('../img/generic/equal_sign_32x32.png');
-}

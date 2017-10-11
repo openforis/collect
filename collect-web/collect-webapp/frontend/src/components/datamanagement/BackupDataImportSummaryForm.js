@@ -24,13 +24,13 @@ export default class BackupDataImportSummaryForm extends Component {
             let iconClass
             switch(cell) {
                 case -1:
-                    iconClass = "redCircle"
+                    iconClass = "circle-red"
                     break
                 case 0:
-                    iconClass = "equalSign"
+                    iconClass = "equal-sign"
                     break
                 case 1:
-                    iconClass = "greenCircle"
+                    iconClass = "circle-green"
                     break
             }
             return <span className={iconClass}></span>
