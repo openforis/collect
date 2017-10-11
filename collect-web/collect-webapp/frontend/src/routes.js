@@ -24,6 +24,14 @@ const routes = [
     name: "Export Data"
   },
   {
+    path: '/datamanagement/csvexport',
+    name: "Export to CSV"
+  },
+  {
+    path: '/datamanagement/backup',
+    name: "Backup data"
+  },
+  {
     path: '/datamanagement/import',
     name: "Import Data"
   },

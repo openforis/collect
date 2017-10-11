@@ -25,7 +25,8 @@ class DataManagementPage extends Component {
 		this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
 		this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
 		this.navigateToItemEditView = this.navigateToItemEditView.bind(this)
-		this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
+		this.handleExportToCsvButtonClick = this.handleExportToCsvButtonClick.bind(this)
+		this.handleBackupButtonClick = this.handleBackupButtonClick.bind(this)
 		this.handleImportButtonClick = this.handleImportButtonClick.bind(this)
 	}
 
@@ -88,8 +89,12 @@ class DataManagementPage extends Component {
 		return items.length === 1 ? items[0] : null;
 	}
 
-	handleExportButtonClick() {
-		this.props.history.push('/datamanagement/export')
+	handleExportToCsvButtonClick() {
+		this.props.history.push('/datamanagement/csvexport')
+	}
+
+	handleBackupButtonClick() {
+		this.props.history.push('/datamanagement/backup')
 	}
 
 	handleImportButtonClick() {
@@ -122,10 +127,13 @@ class DataManagementPage extends Component {
 				</Row>
 				<Row>
 					<Col>
-						<Button color="info" onClick={this.handleExportButtonClick}>Export</Button>
+						<Button color="info" onClick={this.handleExportToCsvButtonClick}>Export to CSV</Button>
 					</Col>
 					<Col>
-						<Button color="info" onClick={this.handleImportButtonClick}>Import</Button>
+						<Button color="info" onClick={this.handleBackupButtonClick}>Backup</Button>
+					</Col>
+					<Col>
+						<Button color="warning" onClick={this.handleImportButtonClick}>Import</Button>
 					</Col>
 				</Row>
 			</Container>

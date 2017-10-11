@@ -17,7 +17,8 @@ import UsersPage from 'containers/users/UsersPage'
 import UserGroupsPage from 'containers/users/UserGroupsPage'
 import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
 import DataManagementPage from 'containers/datamanagement/DataManagementPage'
-import DataExportPage from 'containers/datamanagement/DataExportPage'
+import CsvDataExportPage from 'containers/datamanagement/CsvDataExportPage'
+import BackupDataExportPage from 'containers/datamanagement/BackupDataExportPage'
 import DataImportPage from 'containers/datamanagement/DataImportPage'
 import BackupDataImportPage from 'containers/datamanagement/BackupDataImportPage'
 import OldClientRecordEditPage from 'containers/datamanagement/OldClientRecordEditPage'
@@ -36,7 +37,8 @@ class App extends Component {
                   <Route path="/" exact name="HomePage" component={HomePage}/>
                   <Route path="/dashboard" exact name="Dashboard" component={DashboardPage}/>
                   <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage}/>
-                  <Route path="/datamanagement/export" exact name="DataExport" component={DataExportPage}/>
+                  <Route path="/datamanagement/csvexport" exact name="CsvDataExport" component={CsvDataExportPage}/>
+                  <Route path="/datamanagement/backup" exact name="BackupDataExport" component={BackupDataExportPage}/>
                   <Route path="/datamanagement/import" exact name="DataImport" component={DataImportPage}/>
                   <Route path="/datamanagement/import/backup" exact name="BackupDataImport" component={BackupDataImportPage}/>
                   <Route path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage}/>

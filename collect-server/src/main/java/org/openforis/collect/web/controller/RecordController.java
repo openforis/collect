@@ -28,6 +28,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
@@ -118,8 +119,10 @@ public class RecordController extends BasicController implements Serializable {
 	private RecordStatsGenerator recordStatsGenerator;
 
 	private CSVDataExportJob csvDataExportJob;
-	private DataRestoreSummaryJob dataRestoreSummaryJob;
+	private SurveyBackupJob fullBackupJob;
 	
+	private DataRestoreSummaryJob dataRestoreSummaryJob;
+
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
 	public @ResponseBody
 	Map<String, Object> loadData(
@@ -326,7 +329,7 @@ public class RecordController extends BasicController implements Serializable {
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/startcsvexport", method=POST)
-	public @ResponseBody JobView startDataExportJob(
+	public @ResponseBody JobView startCsvDataExportJob(
 			@PathVariable Integer surveyId,
 			@RequestBody CSVExportParametersForm parameters) throws IOException {
 		User user = sessionManager.getSessionState().getUser();
@@ -356,13 +359,43 @@ public class RecordController extends BasicController implements Serializable {
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/csvexportresult.zip", method=GET)
-	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
+	public void downloadCsvExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		File file = csvDataExportJob.getOutputFile();
 		RecordFilter recordFilter = csvDataExportJob.getParameters().getRecordFilter();
 		CollectSurvey survey = recordFilter.getSurvey();
 		String surveyName = survey.getName();
 		Controllers.writeFileToResponse(response, file, 
-				String.format("collect-data-export-%s-%s.zip", surveyName, Dates.formatDate(new Date())), 
+				String.format("collect-csv-data-export-%s-%s.zip", surveyName, Dates.formatDate(new Date())), 
+				Controllers.ZIP_CONTENT_TYPE);
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/startbackupexport", method=POST)
+	public @ResponseBody JobView startBackupDataExportJob(
+			@PathVariable Integer surveyId,
+			@RequestBody BackupDataExportParameters parameters) throws IOException {
+		User user = sessionManager.getSessionState().getUser();
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		RecordFilter filter = new RecordFilter(survey);
+		if (parameters.isOnlyOwnedRecords()) {
+			filter.setOwnerId(user.getId());
+		}
+		
+		fullBackupJob = jobManager.createJob(SurveyBackupJob.class);
+		fullBackupJob.setSurvey(survey);
+		fullBackupJob.setIncludeData(true);
+		fullBackupJob.setIncludeRecordFiles(parameters.isIncludeRecordFiles());
+
+		jobManager.start(fullBackupJob);
+		return new JobView(fullBackupJob);
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/exportresult.collect-data", method=GET)
+	public void downloadBackupExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
+		File file = fullBackupJob.getOutputFile();
+		CollectSurvey survey = fullBackupJob.getSurvey();
+		String surveyName = survey.getName();
+		Controllers.writeFileToResponse(response, file, 
+				String.format("collect-data-export-%s-%s.collect-data", surveyName, Dates.formatDate(new Date())), 
 				Controllers.ZIP_CONTENT_TYPE);
 	}
 	
@@ -462,6 +495,37 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setCaseSensitiveKeyValues(boolean caseSensitiveKeyValues) {
 			this.caseSensitiveKeyValues = caseSensitiveKeyValues;
+		}
+	}
+	
+	public static class BackupDataExportParameters {
+
+		private boolean onlyOwnedRecords;
+		private boolean includeRecordFiles;
+		private List<String> rootEntityKeyValues;
+
+		public boolean isOnlyOwnedRecords() {
+			return onlyOwnedRecords;
+		}
+
+		public void setOnlyOwnedRecords(boolean onlyOwnedRecords) {
+			this.onlyOwnedRecords = onlyOwnedRecords;
+		}
+
+		public boolean isIncludeRecordFiles() {
+			return includeRecordFiles;
+		}
+
+		public void setIncludeRecordFiles(boolean includeRecordFiles) {
+			this.includeRecordFiles = includeRecordFiles;
+		}
+
+		public List<String> getRootEntityKeyValues() {
+			return rootEntityKeyValues;
+		}
+
+		public void setRootEntityKeyValues(List<String> rootEntityKeyValues) {
+			this.rootEntityKeyValues = rootEntityKeyValues;
 		}
 	}
 	

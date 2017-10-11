@@ -41,13 +41,13 @@ class CurrentJobMonitorModal extends Component {
 
     handleOkButtonClick() {
         if (this.props.handleOkButtonClick) {
-            this.props.handleOkButtonClick()
+            this.props.handleOkButtonClick(this.props.job)
         }
     }
     
     handleCancelButtonClick() {
         if (this.props.handleCancelButtonClick) {
-            this.props.handleCancelButtonClick()
+            this.props.handleCancelButtonClick(this.props.job)
         } else {
             this.props.dispatch(Actions.cancelJob(this.props.jobId))
         }
