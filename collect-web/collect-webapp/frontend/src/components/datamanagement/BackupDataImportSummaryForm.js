@@ -42,7 +42,7 @@ export default class BackupDataImportSummaryForm extends Component {
                 .join('<br>')
             return (
                 <div style={{}}>
-                    <span id={row.fileName + '_errorMessageIcon'} className="redCircle"  />
+                    <span id={row.fileName + '_errorMessageIcon'} className="circle-red"  />
                     <Tooltip placement="right" target={row.fileName + '_errorMessageIcon'}>{errorMessage}</Tooltip>
                 </div>
             )

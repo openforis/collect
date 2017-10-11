@@ -142,6 +142,10 @@ public class CollectJobController extends BasicController {
 			return ended;
 		}
 		
+		public boolean isCompleted() {
+			return status == Status.COMPLETED;
+		}
+		
 		public String getId() {
 			return id;
 		}

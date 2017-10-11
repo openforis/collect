@@ -1,6 +1,9 @@
 import {
     START_JOB_MONITOR,
-    CLOSE_JOB_MONITOR
+    CLOSE_JOB_MONITOR,
+    REQUEST_JOB,
+    RECEIVE_JOB,
+    JOB_CANCELED    
 } from '../actions'
 
 const initialState = {
@@ -18,6 +21,14 @@ function currentJob(state = initialState, action) {
             return { ...action, open: true }
         case CLOSE_JOB_MONITOR:
             return { open: false }
+        case RECEIVE_JOB:
+            if (action.job.completed && state.handleJobCompleted) {
+                state.handleJobCompleted(action.job)
+            }
+            return { ...state, job: action.job}
+        case JOB_CANCELED:
+            return {...state, open: false}
+        case REQUEST_JOB:
         default:
             return state
     }
