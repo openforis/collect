@@ -118,7 +118,7 @@ public class CSVDataImportJobIntegrationTest extends CollectIntegrationTest {
 		File file = getTestFile(fileName);
 		CSVDataImportJob job = jobManager.createJob(transactional ? TransactionalCSVDataImportJob.BEAN_NAME: 
 			CSVDataImportJob.BEAN_NAME, CSVDataImportJob.class);
-		job.setInput(new CSVDataImportInput(file, survey, null, parentEntityDefinitionId, settings));
+		job.setInput(new CSVDataImportInput(file, survey, Step.values(), parentEntityDefinitionId, settings));
 		jobManager.start(job, false);
 		return job;
 	}

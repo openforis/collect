@@ -21,12 +21,14 @@ class CsvDataImportPage extends Component {
         this.handleImportButtonClick = this.handleImportButtonClick.bind(this)
         this.handleFileDrop = this.handleFileDrop.bind(this)
         this.handleDataImportComplete = this.handleDataImportComplete.bind(this)
+        this.handleJobModalOkButtonClick = this.handleJobModalOkButtonClick.bind(this)
 
         this.state = {
             importType: 'update',
             selectedSteps: Object.keys(Workflow.STEPS).map(s => Workflow.STEPS[s].code),
             validateRecords: true,
             deleteEntitiesBeforeImport: false,
+            newRecordVersionName: null,
             fileSelected: false,
             fileToBeImportedPreview: null,
             fileToBeImported: null
@@ -59,8 +61,7 @@ class CsvDataImportPage extends Component {
             this.state.validateRecords,
             this.state.deleteEntitiesBeforeImport,
             this.state.newRecordVersionName
-        )
-        .then(job => {
+        ).then(job => {
             this.props.dispatch(Actions.startJobMonitor(job.id, 'Importing data', 'Ok', this.handleJobModalOkButtonClick, null, this.handleDataImportComplete))
         })
     }

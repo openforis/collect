@@ -6,6 +6,7 @@ package org.openforis.collect.io.data;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -240,6 +241,20 @@ public class CSVDataImportJob extends Job {
 		private EntityDefinition parentEntityDefinition;
 		
 		private CSVDataImportSettings settings;
+
+		public CSVDataImportInput(File file, CollectSurvey survey, Step[] steps, int parentEntityDefinitionId,
+				CSVDataImportSettings settings) {
+			this(file, survey, toSet(steps), parentEntityDefinitionId,
+					settings);
+		}
+		
+		private static Set<Step> toSet(Step[] arr) {
+			if (arr == null) {
+				return Collections.emptySet();
+			} else {
+				return new HashSet<Step>(Arrays.asList(arr));
+			}
+		}
 
 		public CSVDataImportInput(File file, CollectSurvey survey, Set<Step> steps, int parentEntityDefinitionId,
 				CSVDataImportSettings settings) {

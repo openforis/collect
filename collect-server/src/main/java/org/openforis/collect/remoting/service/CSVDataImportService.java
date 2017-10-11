@@ -1,10 +1,6 @@
 package org.openforis.collect.remoting.service;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.CSVDataImportJob;
@@ -56,7 +52,7 @@ public class CSVDataImportService {
 			settings.setNewRecordVersionName(newRecordVersionName);
 			settings.setDeleteExistingEntities(deleteExistingEntities);
 			
-			Set<Step> steps = step == null ? new HashSet<Step>(Arrays.asList(Step.values())): Collections.singleton(step);
+			Step[] steps = step == null ? Step.values(): new Step[]{step};
 			CSVDataImportInput input = new CSVDataImportInput(importFile, survey, steps, parentEntityId, settings);
 			importJob.setInput(input);
 			jobManager.start(importJob);
