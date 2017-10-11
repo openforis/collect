@@ -22,11 +22,11 @@ class BackupDataImportPage extends Component {
     
         this.state = {
             importStep: BackupDataImportPage.SELECT_PARAMETERS,
-            fileSelected: false,
             summaryGenerationJobStatusModalOpen: false,
             dataImportJobStatusModalOpen: false,
             dataImportSummaryJobId: null,
             dataImportJobId: null,
+            fileSelected: false,
             fileToBeImportedPreview: null,
             fileToBeImported: null,
             selectedRecordsToImport: [],
@@ -44,11 +44,13 @@ class BackupDataImportPage extends Component {
     }
 
     handleGenerateSummaryButtonClick() {
-        ServiceFactory.recordService.generateBackupDataImportSummary(this.props.survey, 
-            this.props.survey.schema.firstRootEntityDefinition.name,
-            this.state.fileToBeImported).then(job => {
-                this.props.dispatch(Actions.startJobMonitor(job.id, 'Generating data import summary', 'Done', null, null, this.handleRecordSummaryGenerationComplete))
-            })
+        const survey = this.props.survey
+        ServiceFactory.recordService.generateBackupDataImportSummary(survey, 
+            survey.schema.firstRootEntityDefinition.name,
+            this.state.fileToBeImported)
+        .then(job => {
+            this.props.dispatch(Actions.startJobMonitor(job.id, 'Generating data import summary', 'Done', null, null, this.handleRecordSummaryGenerationComplete))
+        })
     }
 
     onFileDrop(files) {

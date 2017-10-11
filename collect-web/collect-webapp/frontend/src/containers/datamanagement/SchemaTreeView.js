@@ -9,7 +9,7 @@ export default class SchemaTreeView extends Component {
     constructor(props) {
         super(props)
 
-        const treeData = this.buildTreeData(props.survey)
+        const treeData = this.buildTreeData(props.survey, props.includeAttributes, props.allowSingleEntitiesSelection)
         const allNodeIds = this.determineAllNodeIds(treeData)
 
         this.state = {
@@ -27,7 +27,7 @@ export default class SchemaTreeView extends Component {
         
         if (mustUpdateState) {
             const survey = nextProps.survey;
-            const treeData = this.buildTreeData(survey)
+            const treeData = this.buildTreeData(survey, nextProps.includeAttributes, nextProps.allowSingleEntitiesSelection)
             const allNodeIds = this.determineAllNodeIds(treeData)
             this.setState({
                 treeData: treeData,
@@ -51,12 +51,12 @@ export default class SchemaTreeView extends Component {
         return result
     }
 
-    buildTreeData(survey) {
+    buildTreeData(survey, includeAttributes, allowSingleEntitiesSelection) {
         if (survey) {
             const rootEntityDefinition = survey.schema.firstRootEntityDefinition
     
             const schemaTree = new SchemaTree()
-            schemaTree.build(rootEntityDefinition)
+            schemaTree.build(rootEntityDefinition, includeAttributes, allowSingleEntitiesSelection)
     
             return [schemaTree.root]
         } else {
@@ -75,7 +75,7 @@ export default class SchemaTreeView extends Component {
             let def = survey.schema.getDefinitionById(parseInt(id))
             selectedNodeDefinitions.push(def)
         })
-        this.props.handleCheck({selectedNodeDefinitions: selectedNodeDefinitions})
+        this.props.handleNodeSelect({selectedNodeDefinitions: selectedNodeDefinitions})
 
         this.setState({ checkedNodeIds: newCheckedNodeIds })
     }
@@ -98,16 +98,16 @@ export default class SchemaTreeView extends Component {
 
 SchemaTreeView.propTypes = {
     survey: PropTypes.object.isRequired,
-    handleCheck: PropTypes.func.isRequired,
+    handleNodeSelect: PropTypes.func.isRequired,
     selectAll: PropTypes.bool
 }
 
 class SchemaTree {
     root
 
-    build(rootEntityDefinition, includeAttributes) {
+    build(rootEntityDefinition, includeAttributes, allowSingleEntitiesSelection) {
         this.root = new EntityNode()
-        this.root.fillFromNodeDefinition(rootEntityDefinition, includeAttributes)
+        this.root.fillFromNodeDefinition(rootEntityDefinition, includeAttributes, allowSingleEntitiesSelection)
     }
 
 }
@@ -116,10 +116,12 @@ class SchemaNode {
     value
     label
     multiple
+    disabled
 
-    fillFromNodeDefinition(nodeDef) {
+    fillFromNodeDefinition(nodeDef, includeAttributes, allowSingleEntitiesSelection) {
         this.value = nodeDef.id.toString()
         this.multiple = nodeDef.multiple
+        this.disabled = !allowSingleEntitiesSelection && nodeDef instanceof EntityDefinition && !nodeDef.multiple
         this.label = (nodeDef.label ? nodeDef.label : '') + ' [' + nodeDef.name + ']'
     }
 }
@@ -127,8 +129,8 @@ class SchemaNode {
 class EntityNode extends SchemaNode {
     children
 
-    fillFromNodeDefinition(nodeDef, includeAttributes) {
-        super.fillFromNodeDefinition(nodeDef)
+    fillFromNodeDefinition(nodeDef, includeAttributes, allowSingleEntitiesSelection) {
+        super.fillFromNodeDefinition(nodeDef, includeAttributes, allowSingleEntitiesSelection)
 
         this.children = nodeDef.children.filter(c => includeAttributes || c.type == 'ENTITY').map(c => {
             let childNode
@@ -137,7 +139,7 @@ class EntityNode extends SchemaNode {
             } else {
                 childNode = new AttributeNode()
             }
-            childNode.fillFromNodeDefinition(c)
+            childNode.fillFromNodeDefinition(c, includeAttributes, allowSingleEntitiesSelection)
             return childNode
         })
     }

@@ -19,7 +19,7 @@ import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
 import DataManagementPage from 'containers/datamanagement/DataManagementPage'
 import CsvDataExportPage from 'containers/datamanagement/CsvDataExportPage'
 import BackupDataExportPage from 'containers/datamanagement/BackupDataExportPage'
-import DataImportPage from 'containers/datamanagement/DataImportPage'
+import CsvDataImportPage from 'containers/datamanagement/CsvDataImportPage'
 import BackupDataImportPage from 'containers/datamanagement/BackupDataImportPage'
 import OldClientRecordEditPage from 'containers/datamanagement/OldClientRecordEditPage'
 
@@ -39,8 +39,8 @@ class App extends Component {
                   <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage}/>
                   <Route path="/datamanagement/csvexport" exact name="CsvDataExport" component={CsvDataExportPage}/>
                   <Route path="/datamanagement/backup" exact name="BackupDataExport" component={BackupDataExportPage}/>
-                  <Route path="/datamanagement/import" exact name="DataImport" component={DataImportPage}/>
-                  <Route path="/datamanagement/import/backup" exact name="BackupDataImport" component={BackupDataImportPage}/>
+                  <Route path="/datamanagement/backupimport" exact name="BackupDataImport" component={BackupDataImportPage}/>
+                  <Route path="/datamanagement/csvimport" exact name="CsvDataImport" component={CsvDataImportPage}/>
                   <Route path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage}/>
                   <Route path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage}/>
                   <Route path="/map" exact name="Map" component={MapPage}/>

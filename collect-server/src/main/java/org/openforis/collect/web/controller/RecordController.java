@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -30,12 +31,15 @@ import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.CSVDataExportJob;
+import org.openforis.collect.io.data.CSVDataImportJob;
+import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportInput;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreSummaryJob;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
+import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
 import org.openforis.collect.manager.RecordAccessControlManager;
@@ -120,8 +124,8 @@ public class RecordController extends BasicController implements Serializable {
 
 	private CSVDataExportJob csvDataExportJob;
 	private SurveyBackupJob fullBackupJob;
-	
 	private DataRestoreSummaryJob dataRestoreSummaryJob;
+	private CSVDataImportJob csvDataImportSummaryJob;
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
 	public @ResponseBody
@@ -282,6 +286,37 @@ public class RecordController extends BasicController implements Serializable {
 		job.setRestoreUploadedFiles(true);
 		job.setValidateRecords(validateRecords);
 		jobManager.start(job);
+		return new JobView(job);
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method=POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody
+	JobView startCsvDataImport(@PathVariable int surveyId, 
+			@RequestParam("file") MultipartFile multipartFile, 
+			@RequestParam String rootEntityName, 
+			@RequestParam String importType, 
+			@RequestParam Set<Step> steps, 
+			@RequestParam(required=false) Integer entityDefinitionId, 
+			@RequestParam(required=false) boolean validateRecords, 
+			@RequestParam(required=false) boolean deleteEntitiesBeforeImport, 
+			@RequestParam(required=false) String newRecordVersionName) throws IOException {
+		File file = File.createTempFile("ofc_csv_data_import", ".csv");
+		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		CSVDataImportJob job = jobManager.createJob(CSVDataImportJob.class);
+		CSVDataImportInput input = new CSVDataImportInput(file, survey, steps, entityDefinitionId, null);
+		input.setSurvey(survey);
+		input.setParentEntityDefinitionId(entityDefinitionId);
+		input.setSteps(steps);
+		CSVDataImportSettings settings = new CSVDataImportSettings();
+		settings.setDeleteExistingEntities(deleteEntitiesBeforeImport);
+		settings.setRecordValidationEnabled(validateRecords);
+		settings.setInsertNewRecords("newRecords".equals(importType));
+		settings.setNewRecordVersionName(newRecordVersionName);
+		input.setSettings(settings);
+		job.setInput(input);
+		jobManager.start(job);
+		this.csvDataImportSummaryJob = job;
 		return new JobView(job);
 	}
 	

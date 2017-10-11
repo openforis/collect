@@ -32,11 +32,11 @@ const routes = [
     name: "Backup data"
   },
   {
-    path: '/datamanagement/import',
-    name: "Import Data"
+    path: '/datamanagement/csvimport',
+    name: "Import Data from CSV/Excel"
   },
   {
-    path: '/datamanagement/import/backup',
+    path: '/datamanagement/backupimport',
     name: "Import Backup file"
   },
   {

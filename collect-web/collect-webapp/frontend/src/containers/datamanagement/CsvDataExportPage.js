@@ -3,8 +3,9 @@ import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Containe
     Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
-import ServiceFactory from 'services/ServiceFactory'
-import SchemaTreeView from './SchemaTreeView'
+import ServiceFactory from 'services/ServiceFactory';
+import SchemaTreeView from './SchemaTreeView';
+import Workflow from 'model/Workflow';
 import * as Actions from 'actions';
 
 const csvExportAdditionalOptions = [
@@ -49,7 +50,7 @@ class CsvDataExportPage extends Component {
     
             this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
             this.handleCsvDataExportModalOkButtonClick = this.handleCsvDataExportModalOkButtonClick.bind(this)
-            this.handleEntityCheck = this.handleEntityCheck.bind(this)
+            this.handleEntitySelect = this.handleEntitySelect.bind(this)
         }
     
         handleExportButtonClick() {
@@ -69,7 +70,7 @@ class CsvDataExportPage extends Component {
                 parameters[o.name] = this.state[o.name]
             })
             ServiceFactory.recordService.startCSVDataExport(surveyId, parameters).then(job => {
-                this.props.dispatch(Actions.startJobMonitor(job.id, 'Exporting data', 'Done', this.handleCsvDataExportModalOkButtonClick))
+                this.props.dispatch(Actions.startJobMonitor(job.id, 'Exporting data', 'Download CSV file', this.handleCsvDataExportModalOkButtonClick))
             })
         }
     
@@ -82,7 +83,7 @@ class CsvDataExportPage extends Component {
             this.props.dispatch(Actions.closeJobMonitor())
         }
         
-        handleEntityCheck(event) {
+        handleEntitySelect(event) {
             this.setState({...this.state, selectedEntityDefinition: event.selectedNodeDefinitions.length == 1 ? event.selectedNodeDefinitions[0]: null})
         }
     
@@ -103,8 +104,8 @@ class CsvDataExportPage extends Component {
                 </FormGroup>
             });
     
-            const steps = ['ENTRY', 'CLEANSING', 'ANALYSIS']
-            const stepsOptions = steps.map(s => <option key={s} value={s}>{s}</option>)
+            const steps = Workflow.STEPS
+            const stepsOptions = Object.keys(steps).map(s => <option key={s} value={steps[s].code}>{steps[s].label}</option>)
             
             return (
                 <Form>
@@ -121,7 +122,7 @@ class CsvDataExportPage extends Component {
                          <Label>Entity:</Label>
                          <Col sm={{size: 10 }}>
                              <SchemaTreeView survey={this.props.survey} selectAll={this.state.allEntitiesSelected}
-                                 handleCheck={this.handleEntityCheck} />
+                                handleNodeSelect={this.handleEntitySelect} />
                          </Col>
                      </FormGroup>
                      <FormGroup row>

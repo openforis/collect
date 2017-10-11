@@ -112,7 +112,7 @@ public class CSVDataImportJob extends Job {
 					if (! entityDef.isRoot()) {
 						settings.setInsertNewRecords(false);
 					}
-					task.input = new CSVDataImportInput(file, input.survey, input.step, entityDef.getId(), settings);
+					task.input = new CSVDataImportInput(file, input.survey, input.steps, entityDef.getId(), settings);
 					addTask(task);
 					processedFileNames.add(fileName);
 				}
@@ -231,7 +231,7 @@ public class CSVDataImportJob extends Job {
 		/**
 		 * Record step that will be considered for insert or update
 		 */
-		private Step step;
+		private Set<Step> steps = new HashSet<Step>();
 		/**
 		 * Entity definition that should be considered as the parent of each attribute in the csv file
 		 */
@@ -241,12 +241,12 @@ public class CSVDataImportJob extends Job {
 		
 		private CSVDataImportSettings settings;
 
-		public CSVDataImportInput(File file, CollectSurvey survey, Step step, int parentEntityDefinitionId,
+		public CSVDataImportInput(File file, CollectSurvey survey, Set<Step> steps, int parentEntityDefinitionId,
 				CSVDataImportSettings settings) {
 			super();
 			this.file = file;
 			this.survey = survey;
-			this.step = step;
+			this.steps = steps;
 			this.parentEntityDefinitionId = parentEntityDefinitionId;
 			this.settings = settings == null ? new CSVDataImportSettings(): settings;
 			this.parentEntityDefinition = (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
@@ -268,12 +268,12 @@ public class CSVDataImportJob extends Job {
 			this.survey = survey;
 		}
 
-		public Step getStep() {
-			return step;
+		public Set<Step> getSteps() {
+			return steps;
 		}
 
-		public void setStep(Step step) {
-			this.step = step;
+		public void setSteps(Set<Step> steps) {
+			this.steps = steps;
 		}
 
 		public int getParentEntityDefinitionId() {
@@ -395,7 +395,7 @@ public class CSVDataImportJob extends Job {
 					}
 					if ( ! reader.isReady() ) {
 						//end of file reached
-						if ( input.step != null && lastModifiedRecordSummary != null ) {
+						if ( input.steps.size() == 1 && lastModifiedRecordSummary != null ) {
 							saveLastModifiedRecord();
 						}
 						break;
@@ -432,10 +432,10 @@ public class CSVDataImportJob extends Job {
 				setRecordKeys(line, record);
 				setValuesInRecord(line, record, Step.ENTRY);
 				insertRecord(record);
-			} else if ( input.step == null ) {
+			} else if ( input.steps.size() > 1) {
 				Step originalRecordStep = recordSummary.getStep();
 				//set values in each step data
-				for (Step currentStep : Step.values()) {
+				for (Step currentStep : input.steps) {
 					if ( currentStep.beforeEqual(originalRecordStep) ) {
 						CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
 						setValuesInRecord(line, record, currentStep);
@@ -445,7 +445,8 @@ public class CSVDataImportJob extends Job {
 				}
 			} else {
 				Step originalRecordStep = recordSummary.getStep();
-				if ( input.step.beforeEqual(originalRecordStep) ) {
+				Step inputStep = input.steps.iterator().next();
+				if ( inputStep.beforeEqual(originalRecordStep) ) {
 					CollectRecord record;
 					boolean recordChanged = lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() );
 					if ( recordChanged ) {
@@ -453,11 +454,11 @@ public class CSVDataImportJob extends Job {
 						if ( lastModifiedRecordSummary != null ) {
 							saveLastModifiedRecord();
 						}
-						record = loadRecord(recordSummary.getId(), input.step);
+						record = loadRecord(recordSummary.getId(), inputStep);
 					} else {
 						record = lastModifiedRecord;
 					}
-					setValuesInRecord(line, record, input.step);
+					setValuesInRecord(line, record, inputStep);
 					lastModifiedRecordSummary = recordSummary;
 					lastModifiedRecord = record;
 				} else {
@@ -509,10 +510,11 @@ public class CSVDataImportJob extends Job {
 
 		private void saveLastModifiedRecord() throws RecordPersistenceException {
 			Step originalStep = lastModifiedRecordSummary.getStep();
+			Step inputStep = input.steps.iterator().next();
+
+			updateRecord(lastModifiedRecord, originalStep, inputStep);
 			
-			updateRecord(lastModifiedRecord, originalStep, input.step);
-			
-			if ( input.step.compareTo(originalStep) < 0 ) {
+			if ( inputStep.compareTo(originalStep) < 0 ) {
 				//reset record step to the original one
 				CollectRecord record = recordManager.load(input.survey, lastModifiedRecordSummary.getId(), 
 						originalStep, input.settings.isRecordValidationEnabled());

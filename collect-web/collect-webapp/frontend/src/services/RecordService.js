@@ -82,4 +82,18 @@ export default class RecordService extends AbstractService {
             validateRecords: validateRecords
         })
     }
+
+    startCsvDataImport(survey, rootEntityName, file, importType, steps, entityDefinitionId, 
+            validateRecords, deleteEntitiesBeforeImport, newRecordVersionName) {
+        return this.postFormData('survey/' + survey.id + '/data/csvimport/records', {
+            rootEntityName: rootEntityName,
+            file: file,
+            importType: importType,
+            steps: steps,
+            entityDefinitionId: entityDefinitionId,
+            validateRecords: validateRecords,
+            deleteEntitiesBeforeImport: deleteEntitiesBeforeImport,
+            newRecordVersionName: newRecordVersionName
+        })
+    }
 }

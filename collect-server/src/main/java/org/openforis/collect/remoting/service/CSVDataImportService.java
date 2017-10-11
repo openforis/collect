@@ -1,6 +1,10 @@
 package org.openforis.collect.remoting.service;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.CSVDataImportJob;
@@ -10,7 +14,7 @@ import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordSessionManager;
-import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +37,7 @@ public class CSVDataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public DataImportStatusProxy start(String tempFileName, int parentEntityId, CollectRecord.Step step, 
+	public DataImportStatusProxy start(String tempFileName, int parentEntityId, Step step, 
 			boolean transactional, boolean validateRecords, 
 			boolean insertNewRecords, String newRecordVersionName,
 			boolean deleteExistingEntities) throws DataImportExeption {
@@ -51,7 +55,9 @@ public class CSVDataImportService {
 			settings.setInsertNewRecords(insertNewRecords);
 			settings.setNewRecordVersionName(newRecordVersionName);
 			settings.setDeleteExistingEntities(deleteExistingEntities);
-			CSVDataImportInput input = new CSVDataImportInput(importFile, survey, step, parentEntityId, settings);
+			
+			Set<Step> steps = step == null ? new HashSet<Step>(Arrays.asList(Step.values())): Collections.singleton(step);
+			CSVDataImportInput input = new CSVDataImportInput(importFile, survey, steps, parentEntityId, settings);
 			importJob.setInput(input);
 			jobManager.start(importJob);
 		}

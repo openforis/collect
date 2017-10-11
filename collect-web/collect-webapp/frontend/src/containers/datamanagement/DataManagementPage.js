@@ -28,6 +28,7 @@ class DataManagementPage extends Component {
 		this.handleExportToCsvButtonClick = this.handleExportToCsvButtonClick.bind(this)
 		this.handleBackupButtonClick = this.handleBackupButtonClick.bind(this)
 		this.handleImportButtonClick = this.handleImportButtonClick.bind(this)
+		this.handleCsvImportButtonClick = this.handleCsvImportButtonClick.bind(this)
 	}
 
 	handleNewButtonClick() {
@@ -98,7 +99,11 @@ class DataManagementPage extends Component {
 	}
 
 	handleImportButtonClick() {
-		this.props.history.push('/datamanagement/import/backup')
+		this.props.history.push('/datamanagement/backupimport')
+	}
+
+	handleCsvImportButtonClick() {
+		this.props.history.push('/datamanagement/csvimport')
 	}
 
 	render() {
@@ -134,6 +139,9 @@ class DataManagementPage extends Component {
 					</Col>
 					<Col>
 						<Button color="warning" onClick={this.handleImportButtonClick}>Import</Button>
+					</Col>
+					<Col>
+						<Button color="warning" onClick={this.handleCsvImportButtonClick}>Import from CSV</Button>
 					</Col>
 				</Row>
 			</Container>
