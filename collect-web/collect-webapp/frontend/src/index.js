@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter, Route, Switch } from 'react-router-dom'
-import { createBrowserHistory } from 'history';
 import thunkMiddleware from 'redux-thunk'
 import { createLogger } from 'redux-logger'
 import { createStore, applyMiddleware } from 'redux'
@@ -28,12 +27,11 @@ const store = createStore(
     loggerMiddleware // neat middleware that logs actions
   )
 )
-const history = createBrowserHistory();
 
 ReactDOM.render((
   <Provider store={store}>
     <Startup>
-      <HashRouter history={history}>
+      <HashRouter>
         <Switch>
           <Route exact path="/signin" name="Signin Page" component={Signin}/>
           <Route exact path="/register" name="Register Page" component={Register}/>
