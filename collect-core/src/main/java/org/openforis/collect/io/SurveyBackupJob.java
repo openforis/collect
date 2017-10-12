@@ -271,6 +271,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		CollectMobileBackupConvertTask task = new CollectMobileBackupConvertTask();
 		task.setCollectBackupFile(outputFile);
 		task.setSurveyName(survey.getName());
+		task.setSurveyUserGroup(survey.getUserGroup());
 		addTask(task);
 	}
 	

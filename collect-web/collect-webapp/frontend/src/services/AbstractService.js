@@ -9,7 +9,9 @@ export default class AbstractService {
         return fetch(this.BASE_URL + url + '?' + queryData, {
             credentials: 'include'
         })
-        .then(response => response.json(),
+        .then(response => {
+            return response.json()
+        },
             error => console.log('An error occured.', error))
         .catch(error => {
             throw(error);

@@ -45,7 +45,9 @@ public abstract class AbstractSurveyRestoreJob extends Job {
 	 * If true, validates the XML file to import against schema.
 	 */
 	protected boolean validateSurvey;
-
+	/**
+	 * User group to be assigned to the new survey
+	 */
 	protected UserGroup userGroup;
 
 	//output
