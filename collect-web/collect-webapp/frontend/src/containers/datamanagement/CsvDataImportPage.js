@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+    Form, FormGroup, Label, Input, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';
@@ -20,8 +21,10 @@ class CsvDataImportPage extends Component {
         this.handleEntitySelect = this.handleEntitySelect.bind(this)
         this.handleImportButtonClick = this.handleImportButtonClick.bind(this)
         this.handleFileDrop = this.handleFileDrop.bind(this)
-        this.handleDataImportComplete = this.handleDataImportComplete.bind(this)
         this.handleJobModalOkButtonClick = this.handleJobModalOkButtonClick.bind(this)
+        this.handleDataImportComplete = this.handleDataImportComplete.bind(this)
+        this.handleDataImoprtJobFailed = this.handleDataImoprtJobFailed.bind(this)
+        this.handleErrorsModalCloseButtonClick = this.handleErrorsModalCloseButtonClick.bind(this)
 
         this.state = {
             importType: 'update',
@@ -31,7 +34,8 @@ class CsvDataImportPage extends Component {
             newRecordVersionName: null,
             fileSelected: false,
             fileToBeImportedPreview: null,
-            fileToBeImported: null
+            fileToBeImported: null,
+            errorModalOpen: false
         }
     }
 
@@ -62,7 +66,14 @@ class CsvDataImportPage extends Component {
             this.state.deleteEntitiesBeforeImport,
             this.state.newRecordVersionName
         ).then(job => {
-            this.props.dispatch(Actions.startJobMonitor(job.id, 'Importing data', 'Ok', this.handleJobModalOkButtonClick, null, this.handleDataImportComplete))
+            this.props.dispatch(Actions.startJobMonitor({
+                jobId: job.id, 
+                title: 'Importing data',
+                okButtonLabel: 'Ok',                        
+                handleOkButtonClick: this.handleJobModalOkButtonClick,
+                handleJobCompleted: this.handleDataImportComplete,
+                handleJobFailed: this.handleDataImoprtJobFailed
+            }))
         })
     }
 
@@ -71,14 +82,26 @@ class CsvDataImportPage extends Component {
     }
 
     handleDataImportComplete(job) {
-        if (! job.completed) {
-            this.loadErrorsPage()
-        }
+    }
+
+    handleDataImoprtJobFailed(job) {
+        this.loadErrorsPage(job)
+        setTimeout(() => this.props.dispatch(Actions.closeJobMonitor()))
     }
 
     handleFileDrop(files) {
         const file = files[0]
         this.setState({fileSelected: true, fileToBeImported: file, fileToBeImportedPreview: file.name})
+    }
+
+    loadErrorsPage(job) {
+        ServiceFactory.recordService.loadCsvDataImportStatus(this.props.survey).then(job => {
+            this.setState({errorModalOpen: true, errors: job.errors})
+        })
+    }
+
+    handleErrorsModalCloseButtonClick() {
+        this.setState({errorModalOpen: false})
     }
 
     render() {
@@ -114,6 +137,10 @@ class CsvDataImportPage extends Component {
         })
         const entitySelectionEnabled = this.state.importType == 'update'
 
+        const formatErrorMessage = function(cell, row) {
+            return row.message
+        }
+    
         return (
             <Form>
                 <FormGroup tag="fieldset">
@@ -144,37 +171,53 @@ class CsvDataImportPage extends Component {
                                 onChange={e => this.setState({deleteEntitiesBeforeImport: e.target.checked})} /> Delete entities before import
                         </Label>
                     </FormGroup>
-                </FormGroup>
-                {entitySelectionEnabled ?
+                    {entitySelectionEnabled ?
+                        <FormGroup row>
+                            <Label>Entity:</Label>
+                            <Col sm={{size: 10 }}>
+                                <SchemaTreeView survey={this.props.survey}
+                                    handleNodeSelect={this.handleEntitySelect} />
+                            </Col>
+                        </FormGroup>
+                        : ''
+                    }
                     <FormGroup row>
-                        <Label>Entity:</Label>
-                        <Col sm={{size: 10 }}>
-                            <SchemaTreeView survey={this.props.survey}
-                                handleNodeSelect={this.handleEntitySelect} />
+                        <Label for="file">File:</Label>
+                        <Col sm={10}>
+                            <Dropzone accept=".csv,.xls,xlsx,.zip" onDrop={(files) => this.handleFileDrop(files)} style={{
+                                width: '100%', height: '200px', 
+                                borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
+                                borderStyle: 'dashed', borderRadius: '5px'
+                            }}>
+                            {this.state.fileToBeImportedPreview ?
+                                <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.state.fileToBeImportedPreview}</p>
+                                : <p>Click to select a CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip) file or drop it here.</p>
+                            }
+                            </Dropzone>
                         </Col>
                     </FormGroup>
-                    : ''
-                }
-                <FormGroup row>
-                    <Label for="file">File:</Label>
-                    <Col sm={10}>
-                        <Dropzone accept=".csv,.xls,xlsx,.zip" onDrop={(files) => this.handleFileDrop(files)} style={{
-                            width: '100%', height: '200px', 
-                            borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
-                            borderStyle: 'dashed', borderRadius: '5px'
-                        }}>
-                        {this.state.fileToBeImportedPreview ?
-                            <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.state.fileToBeImportedPreview}</p>
-                            : <p>Click to select a CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip) file or drop it here.</p>
-                        }
-                        </Dropzone>
-                    </Col>
                 </FormGroup>
                 <FormGroup row>
                     <Col sm={{size: 2, offset: 5}}>
                         <Button color="primary" onClick={this.handleImportButtonClick}>Import</Button>
                     </Col>
                 </FormGroup>
+
+                <Modal isOpen={this.state.errorModalOpen} style={{maxWidth: '1000px'}}>
+                    <ModalHeader toggle={() => this.setState({errorModalOpen: ! this.state.errorModalOpen})}>Errors in uploaded file</ModalHeader>
+                    <ModalBody>
+                        <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors'}>
+							<TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
+							<TableHeaderColumn dataField="fileName" width="200">File</TableHeaderColumn>
+							<TableHeaderColumn dataField="row" width="50">Row</TableHeaderColumn>
+							<TableHeaderColumn dataField="columns" width="100">Columns</TableHeaderColumn>
+                            <TableHeaderColumn dataField="message" width="400" dataFormat={this.formatErrorMessage}>Message</TableHeaderColumn>
+						</BootstrapTable>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="primary" onClick={this.handleErrorsModalCloseButtonClick}>Close</Button>
+                    </ModalFooter>
+                </Modal>
             </Form>
         )
     }

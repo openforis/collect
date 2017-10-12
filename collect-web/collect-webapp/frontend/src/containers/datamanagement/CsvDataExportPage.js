@@ -70,7 +70,12 @@ class CsvDataExportPage extends Component {
                 parameters[o.name] = this.state[o.name]
             })
             ServiceFactory.recordService.startCSVDataExport(surveyId, parameters).then(job => {
-                this.props.dispatch(Actions.startJobMonitor(job.id, 'Exporting data', 'Download CSV file', this.handleCsvDataExportModalOkButtonClick))
+                this.props.dispatch(Actions.startJobMonitor({
+                    jobId: job.id, 
+                    title: 'Exporting data',
+                    okButtonLabel: 'Download CSV file',                        
+                    handleOkButtonClick: this.handleCsvDataExportModalOkButtonClick
+                }))
             })
         }
     

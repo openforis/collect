@@ -254,15 +254,20 @@ function requestJob() {
 	}
 }
 
-export function startJobMonitor(jobId, title, okButtonLabel = 'Ok', handleOkButtonClick = null, handleCancelButtonClick = null, handleJobCompleted = null) {
+export class jobMonitorConfiguration {
+	jobId
+	title = 'Processing'
+	okButtonLabel = 'Ok'
+	handleOkButtonClick
+	handleCancelButtonClick
+	handleJobCompleted
+	handleJobFailed
+}
+
+export function startJobMonitor(jobMonitorConfiguration) {
 	return {
 		type: START_JOB_MONITOR,
-		jobId: jobId,
-		title: title,
-		okButtonLabel: okButtonLabel,
-		handleOkButtonClick: handleOkButtonClick,
-		handleCancelButtonClick: handleCancelButtonClick,
-		handleJobCompleted: handleJobCompleted
+		jobMonitorConfiguration: jobMonitorConfiguration
 	}
 }
 

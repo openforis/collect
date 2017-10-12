@@ -6,16 +6,15 @@ export default class AbstractService {
     
     get(url, data) {
         let queryData = this._toQueryData(data);
-        return fetch(this.BASE_URL + url + '?' + queryData, {
-            credentials: 'include'
-        })
-        .then(response => {
-            return response.json()
-        },
-            error => console.log('An error occured.', error))
-        .catch(error => {
-            throw(error);
-        })
+        return fetch(this.BASE_URL + url + (queryData === null ? '': '?' + queryData), {
+                credentials: 'include'
+            })
+            .then(response => {
+                return response.json()
+            }, error => console.log('An error occured.', error))
+            .catch(error => {
+                throw(error);
+            })
     }
 
     delete(url) {
@@ -93,7 +92,7 @@ export default class AbstractService {
 
     _toQueryData(data, propPrefix) {
         if (! data) {
-            return ''
+            return null
         }
         return Object.keys(data).map((key) => {
             const val = data[key];
@@ -114,7 +113,7 @@ export default class AbstractService {
                             }
                         }
                     }
-                    return arrQueryDataParts.join('&');
+                    return arrQueryDataParts.filter(i => i !== null).join('&');
                 } else {
                     return (propPrefix ? propPrefix : '') + encodeURIComponent(key) + '=' + encodeURIComponent(val)
                 }

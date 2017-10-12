@@ -49,7 +49,12 @@ class BackupDataImportPage extends Component {
             survey.schema.firstRootEntityDefinition.name,
             this.state.fileToBeImported)
         .then(job => {
-            this.props.dispatch(Actions.startJobMonitor(job.id, 'Generating data import summary', 'Done', null, null, this.handleRecordSummaryGenerationComplete))
+            this.props.dispatch(Actions.startJobMonitor({
+                jobId: job.id, 
+                title: 'Generating data import summary',
+                okButtonLabel: 'Done',                        
+                handleJobCompleted: this.handleRecordSummaryGenerationComplete
+            }))
         })
     }
 

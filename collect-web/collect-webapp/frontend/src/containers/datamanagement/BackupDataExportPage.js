@@ -30,7 +30,12 @@ class BackupDataExportPage extends Component {
             onlyOwnedRecords: this.state.exportOnlyOwnedRecords
         }
         ServiceFactory.recordService.startBackupDataExport(surveyId, backupExportParams).then(job => {
-            this.props.dispatch(Actions.startJobMonitor(job.id, 'Exporting data', 'Done', this.handleBackupDataExportModalOkButtonClick))
+            this.props.dispatch(Actions.startJobMonitor({
+                jobId: job.id, 
+                title: 'Exporting data',
+                okButtonLabel: 'Done',                        
+                handleOkButtonClick: this.handleBackupDataExportModalOkButtonClick
+            }))
         })
     }
 

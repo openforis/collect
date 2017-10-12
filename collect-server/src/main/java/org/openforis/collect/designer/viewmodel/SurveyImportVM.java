@@ -350,20 +350,22 @@ public class SurveyImportVM extends SurveyBaseVM {
 		UserGroup userGroup = userGroupManager.findByName(userGroupItem.getCode());
 		
 		String uploadedFileNameExtension = FilenameUtils.getExtension(this.uploadedFileName);
+		AbstractSurveyRestoreJob job;
 		if ( XML_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension) ) {
-			restoreJob = jobManager.createJob(XMLSurveyRestoreJob.class);
+			job = jobManager.createJob(XMLSurveyRestoreJob.class);
 		} else if (CEP_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension)) {
-			restoreJob = jobManager.createJob(CESurveyRestoreJob.class);
+			job= jobManager.createJob(CESurveyRestoreJob.class);
 		} else {
-			restoreJob = jobManager.createJob(SurveyRestoreJob.class);
+			job= jobManager.createJob(SurveyRestoreJob.class);
 		}
-		restoreJob.setFile(uploadedFile);
-		restoreJob.setSurveyName(surveyName);
-		restoreJob.setSurveyUri(uploadedSurveyUri);
-		restoreJob.setUserGroup(userGroup);
-		restoreJob.setRestoreIntoPublishedSurvey(false);
-		restoreJob.setValidateSurvey(false);
-		jobManager.start(restoreJob);
+		job.setFile(uploadedFile);
+		job.setSurveyName(surveyName);
+		job.setSurveyUri(uploadedSurveyUri);
+		job.setUserGroup(userGroup);
+		job.setRestoreIntoPublishedSurvey(false);
+		job.setValidateSurvey(false);
+		jobManager.start(job);
+		this.restoreJob = job;
 		openSurveyRestoreStatusPopUp();
 	}
 	

@@ -8,27 +8,32 @@ import {
 
 const initialState = {
     open: false,
-    jobId: null,
-    okButtonLabel: 'Ok',
-    handleOkButtonClick: null,
-    handleCancelButtonClick: null,
-    handleJobCompleted: null
+    jobMonitorConfiguration: null,
+    job: null
 }
 
 function currentJob(state = initialState, action) {
     switch (action.type) {
         case START_JOB_MONITOR:
             return { ...action, open: true }
-        case CLOSE_JOB_MONITOR:
-            return { open: false }
         case RECEIVE_JOB:
-            if (action.job.completed && state.handleJobCompleted) {
-                state.handleJobCompleted(action.job)
+            switch(action.job.status) {
+                case 'COMPLETED':
+                    if (state.jobMonitorConfiguration.handleJobCompleted) {
+                        state.jobMonitorConfiguration.handleJobCompleted(action.job)
+                    }
+                    break
+                case 'FAILED':
+                    if (state.jobMonitorConfiguration.handleJobFailed) {
+                        state.jobMonitorConfiguration.handleJobFailed(action.job)
+                    }
+                    break
             }
             return { ...state, job: action.job}
         case JOB_CANCELED:
-            return {...state, open: false}
-        case REQUEST_JOB:
+            return initialState
+        case CLOSE_JOB_MONITOR:
+            return initialState
         default:
             return state
     }

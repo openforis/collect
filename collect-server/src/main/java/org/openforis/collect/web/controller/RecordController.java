@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
@@ -40,6 +41,7 @@ import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
 import org.openforis.collect.io.data.csv.CSVDataImportSettings;
+import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
 import org.openforis.collect.manager.RecordAccessControlManager;
@@ -77,7 +79,6 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -243,7 +244,7 @@ public class RecordController extends BasicController implements Serializable {
 		return new Response();
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody
 	JobView generateRecordImportSummary(@PathVariable int surveyId, @RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam String rootEntityName) throws IOException {
@@ -289,7 +290,7 @@ public class RecordController extends BasicController implements Serializable {
 		return new JobView(job);
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method=POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody
 	JobView startCsvDataImportJob(@PathVariable int surveyId, 
 			@RequestParam("file") MultipartFile multipartFile, 
@@ -314,6 +315,11 @@ public class RecordController extends BasicController implements Serializable {
 		jobManager.start(job);
 		this.csvDataImportJob = job;
 		return new JobView(job);
+	}
+	
+	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method=GET)
+	public @ResponseBody DataImportStatusProxy getCsvDataImportStatus(@PathVariable int surveyId) {
+		return new DataImportStatusProxy(csvDataImportJob);
 	}
 	
 	private Step[] fromStepNames(List<String> stepNames) {

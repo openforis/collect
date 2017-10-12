@@ -15,19 +15,18 @@ class CurrentJobMonitorModal extends Component {
         this.handleCancelButtonClick = this.handleCancelButtonClick.bind(this)
         this.handleOkButtonClick = this.handleOkButtonClick.bind(this)
         
-        if (props.open && props.jobId) {
+        if (props.open && props.jobMonitorConfiguration.jobId) {
             this.startTimer()
          } 
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.jobId && nextProps.open && nextProps.jobId != this.props.jobId) {
+        if (nextProps.open && nextProps.jobMonitorConfiguration.jobId && 
+                (this.props.jobMonitorConfiguration === null || 
+                    nextProps.jobMonitorConfiguration.jobId !== this.props.jobMonitorConfiguration.jobId)) {
             this.startTimer()
-        } else if (nextProps.job) {
-            const job = nextProps.job
-            if (job.ended) {
-                clearInterval(this.timer)
-            }
+        } else if (nextProps.job && nextProps.job.ended) {
+            this.stopTimer()
         }
     }
 
@@ -35,41 +34,52 @@ class CurrentJobMonitorModal extends Component {
         this.timer = setInterval(this.handleTimeout, 2000);
     }
 
+    stopTimer() {
+        clearInterval(this.timer)
+    }
+
     handleTimeout() {
         this.loadJob()
     }
 
     handleOkButtonClick() {
-        if (this.props.handleOkButtonClick) {
-            this.props.handleOkButtonClick(this.props.job)
+        if (this.props.jobMonitorConfiguration.handleOkButtonClick) {
+            this.props.jobMonitorConfiguration.handleOkButtonClick(this.props.job)
         }
     }
     
     handleCancelButtonClick() {
-        if (this.props.handleCancelButtonClick) {
-            this.props.handleCancelButtonClick(this.props.job)
+        if (this.props.jobMonitorConfiguration.handleCancelButtonClick) {
+            this.props.jobMonitorConfiguration.handleCancelButtonClick(this.props.job)
         } else {
-            this.props.dispatch(Actions.cancelJob(this.props.jobId))
+            this.props.dispatch(Actions.cancelJob(this.props.jobMonitorConfiguration.jobId))
         }
     }
 
     loadJob() {
-        const jobId = this.props.jobId
-        this.props.dispatch(Actions.fetchJob(jobId))
+        if (this.props.jobMonitorConfiguration) {
+            const jobId = this.props.jobMonitorConfiguration.jobId
+            this.props.dispatch(Actions.fetchJob(jobId))
+        } else {
+            this.stopTimer()
+        }
     }
 
     render() {
+        if (!this.props.open){
+            return <div></div>
+        }
         return (
-        <JobMonitorModal
-            open={this.props.open}
-            title={this.props.title}
-            jobId={this.props.jobId}
-            job={this.props.job}
-            okButtonLabel={this.props.okButtonLabel ? this.props.okButtonLabel: 'Ok'}
-            handleOkButtonClick={this.handleOkButtonClick}
-            handleCancelButtonClick={this.handleCancelButtonClick}
-            handleJobCompleted={this.props.handleJobCompleted}
-        />
+            <JobMonitorModal
+                open={this.props.open}
+                title={this.props.jobMonitorConfiguration.title}
+                jobId={this.props.jobMonitorConfiguration.jobId}
+                job={this.props.job}
+                okButtonLabel={this.props.jobMonitorConfiguration.okButtonLabel}
+                handleOkButtonClick={this.handleOkButtonClick}
+                handleCancelButtonClick={this.handleCancelButtonClick}
+                handleJobCompleted={this.props.jobMonitorConfiguration.handleJobCompleted}
+            />
         )
     }
 }
@@ -77,27 +87,17 @@ class CurrentJobMonitorModal extends Component {
 const mapStateToProps = state => {
     const {
         open,
-        jobId,
         job,
-        title,
-        okButtonLabel,
-        handleOkButtonClick,
-        handleCancelButtonClick,
-        handleJobCompleted
+        jobMonitorConfiguration,
     } = state.currentJob || {
         open: false,
-        jobId: null,
+        jobMonitorConfiguration: null,
         job: null
     }
     return {
         open,
-        jobId,
-        job,
-        title,
-        okButtonLabel,
-        handleOkButtonClick,
-        handleCancelButtonClick,
-        handleJobCompleted
+        jobMonitorConfiguration,
+        job
     }
 }
 

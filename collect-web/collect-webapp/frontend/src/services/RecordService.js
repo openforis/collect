@@ -96,4 +96,8 @@ export default class RecordService extends AbstractService {
             newRecordVersionName: newRecordVersionName
         })
     }
+
+    loadCsvDataImportStatus(survey) {
+        return this.get('survey/' + survey.id + '/data/csvimport/records')
+    }
 }
