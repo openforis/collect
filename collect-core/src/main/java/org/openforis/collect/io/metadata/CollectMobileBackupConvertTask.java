@@ -16,9 +16,10 @@ import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyRestoreJob;
-import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Task;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -35,7 +36,6 @@ public class CollectMobileBackupConvertTask extends Task {
 	//input
 	private File collectBackupFile;
 	private String surveyName;
-	private UserGroup surveyUserGroup;
 	
 	//output
 	private File outputDbFile;
@@ -43,6 +43,9 @@ public class CollectMobileBackupConvertTask extends Task {
 	
 	//transient
 	private ConfigurableApplicationContext ctx;
+	
+	@Autowired
+	private UserGroupManager userGroupManager;
 	
 	@Override
 	protected void createInternalVariables() throws Throwable {
@@ -86,7 +89,7 @@ public class CollectMobileBackupConvertTask extends Task {
 
 		restoreJob.setFile(collectBackupFile);
 		restoreJob.setSurveyName(surveyName);
-		restoreJob.setUserGroup(surveyUserGroup);
+		restoreJob.setUserGroup(userGroupManager.getDefaultPublicUserGroup());
 		restoreJob.setRestoreIntoPublishedSurvey(true);
 		restoreJob.setValidateSurvey(false);
 		jobManager.start(restoreJob, false);
@@ -150,7 +153,4 @@ public class CollectMobileBackupConvertTask extends Task {
 		this.surveyName = surveyName;
 	}
 	
-	public void setSurveyUserGroup(UserGroup surveyUserGroup) {
-		this.surveyUserGroup = surveyUserGroup;
-	}
 }
