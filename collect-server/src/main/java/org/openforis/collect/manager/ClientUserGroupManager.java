@@ -7,17 +7,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.openforis.collect.client.AbstractClient;
-import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
+import org.openforis.collect.model.UserGroup.UserGroupRole;
+import org.openforis.collect.model.UserGroup.UserInGroup;
 
 public class ClientUserGroupManager extends AbstractClient implements UserGroupManager {
 
+	/**
+	 * Cached default public user group
+	 */
+	private UserGroup defaultPublicUserGroup;
+
 	@Override
 	public UserGroup getDefaultPublicUserGroup() {
-		return findByName(DEFAULT_PUBLIC_USER_GROUP_NAME);
+		if (defaultPublicUserGroup == null) {
+			defaultPublicUserGroup = findByName(DEFAULT_PUBLIC_USER_GROUP_NAME); 
+		}
+		return defaultPublicUserGroup;
 	}
 
 	@Override
@@ -36,15 +47,29 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public UserInGroup findUserInGroup(UserGroup userGroup, User user) {
-		// TODO Auto-generated method stub
-		return null;
+	public UserInGroup findUserInGroup(UserGroup userGroup, final User user) {
+		List<UserInGroup> userInGroups = findUsersInGroup(userGroup);
+		return (UserInGroup) CollectionUtils.find(userInGroups, new Predicate() {
+			public boolean evaluate(Object userInGroup) {
+				return ((UserInGroup) userInGroup).getUser().getId().equals(user.getId());
+			}
+		});
 	}
 	
 	@Override
 	public List<UserInGroup> findUsersInGroup(UserGroup userGroup) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Map> userGroupRelations = getList(getUsersRestfulApiUrl() + "/group/" + userGroup.getId() + "/users", Map.class);
+		List<UserInGroup> result = new ArrayList<UserInGroup>();
+		for (Map userGroupRelation : userGroupRelations) {
+			UserInGroup userInGroup = new UserInGroup();
+			userInGroup.setGroup(userGroup);
+			int userId = (Integer) userGroupRelation.get("userId");
+			userInGroup.setUser(new User(userId, null));
+			userInGroup.setJoinStatus(UserGroupJoinRequestStatus.fromCode((String) userGroupRelation.get("statusCode")));
+			userInGroup.setRole(UserGroupRole.fromCode((String) userGroupRelation.get("roleCode")));
+			result.add(userInGroup);
+		}
+		return result;
 	}
 	
 	@Override
@@ -55,8 +80,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	
 	@Override
 	public UserInGroup findUserInGroupOrDescendants(UserGroup userGroup, User user) {
-		// TODO Auto-generated method stub
-		return null;
+		return findUserInGroup(userGroup, user); //TODO
 	}
 
 	@Override
@@ -69,21 +93,16 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		return list.isEmpty() ? null : list.get(0);
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List<UserGroup> findByUser(User user) {
+		List<Map> userGroupRelations = getList(getUsersRestfulApiUrl() + "/user/" + user.getId() + "/groups", Map.class);
 		List<UserGroup> result = new ArrayList<UserGroup>();
-		List<Map> userGroups = getList(getUsersRestfulApiUrl() + "/user/" + user.getId() + "/groups", Map.class);
-		for (Map<String, Object> item : userGroups) {
-			Object group = item.get("group");
-			UserGroup userGroup = new UserGroup();
-			try {
-				BeanUtils.copyProperties(userGroup, group);
-				result.add(userGroup);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+		for (Map userGroupRelation : userGroupRelations) {
+			int groupId = (Integer) userGroupRelation.get("groupId");
+			UserGroup group = loadById(groupId);
+			result.add(group);
 		}
+		result.add(getDefaultPublicUserGroup());
 		return result;
 	}
 	
@@ -92,16 +111,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		@SuppressWarnings("serial")
 		List<UserGroup> result = getList(getUsersRestfulApiUrl() + "/group", new HashMap<String, Object>(){{
 			put("visibility", "PUBLIC");
-		}}, UserGroup.class);
-		return result;
-	}
-	
-	@Override
-	public List<UserGroup> findUserDefinedGroups() {
-		@SuppressWarnings("serial")
-		List<UserGroup> result = getList(getUsersRestfulApiUrl() + "/group", new HashMap<String, Object>(){{
-			put("visibility", "PUBLIC");
-			put("systemDefined", "false");
+			put("systemDefined", false);
 		}}, UserGroup.class);
 		return result;
 	}

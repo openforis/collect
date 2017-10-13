@@ -63,7 +63,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	
 	@Override
 	protected List<UserGroup> loadAllItems() {
-		return itemManager.findUserDefinedGroups();
+		return itemManager.findPublicUserGroups();
 	}
 		
 	public static class UserGroupForm extends PersistedObjectForm<UserGroup> {

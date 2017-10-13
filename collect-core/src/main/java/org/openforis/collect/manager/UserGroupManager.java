@@ -19,8 +19,6 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	
 	List<UserGroup> findPublicUserGroups();
 
-	List<UserGroup> findUserDefinedGroups();
-	
 	List<UserGroup> findDescendantGroups(UserGroup group);
 
 	List<UserGroup> findByUser(User user);

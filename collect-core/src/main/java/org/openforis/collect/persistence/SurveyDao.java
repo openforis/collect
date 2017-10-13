@@ -22,6 +22,7 @@ import org.openforis.collect.manager.SurveyMigrator;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.model.CollectSurvey.Availability;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
@@ -207,6 +208,7 @@ public class SurveyDao extends JooqDaoSupport {
 				.fetch();
 		for (Record row : results) {
 			CollectSurvey survey = processSurveyRow(row);
+			survey.setAvailability(Availability.PUBLISHED);
 			surveys.add(survey);
 		}
 		return surveys;
