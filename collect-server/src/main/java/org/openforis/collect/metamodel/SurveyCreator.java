@@ -10,6 +10,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters.ListItem;
+import org.openforis.collect.metamodel.SimpleSurveyCreationParameters.SimpleCodeList;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
@@ -24,6 +25,7 @@ import org.openforis.collect.persistence.xml.CeoApplicationOptions;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
@@ -62,7 +64,7 @@ public class SurveyCreator {
 			//TODO move it to validator
 			throw new IllegalArgumentException(String.format("Survey with name %s already existing", name));
 		}
-		CollectSurvey survey = createTemporarySingleAttributeSurvey(name, parameters.getValues());
+		CollectSurvey survey = createTemporarySimpleSurvey(name, parameters.getCodeLists());
 		UserGroup userGroup = userGroupManager.loadById(parameters.getUserGroupId());
 		survey.setUserGroup(userGroup);
 	
@@ -80,25 +82,34 @@ public class SurveyCreator {
 		return survey;
 	}
 
-	private CollectSurvey createTemporarySingleAttributeSurvey(String name, List<ListItem> list) {
+	private CollectSurvey createTemporarySimpleSurvey(String name, List<SimpleCodeList> simpleCodeLists) {
 		CollectSurvey survey = surveyManager.createTemporarySurvey(name, languageCode);
 
-		CodeList codeList = survey.createCodeList();
-		codeList.setName(singleAttributeSurveyCodeListName);
-		for (int i = 0; i < list.size(); i++) {
-			ListItem paramItem = list.get(i);
-			CodeListItem item = codeList.createItem(1);
-			item.setCode(ObjectUtils.defaultIfNull(paramItem.getCode(), String.valueOf(i + 1))); //specified code or item index
-			item.setLabel(languageCode, paramItem.getLabel());
-			codeList.addItem(item);
+		for (int codeListIdx = 0; codeListIdx < simpleCodeLists.size(); codeListIdx++) {
+			SimpleCodeList simpleCodeList = simpleCodeLists.get(codeListIdx);
+
+			CodeList codeList = survey.createCodeList();
+			codeList.setName("values_" + (codeListIdx+1));
+			codeList.setLabel(CodeListLabel.Type.ITEM, survey.getDefaultLanguage(), simpleCodeList.getName());
+			
+			List<ListItem> items = simpleCodeList.getItems();
+			for (int itemIdx = 0; itemIdx < items.size(); itemIdx++) {
+				ListItem paramItem = items.get(itemIdx);
+				CodeListItem item = codeList.createItem(1);
+				item.setCode(ObjectUtils.defaultIfNull(paramItem.getCode(), String.valueOf(itemIdx + 1))); //specified code or item index
+				item.setLabel(languageCode, paramItem.getLabel());
+				item.setColor(paramItem.getColor());
+				codeList.addItem(item);
+			}
+			survey.addCodeList(codeList);
 		}
-		survey.addCodeList(codeList);
 		
 		Schema schema = survey.getSchema();
 
 		EntityDefinition rootEntityDef = schema.createEntityDefinition();
 		rootEntityDef.setName(singleAttributeSurveyRootEntityName);
 		schema.addRootEntityDefinition(rootEntityDef);
+		
 		
 		CodeAttributeDefinition idAttrDef = schema.createCodeAttributeDefinition();
 		idAttrDef.setName(singleAttributeSurveyKeyAttributeName);
@@ -125,10 +136,14 @@ public class SurveyCreator {
 		secondLevelIdAttrDef.setParentCodeAttributeDefinition(idAttrDef);
 		secondLevelEntityDef.addChildDefinition(secondLevelIdAttrDef);
 		
-		CodeAttributeDefinition valueAttrDef = schema.createCodeAttributeDefinition();
-		valueAttrDef.setName(singleAttributeSurveyValueAttributeName);
-		valueAttrDef.setList(codeList);
-		secondLevelEntityDef.addChildDefinition(valueAttrDef);
+		for (int i = 0; i < simpleCodeLists.size(); i++) {
+			String codeListName = "values_" + (i+1);
+			CodeList codeList = survey.getCodeList(codeListName);
+			CodeAttributeDefinition valueAttrDef = schema.createCodeAttributeDefinition();
+			valueAttrDef.setName(codeListName);
+			valueAttrDef.setList(codeList);
+			secondLevelEntityDef.addChildDefinition(valueAttrDef);
+		}
 		
 		//create root tab set
 		UIOptions uiOptions = survey.getUIOptions();

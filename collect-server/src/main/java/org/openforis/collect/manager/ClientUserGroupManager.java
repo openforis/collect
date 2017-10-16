@@ -98,8 +98,8 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		List<Map> userGroupRelations = getList(getUsersRestfulApiUrl() + "/user/" + user.getId() + "/groups", Map.class);
 		List<UserGroup> result = new ArrayList<UserGroup>();
 		for (Map userGroupRelation : userGroupRelations) {
-			int groupId = (Integer) userGroupRelation.get("groupId");
-			UserGroup group = loadById(groupId);
+			Double groupId = (Double) userGroupRelation.get("groupId");
+			UserGroup group = loadById(groupId.intValue());
 			result.add(group);
 		}
 		result.add(getDefaultPublicUserGroup());

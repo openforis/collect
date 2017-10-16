@@ -17,7 +17,7 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	
 	private String name;
 	private String description;
-	private List<ListItem> values = new ArrayList<ListItem>();
+	private List<SimpleCodeList> codeLists = new ArrayList<SimpleCodeList>();
 	private List<String> imagery = new ArrayList<String>();
 	private SamplingPointGenerationSettings samplingPointGenerationSettings;
 	private int userGroupId;
@@ -38,14 +38,14 @@ public class SimpleSurveyCreationParameters implements Serializable {
 		this.description = description;
 	}
 	
-	public List<ListItem> getValues() {
-		return values;
+	public List<SimpleCodeList> getCodeLists() {
+		return codeLists;
 	}
 	
-	public void setValues(List<ListItem> values) {
-		this.values = values;
+	public void setCodeLists(List<SimpleCodeList> codeLists) {
+		this.codeLists = codeLists;
 	}
-
+	
 	public List<String> getImagery() {
 		return imagery;
 	}
@@ -68,6 +68,28 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	
 	public void setUserGroupId(int userGroupId) {
 		this.userGroupId = userGroupId;
+	}
+	
+	public static class SimpleCodeList {
+		
+		private String name;
+		private List<ListItem> items;
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public List<ListItem> getItems() {
+			return items;
+		}
+		
+		public void setItems(List<ListItem> items) {
+			this.items = items;
+		}
 	}
 	
 	public static class ListItem {

@@ -144,6 +144,9 @@ public class SurveyController extends BasicController {
 	}
 	
 	private SurveyView generateView(CollectSurvey survey, boolean includeCodeListValues) {
+		if (survey == null) {
+			return null;
+		}
 		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH.getLanguage());
 		viewGenerator.setIncludeCodeListValues(includeCodeListValues);
 		SurveyView view = viewGenerator.generateView(survey);

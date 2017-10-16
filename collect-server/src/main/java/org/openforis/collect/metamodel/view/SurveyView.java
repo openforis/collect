@@ -15,6 +15,7 @@ public class SurveyView {
 	
 	private Integer id;
 	private String name;
+	private String title;
 	private boolean temporary;
 	private SurveyTarget target;
 	private UserGroup userGroup;
@@ -33,6 +34,7 @@ public class SurveyView {
 	
 	public SurveyView(CollectSurvey survey) {
 		this(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
+		this.title = survey.getProjectName();
 		this.userGroup = survey.getUserGroup();
 		this.schema = new SchemaView();
 		this.uiConfiguration = survey.getUIConfiguration();
@@ -54,6 +56,14 @@ public class SurveyView {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String title) {
+		this.title = title;
 	}
 	
 	public boolean isTemporary() {

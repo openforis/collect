@@ -51,6 +51,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
@@ -117,6 +118,8 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
+	private UserManager userManager;
+	@Autowired
 	private UserGroupManager userGroupManager;
 	@Autowired
 	private CollectJobManager jobManager;
@@ -166,8 +169,8 @@ public class RecordController extends BasicController implements Serializable {
 			@PathVariable int surveyId,
 			@Valid RecordSummarySearchParameters params) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		User user = sessionManager.getSessionState().getUser();
 		UserGroup surveyUserGroup = survey.getUserGroup();
+		User user = userManager.loadById(params.getUserId());
 		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
 		if (userInGroup == null) {
 			throw new IllegalArgumentException(String.format("User %s is not allowed to see records for survey %s", user.getUsername(), survey.getName()));
@@ -228,7 +231,7 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	RecordProxy newRecord(@PathVariable int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
-		User user = sessionManager.getSessionState().getUser();
+		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName()));
 		params.setVersionName(ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null));
@@ -348,7 +351,7 @@ public class RecordController extends BasicController implements Serializable {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		CollectRecord record = recordManager.load(survey, recordId);
 		RecordAccessControlManager accessControlManager = new RecordAccessControlManager();
-		if (accessControlManager.canEdit(sessionManager.getSessionState().getUser(), record)) {
+		if (accessControlManager.canEdit(sessionManager.getLoggedUser(), record)) {
 			CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 			CSVDataExportParameters parameters = new CSVDataExportParameters();
 			RecordFilter recordFilter = new RecordFilter(survey);
@@ -377,7 +380,7 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody JobView startCsvDataExportJob(
 			@PathVariable Integer surveyId,
 			@RequestBody CSVExportParametersForm parameters) throws IOException {
-		User user = sessionManager.getSessionState().getUser();
+		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		
 		csvDataExportJob = jobManager.createJob(CSVDataExportJob.class);
@@ -418,7 +421,7 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody JobView startBackupDataExportJob(
 			@PathVariable Integer surveyId,
 			@RequestBody BackupDataExportParameters parameters) throws IOException {
-		User user = sessionManager.getSessionState().getUser();
+		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		RecordFilter filter = new RecordFilter(survey);
 		if (parameters.isOnlyOwnedRecords()) {
@@ -505,11 +508,20 @@ public class RecordController extends BasicController implements Serializable {
 	
 	public static class RecordSummarySearchParameters extends SearchParameters {
 		
+		private Integer userId;
 		private String rootEntityName;
 		private List<RecordSummarySortField> sortFields;
 		private String[] keyValues;
 		private boolean caseSensitiveKeyValues = false;
 
+		public Integer getUserId() {
+			return userId;
+		}
+		
+		public void setUserId(Integer userId) {
+			this.userId = userId;
+		}
+		
 		public String getRootEntityName() {
 			return rootEntityName;
 		}
