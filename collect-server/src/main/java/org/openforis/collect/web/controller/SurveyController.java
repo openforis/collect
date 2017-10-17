@@ -76,20 +76,19 @@ public class SurveyController extends BasicController {
 			@RequestParam(value="includeTemporary", required=false) boolean includeTemporary) throws Exception {
 		String languageCode = Locale.ENGLISH.getLanguage();
 		Set<UserGroup> groups = getAvailableUserGrups(userId, groupId);
-		List<SurveySummary> summaries = surveyManager.getSurveySummaries(languageCode, groups);
+		List<SurveySummary> summaries = includeTemporary ? surveyManager.loadCombinedSummaries(languageCode, true, groups, null)
+				: surveyManager.getSurveySummaries(languageCode, groups);
 		
-		if (fullSurveys) {
-			List<SurveyView> views = new ArrayList<SurveyView>();
-			for (SurveySummary surveySummary : summaries) {
-				CollectSurvey survey = surveyManager.getById(surveySummary.getId());
+		List<Object> views = new ArrayList<Object>();
+		for (SurveySummary surveySummary : summaries) {
+			if (fullSurveys) {
+				CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveySummary.getId());
 				views.add(generateView(survey, includeCodeListValues));
+			} else {
+				views.add(surveySummary);
 			}
-			return views;
-		} else if (includeTemporary) {
-			return surveyManager.loadCombinedSummaries(languageCode, true); //TODO fix it, filter by user
-		} else {
-			return summaries;
 		}
+		return views;
 	}
 
 	@RequestMapping(value="{id}", method=GET)

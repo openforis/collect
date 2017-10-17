@@ -7,7 +7,7 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.uiconfiguration.view.UIConfigurationView;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.CollectSurvey.Availability;
+import org.openforis.collect.model.SurveyAvailability;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.xml.CeoApplicationOptions;
 
@@ -15,7 +15,8 @@ public class SurveyView {
 	
 	private Integer id;
 	private String name;
-	private String title;
+	private String projectName;
+	private String description;
 	private boolean temporary;
 	private SurveyTarget target;
 	private UserGroup userGroup;
@@ -23,7 +24,7 @@ public class SurveyView {
 	private List<CodeListView> codeLists = new ArrayList<CodeListView>();
 	private CeoApplicationOptions ceoApplicationOptions;
 	private UIConfiguration uiConfiguration;
-	private Availability availability;
+	private SurveyAvailability availability;
 	
 	public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
 		this.id = id;
@@ -34,7 +35,8 @@ public class SurveyView {
 	
 	public SurveyView(CollectSurvey survey) {
 		this(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
-		this.title = survey.getProjectName();
+		this.projectName = survey.getProjectName();
+		this.description = survey.getDescription();
 		this.userGroup = survey.getUserGroup();
 		this.schema = new SchemaView();
 		this.uiConfiguration = survey.getUIConfiguration();
@@ -58,12 +60,20 @@ public class SurveyView {
 		return name;
 	}
 	
-	public String getTitle() {
-		return title;
+	public String getProjectName() {
+		return projectName;
 	}
 	
-	public void setTitle(String title) {
-		this.title = title;
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 	public boolean isTemporary() {
@@ -106,7 +116,7 @@ public class SurveyView {
 		this.ceoApplicationOptions = ceoApplicationOptions;
 	}
 	
-	public Availability getAvailability() {
+	public SurveyAvailability getAvailability() {
 		return availability;
 	}
 }

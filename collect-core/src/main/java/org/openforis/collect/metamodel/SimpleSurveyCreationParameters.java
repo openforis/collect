@@ -16,6 +16,7 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private String name;
+	private String projectName;
 	private String description;
 	private List<SimpleCodeList> codeLists = new ArrayList<SimpleCodeList>();
 	private List<String> imagery = new ArrayList<String>();
@@ -28,6 +29,14 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getProjectName() {
+		return projectName;
+	}
+	
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
 	}
 	
 	public String getDescription() {

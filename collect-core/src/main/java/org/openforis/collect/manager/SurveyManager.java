@@ -3,6 +3,11 @@
  */
 package org.openforis.collect.manager;
 
+import static org.openforis.collect.model.SurveyAvailability.ARCHIVED;
+import static org.openforis.collect.model.SurveyAvailability.CLOSED;
+import static org.openforis.collect.model.SurveyAvailability.PUBLISHED;
+import static org.openforis.collect.model.SurveyAvailability.UNPUBLISHED;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,9 +24,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -42,11 +47,11 @@ import org.openforis.collect.metamodel.SurveySummarySortField;
 import org.openforis.collect.metamodel.SurveySummarySortField.Sortable;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.collect.model.SurveyAvailability;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.CollectSurvey.Availability;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyFileDao;
@@ -606,12 +611,17 @@ public class SurveyManager {
 	 * @return list of published and temporary surveys.
 	 */
 	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, List<SurveySummarySortField> sortFields) {
-		return loadCombinedSummaries(labelLang, includeDetails, null, sortFields);
+		return loadCombinedSummaries(labelLang, includeDetails, (User) null, sortFields);
 	}
 	
 	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, User availableToUser, List<SurveySummarySortField> sortFields) {
-		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang, availableToUser);
-		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails, availableToUser);
+		Set<UserGroup> userGroups = getAvailableUserGroups(availableToUser);
+		return loadCombinedSummaries(labelLang, includeDetails, userGroups, sortFields);
+	}
+		
+	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, Set<UserGroup> groups, List<SurveySummarySortField> sortFields) {
+		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang, groups);
+		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails, groups);
 		List<SurveySummary> result = new ArrayList<SurveySummary>();
 		Map<String, SurveySummary> summariesByUri = new HashMap<String, SurveySummary>();
 		for (SurveySummary summary : temporarySurveySummaries) {
@@ -625,6 +635,7 @@ public class SurveyManager {
 			if ( temporarySurveySummary == null ) {
 				result.add(publishedSurveySummary);
 			} else {
+				temporarySurveySummary.setAvailability(PUBLISHED);
 				temporarySurveySummary.setPublished(true);
 				temporarySurveySummary.setRecordValidationProcessStatus(publishedSurveySummary.getRecordValidationProcessStatus());
 			}
@@ -667,6 +678,9 @@ public class SurveyManager {
 	public CollectSurvey loadSurvey(int id) {
 		CollectSurvey survey = surveyDao.loadById(id);
 		if ( survey != null ) {
+			if (survey.isTemporary()) {
+				survey.setAvailability(UNPUBLISHED);
+			}
 			codeListManager.deleteInvalidCodeListReferenceItems(survey);
 			survey.getUIOptions().removeUnassignedTabs();
 			
@@ -687,13 +701,18 @@ public class SurveyManager {
 	}
 	
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails) {
-		return loadTemporarySummaries(labelLang, includeDetails, null);
+		return loadTemporarySummaries(labelLang, includeDetails, (User) null);
 	}
 	
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, User availableToUser) {
+		Set<UserGroup> userGroups = getAvailableUserGroups(availableToUser);
+		return loadTemporarySummaries(labelLang, includeDetails, userGroups);
+	}
+	
+	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, Set<UserGroup> userGroups) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
-		List<SurveySummary> filteredSummaries = filterSummariesByAvailableUserGroups(summaries, availableToUser);
-		fillSummaeriesReferencedItems(filteredSummaries);
+		List<SurveySummary> filteredSummaries = filterSummariesUserGroups(summaries, userGroups);
+		fillSummariesReferencedItems(filteredSummaries);
 		if ( includeDetails ) {
 			for (SurveySummary summary : filteredSummaries) {
 				CollectSurvey survey = surveyDao.loadById(summary.getId());
@@ -740,7 +759,7 @@ public class SurveyManager {
 		survey.setUri(generateSurveyUri(name));
 		survey.addLanguage(language);
 		survey.setTemporary(true);
-		survey.setAvailability(Availability.UNPUBLISHED);
+		survey.setAvailability(UNPUBLISHED);
 		if (survey.getSamplingDesignCodeList() == null) {
 			survey.addSamplingDesignCodeList();
 		}
@@ -789,7 +808,7 @@ public class SurveyManager {
 			temporarySurvey.setId(null);
 			temporarySurvey.setPublished(markCopyAsPublished);
 			temporarySurvey.setTemporary(true);
-			temporarySurvey.setAvailability(Availability.UNPUBLISHED);
+			temporarySurvey.setAvailability(UNPUBLISHED);
 			temporarySurvey.setPublishedId(preserveReferenceToPublishedSurvey ? publishedSurveyId : null);
 			if ( temporarySurvey.getSamplingDesignCodeList() == null ) {
 				temporarySurvey.addSamplingDesignCodeList();
@@ -817,7 +836,7 @@ public class SurveyManager {
 			newSurvey.setId(null);
 			newSurvey.setPublished(false);
 			newSurvey.setTemporary(true);
-			newSurvey.setAvailability(Availability.UNPUBLISHED);
+			newSurvey.setAvailability(UNPUBLISHED);
 			newSurvey.setPublishedId(null);
 			newSurvey.setName(newName);
 			newSurvey.setUri(generateSurveyUri(newName));
@@ -872,7 +891,7 @@ public class SurveyManager {
 			survey.setId(oldPublishedSurveyId);
 		}
 		survey.setTemporary(false);
-		survey.setAvailability(Availability.PUBLISHED);
+		survey.setAvailability(PUBLISHED);
 		survey.setPublished(true);
 		survey.setPublishedId(null);
 		survey.setModifiedDate(new Date());
@@ -936,14 +955,14 @@ public class SurveyManager {
 	}
 	
 	public void close(CollectSurvey survey) throws SurveyImportException {
-		updateAvailability(survey, Availability.CLOSED);
+		updateAvailability(survey, CLOSED);
 	}
 
 	public void archive(CollectSurvey survey) throws SurveyImportException {
-		updateAvailability(survey, Availability.ARCHIVED);
+		updateAvailability(survey, ARCHIVED);
 	}
 	
-	private void updateAvailability(CollectSurvey survey, Availability availability) throws SurveyImportException {
+	private void updateAvailability(CollectSurvey survey, SurveyAvailability availability) throws SurveyImportException {
 		survey.setAvailability(availability);
 		surveyDao.update(survey);
 	}
@@ -1085,7 +1104,7 @@ public class SurveyManager {
 		}
 	}
 
-	private void fillSummaeriesReferencedItems(Collection<SurveySummary> summaries) {
+	private void fillSummariesReferencedItems(Collection<SurveySummary> summaries) {
 		for (SurveySummary s : summaries) {
 			fillReferencedItems(s);
 		}
@@ -1130,11 +1149,14 @@ public class SurveyManager {
 		return status != null && status.isRunning();
 	}
 
-	private List<SurveySummary> filterSummariesByAvailableUserGroups(List<SurveySummary> summaries, User user) {
+	private List<SurveySummary> filterSummariesUserGroups(List<SurveySummary> summaries, Set<UserGroup> groups) {
+		if (groups == null || groups.isEmpty()) {
+			return summaries;
+		}
 		List<SurveySummary> filteredSurveys = new ArrayList<SurveySummary>(summaries.size());
-		List<Integer> userGroupIds = loadUserGroupIds(user);
+		List<Integer> groupIds = CollectionUtils.project(groups, "id");
 		for (SurveySummary summary : summaries) {
-			if (userGroupIds == null || userGroupIds.contains(summary.getUserGroupId())) {
+			if (groupIds.contains(summary.getUserGroupId())) {
 				filteredSurveys.add(summary);
 			}
 		}

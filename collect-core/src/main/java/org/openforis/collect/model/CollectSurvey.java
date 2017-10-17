@@ -37,36 +37,13 @@ public class CollectSurvey extends Survey {
 	
 	public static final String SAMPLING_DESIGN_CODE_LIST_NAME = "sampling_design";
 	
-	public enum Availability {
-		UNPUBLISHED('u'), PUBLISHED('p'), CLOSED('c'), ARCHIVED('a');
-		
-		private char code;
-
-		Availability(char code) {
-			this.code = code;
-		}
-		
-		public static Availability fromCode(char code) {
-			for (Availability val : values()) {
-				if (val.code == code) {
-					return val;
-				}
-			}
-			throw new IllegalArgumentException("Invalid code for CollectSurvey.Visibility: " + code);
-		}
-		
-		public char getCode() {
-			return code;
-		}
-	}
-	
 	private boolean temporary;
 	private Version collectVersion;
 	private SurveyTarget target;
 	private Integer publishedId;
 	private Integer userGroupId;
 	private UserGroup userGroup;
-	private Availability availability;
+	private SurveyAvailability availability;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -249,11 +226,11 @@ public class CollectSurvey extends Survey {
 		this.userGroupId = userGroup == null ? null : userGroup.getId();
 	}
 	
-	public Availability getAvailability() {
+	public SurveyAvailability getAvailability() {
 		return availability;
 	}
 	
-	public void setAvailability(Availability availability) {
+	public void setAvailability(SurveyAvailability availability) {
 		this.availability = availability;
 	}
 }

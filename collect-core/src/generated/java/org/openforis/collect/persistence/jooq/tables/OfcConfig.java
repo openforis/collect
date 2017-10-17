@@ -32,7 +32,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcConfigRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcConfig extends TableImpl<OfcConfigRecord> {
 
-	private static final long serialVersionUID = 940405265;
+	private static final long serialVersionUID = 111242347;
 
 	/**
 	 * The reference instance of <code>collect.ofc_config</code>
@@ -50,7 +50,7 @@ public class OfcConfig extends TableImpl<OfcConfigRecord> {
 	/**
 	 * The column <code>collect.ofc_config.name</code>.
 	 */
-	public final TableField<OfcConfigRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR.length(30).nullable(false), this, "");
+	public final TableField<OfcConfigRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR.length(25).nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_config.value</code>.

@@ -1,5 +1,7 @@
 package org.openforis.collect.persistence;
 
+import static org.openforis.collect.model.SurveyAvailability.PUBLISHED;
+import static org.openforis.collect.model.SurveyAvailability.UNPUBLISHED;
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
@@ -22,7 +24,6 @@ import org.openforis.collect.manager.SurveyMigrator;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.model.CollectSurvey.Availability;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
@@ -208,7 +209,7 @@ public class SurveyDao extends JooqDaoSupport {
 				.fetch();
 		for (Record row : results) {
 			CollectSurvey survey = processSurveyRow(row);
-			survey.setAvailability(Availability.PUBLISHED);
+			survey.setAvailability(PUBLISHED);
 			surveys.add(survey);
 		}
 		return surveys;
@@ -285,6 +286,7 @@ public class SurveyDao extends JooqDaoSupport {
 		s.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
 		s.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
 		s.setUserGroupId(row.getValue(OFC_SURVEY.USERGROUP_ID));
+		s.setAvailability(s.isTemporary() ? UNPUBLISHED: PUBLISHED);
 		return s;
 	}
 	

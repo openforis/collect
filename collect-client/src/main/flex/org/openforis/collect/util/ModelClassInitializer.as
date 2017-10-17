@@ -47,6 +47,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.UITabProxy;
 	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
+	import org.openforis.collect.model.SurveyAvailability;
 	import org.openforis.collect.model.SurveySummary;
 	import org.openforis.collect.model.proxy.AttributeAddChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
@@ -156,6 +157,7 @@ package org.openforis.collect.util {
 				SchemaProxy,
 				SpatialReferenceSystemProxy,
 				SpeciesImportStatusProxy,
+				SurveyAvailability,
 				SurveyProxy,
 				SurveySummary,
 				TaxonAttributeDefinitionProxy,

@@ -31,6 +31,7 @@ public class SurveySummary {
 	private List<String> languages;
 	private Integer userGroupId;
 	private UserGroup userGroup;
+	private SurveyAvailability availability;
 	
 	public SurveySummary() {
 	}
@@ -195,5 +196,13 @@ public class SurveySummary {
 	public void setUserGroup(UserGroup userGroup) {
 		this.userGroup = userGroup;
 		this.userGroupId = userGroup == null ? null: userGroup.getId();
+	}
+	
+	public SurveyAvailability getAvailability() {
+		return availability;
+	}
+	
+	public void setAvailability(SurveyAvailability availability) {
+		this.availability = availability;
 	}
 }

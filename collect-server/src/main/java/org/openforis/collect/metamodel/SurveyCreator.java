@@ -22,6 +22,7 @@ import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.persistence.xml.CeoApplicationOptions;
+import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -38,10 +39,8 @@ public class SurveyCreator {
 	private UserGroupManager userGroupManager;
 	//TODO make it configurable
 	private String languageCode = Locale.ENGLISH.getLanguage();
-	private String singleAttributeSurveyCodeListName = "values";
 	private String singleAttributeSurveyRootEntityName = "plot";
 	private String singleAttributeSurveyKeyAttributeName = "plot_id";
-	private String singleAttributeSurveyValueAttributeName = "value";
 	private String singleAttributeSurveyTabLabel = "Plot";
 	private String singleAttributeSurveySecondLevelEntityName = "subplot";
 	private String singleAttributeSurveySecondLevelIdAttributeName = "subplot_id";
@@ -58,13 +57,15 @@ public class SurveyCreator {
 
 	public CollectSurvey generateSimpleSurvey(SimpleSurveyCreationParameters parameters)
 			throws SurveyStoreException, SurveyImportException {
-		String name = parameters.getName();
-		CollectSurvey existingSurvey = surveyManager.get(name);
+		String projectName = parameters.getProjectName();
+		String internalName = ObjectUtils.defaultIfNull(parameters.getName(), SurveyObjects.adjustInternalName(projectName));
+		CollectSurvey existingSurvey = surveyManager.get(internalName);
 		if (existingSurvey != null) {
 			//TODO move it to validator
-			throw new IllegalArgumentException(String.format("Survey with name %s already existing", name));
+			throw new IllegalArgumentException(String.format("Survey with name %s already existing", internalName));
 		}
-		CollectSurvey survey = createTemporarySimpleSurvey(name, parameters.getCodeLists());
+		CollectSurvey survey = createTemporarySimpleSurvey(internalName, parameters.getCodeLists());
+		survey.setProjectName(survey.getDefaultLanguage(), projectName);
 		UserGroup userGroup = userGroupManager.loadById(parameters.getUserGroupId());
 		survey.setUserGroup(userGroup);
 	
