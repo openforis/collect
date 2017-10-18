@@ -38,7 +38,7 @@
         <constructor-arg ref="transactionAwareDataSource" />
     </bean>
 
- 	<bean id="jooqConfiguration" autowire="no"
+ 	<bean id="jooqConfig" autowire="no"
 		class="org.jooq.impl.DialectAwareJooqConfiguration">
 		<constructor-arg ref="connectionProvider" />
 	</bean>
@@ -46,7 +46,7 @@
 	<!-- Configure the DSL object, optionally overriding jOOQ Exceptions with 
 		Spring Exceptions -->
 	<bean id="dsl" class="org.openforis.collect.persistence.jooq.CollectDSLContext">
-		<constructor-arg ref="jooqConfiguration" />
+		<constructor-arg ref="jooqConfig" />
 	</bean>
     
     <!-- End of JOOQ configuration -->
@@ -66,61 +66,51 @@
 		lazy-init="false" depends-on="liquibase">
 		<property name="dsl" ref="dsl" />
 	</bean>
-	
 	<bean id="codeListItemDao" class="org.openforis.collect.persistence.CodeListItemDao"
 		lazy-init="false" depends-on="liquibase">
 		<property name="dsl" ref="dsl" />
 		<property name="useCache" value="true" />
 	</bean>
-	
 	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao"
 		lazy-init="false" depends-on="liquibase">
   		<property name="dsl" ref="dsl" />
 	</bean>
-	
 	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
   		<property name="dsl" ref="dsl" />
 	</bean>
-	
+	<bean id="imageryDao" class="org.openforis.collect.persistence.ImageryDao">
+  		<constructor-arg ref="jooqConfig" />
+	</bean>
 	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
   		<property name="dsl" ref="dsl" />
 	</bean>
-	
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
   		<property name="dsl" ref="dsl" />
 	</bean>
-
 	<bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
 		<property name="dsl" ref="dsl" />
 	</bean>
-  
 	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao"
 		init-method="init">
 		<property name="dsl" ref="dsl" />
 	</bean>
-
 	<bean id="surveyFileDao" class="org.openforis.collect.persistence.SurveyFileDao">
 		<property name="dsl" ref="dsl" />
 	</bean>
-
 	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDao">
   		<property name="dsl" ref="dsl" />
 	</bean>
-	
 	<bean id="taxonDao" class="org.openforis.collect.persistence.TaxonDao">
   		<property name="dsl" ref="dsl" />
 	</bean>
-	
 	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDao">
   		<property name="dsl" ref="dsl" />
 	</bean>
-
 	<bean id="userDao" class="org.openforis.collect.persistence.UserDao">
   		<property name="dsl" ref="dsl" />
 	</bean>
-	
 	<bean id="userGroupDao" class="org.openforis.collect.persistence.UserGroupDao">
-  		<constructor-arg ref="jooqConfiguration" />
+  		<constructor-arg ref="jooqConfig" />
 	</bean>
 	
 	<!--  Managers -->

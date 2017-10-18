@@ -17,7 +17,6 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,13 +33,6 @@ public class DataReportManager extends AbstractSurveyObjectManager<DataReport, D
 	@Autowired
 	private DataReportItemDao dataReportItemDao;
 
-	@Override
-	@Autowired
-	@Qualifier("dataReportDao")
-	public void setDao(DataReportDao dao) {
-		super.setDao(dao);
-	}
-	
 	@Override
 	public void delete(DataReport obj) {
 		dataReportItemDao.deleteByReport(obj);

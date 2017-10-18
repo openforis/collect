@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcImageryRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcImagery extends TableImpl<OfcImageryRecord> {
 
-	private static final long serialVersionUID = 1937246028;
+	private static final long serialVersionUID = -1254891450;
 
 	/**
 	 * The reference instance of <code>collect.ofc_imagery</code>
@@ -72,6 +72,11 @@ public class OfcImagery extends TableImpl<OfcImageryRecord> {
 	 * The column <code>collect.ofc_imagery.source_config</code>.
 	 */
 	public final TableField<OfcImageryRecord, String> SOURCE_CONFIG = createField("source_config", org.jooq.impl.SQLDataType.VARCHAR.length(2047).nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_imagery.visibility</code>. N=Private, P=Public
+	 */
+	public final TableField<OfcImageryRecord, String> VISIBILITY = createField("visibility", org.jooq.impl.SQLDataType.CHAR.length(1).nullable(false).defaulted(true), this, "N=Private, P=Public");
 
 	/**
 	 * Create a <code>collect.ofc_imagery</code> table reference

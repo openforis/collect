@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.openforis.collect.persistence.PersistedObjectDao;
 import org.openforis.idm.metamodel.PersistedObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 
@@ -66,6 +67,7 @@ public abstract class AbstractPersistedObjectManager<T extends PersistedObject, 
 		return dao;
 	}
 	
+	@Autowired
 	public void setDao(D dao) {
 		this.dao = dao;
 	}

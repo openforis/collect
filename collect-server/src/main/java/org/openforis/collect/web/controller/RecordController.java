@@ -168,13 +168,11 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody Map<String, Object> loadRecordSummaries(
 			@PathVariable int surveyId,
 			@Valid RecordSummarySearchParameters params) {
-		CollectSurvey survey = surveyManager.getById(surveyId);
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		UserGroup surveyUserGroup = survey.getUserGroup();
-		User user = userManager.loadById(params.getUserId());
-		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
-		if (userInGroup == null) {
-			throw new IllegalArgumentException(String.format("User %s is not allowed to see records for survey %s", user.getUsername(), survey.getName()));
-		}
+		Integer userId = params.getUserId();
+		User user = userId == null ? null : userManager.loadById(userId);
+		
 		Map<String, Object> result = new HashMap<String, Object>();
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefinition = params.getRootEntityName() == null ? schema.getFirstRootEntityDefinition() : 
@@ -186,11 +184,15 @@ public class RecordController extends BasicController implements Serializable {
 		filter.setOffset(params.getOffset());
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
 		
-		String qualifierName = userInGroup.getGroup().getQualifier1Name();
-		if (StringUtils.isNotBlank(qualifierName)) {
-			HashMap<String, String> qualifiersByName = new HashMap<String, String>();
-			qualifiersByName.put(qualifierName, userInGroup.getGroup().getQualifier1Value());
-			filter.setQualifiersByName(qualifiersByName);
+		//filter by user group qualifier
+		if (user != null) {
+			UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
+			String qualifierName = userInGroup.getGroup().getQualifier1Name();
+			if (StringUtils.isNotBlank(qualifierName)) {
+				HashMap<String, String> qualifiersByName = new HashMap<String, String>();
+				qualifiersByName.put(qualifierName, userInGroup.getGroup().getQualifier1Value());
+				filter.setQualifiersByName(qualifiersByName);
+			}
 		}
 		
 		//load summaries

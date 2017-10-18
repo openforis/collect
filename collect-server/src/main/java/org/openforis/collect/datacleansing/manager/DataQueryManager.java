@@ -15,7 +15,6 @@ import org.openforis.collect.datacleansing.persistence.DataQueryDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
@@ -35,13 +34,6 @@ public class DataQueryManager extends AbstractSurveyObjectManager<DataQuery, Dat
 	@Autowired
 	private MessageSource messageSource;
 	
-	@Override
-	@Autowired
-	@Qualifier("dataQueryDao")
-	public void setDao(DataQueryDao dao) {
-		super.setDao(dao);
-	}
-
 	@Override
 	public void delete(DataQuery query) {
 		checkNotExistsCalculationStepUsingQuery(query);

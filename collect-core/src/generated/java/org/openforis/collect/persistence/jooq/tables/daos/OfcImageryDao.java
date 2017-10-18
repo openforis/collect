@@ -90,4 +90,11 @@ public class OfcImageryDao extends DAOImpl<OfcImageryRecord, org.openforis.colle
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcImagery> fetchBySourceConfig(String... values) {
 		return fetch(OfcImagery.OFC_IMAGERY.SOURCE_CONFIG, values);
 	}
+
+	/**
+	 * Fetch records that have <code>visibility IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcImagery> fetchByVisibility(String... values) {
+		return fetch(OfcImagery.OFC_IMAGERY.VISIBILITY, values);
+	}
 }

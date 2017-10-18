@@ -1,5 +1,8 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +21,7 @@ import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.web.controller.UserGroupController.UserGroupForm;
 import org.openforis.collect.web.validator.UserGroupValidator;
 import org.openforis.commons.web.PersistedObjectForm;
+import org.openforis.commons.web.Response;
 import org.openforis.commons.web.SimpleObjectForm;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +29,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
 @Controller
@@ -65,7 +71,25 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	protected List<UserGroup> loadAllItems() {
 		return itemManager.findPublicUserGroups();
 	}
-		
+	
+	@RequestMapping(value="/{userGroupId}/resources/{resourceType}/{resourceId}", method=POST)
+	public @ResponseBody Response associateToResource(
+			@PathVariable int userGroupId, 
+			@PathVariable String resourceType,
+			@PathVariable String resourceId) {
+		itemManager.associateResource(userGroupId, resourceType, resourceId);
+		return new Response();
+	}
+	
+	@RequestMapping(value="/{userGroupId}/resources/{resourceType}/{resourceId}", method=DELETE)
+	public @ResponseBody Response disassociateToResource(
+			@PathVariable int userGroupId, 
+			@PathVariable String resourceType,
+			@PathVariable String resourceId) {
+		itemManager.disassociateResource(userGroupId, resourceType, resourceId);
+		return new Response();
+	}
+	
 	public static class UserGroupForm extends PersistedObjectForm<UserGroup> {
 		
 		private String    name;

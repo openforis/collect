@@ -16,7 +16,6 @@ import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.UserGroup.Visibility;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.UserGroupDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +26,6 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	private static final String DEFAULT_PRIVATE_USER_GROUP_LABEL_SUFFIX = " Default Private Group";
 	
 	private static UserGroup DEFAULT_PUBLIC_USER_GROUP = null;
-	
-	@Override
-	@Autowired
-	public void setDao(UserGroupDao dao) {
-		super.setDao(dao);
-	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
 	public UserGroup createDefaultPrivateUserGroup(User user) {

@@ -13,7 +13,6 @@ import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,13 +25,6 @@ public class DataQueryGroupManager extends AbstractSurveyObjectManager<DataQuery
 
 	@Autowired
 	private DataQueryManager dataQueryManager;
-	
-	@Override
-	@Autowired
-	@Qualifier("dataQueryGroupDao")
-	public void setDao(DataQueryGroupDao dao) {
-		super.setDao(dao);
-	}
 	
 	public Set<DataQueryGroup> loadByQuery(DataQuery query) {
 		Set<DataQueryGroup> groups = dao.loadGroupsByQuery(query);

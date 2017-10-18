@@ -18,10 +18,12 @@
 			<column name="attribution" type="VARCHAR(255)">
 				<constraints nullable="false" />
 			</column>
-			<column name="extent" type="VARCHAR(255)">
+			<column name="extent" type="VARCHAR(255)" />
+			<column name="source_config" type="VARCHAR(2047)">
 				<constraints nullable="false" />
 			</column>
-			<column name="source_config" type="VARCHAR(2047)">
+			<column name="visibility" type="char(1)" defaultValue="N"
+					remarks="N=Private, P=Public">
 				<constraints nullable="false" />
 			</column>
 		</createTable>

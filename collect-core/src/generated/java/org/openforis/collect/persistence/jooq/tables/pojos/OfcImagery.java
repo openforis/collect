@@ -22,13 +22,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcImagery implements Serializable {
 
-	private static final long serialVersionUID = -1816341167;
+	private static final long serialVersionUID = -1392081964;
 
 	private Integer id;
 	private String  title;
 	private String  attribution;
 	private String  extent;
 	private String  sourceConfig;
+	private String  visibility;
 
 	public OfcImagery() {}
 
@@ -38,6 +39,7 @@ public class OfcImagery implements Serializable {
 		this.attribution = value.attribution;
 		this.extent = value.extent;
 		this.sourceConfig = value.sourceConfig;
+		this.visibility = value.visibility;
 	}
 
 	public OfcImagery(
@@ -45,13 +47,15 @@ public class OfcImagery implements Serializable {
 		String  title,
 		String  attribution,
 		String  extent,
-		String  sourceConfig
+		String  sourceConfig,
+		String  visibility
 	) {
 		this.id = id;
 		this.title = title;
 		this.attribution = attribution;
 		this.extent = extent;
 		this.sourceConfig = sourceConfig;
+		this.visibility = visibility;
 	}
 
 	public Integer getId() {
@@ -92,5 +96,13 @@ public class OfcImagery implements Serializable {
 
 	public void setSourceConfig(String sourceConfig) {
 		this.sourceConfig = sourceConfig;
+	}
+
+	public String getVisibility() {
+		return this.visibility;
+	}
+
+	public void setVisibility(String visibility) {
+		this.visibility = visibility;
 	}
 }

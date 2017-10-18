@@ -47,11 +47,11 @@ public class SamplingPointsController extends BasicController {
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value="survey/{surveyId}/sampling_point_data.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SamplingDesignItem> loadSamplingPoints(
 			@PathVariable int surveyId, 
-			@RequestParam(value="parent_keys", required=false) String[] parentKeys, 
+			@RequestParam(value="parent_keys[]", required=false) String[] parentKeys, 
 			@RequestParam(value="only_parent_item", required=false, defaultValue="false") boolean onlyParentItem) {
 		if (onlyParentItem) {
 			SamplingDesignItem item = samplingDesignManager.loadItem(surveyId, parentKeys);
@@ -61,7 +61,7 @@ public class SamplingPointsController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/sampling_point_data.csv", method=GET)
+	@RequestMapping(value = "api/survey/{surveyId}/sampling_point_data.csv", method=GET)
 	public @ResponseBody String exportWorkSamplingDesign(HttpServletResponse response,
 			@PathVariable("surveyId") Integer surveyId) throws IOException {
 		SamplingDesignExportProcess process = new SamplingDesignExportProcess(samplingDesignManager);
@@ -72,14 +72,14 @@ public class SamplingPointsController extends BasicController {
 		return "ok";
 	}
 	
-	@RequestMapping(value="survey/{surveyId}/sampling_point_data", method=PATCH, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data", method=PATCH, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SamplingDesignItem updateSamplingPointItem(@PathVariable int surveyId, @RequestBody SamplingDesignItem item) {
 		samplingDesignManager.save(item);
 		return item;
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/sampling_point_data.kml", method=GET, produces=KML_CONTENT_TYPE)
+	@RequestMapping(value = "api/survey/{surveyId}/sampling_point_data.kml", method=GET, produces=KML_CONTENT_TYPE)
 	public void loadSamplingPointKmlData(@PathVariable int surveyId, HttpServletResponse response) throws Exception {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		SamplingPointDataKmlGenerator samplingPointDataKmlGenerator = new SamplingPointDataKmlGenerator(samplingDesignManager, survey);
@@ -87,7 +87,7 @@ public class SamplingPointsController extends BasicController {
 		samplingPointDataKmlGenerator.write(response.getOutputStream());
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/sampling_point_data_features.json", method=GET)
+	@RequestMapping(value = "api/survey/{surveyId}/sampling_point_data_features.json", method=GET)
 	public @ResponseBody FeatureCollection loadSamplingPointData(@PathVariable int surveyId) {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		return loadSamplingPointDataFeatures(survey);

@@ -1,5 +1,10 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +13,12 @@ import org.openforis.commons.web.AbstractFormUpdateValidationResponse;
 import org.openforis.commons.web.PersistedObjectForm;
 import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.PersistedObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -141,6 +146,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		return response;
 	}
 	
+	@Autowired
 	public void setItemManager(M itemManager) {
 		this.itemManager = itemManager;
 	}

@@ -92,7 +92,8 @@ public class RecordGenerator {
 			String keyPart = recordKey.get(i);
 			AttributeDefinition keyAttrDef = keyAttributeDefs.get(i);
 			Attribute<?,Value> keyAttribute = record.findNodeByPath(keyAttrDef.getPath());
-			recordUpdater.updateAttribute(keyAttribute, keyAttrDef.createValue(keyPart));
+			Value value = keyAttrDef.createValue(keyPart);
+			recordUpdater.updateAttribute(keyAttribute, value);
 		}
 		return survey;
 	}

@@ -9,6 +9,7 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.openforis.collect.model.Imagery;
 import org.openforis.collect.persistence.jooq.tables.daos.OfcImageryDao;
+import org.openforis.collect.persistence.jooq.tables.pojos.OfcImagery;
 
 public class ImageryDao extends OfcImageryDao implements PersistedObjectDao<Imagery, Integer> {
 
@@ -21,6 +22,15 @@ public class ImageryDao extends OfcImageryDao implements PersistedObjectDao<Imag
 		return new Imagery(fetchOneById(id));
 	}
 
+	public Imagery findByTitle(String title) {
+		List<OfcImagery> result = super.fetchByTitle(title);
+		if (result.isEmpty()) {
+			return null;
+		} else {
+			return new Imagery(result.get(0));
+		}
+	}
+	
 	@Override
 	public List<Imagery> loadAll() {
 		return dsl()

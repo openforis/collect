@@ -86,10 +86,6 @@ public abstract class AbstractSurveyObjectManager
 		dao.delete(id);
 	}
 	
-	public void setDao(D dao) {
-		this.dao = dao;
-	}
-	
 //	private static class PersistedSurveyObjectCache<S extends PersistedSurveyObject> {
 //		
 //		private Map<Integer, List<S>> typesBySurvey;

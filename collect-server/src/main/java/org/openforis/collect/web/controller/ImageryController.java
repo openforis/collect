@@ -1,15 +1,35 @@
 package org.openforis.collect.web.controller;
 
 import org.openforis.collect.manager.ImageryManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.model.Imagery;
 import org.openforis.collect.web.controller.ImageryController.ImageryForm;
+import org.openforis.collect.web.validator.ImageryValidator;
 import org.openforis.commons.web.PersistedObjectForm;
+import org.openforis.commons.web.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/api/imagery")
 public class ImageryController extends AbstractPersistedObjectEditFormController<Imagery, ImageryForm, ImageryManager> {
+	
+	private static final String IMAGERY_RESOURCE_TYPE = "IMAGERY";
+	
+	@Autowired
+	private ImageryValidator validator;
+	@Autowired
+	private UserGroupManager userGroupManager;
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.setValidator(validator);
+	}
 	
 	@Override
 	protected Imagery createItemInstance() {
@@ -18,15 +38,38 @@ public class ImageryController extends AbstractPersistedObjectEditFormController
 
 	@Override
 	protected ImageryForm createFormInstance(Imagery item) {
-		return new ImageryForm();
+		return new ImageryForm(item);
+	}
+	
+	@Override
+	public Response insert(@RequestBody ImageryForm form, BindingResult result) {
+		Response response = super.insert(form, result);
+		if (response.isStatusOk()) {
+			Imagery reloaded = itemManager.findByTitle(form.getTitle());
+			ImageryForm reloadedForm = createFormInstance(reloaded);
+			return new SimpleFormUpdateResponse(reloadedForm);
+		} else {
+			return response;
+		}
+	}
+	
+	@Override
+	public Response update(@RequestBody ImageryForm form, BindingResult result) {
+		return super.update(form, result);
 	}
 
 	public static class ImageryForm extends PersistedObjectForm<Imagery> {
 
-		private String  title;
-		private String  attribution;
-		private String  extent;
-		private String  sourceConfig;
+		private String title;
+		private String attribution;
+		private String extent;
+		private String sourceConfig;
+
+		public ImageryForm() {}
+		
+		public ImageryForm(Imagery imagery) {
+			super(imagery);
+		}
 
 		public String getTitle() {
 			return title;
