@@ -4,14 +4,21 @@ export default class AbstractService {
 
     BASE_URL = Constants.API_BASE_URL;
     
+    constructor() {
+        this._handleError = this._handleError.bind(this)
+    }
+
     get(url, data) {
         let queryData = this._toQueryData(data);
         return fetch(this.BASE_URL + url + (queryData === null ? '': '?' + queryData), {
                 credentials: 'include'
             })
             .then(response => {
+                if (!response.ok) {
+                    throw Error(response.statusText)
+                }
                 return response.json()
-            }, error => console.log('An error occured.', error))
+            }, this._handleError)
             .catch(error => {
                 throw(error);
             })
@@ -23,7 +30,7 @@ export default class AbstractService {
             method: 'DELETE'
         })
         .then(response => response.json(),
-            error => console.log('An error occured.', error))
+            this._handleError)
         .catch(error => {
             throw(error);
         })
@@ -40,7 +47,7 @@ export default class AbstractService {
             },
             body: body
         }).then(response => response.json(),
-            error => console.log('An error occured.', error))
+            this._handleError)
         .catch(error => {
             throw(error);
         })
@@ -61,7 +68,7 @@ export default class AbstractService {
             method: 'POST',
             body: formData
         }).then(response => response.json(),
-            error => console.log('An error occured.', error))
+            this._handleError)
         .catch(error => {
             throw(error);
         })
@@ -80,7 +87,7 @@ export default class AbstractService {
             },
             body: JSON.stringify(data)
         }).then(response => response.json(),
-            error => console.log('An error occured.', error))
+            this._handleError)
         .catch(error => {
             throw(error);
         })
@@ -121,5 +128,9 @@ export default class AbstractService {
           }).filter(item => item !== null && item !== '').join('&');
     }
     
+    _handleError(error) {
+        console.log('Remote Service: error occurred.', error)
+        throw error;
+    }
 }
     

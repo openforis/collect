@@ -17,7 +17,7 @@ import Page500 from 'views/Pages/Page500/'
 
 import rootReducer from 'reducers'
 import Startup from 'containers/Startup'
-import ServerConnectionVerifier from 'containers/ServerConnectionVerifier'
+import SessionTimeoutVerifier from 'containers/SessionTimeoutVerifier'
 
 const loggerMiddleware = createLogger()
 
@@ -31,18 +31,18 @@ const store = createStore(
 
 ReactDOM.render((
   <Provider store={store}>
-    <ServerConnectionVerifier>
+    <SessionTimeoutVerifier>
       <Startup>
         <HashRouter>
           <Switch>
-            <Route exact path="/signin" name="Signin Page" component={Signin}/>
-            <Route exact path="/register" name="Register Page" component={Register}/>
-            <Route exact path="/404" name="Page 404" component={Page404}/>
-            <Route exact path="/500" name="Page 500" component={Page500}/>
+            <Route exact path="/signin" name="Signin Page" component={Signin} />
+            <Route exact path="/register" name="Register Page" component={Register} />
+            <Route exact path="/404" name="Page 404" component={Page404} />
+            <Route exact path="/500" name="Page 500" component={Page500} />
             <Route path="/" name="Home" component={App} />
           </Switch>
         </HashRouter>
       </Startup>
-    </ServerConnectionVerifier>
+    </SessionTimeoutVerifier>
   </Provider>
 ), document.getElementById('root'))
