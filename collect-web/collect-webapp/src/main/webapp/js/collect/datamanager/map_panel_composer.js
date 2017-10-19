@@ -214,7 +214,7 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			var surveyGroup = $this.createSurveyLayerGroup(survey);
 			surveysOverlayGroup.getLayers().push(surveyGroup);
 		});
-	}, function() {}, true);
+	}, function() {}, collect.loggedUser.id);
 
 	$this.initialized = true;
 
@@ -548,7 +548,7 @@ Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 }
 
 Collect.DataManager.MapPanelComposer.prototype.createSamplingPointDataSource = function(survey, callback, readyCallback) {
-	var url = OF.Strings.format("survey/{0}/sampling_point_data.kml", survey.id);
+	var url = OF.Strings.format("api/survey/{0}/sampling_point_data.kml", survey.id);
 	
 	var source = new ol.source.Vector({
 		url : url,
@@ -830,7 +830,7 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 	$(modalContainer).on("resize", resizeIFrame);
 
 	modalContainer.on('show.bs.modal', function() {
-		iframe.attr("src", "index.htm?edit=true"
+		iframe.attr("src", "old_client.htm?edit=true"
 			+ "&surveyId=" + surveyId
 			+ "&recordId=" + recordId
 			+ "&locale=" + OF.i18n.currentLocale());

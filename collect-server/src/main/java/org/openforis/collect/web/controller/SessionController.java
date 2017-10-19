@@ -72,7 +72,7 @@ public class SessionController extends BasicController {
 	}
 	
 	@RequestMapping(value="user", method=RequestMethod.GET)
-	public @ResponseBody UserForm getActiveUser(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody UserForm getLoggedUser(HttpServletRequest request, HttpServletResponse response) {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
 		if (user == null) {

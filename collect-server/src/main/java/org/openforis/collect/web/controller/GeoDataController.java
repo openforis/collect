@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
 @Controller
+@RequestMapping("api")
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
 public class GeoDataController {
 

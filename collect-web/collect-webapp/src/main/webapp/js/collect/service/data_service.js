@@ -1,6 +1,6 @@
 Collect.DataService = function() {
 	Collect.AbstractService.apply(this, arguments);
-	this.contextPath = "";
+	this.contextPath = "api/";
 };
 
 Collect.DataService.prototype = Object.create(Collect.AbstractService.prototype);

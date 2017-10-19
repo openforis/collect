@@ -1,6 +1,6 @@
 Collect.GeoDataService = function() {
 	Collect.AbstractService.apply(this, arguments);
-	this.contextPath = "";
+	this.contextPath = "api/";
 };
 
 Collect.GeoDataService.prototype = Object.create(Collect.AbstractService.prototype);
@@ -32,5 +32,5 @@ Collect.GeoDataService.prototype.loadSamplingPointCoordinates = function(surveyI
 		recordOffset: recordOffset, 
 		maxNumberOfRecords: maxNumberOfRecords
 	};
-	this.send("survey/" + surveyId + "/sampling_point_data.json", data, "GET", onSuccess, onError);
+	this.send("survey/" + surveyId + "/sampling_point_data", data, "GET", onSuccess, onError);
 };

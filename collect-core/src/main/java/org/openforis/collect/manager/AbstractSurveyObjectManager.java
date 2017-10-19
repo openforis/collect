@@ -19,7 +19,6 @@ public abstract class AbstractSurveyObjectManager
 		<T extends PersistedSurveyObject, D extends SurveyObjectMappingJooqDaoSupport<T, ?>> 
 		extends AbstractPersistedObjectManager<T, Integer, D> {
 
-	protected D dao;
 //	private PersistedSurveyObjectCache<T> cache;
 	
 	@Override

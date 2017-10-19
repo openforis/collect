@@ -30,7 +30,7 @@ Collect.SurveySelectDialogController.prototype.loadInstanceVariables = function(
 	collect.surveyService.loadSummaries(function(summaries) {
 		$this.surveySummaries = summaries;
 		callback();
-	});
+	}, null, collect.loggedUser.id);
 };
 
 Collect.SurveySelectDialogController.prototype.initFormElements = function(callback) {

@@ -19,11 +19,27 @@ Collect.VERSION = "PROJECT_VERSION";
 Collect.SURVEY_CHANGED = "surveyChanged";
 
 Collect.prototype.init = function() {
+	var $this = this;
+
 	this.initI18n();
 	
 	this.initGlobalEventHandlers();
 	
-	this.initView();
+	this.loadSession(function() {
+		$this.initView();
+	});
+};
+
+Collect.prototype.loadSession = function(onComplete) {
+	var $this = this;
+	
+	$this.sessionService.getLoggedUser(function(user) {
+		$this.loggedUser = user;
+		
+		if (onComplete) {
+			onComplete();
+		}
+	});	
 };
 
 Collect.prototype.initI18n = function() {
@@ -46,7 +62,8 @@ Collect.prototype.checkActiveSurveySelected = function() {
 		var surveySelectDialogController = new Collect.SurveySelectDialogController();
 		surveySelectDialogController.open();
 	};
-	this.sessionService.getActiveSurvey(function(survey) {
+	
+	$this.sessionService.getActiveSurvey(function(survey) {
 		if (survey == null) {
 			collect.surveyService.loadSummaries(function(summaries) {
 				switch(summaries.length) {
@@ -62,7 +79,7 @@ Collect.prototype.checkActiveSurveySelected = function() {
 				default:
 					openSurveySelectDialog();
 				}
-			});
+			}, null, collect.loggedUser.id);
 		} else {
 			$this.activeSurvey = new Collect.Metamodel.Survey(survey);
 			EventBus.dispatch(Collect.SURVEY_CHANGED, $this);
