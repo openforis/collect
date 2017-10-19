@@ -74,7 +74,7 @@ public class CEComponentHTMLFormatter {
 		String legend =  comp.getLabelOrName() ;
 		builder.e("legend").t(legend); //$NON-NLS-1$
 		
-		String tooltip = comp.getTooltip();
+		String tooltip = comp.getToolTip();
 		addTooltip(builder, tooltip);
 		
 		XMLBuilder tableBuilder = builder.e("table").a("class", "table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -49,7 +49,7 @@ class CEComponent {
 		return multiple;
 	}
 
-	public String getTooltip() {
+	public String getToolTip() {
 		return tooltip;
 	}
 }
