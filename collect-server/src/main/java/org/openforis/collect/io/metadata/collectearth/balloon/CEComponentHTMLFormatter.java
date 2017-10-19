@@ -73,6 +73,10 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder builder =  parentBuilder.e("fieldset").attr("class", "entity-group" ); //$NON-NLS-1$
 		String legend =  comp.getLabelOrName() ;
 		builder.e("legend").t(legend); //$NON-NLS-1$
+		
+		String tooltip = comp.getTooltip();
+		addTooltip(builder, tooltip);
+		
 		XMLBuilder tableBuilder = builder.e("table").a("class", "table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr"); //$NON-NLS-1$ //$NON-NLS-2$
 		for (String heading : comp.getHeadings()) {
@@ -92,7 +96,7 @@ public class CEComponentHTMLFormatter {
 							.t( row.getLabelOrName() );
 					
 					
-					String tooltip = row.getTooltip();
+					tooltip = row.getTooltip();
 					addTooltip(cellBuilder, tooltip);
 					
 				} else if (child instanceof CEField) {

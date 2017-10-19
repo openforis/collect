@@ -420,7 +420,9 @@ public class CollectEarthBalloonGenerator {
 		}
 		UIOptions uiOptions = survey.getUIOptions();
 		
-		CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label);
+		String tooltip = def.getDescription(language);
+		
+		CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label, tooltip);
 		for (NodeDefinition child : def.getChildDefinitions()) {
 			if (! uiOptions.isHidden(child)) {
 				String heading = child.getLabel(Type.INSTANCE, language);
@@ -441,7 +443,7 @@ public class CollectEarthBalloonGenerator {
 		for (CodeListItem item : codeItems) {
 			String key = item.getCode();
 			String itemLabel = CEComponentHTMLFormatter.getItemLabel(item, language);
-			String tooltip = CEComponentHTMLFormatter.getDescription(item, language);
+			tooltip = CEComponentHTMLFormatter.getDescription(item, language);
 			
 			CETableRow row = new CETableRow(key, itemLabel, tooltip);
 			for (NodeDefinition child : def.getChildDefinitions()) {
