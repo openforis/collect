@@ -1,7 +1,6 @@
 package org.openforis.collect.web.controller;
 
 import org.openforis.collect.manager.ImageryManager;
-import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.model.Imagery;
 import org.openforis.collect.web.controller.ImageryController.ImageryForm;
 import org.openforis.collect.web.validator.ImageryValidator;
@@ -19,12 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/imagery")
 public class ImageryController extends AbstractPersistedObjectEditFormController<Imagery, ImageryForm, ImageryManager> {
 	
-	private static final String IMAGERY_RESOURCE_TYPE = "IMAGERY";
-	
 	@Autowired
 	private ImageryValidator validator;
-	@Autowired
-	private UserGroupManager userGroupManager;
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -43,14 +38,7 @@ public class ImageryController extends AbstractPersistedObjectEditFormController
 	
 	@Override
 	public Response insert(@RequestBody ImageryForm form, BindingResult result) {
-		Response response = super.insert(form, result);
-		if (response.isStatusOk()) {
-			Imagery reloaded = itemManager.findByTitle(form.getTitle());
-			ImageryForm reloadedForm = createFormInstance(reloaded);
-			return new SimpleFormUpdateResponse(reloadedForm);
-		} else {
-			return response;
-		}
+		return super.insert(form, result);
 	}
 	
 	@Override

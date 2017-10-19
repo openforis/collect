@@ -22,6 +22,7 @@ import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.UserGroup.Visibility;
 import org.openforis.collect.persistence.jooq.Sequences;
 import org.openforis.collect.persistence.jooq.tables.daos.OfcUsergroupDao;
+import org.openforis.collect.persistence.jooq.tables.records.OfcUsergroupRecord;
 import org.openforis.collect.persistence.utils.Daos;
 
 public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<UserGroup, Integer> {
@@ -57,16 +58,41 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 	}
 	
 	@Override
-	public void insert(UserGroup userGroup) {
+	public void insert(UserGroup ug) {
 		DSLContext dsl = dsl();
-		Integer id;
 		if (dsl.dialect() == SQLDialect.SQLITE) {
-			id = null; //autoincrement
+			OfcUsergroupRecord insertResult = dsl.insertInto(OFC_USERGROUP)
+				.columns(OFC_USERGROUP.CREATED_BY,
+						OFC_USERGROUP.CREATION_DATE,
+						OFC_USERGROUP.DESCRIPTION,
+						OFC_USERGROUP.ENABLED,
+						OFC_USERGROUP.LABEL,
+						OFC_USERGROUP.NAME,
+						OFC_USERGROUP.PARENT_ID,
+						OFC_USERGROUP.QUALIFIER1_NAME,
+						OFC_USERGROUP.QUALIFIER1_VALUE,
+						OFC_USERGROUP.SYSTEM_DEFINED,
+						OFC_USERGROUP.VISIBILITY_CODE)
+				.values(ug.getCreatedBy(),
+						ug.getCreationDate(),
+						ug.getDescription(),
+						ug.getEnabled(),
+						ug.getLabel(),
+						ug.getName(),
+						ug.getParentId(),
+						ug.getQualifier1Name(),
+						ug.getQualifier1Value(),
+						ug.getSystemDefined(),
+						ug.getVisibilityCode())
+				.returning(OFC_USERGROUP.ID)
+				.fetchOne();
+			ug.setId(insertResult.getId());
 		} else {
+			Integer id;
 			id = dsl.nextval(Sequences.OFC_USERGROUP_ID_SEQ).intValue();
+			ug.setId(id);
+			super.insert(ug);
 		}
-		userGroup.setId(id);
-		super.insert(userGroup);
 	}
 	
 	public void save(UserGroup userGroup) {

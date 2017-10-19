@@ -59,6 +59,9 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 	}
 
 	private String determineHostName() {
+		if (CollectConfiguration.isDevelopmentMode()) {
+			return "127.0.0.1";
+		}
 		try {
 			String hostName = InetAddress.getLocalHost().getHostAddress();
 			return hostName;

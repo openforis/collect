@@ -10,6 +10,7 @@ import org.jooq.impl.DSL;
 import org.openforis.collect.model.Imagery;
 import org.openforis.collect.persistence.jooq.tables.daos.OfcImageryDao;
 import org.openforis.collect.persistence.jooq.tables.pojos.OfcImagery;
+import org.openforis.collect.persistence.jooq.tables.records.OfcImageryRecord;
 
 public class ImageryDao extends OfcImageryDao implements PersistedObjectDao<Imagery, Integer> {
 
@@ -49,7 +50,18 @@ public class ImageryDao extends OfcImageryDao implements PersistedObjectDao<Imag
 	
 	@Override
 	public void insert(Imagery imagery) {
-		super.insert(imagery);
+		OfcImageryRecord result = dsl().insertInto(OFC_IMAGERY).columns(
+				OFC_IMAGERY.ATTRIBUTION, 
+				OFC_IMAGERY.EXTENT, 
+				OFC_IMAGERY.SOURCE_CONFIG, 
+				OFC_IMAGERY.TITLE)
+			.values(imagery.getAttribution(),
+					imagery.getExtent(),
+					imagery.getSourceConfig(),
+					imagery.getTitle())
+			.returning(OFC_IMAGERY.ID)
+			.fetchOne();
+		imagery.setId(result.getId());
 	}
 	
 	@Override
