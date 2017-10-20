@@ -17,7 +17,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.SurveyStoreException;
-import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -60,16 +59,15 @@ public class SessionManager {
 	}
 
 	public SessionState getSessionState() {
-		SessionState sessionState = null;
-		try {
-			sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-		} catch(IllegalStateException e) {
-			throw new InvalidSessionException();
+		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
+		if (sessionState == null) {
+			return null;
+		} else {
+			if (sessionState.getUser() == null) {
+				sessionState.setUser(loadAuthenticatedUser());
+			}
+			return sessionState;
 		}
-		if (sessionState.getUser() == null) {
-			sessionState.setUser(loadAuthenticatedUser());
-		}
-		return sessionState;
 	}
 
 	public CollectRecord getActiveRecord() {
@@ -178,11 +176,7 @@ public class SessionManager {
 				result = session.getAttribute(attributeName);
 			}
 		}
-		if ( result == null ) {
-			throw new InvalidSessionException("Error getting session attribute: " + attributeName);
-		} else {
-			return result;
-		}
+		return result;
 	}
 	
 	public void invalidateSession() {

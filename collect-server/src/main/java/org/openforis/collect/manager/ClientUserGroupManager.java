@@ -56,6 +56,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		});
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public List<UserInGroup> findUsersInGroup(UserGroup userGroup) {
 		List<Map> userGroupRelations = getList(getUsersRestfulApiUrl() + "/group/" + userGroup.getId() + "/users", Map.class);
@@ -70,6 +71,18 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 			result.add(userInGroup);
 		}
 		return result;
+	}
+	
+	@Override
+	public List<UserGroup> findAllUserDefinedGroups() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public List<UserGroup> findManageableUserGroups(User user) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	@Override
@@ -93,6 +106,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		return list.isEmpty() ? null : list.get(0);
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public List<UserGroup> findByUser(User user) {
 		List<Map> userGroupRelations = getList(getUsersRestfulApiUrl() + "/user/" + user.getId() + "/groups", Map.class);

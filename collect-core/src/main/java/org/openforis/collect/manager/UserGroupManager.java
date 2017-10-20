@@ -17,6 +17,12 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	
 	UserGroup findByName(String name);
 	
+	List<UserGroup> loadAll();
+	
+	List<UserGroup> findAllUserDefinedGroups();
+	
+	List<UserGroup> findManageableUserGroups(User user);
+	
 	List<UserGroup> findPublicUserGroups();
 
 	List<UserGroup> findDescendantGroups(UserGroup group);
@@ -36,5 +42,4 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	void associateResource(int userGroupId, String resourceType, String resourceId);
 	
 	void disassociateResource(int userGroupId, String resourceType, String resourceId);
-
 }

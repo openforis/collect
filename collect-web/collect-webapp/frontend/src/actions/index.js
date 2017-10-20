@@ -36,6 +36,8 @@ export const REQUEST_JOB = 'REQUEST_JOB'
 export const RECEIVE_JOB = 'RECEIVE_JOB'
 export const JOB_CANCELED = 'JOB_CANCELED'
 
+export const RECORD_DELETED = 'RECORD_DELETED'
+
 //LOGIN
 function loginPending() {
 	return {
@@ -244,6 +246,13 @@ export function invalidateUserGroups(userGroups) {
 	return {
 		type: INVALIDATE_USER_GROUPS,
 		userGroups
+	}
+}
+
+//RECORDS
+export function recordDeleted() {
+	return {
+		type: RECORD_DELETED
 	}
 }
 

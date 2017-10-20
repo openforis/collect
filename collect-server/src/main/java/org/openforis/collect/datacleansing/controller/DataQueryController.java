@@ -38,7 +38,6 @@ import org.openforis.concurrency.Job;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -75,13 +74,6 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(validator);
-	}
-	
-	@Override
-	@Autowired
-	@Qualifier("dataQueryManager")
-	public void setItemManager(DataQueryManager itemManager) {
-		super.setItemManager(itemManager);
 	}
 	
 	@Override

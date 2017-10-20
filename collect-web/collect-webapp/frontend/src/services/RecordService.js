@@ -3,12 +3,13 @@ import { Record } from '../model/Record';
 
 export default class RecordService extends AbstractService {
 
-    fetchRecordSummaries(surveyId, recordsPerPage, page, rootEntityName, keyValues, sortFields) {
+    fetchRecordSummaries(surveyId, rootEntityName, userId, filterOptions, sortFields) {
         return this.get('survey/' + surveyId + '/data/records/summary', {
-            maxNumberOfRows: recordsPerPage,
-            offset: (page - 1) * recordsPerPage,
             rootEntityName: rootEntityName,
-            keyValues: keyValues,
+            userId: userId,
+            maxNumberOfRows: filterOptions.recordsPerPage,
+            offset: (filterOptions.page - 1) * filterOptions.recordsPerPage,
+            keyValues: filterOptions.keyValues,
             sortFields: sortFields
         });
     }

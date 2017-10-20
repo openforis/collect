@@ -9,7 +9,8 @@ import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import { receiveUserGroup } from 'actions/' 
 import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage'
 import UserGroupService from 'services/UserGroupService';
-import UserRoleDetailsPage from './UserRoleDetailsPage';
+import UserRoleDropdownEditor from './UserRoleDropdownEditor';
+import Arrays from 'utils/Arrays'
 
 class UserGroupDetailsPage extends AbstractItemDetailsPage {
 
@@ -21,6 +22,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         this.handleUsersInGroupRowSelect = this.handleUsersInGroupRowSelect.bind(this);
         this.handleAddSelectedUsersToGroup = this.handleAddSelectedUsersToGroup.bind(this);
         this.handleRemoveSelectedUsersToGroup = this.handleRemoveSelectedUsersToGroup.bind(this);
+        this.handleSelectedUsersCellEdit = this.handleSelectedUsersCellEdit.bind(this)
 
         this.state = {
             ready: false
@@ -99,6 +101,8 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             description: this.state.description,
             visibilityCode: this.state.visibilityCode,
             enabled: this.state.enabled,
+            qualifierName: this.state.qualifierName,
+            qualifierValue: this.state.qualifierValue,
             users: this.state.usersInGroup
         }
     }
@@ -109,13 +113,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
     }
     
     handleAvailableUsersRowSelect(user, isSelected, e) {
-        let newSelectedUsers;
-        if (isSelected) {
-            newSelectedUsers = this.state.selectedAvailableUsers.concat([user]);
-        } else {
-            let idx = this.state.selectedAvailableUsers.indexOf(user);
-            newSelectedUsers = this.state.selectedAvailableUsers.slice(idx, 0);
-        }
+        const newSelectedUsers = Arrays.addOrRemoveItem(this.state.selectedAvailableUsers, user, !isSelected)
         this.setState({ ...this.state, 
             selectedAvailableUsers: newSelectedUsers,
             selectedAvailableUsersIds: newSelectedUsers.map(u => u.id)
@@ -123,37 +121,31 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
     }
 
     handleUsersInGroupRowSelect(user, isSelected, e) {
-        let newSelectedUsers;
-        if (isSelected) {
-            newSelectedUsers = this.state.selectedUsersInGroup.concat([user]);
-        } else {
-            let idx = this.state.selectedAvailableUsers.indexOf(user);
-            newSelectedUsers = this.state.selectedUsersInGroup.slice(idx, 0);
-        }
+        const newSelectedUsersInGroup = Arrays.addOrRemoveItem(this.state.selectedUsersInGroup, user, !isSelected)
         this.setState({ ...this.state, 
-            selectedUsersInGroup: newSelectedUsers,
-            selectedUsersInGroupIds: newSelectedUsers.map(u => u.userId)
+            selectedUsersInGroup: newSelectedUsersInGroup,
+            selectedUsersInGroupIds: newSelectedUsersInGroup.map(u => u.userId)
 		})
     }
 
     handleAddSelectedUsersToGroup() {
-        let selectedUsers = this.state.selectedAvailableUsers
-        let newUsersInGroup = []
-        let role = this.state.newUserRoleCode
-
-        selectedUsers.forEach(user => {
-            newUsersInGroup.push({
+        const selectedUsers = this.state.selectedAvailableUsers
+        const role = this.state.newUserRoleCode
+        const usersInGroupToAdd = selectedUsers.map(user => {
+            return {
                 userId: user.id, 
                 username: user.username, 
                 userEnabled: user.enabled, 
                 role: role,
                 joinStatus: 'ACCEPTED'
-            });
+            }
         })
-        let newAvailableUsers = this.state.availableUsers.filter(u => selectedUsers.indexOf(u) < 0)
+        const newAvailableUsers = this.state.availableUsers.filter(u => selectedUsers.indexOf(u) < 0)
+        const newUsersInGroup = this.state.usersInGroup.concat(usersInGroupToAdd)
+        Arrays.sort(newUsersInGroup, 'username')
 
         this.setState({ ...this.state, 
-            usersInGroup: this.state.usersInGroup.concat(newUsersInGroup),
+            usersInGroup: newUsersInGroup,
             availableUsers: newAvailableUsers,
             selectedAvailableUsers: [],
             selectedAvailableUsersIds: [],
@@ -168,13 +160,15 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                 enabled: userInGroup.userEnabled
             }
         })
-        let notSelectedUsersInGroup = this.state.usersInGroup.filter(u => this.state.selectedUsersInGroup.indexOf(u) < 0)
-        let newUsersInGroup = notSelectedUsersInGroup
-        
+        const notSelectedUsersInGroup = this.state.usersInGroup.filter(u => this.state.selectedUsersInGroup.indexOf(u) < 0)
+        const newUsersInGroup = notSelectedUsersInGroup
+        const newAvailableUsers = this.state.availableUsers.concat(selectedUsers)
+        Arrays.sort(newAvailableUsers, 'username')
+
         this.setState({ ...this.state, 
             selectedUsersInGroup: [],
             selectedUsersInGroupIds: [],
-            availableUsers: this.state.availableUsers.concat(selectedUsers),
+            availableUsers: newAvailableUsers,
             usersInGroup: newUsersInGroup
 		})
     }
@@ -191,6 +185,11 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         }
     }
 
+    handleSelectedUsersCellEdit(row, cellName, cellValue) {
+        console.log(cellValue)
+        console.log(this.state.selectedUsersInGroup)
+    }
+
     render() {
         if (! this.state.ready) {
             return <div>Loading...</div>;
@@ -199,7 +198,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         const roles = ['OWNER', 'ADMINISTRATOR', 'OPERATOR', 'VIEWER']
         const joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
 
-        const createRoleEditor = (onUpdate, props) => (<UserRoleDetailsPage onUpdate={ onUpdate } {...props}/>);
+        const createRoleEditor = (onUpdate, props) => (<UserRoleDropdownEditor onUpdate={ onUpdate } {...props}/>);
         
         const isNotDescendantOf = function(group1, group2) {
             return false;
@@ -340,11 +339,11 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                             >
                                             <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
                                             <TableHeaderColumn dataField="username">Username</TableHeaderColumn>
-                                            <TableHeaderColumn dataField="enabled">Enabled</TableHeaderColumn>
+                                            <TableHeaderColumn dataField="enabled" width="100">Enabled</TableHeaderColumn>
                                         </BootstrapTable>
                                     </Col>
-                                    {this.state.selectedAvailableUsers.length > 0 ?
-                                        <Col sm="3">
+                                    <Col sm="3">
+                                        {this.state.selectedAvailableUsers.length > 0 ?
                                             <Row>
                                                 <Col sm="5">
                                                     <Input type="select" name="newUserRole" id="newUserRoleSelect" 
@@ -357,13 +356,15 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                                     <Button onClick={this.handleAddSelectedUsersToGroup}>&gt;</Button>
                                                 </Col>
                                             </Row>
+                                        : ''}
+                                        {this.state.selectedUsersInGroup.length > 0 ?
                                             <Row>
                                                 <Col sm={{ size: 2, offset: 6 }}>
                                                     <Button onClick={this.handleRemoveSelectedUsersToGroup}>&lt;</Button>
                                                 </Col>
                                             </Row>
-                                        </Col>
-                                    : ''}
+                                        : ''}
+                                    </Col>
                                 </Row>
                             </fieldset>
                         </Col>
@@ -374,7 +375,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                     data={this.state.usersInGroup}
                                     striped	hover condensed
                                     height='200'
-                                    cellEdit={ { mode: 'click' } }
+                                    cellEdit={ { mode: 'click', afterSaveCell: this.handleSelectedUsersCellEdit } }
                                     selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
                                         onSelect: this.handleUsersInGroupRowSelect, selected: this.state.selectedUsersInGroupIds,
                                         unselectable: [ownerId]} }
@@ -382,8 +383,8 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                     <TableHeaderColumn dataField="userId" isKey hidden>Id</TableHeaderColumn>
                                     <TableHeaderColumn dataField="username" editable={false}>Username</TableHeaderColumn>
                                     <TableHeaderColumn dataField="userEnabled" editable={false}>Enabled</TableHeaderColumn>
-                                    <TableHeaderColumn dataField="role" editable={ { type: 'select', options: { values: roles } } }
-                                        >Role</TableHeaderColumn>
+                                    <TableHeaderColumn dataField="role" 
+                                        customEditor={ { getElement: createRoleEditor, customEditorParameters: {roles: roles} } }>Role</TableHeaderColumn>
                                     <TableHeaderColumn dataField="joinStatus" editable={ { type: 'select', options: { values: joinStatuses } } }>Status</TableHeaderColumn>
                                 </BootstrapTable>
                             </fieldset>
@@ -404,7 +405,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
 
 const mapStateToProps = state => {
     const {
-        isInitialized: isUserGroupsInitialized,
+        initialized: isUserGroupsInitialized,
         isFetching: isFetchingUserGroups,
         lastUpdated: lastUpdatedUserGroups,
         userGroups
@@ -419,7 +420,7 @@ const mapStateToProps = state => {
         users
     } = state.users || {
         isFetchingUsers: true,
-        userGroups: []
+        users: []
     }
     const {
         loggedUser

@@ -4,8 +4,10 @@ import { Button, ButtonGroup, ButtonToolbar, Container, ButtonDropdown,
 	DropdownToggle, DropdownMenu, DropdownItem, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
+import { recordDeleted } from 'actions'
 import ServiceFactory from 'services/ServiceFactory'
 import Modals from 'components/Modals'
+import Arrays from 'utils/Arrays'
 
 class DataManagementPage extends Component {
 
@@ -44,9 +46,14 @@ class DataManagementPage extends Component {
 	}
 
 	handleDeleteButtonClick() {
-		if (window.confirm('Delete?'))  { 
+		if (window.confirm('Delete?'))  {
+			const $this = this
 			//Modals.confirm('test', 'test', function() {
-				this.recordService.delete(this.state.selectedItem).then(console.log('deleted'))
+				this.recordService.delete(this.state.selectedItem).then(response => {
+					$this.props.dispatch(recordDeleted($this.state.selectedItem));
+					$this.setState({selectedItem: null, selectedItemIds: []})
+					$this.forceUpdate()
+				})
 			//})
 		}
 	}
@@ -60,21 +67,7 @@ class DataManagementPage extends Component {
 	}
 
 	handleRowSelect(row, isSelected, e) {
-		if (isSelected) {
-			this.handleItemSelected(row);
-		} else {
-			this.handleItemUnselected(row);
-		}
-	}
-
-	handleItemSelected(item) {
-		let newSelectedItems = this.state.selectedItems.concat([item]);
-		this.handleItemsSelection(newSelectedItems)
-	}
-
-	handleItemUnselected(item) {
-		let idx = this.state.selectedItems.indexOf(item);
-		let newSelectedItems = this.state.selectedItems.slice(idx, 0);
+		const newSelectedItems = Arrays.addOrRemoveItem(this.state.selectedItems, row, !isSelected)
 		this.handleItemsSelection(newSelectedItems)
 	}
 
@@ -144,7 +137,7 @@ class DataManagementPage extends Component {
 				</Row>
 				<Row>
 					<Col>
-						<RecordDataTable
+						<RecordDataTable 
 							selectedItemIds={this.state.selectedItemIds}
 							handlRowDoubleClick={this.handleRowDoubleClick}
 							handleRowSelect={this.handleRowSelect}

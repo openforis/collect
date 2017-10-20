@@ -115,6 +115,22 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 		setVisibilityCode(visibility == null ? null : String.valueOf(visibility.getCode()));
 	}
 	
+	public String getQualifierName() {
+		return getQualifier1Name();
+	}
+	
+	public void setQualifierName(String qualifierName) {
+		setQualifier1Name(qualifierName);
+	}
+	
+	public String getQualifierValue() {
+		return getQualifier1Value();
+	}
+	
+	public void setQualifierValue(String qualifierValue) {
+		setQualifier1Value(qualifierValue);
+	}
+	
 	private Set<UserInGroup> users = new HashSet<UserInGroup>();
 	
 	public Set<UserInGroup> getUsers() {
@@ -167,6 +183,14 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 		public UserInGroup() {
 		}
 
+		public Integer getGroupId() {
+			return group == null ? null : group.getId();
+		}
+		
+		public Integer getUserId() {
+			return user == null ? null : user.getId();
+		}
+		
 		public UserGroup getGroup() {
 			return group;
 		}

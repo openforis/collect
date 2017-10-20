@@ -5,6 +5,7 @@ import {
 
 function session(
     state = {
+        initialized: false,
         isFetching: false,
         didInvalidate: false,
         loggedUser: null
@@ -19,6 +20,7 @@ function session(
             })
         case RECEIVE_CURRENT_USER:
             return Object.assign({}, state, {
+                initialized: true,
                 isFetching: false,
                 didInvalidate: false,
                 loggedUser: action.user

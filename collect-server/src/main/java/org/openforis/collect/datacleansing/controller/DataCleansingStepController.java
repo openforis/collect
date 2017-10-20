@@ -12,7 +12,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -38,13 +37,6 @@ public class DataCleansingStepController extends AbstractSurveyObjectEditFormCon
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(dataCleansingStepValidator);
-	}
-	
-	@Override
-	@Autowired
-	@Qualifier("dataCleansingStepManager")
-	public void setItemManager(DataCleansingStepManager itemManager) {
-		super.setItemManager(itemManager);
 	}
 	
 	@Override

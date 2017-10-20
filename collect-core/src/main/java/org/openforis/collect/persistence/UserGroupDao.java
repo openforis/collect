@@ -13,6 +13,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordHandler;
 import org.jooq.SQLDialect;
+import org.jooq.SelectQuery;
 import org.jooq.impl.DSL;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
@@ -140,12 +141,12 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 		).execute();
 	}
 	
-	public void updateRelation(UserGroup userGroup, UserInGroup userInGroup) {
+	public void updateRelation(UserInGroup userInGroup) {
 		dsl().update(OFC_USER_USERGROUP)
 			.set(OFC_USER_USERGROUP.MEMBER_SINCE, Daos.toTimestamp(userInGroup.getMemberSince()))
 			.set(OFC_USER_USERGROUP.STATUS_CODE, String.valueOf(userInGroup.getJoinStatus().getCode()))
 			.set(OFC_USER_USERGROUP.ROLE_CODE, String.valueOf(userInGroup.getRole().getCode()))
-			.where(OFC_USER_USERGROUP.GROUP_ID.eq(userGroup.getId())
+			.where(OFC_USER_USERGROUP.GROUP_ID.eq(userInGroup.getGroupId())
 					.and(OFC_USER_USERGROUP.USER_ID.eq(userInGroup.getUser().getId()))
 			)
 			.execute();
@@ -221,19 +222,25 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 	}
 
 	public List<UserGroup> findPublicGroups() {
-		return dsl()
-				.selectFrom(OFC_USERGROUP)
-				.where(OFC_USERGROUP.VISIBILITY_CODE.eq(String.valueOf(Visibility.PUBLIC.getCode())))
-				.fetchInto(UserGroup.class);
+		return findGroups(null, Visibility.PUBLIC);
 	}
 	
 	public List<UserGroup> findPublicUserDefinedGroups() {
-		return dsl()
-				.selectFrom(OFC_USERGROUP)
-				.where(OFC_USERGROUP.SYSTEM_DEFINED.eq(false)
-					.and(OFC_USERGROUP.VISIBILITY_CODE.eq(String.valueOf(Visibility.PUBLIC.getCode()))))
-				.fetchInto(UserGroup.class);
+		return findGroups(false, Visibility.PUBLIC);
 	}
+	
+	public List<UserGroup> findGroups(Boolean systemDefined, Visibility visibility) {
+		SelectQuery<Record> q = dsl().selectQuery();
+		q.addFrom(OFC_USERGROUP);
+		if (systemDefined != null) {
+			q.addConditions(OFC_USERGROUP.SYSTEM_DEFINED.eq(systemDefined));
+		}
+		if (visibility != null) {
+			q.addConditions(OFC_USERGROUP.VISIBILITY_CODE.eq(String.valueOf(Visibility.PUBLIC.getCode())));
+		}
+		return q.fetchInto(UserGroup.class);
+	}
+
 	
 	public UserGroup loadByName(String name) {
 		return dsl()

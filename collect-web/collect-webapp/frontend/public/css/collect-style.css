@@ -2,6 +2,17 @@
 /**
 * Customuzation for OF Collect
 **/
+
+.breadcrumb-item.active {
+    color: #20a8d8; 
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.breadcrumb-item a {
+    color: #3795c4;
+}
+
 .container.formItems {
     margin-left: 0px;
     margin-right: 0px;

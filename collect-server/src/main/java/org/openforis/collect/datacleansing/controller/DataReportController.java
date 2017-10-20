@@ -54,7 +54,6 @@ import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.path.Path;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,13 +75,6 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 	
 	private DataReportGeneratorJob generationJob;
 	private ReportExportJob exportJob;
-	
-	@Override
-	@Autowired
-	@Qualifier("dataReportManager")
-	public void setItemManager(DataReportManager itemManager) {
-		super.setItemManager(itemManager);
-	}
 	
 	@Override
 	protected DataReportForm createFormInstance(DataReport item) {

@@ -14,7 +14,6 @@ import org.openforis.collect.web.controller.UserController.UserForm;
 import org.openforis.collect.web.validator.UserValidator;
 import org.openforis.commons.web.PersistedObjectForm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -41,13 +40,6 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 	@Autowired
 	private UserValidator validator;
 
-	@Override
-	@Autowired
-	@Qualifier("userManager")
-	public void setItemManager(LocalUserManager itemManager) {
-		super.setItemManager(itemManager);
-	}
-	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(validator);

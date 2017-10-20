@@ -1,3 +1,4 @@
+import Objects from './Objects'
 
 export default class Arrays {
 
@@ -34,6 +35,11 @@ export default class Arrays {
         } else {
             return Arrays.addItem(array, item)
         }
+    }
+
+    static sort(array, propName) {
+        array.sort((a,b) => a === null && b === null ? 0: a === null ? -1: b === null ? 1: 
+            Objects.compare(a[propName], b[propName]))
     }
 
 }

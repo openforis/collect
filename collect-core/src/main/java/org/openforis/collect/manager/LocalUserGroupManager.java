@@ -1,13 +1,16 @@
 package org.openforis.collect.manager;
 
+import static org.openforis.collect.model.UserGroup.UserGroupRole.ADMINISTRATOR;
+import static org.openforis.collect.model.UserGroup.UserGroupRole.OWNER;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGroup, Integer, UserGroupDao> implements UserGroupManager {
 
+	private static final List<UserGroupRole> ADMINISTRATOR_ROLES = Arrays.asList(ADMINISTRATOR, OWNER);
 	private static final String DEFAULT_PUBLIC_USER_GROUP_NAME = "default_public_group";
 	private static final String DEFAULT_PRIVATE_USER_GROUP_SUFFIX = "_default_private_group";
 	private static final String DEFAULT_PRIVATE_USER_GROUP_LABEL_SUFFIX = " Default Private Group";
@@ -37,7 +41,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		UserInGroup userInGroup = new UserInGroup();
 		userInGroup.setGroup(userGroup);
 		userInGroup.setUser(user);
-		userInGroup.setRole(UserGroupRole.OWNER);
+		userInGroup.setRole(OWNER);
 		userInGroup.setJoinStatus(UserGroupJoinRequestStatus.ACCEPTED);
 		userInGroup.setRequestDate(new Date());
 		userInGroup.setMemberSince(new Date());
@@ -60,55 +64,27 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		return DEFAULT_PUBLIC_USER_GROUP;
 	}
 	
-	@Transactional(propagation=Propagation.REQUIRED)
-	public UserGroup save(UserGroup userGroup) {
-		dao.save(userGroup);
-		List<UserInGroup> oldUsersInGroup = dao.findUsersByGroup(userGroup);
-		Set<UserInGroup> parameterUsersInGroup = userGroup.getUsers();
-		Set<UserInGroup> removedUsersInGroup = new HashSet<UserInGroup>();
-		Set<UserInGroup> updatedUsersInGroup = new HashSet<UserInGroup>();
-		Set<UserInGroup> newUsersInGroup = new HashSet<UserInGroup>();
-
-		for (UserInGroup oldUserInGroup : oldUsersInGroup) {
-			if (parameterUsersInGroup.contains(oldUserInGroup)) {
-				final User user = oldUserInGroup.getUser();
-				UserInGroup modifiedUserInGroup = (UserInGroup) CollectionUtils.find(parameterUsersInGroup, new Predicate() {
-					public boolean evaluate(Object parameterUserInGroup) {
-						return user.equals(((UserInGroup) parameterUserInGroup).getUser());
-					}
-				});
-				oldUserInGroup.setJoinStatus(modifiedUserInGroup.getJoinStatus());
-				updatedUsersInGroup.add(oldUserInGroup);
-			} else {
-				removedUsersInGroup.add(oldUserInGroup);
+	@Override
+	public List<UserGroup> findAllUserDefinedGroups() {
+		return fillLazyLoadedFields(dao.findGroups(false, null));
+	}
+	
+	@Override
+	public List<UserGroup> findManageableUserGroups(User user) {
+		List<UserGroup> result = new ArrayList<UserGroup>();
+		List<UserGroup> userDefinedGroups = findAllUserDefinedGroups();
+		for (UserGroup userGroup : userDefinedGroups) {
+			UserInGroup userInGroup = findUserInGroup(userGroup, user);
+			if (userInGroup != null && ADMINISTRATOR_ROLES.contains(userInGroup.getRole())) {
+				result.add(userInGroup.getGroup());
 			}
 		}
-
-		for (UserInGroup newUserInGroup : parameterUsersInGroup) {
-			if (! oldUsersInGroup.contains(newUserInGroup)) {
-				newUserInGroup.setRequestDate(new Date());
-				if (newUserInGroup.getJoinStatus() == UserGroupJoinRequestStatus.ACCEPTED) {
-					newUserInGroup.setMemberSince(new Date());
-				}
-				newUsersInGroup.add(newUserInGroup);
-			}
-		}
-
-		for (UserInGroup userInGroup : removedUsersInGroup) {
-			dao.deleteRelation(userInGroup.getUser(), userGroup);
-		}
-		for (UserInGroup userInGroup : updatedUsersInGroup) {
-			dao.updateRelation(userGroup, userInGroup);
-		}
-		for (UserInGroup userInGroup : newUsersInGroup) {
-			dao.insertRelation(userGroup, userInGroup);
-		}
-		return userGroup;
+		return result;
 	}
 	
 	@Override
 	public UserGroup findByName(String userGroupName) {
-		return dao.loadByName(userGroupName);
+		return fillLazyLoadedFields(dao.loadByName(userGroupName));
 	}
 
 	@Override
@@ -161,9 +137,53 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	
 	@Override
 	public List<UserGroup> findDescendantGroups(UserGroup group) {
-		return dao.findDescendantGroups(group);
+		return fillLazyLoadedFields(dao.findDescendantGroups(group));
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED)
+	public UserGroup save(UserGroup userGroup) {
+		dao.save(userGroup);
+		List<UserInGroup> oldUsersInGroup = dao.findUsersByGroup(userGroup);
+		Map<Integer, UserInGroup> parameterUsersInGroupByUserId = new HashMap<Integer, UserInGroup>();
+		for (UserInGroup userInGroup : userGroup.getUsers()) {
+			parameterUsersInGroupByUserId.put(userInGroup.getUserId(), userInGroup);
+		}
+		Map<Integer, UserInGroup> removedUsersInGroupByUserId = new HashMap<Integer, UserInGroup>();
+		Map<Integer, UserInGroup> updatedUsersInGroupByUserId = new HashMap<Integer, UserInGroup>();
+		Map<Integer, UserInGroup> newUsersInGroupByUserId = new HashMap<Integer, UserInGroup>();
+
+		for (UserInGroup oldUserInGroup : oldUsersInGroup) {
+			UserInGroup updatedUserInGroup = parameterUsersInGroupByUserId.get(oldUserInGroup.getUserId());
+			if (updatedUserInGroup != null) {
+				oldUserInGroup.setJoinStatus(updatedUserInGroup.getJoinStatus());
+				updatedUsersInGroupByUserId.put(oldUserInGroup.getUserId(), oldUserInGroup);
+			} else {
+				removedUsersInGroupByUserId.put(oldUserInGroup.getUserId(), oldUserInGroup);
+			}
+		}
+
+		for (UserInGroup newUserInGroup : parameterUsersInGroupByUserId.values()) {
+			if (! oldUsersInGroup.contains(newUserInGroup)) {
+				newUserInGroup.setRequestDate(new Date());
+				if (newUserInGroup.getJoinStatus() == UserGroupJoinRequestStatus.ACCEPTED) {
+					newUserInGroup.setMemberSince(new Date());
+				}
+				newUsersInGroupByUserId.put(newUserInGroup.getUserId(), newUserInGroup);
+			}
+		}
+
+		for (UserInGroup userInGroup : removedUsersInGroupByUserId.values()) {
+			dao.deleteRelation(userInGroup.getUser(), userGroup);
+		}
+		for (UserInGroup userInGroup : updatedUsersInGroupByUserId.values()) {
+			dao.updateRelation(userInGroup);
+		}
+		for (UserInGroup userInGroup : newUsersInGroupByUserId.values()) {
+			dao.insertRelation(userGroup, userInGroup);
+		}
+		return userGroup;
+	}
+	
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void requestJoin(User user, UserGroup userGroup, UserGroupRole role) {
 		UserInGroup userInGroup = new UserInGroup();
@@ -187,10 +207,15 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	
 	private List<UserGroup> fillLazyLoadedFields(List<UserGroup> groups) {
 		for (UserGroup group : groups) {
-			List<UserInGroup> usersInGroup = dao.findUsersByGroup(group);
-			group.setUsers(new HashSet<UserInGroup>(usersInGroup));
+			fillLazyLoadedFields(group);
 		}
 		return groups;
+	}
+
+	private UserGroup fillLazyLoadedFields(UserGroup group) {
+		List<UserInGroup> usersInGroup = dao.findUsersByGroup(group);
+		group.setUsers(new HashSet<UserInGroup>(usersInGroup));
+		return group;
 	}
 
 	public static class UserGroupTree {

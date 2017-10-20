@@ -51,6 +51,7 @@ class RecordDataTable extends Component {
 	}
 
 	fetchData(page = this.state.page, recordsPerPage = this.state.recordsPerPage, survey = this.props.survey, keyValues, sortFields) {
+		const userId = this.props.loggedUser.id
 		const surveyId = survey.id
 		const rootEntityName = survey.schema.firstRootEntityDefinition.name
 		if (! keyValues) {
@@ -59,7 +60,10 @@ class RecordDataTable extends Component {
 		if (! sortFields) {
 			sortFields = [{field: 'DATE_MODIFIED', descending: true}]
 		}
-		ServiceFactory.recordService.fetchRecordSummaries(surveyId, recordsPerPage, page, rootEntityName, keyValues, sortFields).then((res) => {
+		ServiceFactory.recordService.fetchRecordSummaries(surveyId, rootEntityName, userId, {
+				recordsPerPage: recordsPerPage, 
+				page: page,
+				keyValues: keyValues}, sortFields).then((res) => {
 			this.setState({page: page, recordsPerPage: recordsPerPage, records: res.records, totalSize: res.count});
 		});
 	}
@@ -225,7 +229,9 @@ class RecordDataTable extends Component {
 const mapStateToProps = state => {
 	return {
 		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
-		users: state.users ? state.users.users : null
+		users: state.users ? state.users.users : null,
+		loggedUser: state.session ? state.session.loggedUser : null,
+		records: state.records ? state.records.list : null
 	}
 }
 

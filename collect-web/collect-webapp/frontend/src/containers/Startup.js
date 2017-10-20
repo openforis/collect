@@ -18,7 +18,9 @@ class Startup extends Component {
 
     render() {
         const p = this.props
-        if (p.isFetchingLoggedUser || p.isFetchingUsers|| p.isFetchingUserGroups ) {
+        if (!p.isLoggedUserReady || p.isFetchingLoggedUser 
+            || !p.isUsersReady || p.isFetchingUsers
+            || !p.isUserGroupsReady || p.isFetchingUserGroups ) {
             return <p>Loading...</p>
         } else {
             return this.props.children
@@ -29,30 +31,39 @@ class Startup extends Component {
 function mapStateToProps(state) {
     const {
         loggedUser,
-        isFetching: isFetchingLoggedUser
+        isFetching: isFetchingLoggedUser,
+        initialized: isLoggedUserReady
     } = state.session || {
+        isLoggedUserReady: false,
         isFetchingLoggedUser: true
     }
 
     const {
         users,
-        isFetching: isFetchingUsers
+        isFetching: isFetchingUsers,
+        initialized: isUsersReady
     } = state.users || {
+        isUsersReady: false,
         isFetchingUsers: true
     }
 
     const {
         userGroups,
-        isFetching: isFetchingUserGroups
+        isFetching: isFetchingUserGroups,
+        initialized: isUserGroupsReady
     } = state.userGroups || {
+        isUserGroupsReady: true,
         isFetchingUserGroups: true
     }
 
     return {
+        isLoggedUserReady,
         isFetchingLoggedUser,
         loggedUser,
+        isUsersReady,
         isFetchingUsers,
         users,
+        isUserGroupsReady,
         isFetchingUserGroups,
         userGroups
     };

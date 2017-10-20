@@ -4,6 +4,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress } from 're
 import { BrowserRouter as Router } from 'react-router-dom'
 
 import ServiceFactory from 'services/ServiceFactory'
+import recordDeleted from 'actions'
 
 export default class SessionTimeoutVerifier extends Component {
     
@@ -46,9 +47,12 @@ export default class SessionTimeoutVerifier extends Component {
     }
 
     handlePingResponse(user) {
-        this.startTimer()
-        this.setState({initializing: false, active: true, sessionExpired: false, outOfServiceTime: 0})
-        console.log(user)
+        if (user == null) {
+            this.setState({initializing: false, active: false, sessionExpired: true})
+        } else {
+            this.startTimer()
+            this.setState({initializing: false, active: true, sessionExpired: false, outOfServiceTime: 0})
+        }
     }
 
     handlePingError(error) {

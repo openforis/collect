@@ -30,37 +30,37 @@ class Sidebar extends Component {
           <ul className="nav">
             {
             <li className="nav-item">
-              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active"><i className="icon-speedometer"></i>Dashboard</NavLink>
+              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active"><i className="fa fa-tachometer"></i>Dashboard</NavLink>
             </li>
             }
             {preferredSurvey ? 
               <li className="nav-item">
-                <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Data Management</NavLink>
+                <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="fa fa-database"></i>Data Management</NavLink>
               </li>
             : ''}
             {loggedUser.canAccessSurveyDesigner ?
               <li className="nav-item">
-                <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="icon-layers"></i>Survey Designer</NavLink>
+                <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="fa fa-flask"></i>Survey Designer</NavLink>
               </li>
               : ''}
             {loggedUser.canAccessDataCleansing ?
               <li className="nav-item">
-                <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="icon-diamond"></i>Data Cleansing</NavLink>
+                <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="fa fa-diamond"></i>Data Cleansing</NavLink>
               </li>
             : ''}
             <li className="nav-item">
-              <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="icon-map"></i>Map</NavLink>
+              <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="fa fa-map-o"></i>Map</NavLink>
 	          </li>
             <li className="divider"></li>
             {loggedUser.canAccessUsersManagement ?
               <li className="nav-item nav-dropdown">
-                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="icon-people"></i>Users Management</a>
+                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="fa fa-users"></i>Users Management</a>
                 <ul className="nav-dropdown-items">
                   <li className="nav-item">
-                    <NavLink to={'/users'} className="nav-link" activeClassName="active"><i className="icon-user"></i> Users</NavLink>
+                    <NavLink to={'/users'} className="nav-link" activeClassName="active"><i className="fa fa-user"></i> Users</NavLink>
                   </li>
                   <li className="nav-item">
-                    <NavLink to={'/usergroups'} className="nav-link" activeClassName="active"><i className="icon-people"></i> Groups</NavLink>
+                    <NavLink to={'/usergroups'} className="nav-link" activeClassName="active"><i className="fa fa-users"></i> Groups</NavLink>
                   </li>
                 </ul>
               </li>

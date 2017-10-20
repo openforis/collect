@@ -15,6 +15,7 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
 import org.openforis.collect.model.UserGroup.UserGroupRole;
 import org.openforis.collect.model.UserGroup.UserInGroup;
@@ -44,12 +45,6 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	@Autowired
 	private SessionManager sessionManager;
 
-	@Override
-	@Autowired
-	public void setItemManager(UserGroupManager itemManager) {
-		super.setItemManager(itemManager);
-	}
-	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(validator);
@@ -69,7 +64,12 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	
 	@Override
 	protected List<UserGroup> loadAllItems() {
-		return itemManager.findPublicUserGroups();
+		User loggedUser = sessionManager.getLoggedUser();
+		if (loggedUser.getRole() == UserRole.ADMIN) {
+			return itemManager.findAllUserDefinedGroups();
+		} else {
+			return itemManager.findManageableUserGroups(loggedUser);
+		}
 	}
 	
 	@RequestMapping(value="/{userGroupId}/resources/{resourceType}/{resourceId}", method=POST)
@@ -115,7 +115,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		@Override
 		public void copyTo(UserGroup target, String... ignoreProperties) {
 			super.copyTo(target, ArrayUtils.addAll(ignoreProperties, "users"));
-			Set<UserInGroup> users = new HashSet<UserGroup.UserInGroup>();
+			Set<UserInGroup> users = new HashSet<UserInGroup>();
 			for (UserInGroupForm userInGroupForm : this.users) {
 				User user = new User();
 				user.setId(userInGroupForm.getUserId());
@@ -171,15 +171,15 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		public String getQualifierName() {
 			return qualifierName;
 		}
-		
+
 		public void setQualifierName(String qualifierName) {
 			this.qualifierName = qualifierName;
 		}
-		
+
 		public String getQualifierValue() {
 			return qualifierValue;
 		}
-		
+
 		public void setQualifierValue(String qualifierValue) {
 			this.qualifierValue = qualifierValue;
 		}

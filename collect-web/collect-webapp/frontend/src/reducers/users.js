@@ -6,6 +6,7 @@ import {
 
 function users(
   state = {
+    initialized: false,
 	  isFetching: false,
 	  didInvalidate: false,
 	  users: []
@@ -24,6 +25,7 @@ function users(
         })
     case RECEIVE_USERS:
       return Object.assign({}, state, {
+        initialized: true,
 		    isFetching: false,
 		    didInvalidate: false,
 		    users: action.users,
