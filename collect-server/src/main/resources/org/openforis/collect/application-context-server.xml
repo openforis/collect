@@ -34,10 +34,10 @@
 	<bean id="volatileRecordIndexManager"
 		class="org.openforis.collect.remoting.service.recordindex.VolatileRecordIndexManager"
 		init-method="init" scope="session" lazy-init="false" autowire="byName" />
-<!-- 	<bean id="userManager" class="org.openforis.collect.manager.ClientUserManager" /> -->
-<!-- 	<bean id="userGroupManager" class="org.openforis.collect.manager.ClientUserGroupManager" /> -->
-	<bean id="userManager" class="org.openforis.collect.manager.LocalUserManager" />
-	<bean id="userGroupManager" class="org.openforis.collect.manager.LocalUserGroupManager" />
+	<bean id="userManager" class="org.openforis.collect.manager.ClientUserManager" />
+	<bean id="userGroupManager" class="org.openforis.collect.manager.ClientUserGroupManager" />
+<!-- 	<bean id="userManager" class="org.openforis.collect.manager.LocalUserManager" /> -->
+<!-- 	<bean id="userGroupManager" class="org.openforis.collect.manager.LocalUserGroupManager" /> -->
 	
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
