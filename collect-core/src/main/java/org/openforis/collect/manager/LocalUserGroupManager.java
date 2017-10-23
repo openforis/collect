@@ -1,7 +1,9 @@
 package org.openforis.collect.manager;
 
-import static org.openforis.collect.model.UserGroup.UserGroupRole.ADMINISTRATOR;
-import static org.openforis.collect.model.UserGroup.UserGroupRole.OWNER;
+import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus.ACCEPTED;
+import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus.PENDING;
+import static org.openforis.collect.model.UserInGroup.UserGroupRole.ADMINISTRATOR;
+import static org.openforis.collect.model.UserInGroup.UserGroupRole.OWNER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,10 +15,9 @@ import java.util.Map;
 
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
-import org.openforis.collect.model.UserGroup.UserGroupRole;
-import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.UserGroup.Visibility;
+import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.UserGroupDao;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,7 +43,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		userInGroup.setGroup(userGroup);
 		userInGroup.setUser(user);
 		userInGroup.setRole(OWNER);
-		userInGroup.setJoinStatus(UserGroupJoinRequestStatus.ACCEPTED);
+		userInGroup.setJoinStatus(ACCEPTED);
 		userInGroup.setRequestDate(new Date());
 		userInGroup.setMemberSince(new Date());
 		dao.insertRelation(userGroup, userInGroup);
@@ -167,7 +168,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		for (UserInGroup newUserInGroup : parameterUsersInGroupByUserId.values()) {
 			if (! oldUsersInGroup.contains(newUserInGroup)) {
 				newUserInGroup.setRequestDate(new Date());
-				if (newUserInGroup.getJoinStatus() == UserGroupJoinRequestStatus.ACCEPTED) {
+				if (newUserInGroup.getJoinStatus() == ACCEPTED) {
 					newUserInGroup.setMemberSince(new Date());
 				}
 				newUsersInGroupByUserId.put(newUserInGroup.getUserId(), newUserInGroup);
@@ -193,7 +194,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		userInGroup.setUser(user);
 		userInGroup.setRole(role);
 		userInGroup.setRequestDate(new Date());
-		userInGroup.setJoinStatus(UserGroupJoinRequestStatus.PENDING);
+		userInGroup.setJoinStatus(PENDING);
 		dao.insertRelation(userGroup, userInGroup);
 	}
 

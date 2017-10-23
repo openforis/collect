@@ -2,9 +2,9 @@ package org.openforis.collect.manager;
 
 import java.util.List;
 
-import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserGroup.UserInGroup;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 
 public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	

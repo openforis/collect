@@ -49,6 +49,11 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.model.SurveyAvailability;
 	import org.openforis.collect.model.SurveySummary;
+	import org.openforis.collect.model.User;
+	import org.openforis.collect.model.UserInGroup;
+	import org.openforis.collect.model.UserInGroup$UserGroupJoinRequestStatus;
+	import org.openforis.collect.model.UserInGroup$UserGroupRole;
+	import org.openforis.collect.model.UserGroup;
 	import org.openforis.collect.model.proxy.AttributeAddChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -172,6 +177,9 @@ package org.openforis.collect.util {
 				UITabSetProxy,
 				UITabProxy,
 				UnitProxy,
+				User,
+				UserInGroup,
+				UserGroup,
 				ValidationResultsProxy,
 				ValidationResultFlag
 			];

@@ -17,7 +17,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserGroup.UserInGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.UserDao;

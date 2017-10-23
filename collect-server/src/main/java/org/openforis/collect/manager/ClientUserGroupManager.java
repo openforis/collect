@@ -12,9 +12,9 @@ import org.apache.commons.collections.Predicate;
 import org.openforis.collect.client.AbstractClient;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserGroup.UserGroupJoinRequestStatus;
-import org.openforis.collect.model.UserGroup.UserGroupRole;
-import org.openforis.collect.model.UserGroup.UserInGroup;
+import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 
 public class ClientUserGroupManager extends AbstractClient implements UserGroupManager {
 

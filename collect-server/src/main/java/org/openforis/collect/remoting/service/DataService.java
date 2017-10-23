@@ -52,7 +52,7 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserGroup.UserInGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 import org.openforis.collect.model.proxy.RecordFilterProxy;

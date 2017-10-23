@@ -121,7 +121,12 @@
                                 <includeClass>org.openforis.collect.model.SurveySummary</includeClass>
                                 <includeClass>org.openforis.collect.model.User</includeClass>
                                 <includeClass>org.openforis.collect.model.UserGroup</includeClass>
+                                <includeClass>org.openforis.collect.model.UserGroup$Visibility</includeClass>
+                                <includeClass>org.openforis.collect.model.UserInGroup</includeClass>
+                                <includeClass>org.openforis.collect.model.UserInGroup$UserGroupRole</includeClass>
+                                <includeClass>org.openforis.collect.model.UserInGroup$UserGroupJoinRequestStatus</includeClass>
                                 <includeClass>org.openforis.collect.model.proxy.*</includeClass>
+                                <includeClass>org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup</includeClass>
                                 <includeClass>org.openforis.collect.remoting.SurveyBackupInfo</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.DataExportStatus$Format</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
