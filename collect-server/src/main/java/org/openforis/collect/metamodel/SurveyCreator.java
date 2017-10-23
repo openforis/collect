@@ -66,6 +66,7 @@ public class SurveyCreator {
 		}
 		CollectSurvey survey = createTemporarySimpleSurvey(internalName, parameters.getCodeLists());
 		survey.setProjectName(survey.getDefaultLanguage(), projectName);
+		survey.setDescription(survey.getDefaultLanguage(), parameters.getDescription());
 		UserGroup userGroup = userGroupManager.loadById(parameters.getUserGroupId());
 		survey.setUserGroup(userGroup);
 	

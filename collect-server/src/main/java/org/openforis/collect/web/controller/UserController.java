@@ -4,9 +4,9 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.util.List;
 
-import org.openforis.collect.manager.LocalUserManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
@@ -31,7 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/api/user")
 @Scope(WebApplicationContext.SCOPE_SESSION)
-public class UserController extends AbstractPersistedObjectEditFormController<User, UserForm, LocalUserManager> {
+public class UserController extends AbstractPersistedObjectEditFormController<User, UserForm, UserManager> {
 	
 	@Autowired
 	private SurveyManager surveyManager;

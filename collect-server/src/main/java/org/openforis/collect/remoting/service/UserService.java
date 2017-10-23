@@ -47,7 +47,7 @@ public class UserService {
 	}
 
 	public void delete(int id) throws CannotDeleteUserException {
-		userManager.delete(id);
+		userManager.deleteById(id);
 	}
 
 	private UserProxy getProxy(User user) {

@@ -84,7 +84,8 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	
 	@Override
 	public UserGroup findByName(String userGroupName) {
-		return fillLazyLoadedFields(dao.loadByName(userGroupName));
+		UserGroup group = dao.loadByName(userGroupName);
+		return fillLazyLoadedFields(group);
 	}
 
 	@Override
@@ -156,6 +157,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 			UserInGroup updatedUserInGroup = parameterUsersInGroupByUserId.get(oldUserInGroup.getUserId());
 			if (updatedUserInGroup != null) {
 				oldUserInGroup.setJoinStatus(updatedUserInGroup.getJoinStatus());
+				oldUserInGroup.setRole(updatedUserInGroup.getRole());
 				updatedUsersInGroupByUserId.put(oldUserInGroup.getUserId(), oldUserInGroup);
 			} else {
 				removedUsersInGroupByUserId.put(oldUserInGroup.getUserId(), oldUserInGroup);
@@ -213,9 +215,13 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	}
 
 	private UserGroup fillLazyLoadedFields(UserGroup group) {
-		List<UserInGroup> usersInGroup = dao.findUsersByGroup(group);
-		group.setUsers(new HashSet<UserInGroup>(usersInGroup));
-		return group;
+		if (group == null) {
+			return null;
+		} else {
+			List<UserInGroup> usersInGroup = dao.findUsersByGroup(group);
+			group.setUsers(new HashSet<UserInGroup>(usersInGroup));
+			return group;
+		}
 	}
 
 	public static class UserGroupTree {

@@ -47,13 +47,14 @@ public class SamplingPointsController extends BasicController {
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	List<SamplingDesignItem> loadSamplingPoints(
-			@PathVariable int surveyId, 
-			@RequestParam(value="parent_keys[]", required=false) String[] parentKeys, 
+	List<SamplingDesignItem> loadSamplingPoints(@PathVariable int surveyId, 
+			@RequestParam(value="parent_keys", required=false) List<String> parentKeys, 
 			@RequestParam(value="only_parent_item", required=false, defaultValue="false") boolean onlyParentItem) {
-		if (onlyParentItem) {
+		if (parentKeys == null || parentKeys.isEmpty()) {
+			return samplingDesignManager.loadChildItems(surveyId);
+		} else if (onlyParentItem) {
 			SamplingDesignItem item = samplingDesignManager.loadItem(surveyId, parentKeys);
 			return Arrays.asList(item);
 		} else {
@@ -180,5 +181,27 @@ public class SamplingPointsController extends BasicController {
 		private LngLatAlt bottomRight;
 		private LngLatAlt bottomLeft;
 		
+	}
+	
+	public static class SamplingPointSearchParameters {
+		
+		private List<String> parentKeys;
+		private boolean onlyParentItem;
+		
+		public List<String> getParentKeys() {
+			return parentKeys;
+		}
+		
+		public void setParentKeys(List<String> parentKeys) {
+			this.parentKeys = parentKeys;
+		}
+
+		public boolean isOnlyParentItem() {
+			return onlyParentItem;
+		}
+		
+		public void setOnlyParentItem(boolean onlyParentItem) {
+			this.onlyParentItem = onlyParentItem;
+		}
 	}
 }

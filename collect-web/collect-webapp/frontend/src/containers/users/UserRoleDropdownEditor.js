@@ -24,7 +24,9 @@ export default class UserRoleDropdownEditor extends Component {
     }
 
     handleChange(e) {
-        this.setState({ role: e.currentTarget.value })
+        const role = e.currentTarget.value
+        this.setState({ role: role })
+        this.props.onUpdate(role)
     }
 
     render() {
@@ -37,12 +39,6 @@ export default class UserRoleDropdownEditor extends Component {
                     onChange={this.handleChange} >
                     {this.props.roles.map(role => (<option key={role} value={role}>{role}</option>))}
                 </select>
-                <button className='btn btn-info btn-xs'>
-                    <span onClick={ this.updateData } className="fa fa-save"/>
-                </button>
-                <button className='btn btn- btn-xs'>
-                    <span onClick={ this.handleCancel } className="fa fa-cancel"/>
-                </button>
             </span>
         );
     }

@@ -53,11 +53,6 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		return user;
 	}
 	
-	@Override
-	public User loadById(int userId) {
-		return loadById(Integer.valueOf(userId));
-	}
-	
 	public User loadByUserName(String userName) {
 		return loadByUserName(userName, null);
 	}

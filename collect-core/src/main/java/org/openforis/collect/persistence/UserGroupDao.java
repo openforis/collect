@@ -147,7 +147,7 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 			.set(OFC_USER_USERGROUP.STATUS_CODE, String.valueOf(userInGroup.getJoinStatus().getCode()))
 			.set(OFC_USER_USERGROUP.ROLE_CODE, String.valueOf(userInGroup.getRole().getCode()))
 			.where(OFC_USER_USERGROUP.GROUP_ID.eq(userInGroup.getGroupId())
-					.and(OFC_USER_USERGROUP.USER_ID.eq(userInGroup.getUser().getId()))
+					.and(OFC_USER_USERGROUP.USER_ID.eq(userInGroup.getUserId()))
 			)
 			.execute();
 	}

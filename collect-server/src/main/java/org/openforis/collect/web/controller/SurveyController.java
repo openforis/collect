@@ -109,21 +109,21 @@ public class SurveyController extends BasicController {
 		return generateView(survey, true);
 	}
 
-	@RequestMapping(value="publish/{id}", method=PATCH)
+	@RequestMapping(value="publish/{id}", method=POST)
 	public @ResponseBody SurveyView publishSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.publish(survey);
 		return generateView(survey, false);
 	}
 	
-	@RequestMapping(value="close/{id}", method=PATCH)
+	@RequestMapping(value="close/{id}", method=POST)
 	public @ResponseBody SurveyView closeSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.close(survey);
 		return generateView(survey, false);
 	}
 	
-	@RequestMapping(value="archive/{id}", method=PATCH)
+	@RequestMapping(value="archive/{id}", method=POST)
 	public @ResponseBody SurveyView archiveSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.archive(survey);

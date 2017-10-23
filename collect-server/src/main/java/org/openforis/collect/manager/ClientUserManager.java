@@ -14,7 +14,7 @@ import org.openforis.collect.model.UserRole;
 public class ClientUserManager extends AbstractClient implements UserManager  {
 
 	@Override
-	public User loadById(int userId) {
+	public User loadById(Integer userId) {
 		User user = getOne(getUsersRestfulApiUrl() + "/user/" + userId, User.class);
 		setGenericRoles(user);
 		return user;
@@ -92,10 +92,15 @@ public class ClientUserManager extends AbstractClient implements UserManager  {
 	}
 
 	@Override
-	public void delete(int id) throws CannotDeleteUserException {
+	public void deleteById(Integer id) throws CannotDeleteUserException {
 		delete(getUsersRestfulApiUrl() + "/user/" + id);
 	}
 
+	@Override
+	public void delete(User user) {
+		deleteById(user.getId());
+	}
+	
 	private void adaptRoles(List<User> list) {
 		for (User user : list) {
 			setGenericRoles(user);

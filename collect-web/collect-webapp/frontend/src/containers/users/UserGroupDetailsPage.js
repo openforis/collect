@@ -48,13 +48,23 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             let idParam = props.match.params.id;
             let userGroup;
             if (idParam == 'new') {
-                userGroup = {id: null, name: '', label: '', description: '', visibilityCode: 'P', enabled: true, users: [{
-                    userId: loggedUser.id, 
-                    username: loggedUser.username, 
-                    userEnabled: loggedUser.enabled, 
-                    role: 'OWNER',
-                    joinStatus: 'ACCEPTED'
-                }]}
+                userGroup = {
+                    id: null, 
+                    name: '', 
+                    label: '', 
+                    description: '', 
+                    visibilityCode: 'P', 
+                    enabled: true,
+                    qualifierName: '',
+                    qualifierValue: '', 
+                    users: [{
+                        userId: loggedUser.id, 
+                        username: loggedUser.username, 
+                        userEnabled: loggedUser.enabled, 
+                        role: 'OWNER',
+                        joinStatus: 'ACCEPTED'
+                    }]
+                }
             } else {
                 let userGroupId = parseInt(idParam)
                 userGroup = props.userGroups.find(group => group.id === userGroupId)
@@ -70,6 +80,8 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     description: userGroup.description,
                     visibilityCode: userGroup.visibilityCode,
                     enabled: userGroup.enabled,
+                    qualifierName: userGroup.qualifierName,
+                    qualifierValue: userGroup.qualifierValue,
                     errorFeedback: [],
                     alertMessageOpen: false,
                     availableUsers: this.getAvailableUsers(props.users, userGroup.users),
@@ -187,7 +199,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
 
     handleSelectedUsersCellEdit(row, cellName, cellValue) {
         console.log(cellValue)
-        console.log(this.state.selectedUsersInGroup)
+        console.log(this.state.usersInGroup)
     }
 
     render() {
