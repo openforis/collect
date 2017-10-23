@@ -78,21 +78,21 @@
 		]]>
 	</fx:Script>
 	
-	<s:layout.horizontal>
+	<s:layout.HORIZONTAL>
 		<s:HorizontalLayout gap="2"
 							paddingRight="10"
 							useVirtualLayout="true" />
-	</s:layout.horizontal>
+	</s:layout.HORIZONTAL>
 	
-	<s:layout.vertical>
+	<s:layout.VERTICAL>
 		<s:VerticalLayout gap="2"
 						  paddingRight="10"
 						  useVirtualLayout="true" />
-	</s:layout.vertical>
+	</s:layout.VERTICAL>
 	
 	<s:states>
-		<s:State name="horizontal" />
-		<s:State name="vertical" />
+		<s:State name="HORIZONTAL" />
+		<s:State name="VERTICAL" />
 	</s:states>
 	
 </s:DataGroup>

@@ -96,6 +96,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		private String    label;
 		private String    description;
 		private String    visibilityCode;
+		private Integer   parentId;
 		private Boolean   enabled;
 		private String    qualifierName;
 		private String    qualifierValue;
@@ -158,6 +159,14 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		
 		public void setVisibilityCode(String visibilityCode) {
 			this.visibilityCode = visibilityCode;
+		}
+		
+		public Integer getParentId() {
+			return parentId;
+		}
+		
+		public void setParentId(Integer parentId) {
+			this.parentId = parentId;
 		}
 		
 		public Boolean getEnabled() {

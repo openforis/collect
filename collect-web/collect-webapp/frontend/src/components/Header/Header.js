@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Form, FormGroup, Label, Col, Dropdown, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import SurveySelect from '../SurveySelect/';
+import ServiceFactory from 'services/ServiceFactory'
 
 class Header extends Component {
 
@@ -10,6 +11,8 @@ class Header extends Component {
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.handleLogoutClick = this.handleLogoutClick.bind(this)
+
     this.state = {
       dropdownOpen: false
     };
@@ -39,6 +42,10 @@ class Header extends Component {
   asideToggle(e) {
     e.preventDefault();
     document.body.classList.toggle('aside-menu-hidden');
+  }
+
+  handleLogoutClick() {
+    ServiceFactory.sessionService.invalidate().then(r => window.location.assign('/'))
   }
 
   render() {
@@ -76,7 +83,7 @@ class Header extends Component {
               <DropdownMenu className="dropdown-menu-right">
                 <DropdownItem header className="text-center"><strong>Account</strong></DropdownItem>
                 <DropdownItem><i className="fa fa-user"></i> Change Password</DropdownItem>
-                <DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>
+                <DropdownItem onClick={this.handleLogoutClick}><i className="fa fa-lock"></i> Logout</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </li>

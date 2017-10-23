@@ -9,6 +9,6 @@
         type="javax.sql.DataSource"
         global="jdbc/collectRDBDs"/>
         
-	<Parameter name="devMode" value="true" />
+	<Parameter name="devMode" value="false" />
 	
 </Context>

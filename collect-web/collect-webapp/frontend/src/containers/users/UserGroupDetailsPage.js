@@ -80,6 +80,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     description: userGroup.description,
                     visibilityCode: userGroup.visibilityCode,
                     enabled: userGroup.enabled,
+                    parentId: userGroup.parentId,
                     qualifierName: userGroup.qualifierName,
                     qualifierValue: userGroup.qualifierValue,
                     errorFeedback: [],
@@ -112,6 +113,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             label: this.state.label,
             description: this.state.description,
             visibilityCode: this.state.visibilityCode,
+            parentId: this.state.parentId,
             enabled: this.state.enabled,
             qualifierName: this.state.qualifierName,
             qualifierValue: this.state.qualifierValue,
@@ -213,7 +215,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         const createRoleEditor = (onUpdate, props) => (<UserRoleDropdownEditor onUpdate={ onUpdate } {...props}/>);
         
         const isNotDescendantOf = function(group1, group2) {
-            return false;
+            return true;
         }
         const editedUserGroup = this.state.editedUserGroup;
         const ownerId = 0//this.state.usersInGroup.find(u => u.role == 'OWNER').userId
@@ -288,15 +290,16 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                             }
                         </Col>
                     </FormGroup>
-                    <FormGroup row color={this.getFieldState('parentGroup')}>
+                    <FormGroup row color={this.getFieldState('parentId')}>
                         <Label for="parentGroupSelect" sm={2}>Parent Group</Label>
                         <Col sm={10}>
-                            <Input type="select" name="parentGroup" id="parentGroupSelect"
-                                state={this.getFieldState('parentGroup')}
-                                onChange={(event) => this.setState({...this.state, parentGroupId: event.target.value})}
+                            <Input type="select" name="parentId" id="parentGroupSelect"
+                                state={this.getFieldState('parentId')}
+                                value={this.state.parentId}
+                                onChange={(event) => this.setState({...this.state, parentId: event.target.value})}
                                 >{parentGroupOptions}</Input>
-                            {this.state.errorFeedback['parentGroup'] &&
-                                <FormFeedback>{this.state.errorFeedback['parentGroup']}</FormFeedback>
+                            {this.state.errorFeedback['parentId'] &&
+                                <FormFeedback>{this.state.errorFeedback['parentId']}</FormFeedback>
                             }
                         </Col>
                     </FormGroup>

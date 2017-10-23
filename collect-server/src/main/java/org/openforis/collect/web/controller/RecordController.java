@@ -61,6 +61,7 @@ import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.MultipleEditException;
@@ -186,12 +187,18 @@ public class RecordController extends BasicController implements Serializable {
 		
 		//filter by user group qualifier
 		if (user != null) {
-			UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
-			String qualifierName = userInGroup.getGroup().getQualifier1Name();
-			if (StringUtils.isNotBlank(qualifierName)) {
-				HashMap<String, String> qualifiersByName = new HashMap<String, String>();
-				qualifiersByName.put(qualifierName, userInGroup.getGroup().getQualifier1Value());
-				filter.setQualifiersByName(qualifiersByName);
+			if (user.getRole() != UserRole.ADMIN) { //administrators can see all records
+				UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
+				if (userInGroup == null) {
+					throw new IllegalArgumentException(String.format("User %s not allowed to see records for survey %s", 
+							user.getUsername(), survey.getName()));
+				}
+				String qualifierName = userInGroup.getGroup().getQualifier1Name();
+				if (StringUtils.isNotBlank(qualifierName)) {
+					HashMap<String, String> qualifiersByName = new HashMap<String, String>();
+					qualifiersByName.put(qualifierName, userInGroup.getGroup().getQualifier1Value());
+					filter.setQualifiersByName(qualifiersByName);
+				}
 			}
 		}
 		

@@ -1,5 +1,8 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
@@ -39,7 +41,7 @@ public class SessionController extends BasicController {
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value = "ping", method = RequestMethod.GET)
+	@RequestMapping(value = "ping", method = GET)
 	public @ResponseBody Response ping(@RequestParam(value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
 		if ( editing ) {
 			sessionManager.checkIsActiveRecordLocked();
@@ -47,14 +49,14 @@ public class SessionController extends BasicController {
 		return new Response();
 	}
 	
-	@RequestMapping(value = "survey", method = RequestMethod.POST)
+	@RequestMapping(value = "survey", method = POST)
 	public @ResponseBody Response setActiveSurvey(@RequestParam int surveyId) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		sessionManager.setActiveSurvey(survey);
 		return new Response();
 	}
 	
-	@RequestMapping(value = "survey", method = RequestMethod.GET)
+	@RequestMapping(value = "survey", method = GET)
 	public @ResponseBody SurveyView getActiveSurvey(HttpServletResponse response) {
 		CollectSurvey survey = getUpdatedActiveSurvey();
 		if (survey == null) {
@@ -71,7 +73,7 @@ public class SessionController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value="user", method=RequestMethod.GET)
+	@RequestMapping(value="user", method=GET)
 	public @ResponseBody UserForm getLoggedUser(HttpServletRequest request, HttpServletResponse response) {
 		SessionState sessionState = sessionManager.getSessionState();
 		User user = sessionState.getUser();
@@ -80,6 +82,13 @@ public class SessionController extends BasicController {
 			return null;
 		}
 		return new UserController.UserForm(user);
+	}
+	
+	@RequestMapping(value="invalidate", method=POST)
+	public @ResponseBody Response invalidate(HttpServletRequest request) {
+		sessionManager.invalidateSession();
+		request.getSession().invalidate();
+		return new Response();
 	}
 	
 	private CollectSurvey getUpdatedActiveSurvey() {

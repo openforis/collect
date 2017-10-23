@@ -525,7 +525,8 @@ public class DataService {
 		
 		//filter by user group qualifier (if any)
 		String qualifierName = userInGroup.getGroup().getQualifier1Name();
-		if (qualifierName != null && qualifierName.equals(def.getList().getName())) {
+		String listHierarchicalLevelName = def.getList().isHierarchical() ? def.getHierarchicalLevel() : def.getListName();
+		if (qualifierName != null && qualifierName.equals(listHierarchicalLevelName)) {
 			CollectionUtils.filter(filteredItems, new Predicate<CodeListItem>() {
 				public boolean evaluate(CodeListItem item) {
 					return item.getCode().equals(userInGroup.getGroup().getQualifier1Value());
