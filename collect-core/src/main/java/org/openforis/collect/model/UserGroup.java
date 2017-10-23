@@ -35,6 +35,7 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 	}
 	
 	private User createdByUser;
+	private Visibility visibility;
 
 	public User getCreatedByUser() {
 		return createdByUser;
@@ -48,14 +49,24 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 	}
 
 	public Visibility getVisibility() {
-		String code = getVisibilityCode();
-		return StringUtils.isBlank(code) ? null : Visibility.fromCode(code.charAt(0));
-	}
-
-	public void setVisibility(Visibility visibility) {
-		setVisibilityCode(visibility == null ? null : String.valueOf(visibility.getCode()));
+		return visibility;
 	}
 	
+	public void setVisibility(Visibility visibility) {
+		this.visibility = visibility;
+		setInternalVisibilityCode(visibility == null ? null : String.valueOf(visibility.getCode()));
+	}
+	
+	@Override
+	public void setVisibilityCode(java.lang.String visibilityCode) {
+		setInternalVisibilityCode(visibilityCode);
+		this.visibility = StringUtils.isBlank(visibilityCode) ? null : Visibility.fromCode(visibilityCode.charAt(0));
+	}
+	
+	protected void setInternalVisibilityCode(String visibilityCode) {
+		super.setVisibilityCode(visibilityCode);
+	}
+
 	public String getQualifierName() {
 		return getQualifier1Name();
 	}
