@@ -19,6 +19,7 @@ import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.collect.utils.Dates;
@@ -125,6 +126,9 @@ public class ValidationController extends BasicController {
 			RecordFilter recordFilter = new RecordFilter(survey, rootEntityId);
 			recordFilter.setKeyValues(recordKeys);
 			recordFilter.setModifiedSince(modifiedSince);
+			if (user.getRole() == UserRole.ENTRY_LIMITED) {
+				recordFilter.setOwnerId(user.getId());
+			}
 			ValidationReportProcess process = new ValidationReportProcess(outputStream, recordManager, messageContextHolder, 
 					ReportType.CSV, user, sessionId, recordFilter, true, LocaleUtils.toLocale(locale));
 			process.init();

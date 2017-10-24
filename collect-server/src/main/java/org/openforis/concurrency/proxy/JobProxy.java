@@ -72,8 +72,13 @@ public class JobProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
+	public String[] getErrorMessageArgs() {
+		return job.getErrorMessageArgs();
+	}
+	
+	@ExternalizedProperty
 	public String getName() {
 		return job.getName();
 	}
-
+	
 }

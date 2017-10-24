@@ -10,8 +10,11 @@ export default class SessionService extends AbstractService {
         return this.get('session/ping')
     }
 
+    initialize() {
+        return this.post('session/initialize')
+    }
+
     invalidate() {
         return this.post('session/invalidate')
     }
-    
 }

@@ -52,6 +52,9 @@ import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.ValidationReportJob;
+import org.openforis.collect.manager.ValidationReportJob.Input;
+import org.openforis.collect.manager.ValidationReportJob.ReportType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
@@ -76,6 +79,7 @@ import org.openforis.collect.web.controller.RecordStatsGenerator.RecordsStats;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
+import org.openforis.concurrency.proxy.JobProxy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -131,6 +135,7 @@ public class RecordController extends BasicController implements Serializable {
 	private SurveyBackupJob fullBackupJob;
 	private DataRestoreSummaryJob dataRestoreSummaryJob;
 	private CSVDataImportJob csvDataImportJob;
+	private ValidationReportJob validationReportJob;
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
 	public @ResponseBody
@@ -464,6 +469,38 @@ public class RecordController extends BasicController implements Serializable {
 		}
 		RecordsStats stats = recordStatsGenerator.generate(surveyId, period);
 		return stats;
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/validationreport", method=POST)
+	public @ResponseBody JobProxy startValidationResportJob(@PathVariable int surveyId) {
+		User user = sessionManager.getLoggedUser();
+		Locale locale = sessionManager.getSessionState().getLocale();
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
+		ValidationReportJob job = jobManager.createJob(ValidationReportJob.class);
+		Input input = new Input();
+		input.setLocale(locale);
+		input.setReportType(ReportType.CSV);
+		RecordFilter recordFilter = new RecordFilter(survey);
+		recordFilter.setRootEntityId(rootEntityDef.getId());
+		if (user.getRole() == UserRole.ENTRY_LIMITED) {
+			recordFilter.setOwnerId(user.getId());
+		}
+		input.setRecordFilter(recordFilter);
+		job.setInput(input);
+		this.validationReportJob = job;
+		jobManager.start(job);
+		return new JobProxy(job);
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/validationreport.csv", method=GET)
+	public void downloadValidationReportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
+		File file = validationReportJob.getOutputFile();
+		CollectSurvey survey = validationReportJob.getInput().getRecordFilter().getSurvey();
+		String surveyName = survey.getName();
+		Controllers.writeFileToResponse(response, file, 
+				String.format("collect-validation-report-%s-%s.csv", surveyName, Dates.formatDate(new Date())), 
+				Controllers.CSV_CONTENT_TYPE);
 	}
 	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {

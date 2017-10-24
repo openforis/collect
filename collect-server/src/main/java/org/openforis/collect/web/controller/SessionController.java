@@ -73,13 +73,24 @@ public class SessionController extends BasicController {
 		}
 	}
 	
+	@RequestMapping(value="initialize", method=POST)
+	public @ResponseBody UserForm initialize(HttpServletRequest request) {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		sessionState.setLocale(request.getLocale());
+		return new UserController.UserForm(user);
+	}
+	
 	@RequestMapping(value="user", method=GET)
 	public @ResponseBody UserForm getLoggedUser(HttpServletRequest request, HttpServletResponse response) {
 		SessionState sessionState = sessionManager.getSessionState();
-		User user = sessionState.getUser();
+		User user = sessionState == null ? null : sessionState.getUser();
 		if (user == null) {
 			HttpResponses.setNoContentStatus(response);
 			return null;
+		}
+		if (sessionState.getLocale() == null) {
+			sessionState.setLocale(request.getLocale());
 		}
 		return new UserController.UserForm(user);
 	}

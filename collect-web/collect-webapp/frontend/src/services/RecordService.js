@@ -56,6 +56,14 @@ export default class RecordService extends AbstractService {
         this.downloadFile(this.BASE_URL + 'survey/' + surveyId + '/data/records/exportresult.collect-data')
     }
 
+    startValidationReport(surveyId, parameters) {
+        return this.postJson('survey/' + surveyId + '/data/records/validationreport', parameters)
+    }
+
+    downloadValidationReportResult(surveyId) {
+        this.downloadFile(this.BASE_URL + 'survey/' + surveyId + '/data/records/validationreport.csv')
+    }
+
     updateOwner(record, owner) {
         return this.patchJson('survey/' + record.surveyId + '/data/records/' + record.id, {
             ownerId: owner == null ? null : owner.id

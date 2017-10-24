@@ -4,7 +4,7 @@ import { Button, ButtonGroup, ButtonToolbar, Container, ButtonDropdown,
 	DropdownToggle, DropdownMenu, DropdownItem, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
-import { recordDeleted } from 'actions'
+import * as Actions from 'actions';
 import ServiceFactory from 'services/ServiceFactory'
 import Modals from 'components/Modals'
 import Arrays from 'utils/Arrays'
@@ -32,6 +32,8 @@ class DataManagementPage extends Component {
 		this.handleBackupButtonClick = this.handleBackupButtonClick.bind(this)
 		this.handleBackupImportButtonClick = this.handleBackupImportButtonClick.bind(this)
 		this.handleCsvImportButtonClick = this.handleCsvImportButtonClick.bind(this)
+		this.handleValidationReportButtonClick = this.handleValidationReportButtonClick.bind(this)
+		this.handleDownloadValidationReportClick = this.handleDownloadValidationReportClick.bind(this)
 	}
 
 	handleNewButtonClick() {
@@ -50,7 +52,7 @@ class DataManagementPage extends Component {
 			const $this = this
 			//Modals.confirm('test', 'test', function() {
 				this.recordService.delete(this.state.selectedItem).then(response => {
-					$this.props.dispatch(recordDeleted($this.state.selectedItem));
+					$this.props.dispatch(Actions.recordDeleted($this.state.selectedItem));
 					$this.setState({selectedItem: null, selectedItemIds: []})
 					$this.forceUpdate()
 				})
@@ -100,6 +102,28 @@ class DataManagementPage extends Component {
 		this.props.history.push('/datamanagement/csvimport')
 	}
 
+	handleValidationReportButtonClick() {
+		const survey = this.props.survey
+        
+        ServiceFactory.recordService.startValidationReport(survey.id, null).then(job => {
+            this.props.dispatch(Actions.startJobMonitor({
+                jobId: job.id, 
+                title: 'Generating validation report',
+                okButtonLabel: 'Download',                        
+                handleOkButtonClick: this.handleDownloadValidationReportClick
+            }))
+        })
+	}
+
+	handleDownloadValidationReportClick(job) {
+		if (job.completed) {
+			const survey = this.props.survey
+			const surveyId = survey.id
+			ServiceFactory.recordService.downloadValidationReportResult(surveyId)
+		}
+		this.props.dispatch(Actions.closeJobMonitor())
+	}
+	
 	render() {
 		if (!this.props.survey) {
 			return <div>Select a survey first</div>
@@ -114,23 +138,27 @@ class DataManagementPage extends Component {
 						<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "danger" : "disabled"}
 							onClick={this.handleDeleteButtonClick}>Delete</Button>
 					</Col>
-					<Col sm={{size: 2}}>
+					<Col sm={{size: 1}}>
+						<Button color="success" onClick={this.handleValidationReportButtonClick}><i className="fa fa-exclamation-triangle" aria-hidden="true"></i> Validation Report</Button>
+					</Col>
+					<Col sm={{size: 1}}>
 						<ButtonDropdown isOpen={this.state.exportDropdownOpen} 
 								toggle={() => this.setState({exportDropdownOpen: !this.state.exportDropdownOpen})}>
 							<DropdownToggle color="primary" caret><span className="fa fa-download"/>Export</DropdownToggle>
 							<DropdownMenu>
-								<DropdownItem onClick={this.handleExportToCsvButtonClick}>to CSV</DropdownItem>
-								<DropdownItem onClick={this.handleBackupButtonClick}>to Collect format</DropdownItem>
+								<DropdownItem onClick={this.handleExportToCsvButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> to CSV</DropdownItem>
+								<DropdownItem onClick={this.handleBackupButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> to Collect format</DropdownItem>
 							</DropdownMenu>
 						</ButtonDropdown>
 					</Col>
-					<Col sm={{size: 2}}>
+
+					<Col sm={{size: 1}}>
 						<ButtonDropdown isOpen={this.state.importDropdownOpen} 
 								toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
 							<DropdownToggle color="warning" caret><span className="fa fa-upload"/>Import</DropdownToggle>
 							<DropdownMenu>
-								<DropdownItem onClick={this.handleCsvImportButtonClick}>from CSV</DropdownItem>
-								<DropdownItem onClick={this.handleBackupImportButtonClick}>from Collect format</DropdownItem>
+								<DropdownItem onClick={this.handleCsvImportButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> from CSV</DropdownItem>
+								<DropdownItem onClick={this.handleBackupImportButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> from Collect format</DropdownItem>
 							</DropdownMenu>
 						</ButtonDropdown>
 					</Col>

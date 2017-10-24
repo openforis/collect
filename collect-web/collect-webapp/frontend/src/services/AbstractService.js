@@ -85,7 +85,7 @@ export default class AbstractService {
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: data ? JSON.stringify(data) : null
         }).then(response => response.json(),
             this._handleError)
         .catch(error => {
