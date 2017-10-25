@@ -6,6 +6,8 @@ import { createLogger } from 'redux-logger'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 
+import 'bootstrap/dist/css/bootstrap.css';
+
 // Containers
 import App from 'App'
 

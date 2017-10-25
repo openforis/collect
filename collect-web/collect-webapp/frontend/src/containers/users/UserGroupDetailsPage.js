@@ -269,22 +269,25 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         </Col>
                     </FormGroup>
                     <FormGroup row color={this.getFieldState('visibilityCode')}>
-                        <Col sm={2}>
-                            <Label for="visibilityCode">Visibility</Label>
-                        </Col>
-                        <Col sm={2}>
-                            <Input type="radio" value="P" name="visibilityCode" id="visibilityCodePublic"
-                                checked={this.state.visibilityCode === 'P'} 
-                                state={this.getFieldState('visibilityCode')}
-                                onChange={(event) => this.setState({...this.state, visibilityCode: event.target.value})} />
-                            <Label for="visibilityCodePublic">Public</Label>
-                        </Col>
-                        <Col sm={8}>
-                            <Input type="radio" value="N" name="visibilityCode" id="visibilityCodePrivate"
-                                checked={this.state.visibilityCode === 'N'} 
-                                state={this.getFieldState('visibilityCode')}
-                                onChange={(event) => this.setState({...this.state, visibilityCode: event.target.value})} />
-                            <Label for="visibilityCodePrivate">Private</Label>
+                        <Label for="visibilityCode" sm={2}>Visibility</Label>
+                        <Col sm={10}>
+                            <FormGroup check>
+                                <Label check>
+                                    <Input type="radio" value="P" name="visibilityCode" id="visibilityCodePublic"
+                                        checked={this.state.visibilityCode === 'P'} 
+                                        state={this.getFieldState('visibilityCode')}
+                                        onChange={(event) => this.setState({...this.state, visibilityCode: event.target.value})} />
+                                    Public
+                                </Label>
+                                <span style={{display: 'inline-block', width: '40px'}}></span>
+                                <Label check>
+                                    <Input type="radio" value="N" name="visibilityCode" id="visibilityCodePrivate"
+                                        checked={this.state.visibilityCode === 'N'} 
+                                        state={this.getFieldState('visibilityCode')}
+                                        onChange={(event) => this.setState({...this.state, visibilityCode: event.target.value})} />
+                                    Private
+                                </Label>
+                            </FormGroup>
                             {this.state.errorFeedback['visibilityCode'] &&
                                 <FormFeedback>{this.state.errorFeedback['visibilityCode']}</FormFeedback>
                             }
@@ -300,18 +303,6 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                 >{parentGroupOptions}</Input>
                             {this.state.errorFeedback['parentId'] &&
                                 <FormFeedback>{this.state.errorFeedback['parentId']}</FormFeedback>
-                            }
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row color={this.getFieldState('enabled')}>
-                        <Label for="enabled" sm={2}>Enabled</Label>
-                        <Col sm={10}>
-                            <Input type="checkbox" name="enabled" id="enabled"
-                                checked={this.state.enabled} 
-                                state={this.getFieldState('enabled')}
-                                onChange={(event) => this.setState({...this.state, enabled: event.target.checked})} />
-                            {this.state.errorFeedback['enabled'] &&
-                                <FormFeedback>{this.state.errorFeedback['enabled']}</FormFeedback>
                             }
                         </Col>
                     </FormGroup>
@@ -339,12 +330,28 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                             }
                         </Col>
                     </FormGroup>
+                    <FormGroup row color={this.getFieldState('enabled')}>
+                        <Label for="enabled" sm={2}>Enabled</Label>
+                        <Col sm={{ size: 10 }}>
+                            <FormGroup check>
+                                <Label check>
+                                    <Input type="checkbox" name="enabled" id="enabled"
+                                        checked={this.state.enabled} 
+                                        state={this.getFieldState('enabled')}
+                                        onChange={(event) => this.setState({...this.state, enabled: event.target.checked})} />
+                                    {this.state.errorFeedback['enabled'] &&
+                                        <FormFeedback>{this.state.errorFeedback['enabled']}</FormFeedback>
+                                    }
+                                </Label>
+                            </FormGroup>
+                        </Col>
+                    </FormGroup>
                     <Row>
-                        <Col sm="2">
+                        <Col sm="6">
                             <fieldset className="secondary">
                                 <legend>Add/Remove Users</legend>
                                 <Row>
-                                    <Col sm="2">
+                                    <Col sm="6">
                                         <BootstrapTable
                                             data={this.state.availableUsers}
                                             striped	hover condensed
@@ -354,13 +361,13 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                             >
                                             <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
                                             <TableHeaderColumn dataField="username">Username</TableHeaderColumn>
-                                            <TableHeaderColumn dataField="enabled" width="100">Enabled</TableHeaderColumn>
+                                            <TableHeaderColumn dataField="role" width="100">Role</TableHeaderColumn>
                                         </BootstrapTable>
                                     </Col>
-                                    <Col sm="3">
+                                    <Col sm="4">
                                         {this.state.selectedAvailableUsers.length > 0 ?
                                             <Row>
-                                                <Col sm="5">
+                                                <Col sm="8">
                                                     <Input type="select" name="newUserRole" id="newUserRoleSelect" 
                                                             onChange={(event) => this.setState({...this.state, newUserRoleCode: event.target.value})}
                                                             value={this.state.newUserRoleCode}>
@@ -385,7 +392,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         </Col>
                         <Col sm="6">
                             <fieldset className="secondary">
-                                <legend>Selected Users</legend>
+                                <legend>Users in Group</legend>
                                 <BootstrapTable
                                     data={this.state.usersInGroup}
                                     striped	hover condensed

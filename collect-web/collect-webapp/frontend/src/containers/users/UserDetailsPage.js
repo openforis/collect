@@ -100,13 +100,15 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                     <FormGroup row color={this.getFieldState('enabled')}>
                         <Label for="enabled" sm={2}>Enabled</Label>
                         <Col sm={10}>
-                            <Input type="checkbox" name="enabled" id="enabled"
-                                checked={this.state.enabled} 
-                                state={this.getFieldState('enabled')}
-                                onChange={(event) => this.setState({...this.state, enabled: event.target.checked})} />
-                            {this.state.errorFeedback['enabled'] &&
-                                <FormFeedback>{this.state.errorFeedback['enabled']}</FormFeedback>
-                            }
+                            <FormGroup check>
+                                <Label check>
+                                    <Input type="checkbox" name="enabled" id="enabled"
+                                        checked={this.state.enabled} 
+                                        state={this.getFieldState('enabled')}
+                                        onChange={(event) => this.setState({...this.state, enabled: event.target.checked})} />
+                                </Label>
+                            </FormGroup>
+                            {this.state.errorFeedback['enabled'] && <FormFeedback>{this.state.errorFeedback['enabled']}</FormFeedback>}
                         </Col>
                     </FormGroup>
                     <FormGroup row color={this.getFieldState('role')}>
@@ -149,7 +151,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                     <FormGroup check row>
                         <Col sm={{ size: 10, offset: 2 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
-                            <Button color="danger" onClick={this.handleDeleteBtnClick}><span className="icon-trash"/></Button>
+                            {! this.state.newItem && <Button color="danger" onClick={this.handleDeleteBtnClick}><span className="icon-trash"/></Button>}
                         </Col>
                     </FormGroup>
                 </Form>

@@ -1,6 +1,4 @@
-import createReactClass from 'create-react-class';
-
-class Constants {
+export default class Constants {
 
     static BASE_URL = Constants.determineBaseURL();
     static API_BASE_URL = Constants.BASE_URL + "api/";
@@ -18,5 +16,3 @@ class Constants {
         return typeof JSON3 !== 'undefined' //TODO improve it
       };
 }
-
-export default Constants;

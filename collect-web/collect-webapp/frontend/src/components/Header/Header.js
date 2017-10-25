@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Form, FormGroup, Label, Col, Dropdown, DropdownMenu, DropdownItem } from 'reactstrap';
+import { Form, FormGroup, Label, Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import SurveySelect from '../SurveySelect/';
 import ServiceFactory from 'services/ServiceFactory'
@@ -76,10 +76,7 @@ class Header extends Component {
         <ul className="nav navbar-nav ml-auto">
 	        <li className="nav-item">
             <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-              <button onClick={this.toggle} className="nav-link dropdown-toggle" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded={this.state.dropdownOpen}>
-                <span className="d-md-down-none">{loggedUser.username}</span>
-              </button>
-
+              <DropdownToggle caret>{loggedUser.username}</DropdownToggle>
               <DropdownMenu className="dropdown-menu-right">
                 <DropdownItem header className="text-center"><strong>Account</strong></DropdownItem>
                 <DropdownItem><i className="fa fa-user"></i> Change Password</DropdownItem>
@@ -87,9 +84,11 @@ class Header extends Component {
               </DropdownMenu>
             </Dropdown>
           </li>
+          {/*
           <li className="nav-item d-md-down-none">
             <button className="nav-link navbar-toggler aside-menu-toggler" type="button" onClick={this.asideToggle}>&#9776;</button>
           </li>
+          */}
         </ul>
       </header>
     )

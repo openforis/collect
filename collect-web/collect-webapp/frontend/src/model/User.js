@@ -19,8 +19,6 @@ export default class User extends Serializable {
 
     get canAccessSurveyDesigner() {
         switch(this.role) {
-            case 'CLEANSING':
-            case 'ANALYSIS':
             case 'ADMIN':
                 return true
             default:

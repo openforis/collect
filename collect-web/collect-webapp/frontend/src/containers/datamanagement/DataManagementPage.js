@@ -131,17 +131,17 @@ class DataManagementPage extends Component {
 		return (
 			<Container>
 				<Row className="justify-content-between">
-					<Col sm={{size: 8}}>
+					<Col sm={{size: 4}}>
 						<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
 						<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "success" : "disabled"}
 							onClick={this.handleEditButtonClick}>Edit</Button>
 						<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "danger" : "disabled"}
 							onClick={this.handleDeleteButtonClick}>Delete</Button>
 					</Col>
-					<Col sm={{size: 1}}>
+					<Col sm={{size: 2}}>
 						<Button color="success" onClick={this.handleValidationReportButtonClick}><i className="fa fa-exclamation-triangle" aria-hidden="true"></i> Validation Report</Button>
 					</Col>
-					<Col sm={{size: 1}}>
+					<Col sm={{size: 2}}>
 						<ButtonDropdown isOpen={this.state.exportDropdownOpen} 
 								toggle={() => this.setState({exportDropdownOpen: !this.state.exportDropdownOpen})}>
 							<DropdownToggle color="primary" caret><span className="fa fa-download"/>Export</DropdownToggle>
@@ -152,7 +152,7 @@ class DataManagementPage extends Component {
 						</ButtonDropdown>
 					</Col>
 
-					<Col sm={{size: 1}}>
+					<Col sm={{size: 2}}>
 						<ButtonDropdown isOpen={this.state.importDropdownOpen} 
 								toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
 							<DropdownToggle color="warning" caret><span className="fa fa-upload"/>Import</DropdownToggle>

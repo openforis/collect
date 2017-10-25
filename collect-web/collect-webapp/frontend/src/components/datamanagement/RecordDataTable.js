@@ -91,6 +91,12 @@ class RecordDataTable extends Component {
 			case 'key3':
 				sortField = 'KEY3'
 				break
+			case 'errors':
+				sortField = 'ERRORS'
+				break
+			case 'warnings':
+				sortField = 'WARNINGS'
+				break
 			case 'owner':
 				sortField = 'OWNER_NAME'
 				break
@@ -159,7 +165,7 @@ class RecordDataTable extends Component {
 		const attributeDefsShownInSummaryList = survey.schema.firstRootEntityDefinition.attributeDefinitionsShownInRecordSummaryList
 		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => 
 			<TableHeaderColumn key={'shown'+(i+1)} dataField={'shown'+(i+1)} dataFormat={shownInSummaryListFormatter} width="80"
-				editable={false} dataSort filter={ { type: 'TextFilter' } }>{attr.label}</TableHeaderColumn>)
+				editable={false}>{attr.label}</TableHeaderColumn>)
 		columns = columns.concat(attributeDefsShownInSummaryListColumns)
 
 		columns.push(

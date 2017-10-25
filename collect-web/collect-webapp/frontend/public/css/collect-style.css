@@ -4,7 +4,6 @@
 **/
 
 .breadcrumb-item.active {
-    color: #20a8d8; 
     font-weight: bold;
     font-size: 1em;
 }
@@ -44,14 +43,18 @@
     max-width: 100%; } }
   
 fieldset {
-    border: 1px solid #c0c0c0;
-    margin: 0 2px;
-    padding: 0.35em 0.625em 0.75em;
+    border: 1px solid #c0c0c0 !important;
+    margin: 0 2px !important;
+    padding: 0.35em 1.625em 0.75em !important;
 }
 
 fieldset legend {
     width: auto;
     font-size: 1.5em;
+}
+
+.card fieldset {
+    margin-left: 20px !important;
 }
 
 .app-header.navbar .navbar-brand {
@@ -119,4 +122,28 @@ span.circle-green {
 
 span.equal-sign {
   background-image: url('../img/generic/equal_sign_32x32.png');
+}
+
+.dropdown-menu.dropdown-menu-right {
+    right: auto;
+}
+
+.app-header.navbar .dropdown-menu {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.app-header.navbar .nav-item .dropdown-toggle.survey-dropdown-toggle {
+    width: 400px;
+    background-color: #0069d9;
+    padding: 10px;
+    color: white;
+}
+
+.dropdown-item.survey-item {
+    border-bottom: 1px solid grey;
+}
+
+.dropdown-item.survey-item .survey-name {
+    font-weight: bold;
 }

@@ -388,25 +388,28 @@ class DashboardPage extends Component {
                 <fieldset>
                   <legend>Visible Record Types</legend>
                   <form className="form-inline">
-                    <label for="createdRecordsVisibilityCheckBox" style={{color: createdRecordsLineColor}}>
+                    <label htmlFor="createdRecordsVisibilityCheckBox" style={{color: createdRecordsLineColor}}>
                       <input id="createdRecordsVisibilityCheckBox" type="checkbox"
                         className="form-control form-check-input" 
                         checked={this.state.createdRecordsVisible}
                         onChange={this.handleRecordTypeVisibilityChange} />Created
                     </label>
-                    <label for="modifiedRecordsVisibilityCheckBox" style={{color: modifiedRecordsLineColor}}>
+                    <span style={{width: '40px'}}></span>
+                    <label htmlFor="modifiedRecordsVisibilityCheckBox" style={{color: modifiedRecordsLineColor}}>
                       <input id="modifiedRecordsVisibilityCheckBox" type="checkbox"
                         className="form-control form-check-input"
                         checked={this.state.modifiedRecordsVisible}
                         onChange={this.handleRecordTypeVisibilityChange} />Modified
                     </label>
-                    <label for="enteredRecordsVisibilityCheckBox" style={{color: enteredRecordsLineColor}}>
+                    <span style={{width: '40px'}}></span>
+                    <label htmlFor="enteredRecordsVisibilityCheckBox" style={{color: enteredRecordsLineColor}}>
                       <input id="enteredRecordsVisibilityCheckBox" type="checkbox"
                         className="form-control form-check-input" 
                         checked={this.state.enteredRecordsVisible}
                         onChange={this.handleRecordTypeVisibilityChange} />Entered
                     </label>
-                    <label for="cleansedRecordsVisibilityCheckBox" style={{color: cleansedRecordsLineColor}}>
+                    <span style={{width: '40px'}}></span>
+                    <label htmlFor="cleansedRecordsVisibilityCheckBox" style={{color: cleansedRecordsLineColor}}>
                       <input id="cleansedRecordsVisibilityCheckBox" type="checkbox"
                         className="form-control form-check-input" 
                         checked={this.state.cleansedRecordsVisible}
@@ -415,17 +418,6 @@ class DashboardPage extends Component {
                   </form>
                 </fieldset>
               </div>
-              
-
-              {/*
-              <div className="col-sm-7 hidden-sm-down">
-                <div className="btn-toolbar float-right" role="toolbar" aria-label="Toolbar with button groups">
-                  <div className="btn-group mr-3" data-toggle="buttons" aria-label="First group">
-                    {timeUnitChecks}
-                  </div>
-                </div>
-              </div>
-              */}
             </div>
             <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }}>
               <h5>By day</h5>
