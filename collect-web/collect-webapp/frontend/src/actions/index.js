@@ -3,6 +3,9 @@ import ServiceFactory from 'services/ServiceFactory'
 import { Survey } from 'model/Survey';
 import User from 'model/User';
 
+export const REQUEST_APPLICATION_INFO = 'REQUEST_APPLICATION_INFO'
+export const RECEIVE_APPLICATION_INFO = 'RECEIVE_APPLICATION_INFO'
+
 export const LOG_IN_PENDING = 'LOG_IN_PENDING'
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS'
 export const LOG_IN_FAILED = 'LOG_IN_FAILED'
@@ -37,6 +40,29 @@ export const RECEIVE_JOB = 'RECEIVE_JOB'
 export const JOB_CANCELED = 'JOB_CANCELED'
 
 export const RECORD_DELETED = 'RECORD_DELETED'
+
+//APPLICATION INFO
+function requestApplicationInfo() {
+	return {
+		type: REQUEST_APPLICATION_INFO
+	}
+}
+
+export function fetchApplicationInfo() {
+	return function (dispatch) {
+		dispatch(requestApplicationInfo())
+		ServiceFactory.applicationInfoService.fetchInfo().then(json => {
+			dispatch(receiveApplicationInfo(json));
+		})
+	}
+}
+
+function receiveApplicationInfo(info) {
+	return {
+		type: RECEIVE_APPLICATION_INFO,
+		info: info
+	}
+}
 
 //LOGIN
 function loginPending() {

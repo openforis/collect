@@ -59,7 +59,7 @@
 		
 		var checkDefaultPasswordActive = function() {
 			$.ajax({
-				url: "default-password-active.json"
+				url: "api/defaultpasswordactive"
 			}).done(function(defaultPasswordActive) {
 				$("#defaultPasswordActiveContainer").toggle(defaultPasswordActive);
 			});

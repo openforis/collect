@@ -14,5 +14,6 @@ export default class Constants {
 
     static isDevReact() {
         return typeof JSON3 !== 'undefined' //TODO improve it
-      };
+    }
+
 }

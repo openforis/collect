@@ -51,6 +51,11 @@ class Sidebar extends Component {
             <li className="nav-item">
               <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="fa fa-map-o"></i>Map</NavLink>
 	          </li>
+            {loggedUser.canAccessSaiku ?
+              <li className="nav-item">
+                <NavLink to={'/saiku'} className="nav-link" activeClassName="active"><i className="fa fa-bar-chart"></i>Saiku</NavLink>
+              </li>
+            : ''}
             <li className="divider"></li>
             {loggedUser.canAccessUsersManagement ?
               <li className="nav-item nav-dropdown">

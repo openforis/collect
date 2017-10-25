@@ -17,6 +17,8 @@ public class SurveyView {
 	private String name;
 	private String projectName;
 	private String description;
+	private List<String> languages;
+	private String defaultLanguage;
 	private boolean temporary;
 	private SurveyTarget target;
 	private UserGroup userGroup;
@@ -37,6 +39,8 @@ public class SurveyView {
 		this(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
 		this.projectName = survey.getProjectName();
 		this.description = survey.getDescription();
+		this.defaultLanguage = survey.getDefaultLanguage();
+		this.languages = survey.getLanguages();
 		this.userGroup = survey.getUserGroup();
 		this.schema = new SchemaView();
 		this.uiConfiguration = survey.getUIConfiguration();
@@ -74,6 +78,22 @@ public class SurveyView {
 	
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public List<String> getLanguages() {
+		return languages;
+	}
+	
+	public void setLanguages(List<String> languages) {
+		this.languages = languages;
+	}
+	
+	public String getDefaultLanguage() {
+		return defaultLanguage;
+	}
+	
+	public void setDefaultLanguage(String defaultLanguage) {
+		this.defaultLanguage = defaultLanguage;
 	}
 	
 	public boolean isTemporary() {

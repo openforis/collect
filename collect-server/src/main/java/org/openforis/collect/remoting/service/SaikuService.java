@@ -11,16 +11,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.webapp.HttpGraniteContext;
 import org.openforis.collect.concurrency.CollectJobManager;
-import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.reporting.ReportingRepositories;
+import org.openforis.collect.reporting.ReportingRepositoriesGeneratorJob;
+import org.openforis.collect.reporting.ReportingRepositoriesGeneratorJob.Input;
 import org.openforis.collect.reporting.SaikuConfiguration;
 import org.openforis.collect.reporting.proxy.ReportingRepositoryInfoProxy;
 import org.openforis.collect.utils.Proxies;
-import org.openforis.concurrency.Progress;
-import org.openforis.concurrency.ProgressListener;
-import org.openforis.concurrency.Task;
 import org.openforis.concurrency.proxy.JobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -58,21 +56,9 @@ public class SaikuService {
 	
 	@Secured(USER)
 	public JobProxy generateRdb(final String surveyName, final String preferredLanguage) {
-		SurveyLockingJob job = new SurveyLockingJob() {
-			protected void buildTasks() throws Throwable {
-				addTask(new Task() {
-					protected void execute() throws Throwable {
-						reportingRepositories.createRepositories(surveyName, preferredLanguage, new ProgressListener() {
-							public void progressMade(Progress progress) {
-								setProcessedItems(progress.getProcessedItems());
-								setTotalItems(progress.getTotalItems());
-							}
-						});
-					}
-				});
-			}
-		};
 		CollectSurvey survey = surveyManager.get(surveyName);
+		ReportingRepositoriesGeneratorJob job = jobManager.createJob(ReportingRepositoriesGeneratorJob.class);
+		job.setInput(new Input(preferredLanguage));
 		job.setSurvey(survey);
 		jobManager.startSurveyJob(job);
 		return new JobProxy(job);

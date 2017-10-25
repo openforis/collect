@@ -27,14 +27,15 @@
       
 		<intercept-url access="permitAll" pattern="collect.swf" />
 		<intercept-url access="permitAll" pattern="/api/session/**" />
+		<intercept-url access="permitAll" pattern="/api/default-password-active" />
+		<intercept-url access="permitAll" pattern="/api/info" />
+		<intercept-url access="permitAll" pattern="/api/complete-info" />
 		<intercept-url access="permitAll" pattern="/assets/**" />
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
 		<intercept-url access="permitAll" pattern="/js/**" />
 		<intercept-url access="permitAll" pattern="/script/**" />
-		<intercept-url access="permitAll" pattern="/default-password-active.json" />
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
-		<intercept-url access="permitAll" pattern="/info.json" />
 		<intercept-url access="permitAll" pattern="/keepSessionAlive.htm" />
 		<intercept-url access="permitAll" pattern="/login" />
 		<intercept-url access="permitAll" pattern="/logout.htm" />

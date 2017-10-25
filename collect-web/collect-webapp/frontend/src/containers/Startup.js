@@ -11,9 +11,10 @@ class Startup extends Component {
     }
 
     componentDidMount() {
-        this.props.actions.fetchCurrentUser();
-        this.props.actions.fetchUsers();
-        this.props.actions.fetchUserGroups();
+        this.props.actions.fetchApplicationInfo()
+        this.props.actions.fetchCurrentUser()
+        this.props.actions.fetchUsers()
+        this.props.actions.fetchUserGroups()
     }
 
     render() {

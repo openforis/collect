@@ -30,6 +30,10 @@ export default class User extends Serializable {
         return this.role === 'ADMIN'
     }
 
+    get canAccessSaiku() {
+        return this.role === 'ADMIN'
+    }
+
     get canAccessDataCleansing() {
         switch(this.role) {
             case 'CLEANSING':

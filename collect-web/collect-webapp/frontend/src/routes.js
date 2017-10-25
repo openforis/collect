@@ -57,6 +57,10 @@ const routes = [
     name: "Map"
   },
   {
+    path: '/saiku',
+    name: "Saiku"
+  },
+  {
     path: '/users',
     name: "Users"
   },
