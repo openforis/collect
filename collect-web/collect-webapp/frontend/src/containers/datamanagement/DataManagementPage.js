@@ -121,7 +121,6 @@ class DataManagementPage extends Component {
 			const surveyId = survey.id
 			ServiceFactory.recordService.downloadValidationReportResult(surveyId)
 		}
-		this.props.dispatch(Actions.closeJobMonitor())
 	}
 	
 	render() {

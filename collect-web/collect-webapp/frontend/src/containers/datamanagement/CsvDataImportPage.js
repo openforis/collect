@@ -78,7 +78,6 @@ class CsvDataImportPage extends Component {
     }
 
     handleJobModalOkButtonClick() {
-        this.props.dispatch(Actions.closeJobMonitor())
     }
 
     handleDataImportComplete(job) {

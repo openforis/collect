@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -313,7 +313,7 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam String rootEntityName, 
 			@RequestParam String importType, 
-			@RequestParam List<String> steps, 
+			@RequestParam String steps, 
 			@RequestParam(required=false) Integer entityDefinitionId, 
 			@RequestParam(required=false) boolean validateRecords, 
 			@RequestParam(required=false) boolean deleteEntitiesBeforeImport, 
@@ -339,10 +339,11 @@ public class RecordController extends BasicController implements Serializable {
 		return new DataImportStatusProxy(csvDataImportJob);
 	}
 	
-	private Step[] fromStepNames(List<String> stepNames) {
-		Step[] steps = new Step[stepNames.size()];
-		for (int i = 0; i < stepNames.size(); i++) {
-			steps[i] = Step.valueOf(stepNames.get(i));
+	private Step[] fromStepNames(String stepNamesStr) {
+		String[] stepNames = stepNamesStr.split(",");
+		Step[] steps = new Step[stepNames.length];
+		for (int i = 0; i < stepNames.length; i++) {
+			steps[i] = Step.valueOf(stepNames[i]);
 		}
 		return steps;
 	}
@@ -665,7 +666,7 @@ public class RecordController extends BasicController implements Serializable {
 				recordFilter.setOwnerId(user.getId());
 			}
 			try {
-				BeanUtils.copyProperties(result, this);
+				PropertyUtils.copyProperties(result, this);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

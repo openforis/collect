@@ -14,7 +14,8 @@ class CurrentJobMonitorModal extends Component {
         this.handleTimeout = this.handleTimeout.bind(this)
         this.handleCancelButtonClick = this.handleCancelButtonClick.bind(this)
         this.handleOkButtonClick = this.handleOkButtonClick.bind(this)
-        
+        this.handleCloseButtonClick = this.handleCloseButtonClick.bind(this)
+
         if (props.open && props.jobMonitorConfiguration.jobId) {
             this.startTimer()
          } 
@@ -46,6 +47,7 @@ class CurrentJobMonitorModal extends Component {
         if (this.props.jobMonitorConfiguration.handleOkButtonClick) {
             this.props.jobMonitorConfiguration.handleOkButtonClick(this.props.job)
         }
+        this.dispatchCloseJobMonitorAction()
     }
     
     handleCancelButtonClick() {
@@ -54,6 +56,14 @@ class CurrentJobMonitorModal extends Component {
         } else {
             this.props.dispatch(Actions.cancelJob(this.props.jobMonitorConfiguration.jobId))
         }
+    }
+
+    handleCloseButtonClick() {
+        this.dispatchCloseJobMonitorAction()
+    }
+
+    dispatchCloseJobMonitorAction() {
+        this.props.dispatch(Actions.closeJobMonitor())
     }
 
     loadJob() {
@@ -78,6 +88,7 @@ class CurrentJobMonitorModal extends Component {
                 okButtonLabel={this.props.jobMonitorConfiguration.okButtonLabel}
                 handleOkButtonClick={this.handleOkButtonClick}
                 handleCancelButtonClick={this.handleCancelButtonClick}
+                handleCloseButtonClick={this.handleCloseButtonClick}
                 handleJobCompleted={this.props.jobMonitorConfiguration.handleJobCompleted}
             />
         )

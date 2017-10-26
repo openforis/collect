@@ -7,6 +7,7 @@ import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';
 import Workflow from 'model/Workflow';
 import * as Actions from 'actions';
+import Objects from 'utils/Objects'
 
 const csvExportAdditionalOptions = [
     {
@@ -67,7 +68,8 @@ class CsvDataExportPage extends Component {
                 alwaysGenerateZipFile: true
             }
             csvExportAdditionalOptions.forEach(o => {
-                parameters[o.name] = this.state[o.name]
+                const val = this.state[o.name]
+                parameters[o.name] = Objects.isNullOrUndefined(val) ? null : val
             })
             ServiceFactory.recordService.startCSVDataExport(surveyId, parameters).then(job => {
                 this.props.dispatch(Actions.startJobMonitor({

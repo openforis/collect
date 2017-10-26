@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 
 import * as Actions from 'actions';
 import ServiceFactory from 'services/ServiceFactory'
+import Dates from 'utils/Dates'
 import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
 
 class SaikuPage extends Component {
@@ -15,6 +16,7 @@ class SaikuPage extends Component {
 		this.handleSurveyChange = this.handleSurveyChange.bind(this)
 		this.handleGenerateSaikuDbClick = this.handleGenerateSaikuDbClick.bind(this)
 		this.handleSaikuDbGenerationJobCompleted = this.handleSaikuDbGenerationJobCompleted.bind(this)
+		this.handleStartSaikuClick = this.handleStartSaikuClick.bind(this)
 
 		this.state = {
 			selectedLanguage: null,
@@ -62,6 +64,10 @@ class SaikuPage extends Component {
 		this.setState({showSaiku: true})
 	}
 
+	handleStartSaikuClick() {
+		this.setState({showSaiku: true})
+	}
+
 	render() {
 		const survey = this.props.survey
 		if (! survey) {
@@ -78,39 +84,52 @@ class SaikuPage extends Component {
 								width="100%" height="100%" />
 				</MaxAvailableSpaceContainer>
 			:
-			<Form inline>
-				<FormGroup tag="fieldset">
+			<div>
+				<FormGroup tag="fieldset" style={{width: "500px"}}>
 					<legend>Prepare Saiku database</legend>
-					<FormGroup row>
-						<Label for="languageSelect">Language</Label>
-						<Input type="select" name="select" id="languageSelect" value={this.state.selectedLanguage}
-							onChange={e => this.setState({selectedLanguage: e.target.value})}>
-							{survey.languages.map(lang => <option key={lang} value={lang}>{lang}</option>)}
-						</Input>
-					</FormGroup>
-					{reportingRepositoryInfo && (
-						<FormGroup row>
-							<FormGroup row>
-								<Label sm={8}>Updated records since last Saiku DB generation:</Label>
-								<Col sm={2}>
-									<div>{reportingRepositoryInfo.updatedRecordsSinceLastUpdate}</div>
-								</Col>
-							</FormGroup>
-							<FormGroup row>
-								<Label sm={8}>Last Saiku DB generation:</Label>
-								<Col sm={2}>
-									<div>{reportingRepositoryInfo.lastUpdate}</div>
-								</Col>
-							</FormGroup>
+					<Form sm={4}>
+						<FormGroup row inline>
+							<Label sm={2} for="languageSelect">Language</Label>
+							<Col sm={4}>
+								<Input type="select" name="select" id="languageSelect"  className="form-control" value={this.state.selectedLanguage}
+									onChange={e => this.setState({selectedLanguage: e.target.value})}>
+									{survey.languages.map(lang => <option key={lang} value={lang}>{lang}</option>)}
+								</Input>
+							</Col>
 						</FormGroup>
-					)}
+						{reportingRepositoryInfo && (
+							<Form>
+								<FormGroup row inline>
+									<Label sm={8}>Last Saiku DB generation:</Label>
+									<Col sm={4} className="form-control">
+										{Dates.formatDatetime(reportingRepositoryInfo.lastUpdate)}
+									</Col>
+								</FormGroup>
+								<FormGroup row inline>
+									<Label sm={8}>Updated records since last generation:</Label>
+									<Col sm={4} className="form-control">
+										{reportingRepositoryInfo.updatedRecordsSinceLastUpdate}
+									</Col>
+								</FormGroup>
+							</Form>
+						)}
+						<FormGroup row>
+							{dbGenerationNeeded && <div>Saiku DB Generation needed</div>}
+						</FormGroup>
+						<FormGroup row>
+							<Col sm={{size: 2, offset: 4}}>
+								<Button onClick={this.handleGenerateSaikuDbClick} className="btn btn-success">Generate Saiku DB</Button>
+							</Col>
+						</FormGroup>						
+					</Form>
 				</FormGroup>
-				<Row>
-					<Col sm={{ size: 'auto', offset: 5 }}>
-						<Button onClick={this.handleGenerateSaikuDbClick} className="btn btn-success">Generate Saiku DB</Button>
+				<FormGroup row />
+				<FormGroup row>
+					<Col sm={{size: 2, offset: 1}} style={{textAlign: 'center'}}>
+						<Button onClick={this.handleStartSaikuClick} className="btn btn-info">Start Saiku</Button>
 					</Col>
-				</Row>
-			</Form>
+				</FormGroup>
+			</div>
 		)
 	}
 }

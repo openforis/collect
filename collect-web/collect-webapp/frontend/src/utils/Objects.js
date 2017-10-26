@@ -16,4 +16,16 @@ export default class Objects {
         }
     }
 
+    static isNullOrUndefined(obj) {
+        return obj === null || typeof obj === 'undefined'
+    }
+
+    static defaultIfNull(obj, defaultVal) {
+        if (Objects.isNullOrUndefined(obj)) {
+            return defaultVal
+        } else {
+            return obj
+        }
+    }
+
 }

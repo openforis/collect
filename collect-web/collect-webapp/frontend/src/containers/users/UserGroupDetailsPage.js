@@ -347,11 +347,11 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         </Col>
                     </FormGroup>
                     <Row>
-                        <Col sm="6">
+                        <Col sm="7">
                             <fieldset className="secondary">
                                 <legend>Add/Remove Users</legend>
                                 <Row>
-                                    <Col sm="6">
+                                    <Col sm="8">
                                         <BootstrapTable
                                             data={this.state.availableUsers}
                                             striped	hover condensed
@@ -367,7 +367,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                     <Col sm="4">
                                         {this.state.selectedAvailableUsers.length > 0 ?
                                             <Row>
-                                                <Col sm="8">
+                                                <Col sm="10">
                                                     <Input type="select" name="newUserRole" id="newUserRoleSelect" 
                                                             onChange={(event) => this.setState({...this.state, newUserRoleCode: event.target.value})}
                                                             value={this.state.newUserRoleCode}>
@@ -390,7 +390,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                 </Row>
                             </fieldset>
                         </Col>
-                        <Col sm="6">
+                        <Col sm="5">
                             <fieldset className="secondary">
                                 <legend>Users in Group</legend>
                                 <BootstrapTable
@@ -404,10 +404,10 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                     >
                                     <TableHeaderColumn dataField="userId" isKey hidden>Id</TableHeaderColumn>
                                     <TableHeaderColumn dataField="username" editable={false}>Username</TableHeaderColumn>
-                                    <TableHeaderColumn dataField="userEnabled" editable={false}>Enabled</TableHeaderColumn>
-                                    <TableHeaderColumn dataField="role" 
+                                    <TableHeaderColumn dataField="role" width="160"
                                         customEditor={ { getElement: createRoleEditor, customEditorParameters: {roles: roles} } }>Role</TableHeaderColumn>
-                                    <TableHeaderColumn dataField="joinStatus" editable={ { type: 'select', options: { values: joinStatuses } } }>Status</TableHeaderColumn>
+                                    <TableHeaderColumn dataField="joinStatus" editable={ { type: 'select', options: { values: joinStatuses } } }
+                                        width="140">Status</TableHeaderColumn>
                                 </BootstrapTable>
                             </fieldset>
                         </Col>

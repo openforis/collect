@@ -2,13 +2,19 @@ import Moment from 'moment';
 
 export default class Dates {
 
+    static DATE_FORMAT = 'DD/MM/YYYY'
+    static DATETIME_FORMAT = 'DD/MM/YYYY hh:mm'
     static MILLIS = 'millis'
     static DAYS = 'days'
     static MONTHS = 'months'
     static YEARS = 'years'
 
-    static format(date) {
-        return date == null ? '' : Moment(date).format('DD/MM/YYYY')
+    static format(date, pattern = Dates.DATE_FORMAT) {
+        return date == null ? '' : Moment(date).format(pattern)
+    }
+
+    static formatDatetime(dateTime) {
+        return Dates.format(dateTime, Dates.DATETIME_FORMAT)
     }
 
     static compare(date1, date2, datePart) {

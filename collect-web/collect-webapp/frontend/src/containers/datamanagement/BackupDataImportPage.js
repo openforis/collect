@@ -8,7 +8,6 @@ import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import * as Formatters from 'components/datatable/formatters'
 import BackupDataImportSummaryForm from 'components/datamanagement/BackupDataImportSummaryForm'
 import ServiceFactory from 'services/ServiceFactory'
-import JobMonitorModal from 'components/JobMonitorModal'
 import Arrays from 'utils/Arrays'
 import * as Actions from 'actions';
 
@@ -22,10 +21,6 @@ class BackupDataImportPage extends Component {
     
         this.state = {
             importStep: BackupDataImportPage.SELECT_PARAMETERS,
-            summaryGenerationJobStatusModalOpen: false,
-            dataImportJobStatusModalOpen: false,
-            dataImportSummaryJobId: null,
-            dataImportJobId: null,
             fileSelected: false,
             fileToBeImportedPreview: null,
             fileToBeImported: null,
@@ -92,7 +87,12 @@ class BackupDataImportPage extends Component {
         ServiceFactory.recordService.startBackupDataImportFromSummary(this.props.survey, 
             this.state.selectedRecordsToImportIds.concat(this.state.selectedConflictingRecordsIds),
             true).then(job => {
-                this.setState({dataImportJobStatusModalOpen: true, dataImportJobId: job.id})
+                this.props.dispatch(Actions.startJobMonitor({
+                    jobId: job.id, 
+                    title: 'Importing data',
+                    okButtonLabel: 'Done',                        
+                    handleOkButtonClick: this.handleDataImportCompleteOkButtonClick
+                }))
             })
     }
 
@@ -130,14 +130,6 @@ class BackupDataImportPage extends Component {
                             <Button disabled={! this.state.fileSelected} onClick={this.handleGenerateSummaryButtonClick} className="btn btn-success">Generate Import Summary</Button>
                         </Col>
                     </FormGroup>
-                    
-                    <JobMonitorModal
-                        open={this.state.summaryGenerationJobStatusModalOpen}
-                        title="Generating data import summary"
-                        jobId={this.state.dataImportSummaryJobId}
-                        okButtonLabel={'Done'}
-                        handleJobCompleted={this.handleRecordSummaryGenerationComplete}
-                    />
                 </Form>
                 )
             case BackupDataImportPage.SHOW_IMPORT_SUMMARY:
@@ -156,13 +148,6 @@ class BackupDataImportPage extends Component {
                                 <Button onClick={this.handleImportButtonClick} className="btn btn-success">Import</Button>
                             </Col>
                         </Row>
-                        <JobMonitorModal
-                            open={this.state.dataImportJobStatusModalOpen}
-                            title="Importing data"
-                            jobId={this.state.dataImportJobId}
-                            okButtonLabel={'Done'}
-                            handleOkButtonClick={this.handleDataImportCompleteOkButtonClick}
-                        />
                     </FormGroup>
                 )
         }
