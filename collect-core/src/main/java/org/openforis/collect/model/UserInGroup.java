@@ -125,6 +125,7 @@ public class UserInGroup {
 	public enum UserGroupRole {
 		OWNER('O'), 
 		ADMINISTRATOR('A'), 
+		SUPERVISOR('S'),
 		DATA_ANALYZER('D'), 
 		OPERATOR('U'), 
 		VIEWER('V');

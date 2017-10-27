@@ -209,7 +209,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             return <div>Loading...</div>;
         }
 
-        const roles = ['OWNER', 'ADMINISTRATOR', 'OPERATOR', 'VIEWER']
+        const roles = ['OWNER', 'ADMINISTRATOR', 'SUPERVISOR', 'OPERATOR', 'VIEWER']
         const joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
 
         const createRoleEditor = (onUpdate, props) => (<UserRoleDropdownEditor onUpdate={ onUpdate } {...props}/>);
