@@ -19,7 +19,6 @@ import org.openforis.collect.io.SurveyRestoreJob;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Task;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -43,8 +42,6 @@ public class CollectMobileBackupConvertTask extends Task {
 	
 	//transient
 	private ConfigurableApplicationContext ctx;
-	
-	@Autowired
 	private UserGroupManager userGroupManager;
 	
 	@Override
@@ -61,6 +58,8 @@ public class CollectMobileBackupConvertTask extends Task {
 				"/" + serverApplicationContextFile.getAbsolutePath(), 
 				"/" + dataSourceConfigFile.getAbsolutePath()
 				);
+		
+		userGroupManager = ctx.getBean(UserGroupManager.class);
 
 		super.createInternalVariables();
 	}
