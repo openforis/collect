@@ -147,3 +147,7 @@ span.equal-sign {
 .dropdown-item.survey-item .survey-name {
     font-weight: bold;
 }
+
+label.invalid {
+    color: #dc3545;
+}

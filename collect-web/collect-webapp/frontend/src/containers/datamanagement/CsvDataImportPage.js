@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormGroup, Label, Input, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+    Form, FormFeedback, FormGroup, Label, Input, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
@@ -35,7 +35,8 @@ class CsvDataImportPage extends Component {
             fileSelected: false,
             fileToBeImportedPreview: null,
             fileToBeImported: null,
-            errorModalOpen: false
+            errorModalOpen: false,
+            selectedEntityDefinition: null
         }
     }
 
@@ -135,6 +136,9 @@ class CsvDataImportPage extends Component {
             )
         })
         const entitySelectionEnabled = this.state.importType == 'update'
+        const entityNotSelected = entitySelectionEnabled && this.state.selectedEntityDefinition === null
+        const acceptedFileTypes = this.state.importType === 'multipleFiles' ? '.zip': '.csv,.xls,xlsx,.zip'
+        const acceptedFileTypesDescription = this.state.importType === 'multipleFiles' ? 'ZIP (.zip)': 'CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip)'
 
         const formatErrorMessage = function(cell, row) {
             return row.message
@@ -153,7 +157,7 @@ class CsvDataImportPage extends Component {
                         </Col>
                     </FormGroup>
                     <FormGroup row>
-                        <Label>Apply to step:</Label>
+                        <Label>Apply to step(s):</Label>
                         <Col sm={10}>
                             {stepsChecks}
                         </Col>
@@ -170,27 +174,26 @@ class CsvDataImportPage extends Component {
                                 onChange={e => this.setState({deleteEntitiesBeforeImport: e.target.checked})} /> Delete entities before import
                         </Label>
                     </FormGroup>
-                    {entitySelectionEnabled ?
+                    {entitySelectionEnabled &&
                         <FormGroup row>
-                            <Label>Entity:</Label>
+                            <Label className={entityNotSelected ? 'invalid': ''}>Entity:</Label>
                             <Col sm={{size: 10 }}>
                                 <SchemaTreeView survey={this.props.survey}
                                     handleNodeSelect={this.handleEntitySelect} />
+                                <FormFeedback style={entityNotSelected ? {display: 'block'}: {}}>Please select an entity</FormFeedback>
                             </Col>
-                        </FormGroup>
-                        : ''
-                    }
+                        </FormGroup>}
                     <FormGroup row>
                         <Label for="file">File:</Label>
                         <Col sm={10}>
-                            <Dropzone accept=".csv,.xls,xlsx,.zip" onDrop={(files) => this.handleFileDrop(files)} style={{
+                            <Dropzone accept={acceptedFileTypes} onDrop={(files) => this.handleFileDrop(files)} style={{
                                 width: '100%', height: '200px', 
                                 borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
                                 borderStyle: 'dashed', borderRadius: '5px'
                             }}>
                             {this.state.fileToBeImportedPreview ?
                                 <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.state.fileToBeImportedPreview}</p>
-                                : <p>Click to select a CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip) file or drop it here.</p>
+                                : <p>Click to select a {acceptedFileTypesDescription} file or drop it here.</p>
                             }
                             </Dropzone>
                         </Col>
