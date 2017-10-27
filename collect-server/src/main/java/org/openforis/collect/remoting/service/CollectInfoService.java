@@ -43,6 +43,13 @@ public class CollectInfoService {
 		return new CollectInfo();
 	}
 	
+	public CollectCompleteInfo getCompleteInfo() {
+		Version latestRelease = latestRelease();
+		Version currentVersion = Collect.VERSION;
+		CollectCompleteInfo info = new CollectCompleteInfo(currentVersion, latestRelease);
+		return info;
+	}
+	
 	public CollectCompleteInfo getCompleteInfo(HttpServletRequest request) {
 		Version latestRelease = latestRelease();
 		Version currentVersion = Collect.VERSION;
