@@ -205,7 +205,7 @@ class CsvDataImportPage extends Component {
                 <Modal isOpen={this.state.errorModalOpen} style={{maxWidth: '1000px'}}>
                     <ModalHeader toggle={() => this.setState({errorModalOpen: ! this.state.errorModalOpen})}>Errors in uploaded file</ModalHeader>
                     <ModalBody>
-                        <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors'}>
+                        <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors.csv'}>
 							<TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
 							<TableHeaderColumn dataField="fileName" width="200">File</TableHeaderColumn>
 							<TableHeaderColumn dataField="row" width="50">Row</TableHeaderColumn>

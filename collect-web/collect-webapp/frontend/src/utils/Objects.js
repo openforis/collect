@@ -20,6 +20,10 @@ export default class Objects {
         return obj === null || typeof obj === 'undefined'
     }
 
+    static isNotNullOrUndefined(obj) {
+        return ! Objects.isNullOrUndefined(obj)
+    }
+
     static defaultIfNull(obj, defaultVal) {
         if (Objects.isNullOrUndefined(obj)) {
             return defaultVal

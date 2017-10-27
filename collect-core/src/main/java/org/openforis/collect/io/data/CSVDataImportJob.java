@@ -95,7 +95,7 @@ public class CSVDataImportJob extends Job {
 	@Override
 	protected void buildTasks() throws Throwable {
 		String extension = FilenameUtils.getExtension(input.file.getName());
-		if ("zip".equalsIgnoreCase(extension)) {
+		if (Files.ZIP_FILE_EXTENSION.equalsIgnoreCase(extension)) {
 			tempInputFilesFolder = Files.createTempDirectory();
 			ZipFiles.extract(input.file, tempInputFilesFolder);
 			List<String> fileNames = Files.listFileNamesInFolder(tempInputFilesFolder);
@@ -236,27 +236,19 @@ public class CSVDataImportJob extends Job {
 		/**
 		 * Entity definition that should be considered as the parent of each attribute in the csv file
 		 */
-		private int parentEntityDefinitionId;
+		private Integer parentEntityDefinitionId;
 		
 		private EntityDefinition parentEntityDefinition;
 		
 		private CSVDataImportSettings settings;
 
-		public CSVDataImportInput(File file, CollectSurvey survey, Step[] steps, int parentEntityDefinitionId,
+		public CSVDataImportInput(File file, CollectSurvey survey, Step[] steps, Integer parentEntityDefinitionId,
 				CSVDataImportSettings settings) {
 			this(file, survey, toSet(steps), parentEntityDefinitionId,
 					settings);
 		}
 		
-		private static Set<Step> toSet(Step[] arr) {
-			if (arr == null) {
-				return Collections.emptySet();
-			} else {
-				return new HashSet<Step>(Arrays.asList(arr));
-			}
-		}
-
-		public CSVDataImportInput(File file, CollectSurvey survey, Set<Step> steps, int parentEntityDefinitionId,
+		public CSVDataImportInput(File file, CollectSurvey survey, Set<Step> steps, Integer parentEntityDefinitionId,
 				CSVDataImportSettings settings) {
 			super();
 			this.file = file;
@@ -264,7 +256,15 @@ public class CSVDataImportJob extends Job {
 			this.steps = steps;
 			this.parentEntityDefinitionId = parentEntityDefinitionId;
 			this.settings = settings == null ? new CSVDataImportSettings(): settings;
-			this.parentEntityDefinition = (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
+			this.parentEntityDefinition = parentEntityDefinitionId == null ? null : (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
+		}
+
+		private static Set<Step> toSet(Step[] arr) {
+			if (arr == null) {
+				return Collections.emptySet();
+			} else {
+				return new HashSet<Step>(Arrays.asList(arr));
+			}
 		}
 
 		public File getFile() {
@@ -291,11 +291,11 @@ public class CSVDataImportJob extends Job {
 			this.steps = steps;
 		}
 
-		public int getParentEntityDefinitionId() {
+		public Integer getParentEntityDefinitionId() {
 			return parentEntityDefinitionId;
 		}
 
-		public void setParentEntityDefinitionId(int parentEntityDefinitionId) {
+		public void setParentEntityDefinitionId(Integer parentEntityDefinitionId) {
 			this.parentEntityDefinitionId = parentEntityDefinitionId;
 		}
 		

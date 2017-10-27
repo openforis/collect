@@ -1,4 +1,5 @@
-import Constants from '../utils/Constants';
+import Constants from 'utils/Constants';
+import Objects from 'utils/Objects';
 
 export default class AbstractService {
 
@@ -60,7 +61,10 @@ export default class AbstractService {
     postFormData(url, data) {
         const formData = new FormData()
         for(var name in data) {
-            formData.append(name, data[name])
+            const value = data[name]
+            if (Objects.isNotNullOrUndefined(value)) {
+                formData.append(name, value)
+            }
         }
 
         return fetch(this.BASE_URL + url, {

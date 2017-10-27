@@ -318,8 +318,7 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestParam(required=false) boolean validateRecords, 
 			@RequestParam(required=false) boolean deleteEntitiesBeforeImport, 
 			@RequestParam(required=false) String newRecordVersionName) throws IOException {
-		File file = File.createTempFile("ofc_csv_data_import", ".csv");
-		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
+		File file = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(), "ofc_csv_data_import");
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		CSVDataImportJob job = jobManager.createJob(TransactionalCSVDataImportJob.class);
 		CSVDataImportSettings settings = new CSVDataImportSettings();
@@ -647,7 +646,7 @@ public class RecordController extends BasicController implements Serializable {
 		private boolean includeAllAncestorAttributes = false;
 		private boolean includeCodeItemPositionColumn = false;
 		private boolean includeKMLColumnForCoordinates = false;
-		private boolean includeEnumeratedEntities = true;
+		private boolean includeEnumeratedEntities = false;
 		private boolean includeCompositeAttributeMergedColumn = false;
 		private boolean includeCodeItemLabelColumn = false;
 		private boolean includeGroupingLabels = true;
