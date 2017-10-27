@@ -13,6 +13,7 @@ public class CSVDataExportParameters {
 	public enum HeadingSource {
 		ATTRIBUTE_NAME, INSTANCE_LABEL, REPORTING_LABEL;
 	}
+	
 	private RecordFilter recordFilter;
 	private NodeFilter nodeFilter;
 	private Integer entityId;
