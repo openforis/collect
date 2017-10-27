@@ -97,6 +97,18 @@ span.equal-sign {
   background-size: 16px;
 }
 
+.error {
+    color: red;
+}
+
+.warning {
+    color: orange;
+}
+
+.success {
+    color: green;
+}
+
 span.checked {
   background-image: url('../img/generic/tick_mark_32x32.png');
 }
@@ -105,11 +117,17 @@ span.checked.large {
   background-image: url('../img/generic/tick_mark_64x64.png');
   background-size: 64px;
   height: 64px;
+  width: 64px;
 }
 
 span.checked.small {
   height: 16px;
+  width: 16px;
   background-size: 16px;
+}
+
+span.checked.small.inline {
+  display: inline;
 }
 
 span.circle-red {
@@ -150,4 +168,19 @@ span.equal-sign {
 
 label.invalid {
     color: #dc3545;
+}
+
+.tooltip.success .tooltip-inner {
+    background-color: green;
+    color: white;
+}
+
+.tooltip.warning .tooltip-inner {
+    background-color: orange;
+    color: black;
+}
+
+.tooltip.error .tooltip-inner {
+    background-color: red;
+    color: white;
 }

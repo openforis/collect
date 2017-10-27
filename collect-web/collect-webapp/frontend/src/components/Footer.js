@@ -1,14 +1,56 @@
 import React, { Component } from 'react';
+import { Container, Row, Col, UncontrolledTooltip } from 'reactstrap';
+import { connect } from 'react-redux';
 
 class Footer extends Component {
   render() {
+    const applicationInfo = this.props.applicationInfo
+    console.log(applicationInfo)
+    if (! applicationInfo) {
+      return <div>Loading...</div>
+    }
+
+    const versionVerifiedIcon = 
+      applicationInfo.latestReleaseVersionVerified ? 
+        applicationInfo.latestReleaseVersion ? 
+          <span className="fa fa-check success" id="latest-version-running-icon" />
+        : <span className="fa fa-exclamation-triangle warning" id="old-version-running-icon" />
+      : <span className="fa fa-exclamation-circle error" id="cannot-verify-latest-version-icon" />
+
+    const versionTooltip = 
+      applicationInfo.latestReleaseVersionVerified ? 
+        applicationInfo.latestReleaseVersion ? 
+          <UncontrolledTooltip placement="right" className="success" target="latest-version-running-icon">
+            Latest version running
+          </UncontrolledTooltip>
+        : <UncontrolledTooltip placement="right" className="warning" target="old-version-running-icon">
+          Old version running: please update it running Update Open Foris Collect
+        </UncontrolledTooltip>
+      : <UncontrolledTooltip placement="right" className="error" target="cannot-verify-latest-version-icon">
+        Cannot verify if you are running the latest version of Collect
+      </UncontrolledTooltip>
     return (
       <footer className="app-footer">
-        <a href="http://www.openforis.org/tools/collect">Open Foris Collect</a> &copy; 2017.
-        <span className="float-right">Powered by <a href="http://www.openforis.org">Open Foris</a></span>
+        <Row>
+          <Col sm={6}>
+            <a href="http://www.openforis.org/tools/collect">Open Foris Collect</a>
+            <span> version: {applicationInfo.version}</span>
+            {versionVerifiedIcon}
+            {versionTooltip}
+          </Col>
+          <Col sm={4} style={{textAlign: 'right'}}>
+            <span>Powered by <a href="http://www.openforis.org">Open Foris</a> &copy; 2017</span>
+          </Col>
+        </Row>
       </footer>
     )
   }
 }
 
-export default Footer;
+const mapStateToProps = state => {
+	return {
+		applicationInfo: state.applicationInfo ? state.applicationInfo.info : null
+	}
+}
+
+export default connect(mapStateToProps)(Footer)
