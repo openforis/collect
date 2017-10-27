@@ -51,7 +51,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		List<UserInGroup> userInGroups = findUsersInGroup(userGroup);
 		return (UserInGroup) CollectionUtils.find(userInGroups, new Predicate() {
 			public boolean evaluate(Object userInGroup) {
-				return ((UserInGroup) userInGroup).getUser().getId().equals(user.getId());
+				return ((UserInGroup) userInGroup).getUserId().equals(user.getId());
 			}
 		});
 	}
@@ -63,9 +63,8 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		List<UserInGroup> result = new ArrayList<UserInGroup>();
 		for (Map userGroupRelation : userGroupRelations) {
 			UserInGroup userInGroup = new UserInGroup();
-			userInGroup.setGroup(userGroup);
-			int userId = (Integer) userGroupRelation.get("userId");
-			userInGroup.setUser(new User(userId, null));
+			userInGroup.setGroupId(userGroup.getId());
+			userInGroup.setUserId((Integer) userGroupRelation.get("userId"));
 			userInGroup.setJoinStatus(UserGroupJoinRequestStatus.fromCode((String) userGroupRelation.get("statusCode")));
 			userInGroup.setRole(UserGroupRole.fromCode((String) userGroupRelation.get("roleCode")));
 			result.add(userInGroup);

@@ -101,11 +101,13 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		private String    qualifierName;
 		private String    qualifierValue;
 		private List<UserInGroupForm> users = new ArrayList<UserInGroupForm>();
+		private List<Integer> childrenGroupIds = new ArrayList<Integer>();
 		
 		public UserGroupForm() {
 		}
 		
 		public UserGroupForm(UserGroup userGroup) {
+			BeanUtils.copyProperties(userGroup, this);
 			BeanUtils.copyProperties(userGroup, this, "users");
 			this.users.clear();
 			for (UserInGroup user: userGroup.getUsers()) {
@@ -118,11 +120,9 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 			super.copyTo(target, ArrayUtils.addAll(ignoreProperties, "users"));
 			Set<UserInGroup> users = new HashSet<UserInGroup>();
 			for (UserInGroupForm userInGroupForm : this.users) {
-				User user = new User();
-				user.setId(userInGroupForm.getUserId());
-				user.setUsername(userInGroupForm.getUsername());
 				UserInGroup userInGroup = new UserInGroup();
-				userInGroup.setUser(user);
+				userInGroup.setGroupId(target.getId());
+				userInGroup.setUserId(userInGroupForm.getUserId());
 				userInGroup.setRole(userInGroupForm.getRole());
 				userInGroup.setJoinStatus(userInGroupForm.getJoinStatus());
 				users.add(userInGroup);
@@ -200,14 +200,20 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		public void setUsers(List<UserInGroupForm> users) {
 			this.users = users;
 		}
+		
+		public List<Integer> getChildrenGroupIds() {
+			return childrenGroupIds;
+		}
+		
+		public void setChildrenGroupIds(List<Integer> childrenGroupIds) {
+			this.childrenGroupIds = childrenGroupIds;
+		}
 	}
 	
 	public static class UserInGroupForm extends SimpleObjectForm<UserInGroup> {
 		
 		private UserGroupRole role;
 		private Integer userId;
-		private String username;
-		private Boolean userEnabled;
 		private UserGroupJoinRequestStatus joinStatus;
 		private Date joinRequestDate;
 		private Date memberSince;
@@ -216,10 +222,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		}
 		
 		public UserInGroupForm(UserInGroup userInGroup) {
-			User user = userInGroup.getUser();
-			this.userId = user.getId();
-			this.username = user.getUsername();
-			this.userEnabled = user.getEnabled();
+			this.userId = userInGroup.getUserId();
 			this.role = userInGroup.getRole();
 			this.joinStatus = userInGroup.getJoinStatus();
 			this.joinRequestDate = userInGroup.getRequestDate();
@@ -232,22 +235,6 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 
 		public void setUserId(Integer userId) {
 			this.userId = userId;
-		}
-
-		public String getUsername() {
-			return username;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
-		public Boolean getUserEnabled() {
-			return userEnabled;
-		}
-
-		public void setUserEnabled(Boolean userEnabled) {
-			this.userEnabled = userEnabled;
 		}
 
 		public UserGroupRole getRole() {

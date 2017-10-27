@@ -92,7 +92,9 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 			for (UserGroup userGroup : userGroups) {
 				List<UserInGroup> groupUsers = groupManager.findUsersInGroup(userGroup);
 				for (UserInGroup userInGroup : groupUsers) {
-					users.add(userInGroup.getUser());
+					Integer userId = userInGroup.getUserId();
+					User user = loadById(userId);
+					users.add(user);
 				}
 			}
 			//sorted by username by default (see User.compareTo)

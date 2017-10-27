@@ -524,12 +524,13 @@ public class DataService {
 		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>(items);
 		
 		//filter by user group qualifier (if any)
-		String qualifierName = userInGroup.getGroup().getQualifier1Name();
+		UserGroup group = userGroupManager.loadById(userInGroup.getGroupId());
+		String qualifierName = group.getQualifier1Name();
 		String listHierarchicalLevelName = def.getList().isHierarchical() ? def.getHierarchicalLevel() : def.getListName();
 		if (qualifierName != null && qualifierName.equals(listHierarchicalLevelName)) {
 			CollectionUtils.filter(filteredItems, new Predicate<CodeListItem>() {
 				public boolean evaluate(CodeListItem item) {
-					return item.getCode().equals(userInGroup.getGroup().getQualifier1Value());
+					return item.getCode().equals(group.getQualifier1Value());
 				}
 			});
 		}

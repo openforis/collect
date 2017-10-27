@@ -1094,14 +1094,19 @@ public class SurveyManager {
 	
 	private void fillReferencedItems(CollectSurvey survey) {
 		if (userGroupManager != null) {
-			UserGroup userGroup = null;
-			if (survey.getUserGroupId() == null) {
-				userGroup = userGroupManager.getDefaultPublicUserGroup();
-			} else {
-				userGroup = userGroupManager.loadById(survey.getUserGroupId());
-			}
+			UserGroup userGroup = loadUserGroup(survey.getUserGroupId());
 			survey.setUserGroup(userGroup);
 		}
+	}
+
+	private UserGroup loadUserGroup(Integer userGroupId) {
+		UserGroup userGroup = null;
+		if (userGroupId == null) {
+			userGroup = userGroupManager.getDefaultPublicUserGroup();
+		} else {
+			userGroup = userGroupManager.loadById(userGroupId);
+		}
+		return userGroup;
 	}
 
 	private void fillSummariesReferencedItems(Collection<SurveySummary> summaries) {
@@ -1112,13 +1117,7 @@ public class SurveyManager {
 	
 	private void fillReferencedItems(SurveySummary summary) {
 		if (userGroupManager != null) {
-			UserGroup userGroup = null;
-			if (summary.getUserGroupId() == null) {
-				//use default public user group
-				userGroup = userGroupManager.getDefaultPublicUserGroup();
-			} else {
-				userGroup = userGroupManager.loadById(summary.getUserGroupId());
-			}
+			UserGroup userGroup = loadUserGroup(summary.getUserGroupId());
 			summary.setUserGroup(userGroup);
 		}
 	}

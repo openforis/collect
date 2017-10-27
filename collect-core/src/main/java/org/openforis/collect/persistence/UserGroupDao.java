@@ -113,7 +113,7 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 				OFC_USER_USERGROUP.STATUS_CODE, 
 				OFC_USER_USERGROUP.ROLE_CODE)
 			.values(group.getId(), 
-					userInGroup.getUser().getId(), 
+					userInGroup.getUserId(), 
 					Daos.toTimestamp(userInGroup.getRequestDate()),
 					Daos.toTimestamp(userInGroup.getMemberSince()), 
 					String.valueOf(userInGroup.getJoinStatus().getCode()),
@@ -134,10 +134,10 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 		.execute();
 	}
 	
-	public void deleteRelation(User user, UserGroup group) {
+	public void deleteRelation(int userId, int groupId) {
 		dsl().deleteFrom(OFC_USER_USERGROUP)
-			.where(OFC_USER_USERGROUP.USER_ID.eq(user.getId())
-				.and(OFC_USER_USERGROUP.GROUP_ID.eq(group.getId()))
+			.where(OFC_USER_USERGROUP.USER_ID.eq(userId)
+				.and(OFC_USER_USERGROUP.GROUP_ID.eq(groupId))
 		).execute();
 	}
 	
@@ -152,22 +152,22 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 			.execute();
 	}
 
-	public List<UserInGroup> findUsersByGroup(UserGroup userGroup) {
-		return findUsersInGroup(userGroup, null);
+	public List<UserInGroup> findUsersByGroup(int userGroupId) {
+		return findUsersInGroup(userGroupId, null);
 	}
 	
-	public UserInGroup findUserInGroup(UserGroup userGroup, User user) {
-		List<UserInGroup> usersInGroup = findUsersInGroup(userGroup, user);
+	public UserInGroup findUserInGroup(int userGroupId, int userId) {
+		List<UserInGroup> usersInGroup = findUsersInGroup(userGroupId, userId);
 		return usersInGroup.isEmpty() ? null : usersInGroup.get(0);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public List<UserInGroup> findUsersInGroup(final UserGroup userGroup, final User user) {
+	public List<UserInGroup> findUsersInGroup(final int userGroupId, final Integer userId) {
 		final List<UserInGroup> result = new ArrayList<UserInGroup>();
 		
-		Condition conditions = OFC_USER_USERGROUP.GROUP_ID.eq(userGroup.getId());
-		if (user != null) {
-			conditions = conditions.and(OFC_USER_USERGROUP.USER_ID.eq(user.getId()));
+		Condition conditions = OFC_USER_USERGROUP.GROUP_ID.eq(userGroupId);
+		if (userId != null) {
+			conditions = conditions.and(OFC_USER_USERGROUP.USER_ID.eq(userId));
 		}
 		dsl().select(OFC_USER_USERGROUP.USER_ID, 
 				OFC_USER_USERGROUP.ROLE_CODE, 
@@ -182,16 +182,8 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 			.fetchInto(new RecordHandler() {
 				public void next(Record record) {
 					UserInGroup userInGroup = new UserInGroup();
-					if (user == null) {
-						User u = new User();
-						u.setId(record.getValue(OFC_USER_USERGROUP.USER_ID));
-						u.setUsername(record.getValue(OFC_USER.USERNAME));
-						u.setEnabled(record.getValue(OFC_USER.ENABLED).equalsIgnoreCase("Y"));
-						userInGroup.setUser(u);
-					} else {
-						userInGroup.setUser(user);
-					}
-					userInGroup.setGroup(userGroup);
+					userInGroup.setGroupId(userGroupId);
+					userInGroup.setUserId(userId == null ? record.getValue(OFC_USER_USERGROUP.USER_ID) : userId);
 					userInGroup.setRole(UserGroupRole.fromCode(record.getValue(OFC_USER_USERGROUP.ROLE_CODE)));
 					userInGroup.setMemberSince(record.getValue(OFC_USER_USERGROUP.MEMBER_SINCE));
 					userInGroup.setRequestDate(record.getValue(OFC_USER_USERGROUP.REQUEST_DATE));
@@ -249,11 +241,12 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 			.fetchOneInto(UserGroup.class);
 	}
 	
-	public List<UserGroup> findDescendantGroups(UserGroup group) {
+	public List<Integer> findChildrenGroupIds(int groupId) {
 		return dsl()
-				.selectFrom(OFC_USERGROUP)
-				.where(OFC_USERGROUP.PARENT_ID.eq(group.getId()))
-				.fetchInto(UserGroup.class);
+				.select(OFC_USERGROUP.ID)
+				.from(OFC_USERGROUP)
+				.where(OFC_USERGROUP.PARENT_ID.eq(groupId))
+				.fetch(OFC_USERGROUP.ID);
 	}
 
 	private DSLContext dsl() {

@@ -86,7 +86,13 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     errorFeedback: [],
                     alertMessageOpen: false,
                     availableUsers: this.getAvailableUsers(props.users, userGroup.users),
-                    usersInGroup: userGroup.users,
+                    usersInGroup: userGroup.users.map(uig => {
+                        const user = this.props.users.find(u => u.id === uig.userId)
+                        return {...uig,
+                            username: user.username,
+                            userRole: user.role
+                        }
+                    }),
                     selectedAvailableUsers: [],
                     selectedAvailableUsersIds: [],
                     selectedUsersInGroup: [],
@@ -149,6 +155,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             return {
                 userId: user.id, 
                 username: user.username, 
+                userRole: user.role,
                 userEnabled: user.enabled, 
                 role: role,
                 joinStatus: 'ACCEPTED'
@@ -168,10 +175,11 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
 
     handleRemoveSelectedUsersToGroup() {
         let selectedUsers = this.state.selectedUsersInGroup.map(userInGroup => {
+            const user = this.props.users.find(u => u.id === userInGroup.userId)
             return {
                 id: userInGroup.userId,
-                username: userInGroup.username,
-                enabled: userInGroup.userEnabled
+                username: user.username,
+                role: user.role       
             }
         })
         const notSelectedUsersInGroup = this.state.usersInGroup.filter(u => this.state.selectedUsersInGroup.indexOf(u) < 0)
@@ -208,8 +216,22 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         if (! this.state.ready) {
             return <div>Loading...</div>;
         }
-
+        const loggedUserRole = this.props.loggedUser.role
         const roles = ['OWNER', 'ADMINISTRATOR', 'SUPERVISOR', 'OPERATOR', 'VIEWER']
+        const availableRoles = roles.filter(r => {
+            switch(loggedUserRole) {
+                case 'ADMIN':
+                    return true
+                case 'ANALYSIS':
+                case 'CLEANSING':
+                    return r !== 'OWNER'
+                case 'ENTRY':
+                case 'ENTRY_LIMITED':
+                    return r === 'OPERATOR' || r === 'VIEWER'
+                default:
+                    return false
+            }
+        })
         const joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
 
         const createRoleEditor = (onUpdate, props) => (<UserRoleDropdownEditor onUpdate={ onUpdate } {...props}/>);
@@ -225,6 +247,12 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         })
         const parentGroupOptions = [<option key="0" value="">---</option>]
             .concat(availableParentGroups.map(group => <option key={group.id} value={group.id}>{group.label}</option>))
+
+
+        const getUser = function(userId) {
+            this.props.users.find(u => u.id === userId)
+        }
+
 
 		return (
             <div>
@@ -371,7 +399,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                                     <Input type="select" name="newUserRole" id="newUserRoleSelect" 
                                                             onChange={(event) => this.setState({...this.state, newUserRoleCode: event.target.value})}
                                                             value={this.state.newUserRoleCode}>
-                                                        {roles.map(role => <option key={role} value={role}>{role}</option>)}
+                                                        {availableRoles.map(role => <option key={role} value={role}>{role}</option>)}
                                                     </Input>
                                                 </Col>
                                                 <Col sm="2">

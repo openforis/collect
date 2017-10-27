@@ -36,7 +36,9 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 	
 	private User createdByUser;
 	private Visibility visibility;
-
+	private Set<UserInGroup> users = new HashSet<UserInGroup>();
+	private Set<Integer> childrenGroupIds = new HashSet<Integer>();
+	
 	public User getCreatedByUser() {
 		return createdByUser;
 	}
@@ -83,14 +85,20 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 		setQualifier1Value(qualifierValue);
 	}
 	
-	private Set<UserInGroup> users = new HashSet<UserInGroup>();
-	
 	public Set<UserInGroup> getUsers() {
 		return users;
 	}
 	
 	public void setUsers(Set<UserInGroup> users) {
 		this.users = users;
+	}
+	
+	public Set<Integer> getChildrenGroupIds() {
+		return childrenGroupIds;
+	}
+	
+	public void setChildrenGroupIds(Set<Integer> childrenGroupIds) {
+		this.childrenGroupIds = childrenGroupIds;
 	}
 
 	@Override

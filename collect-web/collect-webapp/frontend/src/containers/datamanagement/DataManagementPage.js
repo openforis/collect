@@ -127,15 +127,23 @@ class DataManagementPage extends Component {
 		if (!this.props.survey) {
 			return <div>Select a survey first</div>
 		}
+		const surveyUserGroup = this.props.survey.userGroup
+		const loggedUser = this.props.loggedUser
 		return (
 			<Container>
 				<Row className="justify-content-between">
 					<Col sm={{size: 4}}>
-						<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
-						<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "success" : "disabled"}
-							onClick={this.handleEditButtonClick}>Edit</Button>
-						<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "danger" : "disabled"}
-							onClick={this.handleDeleteButtonClick}>Delete</Button>
+						{loggedUser.canCreateRecords(surveyUserGroup) && 
+							<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
+						}
+						{loggedUser.canEditRecords(surveyUserGroup) &&
+							<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "success" : "disabled"}
+								onClick={this.handleEditButtonClick}>Edit</Button>
+						}
+						{loggedUser.canDeleteRecords(surveyUserGroup) &&
+							<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "danger" : "disabled"}
+								onClick={this.handleDeleteButtonClick}>Delete</Button>
+						}
 					</Col>
 					<Col sm={{size: 2}}>
 						<Button color="success" onClick={this.handleValidationReportButtonClick}><i className="fa fa-exclamation-triangle" aria-hidden="true"></i> Validation Report</Button>
@@ -152,14 +160,16 @@ class DataManagementPage extends Component {
 					</Col>
 
 					<Col sm={{size: 2}}>
-						<ButtonDropdown isOpen={this.state.importDropdownOpen} 
-								toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
-							<DropdownToggle color="warning" caret><span className="fa fa-upload"/>Import</DropdownToggle>
-							<DropdownMenu>
-								<DropdownItem onClick={this.handleCsvImportButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> from CSV</DropdownItem>
-								<DropdownItem onClick={this.handleBackupImportButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> from Collect format</DropdownItem>
-							</DropdownMenu>
-						</ButtonDropdown>
+						{loggedUser.canImportRecords(surveyUserGroup) &&
+							<ButtonDropdown isOpen={this.state.importDropdownOpen} 
+									toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
+								<DropdownToggle color="warning" caret><span className="fa fa-upload"/>Import</DropdownToggle>
+								<DropdownMenu>
+									<DropdownItem onClick={this.handleCsvImportButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> from CSV</DropdownItem>
+									<DropdownItem onClick={this.handleBackupImportButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> from Collect format</DropdownItem>
+								</DropdownMenu>
+							</ButtonDropdown>
+						}
 					</Col>
 				</Row>
 				<Row>
@@ -178,7 +188,8 @@ class DataManagementPage extends Component {
 
 const mapStateToProps = state => {
 	return {
-		survey: state.preferredSurvey ? state.preferredSurvey.survey : null
+		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
+		loggedUser: state.session ? state.session.loggedUser : null
 	}
 }
 

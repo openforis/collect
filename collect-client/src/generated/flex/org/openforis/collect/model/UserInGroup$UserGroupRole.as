@@ -15,6 +15,7 @@ package org.openforis.collect.model {
 
         public static const OWNER:UserInGroup$UserGroupRole = new UserInGroup$UserGroupRole("OWNER", _);
         public static const ADMINISTRATOR:UserInGroup$UserGroupRole = new UserInGroup$UserGroupRole("ADMINISTRATOR", _);
+        public static const SUPERVISOR:UserInGroup$UserGroupRole = new UserInGroup$UserGroupRole("SUPERVISOR", _);
         public static const DATA_ANALYZER:UserInGroup$UserGroupRole = new UserInGroup$UserGroupRole("DATA_ANALYZER", _);
         public static const OPERATOR:UserInGroup$UserGroupRole = new UserInGroup$UserGroupRole("OPERATOR", _);
         public static const VIEWER:UserInGroup$UserGroupRole = new UserInGroup$UserGroupRole("VIEWER", _);
@@ -28,7 +29,7 @@ package org.openforis.collect.model {
         }
 
         public static function get constants():Array {
-            return [OWNER, ADMINISTRATOR, DATA_ANALYZER, OPERATOR, VIEWER];
+            return [OWNER, ADMINISTRATOR, SUPERVISOR, DATA_ANALYZER, OPERATOR, VIEWER];
         }
 
         public static function valueOf(name:String):UserInGroup$UserGroupRole {

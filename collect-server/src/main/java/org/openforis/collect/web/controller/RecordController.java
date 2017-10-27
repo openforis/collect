@@ -191,19 +191,18 @@ public class RecordController extends BasicController implements Serializable {
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
 		
 		//filter by user group qualifier
-		if (user != null) {
-			if (user.getRole() != UserRole.ADMIN) { //administrators can see all records
-				UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
-				if (userInGroup == null) {
-					throw new IllegalArgumentException(String.format("User %s not allowed to see records for survey %s", 
-							user.getUsername(), survey.getName()));
-				}
-				String qualifierName = userInGroup.getGroup().getQualifier1Name();
-				if (StringUtils.isNotBlank(qualifierName)) {
-					HashMap<String, String> qualifiersByName = new HashMap<String, String>();
-					qualifiersByName.put(qualifierName, userInGroup.getGroup().getQualifier1Value());
-					filter.setQualifiersByName(qualifiersByName);
-				}
+		if (user != null && user.getRole() != UserRole.ADMIN) { //administrators can see all records
+			UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
+			if (userInGroup == null) {
+				throw new IllegalArgumentException(String.format("User %s not allowed to see records for survey %s", 
+						user.getUsername(), survey.getName()));
+			}
+			UserGroup group = userGroupManager.loadById(userInGroup.getGroupId());
+			String qualifierName = group.getQualifierName();
+			if (StringUtils.isNotBlank(qualifierName)) {
+				HashMap<String, String> qualifiersByName = new HashMap<String, String>();
+				qualifiersByName.put(qualifierName, group.getQualifierValue());
+				filter.setQualifiersByName(qualifiersByName);
 			}
 		}
 		
