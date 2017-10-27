@@ -4,6 +4,7 @@ import { Form, FormGroup, Label, Col, Dropdown, DropdownToggle, DropdownMenu, Dr
 
 import SurveySelect from '../SurveySelect/';
 import ServiceFactory from 'services/ServiceFactory'
+import Constants from 'utils/Constants'
 
 class Header extends Component {
 
@@ -45,7 +46,7 @@ class Header extends Component {
   }
 
   handleLogoutClick() {
-    ServiceFactory.sessionService.invalidate().then(r => window.location.assign('/'))
+    ServiceFactory.sessionService.invalidate().then(r => window.location.assign(Constants.BASE_URL))
   }
 
   render() {
