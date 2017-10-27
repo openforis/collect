@@ -36,7 +36,13 @@ function userGroups(
       const userGroups = state.userGroups
       const userGroupIdx = userGroups.findIndex(u => u.id === newUserGroup.id)
       if (newUserGroup.parentId != null) {
-        newUserGroup.parent = userGroups.find(ug => ug.id === newUserGroup.parentId)
+        const parentGroup = userGroups.find(ug => ug.id === newUserGroup.parentId)
+        newUserGroup.parent = parentGroup
+        if (parentGroup.chindrenGroupIds.indexOf(newUserGroup.id) < 0) {
+          parentGroup.childrenGroupIds.push(newUserGroup.id)
+        }
+      } else {
+        newUserGroup.parent = null
       }
       var newUserGroups = update(userGroups, {
         $splice: [[userGroupIdx, 1, newUserGroup]]

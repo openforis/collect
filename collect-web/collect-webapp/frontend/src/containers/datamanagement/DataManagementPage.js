@@ -124,23 +124,27 @@ class DataManagementPage extends Component {
 	}
 	
 	render() {
+		if (!this.props.loggedUser || !this.props.userGroups) {
+			return <div>Loading...</div>
+		}
 		if (!this.props.survey) {
 			return <div>Select a survey first</div>
 		}
 		const surveyUserGroup = this.props.survey.userGroup
 		const loggedUser = this.props.loggedUser
+		const allUserGroups = this.props.userGroups
 		return (
 			<Container>
 				<Row className="justify-content-between">
 					<Col sm={{size: 4}}>
-						{loggedUser.canCreateRecords(surveyUserGroup) && 
+						{loggedUser.canCreateRecords(surveyUserGroup, allUserGroups) && 
 							<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
 						}
-						{loggedUser.canEditRecords(surveyUserGroup) &&
+						{loggedUser.canEditRecords(surveyUserGroup, allUserGroups) &&
 							<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "success" : "disabled"}
 								onClick={this.handleEditButtonClick}>Edit</Button>
 						}
-						{loggedUser.canDeleteRecords(surveyUserGroup) &&
+						{loggedUser.canDeleteRecords(surveyUserGroup, allUserGroups) &&
 							<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "danger" : "disabled"}
 								onClick={this.handleDeleteButtonClick}>Delete</Button>
 						}
@@ -160,7 +164,7 @@ class DataManagementPage extends Component {
 					</Col>
 
 					<Col sm={{size: 2}}>
-						{loggedUser.canImportRecords(surveyUserGroup) &&
+						{loggedUser.canImportRecords(surveyUserGroup, allUserGroups) &&
 							<ButtonDropdown isOpen={this.state.importDropdownOpen} 
 									toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
 								<DropdownToggle color="warning" caret><span className="fa fa-upload"/>Import</DropdownToggle>
@@ -189,7 +193,8 @@ class DataManagementPage extends Component {
 const mapStateToProps = state => {
 	return {
 		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
-		loggedUser: state.session ? state.session.loggedUser : null
+		loggedUser: state.session ? state.session.loggedUser : null,
+		userGroups: state.userGroups ? state.userGroups.userGroups : null
 	}
 }
 

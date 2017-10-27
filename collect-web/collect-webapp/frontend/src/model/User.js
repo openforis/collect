@@ -12,13 +12,13 @@ export default class User extends Serializable {
         this.fillFromJSON(jsonData)
     }
 
-    determineRoleInGroup(userGroup) {
-        let userInGroup = userGroup.users.find(uig => uig.userId == this.id)
+    determineRoleInGroup(userGroup, allUserGroups) {
+        const userInGroup = this._findUserInGroupOrDescendants(userGroup, allUserGroups)
         return userInGroup == null ? userInGroup.role : null
     }
 
-    canCreateRecords(userGroup) {
-        const userInGroup = userGroup.users.find(uig => uig.userId === this.id)
+    canCreateRecords(userGroup, allUserGroups) {
+        const userInGroup = this._findUserInGroupOrDescendants(userGroup, allUserGroups)
         const role = userInGroup ? userInGroup.role : null
         if (role === null) {
             return false
@@ -34,16 +34,16 @@ export default class User extends Serializable {
         }
     }
 
-    canEditRecords(userGroup) {
+    canEditRecords(userGroup, allUserGroups) {
         return this.canCreateRecords(userGroup)
     }
 
-    canDeleteRecords(userGroup) {
+    canDeleteRecords(userGroup, allUserGroups) {
         return this.canCreateRecords(userGroup)
     }
 
-    canImportRecords(userGroup) {
-        const userInGroup = userGroup.users.find(uig => uig.userId === this.id)
+    canImportRecords(userGroup, allUserGroups) {
+        const userInGroup = this._findUserInGroupOrDescendants(userGroup, allUserGroups)
         const role = userInGroup ? userInGroup.role : null
         if (role === null) {
             return false
@@ -56,6 +56,22 @@ export default class User extends Serializable {
             default:
                 return false
         }
+    }
+
+    _findUserInGroupOrDescendants(userGroup, allUserGroups) {
+        const stack = []
+        stack.push(userGroup)
+        while(stack.length > 0) {
+            let currentUserGroup = stack.pop()
+            let userInGroup = currentUserGroup.users.find(uig => uig.userId === this.id)
+            if (userInGroup) {
+                return userInGroup
+            } else {
+                let childrenGroups = userGroup.childrenGroupIds.map(id => allUserGroups.find(g => g.id === id))
+                childrenGroups.forEach(g => stack.push(g))
+            }
+        }
+        return null
     }
 
     get canAccessSurveyDesigner() {
