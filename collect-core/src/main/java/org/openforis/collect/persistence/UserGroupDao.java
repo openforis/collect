@@ -201,13 +201,9 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 				OFC_USERGROUP.ID.in(
 					dsl.select(OFC_USER_USERGROUP.GROUP_ID)
 						.from(OFC_USER_USERGROUP)
-						.where(OFC_USER_USERGROUP.USER_ID.eq(user.getId())
-							.and(
-								OFC_USER_USERGROUP.STATUS_CODE.eq(String.valueOf(UserGroupJoinRequestStatus.ACCEPTED.getCode()))
-							)
-						)
-					)
+						.where(OFC_USER_USERGROUP.USER_ID.eq(user.getId()))
 				)
+			)
 			.orderBy(OFC_USERGROUP.PARENT_ID, OFC_USERGROUP.NAME)
 			.fetchInto(UserGroup.class);
 		return result;

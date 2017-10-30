@@ -134,7 +134,7 @@ class DataManagementPage extends Component {
 		const loggedUser = this.props.loggedUser
 		const allUserGroups = this.props.userGroups
 		return (
-			<Container>
+			<Container fluid>
 				<Row className="justify-content-between">
 					<Col sm={{size: 4}}>
 						{loggedUser.canCreateRecords(surveyUserGroup, allUserGroups) && 
@@ -162,7 +162,6 @@ class DataManagementPage extends Component {
 							</DropdownMenu>
 						</ButtonDropdown>
 					</Col>
-
 					<Col sm={{size: 2}}>
 						{loggedUser.canImportRecords(surveyUserGroup, allUserGroups) &&
 							<ButtonDropdown isOpen={this.state.importDropdownOpen} 

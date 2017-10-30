@@ -79,7 +79,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public List<UserGroup> findManageableUserGroups(User user) {
+	public List<UserGroup> findAllRelatedUserGroups(User user) {
 		// TODO Auto-generated method stub
 		return null;
 	}

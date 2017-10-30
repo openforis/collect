@@ -61,6 +61,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         userId: loggedUser.id, 
                         username: loggedUser.username, 
                         userEnabled: loggedUser.enabled, 
+                        userRole: loggedUser.role,
                         role: 'OWNER',
                         joinStatus: 'ACCEPTED'
                     }]
@@ -432,11 +433,13 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                     >
                                     <TableHeaderColumn dataField="userId" isKey hidden>Id</TableHeaderColumn>
                                     <TableHeaderColumn dataField="username" editable={false}>Username</TableHeaderColumn>
-                                    <TableHeaderColumn dataField="role" width="160"
+                                    <TableHeaderColumn dataField="role" width="140"
                                         customEditor={ { getElement: createRoleEditor, customEditorParameters: {roles: roles} } }>Role</TableHeaderColumn>
                                     <TableHeaderColumn dataField="joinStatus" editable={ { type: 'select', options: { values: joinStatuses } } }
-                                        width="140">Status</TableHeaderColumn>
+                                        width="120">Status</TableHeaderColumn>
                                 </BootstrapTable>
+                                {this.state.errorFeedback['users'] &&
+                                    <FormFeedback>{this.state.errorFeedback['users']}</FormFeedback>}
                             </fieldset>
                         </Col>
                     </Row>

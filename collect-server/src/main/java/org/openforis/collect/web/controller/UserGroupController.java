@@ -68,7 +68,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		if (loggedUser.getRole() == UserRole.ADMIN) {
 			return itemManager.findAllUserDefinedGroups();
 		} else {
-			return itemManager.findManageableUserGroups(loggedUser);
+			return itemManager.findAllRelatedUserGroups(loggedUser);
 		}
 	}
 	

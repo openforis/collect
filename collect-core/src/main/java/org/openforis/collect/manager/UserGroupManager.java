@@ -21,7 +21,7 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	
 	List<UserGroup> findAllUserDefinedGroups();
 	
-	List<UserGroup> findManageableUserGroups(User user);
+	List<UserGroup> findAllRelatedUserGroups(User user);
 	
 	List<UserGroup> findPublicUserGroups();
 

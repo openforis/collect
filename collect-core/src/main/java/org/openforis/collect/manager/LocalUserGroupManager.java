@@ -2,11 +2,9 @@ package org.openforis.collect.manager;
 
 import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus.ACCEPTED;
 import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus.PENDING;
-import static org.openforis.collect.model.UserInGroup.UserGroupRole.ADMINISTRATOR;
 import static org.openforis.collect.model.UserInGroup.UserGroupRole.OWNER;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGroup, Integer, UserGroupDao> implements UserGroupManager {
 
-	private static final List<UserGroupRole> ADMINISTRATOR_ROLES = Arrays.asList(ADMINISTRATOR, OWNER);
 	private static final String DEFAULT_PUBLIC_USER_GROUP_NAME = "default_public_group";
 	private static final String DEFAULT_PRIVATE_USER_GROUP_SUFFIX = "_default_private_group";
 	private static final String DEFAULT_PRIVATE_USER_GROUP_LABEL_SUFFIX = " Default Private Group";
@@ -80,18 +77,27 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	}
 	
 	@Override
-	public List<UserGroup> findManageableUserGroups(User user) {
+	public List<UserGroup> findAllRelatedUserGroups(User user) {
+		List<UserGroup> relatedUserGroups = findByUser(user);
+		Set<UserGroup> result = new HashSet<UserGroup>(relatedUserGroups);
+		//include ancestors
+		for (UserGroup userGroup : relatedUserGroups) {
+			List<UserGroup> ancestors = findAncestorGroups(userGroup);
+			result.addAll(ancestors);
+		}
+		return new ArrayList<UserGroup>(result);
+	}
+	
+	private List<UserGroup> findAncestorGroups(UserGroup userGroup) {
 		List<UserGroup> result = new ArrayList<UserGroup>();
-		List<UserGroup> userDefinedGroups = findAllUserDefinedGroups();
-		for (UserGroup userGroup : userDefinedGroups) {
-			UserInGroup userInGroup = findUserInGroup(userGroup, user);
-			if (userInGroup != null && ADMINISTRATOR_ROLES.contains(userInGroup.getRole())) {
-				result.add(userGroup);
-			}
+		UserGroup currentGroup = userGroup;
+		while (currentGroup.getParentId() != null) {
+			UserGroup parentGroup = loadById(currentGroup.getParentId());
+			result.add(0, parentGroup);
 		}
 		return result;
 	}
-	
+
 	@Override
 	public UserGroup findByName(String userGroupName) {
 		UserGroup group = dao.loadByName(userGroupName);
