@@ -30,7 +30,12 @@ class RecordDataTable extends Component {
 	}
 
 	componentDidMount() {
-		this.fetchData();
+		this.fetchData()
+		this.props.onRef(this)
+	}
+
+	componentWillUnmount() {
+		this.props.onRef(undefined)
 	}
 
 	componentWillReceiveProps(nextProps) {

@@ -52,8 +52,13 @@ class DataManagementPage extends Component {
 			const $this = this
 			//Modals.confirm('test', 'test', function() {
 				this.recordService.delete(this.state.selectedItem).then(response => {
+					$this.recordDataTable.fetchData()
 					$this.props.dispatch(Actions.recordDeleted($this.state.selectedItem));
-					$this.setState({selectedItem: null, selectedItemIds: []})
+					$this.setState({
+						selectedItem: null, 
+						selectedItems: [],
+						selectedItemIds: []
+					})
 					$this.forceUpdate()
 				})
 			//})
@@ -176,7 +181,7 @@ class DataManagementPage extends Component {
 				</Row>
 				<Row>
 					<Col>
-						<RecordDataTable 
+						<RecordDataTable onRef={ref => this.recordDataTable = ref}
 							selectedItemIds={this.state.selectedItemIds}
 							handlRowDoubleClick={this.handleRowDoubleClick}
 							handleRowSelect={this.handleRowSelect}
