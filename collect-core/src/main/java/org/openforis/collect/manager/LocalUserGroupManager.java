@@ -85,7 +85,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 			List<UserGroup> ancestors = findAncestorGroups(userGroup);
 			result.addAll(ancestors);
 		}
-		return new ArrayList<UserGroup>(result);
+		return fillLazyLoadedFields(new ArrayList<UserGroup>(result));
 	}
 	
 	private List<UserGroup> findAncestorGroups(UserGroup userGroup) {
@@ -94,6 +94,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		while (currentGroup.getParentId() != null) {
 			UserGroup parentGroup = loadById(currentGroup.getParentId());
 			result.add(0, parentGroup);
+			currentGroup = parentGroup;
 		}
 		return result;
 	}

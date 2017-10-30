@@ -6,10 +6,15 @@ export default class Arrays {
      * Adds an element without side effect on the specified array
      * 
      * @param {Array} array 
-     * @param {Object} item 
+     * @param {Object} item
+     * @param {boolean} onlyIfNotExists 
+     * 
+     * @returns {Array}
      */
-    static addItem(array, item) {
-        return array.concat([item])
+    static addItem(array, item, onlyIfNotExists=false) {
+        if (! onlyIfNotExists || array.indexOf(item) < 0) {
+            return array.concat([item])
+        }
     }
 
     /**
@@ -17,10 +22,14 @@ export default class Arrays {
      * 
      * @param {Array} array 
      * @param {Object} item 
+     * 
+     * @returns {Array}
      */
     static removeItem(array, item) {
         const idx = array.indexOf(item)
-        return array.slice(0, idx).concat(array.slice(idx + 1))
+        if (idx >= 0) {
+            return array.slice(0, idx).concat(array.slice(idx + 1))
+        }
     }
 
     /**
@@ -28,6 +37,8 @@ export default class Arrays {
      * @param {Array} array 
      * @param {Object} item 
      * @param {boolean} remove 
+     * 
+     * @returns {Array}
      */
     static addOrRemoveItem(array, item, remove=false) {
         if (remove) {

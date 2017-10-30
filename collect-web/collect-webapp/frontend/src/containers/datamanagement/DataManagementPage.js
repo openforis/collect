@@ -130,21 +130,20 @@ class DataManagementPage extends Component {
 		if (!this.props.survey) {
 			return <div>Select a survey first</div>
 		}
-		const surveyUserGroup = this.props.survey.userGroup
+		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === this.props.survey.userGroup.id)
 		const loggedUser = this.props.loggedUser
-		const allUserGroups = this.props.userGroups
 		return (
 			<Container fluid>
 				<Row className="justify-content-between">
 					<Col sm={{size: 4}}>
-						{loggedUser.canCreateRecords(surveyUserGroup, allUserGroups) && 
+						{loggedUser.canCreateRecords(surveyUserGroup) && 
 							<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
 						}
-						{loggedUser.canEditRecords(surveyUserGroup, allUserGroups) &&
+						{loggedUser.canEditRecords(surveyUserGroup) &&
 							<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "success" : "disabled"}
 								onClick={this.handleEditButtonClick}>Edit</Button>
 						}
-						{loggedUser.canDeleteRecords(surveyUserGroup, allUserGroups) &&
+						{loggedUser.canDeleteRecords(surveyUserGroup) &&
 							<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "danger" : "disabled"}
 								onClick={this.handleDeleteButtonClick}>Delete</Button>
 						}
@@ -163,7 +162,7 @@ class DataManagementPage extends Component {
 						</ButtonDropdown>
 					</Col>
 					<Col sm={{size: 2}}>
-						{loggedUser.canImportRecords(surveyUserGroup, allUserGroups) &&
+						{loggedUser.canImportRecords(surveyUserGroup) &&
 							<ButtonDropdown isOpen={this.state.importDropdownOpen} 
 									toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
 								<DropdownToggle color="warning" caret><span className="fa fa-upload"/>Import</DropdownToggle>

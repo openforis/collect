@@ -12,13 +12,13 @@ export default class User extends Serializable {
         this.fillFromJSON(jsonData)
     }
 
-    determineRoleInGroup(userGroup, allUserGroups) {
-        const userInGroup = this._findUserInGroupOrDescendants(userGroup, allUserGroups)
+    determineRoleInGroup(userGroup) {
+        const userInGroup = this._findUserInGroupOrDescendants(userGroup)
         return userInGroup == null ? userInGroup.role : null
     }
 
-    canCreateRecords(userGroup, allUserGroups) {
-        const userInGroup = this._findUserInGroupOrDescendants(userGroup, allUserGroups)
+    canCreateRecords(userGroup) {
+        const userInGroup = this._findUserInGroupOrDescendants(userGroup)
         const role = userInGroup ? userInGroup.role : null
         if (role === null) {
             return false
@@ -34,16 +34,16 @@ export default class User extends Serializable {
         }
     }
 
-    canEditRecords(userGroup, allUserGroups) {
+    canEditRecords(userGroup) {
         return this.canCreateRecords(userGroup)
     }
 
-    canDeleteRecords(userGroup, allUserGroups) {
+    canDeleteRecords(userGroup) {
         return this.canCreateRecords(userGroup)
     }
 
-    canImportRecords(userGroup, allUserGroups) {
-        const userInGroup = this._findUserInGroupOrDescendants(userGroup, allUserGroups)
+    canImportRecords(userGroup) {
+        const userInGroup = this._findUserInGroupOrDescendants(userGroup)
         const role = userInGroup ? userInGroup.role : null
         if (role === null) {
             return false
@@ -58,7 +58,7 @@ export default class User extends Serializable {
         }
     }
 
-    _findUserInGroupOrDescendants(userGroup, allUserGroups) {
+    _findUserInGroupOrDescendants(userGroup) {
         const stack = []
         stack.push(userGroup)
         while(stack.length > 0) {
@@ -67,8 +67,7 @@ export default class User extends Serializable {
             if (userInGroup) {
                 return userInGroup
             } else {
-                let childrenGroups = userGroup.childrenGroupIds.map(id => allUserGroups.find(g => g.id === id))
-                childrenGroups.forEach(g => stack.push(g))
+                userGroup.children.forEach(g => stack.push(g))
             }
         }
         return null

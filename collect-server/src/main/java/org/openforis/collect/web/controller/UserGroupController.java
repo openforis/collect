@@ -107,12 +107,12 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		}
 		
 		public UserGroupForm(UserGroup userGroup) {
-			BeanUtils.copyProperties(userGroup, this);
 			BeanUtils.copyProperties(userGroup, this, "users");
 			this.users.clear();
 			for (UserInGroup user: userGroup.getUsers()) {
 				this.users.add(new UserInGroupForm(user));
 			}
+			this.childrenGroupIds = new ArrayList<Integer>(userGroup.getChildrenGroupIds());
 		}
 		
 		@Override

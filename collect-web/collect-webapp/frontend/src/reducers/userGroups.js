@@ -1,4 +1,5 @@
 import update from 'react-addons-update';
+import Arrays from 'utils/Arrays'
 
 import {
   REQUEST_USER_GROUPS, RECEIVE_USER_GROUPS, RECEIVE_USER_GROUP, INVALIDATE_USER_GROUPS
@@ -24,6 +25,12 @@ function userGroups(
 	        didInvalidate: false
         })
     case RECEIVE_USER_GROUPS:
+      action.userGroups.forEach(ug => {
+          //adjust parent group reference
+          ug.parent = ug.parentId ? action.userGroups.find(ug2 => ug2.id === ug.parentId) : null
+          ug.children = ug.childrenGroupIds.map(id => action.userGroups.find(ug2 => ug2.id === id))
+      })
+      
       return Object.assign({}, state, {
         initialized: true,
 		    isFetching: false,
@@ -35,15 +42,24 @@ function userGroups(
       const newUserGroup = action.userGroup
       const userGroups = state.userGroups
       const userGroupIdx = userGroups.findIndex(u => u.id === newUserGroup.id)
-      if (newUserGroup.parentId != null) {
+      const oldUserGroup = userGroups[userGroupIdx]
+      const oldUserGroupParentId = oldUserGroup.parentId
+      if (oldUserGroupParentId !== null) {
+        const oldParentGroup = userGroups.find(ug => ug.id === oldUserGroupParentId)
+        oldParentGroup.childrenGroupIds = Arrays.removeItem(oldParentGroup.childrenGroupIds, newUserGroup.id)
+        oldParentGroup.children = Arrays.removeItem(oldParentGroup.children, oldUserGroup)
+      }
+      if (newUserGroup.parentId === null) {
+        newUserGroup.parent = null
+      } else {
         const parentGroup = userGroups.find(ug => ug.id === newUserGroup.parentId)
         newUserGroup.parent = parentGroup
-        if (parentGroup.chindrenGroupIds.indexOf(newUserGroup.id) < 0) {
+        if (parentGroup.childrenGroupIds.indexOf(newUserGroup.id) < 0) {
           parentGroup.childrenGroupIds.push(newUserGroup.id)
+          parentGroup.children.push(newUserGroup)
         }
-      } else {
-        newUserGroup.parent = null
       }
+        
       var newUserGroups = update(userGroups, {
         $splice: [[userGroupIdx, 1, newUserGroup]]
       });
