@@ -1,6 +1,8 @@
 package org.openforis.collect.model;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +40,17 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 	private Visibility visibility;
 	private Set<UserInGroup> users = new HashSet<UserInGroup>();
 	private Set<Integer> childrenGroupIds = new HashSet<Integer>();
+	
+	@SuppressWarnings("serial")
+	public Map<String, String> getQualifiersByName() {
+		if (StringUtils.isBlank(getQualifierName())) {
+			return null;
+		} else {
+			return new HashMap<String, String>(){{
+				put(getQualifierName(), getQualifierValue());
+			}};
+		}
+	}
 	
 	public User getCreatedByUser() {
 		return createdByUser;

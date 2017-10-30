@@ -26,7 +26,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.SurveyBackupJob;
@@ -192,18 +191,8 @@ public class RecordController extends BasicController implements Serializable {
 		
 		//filter by user group qualifier
 		if (user != null && user.getRole() != UserRole.ADMIN) { //administrators can see all records
-			UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
-			if (userInGroup == null) {
-				throw new IllegalArgumentException(String.format("User %s not allowed to see records for survey %s", 
-						user.getUsername(), survey.getName()));
-			}
-			UserGroup group = userGroupManager.loadById(userInGroup.getGroupId());
-			String qualifierName = group.getQualifierName();
-			if (StringUtils.isNotBlank(qualifierName)) {
-				HashMap<String, String> qualifiersByName = new HashMap<String, String>();
-				qualifiersByName.put(qualifierName, group.getQualifierValue());
-				filter.setQualifiersByName(qualifiersByName);
-			}
+			Map<String, String> qualifiersByName = getQualifiers(surveyUserGroup, user);
+			filter.setQualifiersByName(qualifiersByName);
 		}
 		
 		//load summaries
@@ -215,6 +204,16 @@ public class RecordController extends BasicController implements Serializable {
 		result.put("count", count);
 		
 		return result;
+	}
+
+	private Map<String, String> getQualifiers(UserGroup userGroup, User user) {
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(userGroup, user);
+		if (userInGroup == null) {
+			throw new IllegalArgumentException(String.format("User %s not allowed to see records for user group %s", 
+					user.getUsername(), userGroup.getName()));
+		}
+		UserGroup group = userGroupManager.loadById(userInGroup.getGroupId());
+		return group.getQualifiersByName();
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=GET, produces=APPLICATION_JSON_VALUE)

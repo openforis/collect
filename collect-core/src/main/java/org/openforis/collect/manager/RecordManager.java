@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,12 +23,15 @@ import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecordSummary.StepSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.NodeChangeMap;
 import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordLock;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
@@ -67,6 +72,8 @@ public class RecordManager {
 	private SurveyManager surveyManager;
 	@Autowired
 	private UserManager userManager;
+	@Autowired
+	private UserGroupManager userGroupManager;
 	
 	private RecordUpdater updater;
 	private RecordConverter recordConverter;
@@ -472,12 +479,20 @@ public class RecordManager {
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId, Step step) {
 		CollectRecord record = instantiateRecord(survey, rootEntityName, user,
 				modelVersionName, step);
-		initializeRecord(record);
+		initializeRecord(record, user);
 		return record;
 	}
 
 	public NodeChangeSet initializeRecord(CollectRecord record) {
-		return updater.initializeNewRecord(record);
+		return initializeRecord(record, null);
+	}
+	
+	public NodeChangeSet initializeRecord(CollectRecord record, User user) {
+		NodeChangeMap changeSet = new NodeChangeMap(updater.initializeNewRecord(record));
+		if (user != null) {
+			addQualifierValues(record, user);
+		}
+		return changeSet;
 	}
 
 	public CollectRecord instantiateRecord(CollectSurvey survey,
@@ -485,10 +500,32 @@ public class RecordManager {
 		EntityDefinition rootEntityDef = rootEntityName == null ? survey.getSchema().getFirstRootEntityDefinition() 
 				: survey.getSchema().getRootEntityDefinition(rootEntityName);
 		CollectRecord record = survey.createRecord(modelVersionName, rootEntityDef);
-		record.setCreationDate(new Date());
+		Date now = new Date();
+		record.setCreationDate(now);
+		record.setModifiedDate(now);
 		record.setCreatedBy(user);
 		record.setStep(step);
 		return record;
+	}
+	
+	private void addQualifierValues(CollectRecord record, User user) {
+		NodeChangeMap changeSet = new NodeChangeMap(updater.initializeNewRecord(record));
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		UserGroup surveyUserGrup = survey.getUserGroup();
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGrup, user);
+		if (userInGroup == null) {
+			throw new IllegalArgumentException(String.format("User %s is not allowed to create records for survey %s", 
+					user.getUsername(), survey.getName()));
+		}
+		UserGroup group = userGroupManager.loadById(userInGroup.getGroupId());
+		Map<String, String> qualifiersByName = group.getQualifiersByName();
+		for (Entry<String, String> qualifier : qualifiersByName.entrySet()) {
+			String attributePath = record.getRootEntity().getName() + "/" + qualifier.getKey();
+			Attribute<?, Value> attribute = record.findNodeByPath(attributePath);
+			Value qualifierValue = attribute.getDefinition().createValue(qualifier.getValue());
+			NodeChangeSet changes = updater.updateAttribute(attribute, qualifierValue);
+			changeSet.addMergeChanges(changes);
+		}
 	}
 
 	@Transactional(readOnly=false, propagation=REQUIRED)
