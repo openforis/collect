@@ -194,12 +194,21 @@ class RecordDataTable extends Component {
 			return cell ? cell.username : ''
 		}
 
+		function createRootEntityFilter(attrDef) {
+			switch(attrDef.attributeType) {
+				case 'NUMBER':
+					return {type: 'NumberFilter'}
+				default:
+					return {type: 'TextFilter'}
+			}
+		}
+
 		var columns = [];
 		columns.push(<TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>);
 
 		const keyAttributeColumns = keyAttributes.map((keyAttr, i) => 
 			<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter} width="80"
-				editable={false} dataSort filter={{type: 'TextFilter'}}>{keyAttr.label}</TableHeaderColumn>)
+				editable={false} dataSort filter={createRootEntityFilter(keyAttr)}>{keyAttr.label}</TableHeaderColumn>)
 		columns = columns.concat(keyAttributeColumns)
 
 		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => {
@@ -248,7 +257,8 @@ class RecordDataTable extends Component {
 				}}
 				fetchInfo={{ dataTotalSize: this.state.totalSize }}
 				remote pagination striped hover condensed
-				height={this.state.recordsPerPage === 25 ? '300px' : '600px'}
+				height="100%"
+				containerStyle={{position: 'absolute', top: '20px', bottom: '150px'}}
 				selectRow={{
 					mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
 					onSelect: this.props.handleRowSelect,

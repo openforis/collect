@@ -120,6 +120,7 @@ package org.openforis.collect.presenter {
 			view.bottomButtonBar.visible = view.bottomButtonBar.includeInLayout = showFooter;
 			view.footer.userButtonVisible = showFooter && ! onlyOneRecordEdit;
 			view.footer.footerImg.visible = showFooter && ! onlyOneRecordEdit;
+			view.footer.applicationVersionVisible = showFooter && !onlyOneRecordEdit;
 			
 			view.backToListButton.visible = view.backToListButton.includeInLayout = showBackToListButton;
 			view.submitButton.visible = view.submitButton.includeInLayout = canSubmit;

@@ -19,6 +19,9 @@ package org.openforis.collect.model {
         public static const COUNT1:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("COUNT1", _);
         public static const COUNT2:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("COUNT2", _);
         public static const COUNT3:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("COUNT3", _);
+        public static const SUMMARY1:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("SUMMARY1", _);
+        public static const SUMMARY2:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("SUMMARY2", _);
+        public static const SUMMARY3:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("SUMMARY3", _);
         public static const SKIPPED:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("SKIPPED", _);
         public static const MISSING:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("MISSING", _);
         public static const ERRORS:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("ERRORS", _);
@@ -37,7 +40,7 @@ package org.openforis.collect.model {
         }
 
         public static function get constants():Array {
-            return [KEY1, KEY2, KEY3, COUNT1, COUNT2, COUNT3, SKIPPED, MISSING, ERRORS, WARNINGS, DATE_CREATED, DATE_MODIFIED, OWNER_NAME, STEP];
+            return [KEY1, KEY2, KEY3, COUNT1, COUNT2, COUNT3, SUMMARY1, SUMMARY2, SUMMARY3, SKIPPED, MISSING, ERRORS, WARNINGS, DATE_CREATED, DATE_MODIFIED, OWNER_NAME, STEP];
         }
 
         public static function valueOf(name:String):RecordSummarySortField$Sortable {

@@ -2,6 +2,9 @@
 /**
 * Customuzation for OF Collect
 **/
+body {
+    overflow: hidden;
+}
 
 .breadcrumb-item.active {
     font-weight: bold;
@@ -10,6 +13,38 @@
 
 .breadcrumb-item a {
     color: #3795c4;
+}
+
+.main-content-wrapper {
+    position: absolute;
+    top: 110px;
+    bottom: 50px;
+    left: 200px;
+    right: 0px;
+    margin: 10px;
+    overflow: auto;
+}
+
+@media (max-width: 991px) {
+.main-content-wrapper {
+    left: 0px;
+}}
+
+.main .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.sidebar-hidden .main-content-wrapper {
+    left: 0px;
+}
+
+.full-height {
+    height: 100%;
+}
+
+.container-fluid {
+    height: 100%;
 }
 
 .container.formItems {

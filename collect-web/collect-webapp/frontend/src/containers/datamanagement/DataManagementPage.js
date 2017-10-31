@@ -183,9 +183,10 @@ class DataManagementPage extends Component {
 						}
 					</Col>
 				</Row>
-				<Row>
+				<Row className="full-height">
 					<Col>
 						<RecordDataTable onRef={ref => this.recordDataTable = ref}
+							className="full-height"
 							selectedItemIds={this.state.selectedItemIds}
 							handleRowSelect={this.handleRowSelect}
 							handleRowDoubleClick={this.handleRowDoubleClick} />

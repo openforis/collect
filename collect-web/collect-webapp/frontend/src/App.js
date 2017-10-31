@@ -33,7 +33,7 @@ class App extends Component {
             <Sidebar {...this.props}/>
             <main className="main">
               <Breadcrumb />
-              <div className="container-fluid">
+              <div className="main-content-wrapper">
                 <Switch>
                   <Route path="/" exact name="HomePage" component={HomePage}/>
                   <Route path="/dashboard" exact name="Dashboard" component={DashboardPage}/>

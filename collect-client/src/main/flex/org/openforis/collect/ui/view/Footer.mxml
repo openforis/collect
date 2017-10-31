@@ -18,6 +18,7 @@
 			
 			private var _formVersion:String = null;
 			private var _userButtonVisible:Boolean = true;
+			private var _applicationVersionVisible:Boolean = true;
 			private var footerImageLoader:CustomImageLoader;
 			
 			[Bindable]
@@ -36,6 +37,15 @@
 			
 			public function set userButtonVisible(userButtonVisible:Boolean):void {
 				_userButtonVisible = userButtonVisible;
+			}
+			
+			[Bindable]
+			public function get applicationVersionVisible():Boolean {
+				return _applicationVersionVisible;
+			}
+			
+			public function set applicationVersionVisible(applicationVersionVisible:Boolean):void {
+				_applicationVersionVisible = applicationVersionVisible;
 			}
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
@@ -63,10 +73,10 @@
 					 styleName="formVersionText"
 					 text="{formVersion}" />
 			</s:HGroup>
-			<component:ApplicationVersionContainer />
+			<component:ApplicationVersionContainer visible={applicationVersionVisible} />
 		</s:VGroup>	
 		<s:Spacer width="100%" />
-		<component:UserPopUpButton visible="{}" />
+		<component:UserPopUpButton visible="{userButtonVisible}" />
 	</s:HGroup>
 	
 </s:BorderContainer>
