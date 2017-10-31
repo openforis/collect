@@ -61,8 +61,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.UserGroup;
-import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.model.proxy.RecordSummaryProxy;
@@ -160,8 +158,8 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestParam(value="rootEntityDefinitionId", required=false) Integer rootEntityDefinitionId,
 			@RequestParam(value="step", required=false) Integer stepNumber) throws Exception {
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		RecordFilter filter = new RecordFilter(survey);
-		filter.setRootEntityId(rootEntityDefinitionId);
+		RecordFilter filter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager, 
+				rootEntityDefinitionId, false);
 		if (stepNumber != null) {
 			filter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
 		}
@@ -174,7 +172,6 @@ public class RecordController extends BasicController implements Serializable {
 			@PathVariable int surveyId,
 			@Valid RecordSummarySearchParameters params) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		UserGroup surveyUserGroup = survey.getUserGroup();
 		Integer userId = params.getUserId();
 		User user = userId == null ? null : userManager.loadById(userId);
 		
@@ -183,17 +180,12 @@ public class RecordController extends BasicController implements Serializable {
 		EntityDefinition rootEntityDefinition = params.getRootEntityName() == null ? schema.getFirstRootEntityDefinition() : 
 			schema.getRootEntityDefinition(params.getRootEntityName());
 		
-		RecordFilter filter = new RecordFilter(survey, rootEntityDefinition.getId());
+		RecordFilter filter = createRecordFilter(survey, user, userGroupManager, rootEntityDefinition.getId(), false);
+		
 		filter.setKeyValues(params.getKeyValues());
 		filter.setCaseSensitiveKeyValues(params.isCaseSensitiveKeyValues());
 		filter.setOffset(params.getOffset());
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
-		
-		//filter by user group qualifier
-		if (user != null && user.getRole() != UserRole.ADMIN) { //administrators can see all records
-			Map<String, String> qualifiersByName = getQualifiers(surveyUserGroup, user);
-			filter.setQualifiersByName(qualifiersByName);
-		}
 		
 		//load summaries
 		List<CollectRecordSummary> summaries = recordManager.loadFullSummaries(filter, params.getSortFields());
@@ -204,16 +196,6 @@ public class RecordController extends BasicController implements Serializable {
 		result.put("count", count);
 		
 		return result;
-	}
-
-	private Map<String, String> getQualifiers(UserGroup userGroup, User user) {
-		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(userGroup, user);
-		if (userInGroup == null) {
-			throw new IllegalArgumentException(String.format("User %s not allowed to see records for user group %s", 
-					user.getUsername(), userGroup.getName()));
-		}
-		UserGroup group = userGroupManager.loadById(userInGroup.getGroupId());
-		return group.getQualifiersByName();
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=GET, produces=APPLICATION_JSON_VALUE)
@@ -366,10 +348,9 @@ public class RecordController extends BasicController implements Serializable {
 		if (accessControlManager.canEdit(sessionManager.getLoggedUser(), record)) {
 			CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 			CSVDataExportParameters parameters = new CSVDataExportParameters();
-			RecordFilter recordFilter = new RecordFilter(survey);
+			RecordFilter recordFilter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager, null, false);
 			recordFilter.setRecordId(recordId);
 			recordFilter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
-			recordFilter.setRootEntityId(survey.getSchema().getFirstRootEntityDefinition().getId());
 			parameters.setRecordFilter(recordFilter);
 			parameters.setAlwaysGenerateZipFile(true);
 			job.setParameters(parameters);
@@ -400,7 +381,7 @@ public class RecordController extends BasicController implements Serializable {
 
 		csvDataExportJob.setOutputFile(File.createTempFile("collect-csv-data-export", ".zip"));
 		
-		CSVDataExportParameters exportParameters = parameters.toExportParameters(survey, user);
+		CSVDataExportParameters exportParameters = parameters.toExportParameters(survey, user, userGroupManager);
 		csvDataExportJob.setParameters(exportParameters);
 		
 		jobManager.start(csvDataExportJob);
@@ -435,12 +416,9 @@ public class RecordController extends BasicController implements Serializable {
 			@RequestBody BackupDataExportParameters parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		RecordFilter filter = new RecordFilter(survey);
-		if (parameters.isOnlyOwnedRecords()) {
-			filter.setOwnerId(user.getId());
-		}
-		
+		RecordFilter filter = createRecordFilter(survey, user, userGroupManager, null, parameters.onlyOwnedRecords);
 		fullBackupJob = jobManager.createJob(SurveyBackupJob.class);
+		fullBackupJob.setRecordFilter(filter);
 		fullBackupJob.setSurvey(survey);
 		fullBackupJob.setIncludeData(true);
 		fullBackupJob.setIncludeRecordFiles(parameters.isIncludeRecordFiles());
@@ -479,11 +457,7 @@ public class RecordController extends BasicController implements Serializable {
 		Input input = new Input();
 		input.setLocale(locale);
 		input.setReportType(ReportType.CSV);
-		RecordFilter recordFilter = new RecordFilter(survey);
-		recordFilter.setRootEntityId(rootEntityDef.getId());
-		if (user.getRole() == UserRole.ENTRY_LIMITED) {
-			recordFilter.setOwnerId(user.getId());
-		}
+		RecordFilter recordFilter = createRecordFilter(survey, user, userGroupManager, rootEntityDef.getId(), false);
 		input.setRecordFilter(recordFilter);
 		job.setInput(input);
 		this.validationReportJob = job;
@@ -630,6 +604,25 @@ public class RecordController extends BasicController implements Serializable {
 		}
 	}
 	
+	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager, 
+			Integer rootEntityId, boolean onlyOwnedRecords) {
+		if (rootEntityId == null) {
+			rootEntityId = survey.getSchema().getFirstRootEntityDefinition().getId();
+		}
+		RecordFilter recordFilter = new RecordFilter(survey);
+		recordFilter.setRootEntityId(rootEntityId);
+		if (onlyOwnedRecords || user.getRole() == UserRole.ENTRY_LIMITED) {
+			recordFilter.setOwnerId(user.getId());
+		}
+		if (user.getRole() != UserRole.ADMIN) {
+			Map<String, String> qualifiers = userGroupManager.getQualifiers(survey.getUserGroup(), user);
+			if (! qualifiers.isEmpty()) {
+				recordFilter.setQualifiersByName(qualifiers);
+			}
+		}
+		return recordFilter;
+	}
+	
 	public static class CSVExportParametersForm {
 		
 		private Integer surveyId;
@@ -654,14 +647,10 @@ public class RecordController extends BasicController implements Serializable {
 		private HeadingSource headingSource = HeadingSource.ATTRIBUTE_NAME;
 		private String languageCode = null;
 		
-		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user) {
+		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
 			CSVDataExportParameters result = new CSVDataExportParameters();
-			RecordFilter recordFilter = new RecordFilter(survey);
-			recordFilter.setRootEntityId(rootEntityId);
+			RecordFilter recordFilter = createRecordFilter(survey, user, userGroupManager, rootEntityId, exportOnlyOwnedRecords);
 			result.setRecordFilter(recordFilter);
-			if (exportOnlyOwnedRecords) {
-				recordFilter.setOwnerId(user.getId());
-			}
 			try {
 				PropertyUtils.copyProperties(result, this);
 			} catch (Exception e) {

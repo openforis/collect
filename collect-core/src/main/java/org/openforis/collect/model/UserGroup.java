@@ -1,5 +1,6 @@
 package org.openforis.collect.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class UserGroup extends OfcUsergroup implements PersistedObject {
 	@SuppressWarnings("serial")
 	public Map<String, String> getQualifiersByName() {
 		if (StringUtils.isBlank(getQualifierName())) {
-			return null;
+			return Collections.emptyMap();
 		} else {
 			return new HashMap<String, String>(){{
 				put(getQualifierName(), getQualifierValue());

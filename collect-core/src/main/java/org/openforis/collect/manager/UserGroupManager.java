@@ -1,6 +1,7 @@
 package org.openforis.collect.manager;
 
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
@@ -38,6 +39,8 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	UserGroup findUserGroupByResource(String resourceType, String resourceId);
 	
 	List<String> findResourcesByUserGroup(int userGroupId, String resourceType);
+	
+	Map<String, String> getQualifiers(UserGroup group, User user);
 	
 	void associateResource(int userGroupId, String resourceType, String resourceId);
 	

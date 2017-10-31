@@ -150,6 +150,12 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
+	public Map<String, String> getQualifiers(UserGroup group, User user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
 	public UserGroup findUserGroupByResource(String resourceType, String resourceId) {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> result = getOne(getUsersRestfulApiUrl() + "/resource/" + resourceType + "/" + resourceId, Map.class);

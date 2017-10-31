@@ -277,6 +277,17 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		}
 		
 	}
+	
+	@Override
+	public Map<String, String> getQualifiers(UserGroup group, User user) {
+		UserInGroup userInGroup = findUserInGroupOrDescendants(group, user);
+		if (userInGroup == null) {
+			throw new IllegalArgumentException(String.format("User %s not allowed to see records for user group %s", 
+					user.getUsername(), group.getName()));
+		}
+		UserGroup associatedGroup = loadById(userInGroup.getGroupId());
+		return associatedGroup.getQualifiersByName();
+	}
 
 	@Override
 	public UserGroup findUserGroupByResource(String resourceType, String resourceId) {
