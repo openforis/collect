@@ -555,28 +555,30 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	public Step duplicateLatestActiveStepData(CollectSurvey survey, int recordId) {
-		Field[] columns = ArrayUtils.addAll(RECORD_DATA_FULL_SUMMARY_FIELDS, new Field[] {OFC_RECORD_DATA.DATA, OFC_RECORD_DATA.APP_VERSION});
-		int indexOfSequenceNumberCol = ArrayUtils.indexOf(columns, OFC_RECORD_DATA.SEQ_NUM);
-		Field[] selectColumns = ArrayUtils.clone(columns);
+		List<Field> columns = new ArrayList<Field>();
+		columns.addAll(Arrays.asList(RECORD_DATA_INSERT_FIELDS));
+		int indexOfSequenceNumberCol = columns.indexOf(OFC_RECORD_DATA.SEQ_NUM);
+		List<Field>  selectColumns = new ArrayList<Field>(columns);
 		Integer latestWorkflowSequenceNumber = getLatestWorkflowSequenceNumber(recordId);
 		Integer nextSequenceNumber = getNextWorkflowSequenceNumber(recordId);
-		selectColumns[indexOfSequenceNumberCol] = val(nextSequenceNumber);
+		Param<Integer> seqNumberVal = val(nextSequenceNumber);
+		selectColumns.set(indexOfSequenceNumberCol, seqNumberVal);
 		
 		dsl.insertInto(OFC_RECORD_DATA)
-			.columns(columns)
-			.select(dsl.select(selectColumns)
+			.columns(columns.toArray(new Field[columns.size()]))
+			.select(dsl.select(selectColumns.toArray(new Field[selectColumns.size()]))
 				.from(OFC_RECORD_DATA)
 				.where(OFC_RECORD_DATA.RECORD_ID.eq(recordId)
 					.and(OFC_RECORD_DATA.SEQ_NUM.eq(latestWorkflowSequenceNumber))
 				)
 			).execute();
 		
-		String newStepCode = (String) dsl.select(OFC_RECORD_DATA.STEP)
+		int newStepNumber = dsl.select(OFC_RECORD_DATA.STEP)
 			.from(OFC_RECORD_DATA)
 			.where(OFC_RECORD_DATA.RECORD_ID.eq(recordId)
 					.and(OFC_RECORD_DATA.SEQ_NUM.eq(nextSequenceNumber)))
-			.fetchOne(0);
-		return Step.valueOf(newStepCode);
+			.fetchOne(OFC_RECORD_DATA.STEP);
+		return Step.valueOf(newStepNumber);
 	}
 
 	private Integer getNextWorkflowSequenceNumber(int recordId) {

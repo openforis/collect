@@ -612,6 +612,12 @@ public class RecordManager {
 	}
 
 	@Transactional(readOnly=false, propagation=REQUIRED)
+	public CollectRecord demote(CollectSurvey survey, int recordId, User user) throws RecordPersistenceException {
+		CollectRecord record = load(survey, recordId);
+		return demote(survey, recordId, record.getStep(), user);
+	}
+	
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public CollectRecord demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
 		recordDao.updateStepDataState(survey, recordId, currentStep, State.REJECTED);

@@ -48,6 +48,7 @@ import org.openforis.collect.manager.RecordAccessControlManager;
 import org.openforis.collect.manager.RecordGenerator;
 import org.openforis.collect.manager.RecordGenerator.NewRecordParameters;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
@@ -65,6 +66,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.model.proxy.RecordSummaryProxy;
+import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -224,6 +226,21 @@ public class RecordController extends BasicController implements Serializable {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		SessionState sessionState = sessionManager.getSessionState();
 		recordManager.assignOwner(survey, recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
+		return new Response();
+	}
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/promote/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody Response promoteRecord(@PathVariable int surveyId, @PathVariable int recordId) throws MissingRecordKeyException, RecordPromoteException {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		CollectRecord record = recordManager.load(survey, recordId);
+		recordManager.promote(record, sessionManager.getLoggedUser(), true);
+		return new Response();
+	}
+
+	@RequestMapping(value = "survey/{surveyId}/data/records/demote/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody Response demoteRecord(@PathVariable int surveyId, @PathVariable int recordId) throws RecordPersistenceException {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		recordManager.demote(survey, recordId, sessionManager.getLoggedUser());
 		return new Response();
 	}
 
