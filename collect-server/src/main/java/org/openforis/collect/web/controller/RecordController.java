@@ -24,6 +24,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.ProxyContext;
@@ -184,6 +185,11 @@ public class RecordController extends BasicController implements Serializable {
 		
 		filter.setKeyValues(params.getKeyValues());
 		filter.setCaseSensitiveKeyValues(params.isCaseSensitiveKeyValues());
+		if (CollectionUtils.isEmpty(filter.getQualifiers())) {
+			//filter by qualifiers only if not already done by user group qualifiers
+			filter.setQualifiers(params.getQualifierValues());
+		}
+		filter.setSummaryValues(params.getSummaryValues());
 		filter.setOffset(params.getOffset());
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
 		
@@ -530,6 +536,8 @@ public class RecordController extends BasicController implements Serializable {
 		private String rootEntityName;
 		private List<RecordSummarySortField> sortFields;
 		private String[] keyValues;
+		private String[] qualifierValues;
+		private String[] summaryValues;
 		private boolean caseSensitiveKeyValues = false;
 
 		public Integer getUserId() {
@@ -562,6 +570,22 @@ public class RecordController extends BasicController implements Serializable {
 
 		public void setKeyValues(String[] keyValues) {
 			this.keyValues = keyValues;
+		}
+		
+		public String[] getQualifierValues() {
+			return qualifierValues;
+		}
+		
+		public void setQualifierValues(String[] qualifierValues) {
+			this.qualifierValues = qualifierValues;
+		}
+		
+		public String[] getSummaryValues() {
+			return summaryValues;
+		}
+		
+		public void setSummaryValues(String[] summaryValues) {
+			this.summaryValues = summaryValues;
 		}
 		
 		public boolean isCaseSensitiveKeyValues() {

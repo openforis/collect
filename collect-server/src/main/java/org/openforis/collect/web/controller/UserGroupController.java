@@ -213,6 +213,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	public static class UserInGroupForm extends SimpleObjectForm<UserInGroup> {
 		
 		private UserGroupRole role;
+		private Integer groupId;
 		private Integer userId;
 		private UserGroupJoinRequestStatus joinStatus;
 		private Date joinRequestDate;
@@ -222,11 +223,20 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		}
 		
 		public UserInGroupForm(UserInGroup userInGroup) {
+			this.groupId = userInGroup.getGroupId();
 			this.userId = userInGroup.getUserId();
 			this.role = userInGroup.getRole();
 			this.joinStatus = userInGroup.getJoinStatus();
 			this.joinRequestDate = userInGroup.getRequestDate();
 			this.memberSince = userInGroup.getMemberSince();
+		}
+		
+		public Integer getGroupId() {
+			return groupId;
+		}
+		
+		public void setGroupId(Integer groupId) {
+			this.groupId = groupId;
 		}
 		
 		public Integer getUserId() {

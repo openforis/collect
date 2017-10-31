@@ -343,9 +343,13 @@ public class RecordDao extends JooqDaoSupport {
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
 			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.isIncludeNullConditionsForKeyValues(), filter.getKeyValues());
 		}
-		
+		//qualifiers
 		if (CollectionUtils.isNotEmpty(filter.getQualifiers())) {
-			addFilterByFieldsConditions(q, RECORD_QUALIFIER_FIELDS, false, false, filter.getQualifiers());
+			addFilterByFieldsConditions(q, RECORD_QUALIFIER_FIELDS, false, true, filter.getQualifiers());
+		}
+		//summary values
+		if (CollectionUtils.isNotEmpty(filter.getSummaryValues())) {
+			addFilterByFieldsConditions(q, RECORD_SUMMARY_FIELDS, false, true, filter.getSummaryValues());
 		}
 	}
 	
@@ -435,6 +439,15 @@ public class RecordDao extends JooqDaoSupport {
 				break;
 			case COUNT3:
 				orderBy = OFC_RECORD.COUNT3;
+				break;
+			case SUMMARY1:
+				orderBy = OFC_RECORD.SUMMARY1;
+				break;
+			case SUMMARY2:
+				orderBy = OFC_RECORD.SUMMARY2;
+				break;
+			case SUMMARY3:
+				orderBy = OFC_RECORD.SUMMARY3;
 				break;
 			case DATE_CREATED:
 				orderBy = OFC_RECORD.DATE_CREATED;

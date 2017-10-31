@@ -23,6 +23,16 @@ class RecordDataTable extends Component {
 		this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
 		this.handleSortChange = this.handleSortChange.bind(this)
 		this.handleFilterChange = this.handleFilterChange.bind(this)
+
+		this.state = {
+			page: 1, 
+			recordsPerPage: 25, 
+			records: [], 
+			totalSize: 0,
+			keyValues: [],
+			summaryValues: [],
+			sortFields: []
+		}
 	}
 
 	static propTypes = {
@@ -58,7 +68,8 @@ class RecordDataTable extends Component {
 		//fetch data handled by page change handler
 	}
 
-	fetchData(page = this.state.page, recordsPerPage = this.state.recordsPerPage, survey = this.props.survey, keyValues, sortFields) {
+	fetchData(page = this.state.page, recordsPerPage = this.state.recordsPerPage, survey = this.props.survey, 
+			keyValues = this.state.keyValues, summaryValues = this.state.summaryValues, sortFields) {
 		const userId = this.props.loggedUser.id
 		const surveyId = survey.id
 		const rootEntityName = survey.schema.firstRootEntityDefinition.name
@@ -71,8 +82,10 @@ class RecordDataTable extends Component {
 		ServiceFactory.recordService.fetchRecordSummaries(surveyId, rootEntityName, userId, {
 				recordsPerPage: recordsPerPage, 
 				page: page,
-				keyValues: keyValues}, sortFields).then((res) => {
-			this.setState({page: page, recordsPerPage: recordsPerPage, records: res.records, totalSize: res.count});
+				keyValues: keyValues,
+				summaryValues: summaryValues}, sortFields).then((res) => {
+			this.setState({page: page, recordsPerPage: recordsPerPage, records: res.records, totalSize: res.count, 
+				keyValues: keyValues, summaryValues: summaryValues, sortFields: sortFields});
 		});
 	}
 
@@ -99,6 +112,15 @@ class RecordDataTable extends Component {
 			case 'key3':
 				sortField = 'KEY3'
 				break
+			case 'summary_0':
+				sortField = 'SUMMARY1'
+				break
+			case 'summary_1':
+				sortField = 'SUMMARY2'
+				break
+			case 'summary_2':
+				sortField = 'SUMMARY3'
+				break
 			case 'errors':
 				sortField = 'ERRORS'
 				break
@@ -122,20 +144,24 @@ class RecordDataTable extends Component {
 				break
 		}
 		let sortFields = [{field: sortField, descending: sortOrder === 'desc'}]
-		this.fetchData(1, this.state.recordsPerPage, this.props.survey, this.state.keyValues, sortFields)
+		this.fetchData(1, this.state.recordsPerPage, this.props.survey, this.state.keyValues, this.state.summaryValues, sortFields)
 	}
 
 	handleFilterChange(filterObj) {
 		const keyValuesFilter = []
+		const summaryValues = []
 		if (Object.keys(filterObj).length > 0) {
 			for (const fieldName in filterObj) {
-				if (fieldName.indexOf('key') === 0) {
+				if (fieldName.startsWith('key')) {
 					const keyValueIdx = parseInt(fieldName.substr(3)) - 1
 					keyValuesFilter[keyValueIdx] = filterObj[fieldName].value
+				} else if (fieldName.startsWith('summary_')) {
+					const summaryValueIdx = parseInt(fieldName.substring(fieldName.indexOf('_') + 1))
+					summaryValues[summaryValueIdx] = filterObj[fieldName].value
 				}
 			}
 		}
-		this.fetchData(1, this.state.recordsPerPage, this.props.survey, keyValuesFilter)
+		this.fetchData(1, this.state.recordsPerPage, this.props.survey, keyValuesFilter, summaryValues)
 	}
 
 	render() {
@@ -144,19 +170,24 @@ class RecordDataTable extends Component {
 			return <div>Please select a survey first</div>
 		}
 		const survey = this.props.survey
+		const rootEntityDef = survey.schema.firstRootEntityDefinition
+		const keyAttributes = rootEntityDef.keyAttributeDefinitions
+		const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
 		const loggedUser = this.props.loggedUser
-		const userGroup = this.props.userGroups.find(ug => ug.id === survey.userGroupId)
-
+		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === survey.userGroupId)
+		const userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
+		const mostSpecificGroup = this.props.userGroups.find(ug => ug.id === userInGroup.groupId)
+		
 		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
 
 		function rootEntityKeyFormatter(cell, row) {
-			var idx = this.name.substring(3) - 1;
-			return row.rootEntityKeys[idx];
+			var idx = this.name.substring(3) - 1
+			return row.rootEntityKeys[idx]
 		}
 
 		function shownInSummaryListFormatter(cell, row) {
-			var idx = this.name.substring(5) - 1;
-			return row.summaryValues[idx];
+			var idx = this.name.substring(this.name.indexOf('_') + 1)
+			return row.summaryValues[idx]
 		}
 
 		function usernameFormatter(cell, row) {
@@ -166,16 +197,20 @@ class RecordDataTable extends Component {
 		var columns = [];
 		columns.push(<TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>);
 
-		const keyAttributes = survey.schema.firstRootEntityDefinition.keyAttributeDefinitions
 		const keyAttributeColumns = keyAttributes.map((keyAttr, i) => 
 			<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter} width="80"
-				editable={false} dataSort filter={ { type: 'TextFilter' } }>{keyAttr.label}</TableHeaderColumn>)
+				editable={false} dataSort filter={{type: 'TextFilter'}}>{keyAttr.label}</TableHeaderColumn>)
 		columns = columns.concat(keyAttributeColumns)
 
-		const attributeDefsShownInSummaryList = survey.schema.firstRootEntityDefinition.attributeDefinitionsShownInRecordSummaryList
-		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => 
-			<TableHeaderColumn key={'shown'+(i+1)} dataField={'shown'+(i+1)} dataFormat={shownInSummaryListFormatter} width="80"
-				editable={false}>{attr.label}</TableHeaderColumn>)
+		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => {
+			const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
+			const roleInGroup = userInGroup.role
+			const prefix = 'summary_'
+			const canFilterOrSort = ! isQualifier || roleInGroup === 'ADMINISTRATOR' || roleInGroup === 'OWNER'
+			return <TableHeaderColumn key={prefix+i} dataSort={canFilterOrSort} dataField={prefix+i} 
+				dataFormat={shownInSummaryListFormatter} width="80"
+				filter={canFilterOrSort ? {type: 'TextFilter'} : null} editable={false}>{attr.label}</TableHeaderColumn>
+		})
 		columns = columns.concat(attributeDefsShownInSummaryListColumns)
 
 		columns.push(
@@ -192,7 +227,7 @@ class RecordDataTable extends Component {
 			<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
 				dataAlign="center" width="80" editable={false} dataSort>Cleansed</TableHeaderColumn>,
 			<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter}
-				editable={loggedUser.canChangeRecordOwner(userGroup)}
+				editable={loggedUser.canChangeRecordOwner(surveyUserGroup)}
 				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
 				dataAlign="center" width="150"  dataSort>Owner</TableHeaderColumn>
 		);

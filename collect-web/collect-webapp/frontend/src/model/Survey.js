@@ -190,6 +190,12 @@ export class EntityDefinition extends NodeDefinition {
         })
     }
 
+    get qualifierAttributeDefinitions() {
+        return this.findDefinitions(function(n) {
+            return n instanceof AttributeDefinition && n.qualifier
+        })
+    }
+
     visit(visitor, onlyInsideSingleEntities) {
         const queue = [];
         

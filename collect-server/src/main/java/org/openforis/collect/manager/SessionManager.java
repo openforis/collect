@@ -44,8 +44,8 @@ public class SessionManager {
 		boolean developmentMode = CollectConfiguration.isDevelopmentMode();
 		SessionState sessionState = new SessionState(sessionId);
 		if (developmentMode) {
-//			sessionState.setUser(userManager.loadAdminUser());
-			sessionState.setUser(userManager.loadByUserName("arg_entry"));
+			sessionState.setUser(userManager.loadAdminUser());
+//			sessionState.setUser(userManager.loadByUserName("arg_entry"));
 		}
 		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
 	}

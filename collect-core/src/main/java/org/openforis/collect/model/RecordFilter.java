@@ -2,6 +2,7 @@ package org.openforis.collect.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -154,15 +155,15 @@ public class RecordFilter {
 	}
 	
 	public void setKeyValues(String[] keyValues) {
-		if ( keyValues != null && keyValues.length > 0 ) {
-			setKeyValues(Arrays.asList(keyValues));
-		} else {
-			this.keyValues = null;
-		}
+		this.keyValues = toStringList(keyValues);
 	}
 	
 	public List<String> getQualifiers() {
 		return qualifiers;
+	}
+	
+	public void setQualifiers(String[] qualifierValues) {
+		this.qualifiers = toStringList(qualifierValues);
 	}
 	
 	public void setQualifiers(List<String> qualifiers) {
@@ -171,6 +172,10 @@ public class RecordFilter {
 	
 	public List<String> getSummaryValues() {
 		return summaryValues;
+	}
+	
+	public void setSummaryValues(String[] summaryValues) {
+		this.summaryValues = toStringList(summaryValues);
 	}
 	
 	public void setSummaryValues(List<String> summaryValues) {
@@ -193,4 +198,11 @@ public class RecordFilter {
 		this.includeNullConditionsForKeyValues = includeNullConditionsForKeyValues;
 	}
 	
+	private static List<String> toStringList(String[] values) {
+		if (values == null || values.length == 0) {
+			return Collections.emptyList();
+		} else {
+			return Arrays.asList(values);
+		}
+	}
 }

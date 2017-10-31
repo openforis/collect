@@ -72,11 +72,13 @@ public class SurveyViewGenerator {
 					CodeAttributeDefinition attrDef = (CodeAttributeDefinition) def;
 					int codeListId = attrDef.getList() == null ? -1: attrDef.getList().getId();
 					view = new CodeAttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(), 
-							attrDef.isKey(), attrDef.isMultiple(), survey.getAnnotations().isShowInSummary(attrDef), codeListId);
+							attrDef.isKey(), attrDef.isMultiple(), survey.getAnnotations().isShowInSummary(attrDef), 
+							survey.getAnnotations().isQualifier(attrDef), codeListId);
 				} else {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
 					view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(),
-							attrDef.isKey(), attrDef.isMultiple(), survey.getAnnotations().isShowInSummary(attrDef));
+							attrDef.isKey(), attrDef.isMultiple(), survey.getAnnotations().isShowInSummary(attrDef), 
+							survey.getAnnotations().isQualifier(attrDef));
 				}
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {

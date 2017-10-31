@@ -10,13 +10,15 @@ public class AttributeDefView extends NodeDefView {
 	private AttributeType attributeType;
 	private List<String> fieldNames;
 	private boolean showInRecordSummaryList;
+	private boolean qualifier;
 	
 	public AttributeDefView(int id, String name, String label, AttributeType type, 
-			List<String> fieldNames, boolean key, boolean multiple, boolean showInRecordSummaryList) {
+			List<String> fieldNames, boolean key, boolean multiple, boolean showInRecordSummaryList, boolean qualifier) {
 		super(id, name, label, NodeType.ATTRIBUTE, key, multiple);
 		this.attributeType = type;
 		this.fieldNames = fieldNames;
 		this.showInRecordSummaryList = showInRecordSummaryList;
+		this.qualifier = qualifier;
 	}
 	
 	public AttributeType getAttributeType() {
@@ -29,5 +31,9 @@ public class AttributeDefView extends NodeDefView {
 	
 	public boolean isShowInRecordSummaryList() {
 		return showInRecordSummaryList;
+	}
+	
+	public boolean isQualifier() {
+		return qualifier;
 	}
 }

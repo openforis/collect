@@ -10,6 +10,7 @@ export default class RecordService extends AbstractService {
             maxNumberOfRows: filterOptions.recordsPerPage,
             offset: (filterOptions.page - 1) * filterOptions.recordsPerPage,
             keyValues: filterOptions.keyValues,
+            summaryValues: filterOptions.summaryValues,
             sortFields: sortFields
         });
     }

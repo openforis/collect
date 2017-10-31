@@ -13,7 +13,7 @@ export default class User extends Serializable {
     }
 
     determineRoleInGroup(group) {
-        const userInGroup = this._findUserInGroupOrDescendants(group)
+        const userInGroup = this.findUserInGroupOrDescendants(group)
         return userInGroup == null ? null : userInGroup.role
     }
 
@@ -71,7 +71,7 @@ export default class User extends Serializable {
         }
     }
     
-    _findUserInGroupOrDescendants(group) {
+    findUserInGroupOrDescendants(group) {
         const stack = []
         stack.push(group)
         while(stack.length > 0) {
