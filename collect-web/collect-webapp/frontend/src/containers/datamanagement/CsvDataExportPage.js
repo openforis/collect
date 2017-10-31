@@ -116,68 +116,68 @@ class CsvDataExportPage extends Component {
             
             return (
                 <Form>
-                     <FormGroup tag="fieldset">
-                     <legend>Parameters</legend>
-                     <FormGroup row>
-                         <Label for="stepSelect">Step:</Label>
-                         <Col sm={10}>
-                             <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
-                                 onChange={e => this.setState({step: e.target.value})}>{stepsOptions}</Input>
-                         </Col>
-                     </FormGroup>
-                     <FormGroup row>
-                         <Label>Entity:</Label>
-                         <Col sm={{size: 10 }}>
-                             <SchemaTreeView survey={this.props.survey} selectAll={this.state.allEntitiesSelected}
-                                handleNodeSelect={this.handleEntitySelect} />
-                         </Col>
-                     </FormGroup>
-                     <FormGroup row>
-                         <Col sm={{offset: 1, size: 10 }}>
-                             <FormGroup check>
-                                 <Label check>
-                                     <Input type="checkbox"
-                                         onChange={event => this.setState({allEntitiesSelected: event.target.checked})} />{' '}
-                                     Export all entities
-                                 </Label>
-                             </FormGroup>
-                         </Col>
-                     </FormGroup>
-                     <FormGroup row>
-                         <div>
-                             <Button onClick={e => this.setState({csvExportAdditionalOptionsOpen: ! this.state.csvExportAdditionalOptionsOpen})}>Additional Options</Button>
-                             <Collapse isOpen={this.state.csvExportAdditionalOptionsOpen}>
-                                 <Card>
-                                     <CardBlock>
-                                         <FormGroup row>
-                                             <Col sm={{size: 12}}>
-                                                 <Label check>
-                                                     <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
-                                                         checked={this.state.exportOnlyOwnedRecords} />{' '}
-                                                     Export only owned records
-                                                 </Label>
-                                             </Col>
-                                         </FormGroup>
-                                         <FormGroup row>
-                                             <Col sm={4}>
-                                                 <Label for="headingsSourceSelect">Source for file headings:</Label>
-                                             </Col>
-                                             <Col sm={8}>
-                                                 <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
-                                                     onChange={e => this.setState({headingSource: e.target.value})}>
-                                                     <option value="ATTRIBUTE_NAME">Attribute name</option>
-                                                     <option value="INSTANCE_LABEL">Attribute label</option>
-                                                     <option value="REPORTING_LABEL">Reporting label (Saiku)</option>
-                                                 </Input>
-                                             </Col>
-                                         </FormGroup>
-                                         {additionalOptionsFormGroups}
-                                     </CardBlock>
-                                 </Card>
-                             </Collapse>
-                         </div>
-                     </FormGroup>
-                 </FormGroup>
+                    <FormGroup tag="fieldset">
+                        <legend>Parameters</legend>
+                        <FormGroup row>
+                            <Label for="stepSelect">Step:</Label>
+                            <Col sm={10}>
+                                <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
+                                    onChange={e => this.setState({step: e.target.value})}>{stepsOptions}</Input>
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Label>Entity:</Label>
+                            <Col sm={{size: 10 }}>
+                                <SchemaTreeView survey={this.props.survey} selectAll={this.state.allEntitiesSelected}
+                                    handleNodeSelect={this.handleEntitySelect} />
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Col sm={{offset: 1, size: 10 }}>
+                                <FormGroup check>
+                                    <Label check>
+                                        <Input type="checkbox"
+                                            onChange={event => this.setState({allEntitiesSelected: event.target.checked})} />{' '}
+                                        Export all entities
+                                    </Label>
+                                </FormGroup>
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <div>
+                                <Button onClick={e => this.setState({csvExportAdditionalOptionsOpen: ! this.state.csvExportAdditionalOptionsOpen})}>Additional Options</Button>
+                                <Collapse isOpen={this.state.csvExportAdditionalOptionsOpen}>
+                                    <Card>
+                                        <CardBlock>
+                                            <FormGroup row>
+                                                <Col sm={{size: 12}}>
+                                                    <Label check>
+                                                        <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
+                                                            checked={this.state.exportOnlyOwnedRecords} />{' '}
+                                                        Export only owned records
+                                                    </Label>
+                                                </Col>
+                                            </FormGroup>
+                                            <FormGroup row>
+                                                <Col sm={4}>
+                                                    <Label for="headingsSourceSelect">Source for file headings:</Label>
+                                                </Col>
+                                                <Col sm={8}>
+                                                    <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
+                                                        onChange={e => this.setState({headingSource: e.target.value})}>
+                                                        <option value="ATTRIBUTE_NAME">Attribute name</option>
+                                                        <option value="INSTANCE_LABEL">Attribute label</option>
+                                                        <option value="REPORTING_LABEL">Reporting label (Saiku)</option>
+                                                    </Input>
+                                                </Col>
+                                            </FormGroup>
+                                            {additionalOptionsFormGroups}
+                                        </CardBlock>
+                                    </Card>
+                                </Collapse>
+                            </div>
+                        </FormGroup>
+                    </FormGroup>
                     <Row>
                         <Col sm={{ size: 'auto', offset: 5 }}>
                             <Button onClick={this.handleExportButtonClick} className="btn btn-success">Export</Button>

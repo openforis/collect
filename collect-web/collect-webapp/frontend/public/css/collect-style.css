@@ -103,6 +103,11 @@ fieldset legend {
     flex: 0 0 400px;
 }
 
+.main-content-wrapper .row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
 @media (min-width: 576px) {
 .row {
     margin-right: 0px;
@@ -152,12 +157,10 @@ span.checked.large {
   background-image: url('../img/generic/tick_mark_64x64.png');
   background-size: 64px;
   height: 64px;
-  width: 64px;
 }
 
 span.checked.small {
   height: 16px;
-  width: 16px;
   background-size: 16px;
 }
 

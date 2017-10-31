@@ -36,7 +36,8 @@ class CsvDataImportPage extends Component {
             fileToBeImportedPreview: null,
             fileToBeImported: null,
             errorModalOpen: false,
-            selectedEntityDefinition: null
+            selectedEntityDefinition: null,
+            additionalOptionsOpen: false
         }
     }
 
@@ -50,10 +51,10 @@ class CsvDataImportPage extends Component {
     }
 
     handleImportButtonClick() {
-        const entityDef = this.state.selectedEntityDefinition
-        if (this.state.importType == 'update' && entityDef == null) {
+        if (!this.validateForm()) {
             return
         }
+        const entityDef = this.state.selectedEntityDefinition
         const entityDefId = entityDef == null ? null : entityDef.id
         const survey = this.props.survey
         
@@ -76,6 +77,18 @@ class CsvDataImportPage extends Component {
                 handleJobFailed: this.handleDataImoprtJobFailed
             }))
         })
+    }
+
+    validateForm() {
+        if (! this.state.fileSelected) {
+            alert('Please select a file to import')
+            return false
+        }
+        if (this.state.importType === 'update' && this.state.selectedEntityDefinition === null) {
+            alert('Please select an entity')
+            return false
+        }
+        return true
     }
 
     handleJobModalOkButtonClick() {
@@ -162,18 +175,6 @@ class CsvDataImportPage extends Component {
                             {stepsChecks}
                         </Col>
                     </FormGroup>
-                    <FormGroup row check>
-                        <Label check>
-                            <Input type="checkbox" checked={this.state.validateRecords}
-                                onChange={e => this.setState({validateRecords: e.target.checked})} /> Validate records after import
-                        </Label>
-                    </FormGroup>
-                    <FormGroup row check>
-                        <Label check>
-                            <Input type="checkbox" checked={this.state.deleteEntitiesBeforeImport}
-                                onChange={e => this.setState({deleteEntitiesBeforeImport: e.target.checked})} /> Delete entities before import
-                        </Label>
-                    </FormGroup>
                     {entitySelectionEnabled &&
                         <FormGroup row>
                             <Label className={entityNotSelected ? 'invalid': ''}>Entity:</Label>
@@ -197,6 +198,29 @@ class CsvDataImportPage extends Component {
                             }
                             </Dropzone>
                         </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                        <div>
+                            <Button onClick={e => this.setState({additionalOptionsOpen: ! this.state.additionalOptionsOpen})}>Additional Options</Button>
+                            <Collapse isOpen={this.state.additionalOptionsOpen}>
+                                <Card>
+                                    <CardBlock>
+                                        <FormGroup row check>
+                                            <Label check>
+                                                <Input type="checkbox" checked={this.state.validateRecords}
+                                                    onChange={e => this.setState({validateRecords: e.target.checked})} /> Validate records after import
+                                            </Label>
+                                        </FormGroup>
+                                        <FormGroup row check>
+                                            <Label check>
+                                                <Input type="checkbox" checked={this.state.deleteEntitiesBeforeImport}
+                                                    onChange={e => this.setState({deleteEntitiesBeforeImport: e.target.checked})} /> Delete entities before import
+                                            </Label>
+                                        </FormGroup>
+                                    </CardBlock>
+                                </Card>
+                            </Collapse>
+                        </div>
                     </FormGroup>
                 </FormGroup>
                 <FormGroup row>
