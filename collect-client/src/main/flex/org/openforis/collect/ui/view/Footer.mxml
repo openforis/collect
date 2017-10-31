@@ -17,6 +17,7 @@
 			import org.openforis.collect.ui.component.CustomImageLoader;
 			
 			private var _formVersion:String = null;
+			private var _userButtonVisible:Boolean = true;
 			private var footerImageLoader:CustomImageLoader;
 			
 			[Bindable]
@@ -26,6 +27,15 @@
 			
 			public function set formVersion(formVersion:String):void {
 				_formVersion = formVersion;
+			}
+			
+			[Bindable]
+			public function get userButtonVisible():Boolean {
+				return _userButtonVisible;
+			}
+			
+			public function set userButtonVisible(userButtonVisible:Boolean):void {
+				_userButtonVisible = userButtonVisible;
 			}
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
@@ -56,7 +66,7 @@
 			<component:ApplicationVersionContainer />
 		</s:VGroup>	
 		<s:Spacer width="100%" />
-		<component:UserPopUpButton />
+		<component:UserPopUpButton visible="{}" />
 	</s:HGroup>
 	
 </s:BorderContainer>
