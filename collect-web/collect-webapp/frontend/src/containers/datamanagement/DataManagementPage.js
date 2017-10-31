@@ -70,7 +70,11 @@ class DataManagementPage extends Component {
 	}
 
 	handleRowDoubleClick(record) {
-		this.navigateToItemEditView(record.id)
+		const loggedUser = this.props.loggedUser
+		const userGroup = this.props.userGroups.find(ug => ug.id === this.props.survey.userGroup.id)
+		if (loggedUser.canEditRecords(userGroup)) {
+			this.navigateToItemEditView(record.id)
+		}
 	}
 
 	handleRowSelect(row, isSelected, e) {
@@ -143,14 +147,14 @@ class DataManagementPage extends Component {
 					<Col sm={{size: 4}}>
 						{loggedUser.canCreateRecords(surveyUserGroup) && 
 							<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
-						}
-						{loggedUser.canEditRecords(surveyUserGroup) &&
-							<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "success" : "disabled"}
+						}{' '}
+						{loggedUser.canEditRecords(surveyUserGroup) && this.state.selectedItem &&
+							<Button color={this.state.selectedItem ? "success" : "disabled"}
 								onClick={this.handleEditButtonClick}>Edit</Button>
-						}
-						{loggedUser.canDeleteRecords(surveyUserGroup) &&
-							<Button disabled={!this.state.selectedItem} color={this.state.selectedItem ? "danger" : "disabled"}
-								onClick={this.handleDeleteButtonClick}>Delete</Button>
+						}{' '}
+						{loggedUser.canDeleteRecords(surveyUserGroup) && this.state.selectedItem &&
+							<Button color={this.state.selectedItem ? "danger" : "disabled"}
+								onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/></Button>
 						}
 					</Col>
 					<Col sm={{size: 2}}>
@@ -183,7 +187,6 @@ class DataManagementPage extends Component {
 					<Col>
 						<RecordDataTable onRef={ref => this.recordDataTable = ref}
 							selectedItemIds={this.state.selectedItemIds}
-							handlRowDoubleClick={this.handleRowDoubleClick}
 							handleRowSelect={this.handleRowSelect}
 							handleRowDoubleClick={this.handleRowDoubleClick} />
 					</Col>

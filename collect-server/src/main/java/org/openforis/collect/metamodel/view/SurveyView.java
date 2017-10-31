@@ -21,6 +21,7 @@ public class SurveyView {
 	private String defaultLanguage;
 	private boolean temporary;
 	private SurveyTarget target;
+	private int userGroupId;
 	private UserGroup userGroup;
 	private SchemaView schema;
 	private List<CodeListView> codeLists = new ArrayList<CodeListView>();
@@ -41,6 +42,7 @@ public class SurveyView {
 		this.description = survey.getDescription();
 		this.defaultLanguage = survey.getDefaultLanguage();
 		this.languages = survey.getLanguages();
+		this.userGroupId = survey.getUserGroupId();
 		this.userGroup = survey.getUserGroup();
 		this.schema = new SchemaView();
 		this.uiConfiguration = survey.getUIConfiguration();
@@ -110,6 +112,14 @@ public class SurveyView {
 	
 	public void setTarget(SurveyTarget target) {
 		this.target = target;
+	}
+	
+	public int getUserGroupId() {
+		return userGroupId;
+	}
+	
+	public void setUserGroupId(int userGroupId) {
+		this.userGroupId = userGroupId;
 	}
 	
 	public UserGroup getUserGroup() {

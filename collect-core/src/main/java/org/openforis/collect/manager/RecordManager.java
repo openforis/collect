@@ -504,6 +504,8 @@ public class RecordManager {
 		record.setCreationDate(now);
 		record.setModifiedDate(now);
 		record.setCreatedBy(user);
+		record.setModifiedBy(user);
+		record.setOwner(user);
 		record.setStep(step);
 		return record;
 	}

@@ -12,14 +12,13 @@ export default class User extends Serializable {
         this.fillFromJSON(jsonData)
     }
 
-    determineRoleInGroup(userGroup) {
-        const userInGroup = this._findUserInGroupOrDescendants(userGroup)
-        return userInGroup == null ? userInGroup.role : null
+    determineRoleInGroup(group) {
+        const userInGroup = this._findUserInGroupOrDescendants(group)
+        return userInGroup == null ? null : userInGroup.role
     }
 
-    canCreateRecords(userGroup) {
-        const userInGroup = this._findUserInGroupOrDescendants(userGroup)
-        const role = userInGroup ? userInGroup.role : null
+    canCreateRecords(group) {
+        const role = this.determineRoleInGroup(group)
         if (role === null) {
             return false
         }
@@ -34,17 +33,16 @@ export default class User extends Serializable {
         }
     }
 
-    canEditRecords(userGroup) {
-        return this.canCreateRecords(userGroup)
+    canEditRecords(group) {
+        return this.canCreateRecords(group)
     }
 
-    canDeleteRecords(userGroup) {
-        return this.canCreateRecords(userGroup)
+    canDeleteRecords(group) {
+        return this.canCreateRecords(group)
     }
 
-    canImportRecords(userGroup) {
-        const userInGroup = this._findUserInGroupOrDescendants(userGroup)
-        const role = userInGroup ? userInGroup.role : null
+    canImportRecords(group) {
+        const role = this.determineRoleInGroup(group)
         if (role === null) {
             return false
         }
@@ -58,16 +56,31 @@ export default class User extends Serializable {
         }
     }
 
-    _findUserInGroupOrDescendants(userGroup) {
+    canChangeRecordOwner(group) {
+        const role = this.determineRoleInGroup(group)
+        if (role === null) {
+            return false
+        }
+        switch(role) {
+            case 'OWNER':
+            case 'ADMINISTRATOR':
+            case 'SUPERVISOR':
+                return true
+            default:
+                return false
+        }
+    }
+    
+    _findUserInGroupOrDescendants(group) {
         const stack = []
-        stack.push(userGroup)
+        stack.push(group)
         while(stack.length > 0) {
-            let currentUserGroup = stack.pop()
-            let userInGroup = currentUserGroup.users.find(uig => uig.userId === this.id)
+            let currentGroup = stack.pop()
+            let userInGroup = currentGroup.users.find(uig => uig.userId === this.id)
             if (userInGroup) {
                 return userInGroup
             } else {
-                userGroup.children.forEach(g => stack.push(g))
+                currentGroup.children.forEach(g => stack.push(g))
             }
         }
         return null

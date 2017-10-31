@@ -46,6 +46,9 @@ class RecordDataTable extends Component {
 	}
 
 	handlePageChange(page, recordsPerPage) {
+		if (page === 0) {
+			page = 1
+		}
 		if (this.state.page != page || this.state.recordsPerPage != recordsPerPage) {
 			this.fetchData(page, recordsPerPage)
 		}
@@ -140,7 +143,9 @@ class RecordDataTable extends Component {
 		if (noSurveySelected) {
 			return <div>Please select a survey first</div>
 		}
-		var survey = this.props.survey;
+		const survey = this.props.survey
+		const loggedUser = this.props.loggedUser
+		const userGroup = this.props.userGroups.find(ug => ug.id === survey.userGroupId)
 
 		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
 
@@ -187,6 +192,7 @@ class RecordDataTable extends Component {
 			<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
 				dataAlign="center" width="80" editable={false} dataSort>Cleansed</TableHeaderColumn>,
 			<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter}
+				editable={loggedUser.canChangeRecordOwner(userGroup)}
 				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
 				dataAlign="center" width="150"  dataSort>Owner</TableHeaderColumn>
 		);
@@ -241,6 +247,7 @@ const mapStateToProps = state => {
 	return {
 		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
 		users: state.users ? state.users.users : null,
+		userGroups: state.userGroups ? state.userGroups.userGroups : null,
 		loggedUser: state.session ? state.session.loggedUser : null,
 		records: state.records ? state.records.list : null
 	}
