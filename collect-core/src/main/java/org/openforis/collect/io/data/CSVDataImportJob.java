@@ -654,10 +654,14 @@ public class CSVDataImportJob extends Job {
 		}
 		
 		private <V extends Value> void setValueInAttribute(Attribute<?, V> keyAttr, String value, long row, String colName) {
-			V val = keyAttr.getDefinition().createValue(value);
-			NodeChangeSet changes = recordUpdater.updateAttribute(keyAttr, val);
-			if (nodeChangeBatchProcessor != null) {
-				nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
+			try {
+				V val = keyAttr.getDefinition().createValue(value);
+				NodeChangeSet changes = recordUpdater.updateAttribute(keyAttr, val);
+				if (nodeChangeBatchProcessor != null) {
+					nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
+				}
+			} catch ( Exception e) {
+				dataImportStatus.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName));
 			}
 		}
 		
