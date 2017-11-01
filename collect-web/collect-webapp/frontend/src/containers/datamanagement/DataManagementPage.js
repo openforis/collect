@@ -23,6 +23,7 @@ class DataManagementPage extends Component {
 		}
 
 		this.handleRowSelect = this.handleRowSelect.bind(this)
+		this.handleAllRowsSelect = this.handleAllRowsSelect.bind(this)
 		this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
 		this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
 		this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
@@ -48,12 +49,16 @@ class DataManagementPage extends Component {
 	}
 
 	handleDeleteButtonClick() {
-		if (window.confirm('Delete?'))  {
+		const confirmMessage = this.state.selectedItemIds.length == 1 ? 
+			'Delete the selected record?' 
+			: 'Delete the selected ' + this.state.selectedItemIds.length + ' records?'
+		
+		if (window.confirm(confirmMessage))  {
 			const $this = this
 			//Modals.confirm('test', 'test', function() {
-				this.recordService.delete(this.state.selectedItem).then(response => {
+				this.recordService.delete(this.props.survey.id, this.props.loggedUser.id, this.state.selectedItemIds).then(response => {
 					$this.recordDataTable.fetchData()
-					$this.props.dispatch(Actions.recordDeleted($this.state.selectedItem));
+					$this.props.dispatch(Actions.recordsDeleted($this.state.selectedItems));
 					$this.setState({
 						selectedItem: null, 
 						selectedItems: [],
@@ -79,6 +84,11 @@ class DataManagementPage extends Component {
 
 	handleRowSelect(row, isSelected, e) {
 		const newSelectedItems = Arrays.addOrRemoveItem(this.state.selectedItems, row, !isSelected)
+		this.handleItemsSelection(newSelectedItems)
+	}
+
+	handleAllRowsSelect(isSelected, rows) {
+		const newSelectedItems = Arrays.addOrRemoveItems(this.state.selectedItems, rows, !isSelected)
 		this.handleItemsSelection(newSelectedItems)
 	}
 
@@ -149,12 +159,10 @@ class DataManagementPage extends Component {
 							<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
 						}{' '}
 						{loggedUser.canEditRecords(surveyUserGroup) && this.state.selectedItem &&
-							<Button color={this.state.selectedItem ? "success" : "disabled"}
-								onClick={this.handleEditButtonClick}>Edit</Button>
+							<Button color="success" onClick={this.handleEditButtonClick}>Edit</Button>
 						}{' '}
-						{loggedUser.canDeleteRecords(surveyUserGroup) && this.state.selectedItem &&
-							<Button color={this.state.selectedItem ? "danger" : "disabled"}
-								onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/></Button>
+						{loggedUser.canDeleteRecords(surveyUserGroup) && this.state.selectedItemIds.length > 0 &&
+							<Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/></Button>
 						}
 					</Col>
 					<Col sm={{size: 2}}>
@@ -189,6 +197,7 @@ class DataManagementPage extends Component {
 							className="full-height"
 							selectedItemIds={this.state.selectedItemIds}
 							handleRowSelect={this.handleRowSelect}
+							handleAllRowsSelect={this.handleAllRowsSelect}
 							handleRowDoubleClick={this.handleRowDoubleClick} />
 					</Col>
 				</Row>

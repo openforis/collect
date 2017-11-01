@@ -13,8 +13,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -257,10 +259,10 @@ public class RecordController extends BasicController implements Serializable {
 		return toProxy(record);
 	}
 	
-	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=DELETE, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/records", method=DELETE, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	Response deleteRecord(@PathVariable int surveyId, @PathVariable int recordId) throws RecordPersistenceException {
-		recordManager.delete(recordId);
+	Response deleteRecord(@PathVariable int surveyId, @Valid RecordDeleteParameters params) throws RecordPersistenceException {
+		recordManager.deleteByIds(new HashSet<Integer>(Arrays.asList(params.getRecordIds())));
 		return new Response();
 	}
 	
@@ -611,6 +613,28 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setCaseSensitiveKeyValues(boolean caseSensitiveKeyValues) {
 			this.caseSensitiveKeyValues = caseSensitiveKeyValues;
+		}
+	}
+	
+	public static class RecordDeleteParameters {
+		
+		private int userId;
+		private Integer[] recordIds;
+		
+		public int getUserId() {
+			return userId;
+		}
+		
+		public void setUserId(int userId) {
+			this.userId = userId;
+		}
+		
+		public Integer[] getRecordIds() {
+			return recordIds;
+		}
+		
+		public void setRecordIds(Integer[] recordIds) {
+			this.recordIds = recordIds;
 		}
 	}
 	

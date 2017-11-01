@@ -253,15 +253,15 @@ class RecordDataTable extends Component {
 					onFilterChange: this.handleFilterChange,
 					page: this.state.page,
 					sizePerPage: this.state.recordsPerPage,
-					sizePerPageList: [25, 50, 100]
+					sizePerPageList: [10, 25, 50, 100]
 				}}
 				fetchInfo={{ dataTotalSize: this.state.totalSize }}
 				remote pagination striped hover condensed
 				height="100%"
-				containerStyle={{position: 'absolute', top: '20px', bottom: '150px'}}
 				selectRow={{
 					mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
 					onSelect: this.props.handleRowSelect,
+					onSelectAll: this.props.handleAllRowsSelect,
 					selected: this.props.selectedItemIds
 				}}
 				cellEdit={{ mode: 'click', blurToSave: true }}

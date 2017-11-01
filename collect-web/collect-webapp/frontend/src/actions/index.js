@@ -40,6 +40,7 @@ export const RECEIVE_JOB = 'RECEIVE_JOB'
 export const JOB_CANCELED = 'JOB_CANCELED'
 
 export const RECORD_DELETED = 'RECORD_DELETED'
+export const RECORDS_DELETED = 'RECORDS_DELETED'
 
 //APPLICATION INFO
 function requestApplicationInfo() {
@@ -276,9 +277,17 @@ export function invalidateUserGroups(userGroups) {
 }
 
 //RECORDS
-export function recordDeleted() {
+export function recordDeleted(record) {
 	return {
-		type: RECORD_DELETED
+		type: RECORD_DELETED,
+		record: record
+	}
+}
+
+export function recordsDeleted(records) {
+	return {
+		type: RECORDS_DELETED,
+		records: records
 	}
 }
 

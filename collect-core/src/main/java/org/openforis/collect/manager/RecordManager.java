@@ -631,7 +631,7 @@ public class RecordManager {
 		record.setModifiedBy( user );
 		record.setModifiedDate( new Date() );
 		record.setStep( prevStep );
-		record.setOwner(null);
+		record.setOwner( user );
 		record.setState( State.REJECTED );
 		validate(record);
 		recordDao.updateSummary(record);

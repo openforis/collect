@@ -71,8 +71,11 @@ export default class RecordService extends AbstractService {
         })
     }
 
-    delete(record) {
-        return super.delete('survey/' + record.surveyId + '/data/records/' + record.id)
+    delete(surveyId, userId, recordIds) {
+        return super.delete('survey/' + surveyId + '/data/records', {
+            userId: userId,
+            recordIds: recordIds
+        })
     }
 
     generateBackupDataImportSummary(survey, rootEntityName, file) {

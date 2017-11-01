@@ -25,8 +25,9 @@ export default class AbstractService {
             })
     }
 
-    delete(url) {
-        return fetch(this.BASE_URL + url, {
+    delete(url, data) {
+        let queryData = this._toQueryData(data);
+        return fetch(this.BASE_URL + url + (queryData === null ? '': '?' + queryData), {
             credentials: 'include',
             method: 'DELETE'
         })

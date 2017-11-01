@@ -2,6 +2,14 @@ import Objects from './Objects'
 
 export default class Arrays {
 
+    static contains(array, item) {
+        return array.indexOf(item) >= 0
+    }
+
+    static clone(array) {
+        return array.slice(0)
+    }
+
     /**
      * Adds an element without side effect on the specified array
      * 
@@ -12,7 +20,9 @@ export default class Arrays {
      * @returns {Array}
      */
     static addItem(array, item, onlyIfNotExists=false) {
-        if (! onlyIfNotExists || array.indexOf(item) < 0) {
+        if (onlyIfNotExists && Arrays.contains(array, item)) {
+            return Arrays.clone(array)
+        } else {
             return array.concat([item])
         }
     }
@@ -27,7 +37,9 @@ export default class Arrays {
      */
     static removeItem(array, item) {
         const idx = array.indexOf(item)
-        if (idx >= 0) {
+        if (idx < 0) {
+            return Arrays.clone(array)
+        } else {
             return array.slice(0, idx).concat(array.slice(idx + 1))
         }
     }
@@ -46,6 +58,12 @@ export default class Arrays {
         } else {
             return Arrays.addItem(array, item)
         }
+    }
+
+    static addOrRemoveItems(array, items, remove=false) {
+        let result = Arrays.clone(array)
+        items.forEach(item => result = Arrays.addOrRemoveItem(result, item, remove))
+        return result
     }
 
     static sort(array, propName) {
