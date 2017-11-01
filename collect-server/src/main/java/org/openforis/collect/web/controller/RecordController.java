@@ -189,6 +189,7 @@ public class RecordController extends BasicController implements Serializable {
 		
 		filter.setKeyValues(params.getKeyValues());
 		filter.setCaseSensitiveKeyValues(params.isCaseSensitiveKeyValues());
+		
 		if (CollectionUtils.isEmpty(filter.getQualifiers())) {
 			//filter by qualifiers only if not already done by user group qualifiers
 			filter.setQualifiers(params.getQualifierValues());
@@ -555,9 +556,9 @@ public class RecordController extends BasicController implements Serializable {
 		private String rootEntityName;
 		private List<RecordSummarySortField> sortFields;
 		private String[] keyValues;
+		private boolean caseSensitiveKeyValues = false;
 		private String[] qualifierValues;
 		private String[] summaryValues;
-		private boolean caseSensitiveKeyValues = false;
 
 		public Integer getUserId() {
 			return userId;

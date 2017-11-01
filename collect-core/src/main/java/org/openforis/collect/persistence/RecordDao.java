@@ -341,7 +341,8 @@ public class RecordDao extends JooqDaoSupport {
 		}
 		//record keys
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
-			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.isIncludeNullConditionsForKeyValues(), filter.getKeyValues());
+			addFilterByFieldsConditions(q, RECORD_KEY_FIELDS, filter.isCaseSensitiveKeyValues(), filter.isIncludeNullConditionsForKeyValues(), 
+					filter.getKeyValues());
 		}
 		//qualifiers
 		if (CollectionUtils.isNotEmpty(filter.getQualifiers())) {
@@ -385,34 +386,31 @@ public class RecordDao extends JooqDaoSupport {
 		return countRecords(filter);
 	}
 	
-	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, boolean includeNullConditions, List<String> keyValues) {
-		addFilterByKeyConditions(q, caseSensitiveKeyValues, includeNullConditions, keyValues.toArray(new String[keyValues.size()]));
-	}
-	
-	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, boolean includeNullConditions, String... keyValues) {
-		addFilterByFieldsConditions(q, RECORD_KEY_FIELDS, caseSensitiveKeyValues, includeNullConditions, keyValues);
-	}
-	
 	private void addFilterByFieldsConditions(SelectQuery<?> q, TableField[] fields,
-			boolean caseSensitiveValues, boolean includeNullConditions, List<String> values) {
-		addFilterByFieldsConditions(q, fields, caseSensitiveValues, includeNullConditions, values.toArray(new String[values.size()]));
+			boolean caseSensitiveValues, boolean isNullWhenNotSpecified, List<String> values) {
+		addFilterByFieldsConditions(q, fields, caseSensitiveValues, isNullWhenNotSpecified, values.toArray(new String[values.size()]));
 	}
 
-	private void addFilterByFieldsConditions(SelectQuery q, TableField[] fields, boolean caseSensitiveValues, boolean includeNullConditions,
-			String... values) {
+	private void addFilterByFieldsConditions(SelectQuery q, TableField[] fields, boolean caseSensitiveValues, 
+			boolean isNullWhenNotSpecified, String... values) {
 		if ( values != null && values.length > 0 ) {
 			for (int i = 0; i < values.length && i < fields.length; i++) {
-				String key = values[i];
+				String value = values[i];
 				@SuppressWarnings("unchecked")
-				Field<String> keyField = (Field<String>) fields[i];
-				if (StringUtils.isNotBlank(key)) {
-					if (caseSensitiveValues) {
-						q.addConditions(keyField.equal(key));
+				Field<String> field = (Field<String>) fields[i];
+				if (StringUtils.isNotBlank(value)) {
+					Condition condition;
+					boolean likeSearchType = value.contains("*");
+					if (likeSearchType) {
+						condition = field.like(value.replaceAll("\\*", "%"));
+					} else if (caseSensitiveValues) {
+						condition = field.equal(value);
 					} else {
-						q.addConditions(keyField.upper().equal(key.toUpperCase()));
+						condition = field.upper().equal(value.toUpperCase());
 					}
-				} else if (includeNullConditions) {
-					q.addConditions(keyField.isNull());
+					q.addConditions(condition);
+				} else if (isNullWhenNotSpecified) {
+					q.addConditions(field.isNull());
 				}
 			}
 		}

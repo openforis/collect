@@ -83,7 +83,8 @@ class RecordDataTable extends Component {
 				recordsPerPage: recordsPerPage, 
 				page: page,
 				keyValues: keyValues,
-				summaryValues: summaryValues}, sortFields).then((res) => {
+				summaryValues: summaryValues
+			}, sortFields).then((res) => {
 			this.setState({page: page, recordsPerPage: recordsPerPage, records: res.records, totalSize: res.count, 
 				keyValues: keyValues, summaryValues: summaryValues, sortFields: sortFields});
 		});
@@ -152,12 +153,13 @@ class RecordDataTable extends Component {
 		const summaryValues = []
 		if (Object.keys(filterObj).length > 0) {
 			for (const fieldName in filterObj) {
+				let val = filterObj[fieldName].value
 				if (fieldName.startsWith('key')) {
 					const keyValueIdx = parseInt(fieldName.substr(3)) - 1
-					keyValuesFilter[keyValueIdx] = filterObj[fieldName].value
+					keyValuesFilter[keyValueIdx] = val
 				} else if (fieldName.startsWith('summary_')) {
 					const summaryValueIdx = parseInt(fieldName.substring(fieldName.indexOf('_') + 1))
-					summaryValues[summaryValueIdx] = filterObj[fieldName].value
+					summaryValues[summaryValueIdx] = val
 				}
 			}
 		}
