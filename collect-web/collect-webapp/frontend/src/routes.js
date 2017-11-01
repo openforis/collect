@@ -49,6 +49,10 @@ const routes = [
     name: "Survey Designer"
   },
   {
+    path: '/surveydesigner/surveys',
+    name: "List of surveys"
+  },
+  {
     path: '/datacleansing',
     name: "Data Cleansing"
   },
