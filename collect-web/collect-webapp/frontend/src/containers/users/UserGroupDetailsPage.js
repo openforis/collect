@@ -424,7 +424,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                 <legend>Users in Group</legend>
                                 <BootstrapTable
                                     data={this.state.usersInGroup}
-                                    striped	hover condensed
+                                    striped	hover
                                     height='200'
                                     cellEdit={ { mode: 'click', afterSaveCell: this.handleSelectedUsersCellEdit } }
                                     selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
@@ -447,7 +447,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     <FormGroup check row>
                         <Col sm={{ size: 2, offset: 5 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
-                            <Button color="danger" onClick={this.handleDeleteBtnClick}>Delete</Button>
+                            <Button color="danger" onClick={this.handleDeleteBtnClick}><i className="fa fa-trash" /></Button>
                         </Col>
                     </FormGroup>
                 </Form>

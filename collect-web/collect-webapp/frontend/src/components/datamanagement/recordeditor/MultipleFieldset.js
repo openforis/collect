@@ -126,7 +126,7 @@ export default class MultipleFieldset extends Component {
                 </Input>
                 <Button color="success" onClick={this.handleNewButtonClick}>New</Button>
                 {this.state.selelectedEntityId > 0 ? 
-                    <Button color="danger" onClick={this.handleDeleteButtonClick}><span className="icon-trash"/></Button>
+                    <Button color="danger" onClick={this.handleDeleteButtonClick}><span className="fa fa-trash"/></Button>
                 : ''}
 
                 {selectedEntity ? 
