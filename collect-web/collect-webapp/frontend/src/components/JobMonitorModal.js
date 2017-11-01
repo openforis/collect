@@ -27,8 +27,8 @@ export default class JobMonitorModal extends Component {
                             <Progress value={this.state.job.progressPercent} />
                             : this.props.job.status
                     } 
-                    {! loading && this.props.job.status == 'ERROR' &&
-                        <span>this.props.job.errorMessage</span>
+                    {! loading && this.props.job.status == 'FAILED' &&
+                        <p>{this.props.job.errorMessage}</p>
                     }
                 </ModalBody>
                 <ModalFooter>

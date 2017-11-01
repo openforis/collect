@@ -244,8 +244,7 @@ public class CSVDataImportJob extends Job {
 
 		public CSVDataImportInput(File file, CollectSurvey survey, Step[] steps, Integer parentEntityDefinitionId,
 				CSVDataImportSettings settings) {
-			this(file, survey, toSet(steps), parentEntityDefinitionId,
-					settings);
+			this(file, survey, toSet(steps), parentEntityDefinitionId, settings);
 		}
 		
 		public CSVDataImportInput(File file, CollectSurvey survey, Set<Step> steps, Integer parentEntityDefinitionId,
@@ -254,8 +253,8 @@ public class CSVDataImportJob extends Job {
 			this.file = file;
 			this.survey = survey;
 			this.steps = steps;
-			this.parentEntityDefinitionId = parentEntityDefinitionId;
 			this.settings = settings == null ? new CSVDataImportSettings(): settings;
+			this.parentEntityDefinitionId = parentEntityDefinitionId;
 			this.parentEntityDefinition = parentEntityDefinitionId == null ? null : (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
 		}
 

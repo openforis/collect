@@ -54,9 +54,11 @@ class CsvDataImportPage extends Component {
         if (!this.validateForm()) {
             return
         }
-        const entityDef = this.state.selectedEntityDefinition
-        const entityDefId = entityDef == null ? null : entityDef.id
         const survey = this.props.survey
+        const entityDef = this.state.importType === 'newRecords' ? 
+            survey.schema.firstRootEntityDefinition
+            : this.state.selectedEntityDefinition
+        const entityDefId = entityDef == null ? null : entityDef.id
         
         ServiceFactory.recordService.startCsvDataImport(survey, 
             survey.schema.firstRootEntityDefinition.name,
@@ -99,7 +101,6 @@ class CsvDataImportPage extends Component {
 
     handleDataImoprtJobFailed(job) {
         this.loadErrorsPage(job)
-        setTimeout(() => this.props.dispatch(Actions.closeJobMonitor()))
     }
 
     handleFileDrop(files) {
@@ -109,7 +110,10 @@ class CsvDataImportPage extends Component {
 
     loadErrorsPage(job) {
         ServiceFactory.recordService.loadCsvDataImportStatus(this.props.survey).then(job => {
-            this.setState({errorModalOpen: true, errors: job.errors})
+            if (job.errors.length > 0) {
+                this.setState({errorModalOpen: true, errors: job.errors})
+                setTimeout(() => this.props.dispatch(Actions.closeJobMonitor()))
+            }
         })
     }
 
@@ -236,7 +240,8 @@ class CsvDataImportPage extends Component {
 							<TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
 							<TableHeaderColumn dataField="fileName" width="200">File</TableHeaderColumn>
 							<TableHeaderColumn dataField="row" width="50">Row</TableHeaderColumn>
-							<TableHeaderColumn dataField="columns" width="100">Columns</TableHeaderColumn>
+							<TableHeaderColumn dataField="columns" width="150">Columns</TableHeaderColumn>
+                            <TableHeaderColumn dataField="errorType" width="140">Error type</TableHeaderColumn>
                             <TableHeaderColumn dataField="message" width="400" dataFormat={this.formatErrorMessage}>Message</TableHeaderColumn>
 						</BootstrapTable>
                     </ModalBody>
