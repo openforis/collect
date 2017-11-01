@@ -1,6 +1,9 @@
 package org.openforis.collect.persistence;
 
 
+import static org.apache.commons.lang3.ArrayUtils.addAll;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.jooq.impl.DSL.coalesce;
 import static org.jooq.impl.DSL.count;
 import static org.jooq.impl.DSL.exists;
@@ -23,8 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.Batch;
 import org.jooq.Condition;
 import org.jooq.Cursor;
@@ -96,40 +97,40 @@ public class RecordDao extends JooqDaoSupport {
 	private static final TableField[] RECORD_DATA_QUALIFIER_FIELDS = 
 		{OFC_RECORD_DATA.QUALIFIER1, OFC_RECORD_DATA.QUALIFIER2, OFC_RECORD_DATA.QUALIFIER3};
 	
-	private static final TableField[] RECORD_FULL_SUMMARY_FIELDS = ArrayUtils.addAll(
+	private static final TableField[] RECORD_FULL_SUMMARY_FIELDS = addAll(
 			new TableField[]{OFC_RECORD.ID, OFC_RECORD.SURVEY_ID, OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.MODEL_VERSION,
 				OFC_RECORD.DATE_CREATED, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.MODIFIED_BY_ID, 
 				OFC_RECORD.STEP, OFC_RECORD.DATA_SEQ_NUM, OFC_RECORD.STATE, 
 				OFC_RECORD.ERRORS, OFC_RECORD.WARNINGS, OFC_RECORD.MISSING, OFC_RECORD.SKIPPED, 
 				OFC_RECORD.OWNER_ID},
-			ArrayUtils.addAll(
-					ArrayUtils.addAll(
-							ArrayUtils.addAll(RECORD_KEY_FIELDS, RECORD_COUNT_FIELDS), 
+			addAll(
+					addAll(
+							addAll(RECORD_KEY_FIELDS, RECORD_COUNT_FIELDS), 
 							RECORD_SUMMARY_FIELDS), 
 					RECORD_QUALIFIER_FIELDS)
 			);
 
-	private static final TableField[] RECORD_DATA_FULL_SUMMARY_FIELDS = ArrayUtils.addAll(
+	private static final TableField[] RECORD_DATA_FULL_SUMMARY_FIELDS = addAll(
 			new TableField[]{OFC_RECORD.SURVEY_ID, OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.ID,
 				OFC_RECORD.STEP, OFC_RECORD.DATA_SEQ_NUM, OFC_RECORD.MODEL_VERSION, OFC_RECORD.OWNER_ID, 
 				OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_CREATED, OFC_RECORD.MODIFIED_BY_ID, OFC_RECORD.DATE_MODIFIED, 
 				OFC_RECORD_DATA.RECORD_ID, OFC_RECORD_DATA.DATE_CREATED, OFC_RECORD_DATA.CREATED_BY, OFC_RECORD_DATA.DATE_MODIFIED, OFC_RECORD_DATA.MODIFIED_BY, 
 				OFC_RECORD_DATA.STEP, OFC_RECORD_DATA.SEQ_NUM, OFC_RECORD_DATA.STATE, OFC_RECORD_DATA.ERRORS,
 				OFC_RECORD_DATA.WARNINGS, OFC_RECORD_DATA.MISSING, OFC_RECORD_DATA.SKIPPED},
-			ArrayUtils.addAll(
-					ArrayUtils.addAll(
-							ArrayUtils.addAll(RECORD_DATA_KEY_FIELDS, RECORD_DATA_COUNT_FIELDS), 
+			addAll(
+					addAll(
+							addAll(RECORD_DATA_KEY_FIELDS, RECORD_DATA_COUNT_FIELDS), 
 							RECORD_DATA_SUMMARY_FIELDS), 
 					RECORD_DATA_QUALIFIER_FIELDS)
 		);
 
-	private static final TableField[] RECORD_DATA_INSERT_FIELDS = ArrayUtils.addAll(new TableField[]{
+	private static final TableField[] RECORD_DATA_INSERT_FIELDS = addAll(new TableField[]{
 			OFC_RECORD_DATA.RECORD_ID, OFC_RECORD_DATA.DATE_CREATED, OFC_RECORD_DATA.CREATED_BY, OFC_RECORD_DATA.DATE_MODIFIED, OFC_RECORD_DATA.MODIFIED_BY, 
 			OFC_RECORD_DATA.STEP, OFC_RECORD_DATA.SEQ_NUM, OFC_RECORD_DATA.STATE, OFC_RECORD_DATA.DATA, OFC_RECORD_DATA.APP_VERSION, 
 			OFC_RECORD_DATA.ERRORS, OFC_RECORD_DATA.WARNINGS, OFC_RECORD_DATA.MISSING, OFC_RECORD_DATA.SKIPPED},
-		ArrayUtils.addAll(
-				ArrayUtils.addAll(
-						ArrayUtils.addAll(RECORD_DATA_KEY_FIELDS, RECORD_DATA_COUNT_FIELDS), 
+		addAll(
+				addAll(
+						addAll(RECORD_DATA_KEY_FIELDS, RECORD_DATA_COUNT_FIELDS), 
 						RECORD_DATA_SUMMARY_FIELDS), 
 				RECORD_DATA_QUALIFIER_FIELDS)
 	);
@@ -398,7 +399,7 @@ public class RecordDao extends JooqDaoSupport {
 				String value = values[i];
 				@SuppressWarnings("unchecked")
 				Field<String> field = (Field<String>) fields[i];
-				if (StringUtils.isNotBlank(value)) {
+				if (isNotBlank(value)) {
 					Condition condition;
 					boolean likeSearchType = value.contains("*");
 					if (likeSearchType) {
@@ -508,9 +509,12 @@ public class RecordDao extends JooqDaoSupport {
 		if (sequenceNumber == null) {
 			List<Field<?>> insertFields = new ArrayList<Field<?>>();
 			
-			insertFields.addAll(Arrays.asList(val(recordId), val(toTimestamp(r.getCreationDate())), val(getUserId(r.getCreatedBy())), 
+			insertFields.addAll(Arrays.asList(val(recordId), 
+					val(toTimestamp(r.getCreationDate())), val(getUserId(r.getCreatedBy())), 
 					val(toTimestamp(r.getModifiedDate())), val(getUserId(r.getModifiedBy())),
-					val(step.getStepNumber()), coalesce(max(OFC_RECORD_DATA.SEQ_NUM), val(1)).add(1), val(null), 
+					val(step.getStepNumber()), 
+					coalesce(max(OFC_RECORD_DATA.SEQ_NUM), val(1)).add(1), 
+					val(null), 
 					val(new ModelSerializer(SERIALIZATION_BUFFER_SIZE).toByteArray(r.getRootEntity())), 
 					val(Collect.VERSION.toString()),
 					val(r.getErrors()), val(r.getWarnings()), val(r.getMissing()), val(r.getSkipped())));
@@ -553,11 +557,20 @@ public class RecordDao extends JooqDaoSupport {
 	}
 	
 	public Step duplicateLatestActiveStepData(CollectSurvey survey, int recordId) {
+		Integer sequenceNumber = getLatestWorkflowSequenceNumber(recordId);
+		return duplicateStepData(recordId, sequenceNumber);
+	}
+	
+	public Step duplicateLatestNotRejectedStepData(CollectSurvey survey, int recordId, Step step) {
+		Integer sequenceNumber = getLatestWorkflowSequenceNumber(recordId, step, false);
+		return duplicateStepData(recordId, sequenceNumber);
+	}
+
+	private Step duplicateStepData(int recordId, Integer latestWorkflowSequenceNumber) {
 		List<Field> columns = new ArrayList<Field>();
 		columns.addAll(Arrays.asList(RECORD_DATA_INSERT_FIELDS));
 		int indexOfSequenceNumberCol = columns.indexOf(OFC_RECORD_DATA.SEQ_NUM);
 		List<Field>  selectColumns = new ArrayList<Field>(columns);
-		Integer latestWorkflowSequenceNumber = getLatestWorkflowSequenceNumber(recordId);
 		Integer nextSequenceNumber = getNextWorkflowSequenceNumber(recordId);
 		Param<Integer> seqNumberVal = val(nextSequenceNumber);
 		selectColumns.set(indexOfSequenceNumberCol, seqNumberVal);
@@ -578,7 +591,7 @@ public class RecordDao extends JooqDaoSupport {
 			.fetchOne(OFC_RECORD_DATA.STEP);
 		return Step.valueOf(newStepNumber);
 	}
-
+	
 	private Integer getNextWorkflowSequenceNumber(int recordId) {
 		Integer latestWorkflowSequenceNumber = getLatestWorkflowSequenceNumber(recordId, null, false);
 		return latestWorkflowSequenceNumber == null ? 1 : latestWorkflowSequenceNumber + 1;
@@ -690,10 +703,10 @@ public class RecordDao extends JooqDaoSupport {
 		if (sequenceNumber != null) {
 			map.put(OFC_RECORD_DATA.SEQ_NUM, sequenceNumber);
 		}
-		map.put(OFC_RECORD_DATA.DATE_CREATED, toTimestamp(r.getDataCreationDate()));
-		map.put(OFC_RECORD_DATA.CREATED_BY, getUserId(r.getDataCreatedBy()));
-		map.put(OFC_RECORD_DATA.DATE_MODIFIED, toTimestamp(r.getDataModifiedDate()));
-		map.put(OFC_RECORD_DATA.MODIFIED_BY, getUserId(r.getDataModifiedBy()));
+		map.put(OFC_RECORD_DATA.DATE_CREATED, toTimestamp(defaultIfNull(r.getDataCreationDate(), r.getCreationDate())));
+		map.put(OFC_RECORD_DATA.CREATED_BY, getUserId(defaultIfNull(r.getDataCreatedBy(), r.getCreatedBy())));
+		map.put(OFC_RECORD_DATA.DATE_MODIFIED, toTimestamp(defaultIfNull(r.getDataModifiedDate(), r.getModifiedDate())));
+		map.put(OFC_RECORD_DATA.MODIFIED_BY, getUserId(defaultIfNull(r.getDataModifiedBy(), r.getModifiedBy())));
 		map.put(OFC_RECORD_DATA.STEP, r.getStep().getStepNumber());
 		map.put(OFC_RECORD_DATA.STATE, r.getState() != null ? r.getState().getCode(): null);
 		map.put(OFC_RECORD_DATA.SKIPPED, r.getSkipped());

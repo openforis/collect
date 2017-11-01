@@ -31,7 +31,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.EventQueue;
+import org.openforis.collect.event.RecordDeletedEvent;
+import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.event.RecordStep;
+import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.SurveyBackupJob;
+import org.openforis.collect.io.data.BulkRecordMoveJob;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.CSVDataImportJob;
 import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportInput;
@@ -132,7 +139,9 @@ public class RecordController extends BasicController implements Serializable {
 	private CollectJobManager jobManager;
 	@Autowired
 	private RecordStatsGenerator recordStatsGenerator;
-
+	@Autowired
+	private transient EventQueue eventQueue;
+	
 	private CSVDataExportJob csvDataExportJob;
 	private SurveyBackupJob fullBackupJob;
 	private DataRestoreSummaryJob dataRestoreSummaryJob;
@@ -247,6 +256,33 @@ public class RecordController extends BasicController implements Serializable {
 		return new Response();
 	}
 
+	@RequestMapping(value = "survey/{surveyId}/data/move/records", method=PATCH, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody JobProxy moveRecords(@PathVariable int surveyId, @RequestParam String fromStep, 
+			@RequestParam boolean promote) {
+		BulkRecordMoveJob job = jobManager.createJob(BulkRecordMoveJob.class);
+		SessionState sessionState = sessionManager.getSessionState();
+		User loggedUser = sessionState.getUser();
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
+		job.setSurvey(survey);
+		job.setRootEntity(rootEntityDef.getName());
+		job.setPromote(promote);
+		job.setFromStep(Step.valueOf(fromStep));
+		job.setUser(loggedUser);
+		job.setRecordMovedCallback(new BulkRecordMoveJob.Callback() {
+			@Override
+			public void recordMoved(CollectRecord record) {
+				if (promote) {
+					publishRecordPromotedEvents(record, loggedUser.getUsername());
+				} else {
+					publishRecordDeletedEvent(record, RecordStep.valueOf(fromStep), loggedUser.getUsername());
+				}
+			}
+		});
+		jobManager.startSurveyJob(job);
+		return new JobProxy(job);
+	}
+	
 	@Transactional
 	@RequestMapping(value = "survey/{surveyId}/data/records", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
@@ -526,6 +562,24 @@ public class RecordController extends BasicController implements Serializable {
 	private RecordSummaryProxy toSummaryProxy(CollectRecordSummary summary) {
 		ProxyContext context = new ProxyContext(sessionManager.getSessionState().getLocale(), messageSource, surveyContext);
 		return new RecordSummaryProxy(summary, context);
+	}
+	
+	private void publishRecordPromotedEvents(CollectRecord record, String userName) {
+		if (! eventQueue.isEnabled()) {
+			return;
+		}
+		List<RecordEvent> events = new EventProducer().produceFor(record, userName);
+		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), events));
+	}
+	
+	private void publishRecordDeletedEvent(CollectRecord record, RecordStep recordStep, String userName) {
+		if (! eventQueue.isEnabled()) {
+			return;
+		}
+		List<RecordDeletedEvent> events = Arrays.asList(new RecordDeletedEvent(record.getSurvey().getName(), 
+				record.getId(), new Date(), userName));
+		String surveyName = record.getSurvey().getName();
+		eventQueue.publish(new RecordTransaction(surveyName, record.getId(), recordStep, events));
 	}
 
 	public static class SearchParameters {

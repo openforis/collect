@@ -20,6 +20,7 @@ import MapPage from 'containers/MapPage'
 import OldClientRecordEditPage from 'containers/datamanagement/OldClientRecordEditPage'
 import SaikuPage from 'containers/SaikuPage'
 import SurveyDesignerPage from 'containers/SurveyDesignerPage'
+import SurveysListPage from 'containers/surveydesigner/SurveysListPage'
 import UsersPage from 'containers/users/UsersPage'
 import UserGroupsPage from 'containers/users/UserGroupsPage'
 import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
@@ -47,6 +48,7 @@ class App extends Component {
                   <Route path="/map" exact name="Map" component={MapPage}/>
                   <Route path="/saiku" exact name="Saiku" component={SaikuPage}/>
                   <Route path="/surveydesigner" exact name="Survey Designer" component={SurveyDesignerPage}/>
+                  <Route path="/surveydesigner/surveys" exact name="List of Surveys" component={SurveysListPage}/>
                   <Route path="/users" exact name="Users" component={UsersPage}/>
                   <Route path="/usergroups" exact name="User Groups" component={UserGroupsPage}/>
                   <Route path="/usergroups/:id" name="User Group" component={UserGroupDetailsPage}/>

@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import RecordDataTable from 'components/datamanagement/RecordDataTable';
 import { Button, ButtonGroup, ButtonToolbar, Container, ButtonDropdown, 
-	DropdownToggle, DropdownMenu, DropdownItem, Row, Col } from 'reactstrap';
+	DropdownToggle, DropdownMenu, DropdownItem, Row, Col, UncontrolledDropdown } from 'reactstrap';
 import { connect } from 'react-redux';
 
 import * as Actions from 'actions';
 import ServiceFactory from 'services/ServiceFactory'
 import Modals from 'components/Modals'
 import Arrays from 'utils/Arrays'
+import Workflow from 'model/Workflow'
 
 class DataManagementPage extends Component {
 
@@ -35,6 +36,11 @@ class DataManagementPage extends Component {
 		this.handleCsvImportButtonClick = this.handleCsvImportButtonClick.bind(this)
 		this.handleValidationReportButtonClick = this.handleValidationReportButtonClick.bind(this)
 		this.handleDownloadValidationReportClick = this.handleDownloadValidationReportClick.bind(this)
+		this.handlePromoteEntryToCleansingButtonClick = this.handlePromoteEntryToCleansingButtonClick.bind(this)
+		this.handlePromoteCleansingToAnalysisButtonClick = this.handlePromoteCleansingToAnalysisButtonClick.bind(this)
+		this.handleDemoteAnalysisToCleansingButtonClick = this.handleDemoteAnalysisToCleansingButtonClick.bind(this)
+		this.handleDemoteCleansingToEntryButtonClick = this.handleDemoteCleansingToEntryButtonClick.bind(this)
+		this.handleMoveRecordsJobCompleted = this.handleMoveRecordsJobCompleted.bind(this)
 	}
 
 	handleNewButtonClick() {
@@ -59,15 +65,18 @@ class DataManagementPage extends Component {
 				this.recordService.delete(this.props.survey.id, this.props.loggedUser.id, this.state.selectedItemIds).then(response => {
 					$this.recordDataTable.fetchData()
 					$this.props.dispatch(Actions.recordsDeleted($this.state.selectedItems));
-					$this.setState({
-						selectedItem: null, 
-						selectedItems: [],
-						selectedItemIds: []
-					})
-					$this.forceUpdate()
+					$this.deselectAllRecords()
 				})
 			//})
 		}
+	}
+
+	deselectAllRecords() {
+		this.setState({
+			selectedItem: null, 
+			selectedItems: [],
+			selectedItemIds: []
+		})
 	}
 
 	navigateToItemEditView(itemId) {
@@ -141,6 +150,37 @@ class DataManagementPage extends Component {
 			ServiceFactory.recordService.downloadValidationReportResult(surveyId)
 		}
 	}
+
+	handlePromoteEntryToCleansingButtonClick() {
+		this.startRecordsMoveJob(Workflow.STEPS.entry, true)
+	}
+
+	handlePromoteCleansingToAnalysisButtonClick() {
+		this.startRecordsMoveJob(Workflow.STEPS.cleansing, true)
+	}
+
+	handleDemoteAnalysisToCleansingButtonClick() {
+		this.startRecordsMoveJob(Workflow.STEPS.analysis, false)
+	}
+
+	handleDemoteCleansingToEntryButtonClick() {
+		this.startRecordsMoveJob(Workflow.STEPS.cleansing, false)
+	}
+
+	startRecordsMoveJob(fromStep, promote) {
+		const surveyId = this.props.survey.id
+		ServiceFactory.recordService.startRecordMoveJob(surveyId, fromStep.code, promote).then(job => {
+			this.props.dispatch(Actions.startJobMonitor({
+                jobId: job.id, 
+				title: promote ? 'Promoting records': 'Demoting records',
+				handleJobCompleted: this.handleMoveRecordsJobCompleted
+            }))
+		})
+	}
+
+	handleMoveRecordsJobCompleted(job) {
+		this.recordDataTable.fetchData()		
+	}
 	
 	render() {
 		if (!this.props.loggedUser || !this.props.userGroups) {
@@ -188,6 +228,22 @@ class DataManagementPage extends Component {
 									<DropdownItem onClick={this.handleBackupImportButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> from Collect format</DropdownItem>
 								</DropdownMenu>
 							</ButtonDropdown>
+						}
+					</Col>
+					<Col sm={{size: 2}}>
+						{loggedUser.canPromoteRecordsInBulk(surveyUserGroup) &&
+							<UncontrolledDropdown>
+								<DropdownToggle color="warning" caret><span className="fa fa-arrow-right"/>Workflow</DropdownToggle>
+								<DropdownMenu>
+									<DropdownItem header>Promote records</DropdownItem>
+									<DropdownItem onClick={this.handlePromoteEntryToCleansingButtonClick}><i className="fa fa-arrow-right" aria-hidden="true"></i> Entry -> Cleansing</DropdownItem>
+									<DropdownItem onClick={this.handlePromoteCleansingToAnalysisButtonClick}><i className="fa fa-arrow-right" aria-hidden="true"></i> Cleansing -> Analysis</DropdownItem>
+									<DropdownItem divider />
+									<DropdownItem header>Demote records</DropdownItem>
+									<DropdownItem onClick={this.handleDemoteCleansingToEntryButtonClick}><i className="fa fa-arrow-left" aria-hidden="true"></i> Cleansing -> Entry</DropdownItem>
+									<DropdownItem onClick={this.handleDemoteAnalysisToCleansingButtonClick}><i className="fa fa-arrow-left" aria-hidden="true"></i> Analysis -> Cleansing</DropdownItem>
+								</DropdownMenu>
+							</UncontrolledDropdown>
 						}
 					</Col>
 				</Row>

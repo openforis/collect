@@ -113,4 +113,11 @@ export default class RecordService extends AbstractService {
     loadCsvDataImportStatus(survey) {
         return this.get('survey/' + survey.id + '/data/csvimport/records')
     }
+
+    startRecordMoveJob(surveyId, fromStep, promote) {
+        return this.patch('survey/' + surveyId + '/data/move/records', {
+            fromStep: fromStep,
+            promote: promote
+        })
+    }
 }

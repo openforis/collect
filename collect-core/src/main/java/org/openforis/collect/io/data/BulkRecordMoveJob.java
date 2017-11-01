@@ -32,7 +32,7 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 	
 	//input
 	private String rootEntity;
-	private User adminUser;
+	private User user;
 	private Step fromStep;
 	private boolean promote;
 
@@ -47,8 +47,8 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 		this.rootEntity = rootEntity;
 	}
 	
-	public void setAdminUser(User adminUser) {
-		this.adminUser = adminUser;
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	public void setFromStep(Step fromStep) {
@@ -90,9 +90,9 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 					}
 				};
 				if (promote) {
-					recordManager.promote(survey, summary.getId(), summary.getStep(), adminUser, recordCallback);
+					recordManager.promote(survey, summary.getId(), summary.getStep(), user, recordCallback);
 				} else {
-					recordManager.demote(survey, summary.getId(), summary.getStep(), adminUser, recordCallback);
+					recordManager.demote(survey, summary.getId(), summary.getStep(), user, recordCallback);
 				}
 				
 				incrementProcessedItems();

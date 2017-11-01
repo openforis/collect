@@ -56,6 +56,14 @@ export default class User extends Serializable {
         }
     }
 
+    canPromoteRecordsInBulk(group) {
+        return this.canChangeRecordOwner(group)
+    }
+
+    canDemoteRecordsInBulk(group) {
+        return this.canPromoteRecordsInBulk(group)
+    }
+
     canChangeRecordOwner(group) {
         const role = this.determineRoleInGroup(group)
         if (role === null) {

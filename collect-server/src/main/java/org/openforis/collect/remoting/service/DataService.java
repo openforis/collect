@@ -587,7 +587,7 @@ public class DataService {
 		job.setPromote(promote);
 		final Step fromStep = Step.valueOf(fromStepNumber);
 		job.setFromStep(fromStep);
-		job.setAdminUser(sessionState.getUser());
+		job.setUser(sessionState.getUser());
 		job.setRecordMovedCallback(new BulkRecordMoveJob.Callback() {
 			@Override
 			public void recordMoved(CollectRecord record) {

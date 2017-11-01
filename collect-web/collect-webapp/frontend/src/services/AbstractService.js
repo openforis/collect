@@ -10,32 +10,11 @@ export default class AbstractService {
     }
 
     get(url, data) {
-        let queryData = this._toQueryData(data);
-        return fetch(this.BASE_URL + url + (queryData === null ? '': '?' + queryData), {
-                credentials: 'include'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw Error(response.statusText)
-                }
-                return response.json()
-            }, this._handleError)
-            .catch(error => {
-                throw(error);
-            })
+        return this._getDeleteOrPatch('GET', url, data)
     }
 
     delete(url, data) {
-        let queryData = this._toQueryData(data);
-        return fetch(this.BASE_URL + url + (queryData === null ? '': '?' + queryData), {
-            credentials: 'include',
-            method: 'DELETE'
-        })
-        .then(response => response.json(),
-            this._handleError)
-        .catch(error => {
-            throw(error);
-        })
+        return this._getDeleteOrPatch('DELETE', url, data)
     }
 
     post(url, data) {
@@ -79,8 +58,29 @@ export default class AbstractService {
         })
     }
 
+    patch(url, data) {
+        return this._getDeleteOrPatch('PATCH', url, data)
+    }
+
     patchJson(url, data) {
         return this._sendJson(url, data, 'PATCH')
+    }
+
+    _getDeleteOrPatch(method, url, data) {
+        let queryData = this._toQueryData(data);
+        return fetch(this.BASE_URL + url + (queryData === null ? '': '?' + queryData), {
+                credentials: 'include',
+                method: method
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw Error(response.statusText)
+                }
+                return response.json()
+            }, this._handleError)
+            .catch(error => {
+                throw(error);
+            })
     }
 
     _sendJson(url, data, method) {

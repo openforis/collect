@@ -621,7 +621,7 @@ public class RecordManager {
 	public CollectRecord demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
 		recordDao.updateStepDataState(survey, recordId, currentStep, State.REJECTED);
-		Step newStep = recordDao.duplicateLatestActiveStepData(survey, recordId);
+		Step newStep = recordDao.duplicateLatestNotRejectedStepData(survey, recordId, prevStep);
 		if (newStep != prevStep) {
 			throw new IllegalStateException(String.format("Unexpected step after demote: expected %s found %s", prevStep, newStep));
 		}
