@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
 	
+	import org.openforis.idm.model.species.Taxon$TaxonRank;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.event.InputFieldEvent;
@@ -233,26 +234,26 @@ package org.openforis.collect.presenter {
 			var client:SpeciesClient = ClientFactory.speciesClient;
 			var searchText:String = autoCompleteLastInputField.text;
 			var attrDef:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(autoCompleteLastInputField.attributeDefinition); 
-			var taxonomy:String = attrDef.taxonomy;
 			var token:Object = {searchText: searchText, searchType: autoCompleteLastSearchType};
 			var responder:IResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler, token);
 			var parameters:TaxonSearchParameters = new TaxonSearchParameters();
+			parameters.highestRank = attrDef.highestRank == null ? null : Taxon$TaxonRank.valueOf(attrDef.highestRank.toUpperCase());
 			parameters.includeUniqueVernacularName = attrDef.includeUniqueVernacularName;
 			parameters.includeAncestorTaxons = attrDef.showFamily;
 
 			switch ( autoCompleteLastSearchType ) {
 				case SEARCH_BY_FAMILY_SCIENTIFIC_NAME:
-					client.findByFamilyScientificName(responder, taxonomy, searchText, MAX_RESULTS, parameters);
+					client.findByFamilyScientificName(responder, attrDef.taxonomy, searchText, MAX_RESULTS, parameters);
 					break;
 				case SEARCH_BY_CODE:
-					client.findByCode(responder, taxonomy, searchText, MAX_RESULTS, parameters);
+					client.findByCode(responder, attrDef.taxonomy, searchText, MAX_RESULTS, parameters);
 					break;
 				case SEARCH_BY_SCIENTIFIC_NAME:
-					client.findByScientificName(responder, taxonomy, searchText, MAX_RESULTS, parameters);
+					client.findByScientificName(responder, attrDef.taxonomy, searchText, MAX_RESULTS, parameters);
 					break;
 				case SEARCH_BY_VERNACULAR_NAME:
 					var nodeId:int = autoCompleteLastInputField.attribute.id;
-					client.findByVernacularName(responder, taxonomy, nodeId, searchText, MAX_RESULTS, parameters);
+					client.findByVernacularName(responder, attrDef.taxonomy, nodeId, searchText, MAX_RESULTS, parameters);
 					break;
 				default:
 			}

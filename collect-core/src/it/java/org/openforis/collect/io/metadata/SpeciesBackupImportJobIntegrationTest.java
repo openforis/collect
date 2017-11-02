@@ -3,6 +3,9 @@ package org.openforis.collect.io.metadata;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +25,7 @@ import org.openforis.collect.io.metadata.species.SpeciesBackupImportJob;
 import org.openforis.collect.io.metadata.species.SpeciesBackupImportTask;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.TaxonSearchParameters;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.model.CollectSurvey;
@@ -33,7 +37,6 @@ import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
-import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -99,7 +102,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(code, "Olea capensis ssp. macrocarpa");
 			expected.setInfoAttributes(Arrays.asList("info_value_1", "info_value_2"));
-			expected.setTaxonRank(TaxonRank.SUBSPECIES);
+			expected.setTaxonRank(SUBSPECIES);
 			assertEquals(expected, occurrence);
 		}
 		{
@@ -107,7 +110,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(code, "Albizia adianthifolia");
 			expected.setInfoAttributes(Arrays.asList("info_value_3", null));
-			expected.setTaxonRank(TaxonRank.SPECIES);
+			expected.setTaxonRank(SPECIES);
 			assertEquals(expected, occurrence);
 		}
 	}
@@ -137,7 +140,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	
 	protected Taxon findTaxonByCode(String code) {
 		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
-		List<Taxon> results = taxonDao.findByCode(taxonomy, code, 10);
+		List<Taxon> results = taxonDao.findByCode(taxonomy, FAMILY, code, 10);
 		assertNotNull(results);
 		assertEquals(1, results.size());
 		Taxon taxon = results.get(0);
@@ -145,7 +148,10 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	}
 	
 	protected TaxonOccurrence findByCode(String code) {
-		List<TaxonOccurrence> occurrences = speciesManager.findByCode(survey, TEST_TAXONOMY_NAME, code, 10);
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(survey, TEST_TAXONOMY_NAME);
+		TaxonSearchParameters searchParameters = new TaxonSearchParameters();
+		searchParameters.setHighestRank(FAMILY);
+		List<TaxonOccurrence> occurrences = speciesManager.findByCode(taxonomy, code, 10, searchParameters);
 		assertNotNull(occurrences);
 		assertEquals(1, occurrences.size());
 		TaxonOccurrence occurrence = occurrences.get(0);

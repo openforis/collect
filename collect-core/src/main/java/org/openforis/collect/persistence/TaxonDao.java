@@ -101,27 +101,24 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		dsl((CollectTaxonomy) entity.getTaxonomy()).deleteQuery(entity.getSystemId()).execute();
 	}
 
-	public List<Taxon> findByCode(CollectTaxonomy taxonomy, String searchString, int maxResults) {
-		return findStartingWith(taxonomy, null, OFC_TAXON.CODE, searchString, maxResults);
-	}
-
-	public List<Taxon> findByCode(CollectTaxonomy taxonomy, TaxonRank rank, String searchString, int maxResults) {
-		return findStartingWith(taxonomy, rank, OFC_TAXON.CODE, searchString, maxResults);
+	public List<Taxon> findByCode(CollectTaxonomy taxonomy, TaxonRank highestRank, String searchString, int maxResults) {
+		return findStartingWith(taxonomy, highestRank, OFC_TAXON.CODE, searchString, maxResults);
 	}
 	
-	public List<Taxon> findByScientificName(CollectTaxonomy taxonomy, String searchString, int maxResults) {
-		return findStartingWith(taxonomy, null, OFC_TAXON.SCIENTIFIC_NAME, searchString, maxResults);
+	public List<Taxon> findByScientificName(CollectTaxonomy taxonomy, TaxonRank highestRank, String searchString, int maxResults) {
+		return findStartingWith(taxonomy, highestRank, OFC_TAXON.SCIENTIFIC_NAME, searchString, maxResults);
 	}
 
-	protected List<Taxon> findStartingWith(CollectTaxonomy taxonomy, TaxonRank rank, TableField<?,String> field, String searchString, int maxResults) {
+	protected List<Taxon> findStartingWith(CollectTaxonomy taxonomy, TaxonRank highestRank, TableField<?,String> field, String searchString, int maxResults) {
 		TaxonDSLContext dsl = dsl(taxonomy);
 		searchString = searchString.toLowerCase(Locale.ENGLISH) + "%";
 		SelectConditionStep<Record> query = dsl.select()
 			.from(OFC_TAXON)
 			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomy.getId())
 				.and(DSL.lower(field).like(searchString)));
-		if (rank != null) {
-			query.and(OFC_TAXON.TAXON_RANK.equal(rank.name()));
+		if (highestRank != null) {
+			List<String> selfAndDescendantRankNames = CollectionUtils.project(highestRank.getSelfAndDescendants(), "name");
+			query.and(OFC_TAXON.TAXON_RANK.in(selfAndDescendantRankNames));
 		}
 		query.limit(maxResults);
 		Result<?> result = query.fetch();
