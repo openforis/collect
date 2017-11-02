@@ -150,10 +150,14 @@
 					<loadConfig>${project.build.outputDirectory}/flex-config.xml</loadConfig>
 					<locales>
 						<locale>en_US</locale>
+						<locale>es_ES</locale>
+						<locale>fr_FR</locale>
 						<locale>pt_BR</locale>
 					</locales>
 					<localesCompiled>
 						<locale>en_US</locale>
+<!-- 						<locale>es_ES</locale> -->
+						<locale>fr_FR</locale>
 						<locale>pt_BR</locale>
 					</localesCompiled>
 					<includeResourceBundles>
