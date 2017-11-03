@@ -39,8 +39,8 @@ class CsvDataExportPage extends Component {
     
             this.state = {
                 exportFormat: null,
-                allEntitiesSelected: false,
                 stepGreaterOrEqual: 'ENTRY',
+                exportMode: 'ALL_ENTITIES',
                 selectedEntityDefinition: null,
                 entityId: null,
                 exportOnlyOwnedRecords: false,
@@ -55,6 +55,9 @@ class CsvDataExportPage extends Component {
         }
     
         handleExportButtonClick() {
+            if (! this.validateForm()) {
+                return
+            }
             const survey = this.props.survey
             const surveyId = survey.id
             
@@ -79,6 +82,14 @@ class CsvDataExportPage extends Component {
                     handleOkButtonClick: this.handleCsvDataExportModalOkButtonClick
                 }))
             })
+        }
+
+        validateForm() {
+            if (this.state.exportMode === 'SELECTED_ENTITY' && ! this.state.selectedEntityDefinition) {
+                alert('Please select an entity to export')
+                return false
+            }
+            return true
         }
     
         handleCsvDataExportModalOkButtonClick(job) {
@@ -118,65 +129,78 @@ class CsvDataExportPage extends Component {
                 <Form>
                     <FormGroup tag="fieldset">
                         <legend>Parameters</legend>
-                        <FormGroup row>
-                            <Label for="stepSelect">Step:</Label>
-                            <Col sm={10}>
-                                <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
-                                    onChange={e => this.setState({step: e.target.value})}>{stepsOptions}</Input>
-                            </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                            <Label>Entity:</Label>
-                            <Col sm={{size: 10 }}>
-                                <SchemaTreeView survey={this.props.survey} selectAll={this.state.allEntitiesSelected}
-                                    handleNodeSelect={this.handleEntitySelect} />
-                            </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                            <Col sm={{offset: 1, size: 10 }}>
-                                <FormGroup check>
-                                    <Label check>
-                                        <Input type="checkbox"
-                                            onChange={event => this.setState({allEntitiesSelected: event.target.checked})} />{' '}
-                                        Export all entities
-                                    </Label>
+                        <Form>
+                            <FormGroup row>
+                                <Label for="stepSelect" sm={1}>Step:</Label>
+                                <Col sm={10}>
+                                    <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
+                                        onChange={e => this.setState({step: e.target.value})}>{stepsOptions}</Input>
+                                </Col>
+                            </FormGroup>
+                            <FormGroup row>
+                                <Label for="exportMode" sm={1}>Export mode:</Label>
+                                <Col sm={10}>
+                                    <FormGroup check>
+                                        <Label check>
+                                            <Input type="radio" value="ALL_ENTITIES" name="exportMode"
+                                                checked={this.state.exportMode === 'ALL_ENTITIES'} 
+                                                onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
+                                            All entities
+                                        </Label>
+                                        <span style={{display: 'inline-block', width: '40px'}}></span>
+                                        <Label check>
+                                            <Input type="radio" value="SELECTED_ENTITY" name="exportMode"
+                                                checked={this.state.exportMode === 'SELECTED_ENTITY'} 
+                                                onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
+                                            Only selected entities
+                                        </Label>
+                                    </FormGroup>
+                                </Col>
+                            </FormGroup>
+                            {this.state.exportMode === 'SELECTED_ENTITY' &&
+                                <FormGroup row>
+                                    <Label sm={1}>Select entities to export:</Label>
+                                    <Col sm={{size: 10 }}>
+                                        <SchemaTreeView survey={this.props.survey}
+                                            handleNodeSelect={this.handleEntitySelect} />
+                                    </Col>
                                 </FormGroup>
-                            </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                            <div>
-                                <Button onClick={e => this.setState({csvExportAdditionalOptionsOpen: ! this.state.csvExportAdditionalOptionsOpen})}>Additional Options</Button>
-                                <Collapse isOpen={this.state.csvExportAdditionalOptionsOpen}>
-                                    <Card>
-                                        <CardBlock>
-                                            <FormGroup row>
-                                                <Col sm={{size: 12}}>
-                                                    <Label check>
-                                                        <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
-                                                            checked={this.state.exportOnlyOwnedRecords} />{' '}
-                                                        Export only owned records
-                                                    </Label>
-                                                </Col>
-                                            </FormGroup>
-                                            <FormGroup row>
-                                                <Col sm={4}>
-                                                    <Label for="headingsSourceSelect">Source for file headings:</Label>
-                                                </Col>
-                                                <Col sm={8}>
-                                                    <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
-                                                        onChange={e => this.setState({headingSource: e.target.value})}>
-                                                        <option value="ATTRIBUTE_NAME">Attribute name</option>
-                                                        <option value="INSTANCE_LABEL">Attribute label</option>
-                                                        <option value="REPORTING_LABEL">Reporting label (Saiku)</option>
-                                                    </Input>
-                                                </Col>
-                                            </FormGroup>
-                                            {additionalOptionsFormGroups}
-                                        </CardBlock>
-                                    </Card>
-                                </Collapse>
-                            </div>
-                        </FormGroup>
+                            }
+                            <FormGroup row>
+                                <div>
+                                    <Button onClick={e => this.setState({csvExportAdditionalOptionsOpen: ! this.state.csvExportAdditionalOptionsOpen})}>Additional Options</Button>
+                                    <Collapse isOpen={this.state.csvExportAdditionalOptionsOpen}>
+                                        <Card>
+                                            <CardBlock>
+                                                <FormGroup row>
+                                                    <Col sm={{size: 12}}>
+                                                        <Label check>
+                                                            <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
+                                                                checked={this.state.exportOnlyOwnedRecords} />{' '}
+                                                            Export only owned records
+                                                        </Label>
+                                                    </Col>
+                                                </FormGroup>
+                                                <FormGroup row>
+                                                    <Col sm={4}>
+                                                        <Label for="headingsSourceSelect">Source for file headings:</Label>
+                                                    </Col>
+                                                    <Col sm={8}>
+                                                        <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
+                                                            onChange={e => this.setState({headingSource: e.target.value})}>
+                                                            <option value="ATTRIBUTE_NAME">Attribute name</option>
+                                                            <option value="INSTANCE_LABEL">Attribute label</option>
+                                                            <option value="REPORTING_LABEL">Reporting label (Saiku)</option>
+                                                        </Input>
+                                                    </Col>
+                                                </FormGroup>
+                                                {additionalOptionsFormGroups}
+                                            </CardBlock>
+                                        </Card>
+                                    </Collapse>
+                                </div>
+                            </FormGroup>
+                        </Form>
                     </FormGroup>
                     <Row>
                         <Col sm={{ size: 'auto', offset: 5 }}>
