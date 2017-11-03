@@ -64,7 +64,7 @@ class CsvDataExportPage extends Component {
             const parameters = {
                 surveyId: survey.id,
                 rootEntityId: survey.schema.firstRootEntityDefinition.id,
-                stepGreaterOrEqual: this.state.step,
+                stepGreaterOrEqual: this.state.stepGreaterOrEqual,
                 entityId: this.state.selectedEntityDefinition ? this.state.selectedEntityDefinition.id: null,
                 exportOnlyOwnedRecords: this.state.exportOnlyOwnedRecords,
                 headingSource: this.state.headingSource,
@@ -134,7 +134,8 @@ class CsvDataExportPage extends Component {
                                 <Label for="stepSelect" sm={1}>Step:</Label>
                                 <Col sm={10}>
                                     <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
-                                        onChange={e => this.setState({step: e.target.value})}>{stepsOptions}</Input>
+                                        value={this.state.stepGreaterOrEqual}
+                                        onChange={e => this.setState({stepGreaterOrEqual: e.target.value})}>{stepsOptions}</Input>
                                 </Col>
                             </FormGroup>
                             <FormGroup row>

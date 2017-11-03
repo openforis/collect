@@ -770,6 +770,7 @@ public class RecordController extends BasicController implements Serializable {
 		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
 			CSVDataExportParameters result = new CSVDataExportParameters();
 			RecordFilter recordFilter = createRecordFilter(survey, user, userGroupManager, rootEntityId, exportOnlyOwnedRecords);
+			recordFilter.setStepGreaterOrEqual(stepGreaterOrEqual);
 			result.setRecordFilter(recordFilter);
 			try {
 				PropertyUtils.copyProperties(result, this);

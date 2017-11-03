@@ -24,7 +24,6 @@ import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
@@ -144,11 +143,10 @@ public class CSVDataExportJob extends SurveyLockingJob {
 			modelWriter.printColumnHeadings();
 			
 			CollectSurvey survey = recordFilter.getSurvey();
-			Step step = recordFilter.getStepGreaterOrEqual();
 			List<CollectRecordSummary> summaries = recordManager.loadSummaries(recordFilter);
 			for (CollectRecordSummary s : summaries) {
 				if ( isRunning() ) {
-					CollectRecord record = recordManager.load(survey, s.getId(), step, false);
+					CollectRecord record = recordManager.load(survey, s.getId(), recordFilter.getStepGreaterOrEqual(), false);
 					modelWriter.printData(record);
 					incrementProcessedItems();
 				} else {
