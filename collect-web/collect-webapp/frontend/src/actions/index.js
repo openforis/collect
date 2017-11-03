@@ -22,12 +22,6 @@ export const REQUEST_FULL_PREFERRED_SURVEY = 'REQUEST_FULL_PREFERRED_SURVEY'
 export const RECEIVE_FULL_PREFERRED_SURVEY = 'RECEIVE_FULL_PREFERRED_SURVEY'
 export const INVALIDATE_PREFERRED_SURVEY = 'INVALIDATE_PREFERRED_SURVEY'
 
-export const REQUEST_USERS = 'REQUEST_USERS'
-export const RECEIVE_USERS = 'RECEIVE_USERS'
-export const INVALIDATE_USERS = 'INVALIDATE_USERS'
-export const UDPATE_USER = 'UDPATE_USER'
-export const RECEIVE_USER = 'RECEIVE_USER'
-
 export const REQUEST_USER_GROUPS = 'REQUEST_USER_GROUPS'
 export const RECEIVE_USER_GROUPS = 'RECEIVE_USER_GROUPS'
 export const RECEIVE_USER_GROUP = 'RECEIVE_USER_GROUP'
@@ -194,43 +188,6 @@ export function invalidatePreferredSurvey(preferredSurvey) {
 	return {
 		type: INVALIDATE_PREFERRED_SURVEY,
 		preferredSurvey
-	}
-}
-
-//USERS
-function requestUsers() {
-	return {
-		type: REQUEST_USERS
-	}
-}
-
-function receiveUsers(json) {
-	return {
-	    type: RECEIVE_USERS,
-		users: json.map(u => new User(u)), 
-	    receivedAt: Date.now()
-	}
-}
-
-export function receiveUser(json) {
-	return {
-	    type: RECEIVE_USER,
-	    user: new User(json),
-	    receivedAt: Date.now()
-	}
-}
-
-export function fetchUsers() {
-	return function (dispatch) {
-		dispatch(requestUsers())
-		ServiceFactory.userService.fetchUsers().then(json => dispatch(receiveUsers(json)))
-	}
-}
-
-export function invalidateUsers(users) {
-	return {
-		type: INVALIDATE_USERS,
-		users
 	}
 }
 

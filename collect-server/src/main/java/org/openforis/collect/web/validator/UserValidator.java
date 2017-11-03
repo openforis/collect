@@ -7,6 +7,7 @@ import org.openforis.collect.datacleansing.form.validation.SimpleValidator;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.web.controller.UserController.UserForm;
+import org.openforis.collect.web.controller.UserController.UsersDeleteParameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -28,6 +29,14 @@ public class UserValidator extends SimpleValidator<UserForm> {
 	
 	@Autowired
 	private UserManager userManager;
+	
+	@Override
+	public void validate(Object target, Errors errors) {
+		super.validate(target, errors);
+		if (target instanceof UsersDeleteParameters) {
+//			List<Integer> userIds = ((UsersDeleteParameters) target).getUserIds();
+		}
+	}
 	
 	@Override
 	public void validateForm(UserForm target, Errors errors) {
@@ -64,5 +73,10 @@ public class UserValidator extends SimpleValidator<UserForm> {
 		}
 		return true;
 	}
-
+	
+	@Override
+	public boolean supports(Class<?> clazz) {
+		boolean result = super.supports(clazz);
+		return result || UsersDeleteParameters.class.isAssignableFrom(clazz);
+	}
 }

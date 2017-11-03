@@ -6,6 +6,7 @@ import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactst
 
 import UserDetailsPage from './UserDetailsPage';
 import AbstractItemsListPage from 'components/AbstractItemsListPage';
+import * as UserActions from 'actions/users'
 
 class UsersPage extends AbstractItemsListPage {
 
@@ -16,15 +17,32 @@ class UsersPage extends AbstractItemsListPage {
 		dispatch: PropTypes.func.isRequired
 	}
 
-	constructor(props) {
-		super({...props, singleSelection: true})
+	componentDidMount() {
 	}
 
-	componentDidMount() {
+	componentWillReceiveProps(nextProps) {
+		if (this.state.selectedItemIds.length > 0 && nextProps.users) {
+			const newSelectedItemIds = this.state.selectedItemIds.filter(id => nextProps.users.find(u => u.id === id))
+			const newSelectedItems = newSelectedItemIds.map(id => nextProps.users.find(u => u.id === id))
+			const newEditedItem = newSelectedItems.length === 1 ? newSelectedItems[0] : null
+			this.setState({
+				selectedItemIds: newSelectedItemIds,
+				selectedItems: newSelectedItems,
+				editedItem: newEditedItem
+			})
+		}
 	}
 
 	createNewItem() {
 		return {id: null, username: '', enabled: true, role: '-1'};
+	}
+
+	handleDeleteButtonClick() {
+		const ids = this.state.selectedItemIds
+		if (window.confirm('Delete the selected ' + ids.length + ' user(s)?')) {
+			const loggedUser = this.props.loggedUser
+			this.props.dispatch(UserActions.deleteUsers(loggedUser.id, ids))
+		}
 	}
 
   	render() {
@@ -45,6 +63,10 @@ class UsersPage extends AbstractItemsListPage {
 				<Row>
 					<Col>
 						<Button color="success" onClick={this.handleNewButtonClick}>New</Button>
+						{' '}
+						{this.state.selectedItemIds.length > 0 &&
+							<Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash" aria-hidden="true" /></Button>
+						}
 					</Col>
 				</Row>
 				<Row>
@@ -52,12 +74,9 @@ class UsersPage extends AbstractItemsListPage {
 						<BootstrapTable
 							ref="table"
 							data={this.props.users}
-							striped
-							hover
-							condensed
-							selectRow={ 
-								{mode: 'radio', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', onSelect: this.handleRowSelect,
-									selected: this.state.selectedItemIds} 
+							striped hover selectRow={ 
+								{mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
+									onSelect: this.handleRowSelect, selected: this.state.selectedItemIds} 
 							}
 							>
 							<TableHeaderColumn dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>
@@ -87,7 +106,8 @@ const mapStateToProps = state => {
   return {
     isFetching,
     lastUpdated,
-    users
+	users,
+	loggedUser: state.session ? state.session.loggedUser : null,
   }
 }
 

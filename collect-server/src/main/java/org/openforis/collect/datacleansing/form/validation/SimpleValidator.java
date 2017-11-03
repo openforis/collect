@@ -53,10 +53,12 @@ public abstract class SimpleValidator<F> implements Validator {
 	}
 	
 	@Override
-	public final void validate(Object target, Errors errors) {
-		@SuppressWarnings("unchecked")
-		F form = (F) target;
-		validateForm(form, errors);
+	public void validate(Object target, Errors errors) {
+		if (genericType.isAssignableFrom(target.getClass())) {
+			@SuppressWarnings("unchecked")
+			F form = (F) target;
+			validateForm(form, errors);
+		}
 	}
 	
 	public abstract void validateForm(F target, Errors errors);

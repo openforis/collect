@@ -23,7 +23,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
             username: '',
             rawPassword: '',
             retypedPassword: '',
-            role: null,
+            role: 'ENTRY',
             enabled: false,
         }
         return s
@@ -68,10 +68,6 @@ class UserDetailsPage extends AbstractItemDetailsPage {
             })
             this.props.actions.receiveUser(res.form);
         }
-    }
-
-    handleDeleteBtnClick() {
-        
     }
 
     render() {
@@ -151,7 +147,6 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                     <FormGroup check row>
                         <Col sm={{ size: 10, offset: 2 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
-                            {! this.state.newItem && <Button color="danger" onClick={this.handleDeleteBtnClick}><span className="fa fa-trash"/></Button>}
                         </Col>
                     </FormGroup>
                 </Form>

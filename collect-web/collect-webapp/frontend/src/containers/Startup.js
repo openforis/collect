@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as Actions from 'actions';
+import * as UserActions from 'actions/users';
 
 class Startup extends Component {
     
@@ -11,10 +12,10 @@ class Startup extends Component {
     }
 
     componentDidMount() {
-        this.props.actions.fetchApplicationInfo()
-        this.props.actions.fetchCurrentUser()
-        this.props.actions.fetchUsers()
-        this.props.actions.fetchUserGroups()
+        this.props.dispatch(Actions.fetchApplicationInfo())
+        this.props.dispatch(Actions.fetchCurrentUser())
+        this.props.dispatch(UserActions.fetchUsers())
+        this.props.dispatch(Actions.fetchUserGroups())
     }
 
     render() {
@@ -70,13 +71,6 @@ function mapStateToProps(state) {
     };
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators(Actions, dispatch)
-    };
-}
-
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps
 )(Startup);

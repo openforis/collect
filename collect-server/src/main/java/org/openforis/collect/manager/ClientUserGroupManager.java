@@ -150,6 +150,16 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
+	public void deleteRelation(int userGroupId, int userId) {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void deleteAllUserRelations(int userId) {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
 	public Map<String, String> getQualifiers(UserGroup group, User user) {
 		// TODO Auto-generated method stub
 		return null;

@@ -1,8 +1,11 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.util.List;
+
+import javax.validation.Valid;
 
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -13,9 +16,11 @@ import org.openforis.collect.model.UserRole;
 import org.openforis.collect.web.controller.UserController.UserForm;
 import org.openforis.collect.web.validator.UserValidator;
 import org.openforis.commons.web.PersistedObjectForm;
+import org.openforis.commons.web.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,6 +63,16 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 		return itemManager.loadAllAvailableUsers(loggedUser);
 	}
 	
+	@Transactional
+	@RequestMapping(method=DELETE)
+	public @ResponseBody
+	Response delete(@Valid UsersDeleteParameters parameters) {
+		for (int userId : parameters.getUserIds()) {
+			itemManager.deleteById(userId);
+		}
+		return new Response();
+	}
+
 	@Override
 	protected UserForm createFormInstance(User item) {
 		return new UserForm(item);
@@ -66,6 +81,28 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 	@Override
 	protected User createItemInstance() {
 		return new User();
+	}
+	
+	public static class UsersDeleteParameters {
+		
+		private int loggedUserId;
+		private List<Integer> userIds;
+
+		public int getLoggedUserId() {
+			return loggedUserId;
+		}
+
+		public void setLoggedUserId(int loggedUserId) {
+			this.loggedUserId = loggedUserId;
+		}
+
+		public List<Integer> getUserIds() {
+			return userIds;
+		}
+
+		public void setUserIds(List<Integer> userIds) {
+			this.userIds = userIds;
+		}
 	}
 	
 	public static class UserForm extends PersistedObjectForm<User> {

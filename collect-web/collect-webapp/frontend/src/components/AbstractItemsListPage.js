@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Arrays from 'utils/Arrays'
 
 export default class AbstractItemsListPage extends Component {
 
@@ -12,8 +13,9 @@ export default class AbstractItemsListPage extends Component {
             editedItem: null
         };
         
-		this.handleRowSelect = this.handleRowSelect.bind(this);
-		this.handleNewButtonClick = this.handleNewButtonClick.bind(this);
+		this.handleRowSelect = this.handleRowSelect.bind(this)
+		this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
+		this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
     }
     
     handleRowSelect(row, isSelected, e) {
@@ -25,13 +27,12 @@ export default class AbstractItemsListPage extends Component {
 	}
 
 	handleItemSelected(item) {
-		let newSelectedItems = this.state.singleSelection ? [item] : this.state.selectedItems.concat([item]);
+		const newSelectedItems = this.state.singleSelection ? [item] : Arrays.addItem(this.state.selectedItems, item);
 		this.handleItemsSelection(newSelectedItems)
 	}
 
 	handleItemUnselected(item) {
-		let idx = this.state.selectedItems.indexOf(item);
-		let newSelectedItems = this.state.selectedItems.slice(idx, 0);
+		const newSelectedItems = Arrays.removeItem(this.state.selectedItems, item)
 		this.handleItemsSelection(newSelectedItems)
 	}
 
@@ -39,14 +40,10 @@ export default class AbstractItemsListPage extends Component {
 		this.setState({ ...this.state, 
 			selectedItems: selectedItems,
 			selectedItemIds: selectedItems.map(item => item.id),
-			editedItem: this.getUniqueItemOrNull(selectedItems)
+			editedItem: Arrays.singleItemOrNull(selectedItems)
 		})
 	}
 
-	getUniqueItemOrNull(items) {
-		return items.length === 1 ? items[0] : null;
-	}
-	
 	handleNewButtonClick() {
 		this.setState({...this.state, 
 			editedItem: this.createNewItem(),
@@ -54,7 +51,11 @@ export default class AbstractItemsListPage extends Component {
 			selectedItemIds: []
 		})
     }
-    
+	
+	handleDeleteButtonClick() {
+		
+	}
+	
     createNewItem() {
         //abstract
         return {};

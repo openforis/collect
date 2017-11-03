@@ -44,6 +44,10 @@ export default class Arrays {
         }
     }
 
+    static removeItems(array, items) {
+        return Arrays.addOrRemoveItems(array, items, true)
+    }
+
     /**
      * Adds or removes an element without side effect on the specified array
      * @param {Array} array 
@@ -70,5 +74,9 @@ export default class Arrays {
         array.sort((a,b) => a === null && b === null ? 0: a === null ? -1: b === null ? 1: 
             Objects.compare(a[propName], b[propName]))
     }
+
+    static singleItemOrNull(items) {
+		return items.length === 1 ? items[0] : null;
+	}
 
 }

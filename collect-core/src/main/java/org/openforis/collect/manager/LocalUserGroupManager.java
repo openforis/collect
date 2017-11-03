@@ -198,7 +198,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		}
 
 		for (UserInGroup userInGroup : removedUsersInGroupByUserId.values()) {
-			dao.deleteRelation(userInGroup.getUserId(), userGroup.getId());
+			deleteRelation(userGroup.getId(), userInGroup.getUserId());
 		}
 		for (UserInGroup userInGroup : updatedUsersInGroupByUserId.values()) {
 			dao.updateRelation(userInGroup);
@@ -207,6 +207,16 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 			dao.insertRelation(userGroup, userInGroup);
 		}
 		return userGroup;
+	}
+	
+	@Override
+	public void deleteRelation(int userGroupId, int userId) {
+		dao.deleteRelation(userGroupId, userId);
+	}
+	
+	@Override
+	public void deleteAllUserRelations(int userId) {
+		dao.deleteAllUserRelations(userId);
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)

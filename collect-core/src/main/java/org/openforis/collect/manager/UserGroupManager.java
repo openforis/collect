@@ -45,4 +45,8 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	void associateResource(int userGroupId, String resourceType, String resourceId);
 	
 	void disassociateResource(int userGroupId, String resourceType, String resourceId);
+	
+	void deleteRelation(int userGroupId, int userId);
+
+	void deleteAllUserRelations(int userId);
 }

@@ -134,11 +134,17 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 		.execute();
 	}
 	
-	public void deleteRelation(int userId, int groupId) {
+	public void deleteRelation(int groupId, int userId) {
 		dsl().deleteFrom(OFC_USER_USERGROUP)
 			.where(OFC_USER_USERGROUP.USER_ID.eq(userId)
 				.and(OFC_USER_USERGROUP.GROUP_ID.eq(groupId))
 		).execute();
+	}
+	
+	public void deleteAllUserRelations(int userId) {
+		dsl().deleteFrom(OFC_USER_USERGROUP)
+			.where(OFC_USER_USERGROUP.USER_ID.eq(userId))
+			.execute();
 	}
 	
 	public void updateRelation(UserInGroup userInGroup) {

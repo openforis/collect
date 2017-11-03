@@ -177,11 +177,13 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		return encodedDefaultPassword.equals(adminUser.getPassword());
 	}
 
+	@Override
 	@Transactional
-	public void delete(int id) throws CannotDeleteUserException {
+	public void deleteById(Integer id) throws CannotDeleteUserException {
 		if ( recordDao.hasAssociatedRecords(id) ) {
 			throw new CannotDeleteUserException();
 		}
+		groupManager.deleteAllUserRelations(id);
 		userDao.delete(id);
 		
 		User cachedUser = userById.get(id);
