@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.13.10-SNAPSHOT</version>
+		<version>3.13.11-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-client</artifactId>
@@ -159,10 +159,14 @@
 					<loadConfig>${project.build.outputDirectory}/flex-config.xml</loadConfig>
 					<locales>
 						<locale>en_US</locale>
+						<locale>es_ES</locale>
+						<locale>fr_FR</locale>
 						<locale>pt_BR</locale>
 					</locales>
 					<localesCompiled>
 						<locale>en_US</locale>
+<!-- 						<locale>es_ES</locale> -->
+						<locale>fr_FR</locale>
 						<locale>pt_BR</locale>
 					</localesCompiled>
 					<includeResourceBundles>

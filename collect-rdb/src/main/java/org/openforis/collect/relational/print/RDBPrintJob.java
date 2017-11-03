@@ -199,6 +199,7 @@ public class RDBPrintJob extends Job {
 					return;
 				}
 				CodeTableDataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
+				writeBatchInsert(codeTable, extractor);
 				setProcessedItems(getProcessedItems() + extractor.getTotal());
 			}
 		}
@@ -219,12 +220,12 @@ public class RDBPrintJob extends Job {
 		protected void execute() throws Throwable {
 			recordManager.visitSummaries(recordFilter, null, new Visitor<CollectRecordSummary>() {
 				public void visit(CollectRecordSummary summary) {
+					if(!isRunning()) {
+						return;
+					}
 					CollectRecord record = recordManager.load((CollectSurvey) summary.getSurvey(), summary.getId(), summary.getStep());
 					if (record != null) {
 						for (DataTable table : schema.getDataTables()) {
-							if(!isRunning()) {
-								return;
-							}
 							try {
 								writeBatchInsert(table, DataExtractorFactory.getRecordDataExtractor(table, record));
 							} catch(Exception e) {
@@ -245,5 +246,4 @@ public class RDBPrintJob extends Job {
 			this.recordFilter = recordFilter;
 		}
 	}
-	
 }

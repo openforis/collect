@@ -721,6 +721,7 @@ public class SchemaVM extends SurveyBaseVM {
 	private void closeNodeEditPopUp() {
 		closePopUp(rootEntityEditPopUp);
 		rootEntityEditPopUp = null;
+		notifyChange("selectedRootEntity");
 	}
 
 	@Command

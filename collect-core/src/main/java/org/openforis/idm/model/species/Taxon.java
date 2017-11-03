@@ -62,7 +62,6 @@ public class Taxon {
 			switch (this) {
 			case FORM:
 			case VARIETY:
-				return SPECIES;
 			case SUBSPECIES:
 				return SPECIES;
 			case SPECIES:
@@ -92,8 +91,36 @@ public class Taxon {
 			}
 		}
 		
+		public List<TaxonRank> getSelfAndDescendants() {
+			ArrayList<TaxonRank> result = new ArrayList<TaxonRank>();
+			result.add(this);
+			result.addAll(getDescendants());
+			return result;
+		}
+		
+		public List<TaxonRank> getDescendants() {
+			List<TaxonRank> result = new ArrayList<TaxonRank>();
+			for (TaxonRank taxonRank : values()) {
+				if (this.isHigherThan(taxonRank)) {
+					result.add(taxonRank);
+				}
+			}
+			return result;
+		}
+		
 		public String getName() {
 			return name;
+		}
+
+		public boolean isHigherThan(TaxonRank taxonRank) {
+			TaxonRank parent = taxonRank.getParent();
+			while(parent != null) {
+				if (parent == this) {
+					return true;
+				}
+				parent = parent.getParent();
+			}
+			return false;
 		}
 		
 	}
