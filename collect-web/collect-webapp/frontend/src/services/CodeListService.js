@@ -1,6 +1,4 @@
 import AbstractService from './AbstractService';
-import { RecordEventWrapper } from '../model/event/RecordEvent'
-import EventQueue from '../model/event/EventQueue'
 
 export default class CodeListService extends AbstractService {
 

@@ -3,18 +3,18 @@ import Serializable from '../Serializable';
 
 export class RecordEvent extends Event {
 	
-	eventType;
-	surveyName;
-	recordId;
-	recordStep;
-	definitionId;
-	ancestorIds;
-	nodeId;
-	timestamp;
-	userName;
+	eventType
+	surveyName
+	recordId
+	recordStep
+	definitionId
+	ancestorIds
+	nodeId
+	timestamp
+	userName
 	
 	constructor(jsonObj) {
-        super();
+        super()
         if (jsonObj) {
             this.fillFromJSON(jsonObj)
         }
@@ -31,140 +31,79 @@ export class RecordEvent extends Event {
 }
 
 export class AttributeEvent extends RecordEvent {
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
 }
 
 export class AttributeUpdatedEvent extends AttributeEvent {
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
 }
 
 export class BooleanAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    value;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    value
 }
     
 
 export class CodeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    code;
-    qualifier;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    code
+    qualifier
 }
 
 export class CoordinateAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    x;
-    y;
-    srsId;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    x
+    y
+    srsId
 }
 
 export class DateAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    date;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    date
 }
 
 export class DoubleAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    value;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    value
 }
 
 export class DoubleRangeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    from;
-    to;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    from
+    to
 }
 
 export class IntegerAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    value;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    value
 }
 
 export class IntegerRangeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    from;
-    to;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    from
+    to
 }
 
 export class TaxonAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    code;
-    scientificName;
-    vernacularName;
-    languageCode;
-    languageVariety;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    code
+    scientificName
+    vernacularName
+    languageCode
+    languageVariety
 }
 
 export class TextAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    text;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    text
 }
 
 export class TimeAttributeUpdatedEvent extends AttributeUpdatedEvent {
-    time;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    time
 }
 
 export class RelevanceChangedEvent extends RecordEvent {
-    childDefId;
-    relevant;
-
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
+    childDefId
+    relevant
 }
 
 export class EntityCreatedEvent extends RecordEvent {
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
 }
 
 export class EntityCollectionCreatedEvent extends RecordEvent {
-    constructor(jsonObj) {
-        super(jsonObj);
-    }
 }
 
 export class RecordEventWrapper extends Serializable {
-    
-    event;
-    eventType;
+    event
+    eventType
     
     constructor(jsonObj) {
         super()
@@ -174,43 +113,43 @@ export class RecordEventWrapper extends Serializable {
     }
    
     fillFromJSON(jsonObj) {
-        super.fillFromJSON(jsonObj);
+        super.fillFromJSON(jsonObj)
         this.event = this._parseEvent(jsonObj)
     }
 
     _parseEvent(jsonObj) {
         switch(jsonObj.eventType) {
         case "EntityCreatedEvent":
-            return new EntityCreatedEvent(jsonObj.event);
+            return new EntityCreatedEvent(jsonObj.event)
         case "EntityCollectionCreatedEvent":
-            return new EntityCreatedEvent(jsonObj.event);
+            return new EntityCreatedEvent(jsonObj.event)
         case "RelevanceChangedEvent":
-            return new RelevanceChangedEvent(jsonObj.event);
+            return new RelevanceChangedEvent(jsonObj.event)
         case "BooleanAttributeUpdatedEvent":
-            return new BooleanAttributeUpdatedEvent(jsonObj.event);
+            return new BooleanAttributeUpdatedEvent(jsonObj.event)
         case "CodeAttributeUpdatedEvent":
-            return new CodeAttributeUpdatedEvent(jsonObj.event);
+            return new CodeAttributeUpdatedEvent(jsonObj.event)
         case "CoordinateAttributeUpdatedEvent":
-            return new CoordinateAttributeUpdatedEvent(jsonObj.event);
+            return new CoordinateAttributeUpdatedEvent(jsonObj.event)
         case "DateAttributeUpdatedEvent":
-            return new DateAttributeUpdatedEvent(jsonObj.event);
+            return new DateAttributeUpdatedEvent(jsonObj.event)
         case "DoubleAttributeUpdatedEvent":
-            return new DoubleAttributeUpdatedEvent(jsonObj.event);
+            return new DoubleAttributeUpdatedEvent(jsonObj.event)
         case "DoubleRangeAttributeUpdatedEvent":
-            return new DoubleRangeAttributeUpdatedEvent(jsonObj.event);
+            return new DoubleRangeAttributeUpdatedEvent(jsonObj.event)
         case "IntegerAttributeUpdatedEvent":
-            return new IntegerAttributeUpdatedEvent(jsonObj.event);
+            return new IntegerAttributeUpdatedEvent(jsonObj.event)
         case "IntegerRangeAttributeUpdatedEvent":
-            return new IntegerRangeAttributeUpdatedEvent(jsonObj.event);
+            return new IntegerRangeAttributeUpdatedEvent(jsonObj.event)
         case "TaxonAttributeUpdatedEvent":
-            return new TaxonAttributeUpdatedEvent(jsonObj.event);
+            return new TaxonAttributeUpdatedEvent(jsonObj.event)
         case "TextAttributeUpdatedEvent":
-            return new TextAttributeUpdatedEvent(jsonObj.event);
+            return new TextAttributeUpdatedEvent(jsonObj.event)
         case "TimeAttributeUpdatedEvent":
-            return new TimeAttributeUpdatedEvent(jsonObj.event);
+            return new TimeAttributeUpdatedEvent(jsonObj.event)
         default: 
-            console.log("Unsupported event type: " + jsonObj.eventType);
-            return null; //TODO throw error?
+            console.log("Unsupported event type: " + jsonObj.eventType)
+            return null //TODO throw error?
         }
     }
 }

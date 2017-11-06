@@ -1,4 +1,3 @@
-import { UIModelObjectDefinition } from './UIModelObjectDefinition';
 import { FieldDefinition } from './FieldDefinition';
 
 export class CodeFieldDefinition extends FieldDefinition {
@@ -7,7 +6,4 @@ export class CodeFieldDefinition extends FieldDefinition {
     itemsOrientation;
     showCode;
     
-    constructor(id, parent) {
-        super(id, parent);
-    }
 }

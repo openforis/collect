@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input } from 'reactstrap';
+import { Input } from 'reactstrap';
 
 export default class OwnerColumnEditor extends Component {
     constructor(props) {
@@ -16,7 +16,7 @@ export default class OwnerColumnEditor extends Component {
 
     handleInputChange(event) {
         const ownerId = event.target.value
-        const newOwner = ownerId > 0 ? this.props.users.find(u => u.id == ownerId) : null
+        const newOwner = ownerId > 0 ? this.props.users.find(u => u.id === ownerId) : null
         this.props.onUpdate({ owner: newOwner });
     }
 

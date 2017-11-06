@@ -1,11 +1,9 @@
-import Serializable from '../Serializable';
 import { CodeFieldDefinition } from './CodeFieldDefinition';
 import { FieldDefinition } from './FieldDefinition';
 import { FieldsetDefinition } from './FieldsetDefinition';
 import { MultipleFieldsetDefinition } from './MultipleFieldsetDefinition';
 import { TabDefinition } from './TabDefinition';
 import { TableDefinition } from './TableDefinition';
-import { UIModelObjectDefinition } from './UIModelObjectDefinition';
 
 export class TabContainers {
 	
@@ -27,7 +25,7 @@ export class TabContainers {
             var item;
             switch(itemJsonObj.type) {
             case 'FIELD':
-                if (itemJsonObj.attributeType == 'CODE') {
+                if (itemJsonObj.attributeType === 'CODE') {
                     item = new CodeFieldDefinition(itemJsonObj.id, parentUIModelObject);
                 } else {
                     item = new FieldDefinition(itemJsonObj.id, parentUIModelObject);

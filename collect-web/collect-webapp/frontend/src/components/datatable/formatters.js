@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Moment from 'moment';
 import CheckedIconFormatter from './CheckedIconFormatter'
 

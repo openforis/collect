@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import Arrays from 'utils/Arrays'
 
 export default class AbstractItemsListPage extends Component {

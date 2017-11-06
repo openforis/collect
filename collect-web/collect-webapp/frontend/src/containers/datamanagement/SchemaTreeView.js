@@ -22,8 +22,8 @@ export default class SchemaTreeView extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const mustUpdateState = this.props.survey.id != nextProps.survey.id 
-                || this.props.selectAll != nextProps.selectAll
+        const mustUpdateState = this.props.survey.id !== nextProps.survey.id 
+                || this.props.selectAll !== nextProps.selectAll
         
         if (mustUpdateState) {
             const survey = nextProps.survey;

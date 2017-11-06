@@ -1,9 +1,16 @@
 export default class Serializable {
+
+    constructor(jsonObj) {
+        if (jsonObj) {
+            this.fillFromJSON(jsonObj)
+        }
+    }
+
     fillFromJSON(jsonObj) {
         for (var propName in jsonObj) {
             let newVal = jsonObj[propName]
             let oldVal = this[propName]
-            if ((oldVal === null || oldVal === undefined) && newVal != null && newVal != undefined) {
+            if ((oldVal === null || oldVal === undefined) && newVal !== null && newVal !== undefined) {
                 this[propName] = newVal
             }
         }

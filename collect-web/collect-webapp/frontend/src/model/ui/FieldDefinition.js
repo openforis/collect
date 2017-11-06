@@ -1,5 +1,4 @@
 import { UIModelObjectDefinition } from './UIModelObjectDefinition';
-import { AttributeDefinition } from '../Survey';
 
 export class FieldDefinition extends UIModelObjectDefinition {
     
@@ -9,11 +8,6 @@ export class FieldDefinition extends UIModelObjectDefinition {
     column;
     columnSpan;
     row;
-    
-    constructor(id, parent) {
-        super(id, parent);
-        
-    }
     
     get attributeDefinition() {
         let survey = this.parent.uiConfiguration.survey;

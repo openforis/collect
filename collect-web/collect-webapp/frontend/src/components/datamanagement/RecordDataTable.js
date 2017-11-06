@@ -49,7 +49,8 @@ class RecordDataTable extends Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.survey != null && (this.props.survey == null || nextProps.survey.id != this.props.survey.id)) {
+		if (nextProps.survey !== null && (this.props.survey === null || 
+				nextProps.survey.id !== this.props.survey.id)) {
 			this.setState({records: null})
 			this.fetchData(this.state.page, this.state.recordsPerPage, nextProps.survey);
 		}
@@ -59,7 +60,7 @@ class RecordDataTable extends Component {
 		if (page === 0) {
 			page = 1
 		}
-		if (this.state.page != page || this.state.recordsPerPage != recordsPerPage) {
+		if (this.state.page !== page || this.state.recordsPerPage !== recordsPerPage) {
 			this.fetchData(page, recordsPerPage)
 		}
 	}
@@ -91,11 +92,11 @@ class RecordDataTable extends Component {
 	}
 
 	handleCellEdit(row, fieldName, value) {
-		if (fieldName == 'owner') {
+		if (fieldName === 'owner') {
 			const recordId = row.id
 			const newOwner = value.owner
 			ServiceFactory.recordService.updateOwner(row, newOwner).then(res => {
-				const newRecords = this.state.records.map(r => r.id == recordId ? { ...r, owner: newOwner } : r)
+				const newRecords = this.state.records.map(r => r.id === recordId ? { ...r, owner: newOwner } : r)
 				this.setState({ records: newRecords })
 			})
 		}
@@ -143,6 +144,9 @@ class RecordDataTable extends Component {
 			case 'modifiedDate':
 				sortField = 'DATE_MODIFIED'
 				break
+			default:
+				console.log('unsupported sort field: ' + sortName)
+				return
 		}
 		let sortFields = [{field: sortField, descending: sortOrder === 'desc'}]
 		this.fetchData(1, this.state.recordsPerPage, this.props.survey, this.state.keyValues, this.state.summaryValues, sortFields)
@@ -238,7 +242,7 @@ class RecordDataTable extends Component {
 			<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
 				dataAlign="center" width="80" editable={false} dataSort>Cleansed</TableHeaderColumn>,
 			<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter}
-				editable={loggedUser.canChangeRecordOwner(surveyUserGroup)}
+				editable={loggedUser.canChangeRecordOwner(mostSpecificGroup)}
 				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
 				dataAlign="center" width="150"  dataSort>Owner</TableHeaderColumn>
 		);

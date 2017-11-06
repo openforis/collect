@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types'
-import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
-    Form, FormGroup, Label, Input, FormText, FormFeedback } from 'reactstrap';
+import { Alert, Button, Col, Form, FormGroup, Label, Input, FormFeedback } from 'reactstrap';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
     

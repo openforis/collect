@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress } from 'reactstrap';
-import ServiceFactory from 'services/ServiceFactory'
-import * as Actions from 'actions'
 
 export default class JobMonitorModal extends Component {
 
@@ -27,7 +25,7 @@ export default class JobMonitorModal extends Component {
                             <Progress value={this.state.job.progressPercent} />
                             : this.props.job.status
                     } 
-                    {! loading && this.props.job.status == 'FAILED' &&
+                    {! loading && this.props.job.status === 'FAILED' &&
                         <p>{this.props.job.errorMessage}</p>
                     }
                 </ModalBody>

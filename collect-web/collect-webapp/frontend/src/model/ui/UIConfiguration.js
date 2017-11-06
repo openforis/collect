@@ -1,6 +1,5 @@
 import Serializable from '../Serializable';
 import { TabSetDefinition } from './TabSetDefinition';
-import { Survey } from '../Survey';
 
 export class UIConfiguration extends Serializable {
     

@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormGroup, Label, Input, Row, Col, Tooltip } from 'reactstrap';
+import { FormGroup, Tooltip } from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';    
 import * as Formatters from 'components/datatable/formatters'
 
 export default class BackupDataImportSummaryForm extends Component {
-
-    constructor(props) {
-        super(props)
-    }
 
     render() {
         const survey = this.props.survey
@@ -32,6 +27,8 @@ export default class BackupDataImportSummaryForm extends Component {
                 case 1:
                     iconClass = "circle-green"
                     break
+                default:
+                    iconClass = ""
             }
             return <span className={iconClass}></span>
         }
@@ -68,11 +65,6 @@ export default class BackupDataImportSummaryForm extends Component {
         columns.push(<TableHeaderColumn key="recordModifiedDate" dataField="recordModifiedDate" dataFormat={Formatters.dateTimeFormatter}
             dataSort dataAlign="center" width="80" row="0" rowSpan="2">Modified</TableHeaderColumn>)
         
-        function conflictingRecordRootEntityKeyFormatter(cell, row) {
-            var keyIdx = this.name.substring('conflictingKey'.length) - 1;
-            return row.conflictingRecord.rootEntityKeys[keyIdx]
-        }
-
         let conflictingRecordsColumns = []
         conflictingRecordsColumns.push(<TableHeaderColumn key="entryId" dataField="entryId" isKey hidden>Id</TableHeaderColumn>)
         

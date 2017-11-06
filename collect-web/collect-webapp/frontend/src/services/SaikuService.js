@@ -1,5 +1,4 @@
 import AbstractService from './AbstractService';
-import { Survey } from '../model/Survey';
 
 export default class SaikuService extends AbstractService {
 

@@ -1,6 +1,4 @@
 import { UIModelObjectDefinition } from './UIModelObjectDefinition';
-import { TabContainers } from './TabContainers';
-import { AttributeDefinition, EntityDefinition } from '../Survey';
 
 export class TableDefinition extends UIModelObjectDefinition {
 
@@ -13,10 +11,6 @@ export class TableDefinition extends UIModelObjectDefinition {
     row;
     column;
     columnSpan;
-    
-    constructor(id, parent) {
-        super(id, parent);
-    }
     
     fillFromJSON(jsonObj) {
         super.fillFromJSON(jsonObj);
@@ -74,9 +68,6 @@ export class TableDefinition extends UIModelObjectDefinition {
 
 export class TableHeadingComponentDefinition extends UIModelObjectDefinition {
     
-    constructor(id, parent) {
-        super(id, parent);
-    }
 }
 
 export class ColumnGroupDefinition extends TableHeadingComponentDefinition {
@@ -84,10 +75,6 @@ export class ColumnGroupDefinition extends TableHeadingComponentDefinition {
     headingComponents = [];
     entityDefinitionId;
     label;
-    
-    constructor(id, parent) {
-        super(id, parent);
-    }
     
     fillFromJSON(jsonObj) {
         super.fillFromJSON(jsonObj);
@@ -115,10 +102,6 @@ export class ColumnGroupDefinition extends TableHeadingComponentDefinition {
 
 export class ColumnDefinition extends TableHeadingComponentDefinition {
     attributeDefinitionId;
-    
-    constructor(id, parent) {
-        super(id, parent);
-    }
     
     get attributeDefinition() {
         return this.survey.schema.getDefinitionById(this.attributeDefinitionId);

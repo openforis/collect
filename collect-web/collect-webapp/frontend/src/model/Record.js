@@ -1,5 +1,5 @@
 import Serializable from './Serializable';
-import { Survey, NodeDefinition, EntityDefinition } from './Survey';
+import { EntityDefinition } from './Survey';
 
 export class Record extends Serializable {
     id;
@@ -62,10 +62,6 @@ export class Entity extends Node {
     
     childrenByDefinitionId = [];
     
-    constructor(record, definition, parent) {
-        super(record, definition, parent);
-    }
-    
     get summaryLabel() {
         return "Entity " + this.id;
     }
@@ -105,7 +101,7 @@ export class Entity extends Node {
     
     getSingleChild(defId) {
         let children = this.childrenByDefinitionId[defId];
-        return children == null || children.length == 0 ? null : children[0];
+        return children === null || children.length === 0 ? null : children[0];
     }
     
     addChild(child) {
@@ -122,10 +118,6 @@ export class Entity extends Node {
 export class Attribute extends Node {
     
     fields = [];
-    
-    constructor(record, definition, parent) {
-        super(record, definition, parent);
-    }
     
     fillFromJSON(jsonObj) {
         super.fillFromJSON(jsonObj);
@@ -163,10 +155,6 @@ export class Field extends Serializable {
     
     value = null;
     remarks = null;
-    
-    constructor() {
-        super();
-    }
     
     get intValue() {
         return this.value == null ? null : parseInt(this.value.toString());

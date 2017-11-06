@@ -1,6 +1,4 @@
-import { EntityDefinition } from '../Survey';
-import { TabDefinition } from './TabDefinition';
-import { TabContainers } from './TabContainers';
+import {  TabContainers } from './TabContainers';
 import { UIModelObjectDefinition } from './UIModelObjectDefinition';
 
 export class FieldsetDefinition extends UIModelObjectDefinition {

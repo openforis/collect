@@ -1,7 +1,4 @@
-import { Survey } from '../Survey';
 import { TabContainers } from './TabContainers';
-import { TabDefinition } from './TabDefinition';
-import { UIConfiguration } from './UIConfiguration';
 import { UIModelObjectDefinition } from './UIModelObjectDefinition';
 
 export class TabSetDefinition extends UIModelObjectDefinition {
