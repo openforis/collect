@@ -50,29 +50,36 @@ public class RecordOperationGenerator {
 				newRecord = existingRecordSummary == null;
 				if (newRecord) {
 					insertRecordDataUntilStep(operations, parsedRecord, step);
-					workflowSequenceNumber = step.getStepNumber();
+					workflowSequenceNumber = calculateStepDataSequenceNumber(existingRecordSummary, step);
 				} else {
 					// overwrite existing record data
-					Step originalStep = existingRecordSummary.getStep();
+					Step existingRecordStep = existingRecordSummary.getStep();
 					parsedRecord.setId(existingRecordSummary.getId());
 					operations.initializeRecordId(existingRecordSummary.getId());
-					operations.setOriginalStep(originalStep);
-					boolean newStep = step.after(originalStep);
-					if (newStep) {
-						workflowSequenceNumber = existingRecordSummary.getWorkflowSequenceNumber() + (step.getStepNumber() - originalStep.getStepNumber());
-					} else {
-						workflowSequenceNumber = existingRecordSummary.getSummaryByStep(step).getSequenceNumber(); 
-					}
-					operations.addUpdate(parsedRecord, step, newStep, workflowSequenceNumber);
+					operations.setOriginalStep(existingRecordStep);
+					boolean insertNewDataStep = step.after(existingRecordStep);
+					workflowSequenceNumber = calculateStepDataSequenceNumber(existingRecordSummary, step);
+					operations.addUpdate(parsedRecord, step, insertNewDataStep, workflowSequenceNumber);
 				}
 				firstStepToBeProcessed = false;
 			} else {
-				boolean newStep = newRecord ? true : step.after(operations.getOriginalStep());
-				operations.addUpdate(parsedRecord, step, newStep, workflowSequenceNumber);
+				boolean insertNewDataStep = newRecord ? true : step.after(operations.getOriginalStep());
+				workflowSequenceNumber = calculateStepDataSequenceNumber(existingRecordSummary, step);
+				operations.addUpdate(parsedRecord, step, insertNewDataStep, workflowSequenceNumber);
 			}
-			workflowSequenceNumber ++;
 		}
 		return operations;
+	}
+
+	private int calculateStepDataSequenceNumber(CollectRecordSummary existingRecordSummary, Step step) {
+		if (existingRecordSummary == null) {
+			return step.getStepNumber();
+		} else if (step.after(existingRecordSummary.getStep())) {
+			return existingRecordSummary.getCurrentStepSummary().getSequenceNumber() + 
+					(step.getStepNumber() - existingRecordSummary.getStep().getStepNumber());
+		} else {
+			return existingRecordSummary.getSummaryByStep(step).getSequenceNumber(); 
+		}
 	}
 
 	private void setDefaultValues(CollectRecord parsedRecord) {

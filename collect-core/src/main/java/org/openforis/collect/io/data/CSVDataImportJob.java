@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -454,7 +453,7 @@ public class CSVDataImportJob extends Job {
 						CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
 						setValuesInRecord(line, record, currentStep);
 						//always save record when updating multiple record steps in the same process
-						updateRecord(record, originalRecordStep, currentStep);
+						updateRecordData(record, originalRecordStep, currentStep);
 					}
 				}
 			} else {
@@ -526,7 +525,7 @@ public class CSVDataImportJob extends Job {
 			Step originalStep = lastModifiedRecordSummary.getStep();
 			Step inputStep = input.steps.iterator().next();
 
-			updateRecord(lastModifiedRecord, originalStep, inputStep);
+			updateRecordData(lastModifiedRecord, originalStep, inputStep);
 			
 			if ( inputStep.compareTo(originalStep) < 0 ) {
 				//reset record step to the original one
@@ -534,7 +533,7 @@ public class CSVDataImportJob extends Job {
 						originalStep, input.settings.isRecordValidationEnabled());
 				record.setStep(originalStep);
 				
-				updateRecord(record, originalStep, originalStep);
+				updateRecordData(record, originalStep, originalStep);
 			}
 		}
 		
@@ -751,10 +750,18 @@ public class CSVDataImportJob extends Job {
 			}
 		}
 
-		private void updateRecord(final CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
-			record.setModifiedDate(new Date());
-			record.setModifiedBy(adminUser);
-			performRecordSave(record);
+		private void updateRecordData(final CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
+			performRecordUpdate(record, dataStep, record.getDataWorkflowSequenceNumber());
+		}
+		
+		private void performRecordUpdate(final CollectRecord record, Step step, int sequenceNumber) {
+			recordManager.updateRecordStepDataAndRun(record, step, sequenceNumber, adminUser, false, new Runnable() {
+				public void run() {
+					if (nodeChangeBatchProcessor != null) {
+						nodeChangeBatchProcessor.process(record);
+					}
+				}
+			});
 		}
 
 		private void insertRecord(final CollectRecord record) throws RecordPersistenceException {

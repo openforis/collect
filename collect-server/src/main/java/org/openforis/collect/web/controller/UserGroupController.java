@@ -18,7 +18,6 @@ import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus;
 import org.openforis.collect.model.UserInGroup.UserGroupRole;
-import org.openforis.collect.model.UserRole;
 import org.openforis.collect.web.controller.UserGroupController.UserGroupForm;
 import org.openforis.collect.web.validator.UserGroupValidator;
 import org.openforis.commons.web.PersistedObjectForm;
@@ -65,11 +64,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	@Override
 	protected List<UserGroup> loadAllItems() {
 		User loggedUser = sessionManager.getLoggedUser();
-		if (loggedUser.getRole() == UserRole.ADMIN) {
-			return itemManager.findAllUserDefinedGroups();
-		} else {
-			return itemManager.findAllRelatedUserGroups(loggedUser);
-		}
+		return itemManager.findAllRelatedUserGroups(loggedUser);
 	}
 	
 	@RequestMapping(value="/{userGroupId}/resources/{resourceType}/{resourceId}", method=POST)

@@ -279,7 +279,9 @@ public class RecordDao extends JooqDaoSupport {
 		ListIterator<StepSummary> listIterator = allStepsSummaries.listIterator(allStepsSummaries.size());
 		while(listIterator.hasPrevious() && summaryByStep.size() < Step.values().length) {
 			StepSummary stepSummary = listIterator.previous();
-			summaryByStep.put(stepSummary.getStep(), stepSummary);
+			if (! summaryByStep.containsKey(stepSummary.getStep()) && stepSummary.getState() == null) {
+				summaryByStep.put(stepSummary.getStep(), stepSummary);
+			}
 		}
 		return summaryByStep;
 	}
@@ -662,6 +664,11 @@ public class RecordDao extends JooqDaoSupport {
 			.and(OFC_RECORD_DATA.SEQ_NUM.eq(sequenceNumber))
 		);
 		return new CollectStoreQuery(q);
+	}
+	
+	public void updateRecordData(CollectRecord r, Step step, int sequenceNumber) {
+		CollectStoreQuery q = createRecordDataUpdateQuery(r, r.getId(), step, sequenceNumber);
+		execute(Arrays.asList(q));
 	}
 	
 	protected void fillRecordStoreQueryFromObject(StoreQuery<?> q, CollectRecord r) {

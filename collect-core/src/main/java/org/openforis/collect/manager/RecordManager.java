@@ -152,6 +152,20 @@ public class RecordManager {
 		}
 	}
 	
+	public void updateRecordStepData(CollectRecord record, Step step, int workflowSequenceNumber, User modifiedBy, boolean updateDateAndUser) {
+		if (updateDateAndUser) {
+			record.setDataModifiedDate(new Date());
+			record.setDataModifiedBy(modifiedBy);
+		}
+		recordDao.updateRecordData(record, step, workflowSequenceNumber);
+	}
+	
+	public void updateRecordStepDataAndRun(CollectRecord record, Step step, int workflowSequenceNumber, User modifiedBy, 
+			boolean updateDateAndUser, Runnable runnable) {
+		updateRecordStepData(record, step, workflowSequenceNumber, modifiedBy, updateDateAndUser);
+		runnable.run();
+	}
+	
 	public int nextId() {
 		return recordDao.nextId();
 	}
@@ -190,15 +204,16 @@ public class RecordManager {
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void executeRecordOperations(List<RecordOperations> operationsForRecords, Consumer<RecordStepOperation> consumer) {
-		int nextId = nextId();
+		Integer nextId = null;
 		List<CollectStoreQuery> queries = new ArrayList<CollectStoreQuery>();
 		for (RecordOperations recordOperations : operationsForRecords) {
-			CollectRecord lastRecord = null;
-			Step lastOperationStep = null;
+			CollectRecordSummary existingRecordSummary = loadUniqueRecordSummary(recordOperations.getSurvey(), recordOperations.getRecordId());
+			RecordStepOperation lastOperation = null;
 			List<RecordStepOperation> operations = recordOperations.getOperations();
 			for (RecordStepOperation operation : operations) {
 				CollectRecord record = operation.getRecord();
 				if (operation.isNewRecord()) {
+					nextId = nextId();
 					recordOperations.initializeRecordId(nextId ++);
 					queries.addAll(createNewRecordInsertQueries(record));
 				} else if (operation.isNewStep()) {
@@ -211,16 +226,20 @@ public class RecordManager {
 				if (consumer != null) {
 					consumer.consume(operation);
 				}
-				lastRecord = record;
-				lastOperationStep = operation.getStep();
+				lastOperation = operation;
 			}
-			if (lastRecord.getStep().beforeEqual(lastOperationStep)) {
-				lastRecord.setStep(lastOperationStep);
+			if (existingRecordSummary == null || existingRecordSummary.getStep().beforeEqual(lastOperation.getStep())) {
+				CollectRecord lastRecord = lastOperation.getRecord();
+				lastRecord.setId(recordOperations.getRecordId());
+				lastRecord.setDataWorkflowSequenceNumber(lastOperation.getDataStepSequenceNumber());
+				lastRecord.setStep(lastOperation.getStep());
 				queries.add(createSummaryUpdateQuery(lastRecord));
 			}
 		}
 		execute(queries);
-		restartIdSequence(nextId);
+		if (nextId != null) {
+			restartIdSequence(nextId);
+		}
 	}
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
@@ -389,6 +408,13 @@ public class RecordManager {
 		return summaries;
 	}
 
+	public CollectRecordSummary loadUniqueRecordSummary(CollectSurvey survey, int recordId) {
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRecordId(recordId);
+		List<CollectRecordSummary> summaries = loadSummaries(filter);
+		return summaries.isEmpty() ? null : summaries.get(0);
+	}
+	
 	public CollectRecordSummary loadUniqueRecordSummaryByKeys(CollectSurvey survey, int rootEntityId, List<String> keyValues) {
 		return loadUniqueRecordSummaryByKeys(survey, survey.getSchema().getRootEntityDefinition(rootEntityId).getName(), keyValues);
 	}
@@ -975,6 +1001,14 @@ public class RecordManager {
 		
 		public boolean hasMissingSteps() {
 			return originalStep != null && originalStep.after(lastUpdatedStep);
+		}
+		
+		public CollectSurvey getSurvey() {
+			if (isEmpty()) {
+				return null;
+			} else {
+				return (CollectSurvey) operations.get(0).getRecord().getSurvey();
+			}
 		}
 
 		public void addUpdate(CollectRecord record, Step step, boolean newStep, int dataStepSequenceNumber) {

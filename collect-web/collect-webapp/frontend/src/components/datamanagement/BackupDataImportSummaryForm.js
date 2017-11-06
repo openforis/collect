@@ -111,6 +111,7 @@ export default class BackupDataImportSummaryForm extends Component {
                             height='400px'
                             selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
                                 onSelect: this.props.handleRecordsToImportRowSelect, 
+                                onSelectAll: this.props.handleAllRecordsToImportSelect,
                                 selected: this.props.selectedRecordsToImportIds} }
                             >
                             {columns}

@@ -78,16 +78,23 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	
 	@Override
 	public List<UserGroup> findAllRelatedUserGroups(User user) {
-		List<UserGroup> relatedUserGroups = findByUser(user);
-		Set<UserGroup> result = new HashSet<UserGroup>(relatedUserGroups);
-		//include ancestors
-		for (UserGroup userGroup : relatedUserGroups) {
-			List<UserGroup> ancestors = findAncestorGroups(userGroup);
-			result.addAll(ancestors);
+		Set<UserGroup> result = new HashSet<UserGroup>();
+		if (user.getRole() == UserRole.ADMIN) {
+			result.addAll(dao.findGroups(false, null)); //add all user defined groups
+		} else {
+			List<UserGroup> relatedUserGroups = findByUser(user);
+			result.addAll(relatedUserGroups);
+			//include ancestors
+			for (UserGroup userGroup : relatedUserGroups) {
+				List<UserGroup> ancestors = findAncestorGroups(userGroup);
+				result.addAll(ancestors);
+			}
 		}
+		result.add(getDefaultPublicUserGroup());
+		result.add(loadDefaultPrivateGroup(user));
 		return fillLazyLoadedFields(new ArrayList<UserGroup>(result));
 	}
-	
+
 	private List<UserGroup> findAncestorGroups(UserGroup userGroup) {
 		List<UserGroup> result = new ArrayList<UserGroup>();
 		UserGroup currentGroup = userGroup;
@@ -259,6 +266,10 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		}
 	}
 
+	private UserGroup loadDefaultPrivateGroup(User user) {
+		return findByName(getDefaultPrivateUserGroupName(user));
+	}
+	
 	public static class UserGroupTree {
 		
 		private List<UserGroupTreeNode> roots = new ArrayList<UserGroupTreeNode>();
