@@ -94,9 +94,10 @@ public class SurveyObjectsGenerator {
 	protected void addPredefinedSRSs(Survey survey) {
 		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
 		if ( coordinateOperations != null ) {
-			Set<String> labelLanguages = new HashSet<String>(survey.getLanguages());
-			labelLanguages.add("en");
-			survey.addSpatialReferenceSystem(new SpatialReferenceSystem(SpatialReferenceSystem.LAT_LON_SRS));
+			List<SpatialReferenceSystem> predefinedSRSs = Arrays.asList(new SpatialReferenceSystem(SpatialReferenceSystem.LAT_LON_SRS));
+			for (SpatialReferenceSystem srs : predefinedSRSs) {
+				survey.addSpatialReferenceSystem(srs);
+			}
 		}
 		return;
 	}

@@ -138,7 +138,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 		try {
 			CRSAuthorityFactory factory = CRS.getAuthorityFactory(true);
 			CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem(code);
-			SpatialReferenceSystem result = new SpatialReferenceSystem(code, crs.toWKT(), null);
+			SpatialReferenceSystem result = new SpatialReferenceSystem(code, crs.toWKT());
 			String description = getDescription(crs);
 			for (String lang : labelLanguages) {
 				result.setLabel(lang, code);
