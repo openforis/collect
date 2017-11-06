@@ -48,10 +48,16 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 	public SpatialReferenceSystem() {
 	}
 	
-	public SpatialReferenceSystem(String id, String wellKnownText, String defaultLabel) {
+	public SpatialReferenceSystem(String id, String wellKnownText) {
+		this(id, wellKnownText, null);
+	}
+
+	public SpatialReferenceSystem(String id, String wellKnownText, String englishLabel) {
 		this.id = id;
 		this.wellKnownText = wellKnownText;
-		addLabel(new LanguageSpecificText(Locale.ENGLISH.getLanguage(), defaultLabel));
+		if (englishLabel != null) {
+			addLabel(new LanguageSpecificText(Locale.ENGLISH.getLanguage(), englishLabel));
+		}
 	}
 
 	public SpatialReferenceSystem(SpatialReferenceSystem srs) {
