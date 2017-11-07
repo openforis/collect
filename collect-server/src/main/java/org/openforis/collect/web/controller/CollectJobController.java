@@ -8,12 +8,15 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.openforis.collect.Proxy;
 import org.openforis.collect.concurrency.ApplicationLockingJob;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorError;
+import org.openforis.collect.utils.Proxies;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.concurrency.Job;
+import org.openforis.concurrency.Worker;
 import org.openforis.concurrency.Worker.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -90,7 +93,21 @@ public class CollectJobController extends BasicController {
 		}
 	}
 
-	public static class JobView {
+	public static class JobView extends WorkerView {
+		
+		private List<WorkerView> tasks;
+
+		public JobView(Job job) {
+			super(job);
+			tasks = Proxies.fromList(job.getTasks(), WorkerView.class);
+		}
+		
+		public List<WorkerView> getTasks() {
+			return tasks;
+		}
+	}
+	
+	public static class WorkerView implements Proxy {
 		
 		private String id;
 		private String name;
@@ -103,23 +120,23 @@ public class CollectJobController extends BasicController {
 		private Integer remainingMinutes;
 		private boolean ended;
 
-		public JobView(Job job) {
-			id = job.getId().toString();
-			name = job.getName();
-			progressPercent = job.getProgressPercent();
-			status = job.getStatus();
-			ended = job.isEnded();
-			errorMessage = job.getErrorMessage();
-			elapsedTime = calculateElapsedTime(job);
+		public WorkerView(Worker worker) {
+			id = worker.getId().toString();
+			name = worker.getName();
+			progressPercent = worker.getProgressPercent();
+			status = worker.getStatus();
+			ended = worker.isEnded();
+			errorMessage = worker.getErrorMessage();
+			elapsedTime = calculateElapsedTime(worker);
 			remainingTime = calculateRemainingTime();
 			remainingMinutes = calculateRemainingMinutes();
 		}
 
-		private long calculateElapsedTime(Job job) {
-			if (job.isEnded()) {
-				return job.getEndTime() - job.getStartTime();
+		private long calculateElapsedTime(Worker worker) {
+			if (worker.isEnded()) {
+				return worker.getEndTime() - worker.getStartTime();
 			} else {
-				return new Date().getTime() - job.getStartTime();
+				return new Date().getTime() - worker.getStartTime();
 			}
 		}
 		
@@ -144,6 +161,14 @@ public class CollectJobController extends BasicController {
 		
 		public boolean isCompleted() {
 			return status == Status.COMPLETED;
+		}
+		
+		public boolean isRunning() {
+			return status == Status.RUNNING;
+		}
+		
+		public boolean failed() {
+			return status == Status.FAILED;
 		}
 		
 		public String getId() {
@@ -182,5 +207,5 @@ public class CollectJobController extends BasicController {
 			return remainingMinutes;
 		}
 	}
-
+	
 }

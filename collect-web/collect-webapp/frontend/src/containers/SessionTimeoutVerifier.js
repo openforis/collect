@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress } from 'reactstrap';
-import { BrowserRouter as Router } from 'react-router-dom'
 
 import ServiceFactory from 'services/ServiceFactory'
-import recordDeleted from 'actions'
 
 export default class SessionTimeoutVerifier extends Component {
     

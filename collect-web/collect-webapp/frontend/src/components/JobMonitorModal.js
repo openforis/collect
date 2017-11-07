@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress } from 'reactstrap';
 
+import Objects from 'utils/Objects'
+
 export default class JobMonitorModal extends Component {
 
     static propTypes = {
@@ -14,7 +16,7 @@ export default class JobMonitorModal extends Component {
 	}
 
     render() {
-        const loading = this.props.job == null
+        const loading = Objects.isNullOrUndefined(this.props.job)
         const okButtonLabel = this.props.okButtonLabel ? this.props.okButtonLabel : 'Ok'
         return (
             <Modal isOpen={this.props.open} backdrop="static">
@@ -22,10 +24,10 @@ export default class JobMonitorModal extends Component {
                 <ModalBody>
                     {loading ? 'Loading...'
                         : this.props.job.running ? 
-                            <Progress value={this.state.job.progressPercent} />
+                            <Progress value={this.props.job.progressPercent} />
                             : this.props.job.status
                     } 
-                    {! loading && this.props.job.status === 'FAILED' &&
+                    {! loading && this.props.job.failed &&
                         <p>{this.props.job.errorMessage}</p>
                     }
                 </ModalBody>
@@ -36,7 +38,7 @@ export default class JobMonitorModal extends Component {
                     {this.props.job && this.props.job.completed && 
                         <Button color="primary" onClick={this.props.handleOkButtonClick}>{okButtonLabel}</Button>}
                     {' '}
-                    {this.props.job && this.props.job.ended &&
+                    {this.props.job && this.props.job.failed &&
                         <Button color="secondary" onClick={this.props.handleCloseButtonClick}>Close</Button>}
                 </ModalFooter>
             </Modal>

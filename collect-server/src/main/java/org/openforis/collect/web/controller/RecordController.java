@@ -208,7 +208,9 @@ public class RecordController extends BasicController implements Serializable {
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
 		
 		//load summaries
-		List<CollectRecordSummary> summaries = recordManager.loadFullSummaries(filter, params.getSortFields());
+		List<CollectRecordSummary> summaries = params.isFullSummary() ? 
+				recordManager.loadFullSummaries(filter, params.getSortFields())
+				: recordManager.loadSummaries(filter, params.getSortFields());
 		result.put("records", toProxies(summaries));
 		
 		//count total records
@@ -613,6 +615,7 @@ public class RecordController extends BasicController implements Serializable {
 		private boolean caseSensitiveKeyValues = false;
 		private String[] qualifierValues;
 		private String[] summaryValues;
+		private boolean fullSummary = false;
 
 		public Integer getUserId() {
 			return userId;
@@ -668,6 +671,14 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setCaseSensitiveKeyValues(boolean caseSensitiveKeyValues) {
 			this.caseSensitiveKeyValues = caseSensitiveKeyValues;
+		}
+		
+		public boolean isFullSummary() {
+			return fullSummary;
+		}
+		
+		public void setFullSummary(boolean fullSummary) {
+			this.fullSummary = fullSummary;
 		}
 	}
 	
@@ -948,6 +959,4 @@ public class RecordController extends BasicController implements Serializable {
 			this.languageCode = languageCode;
 		}
 	}
-	
-	
 }
