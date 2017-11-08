@@ -33,11 +33,9 @@ class Sidebar extends Component {
               <NavLink to={'/dashboard'} className="nav-link" activeClassName="active"><i className="fa fa-tachometer"></i>Dashboard</NavLink>
             </li>
             }
-            {preferredSurvey ? 
-              <li className="nav-item">
-                <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="fa fa-database"></i>Data Management</NavLink>
-              </li>
-            : ''}
+            <li className="nav-item">
+              <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="fa fa-database"></i>Data Management</NavLink>
+            </li>
             {loggedUser.canAccessSurveyDesigner ?
               <li className="nav-item">
                 <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="fa fa-flask"></i>Survey Designer</NavLink>
