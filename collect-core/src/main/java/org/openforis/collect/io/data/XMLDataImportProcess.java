@@ -579,7 +579,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		ModelVersion version = record.getVersion();
 		String versionName = version != null ? version.getName(): null;
-		CollectRecord result = new CollectRecord(survey, versionName);
+		CollectRecord result = new CollectRecord(survey, versionName, record.getRootEntity().getName());
 		result.setCreatedBy(record.getCreatedBy());
 		result.setCreationDate(record.getCreationDate());
 		result.setEntityCounts(record.getEntityCounts());
