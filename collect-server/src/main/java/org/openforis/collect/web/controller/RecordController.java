@@ -4,7 +4,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
@@ -232,7 +231,7 @@ public class RecordController extends BasicController implements Serializable {
 		return toProxy(record);
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=PATCH, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/update/records/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody Response updateOwner(@PathVariable int surveyId, @PathVariable int recordId,
 			@RequestBody Map<String, String> body) throws RecordLockedException, MultipleEditException {
 		String ownerIdStr = body.get("ownerId");
@@ -258,7 +257,7 @@ public class RecordController extends BasicController implements Serializable {
 		return new Response();
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/move/records", method=PATCH, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "survey/{surveyId}/data/move/records", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody JobProxy moveRecords(@PathVariable int surveyId, @RequestParam String fromStep, 
 			@RequestParam boolean promote) {
 		BulkRecordMoveJob job = jobManager.createJob(BulkRecordMoveJob.class);

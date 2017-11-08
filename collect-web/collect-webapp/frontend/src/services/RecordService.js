@@ -67,7 +67,7 @@ export default class RecordService extends AbstractService {
     }
 
     updateOwner(record, owner) {
-        return this.patchJson('survey/' + record.surveyId + '/data/records/' + record.id, {
+        return this.postJson('survey/' + record.surveyId + '/data/update/records/' + record.id, {
             ownerId: owner == null ? null : owner.id
         })
     }
@@ -116,7 +116,7 @@ export default class RecordService extends AbstractService {
     }
 
     startRecordMoveJob(surveyId, fromStep, promote) {
-        return this.patch('survey/' + surveyId + '/data/move/records', {
+        return this.post('survey/' + surveyId + '/data/move/records', {
             fromStep: fromStep,
             promote: promote
         })
