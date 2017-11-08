@@ -134,16 +134,7 @@
 	      	<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.6.1</version>
-				<configuration>
-					<doclet>org.springdoclet.SpringDoclet</doclet>
-					<docletArtifact>
-						<groupId>org.springdoclet</groupId>
-						<artifactId>springdoclet</artifactId>
-						<version>0.0.1-SNAPSHOT</version>
-					</docletArtifact>
-					<useStandardDocletOptions>false</useStandardDocletOptions>
-				</configuration>
+				<version>2.10.4</version>
 			</plugin>
 			<plugin>
 			    <groupId>io.github.swagger2markup</groupId>

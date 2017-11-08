@@ -537,7 +537,10 @@ public class RecordManager {
 	}
 	
 	private void addQualifierValues(CollectRecord record, User user) {
-		NodeChangeMap changeSet = new NodeChangeMap(updater.initializeNewRecord(record));
+		if (userGroupManager == null) {
+			return;
+		}
+		NodeChangeMap changeSet = new NodeChangeMap();
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		UserGroup surveyUserGrup = survey.getUserGroup();
 		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGrup, user);
