@@ -19,6 +19,7 @@
 	
 	<http access-decision-manager-ref="accessDecisionManager" use-expressions="true">
 		<csrf disabled="true"/>
+		<http-basic />
 		<headers>
 			<frame-options policy="ALLOW-FROM" strategy="static" value="*"  />
 		</headers>
