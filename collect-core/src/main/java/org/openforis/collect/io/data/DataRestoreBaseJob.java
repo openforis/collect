@@ -14,6 +14,7 @@ import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
@@ -40,6 +41,8 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected RecordFileManager recordFileManager;
 	@Autowired
 	protected UserManager userManager;
+	@Autowired
+	protected UserGroupManager userGroupManager;
 	
 	//input
 	protected transient File file;

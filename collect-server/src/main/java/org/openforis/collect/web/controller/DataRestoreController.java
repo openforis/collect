@@ -64,12 +64,13 @@ public class DataRestoreController extends BasicController {
 	private UserManager userManager;
 	
 	@Secured({UserRoles.ENTRY})
-	@RequestMapping(value = "/surveys/data/restore", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "/surveys/restore/data", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody JobStatusResponse restoreData(@RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam(required=false) String surveyName,
-			@RequestParam boolean validateRecords,
-			@RequestParam boolean deleteAllRecords) throws IOException {
+			@RequestParam(required=false, defaultValue="true") boolean validateRecords,
+			@RequestParam(required=false, defaultValue="false") boolean deleteAllRecords) throws IOException {
 		User loggedUser = sessionManager.getLoggedUser();
+		
 		try {
 			DataRestoreJob job = startRestoreJob(multipartFile.getInputStream(), surveyName == null, surveyName, loggedUser,
 					validateRecords, deleteAllRecords);
@@ -106,7 +107,8 @@ public class DataRestoreController extends BasicController {
 		return response;
 	}
 	
-	@RequestMapping(value = "/surveys/data/restore/jobs/{jobId}/status.json", method=GET)
+	@Secured({UserRoles.ENTRY})
+	@RequestMapping(value = "/surveys/data/restorejobs/{jobId}/status.json", method=GET)
 	public @ResponseBody RemoteDataRestoreResponse getRestoreDataRemotelyStatus(@PathVariable String jobId) throws IOException {
 		RemoteDataRestoreResponse response;
 		Job job = jobManager.getJob(jobId);

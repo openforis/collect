@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.concurrency.ProgressListener;
 
@@ -14,6 +15,8 @@ public interface RecordProvider extends Closeable {
 	void init() throws Exception;
 	
 	void init(ProgressListener progressListener) throws Exception;
+	
+	CollectSurvey getSurvey();
 	
 	String getEntryName(int entryId, Step step);
 	

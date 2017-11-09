@@ -146,6 +146,11 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		return result;
 	}
 	
+	@Override
+	public CollectSurvey getSurvey() {
+		return packagedSurvey;
+	}
+	
 	public boolean isValidateRecords() {
 		return validateRecords;
 	}

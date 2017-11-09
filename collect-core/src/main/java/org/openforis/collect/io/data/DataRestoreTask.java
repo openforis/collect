@@ -2,6 +2,7 @@ package org.openforis.collect.io.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -15,10 +16,15 @@ import org.openforis.collect.io.data.RecordImportError.Level;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordManager.RecordOperations;
 import org.openforis.collect.manager.RecordManager.RecordStepOperation;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.collect.utils.Consumer;
@@ -38,12 +44,16 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataRestoreTask extends Task {
 
+	private static final List<UserGroupRole> DATA_RESTORE_ALLOWED_USER_GROUP_ROLES =
+			Arrays.asList(UserGroupRole.OWNER, UserGroupRole.ADMINISTRATOR, UserGroupRole.SUPERVISOR, UserGroupRole.OPERATOR);
+
 	@Autowired
 	private EventQueue eventQueue;
 	
 	private RecordManager recordManager;
 	private UserManager userManager;
-
+	private UserGroupManager userGroupManager;
+	
 	//input
 	private RecordProvider recordProvider;
 	private User user;
@@ -66,6 +76,21 @@ public class DataRestoreTask extends Task {
 		this.errors = new ArrayList<RecordImportError>();
 	}
 
+	@Override
+	protected void validateInput() throws Throwable {
+		super.validateInput();
+		CollectSurvey survey = recordProvider.getSurvey();
+		UserGroup surveyGroup = survey.getUserGroup();
+		if (surveyGroup == null) {
+			throw new IllegalStateException(String.format("No user group for survey %s found", survey.getName()));
+		}
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyGroup, user);
+		if (userInGroup == null || !DATA_RESTORE_ALLOWED_USER_GROUP_ROLES.contains(userInGroup.getRole())) {
+			throw new IllegalStateException(String.format("User %s is not allowed to restore data for survey %s", 
+					user.getUsername(), survey.getName()));
+		}
+	}
+	
 	@Override
 	protected long countTotalItems() {
 		List<Integer> idsToImport = calculateEntryIdsToImport();
@@ -147,6 +172,14 @@ public class DataRestoreTask extends Task {
 	
 	public void setUserManager(UserManager userManager) {
 		this.userManager = userManager;
+	}
+	
+	public UserGroupManager getUserGroupManager() {
+		return userGroupManager;
+	}
+	
+	public void setUserGroupManager(UserGroupManager userGroupManager) {
+		this.userGroupManager = userGroupManager;
 	}
 
 	public User getUser() {

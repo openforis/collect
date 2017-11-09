@@ -119,6 +119,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			DataRestoreTask t = (DataRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
+			t.setUserGroupManager(userGroupManager);
 			t.setRecordProvider(recordProvider);
 			t.setUser(user);
 			t.setOverwriteAll(overwriteAll);
