@@ -120,6 +120,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 			List<String> selfAndDescendantRankNames = CollectionUtils.project(highestRank.getSelfAndDescendants(), "name");
 			query.and(OFC_TAXON.TAXON_RANK.in(selfAndDescendantRankNames));
 		}
+		query.orderBy(field, OFC_TAXON.SCIENTIFIC_NAME, OFC_TAXON.CODE);
 		query.limit(maxResults);
 		Result<?> result = query.fetch();
 		List<Taxon> entities = dsl.fromResult(result);

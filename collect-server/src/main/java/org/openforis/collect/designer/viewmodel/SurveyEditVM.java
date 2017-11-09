@@ -397,6 +397,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void exportCsvDataImportTemplate() throws IOException {
 		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 		job.setOutputFile(File.createTempFile("data-import-template", ".zip"));
+		
 		CSVDataExportParameters parameters = new CSVDataExportParameters();
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		RecordFilter recordFilter = new RecordFilter(survey, rootEntityDef.getId());
@@ -404,6 +405,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		parameters.setAlwaysGenerateZipFile(true);
 		parameters.setIncludeEnumeratedEntities(false);
 		job.setParameters(parameters);
+
 		jobManager.start(job, false);
 		if (job.isCompleted()) {
 			File outputFile = job.getOutputFile();
@@ -425,12 +427,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 		RecordFilter recordFilter = new RecordFilter(survey);
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		recordFilter.setRootEntityId(rootEntityDef.getId());
+
 		CSVDataExportParameters parameters = new CSVDataExportParameters();
 		parameters.setRecordFilter(recordFilter);
 		parameters.setEntityId(rootEntityDef.getId());
 		parameters.setAlwaysGenerateZipFile(false);
 		parameters.setIncludeEnumeratedEntities(true);
 		job.setParameters(parameters);
+
 		jobManager.start(job, false);
 		if (job.isCompleted()) {
 			File outputFile = job.getOutputFile();
@@ -542,18 +546,20 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	public void showPreview(Step recordStep) throws SurveyStoreException {
-		Runnable runAfterSave = new Runnable() {
+		if (! checkCanLeaveForm() ) {
+			return;
+		}
+		previewStep = recordStep;
+
+		Runnable openPreviewPopupRunnable = new Runnable() {
 			public void run() {
 				openPreviewPopUp();
 			}
 		};
-		boolean confirmPopUpShown = false;
 		if (survey.getId() == null || changed)  {
-			confirmPopUpShown = !save(null, runAfterSave);
-		}
-		previewStep = recordStep;
-		if (! confirmPopUpShown) {
-			checkValidity(true, runAfterSave, Labels.getLabel("survey.preview.show_preview"), false);
+			save(null, openPreviewPopupRunnable);
+		} else {
+			checkValidity(true, openPreviewPopupRunnable, Labels.getLabel("survey.preview.show_preview"), false);
 		}
 	}
 
