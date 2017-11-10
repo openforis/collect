@@ -56,6 +56,7 @@ public class CollectAnnotations {
 		SHOW_IN_MAP_BALLOON(new QName(COLLECT_NAMESPACE_URI, "showInMapBalloon"), true),
 		KEY_CHANGE_ALLOWED(new QName(COLLECT_NAMESPACE_URI, "keyChangeAllowed"), true),
 		QUALIFIER(new QName(COLLECT_NAMESPACE_URI, UIOptionsConstants.QUALIFIER), false),
+		TAXON_ATTRIBUTE_ALLOW_UNLISTED(new QName(COLLECT_NAMESPACE_URI, "allowUnlisted"), true),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -237,6 +238,14 @@ public class CollectAnnotations {
 	
 	public void setIncludeUniqueVernacularName(TaxonAttributeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.TAXON_ATTRIBUTE_INCLUDE_UNIQUE_VERNACULAR_NAME, value);
+	}
+	
+	public boolean isAllowUnlisted(TaxonAttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.TAXON_ATTRIBUTE_ALLOW_UNLISTED);
+	}
+	
+	public void setAllowUnlisted(TaxonAttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.TAXON_ATTRIBUTE_ALLOW_UNLISTED, value);
 	}
 	
 	public boolean isHideKeyInCollectEarthRecordList(AttributeDefinition defn) {

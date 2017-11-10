@@ -39,6 +39,7 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	private String languageVarietyFieldLabel;
 	private String familyCodeFieldLabel;
 	private String familyNameFieldLabel;
+	private boolean allowUnlisted;
 	
 	TaxonAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -57,6 +58,7 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		CollectAnnotations annotations = survey.getAnnotations();
 		showFamily = annotations.isShowFamily(source);
 		includeUniqueVernacularName = annotations.isIncludeUniqueVernacularName(source);
+		allowUnlisted = annotations.isAllowUnlisted(source);
 		
 		codeFieldLabel = source.getFieldLabel(CODE_FIELD_NAME, languageCode);
 		scientificNameFieldLabel = source.getFieldLabel(SCIENTIFIC_NAME_FIELD_NAME, languageCode);
@@ -85,6 +87,7 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		CollectAnnotations annotations = survey.getAnnotations();
 		annotations.setShowFamily(dest, showFamily);
 		annotations.setIncludeUniqueVernacularName(dest, includeUniqueVernacularName);
+		annotations.setAllowUnlisted(dest, allowUnlisted);
 	}
 
 	public String getTaxonomy() {
@@ -183,4 +186,11 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		this.familyNameFieldLabel = familyNameFieldLabel;
 	}
 	
+	public boolean isAllowUnlisted() {
+		return allowUnlisted;
+	}
+	
+	public void setAllowUnlisted(boolean allowUnlisted) {
+		this.allowUnlisted = allowUnlisted;
+	}
 }
