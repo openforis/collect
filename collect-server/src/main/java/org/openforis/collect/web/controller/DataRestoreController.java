@@ -19,6 +19,7 @@ import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.data.DataRestoreJob;
+import org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -68,12 +69,13 @@ public class DataRestoreController extends BasicController {
 	public @ResponseBody JobStatusResponse restoreData(@RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam(required=false) String surveyName,
 			@RequestParam(required=false, defaultValue="true") boolean validateRecords,
-			@RequestParam(required=false, defaultValue="false") boolean deleteAllRecords) throws IOException {
+			@RequestParam(required=false, defaultValue="false") boolean deleteAllRecordsBeforeImport,
+			@RequestParam(required=false, defaultValue="OVERWRITE_OLDER") String recordOverwriteStrategy) throws IOException {
 		User loggedUser = sessionManager.getLoggedUser();
 		
 		try {
 			DataRestoreJob job = startRestoreJob(multipartFile.getInputStream(), surveyName == null, surveyName, loggedUser,
-					validateRecords, deleteAllRecords);
+					validateRecords, deleteAllRecordsBeforeImport, OverwriteStrategy.valueOf(recordOverwriteStrategy));
 			return createResponse(job);
 		} catch (Exception e) {
 			JobStatusResponse response = new JobStatusResponse();
@@ -94,7 +96,7 @@ public class DataRestoreController extends BasicController {
 				User user = userManager.loadAdminUser();
 				boolean newSurvey = surveyManager.get(surveyName) == null;
 				DataRestoreJob job = startRestoreJob(uploadItem.getFileData().getInputStream(), newSurvey, surveyName, user,
-						true, false);
+						true, false, OverwriteStrategy.OVERWRITE_OLDER);
 				response.setJobId(job.getId().toString());
 			} catch (Exception e) {
 				response.setErrorStatus();
@@ -157,8 +159,8 @@ public class DataRestoreController extends BasicController {
 	}
 	
 	private DataRestoreJob startRestoreJob(InputStream fileInputStream, boolean newSurvey, 
-			String expectedSurveyName, User user, boolean validateRecords, boolean deleteAllRecords) 
-				throws IOException,	FileNotFoundException, ZipException {
+			String expectedSurveyName, User user, boolean validateRecords, boolean deleteAllRecords,
+			OverwriteStrategy recordOverwriteStrategy) throws IOException,	FileNotFoundException, ZipException {
 		File tempFile = File.createTempFile("ofc_data_restore", ".collect-data");
 		FileUtils.copyInputStreamToFile(fileInputStream, tempFile);
 		
@@ -176,7 +178,7 @@ public class DataRestoreController extends BasicController {
 		job.setStoreRestoredFile(true);
 		job.setPublishedSurvey(publishedSurvey);
 		job.setFile(tempFile);
-		job.setOverwriteAll(true);
+		job.setRecordOverwriteStrategy(recordOverwriteStrategy);
 		job.setRestoreUploadedFiles(true);
 		job.setValidateRecords(validateRecords);
 		job.setDeleteAllRecordsBeforeRestore(deleteAllRecords);

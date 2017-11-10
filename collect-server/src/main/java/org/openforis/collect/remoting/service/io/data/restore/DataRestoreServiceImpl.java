@@ -8,6 +8,7 @@ import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.data.DataRestoreJob;
+import org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class DataRestoreServiceImpl implements DataRestoreService {
 		job.setStoreRestoredFile(true);
 		job.setPublishedSurvey(survey);
 		job.setFile(backupFile);
-		job.setOverwriteAll(true);
+		job.setRecordOverwriteStrategy(OverwriteStrategy.OVERWRITE_ALL);
 		job.setRestoreUploadedFiles(true);
 		job.setCloseRecordProviderOnComplete(true);
 		

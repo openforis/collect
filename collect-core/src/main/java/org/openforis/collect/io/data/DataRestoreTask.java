@@ -47,6 +47,10 @@ public class DataRestoreTask extends Task {
 	private static final List<UserGroupRole> DATA_RESTORE_ALLOWED_USER_GROUP_ROLES =
 			Arrays.asList(UserGroupRole.OWNER, UserGroupRole.ADMINISTRATOR, UserGroupRole.SUPERVISOR, UserGroupRole.OPERATOR);
 
+	public enum OverwriteStrategy {
+		ONLY_SPECIFIED, DO_NOT_OVERWRITE, OVERWRITE_OLDER, OVERWRITE_ALL
+	}
+	
 	@Autowired
 	private EventQueue eventQueue;
 	
@@ -55,10 +59,11 @@ public class DataRestoreTask extends Task {
 	private UserGroupManager userGroupManager;
 	
 	//input
+	private CollectSurvey targetSurvey;
 	private RecordProvider recordProvider;
 	private User user;
 	private List<Integer> entryIdsToImport;
-	private boolean overwriteAll;
+	private OverwriteStrategy overwriteStrategy = OverwriteStrategy.ONLY_SPECIFIED;
 	
 	//output
 	private final List<RecordImportError> errors;
@@ -79,15 +84,15 @@ public class DataRestoreTask extends Task {
 	@Override
 	protected void validateInput() throws Throwable {
 		super.validateInput();
-		CollectSurvey survey = recordProvider.getSurvey();
-		UserGroup surveyGroup = survey.getUserGroup();
+		UserGroup surveyGroup = targetSurvey.getUserGroup();
+		String surveyName = targetSurvey.getName();
 		if (surveyGroup == null) {
-			throw new IllegalStateException(String.format("No user group for survey %s found", survey.getName()));
+			throw new IllegalStateException(String.format("No user group for survey %s found", surveyName));
 		}
 		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyGroup, user);
 		if (userInGroup == null || !DATA_RESTORE_ALLOWED_USER_GROUP_ROLES.contains(userInGroup.getRole())) {
 			throw new IllegalStateException(String.format("User %s is not allowed to restore data for survey %s", 
-					user.getUsername(), survey.getName()));
+					user.getUsername(), surveyName));
 		}
 	}
 	
@@ -101,9 +106,10 @@ public class DataRestoreTask extends Task {
 		if ( entryIdsToImport != null ) {
 			return entryIdsToImport;
 		} 
-		if ( ! overwriteAll ) {
+		if ( overwriteStrategy != OverwriteStrategy.OVERWRITE_ALL ) {
 			throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
 		}
+		//return all entries provided by record provider
 		return recordProvider.findEntryIds();
 	}
 	
@@ -182,6 +188,10 @@ public class DataRestoreTask extends Task {
 		this.userGroupManager = userGroupManager;
 	}
 
+	public void setTargetSurvey(CollectSurvey targetSurvey) {
+		this.targetSurvey = targetSurvey;
+	}
+	
 	public User getUser() {
 		return user;
 	}
@@ -190,14 +200,10 @@ public class DataRestoreTask extends Task {
 		this.user = user;
 	}
 	
-	public boolean isOverwriteAll() {
-		return overwriteAll;
+	public void setOverwriteStrategy(OverwriteStrategy overwriteStrategy) {
+		this.overwriteStrategy = overwriteStrategy;
 	}
-
-	public void setOverwriteAll(boolean overwriteAll) {
-		this.overwriteAll = overwriteAll;
-	}
-
+	
 	public List<Integer> getEntryIdsToImport() {
 		return entryIdsToImport;
 	}
