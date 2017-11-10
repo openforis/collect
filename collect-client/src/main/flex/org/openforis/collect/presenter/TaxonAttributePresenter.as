@@ -234,7 +234,7 @@ package org.openforis.collect.presenter {
 			var client:SpeciesClient = ClientFactory.speciesClient;
 			var searchText:String = autoCompleteLastInputField.text;
 			var attrDef:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(autoCompleteLastInputField.attributeDefinition); 
-			var token:Object = {searchText: searchText, searchType: autoCompleteLastSearchType};
+			var token:Object = {searchText: searchText, searchType: autoCompleteLastSearchType, attributeDefinition: attrDef};
 			var responder:IResponder = new AsyncResponder(autoCompleteSearchResultHandler, searchFaultHandler, token);
 			var parameters:TaxonSearchParameters = new TaxonSearchParameters();
 			parameters.highestRank = attrDef.highestRank == null ? null : Taxon$TaxonRank.valueOf(attrDef.highestRank.toUpperCase());
@@ -350,19 +350,22 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {
+			var defn:TaxonAttributeDefinitionProxy = token.attributeDefinition;
 			var data:IList = event.result as IList;
 			if ( CollectionUtil.isEmpty(data) ) {
 				var searchType:String = token.searchType;
 				var searchText:String = token.searchText;
-				if ( (searchType == SEARCH_BY_SCIENTIFIC_NAME || searchType == SEARCH_BY_VERNACULAR_NAME) &&
-					org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.scientificName, searchText, true) ||
-					searchType == SEARCH_BY_CODE && org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.code, searchText, true)
+				if ( defn.allowUnlisted && ( 
+						(searchType == SEARCH_BY_SCIENTIFIC_NAME || searchType == SEARCH_BY_VERNACULAR_NAME) &&
+							org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.scientificName, searchText, true) 
+						|| searchType == SEARCH_BY_CODE && org.openforis.collect.util.StringUtil.startsWith(UNKNOWN_ITEM.code, searchText, true))
 					) {
 					data.addItem(UNKNOWN_ITEM);
 				}
 			}
-			data.addItem(UNLISTED_ITEM);
-			
+			if (defn.allowUnlisted) {
+				data.addItem(UNLISTED_ITEM);
+			}
 			autoCompletePopUp.dataGrid.dataProvider = data;
 			autoCompleteLastResult = data;
 			autoCompleteDataLoading = false;

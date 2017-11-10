@@ -29,19 +29,27 @@
         </fieldErrorHandler>
       </row>
       <row>
-        <label value="${labels.survey.schema.attribute.taxon.show_family}:" />
+		<label value="${labels.survey.schema.attribute.taxon.allow_unlisted}:" />
         <hbox>
-	        <fieldErrorHandler message="@load(vmsgs['showFamily'])">
+			<fieldErrorHandler message="@load(vmsgs['allowUnlisted'])">
+				<checkbox checked="@bind(fx.allowUnlisted)"
+	    				onCheck="@command('applyChanges')" />
+			</fieldErrorHandler>
+			<space width="30px" />
+			<label value="${labels.survey.schema.attribute.taxon.show_family}:" />
+			<fieldErrorHandler message="@load(vmsgs['showFamily'])">
 	          <checkbox checked="@bind(fx.showFamily)"
 	    				onCheck="@command('applyChanges')" />
 	        </fieldErrorHandler>
-        	<space width="50px" />
-		     <label value="${labels.survey.schema.attribute.taxon.include_unique_vernacular_name}:" />
-		        <fieldErrorHandler message="@load(vmsgs['includeUniqueVernacularName'])">
-		          <checkbox checked="@bind(fx.includeUniqueVernacularName)"
-		    				onCheck="@command('applyChanges')" />
-		        </fieldErrorHandler>
+        	<space width="30px" />
+			<label value="${labels.survey.schema.attribute.taxon.include_unique_vernacular_name}:" />
+			<fieldErrorHandler message="@load(vmsgs['includeUniqueVernacularName'])">
+				<checkbox checked="@bind(fx.includeUniqueVernacularName)"
+	    				onCheck="@command('applyChanges')" />
+			</fieldErrorHandler>
 	   	</hbox>
+	  </row>
+	  <row>
 	  </row>
     </rows>
   </grid>
