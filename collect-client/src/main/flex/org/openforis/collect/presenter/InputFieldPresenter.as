@@ -569,11 +569,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateView():void {
+			var attrDef:AttributeDefinitionProxy = view.attributeDefinition;
 			view.editable = Application.activeRecordEditable 
-				&& ! view.attributeDefinition.calculated 
-				&& view.attributeDefinition.editable
+				&& ! attrDef.calculated 
+				&& attrDef.editable
 				&& (Application.activeRecord.newRecord 
-					|| ! view.attributeDefinition.key 
+					|| ! (attrDef.key && attrDef.nearestParentMultipleEntity == attrDef.rootEntity)
 					|| Application.activeSurvey.keyChangeAllowed);
 
 			//update view according to attribute (generic text value)
