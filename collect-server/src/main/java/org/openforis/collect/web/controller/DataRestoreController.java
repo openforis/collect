@@ -72,7 +72,6 @@ public class DataRestoreController extends BasicController {
 			@RequestParam(required=false, defaultValue="false") boolean deleteAllRecordsBeforeImport,
 			@RequestParam(required=false, defaultValue="OVERWRITE_OLDER") String recordOverwriteStrategy) throws IOException {
 		User loggedUser = sessionManager.getLoggedUser();
-		
 		try {
 			DataRestoreJob job = startRestoreJob(multipartFile.getInputStream(), surveyName == null, surveyName, loggedUser,
 					validateRecords, deleteAllRecordsBeforeImport, OverwriteStrategy.valueOf(recordOverwriteStrategy));

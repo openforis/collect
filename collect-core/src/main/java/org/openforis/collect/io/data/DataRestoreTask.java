@@ -20,11 +20,11 @@ import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.collect.utils.Consumer;
@@ -106,10 +106,6 @@ public class DataRestoreTask extends Task {
 		if ( entryIdsToImport != null ) {
 			return entryIdsToImport;
 		} 
-		if ( overwriteStrategy != OverwriteStrategy.OVERWRITE_ALL ) {
-			throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
-		}
-		//return all entries provided by record provider
 		return recordProvider.findEntryIds();
 	}
 	
@@ -131,7 +127,7 @@ public class DataRestoreTask extends Task {
 	private void importEntries(int entryId) throws IOException, MissingStepsException {
 		try {
 			RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, 
-					entryId, user, includeRecordPredicate);
+					entryId, user, includeRecordPredicate, overwriteStrategy);
 			RecordOperations recordOperations = operationGenerator.generate();
 			if (! recordOperations.isEmpty()) {
 				updateBuffer.append(recordOperations);

@@ -284,10 +284,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		private List<Integer> calculateEntryIdsToImport() {
 			if ( entryIdsToImport != null ) {
 				return entryIdsToImport;
-			} else if (recordOverwriteStrategy == OverwriteStrategy.OVERWRITE_ALL) {
-				return recordProvider.findEntryIds();
 			} else {
-				throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
+				return recordProvider.findEntryIds();
 			}
 		}
 		

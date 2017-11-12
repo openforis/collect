@@ -207,7 +207,8 @@ public class RecordManager {
 		Integer nextId = null;
 		List<CollectStoreQuery> queries = new ArrayList<CollectStoreQuery>();
 		for (RecordOperations recordOperations : operationsForRecords) {
-			CollectRecordSummary existingRecordSummary = loadUniqueRecordSummary(recordOperations.getSurvey(), recordOperations.getRecordId());
+			CollectRecordSummary existingRecordSummary = recordOperations.getRecordId() == null ? null :
+				loadUniqueRecordSummary(recordOperations.getSurvey(), recordOperations.getRecordId());
 			RecordStepOperation lastOperation = null;
 			List<RecordStepOperation> operations = recordOperations.getOperations();
 			for (RecordStepOperation operation : operations) {
