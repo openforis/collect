@@ -3,7 +3,7 @@
  */
 package org.openforis.idm.model.expression;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -54,7 +54,19 @@ public class IDMFunctionsTest extends AbstractExpressionTest {
 		EntityBuilder.addValue(cluster, "plot_direction",  3442.45);
 		Assert.assertTrue(evaluateBooleanExpression(cluster, null, "not( idm:blank( plot_direction ) )"));
 	}
+	
+	@Test
+	public void testNotBlankWithValidCode() throws InvalidExpressionException{
+		EntityBuilder.addValue(cluster, "id",  new Code("001"));
+		Assert.assertTrue(evaluateBooleanExpression(cluster, null, "idm:not-blank(id)"));
+	}
 
+	@Test
+	public void testNotBlankWithNullCode() throws InvalidExpressionException{
+		EntityBuilder.addValue(cluster, "id",  new Code(""));
+		Assert.assertFalse(evaluateBooleanExpression(cluster, null, "idm:not-blank(id)"));
+	}
+	
 	@Test
 	public void testIndexAndPosition() throws InvalidExpressionException {
 		Entity plot1 = EntityBuilder.addEntity(cluster, "plot");
@@ -146,5 +158,30 @@ public class IDMFunctionsTest extends AbstractExpressionTest {
 		String expr = ExpressionFactory.IDM_PREFIX + ":" + "count-distinct(plot/no)";
 		Object result = evaluateExpression(expr);
 		Assert.assertEquals(2, result);
+	}
+	
+	@Test
+	public void testContainsFunction() throws InvalidExpressionException {
+		EntityBuilder.addValue(cluster, "id",  new Code("001"));
+		Entity plot = EntityBuilder.addEntity(cluster, "plot");
+		Entity humanImpact = EntityBuilder.addEntity(plot, "human_impact");
+		EntityBuilder.addValue(humanImpact, "type", new Code("1"));
+		EntityBuilder.addValue(humanImpact, "type", new Code("2"));
+	
+		{
+			String expr = ExpressionFactory.IDM_PREFIX + ":" + "contains(plot/human_impact/type, '1')";
+			Object result = evaluateExpression(expr);
+			assertEquals(true, result);
+		}
+		{
+			String expr = ExpressionFactory.IDM_PREFIX + ":" + "contains(plot/human_impact/type, '2')";
+			Object result = evaluateExpression(expr);
+			assertEquals(true, result);
+		}
+		{
+			String expr = ExpressionFactory.IDM_PREFIX + ":" + "contains(plot/human_impact/type, '0')";
+			Object result = evaluateExpression(expr);
+			assertEquals(false, result);
+		}
 	}
 }

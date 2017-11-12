@@ -63,6 +63,12 @@ public class IDMFunctions extends CustomFunctions {
 				return blank(objects[0]);
 			}
 		});
+		
+		register("not-blank", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return ! blank(objects[0]);
+			}
+		});
 
 		register("index", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
@@ -100,6 +106,12 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 
+		register("contains", new CustomFunction(2) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return contains(objects[0], objects[1]);
+			}
+		});
+		
 		register("currentDate", new CustomFunction(0) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return currentDate();
@@ -376,6 +388,17 @@ public class IDMFunctions extends CustomFunctions {
 			return ((Collection<?>) values).size();
 		} else {
 			return 1;
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private static boolean contains(Object values, Object item) {
+		if (values == null) {
+			return false;
+		} else if (values instanceof Collection) {
+			return ((Collection) values).contains(item);
+		} else {
+			return values.equals(item);
 		}
 	}
 
