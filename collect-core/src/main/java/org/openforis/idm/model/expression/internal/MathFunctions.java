@@ -86,6 +86,18 @@ public class MathFunctions extends CustomFunctions {
 				return tanrad(number);
 			}
 		});
+		
+		register("log", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return log(number);
+			}
+		});
+		
+		register("log10", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return log10(number);
+			}
+		});
 	}
 
 	private static double PI() {
@@ -203,7 +215,14 @@ public class MathFunctions extends CustomFunctions {
 	private static Double tanrad(Number angleInRadians) {
 		return Math.tan(angleInRadians.doubleValue());
 	}
+	
+	private static Double log(Number value) {
+		return Math.log(value.doubleValue());
+	}
 
+	private static Double log10(Number value) {
+		return Math.log10(value.doubleValue());
+	}
 
 	private abstract static class SingleArgMathFunction extends CustomFunction {
 		
