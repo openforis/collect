@@ -65,7 +65,7 @@ class Header extends Component {
           <li className="nav-item">
             <Form>
               <FormGroup row>
-                <Label sm={4} className="d-md-down-none">Preferred survey: </Label>
+                <Label sm={4} className="d-md-down-none">Select survey: </Label>
                 <Col sm={8}>
                   <SurveySelect />
                 </Col>
