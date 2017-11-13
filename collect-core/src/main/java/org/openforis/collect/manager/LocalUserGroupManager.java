@@ -30,6 +30,13 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	
 	private static UserGroup DEFAULT_PUBLIC_USER_GROUP = null;
 	
+	public LocalUserGroupManager() {
+	}
+	
+	public LocalUserGroupManager(UserGroupDao dao) {
+		super(dao);
+	}
+	
 	@Transactional(propagation=Propagation.REQUIRED)
 	public UserGroup createDefaultPrivateUserGroup(User user) {
 		UserGroup userGroup = new UserGroup();

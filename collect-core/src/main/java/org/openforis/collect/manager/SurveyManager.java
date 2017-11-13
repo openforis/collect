@@ -1181,15 +1181,6 @@ public class SurveyManager {
 		}
 	}
 
-	private List<Integer> loadUserGroupIds(User user) {
-		List<Integer> userGroupIds = null;
-		if (user != null) {
-			List<UserGroup> userGroups = userGroupManager.findByUser(user);
-			userGroupIds = CollectionUtils.project(userGroups, "id");
-		}
-		return userGroupIds;
-	}
-
 	/*
 	 * Getters and setters
 	 * 
@@ -1248,6 +1239,10 @@ public class SurveyManager {
 	
 	public void setSurveySerializer(CollectSurveyIdmlBinder surveySerializer) {
 		this.surveySerializer = surveySerializer;
+	}
+	
+	public void setUserGroupManager(UserGroupManager userGroupManager) {
+		this.userGroupManager = userGroupManager;
 	}
 	
 	private class SurveyCache {

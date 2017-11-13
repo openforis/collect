@@ -16,6 +16,13 @@ public abstract class AbstractPersistedObjectManager<T extends PersistedObject, 
 
 	protected D dao;
 	
+	public AbstractPersistedObjectManager() {
+	}
+	
+	public AbstractPersistedObjectManager(D dao) {
+		this.dao = dao;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.openforis.collect.manager.ItemManager#loadAll()
 	 */
