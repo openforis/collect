@@ -67,7 +67,7 @@
 		<intercept-url access="hasRole('ROLE_USER')" pattern="/**" />
 
 		<form-login login-page="/login" 
-			default-target-url="/index.htm"
+			default-target-url="/index.html"
 			authentication-failure-url="/login?login_error=1" />
 		
 		<logout logout-url="/j_spring_security_logout" />
