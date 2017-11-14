@@ -72,7 +72,9 @@ public class CEComponentHTMLFormatter {
 	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder builder =  parentBuilder.e("fieldset").attr("class", "entity-group" ); //$NON-NLS-1$
 		String legend =  comp.getLabelOrName() ;
-		builder.e("legend").t(legend); //$NON-NLS-1$
+		XMLBuilder legendBuilder = builder.e("legend"); //$NON-NLS-1$
+		legendBuilder.e("label").text(legend);
+		addTooltip(legendBuilder, comp.getTooltip());
 		XMLBuilder tableBuilder = builder.e("table").a("class", "table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr"); //$NON-NLS-1$ //$NON-NLS-2$
 		for (String heading : comp.getHeadings()) {
@@ -142,18 +144,14 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder formGroupBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div"); //$NON-NLS-1$ //$NON-NLS-2$
 		formGroupBuilder.a("class", "form-group"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (includeLabel) {
-			
-						
 			//label element
 			formGroupBuilder.e("label") //$NON-NLS-1$
 				.a("for", elId) //$NON-NLS-1$
 				.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 				.t(  comp.getLabelOrName() );
 			
-			String tooltip = comp.getToolTip();
-			
+			String tooltip = comp.getTooltip();
 			addTooltip(formGroupBuilder, tooltip);
-			
 		}
 		//form control external container (for grid alignment)
 		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
@@ -281,7 +279,7 @@ public class CEComponentHTMLFormatter {
 	}
 
 	public void addTooltip(XMLBuilder formGroupBuilder, String tooltip) {
-		if( !StringUtils.isBlank(tooltip)  ){
+		if( !StringUtils.isBlank(tooltip) ) {
 			formGroupBuilder.e("span")
 				.a( "class", "ui-icon  ui-icon-info" )
 				.a( "style", "display:inline-block")

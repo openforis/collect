@@ -11,8 +11,8 @@ package org.openforis.collect.io.metadata.collectearth.balloon;
  */
 class CEEnumeratedEntityTable extends CETable {
 
-	public CEEnumeratedEntityTable(String name, String label) {
-		super(name, label, true);
+	public CEEnumeratedEntityTable(String name, String label, String tooltip) {
+		super(name, label, tooltip, true);
 	}
 
 }

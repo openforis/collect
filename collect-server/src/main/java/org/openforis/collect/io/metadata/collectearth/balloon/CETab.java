@@ -21,7 +21,7 @@ public class CETab extends CEFieldSet {
 	}
 
 	public CETab(String name, String label) {
-		super(name, HtmlUnicodeEscaperUtil.escapeHtmlUnicode( label ) );
+		super(name, HtmlUnicodeEscaperUtil.escapeHtmlUnicode( label ), null);
 	}
 
 	public boolean isMain() {

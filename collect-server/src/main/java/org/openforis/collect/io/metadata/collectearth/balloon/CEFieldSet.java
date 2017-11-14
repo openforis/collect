@@ -12,8 +12,8 @@ public class CEFieldSet extends CEComponent {
 
 	private List<CEComponent> children = new ArrayList<CEComponent>();
 	
-	public CEFieldSet(String name, String label) {
-		super(null, name, label, false);
+	public CEFieldSet(String name, String label, String tooltip) {
+		super(null, name, label, tooltip, false);
 	}
 
 	public void addChild(CEComponent child) {

@@ -14,15 +14,17 @@ class CEComponent {
 	private String htmlParameterName;
 	private String name;
 	private String label;
+	private String tooltip;
 	private boolean multiple;
 	boolean hideWhenNotRelevant = false;
 
-	public CEComponent(String htmlParameterName, String name, String label, boolean multiple) {
+	public CEComponent(String htmlParameterName, String name, String label, String tooltip, boolean multiple) {
 		super();
 		this.htmlParameterName = htmlParameterName;
 		this.name = name;
 		this.label = label;
 		this.multiple = multiple;
+		this.tooltip = tooltip;
 	}
 
 	public String getLabelOrName() {
@@ -39,6 +41,10 @@ class CEComponent {
 
 	public String getLabel() {
 		return label;
+	}
+	
+	public String getTooltip() {
+		return tooltip;
 	}
 
 	public boolean isMultiple() {

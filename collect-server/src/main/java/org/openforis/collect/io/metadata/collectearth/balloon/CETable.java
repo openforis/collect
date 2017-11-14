@@ -14,8 +14,8 @@ class CETable extends CEComponent {
 	private List<String> headings = new ArrayList<String>();
 	private List<CETableRow> rows = new ArrayList<CETableRow>();
 	
-	public CETable(String name, String label, boolean multiple) {
-		super(null, name, label, multiple);
+	public CETable(String name, String label, String tooltip, boolean multiple) {
+		super(null, name, label, tooltip, multiple);
 	}
 	
 	public void addHeading(String heading) {
