@@ -91,7 +91,7 @@
 	<script src="earthFiles/openforis/of-ui-forms.js?v=$[randomNumber]"></script>
 	<script src="earthFiles/openforis/of-ui-forms-validation.js?v=$[randomNumber]"></script>
 	
-	<script src="earthFiles/js/earth_new.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/js/earth.js?v=$[randomNumber]"></script>
 	
 	<link href="earthFiles/jquery/jquery-ui.css?v=$[randomNumber]" rel="stylesheet" />
 	<link href="earthFiles/jquery/jquery.selectBoxIt.css?v=$[randomNumber]" rel="stylesheet" />
