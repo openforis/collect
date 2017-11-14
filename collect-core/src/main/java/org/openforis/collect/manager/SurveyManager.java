@@ -157,7 +157,7 @@ public class SurveyManager {
 	public CollectSurvey importTemporaryModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
 		try {
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
-			survey.setUserGroup(userGroupManager.getDefaultPublicUserGroup());
+			survey.setUserGroup(userGroupManager == null ? null : userGroupManager.getDefaultPublicUserGroup());
 			survey.setName(name);
 			survey.setTemporary(true);
 			surveyDao.insert(survey);
@@ -205,7 +205,8 @@ public class SurveyManager {
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importModel(File surveyFile, String name, boolean validate, boolean includeCodeLists) throws SurveyImportException, SurveyValidationException {
-		return importModel(surveyFile, name, validate, includeCodeLists, userGroupManager.getDefaultPublicUserGroup());
+		UserGroup defaultPublicUserGroup = userGroupManager == null ? null : userGroupManager.getDefaultPublicUserGroup();
+		return importModel(surveyFile, name, validate, includeCodeLists, defaultPublicUserGroup);
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
@@ -1100,13 +1101,13 @@ public class SurveyManager {
 	}
 
 	private UserGroup loadUserGroup(Integer userGroupId) {
-		UserGroup userGroup = null;
-		if (userGroupId == null) {
-			userGroup = userGroupManager.getDefaultPublicUserGroup();
+		if (userGroupManager == null) {
+			return null;
+		} else if (userGroupId == null) {
+			return userGroupManager.getDefaultPublicUserGroup();
 		} else {
-			userGroup = userGroupManager.loadById(userGroupId);
+			return userGroupManager.loadById(userGroupId);
 		}
-		return userGroup;
 	}
 
 	private void fillSummariesReferencedItems(Collection<SurveySummary> summaries) {
