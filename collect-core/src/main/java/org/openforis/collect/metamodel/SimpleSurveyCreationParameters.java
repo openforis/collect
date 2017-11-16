@@ -20,6 +20,7 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	private String description;
 	private List<SimpleCodeList> codeLists = new ArrayList<SimpleCodeList>();
 	private List<String> imagery = new ArrayList<String>();
+	private CeoSettings ceoSettings = new CeoSettings();
 	private SamplingPointGenerationSettings samplingPointGenerationSettings;
 	private int userGroupId;
 	
@@ -61,6 +62,14 @@ public class SimpleSurveyCreationParameters implements Serializable {
 
 	public void setImagery(List<String> imagery) {
 		this.imagery = imagery;
+	}
+	
+	public CeoSettings getCeoSettings() {
+		return ceoSettings;
+	}
+	
+	public void setCeoSettings(CeoSettings ceoSettings) {
+		this.ceoSettings = ceoSettings;
 	}
 	
 	public SamplingPointGenerationSettings getSamplingPointGenerationSettings() {
@@ -132,4 +141,34 @@ public class SimpleSurveyCreationParameters implements Serializable {
 		}
 	}
 	
+	public static class CeoSettings {
+		
+		private String baseMapSource;
+		private int imageryYear;
+		private String stackingProfile;
+
+		public String getBaseMapSource() {
+			return baseMapSource;
+		}
+
+		public void setBaseMapSource(String baseMapSource) {
+			this.baseMapSource = baseMapSource;
+		}
+
+		public int getImageryYear() {
+			return imageryYear;
+		}
+
+		public void setImageryYear(int imageryYear) {
+			this.imageryYear = imageryYear;
+		}
+
+		public String getStackingProfile() {
+			return stackingProfile;
+		}
+
+		public void setStackingProfile(String stackingProfile) {
+			this.stackingProfile = stackingProfile;
+		}
+	}
 }

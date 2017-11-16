@@ -14,6 +14,12 @@ public class CeoApplicationOptions implements ApplicationOptions {
 	private List<String> imagery = new ArrayList<String>();
 	private List<Coordinate> aoiBoundary;
 	private SamplingPointGenerationSettings samplingPointGenerationSettings;
+
+	private String stackingProfile;
+
+	private Integer imageryYear;
+
+	private String baseMapSource;
 	
 	@Override
 	public String getType() {
@@ -42,5 +48,29 @@ public class CeoApplicationOptions implements ApplicationOptions {
 	
 	public void setSamplingPointDataConfiguration(SamplingPointGenerationSettings samplingPointGenerationSettings) {
 		this.samplingPointGenerationSettings = samplingPointGenerationSettings;
+	}
+	
+	public String getBaseMapSource() {
+		return baseMapSource;
+	}
+
+	public void setBaseMapSource(String baseMapSource) {
+		this.baseMapSource = baseMapSource;
+	}
+
+	public Integer getImageryYear() {
+		return imageryYear;
+	}
+	
+	public void setImageryYear(Integer imageryYear) {
+		this.imageryYear = imageryYear;
+	}
+
+	public String getStackingProfile() {
+		return stackingProfile;
+	}
+	
+	public void setStackingProfile(String stackingProfile) {
+		this.stackingProfile = stackingProfile;
 	}
 }
