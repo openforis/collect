@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import * as Actions from 'actions';
 import * as UserActions from 'actions/users';
+import Labels from 'utils/Labels'
 
 class Startup extends Component {
     
@@ -11,10 +12,12 @@ class Startup extends Component {
     }
 
     componentDidMount() {
-        this.props.dispatch(Actions.fetchApplicationInfo())
-        this.props.dispatch(Actions.fetchCurrentUser())
-        this.props.dispatch(UserActions.fetchUsers())
-        this.props.dispatch(Actions.fetchUserGroups())
+        Labels.initialize(() => {
+            this.props.dispatch(Actions.fetchApplicationInfo())
+            this.props.dispatch(Actions.fetchCurrentUser())
+            this.props.dispatch(UserActions.fetchUsers())
+            this.props.dispatch(Actions.fetchUserGroups())
+        })
     }
 
     render() {

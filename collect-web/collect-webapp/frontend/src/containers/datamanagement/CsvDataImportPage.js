@@ -10,6 +10,7 @@ import SchemaTreeView from './SchemaTreeView';
 import Workflow from 'model/Workflow';
 import Arrays from 'utils/Arrays'
 import * as Actions from 'actions';
+import L from 'utils/Labels';
 
 class CsvDataImportPage extends Component {
 
@@ -42,7 +43,7 @@ class CsvDataImportPage extends Component {
     }
 
     handleEntitySelect(event) {
-        this.setState({...this.state, selectedEntityDefinition: event.selectedNodeDefinitions.length == 1 ? event.selectedNodeDefinitions[0]: null})
+        this.setState({...this.state, selectedEntityDefinition: event.selectedNodeDefinitions.length === 1 ? event.selectedNodeDefinitions[0]: null})
     }
 
     handleStepCheck(event) {
@@ -58,7 +59,7 @@ class CsvDataImportPage extends Component {
         const entityDef = this.state.importType === 'newRecords' ? 
             survey.schema.firstRootEntityDefinition
             : this.state.selectedEntityDefinition
-        const entityDefId = entityDef == null ? null : entityDef.id
+        const entityDefId = entityDef === null ? null : entityDef.id
         
         ServiceFactory.recordService.startCsvDataImport(survey, 
             survey.schema.firstRootEntityDefinition.name,
@@ -83,11 +84,11 @@ class CsvDataImportPage extends Component {
 
     validateForm() {
         if (! this.state.fileSelected) {
-            alert('Please select a file to import')
+            alert(L.l('dataManagement.csvDataImport.validation.fileNotSelected'))
             return false
         }
         if (this.state.importType === 'update' && this.state.selectedEntityDefinition === null) {
-            alert('Please select an entity')
+            alert(L.l('dataManagement.csvDataImport.validation.entityNotSelected'))
             return false
         }
         return true
@@ -123,23 +124,13 @@ class CsvDataImportPage extends Component {
 
     render() {
         const survey = this.props.survey
-        if (survey == null) {
+        if (survey === null) {
             return <div>Select a survey first</div>
         }
 
-        const IMPORT_TYPES = {
-            update: {
-                label: 'Update existing records'
-            },
-            newRecords: {
-                label: 'Insert new records'
-            }, 
-            multipleFiles: {
-                label: 'Import multiple CSV/Excel files in a single ZIP file'
-            }
-        }
-        const importTypeOptions = Object.keys(IMPORT_TYPES).map(type =>
-            <option key={type} value={type}>{IMPORT_TYPES[type].label}</option> 
+        const IMPORT_TYPES = ['update', 'newRecords', 'multipleFiles']
+        const importTypeOptions = IMPORT_TYPES.map(type =>
+            <option key={type} value={type}>{L.l('dataManagement.csvDataImport.importType.' + type)}</option> 
         )
         
         const steps = Workflow.STEPS 
@@ -152,13 +143,13 @@ class CsvDataImportPage extends Component {
                 </Label>
             )
         })
-        const entitySelectionEnabled = this.state.importType == 'update'
+        const entitySelectionEnabled = this.state.importType === 'update'
         const entityNotSelected = entitySelectionEnabled && this.state.selectedEntityDefinition === null
         const acceptedFileTypes = this.state.importType === 'multipleFiles' ? '.zip': '.csv,.xls,xlsx,.zip'
         const acceptedFileTypesDescription = this.state.importType === 'multipleFiles' ? 'ZIP (.zip)': 'CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip)'
 
         const formatErrorMessage = function(cell, row) {
-            return row.message
+            return L.l(row.message, row.messageArgs)
         }
     
         return (
@@ -166,7 +157,7 @@ class CsvDataImportPage extends Component {
                 <FormGroup tag="fieldset">
                     <legend>Parameters</legend>
                     <FormGroup row>
-                        <Label for="stepSelect">Import type:</Label>
+                        <Label for="stepSelect">{L.l('dataManagement.csvDataImport.importType.label')}:</Label>
                         <Col sm={10}>
                             <Input type="select" name="step" id="stepSelect"
                                 value={this.state.importType} 
@@ -174,18 +165,18 @@ class CsvDataImportPage extends Component {
                         </Col>
                     </FormGroup>
                     <FormGroup row>
-                        <Label>Apply to step(s):</Label>
+                        <Label>{L.l('dataManagement.csvDataImport.applyToSteps')}:</Label>
                         <Col sm={10}>
                             {stepsChecks}
                         </Col>
                     </FormGroup>
                     {entitySelectionEnabled &&
                         <FormGroup row>
-                            <Label className={entityNotSelected ? 'invalid': ''}>Entity:</Label>
+                            <Label className={entityNotSelected ? 'invalid': ''}>{L.l('dataManagement.csvDataImport.entity')}:</Label>
                             <Col sm={{size: 10 }}>
                                 <SchemaTreeView survey={this.props.survey}
                                     handleNodeSelect={this.handleEntitySelect} />
-                                <FormFeedback style={entityNotSelected ? {display: 'block'}: {}}>Please select an entity</FormFeedback>
+                                <FormFeedback style={entityNotSelected ? {display: 'block'}: {}}>{L.l('dataManagement.csvDataImport.validation.entityNotSelected')}</FormFeedback>
                             </Col>
                         </FormGroup>}
                     <FormGroup row>
@@ -205,20 +196,20 @@ class CsvDataImportPage extends Component {
                     </FormGroup>
                     <FormGroup row>
                         <div>
-                            <Button onClick={e => this.setState({additionalOptionsOpen: ! this.state.additionalOptionsOpen})}>Additional Options</Button>
+                            <Button onClick={e => this.setState({additionalOptionsOpen: ! this.state.additionalOptionsOpen})}>{L.l('general.additionalOptions')}</Button>
                             <Collapse isOpen={this.state.additionalOptionsOpen}>
                                 <Card>
                                     <CardBlock>
                                         <FormGroup row check>
                                             <Label check>
                                                 <Input type="checkbox" checked={this.state.validateRecords}
-                                                    onChange={e => this.setState({validateRecords: e.target.checked})} /> Validate records after import
+                                                    onChange={e => this.setState({validateRecords: e.target.checked})} /> {L.l('dataManagement.csvDataImport.validateRecords')}
                                             </Label>
                                         </FormGroup>
                                         <FormGroup row check>
                                             <Label check>
                                                 <Input type="checkbox" checked={this.state.deleteEntitiesBeforeImport}
-                                                    onChange={e => this.setState({deleteEntitiesBeforeImport: e.target.checked})} /> Delete entities before import
+                                                    onChange={e => this.setState({deleteEntitiesBeforeImport: e.target.checked})} /> {L.l('dataManagement.csvDataImport.deleteEntities')}
                                             </Label>
                                         </FormGroup>
                                     </CardBlock>
@@ -238,11 +229,12 @@ class CsvDataImportPage extends Component {
                     <ModalBody>
                         <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors.csv'}>
 							<TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
-							<TableHeaderColumn dataField="fileName" width="200">File</TableHeaderColumn>
-							<TableHeaderColumn dataField="row" width="50">Row</TableHeaderColumn>
-							<TableHeaderColumn dataField="columns" width="150">Columns</TableHeaderColumn>
-                            <TableHeaderColumn dataField="errorType" width="140">Error type</TableHeaderColumn>
-                            <TableHeaderColumn dataField="message" width="400" dataFormat={this.formatErrorMessage}>Message</TableHeaderColumn>
+							<TableHeaderColumn dataField="fileName" width="200">{L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
+							<TableHeaderColumn dataField="row" width="50">{L.l('dataManagement.csvDataImport.row')}</TableHeaderColumn>
+							<TableHeaderColumn dataField="columns" width="150">{L.l('dataManagement.csvDataImport.columns')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="errorType" width="140">{L.l('dataManagement.csvDataImport.error-type')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="message" width="400" dataFormat={formatErrorMessage}
+                                csvFormat={formatErrorMessage}>{L.l('dataManagement.csvDataImport.error-message')}</TableHeaderColumn>
 						</BootstrapTable>
                     </ModalBody>
                     <ModalFooter>

@@ -1,5 +1,6 @@
 export default class Constants {
 
+    static APP_VERSION = "PROJECT_VERSION"
     static BASE_URL = Constants.determineBaseURL();
     static API_BASE_URL = Constants.BASE_URL + "api/";
 

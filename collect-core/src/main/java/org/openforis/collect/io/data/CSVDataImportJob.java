@@ -315,17 +315,17 @@ public class CSVDataImportJob extends Job {
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public static class CSVDataImportTask extends Task {
 
-		private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "csvDataImport.error.internalErrorImportingFile";
-		private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";
-		private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
-//		private static final String ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY = "csvDataImport.error.onlyNewRecordsAllowed";
-		private static final String MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY = "csvDataImport.error.multipleParentEntityFound";
-		private static final String PARENT_ENTITY_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.noParentEntityFound";
-		private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.unitNotFound";
-		private static final String SRS_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.srsNotFound";
-		private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "csvDataImport.error.recordNotInSelectedStep";
-		private static final String NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY = "csvDataImport.error.noRootEntitySelected";
-		private static final String NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noModelVersionFound";
+		private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.internalErrorImportingFile";
+		private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.noRecordFound";
+		private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.multipleRecordsFound";
+//		private static final String ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY = "dataManagement.csvDataImport.error.onlyNewRecordsAllowed";
+		private static final String MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.multipleParentEntityFound";
+		private static final String PARENT_ENTITY_NOT_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.noParentEntityFound";
+		private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.unitNotFound";
+		private static final String SRS_NOT_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.srsNotFound";
+		private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "dataManagement.csvDataImport.error.recordNotInSelectedStep";
+		private static final String NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.noRootEntitySelected";
+		private static final String NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.noModelVersionFound";
 
 		@Autowired
 		private UserManager userManager;

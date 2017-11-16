@@ -13,6 +13,7 @@
   "dependencies": {
     "bootstrap": "^4.0.0-beta.2",
     "chart.js": "^2.7.1",
+    "i18n-react": "^0.6.3",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-addons-css-transition-group": "^15.6.2",
