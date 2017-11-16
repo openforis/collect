@@ -718,8 +718,10 @@ public class SurveyManager {
 			for (SurveySummary summary : filteredSummaries) {
 				CollectSurvey survey = surveyDao.loadById(summary.getId());
 				String projectName = survey.getProjectName(labelLang);
-				if ( projectName == null && labelLang != null && ! labelLang.equals(survey.getDefaultLanguage()) ) {
+				if (labelLang == null) {
 					projectName = survey.getProjectName();
+				} else {
+					projectName = survey.getProjectName(labelLang, true);
 				}
 				summary.setProjectName(projectName);
 				summary.setDefaultLanguage(survey.getDefaultLanguage());
