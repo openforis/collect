@@ -70,10 +70,10 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder builder =  parentBuilder.e("fieldset").attr("class", "entity-group" ); //$NON-NLS-1$
+		XMLBuilder builder =  parentBuilder.e("fieldset").attr("class", "entity-group" ); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		String legend =  comp.getLabelOrName() ;
 		XMLBuilder legendBuilder = builder.e("legend"); //$NON-NLS-1$
-		legendBuilder.e("label").text(legend);
+		legendBuilder.e("span").text(legend); //$NON-NLS-1$
 		addTooltip(legendBuilder, comp.getTooltip());
 		XMLBuilder tableBuilder = builder.e("table").a("class", "table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr"); //$NON-NLS-1$ //$NON-NLS-2$
