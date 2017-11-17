@@ -23,11 +23,11 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.web.validator.SimpleSurveyParametersValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * 
@@ -46,8 +45,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping("/api/survey")
 public class SurveyController extends BasicController {
-
-	private static final String EDIT_SURVEY_VIEW = "editSurvey";
 
 	@Autowired
 	private SimpleSurveyParametersValidator validator;
@@ -129,16 +126,12 @@ public class SurveyController extends BasicController {
 		return generateView(survey, false);
 	}
 	
-	@RequestMapping(value="temp/{surveyId}/edit.htm", method=GET)
-	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
-		model.addAttribute("temp_id", surveyId);
-		return new ModelAndView(EDIT_SURVEY_VIEW);
-	}
-	
-	@RequestMapping(value="{surveyId}/edit.htm", method=GET)
-	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
-		model.addAttribute("id", surveyId);
-		return new ModelAndView(EDIT_SURVEY_VIEW);
+	@RequestMapping(value="changeusergroup/{id}", method=POST)
+	public @ResponseBody SurveyView changeSurveyUserGroup(@PathVariable int id, @RequestParam int userGroupId) throws SurveyStoreException {
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
+		survey.setUserGroupId(userGroupId);
+		surveyManager.save(survey);
+		return generateView(survey, false);
 	}
 	
 	private SurveyView generateView(CollectSurvey survey, boolean includeCodeListValues) {

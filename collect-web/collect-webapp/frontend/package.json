@@ -2,12 +2,15 @@
   "name": "open-foris-collect",
   "version": "4.0.0-alpha.1",
   "private": true,
+  "homepage": ".",
   "devDependencies": {
     "cross-env": "^5.1.1",
+    "eslint": "^4.11.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-sass": "^3.1.0",
-    "react-scripts": "^1.0.14"
+    "react-scripts": "^1.0.14",
+    "webpack": "^3.8.1"
   },
   "dependencies": {
     "bootstrap": "^4.0.0-beta.2",

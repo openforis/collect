@@ -5,6 +5,8 @@ import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus
 import static org.openforis.collect.model.UserInGroup.UserGroupRole.OWNER;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,6 +88,10 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	@Override
 	public List<UserGroup> findAllRelatedUserGroups(User user) {
 		Set<UserGroup> result = new HashSet<UserGroup>();
+		
+		result.add(getDefaultPublicUserGroup());
+		result.add(loadDefaultPrivateGroup(user));
+
 		if (user.getRole() == UserRole.ADMIN) {
 			result.addAll(dao.findGroups(false, null)); //add all user defined groups
 		} else {
@@ -97,9 +103,24 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 				result.addAll(ancestors);
 			}
 		}
-		result.add(getDefaultPublicUserGroup());
-		result.add(loadDefaultPrivateGroup(user));
-		return fillLazyLoadedFields(new ArrayList<UserGroup>(result));
+		List<UserGroup> sortedResult = sortBySystemDefinedAndLabel(result);
+		return fillLazyLoadedFields(sortedResult);
+	}
+
+	private List<UserGroup> sortBySystemDefinedAndLabel(Set<UserGroup> result) {
+		UserGroup[] array = result.toArray(new UserGroup[result.size()]);
+		Arrays.sort(array, new Comparator<UserGroup>() {
+			public int compare(UserGroup g1, UserGroup g2) {
+				if (g1.getSystemDefined() == g2.getSystemDefined()) {
+					return g1.getLabel().compareTo(g2.getLabel());
+				} else if (g1.getSystemDefined() && ! g2.getSystemDefined()) {
+					return -1;
+				} else {
+					return 1;
+				}
+			}
+		});
+		return Arrays.asList(array);
 	}
 
 	private List<UserGroup> findAncestorGroups(UserGroup userGroup) {

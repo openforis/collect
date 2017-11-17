@@ -298,7 +298,7 @@ const mapStateToProps = state => {
 	return {
 		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
 		users: state.users ? state.users.users : null,
-		userGroups: state.userGroups ? state.userGroups.userGroups : null,
+		userGroups: state.userGroups ? state.userGroups.items : null,
 		loggedUser: state.session ? state.session.loggedUser : null,
 		records: state.records ? state.records.list : null
 	}

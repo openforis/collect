@@ -57,5 +57,14 @@
                 "entityNotSelected": "Please select an entity to import data into"
             }
         }
+    },
+    "survey": {
+        "name": "Name",
+        "projectName": "Project",
+        "lastModified": "Last Modified",
+        "unpublishedChanges": "Unpublished changes",
+        "published": "Published",
+        "userGroup": "User Group",
+        "target": "Target"
     }
 }

@@ -83,7 +83,7 @@ const mapStateToProps = state => {
   const {
     isFetching: isFetchingUserGroups,
     lastUpdated: lastUpdatedUserGroups,
-    userGroups
+    items: userGroups
   } = state.userGroups || {
     isFetchingUserGroups: true,
     userGroups: []
