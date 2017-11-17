@@ -1,0 +1,61 @@
+{
+    "general": {
+        "account": "Account",
+        "additionalOptions": "Additional Options"
+    },
+    "header": {
+        "select-survey": "Select survey: "
+    },
+    "account": {
+        "change-password": "Change password",
+        "logout": "Logout"
+    },
+    "home-page": {
+        "welcome-message": "Welcome to Open Foris Collect!",
+        "introduction": "Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface. Collect handles multiple data types and complex validation rules, all in a multilanguage environment.",
+        "survey-not-selected-message": "Please select a survey or create a new one from the Survey Designer"
+    },
+    "dataManagement": {
+        "csvDataImport": {
+            "filename": "File Name",
+            "row": "Row",
+            "columns": "Columns",
+            "entity": "Entity",
+            "error-type": "Error Type",
+            "error-message": "Error Message",
+            "error": {
+                "missing-required-columns": "Required columns are: {0}",
+                "invalid-node-position": "Invalid node position: it must be a positive integer number",
+                "row-identifier-not-specified": "Row identifier not specified",
+                "noRecordFound": "Record not found: {0}",
+                "onlyNewRecordsAllowed": "New record insert selected but existing record found",
+                "noParentEntityFound": "Entity \"{0}\" with keys {1} not found in record [{2}]",
+                "multipleRecordsFound": "Multiple records found for key: {0}",
+                "multipleParentEntityFound": "Multiple parent entity found for entity \"{0}\" with keys {1} in record [{2}]",
+                "unitNotFound": "Unit {0} not found in the survey or not valid for this numeric attribute",
+                "srsNotFound": "Spatial reference system {0} not found in the survey",
+                "recordNotInSelectedStep": "Record is not in the selected step",
+                "noModelVersionFound": "Model version with name {0} not found in survey",
+                "fieldDefinitionNotFound": "Attribute definition not found or sub-field not specified",
+                "row_identifier_not_specified": "Row identifier not specified",
+                "nodePositionNotSpecified": "Node position not specified for a multiple attribute",
+                "invalidNodePosition": "Invalid node position: it must be a positive integer number",
+                "fieldNameNotSpecified": "Field name not specified"
+            },
+            "importType": {
+                "label": "Import type",
+                "update": "Update existing records",
+                "newRecords": "Insert new records",
+                "multipleFiles": "Import multiple CSV/Excel files in a single ZIP file"
+            },
+            "applyToSteps": "Apply to step(s)",
+            "selectAnEntity": "Please select an entity",
+            "validateRecords": "Validate records after import",
+            "deleteEntities": "Delete entities before import",
+            "validation": {
+                "fileNotSelected": "Please select a file to import",
+                "entityNotSelected": "Please select an entity to import data into"
+            }
+        }
+    }
+}
