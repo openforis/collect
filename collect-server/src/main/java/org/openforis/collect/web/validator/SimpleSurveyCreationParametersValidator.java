@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
 @Component
-public class SimpleSurveyParametersValidator extends SimpleValidator<SimpleSurveyCreationParameters> {
+public class SimpleSurveyCreationParametersValidator extends SimpleValidator<SimpleSurveyCreationParameters> {
 
 	@Override
 	public void validateForm(SimpleSurveyCreationParameters parameters, Errors errors) {

@@ -169,13 +169,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	
 	@Override
 	public List<UserGroup> findByUser(User user) {
-		List<UserGroup> result;
-		List<UserRole> userRoles = user.getRoles();
-		if (userRoles.contains(UserRole.ADMIN)) {
-			result = dao.loadAll();
-		} else {
-			result = dao.findByUser(user);
-		}
+		List<UserGroup> result = dao.findByUser(user);
 		return fillLazyLoadedFields(result);
 	}
 	

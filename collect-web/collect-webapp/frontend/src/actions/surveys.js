@@ -6,6 +6,8 @@ export const INVALIDATE_SURVEY_SUMMARIES = 'INVALIDATE_SURVEY_SUMMARIES'
 export const CHANGE_SURVEY_USER_GROUP = 'CHANGE_SURVEY_USER_GROUP'
 export const REQUEST_SURVEY_USER_GROUP_CHANGE = 'REQUEST_SURVEY_USER_GROUP_CHANGE'
 export const SURVEY_USER_GROUP_CHANGED = 'SURVEY_USER_GROUP_CHANGED'
+export const REQUEST_CREATE_NEW_SURVEY = 'REQUEST_CREATE_NEW_SURVEY'
+export const NEW_SURVEY_CREATED = 'NEW_SURVEY_CREATED'
 
 function requestSurveySummaries() {
     return {
@@ -58,5 +60,30 @@ export function invalidateSurveySummaries(summaries) {
     return {
         type: INVALIDATE_SURVEY_SUMMARIES,
         summaries
+    }
+}
+
+function requestCreateNewSurvey(name, template, userGroupId) {
+    return {
+        type: REQUEST_CREATE_NEW_SURVEY,
+        name: name,
+        template: template,
+        userGroupId: userGroupId
+    }
+}
+
+export function createNewSurvey(name, template, userGroupId) {
+    return function (dispatch) {
+        dispatch(requestCreateNewSurvey(name, template, userGroupId))
+        ServiceFactory.createNewSurvey(name, template, userGroupId).then(summary => 
+            dispatch(newSurveyCreated(summary))
+        )
+    }
+}
+
+function newSurveyCreated(summary) {
+    return {
+        type: NEW_SURVEY_CREATED,
+        summary: summary
     }
 }

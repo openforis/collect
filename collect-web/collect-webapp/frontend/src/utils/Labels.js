@@ -6,6 +6,7 @@ export default class Labels {
 
     static SUPPORTED_LANG_CODES = ['en']
     static DEFAULT_LANG_CODE = 'en'
+    static _ALL_TEXTS = {}
 
     static initialize(callback) {
         const browserLangCode = Labels._determineBrowserLanguageCode()
@@ -28,14 +29,24 @@ export default class Labels {
         fetch("/locales/labels_" + langCode + ".json?_v=" + Constants.APP_VERSION)
             .then(res => res.json())
             .then(texts => {
-                T.setTexts(texts)
-                callback()
+                Object.assign(Labels._ALL_TEXTS, texts)
+                fetch("/locales/languages_" + langCode + ".json?_v=" + Constants.APP_VERSION)
+                .then(res => res.json())
+                .then(texts => {
+                    Object.assign(Labels._ALL_TEXTS, texts)
+                    T.setTexts(Labels._ALL_TEXTS)
+                    callback()
+                })
             }
         )
     }
 
     static label(key, parameters) {
         return T.translate(key, parameters)
+    }
+
+    static keys(prefix) {
+        return Object.keys(Labels._ALL_TEXTS[prefix])
     }
 
     static l(key, parameters) {

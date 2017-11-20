@@ -1,7 +1,9 @@
 import update from 'react-addons-update';
 
+import Arrays from 'utils/Arrays'
+
 import {
-  REQUEST_SURVEY_SUMMARIES, RECEIVE_SURVEY_SUMMARIES, INVALIDATE_SURVEY_SUMMARIES, SURVEY_USER_GROUP_CHANGED
+  REQUEST_SURVEY_SUMMARIES, RECEIVE_SURVEY_SUMMARIES, INVALIDATE_SURVEY_SUMMARIES, SURVEY_USER_GROUP_CHANGED, NEW_SURVEY_CREATED
 } from 'actions/surveys'
 
 function surveySummaries(
@@ -43,6 +45,11 @@ function surveySummaries(
         items: newItems,
         lastUpdated: action.receivedAt
       })
+    case NEW_SURVEY_CREATED: {
+      return Object.assign({}, state, {
+        items: Arrays.addItem(state.items, action.summary)
+      })
+    }
     default:
       return state
   }

@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
@@ -101,19 +100,7 @@ public class SurveySelectVM extends BaseVM {
 	@Command
 	public void editSelectedSurvey() throws IOException {
 		CollectSurvey temporarySurvey = loadSelectedSurveyForEdit();
-		SessionStatus sessionStatus = getSessionStatus();
-		Integer publishedSurveyId = null;
-		if (selectedSurvey.isPublished()) {
-			if (selectedSurvey.isTemporary()) {
-				publishedSurveyId = selectedSurvey.getPublishedId();
-			} else {
-				publishedSurveyId = selectedSurvey.getId();
-			}
-		}
-		sessionStatus.setPublishedSurveyId(publishedSurveyId);
-		sessionStatus.setSurvey(temporarySurvey);
-		sessionStatus.setCurrentLanguageCode(null);
-		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
+		SurveyEditVM.redirectToSurveyEditPage(temporarySurvey.getId());
 	}
 
 	@Command
@@ -196,12 +183,8 @@ public class SurveySelectVM extends BaseVM {
 		boolean jobStartedByThis = isJobStartedByThis(job);
 		if (job == surveyCloneJob) {
 			CollectSurvey survey = surveyCloneJob.getOutputSurvey();
-			//put survey in session and redirect into survey edit page
-			SessionStatus sessionStatus = getSessionStatus();
-			sessionStatus.setSurvey(survey);
-			sessionStatus.setCurrentLanguageCode(survey.getDefaultLanguage());
-			Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 			surveyCloneJob = null;
+			SurveyEditVM.redirectToSurveyEditPage(survey.getId());
 		}
 		if (jobStartedByThis) {
 			onJobEnd(job);

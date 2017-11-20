@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import { Container } from 'reactstrap';
+import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
+    Form, FormFeedback, FormGroup, Label, Input, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 import * as Formatters from 'components/datatable/formatters';
 import UserGroupColumnEditor from 'components/surveydesigner/UserGroupColumnEditor';
@@ -19,6 +20,7 @@ class SurveysListPage extends Component {
         }
 
         this.handleCellEdit = this.handleCellEdit.bind(this)
+        this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
     }
 
     handleCellEdit(row, fieldName, value) {
@@ -29,6 +31,10 @@ class SurveysListPage extends Component {
             this.props.dispatch(SurveyActions.changeUserGroup(surveyId, newUserGroupId, loggedUserId))
 		}
     }
+
+    handleNewButtonClick() {
+        this.props.history.push('/surveydesigner/newsurvey')        
+	}
     
     render() {
         if (this.props.surveySummaries == null) {
@@ -60,6 +66,11 @@ class SurveysListPage extends Component {
 
         return (
             <Container fluid>
+                <Row className="justify-content-between">
+					<Col sm={{size: 4}}>
+						<Button color="info" onClick={this.handleNewButtonClick}>{L.l('general.new')}</Button>
+					</Col>
+                </Row>
                 <BootstrapTable
                     data={this.props.surveySummaries}
                     striped hover condensed

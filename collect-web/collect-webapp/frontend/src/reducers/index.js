@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux'
+import { reducer as formReducer } from 'redux-form'
 import currentJob from './currentJob'
 import applicationInfo from './applicationInfo'
 import login from './login'
@@ -10,6 +11,7 @@ import users from './users'
 import userGroups from './userGroups'
 
 const rootReducer = combineReducers({
+	formReducer, //react-form reducer
 	currentJob,
 	applicationInfo,
 	login,

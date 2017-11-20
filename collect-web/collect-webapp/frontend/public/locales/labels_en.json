@@ -1,7 +1,8 @@
 {
     "general": {
         "account": "Account",
-        "additionalOptions": "Additional Options"
+        "additionalOptions": "Additional Options",
+        "new": "New"
     },
     "header": {
         "select-survey": "Select survey: "
@@ -60,7 +61,15 @@
     },
     "survey": {
         "name": "Name",
+        "templateType": {
+            "label" : "Template",
+            "BLANK": "Blank", 
+            "BIOPHYSICAL": "Biophysical", 
+            "COLLECT_EARTH": "Collect Earth", 
+            "COLLECT_EARTH_IPCC": "Collect Earth + IPCC"
+        },
         "projectName": "Project",
+        "defaultLanguage": "Default Language",
         "lastModified": "Last Modified",
         "unpublishedChanges": "Unpublished changes",
         "published": "Published",

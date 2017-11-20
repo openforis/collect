@@ -1177,7 +1177,7 @@ public class SurveyManager {
 	
 	private Set<UserGroup> getAvailableUserGroups(User availableToUser) {
 		if (userGroupManager != null && availableToUser != null) {
-			List<UserGroup> userGroups = userGroupManager.findByUser(availableToUser);
+			List<UserGroup> userGroups = userGroupManager.findAllRelatedUserGroups(availableToUser);
 			return new LinkedHashSet<UserGroup>(userGroups);
 		} else {
 			return null;
