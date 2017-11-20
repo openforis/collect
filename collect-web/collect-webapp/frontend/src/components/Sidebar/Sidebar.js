@@ -57,7 +57,7 @@ class Sidebar extends Component {
             <li className="divider"></li>
             {loggedUser.canAccessUsersManagement ?
               <li className="nav-item nav-dropdown">
-                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="fa fa-users"></i>Security</a>
+                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="fa fa-lock"></i>Security</a>
                 <ul className="nav-dropdown-items">
                   <li className="nav-item">
                     <NavLink to={'/users'} className="nav-link" activeClassName="active"><i className="fa fa-user"></i> Users</NavLink>
