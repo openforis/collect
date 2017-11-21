@@ -24,9 +24,9 @@
 		<installer-version-id>${buildNumber}</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.1.1</openforis.commons.version>
-		<spring.version>4.2.2.RELEASE</spring.version>
-		<spring-security.version>4.0.3.RELEASE</spring-security.version>
+		<openforis.commons.version>0.1.2</openforis.commons.version>
+		<spring.version>4.3.12.RELEASE</spring.version>
+		<spring-security.version>4.2.3.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
 		<jetty.version>9.4.2.v20170220</jetty.version>
 		<installer.jre.version.major>1.8</installer.jre.version.major>
