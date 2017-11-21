@@ -11,7 +11,7 @@ import users from './users'
 import userGroups from './userGroups'
 
 const rootReducer = combineReducers({
-	formReducer, //react-form reducer
+	form: formReducer, //react-form reducer
 	currentJob,
 	applicationInfo,
 	login,
