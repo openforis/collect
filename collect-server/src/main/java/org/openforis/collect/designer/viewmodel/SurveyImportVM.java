@@ -364,6 +364,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		job.setUserGroup(userGroup);
 		job.setRestoreIntoPublishedSurvey(false);
 		job.setValidateSurvey(false);
+		job.setActiveUser(getLoggedUser());
 		jobManager.start(job);
 		this.restoreJob = job;
 		openSurveyRestoreStatusPopUp();

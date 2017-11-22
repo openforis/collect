@@ -140,12 +140,12 @@ public class SurveyManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public CollectSurvey importTemporaryModel(InputStream is, String name, boolean validate)
+	public CollectSurvey importTemporaryModel(InputStream is, String name, boolean validate, UserGroup userGroup)
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
 		try {
 			tempFile = OpenForisIOUtils.copyToTempFile(is);
-			return importTemporaryModel(tempFile, name, validate);
+			return importTemporaryModel(tempFile, name, validate, userGroup);
 		} finally {
 			if ( tempFile != null && tempFile.exists() ) {
 				tempFile.delete();
@@ -154,10 +154,10 @@ public class SurveyManager {
 	}
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public CollectSurvey importTemporaryModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
+	public CollectSurvey importTemporaryModel(File surveyFile, String name, boolean validate, UserGroup userGroup) throws SurveyImportException, SurveyValidationException {
 		try {
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
-			survey.setUserGroup(userGroupManager == null ? null : userGroupManager.getDefaultPublicUserGroup());
+			survey.setUserGroup(userGroup != null ? userGroup : userGroupManager == null ? null : userGroupManager.getDefaultPublicUserGroup());
 			survey.setName(name);
 			survey.setTemporary(true);
 			surveyDao.insert(survey);
@@ -176,9 +176,9 @@ public class SurveyManager {
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importInPublishedTemporaryModel(String uri, File surveyFile, boolean validate, User activeUser) 
 			throws SurveyStoreException, SurveyValidationException {
-		createTemporarySurveyFromPublished(uri, activeUser);
-		CollectSurvey newTemporarySurvey = updateTemporaryModel(surveyFile, validate);
-		return newTemporarySurvey;
+		CollectSurvey clonedSurvey = createTemporarySurveyFromPublished(uri, activeUser);
+		CollectSurvey updatedTemporarySurvey = updateTemporaryModel(surveyFile, validate, clonedSurvey.getUserGroup());
+		return updatedTemporarySurvey;
 	}
 	
 	/**
@@ -309,7 +309,7 @@ public class SurveyManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public CollectSurvey updateTemporaryModel(File surveyFile, boolean validate)
+	public CollectSurvey updateTemporaryModel(File surveyFile, boolean validate, UserGroup userGroup)
 			throws SurveyValidationException, SurveyStoreException {
 		CollectSurvey parsedSurvey;
 		try {
@@ -327,6 +327,7 @@ public class SurveyManager {
 			parsedSurvey.setName(oldTemporarySurvey.getName());
 			parsedSurvey.setPublishedId(oldTemporarySurvey.getPublishedId());
 			parsedSurvey.setTemporary(true);
+			parsedSurvey.setUserGroup(userGroup);
 			
 			//clean code list items
 			for (CodeList codeList : parsedSurvey.getCodeLists()) {
