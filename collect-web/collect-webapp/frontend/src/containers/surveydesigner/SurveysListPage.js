@@ -56,11 +56,11 @@ class SurveysListPage extends Component {
             switch(cell) {
                 case "COLLECT_EARTH":
                     return <span style={{display: "inline-block", width: "30px", height: "30px", backgroundSize: "30px",
-                        backgroundImage: "url(/img/of_collect_earth_logo_simple.png)"}} />
+                        backgroundImage: "url(/assets/img/of_collect_earth_logo_simple.png)"}} />
                 case "COLLECT_DESKTOP":
                 default:
                     return <span style={{display: "inline-block", width: "30px", height: "30px", backgroundSize: "30px", 
-                        backgroundImage: "url(/img/of_collect_logo_simple.png)"}} />
+                        backgroundImage: "url(/assets/img/of_collect_logo_simple.png)"}} />
             }
         }
 

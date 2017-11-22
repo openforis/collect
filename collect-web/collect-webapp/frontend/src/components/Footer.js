@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, UncontrolledTooltip } from 'reactstrap';
 import { connect } from 'react-redux';
+import Constants from 'utils/Constants'
 
 class Footer extends Component {
   render() {
@@ -34,7 +35,7 @@ class Footer extends Component {
         <Row>
           <Col sm={6}>
             <a href="http://www.openforis.org/tools/collect">Open Foris Collect</a>
-            <span> version: {applicationInfo.version}</span>
+            <span> version: {Constants.APP_VERSION}</span>
             {versionVerifiedIcon}
             {versionTooltip}
           </Col>

@@ -26,20 +26,31 @@ export default class Labels {
     }
 
     static loadLabels(langCode, callback) {
-        fetch("/locales/labels_" + langCode + ".json?_v=" + Constants.APP_VERSION)
-            .then(res => res.json())
-            .then(texts => {
-                Object.assign(Labels._ALL_TEXTS, texts)
-                fetch("/locales/languages_" + langCode + ".json?_v=" + Constants.APP_VERSION)
+        const labelsFileLoaded = function(texts) {
+            Object.assign(Labels._ALL_TEXTS, texts)
+            
+            let nextFilePrefix = filePrefixes.pop()
+            if (nextFilePrefix) {
+                fetchLabelFile(Labels._ALL_TEXTS, nextFilePrefix, langCode, labelsFileLoaded)
+            } else {
+                T.setTexts(Labels._ALL_TEXTS)
+                callback()
+            }
+        }
+
+        const fetchLabelFile = function(allTexts, filePrefix, langCode, callback) {
+            fetch(Constants.BASE_ASSETS_URL + "locales/" + filePrefix + langCode + ".json?_v=" + Constants.APP_VERSION)
                 .then(res => res.json())
                 .then(texts => {
-                    Object.assign(Labels._ALL_TEXTS, texts)
-                    T.setTexts(Labels._ALL_TEXTS)
-                    callback()
+                    callback(texts)
                 })
-            }
-        )
+        }
+
+        const filePrefixes = ['labels_', 'languages_']
+        let nextFilePrefix = filePrefixes.pop()
+        fetchLabelFile(Labels._ALL_TEXTS, nextFilePrefix, langCode, labelsFileLoaded)
     }
+
 
     static label(key, parameters) {
         return T.translate(key, parameters)

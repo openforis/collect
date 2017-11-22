@@ -25,7 +25,8 @@
 		</headers>
 		
 		<intercept-url pattern="/login*" access="isAnonymous()" />
-      
+
+		<intercept-url access="permitAll" pattern="favicon.ico" />
 		<intercept-url access="permitAll" pattern="collect.swf" />
 		<intercept-url access="permitAll" pattern="/api/session/**" />
 		<intercept-url access="permitAll" pattern="/api/defaultpasswordactive" />
@@ -35,6 +36,7 @@
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
 		<intercept-url access="permitAll" pattern="/js/**" />
+		<intercept-url access="permitAll" pattern="/locales/**" />
 		<intercept-url access="permitAll" pattern="/script/**" />
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
 		<intercept-url access="permitAll" pattern="/keepSessionAlive.htm" />
