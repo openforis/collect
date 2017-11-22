@@ -30,6 +30,9 @@
 					<npmVersion>${npm.version}</npmVersion>
 					<workingDirectory>${basedir}/frontend</workingDirectory>
 					<installDirectory>${project.build.directory}</installDirectory>
+					<environmentVariables>
+						<REACT_APP_COLLECT_PROJECT_VERSION>${project.version}</REACT_APP_COLLECT_PROJECT_VERSION>
+					</environmentVariables>
 				</configuration>
 
 				<executions>
