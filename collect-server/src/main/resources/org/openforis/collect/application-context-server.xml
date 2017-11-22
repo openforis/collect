@@ -151,7 +151,6 @@
 		        </constructor-arg>
 		    </bean>
 		</constructor-arg>
-		<constructor-arg ref="jooqConfig" />
 		
 		<!-- Event Queue DISABLED by default -->
 		<property name="enabled" value="true" />
