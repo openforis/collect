@@ -75,5 +75,21 @@
         "published": "Published",
         "userGroup": "User Group",
         "target": "Target"
+    },
+    "user": {
+        "username": "Username",
+        "enabled": "Enabled",
+        "role": "Role",
+        "rawPassword": "Password",
+        "retypedPassword": "Retype-password",
+        "validation": {
+            "invalid_username": "The username's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers and the underscore may be used.",
+            "wrong_password_pattern": "The password's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers and the underscore may be used.",
+            "wrong_retyped_password": "Password and Retyped-Password do not match"
+        }
+    },
+    "validation": {
+        "required_field": "Required field",
+        "duplicate_value": "Duplicate value"
     }
 }

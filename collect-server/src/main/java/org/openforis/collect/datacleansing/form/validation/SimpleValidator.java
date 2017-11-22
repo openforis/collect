@@ -122,7 +122,11 @@ public abstract class SimpleValidator<F> implements Validator {
 	}
 	
 	protected boolean validateInternalName(Errors errors, String fieldName) {
-		return validateRegEx(errors, fieldName, Survey.INTERNAL_NAME_REGEX, "generic.validation.invalid_internal_name");
+		return validateInternalName(errors, fieldName, "generic.validation.invalid_internal_name");
+	}
+	
+	protected boolean validateInternalName(Errors errors, String fieldName, String errorMessageKey) {
+		return validateRegEx(errors, fieldName, Survey.INTERNAL_NAME_REGEX, errorMessageKey);
 	}
 	
 	protected boolean validateRegEx(Errors errors, String fieldName, String regex, String errorMessageKey) {

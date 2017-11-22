@@ -1,12 +1,35 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { Alert, Button, Col, Form, FormGroup, Label, Input, FormFeedback } from 'reactstrap';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-    
-import * as Actions from 'actions';
+
+import * as UsersActions from 'actions/users'
 import ServiceFactory from 'services/ServiceFactory';
 import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage';
+import User from 'model/User'
+import L from 'utils/Labels'
+
+class FormItem extends Component {
+
+    render() {
+        const fieldId = this.props.fieldId
+        const fieldState = this.props.fieldState
+        const errorFeedback = this.props.errorFeedback
+        const label = this.props.label
+
+        return (
+            <FormGroup row color={fieldState}>
+                <Label for={fieldId} sm={2}>{L.l(label)}</Label>
+                <Col sm={10}>
+                    {this.props.children}
+                    {errorFeedback && <FormFeedback>{L.l(errorFeedback)}</FormFeedback>}
+                </Col>
+            </FormGroup>
+        )
+    }
+
+}
 
 class UserDetailsPage extends AbstractItemDetailsPage {
    
@@ -65,84 +88,71 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                 newItem: false,
                 id: res.form.id
             })
-            this.props.actions.receiveUser(res.form);
+            this.props.dispatch(UsersActions.receiveUser(res.form));
         }
     }
 
     render() {
-        const roles = ['VIEW', 'ENTRY_LIMITED', 'ENTRY', 'CLEANSING', 'ANALYSIS', 'ADMIN']
         const EMPTY_OPTION = <option key="-1" value="">--- Select one ---</option>
         
-		return (
+        return (
             <div>
                 <Alert color={this.state.alertMessageColor} isOpen={this.state.alertMessageOpen}>
                     {this.state.alertMessageText}
                 </Alert>
                 <Form>
-                    <FormGroup row color={this.getFieldState('username')}>
-                        <Label for="username" sm={2}>Username</Label>
-                        <Col sm={10}>
-                            <Input type="text" name="username" id="username" 
+                    <FormItem fieldId='username' 
+                            fieldState={this.getFieldState('username')}
+                            errorFeedback={this.state.errorFeedback['username']}
+                            label={'user.username'}>
+                        <Input type="text" name="username" id="username" 
                                 value={this.state.username} 
                                 readOnly={! this.state.newItem}
                                 state={this.getFieldState('username')}
                                 onChange={(event) => this.setState({...this.state, username: event.target.value})} />
-                            {this.state.errorFeedback['username'] &&
-                                <FormFeedback>{this.state.errorFeedback['username']}</FormFeedback>
-                            }
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row color={this.getFieldState('enabled')}>
-                        <Label for="enabled" sm={2}>Enabled</Label>
-                        <Col sm={10}>
-                            <FormGroup check>
-                                <Label check>
-                                    <Input type="checkbox" name="enabled" id="enabled"
-                                        checked={this.state.enabled} 
-                                        state={this.getFieldState('enabled')}
-                                        onChange={(event) => this.setState({...this.state, enabled: event.target.checked})} />
-                                </Label>
-                            </FormGroup>
-                            {this.state.errorFeedback['enabled'] && <FormFeedback>{this.state.errorFeedback['enabled']}</FormFeedback>}
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row color={this.getFieldState('role')}>
-                        <Label for="role" sm={2}>Role</Label>
-                        <Col sm={10}>
-                            <Input type="select" name="role" id="roleSelect" 
-                                onChange={(event) => this.setState({...this.state, role: event.target.value})}
-                                value={this.state.role}>
-                                {[EMPTY_OPTION].concat(roles.map(role => <option key={role} value={role}>{role}</option>))}
-                            </Input>
-                            {this.state.errorFeedback['role'] &&
-                                <FormFeedback>{this.state.errorFeedback['role']}</FormFeedback>
-                            }
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row color={this.getFieldState('rawPassword')}>
-                        <Label for="rawPassword" sm={2}>Password</Label>
-                        <Col sm={10}>
-                            <Input type="password" name="rawPassword" id="rawPassword" 
-                                value={this.state.rawPassword}
-                                state={this.getFieldState('rawPassword')}
-                                onChange={(event) => this.setState({...this.state, rawPassword: event.target.value})} />
-                            {this.state.errorFeedback['rawPassword'] &&
-                                <FormFeedback>{this.state.errorFeedback['rawPassword']}</FormFeedback>
-                            }
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row color={this.getFieldState('retypedPassword')}>
-                        <Label for="retypedPassword" sm={2}>Retype Password</Label>
-                        <Col sm={10}>
-                            <Input type="password" name="retypedPassword" id="retypedPassword"
-                                value={this.state.retypedPassword}
-                                state={this.getFieldState('retypedPassword')}
-                                onChange={(event) => this.setState({...this.state, retypedPassword: event.target.value})} />
-                            {this.state.errorFeedback['retypedPassword'] &&
-                                <FormFeedback>{this.state.errorFeedback['retypedPassword']}</FormFeedback>
-                            }
-                        </Col>
-                    </FormGroup>
+                    </FormItem>
+                    <FormItem fieldId='enabled' 
+                            fieldState={this.getFieldState('enabled')}
+                            errorFeedback={this.state.errorFeedback['enabled']}
+                            label={'user.enabled'}>
+                        <FormGroup check>
+                            <Label check>
+                                <Input type="checkbox" name="enabled" id="enabled"
+                                    checked={this.state.enabled} 
+                                    state={this.getFieldState('enabled')}
+                                    onChange={(event) => this.setState({...this.state, enabled: event.target.checked})} />
+                            </Label>
+                        </FormGroup>
+                    </FormItem>
+                    <FormItem fieldId='roleSelect' 
+                            fieldState={this.getFieldState('role')}
+                            errorFeedback={this.state.errorFeedback['role']}
+                            label={'user.role'}>
+                        <Input type="select" name="role" id="roleSelect" 
+                            onChange={(event) => this.setState({...this.state, role: event.target.value})}
+                            state={this.getFieldState('role')}
+                            value={this.state.role}>
+                            {User.ROLES.map(role => <option key={role} value={role}>{role}</option>)}
+                        </Input>
+                    </FormItem>
+                    <FormItem fieldId='rawPassword' 
+                            fieldState={this.getFieldState('rawPassword')}
+                            errorFeedback={this.state.errorFeedback['rawPassword']}
+                            label={'user.rawPassword'}>
+                        <Input type="password" name="rawPassword" id="rawPassword" 
+                            value={this.state.rawPassword}
+                            state={this.getFieldState('rawPassword')}
+                            onChange={(event) => this.setState({...this.state, rawPassword: event.target.value})} />
+                    </FormItem>
+                    <FormItem fieldId='retypedPassword' 
+                            fieldState={this.getFieldState('retypedPassword')}
+                            errorFeedback={this.state.errorFeedback['retypedPassword']}
+                            label={'user.retypedPassword'}>
+                        <Input type="password" name="retypedPassword" id="retypedPassword"
+                            value={this.state.retypedPassword}
+                            state={this.getFieldState('retypedPassword')}
+                            onChange={(event) => this.setState({...this.state, retypedPassword: event.target.value})} />
+                    </FormItem>
                     <FormGroup check row>
                         <Col sm={{ size: 10, offset: 2 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
@@ -158,13 +168,4 @@ function mapStateToProps(state) {
     return {}
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators(Actions, dispatch)
-    };
-}
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(UserDetailsPage);
+export default connect(mapStateToProps)(UserDetailsPage);

@@ -21,9 +21,11 @@ import org.springframework.validation.Errors;
 public class UserValidator extends SimpleValidator<UserForm> {
 
 	private static final String USERNAME_FIELD = "username";
+	private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z]\\w{3,14}$");
 	private static final String ROLE_FIELD = "role";
 	private static final String RAW_PASSWORD_FIELD = "rawPassword";
 	private static final String RETYPED_PASSWORD_FIELD = "retypedPassword";
+	private static final String INVALID_USERNAME_MESSAGE_KEY = "user.validation.invalid_username";
 	private static final String PASSWORD_PATTERN_MESSAGE_KEY = "user.validation.wrong_password_pattern";
 	private static final String WRONG_RETYPED_PASSWORD_MESSAGE_KEY = "user.validation.wrong_retyped_password";
 	
@@ -44,6 +46,11 @@ public class UserValidator extends SimpleValidator<UserForm> {
 		String retypedPassword = (String) errors.getFieldValue(RETYPED_PASSWORD_FIELD);
 		
 		if (validateRequiredFields(errors, USERNAME_FIELD)) {
+			validateRegEx(errors, USERNAME_FIELD, USERNAME_PATTERN, INVALID_USERNAME_MESSAGE_KEY);
+			
+			if (target.getId() == null) {
+				validateRequiredField(errors, RAW_PASSWORD_FIELD);
+			}
 			if (StringUtils.isNotBlank(rawPassword)) {
 				validatePassword(errors, rawPassword);
 			}
