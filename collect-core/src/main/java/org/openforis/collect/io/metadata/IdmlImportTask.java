@@ -8,6 +8,7 @@ import java.io.File;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -30,6 +31,7 @@ public class IdmlImportTask extends Task {
 	private String surveyUri;
 	private String surveyName;
 	private boolean validate;
+	private User activeUser;
 	
 	//output
 	private transient CollectSurvey survey;
@@ -62,7 +64,7 @@ public class IdmlImportTask extends Task {
 			survey = surveyManager.updateTemporaryModel(file, validate);
 		} else {
 			//duplicates published survey into work and update it with packaged file
-			survey = surveyManager.importInPublishedTemporaryModel(surveyUri, file, validate);
+			survey = surveyManager.importInPublishedTemporaryModel(surveyUri, file, validate, activeUser);
 		}
 	}
 
@@ -112,6 +114,10 @@ public class IdmlImportTask extends Task {
 	
 	public void setValidate(boolean validate) {
 		this.validate = validate;
+	}
+	
+	public void setActiveUser(User activeUser) {
+		this.activeUser = activeUser;
 	}
 	
 	public CollectSurvey getSurvey() {

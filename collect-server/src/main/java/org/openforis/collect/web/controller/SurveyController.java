@@ -200,7 +200,8 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value="publish/{id}", method=POST)
 	public @ResponseBody SurveyView publishSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		surveyManager.publish(survey);
+		User activeUser = null; //TODO
+		surveyManager.publish(survey, activeUser);
 		return generateView(survey, false);
 	}
 	

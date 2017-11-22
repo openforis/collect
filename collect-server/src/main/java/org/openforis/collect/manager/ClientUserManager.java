@@ -55,18 +55,18 @@ public class ClientUserManager extends AbstractClient implements UserManager  {
 	}
 	
 	@Override
-	public User save(User user) throws UserPersistenceException {
+	public User save(User user, User modifiedByUser) throws UserPersistenceException {
 		User result = post(getUsersRestfulApiUrl() + "/user", user, User.class);
 		user.setId(result.getId()); //if user was new
 		return user;
 	}
 
 	@Override
-	public User insertUser(String name, String rawPassword, UserRole role) throws UserPersistenceException {
+	public User insertUser(String name, String rawPassword, UserRole role, User createdByUser) throws UserPersistenceException {
 		User user = new User(name);
 		user.setRawPassword(rawPassword);
 		user.addRole(role);
-		save(user);
+		save(user, createdByUser);
 		return user;
 	}
 

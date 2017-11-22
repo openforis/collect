@@ -97,6 +97,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 		generationJob = collectJobManager.createJob(DataReportGeneratorJob.class);
 		generationJob.setQueryGroup(queryGroup);
 		generationJob.setRecordStep(recordStep);
+		generationJob.setActiveUser(getLoggedUser());
 		collectJobManager.start(generationJob);
 		return new Response();
 	}

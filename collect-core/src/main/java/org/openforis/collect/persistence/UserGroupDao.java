@@ -104,7 +104,7 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 		}
 	}
 	
-	public void insertRelation(UserGroup group, UserInGroup userInGroup) {
+	public void insertRelation(UserInGroup userInGroup) {
 		dsl().insertInto(OFC_USER_USERGROUP, 
 				OFC_USER_USERGROUP.GROUP_ID, 
 				OFC_USER_USERGROUP.USER_ID, 
@@ -112,7 +112,7 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 				OFC_USER_USERGROUP.MEMBER_SINCE, 
 				OFC_USER_USERGROUP.STATUS_CODE, 
 				OFC_USER_USERGROUP.ROLE_CODE)
-			.values(group.getId(), 
+			.values(userInGroup.getGroupId(), 
 					userInGroup.getUserId(), 
 					Daos.toTimestamp(userInGroup.getRequestDate()),
 					Daos.toTimestamp(userInGroup.getMemberSince()), 

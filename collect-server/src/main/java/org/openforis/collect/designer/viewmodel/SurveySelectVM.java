@@ -289,7 +289,7 @@ public class SurveySelectVM extends BaseVM {
 
 	protected void performSurveyPublishing(CollectSurvey survey, Binder binder) {
 		try {
-			surveyManager.publish(survey);
+			surveyManager.publish(survey, getLoggedUser());
 			selectedSurvey = null;
 			notifyChange("selectedSurvey");
 			reloadSurveySummaries(binder);
@@ -304,7 +304,7 @@ public class SurveySelectVM extends BaseVM {
 	private void performSelectedSurveyUnpublishing(Binder binder) {
 		try {
 			Integer publishedSurveyId = selectedSurvey.isTemporary() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
-			CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
+			CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId, getLoggedUser());
 			selectedSurvey = null;
 			notifyChange("selectedSurvey");
 			reloadSurveySummaries(binder);
@@ -468,7 +468,7 @@ public class SurveySelectVM extends BaseVM {
 		if (selectedSurvey.isTemporary()) {
 			temporarySurvey = surveyManager.loadSurvey(selectedSurvey.getId());
 		} else if (selectedSurvey.isPublished()) {
-			temporarySurvey = surveyManager.createTemporarySurveyFromPublished(uri);
+			temporarySurvey = surveyManager.createTemporarySurveyFromPublished(uri, getLoggedUser());
 		} else {
 			throw new IllegalStateException(
 					"Trying to load an invalid survey: " + uri);
@@ -560,7 +560,8 @@ public class SurveySelectVM extends BaseVM {
 				
 				@Override
 				protected void execute() throws Throwable {
-					outputSurvey = surveyManager.duplicateSurveyIntoTemporary(originalSurvey.getName(), originalSurveyIsWork, newName);
+					outputSurvey = surveyManager.duplicateSurveyIntoTemporary(originalSurvey.getName(), 
+							originalSurveyIsWork, newName, getLoggedUser());
 				}
 			});
 		}

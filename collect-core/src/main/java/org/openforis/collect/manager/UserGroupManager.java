@@ -6,6 +6,7 @@ import java.util.Map;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 
 public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	
@@ -49,4 +50,8 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	void deleteRelation(int userGroupId, int userId);
 
 	void deleteAllUserRelations(int userId);
+
+	UserGroup createDefaultPrivateUserGroup(User user, User createdByUser);
+
+	void joinToDefaultPublicGroup(User user, UserGroupRole role);
 }

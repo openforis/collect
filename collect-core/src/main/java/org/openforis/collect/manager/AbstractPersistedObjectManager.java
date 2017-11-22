@@ -2,6 +2,7 @@ package org.openforis.collect.manager;
 
 import java.util.List;
 
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.PersistedObjectDao;
 import org.openforis.idm.metamodel.PersistedObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +41,8 @@ public abstract class AbstractPersistedObjectManager<T extends PersistedObject, 
 		return obj;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.openforis.collect.manager.ItemManager#save(T)
-	 */
 	@Override
-	public T save(T obj) {
+	public T save(T obj, User modifiedByUser) {
 		if (obj.getId() == null) {
 			dao.insert(obj);
 		} else {

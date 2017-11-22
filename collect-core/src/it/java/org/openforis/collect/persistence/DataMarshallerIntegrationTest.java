@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.LocalUserManager;
-import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
@@ -53,7 +52,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 
 	@Before
 	public void init() throws UserPersistenceException {
-		userManager.insertUser("entry", "pass1", UserRole.ENTRY);
+		userManager.insertUser("entry", "pass1", UserRole.ENTRY, userManager.loadAdminUser());
 	}
 	
 	@Test

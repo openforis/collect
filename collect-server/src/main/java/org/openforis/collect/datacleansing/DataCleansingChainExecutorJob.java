@@ -12,6 +12,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordUpdater;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport.CollectStoreQueryBuffer;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
@@ -43,6 +44,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	//input
 	private DataCleansingChain chain;
 	private Step recordStep;
+	private User activeUser;
 
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -62,7 +64,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 			report.setCleansingChainId(chain.getId());
 			report.setCleansedRecords(task.getCleansedRecords());
 			report.setCleansedNodes(task.getCleansedNodes());
-			reportManager.save(report);
+			reportManager.save(report, activeUser);
 		}
 	}
 	
@@ -73,6 +75,10 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	
 	public void setRecordStep(Step recordStep) {
 		this.recordStep = recordStep;
+	}
+	
+	public void setActiveUser(User activeUser) {
+		this.activeUser = activeUser;
 	}
 	
 	private DataCleansingChainExectutorTask getChainExecutorTask() {

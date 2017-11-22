@@ -7,6 +7,7 @@ import org.openforis.collect.datacleansing.DataCleansingMetadataView;
 import org.openforis.collect.datacleansing.io.DataCleansingImportTask;
 import org.openforis.collect.datacleansing.manager.DataCleansingMetadataManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -31,6 +32,7 @@ public class JsonDataCleansingImportTask extends Task implements DataCleansingIm
 	//input
 	private CollectSurvey survey;
 	private File inputFile;
+	private User activeUser;
 	
 	@Override
 	protected void execute() throws Throwable {
@@ -38,7 +40,7 @@ public class JsonDataCleansingImportTask extends Task implements DataCleansingIm
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		DataCleansingMetadataView metadataView = objectMapper.readValue(inputFile, DataCleansingMetadataView.class);
 		DataCleansingMetadata metadata = metadataView.toMetadata(survey);
-		dataCleansingManager.saveMetadata(survey, metadata, true); //TODO handle exceptions
+		dataCleansingManager.saveMetadata(survey, metadata, true, activeUser); //TODO handle exceptions
 	}
 
 	@Override
@@ -49,6 +51,11 @@ public class JsonDataCleansingImportTask extends Task implements DataCleansingIm
 	@Override
 	public void setInputFile(File inputFile) {
 		this.inputFile = inputFile;
+	}
+	
+	@Override
+	public void setActiveUser(User activeUser) {
+		this.activeUser = activeUser;
 	}
 	
 }

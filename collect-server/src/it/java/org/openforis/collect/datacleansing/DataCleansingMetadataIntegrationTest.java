@@ -40,7 +40,7 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 	@Test
 	public void roundTripTest() {
 		DataCleansingMetadata metadata = createTestMetadata();
-		metadataManager.saveMetadata(survey, metadata, false);
+		metadataManager.saveMetadata(survey, metadata, false, adminUser);
 		
 		DataCleansingMetadata reloadedMetadata = metadataManager.loadMetadata(survey);
 		assertDeepEquals(metadata, reloadedMetadata);
@@ -53,6 +53,7 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 				DataCleansingImportTask importTask = applicationContext.getBean(DataCleansingImportTask.class);
 				importTask.setInputFile(file);
 				importTask.setSurvey(survey);
+				importTask.setActiveUser(adminUser);
 				addTask((Task) importTask);
 			}
 		};

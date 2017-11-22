@@ -1,6 +1,7 @@
 package org.openforis.collect.datacleansing.manager;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 
 /**
  * 
@@ -9,10 +10,10 @@ import org.openforis.collect.model.CollectSurvey;
  */
 public interface SurveyDataCleansingManager {
 
-	void moveMetadata(CollectSurvey fromSurvey, CollectSurvey toSurvey);
+	void moveMetadata(CollectSurvey fromSurvey, CollectSurvey toSurvey, User activeUser);
 
 	void deleteMetadata(CollectSurvey survey);
 	
-	void duplicateMetadata(CollectSurvey fromSurvey, CollectSurvey toSurvey);
+	void duplicateMetadata(CollectSurvey fromSurvey, CollectSurvey toSurvey, User activeUser);
 
 }

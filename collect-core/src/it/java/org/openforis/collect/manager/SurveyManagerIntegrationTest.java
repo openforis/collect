@@ -23,6 +23,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -38,8 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 
-	private CollectSurvey survey;
-
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -48,16 +47,22 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	private SpeciesManager speciesManager;
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
+	@Autowired
+	private UserManager userManager;
+
+	private CollectSurvey survey;
+	private User adminUser;
 	
 	@Before
 	public void init() throws SurveyImportException, SurveyValidationException {
 		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
 		survey = surveyManager.importModel(is, "archenland1", false);
+		adminUser = userManager.loadAdminUser();
 	}
 	
 	@Test
 	public void createTemporarySurveyFromPublishedTest() {
-		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri(), adminUser);
 		assertTrue(surveyWork.isTemporary());
 		{
 			CodeList list = survey.getCodeList("admin_unit");
@@ -77,11 +82,11 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	
 	@Test
 	public void publishSurveyTest() throws SurveyImportException {
-		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri(), adminUser);
 		assertEquals("Archenland NFI", surveyWork.getProjectName());
 		
 		surveyWork.setProjectName("en", "New Project Name");
-		surveyManager.publish(surveyWork);
+		surveyManager.publish(surveyWork, adminUser);
 		
 		CollectSurvey survey = surveyManager.getByUri(surveyWork.getUri());
 		assertFalse(survey.isTemporary());
@@ -90,7 +95,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	
 	@Test
 	public void publishSurveyCodeListsTest() throws SurveyImportException {
-		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri(), adminUser);
 		{
 			//modify item in list
 			CodeList list = surveyWork.getCodeList("admin_unit");
@@ -99,7 +104,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 			item.setCode("001A");
 			codeListManager.save(item);
 		}
-		surveyManager.publish(surveyWork);
+		surveyManager.publish(surveyWork, adminUser);
 		
 		CollectSurvey publishedSurvey = surveyManager.getByUri(surveyWork.getUri());
 		
@@ -119,7 +124,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void publishSurveyTaxonomyTest() throws SurveyImportException {
 		insertTestTaxonomy();
-		CollectSurvey temporarySurvey = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
+		CollectSurvey temporarySurvey = surveyManager.createTemporarySurveyFromPublished(survey.getUri(), adminUser);
 		{
 			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(temporarySurvey, "tree");
 			assertNotNull(taxonomy);
@@ -142,7 +147,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void duplicateSurveySamplingDesignForEditTest() {
 		insertTestSamplingDesign();
-		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri(), adminUser);
 		SamplingDesignSummaries summaries = samplingDesignManager.loadBySurvey(surveyWork.getId());
 		List<SamplingDesignItem> records = summaries.getRecords();
 		assertEquals(3, records.size());

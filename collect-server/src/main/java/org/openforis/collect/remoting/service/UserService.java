@@ -6,6 +6,7 @@ package org.openforis.collect.remoting.service;
 import java.util.List;
 
 import org.openforis.collect.manager.CannotDeleteUserException;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.User;
@@ -19,6 +20,8 @@ public class UserService {
 
 	@Autowired
 	private UserManager userManager;
+	@Autowired
+	private SessionManager sessionManager;
 
 	public UserProxy loadById(int userId) {
 		User user = userManager.loadById(userId);
@@ -41,7 +44,7 @@ public class UserService {
 
 	public UserProxy save(UserProxy user) throws UserPersistenceException {
 		User u = user.toUser();
-		userManager.save(u);
+		userManager.save(u, sessionManager.getLoggedUser());
 		UserProxy proxy = new UserProxy(u);
 		return proxy;
 	}

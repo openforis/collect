@@ -19,7 +19,7 @@ public interface UserManager extends ItemManager<User, Integer> {
 
 	List<User> loadAllAvailableUsers(User availableTo);
 
-	User insertUser(String name, String password, UserRole role) throws UserPersistenceException;
+	User insertUser(String name, String password, UserRole role, User createdByUser) throws UserPersistenceException;
 
 	OperationResult changePassword(String username, String oldPassword, String newPassword) throws UserPersistenceException;
 
