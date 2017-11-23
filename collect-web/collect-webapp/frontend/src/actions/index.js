@@ -1,4 +1,3 @@
-import Constants from 'utils/Constants'
 import ServiceFactory from 'services/ServiceFactory'
 import { Survey } from 'model/Survey';
 import User from 'model/User';

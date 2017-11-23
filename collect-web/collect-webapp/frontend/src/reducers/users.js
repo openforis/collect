@@ -32,7 +32,6 @@ function users(
 		    users: action.users,
 		    lastUpdated: action.receivedAt
       })
-      break
     case USER_DELETED:
       const oldUser = state.users.find(u => u.id === action.userId)
       if (oldUser) {

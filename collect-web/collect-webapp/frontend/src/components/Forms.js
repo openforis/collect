@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormFeedback, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
 import L from 'utils/Labels'
 
 class FormItem extends Component {
