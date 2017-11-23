@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 
+import VersionInfo from 'components/VersionInfo'
+
 class Sidebar extends Component {
 
   handleClick(e) {
@@ -22,8 +24,7 @@ class Sidebar extends Component {
       return <div>Loading...</div>
     }
     const loggedUser = this.props.loggedUser
-    const preferredSurvey = this.props.preferredSurvey
-
+     
     return (
       <div className="sidebar">
         <nav className="sidebar-nav">
@@ -69,6 +70,10 @@ class Sidebar extends Component {
               </li>
             : ''}
           </ul>
+          <div style={{position: 'fixed', bottom: '0px'}}>
+            <VersionInfo />
+            <span><a href="http://www.openforis.org">Open Foris</a> &copy; 2017</span>
+          </div>
         </nav>
       </div>
     )
@@ -81,12 +86,9 @@ function mapStateToProps(state) {
   } = state.session || {
     isFetchingLoggedUser: true
   }
-  const preferredSurvey = state.preferredSurvey ? state.preferredSurvey.survey : null
-
   return {
     loggedUser: loggedUser,
-    isFetchingLoggedUser: loggedUser === null,
-    preferredSurvey: preferredSurvey
+    isFetchingLoggedUser: loggedUser === null
   }
 }
 export default connect(mapStateToProps)(Sidebar);

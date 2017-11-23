@@ -4,7 +4,6 @@ import { Switch, Route } from 'react-router-dom'
 import Header from 'components/Header';
 import Sidebar from 'components/Sidebar';
 import Breadcrumb from 'components/Breadcrumb';
-import Footer from 'components/Footer';
 import CurrentJobMonitorModal from 'containers/CurrentJobMonitorModal'
 
 import HomePage from 'containers/HomePage'
@@ -57,7 +56,6 @@ class App extends Component {
               </div>
             </main>
           </div>
-          <Footer />
           <CurrentJobMonitorModal />
         </div>
     );
