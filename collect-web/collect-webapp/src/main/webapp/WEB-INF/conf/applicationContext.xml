@@ -28,6 +28,7 @@
 	<mvc:resources mapping="index.html" location="index.html" />
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
 	<mvc:resources mapping="/assets/**" location="/assets/" />
+	<mvc:resources mapping="/css/**" location="/css/" />
 	<mvc:resources mapping="/datacleansing/**" location="/datacleansing/" />
 	<mvc:resources mapping="/datamanager/**" location="/datamanager/" />
 	<mvc:resources mapping="/earthFiles/**" location="/earthFiles/" />

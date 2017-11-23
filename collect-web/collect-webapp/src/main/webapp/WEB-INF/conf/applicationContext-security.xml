@@ -33,6 +33,7 @@
 		<intercept-url access="permitAll" pattern="/api/info" />
 		<intercept-url access="permitAll" pattern="/api/complete-info" />
 		<intercept-url access="permitAll" pattern="/assets/**" />
+		<intercept-url access="permitAll" pattern="/css/**" />
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
 		<intercept-url access="permitAll" pattern="/js/**" />
