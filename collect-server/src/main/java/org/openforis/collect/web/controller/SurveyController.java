@@ -123,7 +123,13 @@ public class SurveyController extends BasicController {
 	@Transactional
 	@RequestMapping(method=POST)
 	public @ResponseBody
-	SurveySummary createSurvey(@Valid SurveyCreationParameters params, BindingResult bindingResult) throws Exception {
+	Response createSurvey(@Valid SurveyCreationParameters params, BindingResult bindingResult) throws Exception {
+		if (bindingResult.hasErrors()) {
+			Response res = new Response();
+			res.setErrorStatus();
+			res.addObject("errors", bindingResult.getFieldErrors());
+			return res;
+		}
 		CollectSurvey survey;
 		switch (params.getTemplateType()) {
 		case BLANK:
@@ -136,7 +142,10 @@ public class SurveyController extends BasicController {
 		survey.setUserGroupId(userGroup.getId());
 		surveyManager.save(survey);
 		
-		return SurveySummary.createFromSurvey(survey);
+		SurveySummary surveySummary = SurveySummary.createFromSurvey(survey);
+		Response res = new Response();
+		res.setObject(surveySummary);
+		return res;
 	}
 	
 	@RequestMapping(value="validatecreation", method=POST)
@@ -264,7 +273,7 @@ public class SurveyController extends BasicController {
 		private String name;
 		private TemplateType templateType;
 		private String defaultLanguageCode;
-		private int userGroupId;
+		private Integer userGroupId;
 
 		public String getName() {
 			return name;
@@ -290,11 +299,11 @@ public class SurveyController extends BasicController {
 			this.defaultLanguageCode = defaultLanguageCode;
 		}
 		
-		public int getUserGroupId() {
+		public Integer getUserGroupId() {
 			return userGroupId;
 		}
 		
-		public void setUserGroupId(int userGroupId) {
+		public void setUserGroupId(Integer userGroupId) {
 			this.userGroupId = userGroupId;
 		}
 	}

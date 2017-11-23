@@ -32,6 +32,8 @@ import org.springframework.validation.Validator;
  */
 public abstract class SimpleValidator<F> implements Validator {
 
+	private static final String MIN_LENGTH_MESSAGE_KEY = "validation.minLength";
+
 	final Class<F> genericType;
 
 	@Autowired
@@ -139,6 +141,18 @@ public abstract class SimpleValidator<F> implements Validator {
 			Matcher matcher = pattern.matcher((String) value);
 			if ( ! matcher.matches() ) {  
 				errors.rejectValue(fieldName, errorMessageKey);
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	protected boolean validateMinLength(Errors errors, String fieldName, int length) {
+		Object value = errors.getFieldValue(fieldName);
+		if ( value != null && value instanceof String) {
+			String strVal = (String) value;
+			if (strVal.trim().length() < length) {
+				errors.rejectValue(fieldName, MIN_LENGTH_MESSAGE_KEY, new Integer[] {length}, MIN_LENGTH_MESSAGE_KEY);
 				return false;
 			}
 		}

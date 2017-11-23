@@ -2,7 +2,15 @@
     "general": {
         "account": "Account",
         "additionalOptions": "Additional Options",
-        "new": "New"
+        "new": "New",
+        "forms": {
+            "selectOne": "--- Please select one ---"
+        }
+    },
+    "generic": {
+        "validation": {
+            "invalid_internal_name": "Invalid identifier: the first character must be a letter"
+        }
     },
     "header": {
         "select-survey": "Select survey: "
@@ -61,6 +69,7 @@
     },
     "survey": {
         "name": "Name",
+        "identifier": "Identifier",
         "templateType": {
             "label" : "Template",
             "BLANK": "Blank", 
@@ -74,7 +83,10 @@
         "unpublishedChanges": "Unpublished changes",
         "published": "Published",
         "userGroup": "User Group",
-        "target": "Target"
+        "target": "Target",
+        "validation": {
+            "nameAlreadyInUse": "Identifier already in use"            
+        }
     },
     "user": {
         "username": "Username",
@@ -89,6 +101,8 @@
         }
     },
     "validation": {
+        "errorsInTheForm": "Errors in the form",
+        "minLength": "It must be at least {0} characters",
         "required_field": "Required field",
         "duplicate_value": "Duplicate value"
     }

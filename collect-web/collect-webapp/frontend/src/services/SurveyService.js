@@ -7,7 +7,7 @@ export default class SurveyService extends AbstractService {
         return this.get('survey/' + surveyId).then(res => new Survey(res))
     }
 
-    createSurvey(name, templateType, defaultLanguageCode, userGroupId) {
+    createNewSurvey(name, templateType, defaultLanguageCode, userGroupId) {
         return this.post('survey', {
             name: name,
             templateType: templateType,

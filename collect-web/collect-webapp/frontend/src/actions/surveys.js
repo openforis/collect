@@ -1,4 +1,5 @@
 import ServiceFactory from 'services/ServiceFactory';
+import Forms from 'components/Forms'
 
 export const REQUEST_SURVEY_SUMMARIES = 'REQUEST_SURVEY_SUMMARIES'
 export const RECEIVE_SURVEY_SUMMARIES = 'RECEIVE_SURVEY_SUMMARIES'
@@ -8,6 +9,7 @@ export const REQUEST_SURVEY_USER_GROUP_CHANGE = 'REQUEST_SURVEY_USER_GROUP_CHANG
 export const SURVEY_USER_GROUP_CHANGED = 'SURVEY_USER_GROUP_CHANGED'
 export const REQUEST_CREATE_NEW_SURVEY = 'REQUEST_CREATE_NEW_SURVEY'
 export const NEW_SURVEY_CREATED = 'NEW_SURVEY_CREATED'
+export const SURVEY_CREATION_ERROR = "SURVEY_CREATION_ERROR"
 
 function requestSurveySummaries() {
     return {
@@ -63,21 +65,34 @@ export function invalidateSurveySummaries(summaries) {
     }
 }
 
-function requestCreateNewSurvey(name, template, userGroupId) {
+function requestCreateNewSurvey(name, template, defaultLanguageCode, userGroupId) {
     return {
         type: REQUEST_CREATE_NEW_SURVEY,
         name: name,
         template: template,
+        defaultLanguageCode: defaultLanguageCode,
         userGroupId: userGroupId
     }
 }
 
-export function createNewSurvey(name, template, userGroupId) {
+function surveyCreationError(errors) {
+    return {
+        type: SURVEY_CREATION_ERROR,
+        errors: errors
+    }
+}
+
+export function createNewSurvey(name, template, defaultLanguageCode, userGroupId) {
     return function (dispatch) {
-        dispatch(requestCreateNewSurvey(name, template, userGroupId))
-        ServiceFactory.createNewSurvey(name, template, userGroupId).then(summary => 
-            dispatch(newSurveyCreated(summary))
-        )
+        dispatch(requestCreateNewSurvey(name, template, defaultLanguageCode, userGroupId))
+        return ServiceFactory.surveyService.createNewSurvey(name, template, defaultLanguageCode, userGroupId).then(res => {
+            if (res.statusError) {
+                Forms.handleValidationResponse(res)
+                dispatch(surveyCreationError(res.objects.errors))
+            } else {
+                dispatch(newSurveyCreated(res.object))
+            }
+        })
     }
 }
 
