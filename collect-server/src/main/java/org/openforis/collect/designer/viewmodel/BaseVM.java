@@ -120,8 +120,7 @@ public abstract class BaseVM {
 	
 	public String getLoggedUsername() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String loggedUsername = authentication.getName();
-		return loggedUsername;
+		return authentication.getName();
 	}
 	
 	protected static Window openPopUp(String url, boolean modal) {

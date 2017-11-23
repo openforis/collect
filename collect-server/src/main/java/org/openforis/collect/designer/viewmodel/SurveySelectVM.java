@@ -139,6 +139,7 @@ public class SurveySelectVM extends BaseVM {
 		surveyCloneJob.setOriginalSurvey(selectedSurvey);
 		surveyCloneJob.setNewName(newName);
 		surveyCloneJob.setOriginalSurveyIsWork(originalSurveyIsWork);
+		surveyCloneJob.setActiveUser(getLoggedUser());
 		jobManager.start(surveyCloneJob);
 		
 		closePopUp(surveyClonePopup);
@@ -289,13 +290,13 @@ public class SurveySelectVM extends BaseVM {
 
 	protected void performSurveyPublishing(CollectSurvey survey, Binder binder) {
 		try {
-			surveyManager.publish(survey, getLoggedUser());
+			User loggedUser = getLoggedUser();
+			surveyManager.publish(survey, loggedUser);
 			selectedSurvey = null;
 			notifyChange("selectedSurvey");
 			reloadSurveySummaries(binder);
 			MessageUtil.showInfo("survey.successfully_published", survey.getName());
-			User user = getLoggedUser();
-			surveyManager.validateRecords(survey.getId(), user);
+			surveyManager.validateRecords(survey.getId(), loggedUser);
 		} catch (SurveyStoreException e) {
 			throw new RuntimeException(e);
 		}
@@ -343,9 +344,8 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void validateAllRecords() {
-		User user = getLoggedUser();
 		Integer publishedSurveyId = getSelectedPublishedSurveyId();
-		surveyManager.validateRecords(publishedSurveyId, user);
+		surveyManager.validateRecords(publishedSurveyId, getLoggedUser());
 		updateSurveyList();
 	}
 
@@ -550,6 +550,7 @@ public class SurveySelectVM extends BaseVM {
 		private SurveySummary originalSurvey;
 		private boolean originalSurveyIsWork;
 		private String newName;
+		private User activeUser;
 		
 		//ouptut
 		private CollectSurvey outputSurvey;
@@ -561,7 +562,7 @@ public class SurveySelectVM extends BaseVM {
 				@Override
 				protected void execute() throws Throwable {
 					outputSurvey = surveyManager.duplicateSurveyIntoTemporary(originalSurvey.getName(), 
-							originalSurveyIsWork, newName, getLoggedUser());
+							originalSurveyIsWork, newName, activeUser);
 				}
 			});
 		}
@@ -576,6 +577,10 @@ public class SurveySelectVM extends BaseVM {
 		
 		public void setNewName(String newName) {
 			this.newName = newName;
+		}
+		
+		public void setActiveUser(User activeUser) {
+			this.activeUser = activeUser;
 		}
 		
 		public CollectSurvey getOutputSurvey() {
