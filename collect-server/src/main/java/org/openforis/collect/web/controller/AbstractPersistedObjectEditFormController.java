@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.manager.ItemManager;
+import org.openforis.collect.model.User;
 import org.openforis.commons.web.AbstractFormUpdateValidationResponse;
 import org.openforis.commons.web.PersistedObjectForm;
 import org.openforis.commons.web.Response;
@@ -71,7 +72,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		if (errors.isEmpty()) {
 			T item = loadOrCreateItem(form);
 			copyFormIntoItem(form, item);
-			itemManager.save(item);
+			itemManager.save(item, getLoggedUser());
 			F responseForm = createFormInstance(item);
 			response = new SimpleFormUpdateResponse(responseForm);
 		} else {
@@ -86,7 +87,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		T item = itemManager.loadById(itemId);
 		T newItem = item; //TODO clone?!
 		newItem.setId(null);
-		itemManager.save(newItem);
+		itemManager.save(newItem, getLoggedUser());
 		F responseForm = createFormInstance(newItem);
 		return new SimpleFormUpdateResponse(responseForm);
 	}
@@ -144,6 +145,10 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		response.setErrorStatus();
 		response.setErrorMessage(e.getMessage());
 		return response;
+	}
+	
+	protected User getLoggedUser() {
+		return null;
 	}
 	
 	@Autowired

@@ -11,8 +11,6 @@ import java.util.Map;
 import org.openforis.collect.designer.form.validator.SurveyNameValidator;
 import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.model.LabelledItem.LabelComparator;
-import org.openforis.collect.designer.session.SessionStatus;
-import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.exception.SurveyValidationException;
@@ -23,6 +21,8 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.collect.web.controller.SurveyController;
+import org.openforis.collect.web.controller.SurveyController.SurveyCreationParameters.TemplateType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
@@ -32,7 +32,6 @@ import org.zkoss.bind.Validator;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
 import org.zkoss.zul.ListModelList;
@@ -49,14 +48,6 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	private static final String TEMPLATE_FIELD_NAME = "template";
 	private static final String LANGUAGE_FIELD_NAME = "language";
 	private static final String USER_GROUP_FIELD_NAME = "userGroup";
-
-	private enum TemplateType {
-		BLANK,
-		BIOPHYSICAL, 
-		COLLECT_EARTH,
-		COLLECT_EARTH_IPCC,
-		//SOCIOECONOMIC, 
-	}
 
 	@WireVariable 
 	private SurveyManager surveyManager;
@@ -122,11 +113,8 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		UserGroup userGroup = userGroupManager.findByName(userGroupName);
 		survey.setUserGroupId(userGroup.getId());
 		surveyManager.save(survey);
-		//put survey in session and redirect into survey edit page
-		SessionStatus sessionStatus = getSessionStatus();
-		sessionStatus.setSurvey(survey);
-		sessionStatus.setCurrentLanguageCode(survey.getDefaultLanguage());
-		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
+		
+		SurveyEditVM.redirectToSurveyEditPage(survey.getId());
 	}
 
 	protected CollectSurvey createNewSurveyFromTemplate(String name, String langCode, TemplateType templateType)
@@ -162,13 +150,13 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntity = schema.createEntityDefinition();
 		rootEntity.setMultiple(true);
-		rootEntity.setName(SchemaVM.DEFAULT_ROOT_ENTITY_NAME);
+		rootEntity.setName(SurveyController.DEFAULT_ROOT_ENTITY_NAME);
 		schema.addRootEntityDefinition(rootEntity);
 		//create root tab set
 		UIOptions uiOptions = survey.getUIOptions();
 		UITabSet rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
-		mainTab.setLabel(langCode, SchemaVM.DEFAULT_MAIN_TAB_LABEL);
+		mainTab.setLabel(langCode, SurveyController.DEFAULT_MAIN_TAB_LABEL);
 		
 		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
 		surveyObjectsGenerator.addPredefinedObjects(survey);

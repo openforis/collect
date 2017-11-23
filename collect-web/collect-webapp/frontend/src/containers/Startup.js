@@ -3,18 +3,37 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import * as Actions from 'actions';
 import * as UserActions from 'actions/users';
+import * as SurveysActions from 'actions/surveys';
+import Labels from 'utils/Labels';
 
 class Startup extends Component {
     
+    static SURVEY_RELOAD_TIMEOUT = 5000
+
+    constructor(props) {
+        super(props)
+
+        this.handleSurveysReloadTimeout = this.handleSurveysReloadTimeout.bind(this)
+    }
+
     static propTypes = {
         loggedUser: PropTypes.object
     }
 
     componentDidMount() {
-        this.props.dispatch(Actions.fetchApplicationInfo())
-        this.props.dispatch(Actions.fetchCurrentUser())
-        this.props.dispatch(UserActions.fetchUsers())
-        this.props.dispatch(Actions.fetchUserGroups())
+        Labels.initialize(() => {
+            this.props.dispatch(Actions.fetchApplicationInfo())
+            this.props.dispatch(Actions.fetchCurrentUser())
+            this.props.dispatch(UserActions.fetchUsers())
+            this.props.dispatch(Actions.fetchUserGroups())
+            this.props.dispatch(SurveysActions.fetchSurveySummaries());
+            
+            setInterval(this.handleSurveysReloadTimeout, Startup.SURVEY_RELOAD_TIMEOUT);
+        })
+    }
+
+    handleSurveysReloadTimeout() {
+        this.props.dispatch(SurveysActions.fetchSurveySummaries());
     }
 
     render() {

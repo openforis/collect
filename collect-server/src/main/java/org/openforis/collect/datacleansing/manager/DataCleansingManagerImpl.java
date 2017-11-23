@@ -12,6 +12,7 @@ import org.openforis.collect.datacleansing.DataQueryGroup;
 import org.openforis.collect.datacleansing.DataQueryType;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.springframework.beans.BeanUtils;
@@ -91,19 +92,19 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	
 	@Transactional
 	@Override
-	public void saveMetadata(CollectSurvey survey, DataCleansingMetadata metadata, boolean skipErrors) {
-		saveItems(dataTypeManager, survey, metadata.getDataQueryTypes(), skipErrors);
-		saveItems(dataQueryManager, survey, metadata.getDataQueries(), skipErrors);
-		saveItems(dataQueryGroupManager, survey, metadata.getDataQueryGroups(), skipErrors);
-		saveItems(dataCleansingStepManager, survey, metadata.getCleansingSteps(), skipErrors);
-		saveItems(dataCleansingChainManager, survey, metadata.getCleansingChains(), skipErrors);
+	public void saveMetadata(CollectSurvey survey, DataCleansingMetadata metadata, boolean skipErrors, User activeUser) {
+		saveItems(dataTypeManager, survey, metadata.getDataQueryTypes(), skipErrors, activeUser);
+		saveItems(dataQueryManager, survey, metadata.getDataQueries(), skipErrors, activeUser);
+		saveItems(dataQueryGroupManager, survey, metadata.getDataQueryGroups(), skipErrors, activeUser);
+		saveItems(dataCleansingStepManager, survey, metadata.getCleansingSteps(), skipErrors, activeUser);
+		saveItems(dataCleansingChainManager, survey, metadata.getCleansingChains(), skipErrors, activeUser);
 	}
 	
 	@Transactional
 	@Override
-	public void moveMetadata(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
+	public void moveMetadata(CollectSurvey fromSurvey, CollectSurvey toSurvey, User activeUser) {
 		DataCleansingMetadata temporaryMetadata = loadMetadata(fromSurvey);
-		saveMetadata(toSurvey, temporaryMetadata, false);
+		saveMetadata(toSurvey, temporaryMetadata, false, activeUser);
 		deleteMetadata(fromSurvey);
 	}
 	
@@ -126,13 +127,13 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	@Transactional
 	@Override
 	public void duplicateMetadata(CollectSurvey fromSurvey,
-			CollectSurvey toSurvey) {
+			CollectSurvey toSurvey, User activeUser) {
 		DataCleansingMetadata metadata = loadMetadata(fromSurvey);
-		saveMetadata(toSurvey, metadata, false);
+		saveMetadata(toSurvey, metadata, false, activeUser);
 	}
 	
 	private <T extends PersistedSurveyObject> void saveItems(AbstractSurveyObjectManager<T, ?> manager, 
-			CollectSurvey survey, List<T> items, boolean skipErrors) {
+			CollectSurvey survey, List<T> items, boolean skipErrors, User activeUser) {
 		List<T> oldItems = manager.loadBySurvey(survey);
 		for (T item : items) {
 			item.replaceSurvey(survey);
@@ -140,7 +141,7 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 			if (oldItem == null) {
 				//new item
 				item.setId(null);
-				manager.save(item);
+				manager.save(item, activeUser);
 			} else {
 				try {
 					BeanUtils.copyProperties(item, oldItem, ID_PROPERTY_NAME, UUID_PROPERTY_NAME);
@@ -149,7 +150,7 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 						throw new RuntimeException("Error saving data cleansing items", e);
 					}
 				}
-				manager.save(oldItem);
+				manager.save(oldItem, activeUser);
 				item.setId(oldItem.getId());
 			}
 		}

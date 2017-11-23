@@ -3,6 +3,7 @@ package org.openforis.collect.datacleansing.io;
 import java.io.File;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 
 /**
  * 
@@ -14,5 +15,7 @@ public interface DataCleansingImportTask {
 	void setSurvey(CollectSurvey survey);
 	
 	void setInputFile(File inputFile);
+	
+	void setActiveUser(User user);
 	
 }

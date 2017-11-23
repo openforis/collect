@@ -9,7 +9,7 @@ public interface UserManager extends ItemManager<User, Integer> {
 
 	static final String ADMIN_USER_NAME = "admin";
 	static final String ADMIN_DEFAULT_PASSWORD = "admin";
-	static final String PASSWORD_PATTERN = "^\\w{5,}$"; // alphanumeric, at least 5 letters
+	static final String PASSWORD_PATTERN = "^[a-zA-Z]\\w{3,14}$"; //First character must be a letter, at least 4 characters, no more than 15
 
 	User loadByUserName(String userName);
 
@@ -19,7 +19,7 @@ public interface UserManager extends ItemManager<User, Integer> {
 
 	List<User> loadAllAvailableUsers(User availableTo);
 
-	User insertUser(String name, String password, UserRole role) throws UserPersistenceException;
+	User insertUser(String name, String password, UserRole role, User createdByUser) throws UserPersistenceException;
 
 	OperationResult changePassword(String username, String oldPassword, String newPassword) throws UserPersistenceException;
 

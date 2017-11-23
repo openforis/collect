@@ -63,7 +63,6 @@ public class CollectEarthBalloonGenerator {
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	
-	private static final String PREVIEW_BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template_preview.txt"; //$NON-NLS-1$
 	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template_new.txt"; //$NON-NLS-1$
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS"; //$NON-NLS-1$
 	
@@ -170,8 +169,7 @@ public class CollectEarthBalloonGenerator {
 	
 
 	private String getHTMLTemplate() throws IOException {
-		String templateFile = preview ? PREVIEW_BALLOON_TEMPLATE_TXT : BALLOON_TEMPLATE_TXT;
-		InputStream is = getClass().getClassLoader().getResourceAsStream(templateFile);
+		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(is, writer, OpenForisIOUtils.UTF_8);
 		String template = writer.toString();

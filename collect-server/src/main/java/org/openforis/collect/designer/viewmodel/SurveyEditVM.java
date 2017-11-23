@@ -22,6 +22,7 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
@@ -98,18 +99,35 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	private Step previewStep;
 
+	public static void redirectToSurveyEditPage(int surveyId) {
+		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation() + "?id=" + surveyId);
+	}
+	
 	@Init(superclass=false)
-	public void init(@QueryParam("temp_id") Integer tempId) {
+	public void init(@QueryParam("id") Integer surveyId) {
 		super.init();
-		if ( survey == null ) {
+		survey = surveyManager.loadSurvey(surveyId);
+		
+		if (survey == null || ! survey.isTemporary()) {
 			backToSurveysList();
 		} else {
+			SessionStatus sessionStatus = getSessionStatus();
+			Integer publishedSurveyId = null;
+			if (survey.isPublished()) {
+				if (survey.isTemporary()) {
+					publishedSurveyId = survey.getPublishedId();
+				} else {
+					publishedSurveyId = survey.getId();
+				}
+			}
+			sessionStatus.setPublishedSurveyId(publishedSurveyId);
+			sessionStatus.setSurvey(survey);
+			
 			changed = false;
 			currentLanguageCode = survey.getDefaultLanguage();
 			if ( currentLanguageCode == null ) {
 				openLanguageManagerPopUp();
 			} else {
-				SessionStatus sessionStatus = getSessionStatus();
 				sessionStatus.setCurrentLanguageCode(currentLanguageCode);
 			}
 			String confirmCloseMessage = Labels.getLabel("survey.edit.leave_page");

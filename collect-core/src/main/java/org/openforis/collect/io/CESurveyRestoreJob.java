@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 	
-
 	//temporary instance variables
 	private transient ZipFile zipFile;
 	private transient ZipFileExtractor zipFileExtractor;
@@ -71,6 +70,8 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setSurveyUri(surveyUri);
 			t.setSurveyName(surveyName);
 			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
+			t.setActiveUser(activeUser);
+			t.setUserGroup(userGroup);
 			t.setValidate(false);
 		} else if ( task instanceof CEPropertiesImportTask ) {
 			CEPropertiesImportTask t = (CEPropertiesImportTask) task;

@@ -130,7 +130,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public UserGroup save(UserGroup userGroup) {
+	public UserGroup save(UserGroup userGroup, User activeUser) {
 		Integer id = userGroup.getId();
 		if (id == null) {
 			return post(getUsersRestfulApiUrl() + "/group", userGroup, UserGroup.class);
@@ -195,4 +195,14 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		super.delete(url);
 	}
 
+	@Override
+	public UserGroup createDefaultPrivateUserGroup(User user, User createdByUser) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public void joinToDefaultPublicGroup(User user, UserGroupRole role) {
+		// TODO Auto-generated method stub
+	}
 }

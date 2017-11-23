@@ -10,7 +10,7 @@ function userGroups(
     initialized: false,
 	  isFetching: false,
 	  didInvalidate: false,
-	  userGroups: []
+	  items: []
 	},
 	action
 ) {
@@ -35,12 +35,12 @@ function userGroups(
         initialized: true,
 		    isFetching: false,
 		    didInvalidate: false,
-		    userGroups: action.userGroups,
+		    items: action.userGroups,
 		    lastUpdated: action.receivedAt
       })
     case RECEIVE_USER_GROUP:
       const newUserGroup = action.userGroup
-      const userGroups = state.userGroups
+      const userGroups = state.items
       const userGroupIdx = userGroups.findIndex(u => u.id === newUserGroup.id)
       const oldUserGroup = userGroups[userGroupIdx]
       const oldUserGroupParentId = oldUserGroup.parentId
@@ -64,7 +64,7 @@ function userGroups(
         $splice: [[userGroupIdx, 1, newUserGroup]]
       });
       return Object.assign({}, state, {
-        userGroups: newUserGroups,
+        items: newUserGroups,
         lastUpdated: action.receivedAt
       })
     default:

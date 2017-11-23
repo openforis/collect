@@ -11,6 +11,7 @@ import org.openforis.collect.datacleansing.DataQueryGroup;
 import org.openforis.collect.datacleansing.persistence.DataQueryGroupDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.commons.collection.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,12 +35,12 @@ public class DataQueryGroupManager extends AbstractSurveyObjectManager<DataQuery
 	
 	@Override
 	@Transactional
-	public DataQueryGroup save(DataQueryGroup group) {
+	public DataQueryGroup save(DataQueryGroup group, User activeUser) {
 		List<Integer> queryIds = CollectionUtils.project(group.getQueries(), "id");
 		if (group.getId() != null) {
 			dao.deleteQueryAssociations(group);
 		}
-		super.save(group);
+		super.save(group, activeUser);
 		
 		dao.insertQueryAssociations(group, queryIds);
 		

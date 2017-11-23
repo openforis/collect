@@ -45,14 +45,14 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	private RecordUpdater recordUpdater;
 	private RecordUserLoader recordUserLoader;
 	
-	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, 
-			CollectSurvey existingSurvey, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
+	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, CollectSurvey existingSurvey, 
+			User activeUser, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		this.file = file;
 		this.packagedSurvey = packagedSurvey;
 		this.existingSurvey = existingSurvey;
 		this.validateRecords = validateRecords;
 		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
-		this.recordUserLoader = new RecordUserLoader(userManager);
+		this.recordUserLoader = new RecordUserLoader(userManager, activeUser);
 	}
 	
 	@Override
@@ -167,11 +167,13 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		private static final String NEW_USER_PASSWORD = "password";
 		
 		private final UserManager userManager;
+		private User activeUser;
 		private Map<String, User> usersByName;
 		
-		public RecordUserLoader(UserManager userManager) {
+		public RecordUserLoader(UserManager userManager, User activeUser) {
 			super();
 			this.userManager = userManager;
+			this.activeUser = activeUser;
 			this.usersByName = new HashMap<String, User>();
 		}
 
@@ -199,7 +201,7 @@ public class XMLParsingRecordProvider implements RecordProvider {
 				if ( user == null ) {
 					//create a user with data entry role and password equal to the user name
 					try {
-						user = userManager.insertUser(name, NEW_USER_PASSWORD, UserRole.ENTRY);
+						user = userManager.insertUser(name, NEW_USER_PASSWORD, UserRole.ENTRY, activeUser);
 					} catch (UserPersistenceException e) {
 						throw new RuntimeException("Error creating new user with username '" + name + "'", e);
 					}

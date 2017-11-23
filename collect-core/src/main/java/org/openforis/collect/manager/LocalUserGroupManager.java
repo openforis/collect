@@ -4,7 +4,10 @@ import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus
 import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus.PENDING;
 import static org.openforis.collect.model.UserInGroup.UserGroupRole.OWNER;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,12 +40,17 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		super(dao);
 	}
 	
+	@Override
 	@Transactional(propagation=Propagation.REQUIRED)
-	public UserGroup createDefaultPrivateUserGroup(User user) {
+	public UserGroup createDefaultPrivateUserGroup(User user, User createdByUser) {
 		UserGroup userGroup = new UserGroup();
 		userGroup.setName(getDefaultPrivateUserGroupName(user));
 		userGroup.setLabel(user.getUsername() + DEFAULT_PRIVATE_USER_GROUP_LABEL_SUFFIX);
 		userGroup.setVisibility(Visibility.PRIVATE);
+		userGroup.setSystemDefined(true);
+		userGroup.setEnabled(true);
+		userGroup.setCreationDate(new Timestamp(System.currentTimeMillis()));
+		userGroup.setCreatedBy(createdByUser.getId());
 		dao.insert(userGroup);
 		UserInGroup userInGroup = new UserInGroup();
 		userInGroup.setGroupId(userGroup.getId());
@@ -51,7 +59,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		userInGroup.setJoinStatus(ACCEPTED);
 		userInGroup.setRequestDate(new Date());
 		userInGroup.setMemberSince(new Date());
-		dao.insertRelation(userGroup, userInGroup);
+		dao.insertRelation(userInGroup);
 		return userGroup;
 	}
 
@@ -86,6 +94,10 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	@Override
 	public List<UserGroup> findAllRelatedUserGroups(User user) {
 		Set<UserGroup> result = new HashSet<UserGroup>();
+		
+		result.add(getDefaultPublicUserGroup());
+		result.add(loadDefaultPrivateGroup(user));
+
 		if (user.getRole() == UserRole.ADMIN) {
 			result.addAll(dao.findGroups(false, null)); //add all user defined groups
 		} else {
@@ -97,9 +109,24 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 				result.addAll(ancestors);
 			}
 		}
-		result.add(getDefaultPublicUserGroup());
-		result.add(loadDefaultPrivateGroup(user));
-		return fillLazyLoadedFields(new ArrayList<UserGroup>(result));
+		List<UserGroup> sortedResult = sortBySystemDefinedAndLabel(result);
+		return fillLazyLoadedFields(sortedResult);
+	}
+
+	private List<UserGroup> sortBySystemDefinedAndLabel(Set<UserGroup> result) {
+		UserGroup[] array = result.toArray(new UserGroup[result.size()]);
+		Arrays.sort(array, new Comparator<UserGroup>() {
+			public int compare(UserGroup g1, UserGroup g2) {
+				if (g1.getSystemDefined() == g2.getSystemDefined()) {
+					return g1.getLabel().compareTo(g2.getLabel());
+				} else if (g1.getSystemDefined() && ! g2.getSystemDefined()) {
+					return -1;
+				} else {
+					return 1;
+				}
+			}
+		});
+		return Arrays.asList(array);
 	}
 
 	private List<UserGroup> findAncestorGroups(UserGroup userGroup) {
@@ -148,13 +175,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	
 	@Override
 	public List<UserGroup> findByUser(User user) {
-		List<UserGroup> result;
-		List<UserRole> userRoles = user.getRoles();
-		if (userRoles.contains(UserRole.ADMIN)) {
-			result = dao.loadAll();
-		} else {
-			result = dao.findByUser(user);
-		}
+		List<UserGroup> result = dao.findByUser(user);
 		return fillLazyLoadedFields(result);
 	}
 	
@@ -178,8 +199,9 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		return result;
 	}
 
+	@Override
 	@Transactional(propagation=Propagation.REQUIRED)
-	public UserGroup save(UserGroup userGroup) {
+	public UserGroup save(UserGroup userGroup, User modifiedByUser) {
 		dao.save(userGroup);
 		List<UserInGroup> oldUsersInGroup = dao.findUsersByGroup(userGroup.getId());
 		Map<Integer, UserInGroup> parameterUsersInGroupByUserId = new HashMap<Integer, UserInGroup>();
@@ -212,13 +234,13 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		}
 
 		for (UserInGroup userInGroup : removedUsersInGroupByUserId.values()) {
-			deleteRelation(userGroup.getId(), userInGroup.getUserId());
+			dao.deleteRelation(userGroup.getId(), userInGroup.getUserId());
 		}
 		for (UserInGroup userInGroup : updatedUsersInGroupByUserId.values()) {
 			dao.updateRelation(userInGroup);
 		}
 		for (UserInGroup userInGroup : newUsersInGroupByUserId.values()) {
-			dao.insertRelation(userGroup, userInGroup);
+			dao.insertRelation(userInGroup);
 		}
 		return userGroup;
 	}
@@ -241,12 +263,25 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		userInGroup.setRole(role);
 		userInGroup.setRequestDate(new Date());
 		userInGroup.setJoinStatus(PENDING);
-		dao.insertRelation(userGroup, userInGroup);
+		dao.insertRelation(userInGroup);
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void acceptJoinRequest(User user, UserGroup userGroup) {
 		dao.acceptRelation(user, userGroup);
+	}
+	
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED)
+	public void joinToDefaultPublicGroup(User user, UserGroupRole role) {
+		UserGroup publicGroup = getDefaultPublicUserGroup();
+		UserInGroup userInGroup = new UserInGroup();
+		userInGroup.setGroupId(publicGroup.getId());
+		userInGroup.setUserId(user.getId());
+		userInGroup.setRole(role);
+		userInGroup.setRequestDate(new Date());
+		userInGroup.setJoinStatus(ACCEPTED);
+		dao.insertRelation(userInGroup);
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED)

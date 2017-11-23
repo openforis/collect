@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.concurrency.Task;
@@ -26,8 +27,8 @@ public class RecordProviderInitializerTask extends Task {
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
-		output = new XMLParsingRecordProvider(input.file, input.packagedSurvey, input.existingSurvey, input.userManager,
-				input.validateRecords, true);
+		output = new XMLParsingRecordProvider(input.file, input.packagedSurvey, input.existingSurvey, input.activeUser, 
+				input.userManager, input.validateRecords, true);
 	}
 	
 	@Override
@@ -52,6 +53,7 @@ public class RecordProviderInitializerTask extends Task {
 		private File file;
 		private CollectSurvey packagedSurvey;
 		private CollectSurvey existingSurvey;
+		private User activeUser;
 		private UserManager userManager;
 		private boolean validateRecords;
 		
@@ -77,6 +79,14 @@ public class RecordProviderInitializerTask extends Task {
 		
 		public void setExistingSurvey(CollectSurvey existingSurvey) {
 			this.existingSurvey = existingSurvey;
+		}
+		
+		public User getActiveUser() {
+			return activeUser;
+		}
+		
+		public void setActiveUser(User activeUser) {
+			this.activeUser = activeUser;
 		}
 		
 		public UserManager getUserManager() {

@@ -18,8 +18,8 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.zkoss.bind.BindUtils;
@@ -68,22 +68,16 @@ public abstract class BaseVM {
 	protected void initUserGroupsModel() {
 		List<LabelledItem> items = new ArrayList<LabelledItem>();
 		User loggedUser = getLoggedUser();
-		List<UserGroup> userGroups = userGroupManager.findByUser(loggedUser);
-
-		String defaultPublicUserGroupName = UserGroupManager.DEFAULT_PUBLIC_USER_GROUP_NAME;
-		LabelledItem publicUserGroupItem = new LabelledItem(defaultPublicUserGroupName, Labels.getLabel(PUBLIC_USER_GROUP_LABEL_KEY));
-		items.add(publicUserGroupItem);
-		
-		String defaultPrivateUserGroupName = userGroupManager.getDefaultPrivateUserGroupName(loggedUser);
-		items.add(new LabelledItem(defaultPrivateUserGroupName, Labels.getLabel(PRIVATE_USER_GROUP_LABEL_KEY)));
-
-		List<String> predefinedUserGroupNames = Arrays.asList(new String[]{defaultPrivateUserGroupName, defaultPublicUserGroupName});
+		List<UserGroup> userGroups = userGroupManager.findAllRelatedUserGroups(loggedUser);
 		
 		for (UserGroup userGroup : userGroups) {
-			String label = userGroup.getLabel();
-			if (! predefinedUserGroupNames.contains(userGroup.getName())) {
-				items.add(new LabelledItem(userGroup.getName(), label));
-			}
+			String label = 
+				userGroup.getName().equals(UserGroupManager.DEFAULT_PUBLIC_USER_GROUP_NAME) ?
+					Labels.getLabel(PUBLIC_USER_GROUP_LABEL_KEY)
+					: userGroup.getName().equals(userGroupManager.getDefaultPrivateUserGroupName(loggedUser)) ? 
+						Labels.getLabel(PRIVATE_USER_GROUP_LABEL_KEY)
+						: userGroup.getLabel();
+			items.add(new LabelledItem(userGroup.getName(), label));
 		}
 		userGroupsModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
 		userGroupsModel.setMultiple(false);
@@ -126,8 +120,7 @@ public abstract class BaseVM {
 	
 	public String getLoggedUsername() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String loggedUsername = authentication.getName();
-		return loggedUsername;
+		return authentication.getName();
 	}
 	
 	protected static Window openPopUp(String url, boolean modal) {

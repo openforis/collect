@@ -1,0 +1,109 @@
+{
+    "general": {
+        "account": "Account",
+        "additionalOptions": "Additional Options",
+        "new": "New",
+        "forms": {
+            "selectOne": "--- Please select one ---"
+        }
+    },
+    "generic": {
+        "validation": {
+            "invalid_internal_name": "Invalid identifier: the first character must be a letter"
+        }
+    },
+    "header": {
+        "select-survey": "Select survey: "
+    },
+    "account": {
+        "change-password": "Change password",
+        "logout": "Logout"
+    },
+    "home-page": {
+        "welcome-message": "Welcome to Open Foris Collect!",
+        "introduction": "Open Foris Collect is the main entry point for data collected in field-based inventories. It provides a fast, easy, flexible way to set up a survey with a user-friendly interface. Collect handles multiple data types and complex validation rules, all in a multilanguage environment.",
+        "survey-not-selected-message": "Please select a survey or create a new one from the Survey Designer"
+    },
+    "dataManagement": {
+        "csvDataImport": {
+            "filename": "File Name",
+            "row": "Row",
+            "columns": "Columns",
+            "entity": "Entity",
+            "error-type": "Error Type",
+            "error-message": "Error Message",
+            "error": {
+                "missing-required-columns": "Required columns are: {0}",
+                "invalid-node-position": "Invalid node position: it must be a positive integer number",
+                "row-identifier-not-specified": "Row identifier not specified",
+                "noRecordFound": "Record not found: {0}",
+                "onlyNewRecordsAllowed": "New record insert selected but existing record found",
+                "noParentEntityFound": "Entity \"{0}\" with keys {1} not found in record [{2}]",
+                "multipleRecordsFound": "Multiple records found for key: {0}",
+                "multipleParentEntityFound": "Multiple parent entity found for entity \"{0}\" with keys {1} in record [{2}]",
+                "unitNotFound": "Unit {0} not found in the survey or not valid for this numeric attribute",
+                "srsNotFound": "Spatial reference system {0} not found in the survey",
+                "recordNotInSelectedStep": "Record is not in the selected step",
+                "noModelVersionFound": "Model version with name {0} not found in survey",
+                "fieldDefinitionNotFound": "Attribute definition not found or sub-field not specified",
+                "row_identifier_not_specified": "Row identifier not specified",
+                "nodePositionNotSpecified": "Node position not specified for a multiple attribute",
+                "invalidNodePosition": "Invalid node position: it must be a positive integer number",
+                "fieldNameNotSpecified": "Field name not specified"
+            },
+            "importType": {
+                "label": "Import type",
+                "update": "Update existing records",
+                "newRecords": "Insert new records",
+                "multipleFiles": "Import multiple CSV/Excel files in a single ZIP file"
+            },
+            "applyToSteps": "Apply to step(s)",
+            "selectAnEntity": "Please select an entity",
+            "validateRecords": "Validate records after import",
+            "deleteEntities": "Delete entities before import",
+            "validation": {
+                "fileNotSelected": "Please select a file to import",
+                "entityNotSelected": "Please select an entity to import data into"
+            }
+        }
+    },
+    "survey": {
+        "name": "Name",
+        "identifier": "Identifier",
+        "templateType": {
+            "label" : "Template",
+            "BLANK": "Blank", 
+            "BIOPHYSICAL": "Biophysical", 
+            "COLLECT_EARTH": "Collect Earth", 
+            "COLLECT_EARTH_IPCC": "Collect Earth + IPCC"
+        },
+        "projectName": "Project",
+        "defaultLanguage": "Default Language",
+        "lastModified": "Last Modified",
+        "unpublishedChanges": "Unpublished changes",
+        "published": "Published",
+        "userGroup": "User Group",
+        "target": "Target",
+        "validation": {
+            "nameAlreadyInUse": "Identifier already in use"            
+        }
+    },
+    "user": {
+        "username": "Username",
+        "enabled": "Enabled",
+        "role": "Role",
+        "rawPassword": "Password",
+        "retypedPassword": "Retype-password",
+        "validation": {
+            "invalid_username": "The username's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers, underscore (_), hyphen (-) and dot (.) may be used.",
+            "wrong_password_pattern": "The password's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers and the underscore may be used.",
+            "wrong_retyped_password": "Password and Retyped-Password do not match"
+        }
+    },
+    "validation": {
+        "errorsInTheForm": "Errors in the form",
+        "minLength": "It must be at least {0} characters",
+        "required_field": "Required field",
+        "duplicate_value": "Duplicate value"
+    }
+}

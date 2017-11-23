@@ -45,7 +45,9 @@ class UserGroupsPage extends AbstractItemsListPage {
 
   	render() {
 		const { userGroups } = this.props
-	
+		
+		const editableUserGroups = userGroups.filter(g => ! g.systemDefined)
+
 	  	return (
 			<Container>
 				<Row>
@@ -60,7 +62,7 @@ class UserGroupsPage extends AbstractItemsListPage {
 				<Row>
 					<Col>
 						<BootstrapTable
-							data={userGroups}
+							data={editableUserGroups}
 							striped	hover	condensed
 							selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', onSelect: this.handleRowSelect,
 								selected: this.state.selectedItemIds} }
@@ -83,7 +85,7 @@ const mapStateToProps = state => {
   const {
     isFetching: isFetchingUserGroups,
     lastUpdated: lastUpdatedUserGroups,
-    userGroups
+    items: userGroups
   } = state.userGroups || {
     isFetchingUserGroups: true,
     userGroups: []

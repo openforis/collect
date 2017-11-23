@@ -19,6 +19,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.jooq.Configuration;
+import org.openforis.collect.persistence.DbUtils;
 import org.openforis.rmb.MessageBroker;
 import org.openforis.rmb.MessageQueue.Builder;
 import org.openforis.rmb.metrics.MetricsMonitor;
@@ -52,22 +54,18 @@ public class ConfiguredMessageBroker implements MessageBroker {
 	private final SpringJdbcMessageBroker messageBroker;
 	private FileReporter fileReporter;
 
-	public ConfiguredMessageBroker(DataSource dataSource) throws Exception {
+	public ConfiguredMessageBroker(DataSource dataSource, Configuration jooqConf) throws Exception {
 		messageBroker = new SpringJdbcMessageBroker(dataSource);
 		messageBroker.setMessageSerializer(new XStreamMessageSerializer());
-		//messageBroker.setTablePrefix(determineFullTablePrefix(dataSource));
-		messageBroker.setTablePrefix(TABLE_PREFIX);
+		messageBroker.setTablePrefix(determineFullTablePrefix(jooqConf));
 		initMonitors();
 		messageBroker.afterPropertiesSet();
 	}
 
-//	private String determineFullTablePrefix(DataSource dataSource) {
-//		ConnectionProvider connectionProvider = new DataSourceConnectionProvider(dataSource);
-//		DialectAwareJooqConfiguration jooqConf = new DialectAwareJooqConfiguration(connectionProvider);
-//		CollectDSLContext dslContext = new CollectDSLContext(jooqConf);
-//		String fullPrefix = (! (dslContext.isSchemaLess()) ? DbUtils.SCHEMA_NAME + ".": "") + TABLE_PREFIX;
-//		return fullPrefix;
-//	}
+	private String determineFullTablePrefix(Configuration jooqConf) {
+		String fullPrefix = (jooqConf.settings().isRenderSchema() ? DbUtils.SCHEMA_NAME + ".": "") + TABLE_PREFIX;
+		return fullPrefix;
+	}
 
 	private void initMonitors() {
 		List<Monitor<Event>> monitors = new ArrayList<Monitor<Event>>();

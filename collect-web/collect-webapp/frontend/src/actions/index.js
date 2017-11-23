@@ -13,10 +13,6 @@ export const LOG_IN_FAILED = 'LOG_IN_FAILED'
 export const REQUEST_CURRENT_USER = 'REQUEST_CURRENT_USER'
 export const RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER'
 
-export const REQUEST_SURVEY_SUMMARIES = 'REQUEST_SURVEY_SUMMARIES'
-export const RECEIVE_SURVEY_SUMMARIES = 'RECEIVE_SURVEY_SUMMARIES'
-export const INVALIDATE_SURVEY_SUMMARIES = 'INVALIDATE_SURVEY_SUMMARIES'
-
 export const SELECT_PREFERRED_SURVEY = 'SELECT_PREFERRED_SURVEY'
 export const REQUEST_FULL_PREFERRED_SURVEY = 'REQUEST_FULL_PREFERRED_SURVEY'
 export const RECEIVE_FULL_PREFERRED_SURVEY = 'RECEIVE_FULL_PREFERRED_SURVEY'
@@ -113,7 +109,6 @@ export function fetchCurrentUser() {
 		dispatch(requestCurrentUser())
 		ServiceFactory.sessionService.fetchCurrentUser().then(json => {
 			dispatch(receiveCurrentUser(json));
-			dispatch(fetchSurveySummaries(json));
 		})
 	}
 }
@@ -122,37 +117,6 @@ function receiveCurrentUser(json) {
 	return {
 	    type: RECEIVE_CURRENT_USER,
 	    user: new User(json)
-	}
-}
-
-//SURVEY SUMMARIES
-function requestSurveySummaries() {
-	return {
-		type: REQUEST_SURVEY_SUMMARIES
-	}
-}
-
-function receiveSurveySummaries(json) {
-	return {
-	    type: RECEIVE_SURVEY_SUMMARIES,
-	    summaries: json.map(s => s), //TODO map into Survey object
-	    receivedAt: Date.now()
-	}
-}
-
-export function fetchSurveySummaries() {
-	return function (dispatch) {
-		dispatch(requestSurveySummaries())
-		ServiceFactory.surveyService.fetchAllSummaries().then(json => 
-			dispatch(receiveSurveySummaries(json))
-		)
-	}
-}
-
-export function invalidateSurveySummaries(summaries) {
-	return {
-		type: INVALIDATE_SURVEY_SUMMARIES,
-		summaries
 	}
 }
 

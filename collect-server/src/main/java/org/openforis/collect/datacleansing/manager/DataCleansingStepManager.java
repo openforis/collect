@@ -13,6 +13,7 @@ import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.persistence.DataCleansingStepDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,8 +62,8 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	
 	@Override
 	@Transactional
-	public DataCleansingStep save(DataCleansingStep step) {
-		super.save(step);
+	public DataCleansingStep save(DataCleansingStep step, User activeUser) {
+		super.save(step, activeUser);
 		dao.deleteStepValues(step.getId());
 		if (step.getType() == DataCleansingStepType.ATTRIBUTE_UPDATE && ! step.getUpdateValues().isEmpty()) {
 			dao.insertStepValues(step.getId(), step.getUpdateValues());

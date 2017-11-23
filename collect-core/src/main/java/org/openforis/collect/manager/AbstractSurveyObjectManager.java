@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +60,7 @@ public abstract class AbstractSurveyObjectManager
 	}
 
 	@Override
-	public T save(T obj) {
+	public T save(T obj, User modifiedByUser) {
 		Date now = new Date();
 		if (obj.getId() == null) {
 			if (obj.getCreationDate() == null) {

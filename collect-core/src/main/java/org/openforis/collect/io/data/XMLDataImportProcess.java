@@ -116,7 +116,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		this.includeRecordPredicate = null;
 		this.validateRecords = true;
 		this.queryBuffer = new ArrayList<CollectStoreQuery>();
-		this.recordUserLoader = new RecordUserLoader(userManager);
+		this.recordUserLoader = new RecordUserLoader(userManager, userManager.loadAdminUser());
 	}
 
 	public DataImportState getState() {

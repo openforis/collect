@@ -95,6 +95,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		private Boolean   enabled;
 		private String    qualifierName;
 		private String    qualifierValue;
+		private boolean   systemDefined;
 		private List<UserInGroupForm> users = new ArrayList<UserInGroupForm>();
 		private List<Integer> childrenGroupIds = new ArrayList<Integer>();
 		
@@ -186,6 +187,14 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 
 		public void setQualifierValue(String qualifierValue) {
 			this.qualifierValue = qualifierValue;
+		}
+		
+		public boolean isSystemDefined() {
+			return systemDefined;
+		}
+		
+		public void setSystemDefined(boolean systemDefined) {
+			this.systemDefined = systemDefined;
 		}
 		
 		public List<UserInGroupForm> getUsers() {

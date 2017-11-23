@@ -38,7 +38,7 @@ class SurveySelect extends Component {
 	}
 	
     render() {
-    	const { selectedSurvey, isFetchingSummaries, summaries } = this.props
+    	const { selectedSurvey, summaries } = this.props
     	const isEmpty = summaries.length === 0
     	
     	const dropdownItems = summaries.map(s => 
@@ -48,8 +48,8 @@ class SurveySelect extends Component {
 		
     	return (<div>
 			{
-			isEmpty ? (isFetchingSummaries ? <span>Loading...</span> : <span>No published surveys found</span>)
-            : <div style={{ opacity: isFetchingSummaries ? 0.5 : 1, width: '300px' }}>
+			isEmpty ? <span>No published surveys found</span>
+            : <div style={{ width: '300px' }}>
 				<UncontrolledDropdown>
 					<DropdownToggle className="survey-dropdown-toggle" caret>{this.state.selectedSurveyName}</DropdownToggle>
 					<DropdownMenu>

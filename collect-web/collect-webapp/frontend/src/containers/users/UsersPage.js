@@ -34,7 +34,7 @@ class UsersPage extends AbstractItemsListPage {
 	}
 
 	createNewItem() {
-		return {id: null, username: '', enabled: true, role: '-1'};
+		return {id: null, username: '', enabled: true, role: 'ENTRY'};
 	}
 
 	handleDeleteButtonClick() {

@@ -48,6 +48,7 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.web.controller.SurveyController;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
@@ -90,8 +91,6 @@ import org.zkoss.zul.Window;
  */
 public class SchemaVM extends SurveyBaseVM {
 
-	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_sampling_unit";
-	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
 	private static final String PATH_NULL_VALUES_REPLACE = "...";
 
 	private static final String TAB_NAME_LABEL_PATH = "labelTextbox";
@@ -830,7 +829,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private void updateRootTabLabel(Component view, EntityDefinition rootEntity) {
 		UITab mainTab = survey.getUIOptions().getMainTab(rootTabSet);
-		if (DEFAULT_MAIN_TAB_LABEL.equals(mainTab.getLabel(currentLanguageCode))) {
+		if (SurveyController.DEFAULT_MAIN_TAB_LABEL.equals(mainTab.getLabel(currentLanguageCode))) {
 			String label = rootEntity.getLabel(Type.INSTANCE, currentLanguageCode);
 			if (StringUtils.isNotBlank(label)) {
 				mainTab.setLabel(currentLanguageCode, label);
@@ -851,13 +850,13 @@ public class SchemaVM extends SurveyBaseVM {
 
 	protected EntityDefinition createRootEntityDefinition() {
 		EntityDefinition rootEntity = createEntityDefinition();
-		rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
+		rootEntity.setName(SurveyController.DEFAULT_ROOT_ENTITY_NAME);
 		survey.getSchema().addRootEntityDefinition(rootEntity);
 
 		UIOptions uiOptions = survey.getUIOptions();
 		rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
-		mainTab.setLabel(currentLanguageCode, DEFAULT_MAIN_TAB_LABEL);
+		mainTab.setLabel(currentLanguageCode, SurveyController.DEFAULT_MAIN_TAB_LABEL);
 
 		notifyChange("rootEntities");
 

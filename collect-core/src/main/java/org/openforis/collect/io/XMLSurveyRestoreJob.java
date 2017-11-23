@@ -42,6 +42,8 @@ public class XMLSurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setSurveyName(surveyName);
 			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
 			t.setValidate(validateSurvey);
+			t.setUserGroup(userGroup);
+			t.setActiveUser(activeUser);
 		}
 		super.initializeTask(task);
 	}

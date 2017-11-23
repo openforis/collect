@@ -8,13 +8,13 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="
 	    http://www.springframework.org/schema/beans
-	    http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	    http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
 	    http://www.springframework.org/schema/context
-	    http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	    http://www.springframework.org/schema/context/spring-context-4.3.xsd
 	    http://www.springframework.org/schema/mvc
-	    http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+	    http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
 	    http://www.springframework.org/schema/util
-	    http://www.springframework.org/schema/util/spring-util-4.2.xsd"
+	    http://www.springframework.org/schema/util/spring-util-4.3.xsd"
 	default-lazy-init="true">
 	
 	<import resource="classpath:org/openforis/collect/application-context-server.xml"/>
@@ -32,9 +32,6 @@
 	<mvc:resources mapping="/datacleansing/**" location="/datacleansing/" />
 	<mvc:resources mapping="/datamanager/**" location="/datamanager/" />
 	<mvc:resources mapping="/earthFiles/**" location="/earthFiles/" />
-	<mvc:resources mapping="/fonts/**" location="/fonts/" />
-	<mvc:resources mapping="/img/**" location="/img/" />
-	<mvc:resources mapping="/images/**" location="/images/" />
 	<mvc:resources mapping="/js/**" location="/js/" />
 	<mvc:resources mapping="/script/**" location="/script/" />
 	<mvc:resources mapping="/org/**" location="/org/" />

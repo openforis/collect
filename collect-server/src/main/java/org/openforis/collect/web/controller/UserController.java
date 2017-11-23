@@ -63,6 +63,11 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 		return itemManager.loadAllAvailableUsers(loggedUser);
 	}
 	
+	@Override
+	protected User getLoggedUser() {
+		return sessionManager.getLoggedUser();
+	}
+	
 	@Transactional
 	@RequestMapping(method=DELETE)
 	public @ResponseBody

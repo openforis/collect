@@ -6,10 +6,10 @@
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
-    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
-    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd
-    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd"
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd"
 	default-lazy-init="true"
 	default-autowire="byName">
 	
@@ -128,6 +128,7 @@
     <bean id="messageBroker" class="org.openforis.collect.event.ConfiguredMessageBroker" 
     		init-method="start" destroy-method="stop">
         <constructor-arg ref="dataSource" />
+        <constructor-arg ref="jooqConfig" />
     </bean>
 
 	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue">
@@ -150,6 +151,7 @@
 		        </constructor-arg>
 		    </bean>
 		</constructor-arg>
+		
 		<!-- Event Queue DISABLED by default -->
 		<property name="enabled" value="false" />
 	</bean>

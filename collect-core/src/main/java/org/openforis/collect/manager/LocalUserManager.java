@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.UserDao;
@@ -103,7 +104,7 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 	}
 
 	@Transactional
-	public User save(User user) {
+	public User save(User user, User createdByUser) {
 		Integer userId = user.getId();
 		String rawPassword = user.getRawPassword();
 		if (StringUtils.isBlank(rawPassword)) {
@@ -120,6 +121,8 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		}
 		if (userId == null) {
 			userDao.insert(user);
+			groupManager.createDefaultPrivateUserGroup(user, createdByUser);
+			groupManager.joinToDefaultPublicGroup(user, UserGroupRole.ADMINISTRATOR);
 		} else {
 			userDao.update(user);
 		}
@@ -200,11 +203,11 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 	 * @throws UserPersistenceException 
 	 */
 	@Transactional
-	public User insertUser(String name, String password, UserRole role) throws UserPersistenceException {
+	public User insertUser(String name, String password, UserRole role, User createdByUser) throws UserPersistenceException {
 		User user = new User(name);
 		user.setRawPassword(password);
 		user.addRole(role);
-		save(user);
+		save(user, createdByUser);
 		return user;
 	}
 	

@@ -2,6 +2,9 @@ import Serializable from './Serializable'
 
 export default class User extends Serializable {
 
+
+    static ROLES = ['VIEW', 'ENTRY_LIMITED', 'ENTRY', 'CLEANSING', 'ANALYSIS', 'ADMIN']
+
     enabled
     id
     role

@@ -5,6 +5,7 @@ import { Form, FormGroup, Label, Col, Dropdown, DropdownToggle, DropdownMenu, Dr
 import SurveySelect from '../SurveySelect/';
 import ServiceFactory from 'services/ServiceFactory'
 import Constants from 'utils/Constants'
+import L from 'utils/Labels'
 
 class Header extends Component {
 
@@ -65,7 +66,7 @@ class Header extends Component {
           <li className="nav-item">
             <Form>
               <FormGroup row>
-                <Label sm={4} className="d-md-down-none">Select survey: </Label>
+                <Label sm={4} className="d-md-down-none">{L.l('header.select-survey')}</Label>
                 <Col sm={8}>
                   <SurveySelect />
                 </Col>
@@ -79,9 +80,9 @@ class Header extends Component {
             <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
               <DropdownToggle caret>{loggedUser.username}</DropdownToggle>
               <DropdownMenu className="dropdown-menu-right">
-                <DropdownItem header className="text-center"><strong>Account</strong></DropdownItem>
-                <DropdownItem><i className="fa fa-user"></i> Change Password</DropdownItem>
-                <DropdownItem onClick={this.handleLogoutClick}><i className="fa fa-lock"></i> Logout</DropdownItem>
+                <DropdownItem header className="text-center"><strong>{L.l('general.account')}</strong></DropdownItem>
+                <DropdownItem><i className="fa fa-user"></i> {L.l('account.change-password')}</DropdownItem>
+                <DropdownItem onClick={this.handleLogoutClick}><i className="fa fa-lock"></i> {L.l('account.logout')}</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </li>

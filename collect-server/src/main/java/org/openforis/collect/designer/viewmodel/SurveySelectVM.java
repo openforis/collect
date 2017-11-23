@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
@@ -101,19 +100,7 @@ public class SurveySelectVM extends BaseVM {
 	@Command
 	public void editSelectedSurvey() throws IOException {
 		CollectSurvey temporarySurvey = loadSelectedSurveyForEdit();
-		SessionStatus sessionStatus = getSessionStatus();
-		Integer publishedSurveyId = null;
-		if (selectedSurvey.isPublished()) {
-			if (selectedSurvey.isTemporary()) {
-				publishedSurveyId = selectedSurvey.getPublishedId();
-			} else {
-				publishedSurveyId = selectedSurvey.getId();
-			}
-		}
-		sessionStatus.setPublishedSurveyId(publishedSurveyId);
-		sessionStatus.setSurvey(temporarySurvey);
-		sessionStatus.setCurrentLanguageCode(null);
-		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
+		SurveyEditVM.redirectToSurveyEditPage(temporarySurvey.getId());
 	}
 
 	@Command
@@ -152,6 +139,7 @@ public class SurveySelectVM extends BaseVM {
 		surveyCloneJob.setOriginalSurvey(selectedSurvey);
 		surveyCloneJob.setNewName(newName);
 		surveyCloneJob.setOriginalSurveyIsWork(originalSurveyIsWork);
+		surveyCloneJob.setActiveUser(getLoggedUser());
 		jobManager.start(surveyCloneJob);
 		
 		closePopUp(surveyClonePopup);
@@ -196,12 +184,8 @@ public class SurveySelectVM extends BaseVM {
 		boolean jobStartedByThis = isJobStartedByThis(job);
 		if (job == surveyCloneJob) {
 			CollectSurvey survey = surveyCloneJob.getOutputSurvey();
-			//put survey in session and redirect into survey edit page
-			SessionStatus sessionStatus = getSessionStatus();
-			sessionStatus.setSurvey(survey);
-			sessionStatus.setCurrentLanguageCode(survey.getDefaultLanguage());
-			Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 			surveyCloneJob = null;
+			SurveyEditVM.redirectToSurveyEditPage(survey.getId());
 		}
 		if (jobStartedByThis) {
 			onJobEnd(job);
@@ -306,13 +290,13 @@ public class SurveySelectVM extends BaseVM {
 
 	protected void performSurveyPublishing(CollectSurvey survey, Binder binder) {
 		try {
-			surveyManager.publish(survey);
+			User loggedUser = getLoggedUser();
+			surveyManager.publish(survey, loggedUser);
 			selectedSurvey = null;
 			notifyChange("selectedSurvey");
 			reloadSurveySummaries(binder);
 			MessageUtil.showInfo("survey.successfully_published", survey.getName());
-			User user = getLoggedUser();
-			surveyManager.validateRecords(survey.getId(), user);
+			surveyManager.validateRecords(survey.getId(), loggedUser);
 		} catch (SurveyStoreException e) {
 			throw new RuntimeException(e);
 		}
@@ -321,7 +305,7 @@ public class SurveySelectVM extends BaseVM {
 	private void performSelectedSurveyUnpublishing(Binder binder) {
 		try {
 			Integer publishedSurveyId = selectedSurvey.isTemporary() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
-			CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
+			CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId, getLoggedUser());
 			selectedSurvey = null;
 			notifyChange("selectedSurvey");
 			reloadSurveySummaries(binder);
@@ -360,9 +344,8 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void validateAllRecords() {
-		User user = getLoggedUser();
 		Integer publishedSurveyId = getSelectedPublishedSurveyId();
-		surveyManager.validateRecords(publishedSurveyId, user);
+		surveyManager.validateRecords(publishedSurveyId, getLoggedUser());
 		updateSurveyList();
 	}
 
@@ -485,7 +468,7 @@ public class SurveySelectVM extends BaseVM {
 		if (selectedSurvey.isTemporary()) {
 			temporarySurvey = surveyManager.loadSurvey(selectedSurvey.getId());
 		} else if (selectedSurvey.isPublished()) {
-			temporarySurvey = surveyManager.createTemporarySurveyFromPublished(uri);
+			temporarySurvey = surveyManager.createTemporarySurveyFromPublished(uri, getLoggedUser());
 		} else {
 			throw new IllegalStateException(
 					"Trying to load an invalid survey: " + uri);
@@ -567,6 +550,7 @@ public class SurveySelectVM extends BaseVM {
 		private SurveySummary originalSurvey;
 		private boolean originalSurveyIsWork;
 		private String newName;
+		private User activeUser;
 		
 		//ouptut
 		private CollectSurvey outputSurvey;
@@ -577,7 +561,8 @@ public class SurveySelectVM extends BaseVM {
 				
 				@Override
 				protected void execute() throws Throwable {
-					outputSurvey = surveyManager.duplicateSurveyIntoTemporary(originalSurvey.getName(), originalSurveyIsWork, newName);
+					outputSurvey = surveyManager.duplicateSurveyIntoTemporary(originalSurvey.getName(), 
+							originalSurveyIsWork, newName, activeUser);
 				}
 			});
 		}
@@ -592,6 +577,10 @@ public class SurveySelectVM extends BaseVM {
 		
 		public void setNewName(String newName) {
 			this.newName = newName;
+		}
+		
+		public void setActiveUser(User activeUser) {
+			this.activeUser = activeUser;
 		}
 		
 		public CollectSurvey getOutputSurvey() {
