@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
 import L from 'utils/Labels'
+import Strings from 'utils/Strings'
 
 class FormItem extends Component {
     render() {
@@ -24,10 +25,12 @@ export default class Forms {
         if (r.statusError) {
             let result = {}
             const errors = r.objects.errors
-            errors.forEach(error => {
-                result[error.field] = L.l(error.code, error.arguments)
-            })
-            result._error = L.l('validation.errorsInTheForm')
+            if (errors) {
+                errors.forEach(error => {
+                    result[error.field] = L.l(error.code, error.arguments)
+                })
+            }
+            result._error = L.l('validation.errorsInTheForm') + ': ' + r.errorMessage
             throw result
         }
     }
@@ -43,4 +46,13 @@ export default class Forms {
                 <Input valid={error ? false : ''} type="select" {...input}>{options}</Input>
             </FormItem>
     }
+
+    static normalizeInternalName = value => {
+        if (value) {
+            return Strings.replaceAll(value.toLowerCase(), '\\W', '_')
+        } else {
+            return value
+        }
+    }
+
 }

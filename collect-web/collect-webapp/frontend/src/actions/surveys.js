@@ -9,7 +9,13 @@ export const REQUEST_SURVEY_USER_GROUP_CHANGE = 'REQUEST_SURVEY_USER_GROUP_CHANG
 export const SURVEY_USER_GROUP_CHANGED = 'SURVEY_USER_GROUP_CHANGED'
 export const REQUEST_CREATE_NEW_SURVEY = 'REQUEST_CREATE_NEW_SURVEY'
 export const NEW_SURVEY_CREATED = 'NEW_SURVEY_CREATED'
-export const SURVEY_CREATION_ERROR = "SURVEY_CREATION_ERROR"
+export const SURVEY_CREATION_ERROR = 'SURVEY_CREATION_ERROR'
+export const UPLOADING_SURVEY_FILE = 'UPLOADING_SURVEY_FILE'
+export const SURVEY_FILE_UPLOAD_ERROR = 'SURVEY_FILE_UPLOAD_ERROR'
+export const SURVEY_FILE_UPLOADED = 'SURVEY_FILE_UPLOADED'
+export const SURVEY_FILE_IMPORT_STARTED = 'SURVEY_FILE_IMPORT_STARTED'
+export const SURVEY_FILE_IMPORTED = 'SURVEY_FILE_IMPORTED'
+export const SURVEY_FILE_IMPORT_ERROR = 'SURVEY_FILE_IMPORT_ERROR'
 
 function requestSurveySummaries() {
     return {
@@ -100,5 +106,77 @@ function newSurveyCreated(summary) {
     return {
         type: NEW_SURVEY_CREATED,
         summary: summary
+    }
+}
+
+export function uploadSurveyFile(file) {
+    return function(dispatch) {
+        dispatch(uploadingSurveyFile(file))
+        return ServiceFactory.surveyService.uploadSurveyFile(file).then(res => {
+            if (res.statusError) {
+                Forms.handleValidationResponse(res)
+                dispatch(surveyFileUploadError(res.errorMessage))
+            } else {
+                dispatch(surveyFileUploaded(res.objects.surveyBackupInfo, res.objects.importingIntoExistingSurvey))
+            }
+        })
+    }
+}
+
+function uploadingSurveyFile(file) {
+    return {
+        type: UPLOADING_SURVEY_FILE,
+        file: file,
+        filePreview: file.name
+    }
+}
+
+function surveyFileUploadError(errorMessage) {
+    return {
+        type: SURVEY_FILE_UPLOAD_ERROR,
+        errorMessage: errorMessage
+    }
+}
+
+function surveyFileUploaded(surveyBackupInfo, importingIntoExistingSurvey) {
+    return {
+        type: SURVEY_FILE_UPLOADED,
+        surveyBackupInfo: surveyBackupInfo,
+        importingIntoExistingSurvey: importingIntoExistingSurvey
+    }
+}
+
+export function startSurveyFileImport(surveyName, userGroupId) {
+    return function(dispatch) {
+        dispatch(surveyFileImportStarted(surveyName, userGroupId))
+        return ServiceFactory.surveyService.startSurveyFileImport(surveyName, userGroupId).then(res => {
+            if (res.statusError) {
+                Forms.handleValidationResponse(res)
+                dispatch(surveyFileImportError(res.errorMessage, res.objects.errors))
+            } else {
+                dispatch(surveyFileImportStarted(res.objects.surveyBackupInfo, res.objects.importingIntoExistingSurvey))
+            }
+        })
+    }
+}
+
+function surveyFileImportStarted(importJob) {
+    return {
+        type: SURVEY_FILE_IMPORT_STARTED,
+        importJob: importJob
+    }
+}
+
+function surveyFileImportError(errorMessage, fieldErrors) {
+    return {
+        type: SURVEY_FILE_IMPORT_ERROR,
+        errorMessage: errorMessage,
+        fieldErrors: fieldErrors
+    }
+}
+
+export function surveyFileImported() {
+    return {
+        type: SURVEY_FILE_IMPORTED
     }
 }

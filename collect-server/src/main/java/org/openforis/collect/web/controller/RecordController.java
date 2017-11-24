@@ -82,6 +82,7 @@ import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.RecordStatsGenerator.RecordsStats;
 import org.openforis.collect.web.session.SessionState;
@@ -398,7 +399,7 @@ public class RecordController extends BasicController implements Serializable {
 		return toProxy(record);
 	}
 
-	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=Files.ZIP_CONTENT_TYPE)
+	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=MediaTypes.ZIP_CONTENT_TYPE)
 	public void exportRecord(
 			@PathVariable(value="survey_id") int surveyId, 
 			@PathVariable(value="record_id") int recordId,
@@ -422,7 +423,7 @@ public class RecordController extends BasicController implements Serializable {
 			jobManager.startSurveyJob(job);
 			if (job.isCompleted()) {
 				String fileName = String.format("record_data_%s.zip", Dates.formatDate(new Date()));
-				Controllers.writeFileToResponse(response, outputFile, fileName, Files.ZIP_CONTENT_TYPE);
+				Controllers.writeFileToResponse(response, outputFile, fileName, MediaTypes.ZIP_CONTENT_TYPE);
 			}
 		}
 	}

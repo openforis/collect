@@ -1,8 +1,13 @@
 package org.openforis.collect.web.controller;
 
+import static org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator.PLACEMARK_FILE_NAME;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +18,15 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import org.apache.commons.io.FilenameUtils;
+import org.openforis.collect.io.AbstractSurveyRestoreJob;
+import org.openforis.collect.io.CESurveyRestoreJob;
+import org.openforis.collect.io.SurveyBackupInfo;
+import org.openforis.collect.io.SurveyBackupInfoExtractorJob;
+import org.openforis.collect.io.SurveyRestoreJob;
+import org.openforis.collect.io.XMLSurveyRestoreJob;
+import org.openforis.collect.io.ZipFileExtractor;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.UserGroupManager;
@@ -31,14 +45,19 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.collect.utils.Files;
+import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.SurveyController.SurveyCreationParameters.TemplateType;
 import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyCreationParametersValidator;
+import org.openforis.collect.web.validator.SurveyImportParametersValidator;
 import org.openforis.commons.web.Response;
+import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -49,6 +68,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
@@ -57,11 +77,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @RequestMapping("/api/survey")
+@Scope(SCOPE_SESSION)
 public class SurveyController extends BasicController {
 
 	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
 	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_sampling_unit";
 	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
+	private static final String CEP_FILE_EXTENSION = "cep";
 
 	@Autowired
 	private SurveyManager surveyManager;
@@ -70,18 +92,33 @@ public class SurveyController extends BasicController {
 	@Autowired
 	private UserGroupManager userGroupManager;
 	@Autowired
+	private JobManager jobManager;
+	@Autowired
+	private SessionManager sessionManager;
+
+	//validators
+	@Autowired
 	private SurveyCreationParametersValidator surveyCreationParametersValidator;
 	@Autowired
 	private SimpleSurveyCreationParametersValidator simpleSurveyCreationParametersValidator;
+	@Autowired
+	private SurveyImportParametersValidator surveyImportParametersValidator;
+
+	private SurveyBackupInfoExtractorJob surveyBackupInfoExtractorJob;
+	private File uploadedSurveyFile;
+	private SurveyBackupInfo uploadedSurveyInfo;
+	private AbstractSurveyRestoreJob surveyImportJob;
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		Object target = binder.getTarget();
 		if (target != null) {
-			if (target.getClass().isAssignableFrom(SurveyCreationParameters.class)) {
+			if (target instanceof SurveyCreationParameters) {
 				binder.setValidator(surveyCreationParametersValidator);
-			} else if (target.getClass().isAssignableFrom(SimpleSurveyCreationParameters.class)) {
+			} else if (target instanceof SimpleSurveyCreationParameters) {
 				binder.setValidator(simpleSurveyCreationParametersValidator);
+			} else if (target instanceof SurveyImportParameters) {
+				binder.setValidator(surveyImportParametersValidator);
 			}
 		}
 	}
@@ -228,6 +265,78 @@ public class SurveyController extends BasicController {
 		return generateView(survey, false);
 	}
 	
+	@RequestMapping(value = "prepareimport", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody
+	Response uploadSurveyFile(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+		String fileName = multipartFile.getName();
+		File tempFile = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(), "ofc_csv_data_import");
+		String extension = FilenameUtils.getExtension(fileName);
+
+		this.uploadedSurveyFile = tempFile;
+		
+		if ( surveyBackupInfoExtractorJob != null && surveyBackupInfoExtractorJob.isRunning() ) {
+			surveyBackupInfoExtractorJob.abort();
+		}
+		surveyBackupInfoExtractorJob = jobManager.createJob(SurveyBackupInfoExtractorJob.class);
+		
+		if (CEP_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+			File idmFile = extractIdmFromCEPFile(tempFile);
+			surveyBackupInfoExtractorJob.setFile(idmFile);
+		} else {
+			surveyBackupInfoExtractorJob.setFile(tempFile);
+		}
+		surveyBackupInfoExtractorJob.setValidate(false);
+		
+		jobManager.start(surveyBackupInfoExtractorJob, false);
+		
+		Response response = new Response();
+		if (surveyBackupInfoExtractorJob.isCompleted()) {
+			uploadedSurveyInfo = surveyBackupInfoExtractorJob.getInfo();
+			response.addObject("surveyBackupInfo", uploadedSurveyInfo);
+			SurveySummary existingSummary = surveyManager.loadSummaryByUri(uploadedSurveyInfo.getSurveyUri());
+			response.addObject("importingIntoExistingSurvey", existingSummary != null);
+			return response;
+		} else {
+			response.setErrorStatus();
+			response.setErrorMessage(surveyBackupInfoExtractorJob.getErrorMessage());
+			return response;
+		}
+	}
+	
+	@RequestMapping(value = "startimport", method=POST)
+	public Response startSurveyFileImport(@Valid SurveyImportParameters params, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			Response res = new Response();
+			res.setErrorStatus();
+			res.addObject("errors", bindingResult.getFieldErrors());
+			return res;
+		}
+		String surveyName = params.getName();
+		UserGroup userGroup = userGroupManager.loadById(params.getUserGroupId());
+		
+		String uploadedFileNameExtension = FilenameUtils.getExtension(this.uploadedSurveyFile.getName());
+		AbstractSurveyRestoreJob job;
+		if ( Files.XML_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension) ) {
+			job = jobManager.createJob(XMLSurveyRestoreJob.class);
+		} else if (CEP_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension)) {
+			job= jobManager.createJob(CESurveyRestoreJob.class);
+		} else {
+			job= jobManager.createJob(SurveyRestoreJob.class);
+		}
+		job.setFile(this.uploadedSurveyFile);
+		job.setSurveyName(surveyName);
+		job.setSurveyUri(uploadedSurveyInfo == null ? null : uploadedSurveyInfo.getSurveyUri());
+		job.setUserGroup(userGroup);
+		job.setRestoreIntoPublishedSurvey(false);
+		job.setValidateSurvey(false);
+		job.setActiveUser(sessionManager.getLoggedUser());
+		jobManager.start(job);
+		this.surveyImportJob = job;
+		Response res = new Response();
+		res.setObject(new JobView(job));
+		return res;
+	}
+	
 	@RequestMapping(value="changeusergroup/{id}", method=POST)
 	public @ResponseBody SurveyView changeSurveyUserGroup(@PathVariable int id, @RequestParam int userGroupId) throws SurveyStoreException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
@@ -257,6 +366,16 @@ public class SurveyController extends BasicController {
 			return new HashSet<UserGroup>(groups);
 		} else {
 			return null;
+		}
+	}
+	
+	private File extractIdmFromCEPFile(File surveyFile) {
+		try {
+			ZipFileExtractor zipFileExtractor = new ZipFileExtractor(surveyFile);
+			File idmFile = zipFileExtractor.extract(PLACEMARK_FILE_NAME);
+			return idmFile;
+		} catch (Exception e) {
+			throw new RuntimeException("Error extracting " + PLACEMARK_FILE_NAME + " from cep file", e);
 		}
 	}
 	
@@ -297,6 +416,28 @@ public class SurveyController extends BasicController {
 		
 		public void setDefaultLanguageCode(String defaultLanguageCode) {
 			this.defaultLanguageCode = defaultLanguageCode;
+		}
+		
+		public Integer getUserGroupId() {
+			return userGroupId;
+		}
+		
+		public void setUserGroupId(Integer userGroupId) {
+			this.userGroupId = userGroupId;
+		}
+	}
+	
+	public static class SurveyImportParameters {
+		
+		private String name;
+		private Integer userGroupId;
+		
+		public String getName() {
+			return name;
+		}
+		
+		public void setName(String name) {
+			this.name = name;
 		}
 		
 		public Integer getUserGroupId() {

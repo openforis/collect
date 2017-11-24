@@ -57,6 +57,10 @@ const routes = [
     name: "New survey"
   },
   {
+    path: '/surveydesigner/surveyimport',
+    name: "Import survey"
+  },
+  {
     path: '/datacleansing',
     name: "Data Cleansing"
   },
