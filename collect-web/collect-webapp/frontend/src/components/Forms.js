@@ -4,11 +4,8 @@ import L from 'utils/Labels'
 
 class FormItem extends Component {
     render() {
-        const label = this.props.label
-        const error = this.props.error
-        const touched = this.props.touched
-        const asyncValidating = this.props.asyncValidating
-
+        const { label, error, touched, asyncValidating } = this.props
+        
         return (
             <FormGroup row>
                 <Label sm={2}>{label}</Label>
@@ -36,7 +33,7 @@ export default class Forms {
     }
 
     static renderInputField({ input, label, type, meta: { asyncValidating, touched, error } }) {
-        return <FormItem label={label} touched={touched} error={error}>
+        return <FormItem label={label} asyncValidating={asyncValidating} touched={touched} error={error}>
                 <Input valid={error ? false : ''} {...input} type={type} />
             </FormItem>
     }
