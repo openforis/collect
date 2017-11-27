@@ -21,10 +21,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Files {
 	
-	public static final String CSV_CONTENT_TYPE = "text/csv";
 	public static final String CSV_FILE_EXTENSION = "csv";
-	public static final String ZIP_CONTENT_TYPE = "application/zip";
 	public static final String ZIP_FILE_EXTENSION = "zip";
+	public static final String XML_FILE_EXTENSION = "xml";
 	
 	private static final String PATH_SEPARATOR_PATTERN = "[\\\\|/]";
 	public static final String JAVA_IO_TMPDIR_SYS_PROP = "java.io.tmpdir";

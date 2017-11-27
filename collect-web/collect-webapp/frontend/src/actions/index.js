@@ -1,4 +1,3 @@
-import Constants from 'utils/Constants'
 import ServiceFactory from 'services/ServiceFactory'
 import { Survey } from 'model/Survey';
 import User from 'model/User';
@@ -22,12 +21,6 @@ export const REQUEST_USER_GROUPS = 'REQUEST_USER_GROUPS'
 export const RECEIVE_USER_GROUPS = 'RECEIVE_USER_GROUPS'
 export const RECEIVE_USER_GROUP = 'RECEIVE_USER_GROUP'
 export const INVALIDATE_USER_GROUPS = 'INVALIDATE_USER_GROUPS'
-
-export const START_JOB_MONITOR = 'START_JOB_MONITOR'
-export const CLOSE_JOB_MONITOR = 'CLOSE_JOB_MONITOR'
-export const REQUEST_JOB = 'REQUEST_JOB'
-export const RECEIVE_JOB = 'RECEIVE_JOB'
-export const JOB_CANCELED = 'JOB_CANCELED'
 
 export const RECORD_DELETED = 'RECORD_DELETED'
 export const RECORDS_DELETED = 'RECORDS_DELETED'
@@ -209,64 +202,5 @@ export function recordsDeleted(records) {
 	return {
 		type: RECORDS_DELETED,
 		records: records
-	}
-}
-
-//JOB
-function requestJob() {
-	return {
-		type: REQUEST_JOB
-	}
-}
-
-export class jobMonitorConfiguration {
-	jobId
-	title = 'Processing'
-	okButtonLabel = 'Ok'
-	handleOkButtonClick
-	handleCancelButtonClick
-	handleJobCompleted
-	handleJobFailed
-}
-
-export function startJobMonitor(jobMonitorConfiguration) {
-	return {
-		type: START_JOB_MONITOR,
-		jobMonitorConfiguration: jobMonitorConfiguration
-	}
-}
-
-export function fetchJob(jobId) {
-	return function (dispatch) {
-		dispatch(requestJob())
-		ServiceFactory.jobService.fetch(jobId).then(job => dispatch(receiveJob(job)))
-	}
-}
-
-export function receiveJob(job) {
-	return {
-	    type: RECEIVE_JOB,
-	    job: job,
-	    receivedAt: Date.now()
-	}
-}
-
-export function cancelJob(jobId) {
-	return function (dispatch) {
-		ServiceFactory.jobService.cancel(jobId).then(() => dispatch(jobCanceled(jobId)))
-	}
-}
-
-function jobCanceled(jobId) {
-	return {
-		type: JOB_CANCELED,
-		jobId: jobId,
-		receivedAt: Date.now()
-	}
-}
-
-export function closeJobMonitor() {
-	return {
-		type: CLOSE_JOB_MONITOR
 	}
 }

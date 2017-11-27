@@ -40,7 +40,7 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
-import org.openforis.collect.utils.Files;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.concurrency.Job;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -476,7 +476,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void exportCEGridTemplate() throws IOException {
 		File templateFile = new CollectEarthGridTemplateGenerator().generateTemplateCSVFile(survey);
 		String fileName = String.format("%s_grid_template_%s.csv", survey.getName(), Dates.formatDateTime(new Date()));
-		Filedownload.save(new FileInputStream(templateFile),  Files.CSV_CONTENT_TYPE, fileName);
+		Filedownload.save(new FileInputStream(templateFile), MediaTypes.CSV_CONTENT_TYPE, fileName);
 	}
 	
 	@GlobalCommand

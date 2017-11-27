@@ -18,11 +18,14 @@ import MapPage from 'containers/MapPage'
 import OldClientRecordEditPage from 'containers/datamanagement/OldClientRecordEditPage'
 import SaikuPage from 'containers/SaikuPage'
 import SurveyDesignerPage from 'containers/SurveyDesignerPage'
+import SurveyEditPage from 'containers/surveydesigner/SurveyEditPage'
 import SurveysListPage from 'containers/surveydesigner/SurveysListPage'
+import NewSurveyPage from './containers/surveydesigner/NewSurveyPage';
+import SurveyImportPage from './containers/surveydesigner/SurveyImportPage';
 import UsersPage from 'containers/users/UsersPage'
 import UserGroupsPage from 'containers/users/UserGroupsPage'
 import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
-import NewSurveyParametersPage from './containers/surveydesigner/NewSurveyParametersPage';
+
 
 class App extends Component {
   render() {
@@ -48,7 +51,9 @@ class App extends Component {
                   <Route path="/saiku" exact name="Saiku" component={SaikuPage}/>
                   <Route path="/surveydesigner" exact name="SurveyDesigner" component={SurveyDesignerPage}/>
                   <Route path="/surveydesigner/surveys" exact name="SurveysList" component={SurveysListPage}/>
-                  <Route path="/surveydesigner/newsurvey" exact name="NewSurvey" component={NewSurveyParametersPage}/>
+                  <Route path="/surveydesigner/newsurvey" exact name="NewSurvey" component={NewSurveyPage}/>
+                  <Route path="/surveydesigner/surveyimport" exact name="SurveyImport" component={SurveyImportPage}/>
+                  <Route path="/surveydesigner/surveys/:id" exact name="SurveyEdit" component={SurveyEditPage}/>
                   <Route path="/users" exact name="Users" component={UsersPage}/>
                   <Route path="/usergroups" exact name="User Groups" component={UserGroupsPage}/>
                   <Route path="/usergroups/:id" name="User Group" component={UserGroupDetailsPage}/>

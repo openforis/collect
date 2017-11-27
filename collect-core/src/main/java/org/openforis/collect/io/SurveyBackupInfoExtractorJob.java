@@ -92,7 +92,7 @@ public class SurveyBackupInfoExtractorJob extends Job {
 			this.survey = ((IdmlUnmarshallTask) task).getSurvey();
 			if ( zipFile == null ) {
 				//extracting backup info from XML file
-				this.info = SurveyBackupInfo.createOldVersionInstance(survey.getUri());
+				this.info = SurveyBackupInfo.createOldVersionInstance(survey);
 			}
 		}
 	}

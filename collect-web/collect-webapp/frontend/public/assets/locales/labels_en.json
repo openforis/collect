@@ -3,14 +3,16 @@
         "account": "Account",
         "additionalOptions": "Additional Options",
         "new": "New",
-        "forms": {
-            "selectOne": "--- Please select one ---"
-        }
+        "import": "Import"
     },
     "generic": {
         "validation": {
             "invalid_internal_name": "Invalid identifier: the first character must be a letter"
         }
+    },
+    "forms": {
+        "fileDropMessage": "Click to select a {0} file or drop it here.",
+        "selectOne": "--- Please select one ---" 
     },
     "header": {
         "select-survey": "Select survey: "
@@ -86,6 +88,11 @@
         "target": "Target",
         "validation": {
             "nameAlreadyInUse": "Identifier already in use"            
+        },
+        "import": {
+            "file": "File",
+            "acceptedFileTeypesDescription": "Collect Survey (.collect) Collect Backup (.collect-backup), Collect Earth (.cep) or Collect Survey XML file (.xml)",
+            "importingIntoExistingSurveyWarning": "Survey already existing! Applied changes will be override."
         }
     },
     "user": {

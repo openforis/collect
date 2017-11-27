@@ -3,7 +3,7 @@ import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Containe
     Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
-import * as Actions from 'actions';
+import * as JobActions from 'actions/job';
 import ServiceFactory from 'services/ServiceFactory'
 import Dates from 'utils/Dates'
 import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
@@ -51,7 +51,7 @@ class SaikuPage extends Component {
 		const survey = this.props.survey
 		const language = this.state.selectedLanguage
 		ServiceFactory.saikuService.startReportingRepositoryGeneration(survey, language).then(job => {
-            this.props.dispatch(Actions.startJobMonitor({
+            this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id, 
 				title: 'Generating Saiku Database',
 				handleJobCompleted: this.handleSaikuDbGenerationJobCompleted
@@ -60,7 +60,7 @@ class SaikuPage extends Component {
 	}
 
 	handleSaikuDbGenerationJobCompleted() {
-		setTimeout(() => this.props.dispatch(Actions.closeJobMonitor()))
+		setTimeout(() => this.props.dispatch(JobActions.closeJobMonitor()))
 		this.setState({showSaiku: true})
 	}
 

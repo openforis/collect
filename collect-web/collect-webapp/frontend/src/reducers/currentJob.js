@@ -4,7 +4,7 @@ import {
     REQUEST_JOB,
     RECEIVE_JOB,
     JOB_CANCELED    
-} from '../actions'
+} from '../actions/job'
 
 const initialState = {
     open: false,

@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
-import { FormFeedback, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
 import L from 'utils/Labels'
+import Strings from 'utils/Strings'
 
-class FormItem extends Component {
+export class FormItem extends Component {
     render() {
-        const label = this.props.label
-        const error = this.props.error
-        const touched = this.props.touched
-        const asyncValidating = this.props.asyncValidating
-
+        const { label, error, touched, asyncValidating } = this.props
+        
         return (
             <FormGroup row>
                 <Label sm={2}>{label}</Label>
@@ -27,23 +25,42 @@ export default class Forms {
         if (r.statusError) {
             let result = {}
             const errors = r.objects.errors
-            errors.forEach(error => {
-                result[error.field] = L.l(error.code, error.arguments)
-            })
-            result._error = L.l('validation.errorsInTheForm')
+            if (errors) {
+                errors.forEach(error => {
+                    result[error.field] = L.l(error.code, error.arguments)
+                })
+            }
+            result._error = L.l('validation.errorsInTheForm') + ': ' + r.errorMessage
             throw result
         }
     }
 
-    static renderInputField({ input, label, type, meta: { asyncValidating, touched, error } }) {
-        return <FormItem label={label} touched={touched} error={error}>
-                <Input valid={error ? false : ''} {...input} type={type} />
+    static renderFormItemInputField({ input, label, type, contentEditable, meta: { asyncValidating, touched, error } }) {
+        return <FormItem label={label} asyncValidating={asyncValidating} touched={touched} error={error}>
+                <Input readOnly={contentEditable===false} valid={error ? false : null} {...input} type={type} />
             </FormItem>
     }
 
-    static renderSelect({ input, label, type, options, meta: { asyncValidating, touched, error } }) {
+    static renderInputField({ input, label, type, contentEditable, meta: { asyncValidating, touched, error } }) {
+        return <Input readOnly={contentEditable===false} valid={error ? false : null} {...input} type={type} />
+    }
+
+    static renderFormItemSelect({ input, label, type, options, contentEditable, meta: { asyncValidating, touched, error } }) {
         return <FormItem label={label} touched={touched} error={error}>
-                <Input valid={error ? false : ''} type="select" {...input}>{options}</Input>
+                <Input readOnly={!contentEditable} valid={error ? false : null} type="select" {...input}>{options}</Input>
             </FormItem>
     }
+
+    static renderSelect({ input, label, type, options, contentEditable, meta: { asyncValidating, touched, error } }) {
+        return <Input readOnly={!contentEditable} valid={error ? false : null} type="select" {...input}>{options}</Input>
+    }
+
+    static normalizeInternalName = value => {
+        if (value) {
+            return Strings.replaceAll(value.toLowerCase(), '\\W', '_')
+        } else {
+            return value
+        }
+    }
+
 }

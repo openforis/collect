@@ -18,10 +18,10 @@ body {
 .main-content-wrapper {
     position: absolute;
     top: 110px;
-    bottom: 50px;
+    bottom: 0px;
     left: 200px;
     right: 0px;
-    margin: 10px;
+    margin: 2px;
     overflow: auto;
 }
 
@@ -221,4 +221,11 @@ label.invalid {
 .tooltip.error .tooltip-inner {
     background-color: red;
     color: white;
+}
+
+.async-validating input {
+    background-image: url('../img/spinner.gif');
+    background-size: 20px;
+    background-position: center right;
+    background-repeat: no-repeat;
 }

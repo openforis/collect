@@ -4,7 +4,8 @@ import currentJob from './currentJob'
 import applicationInfo from './applicationInfo'
 import login from './login'
 import session from './session'
-import surveySummaries from './surveys'
+import surveys from './surveys'
+import surveySummaries from './surveySummaries'
 import preferredSurvey from './preferredSurvey'
 import records from './records'
 import users from './users'
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
 	session,
 	preferredSurvey,
 	records,
+	surveys,
 	surveySummaries,
 	users,
 	userGroups

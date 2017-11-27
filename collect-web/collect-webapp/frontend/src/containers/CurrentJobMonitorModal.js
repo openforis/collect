@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import JobMonitorModal from 'components/JobMonitorModal'
-import * as Actions from 'actions'
+import * as JobActions from 'actions/job'
 
 class CurrentJobMonitorModal extends Component {
 
@@ -54,7 +54,7 @@ class CurrentJobMonitorModal extends Component {
         if (this.props.jobMonitorConfiguration.handleCancelButtonClick) {
             this.props.jobMonitorConfiguration.handleCancelButtonClick(this.props.job)
         } else {
-            this.props.dispatch(Actions.cancelJob(this.props.jobMonitorConfiguration.jobId))
+            this.props.dispatch(JobActions.cancelJob(this.props.jobMonitorConfiguration.jobId))
         }
     }
 
@@ -63,13 +63,13 @@ class CurrentJobMonitorModal extends Component {
     }
 
     dispatchCloseJobMonitorAction() {
-        this.props.dispatch(Actions.closeJobMonitor())
+        this.props.dispatch(JobActions.closeJobMonitor())
     }
 
     loadJob() {
         if (this.props.jobMonitorConfiguration) {
             const jobId = this.props.jobMonitorConfiguration.jobId
-            this.props.dispatch(Actions.fetchJob(jobId))
+            this.props.dispatch(JobActions.fetchJob(jobId))
         } else {
             this.stopTimer()
         }

@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';
 import Workflow from 'model/Workflow';
-import * as Actions from 'actions';
+import * as JobActions from 'actions/job';
 import Objects from 'utils/Objects'
 
 const csvExportAdditionalOptions = [
@@ -75,7 +75,7 @@ class CsvDataExportPage extends Component {
                 parameters[o.name] = Objects.isNullOrUndefined(val) ? null : val
             })
             ServiceFactory.recordService.startCSVDataExport(surveyId, parameters).then(job => {
-                this.props.dispatch(Actions.startJobMonitor({
+                this.props.dispatch(JobActions.startJobMonitor({
                     jobId: job.id, 
                     title: 'Exporting data',
                     okButtonLabel: 'Download CSV file',                        
@@ -98,7 +98,7 @@ class CsvDataExportPage extends Component {
                 const surveyId = survey.id
                 ServiceFactory.recordService.downloadCSVDataExportResult(surveyId)
             }
-            this.props.dispatch(Actions.closeJobMonitor())
+            this.props.dispatch(JobActions.closeJobMonitor())
         }
         
         handleEntitySelect(event) {
