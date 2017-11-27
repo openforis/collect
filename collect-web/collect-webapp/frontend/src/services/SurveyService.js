@@ -42,10 +42,21 @@ export default class SurveyService extends AbstractService {
         })
     }
 
+    validateSurveyImport(name, userGroupId) {
+        return this.post('survey/validateimport', {
+            name: name,
+            userGroupId: userGroupId
+        })
+    }
+
     startSurveyFileImport(name, userGroupId) {
         return this.post('survey/startimport', {
             name: name,
             userGroupId: userGroupId
         })
+    }
+
+    fetchSurveyImportStatus() {
+        return this.get('survey/importstatus')
     }
 }

@@ -187,13 +187,7 @@ public class SurveyController extends BasicController {
 	
 	@RequestMapping(value="validatecreation", method=POST)
 	public @ResponseBody Response validateSurveyCreationParameters(@Valid SurveyCreationParameters params, BindingResult result) {
-		List<ObjectError> errors = result.getAllErrors();
-		Response response = new Response();
-		if (! errors.isEmpty()) {
-			response.setErrorStatus();
-			response.addObject("errors", errors);
-		}
-		return response;
+		return generateFormValidationResponse(result);
 	}
 	
 	private CollectSurvey createNewSurveyFromTemplate(String name, String langCode, TemplateType templateType)
@@ -267,8 +261,8 @@ public class SurveyController extends BasicController {
 	
 	@RequestMapping(value = "prepareimport", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody
-	Response uploadSurveyFile(@RequestParam("file") MultipartFile multipartFile) throws IOException {
-		String fileName = multipartFile.getName();
+	Response prepareSurveyImport(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+		String fileName = multipartFile.getOriginalFilename();
 		File tempFile = Files.writeToTempFile(multipartFile.getInputStream(), multipartFile.getOriginalFilename(), "ofc_csv_data_import");
 		String extension = FilenameUtils.getExtension(fileName);
 
@@ -295,6 +289,7 @@ public class SurveyController extends BasicController {
 			response.addObject("surveyBackupInfo", uploadedSurveyInfo);
 			SurveySummary existingSummary = surveyManager.loadSummaryByUri(uploadedSurveyInfo.getSurveyUri());
 			response.addObject("importingIntoExistingSurvey", existingSummary != null);
+			response.addObject("existingSurveyUserGroupId", existingSummary == null ? null : existingSummary.getUserGroupId());
 			return response;
 		} else {
 			response.setErrorStatus();
@@ -303,8 +298,13 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
+	@RequestMapping(value="validateimport", method=POST)
+	public @ResponseBody Response validateSurveyImportParameters(@Valid SurveyImportParameters params, BindingResult result) {
+		return generateFormValidationResponse(result);
+	}
+
 	@RequestMapping(value = "startimport", method=POST)
-	public Response startSurveyFileImport(@Valid SurveyImportParameters params, BindingResult bindingResult) {
+	public @ResponseBody Response startSurveyFileImport(@Valid SurveyImportParameters params, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			Response res = new Response();
 			res.setErrorStatus();
@@ -333,8 +333,17 @@ public class SurveyController extends BasicController {
 		jobManager.start(job);
 		this.surveyImportJob = job;
 		Response res = new Response();
-		res.setObject(new JobView(job));
+		res.setObject(new SurveyImportJobView(job));
 		return res;
+	}
+	
+	@RequestMapping(value="importstatus", method=GET)
+	public @ResponseBody SurveyImportJobView getSurveyImportStatus() {
+		if (surveyImportJob == null) {
+			return null;
+		} else {
+			return new SurveyImportJobView(surveyImportJob);
+		}
 	}
 	
 	@RequestMapping(value="changeusergroup/{id}", method=POST)
@@ -377,6 +386,16 @@ public class SurveyController extends BasicController {
 		} catch (Exception e) {
 			throw new RuntimeException("Error extracting " + PLACEMARK_FILE_NAME + " from cep file", e);
 		}
+	}
+	
+	private Response generateFormValidationResponse(BindingResult result) {
+		List<ObjectError> errors = result.getAllErrors();
+		Response response = new Response();
+		if (! errors.isEmpty()) {
+			response.setErrorStatus();
+			response.addObject("errors", errors);
+		}
+		return response;
 	}
 	
 	public static class SurveyCreationParameters {
@@ -447,5 +466,20 @@ public class SurveyController extends BasicController {
 		public void setUserGroupId(Integer userGroupId) {
 			this.userGroupId = userGroupId;
 		}
+	}
+	
+	public static class SurveyImportJobView extends JobView {
+		
+		private Integer surveyId;
+
+		public SurveyImportJobView(AbstractSurveyRestoreJob job) {
+			super(job);
+			this.surveyId = job == null || job.getSurvey() == null ? null : job.getSurvey().getId();
+		}
+		
+		public Integer getSurveyId() {
+			return surveyId;
+		}
+		
 	}
 }

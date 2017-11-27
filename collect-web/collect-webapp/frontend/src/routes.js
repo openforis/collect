@@ -61,6 +61,11 @@ const routes = [
     name: "Import survey"
   },
   {
+    path: '/surveydesigner/surveys/:id',
+    name: "Edit survey",
+    pathRegExp: new RegExp('/surveydesigner/surveys/(\\d)+')
+  },
+  {
     path: '/datacleansing',
     name: "Data Cleansing"
   },

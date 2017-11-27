@@ -11,15 +11,18 @@ function surveys(
     state = {
         surveyCreationErrors: [],
         uploadingSurveyFile: false,
-        surveyFileUploaded: false,
         surveyFileToBeImported: null,
         surveyFileToBeImportedPreview: null,        
+        surveyFileUploaded: false,
+        surveyFileUploadError: false,
+        surveyFileUploadErrorMessage: null,
         importingIntoExistingSurvey: false,
         surveyBackupInfo: null,
         surveyFileImportStarted: false,
         surveyFileImported: false,
+        importedSurveyId: null,
         surveyFileImportErrorMessage: null,
-        surveyFileImportFieldErrors: [],
+        surveyFileImportFieldErrors: []
     },
     action
 ) {
@@ -40,6 +43,7 @@ function surveys(
                 uploadingSurveyFile: true,
                 surveyFileToBeImported: action.file,
                 surveyFileToBeImportedPreview: action.filePreview,
+                surveyFileUploaded: false,
                 surveyBackupInfo: null,
                 surveyFileImported: false,
                 surveyFileImportErrorMessage: null,
@@ -53,6 +57,12 @@ function surveys(
                 surveyBackupInfo: action.surveyBackupInfo,
                 importingIntoExistingSurvey: action.importingIntoExistingSurvey
             })
+        case SURVEY_FILE_UPLOAD_ERROR:
+            return Object.assign({}, state, {
+                uploadingSurveyFile: false,
+                surveyFileUploadError: true,
+                surveyFileUploadErrorMessage: action.errorMessage
+            })
         case SURVEY_FILE_IMPORT_STARTED:
             return Object.assign({}, state, {
                 surveyFileImportStarted: true
@@ -65,7 +75,8 @@ function surveys(
         case SURVEY_FILE_IMPORTED:
             return Object.assign({}, state, {
                 surveyFileImportStarted: false,
-                surveyFileImported: true
+                surveyFileImported: true,
+                importedSurveyId: action.importedSurveyId
             })
         default:
             return state

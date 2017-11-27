@@ -1,5 +1,7 @@
 import ServiceFactory from 'services/ServiceFactory';
-import Forms from 'components/Forms'
+import Forms from 'components/Forms';
+import { change } from 'redux-form';
+import * as JobActions from 'actions/job'
 
 export const REQUEST_SURVEY_SUMMARIES = 'REQUEST_SURVEY_SUMMARIES'
 export const RECEIVE_SURVEY_SUMMARIES = 'RECEIVE_SURVEY_SUMMARIES'
@@ -13,9 +15,12 @@ export const SURVEY_CREATION_ERROR = 'SURVEY_CREATION_ERROR'
 export const UPLOADING_SURVEY_FILE = 'UPLOADING_SURVEY_FILE'
 export const SURVEY_FILE_UPLOAD_ERROR = 'SURVEY_FILE_UPLOAD_ERROR'
 export const SURVEY_FILE_UPLOADED = 'SURVEY_FILE_UPLOADED'
+export const SURVEY_FILE_IMPORT_STARTING = 'SURVEY_FILE_IMPORT_STARTING'
 export const SURVEY_FILE_IMPORT_STARTED = 'SURVEY_FILE_IMPORT_STARTED'
 export const SURVEY_FILE_IMPORTED = 'SURVEY_FILE_IMPORTED'
 export const SURVEY_FILE_IMPORT_ERROR = 'SURVEY_FILE_IMPORT_ERROR'
+
+const SURVEY_IMPORT_FORM_NAME = 'surveyImportForm'
 
 function requestSurveySummaries() {
     return {
@@ -117,7 +122,13 @@ export function uploadSurveyFile(file) {
                 Forms.handleValidationResponse(res)
                 dispatch(surveyFileUploadError(res.errorMessage))
             } else {
-                dispatch(surveyFileUploaded(res.objects.surveyBackupInfo, res.objects.importingIntoExistingSurvey))
+                const backupInfo = res.objects.surveyBackupInfo
+                const importingIntoExistingSurvey = res.objects.importingIntoExistingSurvey
+                dispatch(change(SURVEY_IMPORT_FORM_NAME, 'name', backupInfo.surveyName))
+                if (importingIntoExistingSurvey) {
+                    dispatch(change(SURVEY_IMPORT_FORM_NAME, 'userGroupId', res.objects.existingSurveyUserGroupId))
+                }
+                dispatch(surveyFileUploaded(backupInfo, importingIntoExistingSurvey))
             }
         })
     }
@@ -148,15 +159,33 @@ function surveyFileUploaded(surveyBackupInfo, importingIntoExistingSurvey) {
 
 export function startSurveyFileImport(surveyName, userGroupId) {
     return function(dispatch) {
-        dispatch(surveyFileImportStarted(surveyName, userGroupId))
+        dispatch(surveyFileImportStarting(surveyName, userGroupId))
         return ServiceFactory.surveyService.startSurveyFileImport(surveyName, userGroupId).then(res => {
             if (res.statusError) {
                 Forms.handleValidationResponse(res)
                 dispatch(surveyFileImportError(res.errorMessage, res.objects.errors))
             } else {
-                dispatch(surveyFileImportStarted(res.objects.surveyBackupInfo, res.objects.importingIntoExistingSurvey))
+                const job = res.object
+                dispatch(JobActions.startJobMonitor({
+                    jobId: job.id,
+                    handleJobCompleted: () => {
+                        ServiceFactory.surveyService.fetchSurveyImportStatus().then(importJob => {
+                            const importedSurveyId = importJob.surveyId
+                            dispatch(surveyFileImported(importedSurveyId))
+                        })
+                    }
+                }))
+                dispatch(surveyFileImportStarted())
             }
         })
+    }
+}
+
+function surveyFileImportStarting(surveyName, userGroupId) {
+    return {
+        type: SURVEY_FILE_IMPORT_STARTING,
+        surveyName: surveyName,
+        userGroupId: userGroupId
     }
 }
 
@@ -175,8 +204,9 @@ function surveyFileImportError(errorMessage, fieldErrors) {
     }
 }
 
-export function surveyFileImported() {
+export function surveyFileImported(importedSurveyId) {
     return {
-        type: SURVEY_FILE_IMPORTED
+        type: SURVEY_FILE_IMPORTED,
+        importedSurveyId: importedSurveyId
     }
 }

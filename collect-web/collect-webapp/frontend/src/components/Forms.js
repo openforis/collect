@@ -3,7 +3,7 @@ import { FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
 
-class FormItem extends Component {
+export class FormItem extends Component {
     render() {
         const { label, error, touched, asyncValidating } = this.props
         
@@ -35,16 +35,24 @@ export default class Forms {
         }
     }
 
-    static renderInputField({ input, label, type, meta: { asyncValidating, touched, error } }) {
+    static renderFormItemInputField({ input, label, type, contentEditable, meta: { asyncValidating, touched, error } }) {
         return <FormItem label={label} asyncValidating={asyncValidating} touched={touched} error={error}>
-                <Input valid={error ? false : ''} {...input} type={type} />
+                <Input readOnly={contentEditable===false} valid={error ? false : null} {...input} type={type} />
             </FormItem>
     }
 
-    static renderSelect({ input, label, type, options, meta: { asyncValidating, touched, error } }) {
+    static renderInputField({ input, label, type, contentEditable, meta: { asyncValidating, touched, error } }) {
+        return <Input readOnly={contentEditable===false} valid={error ? false : null} {...input} type={type} />
+    }
+
+    static renderFormItemSelect({ input, label, type, options, contentEditable, meta: { asyncValidating, touched, error } }) {
         return <FormItem label={label} touched={touched} error={error}>
-                <Input valid={error ? false : ''} type="select" {...input}>{options}</Input>
+                <Input readOnly={!contentEditable} valid={error ? false : null} type="select" {...input}>{options}</Input>
             </FormItem>
+    }
+
+    static renderSelect({ input, label, type, options, contentEditable, meta: { asyncValidating, touched, error } }) {
+        return <Input readOnly={!contentEditable} valid={error ? false : null} type="select" {...input}>{options}</Input>
     }
 
     static normalizeInternalName = value => {

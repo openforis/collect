@@ -9,7 +9,7 @@ import * as Formatters from 'components/datatable/formatters'
 import BackupDataImportSummaryForm from 'components/datamanagement/BackupDataImportSummaryForm'
 import ServiceFactory from 'services/ServiceFactory'
 import Arrays from 'utils/Arrays'
-import * as Actions from 'actions';
+import * as JobActions from 'actions/job';
 
 class BackupDataImportPage extends Component {
 
@@ -45,7 +45,7 @@ class BackupDataImportPage extends Component {
             survey.schema.firstRootEntityDefinition.name,
             this.state.fileToBeImported)
         .then(job => {
-            this.props.dispatch(Actions.startJobMonitor({
+            this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id, 
                 title: 'Generating data import summary',
                 okButtonLabel: 'Done',                        
@@ -62,7 +62,7 @@ class BackupDataImportPage extends Component {
     handleRecordSummaryGenerationComplete() {
         const $this = this
         ServiceFactory.recordService.loadBackupDataImportSummary(this.props.survey).then(summary => {
-            this.props.dispatch(Actions.closeJobMonitor())
+            this.props.dispatch(JobActions.closeJobMonitor())
             $this.setState({ 
                 importStep: BackupDataImportPage.SHOW_IMPORT_SUMMARY, 
                 dataImportSummary: summary,
@@ -98,7 +98,7 @@ class BackupDataImportPage extends Component {
         ServiceFactory.recordService.startBackupDataImportFromSummary(this.props.survey, 
             this.state.selectedRecordsToImportIds.concat(this.state.selectedConflictingRecordsIds),
             true).then(job => {
-                this.props.dispatch(Actions.startJobMonitor({
+                this.props.dispatch(JobActions.startJobMonitor({
                     jobId: job.id, 
                     title: 'Importing data',
                     okButtonLabel: 'Done',                        

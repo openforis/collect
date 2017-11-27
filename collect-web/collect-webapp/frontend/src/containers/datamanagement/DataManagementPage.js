@@ -5,6 +5,7 @@ import { Button, ButtonGroup, ButtonToolbar, Container, ButtonDropdown,
 import { connect } from 'react-redux';
 
 import * as Actions from 'actions';
+import * as JobActions from 'actions/job';
 import ServiceFactory from 'services/ServiceFactory'
 import Modals from 'components/Modals'
 import Arrays from 'utils/Arrays'
@@ -134,7 +135,7 @@ class DataManagementPage extends Component {
 		const survey = this.props.survey
         
         ServiceFactory.recordService.startValidationReport(survey.id, null).then(job => {
-            this.props.dispatch(Actions.startJobMonitor({
+            this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id, 
                 title: 'Generating validation report',
                 okButtonLabel: 'Download',                        
@@ -170,7 +171,7 @@ class DataManagementPage extends Component {
 	startRecordsMoveJob(fromStep, promote) {
 		const surveyId = this.props.survey.id
 		ServiceFactory.recordService.startRecordMoveJob(surveyId, fromStep.code, promote).then(job => {
-			this.props.dispatch(Actions.startJobMonitor({
+			this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id, 
 				title: promote ? 'Promoting records': 'Demoting records',
 				handleJobCompleted: this.handleMoveRecordsJobCompleted

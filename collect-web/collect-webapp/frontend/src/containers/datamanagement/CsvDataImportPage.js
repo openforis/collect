@@ -9,7 +9,7 @@ import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';
 import Workflow from 'model/Workflow';
 import Arrays from 'utils/Arrays'
-import * as Actions from 'actions';
+import * as JobActions from 'actions/job';
 import L from 'utils/Labels';
 
 class CsvDataImportPage extends Component {
@@ -71,7 +71,7 @@ class CsvDataImportPage extends Component {
             this.state.deleteEntitiesBeforeImport,
             this.state.newRecordVersionName
         ).then(job => {
-            this.props.dispatch(Actions.startJobMonitor({
+            this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id, 
                 title: 'Importing data',
                 okButtonLabel: 'Ok',                        
@@ -113,7 +113,7 @@ class CsvDataImportPage extends Component {
         ServiceFactory.recordService.loadCsvDataImportStatus(this.props.survey).then(job => {
             if (job.errors.length > 0) {
                 this.setState({errorModalOpen: true, errors: job.errors})
-                setTimeout(() => this.props.dispatch(Actions.closeJobMonitor()))
+                setTimeout(() => this.props.dispatch(JobActions.closeJobMonitor()))
             }
         })
     }

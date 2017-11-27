@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import ServiceFactory from 'services/ServiceFactory'
 import SchemaTreeView from './SchemaTreeView'
-import * as Actions from 'actions';
+import * as JobActions from 'actions/job';
 
 class BackupDataExportPage extends Component {
 
@@ -30,7 +30,7 @@ class BackupDataExportPage extends Component {
             onlyOwnedRecords: this.state.exportOnlyOwnedRecords
         }
         ServiceFactory.recordService.startBackupDataExport(surveyId, backupExportParams).then(job => {
-            this.props.dispatch(Actions.startJobMonitor({
+            this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id, 
                 title: 'Exporting data',
                 okButtonLabel: 'Done',                        
@@ -45,7 +45,7 @@ class BackupDataExportPage extends Component {
             const surveyId = survey.id
             ServiceFactory.recordService.downloadCSVDataExportResult(surveyId)
         }
-        this.props.dispatch(Actions.closeJobMonitor())
+        this.props.dispatch(JobActions.closeJobMonitor())
     }
 
     handleBackupDataExportModalOkButtonClick(job) {
@@ -54,7 +54,7 @@ class BackupDataExportPage extends Component {
             const surveyId = survey.id
             ServiceFactory.recordService.downloadBackupDataExportResult(surveyId)
         }
-        this.props.dispatch(Actions.closeJobMonitor())
+        this.props.dispatch(JobActions.closeJobMonitor())
     }
 
     handleEntityCheck(event) {

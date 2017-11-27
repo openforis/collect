@@ -3,17 +3,16 @@
         "account": "Account",
         "additionalOptions": "Additional Options",
         "new": "New",
-        "forms": {
-            "selectOne": "--- Please select one ---"
-        }
+        "import": "Import"
     },
-   "generic": {
+    "generic": {
         "validation": {
             "invalid_internal_name": "Invalid identifier: the first character must be a letter"
         }
     },
     "forms": {
-        "fileDropMessage": "Click to select a {0} file or drop it here."        
+        "fileDropMessage": "Click to select a {0} file or drop it here.",
+        "selectOne": "--- Please select one ---" 
     },
     "header": {
         "select-survey": "Select survey: "

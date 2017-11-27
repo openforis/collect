@@ -44,26 +44,26 @@ class NewSurveyParametersForm extends Component {
                 <Field
                     name="name"
                     type="text"
-                    component={Forms.renderInputField}
+                    component={Forms.renderFormItemInputField}
                     label={L.l('survey.name')}
                     normalize={Forms.normalizeInternalName}
                 />
                 <Field
                     name="templateType"
-                    component={Forms.renderSelect}
+                    component={Forms.renderFormItemSelect}
                     label={L.l('survey.templateType')}
                     options={templateTypeOptions}
                 />
                 <Field
                     name="defaultLanguageCode"
-                    component={Forms.renderSelect}
+                    component={Forms.renderFormItemSelect}
                     label={L.l('survey.defaultLanguage')}
                     options={languageOptions}
                 />
                 <Field
                     name="userGroupId"
                     multi
-                    component={Forms.renderSelect}
+                    component={Forms.renderFormItemSelect}
                     label={L.l('survey.userGroup')}
                     options={userGroupOptions}
                 />

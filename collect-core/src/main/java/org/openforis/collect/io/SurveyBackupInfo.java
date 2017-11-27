@@ -6,7 +6,9 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Properties;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.Collect;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Dates;
 import org.openforis.commons.versioning.Version;
 
@@ -70,14 +72,19 @@ public class SurveyBackupInfo {
 		return info;
 	}
 	
-	public static SurveyBackupInfo createOldVersionInstance(String surveyUri) {
+	public static SurveyBackupInfo createOldVersionInstance(CollectSurvey survey) {
 		SurveyBackupInfo info = new SurveyBackupInfo();
-		info.surveyUri = surveyUri;
-		info.setCollectVersion(VERSION_3_0);
+		info.surveyUri = survey.getUri();
+		info.surveyName = ObjectUtils.defaultIfNull(survey.getName(), extractNameFromUri(survey.getUri()));
+		info.setCollectVersion(ObjectUtils.defaultIfNull(survey.getCollectVersion(), VERSION_3_0));
 		info.setTimestamp(null);
 		return info;
 	}
 	
+	private static String extractNameFromUri(String uri) {
+		return uri.substring(uri.lastIndexOf('/') + 1);
+	}
+
 	public boolean isOldFormat() {
 		return VERSION_3_0.equals(collectVersion);
 	}
