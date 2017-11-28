@@ -31,6 +31,10 @@ class SurveyImportForm extends Component {
         
     }
 
+    componentWillUnmount() {
+        this.props.dispatch(SurveysActions.resetSurveyFileImport())
+    }
+
     submit(values) {
         this.props.dispatch(SurveysActions.startSurveyFileImport(values.name, values.userGroupId))
     }
@@ -73,7 +77,7 @@ class SurveyImportForm extends Component {
                     </Col>
                 </FormGroup>
                 {surveyFileUploaded &&
-                    <div>
+                    <div className="animated fade-in">
                         {importingIntoExistingSurvey &&
                             <Alert color="warning">{L.l('survey.import.importingIntoExistingSurveyWarning')}</Alert>
                         }

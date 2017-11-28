@@ -1,29 +1,34 @@
 import update from 'react-addons-update';
 
-import Arrays from 'utils/Arrays'
+import Arrays from 'utils/Arrays';
 
 import {
     NEW_SURVEY_CREATED, SURVEY_CREATION_ERROR, UPLOADING_SURVEY_FILE, SURVEY_FILE_UPLOADED, SURVEY_FILE_UPLOAD_ERROR,
-    SURVEY_FILE_IMPORT_STARTED, SURVEY_FILE_IMPORT_ERROR, SURVEY_FILE_IMPORTED
+    SURVEY_FILE_IMPORT_STARTED, SURVEY_FILE_IMPORT_ERROR, SURVEY_FILE_IMPORTED, SURVEY_FILE_IMPORT_RESET
 } from 'actions/surveys'
 
+const SURVEY_FILE_IMPORT_BASE_STATE = {
+    uploadingSurveyFile: false,
+    surveyFileToBeImported: null,
+    surveyFileToBeImportedPreview: null,        
+    surveyFileUploaded: false,
+    surveyFileUploadError: false,
+    surveyFileUploadErrorMessage: null,
+    importingIntoExistingSurvey: false,
+    surveyBackupInfo: null,
+    surveyFileImportStarted: false,
+    surveyFileImported: false,
+    importedSurveyId: null,
+    surveyFileImportErrorMessage: null,
+    surveyFileImportFieldErrors: []
+}
+
+const SURVEYS_BASE_STATE = Object.assign({}, {
+    surveyCreationErrors: []
+}, SURVEY_FILE_IMPORT_BASE_STATE)
+
 function surveys(
-    state = {
-        surveyCreationErrors: [],
-        uploadingSurveyFile: false,
-        surveyFileToBeImported: null,
-        surveyFileToBeImportedPreview: null,        
-        surveyFileUploaded: false,
-        surveyFileUploadError: false,
-        surveyFileUploadErrorMessage: null,
-        importingIntoExistingSurvey: false,
-        surveyBackupInfo: null,
-        surveyFileImportStarted: false,
-        surveyFileImported: false,
-        importedSurveyId: null,
-        surveyFileImportErrorMessage: null,
-        surveyFileImportFieldErrors: []
-    },
+    state = SURVEYS_BASE_STATE,
     action
 ) {
     switch (action.type) {
@@ -78,6 +83,8 @@ function surveys(
                 surveyFileImported: true,
                 importedSurveyId: action.importedSurveyId
             })
+        case SURVEY_FILE_IMPORT_RESET:
+            return Object.assign({}, state, SURVEY_FILE_IMPORT_BASE_STATE)
         default:
             return state
     }

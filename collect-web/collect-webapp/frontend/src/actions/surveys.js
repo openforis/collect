@@ -19,6 +19,7 @@ export const SURVEY_FILE_IMPORT_STARTING = 'SURVEY_FILE_IMPORT_STARTING'
 export const SURVEY_FILE_IMPORT_STARTED = 'SURVEY_FILE_IMPORT_STARTED'
 export const SURVEY_FILE_IMPORTED = 'SURVEY_FILE_IMPORTED'
 export const SURVEY_FILE_IMPORT_ERROR = 'SURVEY_FILE_IMPORT_ERROR'
+export const SURVEY_FILE_IMPORT_RESET = 'SURVEY_FILE_IMPORT_RESET'
 
 const SURVEY_IMPORT_FORM_NAME = 'surveyImportForm'
 
@@ -208,5 +209,11 @@ export function surveyFileImported(importedSurveyId) {
     return {
         type: SURVEY_FILE_IMPORTED,
         importedSurveyId: importedSurveyId
+    }
+}
+
+export function resetSurveyFileImport() {
+    return {
+        type: SURVEY_FILE_IMPORT_RESET
     }
 }
