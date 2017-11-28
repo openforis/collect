@@ -6,7 +6,12 @@ import VersionInfo from 'components/VersionInfo'
 
 class Sidebar extends Component {
 
-  handleClick(e) {
+  constructor(props) {
+    super(props)
+    this.handleNavDropdownClick = this.handleNavDropdownClick.bind(this)
+  }
+
+  handleNavDropdownClick(e) {
     e.preventDefault();
     e.target.parentElement.classList.toggle('open');
   }
@@ -37,28 +42,39 @@ class Sidebar extends Component {
             <li className="nav-item">
               <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="fa fa-database"></i>Data Management</NavLink>
             </li>
-            {loggedUser.canAccessSurveyDesigner ?
-              <li className="nav-item">
-                <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="fa fa-flask"></i>Survey Designer</NavLink>
+            {loggedUser.canAccessSurveyDesigner &&
+              <li className="nav-item nav-dropdown">
+                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleNavDropdownClick}><i className="fa fa-flask" aria-hidden="true"></i>Survey Designer</a>
+                <ul className="nav-dropdown-items">
+                  <li className="nav-item">
+                    <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="fa fa-list" aria-hidden="true"></i> List of surveys</NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to={'/surveydesigner/newsurvey'} className="nav-link" activeClassName="active"><i className="fa fa-file" aria-hidden="true"></i> New survey</NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to={'/surveydesigner/surveyimport'} className="nav-link" activeClassName="active"><i className="fa fa-upload" aria-hidden="true"></i> Import survey</NavLink>
+                  </li>
+                </ul>
               </li>
-              : ''}
-            {loggedUser.canAccessDataCleansing ?
+            }
+            {loggedUser.canAccessDataCleansing &&
               <li className="nav-item">
                 <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="fa fa-diamond"></i>Data Cleansing</NavLink>
               </li>
-            : ''}
+            }
             <li className="nav-item">
               <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="fa fa-map-o"></i>Map</NavLink>
 	          </li>
-            {loggedUser.canAccessSaiku ?
+            {loggedUser.canAccessSaiku &&
               <li className="nav-item">
                 <NavLink to={'/saiku'} className="nav-link" activeClassName="active"><i className="fa fa-bar-chart"></i>Saiku</NavLink>
               </li>
-            : ''}
+            }
             <li className="divider"></li>
             {loggedUser.canAccessUsersManagement ?
               <li className="nav-item nav-dropdown">
-                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleClick.bind(this)}><i className="fa fa-lock"></i>Security</a>
+                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleNavDropdownClick}><i className="fa fa-lock"></i>Security</a>
                 <ul className="nav-dropdown-items">
                   <li className="nav-item">
                     <NavLink to={'/users'} className="nav-link" activeClassName="active"><i className="fa fa-user"></i> Users</NavLink>
