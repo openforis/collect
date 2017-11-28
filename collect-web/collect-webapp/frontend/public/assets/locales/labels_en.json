@@ -10,6 +10,11 @@
             "invalid_internal_name": "Invalid identifier: the first character must be a letter"
         }
     },
+    "global": {
+        "save": {
+            "success": "Saved successfully"
+        }
+    },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
         "selectOne": "--- Please select one ---" 
@@ -105,6 +110,16 @@
             "invalid_username": "The username's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers, underscore (_), hyphen (-) and dot (.) may be used.",
             "wrong_password_pattern": "The password's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers and the underscore may be used.",
             "wrong_retyped_password": "Password and Retyped-Password do not match"
+        }
+    },
+    "usergroup": {
+        "qualifiers": {
+            "heading": "Record attribute / Code list filter",
+            "info": "If specified, users with Data Entry role in the group will be able to insert and see only records having the specified attribute equal to the specified value."
+        },
+        "qualifier": {
+            "name": "Attribute/Code list name",
+            "value": "Attribute/Code value"
         }
     },
     "validation": {

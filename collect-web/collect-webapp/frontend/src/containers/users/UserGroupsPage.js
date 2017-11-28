@@ -7,6 +7,7 @@ import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactst
 
 import AbstractItemsListPage from 'components/AbstractItemsListPage';
 import { fetchUserGroups } from 'actions';
+import RouterUtils from 'utils/RouterUtils';
 
 class UserGroupsPage extends AbstractItemsListPage {
 
@@ -40,7 +41,7 @@ class UserGroupsPage extends AbstractItemsListPage {
 	}
 
 	navigateToItemEditView(itemId) {
-		this.props.history.push('/usergroups/' + itemId)
+		RouterUtils.navigateToUserGroupEditPage(this.props.history, itemId)
 	}
 
   	render() {

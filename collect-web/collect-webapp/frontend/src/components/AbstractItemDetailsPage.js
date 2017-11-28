@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import L from 'utils/Labels'
 
 export default class AbstractItemDetailsPage extends Component {
 
@@ -37,12 +38,12 @@ export default class AbstractItemDetailsPage extends Component {
         let isError = res.status === 'ERROR';
         if (isError) {
             res.errors.forEach(error => {
-                errorFeedback[error.field] = error.code; //TODO give i18n label
+                errorFeedback[error.field] = L.l(error.code)
             })
         }
         let alertMessageOpen = true;
         let alertMessageColor = isError ? 'danger' : 'success';
-        let alertMessageText = isError ? 'global.save.errors_in_form' : 'global.save.success';
+        let alertMessageText = L.l(isError ? 'validation.errorsInTheForm' : 'global.save.success');
         
         this.setState({...this.state, 
             errorFeedback: errorFeedback, 

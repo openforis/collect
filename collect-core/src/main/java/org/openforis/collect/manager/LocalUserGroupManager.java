@@ -206,6 +206,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		List<UserInGroup> oldUsersInGroup = dao.findUsersByGroup(userGroup.getId());
 		Map<Integer, UserInGroup> parameterUsersInGroupByUserId = new HashMap<Integer, UserInGroup>();
 		for (UserInGroup userInGroup : userGroup.getUsers()) {
+			userInGroup.setGroupId(userGroup.getId());
 			parameterUsersInGroupByUserId.put(userInGroup.getUserId(), userInGroup);
 		}
 		Map<Integer, UserInGroup> removedUsersInGroupByUserId = new HashMap<Integer, UserInGroup>();

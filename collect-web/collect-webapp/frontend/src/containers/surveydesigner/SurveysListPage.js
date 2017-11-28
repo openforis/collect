@@ -6,9 +6,10 @@ import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Containe
 
 import * as Formatters from 'components/datatable/formatters';
 import UserGroupColumnEditor from 'components/surveydesigner/UserGroupColumnEditor';
-import L from 'utils/Labels';
 import ServiceFactory from 'services/ServiceFactory';
-import * as SurveyActions  from 'actions/surveys'
+import L from 'utils/Labels';
+import RouterUtils from 'utils/RouterUtils';
+import * as SurveyActions  from 'actions/surveys';
 
 class SurveysListPage extends Component {
 
@@ -33,7 +34,7 @@ class SurveysListPage extends Component {
     }
 
     handleNewButtonClick() {
-        this.props.history.push('/surveydesigner/newsurvey')        
+        RouterUtils.navigateToNewSurveyPage(this.props.history)
 	}
     
     render() {

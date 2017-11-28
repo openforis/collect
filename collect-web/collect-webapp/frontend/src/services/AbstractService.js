@@ -1,5 +1,6 @@
 import Constants from 'utils/Constants';
 import Objects from 'utils/Objects';
+import Strings from 'utils/Strings';
 
 export default class AbstractService {
 
@@ -67,7 +68,7 @@ export default class AbstractService {
     }
 
     _getDeleteOrPatch(method, url, data) {
-        let queryData = this._toQueryData(data);
+        let queryData = this._toQueryData(data, null, false);
         return fetch(this.BASE_URL + url + (queryData === null ? '': '?' + queryData), {
                 credentials: 'include',
                 method: method
@@ -102,14 +103,18 @@ export default class AbstractService {
         window.open(url, windowName ? windowName : '_blank')
     }
 
-    _toQueryData(data, propPrefix) {
+    _toQueryData(data, propPrefix, includeNulls = true) {
         if (! data) {
             return null
         }
         return Object.keys(data).map((key) => {
             const val = data[key];
             if (val === null || val === '') {
-                return null;
+                if (includeNulls) {
+                    return (propPrefix ? propPrefix : '') + encodeURIComponent(key) + '=' + encodeURIComponent(Strings.trimToEmpty(val))
+                } else {
+                    return null
+                }
             } else {
                 if (val instanceof Array) {
                     const arr = val
@@ -119,18 +124,18 @@ export default class AbstractService {
                         if (itemVal !== null && itemVal !== undefined) {
                             if (typeof itemVal === 'object') {
                                 const nestedPropPrefix = encodeURIComponent(key) + '[' + i +'].'
-                                arrQueryDataParts.push(this._toQueryData(itemVal, nestedPropPrefix))
+                                arrQueryDataParts.push(this._toQueryData(itemVal, nestedPropPrefix, includeNulls))
                             } else {
                                 arrQueryDataParts.push(encodeURIComponent(key) + '[' + i +']=' + itemVal)
                             }
                         }
                     }
-                    return arrQueryDataParts.filter(i => i !== null).join('&');
+                    return arrQueryDataParts.filter(i => includeNulls || i !== null).join('&');
                 } else {
                     return (propPrefix ? propPrefix : '') + encodeURIComponent(key) + '=' + encodeURIComponent(val)
                 }
             }
-          }).filter(item => item !== null && item !== '').join('&');
+          }).filter(item => item !== null).join('&');
     }
     
     _handleError(error) {

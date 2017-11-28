@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
-    Form, FormGroup, Label, Input, FormText, FormFeedback } from 'reactstrap';
+    Form, FormGroup, Label, Input, FormText, FormFeedback, UncontrolledTooltip } from 'reactstrap';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
@@ -10,7 +10,9 @@ import { receiveUserGroup } from 'actions/'
 import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage'
 import UserGroupService from 'services/UserGroupService';
 import UserRoleDropdownEditor from './UserRoleDropdownEditor';
-import Arrays from 'utils/Arrays'
+import Arrays from 'utils/Arrays';
+import L from 'utils/Labels';
+import RouterUtils from 'utils/RouterUtils';
 
 class UserGroupDetailsPage extends AbstractItemDetailsPage {
 
@@ -55,6 +57,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     description: '', 
                     visibilityCode: 'P', 
                     enabled: true,
+                    parentId: null,
                     qualifierName: '',
                     qualifierValue: '', 
                     users: [{
@@ -203,7 +206,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             if (wasNewItem) {
                 this.props.dispatch(receiveUserGroup(res.form));
                 const itemId = res.form.id
-                this.props.history.push('/usergroups/' + itemId)
+                RouterUtils.navigateToUserGroupEditPage(this.props.history, itemId)
             }
         }
     }
@@ -335,30 +338,6 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                             }
                         </Col>
                     </FormGroup>
-                    <FormGroup row color={this.getFieldState('qualifierName')}>
-                        <Label for="qualifierName" sm={2}>Qualifier Name</Label>
-                        <Col sm={10}>
-                            <Input type="text" name="qualifierName" id="qualifierName" 
-                                value={this.state.qualifierName}
-                                state={this.getFieldState('qualifierName')}
-                                onChange={(event) => this.setState({...this.state, qualifierName: event.target.value})} />
-                            {this.state.errorFeedback['qualifierName'] &&
-                                <FormFeedback>{this.state.errorFeedback['qualifierName']}</FormFeedback>
-                            }
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row color={this.getFieldState('qualifierValue')}>
-                        <Label for="qualifierValue" sm={2}>Qualifier Value</Label>
-                        <Col sm={10}>
-                            <Input type="text" name="qualifierValue" id="qualifierValue" 
-                                value={this.state.qualifierValue}
-                                state={this.getFieldState('qualifierValue')}
-                                onChange={(event) => this.setState({...this.state, qualifierValue: event.target.value})} />
-                            {this.state.errorFeedback['qualifierValue'] &&
-                                <FormFeedback>{this.state.errorFeedback['qualifierValue']}</FormFeedback>
-                            }
-                        </Col>
-                    </FormGroup>
                     <FormGroup row color={this.getFieldState('enabled')}>
                         <Label for="enabled" sm={2}>Enabled</Label>
                         <Col sm={{ size: 10 }}>
@@ -375,6 +354,36 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                             </FormGroup>
                         </Col>
                     </FormGroup>
+                    <fieldset className="secondary">
+                        <legend>{L.l('usergroup.qualifiers.heading')} <i id="qualifiersHeading" class="info fa fa-info-circle" aria-hidden="true"></i></legend>
+                        <UncontrolledTooltip placement="right" className="info" autohide={false} target="qualifiersHeading">{L.l('usergroup.qualifiers.info')}</UncontrolledTooltip>
+                        <Container fluid>
+                            <FormGroup md={6} row color={this.getFieldState('qualifierName')}>
+                                <Label for="qualifierName" sm={2}>{L.l('usergroup.qualifier.name')}</Label>
+                                <Col sm={10}>
+                                    <Input type="text" name="qualifierName" id="qualifierName" 
+                                        value={this.state.qualifierName}
+                                        state={this.getFieldState('qualifierName')}
+                                        onChange={(event) => this.setState({...this.state, qualifierName: event.target.value})} />
+                                    {this.state.errorFeedback['qualifierName'] &&
+                                        <FormFeedback>{this.state.errorFeedback['qualifierName']}</FormFeedback>
+                                    }
+                                </Col>
+                            </FormGroup>
+                            <FormGroup md={6} row color={this.getFieldState('qualifierValue')}>
+                                <Label for="qualifierValue" sm={2}>{L.l('usergroup.qualifier.value')}</Label>
+                                <Col sm={10}>
+                                    <Input type="text" name="qualifierValue" id="qualifierValue" 
+                                        value={this.state.qualifierValue}
+                                        state={this.getFieldState('qualifierValue')}
+                                        onChange={(event) => this.setState({...this.state, qualifierValue: event.target.value})} />
+                                    {this.state.errorFeedback['qualifierValue'] &&
+                                        <FormFeedback>{this.state.errorFeedback['qualifierValue']}</FormFeedback>
+                                    }
+                                </Col>
+                            </FormGroup>
+                        </Container>
+                    </fieldset>
                     <Row>
                         <Col sm="7">
                             <fieldset className="secondary">

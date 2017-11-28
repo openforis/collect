@@ -137,6 +137,10 @@ span.equal-sign {
   background-size: 16px;
 }
 
+.info {
+    color: #0069d9;
+}
+
 .error {
     color: red;
 }
@@ -206,6 +210,11 @@ span.equal-sign {
 
 label.invalid {
     color: #dc3545;
+}
+
+.tooltip.info .tooltip-inner {
+    background-color: #0069d9;
+    color: white;
 }
 
 .tooltip.success .tooltip-inner {

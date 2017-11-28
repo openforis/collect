@@ -9,6 +9,7 @@ import * as JobActions from 'actions/job';
 import ServiceFactory from 'services/ServiceFactory'
 import Modals from 'components/Modals'
 import Arrays from 'utils/Arrays'
+import RouterUtils from 'utils/RouterUtils'
 import Workflow from 'model/Workflow'
 
 class DataManagementPage extends Component {
@@ -81,7 +82,7 @@ class DataManagementPage extends Component {
 	}
 
 	navigateToItemEditView(itemId) {
-		this.props.history.push('/datamanagement/' + itemId)
+		RouterUtils.navigateToRecordEditPage(this.props.history, itemId)
 	}
 
 	handleRowDoubleClick(record) {
@@ -116,19 +117,19 @@ class DataManagementPage extends Component {
 	}
 
 	handleExportToCsvButtonClick() {
-		this.props.history.push('/datamanagement/csvexport')
+		RouterUtils.navigateToRecordCsvExportPage(this.props.history)
 	}
 
 	handleBackupButtonClick() {
-		this.props.history.push('/datamanagement/backup')
+		RouterUtils.navigateToRecordBackupPage(this.props.history)
 	}
 
 	handleBackupImportButtonClick() {
-		this.props.history.push('/datamanagement/backupimport')
+		RouterUtils.navigateToRecordBackupImportPage(this.props.history)
 	}
 
 	handleCsvImportButtonClick() {
-		this.props.history.push('/datamanagement/csvimport')
+		RouterUtils.navigateToRecordCsvImportPage(this.props.history)
 	}
 
 	handleValidationReportButtonClick() {

@@ -41,14 +41,18 @@ function userGroups(
     case RECEIVE_USER_GROUP:
       const newUserGroup = action.userGroup
       const userGroups = state.items
-      const userGroupIdx = userGroups.findIndex(u => u.id === newUserGroup.id)
-      const oldUserGroup = userGroups[userGroupIdx]
-      const oldUserGroupParentId = oldUserGroup.parentId
-      if (oldUserGroupParentId !== null) {
-        const oldParentGroup = userGroups.find(ug => ug.id === oldUserGroupParentId)
-        oldParentGroup.childrenGroupIds = Arrays.removeItem(oldParentGroup.childrenGroupIds, newUserGroup.id)
-        oldParentGroup.children = Arrays.removeItem(oldParentGroup.children, oldUserGroup)
+      const oldUserGroupIdx = userGroups.findIndex(u => u.id === newUserGroup.id)
+      
+      if (oldUserGroupIdx >= 0) {
+        const oldUserGroup = userGroups[oldUserGroupIdx]
+        const oldUserGroupParentId = oldUserGroup.parentId
+        if (oldUserGroupParentId !== null) {
+          const oldParentGroup = userGroups.find(ug => ug.id === oldUserGroupParentId)
+          oldParentGroup.childrenGroupIds = Arrays.removeItem(oldParentGroup.childrenGroupIds, newUserGroup.id)
+          oldParentGroup.children = Arrays.removeItem(oldParentGroup.children, oldUserGroup)
+        }
       }
+
       if (newUserGroup.parentId === null) {
         newUserGroup.parent = null
       } else {
@@ -59,10 +63,15 @@ function userGroups(
           parentGroup.children.push(newUserGroup)
         }
       }
-        
-      var newUserGroups = update(userGroups, {
-        $splice: [[userGroupIdx, 1, newUserGroup]]
-      });
+      
+      let newUserGroups;
+      if (oldUserGroupIdx >= 0) {
+        newUserGroups = update(userGroups, {
+          $splice: [[oldUserGroupIdx, 1, newUserGroup]]
+        });
+      } else {
+        newUserGroups = Arrays.addItem(userGroups, newUserGroup)
+      }
       return Object.assign({}, state, {
         items: newUserGroups,
         lastUpdated: action.receivedAt

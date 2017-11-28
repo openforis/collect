@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, Col, Container, Row } from 'reactstrap';
 import { connect } from 'react-redux';
 import L from 'utils/Labels'
+import RouterUtils from 'utils/RouterUtils'
 
 import SurveyImportForm from './SurveyImportForm';
 
@@ -12,8 +13,7 @@ class SurveyImportPage extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.surveyFileImported) {
-            //navigate to survey edit
-            this.props.history.push('/surveydesigner/surveys/' + nextProps.importedSurveyId)
+            RouterUtils.navigateToSurveyEditPage(this.props.history, nextProps.importedSurveyId)
         }
     }
 

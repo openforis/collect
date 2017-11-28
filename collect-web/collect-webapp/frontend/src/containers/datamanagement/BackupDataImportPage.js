@@ -9,6 +9,7 @@ import * as Formatters from 'components/datatable/formatters'
 import BackupDataImportSummaryForm from 'components/datamanagement/BackupDataImportSummaryForm'
 import ServiceFactory from 'services/ServiceFactory'
 import Arrays from 'utils/Arrays'
+import RouterUtils from 'utils/RouterUtils'
 import * as JobActions from 'actions/job';
 
 class BackupDataImportPage extends Component {
@@ -108,7 +109,7 @@ class BackupDataImportPage extends Component {
     }
 
     handleDataImportCompleteOkButtonClick() {
-        this.props.history.push('/datamanagement')
+        RouterUtils.navigateToDataManagementHomePage(this.props.history)
     }
 
     render() {
