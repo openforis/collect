@@ -11,10 +11,7 @@ function surveySummaries(
   state = {
     isFetching: false,
     didInvalidate: false,
-    items: [],
-    surveyCreationErrors: [],
-    uploadingSurveyFile: false,
-    surveyFileUploaded: false
+    items: []
   },
   action
 ) {
@@ -49,11 +46,10 @@ function surveySummaries(
         items: newItems,
         lastUpdated: action.receivedAt
       })
-      case NEW_SURVEY_CREATED: {
-        return Object.assign({}, state, {
-          items: Arrays.addItem(state.items, action.summary)
-        })
-      }
+    case NEW_SURVEY_CREATED:
+      return Object.assign({}, state, {
+        items: Arrays.addItem(state.items, action.newSurveySummary)
+      })
     default:
       return state
   }

@@ -12,6 +12,7 @@ export const SURVEY_USER_GROUP_CHANGED = 'SURVEY_USER_GROUP_CHANGED'
 export const REQUEST_CREATE_NEW_SURVEY = 'REQUEST_CREATE_NEW_SURVEY'
 export const NEW_SURVEY_CREATED = 'NEW_SURVEY_CREATED'
 export const SURVEY_CREATION_ERROR = 'SURVEY_CREATION_ERROR'
+export const RESET_NEW_SURVEY_FORM = 'RESET_NEW_SURVEY_FORM'
 export const UPLOADING_SURVEY_FILE = 'UPLOADING_SURVEY_FILE'
 export const SURVEY_FILE_UPLOAD_ERROR = 'SURVEY_FILE_UPLOAD_ERROR'
 export const SURVEY_FILE_UPLOADED = 'SURVEY_FILE_UPLOADED'
@@ -108,10 +109,16 @@ export function createNewSurvey(name, template, defaultLanguageCode, userGroupId
     }
 }
 
-function newSurveyCreated(summary) {
+function newSurveyCreated(newSurveySummary) {
     return {
         type: NEW_SURVEY_CREATED,
-        summary: summary
+        newSurveySummary: newSurveySummary
+    }
+}
+
+export function resetNewSurveyForm() {
+    return {
+        type: RESET_NEW_SURVEY_FORM
     }
 }
 

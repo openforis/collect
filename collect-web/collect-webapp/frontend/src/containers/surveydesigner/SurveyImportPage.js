@@ -31,13 +31,9 @@ class SurveyImportPage extends Component {
 }
 
 const mapStateToProps = state => {
-    const { items: userGroups } = state.userGroups
-    const { uploadingSurveyFile, surveyFileToBeImportedPreview, surveyFileUploaded, surveyBackupInfo, 
-        importingIntoExistingSurvey, surveyFileImported, importedSurveyId, surveyFileUploadError, surveyFileUploadErrorMessage } = state.surveys
+    const { surveyFileImported } = state.surveys
     return {
-        userGroups, 
-        uploadingSurveyFile, surveyFileToBeImportedPreview, surveyFileUploaded, surveyBackupInfo, 
-        importingIntoExistingSurvey, surveyFileImported, importedSurveyId, surveyFileUploadError, surveyFileUploadErrorMessage
+        surveyFileImported
     }
 }
 

@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
 import { Button, Col, Container, Row } from 'reactstrap';
-import L from 'utils/Labels'
+import { connect } from 'react-redux';
 
 import NewSurveyParametersForm from './NewSurveyParametersForm';
+import * as SurveyActions from 'actions/surveys'
+import L from 'utils/Labels';
+import RouterUtils from 'utils/RouterUtils';
 
-export default class NewSurveyPage extends Component {
+class NewSurveyPage extends Component {
+    
     constructor(props) {
         super(props)
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.newSurveyCreated) {
+            const newSurveySummary = nextProps.newSurveySummary
+            this.props.dispatch(SurveyActions.resetNewSurveyForm())
+            RouterUtils.navigateToSurveyEditPage(this.props.history, newSurveySummary.id)
+        }
     }
 
     render() {
@@ -22,3 +34,12 @@ export default class NewSurveyPage extends Component {
     }
 
 }
+
+const mapStateToProps = state => {
+    const { newSurveyCreated, newSurveySummary} = state.surveys
+    return {
+        newSurveyCreated, newSurveySummary
+    }
+}
+
+export default connect(mapStateToProps)(NewSurveyPage)

@@ -1,9 +1,5 @@
 export default class RouterUtils {
 
-    static navigateToSurveyEditPage(history, surveyId) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/surveys/' + surveyId)
-    }
-
     static navigateToDataManagementHomePage(history) {
         RouterUtils._navigateToUrl(history, '/datamanagement')
     }
@@ -30,6 +26,10 @@ export default class RouterUtils {
 
     static navigateToNewSurveyPage(history) {
         RouterUtils._navigateToUrl(history, '/surveydesigner/newsurvey')
+    }
+
+    static navigateToSurveyEditPage(history, surveyId) {
+        RouterUtils._navigateToUrl(history, '/surveydesigner/surveys/' + surveyId)
     }
 
     static navigateToUserGroupEditPage(history, userGroupId) {

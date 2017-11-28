@@ -3,7 +3,7 @@ import update from 'react-addons-update';
 import Arrays from 'utils/Arrays';
 
 import {
-    NEW_SURVEY_CREATED, SURVEY_CREATION_ERROR, UPLOADING_SURVEY_FILE, SURVEY_FILE_UPLOADED, SURVEY_FILE_UPLOAD_ERROR,
+    NEW_SURVEY_CREATED, SURVEY_CREATION_ERROR, RESET_NEW_SURVEY_FORM, UPLOADING_SURVEY_FILE, SURVEY_FILE_UPLOADED, SURVEY_FILE_UPLOAD_ERROR,
     SURVEY_FILE_IMPORT_STARTED, SURVEY_FILE_IMPORT_ERROR, SURVEY_FILE_IMPORTED, SURVEY_FILE_IMPORT_RESET
 } from 'actions/surveys'
 
@@ -24,7 +24,9 @@ const SURVEY_FILE_IMPORT_BASE_STATE = {
 }
 
 const SURVEYS_BASE_STATE = Object.assign({}, {
-    surveyCreationErrors: []
+    surveyCreationErrors: [],
+    newSurveyCreated: false,
+    newSurveySummary: null
 }, SURVEY_FILE_IMPORT_BASE_STATE)
 
 function surveys(
@@ -32,17 +34,22 @@ function surveys(
     action
 ) {
     switch (action.type) {
-        case NEW_SURVEY_CREATED: {
+        case NEW_SURVEY_CREATED:
             return Object.assign({}, state, {
-                surveyCreationErrors: [],
-                items: Arrays.addItem(state.items, action.summary)
+                newSurveyCreated: true,
+                newSurveySummary: action.newSurveySummary,
+                surveyCreationErrors: []
             })
-        }
-        case SURVEY_CREATION_ERROR: {
+        case SURVEY_CREATION_ERROR:
             return Object.assign({}, state, {
                 surveyCreationErrors: action.errors
             })
-        }
+        case RESET_NEW_SURVEY_FORM:
+            return Object.assign({}, state, {
+                newSurveyCreated: false,
+                newSurveySummary: null,
+                surveyCreationErrors: []
+            })
         case UPLOADING_SURVEY_FILE:
             return Object.assign({}, state, {
                 uploadingSurveyFile: true,
