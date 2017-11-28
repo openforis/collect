@@ -378,11 +378,7 @@ public class SchemaVM extends SurveyBaseVM {
 				String committedLabel = editedNode instanceof NodeDefinition ? ((NodeDefinition) editedNode).getName()
 						: ((UITab) editedNode).getLabel(currentLanguageCode);
 				updateTreeNodeLabel(editedNode, committedLabel);
-
-				// restore tree node icon
-				if (editedNode instanceof KeyAttributeDefinition) {
-					updateTreeNodeIcon(editedNode, ((KeyAttributeDefinition) editedNode).isKey());
-				}
+				updateTreeNodeIcon();
 			}
 			resetEditingStatus(false);
 		}
@@ -396,12 +392,21 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	public void editedNodeKeyChanging(@BindingParam("item") SurveyObject item, @BindingParam("key") boolean key) {
+	public void editedNodeKeyChanging(@BindingParam("item") SurveyObject item, 
+			@BindingParam("key") boolean key) {
 		if (editedNode != null && editedNode == item) {
-			updateTreeNodeIcon(editedNode, key);
+			updateTreeNodeIcon(editedNode, key, false);
 		}
 	}
 
+	@GlobalCommand
+	public void editedNodeCalculatedPropertyChanging(@BindingParam("item") SurveyObject item, 
+			@BindingParam("calculated") boolean calculated) {
+		if (editedNode != null && editedNode == item) {
+			updateTreeNodeIcon(editedNode, false, calculated);
+		}
+	}
+	
 	// TODO move it to tree model class
 	private Treeitem getTreeItem(SurveyObject item) {
 		for (Treeitem treeItem : nodesTree.getItems()) {
@@ -423,11 +428,17 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 
-	private void updateTreeNodeIcon(SurveyObject item, boolean key) {
+	private void updateTreeNodeIcon() {
+		boolean key = editedNode instanceof AttributeDefinition ? ((AttributeDefinition) editedNode).isKey() : false;
+		boolean calculated = editedNode instanceof AttributeDefinition ? ((AttributeDefinition) editedNode).isCalculated() : false;
+		updateTreeNodeIcon(editedNode, key, calculated);
+	}
+	
+	private void updateTreeNodeIcon(SurveyObject item, boolean key, boolean calculated) {
 		Treeitem treeItem = getTreeItem(item);
 		if (treeItem != null) {
 			SchemaNodeData data = treeModel.getNodeData(item);
-			String icon = getIcon(data, key);
+			String icon = getIcon(data, key, calculated);
 			treeItem.setImage(icon);
 		}
 	}
@@ -1067,10 +1078,11 @@ public class SchemaVM extends SurveyBaseVM {
 	public static String getIcon(SchemaNodeData data) {
 		SurveyObject surveyObject = data.getSurveyObject();
 		boolean key = surveyObject instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) surveyObject).isKey();
-		return getIcon(data, key);
+		boolean calculated = surveyObject instanceof AttributeDefinition && ((AttributeDefinition) surveyObject).isCalculated();
+		return getIcon(data, key, calculated);
 	}
 
-	public static String getIcon(SchemaNodeData data, boolean key) {
+	public static String getIcon(SchemaNodeData data, boolean key, boolean calculated) {
 		SurveyObject surveyObject = data.getSurveyObject();
 		String imagesRootPath = NODE_TYPES_IMAGES_PATH;
 		if (surveyObject instanceof UITab) {
@@ -1079,7 +1091,7 @@ public class SchemaVM extends SurveyBaseVM {
 			return getEntityIcon((EntityDefinition) surveyObject);
 		} else if (key) {
 			return imagesRootPath + "key-small.png";
-		} else if (surveyObject instanceof AttributeDefinition && ((AttributeDefinition) surveyObject).isCalculated()) {
+		} else if (calculated) {
 			return imagesRootPath + "calculated-small.png";
 		} else {
 			AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) surveyObject);
