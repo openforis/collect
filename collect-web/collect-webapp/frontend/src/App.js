@@ -21,6 +21,7 @@ import SurveyDesignerPage from 'containers/SurveyDesignerPage'
 import SurveyEditPage from 'containers/surveydesigner/SurveyEditPage'
 import SurveysListPage from 'containers/surveydesigner/SurveysListPage'
 import NewSurveyPage from './containers/surveydesigner/NewSurveyPage';
+import SurveyExportPage from './containers/surveydesigner/SurveyExportPage';
 import SurveyImportPage from './containers/surveydesigner/SurveyImportPage';
 import UsersPage from 'containers/users/UsersPage'
 import UserGroupsPage from 'containers/users/UserGroupsPage'
@@ -54,6 +55,7 @@ class App extends Component {
                   <Route path="/surveydesigner/newsurvey" exact name="NewSurvey" component={NewSurveyPage}/>
                   <Route path="/surveydesigner/surveyimport" exact name="SurveyImport" component={SurveyImportPage}/>
                   <Route path="/surveydesigner/surveys/:id" exact name="SurveyEdit" component={SurveyEditPage}/>
+                  <Route path="/surveydesigner/surveys/export/:id" exact name="SurveyExport" component={SurveyExportPage}/>
                   <Route path="/users" exact name="Users" component={UsersPage}/>
                   <Route path="/usergroups" exact name="User Groups" component={UserGroupsPage}/>
                   <Route path="/usergroups/:id" name="User Group" component={UserGroupDetailsPage}/>

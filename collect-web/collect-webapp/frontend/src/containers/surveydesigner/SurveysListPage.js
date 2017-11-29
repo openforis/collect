@@ -8,6 +8,7 @@ import * as Formatters from 'components/datatable/formatters';
 import UserGroupColumnEditor from 'components/surveydesigner/UserGroupColumnEditor';
 import ServiceFactory from 'services/ServiceFactory';
 import L from 'utils/Labels';
+import Arrays from 'utils/Arrays';
 import RouterUtils from 'utils/RouterUtils';
 import * as SurveyActions  from 'actions/surveys';
 
@@ -17,11 +18,18 @@ class SurveysListPage extends Component {
         super(props)
 
         this.state = {
-
+            selectedSurvey: null,
+            selectedSurveys: [],
+            selectedSurveyIds: []
         }
 
         this.handleCellEdit = this.handleCellEdit.bind(this)
+        this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
+        this.handleRowSelect = this.handleRowSelect.bind(this)
+        this.handleSurveysSelection = this.handleSurveysSelection.bind(this)
         this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
+        this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
+        this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
     }
 
     handleCellEdit(row, fieldName, value) {
@@ -35,13 +43,39 @@ class SurveysListPage extends Component {
 
     handleNewButtonClick() {
         RouterUtils.navigateToNewSurveyPage(this.props.history)
+    }
+    
+    handleRowDoubleClick(surveySummary) {
+        RouterUtils.navigateToSurveyEditPage(this.props.history, surveySummary.id)
+    }
+
+    handleEditButtonClick() {
+        this.handleRowDoubleClick(this.state.selectedSurvey)
+    }
+
+    handleExportButtonClick() {
+        RouterUtils.navigateToSurveyExportPage(this.props.history, this.state.selectedSurvey.id)
+    }
+
+    handleRowSelect(row, isSelected, e) {
+        const newSelectedSurveys = isSelected ? [row] : []
+		this.handleSurveysSelection(newSelectedSurveys)
+	}
+
+	handleSurveysSelection(newSelectedSurveys) {
+		this.setState({
+			...this.state,
+			selectedSurvey: Arrays.getUniqueItemOrNull(newSelectedSurveys),
+			selectedSurveyIds: newSelectedSurveys.map(item => item.id),
+			selectedSurveys: newSelectedSurveys
+		})
 	}
     
     render() {
-        if (this.props.surveySummaries == null) {
+        const { surveySummaries, userGroups } = this.props
+        if (this.surveySummaries === null || userGroups === null) {
             return <div>Loading...</div>
         }
-        const userGroups = this.props.userGroups
 
         const createUserGroupEditor = (onUpdate, props) => (<UserGroupColumnEditor onUpdate={onUpdate} {...props} />);
         
@@ -68,20 +102,32 @@ class SurveysListPage extends Component {
         return (
             <Container fluid>
                 <Row className="justify-content-between">
-					<Col sm={{size: 4}}>
+					<Col sm={4}>
 						<Button color="info" onClick={this.handleNewButtonClick}>{L.l('general.new')}</Button>
 					</Col>
+                    {this.state.selectedSurvey &&
+                        <div>
+                            <Button color="success" onClick={this.handleEditButtonClick}>Edit</Button>
+                            <Button color="primary" onClick={this.handleExportButtonClick}>Export</Button>
+                            <Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/></Button>
+                        </div>
+                    }
                 </Row>
                 <BootstrapTable
-                    data={this.props.surveySummaries}
+                    data={surveySummaries}
                     striped hover condensed
                     height="100%"
                     selectRow={{
-                        mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
-                        selected: this.props.selectedItemIds
+                        mode: 'radio',  // single select
+                        clickToSelect: true, 
+                        hideSelectionColumn: true, 
+                        bgColor: 'lightBlue',
+                        onSelect: this.handleRowSelect,
+                        selected: this.state.selectedSurveyIds
                     }}
                     cellEdit={{ mode: 'click', blurToSave: true }}
                     options={{
+                        onRowDoubleClick: this.handleRowDoubleClick,
                         onCellEdit: this.handleCellEdit
                     }}
                 >

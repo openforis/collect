@@ -38,10 +38,11 @@ class SurveySelect extends Component {
 	}
 	
     render() {
-    	const { selectedSurvey, summaries } = this.props
-    	const isEmpty = summaries.length === 0
+		const { selectedSurvey, summaries } = this.props
+		const publishedSurveys = summaries.filter(s => s.published)
+    	const isEmpty = publishedSurveys.length === 0
     	
-    	const dropdownItems = summaries.map(s => 
+    	const dropdownItems = publishedSurveys.map(s => 
 			<DropdownItem key={s.id} className="survey-item" onClick={this.handleSurveySelect.bind(this, s.id)}>
 				<div className="survey-name">{s.name}</div><div className="survey-project-name">{s.projectName}</div>
 			</DropdownItem>)

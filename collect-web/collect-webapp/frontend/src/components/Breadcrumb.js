@@ -13,9 +13,7 @@ const findRouteName = function(match) {
       return false;
     }
   });
-  if (route === undefined) {
-    return "Undefined";
-  } else {
+  if (route !== undefined) {
     return route.name;
   }
 };

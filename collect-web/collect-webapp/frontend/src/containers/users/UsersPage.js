@@ -74,9 +74,14 @@ class UsersPage extends AbstractItemsListPage {
 						<BootstrapTable
 							ref="table"
 							data={this.props.users}
-							striped hover selectRow={ 
-								{mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
-									onSelect: this.handleRowSelect, selected: this.state.selectedItemIds} 
+							striped hover selectRow={ {
+								mode: 'checkbox', 
+								clickToSelect: true, 
+								hideSelectionColumn: true, 
+								bgColor: 'lightBlue', 
+								onSelectAll: this.handleAllRowsSelect,
+								onSelect: this.handleRowSelect, 
+								selected: this.state.selectedItemIds} 
 							}
 							>
 							<TableHeaderColumn dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>

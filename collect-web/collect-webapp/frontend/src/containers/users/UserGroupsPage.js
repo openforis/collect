@@ -65,7 +65,9 @@ class UserGroupsPage extends AbstractItemsListPage {
 						<BootstrapTable
 							data={editableUserGroups}
 							striped	hover	condensed
-							selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', onSelect: this.handleRowSelect,
+							selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
+								onSelect: this.handleRowSelect, 
+								onSelectAll: this.handleAllRowsSelect,
 								selected: this.state.selectedItemIds} }
 							options={{ onRowDoubleClick: this.handleRowDoubleClick}}
 							>

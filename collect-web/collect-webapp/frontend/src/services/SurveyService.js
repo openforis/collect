@@ -33,7 +33,9 @@ export default class SurveyService extends AbstractService {
     }
     
     fetchAllSummaries() {
-        return this.get('survey')
+        return this.get('survey', {
+            includeTemporary: true
+        })
     }
 
     uploadSurveyFile(file) {
@@ -58,5 +60,20 @@ export default class SurveyService extends AbstractService {
 
     fetchSurveyImportStatus() {
         return this.get('survey/importstatus')
+    }
+
+    startExport(surveyId, surveyUri, surveyType, outputFormat, languageCode, skipValidation) {
+        return this.post('survey/export/' + surveyId, {
+            surveyId: surveyId,
+            surveyUri: surveyUri,
+            surveyType: surveyType,
+            outputFormat: outputFormat,
+            languageCode: languageCode,
+            skipValidation: skipValidation
+        })
+    }
+
+    downloadExportResult(surveyId) {
+        return this.downloadFile(this.BASE_URL + 'survey/export/' + surveyId + '/result')
     }
 }

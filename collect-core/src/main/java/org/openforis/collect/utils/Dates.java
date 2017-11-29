@@ -16,6 +16,7 @@ public class Dates {
 
 	private static final String LOCAL_DATE_TIME_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss";
 	private static final String DATE_TIME_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	private static final String COMPACT_DATE_TIME_FORMAT 	= "yyyyMMdd'T'HHmmss";
 	private static final String DATE_FORMAT 		= "yyyy-MM-dd";
 
 	public static Date millisToDate(long millis) {
@@ -77,6 +78,10 @@ public class Dates {
 		return format(dateTime, LOCAL_DATE_TIME_FORMAT);
 	}
 	
+	public static Object formatCompactDateTime(Date dateTime) {
+		return format(dateTime, COMPACT_DATE_TIME_FORMAT);
+	}
+
 	public static String formatDateTime(Date dateTime) {
 		String value = format(dateTime, DATE_TIME_FORMAT);
 		if (value == null) {
@@ -138,4 +143,5 @@ public class Dates {
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
 	}
+
 }

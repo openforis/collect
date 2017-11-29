@@ -1,6 +1,7 @@
 package org.openforis.collect.metamodel.view;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.metamodel.SurveyTarget;
@@ -28,6 +29,8 @@ public class SurveyView {
 	private CeoApplicationOptions ceoApplicationOptions;
 	private UIConfiguration uiConfiguration;
 	private SurveyAvailability availability;
+	private Date creationDate;
+	private Date modifiedDate;
 	
 	public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
 		this.id = id;
@@ -36,18 +39,20 @@ public class SurveyView {
 		this.target = target;
 	}
 	
-	public SurveyView(CollectSurvey survey) {
-		this(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
-		this.projectName = survey.getProjectName();
-		this.description = survey.getDescription();
-		this.defaultLanguage = survey.getDefaultLanguage();
-		this.languages = survey.getLanguages();
-		this.userGroupId = survey.getUserGroupId();
-		this.userGroup = survey.getUserGroup();
+	public SurveyView(CollectSurvey s) {
+		this(s.getId(), s.getName(), s.isTemporary(), s.getTarget());
+		this.projectName = s.getProjectName();
+		this.description = s.getDescription();
+		this.defaultLanguage = s.getDefaultLanguage();
+		this.languages = s.getLanguages();
+		this.userGroupId = s.getUserGroupId();
+		this.userGroup = s.getUserGroup();
 		this.schema = new SchemaView();
-		this.uiConfiguration = survey.getUIConfiguration();
-		this.ceoApplicationOptions = survey.getApplicationOptions(CeoApplicationOptions.TYPE);
-		this.availability = survey.getAvailability();
+		this.uiConfiguration = s.getUIConfiguration();
+		this.ceoApplicationOptions = s.getApplicationOptions(CeoApplicationOptions.TYPE);
+		this.availability = s.getAvailability();
+		this.modifiedDate = s.getModifiedDate();
+		this.creationDate = s.getCreationDate();
 	}
 
 	public UIConfigurationView getUiConfiguration() {
@@ -148,5 +153,13 @@ public class SurveyView {
 	
 	public SurveyAvailability getAvailability() {
 		return availability;
+	}
+	
+	public Date getCreationDate() {
+		return creationDate;
+	}
+	
+	public Date getModifiedDate() {
+		return modifiedDate;
 	}
 }

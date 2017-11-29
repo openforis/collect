@@ -639,6 +639,7 @@ public class SurveyManager {
 			} else {
 				temporarySurveySummary.setAvailability(PUBLISHED);
 				temporarySurveySummary.setPublished(true);
+				temporarySurveySummary.setPublishedId(publishedSurveySummary.getId());
 				temporarySurveySummary.setRecordValidationProcessStatus(publishedSurveySummary.getRecordValidationProcessStatus());
 			}
 		}

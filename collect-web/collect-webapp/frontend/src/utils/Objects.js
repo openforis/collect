@@ -32,4 +32,13 @@ export default class Objects {
         }
     }
 
+    static matchesKeyValuePairs(obj, keyValuePairs) {
+        let matching = true
+        Object.keys(keyValuePairs).forEach(key => {
+            if (obj[key] !== keyValuePairs[key]) {
+                matching = false
+            }
+        })
+        return matching
+    }
 }

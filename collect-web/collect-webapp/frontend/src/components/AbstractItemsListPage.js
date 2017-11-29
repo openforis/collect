@@ -14,25 +14,23 @@ export default class AbstractItemsListPage extends Component {
         };
         
 		this.handleRowSelect = this.handleRowSelect.bind(this)
+		this.handleAllRowsSelect = this.handleAllRowsSelect.bind(this)
 		this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
 		this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
     }
     
     handleRowSelect(row, isSelected, e) {
+		let newSelectedItems
 		if (isSelected) {
-			this.handleItemSelected(row);
+			newSelectedItems = this.state.singleSelection ? [row] : Arrays.addItem(this.state.selectedItems, row);
 		} else {
-			this.handleItemUnselected(row);
+			newSelectedItems = Arrays.removeItem(this.state.selectedItems, row)
 		}
-	}
-
-	handleItemSelected(item) {
-		const newSelectedItems = this.state.singleSelection ? [item] : Arrays.addItem(this.state.selectedItems, item);
 		this.handleItemsSelection(newSelectedItems)
 	}
 
-	handleItemUnselected(item) {
-		const newSelectedItems = Arrays.removeItem(this.state.selectedItems, item)
+	handleAllRowsSelect(isSelected, rows) {
+		let newSelectedItems = Arrays.addOrRemoveItems(this.state.selectedItems, rows, !isSelected);
 		this.handleItemsSelection(newSelectedItems)
 	}
 

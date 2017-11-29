@@ -1,5 +1,6 @@
 package org.openforis.collect.web.controller;
 
+import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.TEMPORARY;
 import static org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator.PLACEMARK_FILE_NAME;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -7,31 +8,40 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.CESurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.SurveyBackupInfoExtractorJob;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyRestoreJob;
 import org.openforis.collect.io.XMLSurveyRestoreJob;
 import org.openforis.collect.io.ZipFileExtractor;
+import org.openforis.collect.manager.CollectEarthSurveyExportJob;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -45,6 +55,8 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.collect.utils.Controllers;
+import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.SurveyController.SurveyCreationParameters.TemplateType;
@@ -52,6 +64,7 @@ import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidat
 import org.openforis.collect.web.validator.SurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyImportParametersValidator;
 import org.openforis.commons.web.Response;
+import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -95,6 +108,8 @@ public class SurveyController extends BasicController {
 	private JobManager jobManager;
 	@Autowired
 	private SessionManager sessionManager;
+	@Autowired
+	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 
 	//validators
 	@Autowired
@@ -108,6 +123,7 @@ public class SurveyController extends BasicController {
 	private File uploadedSurveyFile;
 	private SurveyBackupInfo uploadedSurveyInfo;
 	private AbstractSurveyRestoreJob surveyImportJob;
+	private Job surveyBackupJob;
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -123,6 +139,7 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@RequestMapping(method=GET)
 	public @ResponseBody
 	List<?> loadSurveys(
@@ -132,6 +149,9 @@ public class SurveyController extends BasicController {
 			@RequestParam(value="includeCodeListValues", required=false) boolean includeCodeListValues,
 			@RequestParam(value="includeTemporary", required=false) boolean includeTemporary) throws Exception {
 		String languageCode = Locale.ENGLISH.getLanguage();
+		if (userId == null) {
+			userId = sessionManager.getLoggedUser().getId();
+		}
 		Set<UserGroup> groups = getAvailableUserGrups(userId, groupId);
 		List<SurveySummary> summaries = includeTemporary ? surveyManager.loadCombinedSummaries(languageCode, true, groups, null)
 				: surveyManager.getSurveySummaries(languageCode, groups);
@@ -145,6 +165,7 @@ public class SurveyController extends BasicController {
 				views.add(surveySummary);
 			}
 		}
+		views.sort(new BeanComparator("modifiedDate"));
 		return views;
 	}
 
@@ -354,6 +375,81 @@ public class SurveyController extends BasicController {
 		return generateView(survey, false);
 	}
 	
+	@RequestMapping(value = "export/{id}", method=POST)
+	public @ResponseBody JobView startExport(@Valid SurveyExportParameters params, BindingResult result) {
+		this.surveyBackupJob = null;
+		
+		String uri = params.getSurveyUri();
+		boolean skipValidation = params.isSkipValidation();
+		
+		SurveySummary surveySummary = surveyManager.loadSummaryByUri(uri);
+		final CollectSurvey loadedSurvey;
+		if ( surveySummary.isTemporary() && params.getSurveyType() == TEMPORARY ) {
+			loadedSurvey = surveyManager.loadSurvey(surveySummary.getId());
+		} else {
+			loadedSurvey = surveyManager.getByUri(uri);
+		}
+		switch(params.getOutputFormat()) {
+		case EARTH: {
+//			if (skipValidation || collectEarthSurveyValidator.validate(loadedSurvey).isOk()) {
+			CollectEarthSurveyExportJob job = jobManager.createJob(CollectEarthSurveyExportJob.class);
+			job.setSurvey(loadedSurvey);
+			job.setLanguageCode(params.getLanguageCode());
+			jobManager.start(job, String.valueOf(loadedSurvey.getId()));
+			this.surveyBackupJob = job;
+			return new JobView(job);
+		}
+//			} else {
+//				res.setErrorStatus();
+//				res.setErrorMessage("survey.validation.errors");
+//			}
+//		case RDB:
+//			RDBPrintJob job = null;
+//			job = new RDBPrintJob();
+//			job.setSurvey(loadedSurvey);
+//			job.setTargetSchemaName(loadedSurvey.getName());
+//			job.setRecordManager(recordManager);
+//			RecordFilter recordFilter = new RecordFilter(loadedSurvey);
+//			job.setRecordFilter(recordFilter);
+//			job.setIncludeData(parameters.isIncludeData());
+//			job.setDialect(parameters.getRdbDialectEnum());
+//			job.setDateTimeFormat(parameters.getRdbDateTimeFormat());
+//			job.setTargetSchemaName(parameters.getRdbTargetSchemaName());
+//			jobManager.start(job, String.valueOf(loadedSurvey.getId()));
+//
+//			break;
+		case MOBILE:
+		default:
+			SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
+			job.setSurvey(loadedSurvey);
+//			surveyBackupJob.setIncludeData(parameters.isIncludeData());
+//			surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
+			job.setOutputFormat(org.openforis.collect.io.SurveyBackupJob.OutputFormat.valueOf(params.getOutputFormat().name()));
+			job.setOutputSurveyDefaultLanguage(ObjectUtils.defaultIfNull(params.getLanguageCode(), loadedSurvey.getDefaultLanguage()));
+			jobManager.start(job, String.valueOf(loadedSurvey.getId()));
+			this.surveyBackupJob = job;
+			return new JobView(job);
+		}
+	}
+	
+	@RequestMapping(value="export/{surveyId}/result", method=GET)
+	public void downloadCsvExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
+		if (surveyBackupJob != null) {
+			File outputFile;
+			CollectSurvey survey;
+			if (surveyBackupJob instanceof CollectEarthSurveyExportJob) {
+				outputFile = ((CollectEarthSurveyExportJob) surveyBackupJob).getOutputFile();
+				survey = ((CollectEarthSurveyExportJob) surveyBackupJob).getSurvey();
+			} else {
+				outputFile = ((SurveyBackupJob) surveyBackupJob).getOutputFile();
+				survey = ((SurveyBackupJob) surveyBackupJob).getSurvey();
+			}
+			String surveyName = survey.getName();
+			String fileName = String.format("%s_%s.%s", surveyName, Dates.formatCompactDateTime(survey.getModifiedDate()), FilenameUtils.getExtension(outputFile.getName()));
+			Controllers.writeFileToResponse(response, outputFile, fileName, Controllers.ZIP_CONTENT_TYPE);
+		}
+	}
+	
 	private SurveyView generateView(CollectSurvey survey, boolean includeCodeListValues) {
 		if (survey == null) {
 			return null;
@@ -465,6 +561,68 @@ public class SurveyController extends BasicController {
 		
 		public void setUserGroupId(Integer userGroupId) {
 			this.userGroupId = userGroupId;
+		}
+	}
+	
+	public static class SurveyExportParameters {
+		
+		private String surveyUri;
+		private Integer surveyId;
+		private SurveyType surveyType;
+		private OutputFormat outputFormat;
+		private String languageCode;
+		private boolean skipValidation;
+		
+		public enum OutputFormat {
+			MOBILE, DESKTOP, RDB, EARTH
+		}
+		
+		public String getSurveyUri() {
+			return surveyUri;
+		}
+
+		public void setSurveyUri(String surveyUri) {
+			this.surveyUri = surveyUri;
+		}
+
+		public Integer getSurveyId() {
+			return surveyId;
+		}
+
+		public void setSurveyId(Integer surveyId) {
+			this.surveyId = surveyId;
+		}
+		
+		public SurveyType getSurveyType() {
+			return surveyType;
+		}
+		
+		public void setSurveyType(SurveyType surveyType) {
+			this.surveyType = surveyType;
+		}
+		
+		public OutputFormat getOutputFormat() {
+			return outputFormat;
+		}
+		
+		public void setOutputFormat(OutputFormat outputFormat) {
+			this.outputFormat = outputFormat;
+		}
+		
+		public String getLanguageCode() {
+			return languageCode;
+		}
+		
+		public void setLanguageCode(String languageCode) {
+			this.languageCode = languageCode;
+		}
+		
+		public boolean isSkipValidation() {
+			return skipValidation;
+		}
+		
+		public void setSkipValidation(boolean skipValidation) {
+			this.skipValidation = skipValidation;
 		}
 	}
 	

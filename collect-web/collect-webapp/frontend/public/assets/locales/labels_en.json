@@ -13,6 +13,9 @@
     "global": {
         "save": {
             "success": "Saved successfully"
+        },
+        "export": {
+            "label": "Export"
         }
     },
     "forms": {
@@ -93,6 +96,17 @@
         "target": "Target",
         "validation": {
             "nameAlreadyInUse": "Identifier already in use"            
+        },
+        "export": {
+            "surveyType": {
+                "temporary": "Unpublished changes",
+                "published": "Published"
+            },
+            "mode": {
+                "desktop": "Collect Desktop (backup)",
+                "earth": "Collect Earth",
+                "mobile": "Collect Mobile"
+            }
         },
         "import": {
             "file": "File",

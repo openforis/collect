@@ -2,12 +2,27 @@ import Objects from './Objects'
 
 export default class Arrays {
 
-    static contains(array, item) {
-        return array.indexOf(item) >= 0
+    static contains(array, item, keyProp) {
+        return Arrays.indexOf(array, item, keyProp) >= 0
     }
 
     static clone(array) {
         return array.slice(0)
+    }
+
+    static getUniqueItemOrNull(array) {
+		return array.length === 1 ? array[0] : null;
+	}
+
+    static indexOf(array, item, keyProp=null) {
+        if (keyProp === null) {
+            return array.indexOf(item)
+        } else {
+            const keyValuePairs = {}
+            keyValuePairs[keyProp] = item[keyProp]
+            const idx = array.findIndex(el => Objects.matchesKeyValuePairs(el, keyValuePairs))
+            return idx
+        }
     }
 
     /**
@@ -19,8 +34,8 @@ export default class Arrays {
      * 
      * @returns {Array}
      */
-    static addItem(array, item, onlyIfNotExists=false) {
-        if (onlyIfNotExists && Arrays.contains(array, item)) {
+    static addItem(array, item, onlyIfNotExists=false, keyProp) {
+        if (onlyIfNotExists && Arrays.contains(array, item, keyProp)) {
             return Arrays.clone(array)
         } else {
             return array.concat([item])
@@ -35,8 +50,8 @@ export default class Arrays {
      * 
      * @returns {Array}
      */
-    static removeItem(array, item) {
-        const idx = array.indexOf(item)
+    static removeItem(array, item, keyProp) {
+        const idx = Arrays.indexOf(array, item, keyProp)
         if (idx < 0) {
             return Arrays.clone(array)
         } else {
@@ -44,8 +59,8 @@ export default class Arrays {
         }
     }
 
-    static removeItems(array, items) {
-        return Arrays.addOrRemoveItems(array, items, true)
+    static removeItems(array, items, keyProp) {
+        return Arrays.addOrRemoveItems(array, items, true, keyProp)
     }
 
     /**
@@ -56,17 +71,17 @@ export default class Arrays {
      * 
      * @returns {Array}
      */
-    static addOrRemoveItem(array, item, remove=false) {
+    static addOrRemoveItem(array, item, remove=false, keyProp) {
         if (remove) {
-            return Arrays.removeItem(array, item)
+            return Arrays.removeItem(array, item, keyProp)
         } else {
-            return Arrays.addItem(array, item)
+            return Arrays.addItem(array, item, true, keyProp)
         }
     }
 
-    static addOrRemoveItems(array, items, remove=false) {
+    static addOrRemoveItems(array, items, remove=false, keyProp) {
         let result = Arrays.clone(array)
-        items.forEach(item => result = Arrays.addOrRemoveItem(result, item, remove))
+        items.forEach(item => result = Arrays.addOrRemoveItem(result, item, remove, keyProp))
         return result
     }
 

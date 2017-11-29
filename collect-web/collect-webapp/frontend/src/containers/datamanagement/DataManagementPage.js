@@ -108,12 +108,8 @@ class DataManagementPage extends Component {
 			...this.state,
 			selectedItems: selectedItems,
 			selectedItemIds: selectedItems.map(item => item.id),
-			selectedItem: this.getUniqueItemOrNull(selectedItems)
+			selectedItem: Arrays.getUniqueItemOrNull(selectedItems)
 		})
-	}
-
-	getUniqueItemOrNull(items) {
-		return items.length === 1 ? items[0] : null;
 	}
 
 	handleExportToCsvButtonClick() {
