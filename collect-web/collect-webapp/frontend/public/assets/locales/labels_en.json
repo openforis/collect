@@ -96,7 +96,7 @@
         },
         "import": {
             "file": "File",
-            "acceptedFileTeypesDescription": "Collect Survey (.collect) Collect Backup (.collect-backup), Collect Earth (.cep) or Collect Survey XML file (.xml)",
+            "acceptedFileTypesDescription": "Collect Survey (.collect) Collect Backup (.collect-backup), Collect Earth (.cep) or Collect Survey XML (.xml)",
             "importingIntoExistingSurveyWarning": "Survey already existing! Applied changes will be override."
         }
     },

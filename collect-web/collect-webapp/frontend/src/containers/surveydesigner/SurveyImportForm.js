@@ -67,7 +67,7 @@ class SurveyImportForm extends Component {
                                 }}>
                                 {surveyFileToBeImportedPreview ?
                                     <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.props.surveyFileToBeImportedPreview}</p>
-                                    : <p>{L.l('forms.fileDropMessage', acceptedFileTypesDescription)}</p>
+                                    : <p>{L.l('forms.fileDropMessage', [acceptedFileTypesDescription])}</p>
                                 }
                             </Dropzone>
                         }
