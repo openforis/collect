@@ -31,9 +31,9 @@ class SurveyImportPage extends Component {
 }
 
 const mapStateToProps = state => {
-    const { surveyFileImported } = state.surveys
+    const { surveyFileImported, importedSurveyId } = state.surveys
     return {
-        surveyFileImported
+        surveyFileImported, importedSurveyId
     }
 }
 
