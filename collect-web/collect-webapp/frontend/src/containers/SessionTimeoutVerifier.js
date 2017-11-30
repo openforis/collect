@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress } from 'reactstrap';
 
 import ServiceFactory from 'services/ServiceFactory'
+import RouterUtils from 'utils/RouterUtils'
 
 export default class SessionTimeoutVerifier extends Component {
     
@@ -64,7 +65,7 @@ export default class SessionTimeoutVerifier extends Component {
     }
 
     handleRefreshButtonClick() {
-        window.location.assign('/')
+        RouterUtils.navigateToHomePage()
     }
 
     render() {

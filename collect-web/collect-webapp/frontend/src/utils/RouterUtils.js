@@ -1,4 +1,10 @@
+import Constants from 'utils/Constants'
+
 export default class RouterUtils {
+
+    static navigateToHomePage() {
+        window.location.assign(Constants.BASE_URL)
+    }
 
     static navigateToDataManagementHomePage(history) {
         RouterUtils._navigateToUrl(history, '/datamanagement')

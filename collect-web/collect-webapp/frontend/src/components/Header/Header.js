@@ -6,6 +6,7 @@ import SurveySelect from '../SurveySelect/';
 import ServiceFactory from 'services/ServiceFactory'
 import Constants from 'utils/Constants'
 import L from 'utils/Labels'
+import RouterUtils from 'utils/RouterUtils'
 
 class Header extends Component {
 
@@ -47,7 +48,7 @@ class Header extends Component {
   }
 
   handleLogoutClick() {
-    ServiceFactory.sessionService.invalidate().then(r => window.location.assign(Constants.BASE_URL))
+    ServiceFactory.sessionService.invalidate().then(r => RouterUtils.navigateToHomePage())
   }
 
   render() {
