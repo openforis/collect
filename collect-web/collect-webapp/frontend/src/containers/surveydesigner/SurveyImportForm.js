@@ -82,7 +82,6 @@ class SurveyImportForm extends Component {
                             <Alert color="warning">{L.l('survey.import.importingIntoExistingSurveyWarning')}</Alert>
                         }
                         <Field
-                            className="animated fade-in"
                             name="name"
                             type="text"
                             component={Forms.renderFormItemInputField}
@@ -91,7 +90,6 @@ class SurveyImportForm extends Component {
                             normalize={Forms.normalizeInternalName}
                         />
                         <Field
-                            className="animated fade-in"
                             name="userGroupId"
                             component={Forms.renderFormItemSelect}
                             contentEditable={!importingIntoExistingSurvey}
