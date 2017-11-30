@@ -71,6 +71,9 @@ public class SurveyCreator {
 		survey.setUserGroup(userGroup);
 	
 		CeoApplicationOptions ceoApplicationOptions = new CeoApplicationOptions();
+		ceoApplicationOptions.setBaseMapSource(parameters.getCeoSettings().getBaseMapSource());
+		ceoApplicationOptions.setImageryYear(parameters.getCeoSettings().getImageryYear());
+		ceoApplicationOptions.setStackingProfile(parameters.getCeoSettings().getStackingProfile());
 		ceoApplicationOptions.setSamplingPointDataConfiguration(parameters.getSamplingPointGenerationSettings());
 		survey.addApplicationOptions(ceoApplicationOptions);
 		

@@ -38,6 +38,6 @@
         <constructor-arg ref="transactionAwareDataSource" />
     </bean>
     
+	<bean id="userManager" class="org.openforis.collect.manager.LocalUserManager" />
     <bean id="userGroupManager" class="org.openforis.collect.manager.LocalUserGroupManager" />
-	
 </beans>

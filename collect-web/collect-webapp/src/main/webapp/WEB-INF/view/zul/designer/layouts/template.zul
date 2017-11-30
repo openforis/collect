@@ -12,7 +12,7 @@
 
 ]]></zscript>
 	
-	<style src="/assets/designer_style.css" />
+	<style src="/assets/css/designer_style.css" />
 	
 	<div align="left" self="@{insert(content)}" sclass="content" 
 				hflex="true" vflex="true"></div>
