@@ -2,19 +2,19 @@ package org.openforis.collect.controlpanel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.TimeZone;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
@@ -23,9 +23,6 @@ import org.eclipse.jetty.plus.jndi.Resource;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.util.RolloverFileOutputStream;
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.webapp.Configuration.ClassList;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.openforis.web.server.ApplicationServer;
@@ -35,6 +32,8 @@ import net.lingala.zip4j.core.ZipFile;
 
 public abstract class JettyApplicationServer implements ApplicationServer {
 
+	private static final Logger LOG = LogManager.getLogger(JettyApplicationServer.class);
+
 	private static final String LOCALHOST_ADDRESS = "127.0.0.1";
 	
 	protected int port;
@@ -42,21 +41,16 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 
 	private Server server;
 	protected File webappsFolder;
-	private Logger logger;
-	private File logFile;
 	
-	public JettyApplicationServer(int port, File webappsFolder, File logFile, JndiDataSourceConfiguration... jndiDsConfigurations) {
+	public JettyApplicationServer(int port, File webappsFolder, JndiDataSourceConfiguration... jndiDsConfigurations) {
 		super();
 		this.port = port;
 		this.webappsFolder = webappsFolder;
 		this.jndiDsConfigurations = jndiDsConfigurations;
-		this.logFile = logFile;
-		this.logger = Log.getLogger(this.getClass());
 	}
 
 	@Override
 	public void initialize() throws IOException {
-		initializeLogger();
 		printClasspath();
 	}
 
@@ -71,7 +65,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
         		sb.append(';');
         	}
 		}
-    	logger.info("Classpath: " + sb.toString());
+    	LOG.info("Classpath: " + sb.toString());
 	}
 	
 	@Override
@@ -83,22 +77,14 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 			
 			server.start();
 		} else {
-			throw new RuntimeException(String.format("Port %d already in use", port));
+			String message = String.format("Port %d already in use", port);
+			LOG.error(message);
+			throw new RuntimeException(message);
 		}
 	}
 
-	private void initializeLogger() throws IOException {
-		RolloverFileOutputStream os = new RolloverFileOutputStream(this.logFile.getAbsolutePath(), false, 90,
-				TimeZone.getTimeZone("GMT"), "yyyy_MM_dd", "yyyy_MM_dd_hhmm");
-		
-		PrintStream logStream = new PrintStream(os);
-
-		System.setOut(logStream);
-		System.setErr(logStream);
-	}
-
 	private void registerWebapps() throws IOException, Exception, NamingException {
-		logger.info("Using webapps folder: " + webappsFolder.getAbsolutePath());
+		LOG.info("Using webapps folder: " + webappsFolder.getAbsolutePath());
 		
 		//Enable parsing of jndi-related parts of web.xml and jetty-env.xml
 	    ClassList classlist = ClassList.setServerDefault(server);
@@ -123,14 +109,14 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 					registerDbJndiResource(webapp, jndiDsConfiguration);
 				}
 				contextHandlerCollection.addHandler(webapp);
-				logger.info(String.format("Webapp %s registered", webapp.getContextPath()));
+				LOG.info(String.format("Webapp %s registered", webapp.getContextPath()));
 				webappsCount ++;
 			}
 		}
 		handlerCollection.addHandler(contextHandlerCollection);
 		server.setHandler(handlerCollection);
 		
-		logger.info(String.format("%d webapps registered", webappsCount));
+		LOG.info(String.format("%d webapps registered", webappsCount));
 	}
 
 	@Override
@@ -150,11 +136,6 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 		return String.format("%s://%s:%d/%s", "http", LOCALHOST_ADDRESS, port, getMainWebAppName());
 	}
 	
-	@Override
-	public File getLogFile() {
-		return logFile;
-	}
-
 	private WebAppContext createWebapp(File warFile) {
 		WebAppContext webapp = new WebAppContext();
 		webapp.setConfigurationClasses(new String[]{
@@ -210,7 +191,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 		Properties properties = jndiDataSourceConfig.toProperties();
 		DataSource dataSource = BasicDataSourceFactory.createDataSource(properties);
 		new Resource(context.getServer(), jndiDataSourceConfig.getJndiName(), dataSource);
-		logger.info(String.format("JNDI resource %s registered for webapp %s", 
+		LOG.info(String.format("JNDI resource %s registered for webapp %s", 
 				jndiDataSourceConfig.getJndiName(), context.getContextPath()));
 	}
 

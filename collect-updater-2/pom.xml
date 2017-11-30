@@ -58,6 +58,23 @@
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/lib</outputDirectory>
 										</artifactItem>
+										<!-- new dependencies -->
+										<artifactItem>
+											<groupId>org.apache.logging.log4j</groupId>
+										    <artifactId>log4j-api</artifactId>
+										    <version>2.10.0</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.apache.logging.log4j</groupId>
+										    <artifactId>log4j-core</artifactId>
+										    <version>2.10.0</version>
+											<type>jar</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/lib</outputDirectory>
+										</artifactItem>
 									</artifactItems>
 								</configuration>
 							</execution>
