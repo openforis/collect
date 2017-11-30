@@ -178,7 +178,6 @@
 		<property name="concurrencyLimit" value="20"/>
 	</bean>
 	
-	<!-- Async job executor -->
 	<bean id="jobManager" class="org.openforis.collect.concurrency.CollectJobManager" 
 		destroy-method="destroy" />
 
