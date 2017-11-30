@@ -24,12 +24,12 @@
 		<h1>
 			<span>Open Foris Collect</span>
 		</h1>
-		<c:if test="${param.logout != null}">
+		<c:if test="${param.logout}">
 			<script>LOGGED_OUT = true</script>
 			<h3 data-i18n="collect.login.logged_out"></h3>
 		</c:if>
 		<c:if test="${param.logout == null}">
-			<script>LOGGED_OUT = true</script>
+			<script>LOGGED_OUT = false</script>
 		</c:if>
 		<h3 data-i18n="collect.login.please_login"></h3>
 	</hgroup>
@@ -74,7 +74,9 @@
 		</button>
 	</form>
 	<footer>
-		<p>Powered by <a href="http://www.openfoirs.org/" target="_blank">Open Foris</a></p>
+		<a href="http://www.openforis.org/" target="_blank">
+			<img src="assets/images/of_logo_text.jpg">
+		</a>
 	</footer>
 </body>
 </html>

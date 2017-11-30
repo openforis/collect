@@ -1,12 +1,9 @@
 $(window, document, undefined).ready(function() {
 
-	$('input').blur(function() {
-		var $this = $(this);
-		if ($this.val())
-			$this.addClass('used');
-		else
-			$this.removeClass('used');
-	});
+	const DEFAULT_USERNAME = 'admin';
+	const DEFAULT_PASSWORD = 'admin';
+	
+	$('input').blur(toggleInputUsedClass);
 
 	var $ripples = $('.ripples');
 
@@ -45,8 +42,19 @@ $(window, document, undefined).ready(function() {
 
 	document.f.username.focus();
 
+	//set input fields as 'used' if fields have been filled by browser autofill
+	setTimeout(function() {
+		$('input').each(toggleInputUsedClass);
+	}, 500);
+	
 	if (! LOGGED_OUT) {
 		checkDefaultPasswordActive();
+	}
+	
+	function toggleInputUsedClass() {
+		var $this = $(this);
+		var empty = $this.val().length === 0;
+		$this.toggleClass('used', !empty);
 	}
 
 	function checkDefaultPasswordActive() {
@@ -54,8 +62,8 @@ $(window, document, undefined).ready(function() {
 			url: "api/defaultpasswordactive"
 		}).done(function(defaultPasswordActive) {
 			if (defaultPasswordActive) {
-				document.f.username.value = "admin";
-				document.f.password.value = "admin";
+				document.f.username.value = DEFAULT_USERNAME;
+				document.f.password.value = DEFAULT_PASSWORD;
 				document.f.submit();
 			}
 		});

@@ -6,6 +6,10 @@ export default class RouterUtils {
         window.location.assign(Constants.BASE_URL)
     }
 
+    static navigateToLoginPage(logout = false) {
+        window.location.assign(Constants.BASE_URL + '/login?logout=true')
+    }
+
     static navigateToDataManagementHomePage(history) {
         RouterUtils._navigateToUrl(history, '/datamanagement')
     }

@@ -30,8 +30,8 @@
 					<destination>${installdir}/lib</destination>
 					<platforms>all</platforms>
 					<distributionFileList>
-						<distributionFile>
-							<origin>lib/collect-control-panel-PROJECT_VERSION.jar</origin>
+						<distributionFile allowWildcards="1">
+							<origin>lib/*.jar</origin>
 						</distributionFile>
 					</distributionFileList>
 				</folder>

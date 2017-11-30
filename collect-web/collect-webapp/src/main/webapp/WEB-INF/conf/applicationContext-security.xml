@@ -70,7 +70,8 @@
 			default-target-url="/index.html"
 			authentication-failure-url="/login?login_error=1" />
 		
-		<logout logout-url="/j_spring_security_logout" />
+		<logout logout-url="/j_spring_security_logout" 
+			logout-success-url="/login?logout=true" />
 	</http>
 	
 	<authentication-manager alias="authenticationManager">

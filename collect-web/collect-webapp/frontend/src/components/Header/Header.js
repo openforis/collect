@@ -48,7 +48,7 @@ class Header extends Component {
   }
 
   handleLogoutClick() {
-    ServiceFactory.sessionService.invalidate().then(r => RouterUtils.navigateToHomePage())
+    ServiceFactory.sessionService.invalidate().then(r => RouterUtils.navigateToLoginPage(true))
   }
 
   render() {
