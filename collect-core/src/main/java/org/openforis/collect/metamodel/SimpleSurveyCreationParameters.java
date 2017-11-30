@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSettings;
+import org.openforis.collect.model.SamplingDesignItem;
 
 /**
  * 
@@ -21,6 +22,7 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	private List<SimpleCodeList> codeLists = new ArrayList<SimpleCodeList>();
 	private List<String> imagery = new ArrayList<String>();
 	private CeoSettings ceoSettings = new CeoSettings();
+	private List<SamplingDesignItem> samplingPoints = new ArrayList<SamplingDesignItem>();
 	private SamplingPointGenerationSettings samplingPointGenerationSettings;
 	private int userGroupId;
 	
@@ -70,6 +72,14 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	
 	public void setCeoSettings(CeoSettings ceoSettings) {
 		this.ceoSettings = ceoSettings;
+	}
+	
+	public List<SamplingDesignItem> getSamplingPoints() {
+		return samplingPoints;
+	}
+	
+	public void setSamplingPoints(List<SamplingDesignItem> samplingPoints) {
+		this.samplingPoints = samplingPoints;
 	}
 	
 	public SamplingPointGenerationSettings getSamplingPointGenerationSettings() {
