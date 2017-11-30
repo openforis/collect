@@ -50,17 +50,10 @@
 					time: new Date().getTime()
 				},
 				contentType: 'application/json; charset=utf-8'
-			});
-
-			request.success(function () {
-			});
-
-			request.error(function (err) {
-				settings.onError(err);
-			});
-			
-			request.complete(function() {
+			}).done(function() {
 				timeout = setTimeout(_local.request, settings.time);
+			}).fail(function (err) {
+				settings.onError(err);
 			});
 		}
 	};

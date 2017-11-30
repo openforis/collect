@@ -30,10 +30,10 @@
 			}
 		</style>
 
-		<script type="text/javascript" src="script/jquery-1.6.2.min.js"></script>
-		<script type="text/javascript" src="script/swfobject.js"></script>
-		<script type="text/javascript" src="script/openforis.js"></script>
-		<script type="text/javascript" src="script/sessionping.js"></script>
+		<script type="text/javascript" src="assets/js/jquery-1.6.2.min.js"></script>
+		<script type="text/javascript" src="assets/js/swfobject.js"></script>
+		<script type="text/javascript" src="assets/js/openforis.js"></script>
+		<script type="text/javascript" src="assets/js/sessionping.js"></script>
 		<script type="text/javascript">
 			// For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection. 
 			var swfVersionStr = "10.2.0";

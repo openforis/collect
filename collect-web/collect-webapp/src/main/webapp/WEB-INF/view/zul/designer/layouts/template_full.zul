@@ -69,7 +69,7 @@
 	
 ]]></zscript>
 	
-	<style src="/assets/designer_style.css" />
+	<style src="/assets/css/designer_style.css" />
 	
     <box hflex="true" vflex="true" align="center" sclass="mainContainer"
     	onCreate="onCreate()" >
