@@ -101,6 +101,7 @@ fieldset legend {
 
 .app-body .sidebar {
     flex: 0 0 400px;
+    z-index: 2;
 }
 
 .main-content-wrapper .row {
