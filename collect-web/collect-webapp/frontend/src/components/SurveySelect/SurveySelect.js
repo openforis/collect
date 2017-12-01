@@ -24,10 +24,6 @@ class SurveySelect extends Component {
         lastUpdated: PropTypes.number,
         dispatch: PropTypes.func.isRequired
     }
-    componentDidMount() {
-        //const { dispatch } = this.props
-        //dispatch(fetchSurveySummaries())
-	}
 	
     handleSurveySelect(surveyId) {
     	const { summaries } = this.props
