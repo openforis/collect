@@ -626,21 +626,21 @@ public class SurveyManager {
 		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails, groups);
 		List<SurveySummary> result = new ArrayList<SurveySummary>();
 		Map<String, SurveySummary> summariesByUri = new HashMap<String, SurveySummary>();
-		for (SurveySummary summary : temporarySurveySummaries) {
-			summary.setPublished(false);
-			summary.setTemporary(true);
-			result.add(summary);
-			summariesByUri.put(summary.getUri(), summary);
+		for (SurveySummary tempSummary : temporarySurveySummaries) {
+			tempSummary.setPublished(false);
+			tempSummary.setTemporary(true);
+			result.add(tempSummary);
+			summariesByUri.put(tempSummary.getUri(), tempSummary);
 		}
-		for (SurveySummary publishedSurveySummary : publishedSurveySummaries) {
-			SurveySummary temporarySurveySummary = summariesByUri.get(publishedSurveySummary.getUri());
+		for (SurveySummary publishedSummary : publishedSurveySummaries) {
+			publishedSummary.setPublishedId(publishedSummary.getId());
+			SurveySummary temporarySurveySummary = summariesByUri.get(publishedSummary.getUri());
 			if ( temporarySurveySummary == null ) {
-				result.add(publishedSurveySummary);
+				result.add(publishedSummary);
 			} else {
 				temporarySurveySummary.setAvailability(PUBLISHED);
 				temporarySurveySummary.setPublished(true);
-				temporarySurveySummary.setPublishedId(publishedSurveySummary.getId());
-				temporarySurveySummary.setRecordValidationProcessStatus(publishedSurveySummary.getRecordValidationProcessStatus());
+				temporarySurveySummary.setRecordValidationProcessStatus(publishedSummary.getRecordValidationProcessStatus());
 			}
 		}
 		sortSummaries(result, sortFields);

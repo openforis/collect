@@ -85,13 +85,30 @@ export default class Arrays {
         return result
     }
 
-    static sort(array, propName) {
-        array.sort((a,b) => a === null && b === null ? 0: a === null ? -1: b === null ? 1: 
-            Objects.compare(a[propName], b[propName]))
+    static sort(array, prop) {
+        array.sort((a,b) => 
+                a === null && b === null ? 0: 
+                a === null ? -1: 
+                b === null ? 1: 
+                Objects.compare(a[prop], b[prop])
+        )
     }
 
     static singleItemOrNull(items) {
 		return items.length === 1 ? items[0] : null;
-	}
+    }
+
+    static groupBy(array, prop) {
+        return array.reduce((itemsByProp, item) => {
+            const propValue = item[prop]
+            let group = itemsByProp[propValue]
+            if (!group) {
+                group = []
+                itemsByProp[propValue] = group
+            }
+            group.push(item)
+            return itemsByProp
+        }, {});
+    }
 
 }

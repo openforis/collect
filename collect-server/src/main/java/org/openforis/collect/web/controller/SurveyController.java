@@ -152,8 +152,11 @@ public class SurveyController extends BasicController {
 			userId = sessionManager.getLoggedUser().getId();
 		}
 		Set<UserGroup> groups = getAvailableUserGrups(userId, groupId);
-		List<SurveySummary> summaries = includeTemporary ? surveyManager.loadCombinedSummaries(languageCode, true, groups, null)
-				: surveyManager.getSurveySummaries(languageCode, groups);
+		
+		List<SurveySummary> summaries = new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, groups));
+		if (includeTemporary) {
+			summaries.addAll(surveyManager.loadTemporarySummaries(languageCode, true, groups));
+		}
 		
 		List<Object> views = new ArrayList<Object>();
 		for (SurveySummary surveySummary : summaries) {

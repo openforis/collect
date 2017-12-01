@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem, FormControl } from 'reactstrap';
 
 import { selectPreferredSurvey } from '../../actions'
+import Arrays from 'utils/Arrays'
 
 class SurveySelect extends Component {
     constructor( props ) {
@@ -39,8 +40,9 @@ class SurveySelect extends Component {
 	
     render() {
 		const { selectedSurvey, summaries } = this.props
-		const publishedSurveys = summaries.filter(s => s.published)
+		const publishedSurveys = summaries.filter(s => s.published && !s.temporary)
     	const isEmpty = publishedSurveys.length === 0
+		Arrays.sort(publishedSurveys, 'name')
     	
     	const dropdownItems = publishedSurveys.map(s => 
 			<DropdownItem key={s.id} className="survey-item" onClick={this.handleSurveySelect.bind(this, s.id)}>

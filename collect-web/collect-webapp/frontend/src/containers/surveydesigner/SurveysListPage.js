@@ -5,6 +5,7 @@ import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Containe
     Form, FormFeedback, FormGroup, Label, Input, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 import * as Formatters from 'components/datatable/formatters';
+import CheckedIconFormatter from 'components/datatable/CheckedIconFormatter'
 import UserGroupColumnEditor from 'components/surveydesigner/UserGroupColumnEditor';
 import ServiceFactory from 'services/ServiceFactory';
 import L from 'utils/Labels';
@@ -73,10 +74,27 @@ class SurveysListPage extends Component {
     
     render() {
         const { surveySummaries, userGroups } = this.props
-        if (this.surveySummaries === null || userGroups === null) {
+        if (surveySummaries === null || userGroups === null) {
             return <div>Loading...</div>
         }
 
+        const groupedByUriSummaries = Arrays.groupBy(surveySummaries, 'uri')
+        const surveyUris = Object.keys(groupedByUriSummaries)
+        const combinedSummaries = surveyUris.map(uri => {
+            const tempAndPublished = groupedByUriSummaries[uri]
+            if (tempAndPublished.length === 1) {
+                return tempAndPublished[0]
+            } else {
+                const publishedSurvey = tempAndPublished.filter(s => !s.temporary)[0]
+                const tempSurvey = tempAndPublished.filter(s => s.temporary)[0]
+                const merged = {...tempSurvey, 
+                    published: true,
+                    publishedId: publishedSurvey.id
+                }
+                return merged
+            }
+        })
+        
         const createUserGroupEditor = (onUpdate, props) => (<UserGroupColumnEditor onUpdate={onUpdate} {...props} />);
         
         function userGroupFormatter(cell, row) {
@@ -99,6 +117,10 @@ class SurveysListPage extends Component {
             }
         }
 
+        function publishedIconFormatter(cell, row) {
+            return <CheckedIconFormatter checked={row.published && (!row.temporary || row.publishedId)} />
+        }
+
         return (
             <Container fluid>
                 <Row className="justify-content-between">
@@ -114,7 +136,7 @@ class SurveysListPage extends Component {
                     }
                 </Row>
                 <BootstrapTable
-                    data={surveySummaries}
+                    data={combinedSummaries}
                     striped hover condensed
                     height="100%"
                     selectRow={{
@@ -140,7 +162,7 @@ class SurveysListPage extends Component {
 				        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.target')}</TableHeaderColumn>
                     <TableHeaderColumn key="temporary" dataField="temporary" dataFormat={Formatters.checkedIconFormatter}
 				        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.unpublishedChanges')}</TableHeaderColumn>
-                    <TableHeaderColumn key="published" dataField="published" dataFormat={Formatters.checkedIconFormatter}
+                    <TableHeaderColumn key="published" dataField="published" dataFormat={publishedIconFormatter}
 				        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.published')}</TableHeaderColumn>
                     <TableHeaderColumn key="userGroupId" dataField="userGroupId" dataFormat={userGroupFormatter}
                         customEditor={{ getElement: createUserGroupEditor, customEditorParameters: { userGroups: userGroups } }}

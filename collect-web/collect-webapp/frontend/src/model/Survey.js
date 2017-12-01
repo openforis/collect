@@ -17,6 +17,9 @@ export class Survey extends Serializable {
     schema
     codeLists = []
     uiConfiguration
+    temporary
+    published
+    publishedId
     
     constructor(jsonData) {
         super()
