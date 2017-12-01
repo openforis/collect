@@ -76,6 +76,20 @@
 									onCheck="@command('validate')" />
 							</fieldErrorHandler>
 						</row>
+<!-- 						<row> -->
+<!-- 							<fieldErrorHandler -->
+<!-- 								message="@load(vmsgs['color'])"> -->
+<!-- 								<label -->
+<!-- 				  					use="org.openforis.collect.designer.component.FieldLabel" -->
+<!-- 									value="${labels.survey.code_list.item.color}" -->
+<!-- 									languageCode="@load(vm.currentLanguageCode)" /> -->
+<!-- 							</fieldErrorHandler> -->
+<!-- 							<fieldErrorHandler -->
+<!-- 								message="@load(vmsgs['color'])"> -->
+<!-- 								<colorbox value="@bind(fx.color)" -->
+<!-- 									onChange="@command('validate')" /> -->
+<!-- 							</fieldErrorHandler> -->
+<!-- 						</row> -->
 						<row>
 							<fieldErrorHandler
 								message="@load(vmsgs['image'])">

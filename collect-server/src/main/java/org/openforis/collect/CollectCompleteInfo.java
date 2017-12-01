@@ -6,6 +6,7 @@ public class CollectCompleteInfo extends CollectInfo {
 
 	private boolean latestReleaseVersionVerified;
 	private boolean latestReleaseVersion;
+	private String saikuUrl;
 	
 	public CollectCompleteInfo(Version version, Version latestReleaseVersion) {
 		this(version, latestReleaseVersion != null, 
@@ -32,6 +33,14 @@ public class CollectCompleteInfo extends CollectInfo {
 	
 	public void setLatestReleaseVersion(boolean latestReleaseVersion) {
 		this.latestReleaseVersion = latestReleaseVersion;
+	}
+	
+	public String getSaikuUrl() {
+		return saikuUrl;
+	}
+	
+	public void setSaikuUrl(String saikuUrl) {
+		this.saikuUrl = saikuUrl;
 	}
 	
 }

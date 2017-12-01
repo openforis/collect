@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="usergroups" author="ricci" dbms="sqlite">
+
+	    <comment>User groups</comment>
+	    
+	    <createTable tableName="ofc_usergroup">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_usergroup_pkey" />
+			</column>
+			<column name="parent_id" type="INTEGER">
+				<constraints nullable="true" 
+					foreignKeyName="ofc_usergroup_parent_fkey" 
+					references="ofc_usergroup(id)" />
+			</column>
+			<column name="name" type="VARCHAR(63)">
+				<constraints nullable="false" unique="true" />
+			</column>
+			<column name="label" type="VARCHAR(127)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="created_by" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_usergroup_created_by_fkey" 
+					references="ofc_user(id)" />
+			</column>
+			<column name="creation_date" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+			<column name="visibility_code" type="CHAR(1)"
+				remarks="P=Public, N=Private">
+				<constraints nullable="false" />
+			</column>
+			<column name="enabled" type="boolean" defaultValueBoolean="true">
+            	<constraints nullable="false"/>
+           	</column>
+            <column name="system_defined" type="boolean" defaultValueBoolean="false">
+            	<constraints nullable="false"/>
+           	</column>
+		</createTable>
+    	
+    	<createIndex
+            indexName="ofc_usergroup_parent_idx"
+            tableName="ofc_usergroup">
+	        <column name="parent_id" type="int4"/>
+    	</createIndex>
+    	
+		<createTable tableName="ofc_user_usergroup">
+			<column name="user_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_user_usergroup_user_fkey" 
+					references="ofc_user(id)" />
+			</column>
+			<column name="group_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_user_usergroup_group_fkey" 
+					references="ofc_usergroup(id)" />
+			</column>
+			<column name="role_code" type="CHAR(1)" 
+				remarks="Role in the group: O=Owner, A=Administrator, D=Data analyzer, U=User/Operator, V=Viewer">
+				<constraints nullable="false" />
+			</column>
+			<column name="status_code" type="CHAR(1)"
+				remarks="P=Pending,A=Accepted,R=Rejected">
+				<constraints nullable="false" />
+			</column>
+			<column name="request_date" type="DATETIME">
+				<constraints nullable="false" />
+			</column>
+			<column name="member_since" type="DATETIME">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+		
+		<createIndex
+            indexName="ofc_user_usergroup_pkey"
+            tableName="ofc_user_usergroup"
+            unique="true">
+            <column name="user_id" type="INTEGER"/>
+	        <column name="group_id" type="INTEGER"/>
+    	</createIndex>
+    	
+    	<createIndex
+            indexName="ofc_user_usergroup_user_idx"
+            tableName="ofc_user_usergroup">
+	        <column name="user_id" type="INTEGER"/>
+    	</createIndex>
+
+		<createIndex
+            indexName="ofc_user_usergroup_group_idx"
+            tableName="ofc_user_usergroup">
+	        <column name="group_id" type="INTEGER"/>
+    	</createIndex>
+    </changeSet>
+    
+    <changeSet id="survey-usergroup-column" author="ricci" dbms="sqlite">
+    	<sql>
+	    	ALTER TABLE ofc_survey ADD COLUMN usergroup_id INTEGER REFERENCES usergroup(id);
+    	</sql>
+    	<createIndex
+            indexName="ofc_survey_usergroup_idx"
+            tableName="ofc_survey">
+	        <column name="usergroup_id" type="INTEGER"/>
+    	</createIndex>
+	</changeSet>
+	
+	<changeSet id="user-groups-default-values" author="ricci" dbms="sqlite">
+		<sql>
+    		-- Create a default public group named default_public_group
+	    	
+    		INSERT INTO ofc_usergroup(name, label, created_by, creation_date, visibility_code, system_defined) 
+	    		VALUES (
+		    		'default_public_group',
+		    		'Default Public Group',
+		    		(SELECT u.id FROM ofc_user u WHERE u.username = 'admin'),
+		    		CURRENT_TIMESTAMP,
+		    		'P',
+		    		1
+		    	);
+		    
+		    -- make the admin user owner of the Default Public group
+		    	
+		    INSERT INTO ofc_user_usergroup (user_id, group_id, role_code, status_code, request_date, member_since)
+		    	VALUES (
+   		 			(SELECT u.id FROM ofc_user u WHERE u.username = 'admin'),
+    		 		(SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group'),
+    		 		'O',
+    		 		'A',
+    		 		CURRENT_TIMESTAMP,
+    		 		CURRENT_TIMESTAMP
+    		 	);
+    		 
+    		-- Create a user group named USERNAME_default_private_group per each user
+	    	
+    		INSERT INTO ofc_usergroup(name, label, created_by, creation_date, visibility_code, system_defined) 
+    			SELECT 
+	    			u.username || '_default_private_group',
+		    		'Private group of ' || u.username,
+		    		u.id,
+		    		CURRENT_TIMESTAMP,
+		    		'N',
+		    		1
+		    	FROM ofc_user u
+  		 	;
+  		 	
+  		 	-- Make each user owner of his default group
+	    	
+    		INSERT INTO ofc_user_usergroup (user_id, group_id, role_code, status_code, request_date, member_since)
+   		 		SELECT 
+   		 			u.id, 
+    		 		(SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = u.username || '_default_private_group'),
+    		 		'O',
+    		 		'A',
+    		 		CURRENT_TIMESTAMP,
+    		 		CURRENT_TIMESTAMP
+	 			FROM ofc_user u
+  		 	;
+    		 	
+    		 -- Make each user with administrator role be even administrator of the default_public_group (backwards compatibility)
+    		 
+    		 INSERT INTO ofc_user_usergroup (user_id, group_id, role_code, status_code, request_date, member_since)
+   		 		SELECT 
+   		 			u.id, 
+    		 		(SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group'),
+    		 		'A',
+    		 		'A',
+    		 		CURRENT_TIMESTAMP,
+    		 		CURRENT_TIMESTAMP
+	 			FROM ofc_user u, ofc_user_role ur
+	 			WHERE ur.user_id = u.id 
+	 				AND u.username != 'admin'
+	 				AND ur.role = 'ROLE_ADMIN'
+  		 	;
+    		 	
+    		-- Users with role ROLE_ANALYSIS will be Analyzers in default_public_group
+    		 
+    		 INSERT INTO ofc_user_usergroup (user_id, group_id, role_code, status_code, request_date, member_since)
+   		 		SELECT 
+   		 			u.id, 
+    		 		(SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group'),
+    		 		'D',
+    		 		'A',
+    		 		CURRENT_TIMESTAMP,
+    		 		CURRENT_TIMESTAMP
+  		 			FROM ofc_user u, ofc_user_role ur
+  		 			WHERE 
+  		 				u.id NOT IN (
+		 					SELECT uug.user_id FROM ofc_user_usergroup uug WHERE uug.group_id = (
+		 						SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group')
+  		 				) 
+  		 				AND ur.user_id = u.id 
+  		 				AND u.username != 'admin'
+  		 				AND ur.role = 'ROLE_ANALYSIS'
+  		 	;
+    		 	
+    		-- Users with role ROLE_CLEANSING will be only Analyzers in default_public_group
+    		 
+    		 INSERT INTO ofc_user_usergroup (user_id, group_id, role_code, status_code, request_date, member_since)
+   		 		SELECT 
+   		 			u.id, 
+    		 		(SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group'),
+    		 		'D',
+    		 		'A',
+    		 		CURRENT_TIMESTAMP,
+    		 		CURRENT_TIMESTAMP
+  		 			FROM ofc_user u, ofc_user_role ur
+  		 			WHERE 
+  		 				u.id NOT IN (
+		 					SELECT uug.user_id FROM ofc_user_usergroup uug WHERE uug.group_id = (
+		 						SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group')
+  		 				) 
+  		 				AND ur.user_id = u.id 
+  		 				AND u.username != 'admin'
+  		 				AND ur.role = 'ROLE_CLEANSING'
+  		 	;
+    		 	
+    		-- Users with role ROLE_ENTRY will be only (data entry) Operators in default_public_group
+    		 
+    		 INSERT INTO ofc_user_usergroup (user_id, group_id, role_code, status_code, request_date, member_since)
+   		 		SELECT 
+   		 			u.id, 
+    		 		(SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group'),
+    		 		'U',
+    		 		'A',
+    		 		CURRENT_TIMESTAMP,
+    		 		CURRENT_TIMESTAMP
+  		 			FROM ofc_user u, ofc_user_role ur
+  		 			WHERE 
+  		 				u.id NOT IN (
+		 					SELECT uug.user_id FROM ofc_user_usergroup uug WHERE uug.group_id = (
+		 						SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group')
+  		 				) 
+  		 				AND ur.user_id = u.id 
+  		 				AND u.username != 'admin'
+  		 				AND ur.role = 'ROLE_ENTRY'
+  		 	;
+    		 	
+    		 -- Users with role ROLE_VIEW will be only Viewers in default_public_group
+    		 
+    		 INSERT INTO ofc_user_usergroup (user_id, group_id, role_code, status_code, request_date, member_since)
+   		 		SELECT 
+   		 			u.id, 
+    		 		(SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group'),
+    		 		'V',
+    		 		'A',
+    		 		CURRENT_TIMESTAMP,
+    		 		CURRENT_TIMESTAMP
+  		 			FROM ofc_user u, ofc_user_role ur
+  		 			WHERE 
+  		 				u.id NOT IN (
+		 					SELECT uug.user_id FROM ofc_user_usergroup uug WHERE uug.group_id = (
+		 						SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group')
+  		 				) 
+  		 				AND ur.user_id = u.id 
+  		 				AND u.username != 'admin'
+  		 				AND ur.role = 'ROLE_VIEW'
+  		 	;
+  		 	
+  		 	-- Assign all existing survey to the Default group
+  		 	
+  		 	UPDATE ofc_survey SET usergroup_id = (SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group');
+  		 	
+   		 </sql>
+    	
+	</changeSet>
+	
+</databaseChangeLog>

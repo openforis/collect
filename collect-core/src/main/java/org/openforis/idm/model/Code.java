@@ -58,6 +58,11 @@ public final class Code extends AbstractValue {
 		return StringUtils.defaultIfBlank(code, null);
 	}
 	
+	@Override
+	public String toString() {
+		return toPrettyFormatString();
+	}
+	
 	public String getCode() {
 		return code;
 	}

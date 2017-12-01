@@ -24,7 +24,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcCodeList;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcCodeListRecord extends UpdatableRecordImpl<OfcCodeListRecord> {
 
-	private static final long serialVersionUID = 777217179;
+	private static final long serialVersionUID = -1629367670;
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.id</code>.
@@ -348,6 +348,20 @@ public class OfcCodeListRecord extends UpdatableRecordImpl<OfcCodeListRecord> {
 		return (String) getValue(22);
 	}
 
+	/**
+	 * Setter for <code>collect.ofc_code_list.color</code>.
+	 */
+	public void setColor(String value) {
+		setValue(23, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_code_list.color</code>.
+	 */
+	public String getColor() {
+		return (String) getValue(23);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -374,7 +388,7 @@ public class OfcCodeListRecord extends UpdatableRecordImpl<OfcCodeListRecord> {
 	/**
 	 * Create a detached, initialised OfcCodeListRecord
 	 */
-	public OfcCodeListRecord(Integer id, Integer surveyId, Integer codeListId, Integer itemId, Integer parentId, Integer sortOrder, String code, Boolean qualifiable, Integer sinceVersionId, Integer deprecatedVersionId, String label1, String label2, String label3, String description1, String description2, String description3, Integer level, byte[] imageContent, String imageFileName, String label4, String label5, String description4, String description5) {
+	public OfcCodeListRecord(Integer id, Integer surveyId, Integer codeListId, Integer itemId, Integer parentId, Integer sortOrder, String code, Boolean qualifiable, Integer sinceVersionId, Integer deprecatedVersionId, String label1, String label2, String label3, String description1, String description2, String description3, Integer level, byte[] imageContent, String imageFileName, String label4, String label5, String description4, String description5, String color) {
 		super(OfcCodeList.OFC_CODE_LIST);
 
 		setValue(0, id);
@@ -400,5 +414,6 @@ public class OfcCodeListRecord extends UpdatableRecordImpl<OfcCodeListRecord> {
 		setValue(20, label5);
 		setValue(21, description4);
 		setValue(22, description5);
+		setValue(23, color);
 	}
 }

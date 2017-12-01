@@ -12,7 +12,6 @@ import org.openforis.collect.datacleansing.persistence.DataQueryTypeDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
@@ -27,13 +26,6 @@ public class DataQueryTypeManager extends AbstractSurveyObjectManager<DataQueryT
 	private DataQueryManager dataQueryManager;
 	@Autowired
 	private MessageSource messageSource;
-	
-	@Override
-	@Autowired
-	@Qualifier("dataQueryTypeDao")
-	public void setDao(DataQueryTypeDao dao) {
-		super.setDao(dao);
-	}
 	
 	public DataQueryType loadByCode(CollectSurvey survey, String code) {
 		return dao.loadByCode(survey, code);

@@ -339,7 +339,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 
 	public static String getCodeListImageFilePath(CodeListItem item) {
 		CodeList codeList = item.getCodeList();
-		@SuppressWarnings("unchecked")
 		String zipImageFileName = StringUtils.join(Arrays.asList(
 				EARTH_FILES_FOLDER_NAME, "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
 		return zipImageFileName;

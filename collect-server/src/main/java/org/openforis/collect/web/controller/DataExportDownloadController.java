@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.utils.Controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +30,7 @@ public class DataExportDownloadController extends BasicController {
 			) throws IOException {
 		try {
 			File file = new File(fileName);
-			writeFileToResponse(response, file, outputFileName);
+			Controllers.writeFileToResponse(response, file, outputFileName);
 		} catch (IOException e) {
 			LOG.error(e);
 			throw e;

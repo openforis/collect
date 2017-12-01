@@ -8,6 +8,7 @@ import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
 import org.openforis.idm.model.Attribute;
@@ -33,6 +34,7 @@ public class DataReportGeneratorJob extends Job {
 	//input
 	private DataQueryGroup errorQueryGroup;
 	private Step recordStep;
+	private User activeUser;
 
 	//output
 	private DataReport report;
@@ -53,7 +55,7 @@ public class DataReportGeneratorJob extends Job {
 		report = new DataReport((CollectSurvey) errorQueryGroup.getSurvey());
 		report.setQueryGroup(errorQueryGroup);
 		report.setRecordStep(recordStep);
-		reportManager.save(report);
+		reportManager.save(report, activeUser);
 		batchPersister = new ItemBatchPersister(report);
 	}
 	
@@ -63,7 +65,7 @@ public class DataReportGeneratorJob extends Job {
 			DataQueryGroupExectutorTask t = (DataQueryGroupExectutorTask) task;
 			report.setDatasetSize(Long.valueOf(t.getTotalItems()).intValue());
 			report.setLastRecordModifiedDate(t.getLastRecordModifiedDate());
-			reportManager.save(report);
+			reportManager.save(report, activeUser);
 		}
 		super.onTaskCompleted(task);
 	}
@@ -80,6 +82,10 @@ public class DataReportGeneratorJob extends Job {
 	
 	public void setRecordStep(Step recordStep) {
 		this.recordStep = recordStep;
+	}
+	
+	public void setActiveUser(User activeUser) {
+		this.activeUser = activeUser;
 	}
 	
 	public DataReport getReport() {

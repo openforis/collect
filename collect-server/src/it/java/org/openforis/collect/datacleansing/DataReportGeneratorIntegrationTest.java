@@ -64,7 +64,7 @@ public class DataReportGeneratorIntegrationTest extends DataCleansingIntegration
 		invalidAttributeErrorType = new DataQueryType(survey);
 		invalidAttributeErrorType.setCode("invalid");
 		invalidAttributeErrorType.setLabel("Invalid attribute");
-		dataQueryTypeManager.save(invalidAttributeErrorType);
+		dataQueryTypeManager.save(invalidAttributeErrorType, adminUser);
 	}
 	
 	@Test
@@ -81,17 +81,18 @@ public class DataReportGeneratorIntegrationTest extends DataCleansingIntegration
 			.severity(ErrorSeverity.ERROR)
 			.build();
 		
-		dataQueryManager.save(query);
+		dataQueryManager.save(query, adminUser);
 		
 		DataQueryGroup queryGroup = new DataQueryGroup(survey);
 		queryGroup.setTitle("Simple query group");
 		queryGroup.addQuery(query);
 		
-		dataQueryGroupManager.save(queryGroup);
+		dataQueryGroupManager.save(queryGroup, adminUser);
 		
 		DataReportGeneratorJob job = jobManager.createJob(DataReportGeneratorJob.class);
 		job.setQueryGroup(queryGroup);
 		job.setRecordStep(Step.ENTRY);
+		job.setActiveUser(adminUser);
 		jobManager.start(job, false);
 		DataReport report = job.getReport();
 		

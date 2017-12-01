@@ -2,6 +2,7 @@ package org.openforis.collect.remoting.service;
 
 import java.io.InputStream;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -12,20 +13,31 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.openforis.collect.Collect;
+import org.openforis.collect.CollectCompleteInfo;
 import org.openforis.collect.CollectInfo;
 import org.openforis.collect.CollectInternalInfo;
-import org.openforis.collect.CollectCompleteInfo;
+import org.openforis.collect.reporting.SaikuConfiguration;
 import org.openforis.commons.versioning.Version;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+@Component
 public class CollectInfoService {
 
 	private static final String LATEST_RELEASE_MAVEN_METADATA_URL = 
 			"http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-installer/maven-metadata.xml";
 	private static final int RELEASE_FETCH_TIMEOUT = 10000;
+	
+	private static final String SAIKU_URL_FORMAT = "%s://%s:%s/%s";
+	private static final String DEV_LOCAL_ADDRESS = "127.0.0.1";
+	private static final String DEV_REQUEST_LOCAL_ADDRESS = "0:0:0:0:0:0:0:1";
+	
+	@Autowired
+	private SaikuConfiguration saikuConfiguration;
 	
 	public CollectInfo getInfo() {
 		return new CollectInfo();
@@ -34,14 +46,23 @@ public class CollectInfoService {
 	public CollectCompleteInfo getCompleteInfo() {
 		Version latestRelease = latestRelease();
 		Version currentVersion = Collect.VERSION;
-		return new CollectCompleteInfo(currentVersion, latestRelease);
+		CollectCompleteInfo info = new CollectCompleteInfo(currentVersion, latestRelease);
+		return info;
+	}
+	
+	public CollectCompleteInfo getCompleteInfo(HttpServletRequest request) {
+		Version latestRelease = latestRelease();
+		Version currentVersion = Collect.VERSION;
+		CollectCompleteInfo info = new CollectCompleteInfo(currentVersion, latestRelease);
+		info.setSaikuUrl(determineSaikuUrl(request));
+		return info;
 	}
 	
 	public CollectInternalInfo getInternalInfo() {
 		return new CollectInternalInfo();
 	}
 
-	public Version latestRelease() {
+	private Version latestRelease() {
 		try {
 			CloseableHttpClient client = HttpClients.createDefault();
 			HttpGet request = new HttpGet(LATEST_RELEASE_MAVEN_METADATA_URL);
@@ -70,4 +91,13 @@ public class CollectInfoService {
 		return null;
 	}
 
+	private String determineSaikuUrl(HttpServletRequest request) {
+		String protocol = request.isSecure() ? "https" : "http";
+		String localAddr = request.getLocalAddr();
+		if (DEV_REQUEST_LOCAL_ADDRESS.equals(localAddr)) {
+			localAddr = DEV_LOCAL_ADDRESS;
+		}
+		String url = String.format(SAIKU_URL_FORMAT, protocol, localAddr, request.getLocalPort(), saikuConfiguration.getContextPath());
+		return url;
+	}
 }

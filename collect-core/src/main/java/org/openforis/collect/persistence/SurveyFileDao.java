@@ -18,6 +18,7 @@ import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
+import org.openforis.collect.persistence.SurveyFileDao.SurveyFileDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord;
@@ -27,7 +28,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord
  * @author S. Ricci
  *
  */
-public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile, SurveyFileDao.SurveyFileDSLContext> {
+public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile, SurveyFileDSLContext> {
 	
 	private static final Field<?>[] ALL_FIELDS = new Field<?>[] {
 		OFC_SURVEY_FILE.ID,

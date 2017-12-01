@@ -13,7 +13,7 @@ public class CETabSet extends CEFieldSet {
 	private List<CETab> tabs;
 	
 	public CETabSet(String name, String label) {
-		super(name, label);
+		super(name, label, null);
 		tabs = new ArrayList<CETab>();
 	}
 	

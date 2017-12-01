@@ -12,8 +12,8 @@ import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.persistence.DataCleansingChainDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +27,6 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 	@Autowired
 	private DataCleansingStepManager dataCleansingStepManager;
 	
-	@Override
-	@Autowired
-	@Qualifier("dataCleansingChainDao")
-	public void setDao(DataCleansingChainDao dao) {
-		super.setDao(dao);
-	}
-	
 	public Set<DataCleansingChain> loadByStep(DataCleansingStep step) {
 		Set<DataCleansingChain> chains = dao.loadChainsByStep(step);
 		initializeItems(chains);
@@ -42,7 +35,7 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 	
 	@Override
 	@Transactional
-	public void save(DataCleansingChain chain) {
+	public DataCleansingChain save(DataCleansingChain chain, User activeUser) {
 		List<Integer> stepIds = new ArrayList<Integer>();
 		for (DataCleansingStep step : chain.getSteps()) {
 			stepIds.add(step.getId());
@@ -50,11 +43,13 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 		if (chain.getId() != null) {
 			dao.deleteStepAssociations(chain);
 		}
-		super.save(chain);
+		super.save(chain, activeUser);
 		
 		dao.insertStepAssociations(chain, stepIds);
 		
 		initializeItem(chain);
+		
+		return chain;
 	}
 	
 	@Override

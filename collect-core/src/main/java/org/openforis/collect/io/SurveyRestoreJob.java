@@ -136,6 +136,8 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setSurveyName(surveyName);
 			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
 			t.setValidate(false);
+			t.setUserGroup(userGroup);
+			t.setActiveUser(activeUser);
 		} else if (task instanceof CodeListImagesImportTask) {
 			CodeListImagesImportTask t = (CodeListImagesImportTask) task;
 			t.setCodeListManager(codeListManager);
@@ -176,6 +178,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			this.backupInfo = t.getInfo();
 		} else if ( task instanceof IdmlUnmarshallTask ) {
 			CollectSurvey s = ((IdmlUnmarshallTask) task).getSurvey();
+			s.setUserGroupId(userGroup.getId());
 			this.surveyUri = s.getUri();
 		} else if ( task instanceof IdmlImportTask ) {
 			IdmlImportTask t = (IdmlImportTask) task;

@@ -127,7 +127,7 @@ package org.openforis.collect.presenter {
 					} else if ( limitedDataEntry ) {
 						initLimitedDataEntry();
 					} else if ( edit ) {
-						initEditRecord(int(params.surveyId), int(params.recordId), localeString);
+						initEditRecord(int(params.surveyId), int(params.recordId), localeString, true);
 					} else if ( speciesImport ) {
 						initSpeciesImport();
 					} else if ( samplingDesignImport ) {
@@ -228,7 +228,7 @@ package org.openforis.collect.presenter {
 						
 						if (records.length == 1) {
 							var record:RecordProxy = RecordProxy(records.getItemAt(0));
-							initEditRecord(surveyId, record.id, Application.localeString, false);
+							initEditRecord(surveyId, record.id, Application.localeString, true);
 						} else {
 							showListOfRecordsOrHomePage();
 						}
@@ -257,7 +257,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 
-		protected function initEditRecord(surveyId:int, recordId:int, localeString:String, onlyOneRecordEdit:Boolean = true):void {
+		protected function initEditRecord(surveyId:int, recordId:int, localeString:String, onlyOneRecordEdit:Boolean = false):void {
 			Application.onlyOneRecordEdit = onlyOneRecordEdit;
 			
 			setActiveSurvey(surveyId, function():void {

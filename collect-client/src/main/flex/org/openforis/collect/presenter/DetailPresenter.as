@@ -118,7 +118,10 @@ package org.openforis.collect.presenter {
 			FlexGlobals.topLevelApplication.header.visible = FlexGlobals.topLevelApplication.header.includeInLayout = showHeader;
 			view.topButtonBar.visible = view.topButtonBar.includeInLayout = showTopButtonBar;
 			view.bottomButtonBar.visible = view.bottomButtonBar.includeInLayout = showFooter;
-
+			view.footer.userButtonVisible = showFooter && ! onlyOneRecordEdit;
+			view.footer.footerImg.visible = showFooter && ! onlyOneRecordEdit;
+			view.footer.applicationVersionVisible = showFooter && !onlyOneRecordEdit;
+			
 			view.backToListButton.visible = view.backToListButton.includeInLayout = showBackToListButton;
 			view.submitButton.visible = view.submitButton.includeInLayout = canSubmit;
 			view.rejectButton.visible = view.rejectButton.includeInLayout = canReject;

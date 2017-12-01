@@ -21,7 +21,7 @@ package org.openforis.collect.util {
 		private static const SPECIES_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "species/import/example.htm";
 		private static const _SPECIES_EXPORT_URL:String = "survey/{0}/taxonomy/{1}/export.csv";
 		
-		private static const _SAMPLING_DESIGN_EXPORT_URL:String = "survey/{0}/sampling-point-data.csv";
+		private static const _SAMPLING_DESIGN_EXPORT_URL:String = "survey/{0}/sampling_point_data.csv";
 		private static const SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "samplingdesign/import/example.htm";
 
 		private static const CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "codelist/import/example.htm";

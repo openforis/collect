@@ -52,6 +52,9 @@ public final class Coordinate extends AbstractValue {
 		}
 	}
 	
+	public Coordinate() {
+	}
+	
 	public Coordinate(Double x, Double y, String srsId) {
 		this.x = x;
 		this.y = y;
@@ -76,8 +79,16 @@ public final class Coordinate extends AbstractValue {
 		return x;
 	}
 
+	public void setX(Double x) {
+		this.x = x;
+	}
+	
 	public Double getY() {
 		return y;
+	}
+	
+	public void setY(Double y) {
+		this.y = y;
 	}
 
 	public String getSrsId() {

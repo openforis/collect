@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/collect" reloadable="false">
+    
     <ResourceLink name="jdbc/collectDs"
         type="javax.sql.DataSource"
         global="jdbc/collectDs"/>
+    
     <ResourceLink name="jdbc/collectRDBDs"
         type="javax.sql.DataSource"
         global="jdbc/collectRDBDs"/>
+        
+	<Parameter name="devMode" value="false" />
+	
 </Context>

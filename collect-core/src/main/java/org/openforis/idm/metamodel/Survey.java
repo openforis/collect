@@ -100,18 +100,19 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		coordinateOperations.registerSRS(getSpatialReferenceSystems());
 	}
 	
-	public Record createRecord() {
-		String version;
-		if (getVersions().isEmpty()) {
-			version = null;
-		} else {
-			version = modelVersions.get(modelVersions.size() - 1).getName();
-		}
-		return createRecord(version);
+	public <R extends Record> R createRecord() {
+		ModelVersion latestVersion = getLatestVersion();
+		String versionName = latestVersion == null ? null : latestVersion.getName();
+		return createRecord(versionName, getSchema().getFirstRootEntityDefinition());
 	}
 	
-	public Record createRecord(String version) {
-		return new Record(this, version);
+	public <R extends Record> R createRecord(String versionName, String rootEntityName) {
+		return createRecord(versionName, getSchema().getRootEntityDefinition(rootEntityName));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <R extends Record> R createRecord(String versionName, EntityDefinition rootEntityDefinition) {
+		return (R) new Record(this, versionName, rootEntityDefinition);
 	}
 
 	public void setLastId(int lastId) {
@@ -192,10 +193,20 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 	
 	public String getProjectName(String language) {
-		if ( language == null ) {
-			language = getDefaultLanguage();
+		return getProjectName(language, false);
+	}
+	
+	public String getProjectName(String language, boolean defaultToDefaultLanguage) {
+		if (projectNames == null) {
+			return null;
 		}
-		return projectNames == null ? null: projectNames.getText(language);
+		if ( language != null && projectNames.hasText(language)) {
+			return projectNames.getText(language);
+		} else if (defaultToDefaultLanguage) {
+			return projectNames.getText(getDefaultLanguage());
+		} else {
+			return null;
+		}
 	}
 	
 	public void setProjectName(String language, String text) {
@@ -528,11 +539,12 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		return null;
 	}
 
-	public ApplicationOptions getApplicationOptions(String type) {
+	@SuppressWarnings("unchecked")
+	public <A extends ApplicationOptions> A getApplicationOptions(String type) {
 		if ( applicationOptionsMap == null ) {
 			return null;
 		} else {
-			return applicationOptionsMap.get(type);
+			return (A) applicationOptionsMap.get(type);
 		}
 	}
 
@@ -697,6 +709,31 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		return surveyDependencies;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Survey other = (Survey) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
 	@Override
 	public boolean deepEquals(Object obj) {
 		if (this == obj)

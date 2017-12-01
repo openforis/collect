@@ -8,8 +8,8 @@ public class CollectJettyServer extends JettyApplicationServer {
 
 	public static final String WEBAPP_NAME = "collect";
 
-	public CollectJettyServer(int port, File webappsFolder, File logFile, JndiDataSourceConfiguration... jndiDsConfigurations) {
-		super(port, webappsFolder, logFile, jndiDsConfigurations);
+	public CollectJettyServer(int port, File webappsFolder, JndiDataSourceConfiguration... jndiDsConfigurations) {
+		super(port, webappsFolder, jndiDsConfigurations);
 	}
 	
 	@Override

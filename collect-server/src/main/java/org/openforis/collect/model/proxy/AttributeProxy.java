@@ -5,9 +5,9 @@ package org.openforis.collect.model.proxy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -24,14 +24,14 @@ public class AttributeProxy extends NodeProxy {
 	private ValidationResultsProxy validationResults;
 	private boolean errorConfirmed;
 	
-	public AttributeProxy(EntityProxy parent, Attribute<?, ?> attribute, Locale locale) {
-		super(parent, attribute, locale);
+	public AttributeProxy(EntityProxy parent, Attribute<?, ?> attribute, ProxyContext context) {
+		super(parent, attribute, context);
 		this.attribute = attribute;
 		ValidationResults validationRes = attribute.getValidationResults();
 		if ( validationRes == null ) {
 			validationRes = new ValidationResults();
 		}
-		this.validationResults = new ValidationResultsProxy(getMessageSource(), locale, attribute, validationRes);
+		this.validationResults = new ValidationResultsProxy(context, attribute, validationRes);
 		this.errorConfirmed = ((CollectRecord) attribute.getRecord()).isErrorConfirmed(attribute);
 	}
 

@@ -16,6 +16,7 @@ import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyRestoreJob;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Task;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -41,6 +42,7 @@ public class CollectMobileBackupConvertTask extends Task {
 	
 	//transient
 	private ConfigurableApplicationContext ctx;
+	private UserGroupManager userGroupManager;
 	
 	@Override
 	protected void createInternalVariables() throws Throwable {
@@ -56,6 +58,8 @@ public class CollectMobileBackupConvertTask extends Task {
 				"/" + serverApplicationContextFile.getAbsolutePath(), 
 				"/" + dataSourceConfigFile.getAbsolutePath()
 				);
+		
+		userGroupManager = ctx.getBean(UserGroupManager.class);
 
 		super.createInternalVariables();
 	}
@@ -84,6 +88,7 @@ public class CollectMobileBackupConvertTask extends Task {
 
 		restoreJob.setFile(collectBackupFile);
 		restoreJob.setSurveyName(surveyName);
+		restoreJob.setUserGroup(userGroupManager.getDefaultPublicUserGroup());
 		restoreJob.setRestoreIntoPublishedSurvey(true);
 		restoreJob.setValidateSurvey(false);
 		jobManager.start(restoreJob, false);

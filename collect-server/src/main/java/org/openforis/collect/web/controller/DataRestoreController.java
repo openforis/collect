@@ -1,35 +1,45 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipException;
 
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.data.DataRestoreJob;
+import org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy;
 import org.openforis.collect.manager.ConfigurationManager;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
+import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRoles;
 import org.openforis.collect.web.controller.upload.UploadItem;
 import org.openforis.commons.web.JobStatusResponse;
 import org.openforis.concurrency.Job;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
@@ -37,6 +47,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
  *
  */
 @Controller
+@RequestMapping("api")
+@Scope(SCOPE_SESSION)
 public class DataRestoreController extends BasicController {
 
 	//private static Log LOG = LogFactory.getLog(RestoreController.class);
@@ -47,14 +59,22 @@ public class DataRestoreController extends BasicController {
 	private ConfigurationManager configurationManager;
 	@Autowired
 	private CollectJobManager jobManager;
+	@Autowired
+	private SessionManager sessionManager;
+	@Autowired
+	private UserManager userManager;
 	
-	@RequestMapping(value = "/surveys/data/restore.json", method = RequestMethod.POST)
-	public @ResponseBody JobStatusResponse restoreData(UploadItem uploadItem, 
+	@Secured({UserRoles.ENTRY})
+	@RequestMapping(value = "/surveys/restore/data", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
+	public @ResponseBody JobStatusResponse restoreData(@RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam(required=false) String surveyName,
-			@RequestParam boolean validateRecords,
-			@RequestParam boolean deleteAllRecords) throws IOException {
+			@RequestParam(required=false, defaultValue="true") boolean validateRecords,
+			@RequestParam(required=false, defaultValue="false") boolean deleteAllRecordsBeforeImport,
+			@RequestParam(required=false, defaultValue="OVERWRITE_OLDER") String recordOverwriteStrategy) throws IOException {
+		User loggedUser = sessionManager.getLoggedUser();
 		try {
-			DataRestoreJob job = startRestoreJob(uploadItem, surveyName == null, surveyName, validateRecords, deleteAllRecords);
+			DataRestoreJob job = startRestoreJob(multipartFile.getInputStream(), surveyName == null, surveyName, loggedUser,
+					validateRecords, deleteAllRecordsBeforeImport, OverwriteStrategy.valueOf(recordOverwriteStrategy));
 			return createResponse(job);
 		} catch (Exception e) {
 			JobStatusResponse response = new JobStatusResponse();
@@ -64,15 +84,18 @@ public class DataRestoreController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value = "/surveys/{surveyName}/data/restore-remotely.json", method = RequestMethod.POST)
-	public @ResponseBody RemoteDataRestoreResponse restoreDataRemotely(UploadItem uploadItem, @PathVariable String surveyName, 
+	@RequestMapping(value = "/surveys/{surveyName}/data/restoreremotely.json", method=POST)
+	public @ResponseBody RemoteDataRestoreResponse restoreDataRemotely(UploadItem uploadItem, 
+			@PathVariable String surveyName, 
 			@RequestParam String restoreKey) {
 		RemoteDataRestoreResponse response = new RemoteDataRestoreResponse();
 		String allowedRestoreKey = configurationManager.getConfiguration().get(ConfigurationItem.ALLOWED_RESTORE_KEY);
 		if (StringUtils.isBlank(allowedRestoreKey) || allowedRestoreKey.equals(restoreKey)) {
 			try {
+				User user = userManager.loadAdminUser();
 				boolean newSurvey = surveyManager.get(surveyName) == null;
-				DataRestoreJob job = startRestoreJob(uploadItem, newSurvey, surveyName, true, false);
+				DataRestoreJob job = startRestoreJob(uploadItem.getFileData().getInputStream(), newSurvey, surveyName, user,
+						true, false, OverwriteStrategy.OVERWRITE_OLDER);
 				response.setJobId(job.getId().toString());
 			} catch (Exception e) {
 				response.setErrorStatus();
@@ -85,7 +108,8 @@ public class DataRestoreController extends BasicController {
 		return response;
 	}
 	
-	@RequestMapping(value = "/surveys/data/restore/jobs/{jobId}/status.json", method = RequestMethod.GET)
+	@Secured({UserRoles.ENTRY})
+	@RequestMapping(value = "/surveys/data/restorejobs/{jobId}/status.json", method=GET)
 	public @ResponseBody RemoteDataRestoreResponse getRestoreDataRemotelyStatus(@PathVariable String jobId) throws IOException {
 		RemoteDataRestoreResponse response;
 		Job job = jobManager.getJob(jobId);
@@ -99,7 +123,7 @@ public class DataRestoreController extends BasicController {
 		return response;
 	}
 
-	@RequestMapping(value = "/surveys/data/restore/jobs/{jobId}/abort.json", method = RequestMethod.GET)
+	@RequestMapping(value = "/surveys/data/restore/jobs/{jobId}/abort.json", method=GET)
 	public @ResponseBody RemoteDataRestoreResponse abortRestoreDataRemotelyJob(@PathVariable String jobId) throws IOException {
 		RemoteDataRestoreResponse response;
 		Job job = jobManager.getJob(jobId);
@@ -133,10 +157,12 @@ public class DataRestoreController extends BasicController {
 		response.setErrorMessage(job.getErrorMessage());
 	}
 	
-	private DataRestoreJob startRestoreJob(UploadItem uploadItem, boolean newSurvey, 
-			String expectedSurveyName, boolean validateRecords, boolean deleteAllRecords) 
-				throws IOException,	FileNotFoundException, ZipException {
-		File tempFile = copyContentToFile(uploadItem);
+	private DataRestoreJob startRestoreJob(InputStream fileInputStream, boolean newSurvey, 
+			String expectedSurveyName, User user, boolean validateRecords, boolean deleteAllRecords,
+			OverwriteStrategy recordOverwriteStrategy) throws IOException,	FileNotFoundException, ZipException {
+		File tempFile = File.createTempFile("ofc_data_restore", ".collect-data");
+		FileUtils.copyInputStreamToFile(fileInputStream, tempFile);
+		
 		SurveyBackupInfo info = extractInfo(tempFile);
 		
 		CollectSurvey publishedSurvey = findPublishedSurvey(info);
@@ -147,10 +173,11 @@ public class DataRestoreController extends BasicController {
 		}
 		
 		DataRestoreJob job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
+		job.setUser(user);
 		job.setStoreRestoredFile(true);
 		job.setPublishedSurvey(publishedSurvey);
 		job.setFile(tempFile);
-		job.setOverwriteAll(true);
+		job.setRecordOverwriteStrategy(recordOverwriteStrategy);
 		job.setRestoreUploadedFiles(true);
 		job.setValidateRecords(validateRecords);
 		job.setDeleteAllRecordsBeforeRestore(deleteAllRecords);
@@ -214,18 +241,6 @@ public class DataRestoreController extends BasicController {
 		} finally {
 			IOUtils.closeQuietly(backupFileExtractor);
 		}
-	}
-	
-	private File copyContentToFile(UploadItem uploadItem) throws IOException,
-			FileNotFoundException {
-		CommonsMultipartFile fileData = uploadItem.getFileData();
-		InputStream is = fileData.getInputStream();
-		String fileName = uploadItem.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		File tempFile = File.createTempFile("collect-upload-item", "." + extension);
-		FileOutputStream os = new FileOutputStream(tempFile);
-		IOUtils.copy(is, os);
-		return tempFile;
 	}
 	
 	public static class RemoteDataRestoreResponse extends JobStatusResponse {

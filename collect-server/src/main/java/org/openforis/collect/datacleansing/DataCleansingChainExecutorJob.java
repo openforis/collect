@@ -1,6 +1,5 @@
 package org.openforis.collect.datacleansing;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +12,8 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordUpdater;
-import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
+import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport.CollectStoreQueryBuffer;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.model.Attribute;
@@ -44,6 +44,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	//input
 	private DataCleansingChain chain;
 	private Step recordStep;
+	private User activeUser;
 
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -63,7 +64,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 			report.setCleansingChainId(chain.getId());
 			report.setCleansedRecords(task.getCleansedRecords());
 			report.setCleansedNodes(task.getCleansedNodes());
-			reportManager.save(report);
+			reportManager.save(report, activeUser);
 		}
 	}
 	
@@ -74,6 +75,10 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	
 	public void setRecordStep(Step recordStep) {
 		this.recordStep = recordStep;
+	}
+	
+	public void setActiveUser(User activeUser) {
+		this.activeUser = activeUser;
 	}
 	
 	private DataCleansingChainExectutorTask getChainExecutorTask() {
@@ -101,12 +106,12 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		private DataCleansingChain chain;
 		private CollectRecord lastRecord;
 		private RecordUpdater recordUpdater;
-		private QueryBuffer queryBuffer;
+		private CollectStoreQueryBuffer queryBuffer;
 		
 		public DataCleansingChainNodeProcessor(DataCleansingChain chain) {
 			this.chain = chain;
 			this.recordUpdater = new RecordUpdater();
-			this.queryBuffer = new QueryBuffer();
+			this.queryBuffer = new CollectStoreQueryBuffer();
 		}
 		
 		@Override
@@ -183,7 +188,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 			if (lastRecord != null) {
 				appendLastRecordUpdate();
 			}
-			queryBuffer.flush();
+			recordManager.execute(queryBuffer.flush());
 		}
 
 		private void appendRecordUpdate(CollectRecord record) {
@@ -194,48 +199,12 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		}
 
 		private void appendLastRecordUpdate() {
-			if (recordStep == Step.ANALYSIS) {
-				//save the data
-				appendRecordUpdateQuery(lastRecord, Step.CLEANSING);
-				//restore the original record step
-				appendRecordUpdateQuery(lastRecord, Step.ANALYSIS);
-			} else {
-				appendRecordUpdateQuery(lastRecord, lastRecord.getStep());
-			}
+			appendRecordUpdateQuery(lastRecord, lastRecord.getDataStep(), lastRecord.getDataWorkflowSequenceNumber());
 		}
 		
-		private void appendRecordUpdateQuery(CollectRecord record, Step step) {
+		private void appendRecordUpdateQuery(CollectRecord record, Step step, int dataSequenceNumber) {
 			record.updateSummaryFields();
-			queryBuffer.append(recordManager.createUpdateQuery(record, step));
-		}
-		
-		private class QueryBuffer {
-			
-			private static final int DEFAULT_BATCH_SIZE = 100;
-			
-			private int bufferSize;
-			private List<RecordStoreQuery> buffer;
-			
-			public QueryBuffer() {
-				this(DEFAULT_BATCH_SIZE);
-			}
-			
-			public QueryBuffer(int size) {
-				this.bufferSize = size;
-				this.buffer = new ArrayList<RecordStoreQuery>(size);
-			}
-			
-			void append(RecordStoreQuery query) {
-				buffer.add(query);
-				if (buffer.size() == bufferSize) {
-					flush();
-				}
-			}
-
-			void flush() {
-				recordManager.execute(buffer);
-				buffer.clear();
-			}
+			queryBuffer.append(recordManager.createDataUpdateQuery(record, record.getId(), step, dataSequenceNumber));
 		}
 	}
 

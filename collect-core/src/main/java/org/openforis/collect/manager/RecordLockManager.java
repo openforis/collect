@@ -51,7 +51,7 @@ public class RecordLockManager {
 				return true;
 			} else {
 				User lockUser = lock.getUser();
-				lockUserName = lockUser.getName();
+				lockUserName = lockUser.getUsername();
 			}
 		}
 		throw new RecordUnlockedException(lockUserName);
@@ -86,9 +86,9 @@ public class RecordLockManager {
 		if ( lock == null || ( forceUnlock && isForceUnlockAllowed(user, lock) ) ) {
 			return true;
 		} else if ( lock.getUser().getId().equals(user.getId()) ) {
-			throw new RecordLockedByActiveUserException(user.getName());
+			throw new RecordLockedByActiveUserException(user.getUsername());
 		} else {
-			String lockingUserName = lock.getUser().getName();
+			String lockingUserName = lock.getUser().getUsername();
 			throw new RecordLockedException("Record already locked", lockingUserName);
 		}
 	}

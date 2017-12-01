@@ -1,6 +1,5 @@
 package org.openforis.web.server;
 
-import java.io.File;
 import java.io.IOException;
 
 public interface ApplicationServer {
@@ -14,7 +13,5 @@ public interface ApplicationServer {
 	boolean isRunning();
 
 	String getUrl();
-
-	File getLogFile();
 
 }

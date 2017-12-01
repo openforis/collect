@@ -29,13 +29,14 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcUserRoleRecord;
  * @author S. Ricci
  * 
  */
-public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
+public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> implements PersistedObjectDao<User, Integer> {
 
 	public UserDao() {
 		super(UserDao.UserDSLContext.class);
 	}
 
-	public User loadById(int id){
+	@Override
+	public User loadById(Integer id){
 		UserDSLContext dsl = dsl();
 		SelectQuery<?> query = dsl.selectByIdQuery(id);
 		Record r = query.fetchOne();
@@ -57,6 +58,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 		return user;
 	}
 	
+	@Override
 	public List<User> loadAll() {
 		UserDSLContext dsl = dsl();
 		Result<OfcUserRecord> r = 
@@ -92,7 +94,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 	}
 
 	@Override
-	public void delete(int id) {
+	public void delete(Integer id) {
 		dsl().deleteRoles(id);
 		super.delete(id);
 	}
@@ -121,7 +123,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 			boolean enabled = "Y".equals(enabledFlag);
 			user.setEnabled(enabled);
 			user.setId(r.getValue(OFC_USER.ID));
-			user.setName(r.getValue(OFC_USER.USERNAME));
+			user.setUsername(r.getValue(OFC_USER.USERNAME));
 			user.setPassword(r.getValue(OFC_USER.PASSWORD));
 			
 			loadRoles(user);
@@ -133,7 +135,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 			String enabledFlag = enabled != null && enabled.booleanValue() ? "Y": "N";
 			q.addValue(OFC_USER.ENABLED, enabledFlag);
 			q.addValue(OFC_USER.ID, user.getId());
-			q.addValue(OFC_USER.USERNAME, user.getName());
+			q.addValue(OFC_USER.USERNAME, user.getUsername());
 			q.addValue(OFC_USER.PASSWORD, user.getPassword());
 		}
 		

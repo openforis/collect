@@ -22,11 +22,11 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 
 	private String kmlFormat;
 	
-	public CoordinateColumnProvider(CSVExportConfiguration config,CoordinateAttributeDefinition defn) {
+	public CoordinateColumnProvider(CSVDataExportParameters config,CoordinateAttributeDefinition defn) {
 		this(config, defn, KML_POINT_FORMAT);
 	}
 	
-	public CoordinateColumnProvider(CSVExportConfiguration config,CoordinateAttributeDefinition defn, String kmlFormat) {
+	public CoordinateColumnProvider(CSVDataExportParameters config,CoordinateAttributeDefinition defn, String kmlFormat) {
 		super(config, defn);
 		this.kmlFormat = kmlFormat;
 	}

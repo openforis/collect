@@ -14,9 +14,12 @@ import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.versioning.Version;
 import org.openforis.concurrency.Job;
@@ -38,11 +41,15 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected RecordFileManager recordFileManager;
 	@Autowired
 	protected UserManager userManager;
+	@Autowired
+	protected UserGroupManager userGroupManager;
 	
 	//input
 	protected transient File file;
 	protected transient CollectSurvey publishedSurvey; //optional: if not specified, the packaged survey will be published as a new one
 	protected transient CollectSurvey packagedSurvey; //optional: if not specified, it will be extracted from the ZIP file
+	protected transient User user;
+	protected transient UserGroup newSurveyUserGroup;
 	protected transient boolean validateRecords;
 	protected transient boolean closeRecordProviderOnComplete = true;
 	protected transient Predicate<CollectRecord> includeRecordPredicate;
@@ -130,6 +137,7 @@ public abstract class DataRestoreBaseJob extends Job {
 			t.setRestoreIntoPublishedSurvey(true);
 			t.setSurveyName(surveyName);
 			t.setValidateSurvey(true);
+			t.setUserGroup(newSurveyUserGroup);
 		} else if ( task instanceof IdmlUnmarshallTask ) {
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			File idmlFile = backupFileExtractor.extractIdmlFile();
@@ -252,5 +260,21 @@ public abstract class DataRestoreBaseJob extends Job {
 	
 	public void setCloseRecordProviderOnComplete(boolean closeRecordProviderOnComplete) {
 		this.closeRecordProviderOnComplete = closeRecordProviderOnComplete;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	public UserGroup getNewSurveyUserGroup() {
+		return newSurveyUserGroup;
+	}
+	
+	public void setNewSurveyUserGroup(UserGroup newSurveyUserGroup) {
+		this.newSurveyUserGroup = newSurveyUserGroup;
 	}
 }

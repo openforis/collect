@@ -6,8 +6,8 @@ package org.openforis.collect.io.data;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +35,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeAddChange;
 import org.openforis.collect.model.NodeChange;
@@ -93,7 +94,7 @@ public class CSVDataImportJob extends Job {
 	@Override
 	protected void buildTasks() throws Throwable {
 		String extension = FilenameUtils.getExtension(input.file.getName());
-		if ("zip".equalsIgnoreCase(extension)) {
+		if (Files.ZIP_FILE_EXTENSION.equalsIgnoreCase(extension)) {
 			tempInputFilesFolder = Files.createTempDirectory();
 			ZipFiles.extract(input.file, tempInputFilesFolder);
 			List<String> fileNames = Files.listFileNamesInFolder(tempInputFilesFolder);
@@ -111,7 +112,7 @@ public class CSVDataImportJob extends Job {
 					if (! entityDef.isRoot()) {
 						settings.setInsertNewRecords(false);
 					}
-					task.input = new CSVDataImportInput(file, input.survey, input.step, entityDef.getId(), settings);
+					task.input = new CSVDataImportInput(file, input.survey, input.steps, entityDef.getId(), settings);
 					addTask(task);
 					processedFileNames.add(fileName);
 				}
@@ -230,25 +231,38 @@ public class CSVDataImportJob extends Job {
 		/**
 		 * Record step that will be considered for insert or update
 		 */
-		private Step step;
+		private Set<Step> steps = new HashSet<Step>();
 		/**
 		 * Entity definition that should be considered as the parent of each attribute in the csv file
 		 */
-		private int parentEntityDefinitionId;
+		private Integer parentEntityDefinitionId;
 		
 		private EntityDefinition parentEntityDefinition;
 		
 		private CSVDataImportSettings settings;
 
-		public CSVDataImportInput(File file, CollectSurvey survey, Step step, int parentEntityDefinitionId,
+		public CSVDataImportInput(File file, CollectSurvey survey, Step[] steps, Integer parentEntityDefinitionId,
+				CSVDataImportSettings settings) {
+			this(file, survey, toSet(steps), parentEntityDefinitionId, settings);
+		}
+		
+		public CSVDataImportInput(File file, CollectSurvey survey, Set<Step> steps, Integer parentEntityDefinitionId,
 				CSVDataImportSettings settings) {
 			super();
 			this.file = file;
 			this.survey = survey;
-			this.step = step;
-			this.parentEntityDefinitionId = parentEntityDefinitionId;
+			this.steps = steps;
 			this.settings = settings == null ? new CSVDataImportSettings(): settings;
-			this.parentEntityDefinition = (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
+			this.parentEntityDefinitionId = parentEntityDefinitionId;
+			this.parentEntityDefinition = parentEntityDefinitionId == null ? null : (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
+		}
+
+		private static Set<Step> toSet(Step[] arr) {
+			if (arr == null) {
+				return Collections.emptySet();
+			} else {
+				return new HashSet<Step>(Arrays.asList(arr));
+			}
 		}
 
 		public File getFile() {
@@ -267,19 +281,19 @@ public class CSVDataImportJob extends Job {
 			this.survey = survey;
 		}
 
-		public Step getStep() {
-			return step;
+		public Set<Step> getSteps() {
+			return steps;
 		}
 
-		public void setStep(Step step) {
-			this.step = step;
+		public void setSteps(Set<Step> steps) {
+			this.steps = steps;
 		}
 
-		public int getParentEntityDefinitionId() {
+		public Integer getParentEntityDefinitionId() {
 			return parentEntityDefinitionId;
 		}
 
-		public void setParentEntityDefinitionId(int parentEntityDefinitionId) {
+		public void setParentEntityDefinitionId(Integer parentEntityDefinitionId) {
 			this.parentEntityDefinitionId = parentEntityDefinitionId;
 		}
 		
@@ -301,17 +315,17 @@ public class CSVDataImportJob extends Job {
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public static class CSVDataImportTask extends Task {
 
-		private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "csvDataImport.error.internalErrorImportingFile";
-		private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";
-		private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
-//		private static final String ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY = "csvDataImport.error.onlyNewRecordsAllowed";
-		private static final String MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY = "csvDataImport.error.multipleParentEntityFound";
-		private static final String PARENT_ENTITY_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.noParentEntityFound";
-		private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.unitNotFound";
-		private static final String SRS_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.srsNotFound";
-		private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "csvDataImport.error.recordNotInSelectedStep";
-		private static final String NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY = "csvDataImport.error.noRootEntitySelected";
-		private static final String NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noModelVersionFound";
+		private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.internalErrorImportingFile";
+		private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.noRecordFound";
+		private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.multipleRecordsFound";
+//		private static final String ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY = "dataManagement.csvDataImport.error.onlyNewRecordsAllowed";
+		private static final String MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.multipleParentEntityFound";
+		private static final String PARENT_ENTITY_NOT_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.noParentEntityFound";
+		private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.unitNotFound";
+		private static final String SRS_NOT_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.srsNotFound";
+		private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "dataManagement.csvDataImport.error.recordNotInSelectedStep";
+		private static final String NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.noRootEntitySelected";
+		private static final String NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY = "dataManagement.csvDataImport.error.noModelVersionFound";
 
 		@Autowired
 		private UserManager userManager;
@@ -324,7 +338,7 @@ public class CSVDataImportJob extends Job {
 
 		//transient variables
 		private RecordUpdater recordUpdater;
-		private CollectRecord lastModifiedRecordSummary;
+		private CollectRecordSummary lastModifiedRecordSummary;
 		private CollectRecord lastModifiedRecord;
 		private User adminUser;
 		private Set<RecordStepKey> deletedEntitiesRecordKeys;
@@ -394,7 +408,7 @@ public class CSVDataImportJob extends Job {
 					}
 					if ( ! reader.isReady() ) {
 						//end of file reached
-						if ( input.step != null && lastModifiedRecordSummary != null ) {
+						if ( input.steps.size() == 1 && lastModifiedRecordSummary != null ) {
 							saveLastModifiedRecord();
 						}
 						break;
@@ -418,7 +432,7 @@ public class CSVDataImportJob extends Job {
 			if (! validateRecordKey(line) ) {
 				return;
 			}
-			CollectRecord recordSummary = loadRecordSummary(line);
+			CollectRecordSummary recordSummary = loadRecordSummary(line);
 			if (recordSummary == null && input.settings.isInsertNewRecords() ) {
 				//create new record
 				EntityDefinition rootEntityDefn = input.parentEntityDefinition;
@@ -426,25 +440,26 @@ public class CSVDataImportJob extends Job {
 						adminUser, input.settings.getNewRecordVersionName(), Step.ENTRY);
 				NodeChangeSet changes = recordManager.initializeRecord(record);
 				if (nodeChangeBatchProcessor != null) {
-					nodeChangeBatchProcessor.add(changes, adminUser.getName());
+					nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 				}
 				setRecordKeys(line, record);
 				setValuesInRecord(line, record, Step.ENTRY);
 				insertRecord(record);
-			} else if ( input.step == null ) {
+			} else if ( input.steps.size() > 1) {
 				Step originalRecordStep = recordSummary.getStep();
 				//set values in each step data
-				for (Step currentStep : Step.values()) {
+				for (Step currentStep : input.steps) {
 					if ( currentStep.beforeEqual(originalRecordStep) ) {
 						CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
 						setValuesInRecord(line, record, currentStep);
 						//always save record when updating multiple record steps in the same process
-						updateRecord(record, originalRecordStep, currentStep);
+						updateRecordData(record, originalRecordStep, currentStep);
 					}
 				}
 			} else {
 				Step originalRecordStep = recordSummary.getStep();
-				if ( input.step.beforeEqual(originalRecordStep) ) {
+				Step inputStep = input.steps.iterator().next();
+				if ( inputStep.beforeEqual(originalRecordStep) ) {
 					CollectRecord record;
 					boolean recordChanged = lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() );
 					if ( recordChanged ) {
@@ -452,11 +467,11 @@ public class CSVDataImportJob extends Job {
 						if ( lastModifiedRecordSummary != null ) {
 							saveLastModifiedRecord();
 						}
-						record = loadRecord(recordSummary.getId(), input.step);
+						record = loadRecord(recordSummary.getId(), inputStep);
 					} else {
 						record = lastModifiedRecord;
 					}
-					setValuesInRecord(line, record, input.step);
+					setValuesInRecord(line, record, inputStep);
 					lastModifiedRecordSummary = recordSummary;
 					lastModifiedRecord = record;
 				} else {
@@ -484,7 +499,7 @@ public class CSVDataImportJob extends Job {
 			for (Entity entity : entitiesToBeDeleted) {
 				NodeChangeSet changes = recordUpdater.deleteNode(entity);
 				if (nodeChangeBatchProcessor != null) {
-					nodeChangeBatchProcessor.add(changes, adminUser.getName());
+					nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 				}
 			}
 		}
@@ -508,16 +523,17 @@ public class CSVDataImportJob extends Job {
 
 		private void saveLastModifiedRecord() throws RecordPersistenceException {
 			Step originalStep = lastModifiedRecordSummary.getStep();
+			Step inputStep = input.steps.iterator().next();
+
+			updateRecordData(lastModifiedRecord, originalStep, inputStep);
 			
-			updateRecord(lastModifiedRecord, originalStep, input.step);
-			
-			if ( input.step.compareTo(originalStep) < 0 ) {
+			if ( inputStep.compareTo(originalStep) < 0 ) {
 				//reset record step to the original one
 				CollectRecord record = recordManager.load(input.survey, lastModifiedRecordSummary.getId(), 
 						originalStep, input.settings.isRecordValidationEnabled());
 				record.setStep(originalStep);
 				
-				updateRecord(record, originalStep, originalStep);
+				updateRecordData(record, originalStep, originalStep);
 			}
 		}
 		
@@ -554,13 +570,15 @@ public class CSVDataImportJob extends Job {
 			}
 		}
 		
-		private CollectRecord loadRecordSummary(DataLine line) {
+		private CollectRecordSummary loadRecordSummary(DataLine line) {
 			EntityDefinition parentEntityDefn = input.parentEntityDefinition;
 			EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 			Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-			List<CollectRecord> recordSummaries = recordManager.loadSummaries(input.survey, rootEntityDefn.getName(), 
-					Values.toStringValues(recordKeyValues));
-			CollectRecord recordSummary = recordSummaries.isEmpty() ? null : recordSummaries.get(0);
+			RecordFilter filter = new RecordFilter(input.survey);
+			filter.setRootEntityId(rootEntityDefn.getId());
+			filter.setKeyValues(Values.toStringValues(recordKeyValues));
+			List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
+			CollectRecordSummary recordSummary = recordSummaries.isEmpty() ? null : recordSummaries.get(0);
 			return recordSummary;
 		}
 
@@ -594,7 +612,7 @@ public class CSVDataImportJob extends Job {
 						Node<?> node = attributes.get(0);
 						NodeChangeSet changes = recordUpdater.deleteNode(node);
 						if (nodeChangeBatchProcessor != null) {
-							nodeChangeBatchProcessor.add(changes, adminUser.getName());
+							nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 						}
 					}
 				}
@@ -634,10 +652,14 @@ public class CSVDataImportJob extends Job {
 		}
 		
 		private <V extends Value> void setValueInAttribute(Attribute<?, V> keyAttr, String value, long row, String colName) {
-			V val = keyAttr.getDefinition().createValue(value);
-			NodeChangeSet changes = recordUpdater.updateAttribute(keyAttr, val);
-			if (nodeChangeBatchProcessor != null) {
-				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			try {
+				V val = keyAttr.getDefinition().createValue(value);
+				NodeChangeSet changes = recordUpdater.updateAttribute(keyAttr, val);
+				if (nodeChangeBatchProcessor != null) {
+					nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
+				}
+			} catch ( Exception e) {
+				dataImportStatus.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName));
 			}
 		}
 		
@@ -654,7 +676,7 @@ public class CSVDataImportJob extends Job {
 				Object fieldValue = field.parseValue(value);
 				NodeChangeSet changes = recordUpdater.updateField(field, fieldValue);
 				if (nodeChangeBatchProcessor != null) {
-					nodeChangeBatchProcessor.add(changes, adminUser.getName());
+					nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 				}
 			}
 		}
@@ -677,7 +699,7 @@ public class CSVDataImportJob extends Job {
 				Field<String> field = ((CoordinateAttribute) attr).getSrsIdField();
 				NodeChangeSet changes = recordUpdater.updateField(field, value);
 				if (nodeChangeBatchProcessor != null) {
-					nodeChangeBatchProcessor.add(changes, adminUser.getName());
+					nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 				}
 			}
 		}
@@ -698,7 +720,7 @@ public class CSVDataImportJob extends Job {
 					Field<Integer> field = ((NumberAttribute<?, ?>) attr).getUnitField();
 					NodeChangeSet changes = recordUpdater.updateField(field, unit.getId());
 					if (nodeChangeBatchProcessor != null) {
-						nodeChangeBatchProcessor.add(changes, adminUser.getName());
+						nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 					}
 				}
 			}
@@ -728,16 +750,18 @@ public class CSVDataImportJob extends Job {
 			}
 		}
 
-		private void updateRecord(final CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
-			record.setModifiedDate(new Date());
-			record.setModifiedBy(adminUser);
-			
-			if ( dataStep == Step.ANALYSIS ) {
-				record.setStep(Step.CLEANSING);
-				recordManager.save(record);
-				record.setStep(Step.ANALYSIS);
-			}
-			performRecordSave(record);
+		private void updateRecordData(final CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
+			performRecordUpdate(record, dataStep, record.getDataWorkflowSequenceNumber());
+		}
+		
+		private void performRecordUpdate(final CollectRecord record, Step step, int sequenceNumber) {
+			recordManager.updateRecordStepDataAndRun(record, step, sequenceNumber, adminUser, false, new Runnable() {
+				public void run() {
+					if (nodeChangeBatchProcessor != null) {
+						nodeChangeBatchProcessor.process(record);
+					}
+				}
+			});
 		}
 
 		private void insertRecord(final CollectRecord record) throws RecordPersistenceException {

@@ -41,6 +41,7 @@ import org.openforis.collect.model.NodeAddChange;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeChangeBatchProcessor;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -220,7 +221,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			CollectRecord record = recordManager.instantiateRecord(survey, rootEntityDefn.getName(), adminUser, settings.getNewRecordVersionName(), Step.ENTRY);
 			NodeChangeSet changes = recordManager.initializeRecord(record);
 			if (nodeChangeBatchProcessor != null) {
-				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+				nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 			}
 			setRecordKeys(line, record);
 			setValuesInRecord(line, record, Step.ENTRY);
@@ -228,8 +229,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		} else {
 			CollectRecordSummary recordSummary = loadRecordSummaryIfAny(line);
 			if (recordSummary != null) {
+				Step originalRecordStep = recordSummary.getStep();
 				if ( step == null ) {
-					Step originalRecordStep = recordSummary.getStep();
 					//set values in each step data
 					for (Step currentStep : Step.values()) {
 						if ( currentStep.beforeEqual(originalRecordStep) ) {
@@ -240,7 +241,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						}
 					}
 				} else {
-					Step originalRecordStep = recordSummary.getStep();
 					if ( step.beforeEqual(originalRecordStep) ) {
 						CollectRecord record;
 						boolean recordChanged = lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() );
@@ -282,7 +282,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		for (Entity entity : entitiesToBeDeleted) {
 			NodeChangeSet changes = recordUpdater.deleteNode(entity);
 			if (nodeChangeBatchProcessor != null) {
-				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+				nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 			}
 		}
 	}
@@ -320,7 +320,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 		Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 		String[] recordKeyStringValues = Values.toStringValues(recordKeyValues);
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityDefn.getName(), recordKeyStringValues);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(rootEntityDefn.getId());
+		filter.setKeyValues(recordKeyStringValues);
+		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
 		String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
 				parentEntityDefn,
 				rootEntityDefn.getKeyAttributeDefinitions());
@@ -388,7 +391,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 					Node<?> node = attributes.get(0);
 					NodeChangeSet changes = recordUpdater.deleteNode(node);
 					if (nodeChangeBatchProcessor != null) {
-						nodeChangeBatchProcessor.add(changes, adminUser.getName());
+						nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 					}
 				}
 			}
@@ -440,7 +443,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			Object fieldValue = field.parseValue(value);
 			NodeChangeSet changes = recordUpdater.updateField(field, fieldValue);
 			if (nodeChangeBatchProcessor != null) {
-				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+				nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 			}
 		}
 	}
@@ -463,7 +466,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			Field<String> field = ((CoordinateAttribute) attr).getSrsIdField();
 			NodeChangeSet changes = recordUpdater.updateField(field, value);
 			if (nodeChangeBatchProcessor != null) {
-				nodeChangeBatchProcessor.add(changes, adminUser.getName());
+				nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 			}
 		}
 	}
@@ -484,7 +487,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				Field<Integer> field = ((NumberAttribute<?, ?>) attr).getUnitField();
 				NodeChangeSet changes = recordUpdater.updateField(field, unit.getId());
 				if (nodeChangeBatchProcessor != null) {
-					nodeChangeBatchProcessor.add(changes, adminUser.getName());
+					nodeChangeBatchProcessor.add(changes, adminUser.getUsername());
 				}
 			}
 		}

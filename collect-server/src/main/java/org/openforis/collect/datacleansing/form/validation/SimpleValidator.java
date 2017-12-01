@@ -6,11 +6,14 @@ package org.openforis.collect.datacleansing.form.validation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
@@ -28,6 +31,8 @@ import org.springframework.validation.Validator;
  *
  */
 public abstract class SimpleValidator<F> implements Validator {
+
+	private static final String MIN_LENGTH_MESSAGE_KEY = "validation.minLength";
 
 	final Class<F> genericType;
 
@@ -50,10 +55,12 @@ public abstract class SimpleValidator<F> implements Validator {
 	}
 	
 	@Override
-	public final void validate(Object target, Errors errors) {
-		@SuppressWarnings("unchecked")
-		F form = (F) target;
-		validateForm(form, errors);
+	public void validate(Object target, Errors errors) {
+		if (genericType.isAssignableFrom(target.getClass())) {
+			@SuppressWarnings("unchecked")
+			F form = (F) target;
+			validateForm(form, errors);
+		}
 	}
 	
 	public abstract void validateForm(F target, Errors errors);
@@ -115,6 +122,43 @@ public abstract class SimpleValidator<F> implements Validator {
 		}
 		return result.isOk();
 	}
+	
+	protected boolean validateInternalName(Errors errors, String fieldName) {
+		return validateInternalName(errors, fieldName, "generic.validation.invalid_internal_name");
+	}
+	
+	protected boolean validateInternalName(Errors errors, String fieldName, String errorMessageKey) {
+		return validateRegEx(errors, fieldName, Survey.INTERNAL_NAME_REGEX, errorMessageKey);
+	}
+	
+	protected boolean validateRegEx(Errors errors, String fieldName, String regex, String errorMessageKey) {
+		return validateRegEx(errors, fieldName, Pattern.compile(regex), errorMessageKey);
+	}
+	
+	protected boolean validateRegEx(Errors errors, String fieldName, Pattern pattern, String errorMessageKey) {
+		Object value = errors.getFieldValue(fieldName);
+		if ( value != null && value instanceof String && StringUtils.isNotBlank((String) value) ) {
+			Matcher matcher = pattern.matcher((String) value);
+			if ( ! matcher.matches() ) {  
+				errors.rejectValue(fieldName, errorMessageKey);
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	protected boolean validateMinLength(Errors errors, String fieldName, int length) {
+		Object value = errors.getFieldValue(fieldName);
+		if ( value != null && value instanceof String) {
+			String strVal = (String) value;
+			if (strVal.trim().length() < length) {
+				errors.rejectValue(fieldName, MIN_LENGTH_MESSAGE_KEY, new Integer[] {length}, MIN_LENGTH_MESSAGE_KEY);
+				return false;
+			}
+		}
+		return true;
+	}
+
 	protected void rejectDuplicateValue(Errors errors, String field, Object... args) {
 		rejectDuplicateValues(errors, Arrays.asList(field), args);
 	}

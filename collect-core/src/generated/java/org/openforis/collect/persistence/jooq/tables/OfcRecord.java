@@ -34,7 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcRecord extends TableImpl<OfcRecordRecord> {
 
-	private static final long serialVersionUID = 1357739037;
+	private static final long serialVersionUID = 725931548;
 
 	/**
 	 * The reference instance of <code>collect.ofc_record</code>
@@ -160,16 +160,6 @@ public class OfcRecord extends TableImpl<OfcRecordRecord> {
 	public final TableField<OfcRecordRecord, Integer> COUNT5 = createField("count5", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
-	 * The column <code>collect.ofc_record.data1</code>.
-	 */
-	public final TableField<OfcRecordRecord, byte[]> DATA1 = createField("data1", org.jooq.impl.SQLDataType.BLOB, this, "");
-
-	/**
-	 * The column <code>collect.ofc_record.data2</code>.
-	 */
-	public final TableField<OfcRecordRecord, byte[]> DATA2 = createField("data2", org.jooq.impl.SQLDataType.BLOB, this, "");
-
-	/**
 	 * The column <code>collect.ofc_record.owner_id</code>.
 	 */
 	public final TableField<OfcRecordRecord, Integer> OWNER_ID = createField("owner_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
@@ -178,6 +168,41 @@ public class OfcRecord extends TableImpl<OfcRecordRecord> {
 	 * The column <code>collect.ofc_record.app_version</code>.
 	 */
 	public final TableField<OfcRecordRecord, String> APP_VERSION = createField("app_version", org.jooq.impl.SQLDataType.VARCHAR.length(63).defaulted(true), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record.data_seq_num</code>.
+	 */
+	public final TableField<OfcRecordRecord, Integer> DATA_SEQ_NUM = createField("data_seq_num", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>collect.ofc_record.qualifier1</code>.
+	 */
+	public final TableField<OfcRecordRecord, String> QUALIFIER1 = createField("qualifier1", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record.qualifier2</code>.
+	 */
+	public final TableField<OfcRecordRecord, String> QUALIFIER2 = createField("qualifier2", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record.qualifier3</code>.
+	 */
+	public final TableField<OfcRecordRecord, String> QUALIFIER3 = createField("qualifier3", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record.summary1</code>.
+	 */
+	public final TableField<OfcRecordRecord, String> SUMMARY1 = createField("summary1", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record.summary2</code>.
+	 */
+	public final TableField<OfcRecordRecord, String> SUMMARY2 = createField("summary2", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_record.summary3</code>.
+	 */
+	public final TableField<OfcRecordRecord, String> SUMMARY3 = createField("summary3", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_record</code> table reference

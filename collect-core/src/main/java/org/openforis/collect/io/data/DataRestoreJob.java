@@ -13,15 +13,16 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
+import org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.data.restore.RestoredBackupStorageManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,13 +46,13 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	protected BackupStorageManager backupStorageManager;
 
 	//input parameters
-	private boolean overwriteAll;
 	private boolean restoreUploadedFiles;
 	private List<Integer> entryIdsToImport; //ignored when overwriteAll is true
 	private boolean storeRestoredFile;
 	private File tempFile;
 	private boolean deleteAllRecordsBeforeRestore = false;
-	
+	private OverwriteStrategy recordOverwriteStrategy = OverwriteStrategy.ONLY_SPECIFIED;
+
 	//output
 	private List<RecordImportError> errors;
 	
@@ -119,8 +120,11 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			DataRestoreTask t = (DataRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
+			t.setUserGroupManager(userGroupManager);
 			t.setRecordProvider(recordProvider);
-			t.setOverwriteAll(overwriteAll);
+			t.setTargetSurvey(publishedSurvey);
+			t.setUser(user);
+			t.setOverwriteStrategy(recordOverwriteStrategy);
 			t.setEntryIdsToImport(entryIdsToImport);
 			t.setIncludeRecordPredicate(includeRecordPredicate);
 		} else if ( task instanceof RecordFileRestoreTask ) {
@@ -129,7 +133,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setRecordFileManager(recordFileManager);
 			t.setBackupFileExtractor(backupFileExtractor);
 			t.setRecordProvider(recordProvider);
-			t.setOverwriteAll(overwriteAll);
+			t.setOverwriteAll(recordOverwriteStrategy == OverwriteStrategy.OVERWRITE_ALL);
 			t.setEntryIdsToImport(entryIdsToImport);
 			t.setSurvey(publishedSurvey);
 		}
@@ -198,12 +202,12 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		this.restoreUploadedFiles = restoreUploadedFiles;
 	}
 
-	public boolean isOverwriteAll() {
-		return overwriteAll;
+	public OverwriteStrategy getRecordOverwriteStrategy() {
+		return recordOverwriteStrategy;
 	}
-
-	public void setOverwriteAll(boolean overwriteAll) {
-		this.overwriteAll = overwriteAll;
+	
+	public void setRecordOverwriteStrategy(OverwriteStrategy recordOverwriteStrategy) {
+		this.recordOverwriteStrategy = recordOverwriteStrategy;
 	}
 	
 	public boolean isStoreRestoredFile() {
@@ -280,10 +284,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		private List<Integer> calculateEntryIdsToImport() {
 			if ( entryIdsToImport != null ) {
 				return entryIdsToImport;
-			} else if (overwriteAll) {
-				return recordProvider.findEntryIds();
 			} else {
-				throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
+				return recordProvider.findEntryIds();
 			}
 		}
 		

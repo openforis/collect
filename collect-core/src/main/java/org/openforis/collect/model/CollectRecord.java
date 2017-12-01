@@ -163,12 +163,23 @@ public class CollectRecord extends Record {
 	
 	private transient Version applicationVersion;
 	private transient Step step;
+	private transient Step dataStep;
 	private transient State state;
+	private transient Integer workflowSequenceNumber;
+	private transient Integer dataWorkflowSequenceNumber;
 
 	private transient Date creationDate;
 	private transient User createdBy;
 	private transient Date modifiedDate;
 	private transient User modifiedBy;
+	private transient Date dataCreationDate;
+	private transient User dataCreatedBy;
+	private transient Date dataModifiedDate;
+	private transient User dataModifiedBy;
+	private transient List<String> dataRootEntityKeyValues;
+	private transient List<Integer> dataEntityCounts;
+	private transient List<String> dataQualifierValues;
+	private transient List<String> dataSummaryValues;
 	private transient User owner;
 	private transient Integer missing;
 	private transient Integer missingErrors;
@@ -177,15 +188,13 @@ public class CollectRecord extends Record {
 	private transient Integer errors;
 	private transient Integer warnings;
 	
-	private List<String> rootEntityKeyValues;
-	private List<Integer> entityCounts;
+	private transient List<String> rootEntityKeyValues;
+	private transient List<Integer> entityCounts;
+	private transient List<String> qualifierValues;
+	private transient List<String> summaryValues;
 	
 	private RecordValidationCache validationCache;
 
-	public CollectRecord(CollectSurvey survey, String versionName) {
-		this(survey, versionName, null);
-	}
-	
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName) {
 		this(survey, versionName, rootEntityName, true);
 	}
@@ -195,15 +204,22 @@ public class CollectRecord extends Record {
 	}
 
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
-		super(survey, versionName, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
+		this(survey, versionName, survey.getSchema().getRootEntityDefinition(rootEntityName), enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
+	}
+	
+	public CollectRecord(CollectSurvey survey, String versionName, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs) {
+		this(survey, versionName, rootEntityDefinition, enableValidationDependencyGraphs, false);
+	}
+	
+	public CollectRecord(CollectSurvey survey, String versionName, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
+		super(survey, versionName, rootEntityDefinition, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
 		this.applicationVersion = Collect.VERSION;
 		this.step = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
-		if (rootEntityName != null) {
-			createRootEntity(rootEntityName);
-		}
+		this.qualifierValues = new ArrayList<String>();
+		this.dataSummaryValues = new ArrayList<String>();
 	}
 	
 	@Override
@@ -251,12 +267,36 @@ public class CollectRecord extends Record {
 		this.step = step;
 	}
 	
+	public Step getDataStep() {
+		return dataStep;
+	}
+	
+	public void setDataStep(Step dataStep) {
+		this.dataStep = dataStep;
+	}
+	
 	public State getState() {
 		return state;
 	}
 	
 	public void setState(State state) {
 		this.state = state;
+	}
+	
+	public Integer getWorkflowSequenceNumber() {
+		return workflowSequenceNumber;
+	}
+	
+	public void setWorkflowSequenceNumber(Integer workflowSequenceNumber) {
+		this.workflowSequenceNumber = workflowSequenceNumber;
+	}
+	
+	public Integer getDataWorkflowSequenceNumber() {
+		return dataWorkflowSequenceNumber;
+	}
+	
+	public void setDataWorkflowSequenceNumber(Integer dataWorkflowSequenceNumber) {
+		this.dataWorkflowSequenceNumber = dataWorkflowSequenceNumber;
 	}
 	
 	public Date getCreationDate() {
@@ -289,6 +329,70 @@ public class CollectRecord extends Record {
 
 	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+	
+	public User getDataCreatedBy() {
+		return dataCreatedBy;
+	}
+	
+	public void setDataCreatedBy(User dataCreatedBy) {
+		this.dataCreatedBy = dataCreatedBy;
+	}
+	
+	public Date getDataCreationDate() {
+		return dataCreationDate;
+	}
+	
+	public void setDataCreationDate(Date dataCreationDate) {
+		this.dataCreationDate = dataCreationDate;
+	}
+	
+	public User getDataModifiedBy() {
+		return dataModifiedBy;
+	}
+	
+	public void setDataModifiedBy(User dataModifiedBy) {
+		this.dataModifiedBy = dataModifiedBy;
+	}
+	
+	public Date getDataModifiedDate() {
+		return dataModifiedDate;
+	}
+	
+	public void setDataModifiedDate(Date dataModifiedDate) {
+		this.dataModifiedDate = dataModifiedDate;
+	}
+	
+	public List<Integer> getDataEntityCounts() {
+		return dataEntityCounts;
+	}
+	
+	public void setDataEntityCounts(List<Integer> dataEntityCounts) {
+		this.dataEntityCounts = dataEntityCounts;
+	}
+	
+	public List<String> getDataQualifierValues() {
+		return dataQualifierValues;
+	}
+	
+	public void setDataQualifierValues(List<String> dataQualifierValues) {
+		this.dataQualifierValues = dataQualifierValues;
+	}
+	
+	public List<String> getDataRootEntityKeyValues() {
+		return dataRootEntityKeyValues;
+	}
+	
+	public void setDataRootEntityKeyValues(List<String> dataRootEntityKeyValues) {
+		this.dataRootEntityKeyValues = dataRootEntityKeyValues;
+	}
+	
+	public List<String> getDataSummaryValues() {
+		return dataSummaryValues;
+	}
+
+	public void setDataSummaryValues(List<String> summaryValues) {
+		this.dataSummaryValues = summaryValues;
 	}
 	
 	public User getOwner() {
@@ -367,7 +471,27 @@ public class CollectRecord extends Record {
 	public List<String> getRootEntityKeyValues() {
 		return rootEntityKeyValues;
 	}
+	
+	public void setRootEntityKeyValues(List<String> keys) {
+		this.rootEntityKeyValues = keys;
+	}
+	
+	public List<String> getSummaryValues() {
+		return summaryValues;
+	}
+	
+	public void setSummaryValues(List<String> summaryValues) {
+		this.summaryValues = summaryValues;
+	}
 
+	public List<String> getQualifierValues() {
+		return qualifierValues;
+	}
+	
+	public void setQualifierValues(List<String> qualifierValues) {
+		this.qualifierValues = qualifierValues;
+	}
+	
 	public RecordValidationCache getValidationCache() {
 		return validationCache;
 	}
@@ -398,26 +522,15 @@ public class CollectRecord extends Record {
 	public void updateSummaryFields() {
 		updateRootEntityKeyValues();
 		updateEntityCounts();
+		updateDataSummaryFields();
+		updateQualifiers();
 	}
 	
 	private void updateRootEntityKeyValues(){
 		Entity rootEntity = getRootEntity();
 		if(rootEntity != null) {
-			List<String> values = new ArrayList<String>();
 			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getDefinition().getKeyAttributeDefinitions();
-			for (AttributeDefinition keyDefn : keyAttributeDefinitions) {
-				Attribute<?, ?> keyNode = this.findNodeByPath(keyDefn.getPath());
-				if ( keyNode == null || keyNode.isEmpty() ) {
-					//TODO throw error in this case?
-					values.add(null);
-				} else {
-					if (! keyNode.isEmpty()) {
-						String keyValue = keyNode.extractTextValue();
-						values.add(keyValue);
-					}
-				}
-			}
-			rootEntityKeyValues = values;
+			rootEntityKeyValues = extractValues(keyAttributeDefinitions);
 		}
 	}
 
@@ -431,6 +544,33 @@ public class CollectRecord extends Record {
 		this.entityCounts = counts;
 	}
 	
+	private void updateDataSummaryFields() {
+		List<AttributeDefinition> attrDefs = getSurvey().getSchema().getSummaryAttributeDefinitions(getRootEntity().getDefinition());
+		this.dataSummaryValues = extractValues(attrDefs);
+	}
+	
+	private void updateQualifiers() {
+		List<AttributeDefinition> attrDefs = getSurvey().getSchema().getQualifierAttributeDefinitions(getRootEntity().getDefinition());
+		this.qualifierValues = extractValues(attrDefs);
+	}
+	
+	private List<String> extractValues(List<AttributeDefinition> attrDefs) {
+		List<String> values = new ArrayList<String>();
+		for (AttributeDefinition keyDefn : attrDefs) {
+			Attribute<?, ?> keyNode = this.findNodeByPath(keyDefn.getPath());
+			if ( keyNode == null || keyNode.isEmpty() ) {
+				//TODO throw error in this case?
+				values.add(null);
+			} else {
+				if (! keyNode.isEmpty()) {
+					String keyValue = keyNode.extractTextValue();
+					values.add(keyValue);
+				}
+			}
+		}
+		return values;
+	}
+
 	public List<FileAttribute> getFileAttributes() {
 		final List<FileAttribute> result = new ArrayList<FileAttribute>();
 		Entity rootEntity = getRootEntity();
@@ -445,10 +585,6 @@ public class CollectRecord extends Record {
 		return result;
 	}
 	
-	public void setRootEntityKeyValues(List<String> keys) {
-		this.rootEntityKeyValues = keys;
-	}
-
 	public List<Integer> getEntityCounts() {
 		return entityCounts;
 	}

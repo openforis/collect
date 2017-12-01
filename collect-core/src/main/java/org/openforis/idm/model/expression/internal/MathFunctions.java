@@ -31,6 +31,11 @@ public class MathFunctions extends CustomFunctions {
 				return pow(objects[0], objects[1]);
 			}
 		});
+		register("sqrt", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return sqrt(objects[1]);
+			}
+		});
 		register("min", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return min(objects[0]);
@@ -86,6 +91,16 @@ public class MathFunctions extends CustomFunctions {
 				return tanrad(number);
 			}
 		});
+		register("log", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return log(number);
+			}
+		});
+		register("log10", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return log10(number);
+			}
+		});
 	}
 
 	private static double PI() {
@@ -126,6 +141,10 @@ public class MathFunctions extends CustomFunctions {
 		}
 		Number baseNumber = (Number) base;
 		return Math.pow(baseNumber.doubleValue(), exponent.doubleValue());
+	}
+	
+	private static Object sqrt(Object value) {
+		return pow(value, 0.5);
 	}
 
 	private static Object min(Object values) {
@@ -203,7 +222,14 @@ public class MathFunctions extends CustomFunctions {
 	private static Double tanrad(Number angleInRadians) {
 		return Math.tan(angleInRadians.doubleValue());
 	}
+	
+	private static Double log(Number value) {
+		return Math.log(value.doubleValue());
+	}
 
+	private static Double log10(Number value) {
+		return Math.log10(value.doubleValue());
+	}
 
 	private abstract static class SingleArgMathFunction extends CustomFunction {
 		

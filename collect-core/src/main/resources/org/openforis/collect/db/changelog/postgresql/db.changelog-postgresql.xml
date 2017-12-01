@@ -6,9 +6,9 @@
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-baseline.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130326.1500.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130522.1600.xml" />
- 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130610.1400.xml" />
- 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130919.1600.xml" />
-  	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20131118.1600.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130610.1400.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130919.1600.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20131118.1600.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20131120.1600.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20131218.1600.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20131219.1000.xml" />
@@ -27,12 +27,18 @@
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20150928.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151009.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151016.xml" />
-	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151022.xml" />	
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151022.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151101.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151111.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20160317.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20160825.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170425.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170530.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170815.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170816.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170913.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20170920.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20171002.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20171017.xml" />
 	
 </databaseChangeLog>

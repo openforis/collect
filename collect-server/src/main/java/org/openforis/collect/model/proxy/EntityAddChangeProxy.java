@@ -1,8 +1,7 @@
 package org.openforis.collect.model.proxy;
 
-import java.util.Locale;
-
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.model.EntityChange;
 
 /**
@@ -12,14 +11,14 @@ import org.openforis.collect.model.EntityChange;
  */
 public class EntityAddChangeProxy extends EntityChangeProxy implements NodeAddChangeProxy {
 
-	public EntityAddChangeProxy(EntityChange change, Locale locale) {
-		super(change, locale);
+	public EntityAddChangeProxy(EntityChange change, ProxyContext context) {
+		super(change, context);
 	}
 
 	@Override
 	@ExternalizedProperty
 	public NodeProxy getCreatedNode() {
-		return NodeProxy.fromNode(change.getNode(), getLocale());
+		return NodeProxy.fromNode(change.getNode(), context);
 	}
 	
 }

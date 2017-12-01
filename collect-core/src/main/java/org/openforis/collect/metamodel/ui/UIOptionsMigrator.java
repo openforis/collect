@@ -10,6 +10,7 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITable.Direction;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -80,8 +81,15 @@ public class UIOptionsMigrator {
 
 		//create form components
 		List<NodeDefinition> childNodes = oldUIOptions.getNodesPerTab(tab, false);
+		int lastCol = 1;
+		int currentRow = 0;
 		for (NodeDefinition nodeDefn : childNodes) {
-			addFormComponent(form, nodeDefn);
+			int childCol = oldUIOptions.getColumn(nodeDefn);
+			if (childCol <= lastCol) {
+				currentRow ++;
+			}
+			addFormComponent(form, nodeDefn, currentRow);
+			lastCol = childCol;
 		}
 		
 		//create inner forms
@@ -150,7 +158,7 @@ public class UIOptionsMigrator {
 		return null;
 	}
 
-	protected void addFormComponent(UIFormContentContainer parent, NodeDefinition nodeDefn) throws UIOptionsMigrationException {
+	protected void addFormComponent(UIFormContentContainer parent, NodeDefinition nodeDefn, int row) throws UIOptionsMigrationException {
 		CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
 		UIOptions oldUIOptions = survey.getUIOptions();
 		UIFormComponent component;
@@ -164,6 +172,9 @@ public class UIOptionsMigrator {
 				component = createFormSection(parent, entityDefn);
 			}
 		}
+		component.setColumn(oldUIOptions.getColumn(nodeDefn));
+		component.setColumnSpan(oldUIOptions.getColumnSpan(nodeDefn));
+		component.setRow(row);
 		parent.addChild(component);
 	}
 
@@ -171,13 +182,23 @@ public class UIOptionsMigrator {
 		CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
 		CollectAnnotations annotations = survey.getAnnotations();
-		UIField field = parent.createField();
+		UIField field;
+		if (nodeDefn instanceof CodeAttributeDefinition) {
+			UICodeField codeField = parent.createCodeField();
+			CodeAttributeDefinition codeAttrDefn = (CodeAttributeDefinition) nodeDefn;
+			codeField.setLayout(uiOptions.getLayoutType(codeAttrDefn));
+			codeField.setShowCode(uiOptions.getShowCode(codeAttrDefn));
+			codeField.setItemsOrientation(uiOptions.getLayoutDirection(codeAttrDefn));
+			field = codeField;
+		} else {
+			field = parent.createField();
+		}
 		field.setAttributeDefinitionId(nodeDefn.getId());
+		
 		if ( nodeDefn instanceof TextAttributeDefinition ) {
 			String autoCompleteGroup = annotations.getAutoCompleteGroup((TextAttributeDefinition) nodeDefn);
 			field.setAutoCompleteGroup(autoCompleteGroup);
-		}
-		if ( nodeDefn instanceof CoordinateAttributeDefinition ) {
+		} else if ( nodeDefn instanceof CoordinateAttributeDefinition ) {
 			CoordinateAttributeFieldsOrder fieldsOrder = uiOptions.getFieldsOrder((CoordinateAttributeDefinition) nodeDefn);
 			field.setFieldsOrder(fieldsOrder);
 		}
@@ -193,11 +214,18 @@ public class UIOptionsMigrator {
 		UIFormSection formSection = parent.createFormSection();
 		formSection.setEntityDefinition(entityDefn);
 
+		int currentRow = 0;
+		int lastCol = 1;
 		List<NodeDefinition> childDefns = entityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefns) {
 			UITab assignedChildTab = uiOptions.getAssignedTab(childDefn, true);
 			if ( assignedChildTab == parentTab ) {
-				addFormComponent(formSection, childDefn);
+				int childCol = uiOptions.getColumn(childDefn);
+				if (childCol <= lastCol) {
+					currentRow ++;
+				}
+				addFormComponent(formSection, childDefn, currentRow);
+				lastCol = childCol;
 			}
 		}
 		
@@ -236,12 +264,13 @@ public class UIOptionsMigrator {
 				throw new UIOptionsMigrationException("Nested multiple entity inside table layout entity is not supported: " + nodeDefn.getPath());
 			}
 			component = parent.createColumnGroup();
-			((UIColumnGroup) component).setEntityDefinition(entityDefn);
+			UIColumnGroup columnGroup = (UIColumnGroup) component;
+			columnGroup.setEntityDefinition(entityDefn);
 			
 			List<NodeDefinition> innerChildDefns = entityDefn.getChildDefinitions();
 			for (NodeDefinition innerChildDefn : innerChildDefns) {
-				UITableHeadingComponent innerComponent = createTableHeadingComponent(parent, innerChildDefn);
-				((UIColumnGroup) component).addHeadingComponent(innerComponent);
+				UITableHeadingComponent innerComponent = createTableHeadingComponent(columnGroup, innerChildDefn);
+				columnGroup.addHeadingComponent(innerComponent);
 			}
 		} else {
 			component = parent.createColumn();

@@ -120,9 +120,9 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	private CollectRecord createTestRecord(CollectSurvey survey, int internalId, String id, String gpsModel) {
-		CollectRecord record = new CollectRecord(survey, "2.0");
+		CollectRecord record = new CollectRecord(survey, "2.0", "cluster");
 		record.setId(internalId);
-		Entity cluster = record.createRootEntity("cluster");
+		Entity cluster = record.getRootEntity();
 		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		record.setStep(Step.ENTRY);
 		EntityBuilder.addValue(cluster, "id", new Code(id));

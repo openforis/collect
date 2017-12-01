@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.openforis.idm.metamodel;
 
 import java.io.Serializable;
@@ -20,10 +17,11 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 	private static final long serialVersionUID = 1L;
 
 	public static final String WGS84_SRS_ID = "EPSG:4326";
+	public static final String LAT_LON_SRS_ID = WGS84_SRS_ID;
 	public static final String WEB_MARCATOR_SRS_ID = "EPSG:3857";
 
 	public static final SpatialReferenceSystem LAT_LON_SRS = new SpatialReferenceSystem(
-	            WGS84_SRS_ID, 
+				LAT_LON_SRS_ID, 
 	            "GEOGCS[\"WGS 84\",\n" +
 	            "    DATUM[\"WGS_1984\",\n" +
 	            "        SPHEROID[\"WGS 84\",6378137,298.257223563,\n" +
@@ -33,12 +31,33 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 	            "        AUTHORITY[\"EPSG\",\"8901\"]],\n" +
 	            "    UNIT[\"degree\",0.01745329251994328,\n" +
 	            "        AUTHORITY[\"EPSG\",\"9122\"]],\n" +
-	            "    AUTHORITY[\"EPSG\",\"4326\"]]", "Lat Lon");
+	            "    AUTHORITY[\"EPSG\",\"4326\"]]", 
+	            "Lat Lon");
 
-	public static final SpatialReferenceSystem WEB_MARCATOR_SRS = new SpatialReferenceSystem(
+	public static final SpatialReferenceSystem WEB_MERCATOR_SRS = new SpatialReferenceSystem(
 			WEB_MARCATOR_SRS_ID,
-			"   GEOGCS[\"WGS 84\",\n        DATUM[\"WGS_1984\",\n            SPHEROID[\"WGS 84\",6378137,298.257223563,\n                AUTHORITY[\"EPSG\",\"7030\"]],\n            AUTHORITY[\"EPSG\",\"6326\"]],\n        PRIMEM[\"Greenwich\",0,\n            AUTHORITY[\"EPSG\",\"8901\"]],\n        UNIT[\"degree\",0.0174532925199433,\n            AUTHORITY[\"EPSG\",\"9122\"]],\n        AUTHORITY[\"EPSG\",\"4326\"]],\n    PROJECTION[\"Mercator_1SP\"],\n    PARAMETER[\"central_meridian\",0],\n    PARAMETER[\"scale_factor\",1],\n    PARAMETER[\"false_easting\",0],\n    PARAMETER[\"false_northing\",0],\n    UNIT[\"metre\",1,\n        AUTHORITY[\"EPSG\",\"9001\"]],\n    AXIS[\"X\",EAST],\n    AXIS[\"Y\",NORTH],\n    EXTENSION[\"PROJ4\",\"+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs\"],\n    AUTHORITY[\"EPSG\",\"3857\"]]"
-		    , "Web Marcator");
+			"   GEOGCS[\"WGS 84\",\n"
+			+ "        DATUM[\"WGS_1984\",\n"
+			+ "            SPHEROID[\"WGS 84\",6378137,298.257223563,\n"
+			+ "                AUTHORITY[\"EPSG\",\"7030\"]],\n"
+			+ "            AUTHORITY[\"EPSG\",\"6326\"]],\n"
+			+ "        PRIMEM[\"Greenwich\",0,\n"
+			+ "            AUTHORITY[\"EPSG\",\"8901\"]],\n"
+			+ "        UNIT[\"degree\",0.0174532925199433,\n"
+			+ "            AUTHORITY[\"EPSG\",\"9122\"]],\n"
+			+ "        AUTHORITY[\"EPSG\",\"4326\"]],\n"
+			+ "    PROJECTION[\"Mercator_1SP\"],\n"
+			+ "    PARAMETER[\"central_meridian\",0],\n"
+			+ "    PARAMETER[\"scale_factor\",1],\n"
+			+ "    PARAMETER[\"false_easting\",0],\n"
+			+ "    PARAMETER[\"false_northing\",0],\n"
+			+ "    UNIT[\"metre\",1,\n"
+			+ "        AUTHORITY[\"EPSG\",\"9001\"]],\n"
+			+ "    AXIS[\"X\",EAST],\n"
+			+ "    AXIS[\"Y\",NORTH],\n"
+			+ "    EXTENSION[\"PROJ4\",\"+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs\"],\n"
+			+ "    AUTHORITY[\"EPSG\",\"3857\"]]"
+		    , "Web Mercator");
 	
 	private String id;
 	private LanguageSpecificTextMap labels;
@@ -48,10 +67,16 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 	public SpatialReferenceSystem() {
 	}
 	
-	public SpatialReferenceSystem(String id, String wellKnownText, String defaultLabel) {
+	public SpatialReferenceSystem(String id, String wellKnownText) {
+		this(id, wellKnownText, null);
+	}
+
+	public SpatialReferenceSystem(String id, String wellKnownText, String englishLabel) {
 		this.id = id;
 		this.wellKnownText = wellKnownText;
-		addLabel(new LanguageSpecificText(Locale.ENGLISH.getLanguage(), defaultLabel));
+		if (englishLabel != null) {
+			addLabel(new LanguageSpecificText(Locale.ENGLISH.getLanguage(), englishLabel));
+		}
 	}
 
 	public SpatialReferenceSystem(SpatialReferenceSystem srs) {

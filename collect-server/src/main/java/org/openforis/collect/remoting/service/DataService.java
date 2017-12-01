@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.EventQueue;
@@ -29,6 +30,7 @@ import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.data.BulkRecordMoveJob;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
@@ -37,9 +39,11 @@ import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SessionEventDispatcher;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.NodeChangeMap;
@@ -47,10 +51,13 @@ import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 import org.openforis.collect.model.proxy.RecordFilterProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -67,10 +74,13 @@ import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateReq
 import org.openforis.collect.remoting.service.concurrency.proxy.SurveyLockingJobProxy;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
@@ -86,6 +96,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataService {
 	
 	@Autowired
+	private SurveyContext surveyContext;
+	@Autowired
+	private MessageSource messageSource;
+	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
 	private transient RecordManager recordManager;
@@ -95,6 +109,8 @@ public class DataService {
 	private transient CodeListManager codeListManager;
 	@Autowired
 	private transient RecordFileManager fileManager;
+	@Autowired
+	private transient UserGroupManager userGroupManager;
 	@Autowired
 	private transient RecordIndexService recordIndexService;
 	@Autowired
@@ -108,6 +124,7 @@ public class DataService {
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
 	 */
 	private boolean hasActiveSurveyIndexedNodes;
+	private ProxyContext proxyContext;
 
 	@Secured(USER)
 	public RecordProxy loadRecord(int id, Integer stepNumber) {
@@ -116,8 +133,7 @@ public class DataService {
 		Step step = stepNumber == null ? null: Step.valueOf(stepNumber);
 		CollectRecord record = step == null ? recordManager.load(survey, id) : recordManager.load(survey, id, step);
 		sessionManager.setActiveRecord(record);
-		Locale locale = sessionState.getLocale();
-		return new RecordProxy(record, locale);
+		return toProxy(record);
 	}
 	
 	@Secured(ENTRY_LIMITED)
@@ -134,8 +150,7 @@ public class DataService {
 				: recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
-		Locale locale = sessionState.getLocale();
-		return new RecordProxy(record, locale);
+		return toProxy(record);
 	}
 
 	protected void prepareRecordIndexing() throws RecordIndexException {
@@ -160,10 +175,10 @@ public class DataService {
 		RecordFilter filter = filterProxy.toFilter(survey);
 		
 		//load summaries
-		List<CollectRecord> summaries = recordManager.loadSummaries(filter, sortFields);
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter, sortFields);
 		Locale locale = LocaleUtils.toLocale(localeStr);
-		List<RecordProxy> proxies = RecordProxy.fromList(summaries, locale);
-		
+		ProxyContext proxyContext = new ProxyContext(locale, messageSource, surveyContext);
+		List<RecordSummaryProxy> proxies = RecordSummaryProxy.fromList(summaries, proxyContext);
 		result.put("records", proxies);
 		
 		//count total records
@@ -199,9 +214,8 @@ public class DataService {
 		filter.setMaxNumberOfRecords(maxNumberOfRows);
 		
 		//load summaries
-		List<CollectRecord> summaries = recordManager.loadSummaries(filter, sortFields);
-		Locale locale = sessionState.getLocale();
-		List<RecordProxy> proxies = RecordProxy.fromList(summaries, locale);
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter, sortFields);
+		List<RecordSummaryProxy> proxies = RecordSummaryProxy.fromList(summaries, getProxyContext());
 		
 		result.put("records", proxies);
 		
@@ -223,14 +237,13 @@ public class DataService {
 		CollectRecord record = recordManager.instantiateRecord(activeSurvey, rootEntityName, user, versionName, recordStep);
 		NodeChangeSet changeSet = recordManager.initializeRecord(record);
 
-		List<RecordEvent> events = new EventProducer().produceFor(changeSet, user.getName());
+		List<RecordEvent> events = new EventProducer().produceFor(changeSet, user.getUsername());
 		sessionManager.onEvents(events);
 		
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
 		
-		
-		RecordProxy recordProxy = new RecordProxy(record, sessionState.getLocale(), true);
+		RecordProxy recordProxy = new RecordProxy(record, getProxyContext(), true);
 		return recordProxy;
 	}
 	
@@ -239,7 +252,7 @@ public class DataService {
 	public void deleteRecord(int id) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
-		String userName = sessionState.getUser().getName();
+		String userName = sessionState.getUser().getUsername();
 
 		CollectRecord record = recordManager.load(survey, id);
 		if (record.getStep() != Step.ENTRY) {
@@ -283,11 +296,11 @@ public class DataService {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
 		
-		String userName = sessionManager.getSessionState().getUser().getName();
+		String userName = sessionManager.getSessionState().getUser().getUsername();
 		List<RecordEvent> events = new EventProducer().produceFor(changeSet, userName);
 		sessionManager.onEvents(events);
 		
-		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getCurrentLocale());
+		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getProxyContext());
 		if ( requestSet.isAutoSave() ) {
 			try {
 				saveActiveRecord();
@@ -378,7 +391,7 @@ public class DataService {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		String userName = sessionState.getUser().getName();
+		String userName = sessionState.getUser().getUsername();
 		Step currentStep = record.getStep();
 		Step exptectedStep = to.getPrevious();
 		if ( exptectedStep == currentStep ) {
@@ -426,7 +439,7 @@ public class DataService {
 			throw new IllegalStateException("The active record cannot be demoted: it is not in the exptected phase: " + exptectedFromStep);
 		}
 		CollectSurvey survey = sessionState.getActiveSurvey();
-		String userName = sessionState.getUser().getName();
+		String userName = sessionState.getUser().getUsername();
 		User user = sessionState.getUser();
 		Integer recordId = record.getId();
 		publishRecordDeletedEvent(record, fromStep.toRecordStep(), userName);
@@ -498,10 +511,30 @@ public class DataService {
 	@Secured(USER)
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attrName){
 		CollectRecord record = getActiveRecord();
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		UserGroup surveyUserGroup = survey.getUserGroup();
+		User user = sessionManager.getLoggedUser();
+		final UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
+		if (userInGroup == null) {
+			throw new IllegalStateException(String.format("User %s not allowed to access survey %s", user.getUsername(), survey.getName()));
+		}
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
 		List<CodeListItem> items = codeListManager.loadValidItems(parent, def);
-		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
+		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>(items);
+		
+		//filter by user group qualifier (if any)
+		UserGroup group = userGroupManager.loadById(userInGroup.getGroupId());
+		String qualifierName = group.getQualifier1Name();
+		String listHierarchicalLevelName = def.getList().isHierarchical() ? def.getHierarchicalLevel() : def.getListName();
+		if (qualifierName != null && qualifierName.equals(listHierarchicalLevelName)) {
+			CollectionUtils.filter(filteredItems, new Predicate<CodeListItem>() {
+				public boolean evaluate(CodeListItem item) {
+					return item.getCode().equals(group.getQualifier1Value());
+				}
+			});
+		}
+		List<CodeListItemProxy> result = CodeListItemProxy.fromList(filteredItems);
 		List<Node<?>> selectedCodes = parent.getChildren(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
 		return result;
@@ -548,13 +581,13 @@ public class DataService {
 	public SurveyLockingJobProxy moveRecords(String rootEntity, int fromStepNumber, final boolean promote) {
 		BulkRecordMoveJob job = collectJobManager.createJob(BulkRecordMoveJob.class);
 		SessionState sessionState = getSessionState();
-		final String userName = sessionState.getUser().getName();
+		final String userName = sessionState.getUser().getUsername();
 		job.setSurvey(sessionState.getActiveSurvey());
 		job.setRootEntity(rootEntity);
 		job.setPromote(promote);
 		final Step fromStep = Step.valueOf(fromStepNumber);
 		job.setFromStep(fromStep);
-		job.setAdminUser(sessionState.getUser());
+		job.setUser(sessionState.getUser());
 		job.setRecordMovedCallback(new BulkRecordMoveJob.Callback() {
 			@Override
 			public void recordMoved(CollectRecord record) {
@@ -581,11 +614,8 @@ public class DataService {
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		Entity rootEntity = record.getRootEntity();
-		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		List<RecordDeletedEvent> events = Arrays.asList(new RecordDeletedEvent(record.getSurvey().getName(), 
-				record.getId(), recordStep, String.valueOf(rootEntityDef.getId()), 
-				String.valueOf(rootEntity.getInternalId()), new Date(), userName));
+				record.getId(), new Date(), userName));
 		String surveyName = record.getSurvey().getName();
 		eventQueue.publish(new RecordTransaction(surveyName, record.getId(), recordStep, events));
 	}
@@ -602,6 +632,17 @@ public class DataService {
 		return locale;
 	}
 
+	private RecordProxy toProxy(CollectRecord record) {
+		return new RecordProxy(record, getProxyContext());
+	}
+
+	private ProxyContext getProxyContext() {
+		if (proxyContext == null) {
+			proxyContext = new ProxyContext(getCurrentLocale(), messageSource, surveyContext);
+		}
+		return proxyContext;
+	}
+	
 	protected SessionState getSessionState() {
 		SessionState sessionState = getSessionManager().getSessionState();
 		return sessionState;

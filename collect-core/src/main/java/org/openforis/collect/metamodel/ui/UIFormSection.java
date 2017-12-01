@@ -16,7 +16,9 @@ public class UIFormSection extends UIFormContentContainer implements UIFormCompo
 
 	private Integer entityDefinitionId;
 	private EntityDefinition entityDefinition;
-	private boolean hidden;
+	private int column;
+	private int columnSpan;
+	private int row;
 	
 	public <P extends UIFormContentContainer> UIFormSection(P parent, int id) {
 		super(parent, id);
@@ -58,12 +60,32 @@ public class UIFormSection extends UIFormContentContainer implements UIFormCompo
 	}
 
 	@Override
-	public boolean isHidden() {
-		return this.hidden;
+	public int getColumn() {
+		return column;
 	}
 	
 	@Override
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
+	public void setColumn(int column) {
+		this.column = column;
+	}
+	
+	@Override
+	public int getColumnSpan() {
+		return columnSpan;
+	}
+	
+	@Override
+	public void setColumnSpan(int columnSpan) {
+		this.columnSpan = columnSpan;
+	}
+	
+	@Override
+	public int getRow() {
+		return row;
+	}
+	
+	@Override
+	public void setRow(int row) {
+		this.row = row;
 	}
 }

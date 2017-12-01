@@ -32,10 +32,11 @@ public abstract class RecordIteratorJob extends Job {
 			}
 			@Override
 			protected void execute() throws Throwable {
-				List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
-				for (CollectRecord summary : summaries) {
+				List<CollectRecordSummary> summaries = recordManager.loadSummaries(recordFilter);
+				for (CollectRecordSummary summary : summaries) {
 					if (this.isRunning()) {
-						CollectRecord record = recordManager.load(recordFilter.getSurvey(), summary.getId(), summary.getStep(), false);
+						CollectRecord record = recordManager.load(recordFilter.getSurvey(), summary.getId(), 
+								summary.getStep(), false);
 						processRecord(record);
 						incrementProcessedItems();
 					}

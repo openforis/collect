@@ -66,7 +66,7 @@ public class DataLine extends Line {
 	}
 	
 	public String getColumnName(FieldDefinition<?> fieldDefn) {
-		return columnNameByField.get(fieldDefn);
+		return columnNameByField.get(new FieldValueKey(fieldDefn));
 	}
 
 	public Map<FieldValueKey, String> getColumnNamesByField() {
@@ -85,6 +85,10 @@ public class DataLine extends Line {
 		private int attributePosition;
 		private String fieldName;
 		
+		public FieldValueKey(FieldDefinition<?> fieldDefn) {
+			this(fieldDefn.getAttributeDefinition(), fieldDefn.getName());
+		}
+
 		public FieldValueKey(AttributeDefinition defn) {
 			this(defn, defn.getMainFieldName());
 		}

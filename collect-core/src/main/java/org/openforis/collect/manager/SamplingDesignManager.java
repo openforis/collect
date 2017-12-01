@@ -56,6 +56,14 @@ public class SamplingDesignManager {
 		return new SamplingDesignSummaries(totalCount, items);
 	}
 	
+	public SamplingDesignItem loadItem(int surveyId, List<String> parentKeys) {
+		return loadItem(surveyId, parentKeys.toArray(new String[parentKeys.size()]));
+	}
+	
+	public SamplingDesignItem loadItem(int surveyId, String... parentKeys) {
+		return samplingDesignDao.loadItem(surveyId, parentKeys);
+	}
+	
 	public List<SamplingDesignItem> loadChildItems(int surveyId, String... parentKeys) {
 		return samplingDesignDao.loadChildItems(surveyId, parentKeys);
 	}

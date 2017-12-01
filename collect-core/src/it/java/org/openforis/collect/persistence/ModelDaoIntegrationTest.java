@@ -8,8 +8,6 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -18,7 +16,9 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.RecordSummarySortField.Sortable;
 import org.openforis.collect.model.SurveySummary;
@@ -33,6 +33,8 @@ import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import junit.framework.Assert;
 
 public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
@@ -62,7 +64,7 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 		recordDao.insert(saved);
 		
 		// RELOAD
-		CollectRecord reloaded = recordDao.load(survey, saved.getId(), 1);
+		CollectRecord reloaded = recordDao.load(survey, saved.getId(), Step.ENTRY);
 		
 		assertEquals(saved.getRootEntity(), reloaded.getRootEntity());
 	}
@@ -78,13 +80,14 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 		log.debug("Saving record:\n"+saved);
 		
 		// RELOAD
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", testKey);
+		RecordFilter filter = new RecordFilter(survey, survey.getSchema().getRootEntityDefinition("cluster").getId());
+		filter.setKeyValues(Arrays.asList(testKey));
+		List<CollectRecordSummary> summaries = recordDao.loadSummaries(filter);
 		Assert.assertEquals(1, summaries.size());
-		CollectRecord record1 = summaries.get(0);
+		CollectRecordSummary record1 = summaries.get(0);
 		String key = record1.getRootEntityKeyValues().get(0);
 		assertEquals(key, testKey);
 	}
-
 
 	private void testLoadAllSurveys() {
 		List<SurveySummary> list = this.surveyManager.loadCombinedSummaries();
@@ -104,8 +107,8 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	}
 
 	private CollectRecord createTestRecord(CollectSurvey survey, String id) {
-		CollectRecord record = new CollectRecord(survey, "2.0");
-		Entity cluster = record.createRootEntity("cluster");
+		CollectRecord record = new CollectRecord(survey, "2.0", "cluster");
+		Entity cluster = record.getRootEntity();
 		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDaoIntegrationTest");
 		record.setStep(Step.ENTRY);
@@ -181,12 +184,16 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 		int offset = 0;
 		int maxNumberOfRecords = 1;
 		RecordSummarySortField sortField = new RecordSummarySortField(Sortable.KEY1);
-		String filter = null;
-		List<CollectRecord> list = this.recordDao.loadSummaries(survey, rootEntityName, offset, maxNumberOfRecords, Arrays.asList(sortField), filter);
+
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
+		filter.setOffset(offset);
+		filter.setMaxNumberOfRecords(maxNumberOfRecords);
+		List<CollectRecordSummary> list = this.recordDao.loadSummaries(filter, Arrays.asList(sortField));
 		assertNotNull(list);
 		assertEquals(1, list.size());
 		
-		CollectRecord summary = list.get(0);
+		CollectRecordSummary summary = list.get(0);
 		assertEquals(Step.ENTRY, summary.getStep());
 	}
 }

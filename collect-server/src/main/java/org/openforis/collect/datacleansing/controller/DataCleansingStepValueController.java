@@ -21,7 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/datacleansingstepvalues")
+@RequestMapping(value = "api/datacleansing/datacleansingstepvalues")
 public class DataCleansingStepValueController {
 	
 	@Autowired

@@ -10,13 +10,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.webapp.HttpGraniteContext;
+import org.openforis.collect.config.CollectConfiguration;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.SurveyStoreException;
-import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -41,7 +41,12 @@ public class SessionManager {
 	
 	public void createSessionState(HttpSession session) {
 		String sessionId = session.getId();
+		boolean developmentMode = CollectConfiguration.isDevelopmentMode();
 		SessionState sessionState = new SessionState(sessionId);
+		if (developmentMode) {
+			sessionState.setUser(userManager.loadAdminUser());
+//			sessionState.setUser(userManager.loadByUserName("arg_entry"));
+		}
 		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
 	}
 
@@ -55,21 +60,25 @@ public class SessionManager {
 	}
 
 	public SessionState getSessionState() {
-		SessionState sessionState = null;
-		try {
-			sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-		} catch(IllegalStateException e) {
-			throw new InvalidSessionException();
+		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
+		if (sessionState == null) {
+			return null;
+		} else {
+			if (sessionState.getUser() == null) {
+				sessionState.setUser(loadAuthenticatedUser());
+			}
+			return sessionState;
 		}
-		if (sessionState.getUser() == null) {
-			sessionState.setUser(loadAuthenticatedUser());
-		}
-		return sessionState;
 	}
 
 	public CollectRecord getActiveRecord() {
 		SessionState sessionState = getSessionState();
 		return sessionState.getActiveRecord();
+	}
+	
+	public User getLoggedUser() {
+		SessionState sessionState = getSessionState();
+		return sessionState.getUser();
 	}
 
 	public CollectSurvey getActiveDesignerSurvey() {
@@ -168,11 +177,7 @@ public class SessionManager {
 				result = session.getAttribute(attributeName);
 			}
 		}
-		if ( result == null ) {
-			throw new InvalidSessionException("Error getting session attribute: " + attributeName);
-		} else {
-			return result;
-		}
+		return result;
 	}
 	
 	public void invalidateSession() {

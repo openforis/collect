@@ -24,7 +24,7 @@ public class UserDaoIntegrationTest extends CollectTest {
 		// SAVE NEW
 		User user = new User();
 		user.setEnabled(Boolean.TRUE);
-		user.setName("user1");
+		user.setUsername("user1");
 		user.setPassword("pass1");
 		user.addRole(UserRole.ENTRY);
 		user.addRole(UserRole.CLEANSING);

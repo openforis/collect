@@ -1,3 +1,7 @@
+/build/
+/etc/
 /logs
+/node/
+/node_modules/
 /target/
-/target/
+/npm-debug.log

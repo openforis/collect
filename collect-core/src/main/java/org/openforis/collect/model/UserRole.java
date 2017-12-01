@@ -19,6 +19,15 @@ public enum UserRole {
 		throw new IllegalArgumentException(code + " is not a valid UserRole code");
 	}
 
+	public static UserRole fromHierarchicalOrder(int hierarchicalOrder) {
+		for (UserRole role : values()) {
+			if (role.getHierarchicalOrder() == hierarchicalOrder) {
+				return role;
+			}
+		}
+		throw new IllegalArgumentException(hierarchicalOrder + " is not a valid UserRole hieararchical order");
+	}
+	
 	private String code;
 	private int hierarchicalOrder;
 
@@ -34,5 +43,4 @@ public enum UserRole {
 	public int getHierarchicalOrder() {
 		return hierarchicalOrder;
 	}
-	
 }

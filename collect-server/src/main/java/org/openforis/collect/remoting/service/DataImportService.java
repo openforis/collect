@@ -91,7 +91,7 @@ public class DataImportService {
 			job.setPackagedSurvey(summaryJob.getPackagedSurvey());
 			job.setPublishedSurvey(summaryJob.getPublishedSurvey());
 			job.setEntryIdsToImport(entryIdsToImport);
-			job.setRecordFilesToBeDeleted(summaryJob.getSummary().getConflictingRecordFiles());
+			job.setRecordFilesToBeDeleted(summaryJob.getSummary().getConflictingRecordFiles(entryIdsToImport));
 			job.setRestoreUploadedFiles(true);
 			job.setValidateRecords(validateRecords);
 			

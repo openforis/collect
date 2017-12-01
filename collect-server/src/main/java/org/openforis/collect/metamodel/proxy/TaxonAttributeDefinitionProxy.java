@@ -65,5 +65,9 @@ public class TaxonAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	public boolean isIncludeUniqueVernacularName() {
 		return getAnnotations().isIncludeUniqueVernacularName(attributeDefn);
 	}
-
+	
+	@ExternalizedProperty
+	public boolean isAllowUnlisted() {
+		return getAnnotations().isAllowUnlisted(attributeDefn);
+	}
 }

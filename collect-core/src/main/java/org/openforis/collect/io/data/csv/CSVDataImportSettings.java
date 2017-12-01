@@ -10,37 +10,30 @@ public class CSVDataImportSettings implements Cloneable {
 	/**
 	 * If true, records are validated after insert or update
 	 */
-	private boolean recordValidationEnabled;
+	private boolean recordValidationEnabled = true;
 	/**
 	 * If true, only new records will be inserted and only root entities can be added
 	 */
-	private boolean insertNewRecords;
+	private boolean insertNewRecords = false;
 	/**
 	 * When insertNewRecords is true, it indicates the name of the model version used during new record creation
 	 */
-	private String newRecordVersionName;
+	private String newRecordVersionName = null;
 	
 	/**
 	 * If true, the process automatically creates ancestor multiple entities if they do not exist.
 	 */
-	private boolean createAncestorEntities;
+	private boolean createAncestorEntities = false;
 	
 	/**
 	 * If true, the process automatically delete all entities with the specified definition id before importing the new ones.
 	 */
-	private boolean deleteExistingEntities;
+	private boolean deleteExistingEntities = false;
 	
 	/**
 	 * If true, only existing records update is allowed. 
 	 */
-	private boolean reportNoRecordFoundErrors;
-	
-	public CSVDataImportSettings() {
-		recordValidationEnabled = true;
-		insertNewRecords = false;
-		deleteExistingEntities = false;
-		reportNoRecordFoundErrors = true;
-	}
+	private boolean reportNoRecordFoundErrors = false;
 	
 	@Override
 	public CSVDataImportSettings clone() throws CloneNotSupportedException {

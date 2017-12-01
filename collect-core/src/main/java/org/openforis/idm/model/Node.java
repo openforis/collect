@@ -70,7 +70,7 @@ public abstract class Node<D extends NodeDefinition> implements Serializable, De
 	public Entity getAncestorByDefinition(EntityDefinition def) {
 		List<Entity> ancestors = getAncestors();
 		for (Entity ancestor : ancestors) {
-			if (ancestor.getDefinition() == def) {
+			if (ancestor.getDefinition().equals(def)) {
 				return ancestor;
 			}
 		}

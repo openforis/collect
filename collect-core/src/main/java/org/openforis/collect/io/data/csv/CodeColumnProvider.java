@@ -30,7 +30,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	private boolean hasExpandedItems = false;
 	private List<CodeListItem> expandedItems = null;
 	
-	public CodeColumnProvider(CSVExportConfiguration config, CodeAttributeDefinition defn) {
+	public CodeColumnProvider(CSVDataExportParameters config, CodeAttributeDefinition defn) {
 		super(config, defn);
 		init();
 	}

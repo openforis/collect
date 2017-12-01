@@ -2,6 +2,7 @@ package org.openforis.collect.io.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -15,15 +16,20 @@ import org.openforis.collect.io.data.RecordImportError.Level;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordManager.RecordOperations;
 import org.openforis.collect.manager.RecordManager.RecordStepOperation;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 import org.openforis.collect.utils.Consumer;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -38,17 +44,26 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataRestoreTask extends Task {
 
+	private static final List<UserGroupRole> DATA_RESTORE_ALLOWED_USER_GROUP_ROLES =
+			Arrays.asList(UserGroupRole.OWNER, UserGroupRole.ADMINISTRATOR, UserGroupRole.SUPERVISOR, UserGroupRole.OPERATOR);
+
+	public enum OverwriteStrategy {
+		ONLY_SPECIFIED, DO_NOT_OVERWRITE, OVERWRITE_OLDER, OVERWRITE_ALL
+	}
+	
 	@Autowired
 	private EventQueue eventQueue;
 	
 	private RecordManager recordManager;
 	private UserManager userManager;
-
-	//input
-	private RecordProvider recordProvider;
+	private UserGroupManager userGroupManager;
 	
+	//input
+	private CollectSurvey targetSurvey;
+	private RecordProvider recordProvider;
+	private User user;
 	private List<Integer> entryIdsToImport;
-	private boolean overwriteAll;
+	private OverwriteStrategy overwriteStrategy = OverwriteStrategy.ONLY_SPECIFIED;
 	
 	//output
 	private final List<RecordImportError> errors;
@@ -67,6 +82,21 @@ public class DataRestoreTask extends Task {
 	}
 
 	@Override
+	protected void validateInput() throws Throwable {
+		super.validateInput();
+		UserGroup surveyGroup = targetSurvey.getUserGroup();
+		String surveyName = targetSurvey.getName();
+		if (surveyGroup == null) {
+			throw new IllegalStateException(String.format("No user group for survey %s found", surveyName));
+		}
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyGroup, user);
+		if (userInGroup == null || !DATA_RESTORE_ALLOWED_USER_GROUP_ROLES.contains(userInGroup.getRole())) {
+			throw new IllegalStateException(String.format("User %s is not allowed to restore data for survey %s", 
+					user.getUsername(), surveyName));
+		}
+	}
+	
+	@Override
 	protected long countTotalItems() {
 		List<Integer> idsToImport = calculateEntryIdsToImport();
 		return idsToImport.size();
@@ -76,9 +106,6 @@ public class DataRestoreTask extends Task {
 		if ( entryIdsToImport != null ) {
 			return entryIdsToImport;
 		} 
-		if ( ! overwriteAll ) {
-			throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
-		}
 		return recordProvider.findEntryIds();
 	}
 	
@@ -100,7 +127,7 @@ public class DataRestoreTask extends Task {
 	private void importEntries(int entryId) throws IOException, MissingStepsException {
 		try {
 			RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, 
-					entryId, includeRecordPredicate);
+					entryId, user, includeRecordPredicate, overwriteStrategy);
 			RecordOperations recordOperations = operationGenerator.generate();
 			if (! recordOperations.isEmpty()) {
 				updateBuffer.append(recordOperations);
@@ -148,15 +175,31 @@ public class DataRestoreTask extends Task {
 	public void setUserManager(UserManager userManager) {
 		this.userManager = userManager;
 	}
-
-	public boolean isOverwriteAll() {
-		return overwriteAll;
+	
+	public UserGroupManager getUserGroupManager() {
+		return userGroupManager;
+	}
+	
+	public void setUserGroupManager(UserGroupManager userGroupManager) {
+		this.userGroupManager = userGroupManager;
 	}
 
-	public void setOverwriteAll(boolean overwriteAll) {
-		this.overwriteAll = overwriteAll;
+	public void setTargetSurvey(CollectSurvey targetSurvey) {
+		this.targetSurvey = targetSurvey;
 	}
-
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	public void setOverwriteStrategy(OverwriteStrategy overwriteStrategy) {
+		this.overwriteStrategy = overwriteStrategy;
+	}
+	
 	public List<Integer> getEntryIdsToImport() {
 		return entryIdsToImport;
 	}
@@ -220,15 +263,12 @@ public class DataRestoreTask extends Task {
 			String surveyName = record.getSurvey().getName();
 			int recordId = record.getId();
 			RecordStep recordStep = record.getStep().toRecordStep();
-			Entity rootEntity = record.getRootEntity();
 			
-			String userName = record.getModifiedBy().getName();
+			String userName = record.getModifiedBy().getUsername();
 			List<RecordEvent> events = eventProducer.produceFor(record, userName);
 			
-			if (! operation.isInsert()) {
-				events.add(0, new RecordDeletedEvent(surveyName, recordId, recordStep, 
-						String.valueOf(rootEntity.getDefinition().getId()), 
-						String.valueOf(rootEntity.getInternalId()), new Date(), userName));
+			if (! operation.isNewRecord()) {
+				events.add(0, new RecordDeletedEvent(surveyName, recordId, new Date(), userName));
 			}
 			eventQueue.publish(new RecordTransaction(surveyName, 
 					recordId, recordStep, events));

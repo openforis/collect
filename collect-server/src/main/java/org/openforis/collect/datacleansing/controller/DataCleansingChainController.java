@@ -18,7 +18,6 @@ import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormControll
 import org.openforis.commons.web.Forms;
 import org.openforis.commons.web.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -32,7 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/datacleansingchains")
+@RequestMapping(value = "api/datacleansing/datacleansingchains")
 public class DataCleansingChainController extends AbstractSurveyObjectEditFormController<DataCleansingChain, DataCleansingChainForm, DataCleansingChainManager> {
 	
 	@Autowired
@@ -45,13 +44,6 @@ public class DataCleansingChainController extends AbstractSurveyObjectEditFormCo
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(dataCleansingChainValidator);
-	}
-	
-	@Override
-	@Autowired
-	@Qualifier("dataCleansingChainManager")
-	public void setItemManager(DataCleansingChainManager itemManager) {
-		super.setItemManager(itemManager);
 	}
 	
 	@Override

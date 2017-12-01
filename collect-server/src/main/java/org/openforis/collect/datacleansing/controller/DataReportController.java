@@ -54,7 +54,6 @@ import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.path.Path;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,7 +64,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/datareports")
+@RequestMapping(value = "api/datacleansing/datareports")
 public class DataReportController extends AbstractSurveyObjectEditFormController<DataReport, DataReportForm, DataReportManager> {
 	
 	private static final String DATA_REPORT_CSV_FILE_NAME_FORMAT = "%s (data report - %s).csv";
@@ -76,13 +75,6 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 	
 	private DataReportGeneratorJob generationJob;
 	private ReportExportJob exportJob;
-	
-	@Override
-	@Autowired
-	@Qualifier("dataReportManager")
-	public void setItemManager(DataReportManager itemManager) {
-		super.setItemManager(itemManager);
-	}
 	
 	@Override
 	protected DataReportForm createFormInstance(DataReport item) {
@@ -105,6 +97,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 		generationJob = collectJobManager.createJob(DataReportGeneratorJob.class);
 		generationJob.setQueryGroup(queryGroup);
 		generationJob.setRecordStep(recordStep);
+		generationJob.setActiveUser(getLoggedUser());
 		collectJobManager.start(generationJob);
 		return new Response();
 	}

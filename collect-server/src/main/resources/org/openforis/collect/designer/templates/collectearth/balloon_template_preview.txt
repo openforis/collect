@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<script type="text/javascript">
+	/**
+	 * 
+	 * Values expected ( for the "HTTP parameters" -> "Collect format"
+	 * conversion to work )
+	 * 
+	 * All inputs that have proccesable information ( hidden or otherwise) should
+	 * start with "collect_" :
+	 * 
+	 * If the input is text then it should be followed by "text_" If the input is a
+	 * code (option in combo-box for instance) then it should be followed by "code_"
+	 * If the input is a date then it should be followed by "date_" If the input is
+	 * a coordinate then it should be followed by "coord_" ( the value expected has
+	 * the format "longitude,latitude" ) If the input is an integer then it should
+	 * be followed by "integer_" If the input is a boolean then it should be
+	 * followed by "boolean_"
+	 * 
+	 * When multiple values can be sent ( in a multiple select for instance ) the
+	 * data sent in the Http parameters has to be separated using " " ( a space )
+	 * 
+	 * So, for Mongolia we expect these values : collect_text_id
+	 * collect_coord_location collect_integer_elevation collect_text_operator (
+	 * filled in the earthSurveyService store method as the operator name is fetched
+	 * through a properties file) collect_code_land_use_category
+	 * collect_code_land_use_subcategory collect_code_land_use_subdivision
+	 * collect_code_site_accessibility collect_entity_topography[X]_code_element
+	 * collect_entity_topography[X]_code_coverage collect_code_human_impact_type
+	 * collect_code_human_impact_grade collect_integer_human_impact_year
+	 * collect_date_rs_date collect_code_rs_satellite collect_code_canopy_cover
+	 * collect_code_canopy_type collect_boolean_actively_saved // Set this to true
+	 * when the user saves the data by actively clicking in submit
+	 * 
+	 * collect_real_aspect collect_real_slope collect_text_directions
+	 * collect_code_bearing collect_boolean_land_use_category_accuracy
+	 * collect_boolean_land_use_subcategory_accuracy
+	 * collect_boolean_land_use_subdivision_accuracy
+	 * 
+	 * When a value has multiple values they will be separated with "===" i.e.
+	 * collect_code_human_impact_type = "fire===logging===grazing"
+	 * 
+	 * 
+	 * 
+	 * Other inputs: earth_skip_filled
+	 * 
+	 */
+	 
+ 	/**
+ 	* STATIC CONSTANTS 
+ 	* DO NOT REMOVE THIS LINE
+ 	*/
+	var DEBUG = false; // if set to true, log messages will appear in a box in the bottom part of the balloon
+ 	var NEXT_ID = "$[next_id]";
+ 	var HOST = "$[host]";
+ 	
+ 	var SUBMIT_LABEL = "PLACEHOLDER_FINISH";
+    var NEXT_LABEL = "PLACEHOLDER_NEXT";
+    var PREVIOUS_LABEL = "PLACEHOLDER_PREVIOUS";
+    
+    var COLLECT_NOT_RUNNING = "PLACEHOLDER_COLLECT_NOT_RUNNING";
+    var PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";
+    
+    var PREVIEW = PLACEHOLDER_PREVIEW;
+    
+    
+    // By default all Collect Earth surveys are defined as having at least the id attribute "id" which is stored by the balloon as collect_text_id
+    // If more id attributes are present in the survey then their names ( using the protocoal for the transmission e.g. "collect_code_year") will be specified in this list :
+    // the value of this variable should be something like ['collect_text_id'] or ['collect_text_id','collect_code_measurement']
+    var EXTRA_ID_ATTRIBUTES = PLACEHOLDER_EXTRA_ID_ATTRIBUTES;
+    
+    
+	</script>
+	
+	<script src="earthFiles/jquery/jquery.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/jquery/jquery-ui.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/jquery/jquery.blockUI.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/jquery/jquery.selectBoxIt.min.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/jquery/jquery.steps.openforis.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/bootstrap/bootstrap.min.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/bootstrap/moment.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/bootstrap/bootstrap-datetimepicker.min.js?v=$[randomNumber]"></script>
+
+	<script src="earthFiles/openforis/of.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/openforis/of-arrays.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/openforis/of-ui.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/openforis/of-ui-forms.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/openforis/of-ui-forms-validation.js?v=$[randomNumber]"></script>
+	
+	<script src="earthFiles/js/earth.js?v=$[randomNumber]"></script>
+	
+	<link href="earthFiles/jquery/jquery-ui.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/jquery/jquery.selectBoxIt.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/jquery/jquery-steps.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/bootstrap/bootstrap.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/bootstrap/bootstrap-datetimepicker.min.css?v=$[randomNumber]" rel="stylesheet"  />
+	
+	<link href="earthFiles/css/earth.css?v=$[randomNumber]" rel="stylesheet" />
+	<!--
+	
+		Handle the fonts for different languages that don't have their own glyphs opn the standard interface
+		Right now we only have Lao
+		
+		The TTF file needs to be loaded through the same URL than the balloon to avoid cross referencing issues
+		Use the two character code of the language as the name of the font  
+	-->
+	<style  type="text/css">
+	        @font-face {
+		      font-family: 'lo'; 
+			  src: url('$[host]generated/earthFiles/fonts/Phetsarath_OT.ttf');
+			}
+		
+			body {
+				font-family: "PLACEHOLDER_UI_LANGUAGE","Trebuchet MS", "Helvetica", "Arial", "Verdana",
+					"sans-serif";
+			}
+	</style>
+</head>
+
+<body>
+
+	<div id="dialogSuccess" style="display: none">
+		<table>
+			<tr>
+				<td valign="top">
+					<span class="ui-icon ui-icon-circle-check"
+						style="float: left; margin: 0 7px 70px 0;"> </span>
+				</td>
+				<td valign="top">
+					<div id="succ_mess">
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="contentDiv" style="height:600px; width:400px;">
+		<div id="loadingPanel">
+			<span>Loading...</span>
+		</div>
+		
+		<div id="errorPanel" style="display: none">
+			<span><b>An error occurred!</b><span>
+			<br /> <br />
+			<span>Please try to open again the same plot or restart Collect Earth.</span>
+		</div>
+		
+		<div id="collectEarthNotRunningPanel" style="display: none">
+			<span>PLACEHOLDER_COLLECT_NOT_RUNNING</span>
+		</div>
+		
+		<div id="scrollingDiv" style="overflow: visible; display: none; width:400px" class="earthDiv">
+			<form id="formAll" class="form-horizontal" action="$[host]save-data-expanded">
+			<!-- <form id="formAll" class="form-horizontal" action="http://127.0.0.1:8028/earth/save-data-expanded"> -->
+								
+				<input type="hidden" id="collect_coord_location" 
+					name="collect_coord_location" value="$[latitude],$[longitude]"
+					class="extra" />
+				
+				<input type="hidden" id="collect_text_plot_file" 
+					name="collect_text_plot_file" value="$[plot_file]"
+					class="extra" />
+
+				<input type="hidden" id="collect_boolean_actively_saved"
+					name="collect_boolean_actively_saved" value="false" />
+					
+<!-- DO NOT REMOVE THIS LINE - IT GENERATES THE EXTRA FIELDS FROM THE CSV-BALLOON INTEGRATION -->
+<!-- START OF EXTRA CSV DATA -->
+PLACEHOLDER_FOR_EXTRA_CSV_DATA
+<!-- END OF EXTRA CSV DATA -->
+		
+<!-- DO NOT REMOVE THIS LINE - IT GENERATES THE DYNAMIC FIELDS FROM THE SURVEY DEFINITION -->
+<!-- START OF DYNAMIC FIELDS -->
+PLACEHOLDER_FOR_DYNAMIC_FIELDS
+<!-- END OF DYNAMIC FIELDS -->
+			</form>
+		</div>
+	</div>
+	<iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/openAuxiliaryWindows?latLongCoordinates=$[latitude],$[longitude]" height="0" width="0"></iframe>
+</body>
+</html>

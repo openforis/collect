@@ -20,6 +20,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
@@ -90,9 +91,9 @@ public class DataBackupTask extends Task {
 	@Override
 	protected long countTotalItems() {
 		int count = 0;
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(recordFilter);
+		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(recordFilter);
 		if ( CollectionUtils.isNotEmpty(recordSummaries) && steps != null && steps.length > 0 ) {
-			for (CollectRecord summary : recordSummaries) {
+			for (CollectRecordSummary summary : recordSummaries) {
 				for (Step step : steps) {
 					if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
 						count ++;
@@ -105,9 +106,9 @@ public class DataBackupTask extends Task {
 
 	@Override
 	protected void execute() throws Throwable {
-		List<CollectRecord> recordSummaries = recordManager.loadSummaries(recordFilter);
+		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(recordFilter);
 		if ( CollectionUtils.isNotEmpty(recordSummaries) && steps != null && steps.length > 0 ) {
-			for (CollectRecord summary : recordSummaries) {
+			for (CollectRecordSummary summary : recordSummaries) {
 				for (Step step : steps) {
 					if ( isRunning() ) {
 						if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
@@ -132,7 +133,7 @@ public class DataBackupTask extends Task {
 		super.onEnd();
 	}
 
-	private void backup(CollectRecord summary, Step step) {
+	private void backup(CollectRecordSummary summary, Step step) {
 		Integer id = summary.getId();
 		try {
 			CollectRecord record = recordManager.load(survey, id, step, false);
@@ -150,7 +151,7 @@ public class DataBackupTask extends Task {
 		}
 	}
 
-	private void writeSummaryEntry(CollectRecord summary) {
+	private void writeSummaryEntry(CollectRecordSummary summary) {
 		Step lastStep = null;
 		for (Step step : steps) {
 			if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
@@ -162,9 +163,9 @@ public class DataBackupTask extends Task {
 				summary.getRootEntityDefinitionId().toString(),
 				lastStep.name(), 
 				Dates.formatDateTime(summary.getCreationDate()),
-				summary.getCreatedBy() == null ? "" : summary.getCreatedBy().getName(),
+				summary.getCreatedBy() == null ? "" : summary.getCreatedBy().getUsername(),
 				Dates.formatDateTime(summary.getModifiedDate()),
-				summary.getModifiedBy() == null ? "" : summary.getModifiedBy().getName()
+				summary.getModifiedBy() == null ? "" : summary.getModifiedBy().getUsername()
 		));
 		values.addAll(summary.getRootEntityKeyValues());
 		summaryCSVWriter.writeNext(values);

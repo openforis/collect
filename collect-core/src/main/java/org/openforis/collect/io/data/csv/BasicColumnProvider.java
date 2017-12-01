@@ -12,10 +12,10 @@ import org.openforis.commons.lang.Strings;
  */
 public abstract class BasicColumnProvider implements ColumnProvider {
 
-	protected CSVExportConfiguration config;
+	protected CSVDataExportParameters config;
 	protected ColumnProviderChain parentProvider;
 
-	public BasicColumnProvider(CSVExportConfiguration config) {
+	public BasicColumnProvider(CSVDataExportParameters config) {
 		super();
 		this.config = config;
 	}
@@ -41,7 +41,7 @@ public abstract class BasicColumnProvider implements ColumnProvider {
 	
 	protected abstract String generateHeadingPrefix();
 	
-	public CSVExportConfiguration getConfig() {
+	public CSVDataExportParameters getConfig() {
 		return config;
 	}
 	

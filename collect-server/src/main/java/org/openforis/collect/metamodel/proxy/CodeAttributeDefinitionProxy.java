@@ -51,7 +51,7 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	@ExternalizedProperty
 	public String getLayoutDirection() {
 		UIOptions uiOptions = getUIOptions();
-		return uiOptions.getLayoutDirection(attributeDefinition);
+		return uiOptions.getLayoutDirection(attributeDefinition).name();
 	}
 	
 	@ExternalizedProperty

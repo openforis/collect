@@ -1,6 +1,6 @@
 package org.openforis.collect.utils;
 
-import java.lang.reflect.Constructor;
+import java.beans.Expression;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,8 +14,8 @@ public class Proxies {
 			return null;
 		}
 		try {
-			Constructor<P> constructor = proxyType.getDeclaredConstructor(obj.getClass());
-			P proxy = constructor.newInstance(obj);
+			@SuppressWarnings("unchecked")
+			P proxy = (P) new Expression(proxyType, "new", new Object[] {obj}).getValue();
 			return proxy;
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating proxy", e);

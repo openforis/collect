@@ -8,13 +8,16 @@ import org.junit.Before;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.datacleansing.DataCleansingStepValue.UpdateType;
 import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 
@@ -23,11 +26,16 @@ import org.openforis.idm.metamodel.xml.IdmlParseException;
  */
 public abstract class DataCleansingIntegrationTest extends CollectIntegrationTest {
 	
+	@Autowired
+	private UserManager userManager;
+
 	protected CollectSurvey survey;
+	protected User adminUser;
 	
 	@Before
 	public void init() throws SurveyImportException, IdmlParseException, SurveyValidationException {
 		survey = importModel();
+		adminUser = userManager.loadAdminUser();
 	}
 	
 	public static class PersistedSurveyObjectBuilder<T extends PersistedSurveyObject> {

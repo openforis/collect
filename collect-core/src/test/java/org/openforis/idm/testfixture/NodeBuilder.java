@@ -45,9 +45,8 @@ public class NodeBuilder {
 			}
 		}
 		@SuppressWarnings("unchecked")
-		R record = (R) survey.createRecord(versionName);
-		Entity rootEntity = record.createRootEntity(rootEntityName);
-		addChildren(rootEntity, builders);
+		R record = (R) survey.createRecord(versionName, rootEntityName);
+		addChildren(record.getRootEntity(), builders);
 		return record;
 	}
 	

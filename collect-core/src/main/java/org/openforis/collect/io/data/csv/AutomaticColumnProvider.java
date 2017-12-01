@@ -18,23 +18,23 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	
 //	private static final Log LOG = LogFactory.getLog(AutomaticColumnProvider.class);
 	
-	public AutomaticColumnProvider(CSVExportConfiguration config, EntityDefinition entityDefinition) {
+	public AutomaticColumnProvider(CSVDataExportParameters config, EntityDefinition entityDefinition) {
 		this(config, entityDefinition, null);
 	}
 	
-	public AutomaticColumnProvider(CSVExportConfiguration config, EntityDefinition entityDefinition, List<String> exclusions) {
+	public AutomaticColumnProvider(CSVDataExportParameters config, EntityDefinition entityDefinition, List<String> exclusions) {
 		this(config, "", entityDefinition, exclusions);
 	}
 
-	public AutomaticColumnProvider(CSVExportConfiguration config, String headingPrefix, EntityDefinition entityDefinition) {
+	public AutomaticColumnProvider(CSVDataExportParameters config, String headingPrefix, EntityDefinition entityDefinition) {
 		this(config, headingPrefix, entityDefinition, null);
 	}
 	
-	public AutomaticColumnProvider(CSVExportConfiguration config, String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
+	public AutomaticColumnProvider(CSVDataExportParameters config, String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
 		super(config, entityDefinition, headingPrefix, createProviders(config, entityDefinition, exclusions));
 	}
 	
-	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition rowDefn, List<String> exclusions) {
+	private static List<ColumnProvider> createProviders(CSVDataExportParameters config, EntityDefinition rowDefn, List<String> exclusions) {
 		List<ColumnProvider> cols = new ArrayList<ColumnProvider>();
 		CollectSurvey survey = (CollectSurvey) rowDefn.getSurvey();
 		CollectAnnotations surveyAnnotations = survey.getAnnotations();
@@ -55,7 +55,7 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		return exclusions == null || !exclusions.contains(childDefn.getName());
 	}
 	
-	private static void createEntityProviders(CSVExportConfiguration config, EntityDefinition defn, List<ColumnProvider> cols) {
+	private static void createEntityProviders(CSVDataExportParameters config, EntityDefinition defn, List<ColumnProvider> cols) {
 		if ( defn.isMultiple() ) {
 			if ( defn.isEnumerable() && config.isIncludeEnumeratedEntities() ) {
 				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(config, defn);

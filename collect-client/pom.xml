@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.13.10-SNAPSHOT</version>
+		<version>3.20.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-client</artifactId>
@@ -100,6 +100,7 @@
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.manager.referencedataimport.proxy.*</includeClass>
+                                <includeClass>org.openforis.collect.manager.OperationResult</includeClass>
                                 <includeClass>org.openforis.collect.manager.TaxonSearchParameters</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.NodeDefinitionSummary</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.SurveyTarget</includeClass>
@@ -109,15 +110,23 @@
                                 <includeClass>org.openforis.collect.metamodel.ui.UIOptions$Orientation</includeClass>
                                 <includeClass>org.openforis.collect.model.AbstractSummaries</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
-                                <includeClass>org.openforis.collect.model.Configuration$ConfigurationItem</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectTaxonomy</includeClass>
+                                <includeClass>org.openforis.collect.model.Configuration$ConfigurationItem</includeClass>
+                                <includeClass>org.openforis.collect.model.FieldSymbol</includeClass>
                                 <includeClass>org.openforis.collect.model.Logo</includeClass>
                                 <includeClass>org.openforis.collect.model.LogoPosition</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>\
+                                <includeClass>org.openforis.collect.model.SurveyAvailability</includeClass>
                                 <includeClass>org.openforis.collect.model.SurveySummary</includeClass>
+                                <includeClass>org.openforis.collect.model.User</includeClass>
+                                <includeClass>org.openforis.collect.model.UserGroup</includeClass>
+                                <includeClass>org.openforis.collect.model.UserGroup$Visibility</includeClass>
+                                <includeClass>org.openforis.collect.model.UserInGroup</includeClass>
+                                <includeClass>org.openforis.collect.model.UserInGroup$UserGroupRole</includeClass>
+                                <includeClass>org.openforis.collect.model.UserInGroup$UserGroupJoinRequestStatus</includeClass>
                                 <includeClass>org.openforis.collect.model.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.model.FieldSymbol</includeClass>
+                                <includeClass>org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup</includeClass>
                                 <includeClass>org.openforis.collect.remoting.SurveyBackupInfo</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.DataExportStatus$Format</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
@@ -150,10 +159,14 @@
 					<loadConfig>${project.build.outputDirectory}/flex-config.xml</loadConfig>
 					<locales>
 						<locale>en_US</locale>
+						<locale>es_ES</locale>
+						<locale>fr_FR</locale>
 						<locale>pt_BR</locale>
 					</locales>
 					<localesCompiled>
 						<locale>en_US</locale>
+<!-- 						<locale>es_ES</locale> -->
+						<locale>fr_FR</locale>
 						<locale>pt_BR</locale>
 					</localesCompiled>
 					<includeResourceBundles>

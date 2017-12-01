@@ -108,6 +108,7 @@ public interface IdmlConstants {
 	static String EXTENSIONS = "extensions";
 	static String MAX_SIZE = "maxSize";
 	static String REFERENCED_ATTRIBUTE = "referencedAttribute";
+	static String COLOR = "color";
 	
 	// Checks
 	static String FLAG = "flag";

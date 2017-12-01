@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-user-group-qualifiers-column" author="ricci" dbms="h2">
+		<addColumn tableName="ofc_usergroup">
+			<column name="qualifier1_name" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_usergroup">
+			<column name="qualifier1_value" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="add-record-qualifier-columns" author="ricci" dbms="h2">
+		<addColumn tableName="ofc_record">
+			<column name="qualifier1" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_record">
+			<column name="qualifier2" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_record">
+			<column name="qualifier3" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="add-record-data-qualifier-columns" author="ricci" dbms="h2">
+		<addColumn tableName="ofc_record_data">
+			<column name="qualifier1" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_record_data">
+			<column name="qualifier2" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_record_data">
+			<column name="qualifier3" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="add-record-summary-columns" author="ricci" dbms="h2">
+		<addColumn tableName="ofc_record">
+			<column name="summary1" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_record">
+			<column name="summary2" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_record">
+			<column name="summary3" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="add-record-data-summary-columns" author="ricci" dbms="h2">
+		<addColumn tableName="ofc_record_data">
+			<column name="summary1" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_record_data">
+			<column name="summary2" type="varchar(255)" />
+		</addColumn>
+		<addColumn tableName="ofc_record_data">
+			<column name="summary3" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
+	
+</databaseChangeLog>

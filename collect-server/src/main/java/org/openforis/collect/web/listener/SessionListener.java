@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.web.session.InvalidSessionException;
+import org.openforis.collect.web.session.SessionState;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -38,33 +39,24 @@ public class SessionListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent se) {
 		SessionManager sessionManager = getSessionManager(se);
 		try {
-			User user = sessionManager.getSessionState().getUser();
-			if (user != null) {
-				sessionManager.sessionDestroyed();
+			SessionState sessionState = sessionManager.getSessionState();
+			User user = null;
+			if (sessionState != null) {
+				user = sessionState.getUser();
+				if (user != null) {
+					sessionManager.sessionDestroyed();
+				}
 			}
 			if ( LOG.isInfoEnabled() ) {
 				String message = "Session destroyed: " + se.getSession().getId();
 				if ( user != null ) {
-					message += " username: " +user.getName();
+					message += " username: " +user.getUsername();
 				}
 				LOG.info(message);
 			}
 		} catch(InvalidSessionException e) {
 			//ignore it, session was anonymous
 		}
-//		HttpSession session = se.getSession();
-//		Object sessionStateObj = session.getAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-//		User user = null;
-//		if (sessionStateObj != null) {
-//			SessionState sessionState = (SessionState) sessionStateObj;
-//			CollectRecord record = sessionState.getActiveRecord();
-//			user = sessionState.getUser();
-//			if (record != null && record.getId() != null && user != null) {
-//				RecordManager recordManager = getBean(se, RecordManager.class);
-//				recordManager.releaseLock(record.getId());
-//			}
-//			
-//		}
 	}
 
 	private SessionManager getSessionManager(HttpSessionEvent se) {

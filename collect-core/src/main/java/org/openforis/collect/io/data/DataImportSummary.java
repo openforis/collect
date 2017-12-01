@@ -42,7 +42,7 @@ public class DataImportSummary {
 		List<File> result = new ArrayList<File>();
 		for (DataImportSummaryItem conflictingRecordItem : conflictingRecords) {
 			if (entryIds == null || entryIds.contains(conflictingRecordItem.getEntryId())) {
-				result.addAll(conflictingRecordItem.getConflictingRecord().getFiles());
+				result.addAll(conflictingRecordItem.getConflictingRecordSummary().getFiles());
 			}
 		}
 		return result;

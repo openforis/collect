@@ -17,7 +17,7 @@ import org.openforis.idm.model.NumberAttribute;
  */
 public class NumberColumnProvider extends CompositeAttributeColumnProvider<NumberAttributeDefinition> {
 	
-	public NumberColumnProvider(CSVExportConfiguration config, NumberAttributeDefinition defn) {
+	public NumberColumnProvider(CSVDataExportParameters config, NumberAttributeDefinition defn) {
 		super(config, defn);
 	}
 

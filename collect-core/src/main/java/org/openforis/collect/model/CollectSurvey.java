@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Survey;
@@ -40,6 +41,9 @@ public class CollectSurvey extends Survey {
 	private Version collectVersion;
 	private SurveyTarget target;
 	private Integer publishedId;
+	private Integer userGroupId;
+	private UserGroup userGroup;
+	private SurveyAvailability availability;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -53,8 +57,9 @@ public class CollectSurvey extends Survey {
 	}
 
 	@Override
-	public CollectRecord createRecord(String version) {
-		return new CollectRecord(this, version);
+	@SuppressWarnings("unchecked")
+	public CollectRecord createRecord(String version, EntityDefinition rootEntityDefinition) {
+		return new CollectRecord(this, version, rootEntityDefinition, true);
 	}
 	
 	@Override
@@ -204,4 +209,28 @@ public class CollectSurvey extends Survey {
 		this.uiConfiguration = uiConfiguration;
 	}
 	
+	public Integer getUserGroupId() {
+		return userGroupId;
+	}
+	
+	public void setUserGroupId(Integer userGroupId) {
+		this.userGroupId = userGroupId;
+	}
+	
+	public UserGroup getUserGroup() {
+		return userGroup;
+	}
+	
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
+		this.userGroupId = userGroup == null ? null : userGroup.getId();
+	}
+	
+	public SurveyAvailability getAvailability() {
+		return availability;
+	}
+	
+	public void setAvailability(SurveyAvailability availability) {
+		this.availability = availability;
+	}
 }

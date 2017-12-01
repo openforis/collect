@@ -2,7 +2,6 @@ package org.openforis.collect.web.controller;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -15,15 +14,17 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.ValidationReportProcess;
 import org.openforis.collect.manager.ValidationReportProcess.ReportType;
-import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.commons.collection.Visitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,36 +51,45 @@ public class ValidationController extends BasicController {
 	
 	@RequestMapping(value = "/validateAllRecords.htm", method = RequestMethod.GET)
 	public void validateAllRecords(HttpServletRequest request, HttpServletResponse response, @RequestParam String s, @RequestParam String r) throws IOException {
-		ServletOutputStream outputStream = response.getOutputStream();
+		final ServletOutputStream outputStream = response.getOutputStream();
 		try {
 			if ( s == null || r == null) {
 				outputStream.println("Wrong parameters: please specify 's' (survey) and 'r' (root entity name).");
 				return;
 			}
 			SessionState sessionState = getSessionState(request);
-			User user = sessionState.getUser();
-			String sessionId = sessionState.getSessionId();
+			final User user = sessionState.getUser();
+			final String sessionId = sessionState.getSessionId();
 			print(outputStream, "Starting validation of all records: ");
-			CollectSurvey survey = surveyManager.get(s);
+			final CollectSurvey survey = surveyManager.get(s);
 			if ( survey == null ) {
 				print(outputStream, "Survey not found");
 				return;
 			}
-			List<CollectRecord> summaries = recordManager.loadSummaries(survey, r, (String) null);
-			if ( summaries != null ) {
-				ValidationMessageBuilder validationMessageHelper = ValidationMessageBuilder.createInstance(messageContextHolder);
-				print(outputStream, "Records to validate: " + summaries.size());
-				for (CollectRecord summary : summaries) {
-					String recordKey = validationMessageHelper.getRecordKey(summary);
-					long start = System.currentTimeMillis();
-					print(outputStream, "Start validating record: " + recordKey);
-					Integer id = summary.getId();
-					Step step = summary.getStep();
-					recordManager.validateAndSave(survey, user, sessionId, id, step);
-					long elapsedMillis = System.currentTimeMillis() - start;
-					print(outputStream, "Validation of record " + recordKey + " completed in " + elapsedMillis + " millis");
+			RecordFilter filter = new RecordFilter(survey);
+			filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(r).getId());
+			final ValidationMessageBuilder validationMessageHelper = ValidationMessageBuilder.createInstance(messageContextHolder);
+			recordManager.visitSummaries(filter, null, new Visitor<CollectRecordSummary>() {
+				public void visit(CollectRecordSummary summary) {
+					try {
+						String recordKey = validationMessageHelper.getRecordKey(summary);
+						long start = System.currentTimeMillis();
+						print(outputStream, "Start validating record: " + recordKey);
+						Integer id = summary.getId();
+						Step step = summary.getStep();
+						recordManager.validateAndSave(survey, user, sessionId, id, step);
+						long elapsedMillis = System.currentTimeMillis() - start;
+						print(outputStream, "Validation of record " + recordKey + " completed in " + elapsedMillis + " millis");
+					} catch(Exception e) {
+						try {
+							String message = "ERROR validating record " + summary.getId();
+							outputStream.println(message);
+							LOG.error(message);
+						} catch (IOException e1) {
+						}
+					}
 				}
-			}
+			});
 			print(outputStream, "End of validation of all records.");
 		} catch (Exception e) {
 			outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());
@@ -116,6 +126,9 @@ public class ValidationController extends BasicController {
 			RecordFilter recordFilter = new RecordFilter(survey, rootEntityId);
 			recordFilter.setKeyValues(recordKeys);
 			recordFilter.setModifiedSince(modifiedSince);
+			if (user.getRole() == UserRole.ENTRY_LIMITED) {
+				recordFilter.setOwnerId(user.getId());
+			}
 			ValidationReportProcess process = new ValidationReportProcess(outputStream, recordManager, messageContextHolder, 
 					ReportType.CSV, user, sessionId, recordFilter, true, LocaleUtils.toLocale(locale));
 			process.init();

@@ -1,22 +1,28 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.metamodel.SurveyViewGenerator;
-import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
+import org.openforis.collect.metamodel.view.SurveyView;
+import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.collect.web.controller.UserController.UserForm;
+import org.openforis.collect.web.session.SessionState;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
@@ -27,15 +33,15 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 @Scope(WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/session/")
-public class SessionController {
+@RequestMapping("api/session")
+public class SessionController extends BasicController {
 	
 	@Autowired
 	private RecordSessionManager sessionManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value = "ping.json", method = RequestMethod.GET)
+	@RequestMapping(value = "ping", method = GET)
 	public @ResponseBody Response ping(@RequestParam(value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
 		if ( editing ) {
 			sessionManager.checkIsActiveRecordLocked();
@@ -43,14 +49,14 @@ public class SessionController {
 		return new Response();
 	}
 	
-	@RequestMapping(value = "survey.json", method = RequestMethod.POST)
+	@RequestMapping(value = "survey", method = POST)
 	public @ResponseBody Response setActiveSurvey(@RequestParam int surveyId) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		sessionManager.setActiveSurvey(survey);
 		return new Response();
 	}
 	
-	@RequestMapping(value = "survey.json", method = RequestMethod.GET)
+	@RequestMapping(value = "survey", method = GET)
 	public @ResponseBody SurveyView getActiveSurvey(HttpServletResponse response) {
 		CollectSurvey survey = getUpdatedActiveSurvey();
 		if (survey == null) {
@@ -61,10 +67,39 @@ public class SessionController {
 			if (locale == null) {
 				locale = Locale.ENGLISH;
 			}
-			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
+			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale.getLanguage());
 			SurveyView view = viewGenerator.generateView(survey);
 			return view;
 		}
+	}
+	
+	@RequestMapping(value="initialize", method=POST)
+	public @ResponseBody UserForm initialize(HttpServletRequest request) {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState.getUser();
+		sessionState.setLocale(request.getLocale());
+		return new UserController.UserForm(user);
+	}
+	
+	@RequestMapping(value="user", method=GET)
+	public @ResponseBody UserForm getLoggedUser(HttpServletRequest request, HttpServletResponse response) {
+		SessionState sessionState = sessionManager.getSessionState();
+		User user = sessionState == null ? null : sessionState.getUser();
+		if (user == null) {
+			HttpResponses.setNoContentStatus(response);
+			return null;
+		}
+		if (sessionState.getLocale() == null) {
+			sessionState.setLocale(request.getLocale());
+		}
+		return new UserController.UserForm(user);
+	}
+	
+	@RequestMapping(value="invalidate", method=POST)
+	public @ResponseBody Response invalidate(HttpServletRequest request) {
+		sessionManager.invalidateSession();
+		request.getSession().invalidate();
+		return new Response();
 	}
 	
 	private CollectSurvey getUpdatedActiveSurvey() {

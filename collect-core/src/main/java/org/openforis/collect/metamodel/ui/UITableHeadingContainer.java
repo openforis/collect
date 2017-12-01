@@ -14,6 +14,8 @@ public interface UITableHeadingContainer {
 	public void addHeadingComponent(UITableHeadingComponent component);
 	
 	public void removeHeadingComponent(UITableHeadingComponent component);
+	
+	public int indexOf(UITableHeadingComponent component);
 
 	public UIColumn createColumn();
 	

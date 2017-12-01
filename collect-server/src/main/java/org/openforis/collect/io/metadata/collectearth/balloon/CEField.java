@@ -17,7 +17,7 @@ class CEField extends CEComponent {
 	private boolean readOnly = false;
 	
 	public CEField(String htmlParameterName, String name, String label, String tooltip, boolean multiple, CEField.CEFieldType type, boolean key) {
-		super(htmlParameterName, name, label, multiple, tooltip);
+		super(htmlParameterName, name, label, tooltip, multiple);
 		this.type = type;
 		this.key = key;
 	}

@@ -55,7 +55,7 @@
 				if ( record == null || record.owner == null ) {
 					recordOwner = UNASSIGNED_ITEM;
 				} else if ( Application.user.hasRole(UserProxy.ROLE_ADMIN)) {
-					recordOwner = CollectionUtil.getItem(assignableOwners, "name", record.owner.name);
+					recordOwner = CollectionUtil.getItem(assignableOwners, "name", record.owner.username);
 				} else {
 					recordOwner = record.owner;
 				}
@@ -88,7 +88,7 @@
 				if ( owner == null || owner == UNASSIGNED_ITEM ) {
 					return Message.get("list.unassignedOwnerItem");
 				} else {
-					return owner.name;
+					return owner.username;
 				}
 			}
 			

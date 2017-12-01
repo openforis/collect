@@ -19,13 +19,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.io.data.DataExportStatus.Format;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -61,11 +62,11 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private RecordFilter recordFilter;
 	private Integer entityId;
 	private boolean alwaysGenerateZipFile;
-	private CSVExportConfiguration configuration;
+	private CSVDataExportParameters configuration;
 	
 	public CSVDataExportProcess() {
 		alwaysGenerateZipFile = false;
-		configuration = new CSVExportConfiguration();
+		configuration = new CSVDataExportParameters();
 	}
 	
 	@Override
@@ -151,8 +152,8 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		
 		CollectSurvey survey = recordFilter.getSurvey();
 		Step step = recordFilter.getStepGreaterOrEqual();
-		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
-		for (CollectRecord s : summaries) {
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(recordFilter);
+		for (CollectRecordSummary s : summaries) {
 			if ( status.isRunning() ) {
 				try {
 					CollectRecord record = recordManager.load(survey, s.getId(), step, false);
@@ -237,11 +238,11 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		this.entityId = entityId;
 	}
 	
-	public CSVExportConfiguration getConfiguration() {
+	public CSVDataExportParameters getConfiguration() {
 		return configuration;
 	}
 	
-	public void setConfiguration(CSVExportConfiguration configuration) {
+	public void setConfiguration(CSVDataExportParameters configuration) {
 		this.configuration = configuration;
 	}
 

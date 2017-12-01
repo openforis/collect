@@ -43,6 +43,11 @@ public class LabelledItem {
 		this.label = label;
 	}
 	
+	@Override
+	public String toString() {
+		return "LabelledItem [code=" + code + ", label=" + label + "]";
+	}
+
 	public static class LabelComparator implements Comparator<LabelledItem> {
 		@Override
 		public int compare(LabelledItem item1, LabelledItem item2) {

@@ -3,11 +3,13 @@ package org.openforis.collect.utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,15 +21,21 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Files {
 	
-	public static final String CSV_CONTENT_TYPE = "text/csv";
 	public static final String CSV_FILE_EXTENSION = "csv";
-	public static final String ZIP_CONTENT_TYPE = "application/zip";
 	public static final String ZIP_FILE_EXTENSION = "zip";
+	public static final String XML_FILE_EXTENSION = "xml";
 	
 	private static final String PATH_SEPARATOR_PATTERN = "[\\\\|/]";
 	public static final String JAVA_IO_TMPDIR_SYS_PROP = "java.io.tmpdir";
 	public static final File TEMP_FOLDER = getReadableSysPropLocation(JAVA_IO_TMPDIR_SYS_PROP, null);
 
+	public static File writeToTempFile(InputStream is, String originalFileName, String tempFilePrefix) throws IOException {
+		String orginalExtension = FilenameUtils.getExtension(originalFileName);
+		File file = File.createTempFile(tempFilePrefix, "." + orginalExtension);
+		FileUtils.copyInputStreamToFile(is, file);
+		return file;
+	}
+	
 	public static File writeToTempFile(String text, String tempFilePrefix, String tempFileSuffix) throws IOException {
 		File file = File.createTempFile(tempFilePrefix, tempFileSuffix);
 		Writer writer = null;

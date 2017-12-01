@@ -32,6 +32,7 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 	private CodeListItem parentItem;
 	private final int level;
 	private String imageFileName;
+	private String color;
 
 	protected CodeListItem(CodeList codeList, int id, int level) {
 		super(codeList.getSurvey(), id);
@@ -305,6 +306,14 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 		this.imageFileName = imageFileName;
 	}
 	
+	public String getColor() {
+		return color;
+	}
+	
+	public void setColor(String color) {
+		this.color = color;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -344,12 +353,22 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 				return false;
 		} else if (!code.equals(other.code))
 			return false;
+		if (color == null) {
+			if (other.color != null)
+				return false;
+		} else if (!color.equals(other.color))
+			return false;
 		if (descriptions == null) {
 			if (other.descriptions != null)
 				return false;
 		} else if (!descriptions.equals(other.descriptions))
 			return false;
 		if (getId() != other.getId())
+			return false;
+		if (imageFileName == null) {
+			if (other.imageFileName != null)
+				return false;
+		} else if (!imageFileName.equals(other.imageFileName))
 			return false;
 		if (labels == null) {
 			if (other.labels != null)

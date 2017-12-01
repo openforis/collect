@@ -7,7 +7,6 @@ import org.openforis.collect.datacleansing.manager.DataQueryTypeManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -17,7 +16,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/dataquerytypes")
+@RequestMapping(value = "api/datacleansing/dataquerytypes")
 public class DataQueryTypeController extends AbstractSurveyObjectEditFormController<DataQueryType, DataQueryTypeForm, DataQueryTypeManager> {
 	
 	@Autowired
@@ -26,13 +25,6 @@ public class DataQueryTypeController extends AbstractSurveyObjectEditFormControl
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(validator);
-	}
-	
-	@Override
-	@Autowired
-	@Qualifier("dataQueryTypeManager")
-	public void setItemManager(DataQueryTypeManager itemManager) {
-		super.setItemManager(itemManager);
 	}
 	
 	@Override

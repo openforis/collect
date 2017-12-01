@@ -138,7 +138,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 		try {
 			CRSAuthorityFactory factory = CRS.getAuthorityFactory(true);
 			CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem(code);
-			SpatialReferenceSystem result = new SpatialReferenceSystem(code, crs.toWKT(), null);
+			SpatialReferenceSystem result = new SpatialReferenceSystem(code, crs.toWKT());
 			String description = getDescription(crs);
 			for (String lang : labelLanguages) {
 				result.setLabel(lang, code);
@@ -251,7 +251,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 	}
 	
 	public Coordinate fromLatLonToWebMarcator(double lat, double lon) {
-		return convert(lon, lat, SpatialReferenceSystem.WGS84_SRS_ID, SpatialReferenceSystem.WEB_MARCATOR_SRS.getId());
+		return convert(lon, lat, SpatialReferenceSystem.WGS84_SRS_ID, SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
 	}
 
 	private Coordinate convert(double x, double y, String fromSrsId, String toSrsId) {

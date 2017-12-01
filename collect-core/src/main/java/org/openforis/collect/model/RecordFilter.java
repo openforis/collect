@@ -1,10 +1,14 @@
 package org.openforis.collect.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
@@ -25,6 +29,8 @@ public class RecordFilter {
 	private Date modifiedSince;
 	private Integer ownerId;
 	private List<String> keyValues;
+	private List<String> qualifiers;
+	private List<String> summaryValues;
 	private boolean caseSensitiveKeyValues;
 	private boolean includeNullConditionsForKeyValues = false;
 	
@@ -55,6 +61,17 @@ public class RecordFilter {
 			EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinition(rootEntityName);
 			return rootEntityDef.getId();
 		}
+	}
+	
+	public void setQualifiersByName(Map<String, String> qualifiers) {
+		List<String> qualifierValues = new ArrayList<String>();
+		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinition(rootEntityId);
+		List<AttributeDefinition> qualifierAttrDefs = survey.getSchema().getQualifierAttributeDefinitions(rootEntityDefinition);
+		for (AttributeDefinition qualifierDef : qualifierAttrDefs) {
+			String qualifierVal = qualifiers.get(qualifierDef.getName());
+			qualifierValues.add(qualifierVal);
+		}
+		setQualifiers(qualifierValues);
 	}
 
 	public Integer getOffset() {
@@ -138,11 +155,31 @@ public class RecordFilter {
 	}
 	
 	public void setKeyValues(String[] keyValues) {
-		if ( keyValues != null && keyValues.length > 0 ) {
-			setKeyValues(Arrays.asList(keyValues));
-		} else {
-			this.keyValues = null;
-		}
+		this.keyValues = toStringList(keyValues);
+	}
+	
+	public List<String> getQualifiers() {
+		return qualifiers;
+	}
+	
+	public void setQualifiers(String[] qualifierValues) {
+		this.qualifiers = toStringList(qualifierValues);
+	}
+	
+	public void setQualifiers(List<String> qualifiers) {
+		this.qualifiers = qualifiers;
+	}
+	
+	public List<String> getSummaryValues() {
+		return summaryValues;
+	}
+	
+	public void setSummaryValues(String[] summaryValues) {
+		this.summaryValues = toStringList(summaryValues);
+	}
+	
+	public void setSummaryValues(List<String> summaryValues) {
+		this.summaryValues = summaryValues;
 	}
 	
 	public boolean isCaseSensitiveKeyValues() {
@@ -161,4 +198,11 @@ public class RecordFilter {
 		this.includeNullConditionsForKeyValues = includeNullConditionsForKeyValues;
 	}
 	
+	private static List<String> toStringList(String[] values) {
+		if (values == null || values.length == 0) {
+			return Collections.emptyList();
+		} else {
+			return Arrays.asList(values);
+		}
+	}
 }

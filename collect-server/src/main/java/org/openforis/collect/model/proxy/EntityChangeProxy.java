@@ -1,12 +1,12 @@
 package org.openforis.collect.model.proxy;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.model.EntityChange;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -19,8 +19,8 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
  */
 public class EntityChangeProxy extends NodeChangeProxy<EntityChange> {
 
-	public EntityChangeProxy(EntityChange change, Locale locale) {
-		super(change, locale);
+	public EntityChangeProxy(EntityChange change, ProxyContext context) {
+		super(change, context);
 	}
 
 	@ExternalizedProperty

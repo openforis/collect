@@ -43,10 +43,6 @@
             	value="@bind(fx.surveyName) @validator(vm.nameValidator)" />
           </fieldErrorHandler>
         </row>
-<!--         <row> -->
-<!--           <label value="${labels.survey.import_survey.uri}:" /> -->
-<!--           <label value="@load(vm.uploadedSurveyUri)" /> -->
-<!--         </row> -->
         <row>
         	<cell />
         	<cell>
@@ -57,6 +53,15 @@
 	        		value="${labels.survey.import_survey.updating_published_survey}" />
         	</cell>
         </row>
+        <row  visible="@load(not vm.updatingExistingSurvey)">
+			<label value="${labels.survey.template.usergroup.$}:" />
+			<listbox model="@load(vm.userGroupsModel)" mold="select"
+				selectedItem="@bind(fx.userGroup)">
+				<template name="model">
+					<listitem label="${each.label}" value="${each.code}" />
+				</template>
+			</listbox>
+		</row>
       </rows>
     </grid>
 

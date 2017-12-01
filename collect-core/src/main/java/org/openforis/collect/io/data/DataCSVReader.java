@@ -22,7 +22,7 @@ import org.openforis.collect.io.data.DataLine.EntityPositionIdentifierDefinition
 import org.openforis.collect.io.data.DataLine.FieldValueKey;
 import org.openforis.collect.io.data.DataLine.SingleEntityIdentifierDefinition;
 import org.openforis.collect.io.data.csv.BasicColumnProvider;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CodeColumnProvider;
 import org.openforis.collect.io.data.csv.ColumnProvider;
 import org.openforis.collect.io.data.csv.ColumnProviderChain;
@@ -51,9 +51,9 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	private static final String ATTRIBUTE_FIELD_SEPARATOR = "_";
 	private static final String POSITION_COLUMN_FORMAT = "_%s_position";
 
-	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataImport.parsingError.missing_required_columns.message";
-	private static final String INVALID_NODE_POSITION_VALUE_MESSAGE_KEY = "csvDataImport.error.invalidNodePosition";
-	private static final String ROW_IDENTIFIER_NOT_SPECIFIED_MESSAGE_KEY = "csvDataImport.error.row_identifier_not_specified";
+	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataManagement.csvDataImport.error.missing-required-columns";
+	private static final String INVALID_NODE_POSITION_VALUE_MESSAGE_KEY = "dataManagement.csvDataImport.error.invalid-node-position";
+	private static final String ROW_IDENTIFIER_NOT_SPECIFIED_MESSAGE_KEY = "dataManagement.csvDataImport.error.row-identifier-not-specified";
 
 	//input variables
 	private EntityDefinition parentEntityDefinition;
@@ -87,7 +87,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	}
 	
 	private List<String> calculateIgnoredColumns() {
-		final CSVExportConfiguration csvExportConfig = new CSVExportConfiguration();
+		final CSVDataExportParameters csvExportConfig = new CSVDataExportParameters();
 		csvExportConfig.setIncludeCodeItemLabelColumn(true);
 		csvExportConfig.setIncludeEnumeratedEntities(false);
 		

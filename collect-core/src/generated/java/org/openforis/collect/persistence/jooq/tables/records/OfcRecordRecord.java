@@ -26,7 +26,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcRecordRecord extends UpdatableRecordImpl<OfcRecordRecord> {
 
-	private static final long serialVersionUID = 299564515;
+	private static final long serialVersionUID = -764135012;
 
 	/**
 	 * Setter for <code>collect.ofc_record.id</code>.
@@ -337,59 +337,129 @@ public class OfcRecordRecord extends UpdatableRecordImpl<OfcRecordRecord> {
 	}
 
 	/**
-	 * Setter for <code>collect.ofc_record.data1</code>.
-	 */
-	public void setData1(byte[] value) {
-		setValue(22, value);
-	}
-
-	/**
-	 * Getter for <code>collect.ofc_record.data1</code>.
-	 */
-	public byte[] getData1() {
-		return (byte[]) getValue(22);
-	}
-
-	/**
-	 * Setter for <code>collect.ofc_record.data2</code>.
-	 */
-	public void setData2(byte[] value) {
-		setValue(23, value);
-	}
-
-	/**
-	 * Getter for <code>collect.ofc_record.data2</code>.
-	 */
-	public byte[] getData2() {
-		return (byte[]) getValue(23);
-	}
-
-	/**
 	 * Setter for <code>collect.ofc_record.owner_id</code>.
 	 */
 	public void setOwnerId(Integer value) {
-		setValue(24, value);
+		setValue(22, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_record.owner_id</code>.
 	 */
 	public Integer getOwnerId() {
-		return (Integer) getValue(24);
+		return (Integer) getValue(22);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_record.app_version</code>.
 	 */
 	public void setAppVersion(String value) {
-		setValue(25, value);
+		setValue(23, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_record.app_version</code>.
 	 */
 	public String getAppVersion() {
+		return (String) getValue(23);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_record.data_seq_num</code>.
+	 */
+	public void setDataSeqNum(Integer value) {
+		setValue(24, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_record.data_seq_num</code>.
+	 */
+	public Integer getDataSeqNum() {
+		return (Integer) getValue(24);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_record.qualifier1</code>.
+	 */
+	public void setQualifier1(String value) {
+		setValue(25, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_record.qualifier1</code>.
+	 */
+	public String getQualifier1() {
 		return (String) getValue(25);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_record.qualifier2</code>.
+	 */
+	public void setQualifier2(String value) {
+		setValue(26, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_record.qualifier2</code>.
+	 */
+	public String getQualifier2() {
+		return (String) getValue(26);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_record.qualifier3</code>.
+	 */
+	public void setQualifier3(String value) {
+		setValue(27, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_record.qualifier3</code>.
+	 */
+	public String getQualifier3() {
+		return (String) getValue(27);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_record.summary1</code>.
+	 */
+	public void setSummary1(String value) {
+		setValue(28, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_record.summary1</code>.
+	 */
+	public String getSummary1() {
+		return (String) getValue(28);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_record.summary2</code>.
+	 */
+	public void setSummary2(String value) {
+		setValue(29, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_record.summary2</code>.
+	 */
+	public String getSummary2() {
+		return (String) getValue(29);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_record.summary3</code>.
+	 */
+	public void setSummary3(String value) {
+		setValue(30, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_record.summary3</code>.
+	 */
+	public String getSummary3() {
+		return (String) getValue(30);
 	}
 
 	// -------------------------------------------------------------------------
@@ -418,7 +488,7 @@ public class OfcRecordRecord extends UpdatableRecordImpl<OfcRecordRecord> {
 	/**
 	 * Create a detached, initialised OfcRecordRecord
 	 */
-	public OfcRecordRecord(Integer id, Integer surveyId, Integer rootEntityDefinitionId, Timestamp dateCreated, Integer createdById, Timestamp dateModified, Integer modifiedById, String modelVersion, Integer step, String state, Integer skipped, Integer missing, Integer errors, Integer warnings, String key1, String key2, String key3, Integer count1, Integer count2, Integer count3, Integer count4, Integer count5, byte[] data1, byte[] data2, Integer ownerId, String appVersion) {
+	public OfcRecordRecord(Integer id, Integer surveyId, Integer rootEntityDefinitionId, Timestamp dateCreated, Integer createdById, Timestamp dateModified, Integer modifiedById, String modelVersion, Integer step, String state, Integer skipped, Integer missing, Integer errors, Integer warnings, String key1, String key2, String key3, Integer count1, Integer count2, Integer count3, Integer count4, Integer count5, Integer ownerId, String appVersion, Integer dataSeqNum, String qualifier1, String qualifier2, String qualifier3, String summary1, String summary2, String summary3) {
 		super(OfcRecord.OFC_RECORD);
 
 		setValue(0, id);
@@ -443,9 +513,14 @@ public class OfcRecordRecord extends UpdatableRecordImpl<OfcRecordRecord> {
 		setValue(19, count3);
 		setValue(20, count4);
 		setValue(21, count5);
-		setValue(22, data1);
-		setValue(23, data2);
-		setValue(24, ownerId);
-		setValue(25, appVersion);
+		setValue(22, ownerId);
+		setValue(23, appVersion);
+		setValue(24, dataSeqNum);
+		setValue(25, qualifier1);
+		setValue(26, qualifier2);
+		setValue(27, qualifier3);
+		setValue(28, summary1);
+		setValue(29, summary2);
+		setValue(30, summary3);
 	}
 }

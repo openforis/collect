@@ -1,6 +1,5 @@
 package org.openforis.collect.model.proxy;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -8,6 +7,7 @@ import javax.servlet.ServletContext;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.granite.messaging.webapp.HttpGraniteContext;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.model.AttributeChange;
 import org.openforis.collect.spring.SpringMessageSource;
@@ -22,8 +22,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class AttributeChangeProxy extends NodeChangeProxy<AttributeChange> {
 
-	public AttributeChangeProxy(AttributeChange change, Locale locale) {
-		super(change, locale);
+	public AttributeChangeProxy(AttributeChange change, ProxyContext context) {
+		super(change, context);
 	}
 
 	@ExternalizedProperty
@@ -31,8 +31,8 @@ public class AttributeChangeProxy extends NodeChangeProxy<AttributeChange> {
 		if ( change.getValidationResults() == null ) {
 			return null;
 		} else {
-			MessageSource messageSource = getMessageSource();
-			return new ValidationResultsProxy(messageSource, getLocale(), (Attribute<?, ?>) change.getNode(), change.getValidationResults());
+			return new ValidationResultsProxy(context, 
+					(Attribute<?, ?>) change.getNode(), change.getValidationResults());
 		}
 	}
 

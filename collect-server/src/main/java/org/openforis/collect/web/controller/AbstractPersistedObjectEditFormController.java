@@ -1,19 +1,25 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.manager.AbstractPersistedObjectManager;
+import org.openforis.collect.manager.ItemManager;
+import org.openforis.collect.model.User;
 import org.openforis.commons.web.AbstractFormUpdateValidationResponse;
 import org.openforis.commons.web.PersistedObjectForm;
 import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.PersistedObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -24,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 public abstract class AbstractPersistedObjectEditFormController<T extends PersistedObject, 
 											F extends PersistedObjectForm<T>, 
-											M extends AbstractPersistedObjectManager<T, ?>> {
+											M extends ItemManager<T, Integer>> {
 	
 	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate", "uuid"};
 	
@@ -33,14 +39,14 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 	protected abstract T createItemInstance();
 	protected abstract F createFormInstance(T item);
 	
-	@RequestMapping(value="list.json", method = RequestMethod.GET)
+	@RequestMapping(method=GET)
 	public @ResponseBody
 	List<F> loadAll() {
 		List<T> items = loadAllItems();
 		return createFormInstances(items);
 	}
 	
-	@RequestMapping(value = "/{id}.json", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id}", method=GET)
 	public @ResponseBody
 	F load(@PathVariable int id) {
 		T item = loadItem(id);
@@ -48,15 +54,25 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		return form;
 	}
 	
-	@RequestMapping(value="save.json", method = RequestMethod.POST)
+	@RequestMapping(method=POST)
 	public @ResponseBody
-	Response save(@Validated F form, BindingResult result) {
+	Response insert(@Validated F form, BindingResult result) {
+		return save(form, result);
+	}
+	
+	@RequestMapping(method=PATCH)
+	public @ResponseBody
+	Response update(@Validated F form, BindingResult result) {
+		return save(form, result);
+	}
+	
+	protected Response save(@Validated F form, BindingResult result) {
 		List<ObjectError> errors = result.getAllErrors();
 		SimpleFormUpdateResponse response;
 		if (errors.isEmpty()) {
 			T item = loadOrCreateItem(form);
 			copyFormIntoItem(form, item);
-			itemManager.save(item);
+			itemManager.save(item, getLoggedUser());
 			F responseForm = createFormInstance(item);
 			response = new SimpleFormUpdateResponse(responseForm);
 		} else {
@@ -65,18 +81,18 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		return response;
 	}
 	
-	@RequestMapping(value="duplicate.json", method = RequestMethod.POST)
+	@RequestMapping(value="/{id}/duplicate", method=POST)
 	public @ResponseBody
 	Response duplicate(@RequestParam int itemId, BindingResult result) {
 		T item = itemManager.loadById(itemId);
 		T newItem = item; //TODO clone?!
 		newItem.setId(null);
-		itemManager.save(newItem);
+		itemManager.save(newItem, getLoggedUser());
 		F responseForm = createFormInstance(newItem);
 		return new SimpleFormUpdateResponse(responseForm);
 	}
 	
-	@RequestMapping(value="validate.json", method = RequestMethod.POST)
+	@RequestMapping(value="validate", method=POST)
 	public @ResponseBody
 	Response validate(@Validated F form, BindingResult result) {
 		List<ObjectError> errors = result.getAllErrors();
@@ -84,7 +100,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		return response;
 	}
 	
-	@RequestMapping(value = "{id}.json", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{id}", method=DELETE)
 	public @ResponseBody
 	Response delete(@PathVariable int id) {
 		try {
@@ -131,6 +147,11 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		return response;
 	}
 	
+	protected User getLoggedUser() {
+		return null;
+	}
+	
+	@Autowired
 	public void setItemManager(M itemManager) {
 		this.itemManager = itemManager;
 	}

@@ -11,8 +11,6 @@ import java.util.Map;
 import org.openforis.collect.designer.form.validator.SurveyNameValidator;
 import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.model.LabelledItem.LabelComparator;
-import org.openforis.collect.designer.session.SessionStatus;
-import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.exception.SurveyValidationException;
@@ -21,7 +19,10 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.collect.web.controller.SurveyController;
+import org.openforis.collect.web.controller.SurveyController.SurveyCreationParameters.TemplateType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
@@ -31,7 +32,6 @@ import org.zkoss.bind.Validator;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelListModel;
 import org.zkoss.zul.ListModelList;
@@ -45,14 +45,9 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
 	private static final String SURVEY_NAME_FIELD = "name";
-
-	private enum TemplateType {
-		BLANK,
-		BIOPHYSICAL, 
-		COLLECT_EARTH,
-		COLLECT_EARTH_IPCC,
-		//SOCIOECONOMIC, 
-	}
+	private static final String TEMPLATE_FIELD_NAME = "template";
+	private static final String LANGUAGE_FIELD_NAME = "language";
+	private static final String USER_GROUP_FIELD_NAME = "userGroup";
 
 	@WireVariable 
 	private SurveyManager surveyManager;
@@ -64,12 +59,15 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	private Validator nameValidator;
 	
-	@Init
+	@Init(superclass=false)
 	public void init() {
+		super.init();
 		form = new HashMap<String, Object>();
 		nameValidator = new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, true);
 		initLanguageModel();
 		initTemplatesModel();
+		initUserGroupsModel();
+		form.put(USER_GROUP_FIELD_NAME, getDefaultPublicUserGroupItem());
 	}
 
 	private void initTemplatesModel() {
@@ -81,9 +79,9 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		templateModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(templates));
 		templateModel.setMultiple(false);
 		LabelledItem defaultTemplate = LabelledItem.getByCode(templates, TemplateType.BLANK.name());
-		form.put("template", defaultTemplate);
+		form.put(TEMPLATE_FIELD_NAME, defaultTemplate);
 	}
-
+	
 	private void initLanguageModel() {
 		List<LabelledItem> languages = new ArrayList<LabelledItem>();
 		List<String> codes = Languages.getCodes(Standard.ISO_639_1);
@@ -94,20 +92,16 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		Collections.sort(languages, new LabelComparator());
 		languageModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(languages));
 		LabelledItem defaultLanguage = LabelledItem.getByCode(languages, Locale.ENGLISH.getLanguage());
-		form.put("language", defaultLanguage);
-	}
-	
-	public BindingListModelListModel<LabelledItem> getTemplateModel() {
-		return templateModel;
+		form.put(LANGUAGE_FIELD_NAME, defaultLanguage);
 	}
 	
 	@Command
 	public void ok() throws IdmlParseException, SurveyValidationException, SurveyStoreException {
-		String name = (String) form.get("name");
-		String langCode = ((LabelledItem) form.get("language")).getCode();
-		String templateCode = ((LabelledItem) form.get("template")).getCode();
+		String name = (String) form.get(SURVEY_NAME_FIELD);
+		String langCode = ((LabelledItem) form.get(LANGUAGE_FIELD_NAME)).getCode();
+		String templateCode = ((LabelledItem) form.get(TEMPLATE_FIELD_NAME)).getCode();
 		TemplateType templateType = TemplateType.valueOf(templateCode);
-		
+		String userGroupName = ((LabelledItem) form.get(USER_GROUP_FIELD_NAME)).getCode();
 		CollectSurvey survey;
 		switch (templateType) {
 		case BLANK:
@@ -116,12 +110,11 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		default:
 			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
+		UserGroup userGroup = userGroupManager.findByName(userGroupName);
+		survey.setUserGroupId(userGroup.getId());
 		surveyManager.save(survey);
-		//put survey in session and redirect into survey edit page
-		SessionStatus sessionStatus = getSessionStatus();
-		sessionStatus.setSurvey(survey);
-		sessionStatus.setCurrentLanguageCode(survey.getDefaultLanguage());
-		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
+		
+		SurveyEditVM.redirectToSurveyEditPage(survey.getId());
 	}
 
 	protected CollectSurvey createNewSurveyFromTemplate(String name, String langCode, TemplateType templateType)
@@ -157,20 +150,17 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntity = schema.createEntityDefinition();
 		rootEntity.setMultiple(true);
-		rootEntity.setName(SchemaVM.DEFAULT_ROOT_ENTITY_NAME);
+		rootEntity.setName(SurveyController.DEFAULT_ROOT_ENTITY_NAME);
 		schema.addRootEntityDefinition(rootEntity);
 		//create root tab set
 		UIOptions uiOptions = survey.getUIOptions();
 		UITabSet rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
-		mainTab.setLabel(langCode, SchemaVM.DEFAULT_MAIN_TAB_LABEL);
+		mainTab.setLabel(langCode, SurveyController.DEFAULT_MAIN_TAB_LABEL);
 		
 		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
 		surveyObjectsGenerator.addPredefinedObjects(survey);
 		
-		if ( survey.getSamplingDesignCodeList() == null ) {
-			survey.addSamplingDesignCodeList();
-		}
 		return survey;
 	}
 	
@@ -178,10 +168,14 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		return nameValidator;
 	}
 
+	public BindingListModelListModel<LabelledItem> getTemplateModel() {
+		return templateModel;
+	}
+	
 	public BindingListModelListModel<LabelledItem> getLanguageModel() {
 		return languageModel;
 	}
-
+	
 	public Map<String, Object> getForm() {
 		return form;
 	}

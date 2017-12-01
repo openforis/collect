@@ -29,6 +29,12 @@ public class SurveySummary {
 	private ProcessStatus recordValidationProcessStatus;
 	private String defaultLanguage;
 	private List<String> languages;
+	private Integer userGroupId;
+	private UserGroup userGroup;
+	private SurveyAvailability availability;
+	
+	public SurveySummary() {
+	}
 	
 	public SurveySummary(Integer id, String name, String uri) {
 		this(id, name, uri, null);
@@ -49,18 +55,21 @@ public class SurveySummary {
 	}
 	
 	public static SurveySummary createFromSurvey(CollectSurvey survey, String lang) {
-		Integer id = survey.getId();
-		String projectName = survey.getProjectName(lang);
-		String name = survey.getName();
-		String uri = survey.getUri();
-		SurveySummary summary = new SurveySummary(id, name, uri, projectName);
-		summary.setTemporary(survey.isTemporary());
-		summary.setCreationDate(survey.getCreationDate());
-		summary.setModifiedDate(survey.getModifiedDate());
-		summary.setTarget(survey.getTarget());
-		summary.setDefaultLanguage(survey.getDefaultLanguage());
-		summary.setLanguages(survey.getLanguages());
+		SurveySummary summary = new SurveySummary(survey.getId(), survey.getName(), survey.getUri());
+		summary.fillFromSurvey(survey, lang);
 		return summary;
+	}
+
+	public void fillFromSurvey(CollectSurvey survey, String lang) {
+		this.setProjectName(survey.getProjectName(lang, true));
+		this.setTemporary(survey.isTemporary());
+		this.setCreationDate(survey.getCreationDate());
+		this.setModifiedDate(survey.getModifiedDate());
+		this.setTarget(survey.getTarget());
+		this.setDefaultLanguage(survey.getDefaultLanguage());
+		this.setLanguages(survey.getLanguages());
+		this.setUserGroupId(survey.getUserGroupId());
+		this.setUserGroup(survey.getUserGroup());
 	}
 	
 	public boolean isRecordValidationInProgress() {
@@ -70,7 +79,7 @@ public class SurveySummary {
 	public int getRecordValidationProgressPercent() {
 		return recordValidationProcessStatus == null ? 0: recordValidationProcessStatus.getProgressPercent();
 	}
-
+	
 	public Integer getId() {
 		return id;
 	}
@@ -167,5 +176,33 @@ public class SurveySummary {
 	public void setLanguages(List<String> languages) {
 		this.languages = languages;
 	}
+	
+	public Integer getUserGroupId() {
+		return userGroupId;
+	}
+	
+	public void setUserGroupId(Integer userGroupId) {
+		this.userGroupId = userGroupId;
+	}
 
+	public UserGroup getUserGroup() {
+		return userGroup;
+	}
+	
+	public String getUserGroupLabel() {
+		return userGroup == null ? null : userGroup.getLabel();
+	}
+
+	public void setUserGroup(UserGroup userGroup) {
+		this.userGroup = userGroup;
+		this.userGroupId = userGroup == null ? null: userGroup.getId();
+	}
+	
+	public SurveyAvailability getAvailability() {
+		return availability;
+	}
+	
+	public void setAvailability(SurveyAvailability availability) {
+		this.availability = availability;
+	}
 }

@@ -45,14 +45,14 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	private RecordUpdater recordUpdater;
 	private RecordUserLoader recordUserLoader;
 	
-	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, 
-			CollectSurvey existingSurvey, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
+	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, CollectSurvey existingSurvey, 
+			User activeUser, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		this.file = file;
 		this.packagedSurvey = packagedSurvey;
 		this.existingSurvey = existingSurvey;
 		this.validateRecords = validateRecords;
 		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
-		this.recordUserLoader = new RecordUserLoader(userManager);
+		this.recordUserLoader = new RecordUserLoader(userManager, activeUser);
 	}
 	
 	@Override
@@ -139,9 +139,16 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	private ParseRecordResult parseRecord(Reader reader, Step step) throws IOException {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		if (result.isSuccess()) {
-			result.getRecord().setStep(step);
+			CollectRecord record = result.getRecord();
+			record.setStep(step);
+			record.setDataStep(step);
 		}
 		return result;
+	}
+	
+	@Override
+	public CollectSurvey getSurvey() {
+		return packagedSurvey;
 	}
 	
 	public boolean isValidateRecords() {
@@ -160,23 +167,25 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		private static final String NEW_USER_PASSWORD = "password";
 		
 		private final UserManager userManager;
+		private User activeUser;
 		private Map<String, User> usersByName;
 		
-		public RecordUserLoader(UserManager userManager) {
+		public RecordUserLoader(UserManager userManager, User activeUser) {
 			super();
 			this.userManager = userManager;
+			this.activeUser = activeUser;
 			this.usersByName = new HashMap<String, User>();
 		}
 
 		public void adjustUserReferences(CollectRecord record) {
 			User createdBy = record.getCreatedBy();
 			if (createdBy != null) {
-				User user = loadOrCreateAndInsertUser(createdBy.getName());
+				User user = loadOrCreateAndInsertUser(createdBy.getUsername());
 				record.setCreatedBy(user);
 			}
 			User modifiedBy = record.getModifiedBy();
 			if (modifiedBy != null) {
-				User user = loadOrCreateAndInsertUser(modifiedBy.getName());
+				User user = loadOrCreateAndInsertUser(modifiedBy.getUsername());
 				record.setModifiedBy(user);
 			}
 		}
@@ -192,7 +201,7 @@ public class XMLParsingRecordProvider implements RecordProvider {
 				if ( user == null ) {
 					//create a user with data entry role and password equal to the user name
 					try {
-						user = userManager.insertUser(name, NEW_USER_PASSWORD, UserRole.ENTRY);
+						user = userManager.insertUser(name, NEW_USER_PASSWORD, UserRole.ENTRY, activeUser);
 					} catch (UserPersistenceException e) {
 						throw new RuntimeException("Error creating new user with username '" + name + "'", e);
 					}

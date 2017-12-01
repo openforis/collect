@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-user-group-qualifiers-column" author="ricci" dbms="sqlite">
+		<sql>
+			ALTER TABLE ofc_usergroup ADD COLUMN qualifier1_name VARCHAR;
+			ALTER TABLE ofc_usergroup ADD COLUMN qualifier1_value VARCHAR;
+		</sql>
+	</changeSet>
+	
+	<changeSet id="add-record-qualifier-columns" author="ricci" dbms="sqlite">
+		<sql>
+			ALTER TABLE ofc_record ADD COLUMN qualifier1 VARCHAR;
+			ALTER TABLE ofc_record ADD COLUMN qualifier2 VARCHAR;
+			ALTER TABLE ofc_record ADD COLUMN qualifier3 VARCHAR;
+		</sql>
+	</changeSet>
+	
+	<changeSet id="add-record-data-qualifier-columns" author="ricci" dbms="sqlite">
+		<sql>
+			ALTER TABLE ofc_record_data ADD COLUMN qualifier1 VARCHAR;
+			ALTER TABLE ofc_record_data ADD COLUMN qualifier2 VARCHAR;
+			ALTER TABLE ofc_record_data ADD COLUMN qualifier3 VARCHAR;
+		</sql>
+	</changeSet>
+	
+	<changeSet id="add-record-summary-columns" author="ricci" dbms="sqlite">
+		<sql>
+			ALTER TABLE ofc_record ADD COLUMN summary1 VARCHAR;
+			ALTER TABLE ofc_record ADD COLUMN summary2 VARCHAR;
+			ALTER TABLE ofc_record ADD COLUMN summary3 VARCHAR;
+		</sql>
+	</changeSet>
+	
+	<changeSet id="add-record-data-summary-columns" author="ricci" dbms="sqlite">
+		<sql>
+			ALTER TABLE ofc_record_data ADD COLUMN summary1 VARCHAR;
+			ALTER TABLE ofc_record_data ADD COLUMN summary2 VARCHAR;
+			ALTER TABLE ofc_record_data ADD COLUMN summary3 VARCHAR;
+		</sql>
+	</changeSet>
+	
+</databaseChangeLog>

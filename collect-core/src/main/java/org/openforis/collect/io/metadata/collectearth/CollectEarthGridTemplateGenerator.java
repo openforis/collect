@@ -86,10 +86,11 @@ public class CollectEarthGridTemplateGenerator  {
 		for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
 			keyAttributes += keyAttributeDefinition.getName() + ",";
 		}
+		
 		keyAttributes = keyAttributes.substring(0, keyAttributes.lastIndexOf(",") );		
 		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_ID_COLUMNS_HEADER, keyAttributes);
 		
-		for( int i=1; i<=15;i++){
+		for( int i=1; i<=200;i++){
 			String keyValues = "";
 			for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
 				String value = getDummyValue(keyAttributeDefinition,i);
@@ -374,7 +375,7 @@ public class CollectEarthGridTemplateGenerator  {
 			CodeListItem firstAvailableItem = getFirstAvailableCodeItem(attrDef);
 			value = firstAvailableItem == null ? "0": firstAvailableItem.getCode();
 		} else {
-			value = "value_" + attrName;
+			value = attrName;
 			if( ord != null ){
 				value += "_"+ord;
 			}

@@ -11,9 +11,9 @@ import org.openforis.collect.datacleansing.DataQueryGroup;
 import org.openforis.collect.datacleansing.persistence.DataQueryGroupDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.commons.collection.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +27,6 @@ public class DataQueryGroupManager extends AbstractSurveyObjectManager<DataQuery
 	@Autowired
 	private DataQueryManager dataQueryManager;
 	
-	@Override
-	@Autowired
-	@Qualifier("dataQueryGroupDao")
-	public void setDao(DataQueryGroupDao dao) {
-		super.setDao(dao);
-	}
-	
 	public Set<DataQueryGroup> loadByQuery(DataQuery query) {
 		Set<DataQueryGroup> groups = dao.loadGroupsByQuery(query);
 		initializeItems(groups);
@@ -42,16 +35,18 @@ public class DataQueryGroupManager extends AbstractSurveyObjectManager<DataQuery
 	
 	@Override
 	@Transactional
-	public void save(DataQueryGroup group) {
+	public DataQueryGroup save(DataQueryGroup group, User activeUser) {
 		List<Integer> queryIds = CollectionUtils.project(group.getQueries(), "id");
 		if (group.getId() != null) {
 			dao.deleteQueryAssociations(group);
 		}
-		super.save(group);
+		super.save(group, activeUser);
 		
 		dao.insertQueryAssociations(group, queryIds);
 		
 		initializeItem(group);
+		
+		return group;
 	}
 	
 	@Override

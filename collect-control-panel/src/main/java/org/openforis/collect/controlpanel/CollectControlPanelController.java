@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -16,6 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.utils.Files;
 import org.openforis.web.server.ApplicationServer;
 
@@ -35,6 +36,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Window;
 
 public class CollectControlPanelController implements Initializable {
+
+	private static final Logger LOG = LogManager.getLogger(CollectControlPanelController.class);
 
 	private static final String COLLECT_USER_HOME_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis", "Collect");
 	private static final String LOGS_LOCATION = Files.getLocation(Files.getCurrentLocation(), "logs");
@@ -91,6 +94,7 @@ public class CollectControlPanelController implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		LOG.info("initializing control panel");
 		try {
 			executorService = Executors.newScheduledThreadPool(5);
 
@@ -100,7 +104,6 @@ public class CollectControlPanelController implements Initializable {
 				webappsLocation = DEFAULT_WEBAPPS_LOCATION;
 			}
 			File webappsFolder = new File(webappsLocation);
-			File serverLogFile = new File(SERVER_LOG_FILE_LOCATION);
 
 			deleteBrokenTemporaryFiles();
 			
@@ -111,14 +114,14 @@ public class CollectControlPanelController implements Initializable {
 			}
 			
 			server = new CollectJettyServer(collectProperties.getHttpPort(),
-					webappsFolder, serverLogFile,
-					collectProperties.getCollectDataSourceConfiguration());
+					webappsFolder, collectProperties.getCollectDataSourceConfiguration());
 			server.initialize();
 			
 			initLogFileReaders();
 			
 			urlHyperlink.setText(server.getUrl());
 		} catch (Exception e) {
+			LOG.error("error initializing Collect: " + e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -130,7 +133,7 @@ public class CollectControlPanelController implements Initializable {
 	 */
 	private void initLogFileReaders() throws IOException {
 		this.serverLogFileLinesProcessor = new ConsoleLogFileProcessor(
-				server.getLogFile(), serverConsole);
+				new File(SERVER_LOG_FILE_LOCATION), serverConsole);
 		this.collectLogFileLinesProcessor = new ConsoleLogFileProcessor(
 				new File(COLLECT_LOG_FILE_LOCATION), collectConsole);
 		this.saikuLogFileLinesProcessor = new ConsoleLogFileProcessor(
@@ -322,13 +325,15 @@ public class CollectControlPanelController implements Initializable {
 		File collectWebappFolder = new File(webappsFolder, CollectJettyServer.WEBAPP_NAME);
 		if (collectWebappFolder.exists() && collectWebappFolder.isDirectory()) {
 			String[] folderContent = collectWebappFolder.list();
-			if (folderContent.length == 0 || ! new HashSet<String>(Arrays.<String>asList(folderContent)).contains("index.jsp")) {
+			if (folderContent.length == 0 || ! Arrays.<String>asList(folderContent).contains("index.html")) {
+				LOG.info("deleting empty Collect webapps folder");
 				try {
 					FileUtils.forceDelete(collectWebappFolder);
+					LOG.info("Collect webapps folder deleted successfully");
 				} catch(IOException e) {
-					throw new IOException(
-							String.format("Error deleting folder %s. Please delete it manually and start Collect again",
-									collectWebappFolder.getAbsolutePath()));
+					String message = String.format("Error deleting folder %s: %s. Please delete it manually and start Collect again",
+							collectWebappFolder.getAbsolutePath(), e.getMessage());
+					throw new IOException(message, e);
 				}
 			}
 		}

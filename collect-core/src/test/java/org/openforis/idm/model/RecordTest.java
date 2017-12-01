@@ -16,7 +16,7 @@ public class RecordTest {
 				rootEntityDef("plot")
 		);
 
-		Record record = new Record(fixture.survey, null);
+		Record record = new Record(fixture.survey, null, "plot");
 		EntityDefinition rootEntityDef = fixture.survey.getSchema().getRootEntityDefinition("plot");
 		Entity rootEntity = new Entity(rootEntityDef);
 		record.replaceRootEntity(rootEntity);

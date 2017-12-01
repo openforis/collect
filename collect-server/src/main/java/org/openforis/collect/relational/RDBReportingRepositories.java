@@ -41,6 +41,7 @@ import org.openforis.collect.io.metadata.collectearth.NewMondrianSchemaGenerator
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
@@ -204,13 +205,13 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		RecordFilter recordFilter = new RecordFilter(survey);
 		Step step = Step.fromRecordStep(recordStep);
 		recordFilter.setStepGreaterOrEqual(step);
-		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(recordFilter);
 		
 		ProcessStepProgressListener recordInsertProcessListener = new ProcessStepProgressListener(processProgressListener, progressListener);
 		recordInsertProcessListener.progressMade(new Progress(0, summaries.size()));
 		
 		long processedRecords = 0;
-		for (CollectRecord summary : summaries) {
+		for (CollectRecordSummary summary : summaries) {
 			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
 			databaseUpdater.insertRecordData(record, ProgressListener.NULL_PROGRESS_LISTENER);
 			processedRecords++;

@@ -41,9 +41,9 @@ public abstract class AbstractTest {
 
 	@Before
 	public void createCluster() {
-		this.record = new Record(survey, "2.0");
-		this.cluster = record.createRootEntity("cluster");
-		Record record2 = new Record(survey, "2.0");
-		this.household = record2.createRootEntity("household");
+		this.record = new Record(survey, "2.0", "cluster");
+		this.cluster = record.getRootEntity();
+		Record record2 = new Record(survey, "2.0", "household");
+		this.household = record2.getRootEntity();
 	}
 }

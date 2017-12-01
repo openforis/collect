@@ -40,7 +40,9 @@ import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -180,14 +182,17 @@ public class RecordIndexManager extends BaseStorageManager {
 	
 	public void indexAllRecords(CollectSurvey survey, String rootEntity) throws RecordIndexException {
 		cancelled = false;
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntity);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntity).getId());
+		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		IndexWriter indexWriter = null;
 		try {
 			indexWriter = createIndexWriter();
-			for (CollectRecord record : summaries) {
+			for (CollectRecordSummary s : summaries) {
 				if ( ! cancelled ) {
-					Integer recordId = record.getId();
+					Integer recordId = s.getId();
 					deleteDocuments(indexWriter, recordId);
+					CollectRecord record = recordManager.load(survey, recordId, s.getStep());
 					index(indexWriter, record);
 				} else {
 					break;

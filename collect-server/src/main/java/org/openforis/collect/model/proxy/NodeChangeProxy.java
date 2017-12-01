@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.model.AttributeAddChange;
 import org.openforis.collect.model.AttributeChange;
 import org.openforis.collect.model.EntityAddChange;
@@ -23,28 +24,28 @@ import org.openforis.collect.model.NodeDeleteChange;
 public class NodeChangeProxy<C extends NodeChange<?>> implements Proxy {
 
 	protected transient C change;
-	private Locale locale;
+	protected transient ProxyContext context;
 
-	public NodeChangeProxy(C change, Locale locale) {
+	public NodeChangeProxy(C change, ProxyContext context) {
 		this.change = change;
-		this.locale = locale;
+		this.context = context;
 	}
 
-	public static List<NodeChangeProxy<?>> fromList(Collection<NodeChange<?>> items, Locale locale) {
+	public static List<NodeChangeProxy<?>> fromList(Collection<NodeChange<?>> items, ProxyContext context) {
 		List<NodeChangeProxy<?>> result = new ArrayList<NodeChangeProxy<?>>();
 		if ( items != null ) {
 			for (NodeChange<?> item : items) {
 				NodeChangeProxy<?> proxy;
 				if ( item instanceof AttributeAddChange ) {
-					proxy = new AttributeAddChangeProxy((AttributeAddChange) item, locale);
+					proxy = new AttributeAddChangeProxy((AttributeAddChange) item, context);
 				} else if ( item instanceof EntityAddChange ) {
-					proxy = new EntityAddChangeProxy((EntityAddChange) item, locale);
+					proxy = new EntityAddChangeProxy((EntityAddChange) item, context);
 				} else if ( item instanceof AttributeChange ) {
-					proxy = new AttributeChangeProxy((AttributeChange) item, locale);
+					proxy = new AttributeChangeProxy((AttributeChange) item, context);
 				} else if ( item instanceof EntityChange) {
-					proxy = new EntityChangeProxy((EntityChange) item, locale);
+					proxy = new EntityChangeProxy((EntityChange) item, context);
 				} else if ( item instanceof NodeDeleteChange ) {
-					proxy = new NodeDeleteChangeProxy((NodeDeleteChange) item, locale);
+					proxy = new NodeDeleteChangeProxy((NodeDeleteChange) item, context);
 				} else {
 					throw new IllegalArgumentException("NodeChange type not supported: " + item.getClass().getSimpleName());
 				}
@@ -60,7 +61,7 @@ public class NodeChangeProxy<C extends NodeChange<?>> implements Proxy {
 	}
 	
 	public Locale getLocale() {
-		return locale;
+		return context.getLocale();
 	}
 
 }

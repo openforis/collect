@@ -49,8 +49,8 @@ public class ModelSerializationTest extends CollectIntegrationTest {
 		byte[] data = ms.toByteArray(entity);
 			
 		// Load
-		CollectRecord record2 = new CollectRecord(survey, "2.0");
-		Entity reloadedEntity = record2.createRootEntity("cluster");
+		CollectRecord record2 = new CollectRecord(survey, "2.0", "cluster");
+		Entity reloadedEntity = record2.getRootEntity();
 		ms.mergeFrom(data, reloadedEntity);
 		
 		Assert.assertEquals(entity, reloadedEntity);

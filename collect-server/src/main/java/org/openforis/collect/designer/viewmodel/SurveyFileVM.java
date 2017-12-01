@@ -24,7 +24,7 @@ import org.openforis.collect.manager.validation.SurveyValidator.ValidationParame
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.utils.Dates;
-import org.openforis.collect.utils.Files;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
@@ -188,7 +188,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 		case COLLECT_EARTH_GRID:
 			File templateFile = new CollectEarthGridTemplateGenerator().generateTemplateCSVFile(survey);
 			String fileName = String.format("%s_grid_template_%s.csv", survey.getName(), Dates.formatDateTime(new Date()));
-			Filedownload.save(new FileInputStream(templateFile),  Files.CSV_CONTENT_TYPE, fileName);
+			Filedownload.save(new FileInputStream(templateFile), MediaTypes.CSV_CONTENT_TYPE, fileName);
 			break;
 		default:
 			//TODO

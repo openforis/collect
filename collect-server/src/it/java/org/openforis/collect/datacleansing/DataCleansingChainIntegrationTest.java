@@ -20,12 +20,14 @@ import org.openforis.collect.datacleansing.manager.DataCleansingChainManager;
 import org.openforis.collect.datacleansing.manager.DataCleansingStepManager;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordUpdater;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
@@ -52,15 +54,18 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 	private RecordManager recordManager;
 	@Autowired
 	private CollectJobManager jobManager;
+	@Autowired
+	private UserManager userManager;
 	
 	private RecordUpdater updater;
-	
 	private CollectSurvey survey;
+	private User user;
 	
 	@Before
 	public void init() throws SurveyImportException, IdmlParseException, SurveyValidationException {
 		updater = new RecordUpdater();
 		survey = importModel();
+		user = userManager.loadAdminUser();
 		initRecords();
 	}
 
@@ -77,7 +82,7 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		query.setEntityDefinition(treeDef);
 		query.setAttributeDefinition(dbhDef);
 		query.setConditions("dbh > 20");
-		dataQueryManager.save(query);
+		dataQueryManager.save(query, user);
 		
 		int initialCount = countResults(query);
 		assertEquals(1, initialCount);
@@ -90,16 +95,17 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		updateValue.setUpdateType(UpdateType.ATTRIBUTE);
 		updateValue.setFixExpression("20"); //set dbh = 20
 		step.addUpdateValue(updateValue);
-		stepManager.save(step);
+		stepManager.save(step, user);
 		
 		chain.addStep(step);
 		
-		chainManager.save(chain);
+		chainManager.save(chain, user);
 		
 		DataCleansingChainExecutorJob job = jobManager.createJob(DataCleansingChainExecutorJob.class);
 		job.setSurvey(survey);
 		job.setChain(chain);
 		job.setRecordStep(Step.ENTRY);
+		job.setActiveUser(user);
 		jobManager.start(job, false);
 		
 		int finalCount = countResults(query);
@@ -119,7 +125,7 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		query.setEntityDefinition(treeDef);
 		query.setAttributeDefinition(speciesDef);
 		query.setConditions("species/@code = 'UNL'");
-		dataQueryManager.save(query);
+		dataQueryManager.save(query, user);
 		
 		int initialCount = countResults(query);
 		assertEquals(1, initialCount);
@@ -141,11 +147,11 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 			updateValue.setFieldFixExpressions(Arrays.asList("'PIN'", "'Pinus Sp.'"));
 			step.addUpdateValue(updateValue);
 		}	
-		stepManager.save(step);
+		stepManager.save(step, user);
 		
 		chain.addStep(step);
 		
-		chainManager.save(chain);
+		chainManager.save(chain, user);
 		
 		DataCleansingChainExecutorJob job = jobManager.createJob(DataCleansingChainExecutorJob.class);
 		job.setSurvey(survey);

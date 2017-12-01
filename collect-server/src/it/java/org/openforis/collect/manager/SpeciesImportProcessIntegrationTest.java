@@ -187,8 +187,11 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(survey, TEST_TAXONOMY_NAME);
+		TaxonSearchParameters taxonSearchParameters = new TaxonSearchParameters();
+		taxonSearchParameters.setHighestRank(FAMILY);
 		{
-			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(survey, TEST_TAXONOMY_NAME, "Mbamba", 10);
+			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(taxonomy, null, "Mbamba", 10, taxonSearchParameters);
 			assertNotNull(occurrences);
 			assertEquals(1, occurrences.size());
 			TaxonOccurrence stored = occurrences.get(0);
@@ -197,7 +200,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertEquals(expected, stored);
 		}
 		{
-			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(survey, TEST_TAXONOMY_NAME, "Mshai-mamba", 10);
+			List<TaxonOccurrence> occurrences = speciesManager.findByVernacularName(taxonomy, null, "Mshai-mamba", 10, taxonSearchParameters);
 			assertNotNull(occurrences);
 			assertEquals(1, occurrences.size());
 			TaxonOccurrence stored = occurrences.get(0);
@@ -355,7 +358,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	protected Taxon findTaxonByCode(String code) {
 		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
-		List<Taxon> results = taxonDao.findByCode(taxonomy, code, 10);
+		List<Taxon> results = taxonDao.findByCode(taxonomy, FAMILY, code, 10);
 		assertNotNull(results);
 		assertEquals(1, results.size());
 		Taxon taxon = results.get(0);
@@ -363,7 +366,9 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	protected TaxonOccurrence findByCode(String code) {
-		List<TaxonOccurrence> occurrences = speciesManager.findByCode(survey, TEST_TAXONOMY_NAME, code, 10);
+		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
+		TaxonSearchParameters taxonSearchParameters = new TaxonSearchParameters();
+		List<TaxonOccurrence> occurrences = speciesManager.findByCode(taxonomy, code, 10, taxonSearchParameters);
 		assertNotNull(occurrences);
 		assertEquals(1, occurrences.size());
 		TaxonOccurrence occurrence = occurrences.get(0);

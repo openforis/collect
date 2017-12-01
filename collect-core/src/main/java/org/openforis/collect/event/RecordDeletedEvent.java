@@ -1,6 +1,5 @@
 package org.openforis.collect.event;
 
-import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -11,11 +10,8 @@ import java.util.Date;
  */
 public class RecordDeletedEvent extends RecordEvent {
 
-	public RecordDeletedEvent(String surveyName, int recordId,
-			RecordStep step, String definitionId, String nodeId,
-			Date timestamp, String userName) {
-		super(surveyName, recordId, step, definitionId, Collections
-				.<String> emptyList(), nodeId, timestamp, userName);
+	public RecordDeletedEvent(String surveyName, int recordId, Date timestamp, String userName) {
+		super(surveyName, recordId, null, null, null, null, timestamp, userName);
 	}
 
 }

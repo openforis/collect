@@ -9,8 +9,11 @@ import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -29,7 +32,7 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 	
 	//input
 	private String rootEntity;
-	private User adminUser;
+	private User user;
 	private Step fromStep;
 	private boolean promote;
 
@@ -44,8 +47,8 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 		this.rootEntity = rootEntity;
 	}
 	
-	public void setAdminUser(User adminUser) {
-		this.adminUser = adminUser;
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	public void setFromStep(Step fromStep) {
@@ -64,14 +67,20 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 
 		@Override
 		protected long countTotalItems() {
-			int count = recordManager.countRecords(survey, rootEntity, fromStep);
+			RecordFilter filter = new RecordFilter(survey);
+			EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinition(rootEntity);
+			filter.setRootEntityId(rootEntityDef.getId());
+			filter.setStepGreaterOrEqual(fromStep);
+			int count = recordManager.countRecords(filter);
 			return Integer.valueOf(count).longValue();
 		}
 		
 		@Override
 		protected void execute() throws Throwable {
-			List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntity, fromStep);
-			for (CollectRecord summary : summaries) {
+			RecordFilter filter = new RecordFilter(survey, survey.getSchema().getRootEntityDefinition(rootEntity).getId());
+			filter.setStepGreaterOrEqual(fromStep);
+			List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
+			for (CollectRecordSummary summary : summaries) {
 				if (isAborted()) {
 					break;
 				}
@@ -81,9 +90,9 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 					}
 				};
 				if (promote) {
-					recordManager.promote(survey, summary.getId(), summary.getStep(), adminUser, recordCallback);
+					recordManager.promote(survey, summary.getId(), summary.getStep(), user, recordCallback);
 				} else {
-					recordManager.demote(survey, summary.getId(), summary.getStep(), adminUser, recordCallback);
+					recordManager.demote(survey, summary.getId(), summary.getStep(), user, recordCallback);
 				}
 				
 				incrementProcessedItems();

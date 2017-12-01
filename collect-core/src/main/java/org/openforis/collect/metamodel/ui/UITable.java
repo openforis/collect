@@ -1,6 +1,9 @@
 package org.openforis.collect.metamodel.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
@@ -37,6 +40,9 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 	private boolean showRowNumbers;
 	private boolean countInSummaryList;
 	private Direction direction;
+	private int columnSpan;
+	private int column;
+	private int row;
 	
 	<P extends UIFormContentContainer> UITable(P parent, int id) {
 		super(parent, id);
@@ -72,6 +78,11 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 	@Override
 	public NodeDefinition getNodeDefinition() {
 		return getEntityDefinition();
+	}
+	
+	@Override
+	public int indexOf(UITableHeadingComponent component) {
+		return headingComponents.indexOf(component);
 	}
 	
 	public Integer getEntityDefinitionId() {
@@ -111,6 +122,81 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 		getUIConfiguration().detachItem(component);
 	}
 
+	/**
+	 * Calculate the maximum depth of the headings 
+	 * @return
+	 */
+	public int getTotalHeadingRows() {
+		return getHeadingRows().size();
+	}
+	
+	public List<List<UITableHeadingComponent>> getHeadingRows() {
+		if (headingComponents.isEmpty()) {
+			return Collections.emptyList();
+		}
+		List<List<UITableHeadingComponent>> result = new ArrayList<List<UITableHeadingComponent>>();
+		Deque<List<UITableHeadingComponent>> stack = new LinkedList<List<UITableHeadingComponent>>();
+		stack.add(headingComponents);
+		while(! stack.isEmpty()) {
+			List<UITableHeadingComponent> currentRowComponents = stack.pop();
+			result.add(currentRowComponents);
+			List<UITableHeadingComponent> nextRowComponents = new ArrayList<UITableHeadingComponent>();
+			for (UITableHeadingComponent currentRowComponent: currentRowComponents) {
+				if (currentRowComponent instanceof UIColumnGroup) {
+					nextRowComponents.addAll(((UIColumnGroup) currentRowComponent).getHeadingComponents());
+				}
+			}
+			if (! nextRowComponents.isEmpty()) {
+				stack.add(nextRowComponents);
+			}
+		}
+		return result;
+	}
+	
+	public List<UIColumn> getHeadingColumns() {
+		List<UIColumn> columns = new ArrayList<UIColumn>();
+		Deque<UITableHeadingComponent> stack = new LinkedList<UITableHeadingComponent>();
+		stack.addAll(headingComponents);
+		while(! stack.isEmpty()) {
+			UITableHeadingComponent component = stack.pop();
+			if (component instanceof UIColumn) {
+				columns.add((UIColumn) component);
+			} else {
+				List<UITableHeadingComponent> groupComponents = new ArrayList<UITableHeadingComponent>(
+						((UIColumnGroup) component).getHeadingComponents());
+				Collections.reverse(groupComponents);
+				
+				for (UITableHeadingComponent groupComponent : groupComponents) {
+					stack.push(groupComponent);
+				}
+			}
+		}
+		return columns;
+	}
+	
+	public int getTotalHeadingColumns() {
+		return getHeadingColumns().size();
+	}
+
+	/**
+	 * Finds the component that will be in the specified position
+	 */
+	public UITableHeadingComponent findComponent(int row, int col) {
+		Deque<UITableHeadingComponent> stack = new LinkedList<UITableHeadingComponent>();
+		stack.addAll(headingComponents);
+		while (! stack.isEmpty()) {
+			UITableHeadingComponent component = stack.pop();
+			if (component.getRow() <= row && (component.getRow() + component.getRowSpan()) >= row
+					&& component.getCol() <= col && (component.getCol() + component.getColSpan()) >= col) {
+				return component;
+			}
+			if (component instanceof UIColumnGroup) {
+				stack.addAll(((UIColumnGroup) component).getHeadingComponents());
+			}
+		}
+		return null;
+	}
+	
 	public boolean isShowRowNumbers() {
 		return showRowNumbers;
 	}
@@ -134,7 +220,37 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}
+	
+	@Override
+	public int getColumn() {
+		return column;
+	}
+	
+	@Override
+	public void setColumn(int column) {
+		this.column = column;
+	}
 
+	@Override
+	public int getColumnSpan() {
+		return columnSpan;
+	}
+	
+	@Override
+	public void setColumnSpan(int columnSpan) {
+		this.columnSpan = columnSpan;
+	}
+
+	@Override
+	public int getRow() {
+		return row;
+	}
+	
+	@Override
+	public void setRow(int row) {
+		this.row = row;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

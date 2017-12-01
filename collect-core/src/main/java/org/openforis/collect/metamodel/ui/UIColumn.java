@@ -52,6 +52,11 @@ public class UIColumn extends UITableHeadingComponent implements NodeDefinitionU
 	}
 	
 	@Override
+	public int getColSpan() {
+		return 1;
+	}
+	
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();

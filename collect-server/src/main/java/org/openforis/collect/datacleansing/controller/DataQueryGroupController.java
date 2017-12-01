@@ -11,7 +11,6 @@ import org.openforis.collect.datacleansing.manager.DataQueryGroupManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -21,7 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/dataquerygroups")
+@RequestMapping(value = "api/datacleansing/dataquerygroups")
 public class DataQueryGroupController extends AbstractSurveyObjectEditFormController<DataQueryGroup, DataQueryGroupForm, DataQueryGroupManager> {
 	
 	@Autowired
@@ -30,13 +29,6 @@ public class DataQueryGroupController extends AbstractSurveyObjectEditFormContro
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.setValidator(dataQueryGroupValidator);
-	}
-	
-	@Override
-	@Autowired
-	@Qualifier("dataQueryGroupManager")
-	public void setItemManager(DataQueryGroupManager itemManager) {
-		super.setItemManager(itemManager);
 	}
 	
 	@Override

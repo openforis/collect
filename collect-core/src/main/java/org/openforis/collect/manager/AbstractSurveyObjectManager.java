@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class AbstractSurveyObjectManager
 		<T extends PersistedSurveyObject, D extends SurveyObjectMappingJooqDaoSupport<T, ?>> 
-		extends AbstractPersistedObjectManager<T, D> {
+		extends AbstractPersistedObjectManager<T, Integer, D> {
 
-	protected D dao;
 //	private PersistedSurveyObjectCache<T> cache;
 	
 	@Override
-	public T loadById(int id) {
+	public T loadById(Integer id) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -60,7 +60,7 @@ public abstract class AbstractSurveyObjectManager
 	}
 
 	@Override
-	public void save(T obj) {
+	public T save(T obj, User modifiedByUser) {
 		Date now = new Date();
 		if (obj.getId() == null) {
 			if (obj.getCreationDate() == null) {
@@ -73,20 +73,17 @@ public abstract class AbstractSurveyObjectManager
 			dao.update(obj);
 		}
 		initializeItem(obj);
+		return obj;
 	}
 	
 	@Override
 	public void delete(T obj) {
-		delete(obj.getId());
+		deleteById(obj.getId());
 	}
 
 	@Override
-	public void delete(int id) {
+	public void deleteById(Integer id) {
 		dao.delete(id);
-	}
-	
-	public void setDao(D dao) {
-		this.dao = dao;
 	}
 	
 //	private static class PersistedSurveyObjectCache<S extends PersistedSurveyObject> {

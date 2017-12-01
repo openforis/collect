@@ -48,6 +48,7 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.web.controller.SurveyController;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
@@ -90,8 +91,6 @@ import org.zkoss.zul.Window;
  */
 public class SchemaVM extends SurveyBaseVM {
 
-	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_sampling_unit";
-	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
 	private static final String PATH_NULL_VALUES_REPLACE = "...";
 
 	private static final String TAB_NAME_LABEL_PATH = "labelTextbox";
@@ -379,11 +378,7 @@ public class SchemaVM extends SurveyBaseVM {
 				String committedLabel = editedNode instanceof NodeDefinition ? ((NodeDefinition) editedNode).getName()
 						: ((UITab) editedNode).getLabel(currentLanguageCode);
 				updateTreeNodeLabel(editedNode, committedLabel);
-
-				// restore tree node icon
-				if (editedNode instanceof KeyAttributeDefinition) {
-					updateTreeNodeIcon(editedNode, ((KeyAttributeDefinition) editedNode).isKey());
-				}
+				updateTreeNodeIcon();
 			}
 			resetEditingStatus(false);
 		}
@@ -397,12 +392,21 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	public void editedNodeKeyChanging(@BindingParam("item") SurveyObject item, @BindingParam("key") boolean key) {
+	public void editedNodeKeyChanging(@BindingParam("item") SurveyObject item, 
+			@BindingParam("key") boolean key) {
 		if (editedNode != null && editedNode == item) {
-			updateTreeNodeIcon(editedNode, key);
+			updateTreeNodeIcon(editedNode, key, false);
 		}
 	}
 
+	@GlobalCommand
+	public void editedNodeCalculatedPropertyChanging(@BindingParam("item") SurveyObject item, 
+			@BindingParam("calculated") boolean calculated) {
+		if (editedNode != null && editedNode == item) {
+			updateTreeNodeIcon(editedNode, false, calculated);
+		}
+	}
+	
 	// TODO move it to tree model class
 	private Treeitem getTreeItem(SurveyObject item) {
 		for (Treeitem treeItem : nodesTree.getItems()) {
@@ -424,11 +428,17 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 
-	private void updateTreeNodeIcon(SurveyObject item, boolean key) {
+	private void updateTreeNodeIcon() {
+		boolean key = editedNode instanceof AttributeDefinition ? ((AttributeDefinition) editedNode).isKey() : false;
+		boolean calculated = editedNode instanceof AttributeDefinition ? ((AttributeDefinition) editedNode).isCalculated() : false;
+		updateTreeNodeIcon(editedNode, key, calculated);
+	}
+	
+	private void updateTreeNodeIcon(SurveyObject item, boolean key, boolean calculated) {
 		Treeitem treeItem = getTreeItem(item);
 		if (treeItem != null) {
 			SchemaNodeData data = treeModel.getNodeData(item);
-			String icon = getIcon(data, key);
+			String icon = getIcon(data, key, calculated);
 			treeItem.setImage(icon);
 		}
 	}
@@ -721,6 +731,7 @@ public class SchemaVM extends SurveyBaseVM {
 	private void closeNodeEditPopUp() {
 		closePopUp(rootEntityEditPopUp);
 		rootEntityEditPopUp = null;
+		notifyChange("selectedRootEntity");
 	}
 
 	@Command
@@ -829,7 +840,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private void updateRootTabLabel(Component view, EntityDefinition rootEntity) {
 		UITab mainTab = survey.getUIOptions().getMainTab(rootTabSet);
-		if (DEFAULT_MAIN_TAB_LABEL.equals(mainTab.getLabel(currentLanguageCode))) {
+		if (SurveyController.DEFAULT_MAIN_TAB_LABEL.equals(mainTab.getLabel(currentLanguageCode))) {
 			String label = rootEntity.getLabel(Type.INSTANCE, currentLanguageCode);
 			if (StringUtils.isNotBlank(label)) {
 				mainTab.setLabel(currentLanguageCode, label);
@@ -850,13 +861,13 @@ public class SchemaVM extends SurveyBaseVM {
 
 	protected EntityDefinition createRootEntityDefinition() {
 		EntityDefinition rootEntity = createEntityDefinition();
-		rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
+		rootEntity.setName(SurveyController.DEFAULT_ROOT_ENTITY_NAME);
 		survey.getSchema().addRootEntityDefinition(rootEntity);
 
 		UIOptions uiOptions = survey.getUIOptions();
 		rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
-		mainTab.setLabel(currentLanguageCode, DEFAULT_MAIN_TAB_LABEL);
+		mainTab.setLabel(currentLanguageCode, SurveyController.DEFAULT_MAIN_TAB_LABEL);
 
 		notifyChange("rootEntities");
 
@@ -1067,10 +1078,11 @@ public class SchemaVM extends SurveyBaseVM {
 	public static String getIcon(SchemaNodeData data) {
 		SurveyObject surveyObject = data.getSurveyObject();
 		boolean key = surveyObject instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) surveyObject).isKey();
-		return getIcon(data, key);
+		boolean calculated = surveyObject instanceof AttributeDefinition && ((AttributeDefinition) surveyObject).isCalculated();
+		return getIcon(data, key, calculated);
 	}
 
-	public static String getIcon(SchemaNodeData data, boolean key) {
+	public static String getIcon(SchemaNodeData data, boolean key, boolean calculated) {
 		SurveyObject surveyObject = data.getSurveyObject();
 		String imagesRootPath = NODE_TYPES_IMAGES_PATH;
 		if (surveyObject instanceof UITab) {
@@ -1079,7 +1091,7 @@ public class SchemaVM extends SurveyBaseVM {
 			return getEntityIcon((EntityDefinition) surveyObject);
 		} else if (key) {
 			return imagesRootPath + "key-small.png";
-		} else if (surveyObject instanceof AttributeDefinition && ((AttributeDefinition) surveyObject).isCalculated()) {
+		} else if (calculated) {
 			return imagesRootPath + "calculated-small.png";
 		} else {
 			AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) surveyObject);

@@ -63,6 +63,9 @@ import org.zkoss.zul.Window;
  */
 public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDefinitionVM<T> {
 
+	private static final String EDITED_NODE_KEY_CHANGING_GLOBAL_COMMAND = "editedNodeKeyChanging";
+	private static final String EDITED_NODE_CALCULATED_PROPERTY_CHANGING_GLOBAL_COMMAND = "editedNodeCalculatedPropertyChanging";
+	
 	private List<Check<?>> checks;
 	private boolean editingNewCheck;
 	private Check<?> editedCheck;
@@ -173,7 +176,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", editedItem);
 		args.put("key", key);
-		BindUtils.postGlobalCommand(null, null, "editedNodeKeyChanging", args);
+		BindUtils.postGlobalCommand(null, null, EDITED_NODE_KEY_CHANGING_GLOBAL_COMMAND, args);
 	}
 	
 	@Command
@@ -185,7 +188,15 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		setTempFormObjectFieldValue("editable", Annotation.EDITABLE.getDefaultValue());
 		setTempFormObjectFieldValue("phaseToApplyDefaultValue", ((Step) Annotation.PHASE_TO_APPLY_DEFAULT_VALUE.getDefaultValue()).name());
 		dispatchKeyChangingCommand(false);
+		dispatchCalculatedPropertyChangingCommand(changed);
 		dispatchApplyChangesCommand(binder);
+	}
+	
+	private void dispatchCalculatedPropertyChangingCommand(boolean calculated) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("item", editedItem);
+		args.put("calculated", calculated);
+		BindUtils.postGlobalCommand(null, null, EDITED_NODE_CALCULATED_PROPERTY_CHANGING_GLOBAL_COMMAND, args);
 	}
 	
 	protected void openCheckEditPopUp() {

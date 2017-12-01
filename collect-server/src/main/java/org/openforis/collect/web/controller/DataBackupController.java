@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.io.data.backup.BackupStorageManager;
+import org.openforis.collect.utils.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,7 @@ public class DataBackupController extends BasicController {
 	@RequestMapping(value = "/surveys/{surveyName}/data/backup/last", method = RequestMethod.GET)
 	public void downloadLastBackup(HttpServletResponse response, @PathVariable String surveyName) throws IOException {
 		File file = backupStorageManager.getLastBackupFile(surveyName);
-		writeFileToResponse(response, file);
+		Controllers.writeFileToResponse(response, file);
 	}
 	
 }

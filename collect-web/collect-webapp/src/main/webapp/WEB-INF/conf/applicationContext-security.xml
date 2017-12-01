@@ -6,9 +6,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/security 
-		http://www.springframework.org/schema/security/spring-security-4.0.xsd
+		http://www.springframework.org/schema/security/spring-security-4.2.xsd
         http://www.springframework.org/schema/beans 
-        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
         ">
 
 	<!-- Enables Method Security and Expression-based access control -->
@@ -17,53 +17,58 @@
 <!-- 		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER" /> -->
 <!-- 	</global-method-security> -->
 	
-	<http access-decision-manager-ref="accessDecisionManager">
+	<http access-decision-manager-ref="accessDecisionManager" use-expressions="true">
 		<csrf disabled="true"/>
+		<http-basic />
 		<headers>
-			<frame-options policy="SAMEORIGIN"/>
+			<frame-options policy="ALLOW-FROM" strategy="static" value="*"  />
 		</headers>
 		
 		<intercept-url access="permitAll" pattern="collect.swf" />
+		<intercept-url access="permitAll" pattern="/api/session/**" />
+		<intercept-url access="permitAll" pattern="/api/defaultpasswordactive" />
+		<intercept-url access="permitAll" pattern="/api/info" />
+		<intercept-url access="permitAll" pattern="/api/complete-info" />
 		<intercept-url access="permitAll" pattern="/assets/**" />
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
-		<intercept-url access="permitAll" pattern="/js/**" />
-		<intercept-url access="permitAll" pattern="/script/**" />
-		<intercept-url access="permitAll" pattern="/default-password-active.json" />
+		<intercept-url access="permitAll" pattern="/locales/**" />
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
-		<intercept-url access="permitAll" pattern="/info.json" />
 		<intercept-url access="permitAll" pattern="/keepSessionAlive.htm" />
 		<intercept-url access="permitAll" pattern="/login" />
 		<intercept-url access="permitAll" pattern="/logout.htm" />
-		<intercept-url access="permitAll" pattern="/session/**" />
-		<intercept-url access="permitAll" pattern="/surveys/summaries.json" />
-		<intercept-url access="permitAll" pattern="/zkau/**" />
+		<intercept-url access="permitAll" pattern="/zkau" />
 <!-- 		security disabled for these urls because of an issue with flash player -->
 <!-- 		for netscape compatible browser and uplaod to a secured url -->
 		<intercept-url access="permitAll" pattern="/uploadData.htm" />
 		<intercept-url access="permitAll" pattern="/uploadFile.htm" />
-		
-		<intercept-url access="hasRole('ADMIN')" pattern="/codelist/export/**/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/codelist/import/**/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/designer.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/editSurvey.htm" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/logoUpload" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/saiku/**/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/export/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/samplingdesign/import/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/species/export/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/species/import/*" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/speciesImport" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/surveys" />
-		<intercept-url access="hasRole('ADMIN')" pattern="/validateAllRecords.htm" />
-		
-		<intercept-url access="hasRole('USER')" pattern="/**" />
+
+		<intercept-url access="hasRole('ROLE_USER') or hasIpAddress('127.0.0.1')" pattern="/api/**" />
+
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/export/**/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/import/**/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/designer.htm" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/editSurvey.htm" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/importSurvey.htm" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/logoUpload" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/rdbpublish" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/saiku/**/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/samplingdesign/export/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/samplingdesign/import/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/export/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/import/*" />
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/speciesImport" />
+
+		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/validateAllRecords.htm" />
+
+		<intercept-url access="hasRole('ROLE_USER')" pattern="/**" />
 
 		<form-login login-page="/login" 
-			default-target-url="/index.htm"
+			default-target-url="/"
 			authentication-failure-url="/login?login_error=1" />
 		
-		<logout logout-url="/j_spring_security_logout" />
+		<logout logout-url="/j_spring_security_logout" 
+			logout-success-url="/login?logout=true" />
 	</http>
 	
 	<authentication-manager alias="authenticationManager">

@@ -1,6 +1,7 @@
 package org.openforis.collect.remoting.service.dataimport;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Set;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.ProxyContext;
 import org.openforis.collect.io.data.DataImportSummaryItem;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
@@ -48,22 +50,32 @@ public class DataImportSummaryItemProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public RecordSummaryProxy getRecord() {
-		return createRecordSummaryProxy(item.getRecord(), locale);
+		return createRecordSummaryProxy(item.getRecordSummary(), locale);
 	}
 	
 	@ExternalizedProperty
 	public int getRecordTotalErrors() {
-		return item.getRecord() == null ? -1: Numbers.toInt(item.getRecord().getTotalErrors(), -1);
+		return item.getRecordSummary() == null ? -1: Numbers.toInt(item.getRecordSummary().getCurrentStepSummary().getTotalErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getRecordErrors() {
-		return item.getRecord() == null ? -1: Numbers.toInt(item.getRecord().getErrors(), -1);
+		return item.getRecordSummary() == null ? -1: Numbers.toInt(item.getRecordSummary().getCurrentStepSummary().getErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getRecordMissingErrors() {
-		return item.getRecord() == null ? -1: Numbers.toInt(item.getRecord().getMissingErrors(), -1);
+		return item.getRecordSummary() == null ? -1: Numbers.toInt(item.getRecordSummary().getCurrentStepSummary().getMissingErrors(), -1);
+	}
+	
+	@ExternalizedProperty
+	public Date getRecordCreationDate() {
+		return item.getRecordSummary() == null ? null : item.getRecordSummary().getCreationDate();
+	}
+	
+	@ExternalizedProperty
+	public Date getRecordModifiedDate() {
+		return item.getRecordSummary() == null ? null : item.getRecordSummary().getCreationDate();
 	}
 	
 	@ExternalizedProperty
@@ -78,32 +90,46 @@ public class DataImportSummaryItemProxy implements Proxy {
 
 	@ExternalizedProperty
 	public RecordSummaryProxy getConflictingRecord() {
-		return createRecordSummaryProxy(item.getConflictingRecord(), locale);
+		return createRecordSummaryProxy(item.getConflictingRecordSummary(), locale);
 	}
 
 	@ExternalizedProperty
 	public int getConflictingRecordTotalErrors() {
-		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
-		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getTotalErrors(), -1);
+		CollectRecordSummary conflictingRecord = item.getConflictingRecordSummary();
+		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getCurrentStepSummary().getTotalErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getConflictingRecordErrors() {
-		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
-		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getErrors(), -1);
+		CollectRecordSummary conflictingRecord = item.getConflictingRecordSummary();
+		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getCurrentStepSummary().getErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getConflictingRecordMissingErrors() {
-		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
-		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getMissingErrors(), -1);
+		CollectRecordSummary conflictingRecord = item.getConflictingRecordSummary();
+		return conflictingRecord == null ? -1 : Numbers.toInt(conflictingRecord.getCurrentStepSummary().getMissingErrors(), -1);
 	}
 	
 	@ExternalizedProperty
 	public int getConflictingRecordCompletionPercent() {
 		return item.getConflictingRecordCompletionPercent();
 	}
+	
+	@ExternalizedProperty
+	public Date getConflictingRecordCreationDate() {
+		return item.getConflictingRecordSummary() == null ? null : item.getConflictingRecordSummary().getCreationDate();
+	}
+	
+	@ExternalizedProperty
+	public Date getConflictingRecordModifiedDate() {
+		return item.getConflictingRecordSummary() == null ? null : item.getConflictingRecordSummary().getCreationDate();
+	}
 
+	public Step getConflictingRecordStep() {
+		return item.getConflictingRecordSummary() == null ? null : item.getConflictingRecordSummary().getStep();
+	}
+	
 	@ExternalizedProperty
 	public int getConflictingRecordFilledAttributesCount() {
 		return item.getConflictingRecordFilledAttributesCount();
@@ -118,7 +144,7 @@ public class DataImportSummaryItemProxy implements Proxy {
 	public int getImportabilityLevel() {
 		return item.calculateImportabilityLevel();
 	}
-
+	
 	@ExternalizedProperty
 	public List<NodeUnmarshallingErrorProxy> getWarnings() {
 		List<NodeUnmarshallingError> result = new ArrayList<NodeUnmarshallingError>();
@@ -173,7 +199,8 @@ public class DataImportSummaryItemProxy implements Proxy {
 		if ( summary == null ) {
 			return null;
 		} else {
-			return new RecordSummaryProxy(summary, locale);
+			ProxyContext context = new ProxyContext(locale, null, null);
+			return new RecordSummaryProxy(summary, context);
 		}
 	}
 	
@@ -186,7 +213,7 @@ public class DataImportSummaryItemProxy implements Proxy {
 	}
 	
 	private boolean isConflictingRecordAfterStep(Step step) {
-		CollectRecordSummary conflictingRecord = item.getConflictingRecord();
+		CollectRecordSummary conflictingRecord = item.getConflictingRecordSummary();
 		return conflictingRecord != null && conflictingRecord.getStep().afterEqual(step);
 	}
 

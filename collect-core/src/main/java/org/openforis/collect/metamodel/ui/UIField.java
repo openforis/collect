@@ -22,6 +22,9 @@ public class UIField extends UIModelObject implements UIFormComponent, NodeDefin
 	private Enum<?> fieldsOrder;
 	private List<String> visibleFields;
 	private boolean hidden;
+	private int column;
+	private int columnSpan;
+	private int row;
 	
 	<P extends UIFormContentContainer> UIField(P parent, int id) {
 		super(parent, id);
@@ -94,7 +97,37 @@ public class UIField extends UIModelObject implements UIFormComponent, NodeDefin
 	public void setFieldsOrder(Enum<?> fieldsOrder) {
 		this.fieldsOrder = fieldsOrder;
 	}
+	
+	@Override
+	public int getColumn() {
+		return column;
+	}
+	
+	@Override
+	public void setColumn(int column) {
+		this.column = column;
+	}
 
+	@Override
+	public int getColumnSpan() {
+		return columnSpan;
+	}
+	
+	@Override
+	public void setColumnSpan(int columnSpan) {
+		this.columnSpan = columnSpan;
+	}
+
+	@Override
+	public int getRow() {
+		return row;
+	}
+	
+	@Override
+	public void setRow(int row) {
+		this.row = row;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

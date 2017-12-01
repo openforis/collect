@@ -664,12 +664,11 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		setAnnotationValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE, value);
 	}
 	
-	public String getLayoutDirection(CodeAttributeDefinition defn) {
-		String annotationValue = getAnnotationStringValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION);
-		return annotationValue;
+	public Orientation getLayoutDirection(CodeAttributeDefinition defn) {
+		return getAnnotationEnumValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION, Orientation.class);
 	}
 	
-	public void setLayoutDirection(CodeAttributeDefinition defn, String value) {
+	public void setLayoutDirection(CodeAttributeDefinition defn, Orientation value) {
 		setAnnotationValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION, value);
 	}
 	

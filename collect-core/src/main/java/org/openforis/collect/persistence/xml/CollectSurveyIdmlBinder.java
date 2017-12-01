@@ -28,6 +28,7 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 	public CollectSurveyIdmlBinder(SurveyContext surveyContext) {
 		super(surveyContext);
 		addApplicationOptionsBinder(new UIOptionsBinder());
+		addApplicationOptionsBinder(new CeoApplicationOptionsBinder());
 	}
 	
 	public String marshal(Survey survey) throws SurveyImportException {

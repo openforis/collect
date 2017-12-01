@@ -22,9 +22,10 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.data.CSVDataExportJob;
-import org.openforis.collect.io.data.csv.CSVExportConfiguration;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
 import org.openforis.collect.manager.SurveyManager;
@@ -39,7 +40,7 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
-import org.openforis.collect.utils.Files;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.concurrency.Job;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -98,18 +99,35 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	private Step previewStep;
 
+	public static void redirectToSurveyEditPage(int surveyId) {
+		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation() + "?id=" + surveyId);
+	}
+	
 	@Init(superclass=false)
-	public void init(@QueryParam("temp_id") Integer tempId) {
+	public void init(@QueryParam("id") Integer surveyId) {
 		super.init();
-		if ( survey == null ) {
+		survey = surveyManager.loadSurvey(surveyId);
+		
+		if (survey == null || ! survey.isTemporary()) {
 			backToSurveysList();
 		} else {
+			SessionStatus sessionStatus = getSessionStatus();
+			Integer publishedSurveyId = null;
+			if (survey.isPublished()) {
+				if (survey.isTemporary()) {
+					publishedSurveyId = survey.getPublishedId();
+				} else {
+					publishedSurveyId = survey.getId();
+				}
+			}
+			sessionStatus.setPublishedSurveyId(publishedSurveyId);
+			sessionStatus.setSurvey(survey);
+			
 			changed = false;
 			currentLanguageCode = survey.getDefaultLanguage();
 			if ( currentLanguageCode == null ) {
 				openLanguageManagerPopUp();
 			} else {
-				SessionStatus sessionStatus = getSessionStatus();
 				sessionStatus.setCurrentLanguageCode(currentLanguageCode);
 			}
 			String confirmCloseMessage = Labels.getLabel("survey.edit.leave_page");
@@ -397,14 +415,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void exportCsvDataImportTemplate() throws IOException {
 		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 		job.setOutputFile(File.createTempFile("data-import-template", ".zip"));
-		RecordFilter recordFilter = new RecordFilter(survey);
+		
+		CSVDataExportParameters parameters = new CSVDataExportParameters();
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
-		recordFilter.setRootEntityId(rootEntityDef.getId());
-		job.setRecordFilter(recordFilter);
-		job.setAlwaysGenerateZipFile(true);
-		CSVExportConfiguration configuration = new CSVExportConfiguration();
-		configuration.setIncludeEnumeratedEntities(false);
-		job.setConfiguration(configuration);
+		RecordFilter recordFilter = new RecordFilter(survey, rootEntityDef.getId());
+		parameters.setRecordFilter(recordFilter);
+		parameters.setAlwaysGenerateZipFile(true);
+		parameters.setIncludeEnumeratedEntities(false);
+		job.setParameters(parameters);
+
 		jobManager.start(job, false);
 		if (job.isCompleted()) {
 			File outputFile = job.getOutputFile();
@@ -426,12 +445,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 		RecordFilter recordFilter = new RecordFilter(survey);
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		recordFilter.setRootEntityId(rootEntityDef.getId());
-		job.setRecordFilter(recordFilter);
-		job.setEntityId(rootEntityDef.getId());
-		job.setAlwaysGenerateZipFile(false);
-		CSVExportConfiguration configuration = new CSVExportConfiguration();
-		configuration.setIncludeEnumeratedEntities(true);
-		job.setConfiguration(configuration);
+
+		CSVDataExportParameters parameters = new CSVDataExportParameters();
+		parameters.setRecordFilter(recordFilter);
+		parameters.setEntityId(rootEntityDef.getId());
+		parameters.setAlwaysGenerateZipFile(false);
+		parameters.setIncludeEnumeratedEntities(true);
+		job.setParameters(parameters);
+
 		jobManager.start(job, false);
 		if (job.isCompleted()) {
 			File outputFile = job.getOutputFile();
@@ -455,7 +476,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void exportCEGridTemplate() throws IOException {
 		File templateFile = new CollectEarthGridTemplateGenerator().generateTemplateCSVFile(survey);
 		String fileName = String.format("%s_grid_template_%s.csv", survey.getName(), Dates.formatDateTime(new Date()));
-		Filedownload.save(new FileInputStream(templateFile),  Files.CSV_CONTENT_TYPE, fileName);
+		Filedownload.save(new FileInputStream(templateFile), MediaTypes.CSV_CONTENT_TYPE, fileName);
 	}
 	
 	@GlobalCommand
@@ -543,18 +564,20 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	public void showPreview(Step recordStep) throws SurveyStoreException {
-		Runnable runAfterSave = new Runnable() {
+		if (! checkCanLeaveForm() ) {
+			return;
+		}
+		previewStep = recordStep;
+
+		Runnable openPreviewPopupRunnable = new Runnable() {
 			public void run() {
 				openPreviewPopUp();
 			}
 		};
-		boolean confirmPopUpShown = false;
 		if (survey.getId() == null || changed)  {
-			confirmPopUpShown = !save(null, runAfterSave);
-		}
-		previewStep = recordStep;
-		if (! confirmPopUpShown) {
-			checkValidity(true, runAfterSave, Labels.getLabel("survey.preview.show_preview"), false);
+			save(null, openPreviewPopupRunnable);
+		} else {
+			checkValidity(true, openPreviewPopupRunnable, Labels.getLabel("survey.preview.show_preview"), false);
 		}
 	}
 

@@ -120,7 +120,8 @@ abstract class AttributeDefinitionXS<T extends AttributeDefinition> extends Node
 			
 			@Override
 			protected void marshalInstances(Check<?> check) throws IOException {
-				marshal(check.getMessages());
+				String defaultLanguage = ((SurveyMarshaller) getRootMarshaller()).getParameters().getOutputSurveyDefaultLanguage();
+				marshal(check.getMessages(), defaultLanguage);
 			}
 		}
 	}

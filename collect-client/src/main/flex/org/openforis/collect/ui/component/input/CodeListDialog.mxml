@@ -141,7 +141,7 @@
 			selectionChange="selectionChangeHandler(event)"
 			multipleSelection="{multiple}"
 			apply="applyHandler(event)"
-			currentState="vertical"
+			currentState="VERTICAL"
 			width="100%" 
 			/>
 	</s:Scroller>
@@ -160,7 +160,7 @@
 				sortable="true"
 				selectionChange="selectionChangeHandler(event)"
 				apply="applyHandler(event)"
-				currentState="vertical"
+				currentState="VERTICAL"
 				width="100%" 
 				/>
 		</s:Scroller>
@@ -181,7 +181,7 @@
 				apply="applyHandler(event)"
 				editable="{editable}"
 				sortable="false"
-				currentState="vertical"
+				currentState="VERTICAL"
 				width="100%" 
 				/>
 		</s:Scroller>

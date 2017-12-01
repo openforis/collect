@@ -15,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.SurveyNameValidator;
+import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.MessageType;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
@@ -29,6 +30,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.versioning.Version;
@@ -42,6 +44,7 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.UploadEvent;
@@ -64,13 +67,14 @@ public class SurveyImportVM extends SurveyBaseVM {
 	);
 	
 	private static final String SURVEY_NAME_FIELD = "surveyName";
+	private static final String USER_GROUP_FIELD_NAME = "userGroup";
 	
 	@WireVariable
 	private SurveyManager surveyManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
 
-	private Map<String,String> form;
+	private Map<String,Object> form;
 	
 	private String uploadedSurveyUri;
 	private String uploadedSurveyName;
@@ -86,8 +90,11 @@ public class SurveyImportVM extends SurveyBaseVM {
 	
 	private Window jobStatusPopUp;
 	
-	public SurveyImportVM() {
-		form = new HashMap<String, String>();
+	@Init(superclass=false)
+	@Override
+	public void init() {
+		super.init();
+		form = new HashMap<String, Object>();
 		reset();
 	}
 	
@@ -101,6 +108,8 @@ public class SurveyImportVM extends SurveyBaseVM {
 		uploadedSurveyName = null;
 		updatingExistingSurvey = false;
 		updatingPublishedSurvey = false;
+		
+		form.put(USER_GROUP_FIELD_NAME, getDefaultPublicUserGroupItem());
 		updateForm();
 		notifyChange("uploadedFileName","uploadedSurveyUri");
 	}
@@ -337,21 +346,27 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	protected void startSurveyImport() {
 		String surveyName = getFormSurveyName();
+		LabelledItem userGroupItem = (LabelledItem) form.get(USER_GROUP_FIELD_NAME);
+		UserGroup userGroup = userGroupManager.findByName(userGroupItem.getCode());
 		
 		String uploadedFileNameExtension = FilenameUtils.getExtension(this.uploadedFileName);
+		AbstractSurveyRestoreJob job;
 		if ( XML_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension) ) {
-			restoreJob = jobManager.createJob(XMLSurveyRestoreJob.class);
+			job = jobManager.createJob(XMLSurveyRestoreJob.class);
 		} else if (CEP_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension)) {
-			restoreJob = jobManager.createJob(CESurveyRestoreJob.class);
+			job= jobManager.createJob(CESurveyRestoreJob.class);
 		} else {
-			restoreJob = jobManager.createJob(SurveyRestoreJob.class);
+			job= jobManager.createJob(SurveyRestoreJob.class);
 		}
-		restoreJob.setFile(uploadedFile);
-		restoreJob.setSurveyName(surveyName);
-		restoreJob.setSurveyUri(uploadedSurveyUri);
-		restoreJob.setRestoreIntoPublishedSurvey(false);
-		restoreJob.setValidateSurvey(false);
-		jobManager.start(restoreJob);
+		job.setFile(uploadedFile);
+		job.setSurveyName(surveyName);
+		job.setSurveyUri(uploadedSurveyUri);
+		job.setUserGroup(userGroup);
+		job.setRestoreIntoPublishedSurvey(false);
+		job.setValidateSurvey(false);
+		job.setActiveUser(getLoggedUser());
+		jobManager.start(job);
+		this.restoreJob = job;
 		openSurveyRestoreStatusPopUp();
 	}
 	
@@ -431,11 +446,11 @@ public class SurveyImportVM extends SurveyBaseVM {
 		return uploadedSurveyUri;
 	}
 	
-	public Map<String, String> getForm() {
+	public Map<String, Object> getForm() {
 		return form;
 	}
 	
-	public void setForm(Map<String, String> form) {
+	public void setForm(Map<String, Object> form) {
 		this.form = form;
 	}
 	

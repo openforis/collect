@@ -24,11 +24,11 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 	// TODO Check that list is not lookup
 	// TODO support hierarchical lists!
 	
-	public EnumerableEntityColumnProvider(CSVExportConfiguration config, EntityDefinition defn) {
+	public EnumerableEntityColumnProvider(CSVDataExportParameters config, EntityDefinition defn) {
 		super(config, defn, createProviders(config, defn));
 	}
 
-	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition defn) {
+	private static List<ColumnProvider> createProviders(CSVDataExportParameters config, EntityDefinition defn) {
 		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
 		List<AttributeDefinition> keyDefs = defn.getKeyAttributeDefinitions();
 		CodeAttributeDefinition keyDef = (CodeAttributeDefinition) keyDefs.get(0);
@@ -59,7 +59,7 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 		private String keyName;
 		private String code;
 
-		public EnumeratedCodeItemColumnProvider(CSVExportConfiguration config, EntityDefinition defn, String keyName, String code) {
+		public EnumeratedCodeItemColumnProvider(CSVDataExportParameters config, EntityDefinition defn, String keyName, String code) {
 			super(config, code + "_", defn);
 			this.entityDefinition = defn;
 			this.keyName = keyName;

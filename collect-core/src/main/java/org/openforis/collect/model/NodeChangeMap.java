@@ -30,7 +30,18 @@ public class NodeChangeMap implements NodeChangeSet {
 	private Map<Integer, NodeChange<?>> nodeIdToChange;
 	
 	public NodeChangeMap() {
+		this(null);
+	}
+	
+	public NodeChangeMap(NodeChangeSet changeSet) {
 		nodeIdToChange = new LinkedHashMap<Integer, NodeChange<?>>();
+		if (changeSet != null) {
+			if (changeSet instanceof NodeChangeMap) {
+				nodeIdToChange.putAll(((NodeChangeMap) changeSet).nodeIdToChange);
+			} else {
+				addMergeChanges(changeSet);
+			}
+		}
 	}
 	
 	@Override
