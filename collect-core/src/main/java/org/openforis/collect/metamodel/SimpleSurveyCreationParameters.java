@@ -22,7 +22,7 @@ public class SimpleSurveyCreationParameters implements Serializable {
 	private List<SimpleCodeList> codeLists = new ArrayList<SimpleCodeList>();
 	private List<String> imagery = new ArrayList<String>();
 	private CeoSettings ceoSettings = new CeoSettings();
-	private List<SamplingDesignItem> samplingPoints = new ArrayList<SamplingDesignItem>();
+	private List<List<SamplingDesignItem>> samplingPointsByLevel = new ArrayList<List<SamplingDesignItem>>();
 	private SamplingPointGenerationSettings samplingPointGenerationSettings;
 	private int userGroupId;
 	
@@ -74,12 +74,12 @@ public class SimpleSurveyCreationParameters implements Serializable {
 		this.ceoSettings = ceoSettings;
 	}
 	
-	public List<SamplingDesignItem> getSamplingPoints() {
-		return samplingPoints;
+	public List<List<SamplingDesignItem>> getSamplingPointsByLevel() {
+		return samplingPointsByLevel;
 	}
 	
-	public void setSamplingPoints(List<SamplingDesignItem> samplingPoints) {
-		this.samplingPoints = samplingPoints;
+	public void setSamplingPointsByLevel(List<List<SamplingDesignItem>> samplingPointsByLevel) {
+		this.samplingPointsByLevel = samplingPointsByLevel;
 	}
 	
 	public SamplingPointGenerationSettings getSamplingPointGenerationSettings() {

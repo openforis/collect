@@ -46,7 +46,7 @@ public class SamplingPointDataGeneratorTest {
 		conf.setAoiBoundary(Arrays.asList(topLeftCoordinate, topRightCoordinate, bottomLeftCoordinate, bottomRightCoordinate));
 		conf.setLevelsSettings(Arrays.asList(plotPointsConfig, samplePointsConfig));
 
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, conf);
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, null, conf);
 		
 		List<SamplingDesignItem> items = generator.generate();
 		
@@ -86,7 +86,7 @@ public class SamplingPointDataGeneratorTest {
 		conf.setAoiBoundary(Arrays.asList(topLeftCoordinate, topRightCoordinate, bottomLeftCoordinate, bottomRightCoordinate));
 		conf.setLevelsSettings(Arrays.asList(plotPointsConfig, samplePointsConfig));
 		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, conf);
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, null, conf);
 		
 		List<SamplingDesignItem> items = generator.generate();
 		

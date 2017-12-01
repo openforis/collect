@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSettings;
 import org.openforis.collect.metamodel.samplingdesign.SamplingPointLevelGenerationSettings;
@@ -24,7 +25,7 @@ import org.openforis.idm.model.Coordinate;
  */
 public class SamplingPointDataGenerator {
 
-	public static final SpatialReferenceSystem WEB_MARCATOR_SRS = new SpatialReferenceSystem(
+	public static final SpatialReferenceSystem WEB_MERCATOR_SRS = new SpatialReferenceSystem(
 			"EPSG:3857",
 			"PROJCS[\"WGS 84 / Pseudo-Mercator\"," +
 			"       GEOGCS[\"WGS 84\"," +
@@ -52,11 +53,14 @@ public class SamplingPointDataGenerator {
 			);
 	
 	private CollectSurvey survey;
+	private List<List<SamplingDesignItem>> samplingPointsByLevel;
 	private SamplingPointGenerationSettings configuration;
 	
-	public SamplingPointDataGenerator(CollectSurvey survey, SamplingPointGenerationSettings configuration) {
+	public SamplingPointDataGenerator(CollectSurvey survey, List<List<SamplingDesignItem>> samplingPointsByLevel,
+			SamplingPointGenerationSettings configuration) {
 		super();
 		this.survey = survey;
+		this.samplingPointsByLevel = samplingPointsByLevel;
 		this.configuration = configuration;
 	}
 
@@ -67,33 +71,48 @@ public class SamplingPointDataGenerator {
 	}
 
 	private List<SamplingDesignItem> generateItems(int levelIdx, List<String> previousLevelKeys, Coordinate latLonAoiCenter) {
-		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
-		Coordinate reprojectedAoiCenter = reprojectFromLatLonToWebMarcator(latLonAoiCenter);
-		double areaWidth = calculateAoiWidth(levelIdx);
-		SamplingPointLevelGenerationSettings pointsConfiguration = configuration.getLevelsSettings().get(levelIdx);
-		
-		List<Coordinate> locations = generateLocations(reprojectedAoiCenter, areaWidth, pointsConfiguration);
-		
-		for (int locationIdx = 0; locationIdx < locations.size(); locationIdx++) {
-			Coordinate webMarcatorCenter = locations.get(locationIdx);
-
-			Coordinate latLonCenter = reprojectFromWebMarcatorToLatLon(webMarcatorCenter);
-			
-			SamplingDesignItem item = new SamplingDesignItem();
-			item.setSrsId(LAT_LON_SRS_ID);
-			item.setSurveyId(survey.getId());
-			List<String> itemKeys = new ArrayList<String>(previousLevelKeys);
-			itemKeys.add(String.valueOf(locationIdx + 1));
-			item.setLevelCodes(itemKeys);
-			item.setX(latLonCenter.getX());
-			item.setY(latLonCenter.getY());
-			items.add(item);
-			
-			if (levelIdx < configuration.getLevelsSettings().size() - 1) {
-				items.addAll(generateItems(levelIdx + 1, itemKeys, latLonCenter));
+		if (samplingPointsByLevel != null && samplingPointsByLevel.size() > levelIdx &&
+				CollectionUtils.isNotEmpty(samplingPointsByLevel.get(levelIdx))) {
+			List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
+			List<SamplingDesignItem> itemsInLevel = samplingPointsByLevel.get(levelIdx);
+			items.addAll(itemsInLevel);
+			for (SamplingDesignItem item : itemsInLevel) {
+				item.setSurveyId(survey.getId());
+				if (levelIdx < configuration.getLevelsSettings().size() - 1) {
+					List<String> itemKeys = item.getLevelCodes();
+					items.addAll(generateItems(levelIdx + 1, itemKeys, item.getCoordinate()));
+				}
 			}
+			return items;
+		} else {
+			List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
+			Coordinate reprojectedAoiCenter = reprojectFromLatLonToWebMercator(latLonAoiCenter);
+			double areaWidth = calculateAoiWidth(levelIdx);
+			SamplingPointLevelGenerationSettings pointsConfiguration = configuration.getLevelsSettings().get(levelIdx);
+			
+			List<Coordinate> locations = generateLocations(reprojectedAoiCenter, areaWidth, pointsConfiguration);
+			
+			for (int locationIdx = 0; locationIdx < locations.size(); locationIdx++) {
+				Coordinate webMercatorCenter = locations.get(locationIdx);
+	
+				Coordinate latLonCenter = reprojectFromWebMercatorToLatLon(webMercatorCenter);
+				
+				SamplingDesignItem item = new SamplingDesignItem();
+				item.setSrsId(LAT_LON_SRS_ID);
+				item.setSurveyId(survey.getId());
+				List<String> itemKeys = new ArrayList<String>(previousLevelKeys);
+				itemKeys.add(String.valueOf(locationIdx + 1));
+				item.setLevelCodes(itemKeys);
+				item.setX(latLonCenter.getX());
+				item.setY(latLonCenter.getY());
+				items.add(item);
+				
+				if (levelIdx < configuration.getLevelsSettings().size() - 1) {
+					items.addAll(generateItems(levelIdx + 1, itemKeys, latLonCenter));
+				}
+			}
+			return items;
 		}
-		return items;
 	}
 
 	public Coordinate calculateAoiCenter() {
@@ -123,7 +142,7 @@ public class SamplingPointDataGenerator {
 			List<Coordinate> reprojectedAoiBoundary = new ArrayList<Coordinate>(aoiBoundary.size());
 			
 			for (Coordinate coordinate : aoiBoundary) {
-				reprojectedAoiBoundary.add(reprojectFromLatLonToWebMarcator(coordinate));
+				reprojectedAoiBoundary.add(reprojectFromLatLonToWebMercator(coordinate));
 			}
 			
 			double[] longitudes = new double[reprojectedAoiBoundary.size()];
@@ -180,6 +199,10 @@ public class SamplingPointDataGenerator {
 					}
 				}
 			}
+			break;
+		case CSV:
+			//do nothing
+			break;
 		}
 		return result;
 	}
@@ -188,14 +211,14 @@ public class SamplingPointDataGenerator {
 		return Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2);
 	}
 	
-	private Coordinate reprojectFromLatLonToWebMarcator(Coordinate coordinate) {
+	private Coordinate reprojectFromLatLonToWebMercator(Coordinate coordinate) {
 		double[] reprojectedPoint = CoordinateUtils.transform(SpatialReferenceSystem.LAT_LON_SRS, 
-				new double[]{coordinate.getX(), coordinate.getY()}, WEB_MARCATOR_SRS);
-		return new Coordinate(reprojectedPoint[0], reprojectedPoint[1], WEB_MARCATOR_SRS.getId());
+				new double[]{coordinate.getX(), coordinate.getY()}, WEB_MERCATOR_SRS);
+		return new Coordinate(reprojectedPoint[0], reprojectedPoint[1], WEB_MERCATOR_SRS.getId());
 	}
 	
-	private Coordinate reprojectFromWebMarcatorToLatLon(Coordinate coordinate) {
-		double[] reprojectedPoint = CoordinateUtils.transform(WEB_MARCATOR_SRS, 
+	private Coordinate reprojectFromWebMercatorToLatLon(Coordinate coordinate) {
+		double[] reprojectedPoint = CoordinateUtils.transform(WEB_MERCATOR_SRS, 
 				new double[]{coordinate.getX(), coordinate.getY()}, LAT_LON_SRS);
 		return new Coordinate(reprojectedPoint[0], reprojectedPoint[1], LAT_LON_SRS.getId());
 	}

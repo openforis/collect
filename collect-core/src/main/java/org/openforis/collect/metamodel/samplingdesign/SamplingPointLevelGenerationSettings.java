@@ -7,7 +7,7 @@ public class SamplingPointLevelGenerationSettings {
 	}
 	
 	public enum Distribution {
-		RANDOM, GRIDDED
+		RANDOM, GRIDDED, CSV
 	}
 	
 	private int numPoints;
