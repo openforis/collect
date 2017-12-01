@@ -7,7 +7,7 @@ public class CodeListItemView extends SurveyObjectView {
 	
 	String code;
 	String label;
-	private String color;
+	String color;
 	
 	List<CodeListItemView> items = new ArrayList<CodeListItemView>();
 

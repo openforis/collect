@@ -4,7 +4,7 @@ import static org.openforis.collect.utils.Controllers.CSV_CONTENT_TYPE;
 import static org.openforis.collect.utils.Controllers.KML_CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class SamplingPointsController extends BasicController {
 		return "ok";
 	}
 	
-	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data", method=PATCH, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data", method=POST, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SamplingDesignItem updateSamplingPointItem(@PathVariable int surveyId, @RequestBody SamplingDesignItem item) {
 		samplingDesignManager.save(item);
