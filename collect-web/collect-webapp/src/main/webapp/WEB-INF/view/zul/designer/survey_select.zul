@@ -60,7 +60,7 @@
 					</box>
 					<box align="center" width="100%" visible="${each.target.code ne 'CE'}"
 					 	tooltiptext="${labels.survey.target.CD}">
-						<image src="/assets/images/of_collect_icon.png"
+						<image src="/assets/images/of_collect_logo.png"
 							height="25px" width="25px" />
 					</box>
 				</listcell>
