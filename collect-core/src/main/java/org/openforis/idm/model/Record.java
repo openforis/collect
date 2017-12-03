@@ -386,7 +386,11 @@ public class Record implements DeepComparable {
 				}
 			}
 		}
-		return Double.valueOf(Math.floor((double) (100 * filledAttributes / totalRequiredAttributes))).intValue();
+		if (totalRequiredAttributes == 0) {
+			return -1;
+		} else {
+			return Double.valueOf(Math.floor((double) (100 * filledAttributes / totalRequiredAttributes))).intValue();
+		}
 	}
 	
 	public int countTotalFilledAttributes() {

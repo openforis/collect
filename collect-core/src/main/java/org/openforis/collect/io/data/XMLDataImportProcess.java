@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.zip.ZipException;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,25 +99,20 @@ public class XMLDataImportProcess implements Callable<Void> {
 	private CollectSurvey existingSurvey;
 	private boolean overwriteAll;
 	private DataUnmarshaller dataUnmarshaller;
-	private List<Integer> processedRecords;
+	private List<Integer> processedRecords = new ArrayList<Integer>();
 	private DataImportSummary summary;
-	private List<Integer> entryIdsToImport;
+	private List<Integer> entryIdsToImport = new ArrayList<Integer>();
 	private boolean includesRecordFiles;
 	private Predicate<CollectRecord> includeRecordPredicate;
-	private boolean validateRecords;
-	private List<CollectStoreQuery> queryBuffer;
+	private boolean validateRecords = true;
+	private List<CollectStoreQuery> queryBuffer = new ArrayList<CollectStoreQuery>();
 	private Integer nextRecordId;
 	private NewBackupFileExtractor backupFileExtractor;
 	private RecordUserLoader recordUserLoader;
 
-	public XMLDataImportProcess() {
-		super();
+	@PostConstruct
+	public void init() {
 		this.state = new DataImportState();
-		this.processedRecords = new ArrayList<Integer>();
-		this.entryIdsToImport = new ArrayList<Integer>();
-		this.includeRecordPredicate = null;
-		this.validateRecords = true;
-		this.queryBuffer = new ArrayList<CollectStoreQuery>();
 		this.recordUserLoader = new RecordUserLoader(userManager, userManager.loadAdminUser());
 	}
 
