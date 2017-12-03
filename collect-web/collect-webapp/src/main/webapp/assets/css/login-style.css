@@ -1,265 +1,137 @@
-* { box-sizing:border-box; }
+@font-face {
+	font-family: 'CaviarDreams';
+	src: url('../fonts/caviar-dreams/CaviarDreams.eot');
+	src: local('CaviarDreams'), 
+		url('../fonts/caviar-dreams/CaviarDreams.woff') format('woff'), 
+		url('../fonts/caviar-dreams/CaviarDreams.ttf') format('truetype'), 
+		url('../fonts/caviar-dreams/CaviarDreams.svg') format('svg');
+}
 
+/*----------------------------------------
+  General Layout Style
+------------------------------------------*/
 body {
-	font-family: Helvetica;
-	background: #eee;
-  -webkit-font-smoothing: antialiased;
+  background-color: #6699cc; /* blue Open Foris */
 }
 
-hgroup { 
-	text-align:center;
-	margin-top: 4em;
+.container {
+  padding: 0 0.5rem;
+  margin: 0 auto;
+  max-width: 100% !important;
+  width: 98%;
 }
 
-h1, h3 { font-weight: 300; }
-
-h1 { color: #636363; }
-
-h3 { color: #4a89dc; }
-
-form {
-	width: 380px;
-	margin: 2em auto;
-	padding: 1em 2em 2em 2em;
-	background: #fafafa;
-	border: 1px solid #ebebeb;
-	box-shadow: rgba(0,0,0,0.14902) 0px 1px 1px 0px,rgba(0,0,0,0.09804) 0px 1px 2px 0px;
+#content .container .row {
+  margin-bottom: 0;
 }
 
-.group { 
-	position: relative; 
-	margin-bottom: 45px; 
+@media only screen and (min-width: 601px) {
+  .container {
+    width: 98%;
+  }
 }
 
-input {
-	font-size: 18px;
-	padding: 10px 10px 10px 5px;
-	-webkit-appearance: none;
-	display: block;
-	background: #fafafa;
-	color: #636363;
-	width: 100%;
-	border: none;
-	border-radius: 0;
-	border-bottom: 1px solid #757575;
+@media only screen and (min-width: 993px) {
+  .container {
+    width: 98%;
+  }
 }
 
-input:focus { outline: none; }
-
-
-/* Label */
-
-label {
-	color: #999; 
-	font-size: 18px;
-	font-weight: normal;
-	position: absolute;
-	pointer-events: none;
-	left: 5px;
-	top: 10px;
-	-webkit-transition:all 0.2s ease;
-	transition: all 0.2s ease;
+@media only screen and (max-width: 993px) {
+  #main {
+    padding-left: 0;
+  }
+  footer {
+    padding-left: 0;
+  }
 }
 
-
-/* active */
-
-input:focus ~ label, input.used ~ label {
-	top: -20px;
-  -webkit-transform: scale(.75);
-          transform: scale(.75); left: -2px;
-	/* font-size: 14px; */
-	color: #4a89dc;
+/*---------------------------------
+    Typography
+-----------------------------------*/
+.small {
+  font-size: 1.0rem;
+  margin: 0;
+  padding: 0;
 }
 
-
-/* Underline */
-
-.bar {
-	position: relative;
-	display: block;
-	width: 100%;
+.medium-small {
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0;
 }
 
-.bar:before, .bar:after {
-	content: '';
-	height: 2px; 
-	width: 0;
-	bottom: 1px; 
-	position: absolute;
-	background: #4a89dc; 
-	-webkit-transition:all 0.2s ease; 
-	transition: all 0.2s ease;
+.ultra-small {
+  font-size: 0.8rem;
+  margin: 0;
+  padding: 0;
 }
 
-.bar:before { left: 50%; }
-
-.bar:after { right: 50%; }
-
-
-/* active */
-
-input:focus ~ .bar:before, input:focus ~ .bar:after { width: 50%; }
-
-
-/* Highlight */
-
-.highlight {
-	position: absolute;
-	height: 60%; 
-	width: 100px; 
-	top: 25%; 
-	left: 0;
-	pointer-events: none;
-	opacity: 0.5;
+small {
+  font-size: 0.8rem;
 }
 
-
-/* active */
-
-input:focus ~ .highlight {
-	-webkit-animation: inputHighlighter 0.3s ease;
-	        animation: inputHighlighter 0.3s ease;
+.strong {
+  font-weight: 600;
 }
 
-
-/* Animations */
-
-@-webkit-keyframes inputHighlighter {
-	from { background: #4a89dc; }
-	to 	{ width: 0; background: transparent; }
+h4.header {
+  line-height: 2.508rem;
+  margin: 1.14rem 0 0.912rem 0;
+  font-size: 1.4rem;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
-@keyframes inputHighlighter {
-	from { background: #4a89dc; }
-	to 	{ width: 0; background: transparent; }
+h4.header2 {
+  font-size: 1.1rem;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
+p.title {
+  font-size: 1.3rem;
+}
 
-/* Button */
+p.header {
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
 
-.button {
-  position: relative;
-  display: inline-block;
-  padding: 12px 24px;
-  margin: .3em 0 1em 0;
-  width: 100%;
-  vertical-align: middle;
-  color: #fff;
-  font-size: 16px;
-  line-height: 20px;
-  -webkit-font-smoothing: antialiased;
-  text-align: center;
+.more-text {
+  padding: 5px 20px;
+  font-weight: 500;
   letter-spacing: 1px;
-  background: transparent;
-  border: 0;
-  border-bottom: 2px solid #3160B6;
-  cursor: pointer;
-  -webkit-transition:all 0.15s ease;
-  transition: all 0.15s ease;
-}
-.button:focus { outline: 0; }
-
-
-/* Button modifiers */
-
-.buttonBlue {
-  background: #4a89dc;
-  text-shadow: 1px 1px 0 rgba(39, 110, 204, .5);
+  text-transform: uppercase;
 }
 
-.buttonBlue:hover { background: #357bd8; }
-
-
-/* Ripples container */
-
-.ripples {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: transparent;
+.margin {
+  margin: 0 !important;
 }
 
-
-/* Ripples circle */
-
-.ripplesCircle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
-  opacity: 0;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
+/*----------------------------------------
+    Login Page
+------------------------------------------*/
+.login-form {
+  width: 280px;
 }
 
-.ripples.is-active .ripplesCircle {
-  -webkit-animation: ripples .4s ease-in;
-          animation: ripples .4s ease-in;
+.login-form-text {
+  font-family: 'CaviarDreams',Verdana,Arial,Helvetica,sans-serif;
+  letter-spacing: 2px;
+  font-size: 1.8rem;
 }
 
-
-/* Ripples animation */
-
-@-webkit-keyframes ripples {
-  0% { opacity: 0; }
-
-  25% { opacity: 1; }
-
-  100% {
-    width: 200%;
-    padding-bottom: 200%;
-    opacity: 0;
-  }
+.profile-image-login {
+  width: 100px;
+  height: 100px !important;
 }
 
-@keyframes ripples {
-  0% { opacity: 0; }
-
-  25% { opacity: 1; }
-
-  100% {
-    width: 200%;
-    padding-bottom: 200%;
-    opacity: 0;
-  }
+.login-text {
+  margin-top: -6px;
+  margin-left: -6px !important;
 }
-
-footer { text-align: center; }
-
-footer p {
-	color: #888;
-	font-size: 13px;
-	letter-spacing: .4px;
-}
-
-footer a {
-	color: #4a89dc;
-	text-decoration: none;
-	-webkit-transition:all .2s ease;
-	transition: all .2s ease;
-}
-
-footer a:hover {
-	color: #666;
-	text-decoration: underline;
-}
-
-footer img {
-	width: 80px;
-	-webkit-transition:all .2s ease;
-	transition: all .2s ease;
-}
-
-footer img:hover { opacity: .83; }
-
-footer img:focus , footer a:focus { outline: none; }
 
 div.warn, div.error {
 	font-weight: bold;
