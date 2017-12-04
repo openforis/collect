@@ -6,13 +6,19 @@ import L from 'utils/Labels'
 class DataManagementPage extends Component {
     render() {
         const survey = this.props.survey
-        const message = survey ? ' ' : L.l('home-page.survey-not-selected-message')
+        const message = survey ? null : L.l('home-page.survey-not-selected-message')
         return (
             <Jumbotron>
                 <h1 className="display-3">{L.l('home-page.welcome-message')}</h1>
                 <p className="lead">{L.l('home-page.introduction')}</p>
                 <hr className="my-2" />
-                <p className="lead">{message}</p>
+                {message && 
+                    <p className="lead">
+                        <ul>
+                            <li>{message}</li>
+                        </ul>
+                    </p>
+                }
             </Jumbotron>    
         )
     }

@@ -1,7 +1,4 @@
 
-/**
-* Customuzation for OF Collect
-**/
 body {
     overflow: hidden;
 }
@@ -100,6 +97,11 @@ fieldset legend {
 
 .card fieldset {
     margin-left: 20px !important;
+}
+
+.main .jumbotron {
+    background-color: #6699cc;
+    color: white;
 }
 
 .app-header.navbar .navbar-brand {
@@ -251,9 +253,15 @@ label.invalid {
 }
 
 .dropdown-toggle.survey-dropdown-toggle {
-    background-color: #0069d9;
+    background-color: #6699cc;
+    border-color: #538cc6;
     padding: 10px;
     color: white;
+}
+
+.dropdown-toggle.survey-dropdown-toggle:hover, 
+.dropdown.survey-selector.show .dropdown-toggle.survey-dropdown-toggle  {
+    background-color: #4785c2;
 }
 
 .dropdown-item.survey-item {
