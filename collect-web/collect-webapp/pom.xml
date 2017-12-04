@@ -107,6 +107,7 @@
 					<includes>
 						<include>${project.build.finalName}/datacleansing/main.html</include>
 						<include>${project.build.finalName}/js/collect/collect.js</include>
+						<include>${project.build.finalName}/WEB-INF/view/jsp/login.jsp</include>
 					</includes>
 				</configuration>
 			</plugin>
