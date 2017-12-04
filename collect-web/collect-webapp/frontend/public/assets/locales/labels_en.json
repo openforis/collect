@@ -16,7 +16,8 @@
         },
         "export": {
             "label": "Export"
-        }
+        },
+        "selectOne": "--- Select one ---"
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
@@ -112,7 +113,10 @@
             "file": "File",
             "acceptedFileTypesDescription": "Collect Survey (.collect) Collect Backup (.collect-backup), Collect Earth (.cep) or Collect Survey XML (.xml)",
             "importingIntoExistingSurveyWarning": "Survey already existing! Applied changes will be override."
-        }
+        },
+        "publishedSurvey": "Published survey",
+        "selectPublishedSurveyDropdownHeading": "--- Published survey ---",
+        "selectPublishedSurveyFirst": "Select a published survey first"
     },
     "user": {
         "username": "Username",

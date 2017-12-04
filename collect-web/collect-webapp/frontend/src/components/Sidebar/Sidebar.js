@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import VersionInfo from 'components/VersionInfo'
+import L from 'utils/Labels';
 
 class Sidebar extends Component {
 
@@ -86,6 +88,18 @@ class Sidebar extends Component {
               </li>
             : ''}
           </ul>
+          <div style={{position: 'fixed', bottom: '50px'}}>
+            <UncontrolledDropdown>
+              <DropdownToggle tag="span" caret>
+                <i className="fa fa-user"></i>{'  '}{loggedUser.username}
+              </DropdownToggle>
+              <DropdownMenu className="dropdown-menu-right">
+                <DropdownItem header className="text-center"><strong>{L.l('general.account')}</strong></DropdownItem>
+                <DropdownItem><i className="fa fa-user"></i> {L.l('account.change-password')}</DropdownItem>
+                <DropdownItem onClick={this.handleLogoutClick}><i className="fa fa-lock"></i> {L.l('account.logout')}</DropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+          </div>
           <div style={{position: 'fixed', bottom: '0px'}}>
             <VersionInfo />
             <span><a href="http://www.openforis.org" target="_blank">Open Foris</a> &copy; 2017</span>

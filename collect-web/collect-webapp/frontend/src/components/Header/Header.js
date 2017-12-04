@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Form, FormGroup, Label, Col, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { withRouter } from 'react-router-dom'
 
-import SurveySelect from '../SurveySelect/';
+import Breadcrumb from 'components/Breadcrumb'
+import SurveySelect from 'components/SurveySelect'
+import Routes from 'Routes'
 import ServiceFactory from 'services/ServiceFactory'
-import Constants from 'utils/Constants'
-import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
 
 class Header extends Component {
@@ -52,6 +52,9 @@ class Header extends Component {
   }
 
   render() {
+    const { pathname } = this.props.location
+    const surveySelectRequired = Routes.isSurveySelectRequiredForPath(pathname);
+
     const loggedUser = this.props.loggedUser
     if (loggedUser == null) {
       return <div>Loading...</div>
@@ -64,35 +67,18 @@ class Header extends Component {
           <li className="nav-item d-md-down-none">
             <button className="nav-link navbar-toggler sidebar-toggler" type="button" onClick={this.sidebarToggle}>&#9776;</button>
           </li>
-          <li className="nav-item">
-            <Form>
-              <FormGroup row>
-                <Label sm={4} className="d-md-down-none">{L.l('header.select-survey')}</Label>
-                <Col sm={8}>
-                  <SurveySelect />
-                </Col>
-              </FormGroup>
-            </Form>
-          </li>
         </ul>
-        
-        <ul className="nav navbar-nav ml-auto">
-	        <li className="nav-item">
-            <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-              <DropdownToggle caret>{loggedUser.username}</DropdownToggle>
-              <DropdownMenu className="dropdown-menu-right">
-                <DropdownItem header className="text-center"><strong>{L.l('general.account')}</strong></DropdownItem>
-                <DropdownItem><i className="fa fa-user"></i> {L.l('account.change-password')}</DropdownItem>
-                <DropdownItem onClick={this.handleLogoutClick}><i className="fa fa-lock"></i> {L.l('account.logout')}</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </li>
+        <div className="breadcrumb-wrapper">
+          <Breadcrumb />
+          {surveySelectRequired && <SurveySelect />}
+        </div>
           {/*
+        <ul className="nav navbar-nav ml-auto">
           <li className="nav-item d-md-down-none">
             <button className="nav-link navbar-toggler aside-menu-toggler" type="button" onClick={this.asideToggle}>&#9776;</button>
           </li>
-          */}
         </ul>
+          */}
       </header>
     )
   }
@@ -106,4 +92,4 @@ const mapStateToProps = state => {
       loggedUser
   }
 }
-export default connect(mapStateToProps)(Header);
+export default withRouter(connect(mapStateToProps)(Header));

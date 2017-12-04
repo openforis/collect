@@ -6,6 +6,7 @@ import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';import { connect } from 'react-redux'
 
 import Dates from 'utils/Dates';
+import L from 'utils/Labels';
 import ServiceFactory from 'services/ServiceFactory'
 
 const DAYS_OF_WEEK_ABBREVIATED = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
@@ -354,7 +355,7 @@ class DashboardPage extends Component {
     )
 
     if (chartData == null) {
-      return <div>Select a survey first</div>
+      return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
     }
 
     const lineChart = <Line data={chartData.data} options={chartData.opts} height={500} />

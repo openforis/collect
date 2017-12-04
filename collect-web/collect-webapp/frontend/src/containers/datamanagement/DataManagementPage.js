@@ -8,9 +8,12 @@ import * as Actions from 'actions';
 import * as JobActions from 'actions/job';
 import ServiceFactory from 'services/ServiceFactory'
 import Modals from 'components/Modals'
-import Arrays from 'utils/Arrays'
-import RouterUtils from 'utils/RouterUtils'
+import SurveySelect from 'components/SurveySelect'
+import WithSurveySelectContainer from 'containers/WithSurveySelectContainer'
 import Workflow from 'model/Workflow'
+import Arrays from 'utils/Arrays'
+import L from 'utils/Labels'
+import RouterUtils from 'utils/RouterUtils'
 
 class DataManagementPage extends Component {
 
@@ -185,7 +188,7 @@ class DataManagementPage extends Component {
 			return <div>Loading...</div>
 		}
 		if (!this.props.survey) {
-			return <div>Select a survey first</div>
+			return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
 		}
 		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === this.props.survey.userGroup.id)
 		const loggedUser = this.props.loggedUser

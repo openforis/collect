@@ -6,6 +6,16 @@ body {
     overflow: hidden;
 }
 
+header .breadcrumb-wrapper {
+    width: calc(100% - 205px);
+}
+
+header .breadcrumb {
+    margin-bottom: 0px;
+    padding: 1rem 1rem;
+    background-color: white;
+}
+
 .breadcrumb-item.active {
     font-weight: bold;
     font-size: 1em;
@@ -17,7 +27,7 @@ body {
 
 .main-content-wrapper {
     position: absolute;
-    top: 110px;
+    top: 60px;
     bottom: 0px;
     left: 200px;
     right: 0px;
@@ -194,21 +204,6 @@ span.equal-sign {
     overflow-y: auto;
 }
 
-.app-header.navbar .nav-item .dropdown-toggle.survey-dropdown-toggle {
-    width: 400px;
-    background-color: #0069d9;
-    padding: 10px;
-    color: white;
-}
-
-.dropdown-item.survey-item {
-    border-bottom: 1px solid grey;
-}
-
-.dropdown-item.survey-item .survey-name {
-    font-weight: bold;
-}
-
 label.invalid {
     color: #dc3545;
 }
@@ -239,3 +234,34 @@ label.invalid {
     background-position: center right;
     background-repeat: no-repeat;
 }
+
+/**
+* SURVEY SELECTOR
+*/
+.dropdown.survey-selector {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}
+
+.dropdown.survey-selector,
+.dropdown.survey-selector .dropdown-menu,
+.dropdown-toggle.survey-dropdown-toggle {
+    width: 400px;
+}
+
+.dropdown-toggle.survey-dropdown-toggle {
+    background-color: #0069d9;
+    padding: 10px;
+    color: white;
+}
+
+.dropdown-item.survey-item {
+    border-bottom: 1px solid grey;
+}
+
+.dropdown.survey-selector .survey-name {
+    font-weight: bold;
+}
+
+

@@ -1,65 +1,64 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem, FormControl } from 'reactstrap';
+import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
-import { selectPreferredSurvey } from '../../actions'
-import Arrays from 'utils/Arrays'
+import { selectPreferredSurvey } from '../../actions';
+import Arrays from 'utils/Arrays';
+import L from 'utils/Labels';
 
 class SurveySelect extends Component {
     constructor( props ) {
-        super( props );
-		this.handleSurveySelect = this.handleSurveySelect.bind( this );
-		
-		this.state = {
-			dropdownOpen: false,
-			selectedSurveyName: '---Select a survey---'
+      super( props );
+
+			this.state = {
+				dropdownOpen: false
+			}
+
+			this.handleSurveySelect = this.handleSurveySelect.bind(this)
 		}
-    }
-    static propTypes = {
-        summaries: PropTypes.array.isRequired,
-        selectedSurvey: PropTypes.object,
-		isFetchingSummaries: PropTypes.bool.isRequired,
-		isFetchingPreferredSurvey: PropTypes.bool.isRequired,
-        lastUpdated: PropTypes.number,
-        dispatch: PropTypes.func.isRequired
+
+		static propTypes = {
+			summaries: PropTypes.array.isRequired,
+			selectedSurvey: PropTypes.object,
+			isFetchingSummaries: PropTypes.bool.isRequired,
+			isFetchingPreferredSurvey: PropTypes.bool.isRequired,
+			lastUpdated: PropTypes.number,
+			dispatch: PropTypes.func.isRequired
     }
 	
     handleSurveySelect(surveyId) {
-    	const { summaries } = this.props
-    	var survey = summaries.find(summary => summary.id === surveyId);
-    	if (survey) {
-			this.setState({selectedSurveyName: survey.name})
-    		this.props.dispatch(selectPreferredSurvey(survey));
-    	}
-	}
-	
-    render() {
-		const { selectedSurvey, summaries } = this.props
-		const publishedSurveys = summaries.filter(s => s.published && !s.temporary)
-    	const isEmpty = publishedSurveys.length === 0
-		Arrays.sort(publishedSurveys, 'name')
-    	
-    	const dropdownItems = publishedSurveys.map(s => 
-			<DropdownItem key={s.id} className="survey-item" onClick={this.handleSurveySelect.bind(this, s.id)}>
-				<div className="survey-name">{s.name}</div><div className="survey-project-name">{s.projectName}</div>
-			</DropdownItem>)
-		
-    	return (<div>
-			{
-			isEmpty ? <span>No published surveys found</span>
-            : <div style={{ width: '300px' }}>
-				<UncontrolledDropdown>
-					<DropdownToggle className="survey-dropdown-toggle" caret>{this.state.selectedSurveyName}</DropdownToggle>
-					<DropdownMenu>
-						{dropdownItems}
-					</DropdownMenu>
-				</UncontrolledDropdown>
-              </div>
+			const { summaries } = this.props
+			var survey = summaries.find(summary => summary.id === surveyId);
+			if (survey) {
+				this.props.dispatch(selectPreferredSurvey(survey));
 			}
-			</div>
-		)
-    }
+		}
+
+		render() {
+			const { selectedSurvey, summaries } = this.props
+			const publishedSurveys = summaries.filter(s => s.published && !s.temporary)
+			const isEmpty = publishedSurveys.length === 0
+				
+			if (isEmpty) {
+				return <span>{L.l('survey.noPublishedSurveysFound')}</span>
+			} else {
+				//sort surveys by name
+				Arrays.sort(publishedSurveys, 'name')
+				const selectedSurveyName = selectedSurvey ? selectedSurvey.name : L.l('survey.selectPublishedSurveyDropdownHeading')
+				const dropdownItems = publishedSurveys.map(s => 
+					<DropdownItem key={s.id} className="survey-item" onClick={this.handleSurveySelect.bind(this, s.id)}>
+						<div className="survey-name">{s.name}</div><div className="survey-project-name">{s.projectName}</div>
+					</DropdownItem>)
+				
+				return <UncontrolledDropdown className="survey-selector">
+								<DropdownToggle className="survey-dropdown-toggle" caret>{selectedSurveyName}</DropdownToggle>
+								<DropdownMenu>
+									{dropdownItems}
+								</DropdownMenu>
+							</UncontrolledDropdown>
+				}
+		}
 }
 
 const mapStateToProps = state => {

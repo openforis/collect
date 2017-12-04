@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 const HEADER_HEIGHT = 55
-const BREADCRUMB_HEIGHT = 50
 const PADDING = 10
 
 class MaxAvailableSpaceContainer extends Component {
@@ -18,7 +17,7 @@ class MaxAvailableSpaceContainer extends Component {
 	}
 
 	calculateMaxAvailableHeight() {
-		return (window.document.body.scrollHeight - (HEADER_HEIGHT + BREADCRUMB_HEIGHT + PADDING)) + 'px'
+		return (window.document.body.scrollHeight - (HEADER_HEIGHT + PADDING)) + 'px'
 	}
 	
   render() {

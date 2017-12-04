@@ -13,36 +13,44 @@ const routes = [
   },
   {
     path: '/dashboard',
-    name: "Dashboard"
+    name: "Dashboard",
+    surveySelectRequired: true
   },
   {
     path: '/datamanagement',
-    name: "Data Management"
+    name: "Data Management",
+    surveySelectRequired: true
   },
   {
     path: '/datamanagement/export',
-    name: "Export Data"
+    name: "Export Data",
+    surveySelectRequired: true
   },
   {
     path: '/datamanagement/csvexport',
-    name: "Export to CSV"
+    name: "Export to CSV",
+    surveySelectRequired: true
   },
   {
     path: '/datamanagement/backup',
-    name: "Backup data"
+    name: "Backup data",
+    surveySelectRequired: true
   },
   {
     path: '/datamanagement/csvimport',
-    name: "Import Data from CSV/Excel"
+    name: "Import Data from CSV/Excel",
+    surveySelectRequired: true
   },
   {
     path: '/datamanagement/backupimport',
-    name: "Import Backup file"
+    name: "Import Backup file",
+    surveySelectRequired: true
   },
   {
     path: '/datamanagement/:id',
     name: 'Record',
-    pathRegExp: new RegExp('/datamanagement/(\\d)+')
+    pathRegExp: new RegExp('/datamanagement/(\\d)+'),
+    surveySelectRequired: true
   },
   {
     path: '/surveydesigner',
@@ -80,7 +88,8 @@ const routes = [
   },
   {
     path: '/saiku',
-    name: "Saiku"
+    name: "Saiku",
+    surveySelectRequired: true
   },
   {
     path: '/users',
@@ -100,4 +109,29 @@ const routes = [
     name: 'New User Group'
   }
 ];
-export default routes;
+
+export default class Routes {
+
+  static findRouteByPath(path) {
+    let route = routes.find(route => {
+      if (route.path === path) {
+        return true;
+      } else if (route.pathRegExp && route.pathRegExp.test(path)) {
+          return true;
+      } else {
+        return false;
+      }
+    });
+    return route
+  }
+
+  static findRouteNameByPath(path) {
+    const route = Routes.findRouteByPath(path)
+    return route ? route.name: undefined
+  }
+
+  static isSurveySelectRequiredForPath(path) {
+    const route = Routes.findRouteByPath(path)
+    return route ? route['surveySelectRequired'] === true : false
+  }
+}

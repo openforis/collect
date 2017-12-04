@@ -3,7 +3,6 @@ import { Switch, Route } from 'react-router-dom'
 
 import Header from 'components/Header';
 import Sidebar from 'components/Sidebar';
-import Breadcrumb from 'components/Breadcrumb';
 import CurrentJobMonitorModal from 'containers/CurrentJobMonitorModal'
 
 import HomePage from 'containers/HomePage'
@@ -27,16 +26,18 @@ import UsersPage from 'containers/users/UsersPage'
 import UserGroupsPage from 'containers/users/UserGroupsPage'
 import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
 
+import Routes from 'Routes'
 
 class App extends Component {
+
   render() {
+    
     return (
         <div className="app">
           <Header />
           <div className="app-body">
             <Sidebar {...this.props}/>
             <main className="main">
-              <Breadcrumb />
               <div className="main-content-wrapper">
                 <Switch>
                   <Route path="/" exact name="HomePage" component={HomePage}/>
