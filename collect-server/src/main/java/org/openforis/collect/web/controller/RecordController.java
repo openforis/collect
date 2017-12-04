@@ -151,8 +151,8 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}/binary_data.json", method=GET)
 	public @ResponseBody
 	Map<String, Object> loadData(
-			@PathVariable int surveyId,
-			@PathVariable int recordId,
+			@PathVariable("surveyId") int surveyId,
+			@PathVariable("recordId") int recordId,
 			@RequestParam(value="step") Integer stepNumber) throws Exception {
 		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
@@ -168,7 +168,7 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/count.json", method=GET)
 	public @ResponseBody
-	int getCount(@PathVariable int surveyId,
+	int getCount(@PathVariable("surveyId") int surveyId,
 			@RequestParam(value="rootEntityDefinitionId", required=false) Integer rootEntityDefinitionId,
 			@RequestParam(value="step", required=false) Integer stepNumber) throws Exception {
 		CollectSurvey survey = surveyManager.getById(surveyId);
@@ -183,7 +183,7 @@ public class RecordController extends BasicController implements Serializable {
 	
 	@RequestMapping(value = "survey/{surveyId}/data/records/summary", method=GET)
 	public @ResponseBody Map<String, Object> loadRecordSummaries(
-			@PathVariable int surveyId,
+			@PathVariable("surveyId") int surveyId,
 			@Valid RecordSummarySearchParameters params) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		Integer userId = params.getUserId();
@@ -223,8 +223,8 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records/{recordId}", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	RecordProxy loadRecord(
-			@PathVariable int surveyId, 
-			@PathVariable int recordId,
+			@PathVariable("surveyId") int surveyId, 
+			@PathVariable("recordId") int recordId,
 			@RequestParam(value="step", required=false) Integer stepNumber) throws RecordPersistenceException {
 		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
@@ -233,7 +233,7 @@ public class RecordController extends BasicController implements Serializable {
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/update/records/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody Response updateOwner(@PathVariable int surveyId, @PathVariable int recordId,
+	public @ResponseBody Response updateOwner(@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId,
 			@RequestBody Map<String, String> body) throws RecordLockedException, MultipleEditException {
 		String ownerIdStr = body.get("ownerId");
 		Integer ownerId = ownerIdStr == null ? null : Integer.parseInt(ownerIdStr);
@@ -244,7 +244,7 @@ public class RecordController extends BasicController implements Serializable {
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/promote/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody Response promoteRecord(@PathVariable int surveyId, @PathVariable int recordId) throws MissingRecordKeyException, RecordPromoteException {
+	public @ResponseBody Response promoteRecord(@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId) throws MissingRecordKeyException, RecordPromoteException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		CollectRecord record = recordManager.load(survey, recordId);
 		recordManager.promote(record, sessionManager.getLoggedUser(), true);
@@ -252,14 +252,14 @@ public class RecordController extends BasicController implements Serializable {
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/records/demote/{recordId}", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody Response demoteRecord(@PathVariable int surveyId, @PathVariable int recordId) throws RecordPersistenceException {
+	public @ResponseBody Response demoteRecord(@PathVariable("surveyId") int surveyId, @PathVariable("recordId") int recordId) throws RecordPersistenceException {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		recordManager.demote(survey, recordId, sessionManager.getLoggedUser());
 		return new Response();
 	}
 
 	@RequestMapping(value = "survey/{surveyId}/data/move/records", method=POST, produces=APPLICATION_JSON_VALUE)
-	public @ResponseBody JobProxy moveRecords(@PathVariable int surveyId, @RequestParam String fromStep, 
+	public @ResponseBody JobProxy moveRecords(@PathVariable("surveyId") int surveyId, @RequestParam String fromStep, 
 			@RequestParam boolean promote) {
 		BulkRecordMoveJob job = jobManager.createJob(BulkRecordMoveJob.class);
 		SessionState sessionState = sessionManager.getSessionState();
@@ -288,7 +288,7 @@ public class RecordController extends BasicController implements Serializable {
 	@Transactional
 	@RequestMapping(value = "survey/{surveyId}/data/records", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	RecordProxy newRecord(@PathVariable int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
+	RecordProxy newRecord(@PathVariable("surveyId") int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName()));
@@ -300,14 +300,14 @@ public class RecordController extends BasicController implements Serializable {
 	
 	@RequestMapping(value = "survey/{surveyId}/data/records", method=DELETE, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	Response deleteRecord(@PathVariable int surveyId, @Valid RecordDeleteParameters params) throws RecordPersistenceException {
+	Response deleteRecord(@PathVariable("surveyId") int surveyId, @Valid RecordDeleteParameters params) throws RecordPersistenceException {
 		recordManager.deleteByIds(new HashSet<Integer>(Arrays.asList(params.getRecordIds())));
 		return new Response();
 	}
 	
 	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody
-	JobView generateRecordImportSummary(@PathVariable int surveyId, @RequestParam("file") MultipartFile multipartFile, 
+	JobView generateRecordImportSummary(@PathVariable("surveyId") int surveyId, @RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam String rootEntityName) throws IOException {
 		File file = File.createTempFile("ofc_data_restore", ".collect-data");
 		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
@@ -324,7 +324,7 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=GET)
 	public @ResponseBody
-	DataImportSummaryProxy getRecordImportSummary(@PathVariable int surveyId) throws IOException {
+	DataImportSummaryProxy getRecordImportSummary(@PathVariable("surveyId") int surveyId) throws IOException {
 		if (this.dataRestoreSummaryJob == null || ! this.dataRestoreSummaryJob.isCompleted()) {
 			throw new IllegalStateException("Data restore summary not generated or an error occurred during the generation");
 		}
@@ -334,7 +334,7 @@ public class RecordController extends BasicController implements Serializable {
 	
 	@RequestMapping(value = "survey/{surveyId}/data/import/records", method=POST)
 	public @ResponseBody
-	JobView startRecordImport(@PathVariable int surveyId, @RequestParam List<Integer> entryIdsToImport, 
+	JobView startRecordImport(@PathVariable("surveyId") int surveyId, @RequestParam List<Integer> entryIdsToImport, 
 			@RequestParam(defaultValue="true") boolean validateRecords) throws IOException {
 		DataRestoreJob job = jobManager.createJob(TransactionalDataRestoreJob.class);
 		job.setFile(dataRestoreSummaryJob.getFile());
@@ -353,7 +353,7 @@ public class RecordController extends BasicController implements Serializable {
 	
 	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody
-	JobView startCsvDataImportJob(@PathVariable int surveyId, 
+	JobView startCsvDataImportJob(@PathVariable("surveyId") int surveyId, 
 			@RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam String rootEntityName, 
 			@RequestParam String importType, 
@@ -378,7 +378,7 @@ public class RecordController extends BasicController implements Serializable {
 	}
 	
 	@RequestMapping(value = "survey/{surveyId}/data/csvimport/records", method=GET)
-	public @ResponseBody DataImportStatusProxy getCsvDataImportStatus(@PathVariable int surveyId) {
+	public @ResponseBody DataImportStatusProxy getCsvDataImportStatus(@PathVariable("surveyId") int surveyId) {
 		return new DataImportStatusProxy(csvDataImportJob);
 	}
 	
@@ -394,7 +394,7 @@ public class RecordController extends BasicController implements Serializable {
 	@Transactional
 	@RequestMapping(value = "survey/{surveyId}/data/records/random", method=POST, consumes=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
+	RecordProxy createRandomRecord(@PathVariable("surveyId") int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
 		CollectRecord record = randomRecordGenerator.generate(surveyId, params);
 		return toProxy(record);
 	}
@@ -429,13 +429,13 @@ public class RecordController extends BasicController implements Serializable {
 	}
 	
 	@RequestMapping(value="data/records/{recordId}/surveyId", method=GET)
-	public @ResponseBody int loadSurveyId(@PathVariable int recordId) {
+	public @ResponseBody int loadSurveyId(@PathVariable("recordId") int recordId) {
 		return recordManager.loadSurveyId(recordId);
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/startcsvexport", method=POST)
 	public @ResponseBody JobView startCsvDataExportJob(
-			@PathVariable Integer surveyId,
+			@PathVariable("surveyId") int surveyId,
 			@RequestBody CSVExportParametersForm parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
@@ -476,7 +476,7 @@ public class RecordController extends BasicController implements Serializable {
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/startbackupexport", method=POST)
 	public @ResponseBody JobView startBackupDataExportJob(
-			@PathVariable Integer surveyId,
+			@PathVariable("surveyId") int surveyId,
 			@RequestBody BackupDataExportParameters parameters) throws IOException {
 		User user = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.getById(surveyId);
@@ -502,7 +502,7 @@ public class RecordController extends BasicController implements Serializable {
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/stats", method=GET)
-	public @ResponseBody RecordsStats generateStats(@PathVariable Integer surveyId) {
+	public @ResponseBody RecordsStats generateStats(@PathVariable("surveyId") int surveyId) {
 		Date[] period = recordManager.findWorkingPeriod(surveyId);
 		if (period == null) {
 			return RecordsStats.EMPTY;
@@ -512,7 +512,7 @@ public class RecordController extends BasicController implements Serializable {
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/validationreport", method=POST)
-	public @ResponseBody JobProxy startValidationResportJob(@PathVariable int surveyId) {
+	public @ResponseBody JobProxy startValidationResportJob(@PathVariable("surveyId") int surveyId) {
 		User user = sessionManager.getLoggedUser();
 		Locale locale = sessionManager.getSessionState().getLocale();
 		CollectSurvey survey = surveyManager.getById(surveyId);

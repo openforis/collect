@@ -64,7 +64,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 		for (Map userGroupRelation : userGroupRelations) {
 			UserInGroup userInGroup = new UserInGroup();
 			userInGroup.setGroupId(userGroup.getId());
-			userInGroup.setUserId((Integer) userGroupRelation.get("userId"));
+			userInGroup.setUserId(((Double)userGroupRelation.get("userId")).intValue());
 			userInGroup.setJoinStatus(UserGroupJoinRequestStatus.fromCode((String) userGroupRelation.get("statusCode")));
 			userInGroup.setRole(UserGroupRole.fromCode((String) userGroupRelation.get("roleCode")));
 			result.add(userInGroup);

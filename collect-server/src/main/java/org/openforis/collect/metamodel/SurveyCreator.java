@@ -11,6 +11,7 @@ import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters.ListItem;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters.SimpleCodeList;
+import org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSettings;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
@@ -74,13 +75,14 @@ public class SurveyCreator {
 		ceoApplicationOptions.setBaseMapSource(parameters.getCeoSettings().getBaseMapSource());
 		ceoApplicationOptions.setImageryYear(parameters.getCeoSettings().getImageryYear());
 		ceoApplicationOptions.setStackingProfile(parameters.getCeoSettings().getStackingProfile());
-		ceoApplicationOptions.setSamplingPointDataConfiguration(parameters.getSamplingPointGenerationSettings());
+		SamplingPointGenerationSettings samplingPointGenerationSettings = parameters.getSamplingPointGenerationSettings();
+		ceoApplicationOptions.setSamplingPointDataConfiguration(samplingPointGenerationSettings);
 		survey.addApplicationOptions(ceoApplicationOptions);
 		
 		surveyManager.save(survey);
 		
 		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(
-				survey,	parameters.getSamplingPointGenerationSettings());
+				survey, parameters.getSamplingPointsByLevel(), samplingPointGenerationSettings);
 		List<SamplingDesignItem> items = generator.generate();
 		
 		samplingDesignManager.insert(survey, items, true);
