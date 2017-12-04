@@ -1,17 +1,18 @@
 $(window, document, undefined).ready(function() {
 
+	const DEFAULT_PASSWORD_ACTIVE_ENDPOINT = "api/defaultpasswordactive"
 	const DEFAULT_USERNAME = 'admin';
 	const DEFAULT_PASSWORD = 'admin';
 	
-	if (! (LOGGED_OUT || ERROR)) {
-		checkDefaultPasswordActive();
-	} else {
+	if (LOGGED_OUT || ERROR) {
 		initializeForm();
+	} else {
+		checkDefaultPasswordActive();
 	}
 	
 	function checkDefaultPasswordActive() {
 		$.ajax({
-			url: "api/defaultpasswordactive"
+			url: DEFAULT_PASSWORD_ACTIVE_ENDPOINT
 		}).done(function(defaultPasswordActive) {
 			setTimeout(function() {
 				if (defaultPasswordActive) {
