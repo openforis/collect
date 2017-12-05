@@ -842,7 +842,7 @@ public class RecordManager {
 		for (int i = 0; i < keyDefns.size(); i++) {
 			AttributeDefinition keyDefn = keyDefns.get(i);
 			EntityDefinition keyParentDefn = keyDefn.getParentEntityDefinition();
-			Entity keyParent = (Entity) record.findNodeByPath(keyParentDefn.getPath());
+			Entity keyParent = record.findNodeByPath(keyParentDefn.getPath());
 			if (keyParent == null) {
 				throw new MissingRecordKeyException();
 			}

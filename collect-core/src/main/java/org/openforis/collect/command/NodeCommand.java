@@ -11,9 +11,9 @@ public abstract class NodeCommand implements Command<List<RecordEvent>> {
 	private String username;
 	private int surveyId;
 	private int recordId;
-	private int parentEntityId;
 	private int nodeDefId;
-	private int nodeId;
+	private String parentEntityPath;
+	private String nodePath;
 
 	public String getUsername() {
 		return username;
@@ -39,14 +39,6 @@ public abstract class NodeCommand implements Command<List<RecordEvent>> {
 		this.recordId = recordId;
 	}
 
-	public int getParentEntityId() {
-		return parentEntityId;
-	}
-
-	public void setParentEntityId(int parentEntityId) {
-		this.parentEntityId = parentEntityId;
-	}
-
 	public int getNodeDefId() {
 		return nodeDefId;
 	}
@@ -54,13 +46,20 @@ public abstract class NodeCommand implements Command<List<RecordEvent>> {
 	public void setNodeDefId(int nodeDefId) {
 		this.nodeDefId = nodeDefId;
 	}
-
-	public int getNodeId() {
-		return nodeId;
+	
+	public String getParentEntityPath() {
+		return parentEntityPath;
 	}
-
-	public void setNodeId(int nodeId) {
-		this.nodeId = nodeId;
+	
+	public void setParentEntityPath(String parentEntityPath) {
+		this.parentEntityPath = parentEntityPath;
 	}
-
+	
+	public String getNodePath() {
+		return nodePath;
+	}
+	
+	public void setNodePath(String nodePath) {
+		this.nodePath = nodePath;
+	}
 }

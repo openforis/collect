@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="drop-record-user-fk" author="ricci" dbms="postgresql">
+
+		<comment>Drop record user Foreign Keys</comment>
+
+		<dropForeignKeyConstraint baseTableName="ofc_record" constraintName="ofc_record_created_by_user_fkey" />
+		<dropForeignKeyConstraint baseTableName="ofc_record" constraintName="ofc_record_modified_by_user_fkey" />
+		<dropForeignKeyConstraint baseTableName="ofc_record" constraintName="ofc_record_owner_fkey" />
+		<dropForeignKeyConstraint baseTableName="ofc_record_data" constraintName="ofc_record_data_created_by_fkey" />
+		<dropForeignKeyConstraint baseTableName="ofc_record_data" constraintName="ofc_record_data_modified_by_fkey" />
+		
+		<createIndex tableName="ofc_record" indexName="ofc_record_created_by_idx">
+			<column name="created_by_id" type="INTEGER"/>
+		</createIndex>
+		<createIndex tableName="ofc_record" indexName="ofc_record_modified_by_idx">
+			<column name="modified_by_id" type="INTEGER"/>
+		</createIndex>
+		<createIndex tableName="ofc_record" indexName="ofc_record_owner_idx">
+			<column name="owner_id" type="INTEGER"/>
+		</createIndex>
+		
+		<createIndex tableName="ofc_record_data" indexName="ofc_record_data_created_by_idx">
+			<column name="created_by" type="INTEGER"/>
+		</createIndex>
+		<createIndex tableName="ofc_record_data" indexName="ofc_record_data_modified_by_idx">
+			<column name="modified_by" type="INTEGER"/>
+		</createIndex>
+		
+	</changeSet>
+	
+</databaseChangeLog>

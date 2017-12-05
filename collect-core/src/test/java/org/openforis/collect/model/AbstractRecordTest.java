@@ -44,7 +44,7 @@ public abstract class AbstractRecordTest {
 	}
 
 	protected Entity entityByPath(String path) {
-		return (Entity) record.findNodeByPath(path);
+		return record.findNodeByPath(path);
 	}
 
 	protected NodeChangeSet updateAttribute(String path, String value) {
@@ -63,7 +63,7 @@ public abstract class AbstractRecordTest {
 	}
 
 	protected Attribute<?,?> attributeByPath(String path) {
-		return (Attribute<?, ?>) record.findNodeByPath(path);
+		return record.findNodeByPath(path);
 	}
 
 }

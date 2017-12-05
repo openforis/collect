@@ -121,7 +121,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 				entity("tree")
 			)
 		);
-		Entity tree = (Entity) record.findNodeByPath("/root/plot[1]/tree[1]");
+		Entity tree = record.findNodeByPath("/root/plot[1]/tree[1]");
 		assertTrue(tree.isRequired("start_time"));
 	}
 
@@ -166,7 +166,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			)
 		);
 		Entity rootEntity = record.getRootEntity();
-		Attribute<?, ?> startTime = (Attribute<?, ?>) record.findNodeByPath("/root/time_study[1]/start_time");
+		Attribute<?, ?> startTime = record.findNodeByPath("/root/time_study[1]/start_time");
 		
 		NodeChangeSet nodeChangeSet = update(startTime, "updated");
 		
@@ -411,7 +411,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 		Node<?> plotDetails = record.findNodeByPath("/root/plot[1]/plot_details");
 		assertFalse(plotDetails.isRelevant());
 		
-		Attribute<?, ?> accessibility = (Attribute<?, ?>) record.findNodeByPath("/root/plot[1]/accessibility");
+		Attribute<?, ?> accessibility = record.findNodeByPath("/root/plot[1]/accessibility");
 		update(accessibility, "true");
 		
 		assertTrue(plotDetails.isRelevant());
@@ -579,7 +579,7 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 			entity("tree", NodeBuilder.attribute("angle", "10"))
 		);
 		
-		TextAttribute doubleHeight = (TextAttribute) record.findNodeByPath("/root/tree[1]/double_height");
+		TextAttribute doubleHeight = record.findNodeByPath("/root/tree[1]/double_height");
 		
 		assertEquals("40.0", ((TextValue) doubleHeight.getValue()).getValue());
 	}

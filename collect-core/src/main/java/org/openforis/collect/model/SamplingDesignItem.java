@@ -41,6 +41,12 @@ public class SamplingDesignItem {
 		return new Coordinate(x, y, srsId);
 	}
 	
+	public void setCoordinate(Coordinate c) {
+		this.x = c.getX();
+		this.y = c.getY();
+		this.srsId = c.getSrsId();
+	}
+	
 	public Integer getId() {
 		return id;
 	}
@@ -113,5 +119,4 @@ public class SamplingDesignItem {
 	public String toString() {
 		return levelCodes + " srsId=" + srsId +", x=" + x + ", y=" + y;
 	}
-
 }

@@ -1,9 +1,12 @@
 package org.openforis.collect.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.EntityAddChange;
@@ -42,13 +45,21 @@ public class RecordGenerator {
 	RecordUpdater recordUpdater = new RecordUpdater();
 	
 	@Transactional
-	public CollectRecord generate(int surveyId, NewRecordParameters parameters, List<String> recordKey) {
+	public CollectRecord generate(int surveyId, NewRecordParameters parameters, List<String> recordKeyValues) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		User user = userManager.loadById(parameters.getUserId());
+		List<AttributeDefinition> keyDefs = getKeyAttributeDefs(survey);
+		RecordKey recordKey = new RecordKey(keyDefs, recordKeyValues);
+		return generate(surveyId, parameters, recordKey);
+	}
+	
+	@Transactional
+	public CollectRecord generate(int surveyId, NewRecordParameters parameters, RecordKey recordKey) {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		User user = loadUser(parameters.getUserId(), parameters.getUsername());
 		
 		CollectRecord record = createRecord(survey, user);
 		
-		if (CollectionUtils.isNotEmpty(recordKey)) {
+		if (recordKey.isNotEmpty()) {
 			setRecordKeyValues(record, recordKey);
 		}
 		
@@ -66,9 +77,11 @@ public class RecordGenerator {
 		return record;
 	}
 	
-	private void addSecondLevelEntities(CollectRecord record, List<String> recordKey) {
+	private void addSecondLevelEntities(CollectRecord record, RecordKey recordKey) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		List<SamplingDesignItem> secondLevelSamplingPointItems = samplingDesignManager.loadChildItems(survey.getId(), recordKey);
+		List<AttributeDefinition> nonMeasurementKeyDefs = getNonMeasurementKeyDefs(survey);
+		List<String> keyValues = recordKey.getValues(nonMeasurementKeyDefs);
+		List<SamplingDesignItem> secondLevelSamplingPointItems = samplingDesignManager.loadChildItems(survey.getId(), keyValues);
 		List<CodeAttributeDefinition> samplingPointDataCodeAttributeDefs = findSamplingPointCodeAttributes(survey);
 		if (! secondLevelSamplingPointItems.isEmpty() && samplingPointDataCodeAttributeDefs.size() > 1) {
 			int levelIndex = 1;
@@ -84,13 +97,13 @@ public class RecordGenerator {
 		}
 	}
 	
-	private CollectSurvey setRecordKeyValues(CollectRecord record, List<String> recordKey) {
+	private CollectSurvey setRecordKeyValues(CollectRecord record, RecordKey recordKey) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		List<AttributeDefinition> keyAttributeDefs = survey.getSchema().getFirstRootEntityDefinition()
 				.getKeyAttributeDefinitions();
 		for (int i = 0; i < keyAttributeDefs.size(); i++) {
-			String keyPart = recordKey.get(i);
 			AttributeDefinition keyAttrDef = keyAttributeDefs.get(i);
+			String keyPart = recordKey.getValue(keyAttrDef.getPath());
 			Attribute<?,Value> keyAttribute = record.findNodeByPath(keyAttrDef.getPath());
 			Value value = keyAttrDef.createValue(keyPart);
 			recordUpdater.updateAttribute(keyAttribute, value);
@@ -123,32 +136,69 @@ public class RecordGenerator {
 		throw new IllegalArgumentException("Cannot find added entity in node change set");
 	}
 	
-	protected List<AttributeDefinition> getNonMeasurementKeyDefs(CollectSurvey survey) {
+	protected List<AttributeDefinition> getKeyAttributeDefs(CollectSurvey survey) {
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
-		List<AttributeDefinition> keyAttrDefs = rootEntityDef.getKeyAttributeDefinitions();
-		List<AttributeDefinition> nonMeasurementKeyAttrDefs = new ArrayList<AttributeDefinition>();
+		return rootEntityDef.getKeyAttributeDefinitions();
+	}
+	
+	protected List<AttributeDefinition> getMeasurementKeyDefs(CollectSurvey survey) {
+		List<AttributeDefinition> keyAttrDefs = getKeyAttributeDefs(survey);
+		List<AttributeDefinition> measurementKeyAttrDefs = new ArrayList<AttributeDefinition>();
 		for (AttributeDefinition keyAttrDef : keyAttrDefs) {
-			if (! survey.getAnnotations().isMeasurementAttribute(keyAttrDef)) {
-				nonMeasurementKeyAttrDefs.add(keyAttrDef);
+			if (survey.getAnnotations().isMeasurementAttribute(keyAttrDef)) {
+				measurementKeyAttrDefs.add(keyAttrDef);
 			}
 		}
-		return nonMeasurementKeyAttrDefs;
+		return measurementKeyAttrDefs;
+	}
+
+	protected List<AttributeDefinition> getNonMeasurementKeyDefs(CollectSurvey survey) {
+		List<AttributeDefinition> keyAttrDefs = getKeyAttributeDefs(survey);
+		List<AttributeDefinition> measurementKeyDefs = getMeasurementKeyDefs(survey);
+		List<AttributeDefinition> result = new ArrayList<AttributeDefinition>(keyAttrDefs);
+		Iterator<AttributeDefinition> it = result.iterator();
+		while(it.hasNext()) {
+			AttributeDefinition keyDef = it.next();
+			if (measurementKeyDefs.contains(keyDef)) {
+				it.remove();
+			}
+		}
+		return result;
+	}
+	
+	protected User loadUser(Integer userId, String username) {
+		if (userId != null) {
+			return userManager.loadById(userId);
+		} else if (username != null) {
+			return userManager.loadByUserName(username);
+		} else {
+			return null;
+		}
 	}
 	
 	public static class NewRecordParameters {
 		
-		private int userId;
+		private String username;
+		private Integer userId;
 		private String rootEntityName;
 		private String versionName;
 		private boolean addSecondLevelEntities = false;
 		private boolean onlyUnanalyzedSamplingPoints = false;
-		private List<String> recordKey;
+		private List<String> recordKey = new ArrayList<String>();
 
-		public int getUserId() {
+		public String getUsername() {
+			return username;
+		}
+		
+		public void setUsername(String username) {
+			this.username = username;
+		}
+		
+		public Integer getUserId() {
 			return userId;
 		}
 
-		public void setUserId(int userId) {
+		public void setUserId(Integer userId) {
 			this.userId = userId;
 		}
 		
@@ -190,6 +240,68 @@ public class RecordGenerator {
 		
 		public void setRecordKey(List<String> recordKey) {
 			this.recordKey = recordKey;
+		}
+	}
+	
+	public static class RecordKey {
+		
+		private Map<String,String> valueByPath = new HashMap<String,String>();
+		
+		public RecordKey() {
+		}
+		
+		public List<String> getValues(List<AttributeDefinition> keyDefs) {
+			List<String> values = keyDefs.stream()
+					.map(keyDef -> valueByPath.get(keyDef.getPath()))
+					.collect(Collectors.toList());
+			return values;
+		}
+
+		public RecordKey(List<AttributeDefinition> keyDefs, List<String> keys) {
+			for (int i = 0; i < keyDefs.size() && i < keys.size(); i++) {
+				AttributeDefinition def = keyDefs.get(i);
+				putValue(def.getPath(), keys.get(i));
+			};
+		}
+
+		public String getValue(String path) {
+			return valueByPath.get(path);
+		}
+
+		public void putValue(String path, String value) {
+			valueByPath.put(path, value);
+		}
+		public boolean isNotEmpty() {
+			return ! valueByPath.isEmpty();
+		}
+
+		public Map<String, String> getValueByPath() {
+			return valueByPath;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((valueByPath == null) ? 0 : valueByPath.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			RecordKey other = (RecordKey) obj;
+			if (valueByPath == null) {
+				if (other.valueByPath != null)
+					return false;
+			} else if (!valueByPath.equals(other.valueByPath))
+				return false;
+			return true;
 		}
 	}
 }

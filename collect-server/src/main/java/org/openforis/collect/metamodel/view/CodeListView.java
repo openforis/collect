@@ -6,7 +6,28 @@ import java.util.List;
 public class CodeListView extends SurveyObjectView {
 	
 	private String name;
-	List<CodeListItemView> items = new ArrayList<CodeListItemView>();
+	private String label;
+	private List<CodeListItemView> items = new ArrayList<CodeListItemView>();
+	
+	public void addItem(CodeListItemView item) {
+		items.add(item);
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getLabel() {
+		return label;
+	}
+	
+	public void setLabel(String label) {
+		this.label = label;
+	}
 	
 	public List<CodeListItemView> getItems() {
 		return items;
@@ -15,12 +36,6 @@ public class CodeListView extends SurveyObjectView {
 	public void setItems(List<CodeListItemView> items) {
 		this.items = items;
 	}
+
 	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
 }

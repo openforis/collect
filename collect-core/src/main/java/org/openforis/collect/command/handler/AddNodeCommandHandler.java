@@ -22,7 +22,7 @@ public class AddNodeCommandHandler<C extends AddNodeCommand> extends NodeCommand
 	@Override
 	public List<RecordEvent> execute(C command) {
 		CollectRecord record = findRecord(command);
-		Entity parentEntity = (Entity) record.getNodeByInternalId(command.getParentEntityId());
+		Entity parentEntity = record.findNodeByPath(command.getParentEntityPath());
 		NodeDefinition nodeDef = parentEntity.getDefinition().getChildDefinition(command.getNodeDefId());
 		NodeChangeSet changeSet = recordUpdater.addNode(parentEntity, nodeDef);
 		

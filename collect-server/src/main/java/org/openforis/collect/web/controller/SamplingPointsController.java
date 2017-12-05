@@ -7,13 +7,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.LngLatAlt;
@@ -28,6 +31,7 @@ import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.idm.geospatial.CoordinateOperations;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,20 +50,25 @@ public class SamplingPointsController extends BasicController {
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
+	private CoordinateOperations coordinateOperations;
 	
 	@RequestMapping(value="api/survey/{surveyId}/sampling_point_data", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SamplingDesignItem> loadSamplingPoints(@PathVariable int surveyId, 
 			@RequestParam(value="parent_keys", required=false) List<String> parentKeys, 
-			@RequestParam(value="only_parent_item", required=false, defaultValue="false") boolean onlyParentItem) {
+			@RequestParam(value="only_parent_item", required=false, defaultValue="false") boolean onlyParentItem,
+			@RequestParam(value="srs", required=false, defaultValue=SpatialReferenceSystem.LAT_LON_SRS_ID) String targetSrsId) {
+		List<SamplingDesignItem> items;
 		if (parentKeys == null || parentKeys.isEmpty()) {
-			return samplingDesignManager.loadChildItems(surveyId);
+			items = samplingDesignManager.loadChildItems(surveyId);
 		} else if (onlyParentItem) {
 			SamplingDesignItem item = samplingDesignManager.loadItem(surveyId, parentKeys);
-			return Arrays.asList(item);
+			items = Arrays.asList(item);
 		} else {
-			return samplingDesignManager.loadChildItems(surveyId, parentKeys);
+			items = samplingDesignManager.loadChildItems(surveyId, parentKeys);
 		}
+		return convertTo(items, targetSrsId);
 	}
 	
 	@RequestMapping(value = "api/survey/{surveyId}/sampling_point_data.csv", method=GET)
@@ -174,6 +183,28 @@ public class SamplingPointsController extends BasicController {
 		}
 	}
 	
+	private List<SamplingDesignItem> convertTo(List<SamplingDesignItem> items, String targetSrsId) {
+		return items.stream().map(item -> {
+			if (targetSrsId.equals(item.getSrsId())) {
+				return item;
+			} else {
+				return convertTo(item, targetSrsId);
+			}
+		}).collect(Collectors.toList());
+	}
+
+	private SamplingDesignItem convertTo(SamplingDesignItem item, String targetSrsId) {
+		try {
+			SamplingDesignItem newItem = new SamplingDesignItem();
+			BeanUtils.copyProperties(newItem, item);
+			Coordinate newCoordinate = coordinateOperations.convertTo(item.getCoordinate(), targetSrsId);
+			newItem.setCoordinate(newCoordinate);
+			return newItem;
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private static class Bounds {
 		
 		private LngLatAlt topRight;

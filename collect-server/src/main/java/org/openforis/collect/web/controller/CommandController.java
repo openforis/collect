@@ -64,6 +64,17 @@ public class CommandController {
 		return toView(events);
 	}
 	
+	@RequestMapping(value="record/attributes", method=POST, consumes=APPLICATION_JSON_VALUE)
+	@Transactional
+	public @ResponseBody List<RecordEventView> addOrUpdateAttributes(@RequestBody UpdateAttributesCommandWrapper commandsWrapper) {
+		List<RecordEvent> events = new ArrayList<RecordEvent>(); 
+		commandsWrapper.commands.forEach(c -> {
+			UpdateAttributeCommand command = c.toCommand();
+			events.addAll(commandDispatcher.submit(command));
+		});
+		return toView(events);
+	}
+	
 	@RequestMapping(value="record/attribute", method=PATCH, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> updateAttribute(@RequestBody UpdateAttributeCommandWrapper commandWrapper) {
@@ -111,6 +122,19 @@ public class CommandController {
 			return event;
 		}
 		
+	}
+	
+	static class UpdateAttributesCommandWrapper {
+		
+		List<UpdateAttributeCommandWrapper> commands = new ArrayList<UpdateAttributeCommandWrapper>();
+		
+		public List<UpdateAttributeCommandWrapper> getCommands() {
+			return commands;
+		}
+		
+		public void setCommands(List<UpdateAttributeCommandWrapper> commands) {
+			this.commands = commands;
+		}
 	}
 	
 	static class UpdateAttributeCommandWrapper extends UpdateAttributeCommand {

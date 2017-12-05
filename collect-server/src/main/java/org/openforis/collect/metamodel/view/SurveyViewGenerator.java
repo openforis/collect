@@ -11,6 +11,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -48,12 +49,13 @@ public class SurveyViewGenerator {
 			CodeListView codeListView = new CodeListView();
 			codeListView.setId(codeList.getId());
 			codeListView.setName(codeList.getName());
+			codeListView.setLabel(codeList.getLabel(CodeListLabel.Type.ITEM, languageCode));
 
 			if (includeCodeListValues && ! codeList.isExternal()) {
 				CodeListService service = survey.getContext().getCodeListService();
 				List<CodeListItem> items = service.loadRootItems(codeList);
 				for (CodeListItem item : items) {
-					codeListView.items.add(createCodeListItemView(item));
+					codeListView.addItem(createCodeListItemView(item));
 				}
 			}
 			surveyView.addCodeList(codeListView);

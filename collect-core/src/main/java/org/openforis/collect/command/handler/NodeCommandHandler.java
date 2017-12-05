@@ -33,8 +33,7 @@ public abstract class NodeCommandHandler<C extends NodeCommand> implements Comma
 	}
 
 	protected Attribute<?, Value> findAttribute(NodeCommand command, CollectRecord record) {
-		@SuppressWarnings("unchecked")
-		Attribute<?,Value> attribute = (Attribute<?, Value>) record.getNodeByInternalId(command.getNodeId());
+		Attribute<?,Value> attribute = record.findNodeByPath(command.getNodePath());
 		return attribute;
 	}
 
@@ -46,7 +45,7 @@ public abstract class NodeCommandHandler<C extends NodeCommand> implements Comma
 	
 	protected Entity findParentEntity(NodeCommand command) {
 		CollectRecord record = findRecord(command);
-		Entity parentEntity = (Entity) record.getNodeByInternalId(command.getParentEntityId());
+		Entity parentEntity = record.findNodeByPath(command.getParentEntityPath());
 		return parentEntity;
 	}
 

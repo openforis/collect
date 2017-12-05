@@ -27,25 +27,28 @@ public class NodeProxy implements Proxy {
 	protected transient ProxyContext context;
 	
 	public static NodeProxy fromNode(Node<?> node, ProxyContext context) {
-		if (node instanceof Attribute<?, ?>) {
-			return new AttributeProxy(null, (Attribute<?, ?>) node, context);
-		} else if (node instanceof Entity) {
-			return new EntityProxy(null, (Entity) node, context);
-		}
-		return null;
+		return fromNode(null, node, context);
 	}
 	
-	public NodeProxy(EntityProxy parent, Node<?> node, ProxyContext context) {
-		super();
-		this.node = node;
-		this.context = context;
+	public static NodeProxy fromNode(EntityProxy parent, Node<?> node, ProxyContext context) {
+		if (node instanceof Attribute<?, ?>) {
+			if(node instanceof CodeAttribute) {
+				return new CodeAttributeProxy(parent, (CodeAttribute) node, context);
+			} else {
+				return new AttributeProxy(parent, (Attribute<?, ?>) node, context);
+			}
+		} else if (node instanceof Entity) {
+			return new EntityProxy(parent, (Entity) node, context);
+		} else {
+			throw new IllegalArgumentException("Unsupported node type: " + node.getClass().getName());
+		}
 	}
-
+	
 	public static List<NodeProxy> fromList(EntityProxy parent, List<Node<?>> list, ProxyContext context) {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		if(list != null) {
 			for (Node<?> node : list) {
-				NodeProxy proxy;
+				NodeProxy proxy = fromNode(node, context);
 				if(node instanceof Attribute<?, ?>) {
 					if(node instanceof CodeAttribute) {
 						proxy = new CodeAttributeProxy(parent, (CodeAttribute) node, context);
@@ -61,27 +64,30 @@ public class NodeProxy implements Proxy {
 		return result;
 	}
 	
+	public NodeProxy(EntityProxy parent, Node<?> node, ProxyContext context) {
+		super();
+		this.node = node;
+		this.context = context;
+	}
+
 	@ExternalizedProperty
 	public Integer getId() {
 		return node.getInternalId();
 	}
-
+	
 	@ExternalizedProperty
 	public Integer getDefinitionId() {
-		if(node.getDefinition() == null) {
-			return null;
-		} else {
-			return node.getDefinition().getId();
-		}
+		return node.getDefinition() == null ? null : node.getDefinition().getId();
 	}
 	
 	@ExternalizedProperty
+	public String getPath() {
+		return node.getPath();
+	}
+
+	@ExternalizedProperty
 	public Integer getParentId() {
-		if(node.getParent() == null) {
-			return null;
-		} else {
-			return node.getParent().getInternalId();
-		}
+		return node.getParent() == null ? null : node.getParent().getInternalId();
 	}
 	
 	@ExternalizedProperty

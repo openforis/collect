@@ -60,11 +60,11 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 		super.initialize();
 		try {
 			CRS_BY_SRS_ID.put(WGS84_SRS_ID, WGS84);
-			CoordinateReferenceSystem webMercatorCrs = CRS.decode(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
-			CRS_BY_SRS_ID.put(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, webMercatorCrs);
+			CoordinateReferenceSystem webMercatorCrs = CRS.decode(SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
+			CRS_BY_SRS_ID.put(SpatialReferenceSystem.WEB_MERCATOR_SRS_ID, webMercatorCrs);
 			
-			getOrCreateTransform(SpatialReferenceSystem.WGS84_SRS_ID, SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
-			getOrCreateTransform(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, SpatialReferenceSystem.WGS84_SRS_ID);
+			getOrCreateTransform(SpatialReferenceSystem.WGS84_SRS_ID, SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
+			getOrCreateTransform(SpatialReferenceSystem.WEB_MERCATOR_SRS_ID, SpatialReferenceSystem.WGS84_SRS_ID);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled()) {
 				LOG.error("Error while initializing CoordinateOperations", e);
@@ -216,9 +216,9 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 				latLonTransform = findToWGS84MathTransform(crs);
 				transformCache.put(srsId, SpatialReferenceSystem.WGS84_SRS_ID, latLonTransform);
 				
-				CoordinateReferenceSystem webMarcatorCrs = CRS_BY_SRS_ID.get(SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
+				CoordinateReferenceSystem webMarcatorCrs = CRS_BY_SRS_ID.get(SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
 				MathTransform webMarcatorTransform = CRS.findMathTransform(crs, webMarcatorCrs);
-				transformCache.put(srsId, SpatialReferenceSystem.WEB_MARCATOR_SRS_ID, webMarcatorTransform);
+				transformCache.put(srsId, SpatialReferenceSystem.WEB_MERCATOR_SRS_ID, webMarcatorTransform);
 				
 				CRS_BY_SRS_ID.put(srsId, crs);
 			} catch (Exception e) {
@@ -247,11 +247,11 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 	}
 	
 	public Coordinate convertToWebMarcator(Coordinate coordinate) {
-		return convert(coordinate.getX(), coordinate.getY(), coordinate.getSrsId(), SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
+		return convert(coordinate.getX(), coordinate.getY(), coordinate.getSrsId(), SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
 	}
 	
 	public Coordinate fromLatLonToWebMarcator(double lat, double lon) {
-		return convert(lon, lat, SpatialReferenceSystem.WGS84_SRS_ID, SpatialReferenceSystem.WEB_MARCATOR_SRS_ID);
+		return convert(lon, lat, SpatialReferenceSystem.WGS84_SRS_ID, SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
 	}
 
 	private Coordinate convert(double x, double y, String fromSrsId, String toSrsId) {

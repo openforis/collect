@@ -186,8 +186,7 @@ public class RecordController extends BasicController implements Serializable {
 			@PathVariable("surveyId") int surveyId,
 			@Valid RecordSummarySearchParameters params) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		Integer userId = params.getUserId();
-		User user = userId == null ? null : userManager.loadById(userId);
+		User user = loadUser(params.getUserId(), params.getUsername());
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		Schema schema = survey.getSchema();
@@ -290,6 +289,9 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody
 	RecordProxy newRecord(@PathVariable("surveyId") int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
 		User user = sessionManager.getLoggedUser();
+		if (user == null) {
+			user = loadUser(params.getUserId(), params.getUsername());
+		}
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName()));
 		params.setVersionName(ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null));
@@ -298,6 +300,14 @@ public class RecordController extends BasicController implements Serializable {
 		return toProxy(record);
 	}
 	
+	@Transactional
+	@RequestMapping(value = "survey/{surveyId}/data/records/random", method=POST, consumes=APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	RecordProxy createRandomRecord(@PathVariable("surveyId") int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
+		CollectRecord record = randomRecordGenerator.generate(surveyId, params);
+		return toProxy(record);
+	}
+
 	@RequestMapping(value = "survey/{surveyId}/data/records", method=DELETE, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	Response deleteRecord(@PathVariable("surveyId") int surveyId, @Valid RecordDeleteParameters params) throws RecordPersistenceException {
@@ -389,14 +399,6 @@ public class RecordController extends BasicController implements Serializable {
 			steps[i] = Step.valueOf(stepNames[i]);
 		}
 		return steps;
-	}
-
-	@Transactional
-	@RequestMapping(value = "survey/{surveyId}/data/records/random", method=POST, consumes=APPLICATION_JSON_VALUE)
-	public @ResponseBody
-	RecordProxy createRandomRecord(@PathVariable("surveyId") int surveyId, @RequestBody NewRecordParameters params) throws RecordPersistenceException {
-		CollectRecord record = randomRecordGenerator.generate(surveyId, params);
-		return toProxy(record);
 	}
 
 	@RequestMapping(value = "survey/{survey_id}/data/records/{record_id}/steps/{step}/csv_content.zip", method=GET, produces=MediaTypes.ZIP_CONTENT_TYPE)
@@ -584,6 +586,16 @@ public class RecordController extends BasicController implements Serializable {
 		eventQueue.publish(new RecordTransaction(surveyName, record.getId(), recordStep, events));
 	}
 
+	private User loadUser(Integer userId, String username) {
+		if (userId != null) {
+			return userManager.loadById(userId);
+		} else if (username != null) {
+			return userManager.loadByUserName(username);
+		} else {
+			return null;
+		}
+	}
+
 	public static class SearchParameters {
 		
 		private int offset;
@@ -608,6 +620,7 @@ public class RecordController extends BasicController implements Serializable {
 	
 	public static class RecordSummarySearchParameters extends SearchParameters {
 		
+		private String username;
 		private Integer userId;
 		private String rootEntityName;
 		private List<RecordSummarySortField> sortFields;
@@ -617,6 +630,14 @@ public class RecordController extends BasicController implements Serializable {
 		private String[] summaryValues;
 		private boolean fullSummary = false;
 
+		public String getUsername() {
+			return username;
+		}
+		
+		public void setUsername(String username) {
+			this.username = username;
+		}
+		
 		public Integer getUserId() {
 			return userId;
 		}

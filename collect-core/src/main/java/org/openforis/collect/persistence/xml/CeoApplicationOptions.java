@@ -14,11 +14,8 @@ public class CeoApplicationOptions implements ApplicationOptions {
 	private List<String> imagery = new ArrayList<String>();
 	private List<Coordinate> aoiBoundary;
 	private SamplingPointGenerationSettings samplingPointGenerationSettings;
-
 	private String stackingProfile;
-
 	private Integer imageryYear;
-
 	private String baseMapSource;
 	
 	@Override
