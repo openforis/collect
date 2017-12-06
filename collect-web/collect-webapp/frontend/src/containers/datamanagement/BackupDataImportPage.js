@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { Button, Form, FormGroup, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
-import Dropzone from 'react-dropzone';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
-import * as Formatters from 'components/datatable/formatters'
+import Dropzone from 'components/Dropzone';
 import BackupDataImportSummaryForm from 'components/datamanagement/BackupDataImportSummaryForm'
 import ServiceFactory from 'services/ServiceFactory'
 import Arrays from 'utils/Arrays'
 import RouterUtils from 'utils/RouterUtils'
+import L from 'utils/Labels';
 import * as JobActions from 'actions/job';
 
 class BackupDataImportPage extends Component {
@@ -48,8 +46,8 @@ class BackupDataImportPage extends Component {
         .then(job => {
             this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id, 
-                title: 'Generating data import summary',
-                okButtonLabel: 'Done',                        
+                title: L.l('dataManagement.backupDataImport.generatingDataImportSummary'),
+                okButtonLabel: L.l('global.done'),                        
                 handleJobCompleted: this.handleRecordSummaryGenerationComplete
             }))
         })
@@ -101,8 +99,8 @@ class BackupDataImportPage extends Component {
             true).then(job => {
                 this.props.dispatch(JobActions.startJobMonitor({
                     jobId: job.id, 
-                    title: 'Importing data',
-                    okButtonLabel: 'Done',                        
+                    title: L.l('dataManagement.backupDataImport.importingData'),
+                    okButtonLabel: L.l('global.done'),
                     handleOkButtonClick: this.handleDataImportCompleteOkButtonClick
                 }))
             })
@@ -117,32 +115,29 @@ class BackupDataImportPage extends Component {
         if (survey == null) {
             return <div>Select a survey first</div>
         }
-
+        const acceptedFileTypesDescription = L.l('dataManagement.backupDataImport.acceptedFileTypesDescription')
+        
         switch(this.state.importStep) {
             case BackupDataImportPage.SELECT_PARAMETERS:
                 return (
-                <Form>
-                    <FormGroup row>
-                        <Label for="file">File:</Label>
-                        <Col sm={10}>
-                            <Dropzone accept=".collect-backup,.collect-data,.zip" onDrop={(files) => this.onFileDrop(files)} style={{
-                                width: '100%', height: '200px', 
-                                borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
-                                borderStyle: 'dashed', borderRadius: '5px'
-                            }}>
-                            {this.state.fileToBeImportedPreview ?
-                                <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.state.fileToBeImportedPreview}</p>
-                                : <p>Click to select a .collect-backup or .collect-data file or drop it here.</p>
-                            }
-                            </Dropzone>
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                        <Col sm={{offset: 5, size: 2}} colSpan={2}>
-                            <Button disabled={! this.state.fileSelected} onClick={this.handleGenerateSummaryButtonClick} className="btn btn-success">Generate Import Summary</Button>
-                        </Col>
-                    </FormGroup>
-                </Form>
+                    <Form>
+                        <FormGroup row>
+                            <Col sm={12}>
+                                <Dropzone 
+                                    acceptedFileTypes={'.collect-backup,.collect-data,.zip'}
+                                    acceptedFileTypesDescription={acceptedFileTypesDescription}
+                                    handleFilesDrop={this.onFileDrop}
+                                    height="300px"
+                                    fileToBeImportedPreview={this.state.fileToBeImportedPreview} />
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Col sm={{offset: 5, size: 2}} colSpan={2}>
+                                <Button disabled={! this.state.fileSelected} onClick={this.handleGenerateSummaryButtonClick} 
+                                className="btn btn-success">{L.l('dataManagement.backupDataImport.generateImportSummary')}</Button>
+                            </Col>
+                        </FormGroup>
+                    </Form>
                 )
             case BackupDataImportPage.SHOW_IMPORT_SUMMARY:
                 return (
@@ -158,11 +153,13 @@ class BackupDataImportPage extends Component {
                             />
                         <Row>
                             <Col sm={{offset: 5, size: 2}} colSpan={2}>
-                                <Button onClick={this.handleImportButtonClick} className="btn btn-success">Import</Button>
+                                <Button onClick={this.handleImportButtonClick} className="btn btn-success">{L.l('global.import.label')}</Button>
                             </Col>
                         </Row>
                     </FormGroup>
                 )
+            default: 
+                throw new Error('Import step not supported: ' + this.state.importStep)
         }
     }
 }
