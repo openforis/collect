@@ -118,6 +118,16 @@ public class CollectRecord extends Record {
 			}
 		}
 		
+		public List<Step> getPreviousSteps() {
+			List<Step> result = new ArrayList<Step>();
+			for (Step s : Step.values()) {
+				if (s.beforeEqual(this)) {
+					result.add(s);
+				}
+			}
+			return result;
+		}
+		
 		public boolean before(Step step) {
 			return this.compareTo(step) < 0;
 		}

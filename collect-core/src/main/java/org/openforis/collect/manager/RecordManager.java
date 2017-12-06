@@ -214,7 +214,9 @@ public class RecordManager {
 			for (RecordStepOperation operation : operations) {
 				CollectRecord record = operation.getRecord();
 				if (operation.isNewRecord()) {
-					nextId = nextId();
+					if (nextId == null) {
+						nextId = nextId();
+					}
 					recordOperations.initializeRecordId(nextId ++);
 					queries.addAll(createNewRecordInsertQueries(record));
 				} else if (operation.isNewStep()) {

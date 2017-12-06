@@ -5,7 +5,6 @@ import static org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy.OV
 import static org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy.OVERWRITE_OLDER;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -141,12 +140,7 @@ public class RecordOperationGenerator {
 
 	private void insertRecordDataUntilStep(RecordOperations operations,
 			CollectRecord record, Step untilStep) {
-		List<Step> previousSteps = new ArrayList<Step>();
-		for (Step s : Step.values()) {
-			if (s.beforeEqual(untilStep)) {
-				previousSteps.add(s);
-			}
-		}
+		List<Step> previousSteps = untilStep.getPreviousSteps();
 		int dataStepSequenceNumber = 1;
 		for (Step s : previousSteps) {
 			record.setStep(s);
