@@ -130,11 +130,17 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		return user;
 	}
 	
+	@Override
+	public boolean verifyPassword(String username, String password) {
+		User user = userDao.loadByUserName(username, true);
+		String encodedPassword = encodePassword(password);
+		return user.getPassword().equals(encodedPassword);
+	}
+	
 	@Transactional
 	public OperationResult changePassword(String username, String oldPassword, String newPassword) throws UserPersistenceException {
-		User user = userDao.loadByUserName(username, true);
-		String encodedOldPassword = encodePassword(oldPassword);
-		if ( user.getPassword().equals(encodedOldPassword) ) {
+		if (verifyPassword(username, oldPassword)) {
+			User user = userDao.loadByUserName(username, true);
 			String encodedNewPassword = checkAndEncodePassword(newPassword);
 			user.setPassword(encodedNewPassword);
 			userDao.update(user);

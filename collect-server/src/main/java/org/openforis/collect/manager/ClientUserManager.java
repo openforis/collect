@@ -71,6 +71,16 @@ public class ClientUserManager extends AbstractClient implements UserManager  {
 	}
 
 	@Override
+	public boolean verifyPassword(String username, String password) {
+		@SuppressWarnings({ "serial", "unchecked" })
+		Map<String, Object> result = post(getUsersRestfulApiUrl() + "/login", new HashMap<String, Object>(){{
+			put("username", username);
+			put("rawPassword", password);
+		}}, Map.class);
+		return (Boolean) result.get("success");
+	}
+	
+	@Override
 	@SuppressWarnings("serial")
 	public OperationResult changePassword(final String username, final String oldPassword, final String newPassword) throws UserPersistenceException {
 		OperationResult result = post(getUsersRestfulApiUrl() + "/change-password", new HashMap<String, Object>(){{
@@ -83,12 +93,7 @@ public class ClientUserManager extends AbstractClient implements UserManager  {
 
 	@Override
 	public Boolean isDefaultAdminPasswordSet() {
-		@SuppressWarnings({ "serial", "unchecked" })
-		Map<String, Object> result = post(getUsersRestfulApiUrl() + "/login", new HashMap<String, Object>(){{
-			put("username", ADMIN_USER_NAME);
-			put("rawPassword", ADMIN_DEFAULT_PASSWORD);
-		}}, Map.class);
-		return (Boolean) result.get("success");
+		return verifyPassword(ADMIN_USER_NAME, ADMIN_DEFAULT_PASSWORD);
 	}
 
 	@Override

@@ -2,12 +2,20 @@ import Constants from 'utils/Constants'
 
 export default class RouterUtils {
 
-    static navigateToHomePage() {
-        window.location.assign(Constants.BASE_URL)
+    static navigateToHomePage(history) {
+        if (history) {
+            RouterUtils._navigateToUrl(history, '')
+        } else {
+            window.location.assign(Constants.BASE_URL)
+        }
     }
 
     static navigateToLoginPage(logout = false) {
         window.location.assign(Constants.BASE_URL + 'login?logout=true')
+    }
+
+    static navigateToPasswordChangePage(history) {
+        RouterUtils._navigateToUrl(history, '/users/changepassword')
     }
 
     static navigateToDataManagementHomePage(history) {

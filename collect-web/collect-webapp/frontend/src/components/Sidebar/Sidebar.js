@@ -4,13 +4,17 @@ import { connect } from 'react-redux'
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 import VersionInfo from 'components/VersionInfo'
+import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels';
+import RouterUtils from 'utils/RouterUtils'
 
 class Sidebar extends Component {
 
   constructor(props) {
     super(props)
     this.handleNavDropdownClick = this.handleNavDropdownClick.bind(this)
+    this.handleLogoutClick = this.handleLogoutClick.bind(this)
+    this.handleChangePasswordClick = this.handleChangePasswordClick.bind(this)    
   }
 
   handleNavDropdownClick(e) {
@@ -22,7 +26,14 @@ class Sidebar extends Component {
     return this.props.location.pathname.indexOf(routeName) > -1 ? 'nav-item nav-dropdown open' : 'nav-item nav-dropdown';
   }
 
-  // secondLevelActive(routeName) {
+  handleChangePasswordClick() {
+    RouterUtils.navigateToPasswordChangePage(this.props.history)
+  }
+
+  handleLogoutClick() {
+    ServiceFactory.sessionService.invalidate().then(r => RouterUtils.navigateToLoginPage(true))
+  }
+      // secondLevelActive(routeName) {
   //   return this.props.location.pathname.indexOf(routeName) > -1 ? "nav nav-second-level collapse in" : "nav nav-second-level collapse";
   // }
 
@@ -95,7 +106,7 @@ class Sidebar extends Component {
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-right">
                 <DropdownItem header className="text-center"><strong>{L.l('general.account')}</strong></DropdownItem>
-                <DropdownItem><i className="fa fa-user"></i> {L.l('account.change-password')}</DropdownItem>
+                <DropdownItem onClick={this.handleChangePasswordClick}><i className="fa fa-user"></i> {L.l('account.change-password')}</DropdownItem>
                 <DropdownItem onClick={this.handleLogoutClick}><i className="fa fa-lock"></i> {L.l('account.logout')}</DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>

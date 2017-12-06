@@ -25,6 +25,7 @@ import SurveyImportPage from './containers/surveydesigner/SurveyImportPage';
 import UsersPage from 'containers/users/UsersPage'
 import UserGroupsPage from 'containers/users/UserGroupsPage'
 import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
+import PasswordChangePage from 'containers/users/PasswordChangePage'
 
 import Routes from 'Routes'
 
@@ -58,6 +59,7 @@ class App extends Component {
                   <Route path="/surveydesigner/surveys/:id" exact name="SurveyEdit" component={SurveyEditPage}/>
                   <Route path="/surveydesigner/surveys/export/:id" exact name="SurveyExport" component={SurveyExportPage}/>
                   <Route path="/users" exact name="Users" component={UsersPage}/>
+                  <Route path="/users/changepassword" exact name="ChangePassword" component={PasswordChangePage}/>
                   <Route path="/usergroups" exact name="User Groups" component={UserGroupsPage}/>
                   <Route path="/usergroups/:id" name="User Group" component={UserGroupDetailsPage}/>
                 </Switch>

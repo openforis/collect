@@ -2,6 +2,8 @@ package org.openforis.collect.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.web.controller.UserController.UserForm;
+import org.openforis.collect.web.validator.PasswordChangeValidator;
 import org.openforis.collect.web.validator.UserValidator;
 import org.openforis.commons.web.PersistedObjectForm;
 import org.openforis.commons.web.Response;
@@ -21,12 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * 
@@ -35,7 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 @RequestMapping("/api/user")
-@Scope(WebApplicationContext.SCOPE_SESSION)
+@Scope(SCOPE_SESSION)
 public class UserController extends AbstractPersistedObjectEditFormController<User, UserForm, UserManager> {
 	
 	@Autowired
@@ -43,11 +46,17 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 	@Autowired
 	private SessionManager sessionManager;
 	@Autowired
-	private UserValidator validator;
+	private UserValidator userValidator;
+	@Autowired
+	private PasswordChangeValidator passwordChangeValidator;
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-		binder.setValidator(validator);
+		if (binder.getTarget() instanceof User) {
+			binder.setValidator(userValidator);
+		} else if (binder.getTarget() instanceof PasswordChangeParameters) {
+			binder.setValidator(passwordChangeValidator);
+		}
 	}
 	
 	@RequestMapping(value = "{userId}/surveys/summaries.json", method=GET)
@@ -77,6 +86,22 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 		}
 		return new Response();
 	}
+	
+	@RequestMapping(value="validatepasswordchange", method=POST)
+	public @ResponseBody Response validatePasswordChangeParameters(@Valid PasswordChangeParameters params, 
+			BindingResult result) {
+		return generateFormValidationResponse(result);
+	}
+	
+	@Transactional
+	@RequestMapping(value="changepassword", method=POST)
+	public @ResponseBody Response changePassword(@Valid PasswordChangeParameters params,
+			BindingResult bindingResult) throws Exception {
+		String username = getLoggedUser().getUsername();
+		itemManager.changePassword(username, params.getOldPassword(), params.getNewPassword());
+		return new Response();
+	}
+	
 
 	@Override
 	protected UserForm createFormInstance(User item) {
@@ -161,6 +186,37 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 			return retypedPassword;
 		}
 
+		public void setRetypedPassword(String retypedPassword) {
+			this.retypedPassword = retypedPassword;
+		}
+	}
+	
+	public static class PasswordChangeParameters {
+		
+		private String oldPassword;
+		private String newPassword;
+		private String retypedPassword;
+
+		public String getOldPassword() {
+			return oldPassword;
+		}
+
+		public void setOldPassword(String oldPassword) {
+			this.oldPassword = oldPassword;
+		}
+
+		public String getNewPassword() {
+			return newPassword;
+		}
+
+		public void setNewPassword(String newPassword) {
+			this.newPassword = newPassword;
+		}
+
+		public String getRetypedPassword() {
+			return retypedPassword;
+		}
+		
 		public void setRetypedPassword(String retypedPassword) {
 			this.retypedPassword = retypedPassword;
 		}

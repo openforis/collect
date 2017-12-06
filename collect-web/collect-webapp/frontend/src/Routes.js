@@ -96,6 +96,10 @@ const routes = [
     name: "Users"
   },
   {
+    path: '/users/changepassword',
+    name: "Change Password"
+  },
+  {
     path: '/usergroups',
     name: "User Groups"
   },

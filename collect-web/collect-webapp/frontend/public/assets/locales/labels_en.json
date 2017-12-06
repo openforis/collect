@@ -123,11 +123,17 @@
         "enabled": "Enabled",
         "role": "Role",
         "rawPassword": "Password",
+        "oldPassword": "Old password",
+        "newPassword": "New password",
         "retypedPassword": "Retype-password",
         "validation": {
             "invalid_username": "The username's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers, underscore (_), hyphen (-) and dot (.) may be used.",
             "wrong_password_pattern": "The password's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers and the underscore may be used.",
-            "wrong_retyped_password": "Password and Retyped-Password do not match"
+            "wrong_retyped_password": "Password and Retyped-Password do not match",
+            "wrongPasswordSpecified": "Wrong password specified"
+        },
+        "changePassword": {
+            "change": "Change"
         }
     },
     "usergroup": {
