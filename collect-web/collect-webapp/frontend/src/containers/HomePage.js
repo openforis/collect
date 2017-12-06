@@ -13,11 +13,11 @@ class DataManagementPage extends Component {
                 <p className="lead">{L.l('home-page.introduction')}</p>
                 <hr className="my-2" />
                 {message && 
-                    <p className="lead">
+                    <div className="lead">
                         <ul>
                             <li>{message}</li>
                         </ul>
-                    </p>
+                    </div>
                 }
             </Jumbotron>    
         )
