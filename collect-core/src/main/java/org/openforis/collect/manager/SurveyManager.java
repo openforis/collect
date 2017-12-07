@@ -1270,6 +1270,7 @@ public class SurveyManager {
 
 		public void init() {
 			populate();
+			initialized = true;
 		}
 		
 		private void populate() {
