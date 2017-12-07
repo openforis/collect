@@ -26,8 +26,8 @@
 		rel="stylesheet" media="screen,projection">
 	<link href="assets/css/preloader.css" type="text/css"
 		rel="stylesheet" media="screen,projection">
-	<link href="assets/css/login-style.css" type="text/css" rel="stylesheet"
-		media="screen,projection">
+	<link href="assets/css/login-style.css?v=PROJECT_VERSION" type="text/css" 
+		rel="stylesheet" media="screen,projection">
 </head>
 
 <body>
@@ -117,9 +117,9 @@
 		src='assets/js/jquery/3.2.1/jquery-3.2.1.min.js'></script>
 	<script type="text/javascript"
 		src="assets/js/jquery/jquery-i18n-properties/1.2.0/jquery.i18n.properties.js"></script>
-	<script type="text/javascript" src="assets/js/openforis/of.js"></script>
-	<script type="text/javascript" src="assets/js/openforis/of-i18n.js"></script>
-	<script type="text/javascript" src="assets/js/sessionping.js"></script>
-	<script type="text/javascript" src="assets/js/login.js"></script>
+	<script type="text/javascript" src="assets/js/openforis/of.js?v=PROJECT_VERSION"></script>
+	<script type="text/javascript" src="assets/js/openforis/of-i18n.js?v=PROJECT_VERSION"></script>
+	<script type="text/javascript" src="assets/js/sessionping.js?v=PROJECT_VERSION"></script>
+	<script type="text/javascript" src="assets/js/login.js?v=PROJECT_VERSION"></script>
 </body>
 </html>

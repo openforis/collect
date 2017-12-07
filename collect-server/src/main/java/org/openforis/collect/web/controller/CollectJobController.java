@@ -167,7 +167,7 @@ public class CollectJobController extends BasicController {
 			return status == Status.RUNNING;
 		}
 		
-		public boolean failed() {
+		public boolean isFailed() {
 			return status == Status.FAILED;
 		}
 		

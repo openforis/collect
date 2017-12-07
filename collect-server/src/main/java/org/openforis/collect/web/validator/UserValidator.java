@@ -27,7 +27,7 @@ public class UserValidator extends SimpleValidator<UserForm> {
 	private static final String RETYPED_PASSWORD_FIELD = "retypedPassword";
 	private static final String INVALID_USERNAME_MESSAGE_KEY = "user.validation.invalid_username";
 	private static final String PASSWORD_PATTERN_MESSAGE_KEY = "user.validation.wrong_password_pattern";
-	private static final String WRONG_RETYPED_PASSWORD_MESSAGE_KEY = "user.validation.wrong_retyped_password";
+	protected static final String WRONG_RETYPED_PASSWORD_MESSAGE_KEY = "user.validation.wrong_retyped_password";
 	
 	@Autowired
 	private UserManager userManager;
@@ -55,7 +55,7 @@ public class UserValidator extends SimpleValidator<UserForm> {
 				validateRequiredField(errors, RAW_PASSWORD_FIELD);
 			}
 			if (StringUtils.isNotBlank(rawPassword)) {
-				validatePassword(errors, rawPassword);
+				validatePassword(errors, rawPassword, RAW_PASSWORD_FIELD);
 			}
 		}
 		validateRequiredField(errors, ROLE_FIELD);
@@ -65,11 +65,11 @@ public class UserValidator extends SimpleValidator<UserForm> {
 		}
 	}
 
-	private boolean validatePassword(Errors errors, String rawPassword) {
-		if (Pattern.matches(UserManager.PASSWORD_PATTERN, rawPassword)) {
+	protected static boolean validatePassword(Errors errors, String password, String passwordField) {
+		if (Pattern.matches(UserManager.PASSWORD_PATTERN, password)) {
 			return true;
 		} else {
-			errors.rejectValue(RAW_PASSWORD_FIELD, PASSWORD_PATTERN_MESSAGE_KEY);
+			errors.rejectValue(passwordField, PASSWORD_PATTERN_MESSAGE_KEY);
 			return false;
 		}
 	}

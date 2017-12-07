@@ -40,7 +40,6 @@ import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
-import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -73,7 +72,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,8 +105,8 @@ public class SurveyController extends BasicController {
 	private JobManager jobManager;
 	@Autowired
 	private SessionManager sessionManager;
-	@Autowired
-	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+//	@Autowired
+//	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 
 	//validators
 	@Autowired
@@ -382,7 +380,7 @@ public class SurveyController extends BasicController {
 		this.surveyBackupJob = null;
 		
 		String uri = params.getSurveyUri();
-		boolean skipValidation = params.isSkipValidation();
+//		boolean skipValidation = params.isSkipValidation();
 		
 		SurveySummary surveySummary = surveyManager.loadSummaryByUri(uri);
 		final CollectSurvey loadedSurvey;
@@ -484,16 +482,6 @@ public class SurveyController extends BasicController {
 		} catch (Exception e) {
 			throw new RuntimeException("Error extracting " + PLACEMARK_FILE_NAME + " from cep file", e);
 		}
-	}
-	
-	private Response generateFormValidationResponse(BindingResult result) {
-		List<ObjectError> errors = result.getAllErrors();
-		Response response = new Response();
-		if (! errors.isEmpty()) {
-			response.setErrorStatus();
-			response.addObject("errors", errors);
-		}
-		return response;
 	}
 	
 	public static class SurveyCreationParameters {

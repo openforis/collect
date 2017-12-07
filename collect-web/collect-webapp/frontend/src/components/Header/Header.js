@@ -5,27 +5,8 @@ import { withRouter } from 'react-router-dom'
 import Breadcrumb from 'components/Breadcrumb'
 import SurveySelect from 'components/SurveySelect'
 import Routes from 'Routes'
-import ServiceFactory from 'services/ServiceFactory'
-import RouterUtils from 'utils/RouterUtils'
 
 class Header extends Component {
-
-  constructor(props) {
-    super(props);
-
-    this.toggle = this.toggle.bind(this);
-    this.handleLogoutClick = this.handleLogoutClick.bind(this)
-
-    this.state = {
-      dropdownOpen: false
-    };
-  }
-
-  toggle() {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen
-    });
-  }
 
   sidebarToggle(e) {
     e.preventDefault();
@@ -45,10 +26,6 @@ class Header extends Component {
   asideToggle(e) {
     e.preventDefault();
     document.body.classList.toggle('aside-menu-hidden');
-  }
-
-  handleLogoutClick() {
-    ServiceFactory.sessionService.invalidate().then(r => RouterUtils.navigateToLoginPage(true))
   }
 
   render() {

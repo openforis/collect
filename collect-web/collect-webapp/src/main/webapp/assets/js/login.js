@@ -48,8 +48,8 @@ $(window, document, undefined).ready(function() {
 		//set input fields as 'used' if fields have been filled by browser autofill
 		setTimeout(function() {
 			if ($(document.f.username).val().length > 0) {
-				$(document.f.username).addClass('used', true);
-				$(document.f.password).addClass('used', true);
+				$(document.f.username).addClass('used');
+				$(document.f.password).addClass('used');
 			}
 		}, 500);
 		

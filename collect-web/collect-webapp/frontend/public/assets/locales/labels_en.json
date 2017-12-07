@@ -14,10 +14,14 @@
         "save": {
             "success": "Saved successfully"
         },
+        "import": {
+            "label": "Import"
+        },
         "export": {
             "label": "Export"
         },
-        "selectOne": "--- Select one ---"
+        "selectOne": "--- Select one ---",
+        "done": "Done"        
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
@@ -76,6 +80,12 @@
                 "fileNotSelected": "Please select a file to import",
                 "entityNotSelected": "Please select an entity to import data into"
             }
+        },
+        "backupDataImport": {
+            "acceptedFileTypesDescription": "Collect Backup (.collect-backup), Collect Data (.collect-data), Collect Earth XML data (.zip)",
+            "generateImportSummary": "Generate Import Summary",
+            "generatingDataImportSummary": "Generating data import summary",
+            "importingData": "Importing data"
         }
     },
     "survey": {
@@ -123,11 +133,17 @@
         "enabled": "Enabled",
         "role": "Role",
         "rawPassword": "Password",
+        "oldPassword": "Old password",
+        "newPassword": "New password",
         "retypedPassword": "Retype-password",
         "validation": {
             "invalid_username": "The username's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers, underscore (_), hyphen (-) and dot (.) may be used.",
             "wrong_password_pattern": "The password's first character must be a letter, it must contain at least 4 characters and no more than 15 characters and no characters other than letters, numbers and the underscore may be used.",
-            "wrong_retyped_password": "Password and Retyped-Password do not match"
+            "wrong_retyped_password": "Password and Retyped-Password do not match",
+            "wrongPasswordSpecified": "Wrong password specified"
+        },
+        "changePassword": {
+            "change": "Change"
         }
     },
     "usergroup": {

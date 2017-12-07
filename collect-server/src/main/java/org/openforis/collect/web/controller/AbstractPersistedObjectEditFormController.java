@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 public abstract class AbstractPersistedObjectEditFormController<T extends PersistedObject, 
 											F extends PersistedObjectForm<T>, 
-											M extends ItemManager<T, Integer>> {
+											M extends ItemManager<T, Integer>> extends BasicController {
 	
 	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate", "uuid"};
 	

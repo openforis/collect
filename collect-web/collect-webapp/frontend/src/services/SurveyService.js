@@ -29,7 +29,7 @@ export default class SurveyService extends AbstractService {
         return this.post('survey/changeusergroup/' + surveyId, {
             userGroupId: userGroupId,
             loggedUserId: loggedUserId
-        }).then(res => res)
+        })
     }
     
     fetchAllSummaries() {

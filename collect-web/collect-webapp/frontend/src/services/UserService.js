@@ -21,4 +21,19 @@ export default class UserService extends AbstractService {
         return this.post('login', credentials);
     }
 
+    validatePasswordChange(oldPassword, newPassword, retypedPassword) {
+        return this.post('user/validatepasswordchange', {
+            oldPassword: oldPassword,
+            newPassword: newPassword,
+            retypedPassword:  retypedPassword
+        })
+    }
+
+    changePassword(oldPassword, newPassword) {
+        return this.post('user/changepassword', {
+            oldPassword: oldPassword,
+            newPassword: newPassword
+        })
+    }
+
 }

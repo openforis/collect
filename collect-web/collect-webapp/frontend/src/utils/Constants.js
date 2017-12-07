@@ -2,7 +2,7 @@ import Objects from 'utils/Objects'
 
 export default class Constants {
 
-    static APP_VERSION = Objects.defaultIfNull(process.env.REACT_APP_COLLECT_PROJECT_VERSION, "3.14.0-SNAPSHOT")
+    static APP_VERSION = Objects.defaultIfNull(process.env.REACT_APP_COLLECT_PROJECT_VERSION, "3.20.1-SNAPSHOT")
     static BASE_URL = Constants.determineBaseURL();
     static BASE_ASSETS_URL = Constants.determineBaseAssetsURL();
     static API_BASE_URL = Constants.BASE_URL + "api/";
