@@ -216,8 +216,8 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 				latLonTransform = findToWGS84MathTransform(crs);
 				transformCache.put(srsId, SpatialReferenceSystem.WGS84_SRS_ID, latLonTransform);
 				
-				CoordinateReferenceSystem webMarcatorCrs = CRS_BY_SRS_ID.get(SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
-				MathTransform webMarcatorTransform = CRS.findMathTransform(crs, webMarcatorCrs);
+				CoordinateReferenceSystem webMercatorCrs = CRS_BY_SRS_ID.get(SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
+				MathTransform webMarcatorTransform = CRS.findMathTransform(crs, webMercatorCrs);
 				transformCache.put(srsId, SpatialReferenceSystem.WEB_MERCATOR_SRS_ID, webMarcatorTransform);
 				
 				CRS_BY_SRS_ID.put(srsId, crs);

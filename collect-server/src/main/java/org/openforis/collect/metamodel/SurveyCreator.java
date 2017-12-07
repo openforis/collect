@@ -24,6 +24,7 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.persistence.xml.CeoApplicationOptions;
 import org.openforis.collect.utils.SurveyObjects;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -38,6 +39,7 @@ public class SurveyCreator {
 	private SurveyManager surveyManager;
 	private SamplingDesignManager samplingDesignManager;
 	private UserGroupManager userGroupManager;
+	private CoordinateOperations coordinateOperations;
 	//TODO make it configurable
 	private String languageCode = Locale.ENGLISH.getLanguage();
 	private String singleAttributeSurveyRootEntityName = "plot";
@@ -49,11 +51,12 @@ public class SurveyCreator {
 	private String singleAttributeSurveyOperatorAttributeLabel = "Operator";
 	
 	public SurveyCreator(SurveyManager surveyManager, SamplingDesignManager samplingDesignManager,
-			UserGroupManager userGroupManager) {
+			UserGroupManager userGroupManager, CoordinateOperations coordinateOperations) {
 		super();
 		this.surveyManager = surveyManager;
 		this.samplingDesignManager = samplingDesignManager;
 		this.userGroupManager = userGroupManager;
+		this.coordinateOperations = coordinateOperations;
 	}
 
 	public CollectSurvey generateSimpleSurvey(SimpleSurveyCreationParameters parameters)
@@ -81,7 +84,7 @@ public class SurveyCreator {
 		
 		surveyManager.save(survey);
 		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(coordinateOperations,
 				survey, parameters.getSamplingPointsByLevel(), samplingPointGenerationSettings);
 		List<SamplingDesignItem> items = generator.generate();
 		

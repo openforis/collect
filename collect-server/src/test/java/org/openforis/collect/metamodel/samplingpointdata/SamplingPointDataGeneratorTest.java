@@ -1,9 +1,8 @@
 package org.openforis.collect.metamodel.samplingpointdata;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-import static org.openforis.idm.metamodel.SpatialReferenceSystem.LAT_LON_SRS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.openforis.idm.metamodel.SpatialReferenceSystem.LAT_LON_SRS_ID;
 
 import java.util.ArrayList;
@@ -12,7 +11,9 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.junit.Before;
 import org.junit.Test;
+import org.openforis.collect.geospatial.GeoToolsCoordinateOperations;
 import org.openforis.collect.io.metadata.samplingpointdata.SamplingPointDataGenerator;
 import org.openforis.collect.metamodel.samplingdesign.SamplingPointGenerationSettings;
 import org.openforis.collect.metamodel.samplingdesign.SamplingPointLevelGenerationSettings;
@@ -21,11 +22,18 @@ import org.openforis.collect.metamodel.samplingdesign.SamplingPointLevelGenerati
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SamplingDesignItem;
-import org.openforis.idm.geospatial.CoordinateUtils;
 import org.openforis.idm.model.Coordinate;
 
 public class SamplingPointDataGeneratorTest {
 
+	private GeoToolsCoordinateOperations coordinateOperations;
+
+	@Before
+	public void init() {
+		coordinateOperations = new GeoToolsCoordinateOperations();
+		coordinateOperations.initialize();
+	}
+	
 	@Test
 	public void griddedPlotsGenerationTest() {
 		Coordinate topLeftCoordinate = new Coordinate(12.369192d, 41.987927d, LAT_LON_SRS_ID);
@@ -46,7 +54,7 @@ public class SamplingPointDataGeneratorTest {
 		conf.setAoiBoundary(Arrays.asList(topLeftCoordinate, topRightCoordinate, bottomLeftCoordinate, bottomRightCoordinate));
 		conf.setLevelsSettings(Arrays.asList(plotPointsConfig, samplePointsConfig));
 
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, null, conf);
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(coordinateOperations, survey, null, conf);
 		
 		List<SamplingDesignItem> items = generator.generate();
 		
@@ -86,7 +94,7 @@ public class SamplingPointDataGeneratorTest {
 		conf.setAoiBoundary(Arrays.asList(topLeftCoordinate, topRightCoordinate, bottomLeftCoordinate, bottomRightCoordinate));
 		conf.setLevelsSettings(Arrays.asList(plotPointsConfig, samplePointsConfig));
 		
-		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(survey, null, conf);
+		SamplingPointDataGenerator generator = new SamplingPointDataGenerator(coordinateOperations, survey, null, conf);
 		
 		List<SamplingDesignItem> items = generator.generate();
 		
@@ -110,9 +118,7 @@ public class SamplingPointDataGeneratorTest {
 	}
 	
 	private void assertPointInCircle(SamplingDesignItem item, Coordinate center, int radius) {
-		double distance = CoordinateUtils.distance(
-				LAT_LON_SRS, new double[]{item.getX(), item.getY()}, 
-				LAT_LON_SRS, new double[]{center.getX(), center.getY()});
+		double distance = coordinateOperations.orthodromicDistance(center, item.getCoordinate());
 		assertTrue(distance < radius);
 	}
 	

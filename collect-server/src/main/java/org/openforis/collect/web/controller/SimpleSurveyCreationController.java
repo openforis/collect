@@ -13,6 +13,7 @@ import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidator;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,8 @@ public class SimpleSurveyCreationController {
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private UserGroupManager userGroupManager;
+	@Autowired
+	private CoordinateOperations coordinateOperations;
 	
 	@Autowired
 	private SimpleSurveyCreationParametersValidator validator;
@@ -46,7 +49,7 @@ public class SimpleSurveyCreationController {
 	@RequestMapping(value="simple", method=POST)
 	public @ResponseBody
 	SurveyView createSimpleSurvey(@RequestBody SimpleSurveyCreationParameters parameters, BindingResult bindingResult) throws Exception {
-		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager, userGroupManager);
+		SurveyCreator surveyCreator = new SurveyCreator(surveyManager, samplingDesignManager, userGroupManager, coordinateOperations);
 		CollectSurvey survey = surveyCreator.generateSimpleSurvey(parameters);
 		return generateView(survey, true);
 	}
