@@ -82,7 +82,7 @@ public class DatabaseExternalCodeListProvider implements
 		int level = defn.getLevelPosition();
 		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, level);
 		filters.addAll(emptyNextLevelsFilters);
-		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new NameValueEntry[0]));
+		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new NameValueEntry[filters.size()]));
 		if ( row == null ) {
 			return null;
 		} else {

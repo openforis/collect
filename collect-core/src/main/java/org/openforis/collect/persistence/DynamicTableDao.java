@@ -8,7 +8,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,8 @@ import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
+import org.openforis.collect.persistence.utils.TableMetaData;
+import org.openforis.collect.persistence.utils.TableMetaData.ColumnMetaData;
 import org.openforis.commons.collection.Visitor;
 
 /**
@@ -149,27 +150,42 @@ public class DynamicTableDao extends JooqDaoSupport {
 	}
 
 	private void initializeTable(Lookup table) {
-		Collection<Map<String, ?>> colsMetadata = loadColumnsMetadata(table.getName());
-		table.initialize(colsMetadata);
+		TableMetaData tableMetadata = loadTableMetadata(table);
+		table.initialize(tableMetadata);
 	}
 
-	private List<Map<String, ?>> loadColumnsMetadata(String table) {
-		List<Map<String, ?>> result = new ArrayList<Map<String,?>>();
+	private TableMetaData loadTableMetadata(Lookup table) {
 		try {
 			CollectDSLContext dsl = dsl();
 			Connection connection = dsl.configuration().connectionProvider().acquire();
 			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet columnRs = metaData.getColumns(null, null, table, null);
-			while (columnRs.next()) {
-				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("COLUMN_NAME", columnRs.getString("COLUMN_NAME"));
-				map.put("DATA_TYPE", columnRs.getInt("DATA_TYPE"));
-				result.add(map);
-			}
+			String schemaName = table.getSchema().getName();
+			String tableName = table.getName();
+			return extractTableMetaData(metaData, schemaName, tableName);
 		} catch(SQLException e) {
 			throw new RuntimeException(e);
 		}
-		return result;
+	}
+
+	private TableMetaData extractTableMetaData(DatabaseMetaData metaData, String schemaName,
+			String tableName) throws SQLException {
+		ResultSet columnRs = metaData.getColumns(null, schemaName, tableName, null);
+		boolean metaDataFound = columnRs.next();
+		if (! metaDataFound) {
+			columnRs = metaData.getColumns(null, schemaName.toUpperCase(), tableName.toUpperCase(), null);
+		}
+		metaDataFound = columnRs.next();
+		if (metaDataFound) {
+			TableMetaData tableMetaData = new TableMetaData();
+			do {
+				String colName = columnRs.getString("COLUMN_NAME").toLowerCase();
+				int dataType = columnRs.getInt("DATA_TYPE");
+				tableMetaData.addColumnMetaData(new ColumnMetaData(colName, dataType));
+			} while (columnRs.next());
+			return tableMetaData;
+		} else {
+			throw new IllegalStateException(String.format("Could not extract metadata for table %s.%s", schemaName, tableName));
+		}
 	}
 
 	protected Map<String, String> parseRecord(Record record, Field<?>[] fields) {

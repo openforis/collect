@@ -4,7 +4,6 @@
 package org.openforis.collect.persistence.jooq.tables;
 
 import java.sql.Types;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +13,8 @@ import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.openforis.collect.persistence.jooq.Collect;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
+import org.openforis.collect.persistence.utils.TableMetaData;
+import org.openforis.collect.persistence.utils.TableMetaData.ColumnMetaData;
 
 /**
  * @author M. Togna
@@ -43,11 +44,11 @@ public class Lookup extends TableImpl<LookupRecord> {
 		super(name, Collect.COLLECT);
 	}
 	
-	public void initialize(Collection<Map<String, ?>> colsMetadata) {
-		for (Map<String, ?> colMetadata : colsMetadata) {
-			String colName = (String) colMetadata.get("COLUMN_NAME");
+	public void initialize(TableMetaData tableMetaData) {
+		for (ColumnMetaData colMetadata : tableMetaData.getColumnsMetaData()) {
+			String colName = colMetadata.getName();
 			if ( this.field(colName) == null ) {
-				Integer dataType = (Integer) colMetadata.get("DATA_TYPE");
+				Integer dataType = colMetadata.getDataType();
 				this.createField(colName, dataType);
 			}
 		}
