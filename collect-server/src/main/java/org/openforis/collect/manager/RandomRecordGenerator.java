@@ -87,12 +87,10 @@ public class RandomRecordGenerator extends RecordGenerator {
 		});
 		samplingDesignManager.visitItems(survey.getId(), 1, new Visitor<SamplingDesignItem>() {
 			public void visit(SamplingDesignItem item) {
-				if (item.getLevelCodes().size() == nonMeasurementKeyDefs.size()) {
-					RecordKey key = new RecordKey(nonMeasurementKeyDefs, item.getLevelCodes());
-					Integer measurements = measurementsByRecordKey.get(key);
-					if (measurements == null) {
-						measurementsByRecordKey.put(key, 0);
-					}
+				RecordKey key = new RecordKey(nonMeasurementKeyDefs, item.getLevelCodes());
+				Integer measurements = measurementsByRecordKey.get(key);
+				if (measurements == null) {
+					measurementsByRecordKey.put(key, 0);
 				}
 			}
 		});

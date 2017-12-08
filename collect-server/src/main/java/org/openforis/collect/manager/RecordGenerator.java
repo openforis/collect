@@ -57,11 +57,7 @@ public class RecordGenerator {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		User user = loadUser(parameters.getUserId(), parameters.getUsername());
 		
-		CollectRecord record = createRecord(survey, user);
-		
-		if (recordKey.isNotEmpty()) {
-			setRecordKeyValues(record, recordKey);
-		}
+		CollectRecord record = createRecord(survey, user, recordKey);
 		
 		if (parameters.isAddSecondLevelEntities()) {
 			addSecondLevelEntities(record, recordKey);
@@ -70,10 +66,13 @@ public class RecordGenerator {
 		return record;
 	}
 	
-	private CollectRecord createRecord(CollectSurvey survey, User user) {
+	private CollectRecord createRecord(CollectSurvey survey, User user, RecordKey recordKey) {
 		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
 		String rootEntityName = rootEntityDef.getName();
 		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
+		if (recordKey.isNotEmpty()) {
+			setRecordKeyValues(record, recordKey);
+		}
 		return record;
 	}
 	
@@ -101,8 +100,7 @@ public class RecordGenerator {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		List<AttributeDefinition> keyAttributeDefs = survey.getSchema().getFirstRootEntityDefinition()
 				.getKeyAttributeDefinitions();
-		for (int i = 0; i < keyAttributeDefs.size(); i++) {
-			AttributeDefinition keyAttrDef = keyAttributeDefs.get(i);
+		for (AttributeDefinition keyAttrDef : keyAttributeDefs) {
 			String keyPart = recordKey.getValue(keyAttrDef.getPath());
 			Attribute<?,Value> keyAttribute = record.findNodeByPath(keyAttrDef.getPath());
 			Value value = keyAttrDef.createValue(keyPart);
