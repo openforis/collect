@@ -13,6 +13,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.persistence.SamplingDesignDao;
+import org.openforis.commons.collection.Visitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,6 +86,10 @@ public class SamplingDesignManager {
 		return samplingDesignDao.countBySurvey(surveyId);
 	}
 
+	public void visitItems(int surveyId, Integer upToLevel, Visitor<SamplingDesignItem> visitor) {
+		samplingDesignDao.visitItems(surveyId, upToLevel, visitor);
+	}
+	
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void save(SamplingDesignItem item) {
 		if ( item.getId() == null ) {

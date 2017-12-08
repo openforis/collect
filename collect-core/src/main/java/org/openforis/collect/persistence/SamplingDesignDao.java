@@ -15,6 +15,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
+import org.jooq.Cursor;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
@@ -29,6 +30,7 @@ import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.model.Coordinate;
 
 /**
@@ -114,6 +116,26 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			.where(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId))
 			.execute();
 	}
+	
+	public void visitItems(int surveyId, Integer upToLevel, Visitor<SamplingDesignItem> visitor) {
+		SamplingDesignDSLContext dsl = dsl();
+		
+		SelectQuery<Record> q = createSelectItemsQuery(dsl, surveyId, upToLevel);
+		
+		Cursor<Record> cursor = null;
+		try {
+			cursor = q.fetchLazy();
+			while (cursor.hasNext()) {
+				Record record = cursor.fetchOne();
+				SamplingDesignItem s = dsl.fromRecord(record);
+				visitor.visit(s);
+			}
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+		    }
+		}
+	}
 
 	public List<SamplingDesignItem> loadItems(int surveyId, int offset, int maxRecords) {
 		return loadItems(surveyId, null, offset, maxRecords);
@@ -121,13 +143,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 
 	public List<SamplingDesignItem> loadItems(int surveyId, Integer upToLevel, int offset, int maxRecords) {
 		SamplingDesignDSLContext dsl = dsl();
-		SelectQuery<Record> q = dsl.selectQuery();	
-		q.addFrom(OFC_SAMPLING_DESIGN);
-		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
-		
-		addLevelKeyNullConditions(q, upToLevel);
-		
-		q.addOrderBy(OFC_SAMPLING_DESIGN.ID);
+		SelectQuery<Record> q = createSelectItemsQuery(dsl, surveyId, upToLevel);
 		//add limit
 		q.addLimit(offset, maxRecords);
 		
@@ -135,6 +151,17 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		Result<Record> result = q.fetch();
 		
 		return dsl.fromResult(result);
+	}
+
+	private SelectQuery<Record> createSelectItemsQuery(SamplingDesignDSLContext dsl, int surveyId, Integer upToLevel) {
+		SelectQuery<Record> q = dsl.selectQuery();	
+		q.addFrom(OFC_SAMPLING_DESIGN);
+		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
+		
+		addLevelKeyNullConditions(q, upToLevel);
+		
+		q.addOrderBy(OFC_SAMPLING_DESIGN.ID);
+		return q;
 	}
 
 	/**

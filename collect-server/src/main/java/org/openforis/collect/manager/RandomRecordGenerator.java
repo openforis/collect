@@ -13,7 +13,6 @@ import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SamplingDesignItem;
-import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.model.User;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -86,17 +85,17 @@ public class RandomRecordGenerator extends RecordGenerator {
 				}
 			}
 		});
-		
-		SamplingDesignSummaries samplingPoints = samplingDesignManager.loadBySurvey(survey.getId(), nonMeasurementKeyDefs.size());
-		for (SamplingDesignItem item : samplingPoints.getRecords()) {
-			if (item.getLevelCodes().size() == nonMeasurementKeyDefs.size()) {
-				RecordKey key = new RecordKey(nonMeasurementKeyDefs, item.getLevelCodes());
-				Integer measurements = measurementsByRecordKey.get(key);
-				if (measurements == null) {
-					measurementsByRecordKey.put(key, 0);
+		samplingDesignManager.visitItems(survey.getId(), 1, new Visitor<SamplingDesignItem>() {
+			public void visit(SamplingDesignItem item) {
+				if (item.getLevelCodes().size() == nonMeasurementKeyDefs.size()) {
+					RecordKey key = new RecordKey(nonMeasurementKeyDefs, item.getLevelCodes());
+					Integer measurements = measurementsByRecordKey.get(key);
+					if (measurements == null) {
+						measurementsByRecordKey.put(key, 0);
+					}
 				}
 			}
-		}
+		});
 		return measurementsByRecordKey;
 	}
 
