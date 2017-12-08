@@ -85,14 +85,12 @@ public class RandomRecordGenerator extends RecordGenerator {
 					measurementsByRecordKey.put(nonMeasurementKey, measurements);
 				}
 			}
-
 		});
-		List<AttributeDefinition> nonMeasurementKeyAttrDefs = getNonMeasurementKeyDefs(survey);
 		
-		SamplingDesignSummaries samplingPoints = samplingDesignManager.loadBySurvey(survey.getId(), nonMeasurementKeyAttrDefs.size());
+		SamplingDesignSummaries samplingPoints = samplingDesignManager.loadBySurvey(survey.getId(), nonMeasurementKeyDefs.size());
 		for (SamplingDesignItem item : samplingPoints.getRecords()) {
-			if (item.getLevelCodes().size() == nonMeasurementKeyAttrDefs.size()) {
-				RecordKey key = new RecordKey(nonMeasurementKeyAttrDefs, item.getLevelCodes());
+			if (item.getLevelCodes().size() == nonMeasurementKeyDefs.size()) {
+				RecordKey key = new RecordKey(nonMeasurementKeyDefs, item.getLevelCodes());
 				Integer measurements = measurementsByRecordKey.get(key);
 				if (measurements == null) {
 					measurementsByRecordKey.put(key, 0);

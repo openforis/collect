@@ -97,7 +97,7 @@ public class RecordGenerator {
 		}
 	}
 	
-	private CollectSurvey setRecordKeyValues(CollectRecord record, RecordKey recordKey) {
+	private void setRecordKeyValues(CollectRecord record, RecordKey recordKey) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		List<AttributeDefinition> keyAttributeDefs = survey.getSchema().getFirstRootEntityDefinition()
 				.getKeyAttributeDefinitions();
@@ -108,7 +108,6 @@ public class RecordGenerator {
 			Value value = keyAttrDef.createValue(keyPart);
 			recordUpdater.updateAttribute(keyAttribute, value);
 		}
-		return survey;
 	}
 	
 	private List<CodeAttributeDefinition> findSamplingPointCodeAttributes(final CollectSurvey survey) {

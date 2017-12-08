@@ -24,6 +24,8 @@ import org.openforis.idm.model.Coordinate;
  */
 public class SamplingPointDataGenerator {
 
+	private static final double DEFAULT_POINT_SIZE = 10;
+	
 	private CollectSurvey survey;
 	private List<List<SamplingDesignItem>> samplingPointsByLevel;
 	private SamplingPointGenerationSettings configuration;
@@ -135,14 +137,25 @@ public class SamplingPointDataGenerator {
 		case SQUARE:
 			SamplingPointLevelGenerationSettings nextLevelPointsConfiguration = levelIdx == configuration.getLevelsSettings().size() - 1 ? null :
 				configuration.getLevelsSettings().get(levelIdx + 1);
-			double pointWidth = nextLevelPointsConfiguration.getPointWidth();
-			return generateLocationsInSquare(webMercatorAoiCenter, configuration.getAoiBoundary(), 
-					pointsConfiguration.getResolution(), pointWidth);
+			Double pointWidth = nextLevelPointsConfiguration == null ? DEFAULT_POINT_SIZE : nextLevelPointsConfiguration.getPointWidth();
+			List<Coordinate> boundary = levelIdx == 0 ? configuration.getAoiBoundary() : generateSquareBoundary(latLonCenter, pointWidth);
+			return generateLocationsInSquare(webMercatorAoiCenter, boundary, pointsConfiguration);
 		default:
 			throw new IllegalArgumentException("Shape type not supported: " + pointsConfiguration.getShape());
 		}
 	}
 	
+	private List<Coordinate> generateSquareBoundary(Coordinate latLonCenter, double width) {
+		Coordinate webMercatorCenter = reprojectFromLatLonToWebMercator(latLonCenter);
+		List<Coordinate> latLonBoundary = new ArrayList<Coordinate>(4);
+		double halfWidth = width / 2;
+		latLonBoundary.add(new Coordinate(webMercatorCenter.getX() - halfWidth, webMercatorCenter.getY() + halfWidth, WEB_MERCATOR_SRS_ID));
+		latLonBoundary.add(new Coordinate(webMercatorCenter.getX() + halfWidth, webMercatorCenter.getY() + halfWidth, WEB_MERCATOR_SRS_ID));
+		latLonBoundary.add(new Coordinate(webMercatorCenter.getX() - halfWidth, webMercatorCenter.getY() - halfWidth, WEB_MERCATOR_SRS_ID));
+		latLonBoundary.add(new Coordinate(webMercatorCenter.getX() + halfWidth, webMercatorCenter.getY() - halfWidth, WEB_MERCATOR_SRS_ID));
+		return reprojectToWebMercator(latLonBoundary);
+	}
+
 	private List<Coordinate> generateLocationsInCircle(Coordinate center, double circleRadius, SamplingPointLevelGenerationSettings c) {
 		List<Coordinate> result = new ArrayList<Coordinate>(c.getNumPoints());
 		double radiusSquared = circleRadius * circleRadius;
@@ -181,7 +194,7 @@ public class SamplingPointDataGenerator {
 	}
 	
 	private List<Coordinate> generateLocationsInSquare(Coordinate webMercatorAoiCenter, List<Coordinate> aoiBoundary,
-			double resolution, double pointSize) {
+			SamplingPointLevelGenerationSettings c) {
 		List<Coordinate> result = new ArrayList<Coordinate>();
 		
 		List<Coordinate> reprojectedAoiBoundary = reprojectToWebMercator(aoiBoundary);
@@ -193,16 +206,30 @@ public class SamplingPointDataGenerator {
 			latitudes[i] = coord.getY();
 			longitudes[i] = coord.getX();
 		}
-		double pointRadius = pointSize / 2;
+		double pointRadius = c.getPointWidth() / 2;
 		double minBoundaryLatitude = NumberUtils.min(latitudes) + pointRadius;
 		double maxBoundaryLatitude = NumberUtils.max(latitudes) - pointRadius;
 		double minBoundaryLongitude = NumberUtils.min(longitudes) + pointRadius;
 		double maxBoundaryLongitude = NumberUtils.max(longitudes) - pointRadius;
-		
-		for (double lat = maxBoundaryLatitude; lat >= minBoundaryLatitude; lat -= resolution) {
-			for (double lon = minBoundaryLongitude; lon <= maxBoundaryLongitude; lon += resolution) {
-				result.add(new Coordinate(lon, lat, webMercatorAoiCenter.getSrsId()));
+
+		switch(c.getDistribution()) {
+		case RANDOM:
+			for (int i = 0; i < c.getNumPoints(); i++) {
+				double x = minBoundaryLongitude + (maxBoundaryLongitude - minBoundaryLongitude) * Math.random();
+				double y = minBoundaryLatitude + (maxBoundaryLatitude - minBoundaryLatitude) * Math.random();
+				result.add(new Coordinate(x, y,	webMercatorAoiCenter.getSrsId()));
 			}
+			break;
+		case GRIDDED:
+			for (double lat = maxBoundaryLatitude; lat >= minBoundaryLatitude; lat -= c.getResolution()) {
+				for (double lon = minBoundaryLongitude; lon <= maxBoundaryLongitude; lon += c.getResolution()) {
+					result.add(new Coordinate(lon, lat, webMercatorAoiCenter.getSrsId()));
+				}
+			}
+			break;
+		case CSV:
+			//do nothing
+			break;
 		}
 		return result;
 	}
