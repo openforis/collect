@@ -5,8 +5,8 @@ import * as Actions from 'actions';
 import * as UserActions from 'actions/users';
 import * as SurveysActions from 'actions/surveys';
 import * as SessionActions from 'actions/session';
+import Preloader from 'components/Preloader';
 import Labels from 'utils/Labels';
-import { clearInterval } from 'timers';
 
 class Startup extends Component {
     
@@ -18,10 +18,6 @@ class Startup extends Component {
         super(props)
 
         this.handleSurveysReloadTimeout = this.handleSurveysReloadTimeout.bind(this)
-    }
-
-    static propTypes = {
-        loggedUser: PropTypes.object
     }
 
     componentDidMount() {
@@ -60,13 +56,14 @@ class Startup extends Component {
 
     render() {
         const p = this.props
-        if (!p.isLoggedUserReady || p.isFetchingLoggedUser 
+        const loading = !p.isLoggedUserReady || p.isFetchingLoggedUser 
             || !p.isUsersReady || p.isFetchingUsers
-            || !p.isUserGroupsReady || p.isFetchingUserGroups ) {
-            return <p>Loading...</p>
-        } else {
-            return this.props.children
-        }
+            || !p.isUserGroupsReady || p.isFetchingUserGroups
+        return (
+            <Preloader loading={loading}>
+                {this.props.children}
+            </Preloader>
+        )
     }
 }
 

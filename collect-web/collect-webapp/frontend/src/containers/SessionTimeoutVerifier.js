@@ -3,6 +3,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress } from 're
 import { connect } from 'react-redux';
 
 import * as SessionActions from 'actions/session'
+import Preloader from 'components/Preloader'
 import ServiceFactory from 'services/ServiceFactory'
 import RouterUtils from 'utils/RouterUtils'
 
@@ -73,7 +74,7 @@ class SessionTimeoutVerifier extends Component {
 
     render() {
         if (this.state.initializing) {
-            return <div>Loading...</div>
+            return <Preloader />
         }
         const errorMessage = this.state.sessionExpired ? 'Session expired. Refresh the web browser page.': 
             'Error connecting to the server; trying to establish the connection again...'

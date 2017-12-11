@@ -184,9 +184,6 @@ class DataManagementPage extends Component {
 	}
 	
 	render() {
-		if (!this.props.loggedUser || !this.props.userGroups) {
-			return <div>Loading...</div>
-		}
 		if (!this.props.survey) {
 			return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
 		}

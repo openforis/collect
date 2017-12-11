@@ -29,13 +29,9 @@ class Header extends Component {
   }
 
   render() {
-    const { pathname } = this.props.location
-    const surveySelectRequired = Routes.isSurveySelectRequiredForPath(pathname);
-
-    const loggedUser = this.props.loggedUser
-    if (loggedUser == null) {
-      return <div>Loading...</div>
-    }
+    const { loggedUser, location } = this.props
+    const surveySelectRequired = Routes.isSurveySelectRequiredForPath(location.pathname);
+    
     return (
       <header className="app-header navbar">
         <button className="navbar-toggler mobile-sidebar-toggler d-lg-none" type="button" onClick={this.mobileSidebarToggle}>&#9776;</button>
