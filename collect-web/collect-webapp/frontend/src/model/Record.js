@@ -2,13 +2,14 @@ import Serializable from './Serializable';
 import { EntityDefinition } from './Survey';
 
 export class Record extends Serializable {
-    id;
-    survey;
-    step;
-    stepNumber;
-    rootEntity;
-    rootEntityKeys = [];
-    nodeById = [];
+    id
+    survey
+    step
+    stepNumber
+    rootEntity
+    rootEntityKeys = []
+    nodeById = []
+    owner
     
     constructor(survey, jsonData) {
         super();
@@ -36,6 +37,10 @@ export class Record extends Serializable {
 
     index(node) {
         this.nodeById[node.id] = node
+    }
+
+    get ownerId() {
+        return this.owner ? this.owner.id : null
     }
 }
 

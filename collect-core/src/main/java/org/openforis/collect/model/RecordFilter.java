@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -24,6 +25,7 @@ public class RecordFilter {
 	private int surveyId;
 	private Integer rootEntityId;
 	private Integer recordId;
+	private Set<Integer> recordIds;
 	private Step step;
 	private Step stepGreaterOrEqual;
 	private Date modifiedSince;
@@ -196,6 +198,14 @@ public class RecordFilter {
 	
 	public void setIncludeNullConditionsForKeyValues(boolean includeNullConditionsForKeyValues) {
 		this.includeNullConditionsForKeyValues = includeNullConditionsForKeyValues;
+	}
+	
+	public Set<Integer> getRecordIds() {
+		return recordIds;
+	}
+	
+	public void setRecordIds(Set<Integer> recordIds) {
+		this.recordIds = recordIds;
 	}
 	
 	private static List<String> toStringList(String[] values) {

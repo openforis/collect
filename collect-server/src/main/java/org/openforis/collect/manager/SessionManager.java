@@ -45,7 +45,8 @@ public class SessionManager {
 		SessionState sessionState = new SessionState(sessionId);
 		if (developmentMode) {
 			sessionState.setUser(userManager.loadAdminUser());
-//			sessionState.setUser(userManager.loadByUserName("arg_entry"));
+//			sessionState.setUser(userManager.loadByUserName("view"));
+//			sessionState.setUser(userManager.loadByUserName("entry"));
 		}
 		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
 	}

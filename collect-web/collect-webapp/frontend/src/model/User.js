@@ -1,7 +1,7 @@
 import Serializable from './Serializable'
+import Arrays from 'utils/Arrays'
 
 export default class User extends Serializable {
-
 
     static ROLES = ['VIEW', 'ENTRY_LIMITED', 'ENTRY', 'CLEANSING', 'ANALYSIS', 'ADMIN']
 
@@ -21,18 +21,25 @@ export default class User extends Serializable {
     }
 
     canCreateRecords(group) {
-        const role = this.determineRoleInGroup(group)
-        if (role === null) {
-            return false
-        }
-        switch(role) {
-            case 'OWNER':
-            case 'ADMINISTRATOR':
-            case 'SUPERVISOR':
-            case 'OPERATOR':
-                return true
-            default:
+        const mainRole = this.role
+        switch(mainRole) {
+            case 'VIEW':
+            case 'ENTRY_LIMITED':
                 return false
+            default:
+                const roleInGroup = this.determineRoleInGroup(group)
+                if (roleInGroup === null) {
+                    return false
+                }
+                switch(roleInGroup) {
+                    case 'OWNER':
+                    case 'ADMINISTRATOR':
+                    case 'SUPERVISOR':
+                    case 'OPERATOR':
+                        return true
+                    default:
+                        return false
+                }
         }
     }
 
@@ -40,8 +47,21 @@ export default class User extends Serializable {
         return this.canCreateRecords(group)
     }
 
-    canDeleteRecords(group) {
-        return this.canCreateRecords(group)
+    canDeleteRecords(group, records) {
+        const canDeleteRecordsInGeneral = this.canCreateRecords(group)
+        if (! canDeleteRecordsInGeneral) {
+            return false
+        }
+        switch (this.role) {
+            case 'ENTRY':
+                return ! Arrays.contains(records, r => {
+                    console.log('ownerId: ' + r.ownerId)
+                    return r.step != 'ENTRY' || r.ownerId != this.id
+                })
+            default:
+                return true
+                
+        }
     }
 
     canImportRecords(group) {

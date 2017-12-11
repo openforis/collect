@@ -202,7 +202,7 @@ class DataManagementPage extends Component {
 						{loggedUser.canEditRecords(surveyUserGroup) && this.state.selectedItem &&
 							<Button color="success" onClick={this.handleEditButtonClick}>Edit</Button>
 						}{' '}
-						{loggedUser.canDeleteRecords(surveyUserGroup) && this.state.selectedItemIds.length > 0 &&
+						{loggedUser.canDeleteRecords(surveyUserGroup, this.state.selectedItems) && this.state.selectedItemIds.length > 0 &&
 							<Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/></Button>
 						}
 					</Col>

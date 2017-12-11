@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -26,6 +27,7 @@ import javax.validation.Valid;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.utils.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.ProxyContext;
@@ -71,6 +73,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.model.proxy.RecordSummaryProxy;
@@ -311,10 +314,17 @@ public class RecordController extends BasicController implements Serializable {
 	@RequestMapping(value = "survey/{surveyId}/data/records", method=DELETE, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	Response deleteRecord(@PathVariable("surveyId") int surveyId, @Valid RecordDeleteParameters params) throws RecordPersistenceException {
-		recordManager.deleteByIds(new HashSet<Integer>(Arrays.asList(params.getRecordIds())));
-		return new Response();
+		if (canDeleteRecords(surveyId, Sets.newHashSet(params.getRecordIds()))) {
+			recordManager.deleteByIds(new HashSet<Integer>(Arrays.asList(params.getRecordIds())));
+			return new Response();
+		} else {
+			Response response = new Response();
+			response.setErrorStatus();
+			response.setErrorMessage("Cannot delete some of the specified records: unsufficient user privilegies");
+			return response;
+		}
 	}
-	
+
 	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody
 	JobView generateRecordImportSummary(@PathVariable("surveyId") int surveyId, @RequestParam("file") MultipartFile multipartFile, 
@@ -594,6 +604,18 @@ public class RecordController extends BasicController implements Serializable {
 		} else {
 			return null;
 		}
+	}
+	
+	private boolean canDeleteRecords(int surveyId, Set<Integer> recordIds) {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRecordIds(recordIds);
+		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
+		User loggedUser = sessionManager.getLoggedUser();
+		RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
+		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroup(), loggedUser);
+		boolean canDeleteRecords = userInSurveyGroup != null && recordAccessControlManager.canDeleteRecords(loggedUser, userInSurveyGroup.getRole(), recordSummaries);
+		return canDeleteRecords;
 	}
 
 	public static class SearchParameters {

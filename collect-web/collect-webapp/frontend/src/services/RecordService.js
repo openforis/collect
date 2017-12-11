@@ -1,5 +1,6 @@
 import AbstractService from './AbstractService';
-import { Record } from '../model/Record';
+import { Record } from 'model/Record';
+import RecordSummary from 'model/RecordSummary';
 
 export default class RecordService extends AbstractService {
 
@@ -13,7 +14,7 @@ export default class RecordService extends AbstractService {
             summaryValues: filterOptions.summaryValues,
             sortFields: sortFields,
             fullSummary: fullSummary
-        });
+        }).then(res => {return {...res, records: res.records.map(r => new RecordSummary(r))}});
     }
 
     fetchSurveyId(recordId) {

@@ -2,8 +2,12 @@ import Objects from './Objects'
 
 export default class Arrays {
 
-    static contains(array, item, keyProp) {
-        return Arrays.indexOf(array, item, keyProp) >= 0
+    static contains(array, itemOrPredicate, keyProp) {
+        if (itemOrPredicate instanceof Function) {
+            return array.find(itemOrPredicate) != undefined
+        } else {
+            return Arrays.indexOf(array, itemOrPredicate, keyProp) >= 0
+        }
     }
 
     static clone(array) {

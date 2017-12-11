@@ -321,11 +321,16 @@ public class RecordDao extends JooqDaoSupport {
 			q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(filter.getRootEntityId()));
 		}
 		
-		//root entity
+		//record id
 		if ( filter.getRecordId() != null ) {
 			q.addConditions(OFC_RECORD.ID.equal(filter.getRecordId()));
 		}
 		
+		//records ids
+		if (CollectionUtils.isNotEmpty(filter.getRecordIds())) {
+			q.addConditions(OFC_RECORD.ID.in(filter.getRecordIds()));
+		}
+
 		//step
 		if ( filter.getStep() != null ) {
 			q.addConditions(OFC_RECORD.STEP.equal(filter.getStep().getStepNumber()));
@@ -355,6 +360,8 @@ public class RecordDao extends JooqDaoSupport {
 		if (CollectionUtils.isNotEmpty(filter.getSummaryValues())) {
 			addFilterByFieldsConditions(q, RECORD_SUMMARY_FIELDS, false, true, filter.getSummaryValues());
 		}
+		
+		
 	}
 	
 	public int countRecords(CollectSurvey survey) {
