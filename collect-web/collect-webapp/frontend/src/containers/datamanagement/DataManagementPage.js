@@ -7,10 +7,10 @@ import { connect } from 'react-redux';
 import * as Actions from 'actions';
 import * as JobActions from 'actions/job';
 import ServiceFactory from 'services/ServiceFactory'
-import Modals from 'components/Modals'
 import SurveySelect from 'components/SurveySelect'
 import WithSurveySelectContainer from 'containers/WithSurveySelectContainer'
 import Workflow from 'model/Workflow'
+import Dialogs from 'components/Dialogs'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
@@ -60,20 +60,18 @@ class DataManagementPage extends Component {
 	}
 
 	handleDeleteButtonClick() {
+		const $this = this
 		const confirmMessage = this.state.selectedItemIds.length == 1 ? 
 			'Delete the selected record?' 
 			: 'Delete the selected ' + this.state.selectedItemIds.length + ' records?'
 		
-		if (window.confirm(confirmMessage))  {
-			const $this = this
-			//Modals.confirm('test', 'test', function() {
-				this.recordService.delete(this.props.survey.id, this.props.loggedUser.id, this.state.selectedItemIds).then(response => {
-					$this.recordDataTable.fetchData()
-					$this.props.dispatch(Actions.recordsDeleted($this.state.selectedItems));
-					$this.deselectAllRecords()
-				})
-			//})
-		}
+		Dialogs.confirm('Delete records', confirmMessage, function() {
+			$this.recordService.delete($this.props.survey.id, $this.props.loggedUser.id, $this.state.selectedItemIds).then(response => {
+				$this.recordDataTable.fetchData()
+				$this.props.dispatch(Actions.recordsDeleted($this.state.selectedItems));
+				$this.deselectAllRecords()
+			})
+		})
 	}
 
 	deselectAllRecords() {

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import JobMonitorModal from 'components/JobMonitorModal'
+import JobMonitorDialog from 'components/JobMonitorDialog'
 import * as JobActions from 'actions/job'
 
-class CurrentJobMonitorModal extends Component {
+class CurrentJobMonitorDialog extends Component {
 
     timer = null
 
@@ -80,7 +80,7 @@ class CurrentJobMonitorModal extends Component {
             return <div></div>
         }
         return (
-            <JobMonitorModal
+            <JobMonitorDialog
                 open={this.props.open}
                 title={this.props.jobMonitorConfiguration.title}
                 jobId={this.props.jobMonitorConfiguration.jobId}
@@ -112,4 +112,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps)(CurrentJobMonitorModal)
+export default connect(mapStateToProps)(CurrentJobMonitorDialog)

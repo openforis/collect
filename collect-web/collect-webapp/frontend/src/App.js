@@ -3,8 +3,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import Header from 'components/Header';
 import Sidebar from 'components/Sidebar';
-import CurrentJobMonitorModal from 'containers/CurrentJobMonitorModal'
-
+import CurrentJobMonitorDialog from 'containers/CurrentJobMonitorDialog';
 import HomePage from 'containers/HomePage'
 import BackupDataExportPage from 'containers/datamanagement/BackupDataExportPage'
 import BackupDataImportPage from 'containers/datamanagement/BackupDataImportPage'
@@ -66,7 +65,7 @@ class App extends Component {
               </div>
             </main>
           </div>
-          <CurrentJobMonitorModal />
+          <CurrentJobMonitorDialog />
         </div>
     );
   }
