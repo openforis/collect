@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
+import * as SessionActions from 'actions/session'
 import VersionInfo from 'components/VersionInfo'
 import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels';
@@ -31,7 +32,7 @@ class Sidebar extends Component {
   }
 
   handleLogoutClick() {
-    ServiceFactory.sessionService.invalidate().then(r => RouterUtils.navigateToLoginPage(true))
+    this.props.dispatch(SessionActions.logout())
   }
       // secondLevelActive(routeName) {
   //   return this.props.location.pathname.indexOf(routeName) > -1 ? "nav nav-second-level collapse in" : "nav nav-second-level collapse";

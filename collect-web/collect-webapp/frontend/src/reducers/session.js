@@ -1,14 +1,16 @@
 import {
-    REQUEST_CURRENT_USER, RECEIVE_CURRENT_USER
-} from '../actions'
-
+    REQUEST_CURRENT_USER, RECEIVE_CURRENT_USER, REQUEST_LOGOUT, LOGOUT_PERFORMED, SESSION_EXPIRED
+} from 'actions/session'
 
 function session(
     state = {
         initialized: false,
         isFetching: false,
         didInvalidate: false,
-        loggedUser: null
+        loggedUser: null,
+        sessionExpired: false,
+        loggingOut: false,
+        loggedOut: false
     },
     action
 ) {
@@ -24,6 +26,19 @@ function session(
                 isFetching: false,
                 didInvalidate: false,
                 loggedUser: action.user
+            })
+        case REQUEST_LOGOUT:
+            return Object.assign({}, state, {
+                loggingOut: true
+            })
+        case LOGOUT_PERFORMED:
+            return Object.assign({}, state, {
+                loggingOut: false,
+                loggedOut: true
+            })
+        case SESSION_EXPIRED:
+            return Object.assign({}, state, {
+                sessionExpired: true
             })
         default:
             return state

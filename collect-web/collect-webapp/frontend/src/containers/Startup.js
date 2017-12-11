@@ -4,11 +4,15 @@ import { connect } from 'react-redux'
 import * as Actions from 'actions';
 import * as UserActions from 'actions/users';
 import * as SurveysActions from 'actions/surveys';
+import * as SessionActions from 'actions/session';
 import Labels from 'utils/Labels';
+import { clearInterval } from 'timers';
 
 class Startup extends Component {
     
     static SURVEY_RELOAD_TIMEOUT = 5000
+
+    surveyReloadTimer
 
     constructor(props) {
         super(props)
@@ -23,17 +27,35 @@ class Startup extends Component {
     componentDidMount() {
         Labels.initialize(() => {
             this.props.dispatch(Actions.fetchApplicationInfo())
-            this.props.dispatch(Actions.fetchCurrentUser())
+            this.props.dispatch(SessionActions.fetchCurrentUser())
             this.props.dispatch(UserActions.fetchUsers())
             this.props.dispatch(Actions.fetchUserGroups())
             this.props.dispatch(SurveysActions.fetchSurveySummaries());
             
-            setInterval(this.handleSurveysReloadTimeout, Startup.SURVEY_RELOAD_TIMEOUT);
+            this.startReloadinInfoTimer()
         })
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const { sessionExpired, loggingOut, loggedOut } = nextProps
+        if (sessionExpired || loggingOut || loggedOut) {
+            this.stopReloadingInfoTimer()
+        }
+    }
+
+    startReloadinInfoTimer() {
+        this.surveyReloadTimer = setTimeout(this.handleSurveysReloadTimeout, Startup.SURVEY_RELOAD_TIMEOUT)        
+    }
+    
+    stopReloadingInfoTimer() {
+        if (this.surveyReloadTimer) {
+            clearTimeout(this.surveyReloadTimer)
+        }
     }
 
     handleSurveysReloadTimeout() {
         this.props.dispatch(SurveysActions.fetchSurveySummaries());
+        this.startReloadinInfoTimer()
     }
 
     render() {
@@ -52,10 +74,17 @@ function mapStateToProps(state) {
     const {
         loggedUser,
         isFetching: isFetchingLoggedUser,
-        initialized: isLoggedUserReady
+        initialized: isLoggedUserReady,
+        sessionExpired,
+        loggingOut,
+        loggedOut
     } = state.session || {
+        loggedUser: null,
         isLoggedUserReady: false,
-        isFetchingLoggedUser: true
+        isFetchingLoggedUser: true,
+        sessionExpired: false,
+        loggingOut: false,
+        loggedOut: false
     }
 
     const {
@@ -80,6 +109,9 @@ function mapStateToProps(state) {
         isLoggedUserReady,
         isFetchingLoggedUser,
         loggedUser,
+        loggingOut,
+        sessionExpired,
+        loggedOut,
         isUsersReady,
         isFetchingUsers,
         users,

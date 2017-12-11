@@ -1,6 +1,6 @@
 import {
     LOG_IN_PENDING, LOG_IN_SUCCESS, LOG_IN_FAILED
-    } from '../actions'
+    } from 'actions/login'
 
 function login(
     state = {
