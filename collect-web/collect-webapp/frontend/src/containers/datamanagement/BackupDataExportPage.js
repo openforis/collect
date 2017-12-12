@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { Button, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
 import ServiceFactory from 'services/ServiceFactory'
-import SchemaTreeView from './SchemaTreeView'
 import * as JobActions from 'actions/job';
 
 class BackupDataExportPage extends Component {
@@ -66,34 +64,36 @@ class BackupDataExportPage extends Component {
             return <div>Select survey first</div>
         }
         return (
-            <Form>
-                <FormGroup tag="fieldset">
-                    <legend>Parameters</legend>
-                    <FormGroup row>
-                        <Col sm={{size: 12}}>
-                            <Label check>
-                                <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
-                                    checked={this.state.exportOnlyOwnedRecords} />{' '}
-                                Export only owned records
-                            </Label>
-                        </Col>
+            <Container>
+                <Form>
+                    <FormGroup tag="fieldset">
+                        <legend>Parameters</legend>
+                        <FormGroup row>
+                            <Col sm={{size: 12}}>
+                                <Label check>
+                                    <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
+                                        checked={this.state.exportOnlyOwnedRecords} />{' '}
+                                    Export only owned records
+                                </Label>
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Col sm={{size: 12}}>
+                                <Label check>
+                                    <Input type="checkbox" onChange={event => this.setState({includeRecordFiles: event.target.checked})} 
+                                        checked={this.state.includeRecordFiles} />{' '}
+                                    Include uploaded files (images, documents, etc.)
+                                </Label>
+                            </Col>
+                        </FormGroup>
                     </FormGroup>
-                    <FormGroup row>
-                        <Col sm={{size: 12}}>
-                            <Label check>
-                                <Input type="checkbox" onChange={event => this.setState({includeRecordFiles: event.target.checked})} 
-                                    checked={this.state.includeRecordFiles} />{' '}
-                                Include uploaded files (images, documents, etc.)
-                            </Label>
+                    <Row>
+                        <Col sm={{ size: 'auto', offset: 5 }}>
+                            <Button onClick={this.handleExportButtonClick} className="btn btn-success">Export</Button>
                         </Col>
-                    </FormGroup>
-                </FormGroup>
-                <Row>
-                    <Col sm={{ size: 'auto', offset: 5 }}>
-                        <Button onClick={this.handleExportButtonClick} className="btn btn-success">Export</Button>
-                    </Col>
-                </Row>
-            </Form>
+                    </Row>
+                </Form>
+            </Container>
         )
     }
 }

@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormFeedback, FormGroup, Label, Input, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Button, Container, Form, FormFeedback, FormGroup, Label, Input, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import ExpansionPanel, {
+    ExpansionPanelSummary,
+    ExpansionPanelDetails,
+} from 'material-ui/ExpansionPanel';
+import Typography from 'material-ui/Typography';
+import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';
@@ -37,8 +42,7 @@ class CsvDataImportPage extends Component {
             fileToBeImportedPreview: null,
             fileToBeImported: null,
             errorModalOpen: false,
-            selectedEntityDefinition: null,
-            additionalOptionsOpen: false
+            selectedEntityDefinition: null
         }
     }
 
@@ -153,53 +157,55 @@ class CsvDataImportPage extends Component {
         }
     
         return (
-            <Form>
-                <FormGroup tag="fieldset">
-                    <legend>Parameters</legend>
-                    <FormGroup row>
-                        <Label for="stepSelect">{L.l('dataManagement.csvDataImport.importType.label')}:</Label>
-                        <Col sm={10}>
-                            <Input type="select" name="step" id="stepSelect"
-                                value={this.state.importType} 
-                                onChange={e => this.setState({importType: e.target.value})}>{importTypeOptions}</Input>
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                        <Label>{L.l('dataManagement.csvDataImport.applyToSteps')}:</Label>
-                        <Col sm={10}>
-                            {stepsChecks}
-                        </Col>
-                    </FormGroup>
-                    {entitySelectionEnabled &&
+            <Container>
+                <Form>
+                    <FormGroup tag="fieldset">
+                        <legend>Parameters</legend>
                         <FormGroup row>
-                            <Label className={entityNotSelected ? 'invalid': ''}>{L.l('dataManagement.csvDataImport.entity')}:</Label>
-                            <Col sm={{size: 10 }}>
-                                <SchemaTreeView survey={this.props.survey}
-                                    handleNodeSelect={this.handleEntitySelect} />
-                                <FormFeedback style={entityNotSelected ? {display: 'block'}: {}}>{L.l('dataManagement.csvDataImport.validation.entityNotSelected')}</FormFeedback>
+                            <Label for="stepSelect">{L.l('dataManagement.csvDataImport.importType.label')}:</Label>
+                            <Col sm={10}>
+                                <Input type="select" name="step" id="stepSelect"
+                                    value={this.state.importType} 
+                                    onChange={e => this.setState({importType: e.target.value})}>{importTypeOptions}</Input>
                             </Col>
-                        </FormGroup>}
-                    <FormGroup row>
-                        <Label for="file">File:</Label>
-                        <Col sm={10}>
-                            <Dropzone accept={acceptedFileTypes} onDrop={(files) => this.handleFileDrop(files)} style={{
-                                width: '100%', height: '200px', 
-                                borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
-                                borderStyle: 'dashed', borderRadius: '5px'
-                            }}>
-                            {this.state.fileToBeImportedPreview ?
-                                <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.state.fileToBeImportedPreview}</p>
-                                : <p>Click to select a {acceptedFileTypesDescription} file or drop it here.</p>
-                            }
-                            </Dropzone>
-                        </Col>
-                    </FormGroup>
-                    <FormGroup row>
-                        <div>
-                            <Button onClick={e => this.setState({additionalOptionsOpen: ! this.state.additionalOptionsOpen})}>{L.l('general.additionalOptions')}</Button>
-                            <Collapse isOpen={this.state.additionalOptionsOpen}>
-                                <Card>
-                                    <CardBlock>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Label>{L.l('dataManagement.csvDataImport.applyToSteps')}:</Label>
+                            <Col sm={10}>
+                                {stepsChecks}
+                            </Col>
+                        </FormGroup>
+                        {entitySelectionEnabled &&
+                            <FormGroup row>
+                                <Label className={entityNotSelected ? 'invalid': ''}>{L.l('dataManagement.csvDataImport.entity')}:</Label>
+                                <Col sm={{size: 10 }}>
+                                    <SchemaTreeView survey={this.props.survey}
+                                        handleNodeSelect={this.handleEntitySelect} />
+                                    <FormFeedback style={entityNotSelected ? {display: 'block'}: {}}>{L.l('dataManagement.csvDataImport.validation.entityNotSelected')}</FormFeedback>
+                                </Col>
+                            </FormGroup>}
+                        <FormGroup row>
+                            <Label for="file">File:</Label>
+                            <Col sm={10}>
+                                <Dropzone accept={acceptedFileTypes} onDrop={(files) => this.handleFileDrop(files)} style={{
+                                    width: '100%', height: '200px', 
+                                    borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
+                                    borderStyle: 'dashed', borderRadius: '5px'
+                                }}>
+                                {this.state.fileToBeImportedPreview ?
+                                    <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.state.fileToBeImportedPreview}</p>
+                                    : <p>Click to select a {acceptedFileTypesDescription} file or drop it here.</p>
+                                }
+                                </Dropzone>
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <ExpansionPanel>
+                                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                                    <Typography>{L.l('general.additionalOptions')}</Typography>
+                                </ExpansionPanelSummary>
+                                <ExpansionPanelDetails>
+                                    <div>
                                         <FormGroup row check>
                                             <Label check>
                                                 <Input type="checkbox" checked={this.state.validateRecords}
@@ -212,36 +218,36 @@ class CsvDataImportPage extends Component {
                                                     onChange={e => this.setState({deleteEntitiesBeforeImport: e.target.checked})} /> {L.l('dataManagement.csvDataImport.deleteEntities')}
                                             </Label>
                                         </FormGroup>
-                                    </CardBlock>
-                                </Card>
-                            </Collapse>
-                        </div>
+                                    </div>
+                                </ExpansionPanelDetails>
+                            </ExpansionPanel>
+                        </FormGroup>
                     </FormGroup>
-                </FormGroup>
-                <FormGroup row>
-                    <Col sm={{size: 2, offset: 5}}>
-                        <Button color="primary" onClick={this.handleImportButtonClick}>Import</Button>
-                    </Col>
-                </FormGroup>
+                    <FormGroup row>
+                        <Col sm={{size: 2, offset: 5}}>
+                            <Button color="primary" onClick={this.handleImportButtonClick}>Import</Button>
+                        </Col>
+                    </FormGroup>
 
-                <Modal isOpen={this.state.errorModalOpen} style={{maxWidth: '1000px'}}>
-                    <ModalHeader toggle={() => this.setState({errorModalOpen: ! this.state.errorModalOpen})}>Errors in uploaded file</ModalHeader>
-                    <ModalBody>
-                        <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors.csv'}>
-							<TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
-							<TableHeaderColumn dataField="fileName" width="200">{L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
-							<TableHeaderColumn dataField="row" width="50">{L.l('dataManagement.csvDataImport.row')}</TableHeaderColumn>
-							<TableHeaderColumn dataField="columns" width="150">{L.l('dataManagement.csvDataImport.columns')}</TableHeaderColumn>
-                            <TableHeaderColumn dataField="errorType" width="140">{L.l('dataManagement.csvDataImport.error-type')}</TableHeaderColumn>
-                            <TableHeaderColumn dataField="message" width="400" dataFormat={formatErrorMessage}
-                                csvFormat={formatErrorMessage}>{L.l('dataManagement.csvDataImport.error-message')}</TableHeaderColumn>
-						</BootstrapTable>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="primary" onClick={this.handleErrorsModalCloseButtonClick}>Close</Button>
-                    </ModalFooter>
-                </Modal>
-            </Form>
+                    <Modal isOpen={this.state.errorModalOpen} style={{maxWidth: '1000px'}}>
+                        <ModalHeader toggle={() => this.setState({errorModalOpen: ! this.state.errorModalOpen})}>Errors in uploaded file</ModalHeader>
+                        <ModalBody>
+                            <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors.csv'}>
+                                <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
+                                <TableHeaderColumn dataField="fileName" width="200">{L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
+                                <TableHeaderColumn dataField="row" width="50">{L.l('dataManagement.csvDataImport.row')}</TableHeaderColumn>
+                                <TableHeaderColumn dataField="columns" width="150">{L.l('dataManagement.csvDataImport.columns')}</TableHeaderColumn>
+                                <TableHeaderColumn dataField="errorType" width="140">{L.l('dataManagement.csvDataImport.error-type')}</TableHeaderColumn>
+                                <TableHeaderColumn dataField="message" width="400" dataFormat={formatErrorMessage}
+                                    csvFormat={formatErrorMessage}>{L.l('dataManagement.csvDataImport.error-message')}</TableHeaderColumn>
+                            </BootstrapTable>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="primary" onClick={this.handleErrorsModalCloseButtonClick}>Close</Button>
+                        </ModalFooter>
+                    </Modal>
+                </Form>
+            </Container>
         )
     }
 }

@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { Button, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
+import ExpansionPanel, {
+    ExpansionPanelSummary,
+    ExpansionPanelDetails,
+} from 'material-ui/ExpansionPanel';
+import Typography from 'material-ui/Typography';
+import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';
 import Workflow from 'model/Workflow';
 import * as JobActions from 'actions/job';
 import Objects from 'utils/Objects'
+import Arrays from 'utils/Arrays'
+import L from 'utils/Labels';
 
 const csvExportAdditionalOptions = [
     {
@@ -45,8 +52,7 @@ class CsvDataExportPage extends Component {
                 entityId: null,
                 exportOnlyOwnedRecords: false,
                 includeRecordFiles: true,
-                headingSource: 'ATTRIBUTE_NAME',
-                csvExportAdditionalOptionsOpen: false
+                headingSource: 'ATTRIBUTE_NAME'
             }
     
             this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
@@ -102,7 +108,8 @@ class CsvDataExportPage extends Component {
         }
         
         handleEntitySelect(event) {
-            this.setState({...this.state, selectedEntityDefinition: event.selectedNodeDefinitions.length == 1 ? event.selectedNodeDefinitions[0]: null})
+            const selectedEntityDefinition = Arrays.singleItemOrNull(event.selectedNodeDefinitions)
+            this.setState({...this.state, selectedEntityDefinition: selectedEntityDefinition})
         }
     
         render() {
@@ -113,7 +120,7 @@ class CsvDataExportPage extends Component {
                 return <FormGroup check key={o.name}>
                     <Label check>
                         <Input type="checkbox" onChange={event => {
-                            const newProp = new Object()
+                            const newProp = {}
                             newProp[o.name] = event.target.checked
                             this.setState(newProp)
                          }} />{' '}
@@ -126,67 +133,67 @@ class CsvDataExportPage extends Component {
             const stepsOptions = Object.keys(steps).map(s => <option key={s} value={steps[s].code}>{steps[s].label}</option>)
             
             return (
-                <Form>
-                    <FormGroup tag="fieldset">
-                        <legend>Parameters</legend>
-                        <Form>
-                            <FormGroup row>
-                                <Label for="stepSelect" sm={1}>Step:</Label>
-                                <Col sm={10}>
-                                    <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
-                                        value={this.state.stepGreaterOrEqual}
-                                        onChange={e => this.setState({stepGreaterOrEqual: e.target.value})}>{stepsOptions}</Input>
-                                </Col>
-                            </FormGroup>
-                            <FormGroup row>
-                                <Label for="exportMode" sm={1}>Export mode:</Label>
-                                <Col sm={10}>
-                                    <FormGroup check>
-                                        <Label check>
-                                            <Input type="radio" value="ALL_ENTITIES" name="exportMode"
-                                                checked={this.state.exportMode === 'ALL_ENTITIES'} 
-                                                onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
-                                            All entities
-                                        </Label>
-                                        <span style={{display: 'inline-block', width: '40px'}}></span>
-                                        <Label check>
-                                            <Input type="radio" value="SELECTED_ENTITY" name="exportMode"
-                                                checked={this.state.exportMode === 'SELECTED_ENTITY'} 
-                                                onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
-                                            Only selected entities
-                                        </Label>
-                                    </FormGroup>
-                                </Col>
-                            </FormGroup>
-                            {this.state.exportMode === 'SELECTED_ENTITY' &&
+                <Container>
+                    <Form>
+                        <FormGroup tag="fieldset">
+                            <legend>Parameters</legend>
+                            <Form>
                                 <FormGroup row>
-                                    <Label sm={1}>Select entities to export:</Label>
-                                    <Col sm={{size: 10 }}>
-                                        <SchemaTreeView survey={this.props.survey}
-                                            handleNodeSelect={this.handleEntitySelect} />
+                                    <Label for="stepSelect" sm={1}>Step:</Label>
+                                    <Col sm={10}>
+                                        <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
+                                            value={this.state.stepGreaterOrEqual}
+                                            onChange={e => this.setState({stepGreaterOrEqual: e.target.value})}>{stepsOptions}</Input>
                                     </Col>
                                 </FormGroup>
-                            }
-                            <FormGroup row>
-                                <div>
-                                    <Button onClick={e => this.setState({csvExportAdditionalOptionsOpen: ! this.state.csvExportAdditionalOptionsOpen})}>Additional Options</Button>
-                                    <Collapse isOpen={this.state.csvExportAdditionalOptionsOpen}>
-                                        <Card>
-                                            <CardBlock>
-                                                <FormGroup row>
-                                                    <Col sm={{size: 12}}>
-                                                        <Label check>
-                                                            <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
-                                                                checked={this.state.exportOnlyOwnedRecords} />{' '}
-                                                            Export only owned records
-                                                        </Label>
-                                                    </Col>
+                                <FormGroup row>
+                                    <Label for="exportMode" sm={1}>Export mode:</Label>
+                                    <Col sm={10}>
+                                        <FormGroup check>
+                                            <Label check>
+                                                <Input type="radio" value="ALL_ENTITIES" name="exportMode"
+                                                    checked={this.state.exportMode === 'ALL_ENTITIES'} 
+                                                    onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
+                                                All entities
+                                            </Label>
+                                            <span style={{display: 'inline-block', width: '40px'}}></span>
+                                            <Label check>
+                                                <Input type="radio" value="SELECTED_ENTITY" name="exportMode"
+                                                    checked={this.state.exportMode === 'SELECTED_ENTITY'} 
+                                                    onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
+                                                Only selected entities
+                                            </Label>
+                                        </FormGroup>
+                                    </Col>
+                                </FormGroup>
+                                {this.state.exportMode === 'SELECTED_ENTITY' &&
+                                    <FormGroup row>
+                                        <Label sm={1}>Select entities to export:</Label>
+                                        <Col sm={{size: 10 }}>
+                                            <SchemaTreeView survey={this.props.survey}
+                                                handleNodeSelect={this.handleEntitySelect} />
+                                        </Col>
+                                    </FormGroup>
+                                }
+                                <FormGroup row>
+                                    <ExpansionPanel>
+                                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                                            <Typography>{L.l('general.additionalOptions')}</Typography>
+                                        </ExpansionPanelSummary>
+                                        <ExpansionPanelDetails>
+                                            <div>
+                                                <FormGroup check row>
+                                                    <Label check>
+                                                        <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
+                                                            checked={this.state.exportOnlyOwnedRecords} />{' '}
+                                                        Export only owned records
+                                                    </Label>
                                                 </FormGroup>
                                                 <FormGroup row>
-                                                    <Col sm={4}>
+                                                    <Col sm={6}>
                                                         <Label for="headingsSourceSelect">Source for file headings:</Label>
                                                     </Col>
-                                                    <Col sm={8}>
+                                                    <Col sm={6}>
                                                         <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
                                                             onChange={e => this.setState({headingSource: e.target.value})}>
                                                             <option value="ATTRIBUTE_NAME">Attribute name</option>
@@ -196,19 +203,19 @@ class CsvDataExportPage extends Component {
                                                     </Col>
                                                 </FormGroup>
                                                 {additionalOptionsFormGroups}
-                                            </CardBlock>
-                                        </Card>
-                                    </Collapse>
-                                </div>
-                            </FormGroup>
-                        </Form>
-                    </FormGroup>
-                    <Row>
-                        <Col sm={{ size: 'auto', offset: 5 }}>
-                            <Button onClick={this.handleExportButtonClick} className="btn btn-success">Export</Button>
-                        </Col>
-                    </Row>
-                </Form>
+                                            </div>
+                                        </ExpansionPanelDetails>
+                                    </ExpansionPanel>
+                                </FormGroup>
+                            </Form>
+                        </FormGroup>
+                        <Row>
+                            <Col sm={{ size: 'auto', offset: 5 }}>
+                                <Button onClick={this.handleExportButtonClick} className="btn btn-success">Export</Button>
+                            </Col>
+                        </Row>
+                    </Form>
+                </Container>
             )
         }
     }
