@@ -76,17 +76,16 @@ class ConfirmDialogConfiguration {
 
     confirmButtonLabel = 'Confirm'
     cancelButtonLabel = 'Cancel'
-
 }
 
-export default class Modals {
+export default class Dialogs {
 
-    static confirm(title, message, onConfirm, onCancel, configuration = new ConfirmDialogConfiguration()) {
+    static confirm(title, message, onConfirm, onCancel, configuration) {
         const targetDiv = document.createElement('div');
         targetDiv.id = TARGET_DIV_ID;
         document.body.appendChild(targetDiv);
         render(<ConfirmDialog title={title} message={message} onConfirm={onConfirm} onCancel={onCancel} 
-            configuration={configuration} />, targetDiv)
+            configuration={Object.assign({}, new ConfirmDialogConfiguration(), configuration)} />, targetDiv)
     }
 
 }

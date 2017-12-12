@@ -7,6 +7,8 @@ import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactst
 import UserDetailsPage from './UserDetailsPage';
 import AbstractItemsListPage from 'components/AbstractItemsListPage';
 import * as UserActions from 'actions/users'
+import Dialogs from 'components/Dialogs'
+import L from 'utils/Labels'
 
 class UsersPage extends AbstractItemsListPage {
 
@@ -15,9 +17,6 @@ class UsersPage extends AbstractItemsListPage {
 		isFetching: PropTypes.bool.isRequired,
 		lastUpdated: PropTypes.number,
 		dispatch: PropTypes.func.isRequired
-	}
-
-	componentDidMount() {
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -39,10 +38,12 @@ class UsersPage extends AbstractItemsListPage {
 
 	handleDeleteButtonClick() {
 		const ids = this.state.selectedItemIds
-		if (window.confirm('Delete the selected ' + ids.length + ' user(s)?')) {
+		const confirmMessageKey = ids.length === 1 ? 'user.delete.confirmDeleteOneUserMessage': 'user.delete.confirmDeleteMultipleUsersMessage'
+		const confirmMessage = L.l(confirmMessageKey, [ids.length])
+		Dialogs.confirm(L.l('user.delete.confirmTitle'), confirmMessage, () => {
 			const loggedUser = this.props.loggedUser
 			this.props.dispatch(UserActions.deleteUsers(loggedUser.id, ids))
-		}
+		}, null, {confirmButtonLabel: L.l('global.delete')})
 	}
 
   	render() {

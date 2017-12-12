@@ -15,6 +15,12 @@ import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
 
+const INITIAL_STATE = {
+	selectedItems: [],
+	selectedItemIds: [],
+	selectedItem: null
+}
+
 class DataManagementPage extends Component {
 
 	recordService = ServiceFactory.recordService
@@ -22,11 +28,7 @@ class DataManagementPage extends Component {
 	constructor(props) {
 		super(props)
 
-		this.state = {
-			selectedItems: [],
-			selectedItemIds: [],
-			selectedItem: null
-		}
+		this.state = INITIAL_STATE
 
 		this.handleRowSelect = this.handleRowSelect.bind(this)
 		this.handleAllRowsSelect = this.handleAllRowsSelect.bind(this)
@@ -48,6 +50,12 @@ class DataManagementPage extends Component {
 		this.handleMoveRecordsJobCompleted = this.handleMoveRecordsJobCompleted.bind(this)
 	}
 
+	componentWillReceiveProps(nextProps) {
+		if (this.props.survey && nextProps.survey && this.props.survey.id !== nextProps.survey.id) {
+			this.setState(INITIAL_STATE)
+		}
+	}
+
 	handleNewButtonClick() {
 		let survey = this.props.survey
 		this.recordService.createRecord(survey.id).then(res => {
@@ -62,16 +70,16 @@ class DataManagementPage extends Component {
 	handleDeleteButtonClick() {
 		const $this = this
 		const confirmMessage = this.state.selectedItemIds.length == 1 ? 
-			'Delete the selected record?' 
-			: 'Delete the selected ' + this.state.selectedItemIds.length + ' records?'
+			L.l('dataManagement.deleteRecords.confirmDeleteSingleRecordMessage') 
+			: L.l('dataManagement.deleteRecords.confirmDeleteMultipleRecordsMessage', [this.state.selectedItemIds.length])
 		
-		Dialogs.confirm('Delete records', confirmMessage, function() {
+		Dialogs.confirm(L.l('dataManagement.deleteRecords.confirmDeleteTitle'), confirmMessage, function() {
 			$this.recordService.delete($this.props.survey.id, $this.props.loggedUser.id, $this.state.selectedItemIds).then(response => {
 				$this.recordDataTable.fetchData()
 				$this.props.dispatch(Actions.recordsDeleted($this.state.selectedItems));
 				$this.deselectAllRecords()
 			})
-		})
+		}, null, {confirmButtonLabel: L.l('global.delete')})
 	}
 
 	deselectAllRecords() {

@@ -21,7 +21,8 @@
             "label": "Export"
         },
         "selectOne": "--- Select one ---",
-        "done": "Done"        
+        "done": "Done",
+        "delete": "Delete"    
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
@@ -86,6 +87,11 @@
             "generateImportSummary": "Generate Import Summary",
             "generatingDataImportSummary": "Generating data import summary",
             "importingData": "Importing data"
+        },
+        "deleteRecords": {
+            "confirmDeleteTitle": "Delete record",
+            "confirmDeleteSingleRecordMessage": "Delete the selected record?",
+            "confirmDeleteMultipleRecordsMessage": "Delete the selected {0} records?"
         }
     },
     "survey": {
@@ -144,6 +150,11 @@
         },
         "changePassword": {
             "change": "Change"
+        },
+        "delete": {
+            "confirmTitle": "Delete user",
+            "confirmDeleteOneUserMessage": "Do you want to delete the selected user?",
+            "confirmDeleteMultipleUsersMessage": "Do you want to delete the selected {0} users?"
         }
     },
     "usergroup": {
