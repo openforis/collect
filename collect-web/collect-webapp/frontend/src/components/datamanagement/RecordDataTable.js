@@ -5,6 +5,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import ServiceFactory from 'services/ServiceFactory'
 import * as Formatters from 'components/datatable/formatters'
 import OwnerColumnEditor from './OwnerColumnEditor'
+import L from 'utils/Labels'
 
 class RecordDataTable extends Component {
 
@@ -15,7 +16,12 @@ class RecordDataTable extends Component {
 			records: [],
 			totalSize: 0,
 			page: 1,
-			recordsPerPage: 25
+			recordsPerPage: 25,
+			records: [], 
+			totalSize: 0,
+			keyValues: [],
+			summaryValues: [],
+			sortFields: []
 		}
 		this.fetchData = this.fetchData.bind(this)
 		this.handlePageChange = this.handlePageChange.bind(this)
@@ -23,16 +29,6 @@ class RecordDataTable extends Component {
 		this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
 		this.handleSortChange = this.handleSortChange.bind(this)
 		this.handleFilterChange = this.handleFilterChange.bind(this)
-
-		this.state = {
-			page: 1, 
-			recordsPerPage: 25, 
-			records: [], 
-			totalSize: 0,
-			keyValues: [],
-			summaryValues: [],
-			sortFields: []
-		}
 	}
 
 	static propTypes = {
@@ -248,31 +244,34 @@ class RecordDataTable extends Component {
 		);
 
 		return (
-			<BootstrapTable
-				data={this.state.records}
-				options={{
-					onPageChange: this.handlePageChange,
-					onSizePerPageList: this.handleSizePerPageChange,
-					onRowDoubleClick: this.props.handleRowDoubleClick,
-					onCellEdit: this.handleCellEdit,
-					onSortChange: this.handleSortChange,
-					onFilterChange: this.handleFilterChange,
-					page: this.state.page,
-					sizePerPage: this.state.recordsPerPage,
-					sizePerPageList: [10, 25, 50, 100]
-				}}
-				fetchInfo={{ dataTotalSize: this.state.totalSize }}
-				remote pagination striped hover condensed
-				height="100%"
-				selectRow={{
-					mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
-					onSelect: this.props.handleRowSelect,
-					onSelectAll: this.props.handleAllRowsSelect,
-					selected: this.props.selectedItemIds
-				}}
-				cellEdit={{ mode: 'click', blurToSave: true }}
-			>{columns}</BootstrapTable>
-		);
+			<div>
+				<BootstrapTable
+					data={this.state.records}
+					options={{
+						onPageChange: this.handlePageChange,
+						onSizePerPageList: this.handleSizePerPageChange,
+						onRowDoubleClick: this.props.handleRowDoubleClick,
+						onCellEdit: this.handleCellEdit,
+						onSortChange: this.handleSortChange,
+						onFilterChange: this.handleFilterChange,
+						page: this.state.page,
+						sizePerPage: this.state.recordsPerPage,
+						sizePerPageList: [10, 25, 50, 100],
+						paginationShowsTotal: true
+					}}
+					fetchInfo={{ dataTotalSize: this.state.totalSize }}
+					remote pagination striped hover condensed
+					height="100%"
+					selectRow={{
+						mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
+						onSelect: this.props.handleRowSelect,
+						onSelectAll: this.props.handleAllRowsSelect,
+						selected: this.props.selectedItemIds
+					}}
+					cellEdit={{ mode: 'click', blurToSave: true }}
+				>{columns}</BootstrapTable>
+			</div>
+		)
 	}
 
 	visitNodes(survey, visitFunction) {
