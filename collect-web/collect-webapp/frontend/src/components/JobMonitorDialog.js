@@ -39,7 +39,7 @@ export default class JobMonitorDialog extends Component {
                             : job.status
                     } 
                     {! loading && job.failed &&
-                        <DialogContentText>>{job.errorMessage}</DialogContentText>
+                        <DialogContentText>{job.errorMessage}</DialogContentText>
                     }
                 </DialogContent>
                 <DialogActions>
