@@ -14,17 +14,17 @@
 }
 
 .footer .icon.app-version-latest {
-	background-image: url("images/check-green-small.png");
+	background-image: url("../images/check-green-small.png");
 	background-repeat: no-repeat;
 }
 
 .footer .icon.app-version-not-verified {
-	background-image: url("images/warning-red-small.png");
+	background-image: url("../images/warning-red-small.png");
 	background-repeat: no-repeat;
 }
 
 .footer .icon.app-version-newer-available {
-	background-image: url("images/warning-small.png");
+	background-image: url("../images/warning-small.png");
 	background-repeat: no-repeat;
 }
 
@@ -69,10 +69,10 @@ button.icon {
 	padding: 0px;
 }
 .z-groupbox-3d .open-false .z-caption-l {
-	background: url("images/arrow-down-small.png") no-repeat 0 0px;
+	background: url("../images/arrow-down-small.png") no-repeat 0 0px;
 }
 .z-groupbox-3d .open-true .z-caption-l {
-	background: url("images/arrow-up-small.png") no-repeat 0 0px;;
+	background: url("../images/arrow-up-small.png") no-repeat 0 0px;;
 }
 .z-menu.icon-button .z-menu-btn, 
 	.z-menuitem.icon-button .z-menuitem-btn  {
@@ -267,6 +267,6 @@ button.icon {
 }
 
 .icon.loading {
-	background-image: url("images/loading-small.gif");
+	background-image: url("../images/loading-small.gif");
 	background-repeat: no-repeat;
 }
