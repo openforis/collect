@@ -126,11 +126,13 @@ public class RecordFileRestoreTask extends Task {
 		recordFileManager.deleteAllFiles(record);
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		for (FileAttribute fileAttribute : fileAttributes) {
-			String recordFileEntryName = RecordFileBackupTask.calculateRecordFileEntryName(fileAttribute);
-			InputStream is = backupFileExtractor.findEntryInputStream(recordFileEntryName);
-			if ( is != null ) {
-				sessionRecordFileManager.saveToTempFile(is, fileAttribute.getFilename(), 
-						record, fileAttribute.getInternalId());
+			if (! fileAttribute.isEmpty()) {
+				String recordFileEntryName = RecordFileBackupTask.calculateRecordFileEntryName(fileAttribute);
+				InputStream is = backupFileExtractor.findEntryInputStream(recordFileEntryName);
+				if ( is != null ) {
+					sessionRecordFileManager.saveToTempFile(is, fileAttribute.getFilename(), 
+							record, fileAttribute.getInternalId());
+				}
 			}
 		}
 		if ( sessionRecordFileManager.commitChanges(record) ) {

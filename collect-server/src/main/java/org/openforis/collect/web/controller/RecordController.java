@@ -327,7 +327,7 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
 	public @ResponseBody
-	JobView generateRecordImportSummary(@PathVariable("surveyId") int surveyId, @RequestParam("file") MultipartFile multipartFile, 
+	JobView startRecordImportSummaryJob(@PathVariable("surveyId") int surveyId, @RequestParam("file") MultipartFile multipartFile, 
 			@RequestParam String rootEntityName) throws IOException {
 		File file = File.createTempFile("ofc_data_restore", ".collect-data");
 		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
@@ -344,7 +344,7 @@ public class RecordController extends BasicController implements Serializable {
 
 	@RequestMapping(value = "survey/{surveyId}/data/import/records/summary", method=GET)
 	public @ResponseBody
-	DataImportSummaryProxy getRecordImportSummary(@PathVariable("surveyId") int surveyId) throws IOException {
+	DataImportSummaryProxy downloadRecordImportSummary(@PathVariable("surveyId") int surveyId) throws IOException {
 		if (this.dataRestoreSummaryJob == null || ! this.dataRestoreSummaryJob.isCompleted()) {
 			throw new IllegalStateException("Data restore summary not generated or an error occurred during the generation");
 		}
@@ -482,7 +482,7 @@ public class RecordController extends BasicController implements Serializable {
 		CollectSurvey survey = recordFilter.getSurvey();
 		String surveyName = survey.getName();
 		Controllers.writeFileToResponse(response, file, 
-				String.format("collect-csv-data-export-%s-%s.zip", surveyName, Dates.formatDate(new Date())), 
+				String.format("collect-csv-data-export-%s-%s.zip", surveyName, Dates.formatLocalDateTime(new Date())), 
 				Controllers.ZIP_CONTENT_TYPE);
 	}
 	
@@ -509,7 +509,7 @@ public class RecordController extends BasicController implements Serializable {
 		CollectSurvey survey = fullBackupJob.getSurvey();
 		String surveyName = survey.getName();
 		Controllers.writeFileToResponse(response, file, 
-				String.format("collect-data-export-%s-%s.collect-data", surveyName, Dates.formatDate(new Date())), 
+				String.format("%s-%s.collect-data", surveyName, Dates.formatLocalDateTime(new Date())), 
 				Controllers.ZIP_CONTENT_TYPE);
 	}
 	

@@ -125,8 +125,13 @@ public class RecordFileBackupTask extends Task {
 	public static String calculateRecordFileEntryName(FileAttribute fileAttribute) {
 		FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
 		String repositoryRelativePath = RecordFileManager.getRepositoryRelativePath(fileAttributeDefinition, SurveyBackupJob.ZIP_FOLDER_SEPARATOR, false);
-		String entryName = SurveyBackupJob.UPLOADED_FILES_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + repositoryRelativePath + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + fileAttribute.getFilename();
-		return entryName;
+		String filename = fileAttribute.getFilename();
+		if (StringUtils.isBlank(filename)) {
+			return null;
+		} else {
+			String entryName = SurveyBackupJob.UPLOADED_FILES_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + repositoryRelativePath + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + filename;
+			return entryName;
+		}
 	}
 
 	private void writeFile(File file, String entryName) throws IOException {
