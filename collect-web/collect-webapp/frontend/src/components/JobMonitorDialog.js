@@ -23,7 +23,7 @@ export default class JobMonitorDialog extends Component {
 	}
 
     render() {
-        const { open, title, job, handleCancelButtonClick, handleCloseButtonClick, handleOkButtonClick } = this.props
+        const { open, title, job, cancellingJob, handleCancelButtonClick, handleCloseButtonClick, handleOkButtonClick } = this.props
         const loading = Objects.isNullOrUndefined(job)
         const okButtonLabel = this.props.okButtonLabel ? this.props.okButtonLabel : 'Ok'
         return (
@@ -44,7 +44,7 @@ export default class JobMonitorDialog extends Component {
                 </DialogContent>
                 <DialogActions>
                     {job && job.running &&
-                        <Button onClick={handleCancelButtonClick}>Cancel</Button>}
+                        <Button disabled={cancellingJob} onClick={handleCancelButtonClick}>Cancel</Button>}
                     {' '}
                     {job && job.completed && 
                         <Button raised color="primary" onClick={handleOkButtonClick}>{okButtonLabel}</Button>}

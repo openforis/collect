@@ -76,20 +76,23 @@ class CurrentJobMonitorDialog extends Component {
     }
 
     render() {
-        if (!this.props.open){
+        const { open, jobMonitorConfiguration, job, cancellingJob } = this.props
+        
+        if (!open){
             return <div></div>
         }
         return (
             <JobMonitorDialog
-                open={this.props.open}
-                title={this.props.jobMonitorConfiguration.title}
-                jobId={this.props.jobMonitorConfiguration.jobId}
-                job={this.props.job}
-                okButtonLabel={this.props.jobMonitorConfiguration.okButtonLabel}
+                open={open}
+                title={jobMonitorConfiguration.title}
+                jobId={jobMonitorConfiguration.jobId}
+                job={job}
+                cancellingJob={cancellingJob}
+                okButtonLabel={jobMonitorConfiguration.okButtonLabel}
+                handleJobCompleted={jobMonitorConfiguration.handleJobCompleted}
                 handleOkButtonClick={this.handleOkButtonClick}
                 handleCancelButtonClick={this.handleCancelButtonClick}
                 handleCloseButtonClick={this.handleCloseButtonClick}
-                handleJobCompleted={this.props.jobMonitorConfiguration.handleJobCompleted}
             />
         )
     }
@@ -100,15 +103,18 @@ const mapStateToProps = state => {
         open,
         job,
         jobMonitorConfiguration,
+        cancellingJob
     } = state.currentJob || {
         open: false,
         jobMonitorConfiguration: null,
-        job: null
+        job: null,
+        cancellingJob: false
     }
     return {
         open,
         jobMonitorConfiguration,
-        job
+        job,
+        cancellingJob
     }
 }
 

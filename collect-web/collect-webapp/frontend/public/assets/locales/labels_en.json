@@ -83,10 +83,27 @@
             }
         },
         "backupDataImport": {
+            "keys": "Keys",
+            "steps": "Steps",
+            "createdOn": "Created",
+            "modifiedOn": "Modified",
+            "newRecord": "New Record",
+            "oldRecord": "Old Record",
+            "dataImportSummary": "Data Import Summary",
+            "importability": "Importability",
             "acceptedFileTypesDescription": "Collect Backup (.collect-backup), Collect Data (.collect-data), Collect Earth XML data (.zip)",
             "generateImportSummary": "Generate Import Summary",
             "generatingDataImportSummary": "Generating data import summary",
-            "importingData": "Importing data"
+            "importingData": "Importing data",
+            "newRecordsToBeImported": "New records to be imported: {0}/{1}",
+            "conflictingRecordsToBeImported": "Conflicting records to be imported: {0}/{1}",
+            "errorsFound": "Errors found: {0}",
+            "errors": {
+                "label": "Errors",
+                "fileName": "File Name",
+                "path": "Path",
+                "messages": "Error Messages"
+            }
         },
         "deleteRecords": {
             "confirmDeleteTitle": "Delete record",

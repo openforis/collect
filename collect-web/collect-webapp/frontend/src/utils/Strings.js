@@ -5,7 +5,11 @@ export default class Strings {
     }
 
     static trimToEmpty(value) {
-        return value == null ? '' : value.toString().trim()
+        return value === null ? '' : value.toString().trim()
+    }
+
+    static isNotBlank(value) {
+        return value !== null && value.length > 0
     }
 }
     

@@ -3,13 +3,15 @@ import {
     CLOSE_JOB_MONITOR,
     REQUEST_JOB,
     RECEIVE_JOB,
-    JOB_CANCELED    
+    JOB_CANCELED,
+    CANCELLING_JOB
 } from '../actions/job'
 
 const initialState = {
     open: false,
     jobMonitorConfiguration: null,
-    job: null
+    job: null,
+    cancellingJob: false
 }
 
 function currentJob(state = initialState, action) {
@@ -29,7 +31,13 @@ function currentJob(state = initialState, action) {
                     }
                     break
             }
-            return { ...state, job: action.job}
+            return { ...state, 
+                job: action.job
+            }
+        case CANCELLING_JOB:
+            return { ...state, 
+                cancellingJob: true
+            }
         case JOB_CANCELED:
             return initialState
         case CLOSE_JOB_MONITOR:
