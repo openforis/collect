@@ -22,7 +22,8 @@
         },
         "selectOne": "--- Select one ---",
         "done": "Done",
-        "delete": "Delete"    
+        "delete": "Delete",
+        "loading": "Loading..."
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
@@ -150,6 +151,17 @@
         "publishedSurvey": "Published survey",
         "selectPublishedSurveyDropdownHeading": "--- Published survey ---",
         "selectPublishedSurveyFirst": "Select a published survey first"
+    },
+    "backup": {
+        "label": "Backup",
+        "lastBackup": {
+            "title": "Last Backup",
+            "date": "Date",
+            "updatedRecordsSinceLastBackup": "Updated records since last backup",
+            "download": "Download last backup"
+        },
+        "generateNewBackup": "Generate new backup",
+        "backingUpData": "Backing up data"
     },
     "user": {
         "username": "Username",

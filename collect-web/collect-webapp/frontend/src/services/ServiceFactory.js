@@ -1,4 +1,5 @@
 import ApplicationInfoService from './ApplicationInfoService'
+import BackupRestoreService from './BackupRestoreService'
 import CommandService from './CommandService'
 import CodeListService from './CodeListService'
 import JobService from './JobService'
@@ -12,6 +13,7 @@ import UserGroupService from './UserGroupService'
 export default class ServiceFactory {
 
     static applicationInfoService = new ApplicationInfoService()
+    static backupRestoreService = new BackupRestoreService()
     static commandService = new CommandService()
     static codeListService = new CodeListService()
     static jobService = new JobService()
