@@ -8,6 +8,23 @@ import Input, { InputLabel } from 'material-ui/Input';
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
 
+export class SimpleFormItem extends Component {
+
+    render() {
+        const {fieldId, fieldState, errorFeedback, label, row=true, labelColSpan=2, fieldColSpan=10} = this.props
+
+        return (
+            <FormGroup row={row} color={fieldState}>
+                <Label for={fieldId} sm={labelColSpan}>{L.l(label)}</Label>
+                <Col sm={fieldColSpan}>
+                    {this.props.children}
+                    {errorFeedback && <FormFeedback>{L.l(errorFeedback)}</FormFeedback>}
+                </Col>
+            </FormGroup>
+        )
+    }
+}
+
 export class FormItem extends Component {
     render() {
         const { label, error, touched, asyncValidating, labelColSpan=2, fieldColSpan=10 } = this.props

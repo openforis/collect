@@ -4,32 +4,12 @@ import { Alert, Button, Col, Form, FormGroup, Label, Input, FormFeedback } from 
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
+import { SimpleFormItem } from 'components/Forms'
 import * as UsersActions from 'actions/users'
 import ServiceFactory from 'services/ServiceFactory';
 import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage';
 import User from 'model/User'
 import L from 'utils/Labels'
-
-class FormItem extends Component {
-
-    render() {
-        const fieldId = this.props.fieldId
-        const fieldState = this.props.fieldState
-        const errorFeedback = this.props.errorFeedback
-        const label = this.props.label
-
-        return (
-            <FormGroup row color={fieldState}>
-                <Label for={fieldId} sm={2}>{L.l(label)}</Label>
-                <Col sm={10}>
-                    {this.props.children}
-                    {errorFeedback && <FormFeedback>{L.l(errorFeedback)}</FormFeedback>}
-                </Col>
-            </FormGroup>
-        )
-    }
-
-}
 
 class UserDetailsPage extends AbstractItemDetailsPage {
    
@@ -101,7 +81,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                     {this.state.alertMessageText}
                 </Alert>
                 <Form>
-                    <FormItem fieldId='username' 
+                    <SimpleFormItem fieldId='username' 
                             fieldState={this.getFieldState('username')}
                             errorFeedback={this.state.errorFeedback['username']}
                             label={'user.username'}>
@@ -110,8 +90,8 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                                 readOnly={! this.state.newItem}
                                 state={this.getFieldState('username')}
                                 onChange={(event) => this.setState({...this.state, username: event.target.value})} />
-                    </FormItem>
-                    <FormItem fieldId='enabled' 
+                    </SimpleFormItem>
+                    <SimpleFormItem fieldId='enabled' 
                             fieldState={this.getFieldState('enabled')}
                             errorFeedback={this.state.errorFeedback['enabled']}
                             label={'user.enabled'}>
@@ -123,8 +103,8 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                                     onChange={(event) => this.setState({...this.state, enabled: event.target.checked})} />
                             </Label>
                         </FormGroup>
-                    </FormItem>
-                    <FormItem fieldId='roleSelect' 
+                    </SimpleFormItem>
+                    <SimpleFormItem fieldId='roleSelect' 
                             fieldState={this.getFieldState('role')}
                             errorFeedback={this.state.errorFeedback['role']}
                             label={'user.role'}>
@@ -134,8 +114,8 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                             value={this.state.role}>
                             {User.ROLES.map(role => <option key={role} value={role}>{role}</option>)}
                         </Input>
-                    </FormItem>
-                    <FormItem fieldId='rawPassword' 
+                    </SimpleFormItem>
+                    <SimpleFormItem fieldId='rawPassword' 
                             fieldState={this.getFieldState('rawPassword')}
                             errorFeedback={this.state.errorFeedback['rawPassword']}
                             label={'user.rawPassword'}>
@@ -143,8 +123,8 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                             value={this.state.rawPassword}
                             state={this.getFieldState('rawPassword')}
                             onChange={(event) => this.setState({...this.state, rawPassword: event.target.value})} />
-                    </FormItem>
-                    <FormItem fieldId='retypedPassword' 
+                    </SimpleFormItem>
+                    <SimpleFormItem fieldId='retypedPassword' 
                             fieldState={this.getFieldState('retypedPassword')}
                             errorFeedback={this.state.errorFeedback['retypedPassword']}
                             label={'user.retypedPassword'}>
@@ -152,7 +132,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                             value={this.state.retypedPassword}
                             state={this.getFieldState('retypedPassword')}
                             onChange={(event) => this.setState({...this.state, retypedPassword: event.target.value})} />
-                    </FormItem>
+                    </SimpleFormItem>
                     <FormGroup check row>
                         <Col sm={{ size: 10, offset: 2 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
