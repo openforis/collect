@@ -8,7 +8,10 @@ import Dialog, {
   DialogTitle,
 } from 'material-ui/Dialog';
 
-const TARGET_DIV_ID = 'ofc-confirm-alert'
+import L from 'utils/Labels';
+
+const CONFIRM_TARGET_DIV_ID = 'ofc-confirm-dialog'
+const ALERT_TARGET_DIV_ID = 'ofc-alert-dialog'
 
 class ConfirmDialog extends Component {
 
@@ -42,9 +45,7 @@ class ConfirmDialog extends Component {
     }
 
     close() {
-        const target = document.getElementById(TARGET_DIV_ID);
-        unmountComponentAtNode(target);
-        target.parentNode.removeChild(target);
+        Dialogs._removeTargetDiv(CONFIRM_TARGET_DIV_ID)
     }
 
     render() {
@@ -72,22 +73,95 @@ class ConfirmDialog extends Component {
 
 }
 
+class AlertDialog extends Component {
+
+    okButton = null
+
+    constructor(props) {
+        super(props)
+
+        this.handleEntering = this.handleEntering.bind(this)
+        this.handleOk = this.handleOk.bind(this)
+        this.handleCancel = this.handleCancel.bind(this)
+        this.close = this.close.bind(this)
+    }
+
+    handleEntering() {
+        findDOMNode(this.okButton).focus()
+    }
+
+    handleOk() {
+        if (this.props.onOk) {
+            this.props.onOk()
+        }
+        this.close()
+    }
+
+    handleCancel() {
+        if (this.props.onCancel) {
+            this.props.onCancel()
+        }
+        this.close()
+    }
+
+    close() {
+        Dialogs._removeTargetDiv(ALERT_TARGET_DIV_ID)
+    }
+
+    render() {
+        const { title, message } = this.props
+        const okButtonLabel = L.l('global.ok')
+        return (
+            <Dialog open={true}
+                    ignoreBackdropClick
+                    onEntering={this.handleEntering}
+                    onEscapeKeyUp={this.handleCancel}>
+                <DialogTitle>{title}</DialogTitle>
+                <DialogContent style={{width: '400px'}}>
+                    <DialogContentText>{message}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button raised color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{okButtonLabel}</Button>
+                </DialogActions>
+            </Dialog>
+        )
+    }
+
+}
+
 class ConfirmDialogConfiguration {
 
     confirmButtonLabel = 'Confirm'
     cancelButtonLabel = 'Cancel'
 }
 
+
+
 export default class Dialogs {
 
     static confirm(title, message, onConfirm, onCancel, configuration) {
-        const targetDiv = document.createElement('div');
-        targetDiv.id = TARGET_DIV_ID;
-        document.body.appendChild(targetDiv);
+        const targetDiv = Dialogs._createTargetDiv(CONFIRM_TARGET_DIV_ID)
         render(<ConfirmDialog title={title} message={message} onConfirm={onConfirm} onCancel={onCancel} 
             configuration={Object.assign({}, new ConfirmDialogConfiguration(), configuration)} />, targetDiv)
     }
 
+    static alert(title, message, onOk) {
+        const targetDiv = Dialogs._createTargetDiv(ALERT_TARGET_DIV_ID)
+        render(<AlertDialog title={title} message={message} onOk={onOk} />, targetDiv)
+    }
+
+    static _createTargetDiv(targetDivId) {
+        const targetDiv = document.createElement('div')
+        targetDiv.id = targetDivId
+        document.body.appendChild(targetDiv)
+        return targetDiv
+    }
+
+    static _removeTargetDiv(targetDivId) {
+        const target = document.getElementById(targetDivId)
+        unmountComponentAtNode(target)
+        target.parentNode.removeChild(target)
+    }
 }
 
 

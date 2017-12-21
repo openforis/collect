@@ -17,4 +17,13 @@ export default class BackupRestoreService extends AbstractService {
     downloadLastBackup(surveyId) {
         this.downloadFile(this.BASE_URL + 'survey/' + surveyId + '/backup/latest.collect-backup')
     }
+
+    startRestore(file, surveyName, validateRecords=true, deleteAllRecordsBeforeImport=false, recordOverwriteStrategy='OVERWRITE_OLDER') {
+        return this.postFormData('surveys/restore/data', {
+            file: file,
+            surveyName: surveyName,
+            validateRecords: validateRecords,
+            deleteAllRecordsBeforeImport: deleteAllRecordsBeforeImport
+        })
+    }
 }

@@ -122,8 +122,6 @@ public class BackupRestoreController {
 				Controllers.ZIP_CONTENT_TYPE);
 	}
 	
-	
-	
 	private RecordFilter createRecordFilter(CollectSurvey survey, Integer rootEntityId, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
 		RecordFilter recordFilter = new RecordFilter(survey, rootEntityId);
 		

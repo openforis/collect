@@ -5,7 +5,6 @@ import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from
 
 import * as SessionActions from 'actions/session'
 import VersionInfo from 'components/VersionInfo'
-import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels';
 import RouterUtils from 'utils/RouterUtils'
 
@@ -85,6 +84,19 @@ class Sidebar extends Component {
                 <NavLink to={'/saiku'} className="nav-link" activeClassName="active"><i className="fa fa-bar-chart"></i>Saiku</NavLink>
               </li>
             }
+            {loggedUser.canAccessBackupRestore ?
+              <li className="nav-item nav-dropdown">
+                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleNavDropdownClick}><i className="fa fa-floppy-o"></i>{L.l('backupRestore')}</a>
+                <ul className="nav-dropdown-items">
+                  <li className="nav-item">
+                    <NavLink to={'/backup'} className="nav-link" activeClassName="active"><i className="fa fa-floppy-o"></i> {L.l('backup')}</NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to={'/restore'} className="nav-link" activeClassName="active"><i className="fa fa-upload"></i> {L.l('restore')}</NavLink>
+                  </li>
+                </ul>
+              </li>
+            : ''}
             <li className="divider"></li>
             {loggedUser.canAccessUsersManagement ?
               <li className="nav-item nav-dropdown">

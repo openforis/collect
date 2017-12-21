@@ -11,13 +11,20 @@ import Strings from 'utils/Strings'
 export class SimpleFormItem extends Component {
 
     render() {
-        const {fieldId, fieldState, errorFeedback, label, row=true, labelColSpan=2, fieldColSpan=10} = this.props
+        const {fieldId, fieldState, errorFeedback, label, check=false, row=true, labelColSpan=2, fieldColSpan=10} = this.props
 
         return (
-            <FormGroup row={row} color={fieldState}>
-                <Label for={fieldId} sm={labelColSpan}>{L.l(label)}</Label>
+            <FormGroup row={row} color={fieldState} check={check}>
+                <Label check={check} for={fieldId} sm={labelColSpan}>{L.l(label)}</Label>
                 <Col sm={fieldColSpan}>
-                    {this.props.children}
+                    {check && 
+                        <FormGroup check>
+                            <Label check>
+                                {this.props.children}
+                            </Label>
+                        </FormGroup>
+                    }
+                    {! check && this.props.children}
                     {errorFeedback && <FormFeedback>{L.l(errorFeedback)}</FormFeedback>}
                 </Col>
             </FormGroup>

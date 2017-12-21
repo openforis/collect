@@ -74,10 +74,11 @@ export default class AbstractService {
                 method: method
             })
             .then(response => {
-                if (!response.ok) {
+                if (response.ok) {
+                    return response.json()
+                } else {
                     throw Error(response.statusText)
                 }
-                return response.json()
             }, this._handleError)
             .catch(error => {
                 throw(error);

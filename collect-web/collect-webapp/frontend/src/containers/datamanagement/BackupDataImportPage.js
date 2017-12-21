@@ -61,8 +61,7 @@ class BackupDataImportPage extends Component {
         })
     }
 
-    onFileDrop(files) {
-        const file = files[0]
+    onFileDrop(file) {
         this.setState({fileSelected: true, fileToBeImported: file, fileToBeImportedPreview: file.name})
     }
 
@@ -134,7 +133,7 @@ class BackupDataImportPage extends Component {
                                 <Dropzone 
                                     acceptedFileTypes={'.collect-backup,.collect-data,.zip'}
                                     acceptedFileTypesDescription={acceptedFileTypesDescription}
-                                    handleFilesDrop={this.onFileDrop}
+                                    handleFileDrop={this.onFileDrop}
                                     height="300px"
                                     fileToBeImportedPreview={this.state.fileToBeImportedPreview} />
                             </Col>

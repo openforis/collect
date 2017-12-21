@@ -9,11 +9,13 @@ import BackupDataExportPage from 'containers/datamanagement/BackupDataExportPage
 import BackupDataImportPage from 'containers/datamanagement/BackupDataImportPage'
 import CsvDataExportPage from 'containers/datamanagement/CsvDataExportPage'
 import CsvDataImportPage from 'containers/datamanagement/CsvDataImportPage'
+import BackupPage from 'containers/backuprestore/BackupPage'
 import DashboardPage from 'containers/DashboardPage'
 import DataCleansingPage from 'containers/DataCleansingPage'
 import DataManagementPage from 'containers/datamanagement/DataManagementPage'
 import MapPage from 'containers/MapPage'
 import OldClientRecordEditPage from 'containers/datamanagement/OldClientRecordEditPage'
+import RestorePage from 'containers/backuprestore/RestorePage'
 import SaikuPage from 'containers/SaikuPage'
 import SurveyDesignerPage from 'containers/SurveyDesignerPage'
 import SurveyEditPage from 'containers/surveydesigner/SurveyEditPage'
@@ -41,6 +43,7 @@ class App extends Component {
               <div className="main-content-wrapper">
                 <Switch>
                   <Route path="/" exact name="HomePage" component={HomePage}/>
+                  <Route path="/backup" exact name="Backup" component={BackupPage}/>
                   <Route path="/dashboard" exact name="Dashboard" component={DashboardPage}/>
                   <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage}/>
                   <Route path="/datamanagement/csvexport" exact name="CsvDataExport" component={CsvDataExportPage}/>
@@ -50,6 +53,7 @@ class App extends Component {
                   <Route path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage}/>
                   <Route path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage}/>
                   <Route path="/map" exact name="Map" component={MapPage}/>
+                  <Route path="/restore" exact name="Restore" component={RestorePage}/>
                   <Route path="/saiku" exact name="Saiku" component={SaikuPage}/>
                   <Route path="/surveydesigner" exact name="SurveyDesigner" component={SurveyDesignerPage}/>
                   <Route path="/surveydesigner/surveys" exact name="SurveysList" component={SurveysListPage}/>

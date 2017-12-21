@@ -145,5 +145,7 @@ export default class User extends Serializable {
         }
     }
 
-
+    get canAccessBackupRestore() {
+        return this.role === 'ADMIN'
+    }
 }

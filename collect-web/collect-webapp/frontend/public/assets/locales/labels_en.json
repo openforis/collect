@@ -11,6 +11,7 @@
         }
     },
     "global": {
+        "ok": "Ok",
         "save": {
             "success": "Saved successfully"
         },
@@ -152,6 +153,9 @@
         "selectPublishedSurveyDropdownHeading": "--- Published survey ---",
         "selectPublishedSurveyFirst": "Select a published survey first"
     },
+    "backupRestore": {
+        "label": "Backup/Restore"
+    },
     "backup": {
         "label": "Backup",
         "lastBackup": {
@@ -162,6 +166,19 @@
         },
         "generateNewBackup": "Generate new backup",
         "backingUpData": "Backing up data"
+    },
+    "restore": {
+        "label": "Restore",
+        "acceptedFileTypesDescription": "Collect Backup (.collect-backup)",
+        "restoreMode": {
+            "label": "Restore into",
+            "selectedSurvey": "Selected survey",
+            "newSurvey": "New survey"
+        },
+        "validateRecords": "Validate records (slower)",
+        "deleteRecordsBeforeRestore": "Delete ALL existing records before restore",
+        "restoringData": "Restoring data",
+        "errorRestoringData": "Error restoring data"
     },
     "user": {
         "username": "Username",

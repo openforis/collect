@@ -83,6 +83,16 @@ const routes = [
     name: "Data Cleansing"
   },
   {
+    path: '/backup',
+    name: "Backup",
+    surveySelectRequired: true
+  },
+  {
+    path: '/restore',
+    name: "Restore",
+    surveySelectRequired: true
+  },
+  {
     path: '/map',
     name: "Map"
   },

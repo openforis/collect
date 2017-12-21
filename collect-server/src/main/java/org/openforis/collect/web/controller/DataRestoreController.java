@@ -23,10 +23,12 @@ import org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserRoles;
 import org.openforis.collect.web.controller.upload.UploadItem;
 import org.openforis.commons.web.JobStatusResponse;
@@ -63,6 +65,8 @@ public class DataRestoreController extends BasicController {
 	private SessionManager sessionManager;
 	@Autowired
 	private UserManager userManager;
+	@Autowired
+	private UserGroupManager userGroupManager;
 	
 	@Secured({UserRoles.ENTRY})
 	@RequestMapping(value = "/surveys/restore/data", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
@@ -160,7 +164,7 @@ public class DataRestoreController extends BasicController {
 	private DataRestoreJob startRestoreJob(InputStream fileInputStream, boolean newSurvey, 
 			String expectedSurveyName, User user, boolean validateRecords, boolean deleteAllRecords,
 			OverwriteStrategy recordOverwriteStrategy) throws IOException,	FileNotFoundException, ZipException {
-		File tempFile = File.createTempFile("ofc_data_restore", ".collect-data");
+		File tempFile = File.createTempFile("ofc_data_restore", ".collect-backup");
 		FileUtils.copyInputStreamToFile(fileInputStream, tempFile);
 		
 		SurveyBackupInfo info = extractInfo(tempFile);
@@ -171,11 +175,13 @@ public class DataRestoreController extends BasicController {
 		} else {
 			checkPackagedSurveyValidity(info, expectedSurveyName);
 		}
+		UserGroup newSurveyUserGroup = userGroupManager.getDefaultPublicUserGroup();
 		
 		DataRestoreJob job = jobManager.createJob(DataRestoreJob.JOB_NAME, DataRestoreJob.class);
 		job.setUser(user);
 		job.setStoreRestoredFile(true);
 		job.setPublishedSurvey(publishedSurvey);
+		job.setNewSurveyUserGroup(newSurveyUserGroup);
 		job.setFile(tempFile);
 		job.setRecordOverwriteStrategy(recordOverwriteStrategy);
 		job.setRestoreUploadedFiles(true);

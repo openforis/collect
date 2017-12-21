@@ -85,7 +85,6 @@ class BackupPage extends Component {
                         </Col>
                     </FormGroup>    
                 </Form>
-                <Row>{' '}</Row>
                 <br/> <br/> <br/>
                 <Row>
                     <Col sm={{offset: 2}}>
