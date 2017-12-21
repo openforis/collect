@@ -238,25 +238,6 @@ public class DataRestoreSummaryTask extends Task {
 		return summary;
 	}
 
-	private List<Integer> findIncompleteEntryIds() {
-		List<Integer> result = new ArrayList<Integer>();
-		for (Integer entryId: recordSummaryByEntryId.keySet()) {
-			CollectRecordSummary conflictingRecord = conflictingRecordByEntryId.get(entryId);
-			if (conflictingRecord != null) {
-				Step lastStep = getLastStep(entryId);
-				if (conflictingRecord.getStep().after(lastStep)) {
-					result.add(entryId);
-				}
-			}
-		}
-		return result;
-	}
-
-	private Step getLastStep(Integer entryId) {
-		Set<Step> steps = stepsByEntryId.get(entryId);
-		return new ArrayList<Step>(steps).get(steps.size() - 1);
-	}
-	
 	private List<FileErrorItem> createSkippedFileErrorItems() {
 		List<FileErrorItem> errorItems = new ArrayList<FileErrorItem>();
 		
@@ -266,30 +247,14 @@ public class DataRestoreSummaryTask extends Task {
 			FileErrorItem fileErrorItem = new FileErrorItem(fileName, nodeErrors);
 			errorItems.add(fileErrorItem);
 		}
-
-		List<Integer> incompleteEntryIds = findIncompleteEntryIds();
-		for (Integer entryId : incompleteEntryIds) {
-			CollectRecordSummary conflictingRecordSummary = conflictingRecordByEntryId.get(entryId);
-			Step missingStep = conflictingRecordSummary.getStep();
-			Set<Step> steps = stepsByEntryId.get(entryId);
-			for (Step step : steps) {
-				String entryName = getEntryName(entryId, step);
-				if (! errorsByEntryName.containsKey(entryName)) {
-					NodeUnmarshallingError error = new NodeUnmarshallingError("Incomplete entry set, missing step: " + missingStep);
-					FileErrorItem fileErrorItem = new FileErrorItem(entryName, Arrays.asList(error));
-					errorItems.add(fileErrorItem);
-				}
-			}
-		}
 		return errorItems;
 	}
 
 	private List<DataImportSummaryItem> createRecordToImportItems() {
 		List<DataImportSummaryItem> recordsToImport = new ArrayList<DataImportSummaryItem>();
-		List<Integer> incompleteEntryIds = findIncompleteEntryIds();
 		Set<Integer> entryIds = recordSummaryByEntryId.keySet();
 		for (Integer entryId: entryIds) {
-			if ( ! conflictingRecordByEntryId.containsKey(entryId) && ! incompleteEntryIds.contains(entryId)) {
+			if ( ! conflictingRecordByEntryId.containsKey(entryId)) {
 				Set<Step> steps = stepsByEntryId.get(entryId);
 				CollectRecordSummary recordSummary = recordSummaryByEntryId.get(entryId);
 				DataImportSummaryItem item = new DataImportSummaryItem(entryId, recordSummary, new ArrayList<Step>(steps));
@@ -302,17 +267,14 @@ public class DataRestoreSummaryTask extends Task {
 
 	private List<DataImportSummaryItem> createConflictingRecordItems() {
 		List<DataImportSummaryItem> conflictingRecordItems = new ArrayList<DataImportSummaryItem>();
-		List<Integer> incompleteEntryIds = findIncompleteEntryIds();
 		Set<Integer> conflictingEntryIds = conflictingRecordByEntryId.keySet();
 		for (Integer entryId: conflictingEntryIds) {
-			if ( ! incompleteEntryIds.contains(entryId)) {
-				CollectRecordSummary recordSummary = recordSummaryByEntryId.get(entryId);
-				CollectRecordSummary conflictingRecord = conflictingRecordByEntryId.get(entryId);
-				Set<Step> steps = stepsByEntryId.get(entryId);
-				DataImportSummaryItem item = new DataImportSummaryItem(entryId, recordSummary, new ArrayList<Step>(steps), conflictingRecord);
-				item.setWarnings(warningsByEntryId.get(entryId));
-				conflictingRecordItems.add(item);
-			}
+			CollectRecordSummary recordSummary = recordSummaryByEntryId.get(entryId);
+			CollectRecordSummary conflictingRecord = conflictingRecordByEntryId.get(entryId);
+			Set<Step> steps = stepsByEntryId.get(entryId);
+			DataImportSummaryItem item = new DataImportSummaryItem(entryId, recordSummary, new ArrayList<Step>(steps), conflictingRecord);
+			item.setWarnings(warningsByEntryId.get(entryId));
+			conflictingRecordItems.add(item);
 		}
 		return conflictingRecordItems;
 	}
