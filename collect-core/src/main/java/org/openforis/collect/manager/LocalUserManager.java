@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.manager;
 
+import static org.springframework.transaction.annotation.Propagation.REQUIRED;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -54,10 +56,12 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		return user;
 	}
 	
+	@Override
 	public User loadByUserName(String userName) {
 		return loadByUserName(userName, null);
 	}
 	
+	@Override
 	public User loadEnabledUser(String userName) {
 		return loadByUserName(userName, true);
 	}
@@ -75,10 +79,12 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		}
 	}
 	
+	@Override
 	public User loadAdminUser() {
 		return loadByUserName(ADMIN_USER_NAME);
 	}
 	
+	@Override
 	public List<User> loadAll() {
 		return userDao.loadAll();
 	}
@@ -103,7 +109,8 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		}
 	}
 
-	@Transactional
+	@Override
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public User save(User user, User createdByUser) {
 		Integer userId = user.getId();
 		String rawPassword = user.getRawPassword();
@@ -137,7 +144,8 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		return user.getPassword().equals(encodedPassword);
 	}
 	
-	@Transactional
+	@Override
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public OperationResult changePassword(String username, String oldPassword, String newPassword) throws UserPersistenceException {
 		if (verifyPassword(username, oldPassword)) {
 			User user = userDao.loadByUserName(username, true);
@@ -187,7 +195,7 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void deleteById(Integer id) throws CannotDeleteUserException {
 		if ( recordDao.hasAssociatedRecords(id) ) {
 			throw new CannotDeleteUserException();
@@ -208,7 +216,8 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 	 * 
 	 * @throws UserPersistenceException 
 	 */
-	@Transactional
+	@Override
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public User insertUser(String name, String password, UserRole role, User createdByUser) throws UserPersistenceException {
 		User user = new User(name);
 		user.setRawPassword(password);

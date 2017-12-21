@@ -3,6 +3,7 @@ package org.openforis.collect.manager;
 import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus.ACCEPTED;
 import static org.openforis.collect.model.UserInGroup.UserGroupJoinRequestStatus.PENDING;
 import static org.openforis.collect.model.UserInGroup.UserGroupRole.OWNER;
+import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.openforis.collect.persistence.UserGroupDao;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGroup, Integer, UserGroupDao> implements UserGroupManager {
 
 	private static final String DEFAULT_PUBLIC_USER_GROUP_NAME = "default_public_group";
@@ -41,7 +43,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	}
 	
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public UserGroup createDefaultPrivateUserGroup(User user, User createdByUser) {
 		UserGroup userGroup = new UserGroup();
 		userGroup.setName(getDefaultPrivateUserGroupName(user));
@@ -200,7 +202,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	}
 
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(propagation=REQUIRED)
 	public UserGroup save(UserGroup userGroup, User modifiedByUser) {
 		dao.save(userGroup);
 		List<UserInGroup> oldUsersInGroup = dao.findUsersByGroup(userGroup.getId());
@@ -247,16 +249,18 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	}
 	
 	@Override
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void deleteRelation(int userGroupId, int userId) {
 		dao.deleteRelation(userGroupId, userId);
 	}
 	
 	@Override
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void deleteAllUserRelations(int userId) {
 		dao.deleteAllUserRelations(userId);
 	}
 	
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void requestJoin(User user, UserGroup userGroup, UserGroupRole role) {
 		UserInGroup userInGroup = new UserInGroup();
 		userInGroup.setGroupId(userGroup.getId());
@@ -267,13 +271,13 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		dao.insertRelation(userInGroup);
 	}
 
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void acceptJoinRequest(User user, UserGroup userGroup) {
 		dao.acceptRelation(user, userGroup);
 	}
 	
 	@Override
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void joinToDefaultPublicGroup(User user, UserGroupRole role) {
 		UserGroup publicGroup = getDefaultPublicUserGroup();
 		UserInGroup userInGroup = new UserInGroup();
@@ -285,11 +289,22 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		dao.insertRelation(userInGroup);
 	}
 
-	@Transactional(propagation=Propagation.REQUIRED)
+	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void delete(int id) {
 		dao.deleteById(id);
 	}
 	
+	@Override
+	public Map<String, String> getQualifiers(UserGroup group, User user) {
+		UserInGroup userInGroup = findUserInGroupOrDescendants(group, user);
+		if (userInGroup == null) {
+			throw new IllegalArgumentException(String.format("User %s not allowed to see records for user group %s", 
+					user.getUsername(), group.getName()));
+		}
+		UserGroup associatedGroup = loadById(userInGroup.getGroupId());
+		return associatedGroup.getQualifiersByName();
+	}
+
 	private List<UserGroup> fillLazyLoadedFields(List<UserGroup> groups) {
 		for (UserGroup group : groups) {
 			fillLazyLoadedFields(group);
@@ -313,6 +328,33 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		return findByName(getDefaultPrivateUserGroupName(user));
 	}
 	
+	
+	@Override
+	public UserGroup findUserGroupByResource(String resourceType, String resourceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> findResourcesByUserGroup(int userGroupId, String resourceType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	@Transactional(readOnly=false, propagation=REQUIRED)
+	public void associateResource(int userGroupId, String resourceType, String resourceId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	@Transactional(readOnly=false, propagation=REQUIRED)
+	public void disassociateResource(int userGroupId, String resourceType, String resourceId) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public static class UserGroupTree {
 		
 		private List<UserGroupTreeNode> roots = new ArrayList<UserGroupTreeNode>();
@@ -341,40 +383,4 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		}
 		
 	}
-	
-	@Override
-	public Map<String, String> getQualifiers(UserGroup group, User user) {
-		UserInGroup userInGroup = findUserInGroupOrDescendants(group, user);
-		if (userInGroup == null) {
-			throw new IllegalArgumentException(String.format("User %s not allowed to see records for user group %s", 
-					user.getUsername(), group.getName()));
-		}
-		UserGroup associatedGroup = loadById(userInGroup.getGroupId());
-		return associatedGroup.getQualifiersByName();
-	}
-
-	@Override
-	public UserGroup findUserGroupByResource(String resourceType, String resourceId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<String> findResourcesByUserGroup(int userGroupId, String resourceType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void associateResource(int userGroupId, String resourceType, String resourceId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void disassociateResource(int userGroupId, String resourceType, String resourceId) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
