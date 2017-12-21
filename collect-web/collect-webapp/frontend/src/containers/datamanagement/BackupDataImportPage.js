@@ -23,6 +23,7 @@ class BackupDataImportPage extends Component {
             fileSelected: false,
             fileToBeImportedPreview: null,
             fileToBeImported: null,
+            uploadingFile: false,
             selectedRecordsToImport: [],
             selectedRecordsToImportIds: [],
             selectedConflictingRecords: [],
@@ -40,16 +41,23 @@ class BackupDataImportPage extends Component {
 
     handleGenerateSummaryButtonClick() {
         const survey = this.props.survey
-        ServiceFactory.recordService.generateBackupDataImportSummary(survey, 
-            survey.schema.firstRootEntityDefinition.name,
-            this.state.fileToBeImported)
-        .then(job => {
-            this.props.dispatch(JobActions.startJobMonitor({
-                jobId: job.id, 
-                title: L.l('dataManagement.backupDataImport.generatingDataImportSummary'),
-                okButtonLabel: L.l('global.done'),                        
-                handleJobCompleted: this.handleRecordSummaryGenerationComplete
-            }))
+        this.setState({
+            uploadingFile: true
+        })
+        ServiceFactory.recordService.generateBackupDataImportSummary(
+                survey, 
+                survey.schema.firstRootEntityDefinition.name,
+                this.state.fileToBeImported
+            ).then(job => {
+                this.setState({
+                    uploadingFile: false
+                })
+                this.props.dispatch(JobActions.startJobMonitor({
+                    jobId: job.id, 
+                    title: L.l('dataManagement.backupDataImport.generatingDataImportSummary'),
+                    okButtonLabel: L.l('global.done'),                        
+                    handleJobCompleted: this.handleRecordSummaryGenerationComplete
+                }))
         })
     }
 
@@ -131,12 +139,15 @@ class BackupDataImportPage extends Component {
                                     fileToBeImportedPreview={this.state.fileToBeImportedPreview} />
                             </Col>
                         </FormGroup>
-                        <FormGroup row>
-                            <Col sm={{offset: 5, size: 2}} colSpan={2}>
-                                <Button disabled={! this.state.fileSelected} onClick={this.handleGenerateSummaryButtonClick} 
-                                className="btn btn-success">{L.l('dataManagement.backupDataImport.generateImportSummary')}</Button>
-                            </Col>
-                        </FormGroup>
+                        {this.state.fileSelected && 
+                            <FormGroup row>
+                                <Col sm={{offset: 5, size: 2}} colSpan={2}>
+                                    <Button disabled={this.state.uploadingFile} onClick={this.handleGenerateSummaryButtonClick} 
+                                        className="btn btn-success">{L.l('dataManagement.backupDataImport.generateImportSummary')}</Button>
+                                </Col>
+                            </FormGroup>
+                        }
+                        
                     </Form>
                 )
             case BackupDataImportPage.SHOW_IMPORT_SUMMARY:
