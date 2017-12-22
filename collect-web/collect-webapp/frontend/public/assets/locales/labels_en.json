@@ -26,7 +26,8 @@
         "done": "Done",
         "delete": "Delete",
         "loading": "Loading...",
-        "refresh": "Refresh"
+        "refresh": "Refresh",
+        "close": "Close"
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",

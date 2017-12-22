@@ -259,10 +259,8 @@ class CsvDataImportPage extends Component {
                             </BootstrapTable>
                         </DialogContent>
                         <DialogActions>
-                            {this.state.sessionExpired && 
-                                <Button color="primary" raised
-                                    onClick={this.handleErrorsModalCloseButtonClick}>{L.l('global.close')}</Button>
-                            }
+                            <Button color="primary" raised 
+                                onClick={this.handleErrorsModalCloseButtonClick}>{L.l('global.close')}</Button>
                         </DialogActions>
                     </Dialog>
                 </Form>
