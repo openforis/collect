@@ -94,7 +94,7 @@ class SessionTimeoutVerifier extends Component {
                     ignoreEscapeKeyUp>
                     <DialogTitle>{L.l('connection.serverConnectionError.title')}</DialogTitle>
                     <DialogContent style={{width: '400px'}}>
-                        {errorMessage}
+                        <DialogContentText>{errorMessage}</DialogContentText>
                         {! this.state.sessionExpired && 
                             <LinearProgress />
                         }

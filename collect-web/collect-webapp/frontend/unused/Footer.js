@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Container, Row, Col, UncontrolledTooltip } from 'reactstrap';
 import { connect } from 'react-redux';
-import Constants from 'utils/Constants'
+
+import Constants from 'Constants'
 
 class Footer extends Component {
   render() {

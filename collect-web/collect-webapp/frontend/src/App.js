@@ -4,31 +4,29 @@ import { Switch, Route } from 'react-router-dom'
 import Header from 'components/Header';
 import Sidebar from 'components/Sidebar';
 import CurrentJobMonitorDialog from 'containers/CurrentJobMonitorDialog';
-import HomePage from 'containers/HomePage'
-import BackupDataExportPage from 'containers/datamanagement/BackupDataExportPage'
-import BackupDataImportPage from 'containers/datamanagement/BackupDataImportPage'
-import CsvDataExportPage from 'containers/datamanagement/CsvDataExportPage'
-import CsvDataImportPage from 'containers/datamanagement/CsvDataImportPage'
-import BackupPage from 'containers/backuprestore/BackupPage'
-import DashboardPage from 'containers/DashboardPage'
-import DataCleansingPage from 'containers/DataCleansingPage'
-import DataManagementPage from 'containers/datamanagement/DataManagementPage'
-import MapPage from 'containers/MapPage'
-import OldClientRecordEditPage from 'containers/datamanagement/OldClientRecordEditPage'
-import RestorePage from 'containers/backuprestore/RestorePage'
-import SaikuPage from 'containers/SaikuPage'
-import SurveyDesignerPage from 'containers/SurveyDesignerPage'
-import SurveyEditPage from 'containers/surveydesigner/SurveyEditPage'
-import SurveysListPage from 'containers/surveydesigner/SurveysListPage'
-import NewSurveyPage from './containers/surveydesigner/NewSurveyPage';
-import SurveyExportPage from './containers/surveydesigner/SurveyExportPage';
-import SurveyImportPage from './containers/surveydesigner/SurveyImportPage';
-import UsersPage from 'containers/users/UsersPage'
-import UserGroupsPage from 'containers/users/UserGroupsPage'
-import UserGroupDetailsPage from 'containers/users/UserGroupDetailsPage'
-import PasswordChangePage from 'containers/users/PasswordChangePage'
-
-import Routes from 'Routes'
+import HomePage from 'scenes/HomePage'
+import BackupDataExportPage from 'scenes/datamanagement/BackupDataExportPage'
+import BackupDataImportPage from 'scenes/datamanagement/BackupDataImportPage'
+import CsvDataExportPage from 'scenes/datamanagement/CsvDataExportPage'
+import CsvDataImportPage from 'scenes/datamanagement/CsvDataImportPage'
+import OldClientRecordEditPage from 'scenes/datamanagement/OldClientRecordEditPage'
+import BackupPage from 'scenes/backuprestore/BackupPage'
+import DashboardPage from 'scenes/DashboardPage'
+import DataCleansingPage from 'scenes/DataCleansingPage'
+import DataManagementPage from 'scenes/datamanagement/DataManagementPage'
+import MapPage from 'scenes/MapPage'
+import RestorePage from 'scenes/backuprestore/RestorePage'
+import SaikuPage from 'scenes/SaikuPage'
+import SurveyDesignerPage from 'scenes/SurveyDesignerPage'
+import SurveyEditPage from 'scenes/surveydesigner/SurveyEditPage'
+import SurveysListPage from 'scenes/surveydesigner/SurveysListPage'
+import NewSurveyPage from 'scenes/surveydesigner/NewSurveyPage';
+import SurveyExportPage from 'scenes/surveydesigner/SurveyExportPage';
+import SurveyImportPage from 'scenes/surveydesigner/SurveyImportPage';
+import UsersPage from 'scenes/users/UsersPage'
+import UserGroupsPage from 'scenes/users/UserGroupsPage'
+import UserGroupDetailsPage from 'scenes/users/UserGroupDetailsPage'
+import PasswordChangePage from 'scenes/users/PasswordChangePage'
 
 class App extends Component {
 

@@ -1,5 +1,5 @@
 import T from 'i18n-react';
-import Constants from 'utils/Constants'
+import Constants from 'Constants'
 import Arrays from 'utils/Arrays'
 
 export default class Labels {

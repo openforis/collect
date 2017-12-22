@@ -54,10 +54,7 @@ export default class User extends Serializable {
         }
         switch (this.role) {
             case 'ENTRY':
-                return ! Arrays.contains(records, r => {
-                    console.log('ownerId: ' + r.ownerId)
-                    return r.step != 'ENTRY' || r.ownerId != this.id
-                })
+                return ! Arrays.contains(records, r => r.step !== 'ENTRY' || r.ownerId !== this.id)
             default:
                 return true
                 

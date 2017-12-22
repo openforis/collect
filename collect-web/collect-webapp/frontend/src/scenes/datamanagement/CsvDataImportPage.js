@@ -3,7 +3,6 @@ import { Container, Form, FormFeedback, FormGroup, Label, Input, Col } from 'rea
 import Dialog, {
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
   } from 'material-ui/Dialog';
 import Button from 'material-ui/Button';

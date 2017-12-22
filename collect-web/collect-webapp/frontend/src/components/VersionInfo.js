@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { UncontrolledTooltip } from 'reactstrap';
 import { connect } from 'react-redux'
 
-import Constants from 'utils/Constants'
+import Constants from 'Constants'
 
 class VersionInfo extends Component {
 

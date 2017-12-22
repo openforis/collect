@@ -1,4 +1,4 @@
-import Constants from 'utils/Constants'
+import Constants from 'Constants'
 
 export default class RouterUtils {
 

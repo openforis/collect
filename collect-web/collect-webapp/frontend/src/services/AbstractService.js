@@ -1,4 +1,4 @@
-import Constants from 'utils/Constants';
+import Constants from 'Constants';
 import Objects from 'utils/Objects';
 import Strings from 'utils/Strings';
 

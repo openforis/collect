@@ -21,6 +21,10 @@ class BackupPage extends Component {
         this.handleBackupButtonClick = this.handleBackupButtonClick.bind(this)
         this.handleBackupCompleteOkButtonClick = this.handleBackupCompleteOkButtonClick.bind(this)
         this.handleDownloadLastBackupButtonClick = this.handleDownloadLastBackupButtonClick.bind(this)
+
+        if (this.props.survey) {
+            this.updateLatestBackupInfo(props.survey)
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -81,7 +85,7 @@ class BackupPage extends Component {
                             <Input type="text" readOnly value={latestBackupInfo.updatedRecordsSinceBackup} />
                         </SimpleFormItem>
                         <Col sm={{offset: 4}}>
-                            <Button disabled={latestBackupInfo.data === null} raised onClick={this.handleDownloadLastBackupButtonClick}>{L.l('backup.lastBackup.download')}</Button>
+                            <Button disabled={latestBackupInfo.date === null} raised onClick={this.handleDownloadLastBackupButtonClick}>{L.l('backup.lastBackup.download')}</Button>
                         </Col>
                     </FormGroup>    
                 </Form>

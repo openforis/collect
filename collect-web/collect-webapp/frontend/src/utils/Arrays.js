@@ -4,7 +4,7 @@ export default class Arrays {
 
     static contains(array, itemOrPredicate, keyProp) {
         if (itemOrPredicate instanceof Function) {
-            return array.find(itemOrPredicate) != undefined
+            return array.find(itemOrPredicate) !== undefined
         } else {
             return Arrays.indexOf(array, itemOrPredicate, keyProp) >= 0
         }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Constants from 'utils/Constants';
+import Constants from 'Constants';
 import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
 
 class SurveEditPage extends Component {
