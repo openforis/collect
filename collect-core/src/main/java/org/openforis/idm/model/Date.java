@@ -161,8 +161,13 @@ public final class Date extends AbstractValue {
 	}
 	
 	public java.util.Date toJavaDate() {
-		Calendar cal = toCalendar();
-		return cal == null ? null: cal.getTime();
+		try {
+			Calendar cal = toCalendar();
+			return cal == null ? null: cal.getTime();
+		} catch(Exception e) {
+			//invalid date, ignore it
+			return null;
+		}
 	}
 
 	public String toXmlDate() {
