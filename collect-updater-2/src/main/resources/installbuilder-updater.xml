@@ -38,19 +38,19 @@
 			</folderList>
 			
 			<postInstallationActionList>
-		  		<!-- create logs folder -->
+				<!-- create logs folder -->
 				<createDirectory path="${installdir}/logs" abortOnError="0" />
 
 				<!-- delete old log folder -->
-		  		<deleteFile path="${installdir}/log" abortOnError="0" />
-		  		<deleteFile path="${collect_root_user_dir}/log" abortOnError="0" />
-		  		
-  		        <!-- Delete temporary files -->
-		        <deleteFile>
-		  			<path>${webapps_dir}/collect</path>
-		  		</deleteFile>
-		  		
-		  		<!-- Update update.ini file -->
+				<deleteFile path="${installdir}/log" abortOnError="0" />
+				<deleteFile path="${collect_root_user_dir}/log" abortOnError="0" />
+				
+				<!-- Delete temporary files -->
+				<deleteFile>
+					<path>${webapps_dir}/collect</path>
+				</deleteFile>
+				
+				<!-- Update update.ini file -->
 				<writeFile>
 					<path>update.ini</path>
 					<text>[Update]
@@ -61,26 +61,30 @@ check_for_updates = 1</text>
 				</writeFile>
 				<!-- delete temporary rollaback files -->
 				<deleteFile path="${project.rollbackBackupDirectory}"/>
+				<showInfo>
+					<title>Update Finished!</title>
+					<text>Thank you for keeping Open Foris Collect always up to date!</text>
+				</showInfo>
 			</postInstallationActionList>
 		</component>
 	</componentList>
-    <preInstallationActionList>
-        <createTimeStamp>
+	<preInstallationActionList>
+		<createTimeStamp>
 			<variable>timestamp</variable>
 			<format>%Y%m%d%H%M%S</format>
 		</createTimeStamp>
-    	<setInstallerVariable name="installdir" 
-    			value=".."/>
-    	<setInstallerVariable name="server_http_port" 
-    			value="8380"/>
-    	<setInstallerVariable name="collect_root_user_dir" 
+		<setInstallerVariable name="installdir" 
+				value=".."/>
+		<setInstallerVariable name="server_http_port" 
+				value="8380"/>
+		<setInstallerVariable name="collect_root_user_dir" 
 				value="${user_home_directory}/OpenForis/Collect" />
 		<setInstallerVariable name="backup_dir" 
 				value="${collect_root_user_dir}/backup/${timestamp}" />
 		<setInstallerVariable name="data_dir" 
 				value="${collect_root_user_dir}/data" />
-    	<setInstallerVariable name="webapps_dir" 
-    			value="${installdir}/webapps"/>
+		<setInstallerVariable name="webapps_dir" 
+				value="${installdir}/webapps"/>
 		<propertiesFileGet>
 		   <file>${collect_root_user_dir}/collect.properties</file>
 		   <key>collect.http_port</key>
@@ -97,7 +101,7 @@ check_for_updates = 1</text>
 					<port>${server_http_port}</port>
 				</portTest>
 			</ruleList>
-        </throwError>
+		</throwError>
 	</preInstallationActionList>
 	<readyToInstallActionList>
 		<createDirectory>
@@ -109,35 +113,35 @@ check_for_updates = 1</text>
 			<destination>${backup_dir}/collect.war</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
+		</copyFile>
 		<copyFile>
 			<origin>${data_dir}/collect.db</origin>
 			<destination>${backup_dir}/collect.db</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
-        <copyFile>
+		</copyFile>
+		<copyFile>
 			<origin>${installdir}/lib/collect-control-panel-*.jar</origin>
 			<destination>${backup_dir}</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
-        <copyFile>
+		</copyFile>
+		<copyFile>
 			<origin>${collect_root_user_dir}/collect.properties</origin>
 			<destination>${backup_dir}</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-        </copyFile>
-        <!-- delete temporary files -->
-        <deleteFile>
-  			<path>${webapps_dir}/collect</path>
+		</copyFile>
+		<!-- delete temporary files -->
+		<deleteFile>
+			<path>${webapps_dir}/collect</path>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
-  		</deleteFile>
-  		<!-- delete old Control Panel files -->
-  		<deleteFile>
-  			<path>${installdir}/lib/collect-control-panel-*.jar</path>
-  		</deleteFile>
+		</deleteFile>
+		<!-- delete old Control Panel files -->
+		<deleteFile>
+			<path>${installdir}/lib/collect-control-panel-*.jar</path>
+		</deleteFile>
 	</readyToInstallActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
 	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>

@@ -163,7 +163,12 @@
 		        	<key>collect.http_port</key>
 		        	<value>${http_port}</value>
 		        </propertiesFileSet>
-        	</postInstallationActionList>
+
+				<showInfo>
+					<title>Installation Finished!</title>
+					<text>Thank you for installing Open Foris Collect!</text>
+				</showInfo>	
+			</postInstallationActionList>
 		</component>
 		<component>
 			<name>autoupdater</name>
