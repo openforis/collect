@@ -15,6 +15,7 @@
         "save": {
             "success": "Saved successfully"
         },
+        "info": "Info",
         "import": {
             "label": "Import"
         },
@@ -24,7 +25,8 @@
         "selectOne": "--- Select one ---",
         "done": "Done",
         "delete": "Delete",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "refresh": "Refresh"
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
@@ -67,8 +69,12 @@
                 "row_identifier_not_specified": "Row identifier not specified",
                 "nodePositionNotSpecified": "Node position not specified for a multiple attribute",
                 "invalidNodePosition": "Invalid node position: it must be a positive integer number",
-                "fieldNameNotSpecified": "Field name not specified"
+                "fieldNameNotSpecified": "Field name not specified",
+                "type": {
+                    "MISSING_REQUIRED_COLUMNS": "Missing required columns"
+                }
             },
+            "errorsInUploadedFile": "Errors in uploaded file",
             "importType": {
                 "label": "Import type",
                 "update": "Update existing records",
@@ -218,7 +224,8 @@
             "wrongPasswordSpecified": "Wrong password specified"
         },
         "changePassword": {
-            "change": "Change"
+            "change": "Change",
+            "passwordChanged": "Password changed!"
         },
         "delete": {
             "confirmTitle": "Delete user",
@@ -241,5 +248,12 @@
         "minLength": "It must be at least {0} characters",
         "required_field": "Required field",
         "duplicate_value": "Duplicate value"
+    },
+    "connection": {
+        "serverConnectionError": {
+            "title": "Server connection error",
+            "message": "Error connecting to the server; trying to establish the connection again..."
+        },
+        "sessionExpired": "Session expired. Refresh the web browser page."
     }
 }

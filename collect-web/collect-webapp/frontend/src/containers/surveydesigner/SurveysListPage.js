@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormFeedback, FormGroup, Label, Input, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+    Form, FormFeedback, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 
 import * as Formatters from 'components/datatable/formatters';
 import CheckedIconFormatter from 'components/datatable/CheckedIconFormatter'

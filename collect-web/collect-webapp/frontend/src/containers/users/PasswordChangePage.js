@@ -4,6 +4,7 @@ import Button from 'material-ui/Button';
 
 import ServiceFactory from 'services/ServiceFactory';
 import Forms from 'components/Forms';
+import Dialogs from 'components/Dialogs'
 import L from 'utils/Labels';
 import RouterUtils from 'utils/RouterUtils';
 
@@ -25,7 +26,7 @@ class PasswordChangePage extends Component {
             .then(r => {
                 Forms.handleValidationResponse(r)
                 if (r.statusOk) {
-                    alert('Password changed!') //TODO improve alert dialogs!!!
+                    Dialogs.alert(L.l('global.info'), L.l('user.changePassword.passwordChanged'))
                     RouterUtils.navigateToHomePage(this.props.history)
                 }
             })

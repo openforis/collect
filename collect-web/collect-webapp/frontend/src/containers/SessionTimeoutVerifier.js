@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Progress } from 'reactstrap';
+import Dialog, {
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+  } from 'material-ui/Dialog';
+import { LinearProgress } from 'material-ui/Progress';
+import Button from 'material-ui/Button';
 import { connect } from 'react-redux';
 
 import * as SessionActions from 'actions/session'
 import Preloader from 'components/Preloader'
 import ServiceFactory from 'services/ServiceFactory'
 import RouterUtils from 'utils/RouterUtils'
+import L from 'utils/Labels';
 
 class SessionTimeoutVerifier extends Component {
     
@@ -22,7 +30,7 @@ class SessionTimeoutVerifier extends Component {
             sessionExpired: false,
             outOfServiceTime: 0
         }
-
+        
         this.ping = this.ping.bind(this)
         this.startTimer = this.startTimer.bind(this)
         this.handleTimeout = this.handleTimeout.bind(this)
@@ -76,25 +84,28 @@ class SessionTimeoutVerifier extends Component {
         if (this.state.initializing) {
             return <Preloader />
         }
-        const errorMessage = this.state.sessionExpired ? 'Session expired. Refresh the web browser page.': 
-            'Error connecting to the server; trying to establish the connection again...'
+        const errorMessage = this.state.sessionExpired ? L.l('connection.sessionExpired'): L.l('connection.serverConnectionError.message')
+            
         return (
             <div>
                 {this.props.children}
-                <Modal isOpen={! this.state.active} backdrop="static">
-                    <ModalHeader>Server connection error</ModalHeader>
-                    <ModalBody>{errorMessage}
-                        {! this.state.sessionExpired ? 
-                            <Progress animated value="100" />
-                        : ''}
-                    </ModalBody>
-                    <ModalFooter>
-                        {this.state.sessionExpired ? 
-                            <Button color="primary"
-                                onClick={this.handleRefreshButtonClick}>Refresh</Button>
-                        : ''}
-                    </ModalFooter>
-                </Modal>
+                <Dialog open={! this.state.active} 
+                    ignoreBackdropClick
+                    ignoreEscapeKeyUp>
+                    <DialogTitle>{L.l('connection.serverConnectionError.title')}</DialogTitle>
+                    <DialogContent style={{width: '400px'}}>
+                        {errorMessage}
+                        {! this.state.sessionExpired && 
+                            <LinearProgress />
+                        }
+                    </DialogContent>
+                    <DialogActions>
+                        {this.state.sessionExpired && 
+                            <Button color="primary" raised
+                                onClick={this.handleRefreshButtonClick}>{L.l('global.refresh')}</Button>
+                        }
+                    </DialogActions>
+                </Dialog>
             </div>
         )
     }

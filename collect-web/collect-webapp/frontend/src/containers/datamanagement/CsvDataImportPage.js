@@ -1,5 +1,13 @@
 import React, { Component } from 'react';
-import { Button, Container, Form, FormFeedback, FormGroup, Label, Input, Col, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Container, Form, FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
+import Dialog, {
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+  } from 'material-ui/Dialog';
+import Button from 'material-ui/Button';
+
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
@@ -155,7 +163,11 @@ class CsvDataImportPage extends Component {
         const formatErrorMessage = function(cell, row) {
             return L.l(row.message, row.messageArgs)
         }
-    
+
+        const formatErrorType = function(cell, row) {
+            return L.l('dataManagement.csvDataImport.error.type.' + cell)
+        }
+        
         return (
             <Container>
                 <Form>
@@ -225,27 +237,34 @@ class CsvDataImportPage extends Component {
                     </FormGroup>
                     <FormGroup row>
                         <Col sm={{size: 2, offset: 5}}>
-                            <Button color="primary" onClick={this.handleImportButtonClick}>Import</Button>
+                            <Button color="primary" raised onClick={this.handleImportButtonClick}>{L.l('global.import')}</Button>
                         </Col>
                     </FormGroup>
 
-                    <Modal isOpen={this.state.errorModalOpen} style={{maxWidth: '1000px'}}>
-                        <ModalHeader toggle={() => this.setState({errorModalOpen: ! this.state.errorModalOpen})}>Errors in uploaded file</ModalHeader>
-                        <ModalBody>
+                    <Dialog open={this.state.errorModalOpen} 
+                        maxWidth="md"
+                        fullWidth
+                        ignoreBackdropClick
+                        ignoreEscapeKeyUp>
+                        <DialogTitle>{L.l('dataManagement.csvDataImport.errorsInUploadedFile')}</DialogTitle>
+                        <DialogContent>
                             <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors.csv'}>
                                 <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
                                 <TableHeaderColumn dataField="fileName" width="200">{L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
-                                <TableHeaderColumn dataField="row" width="50">{L.l('dataManagement.csvDataImport.row')}</TableHeaderColumn>
+                                <TableHeaderColumn dataField="row" width="80">{L.l('dataManagement.csvDataImport.row')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="columns" width="150">{L.l('dataManagement.csvDataImport.columns')}</TableHeaderColumn>
-                                <TableHeaderColumn dataField="errorType" width="140">{L.l('dataManagement.csvDataImport.error-type')}</TableHeaderColumn>
+                                <TableHeaderColumn dataField="errorType" width="160" dataFormat={formatErrorType}>{L.l('dataManagement.csvDataImport.error-type')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="message" width="400" dataFormat={formatErrorMessage}
                                     csvFormat={formatErrorMessage}>{L.l('dataManagement.csvDataImport.error-message')}</TableHeaderColumn>
                             </BootstrapTable>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="primary" onClick={this.handleErrorsModalCloseButtonClick}>Close</Button>
-                        </ModalFooter>
-                    </Modal>
+                        </DialogContent>
+                        <DialogActions>
+                            {this.state.sessionExpired && 
+                                <Button color="primary" raised
+                                    onClick={this.handleErrorsModalCloseButtonClick}>{L.l('global.close')}</Button>
+                            }
+                        </DialogActions>
+                    </Dialog>
                 </Form>
             </Container>
         )

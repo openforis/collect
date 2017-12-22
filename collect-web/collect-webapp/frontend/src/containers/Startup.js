@@ -21,15 +21,13 @@ class Startup extends Component {
     }
 
     componentDidMount() {
-        Labels.initialize(() => {
-            this.props.dispatch(Actions.fetchApplicationInfo())
-            this.props.dispatch(SessionActions.fetchCurrentUser())
-            this.props.dispatch(UserActions.fetchUsers())
-            this.props.dispatch(Actions.fetchUserGroups())
-            this.props.dispatch(SurveysActions.fetchSurveySummaries());
-            
-            this.startReloadinInfoTimer()
-        })
+        this.props.dispatch(Actions.fetchApplicationInfo())
+        this.props.dispatch(SessionActions.fetchCurrentUser())
+        this.props.dispatch(UserActions.fetchUsers())
+        this.props.dispatch(Actions.fetchUserGroups())
+        this.props.dispatch(SurveysActions.fetchSurveySummaries());
+        
+        this.startReloadinInfoTimer()
     }
 
     componentWillReceiveProps(nextProps) {
