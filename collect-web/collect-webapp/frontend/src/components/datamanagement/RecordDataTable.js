@@ -17,8 +17,6 @@ class RecordDataTable extends Component {
 			totalSize: 0,
 			page: 1,
 			recordsPerPage: 25,
-			records: [], 
-			totalSize: 0,
 			keyValues: [],
 			summaryValues: [],
 			sortFields: []
@@ -196,7 +194,7 @@ class RecordDataTable extends Component {
 			return cell ? cell.username : ''
 		}
 
-		function createRootEntityFilter(attrDef) {
+		function createKeyAttributeFilter(attrDef) {
 			switch(attrDef.attributeType) {
 				case 'NUMBER':
 					return {type: 'NumberFilter'}
@@ -210,7 +208,9 @@ class RecordDataTable extends Component {
 
 		const keyAttributeColumns = keyAttributes.map((keyAttr, i) => 
 			<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter} width="80"
-				editable={false} dataSort filter={createRootEntityFilter(keyAttr)}>{keyAttr.label}</TableHeaderColumn>)
+				editable={false} dataSort 
+				filter={createKeyAttributeFilter(keyAttr)}
+				>{keyAttr.label}</TableHeaderColumn>)
 		columns = columns.concat(keyAttributeColumns)
 
 		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => {
@@ -220,7 +220,8 @@ class RecordDataTable extends Component {
 			const canFilterOrSort = ! isQualifier || roleInGroup === 'ADMINISTRATOR' || roleInGroup === 'OWNER'
 			return <TableHeaderColumn key={prefix+i} dataSort={canFilterOrSort} dataField={prefix+i} 
 				dataFormat={shownInSummaryListFormatter} width="80"
-				filter={canFilterOrSort ? {type: 'TextFilter'} : null} editable={false}>{attr.label}</TableHeaderColumn>
+				filter={canFilterOrSort ? {type: 'TextFilter'} : null}
+				editable={false}>{attr.label}</TableHeaderColumn>
 		})
 		columns = columns.concat(attributeDefsShownInSummaryListColumns)
 

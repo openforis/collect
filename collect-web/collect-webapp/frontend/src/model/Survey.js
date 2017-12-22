@@ -167,13 +167,13 @@ export class EntityDefinition extends NodeDefinition {
     get attributeDefinitionsShownInRecordSummaryList() {
         return this.findDefinitions(function(n) {
             return n instanceof AttributeDefinition && n.showInRecordSummaryList
-        })
+        }, true)
     }
 
     get qualifierAttributeDefinitions() {
         return this.findDefinitions(function(n) {
             return n instanceof AttributeDefinition && n.qualifier
-        })
+        }, true)
     }
 
     visit(visitor, onlyInsideSingleEntities) {

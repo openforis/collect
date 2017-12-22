@@ -167,30 +167,25 @@ public class Schema extends SurveyObject {
 	 * @return 
 	 */
 	public List<EntityDefinition> getCountableEntitiesInRecordList(EntityDefinition rootEntityDefinition) {
-		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.COUNT_IN_SUMMARY_LIST);
+		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.COUNT_IN_SUMMARY_LIST, false);
 	}
 	
 	public List<AttributeDefinition> getQualifierAttributeDefinitions(EntityDefinition rootEntityDefinition) {
-		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.QUALIFIER);
+		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.QUALIFIER, true);
 	}
 	
-	public List<AttributeDefinition> getSummaryAttributeDefinitions(EntityDefinition rootEntityDefinition) {
-		return getAnnotatedAttributeDefinitions(rootEntityDefinition, Annotation.SHOW_IN_SUMMARY_LIST);
+	public List<AttributeDefinition> getSummaryAttributeDefinitions(EntityDefinition entityDefinition) {
+		return getAnnotatedAttributeDefinitions(entityDefinition, Annotation.SHOW_IN_SUMMARY_LIST, true);
 	}
 	
-	public <N extends NodeDefinition> List<N> getAnnotatedAttributeDefinitions(EntityDefinition rootEntityDefinition, 
-			final Annotation annotation) {
-		final List<N> result = new ArrayList<N>();
-		rootEntityDefinition.traverse(new NodeDefinitionVisitor() {
-			@SuppressWarnings("unchecked")
-			public void visit(NodeDefinition def) {
+	private <N extends NodeDefinition> List<N> getAnnotatedAttributeDefinitions(EntityDefinition rootEntityDefinition, 
+			final Annotation annotation, boolean onlyFirstLevel) {
+		return rootEntityDefinition.findDescendantDefinitions(new NodeDefinitionVerifier() {
+			public boolean verify(NodeDefinition def) {
 				String annotationVal = def.getAnnotation(annotation.getQName());
-				if(Boolean.parseBoolean(annotationVal)) {
-					result.add((N) def);
-				}
+				return Boolean.parseBoolean(annotationVal);
 			}
-		});
-		return result;
+		}, false, onlyFirstLevel);
 	}
 	
 	@Override

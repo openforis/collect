@@ -228,17 +228,11 @@ public class EntityDefinition extends NodeDefinition {
 	 * The key attribute definitions can even be defined inside nested single entities.
 	 */
 	public List<AttributeDefinition> getKeyAttributeDefinitions() {
-		List<AttributeDefinition> result = new ArrayList<AttributeDefinition>(10);
-		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>(childDefinitions);
-		while ( ! queue.isEmpty() ) {
-			NodeDefinition nodeDefn = queue.remove();
-			if ( nodeDefn instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDefn).isKey() ) {
-				result.add((AttributeDefinition) nodeDefn);
-			} else if ( nodeDefn instanceof EntityDefinition && ! nodeDefn.isMultiple() ) {
-				queue.addAll(((EntityDefinition) nodeDefn).childDefinitions);
+		return findDescendantDefinitions(new NodeDefinitionVerifier() {
+			public boolean verify(NodeDefinition definition) {
+				return definition instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) definition).isKey();
 			}
-		}
-		return result;
+		}, false, true);
 	}
 	
 	public <N extends NodeDefinition> N findDescendantDefinition(NodeDefinitionVerifier verifier) {
@@ -247,29 +241,35 @@ public class EntityDefinition extends NodeDefinition {
 		return nodeDefns.isEmpty() ? null: nodeDefns.get(0);
 	}
 	
-	public List<? extends NodeDefinition> findDescendantDefinitions(NodeDefinitionVerifier verifier) {
+	public <N extends NodeDefinition> List<N> findDescendantDefinitions(NodeDefinitionVerifier verifier) {
 		return findDescendantDefinitions(verifier, false);
 	}
 	
-	public List<? extends NodeDefinition> findDescendantDefinitions(NodeDefinitionVerifier verifier, boolean stopAfterFirstFound) {
+	public <N extends NodeDefinition> List<N> findDescendantDefinitions(NodeDefinitionVerifier verifier, boolean stopAfterFirstFound) {
+		return findDescendantDefinitions(verifier, stopAfterFirstFound, false);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <N extends NodeDefinition> List<N> findDescendantDefinitions(NodeDefinitionVerifier verifier, 
+			boolean stopAfterFirstFound, boolean onlyInsideSingleEntities) {
 		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
-		List<NodeDefinition> foundNodeDefns = new ArrayList<NodeDefinition>();
+		List<N> foundNodeDefns = new ArrayList<N>();
 		stack.addAll(childDefinitions);
 		while (! stack.isEmpty()) {
 			NodeDefinition defn = stack.pop();
 			if (verifier.verify(defn)) {
-				foundNodeDefns.add(defn);
+				foundNodeDefns.add((N) defn);
 				if (stopAfterFirstFound) {
 					break;
 				}
 			}
-			if (defn instanceof EntityDefinition ) {
+			if (defn instanceof EntityDefinition && (!onlyInsideSingleEntities || !defn.isMultiple())) {
 				stack.addAll(((EntityDefinition) defn).childDefinitions);
 			}
 		}
 		return foundNodeDefns;
 	}
-
+	
 	public void traverse(NodeDefinitionVisitor visitor) {
 		//use depth first search by default
 		traverse(visitor, TraversalType.DFS);
@@ -290,6 +290,10 @@ public class EntityDefinition extends NodeDefinition {
 	 * Pre-order depth-first traversal from here down.
 	 */
 	protected void dfsTraverse(NodeDefinitionVisitor visitor) {
+		dfsTraverse(visitor, false);
+	}
+	
+	protected void dfsTraverse(NodeDefinitionVisitor visitor, boolean onlyInsideSingleEntities) {
 		// Initialize stack with root entity
 		Deque<NodeDefinition> stack = new LinkedList<NodeDefinition>();
 		stack.push(this);
@@ -302,7 +306,7 @@ public class EntityDefinition extends NodeDefinition {
 			visitor.visit(defn);
 
 			// For entities, add existing child nodes to the stack
-			if (defn instanceof EntityDefinition ) {
+			if (defn instanceof EntityDefinition && !(onlyInsideSingleEntities && defn.isMultiple())) {
 				stack.addAll(((EntityDefinition) defn).getChildDefinitions());
 			}
 		}
