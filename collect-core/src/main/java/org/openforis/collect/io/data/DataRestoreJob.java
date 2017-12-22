@@ -133,7 +133,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setRecordFileManager(recordFileManager);
 			t.setBackupFileExtractor(backupFileExtractor);
 			t.setRecordProvider(recordProvider);
-			t.setOverwriteAll(recordOverwriteStrategy == OverwriteStrategy.OVERWRITE_ALL);
+			t.setOverwriteStrategy(recordOverwriteStrategy);
 			t.setEntryIdsToImport(entryIdsToImport);
 			t.setSurvey(publishedSurvey);
 		}

@@ -3,6 +3,7 @@ package org.openforis.collect.io.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -11,7 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.io.SurveyBackupJob;
+import static org.openforis.collect.io.SurveyBackupJob.*;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.exception.RecordFileException;
@@ -124,12 +125,12 @@ public class RecordFileBackupTask extends Task {
 
 	public static String calculateRecordFileEntryName(FileAttribute fileAttribute) {
 		FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
-		String repositoryRelativePath = RecordFileManager.getRepositoryRelativePath(fileAttributeDefinition, SurveyBackupJob.ZIP_FOLDER_SEPARATOR, false);
+		String repositoryRelativePath = RecordFileManager.getRepositoryRelativePath(fileAttributeDefinition, ZIP_FOLDER_SEPARATOR, false);
 		String filename = fileAttribute.getFilename();
 		if (StringUtils.isBlank(filename)) {
 			return null;
 		} else {
-			String entryName = SurveyBackupJob.UPLOADED_FILES_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + repositoryRelativePath + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + filename;
+			String entryName = StringUtils.join(Arrays.asList(UPLOADED_FILES_FOLDER, repositoryRelativePath, filename), ZIP_FOLDER_SEPARATOR);
 			return entryName;
 		}
 	}

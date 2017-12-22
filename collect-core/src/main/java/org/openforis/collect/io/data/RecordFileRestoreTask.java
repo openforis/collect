@@ -3,12 +3,18 @@
  */
 package org.openforis.collect.io.data;
 
+import static org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy.ONLY_SPECIFIED;
+import static org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy.OVERWRITE_ALL;
+import static org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy.OVERWRITE_OLDER;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.io.BackupFileExtractor;
+import org.openforis.collect.io.data.DataRestoreTask.OverwriteStrategy;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
@@ -40,7 +46,7 @@ public class RecordFileRestoreTask extends Task {
 	//input
 	private CollectSurvey survey;
 	private List<Integer> entryIdsToImport;
-	private boolean overwriteAll;
+	private OverwriteStrategy overwriteStrategy = OverwriteStrategy.ONLY_SPECIFIED;
 	private RecordProvider recordProvider;
 	private BackupFileExtractor backupFileExtractor;
 	
@@ -77,9 +83,6 @@ public class RecordFileRestoreTask extends Task {
 		if ( entryIdsToImport != null ) {
 			return entryIdsToImport;
 		} 
-		if ( ! overwriteAll ) {
-			throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
-		}
 		return recordProvider.findEntryIds();
 	}
 
@@ -88,11 +91,15 @@ public class RecordFileRestoreTask extends Task {
 		if ( lastStepBackupRecord == null ) {
 			throw new IllegalStateException("Error parsing record for entry: " + entryId);
 		}
-		CollectRecord storedRecord = findStoredRecord(lastStepBackupRecord);
-		importRecordFiles(storedRecord);
+		CollectRecordSummary storedRecordSummary = findStoredRecordSummary(lastStepBackupRecord);
+		if (overwriteStrategy == OVERWRITE_OLDER && isNewer(lastStepBackupRecord, storedRecordSummary)
+				|| overwriteStrategy == ONLY_SPECIFIED || overwriteStrategy == OVERWRITE_ALL) {
+			CollectRecord storedRecord = recordManager.load(survey, storedRecordSummary.getId(), storedRecordSummary.getStep(), false);
+			importRecordFiles(storedRecord);
+		}
 	}
 
-	protected CollectRecord findStoredRecord(CollectRecord record) {
+	private CollectRecordSummary findStoredRecordSummary(CollectRecord record) {
 		List<String> recordKeys = record.getRootEntityKeyValues();
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(record.getRootEntityDefinitionId());
@@ -100,8 +107,7 @@ public class RecordFileRestoreTask extends Task {
 		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		if ( summaries.size() == 1 ) {
 			CollectRecordSummary summary = summaries.get(0);
-			CollectRecord storedRecord = recordManager.load(survey, summary.getId(), summary.getStep(), false);
-			return storedRecord;
+			return summary;
 		} else if ( summaries.size() == 0 ) {
 			throw new RuntimeException(String.format("Record with keys %s not found", recordKeys.toString()));
 		} else {
@@ -109,7 +115,7 @@ public class RecordFileRestoreTask extends Task {
 		}
 	}
 	
-	protected CollectRecord getLastStepBackupRecord(int entryId) throws IOException, RecordParsingException {
+	private CollectRecord getLastStepBackupRecord(int entryId) throws IOException, RecordParsingException {
 		Step[] steps = Step.values();
 		for (int i = steps.length - 1; i >= 0; i--) {
 			Step step = steps[i];
@@ -119,6 +125,14 @@ public class RecordFileRestoreTask extends Task {
 			}
 		}
 		return null;
+	}
+	
+	private boolean isNewer(CollectRecord record, CollectRecordSummary existingSummary) {
+		Date existingRecordModifiedDate = existingSummary.getSummaryByStep(record.getDataStep()).getModifiedDate();
+		return record.getModifiedDate() != null && 
+				(existingRecordModifiedDate == null || 
+					record.getModifiedDate().compareTo(existingRecordModifiedDate) > 0
+				);
 	}
 	
 	private void importRecordFiles(CollectRecord record) throws IOException, RecordPersistenceException {
@@ -172,12 +186,12 @@ public class RecordFileRestoreTask extends Task {
 		this.entryIdsToImport = entryIdsToImport;
 	}
 
-	public boolean isOverwriteAll() {
-		return overwriteAll;
+	public OverwriteStrategy getOverwriteStrategy() {
+		return overwriteStrategy;
 	}
-
-	public void setOverwriteAll(boolean overwriteAll) {
-		this.overwriteAll = overwriteAll;
+	
+	public void setOverwriteStrategy(OverwriteStrategy overwriteStrategy) {
+		this.overwriteStrategy = overwriteStrategy;
 	}
 	
 	public void setBackupFileExtractor(BackupFileExtractor backupFileExtractor) {
