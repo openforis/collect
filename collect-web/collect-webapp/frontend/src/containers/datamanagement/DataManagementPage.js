@@ -159,19 +159,31 @@ class DataManagementPage extends Component {
 	}
 
 	handlePromoteEntryToCleansingButtonClick() {
-		this.startRecordsMoveJob(Workflow.STEPS.entry, true)
+		Dialogs.confirm(L.l('dataManagement.workflow.confirmPromoteToCleansing.title'), 
+			L.l('dataManagement.workflow.confirmPromoteToCleansing.message'), () => {
+				this.startRecordsMoveJob(Workflow.STEPS.entry, true)
+			})
 	}
 
 	handlePromoteCleansingToAnalysisButtonClick() {
-		this.startRecordsMoveJob(Workflow.STEPS.cleansing, true)
+		Dialogs.confirm(L.l('dataManagement.workflow.confirmPromoteToAnalysis.title'), 
+			L.l('dataManagement.workflow.confirmPromoteToAnalysis.message'), () => {
+				this.startRecordsMoveJob(Workflow.STEPS.cleansing, true)
+			})
 	}
 
 	handleDemoteAnalysisToCleansingButtonClick() {
-		this.startRecordsMoveJob(Workflow.STEPS.analysis, false)
+		Dialogs.confirm(L.l('dataManagement.workflow.confirmDemoteToCleansing.title'), 
+			L.l('dataManagement.workflow.confirmDemoteToCleansing.message'), () => {
+				this.startRecordsMoveJob(Workflow.STEPS.analysis, false)
+			})
 	}
 
 	handleDemoteCleansingToEntryButtonClick() {
-		this.startRecordsMoveJob(Workflow.STEPS.cleansing, false)
+		Dialogs.confirm(L.l('dataManagement.workflow.confirmDemoteToEntry.title'), 
+			L.l('dataManagement.workflow.confirmDemoteToEntry.message'), () => {
+				this.startRecordsMoveJob(Workflow.STEPS.cleansing, false)
+			})
 	}
 
 	startRecordsMoveJob(fromStep, promote) {

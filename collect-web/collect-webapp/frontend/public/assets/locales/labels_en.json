@@ -116,6 +116,24 @@
             "confirmDeleteTitle": "Delete record",
             "confirmDeleteSingleRecordMessage": "Delete the selected record?",
             "confirmDeleteMultipleRecordsMessage": "Delete the selected {0} records?"
+        },
+        "workflow": {
+            "confirmPromoteToCleansing": {
+                "title": "Confirm",
+                "message": "Promote all records in Entry phase to Cleansing phase?"
+            },
+            "confirmPromoteToAnalysis": {
+                "title": "Confirm",
+                "message": "Promote all records in Cleansing phase to Analysis phase?"
+            },
+            "confirmDemoteToCleansing": {
+                "title": "Confirm",
+                "message": "Demote all records in Analysis phase to Cleansing phase?"
+            },
+            "confirmDemoteToEntry": {
+                "title": "Confirm",
+                "message": "Demote all records in Cleansing phase to Entry phase?"
+            }
         }
     },
     "survey": {

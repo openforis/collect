@@ -78,7 +78,7 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 		@Override
 		protected void execute() throws Throwable {
 			RecordFilter filter = new RecordFilter(survey, survey.getSchema().getRootEntityDefinition(rootEntity).getId());
-			filter.setStepGreaterOrEqual(fromStep);
+			filter.setStep(fromStep);
 			List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 			for (CollectRecordSummary summary : summaries) {
 				if (isAborted()) {
