@@ -107,6 +107,11 @@
                 "messages": "Error Messages"
             }
         },
+        "backupDataExport": {
+            "exportOnlyOwnedRecords": "Export only owned records",
+            "includeUploadedFiles": "Include uploaded files (images, documents, etc.)",
+            "exportingDataJobTitle": "Exporting data"
+        },
         "deleteRecords": {
             "confirmDeleteTitle": "Delete record",
             "confirmDeleteSingleRecordMessage": "Delete the selected record?",

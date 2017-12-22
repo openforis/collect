@@ -66,7 +66,7 @@ class SurveysListPage extends Component {
 	handleSurveysSelection(newSelectedSurveys) {
 		this.setState({
 			...this.state,
-			selectedSurvey: Arrays.getUniqueItemOrNull(newSelectedSurveys),
+			selectedSurvey: Arrays.uniqueItemOrNull(newSelectedSurveys),
 			selectedSurveyIds: newSelectedSurveys.map(item => item.id),
 			selectedSurveys: newSelectedSurveys
 		})

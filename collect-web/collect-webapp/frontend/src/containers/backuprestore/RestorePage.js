@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { Col, Container, Form, FormGroup, Label, Input, Row } from 'reactstrap';
 import Button from 'material-ui/Button';
-import ExpansionPanel, {
-    ExpansionPanelSummary,
-    ExpansionPanelDetails,
-} from 'material-ui/ExpansionPanel';
+import ExpansionPanel, { ExpansionPanelSummary, ExpansionPanelDetails } from 'material-ui/ExpansionPanel';
 import Typography from 'material-ui/Typography';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import { connect } from 'react-redux';

@@ -117,7 +117,7 @@ class DataManagementPage extends Component {
 			...this.state,
 			selectedItems: selectedItems,
 			selectedItemIds: selectedItems.map(item => item.id),
-			selectedItem: Arrays.getUniqueItemOrNull(selectedItems)
+			selectedItem: Arrays.uniqueItemOrNull(selectedItems)
 		})
 	}
 

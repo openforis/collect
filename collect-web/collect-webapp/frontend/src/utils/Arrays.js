@@ -14,7 +14,7 @@ export default class Arrays {
         return array.slice(0)
     }
 
-    static getUniqueItemOrNull(array) {
+    static uniqueItemOrNull(array) {
 		return array.length === 1 ? array[0] : null;
 	}
 

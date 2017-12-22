@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
 import { Button, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import ExpansionPanel, { ExpansionPanelSummary, ExpansionPanelDetails } from 'material-ui/ExpansionPanel';
+import Typography from 'material-ui/Typography';
+import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 import { connect } from 'react-redux';
 
 import ServiceFactory from 'services/ServiceFactory'
 import * as JobActions from 'actions/job';
+import L from 'utils/Labels';
+import Arrays from 'utils/Arrays';
 
 class BackupDataExportPage extends Component {
 
@@ -29,21 +34,12 @@ class BackupDataExportPage extends Component {
         }
         ServiceFactory.recordService.startBackupDataExport(surveyId, backupExportParams).then(job => {
             this.props.dispatch(JobActions.startJobMonitor({
-                jobId: job.id, 
-                title: 'Exporting data',
-                okButtonLabel: 'Done',                        
+                jobId: job.id,
+                title: L.l('dataManagement.backupDataExport.exportingDataJobTitle'),
+                okButtonLabel: L.l('global.done'),
                 handleOkButtonClick: this.handleBackupDataExportModalOkButtonClick
             }))
         })
-    }
-
-    handleCsvDataExportModalOkButtonClick(job) {
-        if (job.completed) {
-            const survey = this.props.survey
-            const surveyId = survey.id
-            ServiceFactory.recordService.downloadCSVDataExportResult(surveyId)
-        }
-        this.props.dispatch(JobActions.closeJobMonitor())
     }
 
     handleBackupDataExportModalOkButtonClick(job) {
@@ -55,41 +51,43 @@ class BackupDataExportPage extends Component {
         this.props.dispatch(JobActions.closeJobMonitor())
     }
 
-    handleEntityCheck(event) {
-        this.setState({...this.state, selectedEntityDefinition: event.selectedNodeDefinitions.length == 1 ? event.selectedNodeDefinitions[0]: null})
-    }
-
     render() {
         if (!this.props.survey) {
-            return <div>Select survey first</div>
+            return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
         }
         return (
             <Container>
                 <Form>
-                    <FormGroup tag="fieldset">
-                        <legend>Parameters</legend>
-                        <FormGroup row>
-                            <Col sm={{size: 12}}>
-                                <Label check>
-                                    <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
-                                        checked={this.state.exportOnlyOwnedRecords} />{' '}
-                                    Export only owned records
-                                </Label>
-                            </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                            <Col sm={{size: 12}}>
-                                <Label check>
-                                    <Input type="checkbox" onChange={event => this.setState({includeRecordFiles: event.target.checked})} 
-                                        checked={this.state.includeRecordFiles} />{' '}
-                                    Include uploaded files (images, documents, etc.)
-                                </Label>
-                            </Col>
-                        </FormGroup>
-                    </FormGroup>
+                    <ExpansionPanel>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography>{L.l('general.additionalOptions')}</Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <div>
+                                <FormGroup row>
+                                    <Col sm={{size: 12}}>
+                                        <Label check>
+                                            <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
+                                                checked={this.state.exportOnlyOwnedRecords} />{' '}
+                                            {L.l('dataManagement.backupDataExport.exportOnlyOwnedRecords')}
+                                        </Label>
+                                    </Col>
+                                </FormGroup>
+                                <FormGroup row>
+                                    <Col sm={{size: 12}}>
+                                        <Label check>
+                                            <Input type="checkbox" onChange={event => this.setState({includeRecordFiles: event.target.checked})} 
+                                                checked={this.state.includeRecordFiles} />{' '}
+                                            {L.l('dataManagement.backupDataExport.includeUploadedFiles')}
+                                        </Label>
+                                    </Col>
+                                </FormGroup>
+                            </div>
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
                     <Row>
                         <Col sm={{ size: 'auto', offset: 5 }}>
-                            <Button onClick={this.handleExportButtonClick} className="btn btn-success">Export</Button>
+                            <Button onClick={this.handleExportButtonClick} className="btn btn-success">{L.l('global.export')}</Button>
                         </Col>
                     </Row>
                 </Form>
