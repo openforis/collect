@@ -773,9 +773,6 @@ public class RecordUpdater {
 	protected NodeChangeMap initializeEntity(Entity entity, boolean newEntity) {
 		Record record = entity.getRecord();
 		
-		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
-		entityAsList.add(entity);
-
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addEntityAddChange(entity);
 
