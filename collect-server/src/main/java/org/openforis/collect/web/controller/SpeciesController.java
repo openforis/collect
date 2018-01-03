@@ -26,7 +26,7 @@ public class SpeciesController {
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value = "/survey/{surveyId}/taxonomy/{taxonomyId}/export.csv", method = RequestMethod.GET)
+	@RequestMapping(value = "api/survey/{surveyId}/taxonomy/{taxonomyId}/export.csv", method = RequestMethod.GET)
 	public @ResponseBody String exportSpecies(HttpServletResponse response,
 			@PathVariable("surveyId") Integer surveyId,
 			@PathVariable("taxonomyId") Integer taxonomyId) throws IOException {
