@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ReactDropzone from 'react-dropzone';
 import L from 'utils/Labels';
-import Arrays from 'utils/Arrays';
 
 export default class Dropzone extends Component {
 
@@ -20,7 +19,7 @@ export default class Dropzone extends Component {
     }
 
     render() {
-        const { acceptedFileTypes, acceptedFileTypesDescription, handleFilesDrop, fileToBeImportedPreview, width='100%', height='200px'} = this.props
+        const { acceptedFileTypes, acceptedFileTypesDescription, fileToBeImportedPreview, width='100%', height='200px'} = this.props
 
         return <ReactDropzone accept={acceptedFileTypes} onDrop={this.handleFilesDrop} style={{
                 width: width, height: height, 
