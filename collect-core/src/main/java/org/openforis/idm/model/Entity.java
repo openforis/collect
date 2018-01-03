@@ -7,13 +7,13 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.collection.CollectionUtils;
@@ -42,9 +42,9 @@ public class Entity extends Node<EntityDefinition> {
 	public Entity(EntityDefinition definition) {
 		super(definition);
 		this.children = new ArrayList<Node<?>>();
-		this.childrenByDefinition = new TreeMap<NodeDefinition, List<Node<?>>>();
+		this.childrenByDefinition = new HashMap<NodeDefinition, List<Node<?>>>();
 		this.derivedStateCache = new ValidationState();
-		this.childStates = new TreeMap<NodeDefinition, State>();
+		this.childStates = new HashMap<NodeDefinition, State>();
 	}
 
 	@Override
@@ -860,11 +860,11 @@ public class Entity extends Node<EntityDefinition> {
 		private Map<NodeDefinition, ValidationResultFlag> maxCountValidationResultByChildDefinition;
 
 		public ValidationState() {
-			minCountByChildDefinition = new TreeMap<NodeDefinition, Integer>();
-			maxCountByChildDefinition = new TreeMap<NodeDefinition, Integer>();
-			relevanceByChildDefinition = new TreeMap<NodeDefinition, Boolean>();
-			minCountValidationResultByChildDefinition = new TreeMap<NodeDefinition, ValidationResultFlag>();
-			maxCountValidationResultByChildDefinition = new TreeMap<NodeDefinition, ValidationResultFlag>();
+			minCountByChildDefinition = new HashMap<NodeDefinition, Integer>();
+			maxCountByChildDefinition = new HashMap<NodeDefinition, Integer>();
+			relevanceByChildDefinition = new HashMap<NodeDefinition, Boolean>();
+			minCountValidationResultByChildDefinition = new HashMap<NodeDefinition, ValidationResultFlag>();
+			maxCountValidationResultByChildDefinition = new HashMap<NodeDefinition, ValidationResultFlag>();
 		}
 
 		private Integer getMinCount(NodeDefinition childDefinition) {

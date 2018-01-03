@@ -4,10 +4,10 @@
 package org.openforis.idm.metamodel;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -32,8 +32,8 @@ class StateDependencyMap {
 
 	StateDependencyMap(ExpressionEvaluator expressionEvaluator) {
 		this.expressionEvaluator = expressionEvaluator;
-		this.dependentsBySource = new TreeMap<NodeDefinition, Set<NodePathPointer>>();
-		this.sourcesByDependent = new TreeMap<NodeDefinition, Set<NodePathPointer>>();
+		this.dependentsBySource = new HashMap<NodeDefinition, Set<NodePathPointer>>();
+		this.sourcesByDependent = new HashMap<NodeDefinition, Set<NodePathPointer>>();
 	}
 	
 	Set<NodePathPointer> getDependencySet(NodeDefinition def){

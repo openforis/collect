@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.commons.collection.CollectionUtils;
@@ -76,8 +76,8 @@ public class EntityDefinition extends NodeDefinition {
 	private void initializeCache() {
 		childDefinitionNames = new String[0];
 		childDefinitions = new ArrayList<NodeDefinition>();
-		childDefinitionByName = new TreeMap<String, NodeDefinition>();
-        childDefinitionById = new TreeMap<Integer, NodeDefinition>();
+		childDefinitionByName = new HashMap<String, NodeDefinition>();
+        childDefinitionById = new HashMap<Integer, NodeDefinition>();
 	}
 
 	void renameChild(String oldName, String newName) {
