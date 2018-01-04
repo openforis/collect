@@ -3,8 +3,13 @@
  */
 package org.openforis.collect.web.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -96,10 +100,19 @@ public class CollectJobController extends BasicController {
 	public static class JobView extends WorkerView {
 		
 		private List<WorkerView> tasks;
+		private Map<String, Object> extras = new HashMap<String, Object>();
 
 		public JobView(Job job) {
 			super(job);
 			tasks = Proxies.fromList(job.getTasks(), WorkerView.class);
+		}
+		
+		public void putExtra(String key, Object value) {
+			extras.put(key, value);
+		}
+		
+		public Map<String, Object> getExtras() {
+			return extras;
 		}
 		
 		public List<WorkerView> getTasks() {

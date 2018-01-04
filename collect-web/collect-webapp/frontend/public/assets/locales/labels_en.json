@@ -11,23 +11,26 @@
         }
     },
     "global": {
-        "ok": "Ok",
-        "save": {
-            "success": "Saved successfully"
-        },
-        "info": "Info",
-        "import": {
-            "label": "Import"
-        },
+        "cancel": "Cancel",
+        "close": "Close",
+        "confirm": "Confirm",
+        "delete": "Delete",
+        "done": "Done",
         "export": {
             "label": "Export"
         },
-        "selectOne": "--- Select one ---",
-        "done": "Done",
-        "delete": "Delete",
+        "import": {
+            "label": "Import"
+        },
+        "info": "Info",
         "loading": "Loading...",
+        "ok": "Ok",
+        "parameters": "Parameters",
         "refresh": "Refresh",
-        "close": "Close"
+        "save": {
+            "success": "Saved successfully"
+        },
+        "selectOne": "--- Select one ---"
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
@@ -163,12 +166,14 @@
         "validation": {
             "nameAlreadyInUse": "Identifier already in use"            
         },
+        "surveyType": {
+            "label": "Type",
+            "temporary": "Unpublished changes",
+            "published": "Published"
+        },
         "export": {
-            "surveyType": {
-                "temporary": "Unpublished changes",
-                "published": "Published"
-            },
             "mode": {
+                "label": "Export mode",
                 "desktop": "Collect Desktop (backup)",
                 "earth": "Collect Earth",
                 "mobile": "Collect Mobile"
@@ -181,7 +186,38 @@
         },
         "publishedSurvey": "Published survey",
         "selectPublishedSurveyDropdownHeading": "--- Published survey ---",
-        "selectPublishedSurveyFirst": "Select a published survey first"
+        "selectPublishedSurveyFirst": "Select a published survey first",
+        "publish": {
+            "label": "Publish",
+            "confirmTitle": "Confirm publish \"{0}\"",
+            "confirmMessage": "Publish the survey \"{0}\"?\n - data collection could start\n - only few changes to the survey will be allowed in the future.",
+            "publishLatestChanges": "Publish latest changes",
+            "successDialog": {
+                "title": "Survey published",
+                "message": "Survey \"{0}\" successfully published"
+            }
+        },
+        "unpublish": {
+            "label": "Unpublish",
+            "confirmTitle": "Confirm unpublish \"{0}\"",
+            "confirmMessage": "Unpublish the survey \"{0}\"?\n All the collected records will be deleted.",
+            "successDialog": {
+                "title": "Survey unpublished",
+                "message": "Survey \"{0}\" successfully unpublished"
+            }
+        },
+        "clone": {
+            "label": "Clone",
+            "title": "Clone survey",
+            "originalSurvey": {
+                "name": "Original survey name",
+                "type": "Original survey type"
+            },
+            "newSurveyName": "New survey name",
+            "validation": {
+                "originalSurveyNotFound": "Original survey with name \"{0}\" not found"
+            }
+        }
     },
     "backupRestore": {
         "label": "Backup/Restore"

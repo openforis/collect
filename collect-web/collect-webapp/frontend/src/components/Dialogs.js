@@ -131,8 +131,8 @@ class AlertDialog extends Component {
 
 class ConfirmDialogConfiguration {
 
-    confirmButtonLabel = 'Confirm'
-    cancelButtonLabel = 'Cancel'
+    confirmButtonLabel = L.l('global.confirm')
+    cancelButtonLabel = L.l('global.cancel')
 }
 
 

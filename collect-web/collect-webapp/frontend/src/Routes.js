@@ -66,6 +66,11 @@ const routes = [
     pathRegExp: new RegExp('/surveydesigner/surveys/export/(\\d)+')
   },
   {
+    path: '/surveydesigner/surveys/clone/:surveyName',
+    name: 'Clone survey',
+    pathRegExp: new RegExp('/surveydesigner/surveys/clone/(\.)+')
+  },
+  {
     path: '/surveydesigner/newsurvey',
     name: "New survey"
   },

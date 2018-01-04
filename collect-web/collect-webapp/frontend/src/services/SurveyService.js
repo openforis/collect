@@ -76,4 +76,32 @@ export default class SurveyService extends AbstractService {
     downloadExportResult(surveyId) {
         return this.downloadFile(this.BASE_URL + 'survey/export/' + surveyId + '/result')
     }
+
+    publish(surveyId) {
+        return this.post('survey/publish/' + surveyId)
+    }
+
+    unpublish(surveyId) {
+        return this.post('survey/unpublish/' + surveyId)
+    }
+
+    startClone(originalSurveyName, originalSurveyType, newSurveyName) {
+        return this.post('survey/clone', {
+            originalSurveyName: originalSurveyName,
+            originalSurveyType: originalSurveyType,
+		    newSurveyName: newSurveyName
+        })
+    }
+
+    getClonedSurveyId() {
+        return this.get('survey/cloned/id')
+    }
+
+    validateClone(originalSurveyName, originalSurveyType, newSurveyName) {
+        return this.post('survey/validate/clone', {
+            originalSurveyName: originalSurveyName,
+            originalSurveyType: originalSurveyType,
+            newSurveyName: newSurveyName
+        })
+    }
 }

@@ -4,6 +4,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
     Form, FormFeedback, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 
+import Dialogs from 'components/Dialogs';
 import * as Formatters from 'components/datatable/formatters';
 import CheckedIconFormatter from 'components/datatable/CheckedIconFormatter'
 import UserGroupColumnEditor from 'components/surveydesigner/UserGroupColumnEditor';
@@ -31,6 +32,9 @@ class SurveysListPage extends Component {
         this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
         this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
         this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
+        this.handlePublishButtonClick = this.handlePublishButtonClick.bind(this)
+        this.handleUnpublishButtonClick = this.handleUnpublishButtonClick.bind(this)
+        this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
     }
 
     handleCellEdit(row, fieldName, value) {
@@ -56,6 +60,32 @@ class SurveysListPage extends Component {
 
     handleExportButtonClick() {
         RouterUtils.navigateToSurveyExportPage(this.props.history, this.state.selectedSurvey.id)
+    }
+
+    handlePublishButtonClick() {
+        const survey = this.state.selectedSurvey
+        const confirmMessage = L.l('survey.publish.confirmMessage', survey.name)
+        Dialogs.confirm(L.l('survey.publish.confirmTitle', survey.name), confirmMessage, function() {
+            ServiceFactory.surveyService.publish(survey.id).then(s => {
+                Dialogs.alert(L.l('survey.publish.successDialog.title'), 
+                    L.l('survey.publish.successDialog.message', survey.name))
+            })
+        }, null, {confirmButtonLabel: L.l('survey.publish')})
+    }
+
+    handleUnpublishButtonClick() {
+        const survey = this.state.selectedSurvey
+        const confirmMessage = L.l('survey.unpublish.confirmMessage', survey.name)
+        Dialogs.confirm(L.l('survey.unpublish.confirmTitle', survey.name), confirmMessage, function() {
+            ServiceFactory.surveyService.unpublish(survey.id).then(s => {
+                Dialogs.alert(L.l('survey.unpublish.successDialog.title'), 
+                    L.l('survey.unpublish.successDialog.message', survey.name))
+            })
+        }, null, {confirmButtonLabel: L.l('survey.unpublish')})
+    }
+    
+    handleCloneButtonClick() {
+        RouterUtils.navigateToSurveyClonePage(this.props.history, this.state.selectedSurvey.name)
     }
 
     handleRowSelect(row, isSelected, e) {
@@ -95,6 +125,8 @@ class SurveysListPage extends Component {
             }
         })
         
+        const selectedSurvey = this.state.selectedSurvey
+        
         const createUserGroupEditor = (onUpdate, props) => (<UserGroupColumnEditor onUpdate={onUpdate} {...props} />);
         
         function userGroupFormatter(cell, row) {
@@ -127,11 +159,18 @@ class SurveysListPage extends Component {
 					<Col sm={4}>
 						<Button color="info" onClick={this.handleNewButtonClick}>{L.l('general.new')}</Button>
 					</Col>
-                    {this.state.selectedSurvey &&
+                    {selectedSurvey &&
                         <div>
                             <Button color="success" onClick={this.handleEditButtonClick}>Edit</Button>
                             <Button color="primary" onClick={this.handleExportButtonClick}>Export</Button>
                             <Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/></Button>
+                            {selectedSurvey && selectedSurvey.temporary &&
+                                <Button color="warning" onClick={this.handlePublishButtonClick}>Publish</Button>
+                            }
+                            {selectedSurvey && selectedSurvey.published && (!selectedSurvey.temporary || selectedSurvey.publishedId) &&
+                                <Button color="warning" onClick={this.handleUnpublishButtonClick}>Unpublish</Button>
+                            }
+                            <Button color="primary" onClick={this.handleCloneButtonClick}>Clone</Button>
                         </div>
                     }
                 </Row>

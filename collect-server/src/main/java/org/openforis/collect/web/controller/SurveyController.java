@@ -1,6 +1,5 @@
 package org.openforis.collect.web.controller;
 
-import static org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType.TEMPORARY;
 import static org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator.PLACEMARK_FILE_NAME;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -24,7 +23,6 @@ import javax.validation.Valid;
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.CESurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -57,13 +55,16 @@ import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
+import org.openforis.collect.web.controller.SurveyController.SurveyCloneParameters.SurveyType;
 import org.openforis.collect.web.controller.SurveyController.SurveyCreationParameters.TemplateType;
 import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidator;
+import org.openforis.collect.web.validator.SurveyCloneParametersValidator;
 import org.openforis.collect.web.validator.SurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyImportParametersValidator;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
+import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
@@ -115,12 +116,15 @@ public class SurveyController extends BasicController {
 	private SimpleSurveyCreationParametersValidator simpleSurveyCreationParametersValidator;
 	@Autowired
 	private SurveyImportParametersValidator surveyImportParametersValidator;
+	@Autowired
+	private SurveyCloneParametersValidator surveyCloneParametersValidator;
 
 	private SurveyBackupInfoExtractorJob surveyBackupInfoExtractorJob;
 	private File uploadedSurveyFile;
 	private SurveyBackupInfo uploadedSurveyInfo;
 	private AbstractSurveyRestoreJob surveyImportJob;
 	private Job surveyBackupJob;
+	private SurveyCloneJob surveyCloneJob;
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
@@ -132,6 +136,8 @@ public class SurveyController extends BasicController {
 				binder.setValidator(simpleSurveyCreationParametersValidator);
 			} else if (target instanceof SurveyImportParameters) {
 				binder.setValidator(surveyImportParametersValidator);
+			} else if (target instanceof SurveyCloneParameters) {
+				binder.setValidator(surveyCloneParametersValidator);
 			}
 		}
 	}
@@ -165,7 +171,7 @@ public class SurveyController extends BasicController {
 				views.add(surveySummary);
 			}
 		}
-		views.sort(new BeanComparator("modifiedDate"));
+		views.sort(Collections.reverseOrder(new BeanComparator("modifiedDate")));
 		return views;
 	}
 
@@ -261,8 +267,15 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value="publish/{id}", method=POST)
 	public @ResponseBody SurveyView publishSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		User activeUser = null; //TODO
+		User activeUser = sessionManager.getLoggedUser();
 		surveyManager.publish(survey, activeUser);
+		return generateView(survey, false);
+	}
+	
+	@RequestMapping(value="unpublish/{id}", method=POST)
+	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id) throws SurveyStoreException {
+		User activeUser = sessionManager.getLoggedUser();
+		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
 		return generateView(survey, false);
 	}
 	
@@ -278,6 +291,31 @@ public class SurveyController extends BasicController {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.archive(survey);
 		return generateView(survey, false);
+	}
+	
+	@RequestMapping(value="clone", method=POST)
+	public @ResponseBody JobView cloneSurvey(@Valid SurveyCloneParameters params) {
+		surveyCloneJob = new SurveyCloneJob(surveyManager);
+		surveyCloneJob.setOriginalSurveyName(params.originalSurveyName);
+		surveyCloneJob.setNewName(params.newSurveyName);
+		surveyCloneJob.setOriginalSurveyType(params.originalSurveyType);
+		surveyCloneJob.setActiveUser(sessionManager.getLoggedUser());
+		jobManager.start(surveyCloneJob);
+		return new JobView(surveyCloneJob);
+	}
+	
+	@RequestMapping(value="cloned/id", method=GET)
+	public Integer getClonedSurveyId() {
+		if (surveyCloneJob == null || !surveyCloneJob.isCompleted()) {
+			return null;
+		} else {
+			return surveyCloneJob.getOutputSurvey().getId();
+		}
+	}
+	
+	@RequestMapping(value="validate/clone", method=POST)
+	public @ResponseBody Response validateSurveyCloneParameters(@Valid SurveyCloneParameters params, BindingResult result) {
+		return generateFormValidationResponse(result);
 	}
 	
 	@RequestMapping(value = "prepareimport", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
@@ -384,7 +422,7 @@ public class SurveyController extends BasicController {
 		
 		SurveySummary surveySummary = surveyManager.loadSummaryByUri(uri);
 		final CollectSurvey loadedSurvey;
-		if ( surveySummary.isTemporary() && params.getSurveyType() == TEMPORARY ) {
+		if ( surveySummary.isTemporary() && params.getSurveyType() == SurveyType.TEMPORARY ) {
 			loadedSurvey = surveyManager.loadSurvey(surveySummary.getId());
 		} else {
 			loadedSurvey = surveyManager.getByUri(uri);
@@ -616,6 +654,41 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
+	public static class SurveyCloneParameters {
+		
+		public enum SurveyType {
+			TEMPORARY, PUBLISHED
+		}
+		
+		private String originalSurveyName;
+		private SurveyType originalSurveyType;
+		private String newSurveyName;
+		
+		public String getOriginalSurveyName() {
+			return originalSurveyName;
+		}
+		
+		public void setOriginalSurveyName(String originalSurveyName) {
+			this.originalSurveyName = originalSurveyName;
+		}
+		
+		public SurveyType getOriginalSurveyType() {
+			return originalSurveyType;
+		}
+		
+		public void setOriginalSurveyType(SurveyType originalSurveyType) {
+			this.originalSurveyType = originalSurveyType;
+		}
+		
+		public String getNewSurveyName() {
+			return newSurveyName;
+		}
+		
+		public void setNewSurveyName(String newSurveyName) {
+			this.newSurveyName = newSurveyName;
+		}
+	}
+	
 	public static class SurveyImportJobView extends JobView {
 		
 		private Integer surveyId;
@@ -628,6 +701,55 @@ public class SurveyController extends BasicController {
 		public Integer getSurveyId() {
 			return surveyId;
 		}
-		
 	}
+	
+	public static class SurveyCloneJob extends Job {
+		
+		private SurveyManager surveyManager;
+		
+		//input
+		private String originalSurveyName;
+		private SurveyType originalSurveyType;
+		private String newName;
+		private User activeUser;
+		
+		//ouptut
+		private CollectSurvey outputSurvey;
+		
+		public SurveyCloneJob(SurveyManager surveyManager) {
+			super();
+			this.surveyManager = surveyManager;
+		}
+
+		@Override
+		protected void buildTasks() throws Throwable {
+			addTask(new Task() {
+				protected void execute() throws Throwable {
+					outputSurvey = surveyManager.duplicateSurveyIntoTemporary(originalSurveyName, 
+							originalSurveyType == SurveyType.TEMPORARY, newName, activeUser);
+				}
+			});
+		}
+		
+		public void setOriginalSurveyName(String originalSurveyName) {
+			this.originalSurveyName = originalSurveyName;
+		}
+		
+		public void setOriginalSurveyType(SurveyType originalSurveyType) {
+			this.originalSurveyType = originalSurveyType;
+		}
+		
+		public void setNewName(String newName) {
+			this.newName = newName;
+		}
+		
+		public void setActiveUser(User activeUser) {
+			this.activeUser = activeUser;
+		}
+		
+		public CollectSurvey getOutputSurvey() {
+			return outputSurvey;
+		}
+	}
+	
 }

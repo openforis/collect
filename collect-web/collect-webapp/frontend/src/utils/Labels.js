@@ -52,7 +52,11 @@ export default class Labels {
     }
 
 
-    static label(key, parameters) {
+    static label(key, params) {
+        const parameters = params ? 
+                params instanceof Array ? params 
+                : [params] 
+            : null
         return T.translate(key, parameters)
     }
 

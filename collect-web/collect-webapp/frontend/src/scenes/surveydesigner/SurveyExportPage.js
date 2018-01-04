@@ -47,8 +47,6 @@ class SurveyExportPage extends Component {
         if (!this.validateForm()) {
             return
         }
-        const surveySummary = this.state.surveySummary
-
         ServiceFactory.surveyService.startExport(
                 this.state.surveySummary.id, 
                 this.state.surveySummary.uri,
@@ -93,7 +91,7 @@ class SurveyExportPage extends Component {
                     onChange={(event) => this.setState({ ...this.state, surveyType: event.target.value })}
                     disabled={type === 'PUBLISHED' && !surveySummary.published || type === 'TEMPORARY' && !surveySummary.temporary}
                     />
-                {L.l('survey.export.surveyType.' + type.toLowerCase())}
+                {L.l('survey.surveyType.' + type.toLowerCase())}
             </Label>
         )
         const outputFormats = ['DESKTOP', 'EARTH', 'MOBILE']
@@ -111,7 +109,7 @@ class SurveyExportPage extends Component {
                     <legend>Parameters</legend>
                     <Form>
                         <FormGroup row>
-                            <Label for="surveyType" sm={1}>Survey Type:</Label>
+                            <Label for="surveyType" sm={1}>{L.l('survey.surveyType')}:</Label>
                             <Col sm={10}>
                                 <FormGroup check>
                                     {surveyTypeCheckBoxes}
@@ -119,7 +117,7 @@ class SurveyExportPage extends Component {
                             </Col>
                         </FormGroup>
                         <FormGroup row>
-                            <Label for="outputFormat" sm={1}>Export mode:</Label>
+                            <Label for="outputFormat" sm={1}>{L.l('survey.export.mode')}:</Label>
                             <Col sm={10}>
                                 <FormGroup check>
                                     {outputFormatCheckboxes}

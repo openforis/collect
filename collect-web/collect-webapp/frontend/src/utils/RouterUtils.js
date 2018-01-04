@@ -54,6 +54,10 @@ export default class RouterUtils {
         RouterUtils._navigateToUrl(history, '/surveydesigner/surveys/export/' + surveyId)
     }
 
+    static navigateToSurveyClonePage(history, surveyName) {
+        RouterUtils._navigateToUrl(history, '/surveydesigner/surveys/clone/' + surveyName)
+    }
+    
     static navigateToUserGroupEditPage(history, userGroupId) {
         RouterUtils._navigateToUrl(history, '/usergroups/' + userGroupId)
     }

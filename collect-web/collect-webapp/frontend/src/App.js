@@ -18,6 +18,7 @@ import MapPage from 'scenes/MapPage'
 import RestorePage from 'scenes/backuprestore/RestorePage'
 import SaikuPage from 'scenes/SaikuPage'
 import SurveyDesignerPage from 'scenes/SurveyDesignerPage'
+import SurveyClonePage from 'scenes/surveydesigner/SurveyClonePage'
 import SurveyEditPage from 'scenes/surveydesigner/SurveyEditPage'
 import SurveysListPage from 'scenes/surveydesigner/SurveysListPage'
 import NewSurveyPage from 'scenes/surveydesigner/NewSurveyPage';
@@ -59,6 +60,7 @@ class App extends Component {
                   <Route path="/surveydesigner/surveyimport" exact name="SurveyImport" component={SurveyImportPage}/>
                   <Route path="/surveydesigner/surveys/:id" exact name="SurveyEdit" component={SurveyEditPage}/>
                   <Route path="/surveydesigner/surveys/export/:id" exact name="SurveyExport" component={SurveyExportPage}/>
+                  <Route path="/surveydesigner/surveys/clone/:surveyName" exact name="SurveyClone" component={SurveyClonePage}/>
                   <Route path="/users" exact name="Users" component={UsersPage}/>
                   <Route path="/users/changepassword" exact name="ChangePassword" component={PasswordChangePage}/>
                   <Route path="/usergroups" exact name="User Groups" component={UserGroupsPage}/>

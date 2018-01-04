@@ -10,12 +10,30 @@ import Strings from 'utils/Strings'
 
 export class SimpleFormItem extends Component {
 
+    extractErrorMessage(fieldId, errorFeedback, validationErrors) {
+        let errorMessage = null
+        let errorMessageArgs = null
+        if (errorFeedback) {
+            errorMessage = errorFeedback
+        } else if (validationErrors) {
+            const error = validationErrors.find(error => error.field === fieldId)
+            if (error) {
+                errorMessage = error.code
+                errorMessageArgs = error.arguments
+            }
+        }
+        errorMessage = L.l(errorMessage, errorMessageArgs)
+        return errorMessage
+    }
+
     render() {
-        const {fieldId, fieldState, errorFeedback, label, check=false, row=true, labelColSpan=2, fieldColSpan=10} = this.props
+        const {fieldId, label, fieldState, errorFeedback, validationErrors, check=false, row=true, labelColSpan=2, fieldColSpan=10} = this.props
+        const errorMessage = this.extractErrorMessage(fieldId, errorFeedback, validationErrors)
+        const formGroupColor = fieldState ? fieldState : errorMessage ? 'danger': null
 
         return (
-            <FormGroup row={row} color={fieldState} check={check}>
-                <Label check={check} for={fieldId} sm={labelColSpan}>{L.l(label)}</Label>
+            <FormGroup row={row} color={formGroupColor} check={check}>
+                <Label check={check} for={fieldId} sm={labelColSpan}>{L.l(label)}:</Label>
                 <Col sm={fieldColSpan}>
                     {check && 
                         <FormGroup check>
@@ -25,7 +43,7 @@ export class SimpleFormItem extends Component {
                         </FormGroup>
                     }
                     {! check && this.props.children}
-                    {errorFeedback && <FormFeedback>{L.l(errorFeedback)}</FormFeedback>}
+                    {errorMessage && <FormFeedback>{errorMessage}</FormFeedback>}
                 </Col>
             </FormGroup>
         )
@@ -103,6 +121,13 @@ export default class Forms {
         } else {
             return value
         }
+    }
+
+    static getValidState(fieldId, validationErrors) {
+        return validationErrors ? 
+                validationErrors.find(e => e.field === fieldId) ? false 
+                : null
+            : null
     }
 
 }

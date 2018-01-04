@@ -169,4 +169,20 @@ public abstract class SimpleValidator<F> implements Validator {
 			errors.rejectValue(field, errorCode, args, messageSource.getMessage(errorCode, args, Locale.ENGLISH));
 		}
 	}
+	
+	protected static class ErrorsHelper {
+		
+		private Errors errors;
+
+		public ErrorsHelper(Errors errors) {
+			super();
+			this.errors = errors;
+		}
+		
+		public String getStringValue(String field) {
+			Object value = errors.getFieldValue(field);
+			return value == null ? null : value.toString();
+		}
+		
+	}
 }
