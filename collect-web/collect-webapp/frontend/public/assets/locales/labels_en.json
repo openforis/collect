@@ -214,6 +214,7 @@
                 "type": "Original survey type"
             },
             "newSurveyName": "New survey name",
+            "cloningSurvey": "Cloning survey",
             "validation": {
                 "originalSurveyNotFound": "Original survey with name \"{0}\" not found"
             }

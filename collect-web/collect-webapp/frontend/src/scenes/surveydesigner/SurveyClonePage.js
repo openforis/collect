@@ -7,18 +7,19 @@ import { connect } from 'react-redux';
 
 import * as JobActions from 'actions/job';
 import Forms, { SimpleFormItem } from 'components/Forms';
+import Dialogs from 'components/Dialogs';
 import Workflow from 'model/Workflow';
 import SurveyService from 'services/SurveyService';
 import ServiceFactory from 'services/ServiceFactory';
-import Objects from 'utils/Objects'
-import L from 'utils/Labels'
+import Arrays from 'utils/Arrays';
+import Objects from 'utils/Objects';
+import L from 'utils/Labels';
 import RouterUtils from 'utils/RouterUtils';
 
 class SurveyClonePage extends Component {
 
     constructor(props) {
         super(props)
-
         
         this.state = {
             originalSurveySummary: null,
@@ -28,26 +29,38 @@ class SurveyClonePage extends Component {
             validationErrors: null
         }
 
-        this.handleSubmit = this.handleSubmit.bind(this)
-        this.validateFormAsync = this.validateFormAsync.bind(this)
+        this.findUnusedSurveyName = this.findUnusedSurveyName.bind(this)
         this.handleNameChange = this.handleNameChange.bind(this)
+        this.validateFormAsync = this.validateFormAsync.bind(this)
+        this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
+        this.handleCloneModalOkButtonClick = this.handleCloneModalOkButtonClick.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
         const { surveySummaries } = nextProps
-        if (surveySummaries && !this.state.originalSurveySummary) {
+        if (surveySummaries && surveySummaries.length > 0 && !this.state.originalSurveySummary) {
             const path = this.props.location.pathname
             const surveyName = path.substring(path.lastIndexOf('/') + 1)
             const surveySummary = surveySummaries.find(s => s.name === surveyName)
             this.setState({
                 originalSurveySummary: surveySummary,
                 originalSurveyType: surveySummary.temporary ? 'TEMPORARY': 'PUBLISHED',
-                newSurveyName: surveySummary.name + '_copy'
+                newSurveyName: this.findUnusedSurveyName(surveySummaries, surveySummary)
             })
         }
     }
 
-    handleSubmit() {
+    findUnusedSurveyName(surveySummaries, surveySummary) {
+        let newNameBase = surveySummary.name + '_copy'
+        let count = 1
+        let newName = newNameBase
+        while (Arrays.contains(surveySummaries, s => s.name === newName)) {
+            newName = newNameBase + '_' + (count++)
+        }
+        return newName
+    }
+
+    handleCloneButtonClick() {
         const { originalSurveySummary, originalSurveyType, newSurveyName } = this.state
         ServiceFactory.surveyService.startClone(originalSurveySummary.name, originalSurveyType, newSurveyName).then(job => {
             this.props.dispatch(JobActions.startJobMonitor({
@@ -79,8 +92,13 @@ class SurveyClonePage extends Component {
 
     handleCloneModalOkButtonClick(job) {
         if (job.completed) {
-            ServiceFactory.surveyService.getClonedSurveyId().then(surveyId => {
-                RouterUtils.navigateToSurveyEditPage(this.props.history, surveyId)
+            ServiceFactory.surveyService.getClonedSurveyId().then(res => {
+                if (res.statusOk) {
+                    const surveyId = res.object
+                    RouterUtils.navigateToSurveyEditPage(this.props.history, surveyId)
+                } else {
+                    Dialogs.alert(L.l('global.error'))
+                }
             })
         }
         this.props.dispatch(JobActions.closeJobMonitor())
@@ -107,7 +125,7 @@ class SurveyClonePage extends Component {
             <Container>
                 <FormGroup tag="fieldset">
                     <legend>{L.l('survey.clone.title')}</legend>
-                    <Form onSubmit={this.handleSubmit}>
+                    <Form>
                         <SimpleFormItem
                             fieldId="originalSurveyName"
                             label={L.l('survey.clone.originalSurvey.name')}
@@ -142,7 +160,8 @@ class SurveyClonePage extends Component {
                         {error && <Alert color="danger">{error}</Alert>}
                         <Row>
                             <Col xs={{offset: 5}}>
-                                <Button color="primary" type="submit" disabled={validationErrors || validating}>{L.l('survey.clone')}</Button>
+                                <Button color="primary" disabled={validationErrors || validating}
+                                    onClick={this.handleCloneButtonClick}>{L.l('survey.clone')}</Button>
                             </Col>
                         </Row>
                     </Form>

@@ -311,12 +311,15 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="cloned/id", method=GET)
-	public Integer getClonedSurveyId() {
+	public @ResponseBody Response getClonedSurveyId() {
+		Response response = new Response();
 		if (surveyCloneJob == null || !surveyCloneJob.isCompleted()) {
-			return null;
+			response.setErrorStatus();
+			response.setErrorMessage("Survey clone job not found");
 		} else {
-			return surveyCloneJob.getOutputSurvey().getId();
+			response.setObject(surveyCloneJob.getOutputSurvey().getId());
 		}
+		return response;
 	}
 	
 	@RequestMapping(value="validate/clone", method=POST)
