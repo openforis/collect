@@ -4,7 +4,7 @@ import Arrays from 'utils/Arrays'
 
 import {
   REQUEST_SURVEY_SUMMARIES, RECEIVE_SURVEY_SUMMARIES, INVALIDATE_SURVEY_SUMMARIES, SURVEY_USER_GROUP_CHANGED,
-  NEW_SURVEY_CREATED
+  NEW_SURVEY_CREATED, SURVEY_DELETED
 } from 'actions/surveys'
 
 function surveySummaries(
@@ -50,6 +50,19 @@ function surveySummaries(
       return Object.assign({}, state, {
         items: Arrays.addItem(state.items, action.newSurveySummary)
       })
+    case SURVEY_DELETED: {
+        const oldItem = state.items.find(u => u.id === action.survey.id)
+        if (oldItem) {
+            let newItems = Arrays.removeItem(state.items, oldItem)
+            return Object.assign({}, state, {
+              items: newItems,
+              lastUpdated: action.receivedAt
+            })
+        } else {
+            return state
+        }
+    }
+
     default:
       return state
   }

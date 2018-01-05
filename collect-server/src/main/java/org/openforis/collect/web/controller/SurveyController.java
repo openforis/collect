@@ -293,6 +293,12 @@ public class SurveyController extends BasicController {
 		return generateView(survey, false);
 	}
 	
+	@RequestMapping(value="delete/{id}", method=POST)
+	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
+		surveyManager.deleteSurvey(id);
+		return new Response();
+	}
+	
 	@RequestMapping(value="clone", method=POST)
 	public @ResponseBody JobView cloneSurvey(@Valid SurveyCloneParameters params) {
 		surveyCloneJob = new SurveyCloneJob(surveyManager);

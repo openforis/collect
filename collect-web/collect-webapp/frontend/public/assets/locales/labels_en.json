@@ -217,6 +217,18 @@
             "validation": {
                 "originalSurveyNotFound": "Original survey with name \"{0}\" not found"
             }
+        },
+        "delete": {
+            "confirm": {
+                "title": "Confirm delete",
+                "message": "Delete survey \"{0}\"?"
+            },
+            "published": {
+                "confirm": {
+                    "title": "Delete published survey",
+                    "message": "The survey \"{0}\" has been published.\n\nIf you delete it, all the records collected with this survey will be deleted.\n\nDo you want to continue?"
+                }    
+            }
         }
     },
     "backupRestore": {

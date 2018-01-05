@@ -51,7 +51,7 @@ class ConfirmDialog extends Component {
     render() {
         const { title, message, configuration } = this.props
         const { confirmButtonLabel, cancelButtonLabel } = configuration
-
+        
         return (
             <Dialog open={true}
                     ignoreBackdropClick

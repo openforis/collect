@@ -85,6 +85,10 @@ export default class SurveyService extends AbstractService {
         return this.post('survey/unpublish/' + surveyId)
     }
 
+    delete(surveyId) {
+        return this.post('survey/delete/' + surveyId)
+    }
+
     startClone(originalSurveyName, originalSurveyType, newSurveyName) {
         return this.post('survey/clone', {
             originalSurveyName: originalSurveyName,

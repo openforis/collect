@@ -26,15 +26,16 @@ class SurveysListPage extends Component {
         }
 
         this.handleCellEdit = this.handleCellEdit.bind(this)
+        this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
+        this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
+        this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
+        this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
+        this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
+        this.handlePublishButtonClick = this.handlePublishButtonClick.bind(this)
         this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
         this.handleRowSelect = this.handleRowSelect.bind(this)
         this.handleSurveysSelection = this.handleSurveysSelection.bind(this)
-        this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
-        this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
-        this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
-        this.handlePublishButtonClick = this.handlePublishButtonClick.bind(this)
         this.handleUnpublishButtonClick = this.handleUnpublishButtonClick.bind(this)
-        this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
     }
 
     handleCellEdit(row, fieldName, value) {
@@ -57,6 +58,32 @@ class SurveysListPage extends Component {
     handleEditButtonClick() {
         this.handleRowDoubleClick(this.state.selectedSurvey)
     }
+
+    handleDeleteButtonClick() {
+        const survey = this.state.selectedSurvey
+        const dispatch = this.props.dispatch
+
+        const performSurveyDelete = function(survey) {
+            dispatch(SurveyActions.deleteSurvey(survey))
+            this.setState({
+                selectedSurvey: null,
+                selectedSurveys: [],
+                selectedSurveyIds: []
+            })
+        }
+    
+        Dialogs.confirm('survey.delete.confirm.title', L.l('survey.delete.confirm.message', survey.name), () => {
+            if (survey.temporary && !survey.publishedId) {
+                performSurveyDelete(survey)
+            } else {
+                Dialogs.confirm(L.l('survey.delete.published.confirm.title'), 
+                                L.l('survey.delete.published.confirm.message', survey.name), () => {
+                    performSurveyDelete(survey)
+                }, null, {confirmButtonLabel: L.l('global.delete')})
+            }
+        }, null, {confirmButtonLabel: L.l('global.delete')})
+    }
+
 
     handleExportButtonClick() {
         RouterUtils.navigateToSurveyExportPage(this.props.history, this.state.selectedSurvey.id)
@@ -186,7 +213,7 @@ class SurveysListPage extends Component {
                         onSelect: this.handleRowSelect,
                         selected: this.state.selectedSurveyIds
                     }}
-                    cellEdit={{ mode: 'click', blurToSave: true }}
+                    //cellEdit={{ mode: 'click', blurToSave: true }}
                     options={{
                         onRowDoubleClick: this.handleRowDoubleClick,
                         onCellEdit: this.handleCellEdit

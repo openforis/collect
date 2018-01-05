@@ -1,7 +1,9 @@
 import ServiceFactory from 'services/ServiceFactory';
 import Forms from 'components/Forms';
 import { change } from 'redux-form';
-import * as JobActions from 'actions/job'
+import * as JobActions from 'actions/job';
+import L from 'utils/Labels';
+import Dialogs from 'components/Dialogs';
 
 export const REQUEST_SURVEY_SUMMARIES = 'REQUEST_SURVEY_SUMMARIES'
 export const RECEIVE_SURVEY_SUMMARIES = 'RECEIVE_SURVEY_SUMMARIES'
@@ -21,6 +23,7 @@ export const SURVEY_FILE_IMPORT_STARTED = 'SURVEY_FILE_IMPORT_STARTED'
 export const SURVEY_FILE_IMPORTED = 'SURVEY_FILE_IMPORTED'
 export const SURVEY_FILE_IMPORT_ERROR = 'SURVEY_FILE_IMPORT_ERROR'
 export const SURVEY_FILE_IMPORT_RESET = 'SURVEY_FILE_IMPORT_RESET'
+export const SURVEY_DELETED = 'SURVEY_DELETED'
 
 const SURVEY_IMPORT_FORM_NAME = 'surveyImportForm'
 
@@ -222,5 +225,21 @@ export function surveyFileImported(importedSurveyId) {
 export function resetSurveyFileImport() {
     return {
         type: SURVEY_FILE_IMPORT_RESET
+    }
+}
+
+export function deleteSurvey(survey) {
+    return function(dispatch) {
+        ServiceFactory.surveyService.delete(survey.id).then(r => {
+            Dialogs.alert(L.l('survey.delete.success.title'), L.l('survey.delete.success.message', survey.name))
+            dispatch(surveyDeleted(survey))
+        })
+    }
+}
+
+function surveyDeleted(survey) {
+    return {
+        type: SURVEY_DELETED,
+        survey: survey
     }
 }
