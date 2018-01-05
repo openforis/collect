@@ -36,6 +36,8 @@ class SurveysListPage extends Component {
         this.handleRowSelect = this.handleRowSelect.bind(this)
         this.handleSurveysSelection = this.handleSurveysSelection.bind(this)
         this.handleUnpublishButtonClick = this.handleUnpublishButtonClick.bind(this)
+        this.performSurveyDelete = this.performSurveyDelete.bind(this)
+        this.resetSelection = this.resetSelection.bind(this)
     }
 
     handleCellEdit(row, fieldName, value) {
@@ -61,29 +63,31 @@ class SurveysListPage extends Component {
 
     handleDeleteButtonClick() {
         const survey = this.state.selectedSurvey
-        const dispatch = this.props.dispatch
 
-        const performSurveyDelete = function(survey) {
-            dispatch(SurveyActions.deleteSurvey(survey))
-            this.setState({
-                selectedSurvey: null,
-                selectedSurveys: [],
-                selectedSurveyIds: []
-            })
-        }
-    
-        Dialogs.confirm('survey.delete.confirm.title', L.l('survey.delete.confirm.message', survey.name), () => {
+        Dialogs.confirm(L.l('survey.delete.confirm.title'), L.l('survey.delete.confirm.message', survey.name), () => {
             if (survey.temporary && !survey.publishedId) {
-                performSurveyDelete(survey)
+                this.performSurveyDelete(survey)
             } else {
                 Dialogs.confirm(L.l('survey.delete.published.confirm.title'), 
                                 L.l('survey.delete.published.confirm.message', survey.name), () => {
-                    performSurveyDelete(survey)
+                    this.performSurveyDelete(survey)
                 }, null, {confirmButtonLabel: L.l('global.delete')})
             }
         }, null, {confirmButtonLabel: L.l('global.delete')})
     }
 
+    performSurveyDelete(survey) {
+        this.props.dispatch(SurveyActions.deleteSurvey(survey))
+        this.resetSelection()
+    }
+
+    resetSelection() {
+        this.setState({
+            selectedSurvey: null,
+            selectedSurveys: [],
+            selectedSurveyIds: []
+        })
+    }
 
     handleExportButtonClick() {
         RouterUtils.navigateToSurveyExportPage(this.props.history, this.state.selectedSurvey.id)
@@ -91,22 +95,26 @@ class SurveysListPage extends Component {
 
     handlePublishButtonClick() {
         const survey = this.state.selectedSurvey
+        const $this = this
         const confirmMessage = L.l('survey.publish.confirmMessage', survey.name)
         Dialogs.confirm(L.l('survey.publish.confirmTitle', survey.name), confirmMessage, function() {
             ServiceFactory.surveyService.publish(survey.id).then(s => {
                 Dialogs.alert(L.l('survey.publish.successDialog.title'), 
                     L.l('survey.publish.successDialog.message', survey.name))
+                $this.resetSelection()
             })
         }, null, {confirmButtonLabel: L.l('survey.publish')})
     }
 
     handleUnpublishButtonClick() {
         const survey = this.state.selectedSurvey
+        const $this = this
         const confirmMessage = L.l('survey.unpublish.confirmMessage', survey.name)
         Dialogs.confirm(L.l('survey.unpublish.confirmTitle', survey.name), confirmMessage, function() {
             ServiceFactory.surveyService.unpublish(survey.id).then(s => {
                 Dialogs.alert(L.l('survey.unpublish.successDialog.title'), 
                     L.l('survey.unpublish.successDialog.message', survey.name))
+                $this.resetSelection()
             })
         }, null, {confirmButtonLabel: L.l('survey.unpublish')})
     }

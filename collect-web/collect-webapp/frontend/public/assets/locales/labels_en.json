@@ -229,6 +229,10 @@
                     "title": "Delete published survey",
                     "message": "The survey \"{0}\" has been published.\n\nIf you delete it, all the records collected with this survey will be deleted.\n\nDo you want to continue?"
                 }    
+            },
+            "success": {
+                "title": "Survey deleted",
+                "message": "Survey \"{0}\" deleted successfully"
             }
         }
     },
