@@ -369,7 +369,7 @@ public class IDMFunctions extends CustomFunctions {
 
 	private static Object distinctValues(Object obj) {
 		if (obj instanceof Collection) {
-			LinkedHashSet<Object> result = new LinkedHashSet<Object>((Collection<?>) obj);
+			Set<Object> result = new LinkedHashSet<Object>((Collection<?>) obj);
 			if (result.size() == 1 && result.iterator().next() == null) {
 				return null;
 			} else {

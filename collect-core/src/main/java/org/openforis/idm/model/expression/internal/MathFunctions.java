@@ -16,29 +16,39 @@ public class MathFunctions extends CustomFunctions {
 
 	public MathFunctions(String namespace) {
 		super(namespace);
-		register("PI", new CustomFunction(0) {
-			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return PI();
-			}
-		});
 		register("abs", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return abs(number);
 			}
 		});
-		register("pow", new CustomFunction(2) {
+		register("avg", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return pow(objects[0], objects[1]);
+				return avg(objects[0]);
 			}
 		});
-		register("sqrt", new CustomFunction(1) {
-			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return sqrt(objects[1]);
+		register("cos", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return cos(number);
 			}
 		});
-		register("min", new CustomFunction(1) {
-			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return min(objects[0]);
+		register("cosrad", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return cosrad(number);
+			}
+		});
+		register("deg", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return deg(number);
+			}
+		});
+		register("log", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return log(number);
+			}
+		});
+		register("log10", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return log10(number);
 			}
 		});
 		register("max", new CustomFunction(1) {
@@ -46,14 +56,24 @@ public class MathFunctions extends CustomFunctions {
 				return max(objects[0]);
 			}
 		});
+		register("min", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return min(objects[0]);
+			}
+		});
+		register("PI", new CustomFunction(0) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return PI();
+			}
+		});
+		register("pow", new CustomFunction(2) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return pow(objects[0], objects[1]);
+			}
+		});
 		register("rad", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return rad(number);
-			}
-		});
-		register("deg", new SingleArgMathFunction() {
-			public Number execute(Number number) {
-				return deg(number);
 			}
 		});
 		register("sin", new SingleArgMathFunction() {
@@ -66,14 +86,14 @@ public class MathFunctions extends CustomFunctions {
 				return sinrad(number);
 			}
 		});
-		register("cos", new SingleArgMathFunction() {
-			public Number execute(Number number) {
-				return cos(number);
+		register("sum", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return sum(objects[0]);
 			}
 		});
-		register("cosrad", new SingleArgMathFunction() {
-			public Number execute(Number number) {
-				return cosrad(number);
+		register("sqrt", new CustomFunction(1) {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return sqrt(objects[1]);
 			}
 		});
 		register("tan", new SingleArgMathFunction() {
@@ -89,16 +109,6 @@ public class MathFunctions extends CustomFunctions {
 		register("tanrad", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return tanrad(number);
-			}
-		});
-		register("log", new SingleArgMathFunction() {
-			public Number execute(Number number) {
-				return log(number);
-			}
-		});
-		register("log10", new SingleArgMathFunction() {
-			public Number execute(Number number) {
-				return log10(number);
 			}
 		});
 	}
@@ -230,7 +240,48 @@ public class MathFunctions extends CustomFunctions {
 	private static Double log10(Number value) {
 		return Math.log10(value.doubleValue());
 	}
+	
+	private static Double sum(Object param) {
+		if (param == null) {
+			return 0.0;
+		} else if (param instanceof Collection) {
+			double result = 0.0;
+			@SuppressWarnings("unchecked")
+			Collection<Object> values = (Collection<Object>) param;
+			if (values != null && !values.isEmpty()) {
+				Iterator<Object> it = values.iterator();
+				while (it.hasNext()) {
+					Object value = it.next();
+					if (value != null) {
+						if (value instanceof Number) {
+							result += ((Number) value).doubleValue();
+						}
+					}
+				}
+			}
+			return result;
+		} else if (param instanceof Number) {
+			return ((Number) param).doubleValue();
+		} else {
+			return null;
+		}
+	}
 
+	private static Double avg(Object param) {
+		if (param == null) {
+			return 0.0;
+		} else if (param instanceof Collection) {
+			@SuppressWarnings("unchecked")
+			Collection<Object> values = (Collection<Object>) param;
+			Double sum = sum(values);
+			return sum / values.size();
+		} else if (param instanceof Number) {
+			return ((Number) param).doubleValue();
+		} else {
+			return null;
+		}
+	}
+	
 	private abstract static class SingleArgMathFunction extends CustomFunction {
 		
 		public SingleArgMathFunction() {
