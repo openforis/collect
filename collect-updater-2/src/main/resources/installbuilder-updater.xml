@@ -61,10 +61,6 @@ check_for_updates = 1</text>
 				</writeFile>
 				<!-- delete temporary rollaback files -->
 				<deleteFile path="${project.rollbackBackupDirectory}"/>
-				<showInfo>
-					<title>Update Finished!</title>
-					<text>Thank you for keeping Open Foris Collect always up to date!</text>
-				</showInfo>
 			</postInstallationActionList>
 		</component>
 	</componentList>
