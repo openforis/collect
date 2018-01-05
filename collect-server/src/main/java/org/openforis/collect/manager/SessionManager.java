@@ -31,6 +31,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class SessionManager {
 
 	private static Log LOG = LogFactory.getLog(SessionManager.class);
+	private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
 	@Autowired
 	private transient SurveyManager surveyManager;
@@ -139,8 +140,8 @@ public class SessionManager {
 		}
 	}
 	
-	public void setLocale(String string) {
-		Locale locale = LocaleUtils.toLocale(string);
+	public void setLocale(String localeStr) {
+		Locale locale = toLocale(localeStr);
 		SessionState sessionState = getSessionState();
 		sessionState.setLocale(locale);
 	}
@@ -217,4 +218,16 @@ public class SessionManager {
 		}
 	}
 	
+	private Locale toLocale(String localeStr) {
+		try {
+			return LocaleUtils.toLocale(localeStr);
+		} catch (Exception e) {
+			if (localeStr.length() > 2) {
+				//try to use only the first two letters (language code)
+				return LocaleUtils.toLocale(localeStr.substring(0, 2));
+			} else {
+				return DEFAULT_LOCALE;
+			}
+		}
+	}
 }
