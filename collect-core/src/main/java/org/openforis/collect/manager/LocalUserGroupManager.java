@@ -64,7 +64,7 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		dao.insertRelation(userInGroup);
 		return userGroup;
 	}
-
+	
 	public String getDefaultPrivateUserGroupName(User user) {
 		return user.getUsername() + DEFAULT_PRIVATE_USER_GROUP_SUFFIX;
 	}
@@ -256,10 +256,16 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	
 	@Override
 	@Transactional(readOnly=false, propagation=REQUIRED)
-	public void deleteAllUserRelations(int userId) {
-		dao.deleteAllUserRelations(userId);
+	public void deleteAllUserRelations(User user) {
+		dao.deleteAllUserRelations(user.getId());
+		deleteDefaultPrivateGroup(user);
 	}
 	
+	private void deleteDefaultPrivateGroup(User user) {
+		UserGroup group = dao.loadByName(getDefaultPrivateUserGroupName(user));
+		dao.delete(group);
+	}
+
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void requestJoin(User user, UserGroup userGroup, UserGroupRole role) {
 		UserInGroup userInGroup = new UserInGroup();
@@ -284,8 +290,10 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		userInGroup.setGroupId(publicGroup.getId());
 		userInGroup.setUserId(user.getId());
 		userInGroup.setRole(role);
-		userInGroup.setRequestDate(new Date());
 		userInGroup.setJoinStatus(ACCEPTED);
+		Date now = new Date();
+		userInGroup.setRequestDate(now);
+		userInGroup.setMemberSince(now);
 		dao.insertRelation(userInGroup);
 	}
 

@@ -46,6 +46,8 @@ import org.openforis.collect.io.data.CSVDataImportJob.CSVDataImportInput;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreSummaryJob;
+import org.openforis.collect.io.data.RecordProvider;
+import org.openforis.collect.io.data.RecordProviderConfiguration;
 import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
@@ -333,6 +335,7 @@ public class RecordController extends BasicController implements Serializable {
 		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
+		job.setUser(sessionManager.getLoggedUser());
 		job.setFullSummary(true);
 		job.setFile(file);
 		job.setPublishedSurvey(survey);
@@ -356,11 +359,13 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody
 	JobView startRecordImport(@PathVariable("surveyId") int surveyId, @RequestParam List<Integer> entryIdsToImport, 
 			@RequestParam(defaultValue="true") boolean validateRecords) throws IOException {
+		RecordProvider recordProvider = dataRestoreSummaryJob.getRecordProvider();
+		recordProvider.setConfiguration(new RecordProviderConfiguration(true));
 		DataRestoreJob job = jobManager.createJob(TransactionalDataRestoreJob.class);
 		job.setFile(dataRestoreSummaryJob.getFile());
 		job.setUser(sessionManager.getLoggedUser());
 		job.setValidateRecords(validateRecords);
-		job.setRecordProvider(dataRestoreSummaryJob.getRecordProvider());
+		job.setRecordProvider(recordProvider);
 		job.setPackagedSurvey(dataRestoreSummaryJob.getPackagedSurvey());
 		job.setPublishedSurvey(dataRestoreSummaryJob.getPublishedSurvey());
 		job.setEntryIdsToImport(entryIdsToImport);

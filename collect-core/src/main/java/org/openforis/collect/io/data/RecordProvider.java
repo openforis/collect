@@ -26,5 +26,5 @@ public interface RecordProvider extends Closeable {
 	
 	List<Integer> findEntryIds();
 
-	
+	void setConfiguration(RecordProviderConfiguration config);
 }

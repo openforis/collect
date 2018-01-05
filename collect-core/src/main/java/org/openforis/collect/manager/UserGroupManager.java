@@ -49,9 +49,10 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 	
 	void deleteRelation(int userGroupId, int userId);
 
-	void deleteAllUserRelations(int userId);
+	void deleteAllUserRelations(User user);
 
 	UserGroup createDefaultPrivateUserGroup(User user, User createdByUser);
 
 	void joinToDefaultPublicGroup(User user, UserGroupRole role);
+
 }

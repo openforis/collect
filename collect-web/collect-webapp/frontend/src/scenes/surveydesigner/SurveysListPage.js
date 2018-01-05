@@ -229,7 +229,7 @@ class SurveysListPage extends Component {
                 >
                     <TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>
                     <TableHeaderColumn key="name" dataField="name" editable={false} filter={{type: 'TextFilter'}} dataSort>{L.l('survey.name')}</TableHeaderColumn>
-                    <TableHeaderColumn key="projectName" dataField="projectName" editable={false} filter={{type: 'TextFilter'}} dataSort>{L.l('survey.name')}</TableHeaderColumn>
+                    <TableHeaderColumn key="projectName" dataField="projectName" editable={false} filter={{type: 'TextFilter'}} dataSort>{L.l('survey.projectName')}</TableHeaderColumn>
                     <TableHeaderColumn key="modifiedDate" dataField="modifiedDate" editable={false} dataFormat={Formatters.dateTimeFormatter}
 				        dataAlign="center" width="150" editable={false} dataSort>{L.l('survey.lastModified')}</TableHeaderColumn>
                     <TableHeaderColumn key="target" dataField="target" dataFormat={targetFormatter}

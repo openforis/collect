@@ -38,15 +38,15 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	protected void initializeTask(Worker task) {
 		if ( task instanceof DataRestoreSummaryTask ) {
 			DataRestoreSummaryTask t = (DataRestoreSummaryTask) task;
-			t.setRecordManager(recordManager);
-			t.setRecordFileManager(recordFileManager);
-			t.setUserManager(userManager);
-			t.setRecordProvider(recordProvider);
-			t.setFullSummary(fullSummary);
 			t.setDataSummaryFile(dataSummaryFile);
-			t.setOldFormat(oldBackupFormat);
-			t.setSurvey(publishedSurvey);
+			t.setFullSummary(fullSummary);
 			t.setIncludeRecordPredicate(includeRecordPredicate);
+			t.setOldFormat(oldBackupFormat);
+			t.setRecordFileManager(recordFileManager);
+			t.setRecordManager(recordManager);
+			t.setRecordProvider(recordProvider);
+			t.setSurvey(publishedSurvey);
+			t.setUserManager(userManager);
 		}
 		super.initializeTask(task);
 	}

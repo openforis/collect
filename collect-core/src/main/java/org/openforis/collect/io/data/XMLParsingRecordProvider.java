@@ -38,21 +38,26 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	private final CollectSurvey existingSurvey;
 	private boolean validateRecords;
 	private boolean ignoreDuplicateRecordKeyValidationErrors;
+	private RecordProviderConfiguration config = new RecordProviderConfiguration();;
 	
 	//internal
 	private NewBackupFileExtractor backupFileExtractor;
 	private DataUnmarshaller dataUnmarshaller;
 	private RecordUpdater recordUpdater;
 	private RecordUserLoader recordUserLoader;
+	private User activeUser;
+	private UserManager userManager;
+	
 	
 	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, CollectSurvey existingSurvey, 
 			User activeUser, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
 		this.file = file;
 		this.packagedSurvey = packagedSurvey;
 		this.existingSurvey = existingSurvey;
+		this.activeUser = activeUser;
+		this.userManager = userManager;
 		this.validateRecords = validateRecords;
 		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
-		this.recordUserLoader = new RecordUserLoader(userManager, activeUser);
 	}
 	
 	@Override
@@ -70,8 +75,13 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		this.dataUnmarshaller.setRecordApplicationVersion(backupFileExtractor.getInfo().getCollectVersion());
 		this.recordUpdater = new RecordUpdater();
 		this.recordUpdater.setValidateAfterUpdate(validateRecords);
+		initializeRecordUserLoader();
 	}
 	
+	private void initializeRecordUserLoader() {
+		this.recordUserLoader = new RecordUserLoader(userManager, activeUser, config.isCreateUsersFoundInRecords());
+	}
+
 	@Override
 	public String getEntryName(int entryId, Step step) {
 		if ( backupFileExtractor.isOldFormat() ) {
@@ -151,6 +161,12 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		return packagedSurvey;
 	}
 	
+	@Override
+	public void setConfiguration(RecordProviderConfiguration config) {
+		this.config = config;
+		initializeRecordUserLoader();
+	}
+	
 	public boolean isValidateRecords() {
 		return validateRecords;
 	}
@@ -168,13 +184,14 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		
 		private final UserManager userManager;
 		private User activeUser;
-		private Map<String, User> usersByName;
+		private Map<String, User> usersByName = new HashMap<String, User>();
+		private boolean createNewUsers;
 		
-		public RecordUserLoader(UserManager userManager, User activeUser) {
+		public RecordUserLoader(UserManager userManager, User activeUser, boolean createNewUsers) {
 			super();
 			this.userManager = userManager;
 			this.activeUser = activeUser;
-			this.usersByName = new HashMap<String, User>();
+			this.createNewUsers = createNewUsers;
 		}
 
 		public void adjustUserReferences(CollectRecord record) {
@@ -198,7 +215,7 @@ public class XMLParsingRecordProvider implements RecordProvider {
 				return usersByName.get(name);
 			} else {
 				user = userManager.loadByUserName(name);
-				if ( user == null ) {
+				if ( user == null && createNewUsers ) {
 					//create a user with data entry role and password equal to the user name
 					try {
 						user = userManager.insertUser(name, NEW_USER_PASSWORD, UserRole.ENTRY, activeUser);

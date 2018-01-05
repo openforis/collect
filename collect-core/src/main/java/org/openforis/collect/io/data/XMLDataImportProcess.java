@@ -113,7 +113,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 	@PostConstruct
 	public void init() {
 		this.state = new DataImportState();
-		this.recordUserLoader = new RecordUserLoader(userManager, userManager.loadAdminUser());
+		this.recordUserLoader = new RecordUserLoader(userManager, userManager.loadAdminUser(), true);
 	}
 
 	public DataImportState getState() {

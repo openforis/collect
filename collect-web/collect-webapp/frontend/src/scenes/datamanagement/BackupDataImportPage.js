@@ -9,6 +9,7 @@ import Arrays from 'utils/Arrays'
 import RouterUtils from 'utils/RouterUtils'
 import L from 'utils/Labels';
 import * as JobActions from 'actions/job';
+import * as UserActions from 'actions/users';
 
 class BackupDataImportPage extends Component {
 
@@ -114,6 +115,7 @@ class BackupDataImportPage extends Component {
     }
 
     handleDataImportCompleteOkButtonClick() {
+        this.props.dispatch(UserActions.fetchUsers())
         RouterUtils.navigateToDataManagementHomePage(this.props.history)
     }
 

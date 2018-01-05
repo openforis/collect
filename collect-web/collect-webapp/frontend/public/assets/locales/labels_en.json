@@ -156,7 +156,7 @@
             "COLLECT_EARTH": "Collect Earth", 
             "COLLECT_EARTH_IPCC": "Collect Earth + IPCC"
         },
-        "projectName": "Project",
+        "projectName": "Title",
         "defaultLanguage": "Default Language",
         "lastModified": "Last Modified",
         "unpublishedChanges": "Unpublished changes",

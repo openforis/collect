@@ -154,7 +154,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public void deleteAllUserRelations(int userId) {
+	public void deleteAllUserRelations(User user) {
 		// TODO Auto-generated method stub
 	}
 	

@@ -200,7 +200,8 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		if ( recordDao.hasAssociatedRecords(id) ) {
 			throw new CannotDeleteUserException();
 		}
-		groupManager.deleteAllUserRelations(id);
+		User user = userDao.loadById(id);
+		groupManager.deleteAllUserRelations(user);
 		userDao.delete(id);
 		
 		User cachedUser = userById.get(id);

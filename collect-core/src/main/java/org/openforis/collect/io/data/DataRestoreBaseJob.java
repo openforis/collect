@@ -147,8 +147,9 @@ public abstract class DataRestoreBaseJob extends Job {
 		} else if (task instanceof RecordProviderInitializerTask) {
 			RecordProviderInitializerTask t = (RecordProviderInitializerTask) task;
 			Input input = new Input();
-			input.setFile(file);
+			input.setActiveUser(user);
 			input.setExistingSurvey(publishedSurvey);
+			input.setFile(file);
 			input.setPackagedSurvey(packagedSurvey);
 			input.setUserManager(userManager);
 			input.setValidateRecords(validateRecords);
