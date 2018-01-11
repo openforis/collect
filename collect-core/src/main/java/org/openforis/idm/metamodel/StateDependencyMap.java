@@ -36,22 +36,24 @@ class StateDependencyMap {
 		this.sourcesByDependent = new HashMap<NodeDefinition, Set<NodePathPointer>>();
 	}
 	
-	Set<NodePathPointer> getDependencySet(NodeDefinition def){
+	Set<NodePathPointer> getDependents(NodeDefinition def){
 		Set<NodePathPointer> set = dependentsBySource.get(def);
-		if(set == null){
-			return Collections.emptySet();
-		} else {
-			return set;
-		}
+		return set == null ? Collections.<NodePathPointer>emptySet() : set;
+	}
+	
+	Set<NodeDefinition> getDependentNodeDefinitions(NodeDefinition def) {
+		Set<NodePathPointer> dependents = getDependents(def);
+		return getReferencedNodeDefinitions(dependents);
 	}
 	
 	Set<NodePathPointer> getSources(NodeDefinition def) {
 		Set<NodePathPointer> set = sourcesByDependent.get(def);
-		if(set == null){
-			return Collections.emptySet();
-		} else {
-			return set;
-		}
+		return set == null ? Collections.<NodePathPointer>emptySet() : set;
+	}
+	
+	Set<NodeDefinition> getSourceNodeDefinitions(NodeDefinition def) {
+		Set<NodePathPointer> sources = getSources(def);
+		return getReferencedNodeDefinitions(sources);
 	}
 	
 	private void addDependency(NodeDefinition def, NodePathPointer value){
@@ -171,6 +173,15 @@ class StateDependencyMap {
 	private Set<String> getReferencedPaths(String expression) throws InvalidExpressionException {
 		Set<String> paths = expressionEvaluator.determineReferencedPaths(expression);
 		return paths;
+	}
+	
+	private Set<NodeDefinition> getReferencedNodeDefinitions(Set<NodePathPointer> pointers) {
+		Set<NodeDefinition> result = new HashSet<NodeDefinition>();
+		for (NodePathPointer source : pointers) {
+			NodeDefinition nodeDef = source.getReferencedNodeDefinition();
+			result.add(nodeDef);
+		}
+		return result;
 	}
 
 }

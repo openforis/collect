@@ -663,6 +663,10 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	public Set<NodePathPointer> getRelevanceSources(NodeDefinition definition) {
 		return getSurveyDependencies().getRelevanceSources(definition);
 	}
+	
+	public Set<NodeDefinition> getRelevanceSourceNodeDefinitions(NodeDefinition definition) {
+		return getSurveyDependencies().getRelevanceSourceNodeDefinitions(definition);
+	}
 
 	public Set<NodePathPointer> getMinCountDependencies(NodeDefinition definition) {
 		return getSurveyDependencies().getMinCountDependencies(definition);

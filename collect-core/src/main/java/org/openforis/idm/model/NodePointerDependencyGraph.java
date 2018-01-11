@@ -35,7 +35,7 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 
 	protected abstract Set<NodePathPointer> determineSources(NodePointer dependent)
 			throws InvalidExpressionException;
-
+	
 	@Override
 	protected List<NodePointer> getChildren(NodePointer node) {
 		return Collections.emptyList();
@@ -99,7 +99,7 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 		}
 		return result;
 	}
-
+	
 	static class NodePointerId implements Comparable<NodePointerId> {
 		
 		private int entityId;

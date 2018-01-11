@@ -417,7 +417,11 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		}
 		return result;
 	}
-
+	
+	public Set<NodeDefinition> getRelevancySourceDefinitions() {
+		return getSurvey().getRelevanceSourceNodeDefinitions(this);
+	}
+	
 	public Set<NodePathPointer> getMinCountDependencies() {
 		Survey survey = getSurvey();
 		return survey.getMinCountDependencies(this);
