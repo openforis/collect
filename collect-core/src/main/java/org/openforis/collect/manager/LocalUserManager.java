@@ -133,6 +133,7 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 		} else {
 			userDao.update(user);
 		}
+		user.setRawPassword(null); //do not store raw password in cache
 		updateCache(user);
 		return user;
 	}
