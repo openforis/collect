@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormFeedback, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, DropdownItem, DropdownToggle, DropdownMenu,
+    Form, FormFeedback, FormGroup, Label, Input, Row, Col, UncontrolledButtonDropdown } from 'reactstrap';
 
 import Dialogs from 'components/Dialogs';
 import * as Formatters from 'components/datatable/formatters';
@@ -196,16 +196,27 @@ class SurveysListPage extends Component {
 					</Col>
                     {selectedSurvey &&
                         <div>
-                            <Button color="success" onClick={this.handleEditButtonClick}>Edit</Button>
-                            <Button color="primary" onClick={this.handleExportButtonClick}>Export</Button>
-                            <Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/></Button>
-                            {selectedSurvey && selectedSurvey.temporary &&
-                                <Button color="warning" onClick={this.handlePublishButtonClick}>Publish</Button>
-                            }
-                            {selectedSurvey && selectedSurvey.published && (!selectedSurvey.temporary || selectedSurvey.publishedId) &&
-                                <Button color="warning" onClick={this.handleUnpublishButtonClick}>Unpublish</Button>
-                            }
-                            <Button color="primary" onClick={this.handleCloneButtonClick}>Clone</Button>
+                            <Button color="success" onClick={this.handleEditButtonClick}><i class="fa fa-pencil" aria-hidden="true"></i>{L.l('global.edit')}</Button>
+                            <Button color="primary" onClick={this.handleExportButtonClick}><i class="fa fa-download" aria-hidden="true"></i>{L.l('global.export')}</Button>
+                            <UncontrolledButtonDropdown>
+                                <DropdownToggle caret color="warning">
+                                    <i class="fa fa-wrench" aria-hidden="true"></i>{L.l('global.advancedFunctions')}
+                                </DropdownToggle>
+                                <DropdownMenu>
+                                    {selectedSurvey && selectedSurvey.temporary &&
+                                        <DropdownItem bgColor="warning" color="warning" onClick={this.handlePublishButtonClick}><i class="fa fa-check-circle" aria-hidden="true"></i>{L.l('survey.publish')}</DropdownItem>
+                                    }
+                                    {selectedSurvey && selectedSurvey.temporary &&
+                                        <DropdownItem divider/>
+                                    }
+                                    {selectedSurvey && selectedSurvey.published && (!selectedSurvey.temporary || selectedSurvey.publishedId) &&
+                                        <DropdownItem color="warning" onClick={this.handleUnpublishButtonClick}><i class="fa fa-ban" aria-hidden="true"></i>{L.l('survey.unpublish')}</DropdownItem>
+                                    }
+                                    <DropdownItem color="primary" onClick={this.handleCloneButtonClick}><i class="fa fa-clone" aria-hidden="true"></i>{L.l('survey.clone')}</DropdownItem>
+                                    <DropdownItem divider/>
+                                    <DropdownItem color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/>{L.l('global.delete')}</DropdownItem>
+                                </DropdownMenu>
+                            </UncontrolledButtonDropdown>
                         </div>
                     }
                 </Row>
@@ -216,7 +227,7 @@ class SurveysListPage extends Component {
                     selectRow={{
                         mode: 'radio',  // single select
                         clickToSelect: true, 
-                        hideSelectionColumn: true, 
+                        hideSelectColumn: true, 
                         bgColor: 'lightBlue',
                         onSelect: this.handleRowSelect,
                         selected: this.state.selectedSurveyIds

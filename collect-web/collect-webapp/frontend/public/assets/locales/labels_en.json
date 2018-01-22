@@ -11,6 +11,7 @@
         }
     },
     "global": {
+        "advancedFunctions": "Advanced Functions",
         "cancel": "Cancel",
         "close": "Close",
         "confirm": "Confirm",
