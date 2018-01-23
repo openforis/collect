@@ -31,6 +31,10 @@ export default class SurveyService extends AbstractService {
             loggedUserId: loggedUserId
         })
     }
+
+    createTemporarySurvey(publishedSurveyId) {
+        return this.post('survey/cloneintotemporary/' + publishedSurveyId)
+    }
     
     fetchAllSummaries() {
         return this.get('survey', {

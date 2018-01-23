@@ -212,6 +212,25 @@ public class SurveyController extends BasicController {
 		return res;
 	}
 	
+	@Transactional
+	@RequestMapping(value="cloneintotemporary/{surveyId}", method=POST)
+	public @ResponseBody
+	Response cloneIntoTemporarySurvey(@PathVariable int surveyId) throws Exception {
+		Response response = new Response();
+		User loggedUser = sessionManager.getLoggedUser();
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
+		if (survey.isPublished()) {
+			String surveyUri = survey.getUri();
+			CollectSurvey temporarySurvey = surveyManager.createTemporarySurveyFromPublished(surveyUri, loggedUser);
+			response.setObject(temporarySurvey.getId());
+		} else {
+			response.setErrorStatus();
+			response.setErrorMessage(String.format("Survey with id %d is not published as expected", surveyId));
+		}
+		return response;
+	}
+	
+	
 	@RequestMapping(value="validatecreation", method=POST)
 	public @ResponseBody Response validateSurveyCreationParameters(@Valid SurveyCreationParameters params, BindingResult result) {
 		return generateFormValidationResponse(result);

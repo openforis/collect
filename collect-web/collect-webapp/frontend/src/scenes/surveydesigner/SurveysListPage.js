@@ -54,7 +54,14 @@ class SurveysListPage extends Component {
     }
     
     handleRowDoubleClick(surveySummary) {
-        RouterUtils.navigateToSurveyEditPage(this.props.history, surveySummary.id)
+        if (surveySummary.temporary) {
+            RouterUtils.navigateToSurveyEditPage(this.props.history, surveySummary.id)
+        } else {
+            ServiceFactory.surveyService.createTemporarySurvey(surveySummary.id).then(res => {
+                const newSurveyId = res.object
+                RouterUtils.navigateToSurveyEditPage(this.props.history, newSurveyId)
+            })
+        }
     }
 
     handleEditButtonClick() {
