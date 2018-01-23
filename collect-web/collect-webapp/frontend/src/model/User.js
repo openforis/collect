@@ -35,6 +35,7 @@ export default class User extends Serializable {
                     case 'OWNER':
                     case 'ADMINISTRATOR':
                     case 'SUPERVISOR':
+                    case 'DATA_ANALYZER':
                     case 'OPERATOR':
                         return true
                     default:
@@ -57,7 +58,6 @@ export default class User extends Serializable {
                 return ! Arrays.contains(records, r => r.step !== 'ENTRY' || r.ownerId !== this.id)
             default:
                 return true
-                
         }
     }
 
@@ -70,6 +70,7 @@ export default class User extends Serializable {
             case 'OWNER':
             case 'ADMINISTRATOR':
             case 'SUPERVISOR':
+            case 'DATA_ANALYZER':
                 return true
             default:
                 return false
@@ -93,6 +94,7 @@ export default class User extends Serializable {
             case 'OWNER':
             case 'ADMINISTRATOR':
             case 'SUPERVISOR':
+            case 'DATA_ANALYZER':
                 return true
             default:
                 return false
