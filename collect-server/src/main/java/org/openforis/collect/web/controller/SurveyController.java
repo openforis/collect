@@ -94,7 +94,7 @@ public class SurveyController extends BasicController {
 	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
 	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_sampling_unit";
 	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
-	private static final String CEP_FILE_EXTENSION = "cep";
+	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = "cep";
 
 	@Autowired
 	private SurveyManager surveyManager;
@@ -360,7 +360,7 @@ public class SurveyController extends BasicController {
 		}
 		surveyBackupInfoExtractorJob = jobManager.createJob(SurveyBackupInfoExtractorJob.class);
 		
-		if (CEP_FILE_EXTENSION.equalsIgnoreCase(extension)) {
+		if (COLLECT_EARTH_PROJECT_FILE_EXTENSION.equalsIgnoreCase(extension)) {
 			File idmFile = extractIdmFromCEPFile(tempFile);
 			surveyBackupInfoExtractorJob.setFile(idmFile);
 		} else {
@@ -405,7 +405,7 @@ public class SurveyController extends BasicController {
 		AbstractSurveyRestoreJob job;
 		if ( Files.XML_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension) ) {
 			job = jobManager.createJob(XMLSurveyRestoreJob.class);
-		} else if (CEP_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension)) {
+		} else if (COLLECT_EARTH_PROJECT_FILE_EXTENSION.equalsIgnoreCase(uploadedFileNameExtension)) {
 			job= jobManager.createJob(CESurveyRestoreJob.class);
 		} else {
 			job= jobManager.createJob(SurveyRestoreJob.class);
@@ -502,16 +502,20 @@ public class SurveyController extends BasicController {
 	public void downloadCsvExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		if (surveyBackupJob != null) {
 			File outputFile;
+			String outputFileExtension;
 			CollectSurvey survey;
 			if (surveyBackupJob instanceof CollectEarthSurveyExportJob) {
-				outputFile = ((CollectEarthSurveyExportJob) surveyBackupJob).getOutputFile();
-				survey = ((CollectEarthSurveyExportJob) surveyBackupJob).getSurvey();
+				CollectEarthSurveyExportJob backupJob = (CollectEarthSurveyExportJob) surveyBackupJob;
+				outputFile = backupJob.getOutputFile();
+				outputFileExtension = COLLECT_EARTH_PROJECT_FILE_EXTENSION;
+				survey = backupJob.getSurvey();
 			} else {
-				outputFile = ((SurveyBackupJob) surveyBackupJob).getOutputFile();
-				survey = ((SurveyBackupJob) surveyBackupJob).getSurvey();
+				SurveyBackupJob backupJob = (SurveyBackupJob) surveyBackupJob;
+				outputFile = backupJob.getOutputFile();
+				outputFileExtension = backupJob.getOutputFormat().getOutputFileExtension();
+				survey = backupJob.getSurvey();
 			}
-			String surveyName = survey.getName();
-			String fileName = String.format("%s_%s.%s", surveyName, Dates.formatCompactDateTime(survey.getModifiedDate()), FilenameUtils.getExtension(outputFile.getName()));
+			String fileName = String.format("%s_%s.%s", survey.getName(), Dates.formatCompactDateTime(survey.getModifiedDate()), outputFileExtension);
 			Controllers.writeFileToResponse(response, outputFile, fileName, Controllers.ZIP_CONTENT_TYPE);
 		}
 	}
