@@ -57,7 +57,7 @@ header .breadcrumb {
 .container.formItems {
     margin-left: 0px;
     margin-right: 0px;
-  }
+}
   
 @media (min-width: 576px) {
 .container.formItems {
@@ -83,7 +83,13 @@ header .breadcrumb {
 .container.formItems {
     width: 1580px;
     max-width: 100%; } }
-  
+
+
+.centered {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
 fieldset {
     border: 1px solid #c0c0c0 !important;
     margin: 0 2px !important;
@@ -137,6 +143,10 @@ fieldset legend {
 .row {
     margin-right: 0px;
     margin-left: 0px; } }
+
+.form-check .form-group {
+    margin-bottom: 0px;
+}
 
 span.checked,
 span.circle-red,
