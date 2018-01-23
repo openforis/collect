@@ -71,7 +71,7 @@ public class CollectMobileBackupConvertTask extends Task {
 		String dataSourceTemplate = writer.toString();
 		String dataSourceConfig = dataSourceTemplate.replace("${TARGET_DB_FILE}", outputDbFile.getAbsolutePath());
 		File dataSourceConfigFile = File.createTempFile("application-context-datasource", ".xml");
-		FileUtils.writeStringToFile(dataSourceConfigFile, dataSourceConfig);
+		FileUtils.writeStringToFile(dataSourceConfigFile, dataSourceConfig, OpenForisIOUtils.UTF_8);
 		return dataSourceConfigFile;
 	}
 
