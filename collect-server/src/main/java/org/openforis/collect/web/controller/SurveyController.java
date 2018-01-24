@@ -504,18 +504,24 @@ public class SurveyController extends BasicController {
 			File outputFile;
 			String outputFileExtension;
 			CollectSurvey survey;
+			String projectName;
 			if (surveyBackupJob instanceof CollectEarthSurveyExportJob) {
 				CollectEarthSurveyExportJob backupJob = (CollectEarthSurveyExportJob) surveyBackupJob;
 				outputFile = backupJob.getOutputFile();
 				outputFileExtension = COLLECT_EARTH_PROJECT_FILE_EXTENSION;
 				survey = backupJob.getSurvey();
+				projectName = survey.getName();
 			} else {
 				SurveyBackupJob backupJob = (SurveyBackupJob) surveyBackupJob;
 				outputFile = backupJob.getOutputFile();
 				outputFileExtension = backupJob.getOutputFormat().getOutputFileExtension();
 				survey = backupJob.getSurvey();
+				projectName = survey.getName();
+				if (backupJob.getOutputFormat() == SurveyBackupJob.OutputFormat.MOBILE) {
+					projectName += "_" + backupJob.getOutputSurveyDefaultLanguage();
+				}
 			}
-			String fileName = String.format("%s_%s.%s", survey.getName(), Dates.formatCompactDateTime(survey.getModifiedDate()), outputFileExtension);
+			String fileName = String.format("%s_%s.%s", projectName, Dates.formatCompactDateTime(survey.getModifiedDate()), outputFileExtension);
 			Controllers.writeFileToResponse(response, outputFile, fileName, Controllers.ZIP_CONTENT_TYPE);
 		}
 	}
