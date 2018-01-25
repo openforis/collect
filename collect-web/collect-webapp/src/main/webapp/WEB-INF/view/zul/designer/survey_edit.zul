@@ -156,9 +156,6 @@
 		<south height="30px" border="none">
 			<borderlayout hflex="1">
 				<west border="none" size="20%">
-					<button label="${labels.survey.back_to_list}"
-						image="/assets/images/back-small.png"
-						onClick="@command('backToSurveysList')" />
 				</west>
 				<center border="none">
 					<box width="100%" align="center">
