@@ -3,13 +3,13 @@
  */
 package org.openforis.collect.designer.component;
 
-import org.openforis.collect.designer.CollectDesignerOptions;
 import org.openforis.collect.designer.util.ComponentUtil;
+import org.openforis.collect.designer.util.PopUpUtil;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Image;
+import org.zkoss.zul.Window;
 
 /**
  * @author S. Ricci
@@ -21,7 +21,8 @@ public class ExpressionInfoIcon extends Image {
 
 	private static final String SCLASS = "expression-info";
 	private static final String IMAGE_SRC = "/assets/images/expression-small.png";
-	private static final String INFO_URL = CollectDesignerOptions.getIdmExpressionLanguageWikiUrl();
+	
+	private static Window popup;
 	
 	public ExpressionInfoIcon() {
 		super();
@@ -37,7 +38,10 @@ public class ExpressionInfoIcon extends Image {
 	}
 
 	private void onClick() {
-		Executions.getCurrent().sendRedirect(INFO_URL, "_blank");
+		if (popup != null) {
+			PopUpUtil.closePopUp(popup);
+		}
+		popup = PopUpUtil.openPopUp("survey_edit/schema/idm_expression_language_popup.zul", false);
 	}
 
 }
