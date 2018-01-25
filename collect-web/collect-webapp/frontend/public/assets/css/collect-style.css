@@ -90,6 +90,12 @@ header .breadcrumb {
     margin-right: auto !important;
 }
 
+.button-bar > button,
+.button-bar > .btn-group {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
 fieldset {
     border: 1px solid #c0c0c0 !important;
     margin: 0 2px !important;

@@ -4,7 +4,9 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, DropdownItem, DropdownToggle, DropdownMenu,
     Form, FormFeedback, FormGroup, Label, Input, Row, Col, UncontrolledButtonDropdown } from 'reactstrap';
 
+import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
 import Dialogs from 'components/Dialogs';
+import Containers from 'components/Containers';
 import * as Formatters from 'components/datatable/formatters';
 import CheckedIconFormatter from 'components/datatable/CheckedIconFormatter'
 import UserGroupColumnEditor from 'components/surveydesigner/UserGroupColumnEditor';
@@ -38,8 +40,28 @@ class SurveysListPage extends Component {
         this.handleUnpublishButtonClick = this.handleUnpublishButtonClick.bind(this)
         this.performSurveyDelete = this.performSurveyDelete.bind(this)
         this.resetSelection = this.resetSelection.bind(this)
+        this.handleWindowResize = this.handleWindowResize.bind(this)
+        this.updateTableHeight = this.updateTableHeight.bind(this)
     }
 
+    componentDidMount() {
+        this.handleWindowResize();
+        window.addEventListener("resize", this.handleWindowResize);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.handleWindowResize);
+    }
+
+    handleWindowResize() {
+        this.updateTableHeight()
+    }
+
+    updateTableHeight() {
+        const mainContainer = this.refs['survey-list-container']
+        Containers.extendToMaxAvailableHeight(mainContainer, 'react-bs-table-container', 130)       
+    }
+    
     handleCellEdit(row, fieldName, value) {
 		if (fieldName === 'userGroupId') {
 			const surveyId = row.id
@@ -196,15 +218,27 @@ class SurveysListPage extends Component {
         }
 
         return (
-            <Container fluid>
-                <Row className="justify-content-between">
-					<Col sm={4}>
+            <MaxAvailableSpaceContainer ref="survey-list-container">
+                <Row className="action-bar justify-content-between">
+					<Col sm={3}>
 						<Button color="info" onClick={this.handleNewButtonClick}>{L.l('general.new')}</Button>
 					</Col>
                     {selectedSurvey &&
-                        <div>
-                            <Button color="success" onClick={this.handleEditButtonClick}><i class="fa fa-pencil" aria-hidden="true"></i>{L.l('global.edit')}</Button>
-                            <Button color="primary" onClick={this.handleExportButtonClick}><i class="fa fa-download" aria-hidden="true"></i>{L.l('global.export')}</Button>
+                        <Col sm={1}>
+                            <Button color="success" onClick={this.handleEditButtonClick}>
+                                <i class="fa fa-pencil" aria-hidden="true"></i>{L.l('global.edit')}
+                            </Button>
+                        </Col>
+                    }
+                    {selectedSurvey &&
+                        <Col sm={1}>
+                            <Button color="primary" onClick={this.handleExportButtonClick}>
+                                <i class="fa fa-download" aria-hidden="true"></i>{L.l('global.export')}
+                            </Button>
+                        </Col>
+                    }
+                    {selectedSurvey &&
+                        <Col sm={2}>
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle caret color="warning">
                                     <i class="fa fa-wrench" aria-hidden="true"></i>{L.l('global.advancedFunctions')}
@@ -224,13 +258,12 @@ class SurveysListPage extends Component {
                                     <DropdownItem color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/>{L.l('global.delete')}</DropdownItem>
                                 </DropdownMenu>
                             </UncontrolledButtonDropdown>
-                        </div>
+                        </Col>
                     }
                 </Row>
                 <BootstrapTable
                     data={combinedSummaries}
                     striped hover condensed
-                    height="100%"
                     selectRow={{
                         mode: 'radio',  // single select
                         clickToSelect: true, 
@@ -260,7 +293,7 @@ class SurveysListPage extends Component {
                         customEditor={{ getElement: createUserGroupEditor, customEditorParameters: { userGroups: userGroups } }}
                         dataAlign="center" width="150" dataSort>{L.l('survey.userGroup')}</TableHeaderColumn>
                 </BootstrapTable>
-            </Container>
+            </MaxAvailableSpaceContainer>
         )
     }
 }
