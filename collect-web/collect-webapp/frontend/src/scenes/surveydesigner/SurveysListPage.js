@@ -59,7 +59,8 @@ class SurveysListPage extends Component {
 
     updateTableHeight() {
         const mainContainer = this.refs['survey-list-container']
-        Containers.extendToMaxAvailableHeight(mainContainer, 'react-bs-table-container', 130)       
+        const marginTop = 50
+        Containers.extendTableHeightToMaxAvailable(mainContainer, 50)
     }
     
     handleCellEdit(row, fieldName, value) {
