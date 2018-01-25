@@ -1,0 +1,510 @@
+<zk>
+	<window id="idmExpressionLanguagePopUp"
+	    title="${labels.survey.schema.idm_expression_language.popup.title}"
+	    width="700px" height="50%"
+	    border="normal" 
+	    position="center" 
+	    mode="overlapped"
+	    sizable="true"
+	    closable="true">
+	    <html vflex="true" style="display: block; overflow-y: auto;"><![CDATA[
+	    	<a name="IDM_Expression_Language" id="IDM_Expression_Language"></a>
+			<h3>
+				<span class="mw-headline">IDM Expression Language</span>
+			</h3>
+			<p>
+				The IDM expression language is used to define custom rules and other
+				logic of a survey model. It is a subset of the W3C-standard [<a
+					href="http://en.wikipedia.org/wiki/XPath" class="external text"
+					title="http://en.wikipedia.org/wiki/XPath" rel="nofollow">XML
+					Path Language (XPath)</a>.
+			</p>
+			<p>Expressions may contain paths and formulas which evaluate to
+				values (e.g. total_height * 8) or other nodes in the schema
+				(parent()/tree).</p>
+			<p>Standard XPath axes are not supported (".", "..", "ancestor",
+				"child", "descendant", etc.). Instead, the following custom functions
+				and special variable are provided to consistently resolve relative
+				paths:</p>
+			<dl>
+				<dt>parent()</dt>
+				<dd>the parent of the entity or attribute where the expression is
+					defined</dd>
+			</dl>
+			<dl>
+				<dt>$this</dt>
+				<dd>the value associated with the attribute where the expression
+					is defined</dd>
+			</dl>
+			<dl>
+				<dt>
+					node(<i>id</i>)
+				</dt>
+				<dd>
+					to be implemented in 3.3; resolves to the relative path of the
+					nearest instance of nodes with the specified definition <i>id</i>. In
+					future versions, this will replace parent() and $this
+				</dd>
+			</dl>
+			<p>
+				IDM expressions are always relative to the parent of the node where
+				they are defined. For example, if you have a biophysical survey with
+				the main entities organized in a structure like <i>cluster</i> -&gt; <i>plot</i>
+				-&gt; <i>tree</i>, if you are defining an expression for the attribute
+				<i>dbh</i> in the <i>tree</i> entity and you want to refer the
+				attribute <i>height</i> of the same <i>tree</i> entity, then you can
+				write simply <i>height &gt; 1.3</i>; instead if you want to refer the
+				attribute <i>accessibility</i> in the <i>plot</i> entity which the
+				current tree belongs to, you will have to write something like <i>parent()/accessibility
+					= 'A'</i>.
+			</p>
+			<p>Almost all the XPath functions are supported.</p>
+			<dl>
+				<dt>Functions on Boolean Values</dt>
+			</dl>
+			<ul>
+				<li>boolean(arg)</li>
+				<li>not(arg)</li>
+				<li>true()</li>
+				<li>false()</li>
+			</ul>
+			<dl>
+				<dt>Functions on Numeric Values</dt>
+			</dl>
+			<ul>
+				<li>number(arg)</li>
+				<li>round(num)</li>
+				<li>floor(num)</li>
+				<li>ceiling(num)</li>
+				<li>format-number(number, format, [decimalformat])</li>
+			</ul>
+			<dl>
+				<dt>Functions on Strings</dt>
+			</dl>
+			<ul>
+				<li>string(arg)</li>
+				<li>concat(string, string)</li>
+				<li>substring(string,start,len)</li>
+				<li>string-length(string)</li>
+				<li>normalize-space(string)</li>
+				<li>contains(string1, string2)</li>
+				<li>starts-with(string1, string2)</li>
+				<li>ends-with(string1,string2)</li>
+			</ul>
+			<dl>
+				<dt>Aggregate Functions</dt>
+			</dl>
+			<ul>
+				<li>sum(arg,arg,...) or sum(nodeset)</li>
+				<li>count((item,item,...))</li>
+			</ul>
+			<dl>
+				<dt>Context functions</dt>
+			</dl>
+			<ul>
+				<li>last()</li>
+			</ul>
+			<p>
+				Here you can find the complete documentation on these functions: <a
+					href="https://www.w3schools.com/xml/xsl_functions.asp"
+					class="external text"
+					title="https://www.w3schools.com/xml/xsl_functions.asp"
+					rel="nofollow">XPath Functions Documentation</a>
+			</p>
+			<a name="Additional_helper_functions" id="Additional_helper_functions"></a>
+			<h4>
+				<span class="mw-headline"> Additional helper functions </span>
+			</h4>
+			<dl>
+				<dt>
+					<i>idm:index()</i>
+				</dt>
+				<dd>returns the index of the current node relatively to its
+					parent (starts from 0)</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:position()</i>
+				</dt>
+				<dd>returns the position of the current node relatively to its
+					parent (starts from 1)</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:blank(node)</i>
+				</dt>
+				<dd>returns true if the attribute at the specified node has no
+					value (symbols, units and other properties are ignored)</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:not-blank(node)</i>
+				</dt>
+				<dd>returns true if the attribute at the specified node is filled
+					(symbols, units and other properties are ignored)</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:contains(multiple_attribute, value)</i>
+				</dt>
+				<dd>returns true if the specified value is among the ones
+					selected for the specified multiple attribute</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:samplingPointCoordinate(key1expr, key2expr, ...)</i>
+				</dt>
+				<dd>
+					retrieves a sampling point coordinate stored in the sampling points
+					list. The sampling point selected will be the one having the key
+					identifiers equal to the values calculated according to the specified
+					expressions. E.g. <i>idm:samplingPointCoordinate(cluster_id,
+						plot_no)</i> evaluates the expressions <i>cluster_id</i> and <i>plot_no</i>
+					and use the values as parameters to look for a coordinate in the
+					sampling piont list having <i>level1_code</i> equal to the evaluated
+					value of <i>cluster_id</i> and <i>level2_code</i> equal to the
+					evaluated value of <i>plot_no</i>.
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:samplingPointData(dataColumnName, level1KeyAttribute,
+						level2KeyAttribute, ...)</i>
+				</dt>
+				<dd>retrieves an extra info column associated to a sampling point
+					in the sampling point data. The sampling point will be selected based
+					on the values of the provided attributes.</dd>
+				<dd>
+					e.g. retrieve the "province" associated to the current plot:
+					<pre>idm:samplingPointData('province', cluster_no, plot_no)</pre>
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:speciesListData(speciesListName, attribute, speciesCode)</i>
+				</dt>
+				<dd>retrieves an info column associated to a species list. The
+					species will be selected by the species code. Possible attributes
+					that can be selected are: code, family, genus, scientific_name and
+					all the extra info attributes defined in the species list.</dd>
+				<dd>Soon there will be the possibility to specify custom
+					attributes for every species.</dd>
+				<dd>
+					e.g. retrieve the "family" associated to the species with code
+					"AFZ/QUA" in a species list named "trees":
+					<pre>idm:speciesListData('trees', 'family', 'AFZ/QUA')</pre>
+				</dd>
+				<dd>
+					e.g. retrieve the "family" of a species in a species list named
+					"trees" inserted using a Taxon Attribute named "tree_species":
+					<pre>idm:speciesListData('trees', 'family', tree_species)</pre>
+					(in this case the quotes on the "tree_species" parameter have not to
+					be specified since it's referring an attribute and not a constant
+					value).
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:distance(coordinateFrom, coordinateTo)</i>
+				</dt>
+				<dd>deprecated: see Geospatial Functions / geo:distance</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:datetime-diff(date1, time1, date2, time2)</i>
+				</dt>
+				<dd>calculates the difference in minutes between the 2 specified
+					datetimes.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:datetime-diff(date1, time1, date2, time2, timeUnit)</i>
+				</dt>
+				<dd>calculates the difference between the 2 specified datetimes.
+					Time unit can be "minute", "hour", "day".</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:lookup(table, column, idcol1, idexpr1, idcol2, idexpr2,
+						...)</i>
+				</dt>
+				<dd>
+					retrieves the <i>column</i> value from specified <i>table</i>,
+					matching value of each <i>idexpr</i> with value in each <i>idcol</i>.
+					This is implementation dependent and assumes the presence of
+					table-based data which may be referenced. E.g. <i>idm:lookup(my_custom_table,
+						my_column, keycol1, 1, keycol2, 3)</i> retrieves the value in <i>my_column</i>
+					in table <i>my_custom_table</i> where <i>keycol1</i>=1 and <i>keycol2</i>=3.
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:currentDate()</i>
+				</dt>
+				<dd>returns the current date as a Date attribute value.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:currentTime()</i>
+				</dt>
+				<dd>returns the current time as a Time attribute value.</dd>
+			</dl>
+			<a name="Util_functions" id="Util_functions"></a>
+			<h4>
+				<span class="mw-headline"> Util functions </span>
+			</h4>
+			<dl>
+				<dt>
+					<i>util:uuid()</i>
+				</dt>
+				<dd>generated a random UUID (Universal Unique Identifier) as a
+					Text attribute value.</dd>
+			</dl>
+			<a name="Mathematical_functions" id="Mathematical_functions"></a>
+			<h4>
+				<span class="mw-headline"> Mathematical functions </span>
+			</h4>
+			<p>Simple binary mathematical operators are supported:</p>
+			<table class="wikitable">
+				<tbody>
+					<tr>
+						<th>Operator</th>
+						<th>Description</th>
+						<th>Example</th>
+					</tr>
+					<tr>
+						<td>+</td>
+						<td>Addition</td>
+						<td>6 + 4</td>
+					</tr>
+					<tr>
+						<td>-</td>
+						<td>Subtraction</td>
+						<td>6 - 4</td>
+					</tr>
+					<tr>
+						<td>*</td>
+						<td>Multiplication</td>
+						<td>6 * 4</td>
+					</tr>
+					<tr>
+						<td>div</td>
+						<td>Division</td>
+						<td>8 div 4</td>
+					</tr>
+					<tr>
+						<td>=</td>
+						<td>Equal</td>
+						<td>price = 9.80</td>
+					</tr>
+					<tr>
+						<td>!=</td>
+						<td>Not equal</td>
+						<td>price&nbsp;!= 9.80</td>
+					</tr>
+					<tr>
+						<td>&lt;</td>
+						<td>Less than</td>
+						<td>price &lt; 9.80</td>
+					</tr>
+					<tr>
+						<td>&lt;=</td>
+						<td>Less than or equal to</td>
+						<td>price &lt;= 9.80</td>
+					</tr>
+					<tr>
+						<td>&gt;</td>
+						<td>Greater than</td>
+						<td>price&gt;9.80</td>
+					</tr>
+					<tr>
+						<td>&gt;=</td>
+						<td>Greater than or equal to</td>
+						<td>price &gt;= 9.80</td>
+					</tr>
+					<tr>
+						<td>or</td>
+						<td>or</td>
+						<td>price = 9.80 or price = 9.70</td>
+					</tr>
+					<tr>
+						<td>and</td>
+						<td>and</td>
+						<td>price &gt; 9.00 and price &lt; 9.90</td>
+					</tr>
+					<tr>
+						<td>mod</td>
+						<td>Modulus (division remainder)</td>
+						<td>5 mod 2</td>
+					</tr>
+				</tbody>
+			</table>
+			<dl>
+				<dt>
+					<i>math:abs(value)</i>
+				</dt>
+				<dd>
+					returns the absolute value of the specified <i>value</i>.
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:pow(base, exponent)</i>
+				</dt>
+				<dd>
+					returns the value of the <i>base</i> raised to the power of the <i>exponent</i>.
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:sqrt(value)</i>
+				</dt>
+				<dd>
+					returns the correctly rounded positive square root of <i>value</i>.
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:rad(angle)</i>
+				</dt>
+				<dd>Converts an angle measured in degrees to an approximately
+					equivalent angle measured in radians. The conversion from degrees to
+					radians is generally inexact.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:deg(angleInRadians)</i>
+				</dt>
+				<dd>
+					converts an angle measured in radians to an approximately equivalent
+					angle measured in degrees. The conversion from radians to degrees is
+					generally inexact; users should not expect <i>cos(toRadians(90.0))</i>
+					to exactly equal 0.0.
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:sin(angle)</i>
+				</dt>
+				<dd>returns the trigonometric sine of an angle.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:cos(angle)</i>
+				</dt>
+				<dd>returns the trigonometric cosine of an angle.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:tan(angle)</i>
+				</dt>
+				<dd>returns the trigonometric tangent of an angle.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:min(nodeset)</i>
+				</dt>
+				<dd>returns the the minimum not null value in a set of node
+					values.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:max(nodeset)</i>
+				</dt>
+				<dd>returns the the maximum not null value in a set of node
+					values.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:log(value)</i>
+				</dt>
+				<dd>
+					returns the natural logarithm (base e) of <i>value</i>.
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:log10(value)</i>
+				</dt>
+				<dd>
+					returns the base 10 logarithm of <i>value</i>.
+				</dd>
+			</dl>
+			<a name="Geospatial_functions" id="Geospatial_functions"></a>
+			<h4>
+				<span class="mw-headline"> Geospatial functions </span>
+			</h4>
+			<dl>
+				<dt>
+					<i>geo:polygon(vertices)</i>
+				</dt>
+				<dd>generates a KML polygon using the specified coordinates as
+					vertices. The coordinates parameter must be a an expression returning
+					a list of Coordinate Attribute values.</dd>
+				<dd>You can use this expression in a Calculated attribute to
+					generate a polygon that can be shown in the Collect Map toolkit.</dd>
+				<dd>
+					e.g. if you have a survey with a structure like <i>cluster</i> -&gt;
+					<i>plot</i> and you are defining this expression in an attribute
+					inside <i>cluster</i> and you have a <i>location</i> Coordinate
+					attribute inside <i>plot</i>, you can write:
+				</dd>
+				<dd>
+					<pre>geo:polygon(plot/location)</pre>
+				</dd>
+				<dd>
+					(mark the attribute <i>Geometry</i> in the Survey Designer in order
+					to make it visible in the Map tool)
+				</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>geo:distance(coordinateFrom, coordinateTo)</i>
+				</dt>
+				<dd>calculates the distance (in meters) between the 2 specified
+					coordinates. Coordinate values can be constant text values (e.g.
+					'SRID=EPSG:21035;POINT(805750 9333820)') or expressions related to
+					coordinate attributes</dd>
+			</dl>
+			<a name="Examples" id="Examples"></a>
+			<h4>
+				<span class="mw-headline"> Examples </span>
+			</h4>
+			<p>Suppose that you have a basic biophysical survey with a
+				structure like cluster -&gt; plot -&gt; tree and you want to:</p>
+			<dl>
+				<dt>make an attribute inside the "plot" entity visible only when
+					cluster is in a specific region</dt>
+				<dd>you will have to write in the "relevant when" field:</dd>
+				<dd>
+					<pre>parent()/region = "A"</pre>
+				</dd>
+				<dd>where A is the code associated to the specific region we are
+					referring to.</dd>
+			</dl>
+			<dl>
+				<dt>make an attribute inside the "plot" entity visible only when
+					plot is accessible</dt>
+				<dd>you will have to write in the "relevant when" field of the
+					"erosion" attribute just this:</dd>
+				<dd>
+					<pre>accessible</pre>
+				</dd>
+				<dd>where "accessible" is the name of a boolean attribute in the
+					"plot" entity. When referencing boolean attributes, you don't need to
+					compare the attribute with any value in the expression.</dd>
+			</dl>
+			<dl>
+				<dt>create a calculated attribute (read only) containing the
+					count of all the trees in every plot</dt>
+				<dd>
+					mark the attribute as <i>Calculated</i> and define a new <i>Attribute
+						default</i> that will use this expression:
+				</dd>
+				<dd>
+					<pre>count(plot/tree)</pre>
+				</dd>
+			</dl>
+		]]></html>
+	</window>
+</zk>
