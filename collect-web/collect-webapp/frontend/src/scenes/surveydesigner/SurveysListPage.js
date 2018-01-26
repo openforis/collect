@@ -59,7 +59,6 @@ class SurveysListPage extends Component {
 
     updateTableHeight() {
         const mainContainer = this.refs['survey-list-container']
-        const marginTop = 50
         Containers.extendTableHeightToMaxAvailable(mainContainer, 50)
     }
     
