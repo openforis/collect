@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="default-user-usergroup-role-update" author="ricci"
+		dbms="sqlite">
+
+		<comment>Update user role in default group to Administrator for all users</comment>
+
+		<sql>
+			UPDATE ofc_user_usergroup
+			SET role_code = 'A'
+			WHERE group_id = (SELECT ug.id FROM ofc_usergroup ug WHERE ug.name = 'default_public_group');
+		</sql>
+
+	</changeSet>
+
+</databaseChangeLog>
