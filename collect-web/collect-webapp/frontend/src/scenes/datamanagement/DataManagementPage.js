@@ -6,14 +6,16 @@ import { connect } from 'react-redux';
 
 import * as Actions from 'actions';
 import * as JobActions from 'actions/job';
-import ServiceFactory from 'services/ServiceFactory'
-import SurveySelect from 'components/SurveySelect'
-import WithSurveySelectContainer from 'containers/WithSurveySelectContainer'
-import Workflow from 'model/Workflow'
-import Dialogs from 'components/Dialogs'
-import Arrays from 'utils/Arrays'
-import L from 'utils/Labels'
-import RouterUtils from 'utils/RouterUtils'
+import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
+import SurveySelect from 'components/SurveySelect';
+import WithSurveySelectContainer from 'containers/WithSurveySelectContainer';
+import Workflow from 'model/Workflow';
+import ServiceFactory from 'services/ServiceFactory';
+import Arrays from 'utils/Arrays';
+import Containers from 'components/Containers';
+import Dialogs from 'components/Dialogs';
+import L from 'utils/Labels';
+import RouterUtils from 'utils/RouterUtils';
 
 const INITIAL_STATE = {
 	selectedItems: [],
@@ -23,6 +25,8 @@ const INITIAL_STATE = {
 
 class DataManagementPage extends Component {
 
+	mainContainer = null
+	recordDataTable = null
 	recordService = ServiceFactory.recordService
 
 	constructor(props) {
@@ -48,6 +52,8 @@ class DataManagementPage extends Component {
 		this.handleDemoteAnalysisToCleansingButtonClick = this.handleDemoteAnalysisToCleansingButtonClick.bind(this)
 		this.handleDemoteCleansingToEntryButtonClick = this.handleDemoteCleansingToEntryButtonClick.bind(this)
 		this.handleMoveRecordsJobCompleted = this.handleMoveRecordsJobCompleted.bind(this)
+		this.handleWindowResize = this.handleWindowResize.bind(this)
+        this.updateTableHeight = this.updateTableHeight.bind(this)
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -55,6 +61,29 @@ class DataManagementPage extends Component {
 			this.setState(INITIAL_STATE)
 		}
 	}
+
+	componentDidMount() {
+        this.handleWindowResize();
+        window.addEventListener("resize", this.handleWindowResize);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this.handleWindowResize);
+	}
+	
+	componentDidUpdate() {
+		this.updateTableHeight()
+	}
+
+    handleWindowResize() {
+		this.updateTableHeight()
+    }
+
+    updateTableHeight() {
+		if (this.mainContainer) {
+			Containers.extendTableHeightToMaxAvailable(this.mainContainer, 120)
+		}
+    }
 
 	handleNewButtonClick() {
 		let survey = this.props.survey
@@ -208,7 +237,7 @@ class DataManagementPage extends Component {
 		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === this.props.survey.userGroup.id)
 		const loggedUser = this.props.loggedUser
 		return (
-			<Container fluid>
+			<MaxAvailableSpaceContainer ref={ r => this.mainContainer = r }>
 				<Row className="justify-content-between">
 					<Col sm={{size: 4}}>
 						{loggedUser.canCreateRecords(surveyUserGroup) && 
@@ -263,17 +292,16 @@ class DataManagementPage extends Component {
 						}
 					</Col>
 				</Row>
-				<Row className="full-height">
+				<Row>
 					<Col>
 						<RecordDataTable onRef={ref => this.recordDataTable = ref}
-							className="full-height"
 							selectedItemIds={this.state.selectedItemIds}
 							handleRowSelect={this.handleRowSelect}
 							handleAllRowsSelect={this.handleAllRowsSelect}
 							handleRowDoubleClick={this.handleRowDoubleClick} />
 					</Col>
 				</Row>
-			</Container>
+			</MaxAvailableSpaceContainer>
 		);
 	}
 }

@@ -5,6 +5,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import ServiceFactory from 'services/ServiceFactory'
 import * as Formatters from 'components/datatable/formatters'
 import OwnerColumnEditor from './OwnerColumnEditor'
+import Tables from 'components/Tables'
 import L from 'utils/Labels'
 
 class RecordDataTable extends Component {
@@ -258,7 +259,8 @@ class RecordDataTable extends Component {
 						page: this.state.page,
 						sizePerPage: this.state.recordsPerPage,
 						sizePerPageList: [10, 25, 50, 100],
-						paginationShowsTotal: true
+						paginationShowsTotal: true,
+						sizePerPageDropDown: Tables.renderSizePerPageDropUp
 					}}
 					fetchInfo={{ dataTotalSize: this.state.totalSize }}
 					remote pagination striped hover condensed
