@@ -21,7 +21,8 @@
 		<csrf disabled="true"/>
 		<http-basic />
 		<headers>
-			<frame-options policy="ALLOW-FROM" strategy="static" value="*"  />
+			<frame-options disabled="true" />
+			<header name="X-Frame-Options" value="ALLOWALL" />
 		</headers>
 		
 		<intercept-url access="permitAll" pattern="collect.swf" />
