@@ -71,6 +71,11 @@ public abstract class JooqDaoSupport {
 		public Query getInternalQuery() {
 			return internalQuery;
 		}
+		
+		@Override
+		public String toString() {
+			return internalQuery.toString();
+		}
 	}
 	
 	public static class CollectStoreQueryBuffer {

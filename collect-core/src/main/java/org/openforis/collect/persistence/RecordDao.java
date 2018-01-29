@@ -542,7 +542,7 @@ public class RecordDao extends JooqDaoSupport {
 			return new CollectStoreQuery(q);
 		} else {
 			InsertQuery<OfcRecordDataRecord> q = dsl.insertQuery(OFC_RECORD_DATA);
-			fillRecordDataStoreQueryFromObject(q, recordId, sequenceNumber, r);
+			fillRecordDataStoreQueryFromObject(q, recordId, sequenceNumber, step, r);
 			return new CollectStoreQuery(q);
 		}
 	}
@@ -665,7 +665,7 @@ public class RecordDao extends JooqDaoSupport {
 	public CollectStoreQuery createRecordDataUpdateQuery(CollectRecord r, int recordId, Step step, int sequenceNumber) {
 		UpdateQuery<OfcRecordDataRecord> q = dsl.updateQuery(OFC_RECORD_DATA);
 
-		fillRecordDataStoreQueryFromObject(q, recordId, sequenceNumber, r);
+		fillRecordDataStoreQueryFromObject(q, recordId, sequenceNumber, step, r);
 		
 		q.addConditions(OFC_RECORD_DATA.RECORD_ID.eq(recordId)
 			.and(OFC_RECORD_DATA.SEQ_NUM.eq(sequenceNumber))
@@ -707,11 +707,12 @@ public class RecordDao extends JooqDaoSupport {
 		addValuesToQuery(q, RECORD_SUMMARY_FIELDS, r.getDataSummaryValues());
 	}
 
-	protected void fillRecordDataStoreQueryFromObject(StoreQuery<?> q, int recordId, Integer sequenceNumber, CollectRecord r) {
-		q.addValues(createRecordDataFieldValueMap(r, recordId, sequenceNumber));
+	protected void fillRecordDataStoreQueryFromObject(StoreQuery<?> q, int recordId, 
+			Integer sequenceNumber, Step step, CollectRecord r) {
+		q.addValues(createRecordDataFieldValueMap(recordId, sequenceNumber, step, r));
 	}
 	
-	private Map<Field<?>, Object> createRecordDataFieldValueMap(CollectRecord r, int recordId, Integer sequenceNumber) {
+	private Map<Field<?>, Object> createRecordDataFieldValueMap(int recordId, Integer sequenceNumber, Step step, CollectRecord r) {
 		Map<Field<?>, Object> map = new HashMap<Field<?>, Object>();
 		map.put(OFC_RECORD_DATA.RECORD_ID, recordId);
 		if (sequenceNumber != null) {
@@ -721,7 +722,7 @@ public class RecordDao extends JooqDaoSupport {
 		map.put(OFC_RECORD_DATA.CREATED_BY, getUserId(defaultIfNull(r.getDataCreatedBy(), r.getCreatedBy())));
 		map.put(OFC_RECORD_DATA.DATE_MODIFIED, toTimestamp(defaultIfNull(r.getDataModifiedDate(), r.getModifiedDate())));
 		map.put(OFC_RECORD_DATA.MODIFIED_BY, getUserId(defaultIfNull(r.getDataModifiedBy(), r.getModifiedBy())));
-		map.put(OFC_RECORD_DATA.STEP, r.getStep().getStepNumber());
+		map.put(OFC_RECORD_DATA.STEP, step.getStepNumber());
 		map.put(OFC_RECORD_DATA.STATE, r.getState() != null ? r.getState().getCode(): null);
 		map.put(OFC_RECORD_DATA.SKIPPED, r.getSkipped());
 		map.put(OFC_RECORD_DATA.MISSING, r.getMissing());
