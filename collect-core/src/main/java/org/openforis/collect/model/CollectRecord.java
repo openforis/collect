@@ -225,6 +225,7 @@ public class CollectRecord extends Record {
 		super(survey, versionName, rootEntityDefinition, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
 		this.applicationVersion = Collect.VERSION;
 		this.step = Step.ENTRY;
+		this.dataStep = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
