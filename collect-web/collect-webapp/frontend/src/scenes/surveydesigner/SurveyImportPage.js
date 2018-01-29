@@ -20,11 +20,7 @@ class SurveyImportPage extends Component {
     render() {
         return (
             <Container fluid>
-                <Row>
-                    <Col md={{ size: 6, offset: 3 }}>
-                        <SurveyImportForm style={{width: "500px"}} />
-                    </Col>
-                </Row>
+                <SurveyImportForm />
             </Container>
         )
     }

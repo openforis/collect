@@ -28,8 +28,8 @@ export default class JobMonitorDialog extends Component {
         const okButtonLabel = this.props.okButtonLabel ? this.props.okButtonLabel : 'Ok'
         return (
             <Dialog open={open} 
-                    ignoreBackdropClick
-                    ignoreEscapeKeyUp>
+                    disableBackdropClick
+                    disableEscapeKeyDown>
                 <DialogTitle>{title}</DialogTitle>
                 <DialogContent style={{width: '400px'}}>
                     {loading ? 

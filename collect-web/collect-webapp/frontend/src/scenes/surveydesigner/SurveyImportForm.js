@@ -4,14 +4,14 @@ import {
     Alert, Button, ButtonGroup, ButtonToolbar, Container, ButtonDropdown,
     DropdownToggle, DropdownMenu, DropdownItem, Form, FormFeedback, FormGroup, Label, Input, Row, Col, Progress
 } from 'reactstrap';
-import Dropzone from 'react-dropzone';
 import { connect } from 'react-redux';
 
-import Forms, { FormItem } from 'components/Forms'
+import Dropzone from 'components/Dropzone';
+import Forms, { FormItem } from 'components/Forms';
 import * as SurveysActions from 'actions/surveys';
 import ServiceFactory from 'services/ServiceFactory'
-import L from 'utils/Labels'
-import Strings from 'utils/Strings'
+import L from 'utils/Labels';
+import Strings from 'utils/Strings';
 
 const SURVEY_IMPORT_ACCEPTED_FILE_TYPES = ".collect,.collect-backup,.cep,.xml"
 
@@ -28,7 +28,6 @@ class SurveyImportForm extends Component {
 
         this.submit = this.submit.bind(this)
         this.handleFileDrop = this.handleFileDrop.bind(this)
-        
     }
 
     componentWillUnmount() {
@@ -39,8 +38,7 @@ class SurveyImportForm extends Component {
         this.props.dispatch(SurveysActions.startSurveyFileImport(values.name, values.userGroupId))
     }
 
-    handleFileDrop(files) {
-        const file = files[0]
+    handleFileDrop(file) {
         this.props.dispatch(SurveysActions.uploadSurveyFile(file))
     }
 
@@ -48,28 +46,22 @@ class SurveyImportForm extends Component {
         const { userGroups, error, handleSubmit, pristine, reset, submitting,
             uploadingSurveyFile, surveyFileToBeImportedPreview, surveyFileUploaded, importingIntoExistingSurvey,
             surveyFileUploadError, surveyFileUploadErrorMessage, surveyBackupInfo } = this.props
-        const acceptedFileTypesDescription = L.l('survey.import.acceptedFileTypesDescription')
         const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
         
         return (
             <Form onSubmit={handleSubmit(this.submit)}>
                 <FormGroup row>
-                    <Label xs={2} for="file">{L.l('survey.import.file')}:</Label>
-                    <Col xs={10}>
+                    <Col>
+                        {! uploadingSurveyFile && 
+                            <Dropzone 
+                                acceptedFileTypes={SURVEY_IMPORT_ACCEPTED_FILE_TYPES}
+                                acceptedFileTypesDescription={L.l('survey.import.acceptedFileTypesDescription')}
+                                handleFileDrop={this.handleFileDrop}
+                                height="300px"
+                                fileToBeImportedPreview={surveyFileToBeImportedPreview} />
+                        }
                         {uploadingSurveyFile && 
                             <Progress animated value={100} />
-                        }
-                        {! uploadingSurveyFile && 
-                            <Dropzone accept={SURVEY_IMPORT_ACCEPTED_FILE_TYPES} onDrop={(files) => this.handleFileDrop(files)} style={{
-                                width: '100%', height: '200px', 
-                                borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
-                                borderStyle: 'dashed', borderRadius: '5px'
-                                }}>
-                                {surveyFileToBeImportedPreview ?
-                                    <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.props.surveyFileToBeImportedPreview}</p>
-                                    : <p>{L.l('forms.fileDropMessage', [acceptedFileTypesDescription])}</p>
-                                }
-                            </Dropzone>
                         }
                         { surveyFileUploadError &&
                             <span className="error">{L.l(surveyFileUploadErrorMessage)}</span> 
