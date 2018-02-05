@@ -17,6 +17,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.component.datagroup.DataGroupHeader;
+	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.util.CollectionUtil;
 
 	/**
@@ -110,13 +111,7 @@ package org.openforis.collect.presenter
 					var entity:EntityProxy = EntityProxy(entities.getItemAt(0));
 					var allCousinsNotRelevantAndEmpty:Boolean = true;
 					var cousins:IList = entity.getDescendantCousins(nodeDefn);
-					for each (var cousin:NodeProxy in cousins) {
-						if ( cousin.relevant || ! cousin.empty ) {
-							allCousinsNotRelevantAndEmpty = false;
-							break;
-						}
-					}
-					visible = ! allCousinsNotRelevantAndEmpty;
+					visible = ! RelevanceDisplayManager.isAllNodesEmptyAndNotRelevant(cousins);
 				} else {
 					visible = false;
 				}

@@ -79,7 +79,7 @@ package org.openforis.collect.ui.component.detail
 			}
 		}
 		
-		private function isAllNodesEmptyAndNotRelevant(nodes:IList):Boolean {
+		public static function isAllNodesEmptyAndNotRelevant(nodes:IList):Boolean {
 			for each (var node:NodeProxy in nodes) {
 				if (node.relevant) {
 					return false;
