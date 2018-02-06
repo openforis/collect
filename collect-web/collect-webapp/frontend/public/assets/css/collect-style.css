@@ -213,6 +213,21 @@ span.equal-sign {
   background-image: url('../img/generic/equal_sign_32x32.png');
 }
 
+span.logo.small {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-size: 30px;
+}
+
+span.logo.small.collect-desktop {
+    background-image: url('../img/of_collect_logo_simple.png')
+}
+
+span.logo.small.collect-earth {
+    background-image: url('../img/of_collect_earth_logo_simple.png')
+}
+
 .dropdown-menu.dropdown-menu-right {
     right: auto;
 }

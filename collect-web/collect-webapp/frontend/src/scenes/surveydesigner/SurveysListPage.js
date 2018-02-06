@@ -204,12 +204,10 @@ class SurveysListPage extends Component {
         function targetFormatter(cell, row) {
             switch(cell) {
                 case "COLLECT_EARTH":
-                    return <span style={{display: "inline-block", width: "30px", height: "30px", backgroundSize: "30px",
-                        backgroundImage: "url(/assets/img/of_collect_earth_logo_simple.png)"}} />
+                    return <span className="logo small collect-earth" />
                 case "COLLECT_DESKTOP":
                 default:
-                    return <span style={{display: "inline-block", width: "30px", height: "30px", backgroundSize: "30px", 
-                        backgroundImage: "url(/assets/img/of_collect_logo_simple.png)"}} />
+                    return <span className="logo small collect-desktop" />
             }
         }
 
