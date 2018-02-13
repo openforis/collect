@@ -39,7 +39,7 @@ class NewSurveyParametersForm extends Component {
         const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
         const languageOptions = L.keys('languages')
             .sort((a, b) => Strings.compare(L.l('languages.' + a), L.l('languages.' + b)))
-            .map(l => <option key={l} value={l}>{L.l('languages.' + l)}</option>)
+            .map(l => <option key={l} value={l}>{L.l('languages.' + l) + ' (' + l + ')'}</option>)
 
         return (
             <Form onSubmit={handleSubmit(this.submit)}>
