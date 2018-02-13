@@ -41,6 +41,7 @@ public class CollectRecordSummary {
 		stepSummary.setMissingWarnings(record.getMissingWarnings());
 		stepSummary.setRootEntityKeyValues(record.getRootEntityKeyValues());
 		stepSummary.setSkipped(record.getSkipped());
+		stepSummary.setWarnings(record.getWarnings());
 		
 		summary.addStepSummary(stepSummary);
 		return summary;

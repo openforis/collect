@@ -57,6 +57,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordDataRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
+import org.openforis.collect.utils.Numbers;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -839,6 +840,7 @@ public class RecordDao extends JooqDaoSupport {
 		stepSummary.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 		stepSummary.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
 		stepSummary.setMissing(r.getValue(OFC_RECORD.MISSING));
+		stepSummary.setTotalErrors(Numbers.addAll(stepSummary.getErrors(), stepSummary.getMissingErrors()));
 		
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDef = schema.getRootEntityDefinition(rootEntityDefId);
