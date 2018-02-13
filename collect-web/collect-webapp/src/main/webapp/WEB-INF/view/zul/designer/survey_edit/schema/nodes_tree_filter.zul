@@ -4,7 +4,7 @@
     
     <label value="${labels.survey.schema.root_entity}:" />
     
-    <listbox width="150px" model="@load(vm.rootEntities)"
+    <listbox width="250px" model="@load(vm.rootEntities)"
       selectedItem="@load(vm.selectedRootEntity)" mold="select"
       onSelect="@command('rootEntitySelected', rootEntity=self.selectedItem.value)"
       visible="@load(not vm.singleRootEntityDefined)">
@@ -15,8 +15,11 @@
     
     <textbox  
     	value="@load(vm.selectedRootEntity.name)" 
-    	width="150px"
+    	width="250px"
     	readonly="true"
+    	onClick="@command('editRootEntity')"
+    	style="cursor: pointer;"
+    	tooltiptext="${labels.global.click_to_edit}"
     	visible="@load(vm.singleRootEntityDefined)" />
     
     <hlayout visible="${canEditRootEntities}">
