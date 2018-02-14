@@ -276,7 +276,7 @@
       			</fieldErrorHandler>
       			<fieldErrorHandler
       				message="@load(vmsgs['instanceLabel'])">
-      				<textbox width="250px"
+      				<textbox width="300px"
       					value="@bind(fx.instanceLabel)"
       					placeholder="@load(fx.defaultInstanceLabel)"
       					onChange="@command('singleInstanceLabelChange', label=self.value)" />

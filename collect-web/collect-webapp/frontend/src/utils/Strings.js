@@ -11,5 +11,9 @@ export default class Strings {
     static isNotBlank(value) {
         return value !== null && value.length > 0
     }
+
+    static compare(a, b) {
+        return a > b ? 1 : b > a ? -1 : 0
+    }
 }
     

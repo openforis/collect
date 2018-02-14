@@ -167,7 +167,7 @@ public class RecordSummaryProxy implements Proxy {
 
 	@ExternalizedProperty
 	public Integer getWarnings() {
-		return summary.getCurrentStepSummary().getMissingWarnings();
+		return summary.getCurrentStepSummary().getWarnings();
 	}
 
 	@ExternalizedProperty

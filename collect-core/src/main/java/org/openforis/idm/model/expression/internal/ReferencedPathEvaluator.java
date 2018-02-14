@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.jxpath.ri.compiler.Expression;
+import org.apache.commons.jxpath.ri.compiler.ExpressionPath;
 import org.apache.commons.jxpath.ri.compiler.Operation;
 import org.apache.commons.jxpath.ri.compiler.Step;
 import org.openforis.idm.path.Path;
@@ -24,7 +25,9 @@ public class ReferencedPathEvaluator {
 	}
 
 	public Set<String> determineReferencedPaths(Expression expression) {
-		if (expression instanceof org.apache.commons.jxpath.ri.compiler.Path) {
+		if (expression instanceof ExpressionPath) {
+			return determineReferencedPaths((ExpressionPath) expression);
+		} else if (expression instanceof org.apache.commons.jxpath.ri.compiler.Path) {
 			return determineReferencedPaths((org.apache.commons.jxpath.ri.compiler.Path) expression);
 		} else if (expression instanceof Operation) {
 			return determineReferencedPaths((Operation) expression);
@@ -33,21 +36,31 @@ public class ReferencedPathEvaluator {
 		}
 	}
 
+	private Set<String> determineReferencedPaths(ExpressionPath expressionPath) {
+		Set<String> paths = new HashSet<String>(determineReferencedPaths((org.apache.commons.jxpath.ri.compiler.Path) expressionPath));
+		for (Expression p : expressionPath.getPredicates()) {
+			paths.addAll(determineReferencedPaths(p));
+		}
+		return paths;
+	}
+	
 	private Set<String> determineReferencedPaths(org.apache.commons.jxpath.ri.compiler.Path modelLocationPath) {
 		Set<String> paths = new HashSet<String>();
-		paths.add(Path.getAbsolutePath(modelLocationPath.toString()));
-		StringBuilder predicateBasePathSB = new StringBuilder();
-		for (Step step : modelLocationPath.getSteps()) {
-			String stepVal = step.toString();
-			predicateBasePathSB.append(Path.getAbsolutePath(stepVal)).append(Path.SEPARATOR);
-			for (Expression predicate : step.getPredicates()) {
-				Set<String> predicatePaths = determineReferencedPaths(predicate);
-				for (String predicateReferencePath : predicatePaths) {
-					if (predicateReferencePath.startsWith(Path.THIS_VARIABLE)
-							|| predicateReferencePath.startsWith(Path.CONTEXT_VARIABLE)) {
-						paths.add(predicateReferencePath);
-					} else {
-						paths.add(predicateBasePathSB.toString() + predicateReferencePath);
+		if (modelLocationPath.getSteps().length > 0) {
+			paths.add(Path.getAbsolutePath(modelLocationPath.toString()));
+			StringBuilder predicateBasePathSB = new StringBuilder();
+			for (Step step : modelLocationPath.getSteps()) {
+				String stepVal = step.toString();
+				predicateBasePathSB.append(Path.getAbsolutePath(stepVal)).append(Path.SEPARATOR);
+				for (Expression predicate : step.getPredicates()) {
+					Set<String> predicatePaths = determineReferencedPaths(predicate);
+					for (String predicateReferencePath : predicatePaths) {
+						if (predicateReferencePath.startsWith(Path.THIS_VARIABLE)
+								|| predicateReferencePath.startsWith(Path.CONTEXT_VARIABLE)) {
+							paths.add(predicateReferencePath);
+						} else {
+							paths.add(predicateBasePathSB.toString() + predicateReferencePath);
+						}
 					}
 				}
 			}

@@ -227,7 +227,7 @@ class RecordDataTable extends Component {
 		columns = columns.concat(attributeDefsShownInSummaryListColumns)
 
 		columns.push(
-			<TableHeaderColumn key="errors" dataField="errors"
+			<TableHeaderColumn key="totalErrors" dataField="totalErrors"
 				dataAlign="right" width="80" editable={false} dataSort>Errors</TableHeaderColumn>,
 			<TableHeaderColumn key="warnings" dataField="warnings"
 				dataAlign="right" width="80" editable={false} dataSort>Warnings</TableHeaderColumn>,

@@ -37,7 +37,9 @@ class NewSurveyParametersForm extends Component {
 
         const templateTypeOptions = templateTypes.map(type => <option key={type} value={type}>{L.l('survey.templateType.' + type)}</option>)
         const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
-        const languageOptions = L.keys('languages').map(l => <option key={l} value={l}>{L.l('languages.' + l)}</option>)
+        const languageOptions = L.keys('languages')
+            .sort((a, b) => Strings.compare(L.l('languages.' + a), L.l('languages.' + b)))
+            .map(l => <option key={l} value={l}>{L.l('languages.' + l) + ' (' + l + ')'}</option>)
 
         return (
             <Form onSubmit={handleSubmit(this.submit)}>
@@ -62,7 +64,6 @@ class NewSurveyParametersForm extends Component {
                 />
                 <Field
                     name="userGroupId"
-                    multi
                     component={Forms.renderFormItemSelect}
                     label={L.l('survey.userGroup')}
                     options={userGroupOptions}
