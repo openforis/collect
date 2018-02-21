@@ -20,6 +20,8 @@ import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.openforis.collect.service.CollectSpeciesListService;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -370,7 +372,13 @@ public class IDMFunctions extends CustomFunctions {
 	private static Object distinctValues(Object obj) {
 		if (obj instanceof Collection) {
 			Set<Object> result = new LinkedHashSet<Object>((Collection<?>) obj);
-			if (result.size() == 1 && result.iterator().next() == null) {
+			CollectionUtils.filter(result, new Predicate<Object>() {
+				public boolean evaluate(Object item) {
+					return item != null && 
+							(!(item instanceof String) || StringUtils.isNotBlank((String) item));
+				}
+			});
+			if (result.isEmpty()) {
 				return null;
 			} else {
 				return new ArrayList<Object>(result);
