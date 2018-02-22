@@ -52,7 +52,7 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-		if (binder.getTarget() instanceof User) {
+		if (binder.getTarget() instanceof UserForm) {
 			binder.setValidator(userValidator);
 		} else if (binder.getTarget() instanceof PasswordChangeParameters) {
 			binder.setValidator(passwordChangeValidator);

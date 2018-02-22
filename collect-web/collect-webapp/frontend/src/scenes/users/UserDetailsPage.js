@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Alert, Button, Col, Form, FormGroup, Label, Input, FormFeedback } from 'reactstrap';
+import { Alert, Button, Col, Form, FormGroup, Label, Input, FormFeedback, Row } from 'reactstrap'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { SimpleFormItem } from 'components/Forms'
 import * as UsersActions from 'actions/users'
-import ServiceFactory from 'services/ServiceFactory';
-import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage';
+import ServiceFactory from 'services/ServiceFactory'
+import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage'
 import User from 'model/User'
 import L from 'utils/Labels'
 
@@ -16,7 +16,13 @@ class UserDetailsPage extends AbstractItemDetailsPage {
 	static propTypes = {
 		user: PropTypes.object.isRequired,
     }
-    
+
+    constructor(props) {
+        super(props)
+
+        this.validateForm = this.validateForm.bind(this)
+    }
+
     getInitialState() {
         let s = super.getInitialState()
         s = {...s, 
@@ -57,18 +63,23 @@ class UserDetailsPage extends AbstractItemDetailsPage {
     }
 
     handleSaveBtnClick() {
-        let formObject = this.extractFormObject();
-        ServiceFactory.userService.save(formObject).then(this.updateStateFromResponse);
+        let formObject = this.extractFormObject()
+        ServiceFactory.userService.save(formObject).then(this.handleSaveResponse)
     }
 
-    updateStateFromResponse(res) {
+    validateForm() {
+        let formObject = this.extractFormObject()
+        ServiceFactory.userService.validate(formObject).then(this.handleValidateResponse)
+    }
+
+    handleSaveResponse(res) {
         super.updateStateFromResponse(res)
         if (res.statusOk) {
             this.setState({
                 newItem: false,
                 id: res.form.id
             })
-            this.props.dispatch(UsersActions.receiveUser(res.form));
+            this.props.dispatch(UsersActions.receiveUser(res.form))
         }
     }
 
@@ -77,9 +88,6 @@ class UserDetailsPage extends AbstractItemDetailsPage {
         
         return (
             <div>
-                <Alert color={this.state.alertMessageColor} isOpen={this.state.alertMessageOpen}>
-                    {this.state.alertMessageText}
-                </Alert>
                 <Form>
                     <SimpleFormItem fieldId='username' 
                             fieldState={this.getFieldState('username')}
@@ -89,6 +97,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                                 value={this.state.username} 
                                 readOnly={! this.state.newItem}
                                 state={this.getFieldState('username')}
+                                onBlur={e => this.validateForm()}
                                 onChange={(event) => this.setState({...this.state, username: event.target.value})} />
                     </SimpleFormItem>
                     <SimpleFormItem fieldId='enabled' 
@@ -100,6 +109,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                                 <Input type="checkbox" name="enabled" id="enabled"
                                     checked={this.state.enabled} 
                                     state={this.getFieldState('enabled')}
+                                    onBlur={e => this.validateForm()}
                                     onChange={(event) => this.setState({...this.state, enabled: event.target.checked})} />
                             </Label>
                         </FormGroup>
@@ -110,6 +120,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                             label={'user.role'}>
                         <Input type="select" name="role" id="roleSelect" 
                             onChange={(event) => this.setState({...this.state, role: event.target.value})}
+                            onBlur={e => this.validateForm()}
                             state={this.getFieldState('role')}
                             value={this.state.role}>
                             {User.ROLES.map(role => <option key={role} value={role}>{role}</option>)}
@@ -122,6 +133,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                         <Input type="password" name="rawPassword" id="rawPassword" 
                             value={this.state.rawPassword}
                             state={this.getFieldState('rawPassword')}
+                            onBlur={e => this.validateForm()}
                             onChange={(event) => this.setState({...this.state, rawPassword: event.target.value})} />
                     </SimpleFormItem>
                     <SimpleFormItem fieldId='retypedPassword' 
@@ -131,16 +143,24 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                         <Input type="password" name="retypedPassword" id="retypedPassword"
                             value={this.state.retypedPassword}
                             state={this.getFieldState('retypedPassword')}
+                            onBlur={e => this.validateForm()}
                             onChange={(event) => this.setState({...this.state, retypedPassword: event.target.value})} />
                     </SimpleFormItem>
+                    <Row>
+                        <Col>
+                            <Alert color={this.state.alertMessageColor} isOpen={this.state.alertMessageOpen}>
+                                {this.state.alertMessageText}
+                            </Alert>
+                        </Col>
+                    </Row>
                     <FormGroup check row>
-                        <Col sm={{ size: 10, offset: 2 }}>
+                        <Col sm={{ size: 12, offset: 5 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
                         </Col>
                     </FormGroup>
                 </Form>
             </div>
-		);
+		)
     }
 }
 
@@ -148,4 +168,4 @@ function mapStateToProps(state) {
     return {}
 }
 
-export default connect(mapStateToProps)(UserDetailsPage);
+export default connect(mapStateToProps)(UserDetailsPage)

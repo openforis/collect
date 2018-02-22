@@ -1,4 +1,4 @@
-import AbstractService from './AbstractService';
+import AbstractService from './AbstractService'
 
 export default class UserService extends AbstractService {
 
@@ -7,7 +7,11 @@ export default class UserService extends AbstractService {
     }
 
     save(user) {
-        return this.post('user', user);
+        return this.post('user', user)
+    }
+
+    validate(user) {
+        return this.post('user/validate', user)
     }
 
     deleteUsers(loggedUserId, userIds) {
