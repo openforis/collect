@@ -1,5 +1,10 @@
 package org.openforis.collect.io.data;
 
+import static org.openforis.collect.model.UserInGroup.UserGroupRole.ADMINISTRATOR;
+import static org.openforis.collect.model.UserInGroup.UserGroupRole.OPERATOR;
+import static org.openforis.collect.model.UserInGroup.UserGroupRole.OWNER;
+import static org.openforis.collect.model.UserInGroup.UserGroupRole.SUPERVISOR;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +50,7 @@ import org.springframework.stereotype.Component;
 public class DataRestoreTask extends Task {
 
 	private static final List<UserGroupRole> DATA_RESTORE_ALLOWED_USER_GROUP_ROLES =
-			Arrays.asList(UserGroupRole.OWNER, UserGroupRole.ADMINISTRATOR, UserGroupRole.SUPERVISOR, UserGroupRole.OPERATOR);
+			Arrays.asList(OWNER, ADMINISTRATOR, SUPERVISOR, OPERATOR);
 
 	public enum OverwriteStrategy {
 		ONLY_SPECIFIED, DO_NOT_OVERWRITE, OVERWRITE_OLDER, OVERWRITE_ALL
