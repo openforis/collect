@@ -198,21 +198,12 @@ public class DataRestoreController extends BasicController {
 			String expectedSurveyName) throws ZipException, FileNotFoundException, IOException {
 		CollectSurvey publishedSurvey = findPublishedSurvey(info);
 		if (publishedSurvey == null) {
-			throw new IllegalArgumentException("The backup file is not related to the published survey");
-		} else {
-			String publishedSurveyUri = publishedSurvey.getUri();
-			String packagedSurveyUri = info.getSurveyUri();
-			if (! packagedSurveyUri.equals(publishedSurveyUri)) {
-				throw new IllegalArgumentException("The backup file is not related to the specified survey");
-			}
+			throw new IllegalArgumentException(String.format("Published survey not found (URI=\"%s\")", info.getSurveyUri()));
 		}
 	}
 
 	private CollectSurvey findPublishedSurvey(SurveyBackupInfo info) throws ZipException, IOException {
-		CollectSurvey survey = surveyManager.get(info.getSurveyName());
-		if (survey == null) {
-			survey = surveyManager.getByUri(info.getSurveyUri());
-		}
+		CollectSurvey survey = surveyManager.getByUri(info.getSurveyUri());
 		return survey;
 	}
 
