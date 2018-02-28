@@ -54,13 +54,12 @@ class App extends Component {
                   <Route path="/map" exact name="Map" component={MapPage}/>
                   <Route path="/restore" exact name="Restore" component={RestorePage}/>
                   <Route path="/saiku" exact name="Saiku" component={SaikuPage}/>
-                  <Route path="/surveydesigner" exact name="SurveyDesigner" component={SurveyDesignerPage}/>
-                  <Route path="/surveydesigner/surveys" exact name="SurveysList" component={SurveysListPage}/>
-                  <Route path="/surveydesigner/newsurvey" exact name="NewSurvey" component={NewSurveyPage}/>
+                  <Route path="/surveydesigner" exact name="SurveysList" component={SurveysListPage}/>
+                  <Route path="/surveydesigner/new" exact name="NewSurvey" component={NewSurveyPage}/>
                   <Route path="/surveydesigner/surveyimport" exact name="SurveyImport" component={SurveyImportPage}/>
-                  <Route path="/surveydesigner/surveys/:id" exact name="SurveyEdit" component={SurveyEditPage}/>
-                  <Route path="/surveydesigner/surveys/export/:id" exact name="SurveyExport" component={SurveyExportPage}/>
-                  <Route path="/surveydesigner/surveys/clone/:surveyName" exact name="SurveyClone" component={SurveyClonePage}/>
+                  <Route path="/surveydesigner/:id" exact name="SurveyEdit" component={SurveyEditPage}/>
+                  <Route path="/surveydesigner/export/:id" exact name="SurveyExport" component={SurveyExportPage}/>
+                  <Route path="/surveydesigner/clone/:surveyName" exact name="SurveyClone" component={SurveyClonePage}/>
                   <Route path="/users" exact name="Users" component={UsersPage}/>
                   <Route path="/users/changepassword" exact name="ChangePassword" component={PasswordChangePage}/>
                   <Route path="/usergroups" exact name="User Groups" component={UserGroupsPage}/>

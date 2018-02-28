@@ -43,19 +43,19 @@ export default class RouterUtils {
     }
 
     static navigateToNewSurveyPage(history) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/newsurvey')
+        RouterUtils._navigateToUrl(history, '/surveydesigner/new')
     }
 
     static navigateToSurveyEditPage(history, surveyId) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/surveys/' + surveyId)
+        RouterUtils._navigateToUrl(history, '/surveydesigner/' + surveyId)
     }
 
     static navigateToSurveyExportPage(history, surveyId) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/surveys/export/' + surveyId)
+        RouterUtils._navigateToUrl(history, '/surveydesigner/export/' + surveyId)
     }
 
     static navigateToSurveyClonePage(history, surveyName) {
-        RouterUtils._navigateToUrl(history, '/surveydesigner/surveys/clone/' + surveyName)
+        RouterUtils._navigateToUrl(history, '/surveydesigner/clone/' + surveyName)
     }
     
     static navigateToUserGroupEditPage(history, userGroupId) {

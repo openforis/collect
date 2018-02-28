@@ -57,21 +57,17 @@ const routes = [
     name: "Survey Designer"
   },
   {
-    path: '/surveydesigner/surveys',
-    name: "List of surveys"
-  },
-  {
-    path: '/surveydesigner/surveys/export/:id',
+    path: '/surveydesigner/export/:id',
     name: 'Export survey',
     pathRegExp: new RegExp('/surveydesigner/surveys/export/(\\d)+')
   },
   {
-    path: '/surveydesigner/surveys/clone/:surveyName',
+    path: '/surveydesigner/clone/:surveyName',
     name: 'Clone survey',
     pathRegExp: new RegExp('/surveydesigner/surveys/clone/(\.)+')
   },
   {
-    path: '/surveydesigner/newsurvey',
+    path: '/surveydesigner/new',
     name: "New survey"
   },
   {
@@ -79,9 +75,9 @@ const routes = [
     name: "Import survey"
   },
   {
-    path: '/surveydesigner/surveys/:id',
+    path: '/surveydesigner/:id',
     name: "Edit survey",
-    pathRegExp: new RegExp('/surveydesigner/surveys/(\\d)+')
+    pathRegExp: new RegExp('/surveydesigner/(\\d)+')
   },
   {
     path: '/datacleansing',

@@ -60,10 +60,10 @@ class Sidebar extends Component {
                 <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleNavDropdownClick}><i className="fa fa-flask" aria-hidden="true"></i>Survey Designer</a>
                 <ul className="nav-dropdown-items">
                   <li className="nav-item">
-                    <NavLink to={'/surveydesigner/surveys'} className="nav-link" activeClassName="active"><i className="fa fa-list" aria-hidden="true"></i> List of surveys</NavLink>
+                    <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active"><i className="fa fa-list" aria-hidden="true"></i> List of surveys</NavLink>
                   </li>
                   <li className="nav-item">
-                    <NavLink to={'/surveydesigner/newsurvey'} className="nav-link" activeClassName="active"><i className="fa fa-file" aria-hidden="true"></i> New survey</NavLink>
+                    <NavLink to={'/surveydesigner/new'} className="nav-link" activeClassName="active"><i className="fa fa-file" aria-hidden="true"></i> New survey</NavLink>
                   </li>
                   <li className="nav-item">
                     <NavLink to={'/surveydesigner/surveyimport'} className="nav-link" activeClassName="active"><i className="fa fa-upload" aria-hidden="true"></i> Import survey</NavLink>
