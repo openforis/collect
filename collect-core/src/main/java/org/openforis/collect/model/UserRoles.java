@@ -9,6 +9,7 @@ public interface UserRoles {
 	public static final String ENTRY = "ROLE_ENTRY";
 	public static final String CLEANSING = "ROLE_CLEANSING";
 	public static final String ANALYSIS = "ROLE_ANALYSIS";
+	public static final String DESIGN = "ROLE_DESIGN";
 	public static final String ADMIN = "ROLE_ADMIN";
 
 }

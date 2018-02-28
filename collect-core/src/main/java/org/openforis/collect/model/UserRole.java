@@ -7,7 +7,8 @@ public enum UserRole {
 	ENTRY(UserRoles.ENTRY, 2),
 	CLEANSING(UserRoles.CLEANSING, 3),
 	ANALYSIS(UserRoles.ANALYSIS, 4),
-	ADMIN(UserRoles.ADMIN, 5);
+	DESIGN(UserRoles.DESIGN, 5),
+	ADMIN(UserRoles.ADMIN, 6);
 	
 	
 	public static UserRole fromCode(String code) {

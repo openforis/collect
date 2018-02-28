@@ -46,21 +46,21 @@
 
 		<intercept-url access="hasRole('ROLE_USER') or hasIpAddress('127.0.0.1')" pattern="/api/**" />
 
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/export/**/*" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/codelist/import/**/*" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/designer.htm" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/editSurvey.htm" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/importSurvey.htm" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/codelist/export/**/*" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/codelist/import/**/*" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/designer.htm" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/editSurvey.htm" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/importSurvey.htm" />
 		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/logoUpload" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/rdbpublish" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/saiku/**/*" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/samplingdesign/export/*" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/samplingdesign/import/*" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/export/*" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/species/import/*" />
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/speciesImport" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/rdbpublish" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/saiku/**/*" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/samplingdesign/export/*" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/samplingdesign/import/*" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/species/export/*" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/species/import/*" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/speciesImport" />
 
-		<intercept-url access="hasRole('ROLE_ADMIN')" pattern="/validateAllRecords.htm" />
+		<intercept-url access="hasRole('ROLE_DESIGN')" pattern="/validateAllRecords.htm" />
 
 		<intercept-url access="hasRole('ROLE_USER')" pattern="/**" />
 
@@ -114,7 +114,8 @@
 	<b:bean id="roleHierarchy" class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl">
 		<b:property name="hierarchy">
 			<b:value>
-				ROLE_ADMIN > ROLE_ANALYSIS
+				ROLE_ADMIN > ROLE_DESIGN
+				ROLE_DESIGN > ROLE_ANALYSIS
 				ROLE_ANALYSIS > ROLE_CLEANSING
 				ROLE_CLEANSING > ROLE_ENTRY
 				ROLE_ENTRY > ROLE_ENTRY_LIMITED

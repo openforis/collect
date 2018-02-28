@@ -3,7 +3,7 @@ import Arrays from 'utils/Arrays'
 
 export default class User extends Serializable {
 
-    static ROLES = ['VIEW', 'ENTRY_LIMITED', 'ENTRY', 'CLEANSING', 'ANALYSIS', 'ADMIN']
+    static ROLES = ['VIEW', 'ENTRY_LIMITED', 'ENTRY', 'CLEANSING', 'ANALYSIS', 'DESIGN', 'ADMIN']
 
     enabled
     id
@@ -118,7 +118,8 @@ export default class User extends Serializable {
 
     get canAccessSurveyDesigner() {
         switch(this.role) {
-            case 'ADMIN':
+        	case 'ADMIN':
+            case 'DESIGN':
                 return true
             default:
                 return false
@@ -130,13 +131,14 @@ export default class User extends Serializable {
     }
 
     get canAccessSaiku() {
-        return this.role === 'ADMIN'
+        return this.role === 'ANALYSIS'
     }
 
     get canAccessDataCleansing() {
         switch(this.role) {
             case 'CLEANSING':
             case 'ANALYSIS':
+            case 'DESIGN':
             case 'ADMIN':
                 return true
             default:
