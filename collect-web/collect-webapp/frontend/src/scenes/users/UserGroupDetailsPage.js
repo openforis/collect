@@ -226,6 +226,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             switch(loggedUserRole) {
                 case 'ADMIN':
                     return true
+                case 'DESIGN':
                 case 'ANALYSIS':
                 case 'CLEANSING':
                     return r !== 'OWNER'
@@ -260,9 +261,6 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
 
 		return (
             <div>
-                <Alert color={this.state.alertMessageColor} isOpen={this.state.alertMessageOpen}>
-                    {this.state.alertMessageText}
-                </Alert>
                 <Form>
                     <FormGroup row color={this.getFieldState('name')}>
                         <Label for="name" sm={2}>Name</Label>
@@ -452,7 +450,13 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                             </fieldset>
                         </Col>
                     </Row>
-
+                    <Row>
+                    	<Col md="12">
+		                    <Alert color={this.state.alertMessageColor} isOpen={this.state.alertMessageOpen}>
+			                    {this.state.alertMessageText}
+			                </Alert>
+			            </Col>
+		            </Row>    
                     <FormGroup check row>
                         <Col sm={{ size: 2, offset: 5 }}>
                             <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
