@@ -92,9 +92,9 @@ public class RecordProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public UserProxy getCreatedBy() {
+	public BasicUserProxy getCreatedBy() {
 		User createdBy = record.getCreatedBy();
-		return createdBy == null ? null: new UserProxy(createdBy);
+		return createdBy == null ? null: new BasicUserProxy(createdBy);
 	}
 
 	@ExternalizedProperty
@@ -108,9 +108,9 @@ public class RecordProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public UserProxy getModifiedBy() {
+	public BasicUserProxy getModifiedBy() {
 		User modifiedBy = record.getModifiedBy();
-		return modifiedBy == null ? null: new UserProxy(modifiedBy);
+		return modifiedBy == null ? null: new BasicUserProxy(modifiedBy);
 	}
 	
 	@ExternalizedProperty

@@ -12,8 +12,10 @@ export default class RecordService extends AbstractService {
             offset: (filterOptions.page - 1) * filterOptions.recordsPerPage,
             keyValues: filterOptions.keyValues,
             summaryValues: filterOptions.summaryValues,
+            ownerIds: filterOptions.ownerIds,
             sortFields: sortFields,
-            fullSummary: fullSummary
+            fullSummary: fullSummary,
+            includeOwners: true
         }).then(res => {return {...res, records: res.records.map(r => new RecordSummary(r))}});
     }
 

@@ -29,10 +29,10 @@ public class RecordFilter {
 	private Step step;
 	private Step stepGreaterOrEqual;
 	private Date modifiedSince;
-	private Integer ownerId;
 	private List<String> keyValues;
 	private List<String> qualifiers;
 	private List<String> summaryValues;
+	private List<Integer> ownerIds;
 	private boolean caseSensitiveKeyValues;
 	private boolean includeNullConditionsForKeyValues = false;
 	
@@ -74,6 +74,10 @@ public class RecordFilter {
 			qualifierValues.add(qualifierVal);
 		}
 		setQualifiers(qualifierValues);
+	}
+	
+	public void setOwnerId(int ownerId) {
+		this.ownerIds = Arrays.asList(ownerId);
 	}
 
 	public Integer getOffset() {
@@ -140,12 +144,12 @@ public class RecordFilter {
 		this.modifiedSince = modifiedSince;
 	}
 	
-	public Integer getOwnerId() {
-		return ownerId;
+	public List<Integer> getOwnerIds() {
+		return ownerIds;
 	}
 	
-	public void setOwnerId(Integer ownerId) {
-		this.ownerId = ownerId;
+	public void setOwnerIds(List<Integer> ownerIds) {
+		this.ownerIds = ownerIds;
 	}
 	
 	public List<String> getKeyValues() {

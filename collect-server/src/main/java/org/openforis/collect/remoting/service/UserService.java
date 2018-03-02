@@ -11,6 +11,7 @@ import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.UserProxy;
+import org.openforis.collect.utils.Proxies;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,7 +38,7 @@ public class UserService {
 		List<UserProxy> result = null;
 		List<User> users = userManager.loadAll();
 		if ( users != null ) {
-			result = UserProxy.fromList(users);
+			result = Proxies.fromList(users, UserProxy.class);
 		}
 		return result;
 	}

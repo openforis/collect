@@ -15,7 +15,7 @@ public class RecordFilterProxy implements Proxy {
 	private List<String> keyValues;
 	private Integer maxNumberOfRecords;
 	private Date modifiedSince;
-	private Integer ownerId;
+	private List<Integer> ownerIds;
 	private Integer recordId;
 	private Integer rootEntityId;
 	private Step step;
@@ -29,7 +29,7 @@ public class RecordFilterProxy implements Proxy {
 		this.maxNumberOfRecords = filter.getMaxNumberOfRecords();
 		this.modifiedSince = filter.getModifiedSince();
 		this.offset = filter.getOffset();
-		this.ownerId = filter.getOwnerId();
+		this.ownerIds = filter.getOwnerIds();
 		this.recordId = filter.getRecordId();
 		this.rootEntityId = filter.getRootEntityId();
 		this.step = filter.getStep();
@@ -44,7 +44,7 @@ public class RecordFilterProxy implements Proxy {
 		filter.setMaxNumberOfRecords(getMaxNumberOfRecords());
 		filter.setModifiedSince(getModifiedSince());
 		filter.setOffset(getOffset());
-		filter.setOwnerId(getOwnerId());
+		filter.setOwnerIds(getOwnerIds());
 		filter.setRecordId(getRecordId());
 		filter.setRootEntityId(getRootEntityId());
 		filter.setStep(getStep());
@@ -92,12 +92,12 @@ public class RecordFilterProxy implements Proxy {
 		this.modifiedSince = modifiedSince;
 	}
 
-	public Integer getOwnerId() {
-		return ownerId;
+	public List<Integer> getOwnerIds() {
+		return ownerIds;
 	}
-
-	public void setOwnerId(Integer ownerId) {
-		this.ownerId = ownerId;
+	
+	public void setOwnerIds(List<Integer> ownerIds) {
+		this.ownerIds = ownerIds;
 	}
 
 	public Integer getRecordId() {

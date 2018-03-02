@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -454,6 +455,15 @@ public class RecordManager {
 		recordDao.visitSummaries(filter, sortFields, visitor, includeStepDetails);
 	}
 	
+	public Set<User> loadDistinctOwners(RecordFilter recordFilter) {
+		Set<Integer> ownerIds = recordDao.loadDistinctOwnerIds(recordFilter);
+		Set<User> owners = new HashSet<User>(ownerIds.size());
+		for (Integer ownerId : ownerIds) {
+			owners.add(userManager.loadById(ownerId));
+		}
+		return owners;
+	}
+
 	public Date[] findWorkingPeriod(int surveyId) {
 		return recordDao.findWorkingPeriod(surveyId);
 	}

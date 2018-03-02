@@ -136,7 +136,7 @@ export default class AbstractService {
                     return (propPrefix ? propPrefix : '') + encodeURIComponent(key) + '=' + encodeURIComponent(val)
                 }
             }
-          }).filter(item => item !== null).join('&');
+          }).filter(item => item !== null && item !== '').join('&');
     }
     
     _handleError(error) {

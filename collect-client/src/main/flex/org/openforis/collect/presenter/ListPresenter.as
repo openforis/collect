@@ -501,7 +501,7 @@ package org.openforis.collect.presenter {
 			filter.rootEntityId = Application.activeRootEntity == null ? NaN : Application.activeRootEntity.id;
 			
 			if (! Application.user.canViewNotOwnedRecords) {
-				filter.ownerId = Application.user.id;
+				filter.ownerIds = [Application.user.id];
 			}
 			
 			_dataClient.loadRecordSummaries(new AsyncResponder(getRecordsSummaryResultHandler, faultHandler), 

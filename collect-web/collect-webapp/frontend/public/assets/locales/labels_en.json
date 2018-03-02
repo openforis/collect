@@ -12,6 +12,7 @@
     },
     "global": {
         "advancedFunctions": "Advanced Functions",
+        "all": "All",
         "cancel": "Cancel",
         "close": "Close",
         "confirm": "Confirm",
@@ -146,7 +147,13 @@
                 "title": "Confirm",
                 "message": "Demote all records in Cleansing phase to Entry phase?"
             }
-        }
+        },
+        "onlyMe": "Only me",
+        "errors": "Errors",
+        "warnings": "Warnings",
+        "created": "Created",
+        "modified": "Modified",
+        "step": "Step"
     },
     "survey": {
         "name": "Name",

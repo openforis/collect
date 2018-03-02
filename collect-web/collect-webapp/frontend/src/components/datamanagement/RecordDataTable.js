@@ -1,10 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
+import { FormControlLabel } from 'material-ui/Form'
+import Switch from 'material-ui/Switch'
+
 import ServiceFactory from 'services/ServiceFactory'
 import * as Formatters from 'components/datatable/formatters'
 import OwnerColumnEditor from './OwnerColumnEditor'
+import SelectFilter from 'components/datatable/SelectFilter'
 import Tables from 'components/Tables'
 import L from 'utils/Labels'
 
@@ -20,7 +24,10 @@ class RecordDataTable extends Component {
 			recordsPerPage: 25,
 			keyValues: [],
 			summaryValues: [],
-			sortFields: []
+			ownerIds: [],
+			sortFields: [],
+			availableOwners: [],
+			onlyMyOwnRecords: false
 		}
 		this.fetchData = this.fetchData.bind(this)
 		this.handlePageChange = this.handlePageChange.bind(this)
@@ -28,6 +35,7 @@ class RecordDataTable extends Component {
 		this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
 		this.handleSortChange = this.handleSortChange.bind(this)
 		this.handleFilterChange = this.handleFilterChange.bind(this)
+		this.handleOnlyMyOwnRecordsChange = this.handleOnlyMyOwnRecordsChange.bind(this)
 	}
 
 	static propTypes = {
@@ -65,12 +73,24 @@ class RecordDataTable extends Component {
 	}
 
 	fetchData(page = this.state.page, recordsPerPage = this.state.recordsPerPage, survey = this.props.survey, 
-			keyValues = this.state.keyValues, summaryValues = this.state.summaryValues, sortFields) {
+			filter = {
+				keyValues: this.state.keyValues, 
+				summaryValues: this.state.summaryValues,
+				ownerIds: this.state.ownerIds
+			}, sortFields) {
 		const userId = this.props.loggedUser.id
 		const surveyId = survey.id
 		const rootEntityName = survey.schema.firstRootEntityDefinition.name
-		if (! keyValues) {
-			keyValues = []
+		if (! filter.keyValues) {
+			filter.keyValues = this.state.keyValues
+		}
+		if (! filter.summaryValues) {
+			filter.summaryValues = this.state.summaryValues
+		}
+		if (this.state.onlyMyOwnRecords) {
+			filter.ownerIds = [this.props.loggedUser.id]
+		} else if (! filter.ownerIds) {
+			filter.ownerIds = this.state.ownerIds
 		}
 		if (! sortFields) {
 			sortFields = [{field: 'DATE_MODIFIED', descending: true}]
@@ -78,11 +98,20 @@ class RecordDataTable extends Component {
 		ServiceFactory.recordService.fetchRecordSummaries(surveyId, rootEntityName, userId, {
 				recordsPerPage: recordsPerPage, 
 				page: page,
-				keyValues: keyValues,
-				summaryValues: summaryValues
+				keyValues: filter.keyValues,
+				summaryValues: filter.summaryValues,
+				ownerIds: filter.ownerIds
 			}, sortFields).then((res) => {
-			this.setState({page: page, recordsPerPage: recordsPerPage, records: res.records, totalSize: res.count, 
-				keyValues: keyValues, summaryValues: summaryValues, sortFields: sortFields});
+			this.setState({
+				page: page, 
+				recordsPerPage: recordsPerPage, 
+				keyValues: filter.keyValues, 
+				summaryValues: filter.summaryValues, 
+				sortFields: sortFields,
+				records: res.records, 
+				totalSize: res.count, 
+				availableOwners: res.owners
+			});
 		});
 	}
 
@@ -127,9 +156,8 @@ class RecordDataTable extends Component {
 			case 'owner':
 				sortField = 'OWNER_NAME'
 				break
+			case 'step':
 			case 'entryComplete':
-				sortField = 'STEP'
-				break
 			case 'cleansingComplete':
 				sortField = 'STEP'
 				break
@@ -144,33 +172,55 @@ class RecordDataTable extends Component {
 				return
 		}
 		let sortFields = [{field: sortField, descending: sortOrder === 'desc'}]
-		this.fetchData(1, this.state.recordsPerPage, this.props.survey, this.state.keyValues, this.state.summaryValues, sortFields)
+		this.fetchData(1, this.state.recordsPerPage, this.props.survey, 
+			{
+				keyValues: this.state.keyValues,
+				summaryValues: this.state.summaryValues,
+				ownerIds: this.state.ownerIds
+			}, 
+			sortFields)
 	}
 
 	handleFilterChange(filterObj) {
-		const keyValuesFilter = []
+		const keyValues = []
 		const summaryValues = []
+		let ownerIds = []
 		if (Object.keys(filterObj).length > 0) {
 			for (const fieldName in filterObj) {
 				let val = filterObj[fieldName].value
 				if (fieldName.startsWith('key')) {
 					const keyValueIdx = parseInt(fieldName.substr(3)) - 1
-					keyValuesFilter[keyValueIdx] = val
+					keyValues[keyValueIdx] = val
 				} else if (fieldName.startsWith('summary_')) {
 					const summaryValueIdx = parseInt(fieldName.substring(fieldName.indexOf('_') + 1))
 					summaryValues[summaryValueIdx] = val
+				} else if (fieldName === 'owner') {
+					ownerIds = val
 				}
 			}
 		}
-		this.fetchData(1, this.state.recordsPerPage, this.props.survey, keyValuesFilter, summaryValues)
+		this.fetchData(1, this.state.recordsPerPage, this.props.survey, {
+				keyValues: keyValues, 
+				summaryValues: summaryValues, 
+				ownerIds: ownerIds
+			})
+	}
+
+	handleOnlyMyOwnRecordsChange(event, checked) {
+		const ownerIds = checked ? [] : this.state.ownerIds
+		this.setState({
+			ownerIds: ownerIds, 
+			onlyMyOwnRecords: checked
+		}, () => this.fetchData())
 	}
 
 	render() {
-		const noSurveySelected = this.props.survey == null;
-		if (noSurveySelected) {
+		const survey = this.props.survey
+		if (survey === null) {
 			return <div>Please select a survey first</div>
 		}
-		const survey = this.props.survey
+		const { ownerIds, availableOwners, onlyMyOwnRecords } = this.state
+
 		const rootEntityDef = survey.schema.firstRootEntityDefinition
 		const keyAttributes = rootEntityDef.keyAttributeDefinitions
 		const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
@@ -178,8 +228,9 @@ class RecordDataTable extends Component {
 		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === survey.userGroupId)
 		const userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
 		const mostSpecificGroup = this.props.userGroups.find(ug => ug.id === userInGroup.groupId)
-		
+
 		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
+		const onlyMyOwnRecordsChangeHandler = this.handleOnlyMyOwnRecordsChange
 
 		function rootEntityKeyFormatter(cell, row) {
 			var idx = this.name.substring(3) - 1
@@ -226,23 +277,53 @@ class RecordDataTable extends Component {
 		})
 		columns = columns.concat(attributeDefsShownInSummaryListColumns)
 
+		function createOwnerFilter(filterHandler, customFilterParameters) {
+			const filterItems = availableOwners.map(u => {
+				return {
+					value: u.id,
+					label: u.username
+				}
+			})
+			if (availableOwners.length === 0 ) {
+				return <div />
+			}
+			return (
+				<div>
+					{ownerIds.length === 0 && !onlyMyOwnRecords &&
+						<span>{L.l('global.all')}</span>
+					}
+					{availableOwners.length > 0 && !onlyMyOwnRecords &&
+						<SelectFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
+					}
+					<FormControlLabel control={
+						<Switch
+							checked={onlyMyOwnRecords}
+							onChange={onlyMyOwnRecordsChangeHandler}
+							color="primary"
+						/>
+						}
+						label={L.l('dataManagement.onlyMe')} 
+					/>
+				</div>
+			)
+		}
+
 		columns.push(
 			<TableHeaderColumn key="totalErrors" dataField="totalErrors"
-				dataAlign="right" width="80" editable={false} dataSort>Errors</TableHeaderColumn>,
+				dataAlign="right" width="80" editable={false} dataSort>{L.l('dataManagement.errors')}</TableHeaderColumn>,
 			<TableHeaderColumn key="warnings" dataField="warnings"
-				dataAlign="right" width="80" editable={false} dataSort>Warnings</TableHeaderColumn>,
+				dataAlign="right" width="80" editable={false} dataSort>{L.l('dataManagement.warnings')}</TableHeaderColumn>,
 			<TableHeaderColumn key="creationDate" dataField="creationDate" dataFormat={Formatters.dateTimeFormatter}
-				dataAlign="center" width="110" editable={false} dataSort>Created</TableHeaderColumn>,
+				dataAlign="center" width="110" editable={false} dataSort>{L.l('dataManagement.created')}</TableHeaderColumn>,
 			<TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateTimeFormatter}
-				dataAlign="center" width="110" editable={false} dataSort>Modified</TableHeaderColumn>,
-			<TableHeaderColumn key="entryComplete" dataField="entryComplete" dataFormat={Formatters.checkedIconFormatter}
-				dataAlign="center" width="80" editable={false} dataSort>Entered</TableHeaderColumn>,
-			<TableHeaderColumn key="cleansingComplete" dataField="cleansingComplete" dataFormat={Formatters.checkedIconFormatter}
-				dataAlign="center" width="80" editable={false} dataSort>Cleansed</TableHeaderColumn>,
+				dataAlign="center" width="110" editable={false} dataSort>{L.l('dataManagement.modified')}</TableHeaderColumn>,
+			<TableHeaderColumn key="step" dataField="step" 
+				dataAlign="center" width="80" editable={false} dataSort>{L.l('dataManagement.step')}</TableHeaderColumn>,
 			<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter}
 				editable={loggedUser.canChangeRecordOwner(mostSpecificGroup)}
+				filter={ { type: 'CustomFilter', getElement: createOwnerFilter } }
 				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
-				dataAlign="center" width="150"  dataSort>Owner</TableHeaderColumn>
+				dataAlign="center" width="150" dataSort>Owner</TableHeaderColumn>
 		);
 
 		return (

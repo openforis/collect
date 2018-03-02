@@ -311,6 +311,14 @@ public class RecordDao extends JooqDaoSupport {
 			return new Date[]{start, end};
 		}
 	}
+	
+	public Set<Integer> loadDistinctOwnerIds(RecordFilter filter) {
+		SelectQuery<?> q = dsl().selectQuery();
+		q.addSelect(OFC_RECORD.OWNER_ID);
+		q.addFrom(OFC_RECORD);
+		addRecordSummaryFilterConditions(q, filter);
+		return q.fetchSet(OFC_RECORD.OWNER_ID);
+	}
 
 	private void addRecordSummaryFilterConditions(SelectQuery<?> q, RecordFilter filter) {
 		CollectSurvey survey = filter.getSurvey();
@@ -344,9 +352,9 @@ public class RecordDao extends JooqDaoSupport {
 		if ( filter.getModifiedSince() != null ) {
 			q.addConditions(OFC_RECORD.DATE_MODIFIED.greaterOrEqual(new Timestamp(filter.getModifiedSince().getTime())));
 		}
-		//owner
-		if ( filter.getOwnerId() != null ) {
-			q.addConditions(OFC_RECORD.OWNER_ID.equal(filter.getOwnerId()));
+		//owners
+		if ( filter.getOwnerIds() != null && !filter.getOwnerIds().isEmpty() ) {
+			q.addConditions(OFC_RECORD.OWNER_ID.in(filter.getOwnerIds()));
 		}
 		//record keys
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
@@ -999,4 +1007,5 @@ public class RecordDao extends JooqDaoSupport {
 		}
 		return params;
 	}
+
 }

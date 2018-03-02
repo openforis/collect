@@ -77,6 +77,7 @@ import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserRole;
+import org.openforis.collect.model.proxy.BasicUserProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.model.proxy.RecordSummaryProxy;
 import org.openforis.collect.persistence.MissingRecordKeyException;
@@ -88,6 +89,7 @@ import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
+import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.RecordStatsGenerator.RecordsStats;
 import org.openforis.collect.web.session.SessionState;
@@ -208,6 +210,9 @@ public class RecordController extends BasicController implements Serializable {
 			filter.setQualifiers(params.getQualifierValues());
 		}
 		filter.setSummaryValues(params.getSummaryValues());
+		if (filter.getOwnerIds() == null && params.getOwnerIds() != null && params.getOwnerIds().length > 0) {
+			filter.setOwnerIds(Arrays.asList(params.getOwnerIds()));
+		}
 		filter.setOffset(params.getOffset());
 		filter.setMaxNumberOfRecords(params.getMaxNumberOfRows());
 		
@@ -220,6 +225,12 @@ public class RecordController extends BasicController implements Serializable {
 		//count total records
 		int count = recordManager.countRecords(filter);
 		result.put("count", count);
+		
+		if (params.isIncludeOwners()) {
+			Set<User> owners = recordManager.loadDistinctOwners(createRecordFilter(survey, user, userGroupManager, rootEntityDefinition.getId(), false));
+			Set<BasicUserProxy> ownerProxies = Proxies.fromSet(owners, BasicUserProxy.class);
+			result.put("owners", ownerProxies);
+		}
 		
 		return result;
 	}
@@ -655,7 +666,9 @@ public class RecordController extends BasicController implements Serializable {
 		private boolean caseSensitiveKeyValues = false;
 		private String[] qualifierValues;
 		private String[] summaryValues;
+		private Integer[] ownerIds;
 		private boolean fullSummary = false;
+		private boolean includeOwners = false;
 
 		public String getUsername() {
 			return username;
@@ -727,6 +740,22 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setFullSummary(boolean fullSummary) {
 			this.fullSummary = fullSummary;
+		}
+		
+		public Integer[] getOwnerIds() {
+			return ownerIds;
+		}
+		
+		public void setOwnerIds(Integer[] ownerIds) {
+			this.ownerIds = ownerIds;
+		}
+		
+		public boolean isIncludeOwners() {
+			return includeOwners;
+		}
+		
+		public void setIncludeOwners(boolean includeOwners) {
+			this.includeOwners = includeOwners;
 		}
 	}
 	

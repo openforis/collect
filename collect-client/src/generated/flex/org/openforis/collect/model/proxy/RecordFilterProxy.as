@@ -17,7 +17,7 @@ package org.openforis.collect.model.proxy {
     	public function isEmpty():Boolean {
     		return ! (
     			containsNonEmptyValue(keyValues) 
-    			|| ! isNaN(ownerId)
+    			|| (ownerIds != null && ownerIds.length > 0)
     			|| modifiedSince != null
     			|| ! isNaN(recordId)
     			|| step != null
