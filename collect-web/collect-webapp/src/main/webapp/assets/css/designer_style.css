@@ -39,6 +39,11 @@ button.icon {
 .nowrap {
 	white-space: nowrap;
 }
+
+.z-west-header, .z-center-header, .z-east-header, .z-north-header, .z-south-header {
+	background: #f6f6f6;
+}
+
 .z-hlayout.controlBar .z-hlayout-inner {
 	vertical-align: middle;
 }
@@ -68,11 +73,17 @@ button.icon {
 .collapsible .z-groupbox-3d-cnt {
 	padding: 0px;
 }
+.z-groupbox-3d-hm {
+	background: #dff1fc;
+}
+.z-groupbox-3d .z-caption-l {
+	height: 16px;
+}
 .z-groupbox-3d .open-false .z-caption-l {
-	background: url("../images/arrow-down-small.png") no-repeat 0 0px;
+	background: url("../images/plus-small.png") no-repeat 0 0px;
 }
 .z-groupbox-3d .open-true .z-caption-l {
-	background: url("../images/arrow-up-small.png") no-repeat 0 0px;;
+	background: url("../images/minus-small.png") no-repeat 0 0px;;
 }
 .z-menu.icon-button .z-menu-btn, 
 	.z-menuitem.icon-button .z-menuitem-btn  {
@@ -100,6 +111,43 @@ button.icon {
 	border-color: red;
 	border-width: 2px;
 }
+
+div.z-listbox {
+	background: #f6f6f6;
+}
+
+div.z-listbox-header tr.z-listhead, div.z-listbox-header tr.z-auxhead {
+	background: #f6f6f6;
+}
+
+div.z-listbox-header th.z-listheader-sort-over {
+	background: #dff1fc;
+}
+
+.z-toolbar {
+	background: #f7f7f7;
+}
+.z-toolbarbutton-cnt {
+	zoom: 1.2;
+}
+
+.z-groupbox-header span.z-caption-cnt, 
+.z-groupbox-title-cnt {
+	font-size: 1.2em;
+}
+
+.z-groupbox-header span.z-caption-cnt > .z-label {
+	font-size: 1.0em;
+}
+
+.z-caption .z-caption-r .z-label {
+	font-size: 1.1em;
+}
+
+.z-caption .z-caption-l {
+	width: 30px;
+}
+
 /**
 * Checkbox style
 */
