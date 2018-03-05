@@ -86,18 +86,26 @@ export default class User extends Serializable {
     }
 
     canChangeRecordOwner(group) {
-        const role = this.determineRoleInGroup(group)
-        if (role === null) {
-            return false
-        }
-        switch(role) {
-            case 'OWNER':
-            case 'ADMINISTRATOR':
-            case 'SUPERVISOR':
-            case 'DATA_ANALYZER':
-                return true
-            default:
+        const mainRole = this.role
+        switch(mainRole) {
+            case 'VIEW':
+            case 'ENTRY':
+            case 'ENTRY_LIMITED':
                 return false
+            default:
+                const role = this.determineRoleInGroup(group)
+                if (role === null) {
+                    return false
+                }
+                switch(role) {
+                    case 'OWNER':
+                    case 'ADMINISTRATOR':
+                    case 'SUPERVISOR':
+                    case 'DATA_ANALYZER':
+                        return true
+                    default:
+                        return false
+                }
         }
     }
     
