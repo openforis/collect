@@ -289,12 +289,6 @@ class RecordDataTable extends Component {
 			}
 			return (
 				<div>
-					{ownerIds.length === 0 && !onlyMyOwnRecords &&
-						<span>{L.l('global.all')}</span>
-					}
-					{availableOwners.length > 0 && !onlyMyOwnRecords &&
-						<SelectFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
-					}
 					<FormControlLabel control={
 						<Switch
 							checked={onlyMyOwnRecords}
@@ -304,6 +298,13 @@ class RecordDataTable extends Component {
 						}
 						label={L.l('dataManagement.onlyMe')} 
 					/>
+					{availableOwners.length > 0 && !onlyMyOwnRecords &&
+						<div className="row">
+							<div className="col">
+								<SelectFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
+							</div>
+						</div>
+					}
 				</div>
 			)
 		}

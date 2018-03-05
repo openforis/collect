@@ -12,7 +12,12 @@
     },
     "global": {
         "advancedFunctions": "Advanced Functions",
-        "all": "All",
+        "all": {
+            "label": "All",
+            "menuitem": {
+                "label": "--- All ---"
+            }
+        },
         "cancel": "Cancel",
         "close": "Close",
         "confirm": "Confirm",
