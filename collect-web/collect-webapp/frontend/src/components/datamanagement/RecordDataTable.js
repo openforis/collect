@@ -9,6 +9,7 @@ import ServiceFactory from 'services/ServiceFactory'
 import * as Formatters from 'components/datatable/formatters'
 import OwnerColumnEditor from './OwnerColumnEditor'
 import SelectFilter from 'components/datatable/SelectFilter'
+import RecordOwnerFilter from 'components/datamanagement/RecordOwnerFilter'
 import Tables from 'components/Tables'
 import L from 'utils/Labels'
 
@@ -287,26 +288,7 @@ class RecordDataTable extends Component {
 			if (availableOwners.length === 0 ) {
 				return <div />
 			}
-			return (
-				<div>
-					<FormControlLabel control={
-						<Switch
-							checked={onlyMyOwnRecords}
-							onChange={onlyMyOwnRecordsChangeHandler}
-							color="primary"
-						/>
-						}
-						label={L.l('dataManagement.onlyMe')} 
-					/>
-					{availableOwners.length > 0 && !onlyMyOwnRecords &&
-						<div className="row">
-							<div className="col">
-								<SelectFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
-							</div>
-						</div>
-					}
-				</div>
-			)
+			return <RecordOwnerFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
 		}
 
 		columns.push(

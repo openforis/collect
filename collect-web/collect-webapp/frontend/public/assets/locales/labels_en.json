@@ -33,6 +33,11 @@
         "info": "Info",
         "loading": "Loading...",
         "ok": "Ok",
+        "onlyme": {
+            "menuitem": {
+                "label": "--- Only me ---"
+            }
+        },
         "parameters": "Parameters",
         "refresh": "Refresh",
         "save": {

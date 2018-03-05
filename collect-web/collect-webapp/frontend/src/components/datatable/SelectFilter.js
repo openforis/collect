@@ -7,6 +7,7 @@ import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
 
+/*
 const styles = theme => ({
   root: {
     display: 'flex',
@@ -25,13 +26,15 @@ const styles = theme => ({
     margin: theme.spacing.unit / 4,
   }
 })
-
+*/
 class SelectFilter extends React.Component {
-  constructor(props) {
+  constructor(props, context) {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.isFiltered = this.isFiltered.bind(this)
-
+    this.buildMenuItems = this.buildMenuItems.bind(this)
+    this.buildFixedMenuItems = this.buildFixedMenuItems.bind(this)
+    
     this.state = {
       selectedValues: [''],
       allValuesSelected: true
@@ -51,7 +54,7 @@ class SelectFilter extends React.Component {
       selectedValues: selectedValues 
     })
 
-    if (selectedValues.length == 0 || allValuesSelected) {
+    if (allValuesSelected) {
       //remove the filter
       this.props.filterHandler()
     } else {
@@ -63,40 +66,59 @@ class SelectFilter extends React.Component {
     return true
   }
 
+  buildFixedMenuItems() {
+    const allValuesItem = <MenuItem key="---all---" value=""><em>{L.l('global.all.menuitem')}</em></MenuItem>
+    return [allValuesItem]
+  }
+
+  buildMenuItems() {
+    const { dataSource } = this.props
+    
+    const fixedMenuItems = this.buildFixedMenuItems()
+    const menuItems = [fixedMenuItems].concat(dataSource
+      .sort((item1, item2) => Strings.compare(item1.label, item2.label))
+      .map(item =>
+        <MenuItem 
+            key={item.value} 
+            value={item.value}>
+            {item.label}
+        </MenuItem>
+      ))
+    return menuItems
+  }
+
+  isDataSourceItemSelected(selectedValues) {
+    return !this.state.allValuesSelected
+  }
+
+  getFixedItemLabel(value) {
+    switch(value) {
+      case '':
+          return L.l('global.all.menuitem')
+      default:
+          return null
+    }
+  }
+
   render() {
-    const { classes, theme, multiple, dataSource } = this.props
+    const { multiple, dataSource } = this.props
     const { selectedValues, allValuesSelected } = this.state
 
-    const allValuesItem = <MenuItem key="---all---" value=""><em>{L.l('global.all.menuitem')}</em></MenuItem>
-    const menuItems = [allValuesItem].concat(dataSource
-            .sort((item1, item2) => Strings.compare(item1.label, item2.label))
-            .map(item =>
-              <MenuItem 
-                  key={item.value} 
-                  value={item.value}>
-                  {item.label}
-              </MenuItem>
-    ))
+    const menuItems = this.buildMenuItems()
     return (
       <Select
         multiple={multiple}
         value={selectedValues}
         onChange={this.handleChange}
         displayEmpty
-        renderValue={selected => {
-            console.log("selectedValues")
-            console.log(selectedValues)
-            console.log("selected")
-            console.log(selected)
-            console.log("allValuesSelected")
-            console.log(allValuesSelected)
-            if (allValuesSelected) {
-              return <div><em>{L.l('global.all.menuitem')}</em></div>
+        renderValue={selectedValues => {
+            if (!this.isDataSourceItemSelected(selectedValues)) {
+              return <div><em>{this.getFixedItemLabel(selectedValues[0])}</em></div>
             } else {
-              return <div className={classes.chips}>
-                  {selected.map(value => {
+              return <div>
+                  {selectedValues.map(value => {
                     const item = dataSource.find(item => item.value === value)
-                    return <Chip key={value} label={item.label} className={classes.chip} />
+                    return <Chip key={value} label={item.label} />
                   })}
                 </div>
             }
@@ -108,4 +130,5 @@ class SelectFilter extends React.Component {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(SelectFilter);
+//export default withStyles(styles, { withTheme: true })(SelectFilter)
+export default SelectFilter
