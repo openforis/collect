@@ -11,6 +11,7 @@ import OwnerColumnEditor from './OwnerColumnEditor'
 import SelectFilter from 'components/datatable/SelectFilter'
 import RecordOwnerFilter from 'components/datamanagement/RecordOwnerFilter'
 import Tables from 'components/Tables'
+import Workflow from 'model/Workflow'
 import L from 'utils/Labels'
 
 class RecordDataTable extends Component {
@@ -277,6 +278,18 @@ class RecordDataTable extends Component {
 				editable={false}>{attr.label}</TableHeaderColumn>
 		})
 		columns = columns.concat(attributeDefsShownInSummaryListColumns)
+
+		function createStepFilter(filterHandler, customFilterParameters) {
+			const filterItems = []
+			for(let stepName in Workflow.STEPS) {
+				let s = Workflow.STEPS[stepName]
+				filterItems.push({
+					value: s.code,
+					label: s.label
+				})
+			}
+			return <SelectFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
+		}
 
 		function createOwnerFilter(filterHandler, customFilterParameters) {
 			const filterItems = availableOwners.map(u => {
