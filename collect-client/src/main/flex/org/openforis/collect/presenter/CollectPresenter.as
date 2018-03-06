@@ -219,7 +219,7 @@ package org.openforis.collect.presenter {
 					filter.surveyId = surveyId;
 					filter.maxNumberOfRecords = 10;
 					filter.rootEntityId = Application.activeSurvey.schema.mainRootEntityDefinition.id;
-					filter.ownerIds = [Application.user.id];
+					filter.ownerIds = new ArrayCollection([Application.user.id]);
 					var loadRecordsResponder:IResponder = new AsyncResponder(loadRecordsSummaryResultHandler, faultHandler);
 					_dataClient.loadRecordSummaries(loadRecordsResponder, filter, null, Application.localeString);
 					
