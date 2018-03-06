@@ -317,6 +317,7 @@ public class RecordDao extends JooqDaoSupport {
 		q.addSelect(OFC_RECORD.OWNER_ID);
 		q.addFrom(OFC_RECORD);
 		addRecordSummaryFilterConditions(q, filter);
+		q.addConditions(OFC_RECORD.OWNER_ID.isNotNull());
 		return q.fetchSet(OFC_RECORD.OWNER_ID);
 	}
 

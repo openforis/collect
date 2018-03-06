@@ -459,7 +459,8 @@ public class RecordManager {
 		Set<Integer> ownerIds = recordDao.loadDistinctOwnerIds(recordFilter);
 		Set<User> owners = new HashSet<User>(ownerIds.size());
 		for (Integer ownerId : ownerIds) {
-			owners.add(userManager.loadById(ownerId));
+			User owner = userManager.loadById(ownerId);
+			owners.add(owner);
 		}
 		return owners;
 	}

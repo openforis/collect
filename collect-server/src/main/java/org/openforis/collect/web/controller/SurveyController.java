@@ -543,7 +543,7 @@ public class SurveyController extends BasicController {
 			return groups;
 		} else if (userId != null) {
 			User availableToUser = userId == null ? null : userManager.loadById(userId);
-			List<UserGroup> groups = userGroupManager.findByUser(availableToUser);
+			List<UserGroup> groups = userGroupManager.findAllRelatedUserGroups(availableToUser);
 			return new HashSet<UserGroup>(groups);
 		} else {
 			return null;

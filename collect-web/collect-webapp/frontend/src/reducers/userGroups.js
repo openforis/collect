@@ -29,6 +29,7 @@ function userGroups(
           //adjust parent group reference
           ug.parent = ug.parentId ? action.userGroups.find(ug2 => ug2.id === ug.parentId) : null
           ug.children = ug.childrenGroupIds.map(id => action.userGroups.find(ug2 => ug2.id === id))
+            .filter(ug => ug !== undefined)
       })
       
       return Object.assign({}, state, {
