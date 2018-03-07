@@ -12,36 +12,37 @@ import org.openforis.idm.metamodel.ModelVersion;
 
 public class CollectRecordSummary {
 
-	public static CollectRecordSummary fromRecord(CollectRecord record) {
-		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		ModelVersion version = record.getVersion();
+	public static CollectRecordSummary fromRecord(CollectRecord r) {
+		CollectSurvey survey = (CollectSurvey) r.getSurvey();
+		ModelVersion version = r.getVersion();
 		CollectRecordSummary summary = new CollectRecordSummary();
-		summary.setCreatedBy(record.getCreatedBy());
-		summary.setCreationDate(record.getCreationDate());
-		summary.setId(record.getId());
-		summary.setModifiedBy(record.getModifiedBy());
-		summary.setModifiedDate(record.getModifiedDate());
+		summary.setCreatedBy(r.getCreatedBy());
+		summary.setCreationDate(r.getCreationDate());
+		summary.setId(r.getId());
+		summary.setModifiedBy(r.getModifiedBy());
+		summary.setModifiedDate(r.getModifiedDate());
 		summary.setSurvey(survey);
 		summary.setVersion(version);
-		summary.setOwner(record.getOwner());
-		summary.setRootEntityDefinitionId(record.getRootEntityDefinitionId());
-		summary.setStep(record.getStep());
-		summary.setWorkflowSequenceNumber(record.getWorkflowSequenceNumber());
+		summary.setOwner(r.getOwner());
+		summary.setRootEntityDefinitionId(r.getRootEntityDefinitionId());
+		summary.setStep(r.getStep());
+		summary.setWorkflowSequenceNumber(r.getWorkflowSequenceNumber());
 		
-		StepSummary stepSummary = new StepSummary(record.getStep());
-		stepSummary.setSequenceNumber(record.getDataWorkflowSequenceNumber());
-		stepSummary.setState(record.getState());
-		stepSummary.setCompletionPercent(record.calculateCompletionPercent());
-		stepSummary.setEntityCounts(record.getEntityCounts());
-		stepSummary.setTotalErrors(record.getTotalErrors());
-		stepSummary.setErrors(record.getErrors());
-		stepSummary.setFilledAttributesCount(record.countTotalFilledAttributes());
-		stepSummary.setMissing(record.getMissing());
-		stepSummary.setMissingErrors(record.getMissingErrors());
-		stepSummary.setMissingWarnings(record.getMissingWarnings());
-		stepSummary.setRootEntityKeyValues(record.getRootEntityKeyValues());
-		stepSummary.setSkipped(record.getSkipped());
-		stepSummary.setWarnings(record.getWarnings());
+		StepSummary stepSummary = new StepSummary(r.getStep());
+		stepSummary.setSequenceNumber(r.getDataWorkflowSequenceNumber());
+		stepSummary.setState(r.getState());
+		stepSummary.setCompletionPercent(r.calculateCompletionPercent());
+		stepSummary.setEntityCounts(r.getEntityCounts());
+		stepSummary.setTotalErrors(r.getTotalErrors());
+		stepSummary.setErrors(r.getErrors());
+		stepSummary.setFilledAttributesCount(r.countTotalFilledAttributes());
+		stepSummary.setMissing(r.getMissing());
+		stepSummary.setMissingErrors(r.getMissingErrors());
+		stepSummary.setMissingWarnings(r.getMissingWarnings());
+		stepSummary.setRootEntityKeyValues(r.getRootEntityKeyValues());
+		stepSummary.setSkipped(r.getSkipped());
+		stepSummary.setTotalErrors(r.getTotalErrors());
+		stepSummary.setWarnings(r.getWarnings());
 		
 		summary.addStepSummary(stepSummary);
 		return summary;

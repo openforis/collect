@@ -849,7 +849,10 @@ public class RecordDao extends JooqDaoSupport {
 		stepSummary.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 		stepSummary.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
 		stepSummary.setMissing(r.getValue(OFC_RECORD.MISSING));
-		stepSummary.setTotalErrors(Numbers.sum(stepSummary.getErrors(), stepSummary.getMissingErrors()));
+		int totalErrors = step == Step.ENTRY ? 
+				Numbers.sum(stepSummary.getErrors(), stepSummary.getSkipped())
+				: Numbers.sum(stepSummary.getErrors(), stepSummary.getMissingErrors());
+		stepSummary.setTotalErrors(totalErrors);
 		
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDef = schema.getRootEntityDefinition(rootEntityDefId);
