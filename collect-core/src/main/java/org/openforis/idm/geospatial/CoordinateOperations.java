@@ -53,8 +53,7 @@ public class CoordinateOperations {
 	}
 
 	public Coordinate convertToWgs84(Coordinate coordinate) {
-		SpatialReferenceSystem toSrs = SpatialReferenceSystem.LAT_LON_SRS;
-		return convertTo(coordinate, toSrs);
+		return convertTo(coordinate, SpatialReferenceSystem.LAT_LON_SRS);
 	}
 
 	public Coordinate convertTo(Coordinate coordinate, String toSrsId) {

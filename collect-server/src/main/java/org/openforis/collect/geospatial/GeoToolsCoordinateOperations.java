@@ -57,7 +57,6 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 	
 	@Override
 	public void initialize() {
-		super.initialize();
 		try {
 			CRS_BY_SRS_ID.put(WGS84_SRS_ID, WGS84);
 			CoordinateReferenceSystem webMercatorCrs = CRS.decode(SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
@@ -208,10 +207,10 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 	@Override
 	public void registerSRS(SpatialReferenceSystem srs) {
 		String srsId = srs.getId();
-		MathTransform latLonTransform = transformCache.get(SpatialReferenceSystem.WGS84_SRS_ID, srsId);
-		if (latLonTransform == null) {
+		if (! CRS_BY_SRS_ID.containsKey(srsId)) {
 			String wkt = srs.getWellKnownText();
 			try {
+				MathTransform latLonTransform = transformCache.get(SpatialReferenceSystem.WGS84_SRS_ID, srsId);
 				CoordinateReferenceSystem crs = parseWKT(wkt);
 				latLonTransform = findToWGS84MathTransform(crs);
 				transformCache.put(srsId, SpatialReferenceSystem.WGS84_SRS_ID, latLonTransform);
@@ -227,6 +226,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 				if (LOG.isErrorEnabled()) {
 					LOG.error(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
 				}
+				CRS_BY_SRS_ID.put(srsId, null);
 			}
 		}
 	}
