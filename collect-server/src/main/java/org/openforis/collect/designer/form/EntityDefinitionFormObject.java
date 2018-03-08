@@ -3,9 +3,11 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Direction;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
@@ -16,7 +18,8 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 
 	private boolean virtual;
 	private String generatorExpression;
-	
+
+	private boolean enumerate;
 	private boolean showRowNumbers;
 	private boolean countInRecordSummary;
 	private String direction;
@@ -36,6 +39,10 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		super.saveTo(dest, languageCode);
 		dest.setVirtual(virtual);
 		dest.setGeneratorExpression(virtual ? generatorExpression: null);
+		
+		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
+		dest.setEnumerate(survey.getTarget() == SurveyTarget.COLLECT_EARTH || enumerate);
+		
 		UIOptions uiOptions = getUIOptions(dest);
 		Layout layout = Layout.valueOf(layoutType);
 		uiOptions.setLayout(dest, layout);
@@ -52,6 +59,9 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 		super.loadFrom(source, languageCode);
 		virtual = source.isVirtual();
 		generatorExpression = source.getGeneratorExpression();
+		
+		enumerate = source.isEnumerate();
+		
 		UIOptions uiOptions = getUIOptions(source);
 		Layout layout = uiOptions.getLayout(source);
 		layoutType = layout.name();
@@ -80,6 +90,14 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 	
 	public void setGeneratorExpression(String generatorExpression) {
 		this.generatorExpression = generatorExpression;
+	}
+	
+	public boolean isEnumerate() {
+		return enumerate;
+	}
+	
+	public void setEnumerate(boolean enumerate) {
+		this.enumerate = enumerate;
 	}
 	
 	public String getLayoutType() {

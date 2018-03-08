@@ -16,6 +16,8 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -374,6 +376,19 @@ public class EntityDefinition extends NodeDefinition {
 	public boolean isEnumerable() {
 		CodeAttributeDefinition enumeratingKeyCodeAttribute = getEnumeratingKeyCodeAttribute();
 		return enumeratingKeyCodeAttribute != null;
+	}
+	
+	public boolean isEnumerate() {
+		//TODO don't use annotations
+		CollectSurvey survey = getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isEnumerate(this);
+	}
+	
+	public void setEnumerate(boolean enumerate) {
+		CollectSurvey survey = getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		annotations.setEnumerate(this, enumerate);
 	}
 
 	public CodeAttributeDefinition getEnumeratingKeyCodeAttribute() {

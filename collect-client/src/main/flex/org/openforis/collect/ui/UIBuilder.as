@@ -216,7 +216,7 @@ package org.openforis.collect.ui {
 				return width;
 			} else if(def is CodeAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					if(def.key && def.parent.enumerable) {
+					if(def.key && def.parent.enumerable && def.parent.enumerate) {
 						//return NaN;
 						return 150;
 					} else {
@@ -304,7 +304,8 @@ package org.openforis.collect.ui {
 		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
 			var parentEntityDefn:EntityDefinitionProxy = def.parent;
 			var directionByColumns:Boolean = parentEntityDefn != null && parentEntityDefn.direction == UIOptions$Direction.BY_COLUMNS;
-			if(ancestorEntity != null && parentEntityDefn.enumerable && def.key && def is CodeAttributeDefinitionProxy) {
+			if(ancestorEntity != null && parentEntityDefn.enumerable && parentEntityDefn.enumerate 
+					&& def.key && def is CodeAttributeDefinitionProxy) {
 				var width:Number = getEnumeratedCodeHeaderWidth(def, ancestorEntity);
 				return width + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
 			} else if ( directionByColumns ) {
@@ -356,7 +357,7 @@ package org.openforis.collect.ui {
 				inputField = new BooleanInputField();
 			} else if(def is CodeAttributeDefinitionProxy) {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
-				if(parentLayout == UIUtil.LAYOUT_TABLE && codeDef.parent.enumerable && codeDef.key) {
+				if(codeDef.parent.enumerable && codeDef.parent.enumerate && codeDef.key) {
 					inputField = new FixedCodeInputField();
 				} else {
 					switch(codeDef.layoutType) {

@@ -120,7 +120,8 @@
 					</s:layout.byRows>
 					
 					<s:Spacer id="dragAnchorSpacer"
-							  includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
+							  includeInLayout="{Application.activeRecordEditable &amp;&amp; 
+							  	!(entityDefinition.enumerable &amp;&amp; entityDefinition.enumerate)}"
 							  width="11" />
 					<s:Spacer id="rowNumberSpacer"
 							  includeInLayout="{entityDefinition.showRowNumbers}"

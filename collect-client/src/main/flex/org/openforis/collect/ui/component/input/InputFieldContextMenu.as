@@ -146,7 +146,7 @@ package org.openforis.collect.ui.component.input {
 								items.push(APPROVE_MISSING_IN_ROW);
 								break;
 						}
-						if( !entityDef.enumerable) {
+						if( !(entityDef.enumerable && entityDef.enumerate)) {
 							items.push(DELETE_ENTITY);
 						}
 					}

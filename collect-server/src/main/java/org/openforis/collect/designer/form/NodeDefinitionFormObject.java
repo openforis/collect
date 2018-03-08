@@ -45,6 +45,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean hideWhenNotRelevant;
 	private String minCountExpression;
 	private String maxCountExpression;
+	private boolean autoGenerateMinItems;
 	private boolean calculated;
 	private boolean includeInDataExport;
 	private boolean showInUI;
@@ -189,6 +190,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 
 		CollectAnnotations annotations = survey.getAnnotations();
 		
+		autoGenerateMinItems = annotations.isAutoGenerateMinItems(source);
+		
 		if (source instanceof AttributeDefinition) {
 			fromCollectEarthCSV = annotations.isFromCollectEarthCSV((AttributeDefinition) source);
 			includedInCollectEarthHeader =  annotations.isIncludedInCollectEarthHeader((AttributeDefinition) source);
@@ -230,6 +233,12 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		dest.setMaxCountExpression(null);
 		dest.setRequiredExpression(null);
 		
+		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		
+		annotations.setAutoGenerateMinItems(dest, 
+				isMultiple() && StringUtils.isNotBlank(getMinCountExpression()) && autoGenerateMinItems);
+		
 		if (dest instanceof EntityDefinition && parentDefinition == null) {
 			//root entity is always true
 			dest.setMultiple(true);
@@ -252,9 +261,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 				}
 			}
 		}
-		
-		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
-		CollectAnnotations annotations = survey.getAnnotations();
 		
 		UIOptions uiOptions = survey.getUIOptions();
 		
@@ -522,6 +528,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 
 	public void setMaxCountExpression(String expression) {
 		this.maxCountExpression = expression;
+	}
+	
+	public boolean isAutoGenerateMinItems() {
+		return autoGenerateMinItems;
+	}
+	
+	public void setAutoGenerateMinItems(boolean autoGenerateMinItems) {
+		this.autoGenerateMinItems = autoGenerateMinItems;
 	}
 
 	public String getTabName() {

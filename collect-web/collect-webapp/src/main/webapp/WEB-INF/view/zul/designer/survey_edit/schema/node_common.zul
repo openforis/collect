@@ -20,7 +20,7 @@
 	  				<label value="${labels.global.item.name}" />
 	  			</fieldErrorHandler>
   				<fieldErrorHandler message="@load(vmsgs['name'])">
-  					<textbox width="200px" maxlength="40"
+  					<textbox width="250px" maxlength="40"
   						id="nodeNameTextbox"
   						value="@bind(fx.name)"
   						readonly="@load(vm.collectEarthSurvey and (vm.rootEntity or vm.predefinedCollectEarthAttribute))"
@@ -162,7 +162,7 @@
 	  					<checkbox
 	  						disabled="@load(vm.multipleFieldEditingDisabled)"
 	  						checked="@load(fx.multiple eq true) @save(fx.multiple)"
-	  						onCheck="@command('applyChanges')" />
+	  						onCheck="@command('multipleChanged', multiple=self.checked)" />
 	  				</fieldErrorHandler>
 	  				
 	  				<hlayout spacing="15px"
@@ -189,6 +189,16 @@
 						</hlayout>		  				
 		  			</hlayout>
 		  		</hlayout>
+  			</row>
+  			<row visible="@load(not(vm.collectEarthSurvey) and fx.multiple and fx.minCountExpression ne null and fx.minCountExpression ne '')">
+  				<div />
+				<fieldErrorHandler message="@load(vmsgs['autoGenerateMinItems'])">
+					<label value="${labels.survey.schema.node.auto_generate_min_items.$}:" />
+					<checkbox checked="@bind(fx.autoGenerateMinItems)"
+						onCheck="@command('applyChanges')" />
+					<image popup="autoGenerateMinItemsInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+				</fieldErrorHandler>
   			</row>
   			<row
   				visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated) and fx.multiple ne true)">
@@ -666,6 +676,11 @@
       		${labels.survey.schema.attribute.calculated.info}
       	]]></html>
 	</popup>
+	<popup id="autoGenerateMinItemsInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.schema.node.auto_generate_min_items.tooltip}
+        ]]></html>
+  	</popup>
 	<popup id="showInSummaryInfoTooltip" width="300px">
         <html><![CDATA[
     		${labels.survey.schema.attribute.show_in_summary.info}

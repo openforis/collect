@@ -12,7 +12,7 @@ package org.openforis.collect.metamodel.proxy {
     public class CodeAttributeDefinitionProxy extends CodeAttributeDefinitionProxyBase {
 		
 		public function get enumeratingAttribute():Boolean {
-			return parent.enumerable && this.key;
+			return parent.enumerable && parent.enumerate && this.key;
 		}
 		
     }

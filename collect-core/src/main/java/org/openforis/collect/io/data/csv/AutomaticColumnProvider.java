@@ -57,7 +57,7 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	
 	private static void createEntityProviders(CSVDataExportParameters config, EntityDefinition defn, List<ColumnProvider> cols) {
 		if ( defn.isMultiple() ) {
-			if ( defn.isEnumerable() && config.isIncludeEnumeratedEntities() ) {
+			if ( defn.isEnumerable() && defn.isEnumerate() && config.isIncludeEnumeratedEntities() ) {
 				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(config, defn);
 				cols.add(p);
 			}

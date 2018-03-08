@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UIOptions.Layout;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -138,14 +135,8 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 
 	public boolean isEnumerator() {
 		EntityDefinition parentDefinition = (EntityDefinition) definition.getParentDefinition();
-		CollectSurvey survey = (CollectSurvey) getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
-		boolean tableLayout = uiOptions == null || uiOptions.getLayout(parentDefinition) == Layout.TABLE;
-		if(parentDefinition.isEnumerable() && tableLayout && definition.isKey() && 
-				definition.getList() != null && ! definition.getList().isExternal()) {
-			return true;
-		} else {
-			return false;
-		}
+		return definition.isKey() 
+				&& parentDefinition.isEnumerable() 
+				&& parentDefinition.isEnumerate();
 	}
 }

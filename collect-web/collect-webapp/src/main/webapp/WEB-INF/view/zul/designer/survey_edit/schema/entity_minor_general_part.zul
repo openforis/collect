@@ -7,6 +7,16 @@
       <column />
     </columns>
     <rows>
+	   	<row visible="@load(not(vm.collectEarthSurvey) and not(vm.rootEntity) and fx.multiple and not(fx.virtual))">
+	   		<div />
+	        <fieldErrorHandler message="@load(vmsgs['enumerate'])">
+		        <label value="${labels.survey.schema.entity.enumerate.$}:" />
+	           <checkbox checked="@bind(fx.enumerate)"
+	             onCheck="@command('applyChanges')" />
+	           <image popup="enumerateInfoTooltip" style="cursor:pointer"
+	             src="/assets/images/info-small.png" />
+	        </fieldErrorHandler>
+      </row>
       <row visible="${not vm.rootEntity}">
         <label value="${labels.survey.schema.entity.show_row_numbers}:" />
         <checkbox checked="@bind(fx.showRowNumbers)"
@@ -48,6 +58,11 @@
     </rows>
   </grid>
   
+  <popup id="enumerateInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.schema.entity.enumerate.tooltip}
+        ]]></html>
+  </popup>
   <popup id="virtualEntityInfoTooltip" width="300px">
         <html><![CDATA[
     		${labels.survey.schema.entity.virtual.tooltip}
@@ -58,4 +73,5 @@
     		${labels.survey.schema.entity.generator_expression.tooltip}
         ]]></html>
   </popup>
+  
 </zk>

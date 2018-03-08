@@ -44,6 +44,11 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	public boolean isEnumerable() {
 		return entityDefinition.isMultiple() && entityDefinition.isEnumerable();
 	}
+	
+	@ExternalizedProperty
+	public boolean isEnumerate() {
+		return entityDefinition.isEnumerate();
+	}
 
 	@ExternalizedProperty
 	public String getLayout() {

@@ -14,6 +14,7 @@ import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.Annotatable;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
@@ -57,6 +58,8 @@ public class CollectAnnotations {
 		KEY_CHANGE_ALLOWED(new QName(COLLECT_NAMESPACE_URI, "keyChangeAllowed"), true),
 		QUALIFIER(new QName(COLLECT_NAMESPACE_URI, UIOptionsConstants.QUALIFIER), false),
 		TAXON_ATTRIBUTE_ALLOW_UNLISTED(new QName(COLLECT_NAMESPACE_URI, "allowUnlisted"), true),
+		ENUMERATE(new QName(COLLECT_NAMESPACE_URI, "enumerate"), false),
+		AUTO_GENERATE_MIN_ITEMS(new QName(COLLECT_NAMESPACE_URI, "autoGenerateMinItems"), false),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -248,6 +251,22 @@ public class CollectAnnotations {
 		setAnnotationValue(defn, Annotation.TAXON_ATTRIBUTE_ALLOW_UNLISTED, value);
 	}
 	
+	public boolean isEnumerate(EntityDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.ENUMERATE);
+	}
+	
+	public void setEnumerate(EntityDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.ENUMERATE, value);
+	}
+	
+	public Boolean isAutoGenerateMinItems(NodeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.AUTO_GENERATE_MIN_ITEMS);
+	}
+	
+	public void setAutoGenerateMinItems(NodeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.AUTO_GENERATE_MIN_ITEMS, value);
+	}
+	
 	public boolean isHideKeyInCollectEarthRecordList(AttributeDefinition defn) {
 		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_HIDE_IN_RECORD_LIST);
 	}
@@ -431,11 +450,11 @@ public class CollectAnnotations {
 		def.setAnnotation(annotation.getQName(), enumName);
 	}
 	
-	private boolean getAnnotationBooleanValue(Annotatable annotatable, Annotation annotation) {
+	private Boolean getAnnotationBooleanValue(Annotatable annotatable, Annotation annotation) {
 		String annotationValue = annotatable.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
 			Boolean defaultValue = annotation.getDefaultValue();
-			return defaultValue.booleanValue();
+			return defaultValue == null ? null : defaultValue.booleanValue();
 		} else {
 			return Boolean.valueOf(annotationValue);
 		}

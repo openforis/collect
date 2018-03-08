@@ -163,7 +163,8 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 				)
 				.multiple()
 				.required()
-			)
+			),
+			entity("time_study")
 		);
 		Entity rootEntity = record.getRootEntity();
 		Attribute<?, ?> startTime = record.findNodeByPath("/root/time_study[1]/start_time");

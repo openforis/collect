@@ -385,7 +385,7 @@ public class CodeList extends VersionableSurveyObject {
 				EntityDefinition entityDefn = (EntityDefinition) node;
 				if ( ! entityDefn.isRoot() ) {
 					CodeAttributeDefinition enumeratingKeyCodeAttribute = entityDefn.getEnumeratingKeyCodeAttribute();
-					if ( enumeratingKeyCodeAttribute != null && 
+					if ( enumeratingKeyCodeAttribute != null && entityDefn.isEnumerate() && 
 							enumeratingKeyCodeAttribute.getList().getId() == this.getId() ) {
 						return true;
 					}

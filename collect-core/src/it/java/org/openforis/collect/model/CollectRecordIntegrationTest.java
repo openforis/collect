@@ -63,7 +63,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Entity cluster = record.getRootEntity();
 		NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "plot");
 		assertNotNull(changeSet);
-		assertEquals(84, changeSet.size());
+		assertEquals(81, changeSet.size());
 		assertEquals(3, cluster.getCount("plot"));
 		{
 			Entity plot = (Entity) cluster.getChild("plot", 2);

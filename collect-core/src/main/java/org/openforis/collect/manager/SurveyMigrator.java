@@ -7,9 +7,18 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.SurveyTarget;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
+import org.openforis.collect.metamodel.ui.UIModelObject;
+import org.openforis.collect.metamodel.ui.UITable;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 
 /**
  * 
@@ -25,9 +34,34 @@ public class SurveyMigrator {
 	
 //	private static final String MIGRATION_NEEDED_COLLECT_VERSION = "3.4.0";
 	
-	public void migrate(CollectSurvey survey) {
+	private static final Version ENUMERATE_VERSION = new Version("3.20.22");
+	
+	public void migrate(final CollectSurvey survey) {
 		fixCodeListHierarchyLevelNames(survey);
 		
+		if (survey.getCollectVersion().compareTo(ENUMERATE_VERSION) < 0) {
+			survey.getSchema().traverse(new NodeDefinitionVisitor() {
+				public void visit(NodeDefinition defn) {
+					if (defn instanceof EntityDefinition && defn.isMultiple()) {
+						EntityDefinition entityDefn = (EntityDefinition) defn;
+						UIConfiguration uiConfig = survey.getUIConfiguration();
+						if (uiConfig != null) {
+							UIModelObject uiModelObject = uiConfig.getModelObjectByNodeDefinitionId(entityDefn.getId());
+							CollectAnnotations annotations = survey.getAnnotations();
+							if (survey.getTarget() == SurveyTarget.COLLECT_EARTH
+									|| uiModelObject == null || uiModelObject instanceof UITable) {
+								if (defn.getMinCountExpression() != null) {
+									annotations.setAutoGenerateMinItems(entityDefn, true);
+								}
+								if (entityDefn.isEnumerable()) {
+									entityDefn.setEnumerate(true);
+								}
+							}
+						}
+					}
+				}
+			});
+		}
 		survey.setCollectVersion(VERSION);
 	}
 	

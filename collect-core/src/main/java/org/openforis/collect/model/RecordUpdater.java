@@ -20,8 +20,6 @@ import java.util.Set;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
-import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -865,11 +863,10 @@ public class RecordUpdater {
 	}
 
 	private int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
-		UIOptions uiOptions = getUIOptions(entity.getSurvey());
+		CollectSurvey survey = (CollectSurvey) entity.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
 		int count = 0;
-		boolean multipleEntityFormLayout = childDefn instanceof EntityDefinition && childDefn.isMultiple() && 
-				uiOptions != null && uiOptions.getLayout((EntityDefinition) childDefn) == Layout.FORM;
-		if ( ! multipleEntityFormLayout ) {
+		if (! childDefn.isMultiple() || annotations.isAutoGenerateMinItems(childDefn)) {
 			while(count < toBeInserted) {
 				if(childDefn instanceof AttributeDefinition) {
 					Node<?> createdNode = childDefn.createNode();
@@ -931,15 +928,13 @@ public class RecordUpdater {
 
 	private void addEmptyEnumeratedEntities(Entity parentEntity) {
 		Record record = parentEntity.getRecord();
-		UIOptions uiOptions = getUIOptions(parentEntity.getSurvey());
 		ModelVersion version = record.getVersion();
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		List<NodeDefinition> childDefinitions = parentEntityDefn.getChildDefinitionsInVersion(version);
 		for (NodeDefinition childDefn : childDefinitions) {
 			if ( childDefn instanceof EntityDefinition ) {
 				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
-				boolean tableLayout = uiOptions == null || uiOptions.getLayout(childEntityDefn) == Layout.TABLE;
-				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable() && tableLayout) {
+				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable() && childEntityDefn.isEnumerate()) {
 					addEmptyEnumeratedEntities(parentEntity, childEntityDefn);
 				}
 			}
@@ -1034,11 +1029,6 @@ public class RecordUpdater {
 		} catch (InvalidExpressionException e) {
 			throw new IllegalStateException(String.format("Invalid expression for calculated attribute %s", attribute.getPath()));
 		}
-	}
-
-	private UIOptions getUIOptions(Survey survey) {
-		UIOptions uiOptions = survey instanceof CollectSurvey ? ((CollectSurvey) survey).getUIOptions(): null;
-		return uiOptions;
 	}
 
 	private List<NodePointer> getChildNodePointers(Entity entity) {

@@ -58,7 +58,7 @@
 				nodeDefinitions = _entityDefinition.getDefinitionsInVersion(_modelVersion);
 				nodesDirection = _entityDefinition.direction == UIOptions$Direction.BY_COLUMNS ?
 					DIRECTION_VERTICAL: DIRECTION_HORIZONTAL;
-				dragEnabled = Application.activeRecordEditable && ! _entityDefinition.enumerable;
+				dragEnabled = Application.activeRecordEditable && !(_entityDefinition.enumerable && _entityDefinition.enumerate);
 				addNodeDefinitionItemRenderers();
 			}
 			

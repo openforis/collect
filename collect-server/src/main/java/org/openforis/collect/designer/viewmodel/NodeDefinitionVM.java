@@ -48,7 +48,8 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	protected static final String FORM_CONTAINER_ID = "nodeFormContainer";
 	private static final String NAME_FIELD_NAME = "name";
 	private static final String INSTANCE_LABEL_FIELD_NAME = "instanceLabel";
-
+	protected static final String MULTIPLE_FIELD_NAME = "multiple";
+	
 	protected Form tempFormObject;
 	protected EntityDefinition parentEntity;
 
@@ -150,6 +151,14 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			name = suggestInternalName(value);
 			nameChanged(binder, name);
 		}
+	}
+	
+	@Command
+	public void multipleChanged(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam("multiple") Boolean multiple) {
+//		((NodeDefinitionFormObject<?>) formObject).setMultiple(name);
+		setTempFormObjectFieldValue(MULTIPLE_FIELD_NAME, multiple);
+		dispatchApplyChangesCommand(binder);
 	}
 	
 	protected String getInstanceLabel(NodeDefinition nodeDefn) {

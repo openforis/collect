@@ -93,8 +93,9 @@ package org.openforis.collect.presenter
 				var entities:IList = getEntities();
 				var maxCount:int = view.parentEntity.getMaxCount(view.entityDefinition);
 				view.addButton.visible = view.addButton.includeInLayout = 
-					Application.activeRecordEditable && ! view.entityDefinition.enumerable && (
-						CollectionUtil.isEmpty(entities) || entities.length < maxCount);
+					Application.activeRecordEditable 
+					&& !(view.entityDefinition.enumerable && view.entityDefinition.enumerate) 
+					&& (CollectionUtil.isEmpty(entities) || entities.length < maxCount);
 			}
 		}
 		

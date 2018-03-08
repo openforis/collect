@@ -126,7 +126,7 @@ public class EntityProxy extends NodeProxy {
 	@ExternalizedProperty
 	public boolean isEnumerated() {
 		EntityDefinition definition = entity.getDefinition();
-		return definition.isEnumerable();
+		return definition.isEnumerable() && definition.isEnumerate();
 	}
 	
 	private List<NodeDefinition> getChildDefinitions() {
