@@ -139,7 +139,7 @@ export default class User extends Serializable {
     }
 
     get canAccessSaiku() {
-        return this.canAccessDataCleansing()
+        return this.canAccessDataCleansing
     }
 
     get canAccessDataCleansing() {
