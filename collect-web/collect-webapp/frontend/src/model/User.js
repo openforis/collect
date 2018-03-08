@@ -139,7 +139,7 @@ export default class User extends Serializable {
     }
 
     get canAccessSaiku() {
-        return this.role === 'ANALYSIS'
+        return this.canAccessDataCleansing()
     }
 
     get canAccessDataCleansing() {
