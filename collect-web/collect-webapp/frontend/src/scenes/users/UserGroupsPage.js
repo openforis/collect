@@ -1,13 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap';
+import { withRouter } from 'react-router'
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table'
+import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap'
 
-import AbstractItemsListPage from 'components/AbstractItemsListPage';
-import { fetchUserGroups } from 'actions';
-import RouterUtils from 'utils/RouterUtils';
+import AbstractItemsListPage from 'components/AbstractItemsListPage'
+import * as UserGroupActions from 'actions/usergroups'
+import Dialogs from 'components/Dialogs'
+import { fetchUserGroups } from 'actions'
+import L from 'utils/Labels'
+import RouterUtils from 'utils/RouterUtils'
 
 class UserGroupsPage extends AbstractItemsListPage {
 
@@ -33,7 +36,7 @@ class UserGroupsPage extends AbstractItemsListPage {
 	}
 
 	handleNewButtonClick() {
-		this.navigateToItemEditView('new');
+		this.navigateToItemEditView('new')
 	}
 
 	handleEditButtonClick() {
@@ -42,6 +45,17 @@ class UserGroupsPage extends AbstractItemsListPage {
 
 	navigateToItemEditView(itemId) {
 		RouterUtils.navigateToUserGroupEditPage(this.props.history, itemId)
+	}
+
+	handleDeleteButtonClick() {
+		const ids = this.state.selectedItemIds
+        const confirmMessageKey = ids.length === 1 ? 'userGroup.delete.confirmDeleteSingleMessage': 
+            'userGroup.delete.confirmDeleteMultipleMessage'
+		const confirmMessage = L.l(confirmMessageKey, [ids.length])
+		Dialogs.confirm(L.l('userGroup.delete.confirmTitle'), confirmMessage, () => {
+			const loggedUser = this.props.loggedUser
+			this.props.dispatch(UserGroupActions.deleteUserGroups(loggedUser.id, ids))
+		}, null, {confirmButtonLabel: L.l('global.delete')})
 	}
 
   	render() {
@@ -79,25 +93,26 @@ class UserGroupsPage extends AbstractItemsListPage {
 					</Col>
 				</Row>
 			</Container>
-	  );
+	  )
   }
 }
 
 
 const mapStateToProps = state => {
-  const {
-    isFetching: isFetchingUserGroups,
-    lastUpdated: lastUpdatedUserGroups,
-    items: userGroups
-  } = state.userGroups || {
-    isFetchingUserGroups: true,
-    userGroups: []
+	const {
+		isFetching: isFetchingUserGroups,
+		lastUpdated: lastUpdatedUserGroups,
+		items: userGroups
+	} = state.userGroups || {
+		isFetchingUserGroups: true,
+		userGroups: []
 	}
 	return {
-    isFetchingUserGroups,
-    lastUpdatedUserGroups,
+		loggedUser: state.session ? state.session.loggedUser : null,
+		isFetchingUserGroups,
+		lastUpdatedUserGroups,
 		userGroups
 	}
 }
 
-export default connect(mapStateToProps)(withRouter(UserGroupsPage));
+export default connect(mapStateToProps)(withRouter(UserGroupsPage))

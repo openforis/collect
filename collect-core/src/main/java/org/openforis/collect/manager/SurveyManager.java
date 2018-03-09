@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -393,13 +394,14 @@ public class SurveyManager {
 	
 	public List<SurveySummary> getSurveySummaries(String lang, User availableToUser) {
 		Set<UserGroup> userGroups = getAvailableUserGroups(availableToUser);
-		return getSurveySummaries(lang, (Set<UserGroup>) userGroups);
+		List<Integer> userGroupIds = CollectionUtils.project(userGroups, "id");
+		return getSurveySummaries(lang, new HashSet<Integer>(userGroupIds));
 	}
 
-	public List<SurveySummary> getSurveySummaries(String lang, Set<UserGroup> userGroups) {
+	public List<SurveySummary> getSurveySummaries(String lang, Set<Integer> userGroupIds) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (CollectSurvey survey : getPublishedSurveyCache().surveys) {
-			if (userGroups == null || userGroups.contains(survey.getUserGroup())) {
+			if (userGroupIds == null || userGroupIds.contains(survey.getUserGroupId())) {
 				SurveySummary summary = SurveySummary.createFromSurvey(survey, lang);
 				if ( summary.isPublished() ) {
 					int publishedSurveyId = summary.isTemporary() ? summary.getPublishedId(): summary.getId();
@@ -618,12 +620,13 @@ public class SurveyManager {
 	
 	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, User availableToUser, List<SurveySummarySortField> sortFields) {
 		Set<UserGroup> userGroups = getAvailableUserGroups(availableToUser);
-		return loadCombinedSummaries(labelLang, includeDetails, userGroups, sortFields);
+		List<Integer> userGroupIds = CollectionUtils.project(userGroups, "id");
+		return loadCombinedSummaries(labelLang, includeDetails, new HashSet<Integer>(userGroupIds), sortFields);
 	}
 		
-	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, Set<UserGroup> groups, List<SurveySummarySortField> sortFields) {
-		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang, groups);
-		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails, groups);
+	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, Set<Integer> groupIds, List<SurveySummarySortField> sortFields) {
+		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang, groupIds);
+		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails, groupIds);
 		List<SurveySummary> result = new ArrayList<SurveySummary>();
 		Map<String, SurveySummary> summariesByUri = new HashMap<String, SurveySummary>();
 		for (SurveySummary tempSummary : temporarySurveySummaries) {
@@ -708,13 +711,14 @@ public class SurveyManager {
 	}
 	
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, User availableToUser) {
-		Set<UserGroup> userGroups = getAvailableUserGroups(availableToUser);
-		return loadTemporarySummaries(labelLang, includeDetails, userGroups);
+		Set<UserGroup> groups = getAvailableUserGroups(availableToUser);
+		List<Integer> groupIds = CollectionUtils.project(groups, "id");
+		return loadTemporarySummaries(labelLang, includeDetails, new HashSet<Integer>(groupIds));
 	}
 	
-	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, Set<UserGroup> userGroups) {
+	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, Set<Integer> groupIds) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
-		List<SurveySummary> filteredSummaries = filterSummariesUserGroups(summaries, userGroups);
+		List<SurveySummary> filteredSummaries = filterSummariesUserGroups(summaries, groupIds);
 		fillSummariesReferencedItems(filteredSummaries);
 		if ( includeDetails ) {
 			for (SurveySummary summary : filteredSummaries) {
@@ -1156,12 +1160,11 @@ public class SurveyManager {
 		return status != null && status.isRunning();
 	}
 
-	private List<SurveySummary> filterSummariesUserGroups(List<SurveySummary> summaries, Set<UserGroup> groups) {
-		if (groups == null || groups.isEmpty()) {
+	private List<SurveySummary> filterSummariesUserGroups(List<SurveySummary> summaries, Set<Integer> groupIds) {
+		if (groupIds == null || groupIds.isEmpty()) {
 			return summaries;
 		}
 		List<SurveySummary> filteredSurveys = new ArrayList<SurveySummary>(summaries.size());
-		List<Integer> groupIds = CollectionUtils.project(groups, "id");
 		for (SurveySummary summary : summaries) {
 			if (groupIds.contains(summary.getUserGroupId())) {
 				filteredSurveys.add(summary);

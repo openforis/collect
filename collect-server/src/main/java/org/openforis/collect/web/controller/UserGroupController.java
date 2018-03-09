@@ -8,11 +8,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
@@ -27,6 +32,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,13 +46,17 @@ import org.springframework.web.context.WebApplicationContext;
 public class UserGroupController extends AbstractPersistedObjectEditFormController<UserGroup, UserGroupForm, UserGroupManager> {
 
 	@Autowired
-	private UserGroupValidator validator;
+	private UserGroupValidator userGroupValidator;
 	@Autowired
 	private SessionManager sessionManager;
-
+	@Autowired
+	private SurveyManager surveyManager;
+	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-		binder.setValidator(validator);
+		if (binder.getTarget() instanceof UserGroup) {
+			binder.setValidator(userGroupValidator);
+		}
 	}
 	@Override
 	protected UserGroup createItemInstance() {
@@ -82,6 +92,21 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 			@PathVariable String resourceType,
 			@PathVariable String resourceId) {
 		itemManager.disassociateResource(userGroupId, resourceType, resourceId);
+		return new Response();
+	}
+	
+	@Transactional
+	@RequestMapping(method=DELETE)
+	public @ResponseBody
+	Response delete(@Valid UserGroupsDeleteParameters parameters) {
+		List<SurveySummary> surveys = surveyManager.loadCombinedSummaries(Locale.getDefault().getLanguage(), false, 
+				new HashSet<Integer>(parameters.getUserGroupIds()), null);
+		if (! surveys.isEmpty()) {
+			throw new IllegalArgumentException("Cannot delete user group, there is one survey associated to the specified user groups: " + parameters.getUserGroupIds());
+		}
+		for (int id : parameters.getUserGroupIds()) {
+			itemManager.deleteById(id);
+		}
 		return new Response();
 	}
 	
@@ -276,4 +301,27 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		}
 		
 	}
+	
+	public static class UserGroupsDeleteParameters {
+		
+		private int loggedUserId;
+		private List<Integer> userGroupIds;
+
+		public int getLoggedUserId() {
+			return loggedUserId;
+		}
+
+		public void setLoggedUserId(int loggedUserId) {
+			this.loggedUserId = loggedUserId;
+		}
+
+		public List<Integer> getUserGroupIds() {
+			return userGroupIds;
+		}
+		
+		public void setUserGroupIds(List<Integer> userGroupIds) {
+			this.userGroupIds = userGroupIds;
+		}
+	}
+	
 }

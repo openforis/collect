@@ -128,9 +128,9 @@ public class UserGroupDao extends OfcUsergroupDao implements PersistedObjectDao<
 			.execute();
 	}
 	
-	public void deleteRelations(UserGroup group) {
+	public void deleteRelations(int groupId) {
 		dsl().deleteFrom(OFC_USER_USERGROUP)
-			.where(OFC_USER_USERGROUP.GROUP_ID.eq(group.getId()))
+			.where(OFC_USER_USERGROUP.GROUP_ID.eq(groupId))
 		.execute();
 	}
 	

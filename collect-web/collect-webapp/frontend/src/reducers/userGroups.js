@@ -2,8 +2,8 @@ import update from 'react-addons-update';
 import Arrays from 'utils/Arrays'
 
 import {
-  REQUEST_USER_GROUPS, RECEIVE_USER_GROUPS, RECEIVE_USER_GROUP, INVALIDATE_USER_GROUPS
-} from '../actions'
+  REQUEST_USER_GROUPS, RECEIVE_USER_GROUPS, RECEIVE_USER_GROUP, INVALIDATE_USER_GROUPS, USER_GROUPS_DELETED
+} from 'actions/usergroups'
 
 function userGroups(
   state = {
@@ -77,6 +77,15 @@ function userGroups(
         items: newUserGroups,
         lastUpdated: action.receivedAt
       })
+    case USER_GROUPS_DELETED: {
+      const deletedIds = action.itemIds
+      const deletedItems = deletedIds.map(id => state.items.find(item => item.id === id))
+      const newItems = Arrays.removeItems(state.items, deletedItems)
+      return Object.assign({}, state, {
+        items: newItems,
+        lastUpdated: action.receivedAt
+      })
+    }
     default:
       return state
   }

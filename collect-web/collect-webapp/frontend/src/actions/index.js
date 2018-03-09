@@ -9,11 +9,6 @@ export const REQUEST_FULL_PREFERRED_SURVEY = 'REQUEST_FULL_PREFERRED_SURVEY'
 export const RECEIVE_FULL_PREFERRED_SURVEY = 'RECEIVE_FULL_PREFERRED_SURVEY'
 export const INVALIDATE_PREFERRED_SURVEY = 'INVALIDATE_PREFERRED_SURVEY'
 
-export const REQUEST_USER_GROUPS = 'REQUEST_USER_GROUPS'
-export const RECEIVE_USER_GROUPS = 'RECEIVE_USER_GROUPS'
-export const RECEIVE_USER_GROUP = 'RECEIVE_USER_GROUP'
-export const INVALIDATE_USER_GROUPS = 'INVALIDATE_USER_GROUPS'
-
 export const RECORD_DELETED = 'RECORD_DELETED'
 export const RECORDS_DELETED = 'RECORDS_DELETED'
 
@@ -72,48 +67,6 @@ export function invalidatePreferredSurvey(preferredSurvey) {
 	return {
 		type: INVALIDATE_PREFERRED_SURVEY,
 		preferredSurvey
-	}
-}
-
-//USER GROUPS
-function requestUserGroups() {
-	return {
-		type: REQUEST_USER_GROUPS
-	}
-}
-
-function receiveUserGroups(json) {
-	return {
-	    type: RECEIVE_USER_GROUPS,
-	    userGroups: json.map(g => {
-			if (g.parentId != null) {
-				g.parent = json.find(g2 => g2.id === g.parentId);
-			}
-			return g;
-		}), //TODO map into UserGroup object
-	    receivedAt: Date.now()
-	}
-}
-
-export function receiveUserGroup(json) {
-	return {
-	    type: RECEIVE_USER_GROUP,
-	    userGroup: json,
-	    receivedAt: Date.now()
-	}
-}
-
-export function fetchUserGroups() {
-	return function (dispatch) {
-		dispatch(requestUserGroups())
-		ServiceFactory.userGroupService.fetchAllAvailableGroups().then(json => dispatch(receiveUserGroups(json)))
-	}
-}
-
-export function invalidateUserGroups(userGroups) {
-	return {
-		type: INVALIDATE_USER_GROUPS,
-		userGroups
 	}
 }
 

@@ -9,5 +9,12 @@ export default class UserGroupService extends AbstractService {
     save(userGroup) {
         return this.post('usergroup', userGroup);
     }
+
+    deleteUserGroups(loggedUserId, userGroupIds) {
+        return this.delete('usergroup', {
+            loggedUserId: loggedUserId,
+            userGroupIds: userGroupIds
+        })
+    }
 }
 

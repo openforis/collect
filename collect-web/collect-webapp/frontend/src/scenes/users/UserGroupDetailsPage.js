@@ -6,7 +6,7 @@ import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
-import { receiveUserGroup } from 'actions/' 
+import * as UserGroupActions from 'actions/usergroups' 
 import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage'
 import UserGroupService from 'services/UserGroupService';
 import UserRoleDropdownEditor from './UserRoleDropdownEditor';
@@ -204,7 +204,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         if (res.statusOk) {
             const wasNewItem = this.state.newItem
             if (wasNewItem) {
-                this.props.dispatch(receiveUserGroup(res.form));
+                this.props.dispatch(UserGroupActions.receiveUserGroup(res.form));
                 const itemId = res.form.id
                 RouterUtils.navigateToUserGroupEditPage(this.props.history, itemId)
             }
@@ -328,7 +328,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         <Col sm={10}>
                             <Input type="select" name="parentId" id="parentGroupSelect"
                                 state={this.getFieldState('parentId')}
-                                value={this.state.parentId}
+                                value={this.state.parentId ? this.state.parentId : ''}
                                 onChange={(event) => this.setState({...this.state, parentId: event.target.value})}
                                 >{parentGroupOptions}</Input>
                             {this.state.errorFeedback['parentId'] &&
@@ -353,11 +353,11 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         </Col>
                     </FormGroup>
                     <fieldset className="secondary">
-                        <legend>{L.l('usergroup.qualifiers.heading')} <i id="qualifiersHeading" class="info fa fa-info-circle" aria-hidden="true"></i></legend>
-                        <UncontrolledTooltip placement="right" className="info" autohide={false} target="qualifiersHeading">{L.l('usergroup.qualifiers.info')}</UncontrolledTooltip>
+                        <legend>{L.l('userGroup.qualifiers.heading')} <i id="qualifiersHeading" className="info fa fa-info-circle" aria-hidden="true"></i></legend>
+                        <UncontrolledTooltip placement="right" className="info" autohide={false} target="qualifiersHeading">{L.l('userGroup.qualifiers.info')}</UncontrolledTooltip>
                         <Container fluid>
                             <FormGroup md={6} row color={this.getFieldState('qualifierName')}>
-                                <Label for="qualifierName" sm={2}>{L.l('usergroup.qualifier.name')}</Label>
+                                <Label for="qualifierName" sm={2}>{L.l('userGroup.qualifier.name')}</Label>
                                 <Col sm={10}>
                                     <Input type="text" name="qualifierName" id="qualifierName" 
                                         value={this.state.qualifierName}
@@ -369,7 +369,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                 </Col>
                             </FormGroup>
                             <FormGroup md={6} row color={this.getFieldState('qualifierValue')}>
-                                <Label for="qualifierValue" sm={2}>{L.l('usergroup.qualifier.value')}</Label>
+                                <Label for="qualifierValue" sm={2}>{L.l('userGroup.qualifier.value')}</Label>
                                 <Col sm={10}>
                                     <Input type="text" name="qualifierValue" id="qualifierValue" 
                                         value={this.state.qualifierValue}
@@ -459,8 +459,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
 		            </Row>    
                     <FormGroup check row>
                         <Col sm={{ size: 2, offset: 5 }}>
-                            <Button color="primary" onClick={this.handleSaveBtnClick}>Save</Button>
-                            <Button color="danger" onClick={this.handleDeleteBtnClick}><i className="fa fa-trash" /></Button>
+                            <Button color="primary" onClick={this.handleSaveBtnClick}>{L.l('global.save')}</Button>
                         </Col>
                     </FormGroup>
                 </Form>

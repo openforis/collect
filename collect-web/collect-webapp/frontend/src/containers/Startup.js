@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import * as Actions from 'actions';
-import * as UserActions from 'actions/users';
-import * as SurveysActions from 'actions/surveys';
-import * as SessionActions from 'actions/session';
-import Preloader from 'components/Preloader';
-import Labels from 'utils/Labels';
+import * as Actions from 'actions'
+import * as SurveysActions from 'actions/surveys'
+import * as SessionActions from 'actions/session'
+import * as UserActions from 'actions/users'
+import * as UserGroupActions from 'actions/usergroups'
+import Preloader from 'components/Preloader'
+import Labels from 'utils/Labels'
 
 class Startup extends Component {
     
@@ -24,8 +25,8 @@ class Startup extends Component {
         this.props.dispatch(Actions.fetchApplicationInfo())
         this.props.dispatch(SessionActions.fetchCurrentUser())
         this.props.dispatch(UserActions.fetchUsers())
-        this.props.dispatch(Actions.fetchUserGroups())
-        this.props.dispatch(SurveysActions.fetchSurveySummaries());
+        this.props.dispatch(UserGroupActions.fetchUserGroups())
+        this.props.dispatch(SurveysActions.fetchSurveySummaries())
         
         this.startReloadinInfoTimer()
     }
@@ -48,7 +49,7 @@ class Startup extends Component {
     }
 
     handleSurveysReloadTimeout() {
-        this.props.dispatch(SurveysActions.fetchSurveySummaries());
+        this.props.dispatch(SurveysActions.fetchSurveySummaries())
         this.startReloadinInfoTimer()
     }
 
@@ -113,9 +114,9 @@ function mapStateToProps(state) {
         isUserGroupsReady,
         isFetchingUserGroups,
         userGroups
-    };
+    }
 }
 
 export default connect(
     mapStateToProps
-)(Startup);
+)(Startup)

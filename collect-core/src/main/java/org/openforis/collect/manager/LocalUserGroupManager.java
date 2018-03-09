@@ -297,9 +297,11 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 		dao.insertRelation(userInGroup);
 	}
 
+	@Override
 	@Transactional(readOnly=false, propagation=REQUIRED)
-	public void delete(int id) {
-		dao.deleteById(id);
+	public void deleteById(Integer id) {
+		dao.deleteRelations(id);
+		super.deleteById(id);
 	}
 	
 	@Override

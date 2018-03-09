@@ -2,7 +2,7 @@ import update from 'react-addons-update';
 import Arrays from 'utils/Arrays'
 
 import {
-  REQUEST_USERS, RECEIVE_USERS, RECEIVE_USER, USER_DELETED, USERS_DELETED, INVALIDATE_USERS
+  REQUEST_USERS, RECEIVE_USERS, RECEIVE_USER, USERS_DELETED, INVALIDATE_USERS, USER_GROUPS_DELETED
 } from '../actions/users'
 
 function users(
@@ -32,17 +32,6 @@ function users(
 		    users: action.users,
 		    lastUpdated: action.receivedAt
       })
-    case USER_DELETED:
-      const oldUser = state.users.find(u => u.id === action.userId)
-      if (oldUser) {
-        let newUsers = Arrays.removeItem(state.users, oldUser)
-        return Object.assign({}, state, {
-          users: newUsers,
-          lastUpdated: action.receivedAt
-        })
-      } else {
-        return state
-      }
     case USERS_DELETED: {
       const deletedUserIds = action.userIds
       const deletedUsers = deletedUserIds.map(id => state.users.find(u => u.id === id))

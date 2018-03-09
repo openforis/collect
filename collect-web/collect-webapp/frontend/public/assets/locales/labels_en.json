@@ -41,6 +41,7 @@
         "parameters": "Parameters",
         "refresh": "Refresh",
         "save": {
+            "label": "Save",
             "success": "Saved successfully"
         },
         "selectOne": "--- Select one ---"
@@ -316,7 +317,12 @@
             "confirmDeleteMultipleUsersMessage": "Do you want to delete the selected {0} users?"
         }
     },
-    "usergroup": {
+    "userGroup": {
+        "delete": {
+            "confirmTitle": "Delete user group",
+            "confirmDeleteSingleMessage": "Do you want to delete the selected user group?",
+            "confirmDeleteMultipleMessage": "Do you want to delete the selected {0} user groups?"
+        },
         "qualifiers": {
             "heading": "Record attribute / Code list filter",
             "info": "If specified, users with Data Entry role in the group will be able to insert and see only records having the specified attribute equal to the specified value."

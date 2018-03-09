@@ -1,4 +1,4 @@
-import User from 'model/User';
+import User from 'model/User'
 import ServiceFactory from 'services/ServiceFactory'
 
 export const REQUEST_USERS = 'REQUEST_USERS'
@@ -6,7 +6,6 @@ export const RECEIVE_USERS = 'RECEIVE_USERS'
 export const INVALIDATE_USERS = 'INVALIDATE_USERS'
 export const DELETE_USER = 'DELETE_USER'
 export const DELETE_USERS = 'DELETE_USERS'
-export const USER_DELETED = 'USER_DELETED'
 export const USERS_DELETED = 'USERS_DELETED'
 export const UDPATE_USER = 'UDPATE_USER'
 export const RECEIVE_USER = 'RECEIVE_USER'

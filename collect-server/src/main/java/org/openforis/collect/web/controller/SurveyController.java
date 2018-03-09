@@ -61,6 +61,7 @@ import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidat
 import org.openforis.collect.web.validator.SurveyCloneParametersValidator;
 import org.openforis.collect.web.validator.SurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyImportParametersValidator;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
@@ -155,11 +156,10 @@ public class SurveyController extends BasicController {
 		if (userId == null) {
 			userId = sessionManager.getLoggedUser().getId();
 		}
-		Set<UserGroup> groups = getAvailableUserGrups(userId, groupId);
-		
-		List<SurveySummary> summaries = new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, groups));
+		Set<Integer> groupIds = getAvailableUserGroupIds(userId, groupId);
+		List<SurveySummary> summaries = new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, groupIds));
 		if (includeTemporary) {
-			summaries.addAll(surveyManager.loadTemporarySummaries(languageCode, true, groups));
+			summaries.addAll(surveyManager.loadTemporarySummaries(languageCode, true, groupIds));
 		}
 		
 		List<Object> views = new ArrayList<Object>();
@@ -536,15 +536,14 @@ public class SurveyController extends BasicController {
 		return view;
 	}
 	
-	private Set<UserGroup> getAvailableUserGrups(Integer userId, Integer groupId) {
+	private Set<Integer> getAvailableUserGroupIds(Integer userId, Integer groupId) {
 		if (groupId != null) {
-			UserGroup group = userGroupManager.loadById(groupId);
-			Set<UserGroup> groups = Collections.singleton(group);
-			return groups;
+			return Collections.singleton(groupId);
 		} else if (userId != null) {
 			User availableToUser = userId == null ? null : userManager.loadById(userId);
 			List<UserGroup> groups = userGroupManager.findAllRelatedUserGroups(availableToUser);
-			return new HashSet<UserGroup>(groups);
+			List<Integer> groupIds = CollectionUtils.project(groups, "id");
+			return new HashSet<Integer>(groupIds);
 		} else {
 			return null;
 		}
