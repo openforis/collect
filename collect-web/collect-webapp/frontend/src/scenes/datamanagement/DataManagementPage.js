@@ -256,10 +256,10 @@ class DataManagementPage extends Component {
 					<Col sm={{size: 2}}>
 						<ButtonDropdown isOpen={this.state.exportDropdownOpen} 
 								toggle={() => this.setState({exportDropdownOpen: !this.state.exportDropdownOpen})}>
-							<DropdownToggle color="primary" caret><span className="fa fa-download"/>Export</DropdownToggle>
+							<DropdownToggle color="primary" caret><span className="fa fa-download"/>{L.l('dataManagement.export')}</DropdownToggle>
 							<DropdownMenu>
-								<DropdownItem onClick={this.handleExportToCsvButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> to CSV</DropdownItem>
-								<DropdownItem onClick={this.handleBackupButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> to Collect format</DropdownItem>
+								<DropdownItem onClick={this.handleExportToCsvButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> {L.l('dataManagement.export.toCsv')}</DropdownItem>
+								<DropdownItem onClick={this.handleBackupButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> {L.l('dataManagement.export.toCollectFormat')}</DropdownItem>
 							</DropdownMenu>
 						</ButtonDropdown>
 					</Col>
@@ -267,10 +267,10 @@ class DataManagementPage extends Component {
 						{loggedUser.canImportRecords(surveyUserGroup) &&
 							<ButtonDropdown isOpen={this.state.importDropdownOpen} 
 									toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
-								<DropdownToggle color="warning" caret><span className="fa fa-upload"/>Import</DropdownToggle>
+								<DropdownToggle color="warning" caret><span className="fa fa-upload"/>{L.l('dataManagement.import')}</DropdownToggle>
 								<DropdownMenu>
-									<DropdownItem onClick={this.handleCsvImportButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> from CSV</DropdownItem>
-									<DropdownItem onClick={this.handleBackupImportButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> from Collect format</DropdownItem>
+									<DropdownItem onClick={this.handleCsvImportButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> {L.l('dataManagement.import.fromCsv')}</DropdownItem>
+									<DropdownItem onClick={this.handleBackupImportButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> {L.l('dataManagement.import.fromCollectFormat')}</DropdownItem>
 								</DropdownMenu>
 							</ButtonDropdown>
 						}
