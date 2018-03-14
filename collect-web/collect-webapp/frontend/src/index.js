@@ -22,7 +22,9 @@ import Startup from 'containers/Startup'
 import SessionTimeoutVerifier from 'containers/SessionTimeoutVerifier'
 import Labels from 'utils/Labels'
 
-const loggerMiddleware = createLogger()
+const loggerMiddleware = createLogger({
+  predicate: () => process.env.NODE_ENV === 'development'
+})
 
 const store = createStore(
   rootReducer,
