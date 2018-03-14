@@ -434,11 +434,18 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="changeusergroup/{id}", method=POST)
-	public @ResponseBody SurveyView changeSurveyUserGroup(@PathVariable int id, @RequestParam int userGroupId) throws SurveyStoreException {
+	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable int id, @RequestParam int userGroupId) throws SurveyStoreException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		survey.setUserGroupId(userGroupId);
-		surveyManager.save(survey);
-		return generateView(survey, false);
+		SurveySummary surveySummary = surveyManager.loadSummaryByUri(survey.getUri());
+		Set<Integer> surveyIdsToUpdate = new HashSet<Integer>();
+		surveyIdsToUpdate.add(surveySummary.getId());
+		org.apache.commons.collections.CollectionUtils.addIgnoreNull(surveyIdsToUpdate, surveySummary.getPublishedId());
+		for (Integer surveyId : surveyIdsToUpdate) {
+			CollectSurvey s = surveyManager.getOrLoadSurveyById(surveyId);
+			s.setUserGroupId(userGroupId);
+			surveyManager.save(s);
+		}
+		return surveySummary;
 	}
 	
 	@RequestMapping(value = "export/{id}", method=POST)

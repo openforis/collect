@@ -42,6 +42,8 @@ class SurveysListPage extends Component {
         this.resetSelection = this.resetSelection.bind(this)
         this.handleWindowResize = this.handleWindowResize.bind(this)
         this.updateTableHeight = this.updateTableHeight.bind(this)
+        this.handleRowClick = this.handleRowClick.bind(this)
+        this.handleFilterChange = this.handleFilterChange.bind(this)
     }
 
     componentDidMount() {
@@ -152,6 +154,10 @@ class SurveysListPage extends Component {
         RouterUtils.navigateToSurveyClonePage(this.props.history, this.state.selectedSurvey.name)
     }
 
+    handleRowClick(row) {
+        this.handleRowSelect(row, true)
+    }
+    
     handleRowSelect(row, isSelected, e) {
         const newSelectedSurveys = isSelected ? [row] : []
 		this.handleSurveysSelection(newSelectedSurveys)
@@ -164,7 +170,11 @@ class SurveysListPage extends Component {
 			selectedSurveyIds: newSelectedSurveys.map(item => item.id),
 			selectedSurveys: newSelectedSurveys
 		})
-	}
+    }
+
+    handleFilterChange(filterObj) {
+        this.resetSelection()
+    }
     
     render() {
         const { surveySummaries, userGroups } = this.props
@@ -195,7 +205,11 @@ class SurveysListPage extends Component {
         
         function userGroupFormatter(cell, row) {
             if (cell) {
-                return userGroups.find(u => u.id === cell).label
+                return <span>
+                        <i className="fa fa-edit" aria-hidden="true" ></i>
+                        &nbsp;
+                        {userGroups.find(u => u.id === cell).label}
+                    </span>
             } else {
                 return ''
             }
@@ -264,32 +278,33 @@ class SurveysListPage extends Component {
                     striped hover condensed
                     selectRow={{
                         mode: 'radio',  // single select
-                        clickToSelect: true, 
-                        hideSelectColumn: true, 
                         bgColor: 'lightBlue',
+                        hideSelectColumn: true,
                         onSelect: this.handleRowSelect,
                         selected: this.state.selectedSurveyIds
                     }}
-                    //cellEdit={{ mode: 'click', blurToSave: true }}
+                    cellEdit={{ mode: 'click', blurToSave: true }}
                     options={{
+                        onRowClick: this.handleRowClick,
                         onRowDoubleClick: this.handleRowDoubleClick,
-                        onCellEdit: this.handleCellEdit
+                        onCellEdit: this.handleCellEdit,
+                        onFilterChange: this.handleFilterChange
                     }}
                 >
                     <TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>
-                    <TableHeaderColumn key="name" dataField="name" editable={false} filter={{type: 'TextFilter'}} dataSort>{L.l('survey.name')}</TableHeaderColumn>
-                    <TableHeaderColumn key="projectName" dataField="projectName" editable={false} filter={{type: 'TextFilter'}} dataSort>{L.l('survey.projectName')}</TableHeaderColumn>
+                    <TableHeaderColumn key="name" dataField="name" editable={false} filter={{type: 'TextFilter'}} dataSort width="200">{L.l('survey.name')}</TableHeaderColumn>
+                    <TableHeaderColumn key="projectName" dataField="projectName" editable={false} filter={{type: 'TextFilter'}} dataSort width="250">{L.l('survey.projectName')}</TableHeaderColumn>
                     <TableHeaderColumn key="modifiedDate" dataField="modifiedDate" editable={false} dataFormat={Formatters.dateTimeFormatter}
-				        dataAlign="center" width="150" editable={false} dataSort>{L.l('survey.lastModified')}</TableHeaderColumn>
+				        dataAlign="center" width="90" editable={false} dataSort>{L.l('survey.lastModified')}</TableHeaderColumn>
                     <TableHeaderColumn key="target" dataField="target" dataFormat={targetFormatter}
-				        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.target')}</TableHeaderColumn>
+				        dataAlign="center" width="60" editable={false} dataSort>{L.l('survey.target')}</TableHeaderColumn>
                     <TableHeaderColumn key="temporary" dataField="temporary" dataFormat={Formatters.checkedIconFormatter}
 				        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.unpublishedChanges')}</TableHeaderColumn>
                     <TableHeaderColumn key="published" dataField="published" dataFormat={publishedIconFormatter}
 				        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.published')}</TableHeaderColumn>
                     <TableHeaderColumn key="userGroupId" dataField="userGroupId" dataFormat={userGroupFormatter}
                         customEditor={{ getElement: createUserGroupEditor, customEditorParameters: { userGroups: userGroups } }}
-                        dataAlign="center" width="150" dataSort>{L.l('survey.userGroup')}</TableHeaderColumn>
+                        dataAlign="left" width="150" dataSort>{L.l('survey.userGroup')}</TableHeaderColumn>
                 </BootstrapTable>
             </MaxAvailableSpaceContainer>
         )
