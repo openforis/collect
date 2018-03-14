@@ -838,6 +838,7 @@ public class RecordDao extends JooqDaoSupport {
 		
 		Step step = Step.valueOf(r.getValue(OFC_RECORD.STEP));
 		s.setStep(step);
+		s.setWorkflowSequenceNumber(r.getValue(OFC_RECORD.DATA_SEQ_NUM));
 		s.setCreationDate(r.getValue(OFC_RECORD.DATE_CREATED));
 		s.setModifiedDate(r.getValue(OFC_RECORD.DATE_MODIFIED));
 		s.setCreatedBy(createDetachedUser(r.getValue(OFC_RECORD.CREATED_BY_ID)));

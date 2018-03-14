@@ -419,16 +419,13 @@ public class XMLDataImportProcess implements Callable<Void> {
 							if ( includesRecordFiles ) {
 								recordFileManager.deleteAllFiles(parsedRecord);
 							}
+							int newWorkflowSequenceNumber = oldRecordSummary.getWorkflowSequenceNumber() + (step.getStepNumber() - originalRecordStep.getStepNumber());
+							parsedRecord.setDataWorkflowSequenceNumber(newWorkflowSequenceNumber);
+							parsedRecord.setWorkflowSequenceNumber(newWorkflowSequenceNumber);
 							if (step.after(originalRecordStep)) {
-								int sequenceNumber = oldRecordSummary.getWorkflowSequenceNumber() + (step.getStepNumber() - originalRecordStep.getStepNumber());
-								parsedRecord.setDataWorkflowSequenceNumber(sequenceNumber);
-								parsedRecord.setWorkflowSequenceNumber(sequenceNumber);
-								queries = Arrays.asList(recordManager.createDataInsertQuery(parsedRecord, oldRecordSummary.getId(), step, sequenceNumber));
+								queries = Arrays.asList(recordManager.createDataInsertQuery(parsedRecord, oldRecordSummary.getId(), step, newWorkflowSequenceNumber));
 							} else {
-								int sequenceNumber = oldRecordSummary.getWorkflowSequenceNumber() - (originalRecordStep.getStepNumber() - step.getStepNumber());
-								parsedRecord.setDataWorkflowSequenceNumber(sequenceNumber);
-								parsedRecord.setWorkflowSequenceNumber(sequenceNumber);
-								queries = Arrays.asList(recordManager.createDataUpdateQuery(parsedRecord, oldRecordSummary.getId(), step, sequenceNumber));
+								queries = Arrays.asList(recordManager.createDataUpdateQuery(parsedRecord, oldRecordSummary.getId(), step, newWorkflowSequenceNumber));
 							}
 						} else {
 							parsedRecord.setId(nextRecordId ++);
