@@ -9,6 +9,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.NodeDefinitionSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.model.User;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -31,7 +32,8 @@ public class ModelService {
 
 	public List<SurveySummary> getSurveySummaries() {
 		String lang = getActiveLanguageCode();
-		List<SurveySummary> summaries = surveyManager.getSurveySummaries(lang);
+		User loggedUser = sessionManager.getLoggedUser();
+		List<SurveySummary> summaries = surveyManager.getSurveySummaries(lang, loggedUser);
 		return summaries;
 	}
 	
