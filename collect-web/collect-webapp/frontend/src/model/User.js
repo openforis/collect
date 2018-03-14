@@ -134,6 +134,27 @@ export default class User extends Serializable {
         }
     }
 
+    canChangeSurveyUserGroup(survey) {
+        switch(this.role) {
+            case 'ADMIN':
+                return true
+            case 'DESIGN':
+                const role = this.determineRoleInGroup(survey.userGroup)
+                if (role === null) {
+                    return false
+                }
+                switch(role) {
+                    case 'OWNER':
+                    case 'ADMINISTRATOR':
+                        return true
+                    default:
+                        return false
+                }
+            default:
+                return false
+        }
+    }
+
     get canAccessUsersManagement() {
         return this.role === 'ADMIN'
     }

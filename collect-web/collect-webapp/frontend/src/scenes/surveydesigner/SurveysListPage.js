@@ -177,11 +177,16 @@ class SurveysListPage extends Component {
     }
     
     render() {
-        const { surveySummaries, userGroups } = this.props
+        const { surveySummaries, userGroups, loggedUser } = this.props
         if (surveySummaries === null || userGroups === null) {
             return <div>Loading...</div>
         }
-
+        //update user group with cached one
+        surveySummaries.forEach(s => {
+            const userGroup = userGroups.find(u => u.id === s.userGroupId)
+            s.userGroup = userGroup //update userGroup with cached one in UI
+        })
+        
         const groupedByUriSummaries = Arrays.groupBy(surveySummaries, 'uri')
         const surveyUris = Object.keys(groupedByUriSummaries)
         const combinedSummaries = surveyUris.map(uri => {
@@ -198,18 +203,27 @@ class SurveysListPage extends Component {
                 return merged
             }
         })
-        
+
         const selectedSurvey = this.state.selectedSurvey
         
         const createUserGroupEditor = (onUpdate, props) => (<UserGroupColumnEditor onUpdate={onUpdate} {...props} />);
         
         function userGroupFormatter(cell, row) {
-            if (cell) {
-                return <span>
-                        <i className="fa fa-edit" aria-hidden="true" ></i>
-                        &nbsp;
-                        {userGroups.find(u => u.id === cell).label}
-                    </span>
+            const userGroupId = cell
+            const survey = row
+
+            if (userGroupId) {
+                const userGroupLabel = survey.userGroup.label
+
+                if (loggedUser.canChangeSurveyUserGroup(survey)) {
+                    return <span>
+                            <i className="fa fa-edit" aria-hidden="true" ></i>
+                            &nbsp;
+                            {userGroupLabel}
+                        </span>
+                } else {
+                    return userGroupLabel
+                }
             } else {
                 return ''
             }
@@ -228,6 +242,8 @@ class SurveysListPage extends Component {
         function publishedIconFormatter(cell, row) {
             return <CheckedIconFormatter checked={row.published && (!row.temporary || row.publishedId)} />
         }
+
+        const nonEditableRows = combinedSummaries.filter(s => loggedUser.canChangeSurveyUserGroup(s))
 
         return (
             <MaxAvailableSpaceContainer ref="survey-list-container">
@@ -283,7 +299,11 @@ class SurveysListPage extends Component {
                         onSelect: this.handleRowSelect,
                         selected: this.state.selectedSurveyIds
                     }}
-                    cellEdit={{ mode: 'click', blurToSave: true }}
+                    cellEdit={{ 
+                        mode: 'click', 
+                        blurToSave: true, 
+                        nonEditableRows: () => nonEditableRows
+                    }}
                     options={{
                         onRowClick: this.handleRowClick,
                         onRowDoubleClick: this.handleRowDoubleClick,
