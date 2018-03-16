@@ -20,6 +20,7 @@ import java.util.Set;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -866,7 +867,7 @@ public class RecordUpdater {
 		CollectSurvey survey = (CollectSurvey) entity.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
 		int count = 0;
-		if (! childDefn.isMultiple() || annotations.isAutoGenerateMinItems(childDefn)) {
+		if (! childDefn.isMultiple() || annotations.isAutoGenerateMinItems(childDefn) || survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
 			while(count < toBeInserted) {
 				if(childDefn instanceof AttributeDefinition) {
 					Node<?> createdNode = childDefn.createNode();
