@@ -152,6 +152,7 @@ public class XMLParsingRecordProvider implements RecordProvider {
 			CollectRecord record = result.getRecord();
 			record.setStep(step);
 			record.setDataStep(step);
+			record.setState(null); //ignore rejected information
 		}
 		return result;
 	}
