@@ -666,6 +666,11 @@ public class SurveyManager {
 		return result;
 	}
 	
+	public SurveySummary loadSummaryById(int id) {
+		SurveySummary summary = surveyDao.loadSurveySummary(id);
+		return loadSummaryByName(summary.getName());
+	}
+	
 	private SurveySummary combineSummaries(SurveySummary temporarySummary,
 			SurveySummary publishedSummary) {
 		SurveySummary result; 
@@ -869,6 +874,21 @@ public class SurveyManager {
 			//it should never enter here, we are duplicating an already existing survey
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public SurveySummary updateUserGroup(int id, int userGroupId) throws SurveyStoreException {
+		UserGroup userGroup = userGroupManager.loadById(userGroupId);
+		SurveySummary surveySummary = loadSummaryById(id);
+		Set<Integer> surveyIdsToUpdate = new HashSet<Integer>();
+		surveyIdsToUpdate.add(surveySummary.getId());
+		//consider even updating associated published survey, if any
+		org.apache.commons.collections.CollectionUtils.addIgnoreNull(surveyIdsToUpdate, surveySummary.getPublishedId());
+		for (Integer surveyId : surveyIdsToUpdate) {
+			CollectSurvey s = getOrLoadSurveyById(surveyId);
+			s.setUserGroup(userGroup);
+			save(s);
+		}
+		return surveySummary;
 	}
 
 	private void copyReferencedMetadata(CollectSurvey fromSurvey,

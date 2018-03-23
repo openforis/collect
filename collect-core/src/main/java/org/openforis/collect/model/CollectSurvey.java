@@ -215,6 +215,7 @@ public class CollectSurvey extends Survey {
 	
 	public void setUserGroupId(Integer userGroupId) {
 		this.userGroupId = userGroupId;
+		this.userGroup = null;
 	}
 	
 	public UserGroup getUserGroup() {
