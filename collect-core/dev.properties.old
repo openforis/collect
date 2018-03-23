@@ -1,4 +1,0 @@
-collect.devdb.driver=org.postgresql.Driver
-collect.devdb.url=jdbc:postgresql://localhost:5432/collect
-collect.devdb.username=collect
-collect.devdb.password=collect123
