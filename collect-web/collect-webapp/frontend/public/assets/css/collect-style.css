@@ -303,4 +303,6 @@ label.invalid {
     font-weight: bold;
 }
 
-
+.progress-bar-remaining-time {
+    text-align: right;
+}
