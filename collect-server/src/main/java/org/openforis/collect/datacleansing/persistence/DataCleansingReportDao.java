@@ -80,6 +80,14 @@ public class DataCleansingReportDao extends SurveyObjectMappingJooqDaoSupport<Da
 		return record == null ? null : dsl.fromRecord(record);
 	}
 	
+	public void deleteByCleansingChain(DataCleansingChain chain) {
+		CollectSurvey survey = (CollectSurvey) chain.getSurvey();
+		JooqDSLContext dsl = dsl(survey);
+		dsl.deleteFrom(OFC_DATA_CLEANSING_REPORT)
+			.where(OFC_DATA_CLEANSING_REPORT.CLEANSING_CHAIN_ID.eq(chain.getId()))
+			.execute();
+	}
+	
 	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataCleansingReport> {
 
 		private static final long serialVersionUID = 1L;

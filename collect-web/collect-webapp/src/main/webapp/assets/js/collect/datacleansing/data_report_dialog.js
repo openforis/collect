@@ -23,7 +23,7 @@ Collect.DataReportDialogController.prototype.generateClickHandler = function() {
 		var item = $this.extractFormObject();
 		collect.dataReportService.generateReport(item.queryGroupId, item.recordStep, function() {
 			new OF.UI.JobDialog();
-			new OF.JobMonitor("datacleansing/datareports/generate/job.json", function() {
+			new OF.JobMonitor("api/datacleansing/datareports/generate/job.json", function() {
 				EventBus.dispatch(Collect.DataCleansing.DATA_REPORT_CREATED, $this);
 			});
 			$this.close();

@@ -10,6 +10,7 @@ import java.util.Set;
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.persistence.DataCleansingChainDao;
+import org.openforis.collect.datacleansing.persistence.DataCleansingReportDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
@@ -26,6 +27,8 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 
 	@Autowired
 	private DataCleansingStepManager dataCleansingStepManager;
+	@Autowired
+	private DataCleansingReportDao dataCleansingReportDao;
 	
 	public Set<DataCleansingChain> loadByStep(DataCleansingStep step) {
 		Set<DataCleansingChain> chains = dao.loadChainsByStep(step);
@@ -54,6 +57,7 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 	
 	@Override
 	public void delete(DataCleansingChain chain) {
+		dataCleansingReportDao.deleteByCleansingChain(chain);
 		dao.deleteStepAssociations(chain);
 		super.delete(chain);
 	}

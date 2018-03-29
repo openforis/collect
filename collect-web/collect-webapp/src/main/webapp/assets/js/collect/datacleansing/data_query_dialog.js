@@ -75,7 +75,7 @@ Collect.DataQueryDialogController.prototype.initTestAndRunContainer = function()
 	          {field: "attributeValue", title: "Value", width: 400}
 	    ]);
 		testResultGridContainer.bootstrapTable({
-			url: this.itemEditService.contextPath + "test-result.json",
+			url: this.itemEditService.contextPath + "/test-result.json",
 			cache: false,
 			height: 200,
 			columns: columns
@@ -87,7 +87,7 @@ Collect.DataQueryDialogController.prototype.initTestAndRunContainer = function()
 			var query = $this.extractFormObject();
 			query.recordStep = $this.recordStepSelectPicker.val();
 			collect.dataQueryService.startTest(query, function() {
-				monitorJob($this.itemEditService.contextPath + "test-job.json", function() {
+				monitorJob($this.itemEditService.contextPath + "/test-job.json", function() {
 					$this.testResultDataGrid.refresh();
 					$this.testResultDataGrid.$container.show();
 				});
@@ -98,7 +98,7 @@ Collect.DataQueryDialogController.prototype.initTestAndRunContainer = function()
 			var query = $this.extractFormObject();
 			query.recordStep = $this.recordStepSelectPicker.val();
 			collect.dataQueryService.startExport(query, function() {
-				monitorJob($this.itemEditService.contextPath + "export-job.json", function() {
+				monitorJob($this.itemEditService.contextPath + "/export-job.json", function() {
 					collect.dataQueryService.downloadResult();
 				});
 			});

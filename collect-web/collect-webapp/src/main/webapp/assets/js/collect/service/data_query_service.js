@@ -18,5 +18,5 @@ Collect.DataQueryService.prototype.loadTestResult = function(query, onSuccess, o
 };
 
 Collect.DataQueryService.prototype.downloadResult = function() {
-	window.open(this.contextPath + "result.csv", "_blank");
+	window.open(this.contextPath + "/result.csv", "_blank");
 };

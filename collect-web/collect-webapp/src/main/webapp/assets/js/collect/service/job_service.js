@@ -1,6 +1,6 @@
 Collect.JobService = function() {
 	Collect.AbstractService.apply(this, arguments);
-	this.contextPath = "api/";
+	this.contextPath = "api/job/";
 };
 
 Collect.JobService.prototype = Object.create(Collect.AbstractService.prototype);
