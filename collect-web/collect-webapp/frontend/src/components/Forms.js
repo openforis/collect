@@ -89,7 +89,11 @@ export default class Forms {
     static renderFormItemInputField({ input, label, type, contentEditable, labelColSpan=2, fieldColSpan=10, meta: { asyncValidating, touched, error } }) {
         return <FormItem label={label} asyncValidating={asyncValidating} touched={touched} error={error} 
                     labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
-                <Input readOnly={contentEditable === false} valid={touched && error ? false : null} {...input} type={type} />
+                <Input readOnly={contentEditable === false} 
+                    valid={touched && error ? false : null}
+                    invalid={touched && error ? true: null} 
+                    type={type}
+                    {...input} />
             </FormItem>
     }
 
@@ -99,7 +103,10 @@ export default class Forms {
 
     static renderFormItemSelect({ input, label, type, options, contentEditable, meta: { asyncValidating, touched, error } }) {
         return <FormItem label={label} touched={touched} error={error}>
-                <Input readOnly={contentEditable === false} valid={touched && error ? false : null} type="select" {...input}>{options}</Input>
+                <Input readOnly={contentEditable === false} 
+                    valid={touched && error ? false : null}
+                    invalid={touched && error ? true: null} 
+                    type="select" {...input}>{options}</Input>
             </FormItem>
     }
 

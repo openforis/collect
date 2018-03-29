@@ -33,7 +33,7 @@ class NewSurveyParametersForm extends Component {
     }
     
     render() {
-        const { userGroups, error, handleSubmit, pristine, reset, submitting } = this.props
+        const { userGroups, error, handleSubmit, pristine, reset, submitting, submitFailed, submitSucceded } = this.props
 
         const templateTypeOptions = templateTypes.map(type => <option key={type} value={type}>{L.l('survey.templateType.' + type)}</option>)
         const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
@@ -68,7 +68,7 @@ class NewSurveyParametersForm extends Component {
                     label={L.l('survey.userGroup')}
                     options={userGroupOptions}
                 />
-                {error && <Alert color="danger">{error}</Alert>}
+                {error && (submitFailed || submitSucceded) && <Alert color="danger">{error}</Alert>}
                 <Row>
                     <Col sm={{ size: 1, offset: 5 }}>
                         <Button color="primary" type="submit" disabled={submitting}>{L.l('general.new')}</Button>

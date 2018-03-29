@@ -84,7 +84,6 @@ header .breadcrumb {
     width: 1580px;
     max-width: 100%; } }
 
-
 .centered {
     margin-left: auto !important;
     margin-right: auto !important;
@@ -305,4 +304,8 @@ label.invalid {
 
 .progress-bar-remaining-time {
     text-align: right;
+}
+
+.invalid-feedback {
+    display: block !important;
 }
