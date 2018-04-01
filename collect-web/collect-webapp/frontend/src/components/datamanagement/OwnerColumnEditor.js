@@ -15,7 +15,7 @@ export default class OwnerColumnEditor extends Component {
     }
 
     handleInputChange(event) {
-        const ownerId = event.target.value
+        const ownerId = parseInt(event.target.value, 10)
         const newOwner = ownerId > 0 ? this.props.users.find(u => u.id === ownerId) : null
         this.props.onUpdate({ owner: newOwner });
     }

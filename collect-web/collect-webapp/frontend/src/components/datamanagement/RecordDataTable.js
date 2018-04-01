@@ -244,9 +244,24 @@ class RecordDataTable extends Component {
 			return row.summaryValues[idx]
 		}
 
-		function usernameFormatter(cell, row) {
-			return cell ? cell.username : ''
-		}
+		function ownerFormatter(cell, row) {
+            const owner = cell
+            const recordSummary = row
+
+            if (owner) {
+                if (loggedUser.canChangeRecordOwner(mostSpecificGroup)) {
+                    return <span>
+                            <i className="fa fa-pencil" aria-hidden="true" ></i>
+                            &nbsp;
+                            {owner.username}
+                        </span>
+                } else {
+                    return owner.username
+                }
+            } else {
+                return ''
+            }
+        }
 
 		function createKeyAttributeFilter(attrDef) {
 			switch(attrDef.attributeType) {
@@ -315,11 +330,11 @@ class RecordDataTable extends Component {
 				dataAlign="center" width="110" editable={false} dataSort>{L.l('dataManagement.modified')}</TableHeaderColumn>,
 			<TableHeaderColumn key="step" dataField="step" 
 				dataAlign="center" width="80" editable={false} dataSort>{L.l('dataManagement.step')}</TableHeaderColumn>,
-			<TableHeaderColumn key="owner" dataField="owner" dataFormat={usernameFormatter}
+			<TableHeaderColumn key="owner" dataField="owner" dataFormat={ownerFormatter}
 				editable={loggedUser.canChangeRecordOwner(mostSpecificGroup)}
 				filter={ { type: 'CustomFilter', getElement: createOwnerFilter } }
 				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
-				dataAlign="center" width="150" dataSort>Owner</TableHeaderColumn>
+				dataAlign="left" width="150" dataSort>Owner</TableHeaderColumn>
 		);
 
 		return (

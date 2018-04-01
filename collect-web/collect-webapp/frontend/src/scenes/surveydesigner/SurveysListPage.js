@@ -217,7 +217,7 @@ class SurveysListPage extends Component {
 
                 if (loggedUser.canChangeSurveyUserGroup(survey)) {
                     return <span>
-                            <i className="fa fa-edit" aria-hidden="true" ></i>
+                            <i className="fa fa-pencil" aria-hidden="true" ></i>
                             &nbsp;
                             {userGroupLabel}
                         </span>
