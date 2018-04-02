@@ -55,23 +55,17 @@
     
     <hlayout spacing="30px" style="padding: 30px">
     	<hlayout>
-    		<label value="${labels.survey.versioning_manager}:" />
-            <button sclass="icon"
-              tooltiptext="${labels.survey.versioning_manager}"
+    		<button label="${labels.survey.versioning_manager}"
               onClick="@global-command('openVersioningManagerPopUp')"
               image="/assets/images/edit-small.png" />
          </hlayout>
     	<hlayout>
-			<label value="${labels.survey.srs.$}:" />
-			<button sclass="icon"
-              tooltiptext="${labels.survey.srs.$}"
+			<button label="${labels.survey.srs.$}"
               onClick="@global-command('openSRSManagerPopUp')"
               image="/assets/images/edit-small.png" />
          </hlayout>
     	<hlayout>
-    		<label value="${labels.survey.units}:" />
-            <button sclass="icon" 
-              tooltiptext="${labels.survey.unit.manager.title}"
+            <button label="${labels.survey.unit.manager.title}"
               onClick="@global-command('openUnitsManagerPopUp')"
               image="/assets/images/edit-small.png" />
          </hlayout>

@@ -46,6 +46,8 @@
     			<hlayout>
     				<textbox width="150px"
     					value="@bind(fx.parentCodeAttributeDefinitionPath)"
+    					onClick="@command('openParentAttributeSelector')"
+    					style="cursor: pointer;"
     					readonly="true" />
     				<button sclass="icon"
     					tooltiptext="${labels.survey.schema.attribute.code.select_parent}"
