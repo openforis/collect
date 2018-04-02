@@ -237,8 +237,7 @@ public class CollectRecord extends Record {
 	@Override
 	public void replaceRootEntity(Entity rootEntity) {
 		super.replaceRootEntity(rootEntity);
-		updateRootEntityKeyValues();
-		updateEntityCounts();
+		this.updateSummaryFields();
 	}
 	
 	@Override
