@@ -142,7 +142,8 @@ class SurveysListPage extends Component {
         const $this = this
         const confirmMessage = L.l('survey.unpublish.confirmMessage', survey.name)
         Dialogs.confirm(L.l('survey.unpublish.confirmTitle', survey.name), confirmMessage, function() {
-            ServiceFactory.surveyService.unpublish(survey.id).then(s => {
+            const surveyId = survey.temporary ? survey.publishedId : survey.id
+            ServiceFactory.surveyService.unpublish(surveyId).then(s => {
                 Dialogs.alert(L.l('survey.unpublish.successDialog.title'), 
                     L.l('survey.unpublish.successDialog.message', survey.name))
                 $this.resetSelection()
