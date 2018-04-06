@@ -91,9 +91,9 @@
       	sclass="collapsible"
       	mold="3d" width="100%">
       	<attribute name="onOpen"><![CDATA[
-      	    caption.setSclass("open-" + self.isOpen());
+      	    surveyFilesGroupboxCaption.setSclass("open-" + self.isOpen());
       	]]></attribute>
-      	<caption id="caption" sclass="open-${not empty vm.surveyFiles}">
+      	<caption id="surveyFilesGroupboxCaption" sclass="open-${not empty vm.surveyFiles}">
       		<div align="left">
       			<label value="${labels.survey.files}" />
       		</div>
