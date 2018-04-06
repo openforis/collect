@@ -8,15 +8,9 @@ import static org.openforis.idm.testfixture.SurveyBuilder.attributeDef;
 import static org.openforis.idm.testfixture.SurveyBuilder.entityDef;
 import static org.openforis.idm.testfixture.SurveyBuilder.survey;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.openforis.idm.AbstractTest;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema;
 import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 
@@ -25,14 +19,6 @@ import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionVali
  *
  */
 public class ExpressionValidatorTest {
-	
-//	private ExpressionValidator validator;
-	
-
-//	@Before
-//	public void init() {
-//		validator = new ExpressionValidator(survey.getContext().getExpressionFactory());
-//	}
 	
 //	@Test
 //	@Ignore
@@ -87,6 +73,25 @@ public class ExpressionValidatorTest {
 	}
 
 	@Test
+	public void testContextVariable() {
+		Survey survey = survey(
+			entityDef("plot", 
+				attributeDef("accessible"),
+				entityDef("tree", 
+					attributeDef("status"),
+					attributeDef("species")
+				).multiple()
+			),
+			entityDef("enumerated",
+				attributeDef("status"),
+				attributeDef("count")
+			).multiple()
+		);
+		assertValidExpression(survey, "root/enumerated/count", "count(parent()/plot/tree[status=$this/parent()/status])");
+		assertValidExpression(survey, "root/enumerated/count", "count(parent()/plot/tree[status=$context/status])");
+	}
+	
+	@Test
 	public void testExistingPath() {
 		Survey survey = survey(
 			attributeDef("region"),
@@ -97,6 +102,7 @@ public class ExpressionValidatorTest {
 		);
 		assertValidExpression(survey, "root/region", "time_study/date");
 	}
+
 
 	@Test
 	public void testInvalidPath() {

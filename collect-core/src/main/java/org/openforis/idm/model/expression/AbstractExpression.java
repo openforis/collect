@@ -66,7 +66,7 @@ public abstract class AbstractExpression {
 	}
 
 	private NodeDefinition getReferencedNodeDefinition(NodeDefinition context, NodeDefinition thisNodeDef, String path) throws InvalidExpressionException {
-		StringTokenizer tokenizer = new StringTokenizer(path, "/");
+		StringTokenizer tokenizer = new StringTokenizer(path, String.valueOf(Path.SEPARATOR));
 		NodeDefinition currentContext = context;
 		while (tokenizer.hasMoreTokens()) {
 			String pathSection = tokenizer.nextToken();
@@ -184,6 +184,8 @@ public abstract class AbstractExpression {
 			return contextNode.getParentDefinition();
 		} else if (Path.THIS_ALIASES.contains(pathSection)) {
 			return thisNodeDef;
+		} else if (Path.CONTEXT_VARIABLE.equals(pathSection)) {
+			return contextNode;
 		} else {
 			String childName = pathSection.replaceAll("\\[.+]", "");
 			if (contextNode instanceof EntityDefinition) {
