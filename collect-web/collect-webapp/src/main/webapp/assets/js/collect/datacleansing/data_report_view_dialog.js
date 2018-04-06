@@ -55,7 +55,7 @@ Collect.DataReportViewDialogController.prototype.initFormElements = function(cal
 			]);
 			var el = $this.content.find('.data-error-report-items-grid');
 			el.bootstrapTable({
-			    url: "datacleansing/datareports/" + $this.item.id + "/items.json",
+			    url: "api/datacleansing/datareports/" + $this.item.id + "/items.json",
 			    cache: false,
 			    clickToSelect: true,
 			    pagination: true,
@@ -85,7 +85,7 @@ Collect.DataReportViewDialogController.prototype.initFormElements = function(cal
 		
 		var startExportSuccessHandler = function(report, job) {
 			var jobDialog = new OF.UI.JobDialog();
-			new OF.JobMonitor("datacleansing/datareports/export/job.json", function() {
+			new OF.JobMonitor("api/datacleansing/datareports/export/job.json", function() {
 				jobDialog.close();
 				collect.dataReportService.downloadGeneratedExport(report.id);
 			});
