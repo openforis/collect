@@ -36,16 +36,6 @@
 				<dd>the value associated with the attribute where the expression
 					is defined</dd>
 			</dl>
-			<dl>
-				<dt>
-					node(<i>id</i>)
-				</dt>
-				<dd>
-					to be implemented in 3.3; resolves to the relative path of the
-					nearest instance of nodes with the specified definition <i>id</i>. In
-					future versions, this will replace parent() and $this
-				</dd>
-			</dl>
 			<p>
 				IDM expressions are always relative to the parent of the node where
 				they are defined. For example, if you have a biophysical survey with
@@ -187,12 +177,12 @@
 					species will be selected by the species code. Possible attributes
 					that can be selected are: code, family, genus, scientific_name and
 					all the extra info attributes defined in the species list.</dd>
-				<dd>Soon there will be the possibility to specify custom
+				<dd>There is the possibility to specify custom
 					attributes for every species.</dd>
 				<dd>
-					e.g. retrieve the "family" associated to the species with code
+					e.g. retrieve a custom attribute "max_dbh" associated to the species with code
 					"AFZ/QUA" in a species list named "trees":
-					<pre>idm:speciesListData('trees', 'family', 'AFZ/QUA')</pre>
+					<pre>idm:speciesListData('trees', 'max_dbh', 'AFZ/QUA')</pre>
 				</dd>
 				<dd>
 					e.g. retrieve the "family" of a species in a species list named
@@ -208,6 +198,18 @@
 					<i>idm:distance(coordinateFrom, coordinateTo)</i>
 				</dt>
 				<dd>deprecated: see Geospatial Functions / geo:distance</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:currentDate()</i>
+				</dt>
+				<dd>returns the current date as a Date attribute value.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>idm:currentTime()</i>
+				</dt>
+				<dd>returns the current time as a Time attribute value.</dd>
 			</dl>
 			<dl>
 				<dt>
@@ -236,18 +238,6 @@
 						my_column, keycol1, 1, keycol2, 3)</i> retrieves the value in <i>my_column</i>
 					in table <i>my_custom_table</i> where <i>keycol1</i>=1 and <i>keycol2</i>=3.
 				</dd>
-			</dl>
-			<dl>
-				<dt>
-					<i>idm:currentDate()</i>
-				</dt>
-				<dd>returns the current date as a Date attribute value.</dd>
-			</dl>
-			<dl>
-				<dt>
-					<i>idm:currentTime()</i>
-				</dt>
-				<dd>returns the current time as a Time attribute value.</dd>
 			</dl>
 			<a name="Util_functions" id="Util_functions"></a>
 			<h4>
