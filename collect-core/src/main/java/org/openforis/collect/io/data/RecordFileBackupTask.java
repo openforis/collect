@@ -1,8 +1,12 @@
 package org.openforis.collect.io.data;
 
+import static org.openforis.collect.io.SurveyBackupJob.UPLOADED_FILES_FOLDER;
+import static org.openforis.collect.io.SurveyBackupJob.ZIP_FOLDER_SEPARATOR;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -12,7 +16,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import static org.openforis.collect.io.SurveyBackupJob.*;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.exception.RecordFileException;
@@ -20,6 +23,8 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.commons.collection.Predicate;
+import org.openforis.commons.collection.Visitor;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -48,6 +53,10 @@ public class RecordFileBackupTask extends Task {
 	private CollectSurvey survey;
 	private String rootEntityName;
 	
+	//output
+	private List<CollectRecordSummary> skippedRecords = new ArrayList<CollectRecordSummary>();
+	private List<MissingRecordFileError> missingRecordFiles = new ArrayList<MissingRecordFileError>();
+	
 	public RecordFileBackupTask() {
 		super();
 	}
@@ -55,8 +64,10 @@ public class RecordFileBackupTask extends Task {
 	@Override
 	protected long countTotalItems() {
 		if (hasFileAttributeDefinitions()) {
-			List<CollectRecordSummary> recordSummaries = loadAllSummaries();
-			return recordSummaries.size();
+			RecordFilter filter = new RecordFilter(survey);
+			filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
+			int count = recordManager.countRecords(filter);
+			return count;
 		} else {
 			return 0;
 		}
@@ -67,31 +78,31 @@ public class RecordFileBackupTask extends Task {
 		if (! hasFileAttributeDefinitions()) {
 			return;
 		}
-		List<CollectRecordSummary> recordSummaries = loadAllSummaries();
-		if ( recordSummaries != null ) {
-			for (CollectRecordSummary summary : recordSummaries) {
-				if ( isRunning() ) {
-					try {
-						backup(summary);
-						incrementProcessedItems();
-					} catch(Exception e) {
-						log.error(String.format("Error backing up record files for record with id %d and keys %s", 
-								summary.getId(), summary.getRootEntityKeyValues().toString()));
-					}
-				} else {
-					break;
-				}
-			}
-		}
-	}
-
-	private List<CollectRecordSummary> loadAllSummaries() {
+		
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
-		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
-		return summaries;
+		recordManager.visitSummaries(filter, new Visitor<CollectRecordSummary>() {
+			public void visit(CollectRecordSummary summary) {
+				try {
+					backup(summary);
+					incrementProcessedItems();
+				} catch(Exception e) {
+					addSkippedRecord(summary);
+					log.error(String.format("Error backing up record files for record with id %d and keys %s", 
+							summary.getId(), summary.getRootEntityKeyValues().toString()));
+				}
+			}
+		}, new Predicate<CollectRecordSummary>() {
+			public boolean evaluate(CollectRecordSummary s) {
+				return !isRunning();
+			}
+		});
 	}
-	
+
+	private void addSkippedRecord(CollectRecordSummary summary) {
+		this.skippedRecords.add(summary);
+	}
+
 	private boolean hasFileAttributeDefinitions() {
 		@SuppressWarnings("unchecked")
 		List<FileAttributeDefinition> defs = (List<FileAttributeDefinition>) 
@@ -109,30 +120,30 @@ public class RecordFileBackupTask extends Task {
 		CollectRecord record = recordManager.load(survey, id, summary.getStep(), false);
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		for (FileAttribute fileAttribute : fileAttributes) {
-			if ( ! fileAttribute.isEmpty() ) {
+			if ( StringUtils.isNotBlank(fileAttribute.getFilename()) ) {
 				File file = recordFileManager.getRepositoryFile(fileAttribute);
-				if ( file == null || ! file.exists() ) {
+				if ( file != null && file.exists() ) {
+					String entryName = calculateRecordFileEntryName(fileAttribute);
+					writeFile(file, entryName);
+				} else {
+					addSkippedFileError(summary, fileAttribute.getPath(), recordFileManager.getRepositoryFileAbsolutePath(fileAttribute));
 					log.error(String.format("Record file not found for record %s (%d) attribute %s (%d)", 
 							StringUtils.join(record.getRootEntityKeyValues(), ','), record.getId(), fileAttribute.getPath(), fileAttribute.getInternalId()));
 					//throw new RecordFileException(message);
-				} else {
-					String entryName = calculateRecordFileEntryName(fileAttribute);
-					writeFile(file, entryName);
 				}
 			}
 		}
+	}
+
+	private void addSkippedFileError(CollectRecordSummary summary, String fileAttributePath, String fileAbsolutePath) {
+		this.missingRecordFiles.add(new MissingRecordFileError(summary, fileAttributePath, fileAbsolutePath));
 	}
 
 	public static String calculateRecordFileEntryName(FileAttribute fileAttribute) {
 		FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
 		String repositoryRelativePath = RecordFileManager.getRepositoryRelativePath(fileAttributeDefinition, ZIP_FOLDER_SEPARATOR, false);
 		String filename = fileAttribute.getFilename();
-		if (StringUtils.isBlank(filename)) {
-			return null;
-		} else {
-			String entryName = StringUtils.join(Arrays.asList(UPLOADED_FILES_FOLDER, repositoryRelativePath, filename), ZIP_FOLDER_SEPARATOR);
-			return entryName;
-		}
+		return StringUtils.join(Arrays.asList(UPLOADED_FILES_FOLDER, repositoryRelativePath, filename), ZIP_FOLDER_SEPARATOR);
 	}
 
 	private void writeFile(File file, String entryName) throws IOException {
@@ -182,5 +193,38 @@ public class RecordFileBackupTask extends Task {
 	public void setZipOutputStream(ZipOutputStream zipOutputStream) {
 		this.zipOutputStream = zipOutputStream;
 	}
-
+	
+	public List<CollectRecordSummary> getSkippedRecords() {
+		return skippedRecords;
+	}
+	
+	public List<MissingRecordFileError> getMissingRecordFiles() {
+		return missingRecordFiles;
+	}
+	
+	public static class MissingRecordFileError {
+		
+		private CollectRecordSummary recordSummary;
+		private String fileAttributePath;
+		private String filePath;
+		
+		public MissingRecordFileError(CollectRecordSummary recordSummary, String fileAttributePath, String filePath) {
+			super();
+			this.recordSummary = recordSummary;
+			this.fileAttributePath = fileAttributePath;
+			this.filePath = filePath;
+		}
+		
+		public CollectRecordSummary getRecordSummary() {
+			return recordSummary;
+		}
+		
+		public String getFileAttributePath() {
+			return fileAttributePath;
+		}
+		
+		public String getFilePath() {
+			return filePath;
+		}
+	}
 }

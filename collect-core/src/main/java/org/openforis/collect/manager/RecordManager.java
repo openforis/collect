@@ -43,6 +43,7 @@ import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.RecordValidationInProgressException;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport.CollectStoreQuery;
 import org.openforis.collect.utils.Consumer;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -443,16 +444,28 @@ public class RecordManager {
 		}
 	}
 	
-	@Transactional(readOnly=true)
+	public void visitSummaries(RecordFilter filter, Visitor<CollectRecordSummary> visitor) {
+		visitSummaries(filter, visitor, null);
+	}
+	
+	public void visitSummaries(RecordFilter filter, Visitor<CollectRecordSummary> visitor, 
+			Predicate<CollectRecordSummary> stopWhenPredicate) {
+		visitSummaries(filter, null, visitor, false, stopWhenPredicate);
+	}
+	
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
 			Visitor<CollectRecordSummary> visitor) {
 		visitSummaries(filter, sortFields, visitor, false);
 	}
-	
-	@Transactional(readOnly=true)
+
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
 			Visitor<CollectRecordSummary> visitor, boolean includeStepDetails) {
-		recordDao.visitSummaries(filter, sortFields, visitor, includeStepDetails);
+	}
+	
+	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
+			Visitor<CollectRecordSummary> visitor, boolean includeStepDetails, 
+			Predicate<CollectRecordSummary> stopWhenPredicate) {
+		recordDao.visitSummaries(filter, sortFields, visitor, includeStepDetails, stopWhenPredicate);
 	}
 	
 	public Set<User> loadDistinctOwners(RecordFilter recordFilter) {

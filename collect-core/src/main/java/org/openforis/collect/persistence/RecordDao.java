@@ -58,6 +58,7 @@ import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordDataRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
 import org.openforis.collect.utils.Numbers;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -214,11 +215,12 @@ public class RecordDao extends JooqDaoSupport {
 
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
 			Visitor<CollectRecordSummary> visitor) {
-		visitSummaries(filter, sortFields, visitor, false);
+		visitSummaries(filter, sortFields, visitor, false, null);
 	}
 	
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
-			Visitor<CollectRecordSummary> visitor, boolean includeStepDetails) {
+			Visitor<CollectRecordSummary> visitor, boolean includeStepDetails, 
+			Predicate<CollectRecordSummary> stopWhenPredicate) {
 		SelectQuery<Record> q = createSelectSummariesQuery(filter, sortFields);
 
 		Cursor<Record> cursor = null;
@@ -238,6 +240,9 @@ public class RecordDao extends JooqDaoSupport {
 					}
 				}
 				visitor.visit(s);
+				if (stopWhenPredicate.evaluate(s)) {
+					break;
+				}					
 			}
 		} finally {
 			if (cursor != null) {

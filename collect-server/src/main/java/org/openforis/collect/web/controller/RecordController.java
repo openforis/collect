@@ -516,7 +516,7 @@ public class RecordController extends BasicController implements Serializable {
 		fullBackupJob.setIncludeRecordFiles(parameters.isIncludeRecordFiles());
 
 		jobManager.start(fullBackupJob);
-		return new JobView(fullBackupJob);
+		return getFullBackupJobView();
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/exportresult.collect-data", method=GET)
@@ -565,6 +565,17 @@ public class RecordController extends BasicController implements Serializable {
 		Controllers.writeFileToResponse(response, file, 
 				String.format("collect-validation-report-%s-%s.csv", surveyName, Dates.formatDate(new Date())), 
 				Controllers.CSV_CONTENT_TYPE);
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/backupexportjob", method=GET)
+	public @ResponseBody JobView getFullBackupJobView() {
+		if (fullBackupJob == null) {
+			return null;
+		} else {
+			JobView jobView = new JobView(fullBackupJob);
+			jobView.putExtra("dataBackupErrors", fullBackupJob.getDataBackupErrors());
+			return jobView;
+		}
 	}
 	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {

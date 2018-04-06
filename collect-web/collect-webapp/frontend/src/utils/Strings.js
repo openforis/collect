@@ -15,5 +15,19 @@ export default class Strings {
     static compare(a, b) {
         return a > b ? 1 : b > a ? -1 : 0
     }
+
+    static join(values, separator) {
+        if (! separator) {
+            separator = ', '
+        }
+        let result = ''
+        for (let i=0; i < values.length; i++) {
+            result += values[i]
+            if (i < values.length - 1) {
+                result += separator
+            }
+        }
+        return result
+    }
 }
     

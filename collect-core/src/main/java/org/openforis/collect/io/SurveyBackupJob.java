@@ -3,6 +3,7 @@ package org.openforis.collect.io;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipOutputStream;
 
@@ -12,6 +13,7 @@ import org.openforis.collect.datacleansing.io.DataCleansingExportTask;
 import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.data.RecordFileBackupTask;
+import org.openforis.collect.io.data.RecordFileBackupTask.MissingRecordFileError;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
 import org.openforis.collect.io.metadata.CodeListImagesExportTask;
@@ -25,6 +27,7 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
@@ -110,7 +113,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	
 	//output
 	private File outputFile;
-	private List<DataBackupError> dataBackupErrors;
+	private List<DataBackupError> dataBackupErrors = new ArrayList<DataBackupError>();
 	
 	//temporary instance variable
 	private ZipOutputStream zipOutputStream;
@@ -179,7 +182,15 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	@Override
 	protected void onTaskCompleted(Worker task) {
 		if (task instanceof DataBackupTask) {
-			this.dataBackupErrors = ((DataBackupTask) task).getErrors();
+			this.dataBackupErrors.addAll(((DataBackupTask) task).getErrors());
+		} else if (task instanceof RecordFileBackupTask) {
+			List<MissingRecordFileError> errors = ((RecordFileBackupTask) task).getMissingRecordFiles();
+			for (MissingRecordFileError error : errors) {
+				CollectRecordSummary recordSummary = error.getRecordSummary();
+				this.dataBackupErrors.add(new DataBackupError(recordSummary.getId(), recordSummary.getRootEntityKeyValues(), 
+						recordSummary.getStep(), String.format("Missing file for attribute %s: %s", 
+						error.getFileAttributePath(), error.getFilePath())));
+			}
 		} else if ( task instanceof CollectMobileBackupConvertTask ) {
 			this.zipOutputStream = null;
 			this.outputFile = ((CollectMobileBackupConvertTask) task).getOutputFile();

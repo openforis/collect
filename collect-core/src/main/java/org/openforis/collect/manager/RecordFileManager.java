@@ -157,4 +157,21 @@ public class RecordFileManager extends BaseStorageManager {
 		return file;
 	}
 
+	public String getRepositoryFileAbsolutePath(FileAttribute fileAttribute) {
+		FileAttributeDefinition defn = fileAttribute.getDefinition();
+		String filename = fileAttribute.getFilename();
+		if ( StringUtils.isNotBlank(filename) ) {
+			String path = getRepositoryFileAbsolutePath(defn, filename);
+			return path;
+		} else {
+			return null;
+		}
+	}
+	
+	public String getRepositoryFileAbsolutePath(FileAttributeDefinition fileAttributeDefn, String fileName) {
+		java.io.File repositoryDir = getRepositoryDir(fileAttributeDefn);
+		java.io.File file = new java.io.File(repositoryDir, fileName);
+		return file.getAbsolutePath();
+	}
+		
 }

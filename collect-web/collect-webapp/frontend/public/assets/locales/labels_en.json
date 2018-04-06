@@ -3,6 +3,7 @@
         "account": "Account",
         "cancel": "Cancel",
         "close": "Close",
+        "download": "Download",
         "additionalOptions": "Additional Options",
         "new": "New",
         "import": "Import",
@@ -151,7 +152,14 @@
         "backupDataExport": {
             "exportOnlyOwnedRecords": "Export only owned records",
             "includeUploadedFiles": "Include uploaded files (images, documents, etc.)",
-            "exportingDataJobTitle": "Exporting data"
+            "exportingDataJobTitle": "Exporting data",
+            "errorsDuringExport": "Errors during data export",
+            "downloadAnyway": "Download anyway",
+            "errors": {
+                "recordKey": "Key",
+                "recordStep": "Step",
+                "errorMessage": "Error"
+            }
         },
         "deleteRecords": {
             "confirmDeleteTitle": "Delete record",

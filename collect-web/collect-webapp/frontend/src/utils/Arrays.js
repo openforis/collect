@@ -2,6 +2,14 @@ import Objects from './Objects'
 
 export default class Arrays {
 
+    static isEmpty(array) {
+        return Objects.isNullOrUndefined(array) || array.length === 0
+    }
+
+    static isNotEmpty(array) {
+        return ! Arrays.isEmpty(array)
+    }
+
     static contains(array, itemOrPredicate, keyProp) {
         if (itemOrPredicate instanceof Function) {
             return array.find(itemOrPredicate) !== undefined
