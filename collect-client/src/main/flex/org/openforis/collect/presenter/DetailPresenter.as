@@ -245,7 +245,7 @@ package org.openforis.collect.presenter {
 			var surveyId:int = Application.activeRecord.survey.id;
 			var step:int = toStepNumber(Application.activeRecord.step);
 			
-			var url:String = ApplicationConstants.URL + "surveys/" + surveyId + "/records/" + recordId + "/steps/" + step + "/csv_content.zip";
+			var url:String = ApplicationConstants.URL + "api/survey/" + surveyId + "/data/records/" + recordId + "/steps/" + step + "/csv_content.zip";
 			
 			var req:URLRequest = new URLRequest(url);
 			req.data = new URLVariables();
