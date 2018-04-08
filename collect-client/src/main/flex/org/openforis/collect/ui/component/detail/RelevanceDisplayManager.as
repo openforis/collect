@@ -65,8 +65,9 @@ package org.openforis.collect.ui.component.detail
 				} else {
 					nodes = parentEntity.getChildren(childDefn);
 				}
-				//do not hide multiple entities renderer if they are relevant but no entities are defined or it will be impossible to add new entities
-				if ( childDefn is EntityDefinitionProxy && nodes.length == 0 ) {
+				//do not hide multiple nodes renderer if it is relevant but no entities are defined 
+				//or it will be impossible to add new entries
+				if ( childDefn.multiple && nodes.length == 0 ) {
 					var result:Boolean = ! parentEntity.isRelevant(childDefn);
 					return result;
 				} else {
