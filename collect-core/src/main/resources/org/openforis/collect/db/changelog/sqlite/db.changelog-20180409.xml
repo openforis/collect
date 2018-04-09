@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="fix-wrong-record-step-number" author="ricci" dbms="sqlite">
+
+		<comment>Fix wrong record data step number assigned during data import</comment>
+
+		<sql>
+			UPDATE ofc_record_data 
+			SET step = step-1 
+			WHERE exists (
+				SELECT * FROM ofc_record_data rd 
+				WHERE rd.record_id = ofc_record_data.record_id 
+					and rd.step = ofc_record_data.step 
+					and rd.seq_num = ofc_record_data.seq_num + 1
+			)
+		</sql>
+
+	</changeSet>
+
+</databaseChangeLog>

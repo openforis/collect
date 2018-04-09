@@ -36,4 +36,5 @@
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20171017.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20171204.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20180126.xml" />
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20180409.xml" />
 </databaseChangeLog>
