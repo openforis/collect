@@ -9,9 +9,12 @@
 		<west width="220px">
 			<borderlayout>
 				<center border="none"
-					title="${labels.global.items.header.inserted}:">
+					title="${labels.survey.code_list.items.header}:">
 					<vlayout vflex="true">
-						<listbox id="itemsListBox"
+						<box pack="center" align="center" hflex="1" vflex="1" visible="@load(empty vm.items)">
+							<label style="white-space: pre-line;" value="${labels.survey.code_list.items.empty_list}" />
+						</box>
+						<listbox id="itemsListBox" visible="@load(not empty vm.items)"
 							selectedItem="@load(vm.selectedItem)" model="@load(vm.items)"
 							onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
 							width="220px" vflex="true">
@@ -39,7 +42,7 @@
 								image="/assets/images/delete.png"
 								disabled="@load(empty vm.selectedItem)"
 								onClick="@command('deleteCodeList', item=vm.selectedItem)" />
-							<menu image="/assets/images/settings-small.png">
+							<menu image="/assets/images/settings-small.png" tooltiptext="${labels.survey.code_list.import_export}">
 								<menupopup>
 									<menuitem label="${labels.survey.code_list.batch_import}"
 										upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />

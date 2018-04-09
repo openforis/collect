@@ -57,17 +57,20 @@
     	<hlayout>
     		<button label="${labels.survey.versioning_manager}"
               onClick="@global-command('openVersioningManagerPopUp')"
-              image="/assets/images/edit-small.png" />
+              image="/assets/images/edit-big.png"
+              height="32" />
          </hlayout>
     	<hlayout>
 			<button label="${labels.survey.srs.$}"
               onClick="@global-command('openSRSManagerPopUp')"
-              image="/assets/images/edit-small.png" />
+              image="/assets/images/compass-medium.png"
+              height="32" />
          </hlayout>
     	<hlayout>
             <button label="${labels.survey.unit.manager.title}"
               onClick="@global-command('openUnitsManagerPopUp')"
-              image="/assets/images/edit-small.png" />
+              image="/assets/images/ruler-medium.png"
+              height="32" />
          </hlayout>
     	 <hlayout visible="@load(not(vm.collectEarthSurvey))">
             <fieldErrorHandler message="@load(vmsgs['keyChangeAllowed'])">
@@ -84,10 +87,21 @@
 	     </hlayout>
     </hlayout>
     
-    <groupbox width="100%" closable="false" class="tableFieldSet">
-      <caption label="${labels.survey.files}"/>
-      <include src="survey_edit/survey_file_list.zul" />
-    </groupbox>
+    <groupbox closable="true" open="${not empty vm.surveyFiles}"
+      	sclass="collapsible"
+      	mold="3d" width="100%">
+      	<attribute name="onOpen"><![CDATA[
+      	    surveyFilesGroupboxCaption.setSclass("open-" + self.isOpen());
+      	]]></attribute>
+      	<caption id="surveyFilesGroupboxCaption" sclass="open-${not empty vm.surveyFiles}">
+      		<div align="left">
+      			<label value="${labels.survey.files}" />
+      		</div>
+      	</caption>
+      	<box>
+			<include src="survey_edit/survey_file_list.zul" />
+      	</box>
+     </groupbox>
     
 	 <groupbox width="100%" closable="false"
 	 	visible="@load(vm.collectEarthSurvey)">

@@ -2,7 +2,7 @@
   <vlayout>
     <listbox id="checksList" model="@load(vm.surveyFiles)"
       selectedItem="@bind(vm.selectedSurveyFile)"
-      width="900px"
+      hflex="true"
       rows="3">
       <listhead>
         <listheader label="${labels.survey.file.type.$}" width="200px"

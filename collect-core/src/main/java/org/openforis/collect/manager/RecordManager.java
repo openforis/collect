@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.manager;
 
+import static java.lang.String.format;
 import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 import static org.springframework.transaction.annotation.Propagation.SUPPORTS;
 
@@ -356,13 +357,16 @@ public class RecordManager {
 			int surveyId = recordDao.loadSurveyId(recordId);
 			survey = surveyManager.getOrLoadSurveyById(surveyId);
 		}
-		CollectRecord record = recordDao.load(survey, recordId, step, validate);
-		loadDetachedObjects(record);
-		recordConverter.convertToLatestVersion(record);
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.setValidateAfterUpdate(validate);
-		recordUpdater.initializeRecord(record);
-		return record;
+		CollectRecord r = recordDao.load(survey, recordId, step, validate);
+		if (r == null) {
+			throw new NullPointerException(format("Could not load record with id %d in phase %s in survey %s", recordId, step, survey.getName()));
+		}
+		loadDetachedObjects(r);
+		recordConverter.convertToLatestVersion(r);
+		RecordUpdater updater = new RecordUpdater();
+		updater.setValidateAfterUpdate(validate);
+		updater.initializeRecord(r);
+		return r;
 	}
 
 	private void loadDetachedObjects(List<CollectRecordSummary> summaries) {
