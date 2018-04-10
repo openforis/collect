@@ -25,6 +25,7 @@
 
 	<mvc:annotation-driven />
 	
+	<mvc:resources mapping="favicon.ico" location="favicon.ico" />
 	<mvc:resources mapping="index.html" location="index.html" />
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
 	<mvc:resources mapping="/assets/**" location="/assets/" />
