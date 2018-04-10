@@ -17,8 +17,10 @@
   		<rows>
   			<row>
   				<fieldErrorHandler message="@load(vmsgs['name'])">
-	  				<label value="${labels.global.item.name}" />
-	  			</fieldErrorHandler>
+	    			<label value="${labels.global.item.name.$}:" />
+					<image popup="nameInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+	    		</fieldErrorHandler>
   				<fieldErrorHandler message="@load(vmsgs['name'])">
   					<textbox width="250px" maxlength="40"
   						id="nodeNameTextbox"
@@ -28,7 +30,11 @@
   				</fieldErrorHandler>
   			</row>
   			<row visible="${vm.attribute}">
-	    		<label value="${labels.survey.schema.attribute.key}:" />
+  				<fieldErrorHandler message="@load(vmsgs['key'])">
+	    			<label value="${labels.survey.schema.attribute.key.$}:" />
+					<image popup="keyInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+	    		</fieldErrorHandler>
 	    		<hbox spacing="20px">
 		    		<fieldErrorHandler message="@load(vmsgs['key'])">
 		    			<checkbox checked="@load(fx.key eq true) @save(fx.key)"
@@ -666,6 +672,16 @@
     	</grid>
     </groupbox>
 	
+	<popup id="nameInfoTooltip" width="300px">
+		<html><![CDATA[
+      		${labels.global.item.name.info}
+      	]]></html>
+	</popup>
+	<popup id="keyInfoTooltip" width="300px">
+		<html><![CDATA[
+      		${labels.survey.schema.attribute.key.info}
+      	]]></html>
+	</popup>
     <popup id="measurementAttributeInfoTooltip" width="300px">
 		<html><![CDATA[
       		${labels.survey.schema.attribute.measurement.info}
