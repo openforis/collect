@@ -218,7 +218,7 @@ class SurveysListPage extends Component {
 
                 if (loggedUser.canChangeSurveyUserGroup(survey)) {
                     return <span>
-                            <i className="fa fa-pencil" aria-hidden="true" ></i>
+                            <i className="fa fa-edit" aria-hidden="true" ></i>
                             &nbsp;
                             {userGroupLabel}
                         </span>
@@ -255,14 +255,14 @@ class SurveysListPage extends Component {
                     {selectedSurvey &&
                         <Col sm={1}>
                             <Button color="success" onClick={this.handleEditButtonClick}>
-                                <i class="fa fa-pencil" aria-hidden="true"></i>{L.l('global.edit')}
+                                <i className="fa fa-edit" aria-hidden="true"></i>{L.l('global.edit')}
                             </Button>
                         </Col>
                     }
                     {selectedSurvey &&
                         <Col sm={1}>
                             <Button color="primary" onClick={this.handleExportButtonClick}>
-                                <i class="fa fa-download" aria-hidden="true"></i>{L.l('global.export')}
+                                <i className="fa fa-download" aria-hidden="true"></i>{L.l('global.export')}
                             </Button>
                         </Col>
                     }
@@ -270,19 +270,19 @@ class SurveysListPage extends Component {
                         <Col sm={2}>
                             <UncontrolledButtonDropdown>
                                 <DropdownToggle caret color="warning">
-                                    <i class="fa fa-wrench" aria-hidden="true"></i>{L.l('global.advancedFunctions')}
+                                    <i className="fa fa-wrench" aria-hidden="true"></i>{L.l('global.advancedFunctions')}
                                 </DropdownToggle>
                                 <DropdownMenu>
                                     {selectedSurvey && selectedSurvey.temporary &&
-                                        <DropdownItem bgColor="warning" color="warning" onClick={this.handlePublishButtonClick}><i class="fa fa-check-circle" aria-hidden="true"></i>{L.l('survey.publish')}</DropdownItem>
+                                        <DropdownItem color="warning" onClick={this.handlePublishButtonClick}><i className="fa fa-check-circle" aria-hidden="true"></i>{L.l('survey.publish')}</DropdownItem>
                                     }
                                     {selectedSurvey && selectedSurvey.temporary &&
                                         <DropdownItem divider/>
                                     }
                                     {selectedSurvey && selectedSurvey.published && (!selectedSurvey.temporary || selectedSurvey.publishedId) &&
-                                        <DropdownItem color="warning" onClick={this.handleUnpublishButtonClick}><i class="fa fa-ban" aria-hidden="true"></i>{L.l('survey.unpublish')}</DropdownItem>
+                                        <DropdownItem color="warning" onClick={this.handleUnpublishButtonClick}><i className="fa fa-ban" aria-hidden="true"></i>{L.l('survey.unpublish')}</DropdownItem>
                                     }
-                                    <DropdownItem color="primary" onClick={this.handleCloneButtonClick}><i class="fa fa-clone" aria-hidden="true"></i>{L.l('survey.clone')}</DropdownItem>
+                                    <DropdownItem color="primary" onClick={this.handleCloneButtonClick}><i className="fa fa-clone" aria-hidden="true"></i>{L.l('survey.clone')}</DropdownItem>
                                     <DropdownItem divider/>
                                     <DropdownItem color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/>{L.l('global.delete')}</DropdownItem>
                                 </DropdownMenu>
