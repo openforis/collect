@@ -1,4 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="collapsiblepanel" class="org.openforis.collect.designer.component.CollapsiblePanel"?>
 <zk>
 	<custom-attributes
 		otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}" />
@@ -19,9 +20,8 @@
 		otherLabelsForm="${otherLabelsForm}"
 		otherLayoutForm="${otherLayoutForm}" />
 
-	<groupbox width="100%" closable="false" class="tableFieldSet">
-		<caption
-			label="${labels.survey.schema.attribute.map_options.caption}" />
+	<collapsiblepanel open="false"
+		captionLabel="${labels.survey.schema.attribute.map_options.caption}">
 		<grid class="inner">
 			<columns>
 				<column width="150px" />
@@ -42,7 +42,7 @@
 				</row>
 			</rows>
 		</grid>
-	</groupbox>
+	</collapsiblepanel>
 
 	<fieldErrorHandler
 		message="@load(vmsgs['attributeDefaults'])">
@@ -94,41 +94,22 @@
 		</groupbox>
 	</fieldErrorHandler>
 
-	<groupbox closable="true" open="@load(not empty fx.referencedAttributePath)" sclass="collapsible"
-		mold="3d" width="100%">
-		<attribute name="onOpen"><![CDATA[
-			referencedAttributePathGroupboxCaption.setSclass("open-" + self.isOpen());
-		]]></attribute>
-		<caption id="referencedAttributePathGroupboxCaption"
-			sclass="@load('open-'.concat(not empty fx.referencedAttributePath))">
-			<div align="left">
-				<label value="${labels.survey.schema.attribute.referenced_attribute}" />
-			</div>
-		</caption>
-		<fieldErrorHandler
-			message="@load(vmsgs['referencedAttributePath'])">
-			<grid class="inner">
-				<columns>
-					<column />
-				</columns>
-				<rows>
-					<row>
-						<cell>
-							<textbox width="400px"
+	<fieldErrorHandler message="@load(vmsgs['referencedAttributePath'])" sclass="fielderrorhandler full-width">
+		<collapsiblepanel open="@load(not empty fx.referencedAttributePath)" width="100%"
+			captionLabel="${labels.survey.schema.attribute.referenced_attribute}">
+			<div>
+				<textbox width="400px"
 								value="@bind(fx.referencedAttributePath)" readonly="true" />
-							<button sclass="icon"
-								tooltiptext="${labels.survey.schema.attribute.select_referenced_attribute}"
-								onClick="@command('openReferencedAttributeSelector')"
-								image="/assets/images/tree-small.png" />
-							<button
-								label="${labels.survey.schema.attribute.generate_entity_alias.$}"
-								tooltiptext="${labels.survey.schema.attribute.generate_entity_alias.tooltip}"
-								onClick="@command('generateEntityAlias')"
-								disabled="@load(empty fx.referencedAttributePath)" />
-						</cell>
-					</row>
-				</rows>
-			</grid>
-		</fieldErrorHandler>
-	</groupbox>
+				<button sclass="icon"
+					tooltiptext="${labels.survey.schema.attribute.select_referenced_attribute}"
+					onClick="@command('openReferencedAttributeSelector')"
+					image="/assets/images/tree-small.png" />
+				<button
+					label="${labels.survey.schema.attribute.generate_entity_alias.$}"
+					tooltiptext="${labels.survey.schema.attribute.generate_entity_alias.tooltip}"
+					onClick="@command('generateEntityAlias')"
+					disabled="@load(empty fx.referencedAttributePath)" />
+			</div>
+		</collapsiblepanel>
+	</fieldErrorHandler>
 </zk>

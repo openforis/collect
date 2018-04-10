@@ -1,5 +1,6 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <?component name="expressionInfoIcon" class="org.openforis.collect.designer.component.ExpressionInfoIcon"?>
+<?component name="collapsiblepanel" class="org.openforis.collect.designer.component.CollapsiblePanel"?>
 <zk xmlns:w="client">
   <custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
   <custom-attributes otherMinorGeneralDetailsForm="${arg.otherMinorGeneralDetailsForm}"/>
@@ -212,12 +213,12 @@
   				<vlayout>
 	  				<radiogroup selectedItem="@bind(fx.requirenessType)"
 							onCheck="@command('applyChanges')">
-						<radio 
-							label="${labels.survey.schema.node.not_required}"
-							value="NOT_REQUIRED" />
 						<radio
 							label="${labels.survey.schema.node.always_required}"
 							value="ALWAYS_REQUIRED" />
+						<radio 
+							label="${labels.survey.schema.node.not_required}"
+							value="NOT_REQUIRED" />
 						<radio
 							label="${labels.survey.schema.node.required_when}"
 							value="REQUIRED_WHEN" />
@@ -239,37 +240,27 @@
 
   	<include src="${arg.otherMinorGeneralDetailsForm}" />
   	
-  	 <groupbox closable="true" open="false" visible="@load(not vm.rootEntity)"
-      	sclass="collapsible"
-      	mold="3d" width="100%">
-      	<attribute name="onOpen"><![CDATA[
-      	    dependentPathsCaption.setSclass("open-" + self.isOpen());
-      	]]></attribute>
-      	<caption id="dependentPathsCaption" sclass="open-false">
-      		<div align="left">
-      			<label value="${labels.survey.schema.node.dependent_paths}" />
-      		</div>
-      	</caption>
-      	
-		<listbox id="dependentNodeListbox"
-			vflex="true" rows="4"
-		    model="@load(vm.dependentNodes)">
-		    <listhead>
-		      <listheader label="${labels.survey.schema.node.dependent_node.type.$}" width="200px" 
-		        sort="auto(type)" />
-		      <listheader label="${labels.survey.schema.node.dependent_node.path}" width="300px" 
-		        sort="auto(path)" />
-		    </listhead>
-		    <template name="model">
-		      <listitem>
-		        <listcell label="${c:l('survey.schema.node.dependent_node.type.'.concat(each.type))}" />
-		        <listcell label="@load(each.path)" />
-		      </listitem>
-		    </template>
+  	<collapsiblepanel open="false" visible="@load(not vm.rootEntity)"
+		captionLabel="${labels.survey.schema.node.dependent_paths}">
+		<listbox id="dependentNodeListbox" vflex="true" rows="4"
+			model="@load(vm.dependentNodes)">
+			<listhead>
+				<listheader
+					label="${labels.survey.schema.node.dependent_node.type.$}"
+					width="200px" sort="auto(type)" />
+				<listheader
+					label="${labels.survey.schema.node.dependent_node.path}"
+					width="300px" sort="auto(path)" />
+			</listhead>
+			<template name="model">
+				<listitem>
+					<listcell
+						label="${c:l('survey.schema.node.dependent_node.type.'.concat(each.type))}" />
+					<listcell label="@load(each.path)" />
+				</listitem>
+			</template>
 		</listbox>
-      </groupbox>
-  	
-  	
+	</collapsiblepanel>
   </groupbox>
 
   <include src="${arg.otherAttributesForm}" />
@@ -460,9 +451,9 @@
       </groupbox>
     </groupbox>
 
-    <groupbox width="100%" closable="false" visible="${not vm.rootEntity}">
-      <caption label="${labels.survey.schema.node.versioning}"/>
-    	<grid class="inner">
+	<collapsiblepanel open="false" visible="@load(not vm.rootEntity)"
+		captionLabel="${labels.survey.schema.node.versioning}">
+		<grid class="inner">
     		<columns>
     			<column width="150px" />
     			<column />
@@ -506,17 +497,17 @@
     			</row>
     		</rows>
     	</grid>
-   </groupbox>
-
-    <groupbox width="100%" closable="false" visible="@load(not vm.rootEntity)">
-    	<caption label="${labels.survey.schema.node.layout.$}" />
+	</collapsiblepanel>
+	
+	<collapsiblepanel captionLabel="${labels.survey.schema.node.layout.$}" open="false"
+		visible="@load(not vm.rootEntity)">
     	<vlayout width="100%">
     		<grid class="inner" visible="@load(not vm.insideTableEntity)">
     			<columns>
     				<column width="150px" />
-    				<column />
-    				<column />
-    				<column />
+    				<column width="200px" />
+    				<column width="200px" />
+    				<column width="200px" />
     			</columns>
     			<rows>
     				<row visible="@load(not vm.collectEarthSurvey)">
@@ -544,9 +535,9 @@
 		  	<grid class="inner">
     			<columns>
     				<column width="150px" />
-    				<column />
-    				<column />
-    				<column />
+    				<column width="200px" />
+    				<column width="200px" />
+    				<column width="200px" />
     			</columns>
     			<rows>
     				<row visible="@load(not vm.collectEarthSurvey)">
@@ -587,9 +578,9 @@
 			<grid class="inner">
     			<columns>
     				<column width="150px" />
-    				<column />
-    				<column />
-    				<column />
+    				<column width="200px" />
+    				<column width="200px" />
+    				<column width="200px" />
     			</columns>
     			<rows>
     				<row visible="@load(not (vm.collectEarthSurvey or vm.attribute))">
@@ -621,19 +612,10 @@
     		<include src="${arg.otherLayoutForm}" />
 
     	</vlayout>
-    </groupbox>
+    </collapsiblepanel>
     
-	<groupbox closable="true" open="${vm.collectEarthSurvey}" visible="@load(vm.attribute)"
-      	sclass="collapsible"
-      	mold="3d" width="100%">
-      	<attribute name="onOpen"><![CDATA[
-      	    collectEarthSectionCaption.setSclass("open-" + self.isOpen());
-      	]]></attribute>
-      	<caption id="collectEarthSectionCaption" sclass="open-${vm.collectEarthSurvey}">
-      		<div align="left">
-      			<label value="${labels.survey.schema.attribute.collect_earth.section_title}" />
-      		</div>
-      	</caption>
+    <collapsiblepanel captionLabel="${labels.survey.schema.attribute.collect_earth.section_title}" open="false"
+		visible="@load(vm.attribute)">
     	<grid class="inner">
     		<columns>
     			<column width="150px" />
@@ -670,7 +652,7 @@
     			</row>
     		</rows>
     	</grid>
-    </groupbox>
+    </collapsiblepanel>
 	
 	<popup id="nameInfoTooltip" width="300px">
 		<html><![CDATA[

@@ -71,7 +71,7 @@ button.icon {
 	margin: 5px;
 }
 .collapsible .z-groupbox-3d-cnt {
-	padding: 0px;
+	padding: 5px;
 }
 .z-groupbox-3d-hm {
 	background: #dff1fc;
@@ -317,4 +317,9 @@ div.z-listbox-header th.z-listheader-sort-over {
 .icon.loading {
 	background-image: url("../images/loading-small.gif");
 	background-repeat: no-repeat;
+}
+
+.fielderrorhandler.full-width .z-hlayout-inner {
+	width: 99%;
+	padding: 10px;
 }
