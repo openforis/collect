@@ -21,9 +21,15 @@ public class CollapsiblePanel extends Groupbox {
 		
 		addEventListener("onOpen",new EventListener<Event>() {
 			public void onEvent(Event event) throws Exception {
-				getCaption().setSclass("open-" + isOpen());
+				handleOpenChange();
 			}
 		});
+	}
+
+	protected void handleOpenChange() {
+		ComponentUtil.toggleClass(this, "open", isOpen());
+		ComponentUtil.toggleClass(this, "closed", !isOpen());
+		getCaption().setSclass("open-" + isOpen());
 	}
 
 	public void setCaptionLabel(String captionText) {
@@ -34,7 +40,7 @@ public class CollapsiblePanel extends Groupbox {
 	@Override
 	public void setOpen(boolean open) {
 		super.setOpen(open);
-		getCaption().setSclass("open-" + isOpen());
+		handleOpenChange();
 	}
 	
 	private void createAndAddCaption() {

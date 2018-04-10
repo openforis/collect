@@ -45,20 +45,6 @@
           </fieldErrorHandler>
         </row>
         <row>
-          <fieldErrorHandler message="@load(vmsgs['condition'])">
-	          <label use="org.openforis.collect.designer.component.FieldLabel"
-			  		value="${labels.survey.schema.node.check.condition}" />
-	      </fieldErrorHandler>
-			<hlayout spacing="2px">
-	          <fieldErrorHandler message="@load(vmsgs['condition'])">
-	            <textbox width="450px" value="@bind(fx.condition)" 
-	            	onChange="@command('applyChanges')"
-	            	multiline="true" rows="4"  />
-	          </fieldErrorHandler>
-	          <expressionInfoIcon />
-	       </hlayout>
-        </row>
-        <row>
             <fieldErrorHandler message="@load(vmsgs['expression'])">
 	            <label use="org.openforis.collect.designer.component.FieldLabel"
 			  		value="${labels.survey.schema.node.check.custom.expression}" />
@@ -71,6 +57,20 @@
 	          	</fieldErrorHandler>
 	            <expressionInfoIcon />
 	        </hlayout>
+        </row>
+        <row>
+          <fieldErrorHandler message="@load(vmsgs['condition'])">
+	          <label use="org.openforis.collect.designer.component.FieldLabel"
+			  		value="${labels.survey.schema.node.check.condition}" />
+	      </fieldErrorHandler>
+			<hlayout spacing="2px">
+	          <fieldErrorHandler message="@load(vmsgs['condition'])">
+	            <textbox width="450px" value="@bind(fx.condition)" 
+	            	onChange="@command('applyChanges')"
+	            	multiline="true" rows="4"  />
+	          </fieldErrorHandler>
+	          <expressionInfoIcon />
+	       </hlayout>
         </row>
       </rows>
     </grid>

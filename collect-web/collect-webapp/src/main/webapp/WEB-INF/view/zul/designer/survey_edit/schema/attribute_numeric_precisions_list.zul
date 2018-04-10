@@ -1,56 +1,56 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="collapsiblepanel" class="org.openforis.collect.designer.component.CollapsiblePanel"?>
 <zk>
-  <groupbox width="100%" closable="false" class="tableFieldSet"
-  	visible="@load(not vm.collectEarthSurvey)">
-    <caption
-      label="${labels.survey.schema.attribute.numeric.precisions.$}:" />
-    <vlayout>
-      <listbox model="@load(vm.precisions)"
-        selectedItem="@bind(vm.selectedPrecision)"
-        width="300px"
-        rows="3">
-        <listhead height="22px">
-          <listheader 
-            width="80px"
-            label="${labels.survey.schema.attribute.numeric.precisions.is_default}" />
-          <listheader 
-            width="100px"
-            label="${labels.survey.schema.attribute.numeric.precisions.unit}"/>
-          <listheader
-            label="${labels.survey.schema.attribute.numeric.precisions.decimal_digits}" />
-        </listhead>
-        <template name="model">
-          <listitem>
-            <listcell label="@load(each.defaultPrecision)"
-              onDoubleClick="@command('editPrecision')" />
-            <listcell label="@load(vm.getUnitLabelFromPrecision(each))"
-              onDoubleClick="@command('editPrecision')" />
-            <listcell label="@load(each.decimalDigits)"
-              onDoubleClick="@command('editPrecision')" />
-          </listitem>
-        </template>
-      </listbox>
-      <toolbar>
-        <toolbarbutton tooltiptext="${labels.global.add_item}"
-          image="/assets/images/add-small.png"
-          onClick="@command('addPrecision')" />
-        <toolbarbutton tooltiptext="${labels.global.edit_item}"
-          image="/assets/images/edit-small.png"
-          disabled="@load(empty vm.selectedPrecision)"
-          onClick="@command('editPrecision')" />
-        <toolbarbutton tooltiptext="${labels.global.delete_item}"
-          image="/assets/images/delete-small.png"
-          disabled="@load(empty vm.selectedPrecision)"
-          onClick="@command('deletePrecision')" />
-        <toolbarbutton tooltiptext="${labels.global.item.move_up}"
-          image="/assets/images/arrow-up-small.png"
-          disabled="@load(vm.moveSelectedPrecisionUpDisabled)"
-          onClick="@command('moveSelectedPrecisionUp')" />
-        <toolbarbutton tooltiptext="${labels.global.item.move_down}"
-          image="/assets/images/arrow-down-small.png"
-          disabled="@load(vm.moveSelectedPrecisionDownDisabled)"
-          onClick="@command('moveSelectedPrecisionDown')" />
-      </toolbar>
-    </vlayout>
-  </groupbox>
+	<collapsiblepanel 
+			open="${not empty vm.precisions}"
+			captionLabel="${labels.survey.schema.attribute.numeric.precisions.$}">
+	    <vlayout>
+	      <listbox model="@load(vm.precisions)"
+	        selectedItem="@bind(vm.selectedPrecision)"
+	        width="300px"
+	        rows="3">
+	        <listhead height="22px">
+	          <listheader 
+	            width="80px"
+	            label="${labels.survey.schema.attribute.numeric.precisions.is_default}" />
+	          <listheader 
+	            width="100px"
+	            label="${labels.survey.schema.attribute.numeric.precisions.unit}"/>
+	          <listheader
+	            label="${labels.survey.schema.attribute.numeric.precisions.decimal_digits}" />
+	        </listhead>
+	        <template name="model">
+	          <listitem>
+	            <listcell label="@load(each.defaultPrecision)"
+	              onDoubleClick="@command('editPrecision')" />
+	            <listcell label="@load(vm.getUnitLabelFromPrecision(each))"
+	              onDoubleClick="@command('editPrecision')" />
+	            <listcell label="@load(each.decimalDigits)"
+	              onDoubleClick="@command('editPrecision')" />
+	          </listitem>
+	        </template>
+	      </listbox>
+	      <toolbar>
+	        <toolbarbutton tooltiptext="${labels.global.add_item}"
+	          image="/assets/images/add-small.png"
+	          onClick="@command('addPrecision')" />
+	        <toolbarbutton tooltiptext="${labels.global.edit_item}"
+	          image="/assets/images/edit-small.png"
+	          disabled="@load(empty vm.selectedPrecision)"
+	          onClick="@command('editPrecision')" />
+	        <toolbarbutton tooltiptext="${labels.global.delete_item}"
+	          image="/assets/images/delete-small.png"
+	          disabled="@load(empty vm.selectedPrecision)"
+	          onClick="@command('deletePrecision')" />
+	        <toolbarbutton tooltiptext="${labels.global.item.move_up}"
+	          image="/assets/images/arrow-up-small.png"
+	          disabled="@load(vm.moveSelectedPrecisionUpDisabled)"
+	          onClick="@command('moveSelectedPrecisionUp')" />
+	        <toolbarbutton tooltiptext="${labels.global.item.move_down}"
+	          image="/assets/images/arrow-down-small.png"
+	          disabled="@load(vm.moveSelectedPrecisionDownDisabled)"
+	          onClick="@command('moveSelectedPrecisionDown')" />
+	      </toolbar>
+	    </vlayout>
+	</collapsiblepanel>
 </zk>

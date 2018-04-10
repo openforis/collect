@@ -265,8 +265,7 @@
 
   <include src="${arg.otherAttributesForm}" />
     
-    <groupbox width="100%" closable="false">
-      <caption label="${labels.survey.schema.node.labels}"/>
+    <collapsiblepanel open="true" captionLabel="${labels.survey.schema.node.labels}">
       <grid class="inner">
       	<columns>
       		<column width="150px" />
@@ -307,17 +306,7 @@
       		</row>
       	</rows>
       </grid>
-      <groupbox closable="true" open="false"
-      	sclass="collapsible"
-      	mold="3d" width="100%">
-      	<attribute name="onOpen"><![CDATA[
-      	    caption.setSclass("open-" + self.isOpen());
-      	]]></attribute>
-      	<caption id="caption" sclass="open-false">
-      		<div align="left">
-      			<label value="${labels.survey.schema.node.other_labels}" />
-      		</div>
-      	</caption>
+      <collapsiblepanel open="false" captionLabel="${labels.survey.schema.node.other_labels}">
       	<grid class="inner">
       		<columns>
       			<column width="150px" />
@@ -448,8 +437,8 @@
       		</rows>
       	</grid>
       	<include src="${arg.otherLabelsForm}" />
-      </groupbox>
-    </groupbox>
+      </collapsiblepanel>
+    </collapsiblepanel>
 
 	<collapsiblepanel open="false" visible="@load(not vm.rootEntity)"
 		captionLabel="${labels.survey.schema.node.versioning}">

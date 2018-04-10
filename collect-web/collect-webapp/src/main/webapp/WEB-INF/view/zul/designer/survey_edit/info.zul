@@ -1,4 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="collapsiblepanel" class="org.openforis.collect.designer.component.CollapsiblePanel"?>
 <zk>
   <div id="formContainer"
   	validationMessages="@id('vmsgs')"
@@ -87,21 +88,11 @@
 	     </hlayout>
     </hlayout>
     
-    <groupbox closable="true" open="${not empty vm.surveyFiles}"
-      	sclass="collapsible"
-      	mold="3d" width="100%">
-      	<attribute name="onOpen"><![CDATA[
-      	    surveyFilesGroupboxCaption.setSclass("open-" + self.isOpen());
-      	]]></attribute>
-      	<caption id="surveyFilesGroupboxCaption" sclass="open-${not empty vm.surveyFiles}">
-      		<div align="left">
-      			<label value="${labels.survey.files}" />
-      		</div>
-      	</caption>
-      	<box>
+    <collapsiblepanel open="${not empty vm.surveyFiles}" captionLabel="${labels.survey.files}">
+    	<box>
 			<include src="survey_edit/survey_file_list.zul" />
       	</box>
-     </groupbox>
+	</collapsiblepanel>
     
 	 <groupbox width="100%" closable="false"
 	 	visible="@load(vm.collectEarthSurvey)">

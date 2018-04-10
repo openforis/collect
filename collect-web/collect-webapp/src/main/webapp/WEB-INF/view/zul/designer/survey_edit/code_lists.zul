@@ -83,7 +83,7 @@
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['name'])">
 			        					<label
-			        						value="${labels.global.item.name}:" />
+			        						value="${labels.global.item.name.$}:" />
 			        				</fieldErrorHandler>
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['name'])">

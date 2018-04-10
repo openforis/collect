@@ -73,9 +73,30 @@ button.icon {
 .collapsible .z-groupbox-3d-cnt {
 	padding: 5px;
 }
+
+.collapsible .z-groupbox-3d-hm {
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.collapsible.closed .z-groupbox-3d-hm,
+.collapsible.open .z-groupbox-3d-cnt {
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+
 .z-groupbox-3d-hm {
 	background: #dff1fc;
 }
+
+.collapsible.error .z-groupbox-3d-hm {
+	background: #f93f3f;
+}
+
+.collapsible.error .z-caption .z-label {
+	color: white;
+}
+
 .z-groupbox-3d .z-caption-l {
 	height: 16px;
 }
@@ -124,7 +145,7 @@ div.z-listbox-header th.z-listheader-sort-over {
 	background: #dff1fc;
 }
 
-.z-toolbar {
+.z-toolbar, .z-menubar-hor, .z-menubar-ver {
 	background: #f7f7f7;
 }
 .z-toolbarbutton-cnt {
@@ -135,15 +156,12 @@ div.z-listbox-header th.z-listheader-sort-over {
 .z-groupbox-title-cnt {
 	font-size: 1.2em;
 }
-
 .z-groupbox-header span.z-caption-cnt > .z-label {
 	font-size: 1.0em;
 }
-
 .z-caption .z-caption-r .z-label {
-	font-size: 1.1em;
+	font-size: 1.2em;
 }
-
 .z-caption .z-caption-l {
 	width: 30px;
 }
@@ -320,6 +338,6 @@ div.z-listbox-header th.z-listheader-sort-over {
 }
 
 .fielderrorhandler.full-width .z-hlayout-inner {
-	width: 99%;
-	padding: 10px;
+	width: 100%;
 }
+

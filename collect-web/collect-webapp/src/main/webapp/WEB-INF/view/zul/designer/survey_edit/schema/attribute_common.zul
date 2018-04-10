@@ -44,17 +44,11 @@
 		</grid>
 	</collapsiblepanel>
 
-	<fieldErrorHandler
-		message="@load(vmsgs['attributeDefaults'])">
-		<groupbox width="100%" closable="false" class="tableFieldSet">
-			<caption>
-				<label
-					value="${labels.survey.schema.attribute.attribute_default.table_heading}"
-					visible="@load(not fx.calculated)" />
-				<label
-					value="${labels.survey.schema.attribute.attribute_default.calculated_value.table_heading}"
-					visible="@load(fx.calculated)" />
-			</caption>
+	<fieldErrorHandler message="@load(vmsgs['attributeDefaults'])" sclass="full-width">
+		<collapsiblepanel open="${not empty vm.attributeDefaults}"
+			captionLabel="@load(fx.calculated ? 
+				labels.survey.schema.attribute.attribute_default.calculated_value.table_heading: 
+				labels.survey.schema.attribute.attribute_default.table_heading)">
 			<grid class="inner">
 				<columns>
 					<column width="200px" />
@@ -84,18 +78,18 @@
 				</rows>
 			</grid>
 			<include src="survey_edit/schema/attribute_defaults_list.zul" />
-		</groupbox>
+		</collapsiblepanel>
 	</fieldErrorHandler>
 
-	<fieldErrorHandler message="@load(vmsgs['checks'])">
-		<groupbox width="100%" closable="false" class="tableFieldSet">
-			<caption label="${labels.survey.schema.node.checks}:" />
+	<fieldErrorHandler message="@load(vmsgs['checks'])" sclass="full-width">
+		<collapsiblepanel open="${not empty vm.checks}"
+			captionLabel="${labels.survey.schema.node.checks}:">
 			<include src="survey_edit/schema/check/list.zul" />
-		</groupbox>
+		</collapsiblepanel> 
 	</fieldErrorHandler>
 
-	<fieldErrorHandler message="@load(vmsgs['referencedAttributePath'])" sclass="fielderrorhandler full-width">
-		<collapsiblepanel open="@load(not empty fx.referencedAttributePath)" width="100%"
+	<fieldErrorHandler message="@load(vmsgs['referencedAttributePath'])" sclass="full-width">
+		<collapsiblepanel open="@load(not empty fx.referencedAttributePath)"
 			captionLabel="${labels.survey.schema.attribute.referenced_attribute}">
 			<div>
 				<textbox width="400px"

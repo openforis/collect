@@ -43,18 +43,6 @@
 					</fieldErrorHandler>
 				</row>
 				<row>
-					<fieldErrorHandler message="@load(vmsgs['condition'])">
-						<label value="${labels.survey.schema.node.check.condition}:" />
-					</fieldErrorHandler>
-					<hlayout spacing="2px">
-						<fieldErrorHandler message="@load(vmsgs['condition'])">
-							<textbox width="450px" multiline="true" rows="4"
-								value="@bind(fx.condition)" onChange="@command('applyChanges')" />
-						</fieldErrorHandler>
-						<expressionInfoIcon />
-					</hlayout>
-				</row>
-				<row>
 					<fieldErrorHandler message="@load(vmsgs['expression'])">
 						<label value="${labels.survey.schema.node.check.uniqueness.expression}:" />
 					</fieldErrorHandler>
@@ -62,6 +50,18 @@
 						<fieldErrorHandler message="@load(vmsgs['expression'])">
 							<textbox width="450px" multiline="true" rows="4"
 								value="@bind(fx.expression)" onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+						<expressionInfoIcon />
+					</hlayout>
+				</row>
+				<row>
+					<fieldErrorHandler message="@load(vmsgs['condition'])">
+						<label value="${labels.survey.schema.node.check.condition}:" />
+					</fieldErrorHandler>
+					<hlayout spacing="2px">
+						<fieldErrorHandler message="@load(vmsgs['condition'])">
+							<textbox width="450px" multiline="true" rows="4"
+								value="@bind(fx.condition)" onChange="@command('applyChanges')" />
 						</fieldErrorHandler>
 						<expressionInfoIcon />
 					</hlayout>

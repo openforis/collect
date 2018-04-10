@@ -30,6 +30,12 @@ public class FieldErrorHandler extends Hlayout {
 		ComponentUtil.addClass(this, SCLASS);
 	}
 
+	@Override
+	public void setSclass(String sclass) {
+		super.setSclass(sclass);
+		ComponentUtil.addClass(this, SCLASS);
+	}
+	
 	public String getMessage() {
 		return message;
 	}
