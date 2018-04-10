@@ -16,6 +16,7 @@ import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
+import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -43,6 +44,8 @@ import liquibase.util.StringUtils;
  */
 public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
+	private static final String SHOW_ALLOWED_VALUES_PREVIEW_FIELD_NAME = "showAllowedValuesPreview";
+	private static final String LAYOUT_DIRECTION_FIELD_NAME = "layoutDirection";
 	private static final String CODE_LIST_ASSIGNED_COMMAND = "codeListAssigned";
 	
 	@Init(superclass=false)
@@ -204,12 +207,11 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	@Command
 	public void layoutTypeChange(@ContextParam(ContextType.BINDER) Binder binder, 
 			@BindingParam("layoutType") String layoutType) {
-		setTempFormObjectFieldValue("showAllowedValuesPreview", Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue());
-		String layoutDirection = null;
-		if ( "radio".equals(layoutType) ) {
-			layoutDirection = Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION.getDefaultValue();
-		}
-		setTempFormObjectFieldValue("layoutDirection", layoutDirection);
+		setTempFormObjectFieldValue(SHOW_ALLOWED_VALUES_PREVIEW_FIELD_NAME, 
+				Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue());
+		String layoutDirection = CodeAttributeLayoutType.RADIO.name().equals(layoutType) ?
+			Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION.getDefaultValue().toString(): null;
+		setTempFormObjectFieldValue(LAYOUT_DIRECTION_FIELD_NAME, layoutDirection);
 		dispatchApplyChangesCommand(binder);
 	}
 	

@@ -3,7 +3,7 @@
 
 	<grid class="inner">
 		<columns>
-			<column width="200px" />
+			<column width="150px" />
 			<column width="100%" />
 		</columns>
 		<rows>
