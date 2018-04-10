@@ -26,6 +26,7 @@ import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
@@ -153,17 +154,20 @@ public class IDMFunctions extends CustomFunctions {
 			protected ExpressionValidationResult performArgumentValidation(NodeDefinition contextNodeDef,
 					Expression[] arguments) {
 				Expression firstArgument = arguments[0];
+				Survey survey = contextNodeDef.getSurvey();
+				SamplingPointDefinition samplingPointDefinition = survey.getReferenceDataSchema().getSamplingPointDefinition();
 				if (firstArgument instanceof Constant) {
 					Object val = ((Constant) firstArgument).computeValue(null);
 					if (val instanceof String) {
-						Survey survey = contextNodeDef.getSurvey();
-						Attribute attr = survey.getReferenceDataSchema().getSamplingPointDefinition().getAttribute((String) val);
+						Attribute attr = samplingPointDefinition.getAttribute((String) val);
 						if (attr != null && ! attr.isKey()) {
 							return new ExpressionValidationResult();
 						}
 					}
 				}
-				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, "First argument must be a valid sampling point attribute");
+				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, 
+						String.format("First argument must be a valid sampling point attribute (valid attributes are: %s)",
+								samplingPointDefinition.getAttributeNames()));
 			}
 		});
 		
