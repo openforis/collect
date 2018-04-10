@@ -110,12 +110,10 @@ package org.openforis.collect.presenter {
 			var canSave:Boolean = !preview && Application.activeRecordEditable;
 			var canViewAllRecords:Boolean = !preview && user.canViewAllRecords;
 			
-			var showHeader:Boolean = !(preview || onlyOneRecordEdit);
 			var showBackToListButton:Boolean = !(preview || onlyOneRecordEdit) || canViewAllRecords;
 			var showTopButtonBar:Boolean = showBackToListButton || (canSubmit || canReject);
 			var showFooter:Boolean = !preview && canSave;
 
-			FlexGlobals.topLevelApplication.header.visible = FlexGlobals.topLevelApplication.header.includeInLayout = showHeader;
 			view.topButtonBar.visible = view.topButtonBar.includeInLayout = showTopButtonBar;
 			view.bottomButtonBar.visible = view.bottomButtonBar.includeInLayout = showFooter;
 			view.footer.userButtonVisible = showFooter && ! onlyOneRecordEdit;
