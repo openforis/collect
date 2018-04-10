@@ -1,4 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="collapsiblepanel" class="org.openforis.collect.designer.component.CollapsiblePanel"?>
 <zk>
 	<custom-attributes parentItem="${arg.parentItem}" />
 	<custom-attributes enumeratingCodeList="${arg.enumeratingCodeList}" />
@@ -97,7 +98,7 @@
 							</fieldErrorHandler>
 							<fieldErrorHandler
 								message="@load(vmsgs['image'])">
-								<vlayout height="100px" width="150px"
+								<vlayout width="150px"
 									visible="@load(empty vm.image)">
 									<label value="${labels.survey.code_list.no_image_uploaded}" />
 								</vlayout>
@@ -115,43 +116,58 @@
 							</fieldErrorHandler>
 						</row>
 						<row>
-							<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
-								<label value="${labels.global.item.since_version}:" />
-							</fieldErrorHandler>
-							<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
-								<listbox width="200px"
-									model="@load(vm.formVersionIdsWithEmptyOption)"
-									selectedItem="@bind(fx.sinceVersionId)" mold="select"
-									onSelect="@command('validate')">
-									<template name="model">
-										<listitem label="@load(vm.getVersionLabel(each))" />
-									</template>
-								</listbox>
-								<button sclass="icon"
-									tooltiptext="${labels.survey.versioning_manager}"
-									onClick="@global-command('openVersioningManagerPopUp')"
-									image="/assets/images/edit-small.png" />
-							</fieldErrorHandler>
+							<cell colspan="2">
+								<collapsiblepanel open="false" captionLabel="${labels.global.item.versioning}">
+									<grid>
+										<columns>
+											<column width="150px" />
+											<column />
+										</columns>
+										<rows>
+											<row>
+												<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
+													<label value="${labels.global.item.since_version}:" />
+												</fieldErrorHandler>
+												<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
+													<listbox width="200px"
+														model="@load(vm.formVersionIdsWithEmptyOption)"
+														selectedItem="@bind(fx.sinceVersionId)" mold="select"
+														onSelect="@command('validate')">
+														<template name="model">
+															<listitem label="@load(vm.getVersionLabel(each))" />
+														</template>
+													</listbox>
+													<button sclass="icon"
+														tooltiptext="${labels.survey.versioning_manager}"
+														onClick="@global-command('openVersioningManagerPopUp')"
+														image="/assets/images/edit-small.png" />
+												</fieldErrorHandler>
+											</row>
+											<row>
+												<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
+													<label value="${labels.global.item.deprecated_version}:" />
+												</fieldErrorHandler>
+												<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
+													<listbox width="200px"
+														model="@load(vm.formVersionIdsWithEmptyOption)"
+														selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
+														onSelect="@command('validate')">
+														<template name="model">
+															<listitem label="@load(vm.getVersionLabel(each))" />
+														</template>
+													</listbox>
+													<button sclass="icon"
+														tooltiptext="${labels.survey.versioning_manager}"
+														onClick="@global-command('openVersioningManagerPopUp')"
+														image="/assets/images/edit-small.png" />
+												</fieldErrorHandler>
+											</row>
+										</rows>
+									</grid>
+								</collapsiblepanel>
+							</cell>
 						</row>
-						<row>
-							<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
-								<label value="${labels.global.item.deprecated_version}:" />
-							</fieldErrorHandler>
-							<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
-								<listbox width="200px"
-									model="@load(vm.formVersionIdsWithEmptyOption)"
-									selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
-									onSelect="@command('validate')">
-									<template name="model">
-										<listitem label="@load(vm.getVersionLabel(each))" />
-									</template>
-								</listbox>
-								<button sclass="icon"
-									tooltiptext="${labels.survey.versioning_manager}"
-									onClick="@global-command('openVersioningManagerPopUp')"
-									image="/assets/images/edit-small.png" />
-							</fieldErrorHandler>
-						</row>
+						
 					</rows>
 				</grid>
         	</center>
