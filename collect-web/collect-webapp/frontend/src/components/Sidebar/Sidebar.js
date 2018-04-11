@@ -49,7 +49,7 @@ class Sidebar extends Component {
           <ul className="nav">
             {
             <li className="nav-item">
-              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active"><i className="fa fa-tachometer"></i>Dashboard</NavLink>
+              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active"><i className="fa fa-tachometer-alt"></i>Dashboard</NavLink>
             </li>
             }
             <li className="nav-item">
@@ -73,23 +73,23 @@ class Sidebar extends Component {
             }
             {loggedUser.canAccessDataCleansing &&
               <li className="nav-item">
-                <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="fa fa-diamond"></i>Data Cleansing</NavLink>
+                <NavLink to={'/datacleansing'} className="nav-link" activeClassName="active"><i className="fa fa-gem"></i>Data Cleansing</NavLink>
               </li>
             }
             <li className="nav-item">
-              <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="fa fa-map-o"></i>Map</NavLink>
+              <NavLink to={'/map'} className="nav-link" activeClassName="active"><i className="fa fa-map"></i>Map</NavLink>
 	          </li>
             {loggedUser.canAccessSaiku &&
               <li className="nav-item">
-                <NavLink to={'/saiku'} className="nav-link" activeClassName="active"><i className="fa fa-bar-chart"></i>Saiku</NavLink>
+                <NavLink to={'/saiku'} className="nav-link" activeClassName="active"><i className="fa fa-chart-bar"></i>Saiku</NavLink>
               </li>
             }
             {loggedUser.canAccessBackupRestore ?
               <li className="nav-item nav-dropdown">
-                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleNavDropdownClick}><i className="fa fa-floppy-o"></i>{L.l('backupRestore')}</a>
+                <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleNavDropdownClick}><i className="fa fa-save"></i>{L.l('backupRestore')}</a>
                 <ul className="nav-dropdown-items">
                   <li className="nav-item">
-                    <NavLink to={'/backup'} className="nav-link" activeClassName="active"><i className="fa fa-floppy-o"></i> {L.l('backup')}</NavLink>
+                    <NavLink to={'/backup'} className="nav-link" activeClassName="active"><i className="fa fa-save"></i> {L.l('backup')}</NavLink>
                   </li>
                   <li className="nav-item">
                     <NavLink to={'/restore'} className="nav-link" activeClassName="active"><i className="fa fa-upload"></i> {L.l('restore')}</NavLink>

@@ -251,7 +251,7 @@ class RecordDataTable extends Component {
             if (owner) {
                 if (loggedUser.canChangeRecordOwner(mostSpecificGroup)) {
                     return <span>
-                            <i className="fa fa-pencil" aria-hidden="true" ></i>
+                            <i className="fa fa-edit" aria-hidden="true" ></i>
                             &nbsp;
                             {owner.username}
                         </span>
