@@ -30,6 +30,38 @@
   						onChange="@command('nameChanged', name=self.value)" />
   				</fieldErrorHandler>
   			</row>
+			<row>
+      			<fieldErrorHandler
+      				message="@load(vmsgs['instanceLabel'])">
+      				<label
+      					use="org.openforis.collect.designer.component.FieldLabel"
+      					value="${labels.survey.schema.node.instance_label}"
+      					languageCode="@load(vm.currentLanguageCode)" />
+      			</fieldErrorHandler>
+      			<fieldErrorHandler
+      				message="@load(vmsgs['instanceLabel'])">
+      				<textbox width="300px"
+      					value="@bind(fx.instanceLabel)"
+      					placeholder="@load(fx.defaultInstanceLabel)"
+      					onChange="@command('singleInstanceLabelChange', label=self.value)" />
+      			</fieldErrorHandler>
+      		</row>
+      		<row>
+      			<fieldErrorHandler
+      				message="@load(vmsgs['description'])">
+      				<label
+      					use="org.openforis.collect.designer.component.FieldLabel"
+      					value="${labels.survey.schema.node.description}"
+      					languageCode="@load(vm.currentLanguageCode)" />
+      			</fieldErrorHandler>
+      			<fieldErrorHandler
+      				message="@load(vmsgs['description'])">
+      				<textbox width="300px" multiline="true" rows="4"
+      					value="@bind(fx.description)"
+      					placeholder="@load(fx.defaultDescription)"
+      					onChange="@command('applyChanges')" />
+      			</fieldErrorHandler>
+      		</row>
   			<row visible="${vm.attribute}">
   				<fieldErrorHandler message="@load(vmsgs['key'])">
 	    			<label value="${labels.survey.schema.attribute.key.$}:" />
@@ -265,48 +297,7 @@
 
   <include src="${arg.otherAttributesForm}" />
     
-    <collapsiblepanel open="true" captionLabel="${labels.survey.schema.node.labels}">
-      <grid class="inner">
-      	<columns>
-      		<column width="150px" />
-      		<column />
-      	</columns>
-      	<rows>
-      		<row>
-      			<fieldErrorHandler
-      				message="@load(vmsgs['instanceLabel'])">
-      				<label
-      					use="org.openforis.collect.designer.component.FieldLabel"
-      					value="${labels.survey.schema.node.instance_label}"
-      					languageCode="@load(vm.currentLanguageCode)" />
-      			</fieldErrorHandler>
-      			<fieldErrorHandler
-      				message="@load(vmsgs['instanceLabel'])">
-      				<textbox width="300px"
-      					value="@bind(fx.instanceLabel)"
-      					placeholder="@load(fx.defaultInstanceLabel)"
-      					onChange="@command('singleInstanceLabelChange', label=self.value)" />
-      			</fieldErrorHandler>
-      		</row>
-      		<row>
-      			<fieldErrorHandler
-      				message="@load(vmsgs['description'])">
-      				<label
-      					use="org.openforis.collect.designer.component.FieldLabel"
-      					value="${labels.survey.schema.node.description}"
-      					languageCode="@load(vm.currentLanguageCode)" />
-      			</fieldErrorHandler>
-      			<fieldErrorHandler
-      				message="@load(vmsgs['description'])">
-      				<textbox width="300px" multiline="true" rows="4"
-      					value="@bind(fx.description)"
-      					placeholder="@load(fx.defaultDescription)"
-      					onChange="@command('applyChanges')" />
-      			</fieldErrorHandler>
-      		</row>
-      	</rows>
-      </grid>
-      <collapsiblepanel open="false" captionLabel="${labels.survey.schema.node.other_labels}">
+    <collapsiblepanel open="false" captionLabel="${labels.survey.schema.node.other_labels}">
       	<grid class="inner">
       		<columns>
       			<column width="150px" />
@@ -437,7 +428,6 @@
       		</rows>
       	</grid>
       	<include src="${arg.otherLabelsForm}" />
-      </collapsiblepanel>
     </collapsiblepanel>
 
 	<collapsiblepanel open="false" visible="@load(not vm.rootEntity)"

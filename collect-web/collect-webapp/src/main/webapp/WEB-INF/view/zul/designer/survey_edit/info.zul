@@ -73,21 +73,8 @@
               image="/assets/images/ruler-medium.png"
               height="32" />
          </hlayout>
-    	 <hlayout visible="@load(not(vm.collectEarthSurvey))">
-            <fieldErrorHandler message="@load(vmsgs['keyChangeAllowed'])">
-	            <label value="${labels.survey.key_change_allowed.$}" />
-              	<image popup="keyChangeAllowedInfoTooltip" 
-              	 	style="cursor:pointer" src="/assets/images/info-small.png" />
-	        </fieldErrorHandler>
-          	<fieldErrorHandler
-				message="@load(vmsgs['keyChangeAllowed'])">
-				<checkbox
-					checked="@bind(fx.keyChangeAllowed)"
-					onCheck="@command('applyChanges')" />
-			</fieldErrorHandler>
-	     </hlayout>
     </hlayout>
-    
+
     <collapsiblepanel open="${not empty vm.surveyFiles}" captionLabel="${labels.survey.files}">
     	<box>
 			<include src="survey_edit/survey_file_list.zul" />
@@ -151,7 +138,7 @@
 		  <hlayout style="padding: 10px">
 			
             <fieldErrorHandler message="@load(vmsgs['openBingMaps'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_bing_maps}:" />  					
+		 		<label value="${labels.survey.collect_earth.other_settings.open_bing_maps}:" />
 	  					<checkbox
 	  						checked="@load(fx.openBingMaps eq true) @save(fx.openBingMaps)"
 	  						onCheck="@command('applyChanges')" />
@@ -160,7 +147,7 @@
 	  		<space width="30px" />
 	  		
 	  		<fieldErrorHandler message="@load(vmsgs['openGEEExplorer'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />  					
+		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />
 	  					<checkbox
 	  						checked="@load(fx.openGEEExplorer eq true) @save(fx.openGEEExplorer)"
 	  						onCheck="@command('applyChanges')" />
@@ -169,7 +156,7 @@
 	  		<space width="30px" />
 	  		
 	  		 <fieldErrorHandler message="@load(vmsgs['openGEECodeEditor'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_code_editor}:" />  					
+		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_code_editor}:" />
 	  					<checkbox
 	  						checked="@load(fx.openGEECodeEditor eq true) @save(fx.openGEECodeEditor)"
 	  						onCheck="@command('applyChanges')" />
@@ -178,7 +165,7 @@
 	  		<space width="30px" />
 	  		
 	  		 <fieldErrorHandler message="@load(vmsgs['openStreetView'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_street_view}:" />  					
+		 		<label value="${labels.survey.collect_earth.other_settings.open_street_view}:" />
 	  					<checkbox
 	  						checked="@load(fx.openStreetView eq true) @save(fx.openStreetView)"
 	  						onCheck="@command('applyChanges')" />
@@ -187,7 +174,7 @@
 	  		<space width="30px" />
 	  		
 	  		 <fieldErrorHandler message="@load(vmsgs['openYandexMaps'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_yandex_maps}:" />  					
+		 		<label value="${labels.survey.collect_earth.other_settings.open_yandex_maps}:" />
 	  					<checkbox
 	  						checked="@load(fx.openYandexMaps eq true) @save(fx.openYandexMaps)"
 	  						onCheck="@command('applyChanges')" />
@@ -195,6 +182,32 @@
 	  	   </hlayout>
             
      </groupbox>
+     
+   	<collapsiblepanel open="false" visible="@load(not(vm.collectEarthSurvey))"
+		captionLabel="${labels.survey.other_options}">
+		<grid>
+			<columns>
+				<column width="250px" />
+				<column />
+			</columns>
+			<rows>
+				<row visible="@load(not(vm.collectEarthSurvey))">
+					<fieldErrorHandler
+						message="@load(vmsgs['keyChangeAllowed'])">
+						<label value="${labels.survey.key_change_allowed.$}" />
+						<image popup="keyChangeAllowedInfoTooltip"
+							style="cursor:pointer" src="/assets/images/info-small.png" />
+					</fieldErrorHandler>
+					<fieldErrorHandler
+						message="@load(vmsgs['keyChangeAllowed'])">
+						<checkbox checked="@bind(fx.keyChangeAllowed)"
+							onCheck="@command('applyChanges')" />
+					</fieldErrorHandler>
+				</row>
+			</rows>
+		</grid>
+	</collapsiblepanel>
+     
   </div>
 
     <popup id="keyChangeAllowedInfoTooltip" width="300px">
