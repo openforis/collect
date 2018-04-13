@@ -1,6 +1,5 @@
 package org.openforis.collect.utils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,23 +36,16 @@ public class Controllers {
 	
 	public static void writeFileToResponse(HttpServletResponse response, File file, String outputFileName, 
 			String contentType) throws FileNotFoundException, IOException {
-		writeFileToResponse(response, new FileInputStream(file), outputFileName, contentType, new Long(file.length()).intValue());
+		writeFileToResponse(response, new FileInputStream(file), outputFileName, contentType, file.length());
 	}
 	
 	public static void writeFileToResponse(HttpServletResponse response, InputStream is,
-			String outputFileName, String contentType, int fileSize) throws IOException {
-		BufferedInputStream buf = null;
+			String outputFileName, String contentType, long fileSize) throws IOException {
 		ServletOutputStream os = response.getOutputStream();
 		try {
 			setOutputContent(response, outputFileName, contentType, fileSize);
-			buf = new BufferedInputStream(is);
-			int readBytes = 0;
-			//read from the file; write to the ServletOutputStream
-			while ((readBytes = buf.read()) != -1) {
-				os.write(readBytes);
-			}
+			IOUtils.copy(is, os);
 		} finally {
-			IOUtils.closeQuietly(buf);
 			IOUtils.closeQuietly(is);
 			os.flush();
 		}
@@ -63,11 +55,15 @@ public class Controllers {
 		setOutputContent(response, outputFileName, contentType, null);
 	}
 	
-	public static void setOutputContent(HttpServletResponse response, String outputFileName, String contentType, Integer contentLength) {
+	public static void setOutputContent(HttpServletResponse response, String outputFileName, String contentType, Long contentLength) {
 		response.setContentType(contentType); 
 		response.setHeader("Content-Disposition", "attachment; filename=" + outputFileName);
 		if (contentLength != null) {
-			response.setContentLength(contentLength);
+			if (contentLength <= Integer.MAX_VALUE) {
+				response.setContentLength(contentLength.intValue());
+			} else {
+				response.addHeader("Content-length", contentLength.toString());
+			}
 		}
 	}
 	

@@ -113,6 +113,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	
 	//output
 	private File outputFile;
+	private boolean outputFileCreated = false; //created or passed from outside
 	private List<DataBackupError> dataBackupErrors = new ArrayList<DataBackupError>();
 	
 	//temporary instance variable
@@ -143,6 +144,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 			outputFileExtension = outputFormat.getOutputFileExtension();
 		}
 		outputFile = File.createTempFile("collect_survey_export", "." + outputFileExtension);
+		outputFileCreated = true;
 	}
 	
 	@Override
@@ -204,6 +206,15 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		super.onTaskCompleted(task);
 	}
 	
+	@Override
+	public void release() {
+		super.release();
+		IOUtils.closeQuietly(zipOutputStream);
+		if (outputFileCreated && outputFile != null && outputFile.exists()) {
+			outputFile.delete();
+		}
+	}
+
 	private void addInfoPropertiesCreatorTask() {
 		SurveyBackupInfoCreatorTask task = createTask(SurveyBackupInfoCreatorTask.class);
 		task.setOutputStream(zipOutputStream);
@@ -258,6 +269,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	
 	private void addDataExportTask() {
 		DataBackupTask task = createTask(DataBackupTask.class);
+		task.setWeight(5);
 		task.setRecordManager(recordManager);
 		task.setDataMarshaller(dataMarshaller);
 		task.setRecordFilter(recordFilter);
@@ -269,6 +281,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	private void addRecordFilesBackupTask() {
 		for (EntityDefinition rootEntity : survey.getSchema().getRootEntityDefinitions()) {
 			RecordFileBackupTask task = createTask(RecordFileBackupTask.class);
+			task.setWeight(5);
 			task.setRecordManager(recordManager);
 			task.setRecordFileManager(recordFileManager);
 			task.setZipOutputStream(zipOutputStream);
