@@ -57,10 +57,6 @@ public class RecordFileBackupTask extends Task {
 	private List<CollectRecordSummary> skippedRecords = new ArrayList<CollectRecordSummary>();
 	private List<MissingRecordFileError> missingRecordFiles = new ArrayList<MissingRecordFileError>();
 	
-	public RecordFileBackupTask() {
-		super();
-	}
-
 	@Override
 	protected long countTotalItems() {
 		if (hasFileAttributeDefinitions()) {
@@ -123,7 +119,7 @@ public class RecordFileBackupTask extends Task {
 			if ( StringUtils.isNotBlank(fileAttribute.getFilename()) ) {
 				File file = recordFileManager.getRepositoryFile(fileAttribute);
 				if ( file != null && file.exists() ) {
-					String entryName = calculateRecordFileEntryName(fileAttribute);
+					String entryName = determineRecordFileEntryName(fileAttribute);
 					writeFile(file, entryName);
 				} else {
 					addSkippedFileError(summary, fileAttribute.getPath(), recordFileManager.getRepositoryFileAbsolutePath(fileAttribute));
@@ -139,7 +135,7 @@ public class RecordFileBackupTask extends Task {
 		this.missingRecordFiles.add(new MissingRecordFileError(summary, fileAttributePath, fileAbsolutePath));
 	}
 
-	public static String calculateRecordFileEntryName(FileAttribute fileAttribute) {
+	public static String determineRecordFileEntryName(FileAttribute fileAttribute) {
 		FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
 		String repositoryRelativePath = RecordFileManager.getRepositoryRelativePath(fileAttributeDefinition, ZIP_FOLDER_SEPARATOR, false);
 		String filename = fileAttribute.getFilename();
