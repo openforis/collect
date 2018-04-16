@@ -51,8 +51,7 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 			return null;
 		} else {
 			if ( value instanceof FileWrapper ) {
-				FileWrapper fileWrapper = (FileWrapper) value;
-				java.io.File tempFile = new java.io.File(fileWrapper.getFilePath());
+				java.io.File tempFile = new java.io.File(((FileWrapper) value).getFilePath());
 				sessionManager.prepareDeleteTempRecordFile(record, nodeId);
 				sessionManager.indexTempRecordFile(tempFile, nodeId);
 				return new File(tempFile.getAbsolutePath(), tempFile.length());

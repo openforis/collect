@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -57,6 +56,7 @@ import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RandomRecordGenerator;
 import org.openforis.collect.manager.RecordAccessControlManager;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordGenerator;
 import org.openforis.collect.manager.RecordGenerator.NewRecordParameters;
 import org.openforis.collect.manager.RecordManager;
@@ -126,6 +126,8 @@ public class RecordController extends BasicController implements Serializable {
 
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private RecordFileManager recordFileManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -328,7 +330,13 @@ public class RecordController extends BasicController implements Serializable {
 	public @ResponseBody
 	Response deleteRecord(@PathVariable("surveyId") int surveyId, @Valid RecordDeleteParameters params) throws RecordPersistenceException {
 		if (canDeleteRecords(surveyId, Sets.newHashSet(params.getRecordIds()))) {
-			recordManager.deleteByIds(new HashSet<Integer>(Arrays.asList(params.getRecordIds())));
+			CollectSurvey survey = surveyManager.getById(surveyId);
+			for (Integer recordId : params.getRecordIds()) {
+				CollectRecord record = recordManager.load(survey, recordId);
+				recordFileManager.deleteAllFiles(record);
+				recordManager.delete(recordId);
+				publishRecordDeletedEvent(record, record.getStep().toRecordStep(), sessionManager.getLoggedUser().getUsername());
+			}
 			return new Response();
 		} else {
 			Response response = new Response();

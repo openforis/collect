@@ -58,7 +58,7 @@ public class RecordSessionManager extends SessionManager implements EventListene
 	}
 
 	public void indexTempRecordFile(java.io.File tempFile, Integer nodeId) {
-		recordFileManager.indexTempFile(tempFile, nodeId);
+		recordFileManager.indexTempFile(nodeId, tempFile, tempFile.getName());
 	}
 
 	public void prepareDeleteTempRecordFile(CollectRecord record, Integer nodeId) {

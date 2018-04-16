@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -15,7 +17,6 @@ import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.FileAttribute;
-import org.openforis.idm.model.Record;
 
 /**
  * 
@@ -25,6 +26,7 @@ import org.openforis.idm.model.Record;
 public class RecordFileManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
+	private static final Pattern UUID_REGEX = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
 	protected static Log LOG = LogFactory.getLog(RecordFileManager.class);
 
@@ -64,13 +66,14 @@ public class RecordFileManager extends BaseStorageManager {
 	 * Moves a file into the repository and associates the file name to the corresponding file attribute node 
 	 * Returns true if the record is modified (file name or size different from the old one).
 	 */
-	public boolean moveFileIntoRepository(CollectRecord record, int nodeId, java.io.File newFile) throws IOException {
+	public boolean moveFileIntoRepository(CollectRecord record, int nodeId, java.io.File newFile, String originalFileName) throws IOException {
 		boolean recordUpdated = false;
 		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
-
-		FileAttributeDefinition defn = fileAttribute.getDefinition();
 		
-		String repositoryFileName = generateUniqueRepositoryFileName(fileAttribute, newFile);
+		String repositoryFileName = isUniqueFileName(originalFileName) ? originalFileName
+				: generateUniqueRepositoryFileName(fileAttribute, newFile);
+		
+		FileAttributeDefinition defn = fileAttribute.getDefinition();
 		File repositoryFile = new java.io.File(getRepositoryDir(defn), repositoryFileName);
 		
 		long repositoryFileSize = newFile.length();
@@ -83,6 +86,11 @@ public class RecordFileManager extends BaseStorageManager {
 		FileUtils.moveFile(newFile, repositoryFile);
 		
 		return recordUpdated;
+	}
+	
+	private boolean isUniqueFileName(String fileName) {
+		String baseName = FilenameUtils.getBaseName(fileName);
+		return UUID_REGEX.matcher(baseName).matches(); 
 	}
 	
 	private String generateUniqueRepositoryFileName(FileAttribute fileAttribute, java.io.File file) {
@@ -98,9 +106,8 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 
 	private String generateNewRepositoryFilename(FileAttribute fileAttribute, String tempFileName) {
-		Record record = fileAttribute.getRecord();
 		String extension = FilenameUtils.getExtension(tempFileName);
-		return String.format("%d_%d.%s", record.getId(), System.currentTimeMillis(), extension);
+		return String.format("%s.%s", UUID.randomUUID(), extension);
 	}
 
 	protected java.io.File getRepositoryDir(FileAttributeDefinition defn) {
@@ -136,9 +143,9 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 	
 	public java.io.File getRepositoryFile(FileAttribute fileAttribute) {
-		FileAttributeDefinition defn = fileAttribute.getDefinition();
 		String filename = fileAttribute.getFilename();
 		if ( StringUtils.isNotBlank(filename) ) {
+			FileAttributeDefinition defn = fileAttribute.getDefinition();
 			java.io.File file = getRepositoryFile(defn, filename);
 			return file;
 		} else {

@@ -36,8 +36,8 @@ public class SessionRecordFileManager implements Serializable {
 	@Autowired
 	private RecordFileManager recordFileManager;
 	
-	private Map<Integer, String> nodeIdToTempFilePath;
-	private Map<Integer, String> filesToDelete;
+	private Map<Integer, TempFileInfo> nodeIdToTempFilePath = new HashMap<Integer, TempFileInfo>();
+	private Map<Integer, String> filesToDelete = new HashMap<Integer, String>();
 
 	protected java.io.File tempRootDir;
 
@@ -46,8 +46,8 @@ public class SessionRecordFileManager implements Serializable {
 	}
 
 	public void resetTempInfo() {
-		nodeIdToTempFilePath = new HashMap<Integer, String>();
-		filesToDelete = new HashMap<Integer, String>();
+		nodeIdToTempFilePath.clear();
+		filesToDelete.clear();
 	}
 	
 	public java.io.File saveToTempFile(byte[] data, String originalFileName, CollectRecord record, int nodeId) throws RecordFileException {
@@ -62,26 +62,26 @@ public class SessionRecordFileManager implements Serializable {
 			java.io.File tempFile = java.io.File.createTempFile("collect_record_file_upload", "." + extension);
 			FileUtils.copyInputStreamToFile(is, tempFile);
 			
-			indexTempFile(tempFile, nodeId);
+			indexTempFile(nodeId, tempFile, originalFileName);
 			return tempFile;
 		} catch (IOException e) {
 			throw new RecordFileException(e);
 		}
 	}
 
-	public void indexTempFile(java.io.File tempFile, int nodeId) {
+	public void indexTempFile(int nodeId, java.io.File tempFile, String originalFileName) {
 		String filePath = tempFile.getAbsolutePath();
-		nodeIdToTempFilePath.put(nodeId, filePath);
+		nodeIdToTempFilePath.put(nodeId, new TempFileInfo(filePath, originalFileName));
 	}
 	
 	protected boolean moveTempFilesToRepository(CollectRecord record) throws RecordFileException {
 		try {
 			boolean recordChanged = false;
-			for (Entry<Integer, String> entry : nodeIdToTempFilePath.entrySet()) {
+			for (Entry<Integer, TempFileInfo> entry : nodeIdToTempFilePath.entrySet()) {
 				int nodeId = entry.getKey();
-				String fileName = entry.getValue();
-				java.io.File tempFile = new java.io.File(fileName);
-				boolean currentRecordChanged = recordFileManager.moveFileIntoRepository(record, nodeId, tempFile);
+				TempFileInfo fileInfo = entry.getValue();
+				java.io.File tempFile = new java.io.File(fileInfo.getTempFilePath());
+				boolean currentRecordChanged = recordFileManager.moveFileIntoRepository(record, nodeId, tempFile, fileInfo.getOriginalFileName());
 				recordChanged = recordChanged || currentRecordChanged;
 			}
 			nodeIdToTempFilePath.clear();
@@ -92,10 +92,9 @@ public class SessionRecordFileManager implements Serializable {
 	}
 	
 	public void deleteAllTempFiles() {
-		Set<Entry<Integer,String>> entrySet = nodeIdToTempFilePath.entrySet();
-		for (Entry<Integer, String> entry : entrySet) {
-			String filePath = entry.getValue();
-			java.io.File tempFile = new java.io.File(filePath);
+		for (Entry<Integer, TempFileInfo> entry : nodeIdToTempFilePath.entrySet()) {
+			TempFileInfo fileInfo = entry.getValue();
+			java.io.File tempFile = new java.io.File(fileInfo.getTempFilePath());
 			tempFile.delete();
 		}
 		nodeIdToTempFilePath.clear();
@@ -108,8 +107,8 @@ public class SessionRecordFileManager implements Serializable {
 	}
 	
 	public void prepareDeleteFile(CollectRecord record, int nodeId) {
-		String tempFilePath = nodeIdToTempFilePath.get(nodeId);
-		if ( tempFilePath == null ) {
+		TempFileInfo tempFileInfo = nodeIdToTempFilePath.get(nodeId);
+		if ( tempFileInfo == null ) {
 			//prepare repository file delete
 			java.io.File repositoryFile = recordFileManager.getRepositoryFile(record, nodeId);
 			if ( repositoryFile != null ) {
@@ -118,7 +117,7 @@ public class SessionRecordFileManager implements Serializable {
 			}
 		} else {
 			//remove temp file
-			java.io.File tempFile = new java.io.File(tempFilePath);
+			java.io.File tempFile = new java.io.File(tempFileInfo.getTempFilePath());
 			tempFile.delete();
 			nodeIdToTempFilePath.remove(nodeId);
 		}
@@ -141,11 +140,11 @@ public class SessionRecordFileManager implements Serializable {
 	
 	public java.io.File getFile(CollectRecord record, int nodeId) {
 		java.io.File file;
-		String tempFilePath = nodeIdToTempFilePath.get(nodeId);
-		if ( tempFilePath == null ) {
+		TempFileInfo tempFileInfo = nodeIdToTempFilePath.get(nodeId);
+		if ( tempFileInfo == null ) {
 			file = recordFileManager.getRepositoryFile(record, nodeId);
 		} else {
-			file = new java.io.File(tempFilePath);
+			file = new java.io.File(tempFileInfo.getTempFilePath());
 		}
 		return file;
 	}
@@ -170,4 +169,23 @@ public class SessionRecordFileManager implements Serializable {
 		this.recordFileManager = recordFileManager;
 	}
 	
+	private class TempFileInfo {
+		
+		private String tempFilePath;
+		private String originalFileName;
+		
+		public TempFileInfo(String tempFilePath, String originalFileName) {
+			super();
+			this.tempFilePath = tempFilePath;
+			this.originalFileName = originalFileName;
+		}
+		
+		public String getTempFilePath() {
+			return tempFilePath;
+		}
+		
+		public String getOriginalFileName() {
+			return originalFileName;
+		}
+	}
 }

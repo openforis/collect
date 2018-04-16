@@ -137,11 +137,12 @@ public class RecordFileRestoreTask extends Task {
 	
 	private void importRecordFiles(CollectRecord record) throws IOException, RecordPersistenceException {
 		sessionRecordFileManager.resetTempInfo();
-		recordFileManager.deleteAllFiles(record);
+		//recordFileManager.deleteAllFiles(record);
+		sessionRecordFileManager.prepareDeleteAllFiles(record);
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		for (FileAttribute fileAttribute : fileAttributes) {
 			if (! fileAttribute.isEmpty()) {
-				String recordFileEntryName = RecordFileBackupTask.calculateRecordFileEntryName(fileAttribute);
+				String recordFileEntryName = RecordFileBackupTask.determineRecordFileEntryName(fileAttribute);
 				InputStream is = backupFileExtractor.findEntryInputStream(recordFileEntryName);
 				if ( is != null ) {
 					sessionRecordFileManager.saveToTempFile(is, fileAttribute.getFilename(), 
