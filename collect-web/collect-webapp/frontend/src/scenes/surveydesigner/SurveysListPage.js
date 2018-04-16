@@ -40,30 +40,10 @@ class SurveysListPage extends Component {
         this.handleUnpublishButtonClick = this.handleUnpublishButtonClick.bind(this)
         this.performSurveyDelete = this.performSurveyDelete.bind(this)
         this.resetSelection = this.resetSelection.bind(this)
-        this.handleWindowResize = this.handleWindowResize.bind(this)
-        this.updateTableHeight = this.updateTableHeight.bind(this)
         this.handleRowClick = this.handleRowClick.bind(this)
         this.handleFilterChange = this.handleFilterChange.bind(this)
     }
 
-    componentDidMount() {
-        this.handleWindowResize();
-        window.addEventListener("resize", this.handleWindowResize);
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener("resize", this.handleWindowResize);
-    }
-
-    handleWindowResize() {
-        this.updateTableHeight()
-    }
-
-    updateTableHeight() {
-        const mainContainer = this.refs['survey-list-container']
-        Containers.extendTableHeightToMaxAvailable(mainContainer, 50)
-    }
-    
     handleCellEdit(row, fieldName, value) {
 		if (fieldName === 'userGroupId') {
 			const surveyId = row.id
@@ -292,7 +272,7 @@ class SurveysListPage extends Component {
                 </Row>
                 <BootstrapTable
                     data={combinedSummaries}
-                    striped hover condensed
+                    striped hover condensed pagination
                     selectRow={{
                         mode: 'radio',  // single select
                         bgColor: 'lightBlue',
