@@ -59,12 +59,12 @@ const routes = [
   {
     path: '/surveydesigner/export/:id',
     name: 'Export survey',
-    pathRegExp: new RegExp('/surveydesigner/surveys/export/(\\d)+')
+    pathRegExp: new RegExp('/surveydesigner/export/(\\d)+')
   },
   {
     path: '/surveydesigner/clone/:surveyName',
     name: 'Clone survey',
-    pathRegExp: new RegExp('/surveydesigner/surveys/clone/(\.)+')
+    pathRegExp: new RegExp('/surveydesigner/clone/(\.)+')
   },
   {
     path: '/surveydesigner/new',
