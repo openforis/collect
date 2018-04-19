@@ -55,6 +55,9 @@ class Sidebar extends Component {
             <li className="nav-item">
               <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active"><i className="fa fa-database"></i>Data Management</NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink to={'/datamanagement/view'} className="nav-link" activeClassName="active"><i className="fa fa-chart-bar"></i>Data View</NavLink>
+            </li>
             {loggedUser.canAccessSurveyDesigner &&
               <li className="nav-item nav-dropdown">
                 <a className="nav-link nav-dropdown-toggle" href="#" onClick={this.handleNavDropdownClick}><i className="fa fa-flask" aria-hidden="true"></i>Survey Designer</a>

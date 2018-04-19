@@ -14,6 +14,7 @@ import BackupPage from 'scenes/backuprestore/BackupPage'
 import DashboardPage from 'scenes/DashboardPage'
 import DataCleansingPage from 'scenes/DataCleansingPage'
 import DataManagementPage from 'scenes/datamanagement/DataManagementPage'
+import DataViewPage from 'scenes/datamanagement/DataViewPage'
 import MapPage from 'scenes/MapPage'
 import RestorePage from 'scenes/backuprestore/RestorePage'
 import SaikuPage from 'scenes/SaikuPage'
@@ -45,6 +46,7 @@ class App extends Component {
                   <Route path="/backup" exact name="Backup" component={BackupPage}/>
                   <Route path="/dashboard" exact name="Dashboard" component={DashboardPage}/>
                   <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage}/>
+                  <Route path="/datamanagement/view" exact name="DataView" component={DataViewPage}/>
                   <Route path="/datamanagement/csvexport" exact name="CsvDataExport" component={CsvDataExportPage}/>
                   <Route path="/datamanagement/backup" exact name="BackupDataExport" component={BackupDataExportPage}/>
                   <Route path="/datamanagement/backupimport" exact name="BackupDataImport" component={BackupDataImportPage}/>

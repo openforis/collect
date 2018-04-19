@@ -22,6 +22,11 @@ const routes = [
     surveySelectRequired: true
   },
   {
+    path: '/datamanagement/view',
+    name: "Data View",
+    surveySelectRequired: true
+  },
+  {
     path: '/datamanagement/export',
     name: "Export Data",
     surveySelectRequired: true
