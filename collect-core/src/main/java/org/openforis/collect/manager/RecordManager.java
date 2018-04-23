@@ -464,6 +464,7 @@ public class RecordManager {
 
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
 			Visitor<CollectRecordSummary> visitor, boolean includeStepDetails) {
+		visitSummaries(filter, sortFields, visitor, includeStepDetails, null);
 	}
 	
 	public void visitSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields, 
