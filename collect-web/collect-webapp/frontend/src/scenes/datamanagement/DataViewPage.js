@@ -139,6 +139,7 @@ class DataViewPage extends Component {
 			borderBottomLeftRadius: 15,
 			borderBottomRightRadius: 15,
 			width: '200px',
+			float: 'left',
 			...draggableStyle
 		});
 		
@@ -155,6 +156,7 @@ class DataViewPage extends Component {
 			margin: `0 0 ${grid}px 0`,
 			background: isDragging ? "lightgreen" : "white",
 			width: '200px',
+			float: 'left',
 			...draggableStyle
 		  });
 		 
