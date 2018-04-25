@@ -3,6 +3,7 @@ import BackupRestoreService from './BackupRestoreService'
 import CommandService from './CommandService'
 import CodeListService from './CodeListService'
 import JobService from './JobService'
+import QueryService from './QueryService'
 import RecordService from './RecordService'
 import SaikuService from './SaikuService'
 import SessionService from './SessionService'
@@ -17,6 +18,7 @@ export default class ServiceFactory {
     static commandService = new CommandService()
     static codeListService = new CodeListService()
     static jobService = new JobService()
+    static queryService = new QueryService()
     static recordService = new RecordService()
     static saikuService = new SaikuService()
     static sessionService = new SessionService()

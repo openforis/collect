@@ -12,9 +12,18 @@ import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 
 public class SQLRelationalSchemaCreator implements RelationalSchemaCreator {
+	
+	private RelationalSchema schema;
+	private Connection conn;
+	
+	public SQLRelationalSchemaCreator(RelationalSchema schema, Connection conn) {
+		super();
+		this.schema = schema;
+		this.conn = conn;
+	}
 
 	@Override
-	public void createRelationalSchema(RelationalSchema schema, Connection conn) {
+	public void createRelationalSchema() {
 		CollectDSLContext dsl = new CollectDSLContext(conn);
 		RdbDialect rdbDialect = getRdbDialect(dsl);
 		Writer writer = new StringWriter();
@@ -43,12 +52,12 @@ public class SQLRelationalSchemaCreator implements RelationalSchemaCreator {
 	}
 
 	@Override
-	public void addConstraints(RelationalSchema schema, Connection conn) {
+	public void addConstraints() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void addIndexes(RelationalSchema schema, Connection conn) {
+	public void addIndexes() {
 		throw new UnsupportedOperationException();
 	}
 	

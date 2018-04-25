@@ -87,11 +87,11 @@ public class CollectRDBPublisher {
 			RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(config);
 			RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, targetSchemaName);
 			
-			RelationalSchemaCreator relationalSchemaCreator = createRelationalSchemaCreator();
-			relationalSchemaCreator.createRelationalSchema(relationalSchema, targetConn);
+			RelationalSchemaCreator relationalSchemaCreator = createRelationalSchemaCreator(relationalSchema, targetConn);
+			relationalSchemaCreator.createRelationalSchema();
 
-			relationalSchemaCreator.addConstraints(relationalSchema, targetConn);
-			relationalSchemaCreator.addIndexes(relationalSchema, targetConn);
+			relationalSchemaCreator.addConstraints();
+			relationalSchemaCreator.addIndexes();
 			
 			insertData(survey, rootEntityName, step, targetConn, relationalSchema, progressListener);
 			
@@ -156,8 +156,8 @@ public class CollectRDBPublisher {
 		return targetConn;
 	}
 	
-	private JooqRelationalSchemaCreator createRelationalSchemaCreator() {
-		return new JooqRelationalSchemaCreator();
+	private JooqRelationalSchemaCreator createRelationalSchemaCreator(RelationalSchema relationalSchema, Connection conn) {
+		return new JooqRelationalSchemaCreator(relationalSchema, conn);
 	}
 	
 	private DatabaseExporter createDatabaseExporter(RelationalSchema schema, Connection targetConn) {

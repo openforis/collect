@@ -146,11 +146,11 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		
 		withConnection(surveyName, recordStep, new Callback() {
 			public void execute(Connection connection) {
-				RelationalSchemaCreator relationalSchemaCreator = new JooqRelationalSchemaCreator();
-				relationalSchemaCreator.createRelationalSchema(relationalSchema, connection);
+				RelationalSchemaCreator relationalSchemaCreator = new JooqRelationalSchemaCreator(relationalSchema, connection);
+				relationalSchemaCreator.createRelationalSchema();
 				insertRecords(surveyName, recordStep, relationalSchema, connection, progressListener);
-				relationalSchemaCreator.addConstraints(relationalSchema, connection);
-				relationalSchemaCreator.addIndexes(relationalSchema, connection);
+				relationalSchemaCreator.addConstraints();
+				relationalSchemaCreator.addIndexes();
 			}
 		});
 	}
@@ -292,7 +292,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		return relationalSchemaDefinitionBySurvey.get(surveyName);
 	}
 
-	private void withConnection(String surveyName, RecordStep recordStep, Callback job) {
+	public void withConnection(String surveyName, RecordStep recordStep, Callback job) {
 		Connection connection = null;
 		try {
 			connection = createTargetConnection(surveyName, recordStep);
@@ -331,6 +331,10 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private RelationalSchema getRelatedRelationalSchema(
 			RecordTransaction recordTransaction) {
 		String surveyName = recordTransaction.getSurveyName();
+		return getRelationalSchema(surveyName);
+	}
+
+	public RelationalSchema getRelationalSchema(String surveyName) {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		return survey == null ? null : relationalSchemaDefinitionBySurvey.get(survey.getName());
 	}
@@ -367,7 +371,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		return new JooqDatabaseExporter(schema, targetConn);
 	}
 	
-	private interface Callback {
+	public interface Callback {
 		
 		void execute(Connection connection);
 		

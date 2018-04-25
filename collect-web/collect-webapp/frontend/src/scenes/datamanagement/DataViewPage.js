@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import TreeSelect, { SHOW_PARENT } from 'rc-tree-select'
 import 'rc-tree-select/assets/index.css'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import Chip from 'material-ui/Chip'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import Button from 'material-ui/Button'
 
 import { EntityDefinition } from 'model/Survey'
+import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels'
 import Arrays from 'utils/Arrays'
 
@@ -17,12 +18,15 @@ class DataViewPage extends Component {
 			treeData: null,
 			selectedEntity: null,
 			selectedEntityTreeNodes: [],
-			columnsSelection: [],
-			filterSelection: []
+			selectedColumns: [],
+			selectedFilter: []
 		}
 
 		this.onEntityChange = this.onEntityChange.bind(this)
 		this.onDragEnd = this.onDragEnd.bind(this)
+		this.getListByDroppableId = this.getListByDroppableId.bind(this)
+		this.updateSelectionState = this.updateSelectionState.bind(this)
+		this.handleQueryButtonClick = this.handleQueryButtonClick.bind(this)
 	}
 
 	static getDerivedStateFromProps(nextProps, prevState) {
@@ -57,9 +61,32 @@ class DataViewPage extends Component {
 		this.setState({
 			selectedEntity: selectedEntity,
 			selectedEntityTreeNodes: newSelectedEntityTreeNodes,
-			columnsSelection: [],
-			filterSelection: []
+			selectedColumns: [],
+			selectedFilter: []
 		})
+	}
+
+	getListByDroppableId(droppableId) {
+		switch(droppableId) {
+			case 'selectedColumns':
+				return this.state.selectedColumns
+			case 'selectedFilter':
+				return this.state.selectedFilter
+			default:
+				return DataViewPage.getAttributes(this.state.selectedEntity)		
+		}
+	}
+
+	updateSelectionState(droppableId, list) {
+		if (droppableId === 'selectedColumns') {
+			this.setState({
+				selectedColumns: list
+			})
+		} else {
+			this.setState({
+				selectedFilter: list
+			})
+		}
 	}
 
 	onDragEnd(result) {
@@ -67,29 +94,83 @@ class DataViewPage extends Component {
 		if (!result.destination) {
 		  return
 		}
-		const attribute = DataViewPage.getAttributes(this.state.selectedEntity)[result.source.index]
-		switch(result.destination.droppableId) {
-			case 'selectedColumns':
-				const newColumnsSelection = Arrays.addItem(this.state.columnsSelection, 
-					{id: attribute.id, attribute: attribute}, true, 'id')
-				this.setState({
-					columnsSelection: newColumnsSelection
-				})
-				break
-			case 'selectedFilter':
-				const newFilterSelection = Arrays.addItem(this.state.filterSelection, 
-					{id: attribute.id, attribute: attribute}, true, 'id')
-				this.setState({
-					filterSelection: newFilterSelection
-				})
-				break
-		}
+		const attributeDefs = DataViewPage.getAttributes(this.state.selectedEntity)
+		const attributeDef = attributeDefs[result.source.index]
 		
+		const sourceList = this.getListByDroppableId(result.source.droppableId)
+		const destList = this.getListByDroppableId(result.destination.droppableId)
+
+		//dropped inside the same list: reorder
+		if (result.source.droppableId === result.destination.droppableId) {
+			const reorder = (list, startIndex, endIndex) => {
+				const result = Array.from(list)
+				const [removed] = result.splice(startIndex, 1)
+				result.splice(endIndex, 0, removed)
+				return result
+			}
+			const newDestList =  reorder(destList, result.source.index, result.source.index)
+			this.updateSelectionState(result.destination.droppableId, newDestList)
+		} else if (result.source.droppableId === 'selectedAttributes') {
+			switch(result.destination.droppableId) {
+				case 'selectedColumns':
+					const newSelectedColumns = Arrays.addItem(this.state.selectedColumns, 
+						{id: attributeDef.id, attributeDefinition: attributeDef}, true, 'id')
+					this.setState({
+						selectedColumns: newSelectedColumns
+					})
+					break
+				case 'selectedFilter':
+					const newSelectedFilter = Arrays.addItem(this.state.selectedFilter, 
+						{id: attributeDef.id, attributeDefinition: attributeDef}, true, 'id')
+					this.setState({
+						selectedFilter: newSelectedFilter
+					})
+					break
+			}
+		} else {
+			const newSourceList = Array.from(sourceList)
+			const [removed] = newSourceList.splice(result.source.index, 1)
+			const newDestList = Array.from(destList)
+			newDestList.push(removed)
+			this.updateSelectionState(result.source.droppableId, newSourceList)
+			this.updateSelectionState(result.destination.droppableId, newDestList)
+		}
 	  }
+
+	handleColumnSelectionItemClose(attributeDefinitionId) {
+		const item = this.state.selectedColumns.find(c => c.id === attributeDefinitionId)
+		this.setState({
+			selectedColumns: Arrays.removeItem(this.state.selectedColumns, item)
+		})
+	}
+
+	handleFilterSelectionItemClose(attributeDefinitionId) {
+		const item = this.state.selectedFilter.find(c => c.id === attributeDefinitionId)
+		this.setState({
+			selectedFilter: Arrays.removeItem(this.state.selectedFilter, item)
+		})
+	}
+
+	handleQueryButtonClick() {
+		const { survey } = this.props
+		const { selectedEntity, selectedColumns, selectedFilter} = this.state
+		const query = new RDBQuery()
+		query.surveyName = survey.name
+		query.recordStep = 'ENTRY'
+		query.contextEntityDefinitionId = selectedEntity.id
+		query.columns = selectedColumns.map(c => {return {
+			attributeDefinitionId: c.attributeDefinition.id
+		}})
+		query.filter = selectedFilter
+		query.page = 1
+		query.recordsPerPage = 20
+		query.sortBy = []
+		ServiceFactory.queryService.getQueryResult(survey.id, query).then(result => console.log(result))
+	}
 
 	render() {
 		const { survey } = this.props
-		const { treeData, selectedEntityTreeNodes, columnsSelection, filterSelection, selectedEntity } = this.state
+		const { treeData, selectedEntityTreeNodes, selectedColumns, selectedFilter, selectedEntity } = this.state
 		
 		if (!survey || !treeData) {
 			return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
@@ -130,7 +211,6 @@ class DataViewPage extends Component {
 		
 		const getColumnItemStyle = (isDragging, draggableStyle) => ({
 			userSelect: "none",
-			padding: grid * 2,
 			margin: `0 0 ${grid}px 0`,
 			background: isDragging ? "lightgreen" : "white",
 			border: 'solid 1px black',
@@ -226,9 +306,9 @@ class DataViewPage extends Component {
 										style={getColumnsListStyle(snapshot.isDraggingOver)}
 										{...provided.droppableProps}
 									>
-									{columnsSelection.map((item, index) => (
-										<Draggable key={'columns_' + item.attribute.id} 
-											draggableId={'columns_' + item.attribute.id} index={index}>
+									{selectedColumns.map((item, index) => (
+										<Draggable key={'columns_' + item.attributeDefinition.id} 
+											draggableId={'columns_' + item.attributeDefinition.id} index={index}>
 										{(provided, snapshot) => (
 											<div
 												ref={provided.innerRef}
@@ -238,11 +318,9 @@ class DataViewPage extends Component {
 													snapshot.isDragging,
 													provided.draggableProps.style
 												)}
-											>
-												{item.attribute.label}
-												<span className="close-icon">
-													<i className="far fa-times-circle"/>
-												</span>
+												className="closeable">
+												{item.attributeDefinition.label}
+												<a className="close-btn" onClick={this.handleColumnSelectionItemClose.bind(this, item.attributeDefinition.id)}></a>
 											</div>
 										)}
 										</Draggable>
@@ -261,9 +339,9 @@ class DataViewPage extends Component {
 										style={getFilterListStyle(snapshot.isDraggingOver)}
 										{...provided.droppableProps}
 									>
-									{filterSelection.map((item, index) => (
-										<Draggable key={'filter_' + item.attribute.id} 
-											draggableId={'filter_' + item.attribute.id} index={index}>
+									{selectedFilter.map((item, index) => (
+										<Draggable key={'filter_' + item.attributeDefinition.id} 
+											draggableId={'filter_' + item.attributeDefinition.id} index={index}>
 										{(provided, snapshot) => (
 											<div
 												ref={provided.innerRef}
@@ -273,11 +351,9 @@ class DataViewPage extends Component {
 													snapshot.isDragging,
 													provided.draggableProps.style
 												)}
-											>
-												{item.attribute.label}
-												<span className="close-icon">
-													<i className="far fa-times-circle"/>
-												</span>
+												className="closeable">
+												{item.attributeDefinition.label}
+												<a className="close-btn" onClick={this.handleFilterSelectionItemClose.bind(this, item.attributeDefinition.id)}></a>
 											</div>
 										)}
 										</Draggable>
@@ -286,6 +362,11 @@ class DataViewPage extends Component {
 									</div>
 								)}
 								</Droppable>
+							</div>
+							<div className="row">
+								<Button variant="raised" color="primary" onClick={this.handleQueryButtonClick}>
+									Query
+      							</Button>
 							</div>
 						</div>
 					</DragDropContext>
@@ -326,8 +407,14 @@ class DropDownTreeNode {
 }
 
 class RDBQuery {
+	surveyName
+	recordStep
+	contextEntityDefinitionId
 	columns = []
 	filter = []
+	page = 1
+	recordsPerPage = 20
+	sortBy = []
 }
 
 class RDBQueryColumn {
@@ -339,6 +426,15 @@ const mapStateToProps = state => {
 		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
 		loggedUser: state.session ? state.session.loggedUser : null,
 		userGroups: state.userGroups ? state.userGroups.items : null
+	}
+}
+
+class CloseableBox extends Component {
+	render() {
+		return <div class="closeable" {...this.props}>
+				<a class="close-btn" onClick={this.props.onClose}></a>
+				{this.props.children}
+			</div>
 	}
 }
 
