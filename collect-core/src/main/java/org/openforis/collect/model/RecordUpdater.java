@@ -293,34 +293,7 @@ public class RecordUpdater {
 			// relevance
 			Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedAttributes);
 			nodesToCheckRelevanceFor.add(attribute);
-			
-			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
-			RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
-			Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
-			Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
-			
-			//apply default values to relevant nodes (if not applied yet)
-			for (Node<?> updatedRelevanceNode: updatedRelevanceNodes) {
-				if (updatedRelevanceNode instanceof Attribute) {
-					Attribute<?, ?> updatedRelevanceAttr = (Attribute<?, ?>) updatedRelevanceNode;
-					if (! updatedRelevanceAttr.getDefinition().isCalculated()) {
-						if (updatedRelevanceAttr.isEmpty() || isDefaultValueApplied(updatedRelevanceAttr)) {
-							Value appliedValue = applyInitialValue(updatedRelevanceAttr);
-							if (appliedValue != null) {
-								updatedAttributes.add((Attribute<?, ?>) updatedRelevanceNode);
-							}
-						}
-					}
-				}
-			}
-			changeMap.addRelevanceChanges(updatedRelevancePointers);
-			
-			if (clearNotRelevantAttributes) {
-				Set<Attribute<?, ?>> noMoreRelevantAttributes = retainNotRelevantAttributes(updatedRelevanceNodes);
-				Set<Attribute<?, ?>> clearedAttributes = clearUserSpecifiedAttributes(noMoreRelevantAttributes);
-				updatedAttributes.addAll(clearedAttributes);
-				changeMap.addValueChanges(clearedAttributes);
-			}
+			Set<NodePointer> updatedRelevancePointers = updateRelevance(record, nodesToCheckRelevanceFor, updatedAttributes, changeMap);
 			
 			// min count
 			Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
@@ -362,6 +335,7 @@ public class RecordUpdater {
 			// validate attributes
 			Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(updatedAttributes);
 			nodesToCheckValidationFor.add(attribute);
+			Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
 			nodesToCheckValidationFor.addAll(updatedRelevanceNodes);
 			nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 			
@@ -370,6 +344,52 @@ public class RecordUpdater {
 			validateAttributes(record, attributesToRevalidate, changeMap);
 		}
 		return changeMap;
+	}
+	
+	private Set<NodePointer> updateRelevance(Record record, Collection<? extends Node<?>> nodesToCheckRelevanceFor, 
+			List<Attribute<?,?>> updatedAttributes, NodeChangeMap changeMap) {
+		Set<NodePointer> totalUpdatedRelevancePointers = new HashSet<NodePointer>();
+		Deque<Collection<? extends Node<?>>> stack = new LinkedList<Collection<? extends Node<?>>>();
+		stack.add(nodesToCheckRelevanceFor);
+		while(!stack.isEmpty()) {
+			Collection<? extends Node<?>> nodes = stack.pop();
+			List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodes);
+			RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
+			Set<NodePointer> updatedRelevancePointers = relevanceUpdater.update();
+			if (! updatedRelevancePointers.isEmpty()) {
+				totalUpdatedRelevancePointers.addAll(updatedRelevancePointers);
+				Set<Node<?>> updatedRelevanceNodes = pointersToNodes(updatedRelevancePointers);
+				
+				//apply default values to relevant nodes (if not applied yet)
+				for (Node<?> updatedRelevanceNode: updatedRelevanceNodes) {
+					if (updatedRelevanceNode instanceof Attribute && updatedRelevanceNode.isRelevant()) {
+						Attribute<?, ?> updatedRelevanceAttr = (Attribute<?, ?>) updatedRelevanceNode;
+						if (! updatedRelevanceAttr.getDefinition().isCalculated()) {
+							if (updatedRelevanceAttr.isEmpty() || isDefaultValueApplied(updatedRelevanceAttr)) {
+								Value appliedValue = applyInitialValue(updatedRelevanceAttr);
+								if (appliedValue != null) {
+									updatedAttributes.add((Attribute<?, ?>) updatedRelevanceNode);
+								}
+							}
+						}
+					}
+				}
+				changeMap.addRelevanceChanges(updatedRelevancePointers);
+				
+				if (clearNotRelevantAttributes) {
+					Set<Attribute<?, ?>> noMoreRelevantAttributes = retainNotRelevantAttributes(updatedRelevanceNodes);
+					if (! noMoreRelevantAttributes.isEmpty()) {
+						Set<Attribute<?, ?>> clearedAttributes = clearUserSpecifiedAttributes(noMoreRelevantAttributes);
+						if (! clearedAttributes.isEmpty()) {
+							updatedAttributes.addAll(clearedAttributes);
+							changeMap.addValueChanges(clearedAttributes);
+							stack.add(clearedAttributes);
+						}
+					}
+				}
+			}
+		}
+		return totalUpdatedRelevancePointers;
 	}
 
 	private Set<CodeAttribute> clearDependentCodeAttributes(Attribute<?, ?> attribute) {

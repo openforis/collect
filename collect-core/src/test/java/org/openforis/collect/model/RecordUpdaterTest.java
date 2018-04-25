@@ -560,6 +560,35 @@ public class RecordUpdaterTest extends AbstractRecordTest {
 	}
 	
 	@Test
+	public void testRelevanceUpdatedInDependentAttributes() {
+		record(
+			rootEntityDef(
+				attributeDef("attribute1"),
+				attributeDef("attribute2")
+					.relevant("attribute1 = 1"),
+				attributeDef("attribute3")
+					.relevant("attribute2 = 2")
+			),
+			attribute("attribute1", "1"),
+			attribute("attribute2", "2"),
+			attribute("attribute3", "3")
+		);
+		Attribute<?, ?> attribute1 = record.findNodeByPath("/root/attribute1");
+		
+		updater.setClearNotRelevantAttributes(true);
+		NodeChangeSet nodeChangeSet = update(attribute1, "2");
+		
+		//expected: attribute2 and attribute3 become not relevant
+		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(record.getRootEntity());
+		Boolean attribute2Relevance = rootEntityChange.getChildrenRelevance().get("attribute2");
+		assertNotNull(attribute2Relevance);
+		assertFalse(attribute2Relevance);
+		Boolean attribute3Relevance = rootEntityChange.getChildrenRelevance().get("attribute3");
+		assertNotNull(attribute3Relevance);
+		assertFalse(attribute3Relevance);
+	}
+	
+	@Test
 	public void testInitializeCalculatedAttributeInNestedNode() {
 		record(
 			rootEntityDef(

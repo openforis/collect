@@ -240,7 +240,7 @@ public class RecordDao extends JooqDaoSupport {
 					}
 				}
 				visitor.visit(s);
-				if (stopWhenPredicate.evaluate(s)) {
+				if (stopWhenPredicate != null && stopWhenPredicate.evaluate(s)) {
 					break;
 				}					
 			}
