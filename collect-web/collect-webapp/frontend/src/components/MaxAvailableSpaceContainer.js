@@ -34,7 +34,8 @@ class MaxAvailableSpaceContainer extends Component {
 
 	render() {
 		return (
-			<div style={{ height: this.state.maxAvailableHeight }}>
+			<div {...this.props} 
+					style={{ height: this.state.maxAvailableHeight }}>
 				{this.props.children}
 			</div>
 		);

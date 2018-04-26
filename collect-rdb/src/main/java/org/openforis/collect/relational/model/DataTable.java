@@ -134,6 +134,11 @@ public class DataTable extends AbstractTable<Node<?>> {
 		}
 		return result;
 	}
+	
+	public DataTable getRootAncestor() {
+		List<DataTable> ancestors = getAncestors();
+		return ancestors.isEmpty() ? this : ancestors.get(ancestors.size() - 1);
+	}
 
 	public DataTable getParent() {
 		return parent;

@@ -6,6 +6,7 @@ import java.util.List;
 public class QueryResult {
 	
 	private List<QueryResultRow> rows = new ArrayList<QueryResultRow>();
+	private int totalRecords;
 	
 	public void addRow(QueryResultRow row) {
 		rows.add(row);
@@ -17,5 +18,13 @@ public class QueryResult {
 
 	public void setRows(List<QueryResultRow> rows) {
 		this.rows = rows;
+	}
+
+	public int getTotalRecords() {
+		return totalRecords;
+	}
+	
+	public void setTotalRecords(int totalRecords) {
+		this.totalRecords = totalRecords;
 	}
 }

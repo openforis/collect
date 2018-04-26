@@ -1,21 +1,30 @@
 package org.openforis.collect.dataview;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QueryResultRow {
 	
-	private Map<Integer, String> valueByAttributeDefinitionId = new HashMap<Integer, String>();
-
-	public void putValueByDefinitionId(int attributeDefinitionId, String value) {
-		valueByAttributeDefinitionId.put(attributeDefinitionId, value);
+	private List<String> values = new ArrayList<String>();
+	private int recordId;
+	
+	public void addValue(String value) {
+		values.add(value);
 	}
 
-	public Map<Integer, String> getValueByAttributeDefinitionId() {
-		return valueByAttributeDefinitionId;
+	public List<String> getValues() {
+		return values;
+	}
+	
+	public void setValues(List<String> values) {
+		this.values = values;
 	}
 
-	public void setValueByAttributeDefinitionId(Map<Integer, String> valueByAttributeDefinitionId) {
-		this.valueByAttributeDefinitionId = valueByAttributeDefinitionId;
+	public int getRecordId() {
+		return recordId;
+	}
+	
+	public void setRecordId(int recordId) {
+		this.recordId = recordId;
 	}
 }

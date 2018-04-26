@@ -335,3 +335,55 @@ Closeable box
 .closeable .close-btn:before {
     content: "×";
 }
+
+.query-builder .attributes {
+    padding: 4px;
+    width: 100%;
+    height: 300px;
+    overflow-y: auto;
+    background: lightgrey;
+}
+
+.query-builder .attributes.dragging {
+    background: lightblue;
+}
+
+.query-builder .attributes .item {
+    user-select: none;
+    padding: 8px;
+    margin: 0 0 4px 0;
+    background: white;
+}
+
+.query-builder .attributes .item.dragging {
+    background: lightgreen;
+}
+
+.query-builder .columns.dragging, 
+.query-builder .filter.dragging {
+    background: lightblue;
+}
+
+.query-builder .columns, 
+.query-builder .filter  {
+    padding: 4px;
+    width: 100%;
+    min-height: 100px;
+    background: lightgrey;
+}
+
+.query-builder .columns .item, 
+.query-builder .filter .item {
+    user-select: none;
+    margin: 0px 0px 4px 0px;
+    background: white;
+    border: solid 1px black;
+    border-radius: 15px;
+    width: 200px;
+    float: left;
+}
+
+.query-builder .columns .item.dragging,
+.query-builder .filter .item.dragging {
+    background: lightgreen;
+}

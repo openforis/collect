@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.openforis.collect.event.RecordStep;
 
-public class Query {
+public class QueryDto {
 	
 	private String surveyName;
 	private RecordStep recordStep;
 	private int contextEntityDefinitionId;
-	private List<QueryColumn> columns = new ArrayList<QueryColumn>();
+	private List<QueryColumnDto> columns = new ArrayList<QueryColumnDto>();
 	private List<QueryFilter> filter = new ArrayList<QueryFilter>();
 	private int page;
 	private int recordsPerPage;
@@ -39,11 +39,11 @@ public class Query {
 		this.contextEntityDefinitionId = contextEntityDefinitionId;
 	}
 	
-	public List<QueryColumn> getColumns() {
+	public List<QueryColumnDto> getColumns() {
 		return columns;
 	}
 	
-	public void setColumns(List<QueryColumn> columns) {
+	public void setColumns(List<QueryColumnDto> columns) {
 		this.columns = columns;
 	}
 	

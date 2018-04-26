@@ -48,11 +48,18 @@ public class DataQuery extends PersistedSurveyObject {
 		}
 	}
 	
+	public enum ExecutionTarget {
+		
+		STANDARD, //Denormalized DB (binary)
+		RDB, //Relational DB
+	}
+	
+	private ExecutionTarget executionTarget = ExecutionTarget.STANDARD;
 	private String title;
 	private String description;
 	private int entityDefinitionId;
 	private int attributeDefinitionId;
-	private String conditions;
+	private String conditions; //applied only for Standard execution target
 	private ErrorSeverity errorSeverity;
 	private Integer typeId;
 	
@@ -77,6 +84,14 @@ public class DataQuery extends PersistedSurveyObject {
 			throw new IllegalStateException(String.format("Definition with id %d not found in the schema", attributeDefinitionId));
 		}
 		return (AttributeDefinition) def;
+	}
+	
+	public ExecutionTarget getExecutionTarget() {
+		return executionTarget;
+	}
+	
+	public void setExecutionTarget(ExecutionTarget executionTarget) {
+		this.executionTarget = executionTarget;
 	}
 	
 	public void setAttributeDefinition(AttributeDefinition def) {

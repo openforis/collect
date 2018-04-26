@@ -191,6 +191,20 @@
         "modified": "Modified",
         "step": "Step"
     },
+    "dataView": {
+        "selectEntity": "Select an Entity",
+        "availableAttributes": "Available Attributes",
+        "columns": "Columns",
+        "filter": "Filter",
+        "query": {
+            "label": "Query",
+            "run": "Run",
+            "noColumnsSelectedAlert": {
+                "title": "No columns selected",
+                "message": "Please select at least one column"
+            }
+        }
+    },
     "survey": {
         "name": "Name",
         "identifier": "Identifier",
