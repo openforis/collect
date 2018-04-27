@@ -63,7 +63,11 @@ public class MinCountValidator implements ValidationRule<Entity> {
 			return OK;
 		}
 	}
-
+	
+	protected boolean isEmpty(Node<?> node){
+		return node.isEmpty();
+	}
+	
 	private boolean isAvailableCodeListItems(Entity parentEntity) {
 		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDefinition;
 		SurveyContext context = codeAttrDef.getSurvey().getContext();
@@ -74,10 +78,6 @@ public class MinCountValidator implements ValidationRule<Entity> {
 		}
 		List<CodeListItem> validItems = codeListService.loadValidItems(parentEntity, codeAttrDef);
 		return ! validItems.isEmpty();
-	}
-
-	protected boolean isEmpty(Node<?> node){
-		return node.isEmpty();
 	}
 	
 	@Override

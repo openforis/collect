@@ -77,7 +77,7 @@ public class CollectValidator extends Validator {
 			/*
 			 * if the attribute is not empty and 'reason blank' has not been specified than validate it
 			 */
-			if (!(attribute.isEmpty() || isReasonBlankAlwaysSpecified(attribute))) {
+			if (!(attribute.isEmpty() || isReasonBlankAlwaysSpecified(attribute)) || shouldValidateEvenIfEmpty(attribute)) {
 				validateAttributeValue(attribute, results);
 				if (!results.hasErrors()) {
 					validateAttributeChecks(attribute, results);
@@ -92,6 +92,11 @@ public class CollectValidator extends Validator {
 			record.updateSkippedCount(attribute.getInternalId());
 		}
 		return results;
+	}
+
+	private boolean shouldValidateEvenIfEmpty(Attribute<?, ?> attribute) {
+		return attribute instanceof CodeAttribute 
+				&& attribute.getDefinition().getParentDefinition() != null;
 	}
 
 	private boolean validateSpecified(Attribute<?, ?> attribute,

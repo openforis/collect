@@ -154,9 +154,11 @@ public class Validator {
 		CodeParentValidator parentValidator = getCodeParentValidator();
 		ValidationResultFlag validParent = parentValidator.evaluate(attribute);
 		if (validParent == ValidationResultFlag.OK ) {
-			CodeValidator codeValidator = getCodeValidator();
-			ValidationResultFlag result = codeValidator.evaluate(attribute);
-			results.addResult(codeValidator, result);
+			if (! attribute.isEmpty()) {
+				CodeValidator codeValidator = getCodeValidator();
+				ValidationResultFlag result = codeValidator.evaluate(attribute);
+				results.addResult(codeValidator, result);
+			}
 		} else {
 			results.addResult(parentValidator, ValidationResultFlag.WARNING);
 		}
