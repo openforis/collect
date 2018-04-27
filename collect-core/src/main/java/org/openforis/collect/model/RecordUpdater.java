@@ -290,6 +290,8 @@ public class RecordUpdater {
 		}
 
 		if (validateAfterUpdate) {
+			Set<NodePointer> updatedAttributePointers = nodesToPointers(updatedAttributes);
+
 			// relevance
 			Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedAttributes);
 			nodesToCheckRelevanceFor.add(attribute);
@@ -298,7 +300,7 @@ public class RecordUpdater {
 			// min count
 			Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
 			pointersToCheckMinCountFor.add(attributeNodePointer);
-			pointersToCheckMinCountFor.addAll(nodesToPointers(updatedAttributes));
+			pointersToCheckMinCountFor.addAll(updatedAttributePointers);
 			
 			Collection<NodePointer> minCountPointersToUpdate = record.determineMinCountDependentNodes(pointersToCheckMinCountFor);
 			Collection<NodePointer> updatedMinCountPointers = updateMinCount(minCountPointersToUpdate);
@@ -307,7 +309,7 @@ public class RecordUpdater {
 			// max count
 			Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
 			pointersToCheckMaxCountFor.add(attributeNodePointer);
-			pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedAttributes));
+			pointersToCheckMaxCountFor.addAll(updatedAttributePointers);
 			
 			Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
 			Collection<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
@@ -318,18 +320,28 @@ public class RecordUpdater {
 	
 			// validate cardinality
 			List<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(attribute);
+			
+			//determine dependent attributes (hierarchical code attributes with parent/child relation)
+			Set<Attribute<?,?>> updatedAttributesAndSelf = new HashSet<Attribute<?,?>>(updatedAttributes.size() + 1);
+			updatedAttributesAndSelf.addAll(updatedAttributes);
+			updatedAttributesAndSelf.add(attribute);
+			Set<NodePointer> dependentCodeAttributesPointers = determineDependentCodeAttributes(updatedAttributesAndSelf);
+			
 			Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(
+					updatedAttributePointers.size() +
 					updatedMinCountPointers.size() + 
 					updatedMaxCountPointers.size() + 
 					updatedRelevancePointers.size() + 
-					ancestorsAndSelfPointers.size());
-			pointersToValidateCardinalityFor.addAll(nodesToPointers(updatedAttributes));
+					ancestorsAndSelfPointers.size() +
+					dependentCodeAttributesPointers.size());
+			pointersToValidateCardinalityFor.addAll(updatedAttributePointers);
 			pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
 			pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
 			pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
-			
+			pointersToValidateCardinalityFor.addAll(dependentCodeAttributesPointers);
 			// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
 			pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
+			
 			validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
 			
 			// validate attributes
@@ -340,12 +352,12 @@ public class RecordUpdater {
 			nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 			
 			Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
-	
+			
 			validateAttributes(record, attributesToRevalidate, changeMap);
 		}
 		return changeMap;
 	}
-	
+
 	private Set<NodePointer> updateRelevance(Record record, Collection<? extends Node<?>> nodesToCheckRelevanceFor, 
 			List<Attribute<?,?>> updatedAttributes, NodeChangeMap changeMap) {
 		Set<NodePointer> totalUpdatedRelevancePointers = new HashSet<NodePointer>();
@@ -606,12 +618,20 @@ public class RecordUpdater {
 			updatedCardinalityPointers.addAll(updatedMaxCountPointers);
 	
 			// validate cardinality
-			Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(updatedMinCountPointers.size() + updatedMaxCountPointers.size());
+			Set<NodePointer> dependentCodeAttributesPointers = determineDependentCodeAttributes(updatedCalculatedAttributes);
+			
+			Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(
+					updatedMinCountPointers.size() + 
+					updatedMaxCountPointers.size() +
+					1 +
+					ancestorPointers.size() +
+					dependentCodeAttributesPointers.size());
 			pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
 			pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
 			// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
 			pointersToValidateCardinalityFor.add(nodePointer);
 			pointersToValidateCardinalityFor.addAll(ancestorPointers);
+			pointersToValidateCardinalityFor.addAll(dependentCodeAttributesPointers);
 			validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
 			
 			// validate attributes
@@ -1093,6 +1113,17 @@ public class RecordUpdater {
 		return pointers;
 	}
 
+	private Set<NodePointer> determineDependentCodeAttributes(Collection<Attribute<?, ?>> attributes) {
+		Set<CodeAttribute> dependentAttributes = new HashSet<CodeAttribute>();
+		for (Attribute<?,?> updatedAttribute : attributes) {
+			if (updatedAttribute instanceof CodeAttribute) {
+				dependentAttributes.addAll(((CodeAttribute) updatedAttribute).getDependentCodeAttributes());
+			}
+		}
+		Set<NodePointer> dependentAttributesPointers = nodesToPointers(dependentAttributes);
+		return dependentAttributesPointers;
+	}
+	
 	public void setValidateAfterUpdate(boolean validateAfterUpdate) {
 		this.validateAfterUpdate = validateAfterUpdate;
 	}

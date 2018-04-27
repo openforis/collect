@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-web</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.21.12-SNAPSHOT</version>
+		<version>3.21.13-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -14,7 +14,7 @@
 	<properties>
 		<dev.jetty.port>8580</dev.jetty.port>
 		<node.version>v8.11.1</node.version>
-		<npm.version>5.8.0</npm.version>
+		<npm.version>6.0.0</npm.version>
 	</properties>
 
 	<build>
