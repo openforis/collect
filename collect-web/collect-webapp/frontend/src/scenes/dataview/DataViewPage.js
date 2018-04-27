@@ -12,6 +12,7 @@ import Typography from 'material-ui/Typography';
 import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 
 import QueryResultTable from './QueryResultTable'
+import DataQueryFilterDialog from './DataQueryFilterDialog'
 import { EntityDefinition } from 'model/Survey'
 import ServiceFactory from 'services/ServiceFactory'
 import Dialogs from 'components/Dialogs'
@@ -32,7 +33,9 @@ class DataViewPage extends Component {
 		queryResultPage: 1,
 		queryResultRecordsPerPage: 10,
 		queryResultTotalRecords: 0,
-		queryPanelExpanded: true
+		queryPanelExpanded: true,
+		queryFilterDialogOpen: false,
+		queryFilterAttributeDefinition: null
 	}
 
 	constructor(props) {
@@ -41,10 +44,9 @@ class DataViewPage extends Component {
 
 		this.onEntityChange = this.onEntityChange.bind(this)
 		this.onDragEnd = this.onDragEnd.bind(this)
-		this.getListByDroppableId = this.getListByDroppableId.bind(this)
-		this.updateSelectionState = this.updateSelectionState.bind(this)
 		this.handleQueryButtonClick = this.handleQueryButtonClick.bind(this)
 		this.handleResultTableChange = this.handleResultTableChange.bind(this)
+		this.handleQueryFilterDialogClose = this.handleQueryFilterDialogClose.bind(this)
 	}
 
 	static getDerivedStateFromProps(nextProps, prevState) {
@@ -101,78 +103,38 @@ class DataViewPage extends Component {
 		}))
 	}
 
-	getListByDroppableId(droppableId) {
-		switch(droppableId) {
-			case 'selectedColumns':
-				return this.state.selectedColumns
-			case 'selectedFilter':
-				return this.state.selectedFilter
-			default:
-				return this.state.availableAttributes
-		}
-	}
-
-	updateSelectionState(droppableId, list) {
-		if (droppableId === 'selectedColumns') {
-			this.setState({
-				selectedColumns: list
-			})
-		} else {
-			this.setState({
-				selectedFilter: list
-			})
-		}
-	}
-
 	onDragEnd(result) {
 		// dropped outside the list
 		if (!result.destination) {
 		  return
 		}
-		const sourceList = this.getListByDroppableId(result.source.droppableId)
-		const destList = this.getListByDroppableId(result.destination.droppableId)
+		const newAvailableAttributes = Array.from(this.state.availableAttributes)
+		const newSelectedColumns = Array.from(this.state.selectedColumns)
+		const newSelectedFilter = Array.from(this.state.selectedFilter)
 
 		//dropped inside the same list: reorder
 		if (result.source.droppableId === result.destination.droppableId) {
 			const reorder = (list, startIndex, endIndex) => {
-				const result = Array.from(list)
-				const [removed] = result.splice(startIndex, 1)
-				result.splice(endIndex, 0, removed)
-				return result
+				const [removed] = list.splice(startIndex, 1)
+				list.splice(endIndex, 0, removed)
 			}
-			const newDestList =  reorder(destList, result.source.index, result.source.index)
-			this.updateSelectionState(result.destination.droppableId, newDestList)
+			const list = result.source.droppableId === 'selectedColumns' ? newSelectedColumns : newSelectedFilter
+			reorder(list, result.source.index, result.destination.index)
 		} else if (result.source.droppableId === 'selectedAttributes') {
-			const newAvailableAttributes = Array.from(this.state.availableAttributes)
+			//drag from Attributes
 			const [attributeDef] = newAvailableAttributes.splice(result.source.index, 1)
-			switch(result.destination.droppableId) {
-				case 'selectedColumns':
-					const newSelectedColumns = Arrays.addItem(this.state.selectedColumns, 
-						{id: attributeDef.id, attributeDefinition: attributeDef}, true, 'id')
-					this.setState({
-						availableAttributes: newAvailableAttributes,
-						selectedColumns: newSelectedColumns
-					})
-					break
-				case 'selectedFilter':
-					const newSelectedFilter = Arrays.addItem(this.state.selectedFilter, 
-						{id: attributeDef.id, attributeDefinition: attributeDef}, true, 'id')
-					this.setState({
-						availableAttributes: newAvailableAttributes,
-						selectedFilter: newSelectedFilter,
-
-					})
-					break
-			}
+			//drop
+			const newDestList = result.destination.droppableId === 'selectedColumns' ? newSelectedColumns: newSelectedFilter
+			newDestList.push(new QueryComponent(attributeDef.id, attributeDef))
 		} else {
-			const newSourceList = Array.from(sourceList)
+			//drag from Columns/Filter, drop into Filter/Columns
+			const newSourceList =  result.source.droppableId === 'selectedColumns' ? newSelectedColumns : newSelectedFilter
+			const newDestList = result.destination.droppableId === 'selectedColumns' ? newSelectedColumns: newSelectedFilter
+			//remove from source list
 			const [removed] = newSourceList.splice(result.source.index, 1)
-			const newDestList = Array.from(destList)
+			//add to dest list
 			newDestList.push(removed)
-			this.updateSelectionState(result.source.droppableId, newSourceList)
-			this.updateSelectionState(result.destination.droppableId, newDestList)
 		}
-		/*
 		this.setState({
 			availableAttributes: newAvailableAttributes,
 			selectedColumns: newSelectedColumns,
@@ -182,7 +144,6 @@ class DataViewPage extends Component {
 			queryResultRecordsPerPage: 10,
 			queryResultTotalRecords: 0,
 		})
-		*/
 	  }
 
 	handleColumnSelectionItemClose(attributeDefinitionId) {
@@ -241,10 +202,23 @@ class DataViewPage extends Component {
 	  }
 	
 
+	openFilterDialog(queryComponent) {
+		this.setState({
+			queryFilterDialogOpen: true,
+			queryFilterAttributeDefinition: queryComponent.attributeDefinition
+		})
+	}
+
+	handleQueryFilterDialogClose() {
+		this.setState({
+			queryFilterDialogOpen: false
+		})
+	}
+
 	render() {
 		const { survey } = this.props
 		const { schemaTreeData, selectedEntityTreeNodes, availableAttributes, selectedColumns, selectedFilter, selectedEntity, queryResult,
-			queryResultPage, queryResultRecordsPerPage, queryPanelExpanded } = this.state
+			queryResultPage, queryResultRecordsPerPage, queryPanelExpanded, queryFilterDialogOpen, queryFilterAttributeDefinition } = this.state
 		const queryResultTotalRecords = queryResult ? queryResult.totalRecords: 0
 		
 		if (!survey || !schemaTreeData) {
@@ -336,7 +310,9 @@ class DataViewPage extends Component {
 																{...provided.dragHandleProps}
 																className={'closeable item' + (snapshot.isDragging ? ' dragging': '')}
 																>
-																{item.attributeDefinition.label}
+																<a onClick={this.openFilterDialog.bind(this, item)}>
+																	{item.attributeDefinition.label}
+																</a>
 																<a className="close-btn" onClick={this.handleColumnSelectionItemClose.bind(this, item.attributeDefinition.id)}></a>
 															</div>
 														)}
@@ -408,6 +384,9 @@ class DataViewPage extends Component {
 						</div>
 					</div>
 				}
+				<DataQueryFilterDialog open={queryFilterDialogOpen} 
+					attributeDefinition={queryFilterAttributeDefinition}
+					onClose={this.handleQueryFilterDialogClose} />
 			</MaxAvailableSpaceContainer>
 		)
     }
@@ -454,8 +433,14 @@ class RDBQuery {
 	sortBy = []
 }
 
-class RDBQueryColumn {
-	attribute
+class QueryComponent {
+	id
+	attributeDefinition
+
+	constructor(id, attributeDef) {
+		this.id = id
+		this.attributeDefinition = attributeDef
+	}
 }
 
 const mapStateToProps = state => {

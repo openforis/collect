@@ -1,13 +1,18 @@
 package org.openforis.collect.dataview;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jooq.Condition;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.Select;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
+import org.openforis.collect.dataview.QueryCondition.Type;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.RDBReportingRepositories;
@@ -71,10 +76,12 @@ public class QueryExecutor {
 			queryResult.setTotalRecords(totalRecords);
 			
 			int offset = (query.getPage() - 1) * query.getRecordsPerPage();
-			Result<Record> result = dsl
+			
+			Select<Record> select = dsl
 				.selectFrom(view)
-				.limit(offset, query.getRecordsPerPage())
-				.fetch();
+				.where(createConditions(contextEntityDef, query, dataTable))
+				.limit(offset, query.getRecordsPerPage());
+			Result<Record> result = select.fetch();
 			
 			for (Record record : result) {
 				QueryResultRow row = new QueryResultRow();
@@ -89,6 +96,77 @@ public class QueryExecutor {
 				queryResult.addRow(row);
 			}
 			return queryResult;
+		}
+
+		private List<Condition> createConditions(EntityDefinition contextEntityDef, QueryDto query, DataTable table) {
+			List<Condition> conditions = new ArrayList<Condition>();
+			List<QueryComponent> queryComponents = new ArrayList<QueryComponent>();
+			queryComponents.addAll(query.getColumns());
+			queryComponents.addAll(query.getFilter());
+			for (QueryComponent queryComponent : queryComponents) {
+				AttributeDefinition attrDef = contextEntityDef.getSchema().getDefinitionById(queryComponent.getAttributeDefinitionId());
+				QueryCondition filterCondition = queryComponent.getFilterCondition();
+				if (filterCondition != null) {
+					switch(filterCondition.getType()) {
+					case EQ:
+					case GT:
+					case GE:
+					case LT:
+					case LE:
+						Condition jooqCondition = getJooqCondition(table, filterCondition, attrDef);
+						conditions.add(jooqCondition);
+						break;
+					case IN: {
+						DataColumn mainColumn = getMainColumn(table, attrDef);
+						if (mainColumn != null) {
+							conditions.add(
+									DSL.field(mainColumn.getName())
+										.in(filterCondition.getInValues()));
+						}
+						break;
+					}
+					case BTW:
+						DataColumn mainColumn = getMainColumn(table, attrDef);
+						if (mainColumn != null) {
+							conditions.add(
+									DSL.field(mainColumn.getName())
+										.between(filterCondition.getMin(), filterCondition.getMax()));
+						}
+						break;
+					}
+				}
+			}
+			return conditions;
+		}
+		
+		private Condition getJooqCondition(DataTable table, QueryCondition filterCondition, AttributeDefinition attrDef) {
+			DataColumn mainColumn = getMainColumn(table, attrDef);
+			if (mainColumn != null) {
+				Field<Object> field = DSL.field(mainColumn.getName());
+				String value = filterCondition.getValue();
+				Type filterType = filterCondition.getType();
+				Condition condition = getSingleValueJooqCondition(filterType, field, value);
+				return condition;
+			} else {
+				return null;
+			}
+		}
+		
+		private Condition getSingleValueJooqCondition(QueryCondition.Type filterType, Field<Object> field, String value) {
+			switch(filterType) {
+			case EQ:
+				return field.eq(value);
+			case GT:
+				return field.gt(value);
+			case GE:
+				return field.ge(value);
+			case LT:
+				return field.lt(value);
+			case LE:
+				return field.le(value);
+			default:
+				return null;
+			}
 		}
 
 		private List<DataColumn> getAttributeColumns(DataTable dataTableView, AttributeDefinition attrDef) {
@@ -116,6 +194,25 @@ public class QueryExecutor {
 						|| attrDef instanceof TextAttributeDefinition
 						|| attrDef instanceof TimeAttributeDefinition) {
 					return record.getValue(dataColumns.get(0).getName(), String.class);
+				} else {
+					return null;
+				}
+			}
+		}
+		
+		private DataColumn getMainColumn(DataTable dataTable, AttributeDefinition attrDef) {
+			List<DataColumn> columns = getAttributeColumns(dataTable, attrDef);
+			if (columns.isEmpty()) {
+				return null;
+			} else {
+				if (	   attrDef instanceof BooleanAttributeDefinition 
+						|| attrDef instanceof CodeAttributeDefinition
+						|| attrDef instanceof DateAttributeDefinition
+						|| attrDef instanceof NumericAttributeDefinition
+						|| attrDef instanceof TaxonAttributeDefinition
+						|| attrDef instanceof TextAttributeDefinition
+						|| attrDef instanceof TimeAttributeDefinition) {
+					return columns.get(0);
 				} else {
 					return null;
 				}

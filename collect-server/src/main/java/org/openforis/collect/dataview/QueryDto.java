@@ -11,7 +11,7 @@ public class QueryDto {
 	private RecordStep recordStep;
 	private int contextEntityDefinitionId;
 	private List<QueryColumnDto> columns = new ArrayList<QueryColumnDto>();
-	private List<QueryFilter> filter = new ArrayList<QueryFilter>();
+	private List<QueryFilterDto> filter = new ArrayList<QueryFilterDto>();
 	private int page;
 	private int recordsPerPage;
 	
@@ -47,11 +47,11 @@ public class QueryDto {
 		this.columns = columns;
 	}
 	
-	public List<QueryFilter> getFilter() {
+	public List<QueryFilterDto> getFilter() {
 		return filter;
 	}
 	
-	public void setFilter(List<QueryFilter> filter) {
+	public void setFilter(List<QueryFilterDto> filter) {
 		this.filter = filter;
 	}
 
