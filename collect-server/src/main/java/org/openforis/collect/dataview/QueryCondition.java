@@ -8,11 +8,12 @@ public class QueryCondition {
 	public enum Type {
 		EQ, //equal to value
 		IN, //in (list of values)
-		BTW, //between (min and max)
+		BETWEEN, //between (min and max)
 		GT, //greater than value
 		GE, //greater or equal to value
 		LT, //less than value
-		LE //less or equal to value
+		LE, //less or equal to value
+		CONTAINS //for text values
 	}
 	
 	private Type type;

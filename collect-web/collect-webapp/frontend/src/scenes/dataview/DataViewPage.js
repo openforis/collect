@@ -35,7 +35,7 @@ class DataViewPage extends Component {
 		queryResultTotalRecords: 0,
 		queryPanelExpanded: true,
 		queryFilterDialogOpen: false,
-		queryFilterAttributeDefinition: null
+		queryFilterDialogQueryComponent: null
 	}
 
 	constructor(props) {
@@ -47,6 +47,7 @@ class DataViewPage extends Component {
 		this.handleQueryButtonClick = this.handleQueryButtonClick.bind(this)
 		this.handleResultTableChange = this.handleResultTableChange.bind(this)
 		this.handleQueryFilterDialogClose = this.handleQueryFilterDialogClose.bind(this)
+		this.handleQueryFilterDialogOk = this.handleQueryFilterDialogOk.bind(this)
 	}
 
 	static getDerivedStateFromProps(nextProps, prevState) {
@@ -146,7 +147,8 @@ class DataViewPage extends Component {
 		})
 	  }
 
-	handleColumnSelectionItemClose(attributeDefinitionId) {
+	handleColumnSelectionItemClose(event, attributeDefinitionId) {
+		event.stopPropagation()
 		const item = this.state.selectedColumns.find(c => c.id === attributeDefinitionId)
 		const newAvailableAttributes = Array.from(this.state.availableAttributes)
 		newAvailableAttributes.push(item.attributeDefinition)
@@ -205,14 +207,19 @@ class DataViewPage extends Component {
 	openFilterDialog(queryComponent) {
 		this.setState({
 			queryFilterDialogOpen: true,
-			queryFilterAttributeDefinition: queryComponent.attributeDefinition
+			queryFilterDialogQueryComponent: queryComponent
 		})
 	}
 
 	handleQueryFilterDialogClose() {
 		this.setState({
-			queryFilterDialogOpen: false
+			queryFilterDialogOpen: false,
+			queryFilterDialogQueryComponent: false
 		})
+	}
+
+	handleQueryFilterDialogOk(condition) {
+		this.state.queryFilterDialogQueryComponent.condition = condition
 	}
 
 	render() {
@@ -309,11 +316,12 @@ class DataViewPage extends Component {
 																{...provided.draggableProps}
 																{...provided.dragHandleProps}
 																className={'closeable item' + (snapshot.isDragging ? ' dragging': '')}
+																onClick={this.openFilterDialog.bind(this, item)}
 																>
-																<a onClick={this.openFilterDialog.bind(this, item)}>
+																<span>
 																	{item.attributeDefinition.label}
-																</a>
-																<a className="close-btn" onClick={this.handleColumnSelectionItemClose.bind(this, item.attributeDefinition.id)}></a>
+																</span>
+																<a className="close-btn" onClick={e => this.handleColumnSelectionItemClose(e, item.attributeDefinition.id)}></a>
 															</div>
 														)}
 														</Draggable>
@@ -385,8 +393,9 @@ class DataViewPage extends Component {
 					</div>
 				}
 				<DataQueryFilterDialog open={queryFilterDialogOpen} 
-					attributeDefinition={queryFilterAttributeDefinition}
-					onClose={this.handleQueryFilterDialogClose} />
+					attributeDefinition={queryFilterDialogQueryComponent.attributeDefinition}
+					onClose={this.handleQueryFilterDialogClose}
+					onOk={this.handleQueryFilterDialogOk} />
 			</MaxAvailableSpaceContainer>
 		)
     }

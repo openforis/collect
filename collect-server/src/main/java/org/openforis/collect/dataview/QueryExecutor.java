@@ -125,7 +125,7 @@ public class QueryExecutor {
 						}
 						break;
 					}
-					case BTW:
+					case BETWEEN: {
 						DataColumn mainColumn = getMainColumn(table, attrDef);
 						if (mainColumn != null) {
 							conditions.add(
@@ -133,6 +133,16 @@ public class QueryExecutor {
 										.between(filterCondition.getMin(), filterCondition.getMax()));
 						}
 						break;
+					}
+					case CONTAINS: {
+						DataColumn mainColumn = getMainColumn(table, attrDef);
+						if (mainColumn != null) {
+							conditions.add(
+									DSL.field(mainColumn.getName())
+										.contains(filterCondition.getValue()));
+						}
+						break;
+					}
 					}
 				}
 			}
