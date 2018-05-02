@@ -54,6 +54,10 @@ export default class Arrays {
         }
     }
 
+    static addItems(array, items) {
+        return array.concat(items)
+    }
+
     /**
      * Removes an element without side effect on the specified array
      * 

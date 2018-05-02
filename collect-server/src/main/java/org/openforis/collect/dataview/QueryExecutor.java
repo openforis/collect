@@ -12,7 +12,6 @@ import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
-import org.openforis.collect.dataview.QueryCondition.Type;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.RDBReportingRepositories;
@@ -113,7 +112,7 @@ public class QueryExecutor {
 					case GE:
 					case LT:
 					case LE:
-						Condition jooqCondition = getJooqCondition(table, filterCondition, attrDef);
+						Condition jooqCondition = getSingleJooqCondition(table, filterCondition, attrDef);
 						conditions.add(jooqCondition);
 						break;
 					case IN: {
@@ -149,13 +148,11 @@ public class QueryExecutor {
 			return conditions;
 		}
 		
-		private Condition getJooqCondition(DataTable table, QueryCondition filterCondition, AttributeDefinition attrDef) {
+		private Condition getSingleJooqCondition(DataTable table, QueryCondition filterCondition, AttributeDefinition attrDef) {
 			DataColumn mainColumn = getMainColumn(table, attrDef);
 			if (mainColumn != null) {
-				Field<Object> field = DSL.field(mainColumn.getName());
-				String value = filterCondition.getValue();
-				Type filterType = filterCondition.getType();
-				Condition condition = getSingleValueJooqCondition(filterType, field, value);
+				Condition condition = getSingleValueJooqCondition(filterCondition.getType(), 
+						DSL.field(mainColumn.getName()), filterCondition.getValue());
 				return condition;
 			} else {
 				return null;

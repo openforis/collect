@@ -44,6 +44,7 @@ class DataViewPage extends Component {
 
 		this.onEntityChange = this.onEntityChange.bind(this)
 		this.onDragEnd = this.onDragEnd.bind(this)
+		this.addAttributeToSelectedColumns = this.addAttributeToSelectedColumns.bind(this)
 		this.handleQueryButtonClick = this.handleQueryButtonClick.bind(this)
 		this.handleResultTableChange = this.handleResultTableChange.bind(this)
 		this.handleQueryFilterDialogClose = this.handleQueryFilterDialogClose.bind(this)
@@ -104,6 +105,24 @@ class DataViewPage extends Component {
 		}))
 	}
 
+	addAttributeToSelectedColumns(attributeDef) {
+		const newAvailableAttributes = Array.from(this.state.availableAttributes)
+		const attrDefIdx = newAvailableAttributes.indexOf(attributeDef)
+		const newSelectedColumns = Array.from(this.state.selectedColumns)
+		
+		newAvailableAttributes.splice(attrDefIdx, 1)
+		newSelectedColumns.push(new QueryComponent(attributeDef.id, attributeDef))
+
+		this.setState({
+			availableAttributes: newAvailableAttributes,
+			selectedColumns: newSelectedColumns,
+			queryResult: null,
+			queryResultPage: 1,
+			queryResultRecordsPerPage: 10,
+			queryResultTotalRecords: 0
+		})
+	}
+
 	onDragEnd(result) {
 		// dropped outside the list
 		if (!result.destination) {
@@ -143,7 +162,7 @@ class DataViewPage extends Component {
 			queryResult: null,
 			queryResultPage: 1,
 			queryResultRecordsPerPage: 10,
-			queryResultTotalRecords: 0,
+			queryResultTotalRecords: 0
 		})
 	  }
 
@@ -158,7 +177,7 @@ class DataViewPage extends Component {
 			queryResult: null,
 			queryResultPage: 1,
 			queryResultRecordsPerPage: 10,
-			queryResultTotalRecords: 0,
+			queryResultTotalRecords: 0
 		})
 	}
 
@@ -184,7 +203,8 @@ class DataViewPage extends Component {
 			query.recordStep = 'ENTRY'
 			query.contextEntityDefinitionId = selectedEntity.id
 			query.columns = selectedColumns.map(c => {return {
-				attributeDefinitionId: c.attributeDefinition.id
+				attributeDefinitionId: c.attributeDefinition.id,
+				filterCondition: c.filterCondition
 			}})
 			query.filter = selectedFilter
 			query.page = queryResultPage
@@ -213,19 +233,23 @@ class DataViewPage extends Component {
 
 	handleQueryFilterDialogClose() {
 		this.setState({
-			queryFilterDialogOpen: false,
-			queryFilterDialogQueryComponent: false
+			queryFilterDialogOpen: false
 		})
 	}
 
-	handleQueryFilterDialogOk(condition) {
-		this.state.queryFilterDialogQueryComponent.condition = condition
+	handleQueryFilterDialogOk(filterCondition) {
+		const newQueryFilterDialogQueryComponent = Object.assign({}, this.state.queryFilterDialogQueryComponent, 
+			{filterCondition: filterCondition})
+		this.setState({
+			queryFilterDialogOpen: false,
+			queryFilterDialogQueryComponent: newQueryFilterDialogQueryComponent
+		})		
 	}
 
 	render() {
 		const { survey } = this.props
 		const { schemaTreeData, selectedEntityTreeNodes, availableAttributes, selectedColumns, selectedFilter, selectedEntity, queryResult,
-			queryResultPage, queryResultRecordsPerPage, queryPanelExpanded, queryFilterDialogOpen, queryFilterAttributeDefinition } = this.state
+			queryResultPage, queryResultRecordsPerPage, queryPanelExpanded, queryFilterDialogOpen, queryFilterDialogQueryComponent } = this.state
 		const queryResultTotalRecords = queryResult ? queryResult.totalRecords: 0
 		
 		if (!survey || !schemaTreeData) {
@@ -286,6 +310,7 @@ class DataViewPage extends Component {
 															{...provided.draggableProps}
 															{...provided.dragHandleProps}
 															className={'item' + (snapshot.isDragging ? ' dragging': '')} 
+															onClick={this.addAttributeToSelectedColumns.bind(this, a)}
 															>
 															{a.label}
 														</div>
@@ -393,7 +418,7 @@ class DataViewPage extends Component {
 					</div>
 				}
 				<DataQueryFilterDialog open={queryFilterDialogOpen} 
-					attributeDefinition={queryFilterDialogQueryComponent.attributeDefinition}
+					queryComponent={queryFilterDialogQueryComponent}
 					onClose={this.handleQueryFilterDialogClose}
 					onOk={this.handleQueryFilterDialogOk} />
 			</MaxAvailableSpaceContainer>
@@ -445,7 +470,8 @@ class RDBQuery {
 class QueryComponent {
 	id
 	attributeDefinition
-
+	filterCondition
+	
 	constructor(id, attributeDef) {
 		this.id = id
 		this.attributeDefinition = attributeDef
