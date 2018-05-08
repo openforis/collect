@@ -266,7 +266,7 @@ public class CollectControlPanelController implements Initializable {
 			statusMessage = "Initializing...";
 			break;
 		case STARTING:
-			statusMessage = "Starting up...";
+			statusMessage = "Starting up...\r\n\r\nDO NOT CLOSE!";
 			break;
 		case RUNNING:
 			statusMessage = "Running!";
