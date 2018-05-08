@@ -37,9 +37,11 @@ import javafx.stage.Window;
 
 public class CollectControlPanelController implements Initializable {
 
+
 	private static final Logger LOG = LogManager.getLogger(CollectControlPanelController.class);
 
 	private static final String COLLECT_USER_HOME_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis", "Collect");
+	private static final String COLLECT_DATA_FOLDER_NAME = "data";
 	private static final String LOGS_LOCATION = Files.getLocation(Files.getCurrentLocation(), "logs");
 	private static final String SERVER_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect_server.log");
 	private static final String COLLECT_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect.log");
@@ -98,7 +100,13 @@ public class CollectControlPanelController implements Initializable {
 		try {
 			executorService = Executors.newScheduledThreadPool(5);
 
-			CollectProperties collectProperties = new CollectPropertiesParser().parse(loadProperties());
+			File collectHomeFolder = new File(COLLECT_USER_HOME_LOCATION);
+			if (! collectHomeFolder.exists()) {
+				initializeCollectHomeFolder();
+				CollectProperties collectProperties = new CollectProperties();
+				new CollectPropertiesHandler().write(collectProperties, new File(collectHomeFolder, SETTINGS_FILENAME));
+			}
+			CollectProperties collectProperties = loadProperties();
 			webappsLocation = collectProperties.getWebappsLocation();
 			if (webappsLocation == null || webappsLocation.isEmpty()) {
 				webappsLocation = DEFAULT_WEBAPPS_LOCATION;
@@ -124,6 +132,12 @@ public class CollectControlPanelController implements Initializable {
 			LOG.error("error initializing Collect: " + e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void initializeCollectHomeFolder() {
+		File collectHomeFolder = new File(COLLECT_USER_HOME_LOCATION);
+		createFolder(collectHomeFolder);
+		createFolder(new File(collectHomeFolder, COLLECT_DATA_FOLDER_NAME));
 	}
 
 	/**
@@ -299,7 +313,7 @@ public class CollectControlPanelController implements Initializable {
 		Platform.runLater(runnable);
 	}
 	
-	private Properties loadProperties() throws IOException {
+	private CollectProperties loadProperties() throws IOException {
 		Properties properties = new Properties();
 		String[] possibleLocations = new String[]{
 			SETTINGS_FILE_LOCATION, 
@@ -317,7 +331,7 @@ public class CollectControlPanelController implements Initializable {
 		}
 		FileInputStream is = new FileInputStream(propertiesFile);
 		properties.load(is);
-		return properties;
+		return new CollectPropertiesHandler().parse(properties);
 	}
 	
 	private void deleteBrokenTemporaryFiles() throws IOException {
@@ -354,6 +368,12 @@ public class CollectControlPanelController implements Initializable {
 				closeable.close();
 			} catch (IOException e) {
 			}
+		}
+	}
+
+	private static void createFolder(File folder) {
+		if (! folder.mkdirs()) {
+			throw new RuntimeException(String.format("Cannot create folder: %s", folder.getAbsolutePath()));
 		}
 	}
 	
