@@ -307,7 +307,13 @@ public class Record implements DeepComparable {
 	int nextId() {
 		return nextId++;
 	}
-
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<Attribute<?, ?>> determineCalculatedAttributes(NodePointer nodePointer) {
+		List dependencies = calculatedAttributeDependencies.dependenciesFor(nodePointer.getNodes());
+		return dependencies;
+	}
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<Attribute<?, ?>> determineCalculatedAttributes(Node<?> node) {
 		List dependenciesFor = calculatedAttributeDependencies.dependenciesFor(node);
@@ -344,6 +350,10 @@ public class Record implements DeepComparable {
 	public Set<Attribute<?, ?>> determineValidationDependentNodes(Collection<Node<?>> nodes) {
 		Set<Attribute<?, ?>> result = validationDependencies.dependentAttributes(nodes);
 		return result;
+	}
+	
+	public Set<CodeAttribute> determineDependentCodeAttributes(NodePointer nodePointer) {
+		return codeAttributeDependencies.dependentCodeAttributes(nodePointer);
 	}
 	
 	public Set<CodeAttribute> determineDependentCodeAttributes(CodeAttribute codeAttr) {

@@ -73,11 +73,15 @@ public class NodePointer {
 		return entity.isRelevant(childDefinition);
 	}
 	
-	public ModelVersion getModelVersion() {
-		Record record = entity.getRecord();
-		return record.getVersion();
+	public Record getRecord() {
+		return entity.getRecord();
 	}
 	
+	public ModelVersion getModelVersion() {
+		Record record = getRecord();
+		return record.getVersion();
+	}
+
 	@Override
 	public String toString() {
 		return getEntityPath() + "/" + getChildName();

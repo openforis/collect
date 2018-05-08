@@ -47,9 +47,10 @@ public abstract class NodeChange<T extends Node<?>> {
 	
 	@Override
 	public String toString() {
+		String prettyFormatPath = node.isDetached() ? "[detached]/" + node.getName() : node.getPath();
 		return String.format("%s for node %s", 
 				this.getClass().getSimpleName(), 
-				node.getPath());
+				prettyFormatPath);
 	}
 
 	@Override
