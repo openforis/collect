@@ -81,12 +81,12 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 		return messages == null ? null: messages.getText(language);
 	}
 	
-	protected String getMessageInPreferredLanguage(Survey survey, String preferredLanguage) {
-		String message = getMessage(preferredLanguage);
-		if (message == null && ! survey.isDefaultLanguage(preferredLanguage)) {
-			message = getMessage(survey.getDefaultLanguage());
+	protected String getFailSafeMessage(Survey survey, String preferredLanguage) {
+		if (preferredLanguage == null || survey.isDefaultLanguage(preferredLanguage)) {
+			return getMessage(survey.getDefaultLanguage());
+		} else {
+			return getMessage(preferredLanguage);
 		}
-		return message;
 	}
 	
 	public void setMessage(String language, String text) {
@@ -127,12 +127,7 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 	
 	public String getMessageWithEvaluatedExpressions(Attribute<?, ?> context, String preferredLanguage) {
 		Survey survey = context.getSurvey();
-		String message;
-		if (preferredLanguage == null || survey.isDefaultLanguage(preferredLanguage)) {
-			message = getMessage(survey.getDefaultLanguage());
-		} else {
-			message = getMessageInPreferredLanguage(survey, preferredLanguage);
-		}
+		String message = getFailSafeMessage(survey, preferredLanguage);
 		if (StringUtils.isBlank(message)) {
 			return null;
 		} else {

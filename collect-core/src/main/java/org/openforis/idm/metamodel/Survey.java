@@ -200,13 +200,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		if (projectNames == null) {
 			return null;
 		}
-		if ( language != null && projectNames.hasText(language)) {
-			return projectNames.getText(language);
-		} else if (defaultToDefaultLanguage) {
-			return projectNames.getText(getDefaultLanguage());
-		} else {
-			return null;
-		}
+		return projectNames.getText(language, getDefaultLanguage(), defaultToDefaultLanguage);
 	}
 	
 	public void setProjectName(String language, String text) {
@@ -248,10 +242,11 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 	
 	public String getDescription(String language) {
-		if ( language == null ) {
-			language = getDefaultLanguage();
-		}
-		return descriptions == null ? null: descriptions.getText(language);
+		return getDescription(language, false);
+	}
+	
+	public String getDescription(String language, boolean returnDefaultIfNotFound) {
+		return descriptions == null ? null: descriptions.getText(language, getDefaultLanguage(), returnDefaultIfNotFound);
 	}
 	
 	public void setDescription(String language, String description) {
