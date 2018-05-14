@@ -242,11 +242,11 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 	
 	public String getDescription(String language) {
-		return getDescription(language, false);
+		return descriptions == null ? null: descriptions.getText(language, getDefaultLanguage());
 	}
 	
-	public String getDescription(String language, boolean returnDefaultIfNotFound) {
-		return descriptions == null ? null: descriptions.getText(language, getDefaultLanguage(), returnDefaultIfNotFound);
+	public String getFailSafeDescription(String language) {
+		return descriptions == null ? null: descriptions.getFailSafeText(language, getDefaultLanguage());
 	}
 	
 	public void setDescription(String language, String description) {
