@@ -136,11 +136,6 @@ public class MathFunctions extends CustomFunctions {
 				return tanrad(number);
 			}
 		});
-		register("tanrad", new SingleArgMathFunction() {
-			public Number execute(Number number) {
-				return tanrad(number);
-			}
-		});
 	}
 
 	private static double PI() {
