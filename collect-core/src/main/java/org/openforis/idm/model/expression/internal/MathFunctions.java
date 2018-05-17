@@ -21,6 +21,36 @@ public class MathFunctions extends CustomFunctions {
 				return abs(number);
 			}
 		});
+		register("acos", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return acos(number);
+			}
+		});
+		register("acosrad", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return acosrad(number);
+			}
+		});
+		register("asin", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return asin(number);
+			}
+		});
+		register("asinrad", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return asinrad(number);
+			}
+		});
+		register("atan", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return atan(number);
+			}
+		});
+		register("atanrad", new SingleArgMathFunction() {
+			public Number execute(Number number) {
+				return atanrad(number);
+			}
+		});
 		register("avg", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return avg(objects[0]);
@@ -215,6 +245,15 @@ public class MathFunctions extends CustomFunctions {
 		return Math.sin(angleInRadians.doubleValue());
 	}
 
+	private static Double asin(Number angleInDegrees) {
+		double angleInRadians = Math.toRadians(angleInDegrees.doubleValue());
+		return Math.asin(angleInRadians);
+	}
+
+	private static Double asinrad(Number angleInRadians) {
+		return Math.asin(angleInRadians.doubleValue());
+	}
+	
 	private static Double cos(Number angleInDegrees) {
 		double angleInRadians = Math.toRadians(angleInDegrees.doubleValue());
 		return Math.cos(angleInRadians);
@@ -224,6 +263,15 @@ public class MathFunctions extends CustomFunctions {
 		return angleInRadians == null ? null : Math.cos(angleInRadians.doubleValue());
 	}
 
+	private static Double acos(Number angleInDegrees) {
+		double angleInRadians = Math.toRadians(angleInDegrees.doubleValue());
+		return Math.acos(angleInRadians);
+	}
+
+	private static Double acosrad(Number angleInRadians) {
+		return Math.acos(angleInRadians.doubleValue());
+	}
+	
 	private static Double tan(Number angleInDegrees) {
 		double angleInRadians = Math.toRadians(angleInDegrees.doubleValue());
 		return Math.tan(angleInRadians);
@@ -231,6 +279,15 @@ public class MathFunctions extends CustomFunctions {
 
 	private static Double tanrad(Number angleInRadians) {
 		return Math.tan(angleInRadians.doubleValue());
+	}
+	
+	private static Double atan(Number angleInDegrees) {
+		double angleInRadians = Math.toRadians(angleInDegrees.doubleValue());
+		return Math.atan(angleInRadians);
+	}
+
+	private static Double atanrad(Number angleInRadians) {
+		return Math.atan(angleInRadians.doubleValue());
 	}
 	
 	private static Double log(Number value) {
