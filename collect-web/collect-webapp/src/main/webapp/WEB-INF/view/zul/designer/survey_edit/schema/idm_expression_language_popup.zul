@@ -107,6 +107,12 @@
 			</h4>
 			<dl>
 				<dt>
+					<i>idm:array(value1, value2, value3, ..., valueN)</i>
+				</dt>
+				<dd>returns a list composed by the specified values. E.g. idm:array('A', 'B', 'C', attribute1, attribute2)</dd>
+			</dl>
+			<dl>
+				<dt>
 					<i>idm:index()</i>
 				</dt>
 				<dd>returns the index of the current node relatively to its
@@ -380,15 +386,69 @@
 			</dl>
 			<dl>
 				<dt>
+					<i>math:sinrad(angleInRadians)</i>
+				</dt>
+				<dd>returns the trigonometric sine of an angle (in radians).</dd>
+			</dl>
+			<dl>
+				<dt>
 					<i>math:cos(angle)</i>
 				</dt>
 				<dd>returns the trigonometric cosine of an angle.</dd>
 			</dl>
 			<dl>
 				<dt>
+					<i>math:cosrad(angleInRadians)</i>
+				</dt>
+				<dd>returns the trigonometric cosine of an angle (in radians).</dd>
+			</dl>
+			<dl>
+				<dt>
 					<i>math:tan(angle)</i>
 				</dt>
 				<dd>returns the trigonometric tangent of an angle.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:tanrad(angleInRadians)</i>
+				</dt>
+				<dd>returns the trigonometric tangent of an angle (in radians).</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:asin(angle)</i>
+				</dt>
+				<dd>returns the arc sine of an angle.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:asinrad(angleInRadians)</i>
+				</dt>
+				<dd>returns the arc sine of an angle (in radians).</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:acos(angle)</i>
+				</dt>
+				<dd>returns the arc cosine of an angle.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:acosrad(angleInRadians)</i>
+				</dt>
+				<dd>returns the arc cosine of an angle (in radians).</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:atan(angle)</i>
+				</dt>
+				<dd>returns the arc tangent of an angle.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>math:atanrad(angleInRadians)</i>
+				</dt>
+				<dd>returns the arc tangent of an angle (in radians).</dd>
 			</dl>
 			<dl>
 				<dt>
@@ -455,6 +515,22 @@
 					coordinates. Coordinate values can be constant text values (e.g.
 					'SRID=EPSG:21035;POINT(805750 9333820)') or expressions related to
 					coordinate attributes</dd>
+			</dl>
+			<a name="Environment_functions" id="Environment_functions"></a>
+			<h4>
+				<span class="mw-headline"> Environment functions </span>
+			</h4>
+			<dl>
+				<dt>
+					<i>env:desktop()</i>
+				</dt>
+				<dd>returns true if Collect is running on a desktop computer, false otherwise.</dd>
+			</dl>
+			<dl>
+				<dt>
+					<i>env:mobile()</i>
+				</dt>
+				<dd>returns true if Collect is running on a mobile device (Android), false otherwise.</dd>
 			</dl>
 			<a name="Examples" id="Examples"></a>
 			<h4>
