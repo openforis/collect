@@ -279,7 +279,8 @@
                 "title": "Survey deleted",
                 "message": "Survey \"{0}\" deleted successfully"
             }
-        }
+        },
+        "noPublishedSurveysFound": "No published surveys found"
     },
     "backupRestore": {
         "label": "Backup/Restore"

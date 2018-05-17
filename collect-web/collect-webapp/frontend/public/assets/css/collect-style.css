@@ -7,6 +7,14 @@ header .breadcrumb-wrapper {
     width: calc(100% - 205px);
 }
 
+
+@media (max-width: 991px) {
+header .breadcrumb-wrapper {
+    width: calc(100% - 50px);
+    position: absolute;
+    left: 70px;
+}}
+
 header .breadcrumb {
     margin-bottom: 0px;
     padding: 1rem 1rem;
@@ -273,10 +281,18 @@ label.invalid {
 /**
 * SURVEY SELECTOR
 */
+span.survey-selector,
 .dropdown.survey-selector {
     position: absolute;
     top: 5px;
-    right: 10px;
+    right: 5px;
+}
+
+span.survey-selector {
+    border: 2px dashed;
+    width: 300px;
+    padding: 5px;
+    text-align: center;
 }
 
 .dropdown.survey-selector,
