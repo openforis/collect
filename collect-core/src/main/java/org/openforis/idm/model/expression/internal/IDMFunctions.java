@@ -61,6 +61,13 @@ public class IDMFunctions extends CustomFunctions {
 	
 	public IDMFunctions(String namespace) {
 		super(namespace);
+		
+		register("array", new CustomFunction() {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return objects;
+			}
+		});
+		
 		register("blank", new CustomFunction(1) {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return blank(objects[0]);

@@ -13,6 +13,10 @@ import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionVali
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResultFlag;
 
 public abstract class CustomFunction implements Function {
+	
+	private static final int UNLIMITED_ARGUMENTS_COUNT = Integer.MAX_VALUE;
+	private static final List<Integer> UNLIMITED_ARGUMENT_COUNTS = Arrays.asList(UNLIMITED_ARGUMENTS_COUNT);
+	
 	private final Set<String> referencedPaths;
 	private final List<Integer> supportedArgumentCounts;
 
@@ -20,6 +24,10 @@ public abstract class CustomFunction implements Function {
 	 * Create a custom function, optionally including paths that are referenced
 	 * independent on any parameters passed to the function.
 	 */
+	public CustomFunction(String... referencedPaths) {
+		this(UNLIMITED_ARGUMENT_COUNTS, referencedPaths);
+	}
+	
 	public CustomFunction(int supportedArgumentCount, String... referencedPaths) {
 		this(Arrays.asList(supportedArgumentCount), referencedPaths);
 	}
@@ -36,7 +44,8 @@ public abstract class CustomFunction implements Function {
 	}
 
 	public final ExpressionValidationResult validateArguments(NodeDefinition contextNodeDef, Expression[] arguments) {
-		if (getSupportedArgumentCounts().contains(arguments.length)) {
+		if (getSupportedArgumentCounts().contains(arguments.length) 
+				|| UNLIMITED_ARGUMENT_COUNTS.equals(getSupportedArgumentCounts())) {
 			return performArgumentValidation(contextNodeDef, arguments);
 		} else {
 			return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR,
