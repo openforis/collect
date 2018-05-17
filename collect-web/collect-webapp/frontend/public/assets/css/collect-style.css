@@ -119,7 +119,15 @@ fieldset legend {
     background-image: url("../img/of_collect_logo_horizontal_of.png");
     background-position: left center;
     background-size: 155px auto;
-    
+}
+
+.app-header.navbar .dropdown-menu {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.sidebar-fixed .sidebar .sidebar-nav {
+    height: calc(100vh - 130px);
 }
 
 .app-body .sidebar {
@@ -229,11 +237,6 @@ span.logo.small.collect-earth {
 
 .dropdown-menu.dropdown-menu-right {
     right: auto;
-}
-
-.app-header.navbar .dropdown-menu {
-    max-height: 400px;
-    overflow-y: auto;
 }
 
 label.invalid {
