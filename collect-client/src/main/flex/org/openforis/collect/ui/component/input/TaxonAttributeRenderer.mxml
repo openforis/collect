@@ -56,7 +56,7 @@
 								fieldIndex="6"								
 								visible="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
 								includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).showFamily}"
-								width="{SCIENTIFIC_NAME_WIDTH}" 
+								width="{FAMILY_SCIENTIFIC_NAME_WIDTH}" 
 								maxChars="255" 
 								/>
 		<input:StringInputField id="codeTextInput" 
