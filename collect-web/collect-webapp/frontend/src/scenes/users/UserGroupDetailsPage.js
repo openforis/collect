@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Alert, Button, ButtonGroup, ButtonToolbar, Container, Row, Col,
-    Form, FormGroup, Label, Input, FormText, FormFeedback, UncontrolledTooltip } from 'reactstrap';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { Alert, Button, Container, Row, Col,
+    Form, FormGroup, Label, Input, FormFeedback, UncontrolledTooltip } from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
 import * as UserGroupActions from 'actions/usergroups' 
@@ -49,7 +48,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             const loggedUser = this.props.loggedUser
             let idParam = props.match.params.id;
             let userGroup;
-            if (idParam == 'new') {
+            if (idParam === 'new') {
                 userGroup = {
                     id: null, 
                     name: '', 
@@ -70,7 +69,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     }]
                 }
             } else {
-                let userGroupId = parseInt(idParam)
+                let userGroupId = parseInt(idParam, 10)
                 userGroup = props.userGroups.find(group => group.id === userGroupId)
             }
             if (! this.state.ready || this.state.id != userGroup.id) {

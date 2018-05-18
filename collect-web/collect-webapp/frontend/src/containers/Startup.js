@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import * as Actions from 'actions'
 import * as SurveysActions from 'actions/surveys'
@@ -7,7 +6,6 @@ import * as SessionActions from 'actions/session'
 import * as UserActions from 'actions/users'
 import * as UserGroupActions from 'actions/usergroups'
 import Preloader from 'components/Preloader'
-import Labels from 'utils/Labels'
 
 class Startup extends Component {
     

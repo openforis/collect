@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import { render, unmountComponentAtNode, findDOMNode } from 'react-dom';
-import Button from 'material-ui/Button';
-import Dialog, {
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from 'material-ui/Dialog';
-
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogActions from '@material-ui/core/DialogActions'
 import L from 'utils/Labels';
 
 const CONFIRM_TARGET_DIV_ID = 'ofc-confirm-dialog'
@@ -54,18 +52,17 @@ class ConfirmDialog extends Component {
         
         return (
             <Dialog open={true}
-                    ignoreBackdropClick
                     onEntering={this.handleEntering}
-                    onEscapeKeyUp={this.handleCancel}>
+                    onBackdropClick={this.handleCancel}
+                    onEscapeKeyDown={this.handleCancel}>
                 <DialogTitle>{title}</DialogTitle>
                 <DialogContent style={{width: '400px'}}>
                     <DialogContentText>{message}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button raised color="primary" onClick={this.handleConfirm}>{confirmButtonLabel}</Button>
+                    <Button variant="raised" color="primary" onClick={this.handleConfirm}>{confirmButtonLabel}</Button>
                     {' '}
                     <Button onClick={this.handleCancel} ref={n => this.cancelButton = n}>{cancelButtonLabel}</Button>
-                    {' '}
                 </DialogActions>
             </Dialog>
         )
@@ -113,9 +110,9 @@ class AlertDialog extends Component {
         const okButtonLabel = L.l('global.ok')
         return (
             <Dialog open={true}
-                    ignoreBackdropClick
                     onEntering={this.handleEntering}
-                    onEscapeKeyUp={this.handleCancel}>
+                    onBackdropClick={this.handleCancel}
+                    onEscapeKeyDown={this.handleCancel}>
                 <DialogTitle>{title}</DialogTitle>
                 <DialogContent style={{width: '400px'}}>
                     <DialogContentText>{message}</DialogContentText>

@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import ExpansionPanel, {
     ExpansionPanelSummary,
     ExpansionPanelDetails,
-} from 'material-ui/ExpansionPanel';
-import Typography from 'material-ui/Typography';
-import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+} from '@material-ui/core/ExpansionPanel';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Field, SubmissionError, reduxForm } from 'redux-form'
-import { Alert, Button, ButtonGroup, ButtonToolbar, Container, ButtonDropdown, 
-    DropdownToggle, DropdownMenu, DropdownItem, Form, FormFeedback, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { Field, reduxForm } from 'redux-form'
+import { Alert, Button, Form, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
 import Forms from 'components/Forms'
@@ -33,7 +32,7 @@ class NewSurveyParametersForm extends Component {
     }
     
     render() {
-        const { userGroups, error, handleSubmit, pristine, reset, submitting, submitFailed, submitSucceded } = this.props
+        const { userGroups, error, handleSubmit, submitting, submitFailed, submitSucceded } = this.props
 
         const templateTypeOptions = templateTypes.map(type => <option key={type} value={type}>{L.l('survey.templateType.' + type)}</option>)
         const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))

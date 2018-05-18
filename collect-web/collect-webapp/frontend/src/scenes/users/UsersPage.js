@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap';
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import { Button, Container, Row, Col } from 'reactstrap';
 
 import UserDetailsPage from './UserDetailsPage';
 import AbstractItemsListPage from 'components/AbstractItemsListPage';
@@ -47,7 +47,11 @@ class UsersPage extends AbstractItemsListPage {
 	}
 
   	render() {
-		const { isFetching, lastUpdated, users} = this.props
+		const { isFetching, users} = this.props
+
+		if (isFetching) {
+			return <div>Loading...</div>
+		}
 		
 		let editedItemContainer = null;
 		if (this.state.editedItem != null) {
@@ -74,7 +78,7 @@ class UsersPage extends AbstractItemsListPage {
 					<Col>
 						<BootstrapTable
 							ref="table"
-							data={this.props.users}
+							data={users}
 							striped hover selectRow={ {
 								mode: 'checkbox', 
 								clickToSelect: true, 

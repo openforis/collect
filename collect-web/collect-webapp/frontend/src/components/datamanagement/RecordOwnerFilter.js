@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { MenuItem } from 'material-ui/Menu'
+import React from 'react'
+import MenuItem from '@material-ui/core/MenuItem'
 import { connect } from 'react-redux'
 
 import SelectFilter from 'components/datatable/SelectFilter'
@@ -48,8 +48,8 @@ class RecordOwnerFilter extends SelectFilter {
         const onlyMeSelected = Arrays.contains(val, '___ONLY_ME___') && !this.state.onlyMeSelected
 
         const allValuesSelected = val.length === 0 
-          || Arrays.contains(val, '') && !this.state.allValuesSelected 
-          || !Arrays.contains(val, '') && notFixedValues.length === this.props.dataSource.length
+          || (Arrays.contains(val, '') && !this.state.allValuesSelected) 
+          || (!Arrays.contains(val, '') && notFixedValues.length === this.props.dataSource.length)
         
         const selectedValues = 
             allValuesSelected ? [''] 

@@ -29,7 +29,7 @@ class Header extends Component {
   }
 
   render() {
-    const { loggedUser, location } = this.props
+    const { location } = this.props
     const surveySelectRequired = Routes.isSurveySelectRequiredForPath(location.pathname);
     
     return (

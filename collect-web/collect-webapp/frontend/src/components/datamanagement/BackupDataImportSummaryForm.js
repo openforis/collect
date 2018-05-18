@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import { FormGroup, UncontrolledTooltip } from 'reactstrap';
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';    
+import { FormGroup } from 'reactstrap';
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';    
 import * as Formatters from 'components/datatable/formatters'
-import Forms from 'components/Forms'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
 

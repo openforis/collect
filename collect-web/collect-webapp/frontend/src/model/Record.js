@@ -1,5 +1,5 @@
-import Serializable from './Serializable';
-import { EntityDefinition } from './Survey';
+import Serializable from './Serializable'
+import { EntityDefinition } from './Survey'
 
 export class Record extends Serializable {
     id
@@ -12,27 +12,27 @@ export class Record extends Serializable {
     owner
     
     constructor(survey, jsonData) {
-        super();
-        this.survey = survey;
-        this.nodeById = [];
+        super()
+        this.survey = survey
+        this.nodeById = []
         if (jsonData) {
-            this.fillFromJSON(jsonData);
+            this.fillFromJSON(jsonData)
         }
     }
     
     fillFromJSON(jsonObj) {
-        super.fillFromJSON(jsonObj);
+        super.fillFromJSON(jsonObj)
         
-        let rootEntityDefId = parseInt(jsonObj.rootEntity.definitionId);
-        let rootEntityDef = this.survey.schema.getDefinitionById(rootEntityDefId);
+        let rootEntityDefId = parseInt(jsonObj.rootEntity.definitionId, 10)
+        let rootEntityDef = this.survey.schema.getDefinitionById(rootEntityDefId)
             
-        this.rootEntity = new Entity(this, rootEntityDef, null);
-        this.rootEntity.fillFromJSON(jsonObj.rootEntity);
+        this.rootEntity = new Entity(this, rootEntityDef, null)
+        this.rootEntity.fillFromJSON(jsonObj.rootEntity)
         this.index(this.rootEntity)
     }
     
     getNodeById(nodeId) {
-        return this.nodeById[nodeId];
+        return this.nodeById[nodeId]
     }
 
     index(node) {
@@ -46,122 +46,122 @@ export class Record extends Serializable {
 
 export class Node extends Serializable {
     
-    record;
-    parent;
-    definition;
-    id;
+    record
+    parent
+    definition
+    id
     
     constructor(record, definition, parent) {
-        super();
-        this.record = record;
-        this.definition = definition;
-        this.parent = parent;
+        super()
+        this.record = record
+        this.definition = definition
+        this.parent = parent
     }
     
     fillFromJSON(jsonObj) {
-        super.fillFromJSON(jsonObj);
+        super.fillFromJSON(jsonObj)
     }
 }
 
 export class Entity extends Node {
     
-    childrenByDefinitionId = [];
+    childrenByDefinitionId = []
     
     get summaryLabel() {
-        return "Entity " + this.id;
+        return "Entity " + this.id
     }
     
     fillFromJSON(jsonObj) {
-        super.fillFromJSON(jsonObj);
+        super.fillFromJSON(jsonObj)
         
-        let $this = this;
-        $this.record.index($this);
+        let $this = this
+        $this.record.index($this)
 
-        this.childrenByDefinitionId = [];
+        this.childrenByDefinitionId = []
         for (var defIdStr in jsonObj.childrenByDefinitionId) {
-            let defId = parseInt(defIdStr);
-            let def = this.record.survey.schema.getDefinitionById(defId);
-            let childrenJsonObj = jsonObj.childrenByDefinitionId[defId];
+            let defId = parseInt(defIdStr, 10)
+            let def = this.record.survey.schema.getDefinitionById(defId)
+            let childrenJsonObj = jsonObj.childrenByDefinitionId[defId]
             childrenJsonObj.forEach(childJsonObj => {
-                let child;
+                let child
                 if (def instanceof EntityDefinition) {
-                    child = new Entity(this.record, def, this);
+                    child = new Entity(this.record, def, this)
                 } else {
-                    child = new Attribute(this.record, def, this);
+                    child = new Attribute(this.record, def, this)
                 }
-                child.fillFromJSON(childJsonObj);
+                child.fillFromJSON(childJsonObj)
                 this.addChild(child)
             })
         }
     }
     
     getDescendants(descendantDefIds) {
-        let currentEntity = this;
-        let descendants;
+        let currentEntity = this
+        let descendants
         for (var descendantDefId in descendantDefIds) {
-            descendants = currentEntity.childrenByDefinitionId[descendantDefId];
+            descendants = currentEntity.childrenByDefinitionId[descendantDefId]
         }
-        return descendants;
+        return descendants
     } 
     
     getSingleChild(defId) {
-        let children = this.childrenByDefinitionId[defId];
-        return children === null || children.length === 0 ? null : children[0];
+        let children = this.childrenByDefinitionId[defId]
+        return children === null || children.length === 0 ? null : children[0]
     }
     
     addChild(child) {
-        let children = this.childrenByDefinitionId[child.definition.id];
+        let children = this.childrenByDefinitionId[child.definition.id]
         if (children == null) {
-            children = [];
-            this.childrenByDefinitionId[child.definition.id] = children;
+            children = []
+            this.childrenByDefinitionId[child.definition.id] = children
         }
-        children.push(child);
+        children.push(child)
         this.record.index(child)
     }
 }
 
 export class Attribute extends Node {
     
-    fields = [];
+    fields = []
     
     fillFromJSON(jsonObj) {
-        super.fillFromJSON(jsonObj);
+        super.fillFromJSON(jsonObj)
         
-        this.fields = [];
+        this.fields = []
         jsonObj.fields.forEach(fieldJsonObj => {
-            let field = new Field();
-            field.fillFromJSON(fieldJsonObj);
-            this.fields.push(field);
+            let field = new Field()
+            field.fillFromJSON(fieldJsonObj)
+            this.fields.push(field)
         })
     }
     
     get allFieldsFilled() {
         for (var i = 0; i < this.fields.length; i++) {
-            let field = this.fields[i];
+            let field = this.fields[i]
             if (field.value == null) {
-                return false;
+                return false
             }
         }
-        return true;
+        return true
     }
     
     setFieldValue(fieldIdx, value) {
         if (this.fields == null) {
-            this.fields = [];
+            this.fields = []
         }
         while (this.fields.length <= fieldIdx) {
-            this.fields.push(new Field());
+            this.fields.push(new Field())
         }
-        this.fields[fieldIdx].value = value;
+        this.fields[fieldIdx].value = value
     }
 }
 
 export class Field extends Serializable {
     
-    value = null;
-    remarks = null;
+    value = null
+    remarks = null
     
     get intValue() {
-        return this.value == null ? null : parseInt(this.value.toString());
+        return this.value == null ? null : parseInt(this.value.toString(), 10)
     }
 }

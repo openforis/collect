@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
-import {
-    Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container,
-    Form, FormGroup, Label, Input, Row, Col
-} from 'reactstrap';
+import { Button, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
 import ServiceFactory from 'services/ServiceFactory';
-import Workflow from 'model/Workflow';
 import * as JobActions from 'actions/job';
-import Objects from 'utils/Objects'
 import L from 'utils/Labels'
 
 class SurveyExportPage extends Component {
@@ -93,8 +88,8 @@ class SurveyExportPage extends Component {
                     <Input type="radio" value={type} name="surveyType"
                         checked={this.state.surveyType === type}
                         onChange={(event) => this.setState({ ...this.state, surveyType: event.target.value })}
-                        disabled={type === 'PUBLISHED' && (surveySummary.temporary && !surveySummary.publishedId)
-                            || type === 'TEMPORARY' && !surveySummary.temporary}
+                        disabled={(type === 'PUBLISHED' && surveySummary.temporary && !surveySummary.publishedId)
+                            || (type === 'TEMPORARY' && !surveySummary.temporary)}
                         />
                     {L.l('survey.surveyType.' + type.toLowerCase())}
                 </Label>

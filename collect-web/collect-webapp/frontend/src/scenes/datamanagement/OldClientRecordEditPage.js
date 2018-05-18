@@ -15,10 +15,10 @@ export default class OldClientRecordEditPage extends Component {
 
     componentDidMount() {
         let idParam = this.props.match.params.id;
-        let recordId = parseInt(idParam);
+        let recordId = parseInt(idParam, 10);
 
         ServiceFactory.recordService.fetchSurveyId(recordId).then(res => {
-            let surveyId = parseInt(res);
+            let surveyId = parseInt(res, 10);
             this.setState({
                 loading: false,
                 surveyId: surveyId,

@@ -2,8 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
-import { FormControlLabel } from 'material-ui/Form'
-import Switch from 'material-ui/Switch'
 
 import ServiceFactory from 'services/ServiceFactory'
 import * as Formatters from 'components/datatable/formatters'
@@ -191,10 +189,10 @@ class RecordDataTable extends Component {
 			for (const fieldName in filterObj) {
 				let val = filterObj[fieldName].value
 				if (fieldName.startsWith('key')) {
-					const keyValueIdx = parseInt(fieldName.substr(3)) - 1
+					const keyValueIdx = parseInt(fieldName.substr(3), 10) - 1
 					keyValues[keyValueIdx] = val
 				} else if (fieldName.startsWith('summary_')) {
-					const summaryValueIdx = parseInt(fieldName.substring(fieldName.indexOf('_') + 1))
+					const summaryValueIdx = parseInt(fieldName.substring(fieldName.indexOf('_') + 1), 10)
 					summaryValues[summaryValueIdx] = val
 				} else if (fieldName === 'owner') {
 					ownerIds = val
@@ -221,7 +219,7 @@ class RecordDataTable extends Component {
 		if (survey === null) {
 			return <div>Please select a survey first</div>
 		}
-		const { ownerIds, availableOwners, onlyMyOwnRecords } = this.state
+		const { availableOwners } = this.state
 
 		const rootEntityDef = survey.schema.firstRootEntityDefinition
 		const keyAttributes = rootEntityDef.keyAttributeDefinitions
@@ -232,7 +230,6 @@ class RecordDataTable extends Component {
 		const mostSpecificGroup = this.props.userGroups.find(ug => ug.id === userInGroup.groupId)
 
 		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
-		const onlyMyOwnRecordsChangeHandler = this.handleOnlyMyOwnRecordsChange
 
 		function rootEntityKeyFormatter(cell, row) {
 			var idx = this.name.substring(3) - 1
@@ -246,7 +243,6 @@ class RecordDataTable extends Component {
 
 		function ownerFormatter(cell, row) {
             const owner = cell
-            const recordSummary = row
 
             if (owner) {
                 if (loggedUser.canChangeRecordOwner(mostSpecificGroup)) {
@@ -294,6 +290,7 @@ class RecordDataTable extends Component {
 		})
 		columns = columns.concat(attributeDefsShownInSummaryListColumns)
 
+		/*
 		function createStepFilter(filterHandler, customFilterParameters) {
 			const filterItems = []
 			for(let stepName in Workflow.STEPS) {
@@ -305,6 +302,7 @@ class RecordDataTable extends Component {
 			}
 			return <SelectFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
 		}
+		*/
 
 		function createOwnerFilter(filterHandler, customFilterParameters) {
 			const filterItems = availableOwners.map(u => {

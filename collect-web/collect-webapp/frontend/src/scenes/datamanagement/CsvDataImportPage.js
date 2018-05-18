@@ -4,8 +4,8 @@ import Dialog, {
     DialogActions,
     DialogContent,
     DialogTitle,
-  } from 'material-ui/Dialog';
-import Button from 'material-ui/Button';
+  } from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
 
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
@@ -13,9 +13,9 @@ import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 import ExpansionPanel, {
     ExpansionPanelSummary,
     ExpansionPanelDetails,
-} from 'material-ui/ExpansionPanel';
-import Typography from 'material-ui/Typography';
-import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+} from '@material-ui/core/ExpansionPanel';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';

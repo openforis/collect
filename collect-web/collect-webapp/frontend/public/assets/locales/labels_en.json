@@ -189,7 +189,10 @@
         "warnings": "Warnings",
         "created": "Created",
         "modified": "Modified",
-        "step": "Step"
+        "step": "Step",
+        "formVersioning": {
+            "selectFormVersion": "Select Form Version"
+        }
     },
     "survey": {
         "name": "Name",

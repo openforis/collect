@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { Button, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap'
-import ExpansionPanel, { ExpansionPanelSummary, ExpansionPanelDetails } from 'material-ui/ExpansionPanel'
-import Typography from 'material-ui/Typography'
-import ExpandMoreIcon from 'material-ui-icons/ExpandMore'
+import ExpansionPanel, { ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core/ExpansionPanel'
+import Typography from '@material-ui/core/Typography'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import Dialog, {
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-  } from 'material-ui/Dialog'
+  } from '@material-ui/core/Dialog'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 import { connect } from 'react-redux'
 
