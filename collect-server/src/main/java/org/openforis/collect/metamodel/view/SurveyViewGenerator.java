@@ -14,6 +14,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -44,8 +45,7 @@ public class SurveyViewGenerator {
 	public SurveyView generateView(final CollectSurvey survey) {
 		final SurveyView surveyView = new SurveyView(survey);
 
-		List<CodeList> codeLists = survey.getCodeLists();
-		for (CodeList codeList : codeLists) {
+		for (CodeList codeList : survey.getCodeLists()) {
 			CodeListView codeListView = new CodeListView();
 			codeListView.setId(codeList.getId());
 			codeListView.setName(codeList.getName());
@@ -59,6 +59,15 @@ public class SurveyViewGenerator {
 				}
 			}
 			surveyView.addCodeList(codeListView);
+		}
+		
+		for (ModelVersion version : survey.getVersions()) {
+			ModelVersionView versionView = new ModelVersionView();
+			versionView.setId(version.getId());
+			versionView.setName(version.getName());
+			versionView.setLabel(version.getLabel(languageCode));
+			versionView.setDate(version.getDate());
+			surveyView.addModelVersion(versionView);
 		}
 		
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();

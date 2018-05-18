@@ -15,6 +15,7 @@ export class Survey extends Serializable {
     name
     uri
     schema
+    modelVersions = []
     codeLists = []
     uiConfiguration
     temporary
@@ -36,6 +37,7 @@ export class Survey extends Serializable {
             codeList.fillFromJSON(codeListJsonObj)
             return codeList
         })
+        this.modelVersions = jsonObj.modelVersions
         this.schema = new Schema(this)
         this.schema.fillFromJSON(jsonObj.schema)
         this.uiConfiguration = new UIConfiguration(this)
