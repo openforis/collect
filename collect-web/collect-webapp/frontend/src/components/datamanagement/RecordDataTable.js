@@ -6,10 +6,8 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
 import ServiceFactory from 'services/ServiceFactory'
 import * as Formatters from 'components/datatable/formatters'
 import OwnerColumnEditor from './OwnerColumnEditor'
-import SelectFilter from 'components/datatable/SelectFilter'
 import RecordOwnerFilter from 'components/datamanagement/RecordOwnerFilter'
 import Tables from 'components/Tables'
-import Workflow from 'model/Workflow'
 import L from 'utils/Labels'
 
 class RecordDataTable extends Component {

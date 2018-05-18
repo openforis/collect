@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
 import { FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
-/*
-import TextField from '@material-ui/core/TextField';
-import { FormControl, FormHelperText } from '@material-ui/core/Form';
-import Input, { InputLabel } from '@material-ui/core/Input';
-*/
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
 

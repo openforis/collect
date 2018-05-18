@@ -72,7 +72,7 @@ export default class SchemaTreeView extends Component {
         const survey = this.props.survey
         let selectedNodeDefinitions = []
         newCheckedNodeIds.forEach(id => {
-            let def = survey.schema.getDefinitionById(parseInt(id))
+            let def = survey.schema.getDefinitionById(parseInt(id, 10))
             selectedNodeDefinitions.push(def)
         })
         this.props.handleNodeSelect({selectedNodeDefinitions: selectedNodeDefinitions})
@@ -132,9 +132,9 @@ class EntityNode extends SchemaNode {
     fillFromNodeDefinition(nodeDef, includeAttributes, allowSingleEntitiesSelection) {
         super.fillFromNodeDefinition(nodeDef, includeAttributes, allowSingleEntitiesSelection)
 
-        this.children = nodeDef.children.filter(c => includeAttributes || c.type == 'ENTITY').map(c => {
+        this.children = nodeDef.children.filter(c => includeAttributes || c.type === 'ENTITY').map(c => {
             let childNode
-            if (c.type == 'ENTITY') {
+            if (c.type === 'ENTITY') {
                 childNode = new EntityNode()
             } else {
                 childNode = new AttributeNode()

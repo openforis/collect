@@ -72,7 +72,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                 let userGroupId = parseInt(idParam, 10)
                 userGroup = props.userGroups.find(group => group.id === userGroupId)
             }
-            if (! this.state.ready || this.state.id != userGroup.id) {
+            if (! this.state.ready || this.state.id !== userGroup.id) {
                 this.setState({
                     ready: true,
                     editedUserGroup: userGroup,
@@ -247,15 +247,10 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
         const ownerId = 0//this.state.usersInGroup.find(u => u.role == 'OWNER').userId
         
         const availableParentGroups = this.props.userGroups.filter(group => {
-            return group.id != editedUserGroup.id && (editedUserGroup.id == null || isNotDescendantOf(group, editedUserGroup))
+            return group.id !== editedUserGroup.id && (editedUserGroup.id === null || isNotDescendantOf(group, editedUserGroup))
         })
         const parentGroupOptions = [<option key="0" value="">---</option>]
             .concat(availableParentGroups.map(group => <option key={group.id} value={group.id}>{group.label}</option>))
-
-
-        const getUser = function(userId) {
-            this.props.users.find(u => u.id === userId)
-        }
 
 
 		return (
