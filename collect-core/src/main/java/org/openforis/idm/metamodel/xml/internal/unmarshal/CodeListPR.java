@@ -15,6 +15,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.SINCE;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListLabel.Type;
@@ -143,10 +144,14 @@ class CodeListPR extends IdmlPullReader {
 		}
 
 		private Type parseType(String typeStr) throws XmlParseException {
-			try {
-				return CodeListLabel.Type.valueOf(typeStr.toUpperCase());
-			} catch (IllegalArgumentException e) {
-				throw new XmlParseException(getParser(), "invalid type for code list label: " + typeStr, e);
+			if (StringUtils.isBlank(typeStr)) {
+				return Type.ITEM;
+			} else {
+				try {
+					return CodeListLabel.Type.valueOf(typeStr.toUpperCase());
+				} catch (IllegalArgumentException e) {
+					throw new XmlParseException(getParser(), "invalid type for code list label: " + typeStr, e);
+				}
 			}
 		}
 	}

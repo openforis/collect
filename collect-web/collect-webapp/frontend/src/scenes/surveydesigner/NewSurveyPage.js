@@ -1,18 +1,13 @@
-import React, { Component } from 'react';
-import { Button, Col, Container, Row } from 'reactstrap';
-import { connect } from 'react-redux';
+import React, { Component } from 'react'
+import { Col, Container, Row } from 'reactstrap'
+import { connect } from 'react-redux'
 
-import NewSurveyParametersForm from './NewSurveyParametersForm';
+import NewSurveyParametersForm from './NewSurveyParametersForm'
 import * as SurveyActions from 'actions/surveys'
-import L from 'utils/Labels';
-import RouterUtils from 'utils/RouterUtils';
+import RouterUtils from 'utils/RouterUtils'
 
 class NewSurveyPage extends Component {
     
-    constructor(props) {
-        super(props)
-    }
-
     componentWillReceiveProps(nextProps) {
         if (nextProps.newSurveyCreated) {
             const newSurveySummary = nextProps.newSurveySummary

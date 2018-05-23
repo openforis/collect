@@ -62,6 +62,13 @@ public class CodeAttributeDependencyGraph extends NodeDependencyGraph {
 		return new HashSet(dependencies);
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Set<CodeAttribute> dependentCodeAttributes(NodePointer nodePointer) {
+		List dependencies = super.dependenciesFor(nodePointer.getNodes());
+		dependencies.removeAll(nodePointer.getNodes());
+		return new HashSet(dependencies);
+	}
+	
 	@Override
 	protected List<Node<?>> getSortedSourceItems(Set<GraphNode> toSort) {
 		List<Node<?>> result = new GraphSorter(toSort).sort();

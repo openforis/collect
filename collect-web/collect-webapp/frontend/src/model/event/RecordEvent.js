@@ -26,7 +26,7 @@ export class RecordEvent extends Event {
      */
     get parentEntityId() {
         let result = this.ancestorIds.find(id => ! isNaN(id) )
-        return result ? parseInt(result) : NaN
+        return result ? parseInt(result, 10) : NaN
     }
 }
 

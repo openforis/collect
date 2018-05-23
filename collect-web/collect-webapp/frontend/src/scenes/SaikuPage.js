@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, 
-    Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
 import * as JobActions from 'actions/job';

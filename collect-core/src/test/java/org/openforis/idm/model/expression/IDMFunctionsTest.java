@@ -21,6 +21,17 @@ import org.openforis.idm.model.EntityBuilder;
 public class IDMFunctionsTest extends AbstractExpressionTest {
 
 	@Test
+	public void testArrayContainsValues() throws InvalidExpressionException {
+		assertTrue(evaluateBooleanExpression(cluster, null, "idm:contains(idm:array(1,2,3), 1)"));
+		assertTrue(evaluateBooleanExpression(cluster, null, "idm:contains(idm:array('A','B','C'), 'B')"));
+	}
+	
+	@Test
+	public void testArrayNotContainsValues() throws InvalidExpressionException {
+		assertFalse(evaluateBooleanExpression(cluster, null, "idm:contains(idm:array(1,2,3), 4)"));
+	}
+	
+	@Test
 	public void testBlankWithMissingNode() throws InvalidExpressionException{
 		assertTrue(evaluateBooleanExpression(cluster, null, "idm:blank(id)"));
 	}

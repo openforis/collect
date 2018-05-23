@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Col, Container, Form, FormGroup, Label, Input, Row } from 'reactstrap';
-import Button from 'material-ui/Button';
+import { Col, Container, Form, FormGroup, Input, Row } from 'reactstrap';
+import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
 
 import * as JobActions from 'actions/job'

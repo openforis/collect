@@ -3,13 +3,12 @@ import { connect } from 'react-redux'
 import TreeSelect, { SHOW_PARENT } from 'rc-tree-select'
 import 'rc-tree-select/assets/index.css'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
-import Button from 'material-ui/Button'
-import ExpansionPanel, {
-    ExpansionPanelSummary,
-    ExpansionPanelDetails,
-} from 'material-ui/ExpansionPanel'
-import Typography from 'material-ui/Typography';
-import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+import Button from '@material-ui/core/Button'
+import ExpansionPanel from '@material-ui/core/ExpansionPanel'
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
+import Typography from '@material-ui/core/Typography'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 import QueryResultTable from './QueryResultTable'
 import DataQueryFilterDialog from './DataQueryFilterDialog'
@@ -18,7 +17,7 @@ import ServiceFactory from 'services/ServiceFactory'
 import Dialogs from 'components/Dialogs'
 import L from 'utils/Labels'
 import Arrays from 'utils/Arrays'
-import MaxAvailableSpaceContainer from '../../components/MaxAvailableSpaceContainer';
+import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer'
 
 class DataViewPage extends Component {
 
@@ -204,7 +203,7 @@ class DataViewPage extends Component {
 			query.contextEntityDefinitionId = selectedEntity.id
 			query.columns = selectedColumns.map(c => {return {
 				attributeDefinitionId: c.attributeDefinition.id,
-				filterCondition: c.filterCondition
+				filterCondition: c.filterCondition ? c.filterCondition : null
 			}})
 			query.filter = selectedFilter
 			query.page = queryResultPage
@@ -312,7 +311,8 @@ class DataViewPage extends Component {
 															className={'item' + (snapshot.isDragging ? ' dragging': '')} 
 															onClick={this.addAttributeToSelectedColumns.bind(this, a)}
 															>
-															{a.label}
+				                                            <span className={'icon node-type ' + a.attributeType.toLowerCase()} />
+                											{a.label}
 														</div>
 													)}
 													</Draggable>

@@ -1,14 +1,13 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table'
-import { Button, ButtonGroup, ButtonToolbar, Container, Row, Col } from 'reactstrap'
+import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
+import { Button, Container, Row, Col } from 'reactstrap'
 
 import AbstractItemsListPage from 'components/AbstractItemsListPage'
 import * as UserGroupActions from 'actions/usergroups'
 import Dialogs from 'components/Dialogs'
-import { fetchUserGroups } from 'actions'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
 
@@ -68,10 +67,14 @@ class UserGroupsPage extends AbstractItemsListPage {
 				<Row>
 					<Col>
 						<Button color="success" onClick={this.handleNewButtonClick}>New</Button>
-						<Button disabled={! this.state.editedItem} color={this.state.editedItem ? "warning": "disabled"} 
-							onClick={this.handleEditButtonClick}>Edit</Button>
-						<Button disabled={! this.state.editedItem} color={this.state.editedItem ? "danger": "disabled"} 
-							onClick={this.handleDeleteButtonClick}>Delete</Button>
+						{this.state.editedItem && 
+							<Button color={this.state.editedItem ? "warning": "disabled"} 
+								onClick={this.handleEditButtonClick}>Edit</Button>
+						}
+						{this.state.editedItem && 
+							<Button color={this.state.editedItem ? "danger": "disabled"} 
+								onClick={this.handleDeleteButtonClick}><i className="fa fa-trash" aria-hidden="true" /></Button>
+						}
 					</Col>
 				</Row>
 				<Row>

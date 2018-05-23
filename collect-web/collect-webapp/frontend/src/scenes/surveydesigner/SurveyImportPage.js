@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
-import { Button, Col, Container, Row } from 'reactstrap';
+import { Container } from 'reactstrap';
 import { connect } from 'react-redux';
-import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
 
 import SurveyImportForm from './SurveyImportForm';
 
 class SurveyImportPage extends Component {
-    constructor(props) {
-        super(props)
-    }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.surveyFileImported) {

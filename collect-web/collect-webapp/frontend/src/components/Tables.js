@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { SizePerPageDropDown } from 'react-bootstrap-table';
 
-export default class Forms {
+export default class Tables {
 
     static renderSizePerPageDropUp = (props) => {
         return (

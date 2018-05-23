@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { Alert, Button, Col, Form, FormGroup, Label, Input, FormFeedback, Row } from 'reactstrap'
-import { bindActionCreators } from 'redux'
+import { Alert, Button, Col, Form, FormGroup, Label, Input, Row } from 'reactstrap'
 import { connect } from 'react-redux'
 
 import { SimpleFormItem } from 'components/Forms'
@@ -9,7 +8,6 @@ import * as UsersActions from 'actions/users'
 import ServiceFactory from 'services/ServiceFactory'
 import AbstractItemDetailsPage from 'components/AbstractItemDetailsPage'
 import User from 'model/User'
-import L from 'utils/Labels'
 
 class UserDetailsPage extends AbstractItemDetailsPage {
    
@@ -84,15 +82,13 @@ class UserDetailsPage extends AbstractItemDetailsPage {
     }
 
     render() {
-        const EMPTY_OPTION = <option key="-1" value="">--- Select one ---</option>
-        
         return (
             <div>
                 <Form>
                     <SimpleFormItem fieldId='username' 
                             fieldState={this.getFieldState('username')}
                             errorFeedback={this.state.errorFeedback['username']}
-                            label={'user.username'}>
+                            label='user.username'>
                         <Input type="text" name="username" id="username" 
                                 value={this.state.username} 
                                 readOnly={! this.state.newItem}
@@ -103,7 +99,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                     <SimpleFormItem fieldId='enabled' 
                             fieldState={this.getFieldState('enabled')}
                             errorFeedback={this.state.errorFeedback['enabled']}
-                            label={'user.enabled'}>
+                            label='user.enabled'>
                         <FormGroup check>
                             <Label check>
                                 <Input type="checkbox" name="enabled" id="enabled"
@@ -117,7 +113,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                     <SimpleFormItem fieldId='roleSelect' 
                             fieldState={this.getFieldState('role')}
                             errorFeedback={this.state.errorFeedback['role']}
-                            label={'user.role'}>
+                            label='user.role'>
                         <Input type="select" name="role" id="roleSelect" 
                             onChange={(event) => this.setState({...this.state, role: event.target.value})}
                             onBlur={e => this.validateForm()}
@@ -129,7 +125,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                     <SimpleFormItem fieldId='rawPassword' 
                             fieldState={this.getFieldState('rawPassword')}
                             errorFeedback={this.state.errorFeedback['rawPassword']}
-                            label={'user.rawPassword'}>
+                            label='user.rawPassword'>
                         <Input type="password" name="rawPassword" id="rawPassword" 
                             value={this.state.rawPassword}
                             state={this.getFieldState('rawPassword')}
@@ -139,7 +135,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                     <SimpleFormItem fieldId='retypedPassword' 
                             fieldState={this.getFieldState('retypedPassword')}
                             errorFeedback={this.state.errorFeedback['retypedPassword']}
-                            label={'user.retypedPassword'}>
+                            label='user.retypedPassword'>
                         <Input type="password" name="retypedPassword" id="retypedPassword"
                             value={this.state.retypedPassword}
                             state={this.getFieldState('retypedPassword')}

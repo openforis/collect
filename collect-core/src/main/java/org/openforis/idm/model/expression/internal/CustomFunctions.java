@@ -10,6 +10,9 @@ import org.openforis.idm.metamodel.validation.LookupProvider;
 import java.util.*;
 
 public abstract class CustomFunctions implements Functions {
+	
+	private static final int UNLIMITED_PARAMTERS_COUNT = Integer.MAX_VALUE;
+	
 	private final Map<FunctionKey, CustomFunction> functions = new HashMap<FunctionKey, CustomFunction>();
 	private final Set<String> functionNames = new HashSet<String>();
 	private final String namespace;
@@ -38,11 +41,11 @@ public abstract class CustomFunctions implements Functions {
 	@Override
 	public final Function getFunction(String namespace, String name, Object[] parameters) {
 		int parameterCount = parameters == null ? 0 : parameters.length;
-		return functions.get(new FunctionKey(name, parameterCount));
+		return getFunction(name, parameterCount);
 	}
 
 	public Set<String> getPathsReferencedByFunction(String functionName, int parameterCount) {
-		CustomFunction function = functions.get(new FunctionKey(functionName, parameterCount));
+		CustomFunction function = getFunction(functionName, parameterCount);
 		if (function == null) {
 			return Collections.emptySet();
 		}
@@ -60,6 +63,17 @@ public abstract class CustomFunctions implements Functions {
 		}
 	}
 	
+	private CustomFunction getFunction(String name, int parameterCount) {
+		int[] parameterCounts = new int[] {UNLIMITED_PARAMTERS_COUNT, parameterCount};
+		for (int count : parameterCounts) {
+			CustomFunction f = functions.get(new FunctionKey(name, count));
+			if (f != null) {
+				return f;
+			}
+		}
+		return null;
+	}
+
 	protected static LookupProvider getLookupProvider(ExpressionContext context) {
 		ModelJXPathContext jxPathContext = (ModelJXPathContext) context.getJXPathContext();
 		LookupProvider lookupProvider = jxPathContext.getLookupProvider();

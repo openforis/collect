@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Field, SubmissionError, reduxForm } from 'redux-form'
-import Button from 'material-ui/Button';
+import { Field, reduxForm } from 'redux-form'
+import Button from '@material-ui/core/Button';
 
 import ServiceFactory from 'services/ServiceFactory';
 import Forms from 'components/Forms';
@@ -33,7 +33,7 @@ class PasswordChangePage extends Component {
     }
     
     render() {
-        const { handleSubmit, pristine, reset, submitting, anyTouched, error } = this.props
+        const { handleSubmit, submitting, anyTouched, error } = this.props
 
         return (
             <form onSubmit={handleSubmit(this.submit)} style={{width: '700px'}}>

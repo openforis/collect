@@ -1,21 +1,19 @@
 import React, { Component } from 'react';
 import { Container, Form, FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
-import Dialog, {
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-  } from 'material-ui/Dialog';
-import Button from 'material-ui/Button';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Typography from '@material-ui/core/Typography';
 
 import { connect } from 'react-redux';
 import Dropzone from 'react-dropzone';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
-import ExpansionPanel, {
-    ExpansionPanelSummary,
-    ExpansionPanelDetails,
-} from 'material-ui/ExpansionPanel';
-import Typography from 'material-ui/Typography';
-import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
 
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';

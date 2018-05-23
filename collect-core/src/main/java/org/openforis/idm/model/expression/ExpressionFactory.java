@@ -27,6 +27,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.internal.CustomFunction;
 import org.openforis.idm.model.expression.internal.CustomFunctions;
+import org.openforis.idm.model.expression.internal.EnvironmentFunctions;
 import org.openforis.idm.model.expression.internal.GeoFunctions;
 import org.openforis.idm.model.expression.internal.IDMFunctions;
 import org.openforis.idm.model.expression.internal.MathFunctions;
@@ -47,6 +48,7 @@ import org.openforis.idm.path.Path;
  */
 public class ExpressionFactory {
 	
+	public static final String ENVIRONMENT_PREFIX = "env";
 	public static final String GEO_PREFIX = "geo";
 	public static final String IDM_PREFIX = "idm";
 	public static final String MATH_PREFIX = "math";
@@ -80,7 +82,7 @@ public class ExpressionFactory {
 		JXPathIntrospector.registerDynamicClass(Node.class, NodePropertyHandler.class);
 		JXPathIntrospector.registerDynamicClass(Record.class, RecordPropertyHandler.class);
 
-		registerFunctions(new GeoFunctions(GEO_PREFIX), new IDMFunctions(IDM_PREFIX), new MathFunctions(MATH_PREFIX),
+		registerFunctions(new EnvironmentFunctions(ENVIRONMENT_PREFIX), new GeoFunctions(GEO_PREFIX), new IDMFunctions(IDM_PREFIX), new MathFunctions(MATH_PREFIX),
 				new RegExFunctions(REGEX_PREFIX), new UtilFunctions(UTIL_PREFIX));
 
 		referencedPathEvaluator = new ReferencedPathEvaluator(customFunctionsByNamespace);

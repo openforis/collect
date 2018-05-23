@@ -23,13 +23,13 @@ class VersionInfo extends Component {
     const versionTooltip = 
         applicationInfo.latestReleaseVersionVerified ? 
           applicationInfo.latestReleaseVersion ? 
-            <UncontrolledTooltip placement="right" className="success" target="latest-version-running-icon">
+            <UncontrolledTooltip placement="top" className="success" target="latest-version-running-icon">
               Latest version running
             </UncontrolledTooltip>
-          : <UncontrolledTooltip placement="right" className="warning" target="old-version-running-icon">
+          : <UncontrolledTooltip placement="top" className="warning" target="old-version-running-icon">
             Old version running: please update it running Update Open Foris Collect
           </UncontrolledTooltip>
-        : <UncontrolledTooltip placement="right" className="error" target="cannot-verify-latest-version-icon">
+        : <UncontrolledTooltip placement="top" className="error" target="cannot-verify-latest-version-icon">
           Cannot verify if you are running the latest version of Collect
         </UncontrolledTooltip>
     

@@ -7,6 +7,14 @@ header .breadcrumb-wrapper {
     width: calc(100% - 205px);
 }
 
+
+@media (max-width: 991px) {
+header .breadcrumb-wrapper {
+    width: calc(100% - 50px);
+    position: absolute;
+    left: 70px;
+}}
+
 header .breadcrumb {
     margin-bottom: 0px;
     padding: 1rem 1rem;
@@ -119,7 +127,15 @@ fieldset legend {
     background-image: url("../img/of_collect_logo_horizontal_of.png");
     background-position: left center;
     background-size: 155px auto;
-    
+}
+
+.app-header.navbar .dropdown-menu {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.sidebar-fixed .sidebar .sidebar-nav {
+    height: calc(100vh - 130px);
 }
 
 .app-body .sidebar {
@@ -231,11 +247,6 @@ span.logo.small.collect-earth {
     right: auto;
 }
 
-.app-header.navbar .dropdown-menu {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
 label.invalid {
     color: #dc3545;
 }
@@ -270,10 +281,18 @@ label.invalid {
 /**
 * SURVEY SELECTOR
 */
+span.survey-selector,
 .dropdown.survey-selector {
     position: absolute;
     top: 5px;
-    right: 10px;
+    right: 5px;
+}
+
+span.survey-selector {
+    border: 2px dashed;
+    width: 300px;
+    padding: 5px;
+    text-align: center;
 }
 
 .dropdown.survey-selector,
@@ -387,3 +406,77 @@ Closeable box
 .query-builder .filter .item.dragging {
     background: lightgreen;
 }
+
+/**
+** Survey schema node type icons
+**/
+.icon.node-type {
+    float: left;
+    width: 36px;
+    height: 36px;
+}
+
+.icon.node-type.boolean {
+    background-image: url('../images/node_types/boolean-small.png');
+}
+
+.icon.node-type.code {
+    background-image: url('../images/node_types/code-small.png');
+}
+
+.icon.node-type.calculated {
+    background-image: url('../images/node_types/calculated-small.png');
+}
+
+.icon.node-type.coordinate {
+    background-image: url('../images/node_types/coordinate-small.png');
+}
+
+.icon.node-type.date {
+    background-image: url('../images/node_types/date-small.png');
+}
+
+.icon.node-type.file {
+    background-image: url('../images/node_types/file-small.png');
+}
+
+.icon.node-type.form {
+    background-image: url('../images/node_types/form-small.png');
+}
+
+.icon.node-type.grouping {
+    background-image: url('../images/node_types/grouping-small.png');
+}
+
+.icon.node-type.key {
+    background-image: url('../images/node_types/key-small.png');
+}
+
+.icon.node-type.number {
+    background-image: url('../images/node_types/number-small.png');
+}
+
+.icon.node-type.range {
+    background-image: url('../images/node_types/range-small.png');
+}
+
+.icon.node-type.tab {
+    background-image: url('../images/node_types/tab-small.png');
+}
+
+.icon.node-type.table {
+    background-image: url('../images/node_types/table-small.png');
+}
+
+.icon.node-type.taxon {
+    background-image: url('../images/node_types/taxon-small.png');
+}
+
+.icon.node-type.text {
+    background-image: url('../images/node_types/text-small.png');
+}
+
+.icon.node-type.time {
+    background-image: url('../images/node_types/time-small.png');
+}
+

@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import Dialog, {
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-  } from 'material-ui/Dialog';
-import { LinearProgress } from 'material-ui/Progress';
-import Button from 'material-ui/Button';
-import { connect } from 'react-redux';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Button from '@material-ui/core/Button';
 
 import * as SessionActions from 'actions/session'
 import Preloader from 'components/Preloader'
@@ -15,7 +13,7 @@ import ServiceFactory from 'services/ServiceFactory'
 import RouterUtils from 'utils/RouterUtils'
 import L from 'utils/Labels';
 
-class SessionTimeoutVerifier extends Component {
+export default class SessionTimeoutVerifier extends Component {
     
     timer
     intervalPeriod = 20000
@@ -41,6 +39,10 @@ class SessionTimeoutVerifier extends Component {
 
     componentDidMount() {
         this.ping()
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.timer)
     }
 
     startTimer() {
@@ -110,11 +112,3 @@ class SessionTimeoutVerifier extends Component {
         )
     }
 }
-
-function mapStateToProps(state) {
-    return {}
-}    
-
-export default connect(
-    mapStateToProps
-)(SessionTimeoutVerifier);

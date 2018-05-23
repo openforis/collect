@@ -108,6 +108,10 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 		return labels == null ? null: labels.getText(language);
 	}
 	
+	public String getFailSafeLabel(String language, String defaultLanguage) {
+		return labels == null ? null : labels.getFailSafeText(language, defaultLanguage);
+	}
+	
 	public void addLabel(LanguageSpecificText label) {
 		if ( labels == null ) {
 			labels = new LanguageSpecificTextMap();

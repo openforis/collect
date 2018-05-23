@@ -1,17 +1,13 @@
-import React, { Component } from 'react';
-import { Field, SubmissionError, reduxForm } from 'redux-form'
-import {
-    Alert, Button, ButtonGroup, ButtonToolbar, Container, ButtonDropdown,
-    DropdownToggle, DropdownMenu, DropdownItem, Form, FormFeedback, FormGroup, Label, Input, Row, Col, Progress
-} from 'reactstrap';
-import { connect } from 'react-redux';
+import React, { Component } from 'react'
+import { Field, reduxForm } from 'redux-form'
+import { Alert, Button, Form, FormGroup, Row, Col, Progress } from 'reactstrap'
+import { connect } from 'react-redux'
 
-import Dropzone from 'components/Dropzone';
-import Forms, { FormItem } from 'components/Forms';
-import * as SurveysActions from 'actions/surveys';
+import Dropzone from 'components/Dropzone'
+import Forms from 'components/Forms'
+import * as SurveysActions from 'actions/surveys'
 import ServiceFactory from 'services/ServiceFactory'
-import L from 'utils/Labels';
-import Strings from 'utils/Strings';
+import L from 'utils/Labels'
 
 const SURVEY_IMPORT_ACCEPTED_FILE_TYPES = ".collect,.collect-backup,.cep,.xml"
 
@@ -43,9 +39,9 @@ class SurveyImportForm extends Component {
     }
 
     render() {
-        const { userGroups, error, handleSubmit, pristine, reset, submitting,
+        const { userGroups, error, handleSubmit, submitting,
             uploadingSurveyFile, surveyFileToBeImportedPreview, surveyFileUploaded, importingIntoExistingSurvey,
-            surveyFileUploadError, surveyFileUploadErrorMessage, surveyBackupInfo } = this.props
+            surveyFileUploadError, surveyFileUploadErrorMessage } = this.props
         const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
         
         return (

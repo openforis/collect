@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { Button, Container, Form, FormGroup, Label, Input, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
-import ExpansionPanel, {
-    ExpansionPanelSummary,
-    ExpansionPanelDetails,
-} from 'material-ui/ExpansionPanel';
-import Typography from 'material-ui/Typography';
-import ExpandMoreIcon from 'material-ui-icons/ExpandMore';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from './SchemaTreeView';

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.EntityAddChange;
@@ -57,7 +58,12 @@ public class RecordGenerator {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		User user = loadUser(parameters.getUserId(), parameters.getUsername());
 		
-		CollectRecord record = createRecord(survey, user, recordKey);
+		EntityDefinition rootEntityDef = StringUtils.isBlank(parameters.getRootEntityName()) ?
+				survey.getSchema().getFirstRootEntityDefinition() 
+				: survey.getSchema().getRootEntityDefinition(parameters.getRootEntityName());
+				
+		CollectRecord record = createRecord(survey, rootEntityDef, parameters.getVersionName(), 
+				user, recordKey);
 		
 		if (parameters.isAddSecondLevelEntities()) {
 			addSecondLevelEntities(record, recordKey);
@@ -66,10 +72,10 @@ public class RecordGenerator {
 		return record;
 	}
 	
-	private CollectRecord createRecord(CollectSurvey survey, User user, RecordKey recordKey) {
-		EntityDefinition rootEntityDef = survey.getSchema().getFirstRootEntityDefinition();
+	private CollectRecord createRecord(CollectSurvey survey, EntityDefinition rootEntityDef, 
+			String versionName, User user, RecordKey recordKey) {
 		String rootEntityName = rootEntityDef.getName();
-		CollectRecord record = recordManager.create(survey, rootEntityName, user, null);
+		CollectRecord record = recordManager.create(survey, rootEntityName, user, versionName);
 		if (recordKey.isNotEmpty()) {
 			setRecordKeyValues(record, recordKey);
 		}

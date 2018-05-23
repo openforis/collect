@@ -189,7 +189,10 @@
         "warnings": "Warnings",
         "created": "Created",
         "modified": "Modified",
-        "step": "Step"
+        "step": "Step",
+        "formVersioning": {
+            "selectFormVersion": "Select Form Version"
+        }
     },
     "dataView": {
         "selectEntity": "Select an Entity",
@@ -293,7 +296,8 @@
                 "title": "Survey deleted",
                 "message": "Survey \"{0}\" deleted successfully"
             }
-        }
+        },
+        "noPublishedSurveysFound": "No published surveys found"
     },
     "backupRestore": {
         "label": "Backup/Restore"

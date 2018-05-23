@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Alert, Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container,
+    Alert, Button, Container,
     Form, FormGroup, Label, Input, Row, Col
 } from 'reactstrap';
 import { connect } from 'react-redux';
@@ -8,11 +8,8 @@ import { connect } from 'react-redux';
 import * as JobActions from 'actions/job';
 import Forms, { SimpleFormItem } from 'components/Forms';
 import Dialogs from 'components/Dialogs';
-import Workflow from 'model/Workflow';
-import SurveyService from 'services/SurveyService';
 import ServiceFactory from 'services/ServiceFactory';
 import Arrays from 'utils/Arrays';
-import Objects from 'utils/Objects';
 import L from 'utils/Labels';
 import RouterUtils from 'utils/RouterUtils';
 
@@ -115,7 +112,8 @@ class SurveyClonePage extends Component {
                 <Input type="radio" value={type} name="originalSurveyType"
                     checked={originalSurveyType === type}
                     onChange={(e) => this.setState({originalSurveyType: e.target.value })}
-                    disabled={type === 'PUBLISHED' && !originalSurveySummary.published || type === 'TEMPORARY' && !originalSurveySummary.temporary}
+                    disabled={(type === 'PUBLISHED' && !originalSurveySummary.published) 
+                        || (type === 'TEMPORARY' && !originalSurveySummary.temporary)}
                     />
                 {L.l('survey.surveyType.' + type.toLowerCase())}
             </Label>

@@ -1,15 +1,21 @@
 import React, { Component } from 'react'
-import Button from 'material-ui/Button'
-import Input, { InputLabel } from 'material-ui/Input'
-import { FormControl, FormHelperText } from 'material-ui/Form'
-import List, { ListItem, ListItemSecondaryAction, ListItemText } from 'material-ui/List'
-import Checkbox from 'material-ui/Checkbox'
-import Dialog, {
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-  } from 'material-ui/Dialog'
+import Input from '@material-ui/core/Input'
+import InputLabel from '@material-ui/core/InputLabel'
+import FormControl from '@material-ui/core/FormControl'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
+import ListItemText from '@material-ui/core/ListItemText'
+
+import Button from '@material-ui/core/Button'
+import Checkbox from '@material-ui/core/Checkbox'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogTitle from '@material-ui/core/DialogTitle'
 import LeftArrowIcon from '@material-ui/icons/ChevronLeft'
 import RightArrowIcon from '@material-ui/icons/ChevronRight'
 import FastForwardIcon from '@material-ui/icons/FastForward'
@@ -216,7 +222,7 @@ export default class DataQueryFilterDialog extends Component {
     }
 
     render() {
-        const { open, onClose } = this.props
+        const { open, onClose, queryComponent } = this.props
         const { availableMembersLoaded, filterType, availableMembers, usedMembers, selectedAvailableMembers, selectedUsedMembers } = this.state
 
         return (

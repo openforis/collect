@@ -27,10 +27,6 @@ export default class RecordSummary extends Serializable {
   version
   warnings
 
-  constructor(jsonObj) {
-    super(jsonObj)
-  }
-
   get ownerId() {
     return this.owner ? this.owner.id : null
   }

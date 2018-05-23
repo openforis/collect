@@ -57,6 +57,15 @@ public abstract class TypedLanguageSpecificTextAbstractMap<L extends TypedLangua
 		return languageSpecificText != null ? languageSpecificText.getText(): null;
 	}
 	
+	public String getFailSafeText(T type, String language, String defaultLanguage) {
+		String text = getText(type, language);
+		if (text == null && defaultLanguage != null && !defaultLanguage.equals(language)) {
+			return getText(type, defaultLanguage);
+		} else {
+			return text;
+		}
+	}
+	
 	public void setText(T type, String language, String text) {
 		if ( StringUtils.isBlank(text) ) {
 			remove(type, language);

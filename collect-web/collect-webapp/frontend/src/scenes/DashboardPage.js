@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Bar, Line } from 'react-chartjs-2';
-import { Dropdown, DropdownMenu, DropdownItem, Input, Label, Progress, Row, Col } from 'reactstrap';
+import { Line } from 'react-chartjs-2';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';import { connect } from 'react-redux'
@@ -9,7 +8,7 @@ import Dates from 'utils/Dates';
 import L from 'utils/Labels';
 import ServiceFactory from 'services/ServiceFactory'
 
-const DAYS_OF_WEEK_ABBREVIATED = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+//const DAYS_OF_WEEK_ABBREVIATED = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'Dicember']
 
 const createdRecordsLineColor = '#993300';
@@ -156,6 +155,7 @@ class DashboardPage extends Component {
         timeUnitStats = stats.monthlyStats
         break
       case 'YEAR':
+      default:
         timeUnitStats = stats.yearlyStats
         break
     }
@@ -167,6 +167,7 @@ class DashboardPage extends Component {
         case 'MONTH':
           return date.getFullYear() * 100 + (date.getMonth() + 1)
         case 'YEAR':
+        default:
           return date.getFullYear()
       }
     }
@@ -184,8 +185,8 @@ class DashboardPage extends Component {
           newDate.setMonth(date.getMonth() + increment)
           break
         case 'YEAR':
+        default:
           newDate.setFullYear(date.getFullYear() + increment)
-          break
       }
       return newDate
     }
@@ -197,6 +198,7 @@ class DashboardPage extends Component {
         case 'MONTH':
           return MONTHS[date.getMonth()] + ' ' + date.getFullYear()
         case 'YEAR':
+        default:
           return date.getFullYear()
       }
     }
@@ -208,6 +210,7 @@ class DashboardPage extends Component {
         case 'MONTH':
           return Dates.compare(date1, date2, Dates.MONTHS)
         case 'YEAR':
+        default:
           return Dates.compare(date1, date2, Dates.YEARS)
       }
     }
@@ -324,7 +327,7 @@ class DashboardPage extends Component {
       case 'cleansedRecordsVisibilityCheckBox':
         this.setState({cleansedRecordsVisible: checked}, this.updateChartsData)
         break
-      
+      default:
     }
   }
 
@@ -343,22 +346,13 @@ class DashboardPage extends Component {
         chartData = this.state.monthlyChartData
         break
       case 'YEAR':
+      default:
         chartData = this.state.yearlyChartData
-        break
     }
-
-    const timeUnitChecks = ['DAY', 'MONTH', 'YEAR'].map(u =>
-      <label key={u} className={'btn btn-outline-secondary ' + (timeUnit == u ? 'active' : '')}>
-        <input type="radio" name="options" value={u} checked={timeUnit == u}
-          onChange={this.handleTimeUnitChange} /> {u}
-      </label>
-    )
 
     if (chartData == null) {
       return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
     }
-
-    const lineChart = <Line data={chartData.data} options={chartData.opts} height={500} />
 
     return (
       <div className="animated fadeIn">

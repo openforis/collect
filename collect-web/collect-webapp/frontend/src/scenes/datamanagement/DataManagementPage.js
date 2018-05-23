@@ -1,26 +1,26 @@
-import React, { Component } from 'react';
-import RecordDataTable from 'components/datamanagement/RecordDataTable';
-import { Button, ButtonGroup, ButtonToolbar, Container, ButtonDropdown, 
-	DropdownToggle, DropdownMenu, DropdownItem, Row, Col, UncontrolledDropdown } from 'reactstrap';
-import { connect } from 'react-redux';
+import React, { Component } from 'react'
+import RecordDataTable from 'components/datamanagement/RecordDataTable'
+import { Button, ButtonDropdown, 
+	DropdownToggle, DropdownMenu, DropdownItem, Row, Col, UncontrolledDropdown } from 'reactstrap'
+import { connect } from 'react-redux'
 
-import * as Actions from 'actions';
-import * as JobActions from 'actions/job';
-import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
-import SurveySelect from 'components/SurveySelect';
-import WithSurveySelectContainer from 'containers/WithSurveySelectContainer';
-import Workflow from 'model/Workflow';
-import ServiceFactory from 'services/ServiceFactory';
-import Arrays from 'utils/Arrays';
-import Containers from 'components/Containers';
-import Dialogs from 'components/Dialogs';
-import L from 'utils/Labels';
-import RouterUtils from 'utils/RouterUtils';
+import * as Actions from 'actions'
+import * as JobActions from 'actions/job'
+import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer'
+import Workflow from 'model/Workflow'
+import ServiceFactory from 'services/ServiceFactory'
+import Arrays from 'utils/Arrays'
+import Containers from 'components/Containers'
+import Dialogs from 'components/Dialogs'
+import NewRecordParametersDialog from 'components/datamanagement/NewRecordParametersDialog'
+import L from 'utils/Labels'
+import RouterUtils from 'utils/RouterUtils'
 
 const INITIAL_STATE = {
 	selectedItems: [],
 	selectedItemIds: [],
-	selectedItem: null
+	selectedItem: null,
+	newRecordParametersDialogOpen: false
 }
 
 class DataManagementPage extends Component {
@@ -38,6 +38,7 @@ class DataManagementPage extends Component {
 		this.handleAllRowsSelect = this.handleAllRowsSelect.bind(this)
 		this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this)
 		this.handleNewButtonClick = this.handleNewButtonClick.bind(this)
+		this.handleNewRecordParametersSelected = this.handleNewRecordParametersSelected.bind(this)
 		this.handleEditButtonClick = this.handleEditButtonClick.bind(this)
 		this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this)
 		this.navigateToItemEditView = this.navigateToItemEditView.bind(this)
@@ -63,12 +64,12 @@ class DataManagementPage extends Component {
 	}
 
 	componentDidMount() {
-        this.handleWindowResize();
-        window.addEventListener("resize", this.handleWindowResize);
+        this.handleWindowResize()
+        window.addEventListener("resize", this.handleWindowResize)
     }
 
     componentWillUnmount() {
-        window.removeEventListener("resize", this.handleWindowResize);
+        window.removeEventListener("resize", this.handleWindowResize)
 	}
 	
 	componentDidUpdate() {
@@ -87,9 +88,22 @@ class DataManagementPage extends Component {
 
 	handleNewButtonClick() {
 		let survey = this.props.survey
-		this.recordService.createRecord(survey.id).then(res => {
-			this.navigateToItemEditView(res.id);
-		})
+		if (survey.schema.rootEntities.length === 1 && survey.modelVersions.length <= 1) {
+			this.recordService.createRecord(survey.id).then(res => {
+				this.navigateToItemEditView(res.id)
+			})
+		} else {
+			this.setState({
+				newRecordParametersDialogOpen: true
+			})
+		}
+	}
+
+	handleNewRecordParametersSelected(versionName) {
+		const survey = this.props.survey
+		this.recordService.createRecord(survey.id, null, versionName).then(res => {
+			this.navigateToItemEditView(res.id)
+		})	
 	}
 
 	handleEditButtonClick() {
@@ -98,14 +112,14 @@ class DataManagementPage extends Component {
 
 	handleDeleteButtonClick() {
 		const $this = this
-		const confirmMessage = this.state.selectedItemIds.length == 1 ? 
+		const confirmMessage = this.state.selectedItemIds.length === 1 ? 
 			L.l('dataManagement.deleteRecords.confirmDeleteSingleRecordMessage') 
 			: L.l('dataManagement.deleteRecords.confirmDeleteMultipleRecordsMessage', [this.state.selectedItemIds.length])
 		
 		Dialogs.confirm(L.l('dataManagement.deleteRecords.confirmDeleteTitle'), confirmMessage, function() {
 			$this.recordService.delete($this.props.survey.id, $this.props.loggedUser.id, $this.state.selectedItemIds).then(response => {
 				$this.recordDataTable.fetchData()
-				$this.props.dispatch(Actions.recordsDeleted($this.state.selectedItems));
+				$this.props.dispatch(Actions.recordsDeleted($this.state.selectedItems))
 				$this.deselectAllRecords()
 			})
 		}, null, {confirmButtonLabel: L.l('global.delete')})
@@ -231,10 +245,12 @@ class DataManagementPage extends Component {
 	}
 	
 	render() {
-		if (!this.props.survey) {
+		const { survey } = this.props
+
+		if (! survey) {
 			return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
 		}
-		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === this.props.survey.userGroup.id)
+		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === survey.userGroup.id)
 		const loggedUser = this.props.loggedUser
 		return (
 			<MaxAvailableSpaceContainer ref={ r => this.mainContainer = r }>
@@ -258,8 +274,8 @@ class DataManagementPage extends Component {
 								toggle={() => this.setState({exportDropdownOpen: !this.state.exportDropdownOpen})}>
 							<DropdownToggle color="primary" caret><span className="fa fa-download"/>{L.l('dataManagement.export')}</DropdownToggle>
 							<DropdownMenu>
-								<DropdownItem onClick={this.handleExportToCsvButtonClick}><i className="fas fa-file-excel" aria-hidden="true"></i> {L.l('dataManagement.export.toCsv')}</DropdownItem>
-								<DropdownItem onClick={this.handleBackupButtonClick}><i className="fa fa-file-code"></i> {L.l('dataManagement.export.toCollectFormat')}</DropdownItem>
+								<DropdownItem onClick={this.handleExportToCsvButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> {L.l('dataManagement.export.toCsv')}</DropdownItem>
+								<DropdownItem onClick={this.handleBackupButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> {L.l('dataManagement.export.toCollectFormat')}</DropdownItem>
 							</DropdownMenu>
 						</ButtonDropdown>
 					</Col>
@@ -269,8 +285,8 @@ class DataManagementPage extends Component {
 									toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
 								<DropdownToggle color="warning" caret><span className="fa fa-upload"/>{L.l('dataManagement.import')}</DropdownToggle>
 								<DropdownMenu>
-									<DropdownItem onClick={this.handleCsvImportButtonClick}><i className="fa fa-file-excel" aria-hidden="true"></i> {L.l('dataManagement.import.fromCsv')}</DropdownItem>
-									<DropdownItem onClick={this.handleBackupImportButtonClick}><i className="fa fa-file-code" aria-hidden="true"></i> {L.l('dataManagement.import.fromCollectFormat')}</DropdownItem>
+									<DropdownItem onClick={this.handleCsvImportButtonClick}><i className="fa fa-file-excel-o" aria-hidden="true"></i> {L.l('dataManagement.import.fromCsv')}</DropdownItem>
+									<DropdownItem onClick={this.handleBackupImportButtonClick}><i className="fa fa-file-code-o" aria-hidden="true"></i> {L.l('dataManagement.import.fromCollectFormat')}</DropdownItem>
 								</DropdownMenu>
 							</ButtonDropdown>
 						}
@@ -301,8 +317,13 @@ class DataManagementPage extends Component {
 							handleRowDoubleClick={this.handleRowDoubleClick} />
 					</Col>
 				</Row>
+				<NewRecordParametersDialog 
+					open={this.state.newRecordParametersDialogOpen} 
+					versions={survey.modelVersions}
+					onClose={() => this.setState({newRecordParametersDialogOpen: false})}
+					onOk={this.handleNewRecordParametersSelected} />
 			</MaxAvailableSpaceContainer>
-		);
+		)
 	}
 }
 

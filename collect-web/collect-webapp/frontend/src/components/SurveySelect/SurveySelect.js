@@ -39,9 +39,9 @@ class SurveySelect extends Component {
 			const { selectedSurvey, summaries } = this.props
 			const publishedSurveys = summaries.filter(s => s.published && !s.temporary)
 			const isEmpty = publishedSurveys.length === 0
-				
+
 			if (isEmpty) {
-				return <span>{L.l('survey.noPublishedSurveysFound')}</span>
+				return <span className="survey-selector">{L.l('survey.noPublishedSurveysFound')}</span>
 			} else {
 				//sort surveys by name
 				Arrays.sort(publishedSurveys, 'name')

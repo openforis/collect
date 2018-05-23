@@ -69,7 +69,7 @@ const routes = [
   {
     path: '/surveydesigner/clone/:surveyName',
     name: 'Clone survey',
-    pathRegExp: new RegExp('/surveydesigner/clone/(\.)+')
+    pathRegExp: new RegExp('/surveydesigner/clone/(.)+')
   },
   {
     path: '/surveydesigner/new',

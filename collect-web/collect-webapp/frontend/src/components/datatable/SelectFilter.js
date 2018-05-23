@@ -1,8 +1,7 @@
-import React, { Component } from 'react'
-import { MenuItem } from 'material-ui/Menu'
-import { withStyles } from 'material-ui/styles'
-import Select from 'material-ui/Select'
-import Chip from 'material-ui/Chip'
+import React from 'react'
+import MenuItem from '@material-ui/core/MenuItem'
+import Select from '@material-ui/core/Select'
+import Chip from '@material-ui/core/Chip'
 import Arrays from 'utils/Arrays'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
@@ -45,8 +44,8 @@ class SelectFilter extends React.Component {
     const val = e.target.value
     const allValuesPreviouslySelected = this.state.allValuesSelected
     const allValuesSelected = val.length === 0 
-      || Arrays.contains(val, '') && !allValuesPreviouslySelected 
-      || !Arrays.contains(val, '') && val.length === this.props.dataSource.length
+      || (Arrays.contains(val, '') && !allValuesPreviouslySelected) 
+      || (!Arrays.contains(val, '') && val.length === this.props.dataSource.length)
     const selectedValues = allValuesSelected ? [''] : Arrays.removeItem(val, '')
     
     this.setState({ 
@@ -102,7 +101,7 @@ class SelectFilter extends React.Component {
 
   render() {
     const { multiple, dataSource } = this.props
-    const { selectedValues, allValuesSelected } = this.state
+    const { selectedValues } = this.state
 
     const menuItems = this.buildMenuItems()
     return (

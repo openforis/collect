@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import { Button, ButtonGroup, ButtonToolbar, Card, CardBlock, Collapse, Container, DropdownItem, DropdownToggle, DropdownMenu,
-    Form, FormFeedback, FormGroup, Label, Input, Row, Col, UncontrolledButtonDropdown } from 'reactstrap';
+import { Button, DropdownItem, DropdownToggle, DropdownMenu,
+    Row, Col, UncontrolledButtonDropdown } from 'reactstrap';
 
 import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
 import Dialogs from 'components/Dialogs';
-import Containers from 'components/Containers';
 import * as Formatters from 'components/datatable/formatters';
 import CheckedIconFormatter from 'components/datatable/CheckedIconFormatter'
 import UserGroupColumnEditor from 'components/surveydesigner/UserGroupColumnEditor';
@@ -295,7 +294,7 @@ class SurveysListPage extends Component {
                     <TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>
                     <TableHeaderColumn key="name" dataField="name" editable={false} filter={{type: 'TextFilter'}} dataSort width="200">{L.l('survey.name')}</TableHeaderColumn>
                     <TableHeaderColumn key="projectName" dataField="projectName" editable={false} filter={{type: 'TextFilter'}} dataSort width="250">{L.l('survey.projectName')}</TableHeaderColumn>
-                    <TableHeaderColumn key="modifiedDate" dataField="modifiedDate" editable={false} dataFormat={Formatters.dateTimeFormatter}
+                    <TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateTimeFormatter}
 				        dataAlign="center" width="90" editable={false} dataSort>{L.l('survey.lastModified')}</TableHeaderColumn>
                     <TableHeaderColumn key="target" dataField="target" dataFormat={targetFormatter}
 				        dataAlign="center" width="60" editable={false} dataSort>{L.l('survey.target')}</TableHeaderColumn>

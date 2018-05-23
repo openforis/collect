@@ -2,7 +2,7 @@ import update from 'react-addons-update';
 import Arrays from 'utils/Arrays'
 
 import {
-  REQUEST_USERS, RECEIVE_USERS, RECEIVE_USER, USERS_DELETED, INVALIDATE_USERS, USER_GROUPS_DELETED
+  REQUEST_USERS, RECEIVE_USERS, RECEIVE_USER, USERS_DELETED, INVALIDATE_USERS
 } from '../actions/users'
 
 function users(
