@@ -52,14 +52,21 @@ public class CodeListController {
 	public @ResponseBody List<CodeListItemView> loadAvailableItems(
 			@PathVariable Integer surveyId,
 			@PathVariable Integer codeListId,
-			@RequestParam Integer recordId,
-			@RequestParam Integer parentEntityId,
-			@RequestParam Integer codeAttrDefId) {
+			@RequestParam(required=false) Integer recordId,
+			@RequestParam(required=false) Integer parentEntityId,
+			@RequestParam(required=false) Integer codeAttrDefId,
+			@RequestParam(required=false) Integer level) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = recordManager.load(survey, recordId, false);
-		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
-		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionById(codeAttrDefId);
-		List<CodeListItem> items = codeListManager.loadValidItems(parentEntity, codeAttrDef);
+		List<CodeListItem> items;
+		if (recordId != null && parentEntityId != null && codeAttrDefId != null) {
+			CollectRecord record = recordManager.load(survey, recordId, false);
+			Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
+			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionById(codeAttrDefId);
+			items = codeListManager.loadValidItems(parentEntity, codeAttrDef);
+		} else {
+			CodeList list = survey.getCodeListById(codeListId);
+			items = codeListManager.loadItems(list, level);
+		}
 		return toViews(items);
 	}
 

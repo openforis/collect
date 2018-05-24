@@ -379,12 +379,12 @@ Closeable box
 }
 
 .query-builder .columns.dragging, 
-.query-builder .filter.dragging {
+.query-builder div.filter.dragging {
     background: lightblue;
 }
 
 .query-builder .columns, 
-.query-builder .filter  {
+.query-builder div.filter  {
     padding: 4px;
     width: 100%;
     min-height: 100px;
@@ -392,7 +392,7 @@ Closeable box
 }
 
 .query-builder .columns .item, 
-.query-builder .filter .item {
+.query-builder div.filter .item {
     user-select: none;
     margin: 0px 0px 4px 0px;
     background: white;
@@ -403,7 +403,7 @@ Closeable box
 }
 
 .query-builder .columns .item.dragging,
-.query-builder .filter .item.dragging {
+.query-builder div.filter .item.dragging {
     background: lightgreen;
 }
 
@@ -480,3 +480,10 @@ Closeable box
     background-image: url('../images/node_types/time-small.png');
 }
 
+.icon.filter.filtered {
+    color: orange;
+}
+
+.icon.filter.not-filtered {
+    color: lightgrey;
+}

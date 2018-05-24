@@ -113,12 +113,12 @@ class AlertDialog extends Component {
                     onEntering={this.handleEntering}
                     onBackdropClick={this.handleCancel}
                     onEscapeKeyDown={this.handleCancel}>
-                <DialogTitle>{title}</DialogTitle>
+                <DialogTitle>{L.l(title)}</DialogTitle>
                 <DialogContent style={{width: '400px'}}>
-                    <DialogContentText>{message}</DialogContentText>
+                    <DialogContentText>{L.l(message)}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button raised color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{okButtonLabel}</Button>
+                    <Button variant="raised" color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{okButtonLabel}</Button>
                 </DialogActions>
             </Dialog>
         )

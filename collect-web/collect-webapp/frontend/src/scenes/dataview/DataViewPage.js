@@ -7,12 +7,19 @@ import Button from '@material-ui/core/Button'
 import ExpansionPanel from '@material-ui/core/ExpansionPanel'
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import FormControl from '@material-ui/core/FormControl'
+import InputLabel from '@material-ui/core/InputLabel'
+import MenuItem from '@material-ui/core/MenuItem'
+import Select from '@material-ui/core/Select'
 import Typography from '@material-ui/core/Typography'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 import QueryResultTable from './QueryResultTable'
 import DataQueryFilterDialog from './DataQueryFilterDialog'
 import { EntityDefinition } from 'model/Survey'
+import { RDBQuery, QueryComponent, FilterCondition } from 'model/DataQuery'
+import Workflow from 'model/Workflow'
 import ServiceFactory from 'services/ServiceFactory'
 import Dialogs from 'components/Dialogs'
 import L from 'utils/Labels'
@@ -25,6 +32,7 @@ class DataViewPage extends Component {
 		schemaTreeData: null,
 		selectedEntity: null,
 		selectedEntityTreeNodes: [],
+		step: Workflow.STEPS.entry.code,
 		availableAttributes: [],
 		selectedColumns: [],
 		selectedFilter: [],
@@ -224,10 +232,22 @@ class DataViewPage extends Component {
 	
 
 	openFilterDialog(queryComponent) {
-		this.setState({
-			queryFilterDialogOpen: true,
-			queryFilterDialogQueryComponent: queryComponent
-		})
+		switch (queryComponent.attributeDefinition.attributeType) {
+			case 'BOOLEAN':
+            case 'CODE':
+            case 'TAXON':
+            case 'DATE':
+            case 'NUMBER':
+            case 'TIME':
+			case 'TEXT':
+				this.setState({
+					queryFilterDialogOpen: true,
+					queryFilterDialogQueryComponent: queryComponent
+				})
+				break
+			default:
+				Dialogs.alert('dataView.filterNotSupported')
+		}
 	}
 
 	handleQueryFilterDialogClose() {
@@ -237,7 +257,7 @@ class DataViewPage extends Component {
 	}
 
 	handleQueryFilterDialogOk(filterCondition) {
-		const newQueryFilterDialogQueryComponent = Object.assign({}, this.state.queryFilterDialogQueryComponent, 
+		const newQueryFilterDialogQueryComponent = Object.assign(this.state.queryFilterDialogQueryComponent, 
 			{filterCondition: filterCondition})
 		this.setState({
 			queryFilterDialogOpen: false,
@@ -247,7 +267,7 @@ class DataViewPage extends Component {
 
 	render() {
 		const { survey } = this.props
-		const { schemaTreeData, selectedEntityTreeNodes, availableAttributes, selectedColumns, selectedFilter, selectedEntity, queryResult,
+		const { schemaTreeData, selectedEntityTreeNodes, step, availableAttributes, selectedColumns, selectedFilter, selectedEntity, queryResult,
 			queryResultPage, queryResultRecordsPerPage, queryPanelExpanded, queryFilterDialogOpen, queryFilterDialogQueryComponent } = this.state
 		const queryResultTotalRecords = queryResult ? queryResult.totalRecords: 0
 		
@@ -312,7 +332,7 @@ class DataViewPage extends Component {
 															onClick={this.addAttributeToSelectedColumns.bind(this, a)}
 															>
 				                                            <span className={'icon node-type ' + a.attributeType.toLowerCase()} />
-                											{a.label}
+															{a.label}
 														</div>
 													)}
 													</Draggable>
@@ -347,6 +367,7 @@ class DataViewPage extends Component {
 																	{item.attributeDefinition.label}
 																</span>
 																<a className="close-btn" onClick={e => this.handleColumnSelectionItemClose(e, item.attributeDefinition.id)}></a>
+																<span><i class={'icon filter fas fa-search ' + (item.filterCondition ? 'filtered' : 'not-filtered')}></i></span>
 															</div>
 														)}
 														</Draggable>
@@ -385,6 +406,21 @@ class DataViewPage extends Component {
 													</div>
 												)}
 												</Droppable>
+											</div>
+											<div className="row">
+												<FormControl>
+													<InputLabel htmlFor="step">{L.l('dataView.step')}</InputLabel>
+													<Select
+														value={step}
+														onChange={e => this.setState({step: e.target.value})}
+														inputProps={{
+															name: 'step',
+															id: 'step',
+														}}
+														style={{width: '200px'}}>
+														{Object.keys(Workflow.STEPS).map(s => <MenuItem key={s} value={Workflow.STEPS[s].code}>{Workflow.STEPS[s].label}</MenuItem>)}
+													</Select>
+												</FormControl>
 											</div>
 										</div>
 									</DragDropContext>
@@ -453,28 +489,6 @@ class DropDownTreeNode {
 			node.disabled = ! nodeDef.multiple
 		}
 		return node
-	}
-}
-
-class RDBQuery {
-	surveyName
-	recordStep
-	contextEntityDefinitionId
-	columns = []
-	filter = []
-	page = 1
-	recordsPerPage = 20
-	sortBy = []
-}
-
-class QueryComponent {
-	id
-	attributeDefinition
-	filterCondition
-	
-	constructor(id, attributeDef) {
-		this.id = id
-		this.attributeDefinition = attributeDef
 	}
 }
 

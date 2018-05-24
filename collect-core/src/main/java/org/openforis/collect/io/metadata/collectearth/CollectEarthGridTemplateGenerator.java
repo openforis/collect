@@ -286,11 +286,11 @@ public class CollectEarthGridTemplateGenerator  {
 					// Check that the code exists in the codelist
 					
 					// Gets the level (in case of hierarchical codelists) that the attribute refers to. If it is a flat codelist then it is alway 0
-					int levelIndex = cad.getLevelIndex();
+					int level = cad.getLevelPosition();
 					
 					CodeListService codeListService = attributeDefinition.getSurvey().getContext().getCodeListService();
 					
-					List<CodeListItem> items = codeListService.loadItems( cad.getList(), levelIndex+1 );
+					List<CodeListItem> items = codeListService.loadItems( cad.getList(), level );
 					
 					// Check one by one in the codes of the codelist assigned to the attribute if the value is present as a code!
 					for (CodeListItem codeListItem : items) {
@@ -387,8 +387,7 @@ public class CollectEarthGridTemplateGenerator  {
 		CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) attrDef;
 		CodeList list = codeDefn.getList();
 		CodeListService codeListService = attrDef.getSurvey().getContext().getCodeListService();
-		Integer levelIndex = codeDefn.getListLevelIndex();
-		int levelPosition = levelIndex == null ? 1: levelIndex + 1;
+		int levelPosition = codeDefn.getLevelPosition();
 		List<CodeListItem> items;
 		if (levelPosition == 1) {
 			items = codeListService.loadRootItems(list);

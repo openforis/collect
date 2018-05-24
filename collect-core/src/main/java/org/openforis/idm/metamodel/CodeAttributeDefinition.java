@@ -213,7 +213,7 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	private boolean isAssignableParentCodeAttributeDefinition(CodeAttributeDefinition codeAttrDefn) {
 		return codeAttrDefn.getList() == list && 
 				! this.isAncestorCodeAttributeDefinitionOf(codeAttrDefn) && 
-					list.getHierarchy().size() > codeAttrDefn.getLevelIndex() + 1;
+					list.getHierarchy().size() > codeAttrDefn.getLevelPosition();
 	}
 	
 	/**
@@ -268,12 +268,12 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	}
 	
 	public String getHierarchicalLevel() {
-		Integer levelIndex = getListLevelIndex();
-		if (levelIndex == null) {
-			return null;
-		} else {
+		if (list.isHierarchical()) {
+			int levelIndex = getListLevelIndex();
 			CodeListLevel level = list.getHierarchy().get(levelIndex);
 			return level.getName();
+		} else {
+			return null;
 		}
 	}
 
@@ -360,36 +360,23 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	}
 	
 	public int getLevelPosition() {
-		return getLevelIndex() + 1;
+		return getListLevelIndex() + 1;
 	}
 
-	public int getLevelIndex() {
-		if ( list == null || list.getHierarchy().isEmpty() ) {
+	public int getListLevelIndex() {
+		if (! list.isHierarchical()) {
 			return 0;
-		} else {
-			int level = 0;
-			CodeAttributeDefinition ptr = getParentCodeAttributeDefinition();
-			while ( ptr != null ) {
-				level ++;
-				ptr = ptr.getParentCodeAttributeDefinition();
-			}
-			return level;
 		}
-	}
-	
-	public Integer getListLevelIndex() {
 		int idx = -1;
 		CodeAttributeDefinition currCode = this;
 		while ( currCode != null ) {
 			idx++;
 			currCode = currCode.getParentCodeAttributeDefinition();
 		}
-		if (idx > 0 && (! list.isHierarchical() || idx >= list.getHierarchy().size())) {
+		if (idx > 0 && idx >= list.getHierarchy().size()) {
 			throw new IllegalStateException(String.format(
 					"Invalid parent code attribute relation for attribute %s in survey %s", 
 					this.getPath(), this.getSurvey().getName()));
-		} else if (! list.isHierarchical()) {
-			return null;
 		} else {
 			return idx;
 		}

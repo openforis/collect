@@ -337,7 +337,7 @@ public class NewMondrianSchemaGenerator {
 			CodeTable codeListTable = rdbSchema.getCodeListTable(codeDef);
 			level.table = codeListTable.getName();
 			level.column = codeListTable.getPrimaryKeyConstraint().getPrimaryKeyColumn().getName();
-			level.nameColumn = CodeListTables.getLabelColumnName(rdbConfig, codeDef.getList(), codeDef.getLevelIndex(), language);
+			level.nameColumn = CodeListTables.getLabelColumnName(rdbConfig, codeDef.getList(), codeDef.getListLevelIndex(), language);
 		} else if (nodeDef instanceof TaxonAttributeDefinition) {
 			DataColumn dataColumn = dataTable.getDataColumn(((TaxonAttributeDefinition) nodeDef).getCodeFieldDefinition());
 			level.column = dataColumn.getName();

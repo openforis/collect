@@ -342,7 +342,7 @@ public class MondrianCubeGenerator {
 	private String extractCodeListName(CodeAttributeDefinition codeAttrDef) {
 		StringBuffer codeListName = new StringBuffer( codeAttrDef.getList().getName() );
 		
-		int levelIdx = codeAttrDef.getLevelIndex();
+		int levelIdx = codeAttrDef.getListLevelIndex();
 		if ( levelIdx != -1 ) {
 			CodeList codeList = codeAttrDef.getList();
 			List<CodeListLevel> codeHierarchy = codeList.getHierarchy();

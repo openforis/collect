@@ -49,17 +49,18 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 		}
 	}
 	
-	public Integer getLevelIdx() {
-		Integer result = null;
+	public int getLevelIdx() {
 		if ( codeList.isHierarchical() ) {
-			result = 0;
+			int result = 0;
 			CodeTable cp = parent;
 			while ( cp != null ) {
 				result++;
 				cp = cp.parent;
 			}
+			return result;
+		} else {
+			return 0;
 		}
-		return result;
 	}
 
 	public CodeListCodeColumn getCodeColumn() {

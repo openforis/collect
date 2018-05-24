@@ -205,8 +205,16 @@
             "noColumnsSelectedAlert": {
                 "title": "No columns selected",
                 "message": "Please select at least one column"
+            },
+            "condition": {
+                "contains": "Contains",
+                "minValue": "Min value",
+                "maxValue": "Max value",
+                "value": "Value"
             }
-        }
+        },
+        "step": "Record Step",
+        "filterNotSupported": "Filter not supported for this attribute type"
     },
     "survey": {
         "name": "Name",

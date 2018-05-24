@@ -84,7 +84,7 @@ public class SurveyViewGenerator {
 					int codeListId = attrDef.getList() == null ? -1: attrDef.getList().getId();
 					view = new CodeAttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(), 
 							attrDef.isKey(), attrDef.isMultiple(), survey.getAnnotations().isShowInSummary(attrDef), 
-							survey.getAnnotations().isQualifier(attrDef), codeListId);
+							survey.getAnnotations().isQualifier(attrDef), codeListId, attrDef.getLevelPosition());
 				} else {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
 					view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(),
