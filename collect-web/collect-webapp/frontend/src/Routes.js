@@ -22,11 +22,6 @@ const routes = [
     surveySelectRequired: true
   },
   {
-    path: '/datamanagement/view',
-    name: "Data View",
-    surveySelectRequired: true
-  },
-  {
     path: '/datamanagement/export',
     name: "Export Data",
     surveySelectRequired: true
@@ -87,6 +82,11 @@ const routes = [
   {
     path: '/datacleansing',
     name: "Data Cleansing"
+  },
+  {
+    path: '/datacleansing/view',
+    name: "Data View",
+    surveySelectRequired: true
   },
   {
     path: '/backup',

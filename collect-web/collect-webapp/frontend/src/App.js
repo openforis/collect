@@ -45,13 +45,13 @@ class App extends Component {
                   <Route path="/backup" exact name="Backup" component={BackupPage}/>
                   <Route path="/dashboard" exact name="Dashboard" component={DashboardPage}/>
                   <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage}/>
-                  <Route path="/datamanagement/view" exact name="DataView" component={DataViewPage}/>
                   <Route path="/datamanagement/csvexport" exact name="CsvDataExport" component={CsvDataExportPage}/>
                   <Route path="/datamanagement/backup" exact name="BackupDataExport" component={BackupDataExportPage}/>
                   <Route path="/datamanagement/backupimport" exact name="BackupDataImport" component={BackupDataImportPage}/>
                   <Route path="/datamanagement/csvimport" exact name="CsvDataImport" component={CsvDataImportPage}/>
                   <Route path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage}/>
                   <Route path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage}/>
+                  <Route path="/datacleansing/view" exact name="DataView" component={DataViewPage}/>
                   <Route path="/map" exact name="Map" component={MapPage}/>
                   <Route path="/restore" exact name="Restore" component={RestorePage}/>
                   <Route path="/saiku" exact name="Saiku" component={SaikuPage}/>
