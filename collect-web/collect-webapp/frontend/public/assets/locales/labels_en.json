@@ -97,7 +97,8 @@
                 "invalidNodePosition": "Invalid node position: it must be a positive integer number",
                 "fieldNameNotSpecified": "Field name not specified",
                 "type": {
-                    "MISSING_REQUIRED_COLUMNS": "Missing required columns"
+                    "MISSING_REQUIRED_COLUMNS": "Missing required columns",
+                    "INVALID_VALUE": "Invalid Value"
                 }
             },
             "errorsInUploadedFile": "Errors in uploaded file",

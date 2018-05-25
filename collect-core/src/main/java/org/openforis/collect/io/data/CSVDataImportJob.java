@@ -646,7 +646,7 @@ public class CSVDataImportJob extends Job {
 				try {
 					setValueInField(attr, fieldName, value, row, colName);
 				} catch ( Exception e) {
-					dataImportStatus.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName));
+					dataImportStatus.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName, value));
 				}
 			}
 		}
