@@ -213,7 +213,10 @@ class DataViewPage extends Component {
 				attributeDefinitionId: c.attributeDefinition.id,
 				filterCondition: c.filterCondition ? c.filterCondition : null
 			}})
-			query.filter = selectedFilter
+			query.filter = selectedFilter.map(f => {return {
+				attributeDefinitionId: f.attributeDefinition.id,
+				filterCondition: f.filterCondition ? f.filterCondition : null
+			}})
 			query.page = queryResultPage
 			query.recordsPerPage = queryResultRecordsPerPage
 			query.sortBy = []
@@ -262,7 +265,7 @@ class DataViewPage extends Component {
 		this.setState({
 			queryFilterDialogOpen: false,
 			queryFilterDialogQueryComponent: newQueryFilterDialogQueryComponent
-		})		
+		})
 	}
 
 	render() {
@@ -366,8 +369,8 @@ class DataViewPage extends Component {
 																<span>
 																	{item.attributeDefinition.label}
 																</span>
-																<a className="close-btn" onClick={e => this.handleColumnSelectionItemClose(e, item.attributeDefinition.id)}></a>
 																<span><i class={'icon filter fas fa-search ' + (item.filterCondition ? 'filtered' : 'not-filtered')}></i></span>
+																<a className="close-btn" onClick={e => this.handleColumnSelectionItemClose(e, item.attributeDefinition.id)}></a>
 															</div>
 														)}
 														</Draggable>
@@ -395,8 +398,10 @@ class DataViewPage extends Component {
 																{...provided.draggableProps}
 																{...provided.dragHandleProps}
 																className={'closeable item' + (snapshot.isDragging ? ' dragging': '')}
+																onClick={this.openFilterDialog.bind(this, item)}
 																>
 																{item.attributeDefinition.label}
+																<span><i class={'icon filter fas fa-search ' + (item.filterCondition ? 'filtered' : 'not-filtered')}></i></span>
 																<a className="close-btn" onClick={this.handleFilterSelectionItemClose.bind(this, item.attributeDefinition.id)}></a>
 															</div>
 														)}

@@ -66,6 +66,9 @@ export default class DataQueryFilterDialog extends Component {
             case 'CODE':
             case 'TAXON':
                 filterType = 'IN'
+                if (filterCondition) {
+
+                }
                 break
             case 'DATE':
             case 'NUMBER':
@@ -116,11 +119,11 @@ export default class DataQueryFilterDialog extends Component {
         case 'BOOLEAN':
             this.availableMembersLoaded([
                 {
-                    code: 'true', 
+                    code: '1', 
                     label: "True"
                 }, 
                 {
-                    code: 'false',
+                    code: '0',
                     label: "False"
                 }
             ])
@@ -148,7 +151,7 @@ export default class DataQueryFilterDialog extends Component {
         if (values) {
             values.forEach(v => {
                 if (filterCondition && filterCondition.values && 
-                        Arrays.contains(filterCondition.values, v, 'code')) {
+                        Arrays.contains(filterCondition.values, v.code)) {
                     usedMembers.push(v)
                 } else {
                     availableMembers.push(v)
@@ -238,7 +241,7 @@ export default class DataQueryFilterDialog extends Component {
 
         switch(this.state.filterType) {
             case 'IN':
-                condition.values = this.state.usedMembers
+                condition.values = this.state.usedMembers.map(m => m.code)
                 break
             case 'BETWEEN':
                 condition.min = this.state.minValue

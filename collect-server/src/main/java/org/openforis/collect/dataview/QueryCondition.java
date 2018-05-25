@@ -18,7 +18,7 @@ public class QueryCondition {
 	
 	private Type type;
 	private String value;
-	private List<String> inValues = new ArrayList<String>();
+	private List<String> values = new ArrayList<String>();
 	private String min;
 	private String max;
 	
@@ -38,12 +38,12 @@ public class QueryCondition {
 		this.value = value;
 	}
 
-	public List<String> getInValues() {
-		return inValues;
+	public List<String> getValues() {
+		return values;
 	}
 	
-	public void setInValues(List<String> inValues) {
-		this.inValues = inValues;
+	public void setValues(List<String> values) {
+		this.values = values;
 	}
 
 	public String getMin() {

@@ -120,7 +120,7 @@ public class QueryExecutor {
 						if (mainColumn != null) {
 							conditions.add(
 									DSL.field(mainColumn.getName())
-										.in(filterCondition.getInValues()));
+										.in(filterCondition.getValues()));
 						}
 						break;
 					}
