@@ -171,26 +171,30 @@ class CsvDataImportPage extends Component {
                     <FormGroup tag="fieldset">
                         <legend>Parameters</legend>
                         <FormGroup row>
-                            <Label for="stepSelect">{L.l('dataManagement.csvDataImport.importType.label')}:</Label>
+                            <Label for="importType">{L.l('dataManagement.csvDataImport.importType.label')}:</Label>
                             <Col sm={10}>
-                                <Input type="select" name="step" id="stepSelect"
+                                <Input type="select" name="importType" id="importType"
                                     value={this.state.importType} 
                                     onChange={e => this.setState({importType: e.target.value})}>{importTypeOptions}</Input>
                             </Col>
                         </FormGroup>
-                        <FormGroup row>
-                            <Label>{L.l('dataManagement.csvDataImport.applyToSteps')}:</Label>
-                            <Col sm={10}>
-                                {stepsChecks}
-                            </Col>
-                        </FormGroup>
+                        {this.state.importType !== 'newRecords' &&
+                            <FormGroup row>
+                                <Label>{L.l('dataManagement.csvDataImport.applyToSteps')}:</Label>
+                                <Col sm={10}>
+                                    {stepsChecks}
+                                </Col>
+                            </FormGroup>
+                        }
                         {entitySelectionEnabled &&
                             <FormGroup row>
                                 <Label className={entityNotSelected ? 'invalid': ''}>{L.l('dataManagement.csvDataImport.entity')}:</Label>
                                 <Col sm={{size: 10 }}>
                                     <SchemaTreeView survey={this.props.survey}
                                         handleNodeSelect={this.handleEntitySelect} />
-                                    <FormFeedback style={entityNotSelected ? {display: 'block'}: {}}>{L.l('dataManagement.csvDataImport.validation.entityNotSelected')}</FormFeedback>
+                                    {entityNotSelected &&
+                                        <FormFeedback>{L.l('dataManagement.csvDataImport.validation.entityNotSelected')}</FormFeedback>
+                                    }
                                 </Col>
                             </FormGroup>}
                         <FormGroup row>
