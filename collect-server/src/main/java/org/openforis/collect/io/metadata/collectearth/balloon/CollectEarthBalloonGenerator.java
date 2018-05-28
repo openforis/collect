@@ -59,7 +59,7 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class CollectEarthBalloonGenerator {
 	
 	public static final String EXTRA_HIDDEN_PREFIX = "EXTRA_";
-	private static final String EXTRA_HIDDEN_FIELD_CLASS = "extra";
+	protected static final String EXTRA_HIDDEN_FIELD_CLASS = "extra";
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	
@@ -378,6 +378,7 @@ public class CollectEarthBalloonGenerator {
 			if (attrDef.isCalculated() || 
 					(annotations.isFromCollectEarthCSV(attrDef) && annotations.isShowReadOnlyFieldInCollectEarth(attrDef))) {
 				((CEField) comp).setReadOnly(true);
+				((CEField) comp).setExtra(true);
 			}
 		}
 		comp.hideWhenNotRelevant = hideWhenNotRelevant;

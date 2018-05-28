@@ -22,6 +22,8 @@ import com.jamesmurty.utils.XMLBuilder;
  */
 public class CEComponentHTMLFormatter {
 
+	private static final String EXTRA_VALUE_FORMAT = "$[EXTRA_%s]";
+	
 	private String language;
 
 	public CEComponentHTMLFormatter(String language) {
@@ -157,14 +159,19 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
 				.a("class", "col-sm-8"); //$NON-NLS-1$ //$NON-NLS-2$
 		
+		String componentAdditionalClass =  comp.isExtra() ? " " + CollectEarthBalloonGenerator.EXTRA_HIDDEN_FIELD_CLASS : "";
+		
 		if (comp instanceof CECodeField) {
 			if (comp.isReadOnly()) {
-				formControlContainer.e("input") //$NON-NLS-1$
+				XMLBuilder inputBuilder = formControlContainer.e("input") //$NON-NLS-1$
 					.a("id", elId) //$NON-NLS-1$
 					.a("name", elId) //$NON-NLS-1$
 					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "form-control" + componentAdditionalClass) //$NON-NLS-1$ //$NON-NLS-2$
 					.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (comp.isExtra()) {
+					inputBuilder.a("value", String.format(EXTRA_VALUE_FORMAT, comp.getName()));
+				}
 			} else {
 				switch(((CEField) comp).getType()) {
 				case CODE_BUTTON_GROUP:
@@ -190,9 +197,12 @@ public class CEComponentHTMLFormatter {
 					.a("id", elId) //$NON-NLS-1$
 					.a("name", elId) //$NON-NLS-1$
 					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("class", "form-control"); //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "form-control" + componentAdditionalClass); //$NON-NLS-1$ //$NON-NLS-2$
 				if (comp.isReadOnly()) {
 					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (comp.isExtra()) {
+						fieldBuilder.a("value", String.format(EXTRA_VALUE_FORMAT, comp.getName()));
+					}
 				}
 				break;
 			case LONG_TEXT:
@@ -200,10 +210,13 @@ public class CEComponentHTMLFormatter {
 					.a("id", elId) //$NON-NLS-1$
 					.a("rows", "3") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("name", elId) //$NON-NLS-1$
-					.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "form-control" + componentAdditionalClass) //$NON-NLS-1$ //$NON-NLS-2$
 					.t(" "); //$NON-NLS-1$
 				if (comp.isReadOnly()) {
 					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
+					if (comp.isExtra()) {
+						fieldBuilder.a("value", String.format(EXTRA_VALUE_FORMAT, comp.getName()));
+					}
 				}
 				break;
 			case INTEGER:
@@ -213,7 +226,7 @@ public class CEComponentHTMLFormatter {
 					.a("name", elId) //$NON-NLS-1$
 					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("value", "0") //$NON-NLS-1$ //$NON-NLS-2$
-					.a("class", "form-control numeric"); //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "form-control numeric" + componentAdditionalClass); //$NON-NLS-1$ //$NON-NLS-2$
 				if (comp.isReadOnly()) {
 					fieldBuilder.a("disabled", "disabled"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
@@ -224,9 +237,12 @@ public class CEComponentHTMLFormatter {
 						.a("id", elId) //$NON-NLS-1$
 						.a("name", elId) //$NON-NLS-1$
 						.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
-						.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+						.a("class", "form-control" + componentAdditionalClass) //$NON-NLS-1$ //$NON-NLS-2$
 						.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
 						.a("disabled", "disabled");
+					if (comp.isExtra()) {
+						fieldBuilder.a("value", String.format(EXTRA_VALUE_FORMAT, comp.getName()));
+					}
 				} else {
 					XMLBuilder containerBuilder = formControlContainer
 						.e("div") //$NON-NLS-1$
@@ -269,6 +285,9 @@ public class CEComponentHTMLFormatter {
 				;
 				if (comp.isReadOnly()) {
 					inputFieldBuilder.a("disabled", "disabled");
+					if (comp.isExtra()) {
+						inputFieldBuilder.a("value", String.format(EXTRA_VALUE_FORMAT, comp.getName()));
+					}
 				}
 				break;
 			default:
