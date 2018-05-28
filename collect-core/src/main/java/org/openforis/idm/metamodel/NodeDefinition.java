@@ -57,8 +57,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		this.name = nodeDef.name;
 		this.relevantExpression = nodeDef.relevantExpression;
 		this.multiple = nodeDef.multiple;
-		this.minCountExpression = nodeDef.minCountExpression;
-		this.maxCountExpression = nodeDef.maxCountExpression;
+		setMinCountExpression(nodeDef.minCountExpression);
+		setMaxCountExpression(nodeDef.maxCountExpression);
 		this.labels = nodeDef.labels == null ? null: new NodeLabelMap(nodeDef.labels);
 		this.prompts = nodeDef.prompts == null ? null: new PromptMap(nodeDef.prompts);
 		this.descriptions = nodeDef.descriptions == null ? null: new LanguageSpecificTextMap(nodeDef.descriptions);
