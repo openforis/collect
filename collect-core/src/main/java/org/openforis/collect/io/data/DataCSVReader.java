@@ -51,9 +51,11 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	private static final String ATTRIBUTE_FIELD_SEPARATOR = "_";
 	private static final String POSITION_COLUMN_FORMAT = "_%s_position";
 
-	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataManagement.csvDataImport.error.missing-required-columns";
-	private static final String INVALID_NODE_POSITION_VALUE_MESSAGE_KEY = "dataManagement.csvDataImport.error.invalid-node-position";
-	private static final String ROW_IDENTIFIER_NOT_SPECIFIED_MESSAGE_KEY = "dataManagement.csvDataImport.error.row-identifier-not-specified";
+	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataManagement.csvDataImport.error.missingRequiredColumns";
+	private static final String INVALID_NODE_POSITION_VALUE_MESSAGE_KEY = "dataManagement.csvDataImport.error.invalidNodePosition";
+	private static final String ROW_IDENTIFIER_NOT_SPECIFIED_MESSAGE_KEY = "dataManagement.csvDataImport.error.rowIdentifierNotSpecified";
+	private static final String FIELD_DEFINITION_NOT_FOUND_MESSAGE_KEY = "dataManagement.csvDataImport.error.fieldDefinitionNotFound";
+	private static final String NODE_POSITION_NOT_SPECIFIED_MESSAGE_KEY = "dataManagement.csvDataImport.error.nodePositionNotSpecified";
 
 	//input variables
 	private EntityDefinition parentEntityDefinition;
@@ -404,7 +406,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 					if (! isIgnoredInDataExport(colName)) {
 						//attribute definition not found
 						ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, 
-								"csvDataImport.error.fieldDefinitionNotFound");
+								FIELD_DEFINITION_NOT_FOUND_MESSAGE_KEY);
 						throw new ParsingException(error);
 					}
 				} else {
@@ -414,7 +416,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 						if (! matcher.matches()) {
 							//node position not specified for a multiple attribute
 							ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, 
-									"csvDataImport.error.nodePositionNotSpecified");
+									NODE_POSITION_NOT_SPECIFIED_MESSAGE_KEY);
 							throw new ParsingException(error);
 						}
 					}
