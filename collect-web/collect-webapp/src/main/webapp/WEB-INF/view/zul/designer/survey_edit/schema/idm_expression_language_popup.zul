@@ -361,11 +361,19 @@
 			</dl>
 			<dl>
 				<dt>
+					<i>math:PI()</i>
+				</dt>
+				<dd>Returns a value that is closer than any other to pi, the ratio of the circumference of a circle to its diameter.</dd>
+			</dl>
+			<dl>
+				<dt>
 					<i>math:rad(angle)</i>
 				</dt>
 				<dd>Converts an angle measured in degrees to an approximately
 					equivalent angle measured in radians. The conversion from degrees to
-					radians is generally inexact.</dd>
+					radians is generally inexact. The conversion from radians to degrees is
+					generally inexact; users should not expect <i>math:cosrad(math:rad(90.0))</i>
+					to exactly equal 0.0.</dd>
 			</dl>
 			<dl>
 				<dt>
@@ -374,7 +382,7 @@
 				<dd>
 					converts an angle measured in radians to an approximately equivalent
 					angle measured in degrees. The conversion from radians to degrees is
-					generally inexact; users should not expect <i>cos(toRadians(90.0))</i>
+					generally inexact; users should not expect <i>math:cos(math:deg(math:PI() div 2))</i>
 					to exactly equal 0.0.
 				</dd>
 			</dl>
@@ -416,39 +424,21 @@
 			</dl>
 			<dl>
 				<dt>
-					<i>math:asin(angle)</i>
+					<i>math:asin(value)</i>
 				</dt>
-				<dd>returns the arc sine of an angle.</dd>
+				<dd>returns the arc sine of a value. Value must be in the range -1 through 1. The arc sine of a value x means "what angle y would have a sine value of x". The returned angle is in radians and it's in the range -pi/2 through pi/2. E.g. math:deg(math:asin(1)) = 90</dd>
 			</dl>
 			<dl>
 				<dt>
-					<i>math:asinrad(angleInRadians)</i>
+					<i>math:acos(value)</i>
 				</dt>
-				<dd>returns the arc sine of an angle (in radians).</dd>
+				<dd>returns the arc cosine of a value. Value must be in the range -1 through 1. The arc cosine of a value x means "what angle y would have a cosine value of x". The returned angle is in radians and it's in the range 0 through pi. E.g. math:deg(math:acos(0)) = 90 ; math:acos(1) = 0 ; math:deg(math:acos(-1)) = 180</dd>
 			</dl>
 			<dl>
 				<dt>
-					<i>math:acos(angle)</i>
+					<i>math:atan(value)</i>
 				</dt>
-				<dd>returns the arc cosine of an angle.</dd>
-			</dl>
-			<dl>
-				<dt>
-					<i>math:acosrad(angleInRadians)</i>
-				</dt>
-				<dd>returns the arc cosine of an angle (in radians).</dd>
-			</dl>
-			<dl>
-				<dt>
-					<i>math:atan(angle)</i>
-				</dt>
-				<dd>returns the arc tangent of an angle.</dd>
-			</dl>
-			<dl>
-				<dt>
-					<i>math:atanrad(angleInRadians)</i>
-				</dt>
-				<dd>returns the arc tangent of an angle (in radians).</dd>
+				<dd>returns the arc tangent of a value. Value must be in the range -1 through 1. The arc tangent of a value x means "what angle y would have a tangent value of x". The returned angle is in radians and it's in the range -pi/2 through pi/2. E.g. math:atan(0) = 0 ; math:deg(math:atan(1)) = 45 ; math:deg(math:atan(-1)) = -45</dd>
 			</dl>
 			<dl>
 				<dt>

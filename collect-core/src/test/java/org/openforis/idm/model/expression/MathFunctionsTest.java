@@ -21,6 +21,8 @@ import org.openforis.idm.model.EntityBuilder;
  */
 public class MathFunctionsTest extends AbstractExpressionTest {
 
+	private static final Double DEFAULT_TOLERACE = 1E-5d;
+
 	@Test
 	public void testConstants() throws InvalidExpressionException{
 		Double pi = (Double) evaluateExpression(cluster, "math:PI()");
@@ -40,10 +42,12 @@ public class MathFunctionsTest extends AbstractExpressionTest {
 	@Test
 	public void testSin() throws InvalidExpressionException {
 		{
-			Object value = evaluateExpression(cluster, "math:sin(45)");
-			assertNotNull(value);
-			double val = ((Double) value).doubleValue();
-			assertTrue(val > 0.70d && val < 0.71);
+			Object value = evaluateExpression(cluster, "math:sin(0)");
+			assertEquals(Double.valueOf(0d), (Double) value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:sin(90)");
+			assertEquals(Double.valueOf(1d), (Double) value);
 		}
 		{
 			double angle = 90d;
@@ -54,25 +58,105 @@ public class MathFunctionsTest extends AbstractExpressionTest {
 	}
 	
 	@Test
+	public void testCos() throws InvalidExpressionException {
+		{
+			Object value = evaluateExpression(cluster, "math:cos(0)");
+			assertEquals(Double.valueOf(1.0d), (Double) value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:cos(90)");
+			assertAlmostEquals(0d, (Double) value);
+		}
+	}
+	
+	@Test
 	public void testTan() throws InvalidExpressionException {
+		{
+			Object value = evaluateExpression(cluster, "math:tan(0)");
+			assertEquals(Double.valueOf(0d), (Double) value);
+		}
 		{
 			Object value = evaluateExpression(cluster, "math:tan(45)");
 			assertNotNull(value);
 			double val = ((Double) value).doubleValue();
-			assertTrue(val > 0.99 && val <= 1.00);
+			assertAlmostEquals(1d, val);
 		}
 		{
 			double angle = 80d;
 			EntityBuilder.addValue(cluster, "plot_direction",  angle);
 			Object value = evaluateExpression(cluster, "math:tan(plot_direction)");
-			assertNotNull(value);
-			double val = ((Double) value).doubleValue();
-			assertTrue(val > 5.67 && val < 5.68);
+			assertAlmostEquals(5.671281d, (Double) value);
 		}
 		{
 			Object value = evaluateExpression(cluster, "math:tan(plot/centre/dist)");
 			assertNull(value);
 		}
+	}
+	
+	@Test
+	public void testASin() throws InvalidExpressionException {
+		{
+			Object value = evaluateExpression(cluster, "math:asin(0)");
+			assertEquals(Double.valueOf(0d), (Double) value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:deg(math:asin(1))");
+			assertEquals(Double.valueOf(90d), (Double) value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:deg(math:asin(-1))");
+			assertEquals(Double.valueOf(-90d), (Double) value);
+		}
+	}
+	
+	@Test
+	public void testACos() throws InvalidExpressionException {
+		{
+			Object value = evaluateExpression(cluster, "math:deg(math:acos(0))");
+			assertEquals(Double.valueOf(90d), (Double) value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:acos(1)");
+			assertEquals(Double.valueOf(0d), (Double) value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:deg(math:acos(-1))");
+			assertEquals(Double.valueOf(180d), (Double) value);
+		}
+	}
+	
+	@Test
+	public void testATan() throws InvalidExpressionException {
+		{
+			Object value = evaluateExpression(cluster, "math:deg(math:atan(0))");
+			assertEquals(Double.valueOf(0d), (Double) value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:deg(math:atan(1))");
+			assertEquals(Double.valueOf(45d), (Double) value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:deg(math:atan(-1))");
+			assertEquals(Double.valueOf(-45d), (Double) value);
+		}
+	}
+	
+	@Test
+	public void testSqrt() throws InvalidExpressionException {
+		{
+			Object value = evaluateExpression(cluster, "math:sqrt(16)");
+			assertEquals(Double.valueOf(4), value);
+		}
+		{
+			Object value = evaluateExpression(cluster, "math:sqrt(20)");
+			assertAlmostEquals(4.47213595d, (Double) value);
+		}
+	}
+	
+	@Test
+	public void testSqrtWithEmptyValue() throws InvalidExpressionException {
+		boolean value = evaluateBooleanExpression(cluster, null, "idm:blank(math:sqrt(plot_direction))");
+		assertTrue(value);
 	}
 	
 	@Test
@@ -104,5 +188,13 @@ public class MathFunctionsTest extends AbstractExpressionTest {
 		
 		Object max = evaluateExpression(cluster, cluster, "math:max(plot/no)");
 		assertEquals("4", max);
+	}
+	
+	private static void assertAlmostEquals(double expected, double value) {
+		assertAlmostEquals(expected, value, DEFAULT_TOLERACE);
+	}
+	
+	private static void assertAlmostEquals(Double expected, Double value, double tolerance) {
+		assertTrue(expected + tolerance >= value && expected - tolerance <= value);
 	}
 }
