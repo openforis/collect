@@ -37,8 +37,8 @@ public abstract class NumericAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 
-	protected NumericAttributeDefinition(NumericAttributeDefinition obj, int id) {
-		super(obj, id);
+	protected NumericAttributeDefinition(Survey survey, NumericAttributeDefinition obj, int id) {
+		super(survey, obj, id);
 		this.type = obj.type;
 		this.precisionDefinitions = Objects.clone(obj.precisionDefinitions);
 	}

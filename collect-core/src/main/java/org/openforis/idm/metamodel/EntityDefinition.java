@@ -56,8 +56,8 @@ public class EntityDefinition extends NodeDefinition {
 		initializeCache();
 	}
 
-	EntityDefinition(EntityDefinition def, int nextId, String... ignoreChildDefinitions) {
-		super(def, nextId);
+	EntityDefinition(Survey survey, EntityDefinition def, int nextId, String... ignoreChildDefinitions) {
+		super(survey, def, nextId);
 		initializeCache();
 		this.virtual = def.virtual;
 		this.generatorExpression = def.generatorExpression;
@@ -70,7 +70,7 @@ public class EntityDefinition extends NodeDefinition {
 		}
 		for (NodeDefinition childDef : childDefs) {
 			if (! ignoreChildDefList.contains(childDef.getName())) {
-				addChildDefinition(getSchema().cloneDefinition(childDef));
+				addChildDefinition(survey.getSchema().cloneDefinition(childDef));
 			}
 		}
 	}

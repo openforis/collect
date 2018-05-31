@@ -24,7 +24,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
+import org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM.NodeSelectedEvent;
 import org.openforis.collect.manager.validation.SurveyValidator.ReferenceableKeyAttributeHelper;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
@@ -416,11 +416,11 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 				}
 			};
 			String title = Labels.getLabel("survey.schema.attribute.select_attribute_referenced_by", new String[]{editedItem.getName()});
-			final Window parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title,
+			final Window parentSelectorPopUp = SchemaObjectSelectorPopUpVM.openPopup(title, false,
 					editedItem.getRootEntity(), null, includedNodePredicate,
 					false, false, disabledNodePredicate, null,
 					editedItem.getReferencedAttribute(), true);
-			parentSelectorPopUp.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+			parentSelectorPopUp.addEventListener(SchemaObjectSelectorPopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 				public void onEvent(NodeSelectedEvent event) throws Exception {
 					AttributeDefinition referencedAttribute = (AttributeDefinition) event.getSelectedItem();
 					AttributeDefinitionFormObject<?> fo = (AttributeDefinitionFormObject<?>) formObject;

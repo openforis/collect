@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.openforis.collect.designer.component.BasicTreeModel.AbstractNode;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNode;
 import org.openforis.collect.designer.util.Predicate;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
-import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.User;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -26,24 +27,24 @@ import org.openforis.idm.metamodel.SurveyObject;
  */
 public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 
-	public UITreeModelCreator(ModelVersion version,
+	public UITreeModelCreator(SurveyManager surveyManager, User loggedUser, ModelVersion version,
 			Predicate<SurveyObject> includeNodePredicate,
 			boolean includeRootEntity, boolean includeEmptyNodes, String labelLanguage) {
-		this(version, null, includeNodePredicate, includeRootEntity, includeEmptyNodes, labelLanguage);
+		this(surveyManager, loggedUser, version, null, includeNodePredicate, includeRootEntity, includeEmptyNodes, labelLanguage);
 	}
 
-	public UITreeModelCreator(ModelVersion version,
+	public UITreeModelCreator(SurveyManager surveyManager, User loggedUser, ModelVersion version,
 			Predicate<SurveyObject> disabledNodePredicate,
 			Predicate<SurveyObject> includeNodePredicate,
 			boolean includeRootEntity, boolean includeEmptyNodes, String labelLanguage) {
-		super(version, disabledNodePredicate, includeNodePredicate, includeRootEntity, includeEmptyNodes, labelLanguage);
+		super(surveyManager, loggedUser, version, disabledNodePredicate, includeNodePredicate, includeRootEntity, includeEmptyNodes, labelLanguage);
 	}
 
 	@Override
-	protected List<AbstractNode<SchemaNodeData>> createChildNodes(SurveyObject surveyObject) {
-		List<AbstractNode<SchemaNodeData>> childNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
+	protected List<SchemaTreeNode> createChildNodes(SurveyObject surveyObject) {
+		List<SchemaTreeNode> childNodes = new ArrayList<SchemaTreeNode>();
 		if ( surveyObject instanceof EntityDefinition ) {
-			List<AbstractNode<SchemaNodeData>> entityChildrenNodes = createChildNodes((EntityDefinition) surveyObject);
+			List<SchemaTreeNode> entityChildrenNodes = createChildNodes((EntityDefinition) surveyObject);
 			childNodes.addAll(entityChildrenNodes);
 		} else if ( surveyObject instanceof UITab ) {
 			List<SchemaTreeNode> childTabNodes = createChildNodes((UITab) surveyObject);
@@ -55,8 +56,8 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 		return childNodes;
 	}
 
-	private List<AbstractNode<SchemaNodeData>> createChildNodes(EntityDefinition entityDefn) {
-		List<AbstractNode<SchemaNodeData>> childNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
+	private List<SchemaTreeNode> createChildNodes(EntityDefinition entityDefn) {
+		List<SchemaTreeNode> childNodes = new ArrayList<SchemaTreeNode>();
 		
 		CollectSurvey survey = (CollectSurvey) entityDefn.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
@@ -64,21 +65,21 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 		
 		//include node definitions
 		List<NodeDefinition> childDefns = entityDefn.getChildDefinitions();
-		Collection<? extends AbstractNode<SchemaNodeData>> schemaTreeNodes = createNodes(assignedTab, childDefns);
+		Collection<? extends SchemaTreeNode> schemaTreeNodes = createNodes(assignedTab, childDefns);
 		childNodes.addAll(schemaTreeNodes);
 		
 		//include tabs
 		if ( entityDefn.isMultiple() && uiOptions.getLayout(entityDefn) == Layout.FORM ) {
 			List<UITab> tabs = uiOptions.getTabsAssignableToChildren(entityDefn, false);
-			Collection<? extends AbstractNode<SchemaNodeData>> tabNodes = createNodes(tabs);
+			Collection<? extends SchemaTreeNode> tabNodes = createNodes(tabs);
 			childNodes.addAll(tabNodes);
 		}
 		return childNodes;
 	}
 
 	@Override
-	protected List<AbstractNode<SchemaNodeData>> createFirstLevelNodes(EntityDefinition rootEntity) {
-		List<AbstractNode<SchemaNodeData>> firstLevelTreeNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
+	protected List<SchemaTreeNode> createFirstLevelNodes(EntityDefinition rootEntity) {
+		List<SchemaTreeNode> firstLevelTreeNodes = new ArrayList<SchemaTreeNode>();
 		if (includeRootEntity) {
 			SchemaTreeNode node = createRootNode(rootEntity);
 			if ( node != null ) {

@@ -142,6 +142,11 @@
     			</zk>
     		</menupopup>
     	</menu>
+    	<menuseparator />
+    	<!-- Add node from another survey -->
+    	<menuitem label="${labels.survey.schema.add_node_from_another_survey.label}"
+    		image="/assets/images/add-small.png"
+    		onClick="@command('openSelectNodeFromAnotherSurveyPopUp')" />
     </menupopup>
     
     <menupopup id="tabPopup">
@@ -188,6 +193,11 @@
     		</menupopup>
     	</menu>
     	<menuseparator />
+    	<!-- Add node from another survey -->
+    	<menuitem label="${labels.survey.schema.add_node_from_another_survey.label}"
+    		image="/assets/images/add-small.png"
+    		onClick="@command('openSelectNodeFromAnotherSurveyPopUp')" />
+    	<menuseparator />
     	<!-- Remove tab -->
     	<menuitem label="${labels.survey.schema.remove_node}"
     		image="/assets/images/delete-small.png"
@@ -232,6 +242,11 @@
     			</zk>
     		</menupopup>
     	</menu>
+		<menuseparator />
+    	<!-- Add node from another survey -->
+    	<menuitem label="${labels.survey.schema.add_node_from_another_survey.label}"
+    		image="/assets/images/add-small.png"
+    		onClick="@command('openSelectNodeFromAnotherSurveyPopUp')" />
     	<menuseparator />
     	<!-- Move node -->
     	<menuitem label="${labels.survey.schema.move_node.$}"
@@ -291,6 +306,11 @@
     			</zk>
     		</menupopup>
     	</menu>
+		<menuseparator />
+    	<!-- Add node from another survey -->
+    	<menuitem label="${labels.survey.schema.add_node_from_another_survey.label}"
+    		image="/assets/images/add-small.png"
+    		onClick="@command('openSelectNodeFromAnotherSurveyPopUp')" />
     	<menuseparator />
     	<!-- Move node -->
     	<menuitem label="${labels.survey.schema.move_node.$}"
@@ -329,6 +349,11 @@
     			</zk>
     		</menupopup>
     	</menu>
+		<menuseparator />
+    	<!-- Add node from another survey -->
+    	<menuitem label="${labels.survey.schema.add_node_from_another_survey.label}"
+    		image="/assets/images/add-small.png"
+    		onClick="@command('openSelectNodeFromAnotherSurveyPopUp')" />
     	<menuseparator />
     	<!-- Move node -->
     	<menuitem label="${labels.survey.schema.move_node.$}"

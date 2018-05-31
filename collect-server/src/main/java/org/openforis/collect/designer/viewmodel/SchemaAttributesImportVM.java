@@ -18,7 +18,7 @@ import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
-import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
+import org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM.NodeSelectedEvent;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Files;
@@ -123,9 +123,9 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		String title = Labels.getLabel("survey.schema.attributes_import.select_entity.popup.title");
 		
 		//calculate parent item (tab or entity)
-		final Window popup = SchemaTreePopUpVM.openPopup(title, parentEntityDefinition.getRootEntity(), null, includedNodePredicate, 
+		final Window popup = SchemaObjectSelectorPopUpVM.openPopup(title, false, parentEntityDefinition.getRootEntity(), null, includedNodePredicate, 
 				true, true, null, selectableNodePredicate, parentEntityDefinition, false);
-		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+		popup.addEventListener(SchemaObjectSelectorPopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
 				parentEntityDefinition = (EntityDefinition) selectedParent;

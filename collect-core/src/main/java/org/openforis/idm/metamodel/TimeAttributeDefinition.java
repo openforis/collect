@@ -33,8 +33,8 @@ public class TimeAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 
-	TimeAttributeDefinition(TimeAttributeDefinition obj, int id) {
-		super(obj, id);
+	TimeAttributeDefinition(Survey survey, TimeAttributeDefinition obj, int id) {
+		super(survey, obj, id);
 	}
 	
 	@Override

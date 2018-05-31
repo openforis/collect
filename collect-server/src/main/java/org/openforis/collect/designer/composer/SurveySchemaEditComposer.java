@@ -62,7 +62,7 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 				Textbox textbox = new Textbox();
 				cell.appendChild(textbox);
 			}
-			cell.setImage(SchemaVM.getIcon(data));
+			cell.setImage(SchemaVM.getIcon(data.getSurveyObject()));
 			row.appendChild(cell);
 			item.appendChild(row);
 		}

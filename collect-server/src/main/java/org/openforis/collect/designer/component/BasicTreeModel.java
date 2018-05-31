@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import org.openforis.collect.designer.component.BasicTreeModel.SimpleNodeData;
 import org.zkoss.zul.DefaultTreeModel;
 import org.zkoss.zul.DefaultTreeNode;
 import org.zkoss.zul.TreeNode;
@@ -17,7 +18,7 @@ import org.zkoss.zul.TreeNode;
  * @author S. Ricci
  *
  */
-public abstract class BasicTreeModel<T> extends DefaultTreeModel<T> {
+public abstract class BasicTreeModel<T extends SimpleNodeData> extends DefaultTreeModel<T> {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -61,7 +62,6 @@ public abstract class BasicTreeModel<T> extends DefaultTreeModel<T> {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void appendNodeToSelected(T data) {
 		AbstractNode<T> parentNode = getSelectedNode();
 		if( parentNode == null ) {
@@ -98,7 +98,6 @@ public abstract class BasicTreeModel<T> extends DefaultTreeModel<T> {
 		return result;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void select(T data) {
 		Collection<? extends TreeNode<T>> selection;
 		if ( data == null ) {
@@ -173,7 +172,6 @@ public abstract class BasicTreeModel<T> extends DefaultTreeModel<T> {
 		Set<TreeNode<T>> openObjects = getOpenObjects();
 		parentTreeNode.insert(treeNode, toIndex);
 		setOpenObjects(openObjects);
-		@SuppressWarnings("unchecked")
 		List<AbstractNode<T>> selection = Arrays.asList(treeNode);
 		setSelection(selection);
 	}

@@ -36,8 +36,8 @@ public class CoordinateAttributeDefinition extends AttributeDefinition  {
 		super(survey, id);
 	}
 
-	CoordinateAttributeDefinition(CoordinateAttributeDefinition obj, int id) {
-		super(obj, id);
+	CoordinateAttributeDefinition(Survey survey, CoordinateAttributeDefinition obj, int id) {
+		super(survey, obj, id);
 	}
 	
 	@Override

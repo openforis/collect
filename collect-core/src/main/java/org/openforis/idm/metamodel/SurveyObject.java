@@ -31,8 +31,8 @@ public abstract class SurveyObject implements Serializable, Annotatable, DeepCom
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected SurveyObject(SurveyObject surveyObject) {
-		this(surveyObject.survey);
+	protected SurveyObject(Survey survey, SurveyObject surveyObject) {
+		this(survey);
 		this.annotations = surveyObject.annotations == null ? null : 
 			(Map<QName, String>) ((HashMap<QName, String>) surveyObject.annotations).clone();
 	}

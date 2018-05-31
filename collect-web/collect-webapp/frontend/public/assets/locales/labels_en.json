@@ -95,8 +95,12 @@
                 "invalidNodePosition": "Invalid node position: it must be a positive integer number",
                 "fieldNameNotSpecified": "Field name not specified",
                 "type": {
+                    "DUPLICATE_VALUE": "Duplicate value",
+                    "EMPTY": "Empty value",
+                    "INVALID_VALUE": "Invalid Value",
+                    "IOERROR": "Internal error",
                     "MISSING_REQUIRED_COLUMNS": "Missing required columns",
-                    "INVALID_VALUE": "Invalid Value"
+                    "WRONG_COLUMN_NAME": "Wrong column name"
                 }
             },
             "errorsInUploadedFile": "Errors in uploaded file",

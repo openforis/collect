@@ -35,8 +35,8 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 		super(survey, id);
 	}
 
-	NumberAttributeDefinition(NumberAttributeDefinition obj, int id) {
-		super(obj, id);
+	NumberAttributeDefinition(Survey survey, NumberAttributeDefinition obj, int id) {
+		super(survey, obj, id);
 	}
 	
 	@Override

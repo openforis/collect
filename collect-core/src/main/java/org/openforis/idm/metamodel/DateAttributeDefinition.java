@@ -34,8 +34,8 @@ public class DateAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 
-	DateAttributeDefinition(DateAttributeDefinition obj, int id) {
-		super(obj, id);
+	DateAttributeDefinition(Survey survey, DateAttributeDefinition obj, int id) {
+		super(survey, obj, id);
 	}
 	
 	@Override

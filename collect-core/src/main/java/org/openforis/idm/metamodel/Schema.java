@@ -320,27 +320,27 @@ public class Schema extends SurveyObject {
 	@SuppressWarnings("unchecked")
 	public <T extends NodeDefinition> T cloneDefinition(T def, String... ignoreChildDefinitions) {
 		if (def instanceof BooleanAttributeDefinition) {
-			return index((T) new BooleanAttributeDefinition((BooleanAttributeDefinition) def, nextId()));
+			return index((T) new BooleanAttributeDefinition(getSurvey(), (BooleanAttributeDefinition) def, nextId()));
 		} else if (def instanceof CodeAttributeDefinition) {
-			return index((T) new CodeAttributeDefinition((CodeAttributeDefinition) def, nextId()));
+			return index((T) new CodeAttributeDefinition(getSurvey(), (CodeAttributeDefinition) def, nextId()));
 		} else if (def instanceof CoordinateAttributeDefinition) {
-			return index((T) new CoordinateAttributeDefinition((CoordinateAttributeDefinition) def, nextId()));
+			return index((T) new CoordinateAttributeDefinition(getSurvey(), (CoordinateAttributeDefinition) def, nextId()));
 		} else if (def instanceof DateAttributeDefinition) {
-			return index((T) new DateAttributeDefinition((DateAttributeDefinition) def, nextId()));
+			return index((T) new DateAttributeDefinition(getSurvey(), (DateAttributeDefinition) def, nextId()));
 		} else if (def instanceof FileAttributeDefinition) {
-			return index((T) new FileAttributeDefinition((FileAttributeDefinition) def, nextId()));
+			return index((T) new FileAttributeDefinition(getSurvey(), (FileAttributeDefinition) def, nextId()));
 		} else if (def instanceof NumberAttributeDefinition) {
-			return index((T) new NumberAttributeDefinition((NumberAttributeDefinition) def, nextId()));
+			return index((T) new NumberAttributeDefinition(getSurvey(), (NumberAttributeDefinition) def, nextId()));
 		} else if (def instanceof RangeAttributeDefinition) {
-			return index((T) new RangeAttributeDefinition((RangeAttributeDefinition) def, nextId()));
+			return index((T) new RangeAttributeDefinition(getSurvey(), (RangeAttributeDefinition) def, nextId()));
 		} else if (def instanceof TaxonAttributeDefinition) {
-			return index((T) new TaxonAttributeDefinition((TaxonAttributeDefinition) def, nextId()));
+			return index((T) new TaxonAttributeDefinition(getSurvey(), (TaxonAttributeDefinition) def, nextId()));
 		} else if (def instanceof TextAttributeDefinition) {
-			return index((T) new TextAttributeDefinition((TextAttributeDefinition) def, nextId()));
+			return index((T) new TextAttributeDefinition(getSurvey(), (TextAttributeDefinition) def, nextId()));
 		} else if (def instanceof TimeAttributeDefinition) {
-			return index((T) new TimeAttributeDefinition((TimeAttributeDefinition) def, nextId()));
+			return index((T) new TimeAttributeDefinition(getSurvey(), (TimeAttributeDefinition) def, nextId()));
 		} else if (def instanceof EntityDefinition) {
-			return index((T) new EntityDefinition((EntityDefinition) def, nextId(), ignoreChildDefinitions));
+			return index((T) new EntityDefinition(getSurvey(), (EntityDefinition) def, nextId(), ignoreChildDefinitions));
 		} else {
 			throw new UnsupportedOperationException("Clone not supported for node type: " + def.getClass().getName());
 		}
@@ -389,7 +389,9 @@ public class Schema extends SurveyObject {
 
 	public void changeParentEntity(NodeDefinition node, EntityDefinition newParent) {
 		EntityDefinition oldParent = node.getParentEntityDefinition();
-		oldParent.removeChildDefinition(node, false);
+		if (oldParent != null) {
+			oldParent.removeChildDefinition(node, false);
+		}
 		newParent.addChildDefinition(node);
 	}
 

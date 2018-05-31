@@ -40,7 +40,7 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
+import org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM.NodeSelectedEvent;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -437,8 +437,8 @@ public class SchemaVM extends SurveyBaseVM {
 	private void updateTreeNodeIcon(SurveyObject item, boolean key, boolean calculated) {
 		Treeitem treeItem = getTreeItem(item);
 		if (treeItem != null) {
-			SchemaNodeData data = treeModel.getNodeData(item);
-			String icon = getIcon(data, key, calculated);
+			SchemaNodeData data = (SchemaNodeData) treeModel.getNodeData(item);
+			String icon = getIcon(data.getSurveyObject(), key, calculated);
 			treeItem.setImage(icon);
 		}
 	}
@@ -553,7 +553,9 @@ public class SchemaVM extends SurveyBaseVM {
 			nodeFormInclude.setSrc(location);
 			// set focus on name textbox
 			Textbox nodeNameTextbox = (Textbox) Path.getComponent(nodeFormInclude.getSpaceOwner(), nodeNameTextboxPath);
-			nodeNameTextbox.setFocus(true);
+			if (nodeNameTextbox != null) {
+				nodeNameTextbox.setFocus(true);
+			}
 		}
 	}
 
@@ -896,10 +898,10 @@ public class SchemaVM extends SurveyBaseVM {
 			SurveyObjectTreeModelCreator modelCreator;
 			switch (viewType) {
 			case ENTRY:
-				modelCreator = new UITreeModelCreator(selectedVersion, null, false, true, currentLanguageCode);
+				modelCreator = new UITreeModelCreator(surveyManager, getLoggedUser(), selectedVersion, null, false, true, currentLanguageCode);
 				break;
 			default:
-				modelCreator = new SchemaTreeModelCreator(selectedVersion, null, false, true, currentLanguageCode);
+				modelCreator = new SchemaTreeModelCreator(surveyManager, getLoggedUser(), selectedVersion, null, false, true, currentLanguageCode);
 			}
 			treeModel = modelCreator.createModel(selectedRootEntity);
 		}
@@ -1075,15 +1077,13 @@ public class SchemaVM extends SurveyBaseVM {
 		return attrDefn.getLabel(Type.INSTANCE, currentLanguageCode);
 	}
 
-	public static String getIcon(SchemaNodeData data) {
-		SurveyObject surveyObject = data.getSurveyObject();
+	public static String getIcon(SurveyObject surveyObject) {
 		boolean key = surveyObject instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) surveyObject).isKey();
 		boolean calculated = surveyObject instanceof AttributeDefinition && ((AttributeDefinition) surveyObject).isCalculated();
-		return getIcon(data, key, calculated);
+		return getIcon(surveyObject, key, calculated);
 	}
 
-	public static String getIcon(SchemaNodeData data, boolean key, boolean calculated) {
-		SurveyObject surveyObject = data.getSurveyObject();
+	public static String getIcon(SurveyObject surveyObject, boolean key, boolean calculated) {
 		String imagesRootPath = NODE_TYPES_IMAGES_PATH;
 		if (surveyObject instanceof UITab) {
 			return imagesRootPath + "tab-small.png";
@@ -1482,13 +1482,41 @@ public class SchemaVM extends SurveyBaseVM {
 		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
 		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
 
-		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, false,
+		final Window popup = SchemaObjectSelectorPopUpVM.openPopup(title, false, selectedRootEntity, null, includedNodePredicate, false,
 				true, disabledPredicate, null, parentItem, false);
-		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+		popup.addEventListener(SchemaObjectSelectorPopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
 				changeEditedNodeParent(selectedParent, false);
 				refreshNodeForm();
+				closePopUp(popup);
+			}
+		});
+	}
+	
+	@Command
+	public void openSelectNodeFromAnotherSurveyPopUp() {
+		SchemaNodeData selectedTreeNode = getSelectedTreeNode();
+		if (selectedTreeNode == null) {
+			return;
+		}
+		SurveyObject clonedItemParent = selectedTreeNode.getSurveyObject();
+		String clonedItemParentLabel = clonedItemParent instanceof NodeDefinition ? 
+				((NodeDefinition) clonedItemParent).getName()
+				: clonedItemParent instanceof UITab ? ((UITab) clonedItemParent).getLabel(currentLanguageCode) 
+				: "";
+		
+		String title = Labels.getLabel("survey.schema.add_node_from_another_survey.popup_title", clonedItemParentLabel);
+		
+		Predicate<SurveyObject> includedNodePredicate = null;
+		Predicate<SurveyObject> disabledPredicate = null;
+		
+		final Window popup = SchemaObjectSelectorPopUpVM.openPopup(title, true, null, null, includedNodePredicate, false,
+				true, disabledPredicate, null, null, false);
+		popup.addEventListener(SchemaObjectSelectorPopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+			public void onEvent(NodeSelectedEvent event) throws Exception {
+				NodeDefinition selectedNode = (NodeDefinition) event.getSelectedItem();
+				duplicateNodeAndSelectIt(selectedNode, clonedItemParent);
 				closePopUp(popup);
 			}
 		});
@@ -1518,21 +1546,21 @@ public class SchemaVM extends SurveyBaseVM {
 		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
 		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
 
-		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, false,
+		final Window popup = SchemaObjectSelectorPopUpVM.openPopup(title, false, selectedRootEntity, null, includedNodePredicate, false,
 				true, disabledPredicate, null, parentItem, false);
-		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+		popup.addEventListener(SchemaObjectSelectorPopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
-				duplicateEditedNodeInto(node, selectedParent);
+				duplicateNodeAndSelectIt(node, selectedParent);
 				closePopUp(popup);
 			}
 		});
 	}
 
-	private void duplicateEditedNodeInto(NodeDefinition node, SurveyObject parent) {
+	private void duplicateNodeAndSelectIt(NodeDefinition node, SurveyObject parent) {
 		NodeDefinition clone = survey.getSchema().cloneDefinition(node);
 		EntityDefinition parentEntity = determineRelatedEntity(parent);
-		clone.setName(createDuplicateNodeName(node, parentEntity));
+		clone.setName(generateDuplicateNodeName(clone, parentEntity));
 		editedNode = clone;
 		changeEditedNodeParent(parent, true);
 		editNode(false, parentEntity, editedNode);
@@ -1542,7 +1570,7 @@ public class SchemaVM extends SurveyBaseVM {
 	 * Creates a name for node that will be the duplicate of the specified one.
 	 * The new name will be unique inside the specified parent entity.
 	 */
-	private String createDuplicateNodeName(NodeDefinition nodeToBeDuplicate, EntityDefinition parent) {
+	private String generateDuplicateNodeName(NodeDefinition nodeToBeDuplicate, EntityDefinition parent) {
 		String name = nodeToBeDuplicate.getName();
 		Matcher matcher = CLONED_NAME_PATTERN.matcher(name);
 		String prefix;
@@ -1555,12 +1583,11 @@ public class SchemaVM extends SurveyBaseVM {
 			currentProgressiveNum = 0;
 		}
 		// find unique new name
-		String newName;
-		do {
+		String newName = prefix + (currentProgressiveNum == 0 ? "" : currentProgressiveNum);
+		while (parent.containsChildDefinition(newName)) {
 			currentProgressiveNum++;
 			newName = prefix + currentProgressiveNum;
-		} while (parent.containsChildDefinition(newName));
-
+		}
 		return newName;
 	}
 

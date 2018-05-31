@@ -15,8 +15,8 @@ public abstract class IdentifiableSurveyObject<I extends IdentifiableSurveyObjec
 		this.id = id;
 	}
 
-	protected IdentifiableSurveyObject(IdentifiableSurveyObject<I> object, int id) {
-		super(object);
+	protected IdentifiableSurveyObject(Survey survey, IdentifiableSurveyObject<I> object, int id) {
+		super(survey, object);
 		this.id = id;
 	}
 	

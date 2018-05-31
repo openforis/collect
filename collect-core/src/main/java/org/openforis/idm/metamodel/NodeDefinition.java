@@ -51,9 +51,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		super(survey, id);
 	}
 
-	NodeDefinition(NodeDefinition nodeDef, int id) {
-		super(nodeDef, id);
-		this.parentDefinition = nodeDef.parentDefinition;
+	NodeDefinition(Survey survey, NodeDefinition nodeDef, int id) {
+		super(survey, nodeDef, id);
 		this.name = nodeDef.name;
 		this.relevantExpression = nodeDef.relevantExpression;
 		this.multiple = nodeDef.multiple;

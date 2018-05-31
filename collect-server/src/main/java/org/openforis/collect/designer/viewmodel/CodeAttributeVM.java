@@ -14,7 +14,7 @@ import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Predicate;
-import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
+import org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM.NodeSelectedEvent;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -173,11 +173,11 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 					return ! (item instanceof CodeAttributeDefinition);
 				}
 			};
-			final Window parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title,
+			final Window parentSelectorPopUp = SchemaObjectSelectorPopUpVM.openPopup(title, false,
 					editedItem.getRootEntity(), null, includedNodePredicate,
 					false, false, disabledNodePredicate, null,
 					parentCodeAttributeDefinition, true);
-			parentSelectorPopUp.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+			parentSelectorPopUp.addEventListener(SchemaObjectSelectorPopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 				public void onEvent(NodeSelectedEvent event) throws Exception {
 					CodeAttributeDefinition parentAttrDefn = (CodeAttributeDefinition) event.getSelectedItem();
 					CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) formObject;

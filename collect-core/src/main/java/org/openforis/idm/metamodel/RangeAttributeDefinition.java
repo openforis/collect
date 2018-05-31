@@ -40,8 +40,8 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		super(survey, id);
 	}
 
-	RangeAttributeDefinition(RangeAttributeDefinition obj, int id) {
-		super(obj, id);
+	RangeAttributeDefinition(Survey survey, RangeAttributeDefinition obj, int id) {
+		super(survey, obj, id);
 	}
 	
 	@Override

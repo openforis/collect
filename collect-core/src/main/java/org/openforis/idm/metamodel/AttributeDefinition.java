@@ -45,8 +45,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		this.calculated = false;
 	}
 
-	AttributeDefinition(AttributeDefinition attrDef, int id) {
-		super(attrDef, id);
+	AttributeDefinition(Survey survey, AttributeDefinition attrDef, int id) {
+		super(survey, attrDef, id);
 		this.key = attrDef.key;
 		this.calculated = attrDef.calculated;
 		this.checks = Objects.clone(attrDef.checks);

@@ -8,7 +8,7 @@
 		border="normal" 
 		position="center" 
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM')"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM')"
 		closable="true">
 
 		<vlayout hflex="true" vflex="true">

@@ -35,8 +35,8 @@ public class TextAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 
-	protected TextAttributeDefinition(TextAttributeDefinition obj, int id) {
-		super(obj, id);
+	protected TextAttributeDefinition(Survey survey, TextAttributeDefinition obj, int id) {
+		super(survey, obj, id);
 		this.type = obj.type;
 	}
 

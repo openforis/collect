@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.metamodel.NodeType;
 import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.SurveyObject;
@@ -24,7 +26,7 @@ import org.zkoss.zul.TreeNode;
  * @author S. Ricci
  *
  */
-public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeData> {
+public class SchemaTreeModel extends BasicTreeModel<SchemaNodeData> {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -32,7 +34,8 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	protected EntityDefinition rootEntity;
 	protected String labelLanguage;
 	
-	public SchemaTreeModel(SurveyObjectTreeModelCreator modelCreator, AbstractNode<SchemaNodeData> root, EntityDefinition rootEntity, String labelLanguage) {
+	public SchemaTreeModel(SurveyObjectTreeModelCreator modelCreator, 
+			SchemaTreeNode root, EntityDefinition rootEntity, String labelLanguage) {
 		super(root);
 		this.modelCreator = modelCreator;
 		this.rootEntity = rootEntity;
@@ -40,9 +43,40 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	}
 	
 	@Override
-	protected AbstractNode<SchemaNodeData> createNode(SchemaNodeData data, boolean defineEmptyChildrenForLeaves) {
-		AbstractNode<SchemaNodeData> result = modelCreator.createNode(data, defineEmptyChildrenForLeaves);
-		return result;
+	protected SchemaTreeNode createNode(SchemaNodeData data, boolean defineEmptyChildrenForLeaves) {
+		return (SchemaTreeNode) modelCreator.createNode((SchemaNodeData) data, defineEmptyChildrenForLeaves);
+	}
+	
+	@Override
+	public int getChildCount(TreeNode<SchemaNodeData> parent) {
+		int count = super.getChildCount(parent);
+		SchemaNodeData data = parent.getData();
+		if (data != null && data.getSurveyObject() == null) {
+			return 1;
+		} else {
+			return count;
+		}
+	}
+
+	@Override
+	public boolean isLeaf(TreeNode<SchemaNodeData> node) {
+		if (node.getData() != null && node.getData().getSurveyObject() == null) {
+			return false;
+		} else {
+			return super.isLeaf(node);
+		}
+	}
+	
+	@Override
+	public TreeNode<SchemaNodeData> getChild(TreeNode<SchemaNodeData> parent, int index) {
+		SchemaNodeData data = parent.getData();
+		if (data != null && data.getSurveyObject() == null) {
+			if (parent.getChildCount() == 0) {
+				AbstractNode<SchemaNodeData> rootEntityNode = modelCreator.createSurveyRootEntityNode(data.getSurvey().getId());
+				parent.add(rootEntityNode);
+			}
+		}
+		return super.getChild(parent, index);
 	}
 	
 	public SchemaNodeData getNodeData(SurveyObject surveyObject) {
@@ -51,14 +85,15 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	}
 	
 	public EntityDefinition getNearestParentEntityDefinition(SurveyObject surveyObject) {
-		SchemaTreeNode treeNode = getTreeNode(surveyObject);
-		SchemaTreeNode parentNode = (SchemaTreeNode) treeNode.getParent();
+		TreeNode<SchemaNodeData> treeNode = getTreeNode(surveyObject);
+		TreeNode<SchemaNodeData> parentNode = treeNode.getParent();
 		while ( parentNode != null && parentNode.getData() != null ) {
-			SurveyObject currentSurveyObject = parentNode.getData().getSurveyObject();
+			SchemaNodeData data = parentNode.getData();
+			SurveyObject currentSurveyObject = data.getSurveyObject();
 			if ( currentSurveyObject instanceof EntityDefinition ) {
 				return (EntityDefinition) currentSurveyObject;
 			}
-			parentNode = (SchemaTreeNode) parentNode.getParent();
+			parentNode = parentNode.getParent();
 		}
 		//if not found, return root entity
 		return rootEntity;
@@ -85,19 +120,19 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	}
 	
 	public SchemaTreeNode getTreeNode(SurveyObject surveyObject) {
-		TreeNode<SchemaNodeData> root = getRoot();
-		Stack<SchemaTreeNode> stack = new Stack<SchemaTreeNode>();
-		stack.push((SchemaTreeNode) root);
+		SchemaTreeNode root = (SchemaTreeNode) getRoot();
+		Stack<TreeNode<SchemaNodeData>> stack = new Stack<TreeNode<SchemaNodeData>>();
+		stack.push(root);
 		while ( ! stack.isEmpty() ) {
-			SchemaTreeNode treeNode = stack.pop();
+			TreeNode<SchemaNodeData> treeNode = stack.pop();
 			SchemaNodeData treeNodeData = treeNode.getData();
 			if ( treeNodeData != null && treeNodeData.getSurveyObject() == surveyObject ) {
-				return treeNode;
+				return (SchemaTreeNode) treeNode;
 			}
 			List<TreeNode<SchemaNodeData>> children = treeNode.getChildren();
 			if ( children != null && children.size() > 0 ) {
 				for (TreeNode<SchemaNodeData> child : children) {
-					stack.push((SchemaTreeNode) child);
+					stack.push(child);
 				}
 			}
 		}
@@ -149,17 +184,17 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	
 	public void markSelectedNodeAsDetached() {
 		AbstractNode<SchemaNodeData> selectedNode = getSelectedNode();
-		SimpleNodeData data = selectedNode.getData();
+		SchemaNodeData data = selectedNode.getData();
 		data.setDetached(true);
 	}
 
 	public List<SurveyObject> getSiblingsAndSelf(SurveyObject obj, boolean sameType) {
 		List<SurveyObject> result = new ArrayList<SurveyObject>();
 		TreeNode<SchemaNodeData> treeNode = getTreeNode(obj);
-		SchemaTreeNode parent = (SchemaTreeNode) treeNode.getParent();
+		TreeNode<SchemaNodeData> parent = treeNode.getParent();
 		List<TreeNode<SchemaNodeData>> children = parent.getChildren();
 		for (TreeNode<SchemaNodeData> child : children) {
-			SurveyObject surveyObject = child.getData().getSurveyObject();
+			SurveyObject surveyObject = ((SchemaNodeData) child.getData()).getSurveyObject();
 			if ( sameType && (
 					(obj instanceof UITab && surveyObject instanceof UITab)
 					||
@@ -176,7 +211,7 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 		Set<TreeNode<SchemaNodeData>> openObjects = getOpenObjects();
 		for (TreeNode<SchemaNodeData> treeNode : openObjects) {
 			if (treeNode != null) {
-				SchemaNodeData data = treeNode.getData();
+				SchemaNodeData data = (SchemaNodeData) treeNode.getData();
 				SurveyObject node = data.getSurveyObject();
 				result.add(node);
 			}
@@ -185,9 +220,9 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	}
 	
 	public void setOpenSchemaNodes(Collection<SurveyObject> nodes) {
-		Set<SchemaTreeNode> opened = new HashSet<SchemaTreeNode>();
+		Set<TreeNode<SchemaNodeData>> opened = new HashSet<TreeNode<SchemaNodeData>>();
 		for (SurveyObject node : nodes) {
-			SchemaTreeNode treeNode = getTreeNode(node);
+			TreeNode<SchemaNodeData> treeNode = getTreeNode(node);
 			if ( treeNode != null ) {
 				opened.add(treeNode);
 			}
@@ -197,14 +232,24 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	
 	public static class SchemaNodeData extends BasicTreeModel.SimpleNodeData {
 		
+		private SurveySummary survey;
 		private SurveyObject surveyObject;
 		
 		protected SchemaNodeData(SurveyObject surveyObject, boolean root, boolean detached, String labelLanguage) {
-			this(surveyObject, getLabel(surveyObject, root, detached, labelLanguage), root, detached);
+			this(SurveySummary.createFromSurvey(surveyObject.getSurvey()), surveyObject, root, detached, labelLanguage);
+		}
+		
+		protected SchemaNodeData(SurveySummary survey, SurveyObject surveyObject, boolean root, boolean detached, String labelLanguage) {
+			this(survey, surveyObject, getLabel(surveyObject, root, detached, labelLanguage), root, detached);
 		}
 
 		protected SchemaNodeData(SurveyObject surveyObject, String label, boolean root, boolean detached) {
+			this(SurveySummary.createFromSurvey(surveyObject.getSurvey()), surveyObject, label, root, detached);
+		}
+		
+		protected SchemaNodeData(SurveySummary survey, SurveyObject surveyObject, String label, boolean root, boolean detached) {
 			super(label, root, detached);
+			this.survey = survey;
 			this.surveyObject = surveyObject;
 		}
 
@@ -231,6 +276,10 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 				result = "NEW TAB";
 			}
 			return result;
+		}
+		
+		public SurveySummary getSurvey() {
+			return survey;
 		}
 		
 		public SurveyObject getSurveyObject() {
@@ -277,13 +326,13 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 			this.disabled = false;
 		}
 		
-		SchemaTreeNode(SchemaNodeData data, Collection<AbstractNode<SchemaNodeData>> children) {
+		SchemaTreeNode(SchemaNodeData data, Collection<SchemaTreeNode> children) {
 			super(data, children);
 			this.disabled = false;
 		}
 		
 		public void markAsDetached() {
-			SimpleNodeData data = getData();
+			SchemaNodeData data = getData();
 			data.setDetached(true);
 //			data.setLabel(SchemaTreeNodeData.getDetachedLabel(nodeDefinition, root));
 		}
@@ -291,7 +340,8 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 		@Override
 		public String getIcon() {
 			SchemaNodeData data = getData();
-			return SchemaVM.getIcon(data);
+			SurveyObject surveyObject = data.getSurveyObject();
+			return surveyObject == null ? null : SchemaVM.getIcon(surveyObject);
 		}
 		
 		public int getIndexInModel() {

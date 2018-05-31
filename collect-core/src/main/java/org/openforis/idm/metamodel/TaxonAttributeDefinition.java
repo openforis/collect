@@ -68,8 +68,8 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 
-	TaxonAttributeDefinition(TaxonAttributeDefinition obj, int id) {
-		super(obj, id);
+	TaxonAttributeDefinition(Survey survey, TaxonAttributeDefinition obj, int id) {
+		super(survey, obj, id);
 		this.taxonomy = obj.taxonomy;
 		this.highestTaxonRank = obj.highestTaxonRank;
 	}
