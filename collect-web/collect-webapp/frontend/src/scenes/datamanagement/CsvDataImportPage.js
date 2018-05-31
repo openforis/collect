@@ -251,7 +251,9 @@ class CsvDataImportPage extends Component {
                         <DialogContent>
                             <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors.csv'}>
                                 <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
-                                <TableHeaderColumn dataField="fileName" width="200">{L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
+                                {this.state.importType === 'multipleFiles' &&
+                                    <TableHeaderColumn dataField="fileName" width="200">{L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
+                                }
                                 <TableHeaderColumn dataField="row" width="80">{L.l('dataManagement.csvDataImport.row')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="columns" width="150">{L.l('dataManagement.csvDataImport.columns')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="errorType" width="160" dataFormat={formatErrorType}>{L.l('dataManagement.csvDataImport.error-type')}</TableHeaderColumn>
