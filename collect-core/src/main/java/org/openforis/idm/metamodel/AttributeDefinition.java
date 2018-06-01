@@ -51,6 +51,9 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		this.calculated = attrDef.calculated;
 		this.checks = Objects.clone(attrDef.checks);
 		this.attributeDefaults = Objects.clone(attrDef.attributeDefaults);
+		if (survey == attrDef.getSurvey()) {
+			this.setReferencedAttribute(attrDef.getReferencedAttribute());
+		}
 	}
 	
 	@Override
