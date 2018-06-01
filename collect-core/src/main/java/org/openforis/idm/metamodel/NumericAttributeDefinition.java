@@ -37,10 +37,10 @@ public abstract class NumericAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 
-	protected NumericAttributeDefinition(Survey survey, NumericAttributeDefinition obj, int id) {
-		super(survey, obj, id);
-		this.type = obj.type;
-		this.precisionDefinitions = Objects.clone(obj.precisionDefinitions);
+	protected NumericAttributeDefinition(Survey survey, NumericAttributeDefinition source, int id) {
+		super(survey, source, id);
+		this.type = source.type;
+		this.precisionDefinitions = Objects.clone(source.precisionDefinitions);
 	}
 
 	public Type getType() {

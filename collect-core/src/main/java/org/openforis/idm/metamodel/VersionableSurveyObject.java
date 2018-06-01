@@ -17,11 +17,11 @@ public abstract class VersionableSurveyObject extends IdentifiableSurveyObject<V
 		super(survey, id);
 	}
 
-	protected VersionableSurveyObject(Survey survey, VersionableSurveyObject object, int id) {
-		super(survey, object, id);
-		if (survey == object.getSurvey()) {
-			this.sinceVersion = object.sinceVersion;
-			this.deprecatedVersion = object.deprecatedVersion;
+	protected VersionableSurveyObject(Survey survey, VersionableSurveyObject source, int id) {
+		super(survey, source, id);
+		if (survey == source.getSurvey()) {
+			this.sinceVersion = source.sinceVersion;
+			this.deprecatedVersion = source.deprecatedVersion;
 		}
 	}
 	

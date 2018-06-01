@@ -49,13 +49,13 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 		this.allowValuesSorting = false;
 	}
 	
-	CodeAttributeDefinition(Survey survey, CodeAttributeDefinition obj, int id) {
-		super(survey, obj, id);
-		this.allowUnlisted = obj.allowUnlisted;
-		this.allowValuesSorting = obj.allowValuesSorting;
-		if (survey == obj.getSurvey()) {
-			this.list = obj.list;
-			this.parentCodeAttributeDefinition = obj.parentCodeAttributeDefinition;
+	CodeAttributeDefinition(Survey survey, CodeAttributeDefinition source, int id) {
+		super(survey, source, id);
+		this.allowUnlisted = source.allowUnlisted;
+		this.allowValuesSorting = source.allowValuesSorting;
+		if (survey == source.getSurvey()) {
+			this.list = source.list;
+			this.parentCodeAttributeDefinition = source.parentCodeAttributeDefinition;
 		}
 	}
 	

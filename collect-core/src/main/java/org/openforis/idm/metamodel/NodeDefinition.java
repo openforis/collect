@@ -51,16 +51,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		super(survey, id);
 	}
 
-	NodeDefinition(Survey survey, NodeDefinition nodeDef, int id) {
-		super(survey, nodeDef, id);
-		this.name = nodeDef.name;
-		this.relevantExpression = nodeDef.relevantExpression;
-		this.multiple = nodeDef.multiple;
-		setMinCountExpression(nodeDef.minCountExpression);
-		setMaxCountExpression(nodeDef.maxCountExpression);
-		this.labels = nodeDef.labels == null ? null: new NodeLabelMap(nodeDef.labels);
-		this.prompts = nodeDef.prompts == null ? null: new PromptMap(nodeDef.prompts);
-		this.descriptions = nodeDef.descriptions == null ? null: new LanguageSpecificTextMap(nodeDef.descriptions);
+	NodeDefinition(Survey survey, NodeDefinition source, int id) {
+		super(survey, source, id);
+		this.name = source.name;
+		this.relevantExpression = source.relevantExpression;
+		this.multiple = source.multiple;
+		setMinCountExpression(source.minCountExpression);
+		setMaxCountExpression(source.maxCountExpression);
+		this.labels = source.labels == null ? null: new NodeLabelMap(source.labels);
+		this.prompts = source.prompts == null ? null: new PromptMap(source.prompts);
+		this.descriptions = source.descriptions == null ? null: new LanguageSpecificTextMap(source.descriptions);
 	}
 	
 	public abstract Node<?> createNode();

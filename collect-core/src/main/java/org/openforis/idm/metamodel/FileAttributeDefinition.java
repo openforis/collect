@@ -35,10 +35,10 @@ public class FileAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 	
-	FileAttributeDefinition(Survey survey, FileAttributeDefinition obj, int id) {
-		super(survey, obj, id);
-		this.maxSize = obj.maxSize;
-		this.extensions = CollectionUtils.clone(obj.extensions);
+	FileAttributeDefinition(Survey survey, FileAttributeDefinition source, int id) {
+		super(survey, source, id);
+		this.maxSize = source.maxSize;
+		this.extensions = CollectionUtils.clone(source.extensions);
 	}
 	
 	public Integer getMaxSize() {

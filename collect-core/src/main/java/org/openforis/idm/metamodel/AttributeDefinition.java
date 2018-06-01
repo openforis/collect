@@ -45,14 +45,14 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		this.calculated = false;
 	}
 
-	AttributeDefinition(Survey survey, AttributeDefinition attrDef, int id) {
-		super(survey, attrDef, id);
-		this.key = attrDef.key;
-		this.calculated = attrDef.calculated;
-		this.checks = Objects.clone(attrDef.checks);
-		this.attributeDefaults = Objects.clone(attrDef.attributeDefaults);
-		if (survey == attrDef.getSurvey()) {
-			this.setReferencedAttribute(attrDef.getReferencedAttribute());
+	AttributeDefinition(Survey survey, AttributeDefinition source, int id) {
+		super(survey, source, id);
+		this.key = source.key;
+		this.calculated = source.calculated;
+		this.checks = Objects.clone(source.checks);
+		this.attributeDefaults = Objects.clone(source.attributeDefaults);
+		if (survey == source.getSurvey()) {
+			this.setReferencedAttribute(source.getReferencedAttribute());
 		}
 	}
 	
