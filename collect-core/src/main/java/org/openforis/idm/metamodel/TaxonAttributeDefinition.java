@@ -68,10 +68,12 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 
-	TaxonAttributeDefinition(Survey survey, TaxonAttributeDefinition obj, int id) {
-		super(survey, obj, id);
-		this.taxonomy = obj.taxonomy;
-		this.highestTaxonRank = obj.highestTaxonRank;
+	TaxonAttributeDefinition(Survey survey, TaxonAttributeDefinition source, int id) {
+		super(survey, source, id);
+		this.highestTaxonRank = source.highestTaxonRank;
+		if (survey == source.getSurvey()) {
+			this.taxonomy = source.taxonomy;
+		}
 	}
 	
 	@Override
