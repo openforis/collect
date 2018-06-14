@@ -209,6 +209,7 @@ public class SurveyDao extends JooqDaoSupport {
 				.fetch();
 		for (Record row : results) {
 			CollectSurvey survey = processSurveyRow(row);
+			survey.setPublished(true);
 			survey.setAvailability(PUBLISHED);
 			surveys.add(survey);
 		}
