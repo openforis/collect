@@ -114,6 +114,7 @@ public class CollectEarthGridTemplateGenerator  {
 			
 			if (csvReader.size() == 1) {
 				headersFound = true;
+				csvReader.setHeadersRead( true );
 			}else{			
 				
 				try {
