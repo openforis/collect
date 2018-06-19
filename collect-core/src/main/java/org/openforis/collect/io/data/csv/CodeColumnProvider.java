@@ -88,9 +88,11 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 		List<String> headings = new ArrayList<String>();
 		for (CodeListItem item : expandedItems) {
 			String heading = ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + item.getCode();
-			headings.add(heading);
-			if (item.isQualifiable()) {
-				headings.add(heading + getConfig().getFieldHeadingSeparator() + CodeAttributeDefinition.QUALIFIER_FIELD);
+			if (! headings.contains(heading)) {
+				headings.add(heading);
+				if (item.isQualifiable()) {
+					headings.add(heading + getConfig().getFieldHeadingSeparator() + CodeAttributeDefinition.QUALIFIER_FIELD);
+				}
 			}
 		}
 		return headings;
