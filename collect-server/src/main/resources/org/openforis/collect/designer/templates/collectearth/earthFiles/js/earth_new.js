@@ -26,44 +26,7 @@ var currentStepIndex = null;
 var ajaxTimeout = null;
 var consoleBox = null;
 
-$(function() {
-	if (DEBUG) {
-		initLogConsole();
-		log("initializing");
-		log("using host: " + HOST);
-	}
-	$form = $("#formAll");
-	$stepsContainer = $(".steps");
 
-	initSteps();
-	fillYears();
-	initCodeButtonGroups();
-	initDateTimePickers();
-	initBooleanButtons();
-	initializeChangeEventSaver();
-	// Declares the Jquery Dialog ( The Bootstrap dialog does
-	// not work in Google Earth )
-	$("#dialogSuccess").dialog({
-		modal : true,
-		width : "400",
-		autoOpen : false,
-		buttons : {
-			Ok : function() {
-				$(this).dialog("close");
-			}
-		}
-	});
-	// SAVING DATA WHEN USER SUBMITS
-	$form.submit(function(e) {
-		e.preventDefault();
-		
-		submitData();
-	});
-
-	$(".code-item").tooltip();
-
-	loadPlacemarkData();
-});
 
 var submitData = function() {
 	sendDataUpdateRequest(findById(ACTIVELY_SAVED_FIELD_ID), true, true);
@@ -1016,3 +979,42 @@ var parseInteger = function(str, defaultValue) {
 		}
 	}
 };
+
+$(function() {
+	if (DEBUG) {
+		initLogConsole();
+		log("initializing");
+		log("using host: " + HOST);
+	}
+	$form = $("#formAll");
+	$stepsContainer = $(".steps");
+
+	initSteps();
+	fillYears();
+	initCodeButtonGroups();
+	initDateTimePickers();
+	initBooleanButtons();
+	initializeChangeEventSaver();
+	// Declares the Jquery Dialog ( The Bootstrap dialog does
+	// not work in Google Earth )
+	$("#dialogSuccess").dialog({
+		modal : true,
+		width : "400",
+		autoOpen : false,
+		buttons : {
+			Ok : function() {
+				$(this).dialog("close");
+			}
+		}
+	});
+	// SAVING DATA WHEN USER SUBMITS
+	$form.submit(function(e) {
+		e.preventDefault();
+		
+		submitData();
+	});
+
+	$(".code-item").tooltip();
+
+	loadPlacemarkData();
+});

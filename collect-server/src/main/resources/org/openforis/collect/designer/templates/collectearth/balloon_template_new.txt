@@ -3,7 +3,37 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+	<link href="earthFiles/jquery/jquery-ui.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/jquery/jquery.selectBoxIt.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/jquery/jquery-steps.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/bootstrap/bootstrap.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/bootstrap/bootstrap-datetimepicker.min.css?v=$[randomNumber]" rel="stylesheet"  />
+	
+	<link href="earthFiles/css/earth.css?v=$[randomNumber]" rel="stylesheet" />
+	<!--
+	
+		Handle the fonts for different languages that don't have their own glyphs opn the standard interface
+		Right now we only have Lao
+		
+		The TTF file needs to be loaded through the same URL than the balloon to avoid cross referencing issues
+		Use the two character code of the language as the name of the font  
+	-->
+	<style  type="text/css">
+	        @font-face {
+		      font-family: 'lo'; 
+			  src: url('$[host]generated/earthFiles/fonts/Phetsarath_OT.ttf');
+			}
+			
+			@font-face {
+		      font-family: 'mn'; 
+			  src: url('$[host]generated/earthFiles/fonts/arhangai.ttf');
+			}
+		
+			body {
+				font-family: "PLACEHOLDER_UI_LANGUAGE","Trebuchet MS", "Helvetica", "Arial", "Verdana",
+					"sans-serif";
+			}
+	</style>
 	<script type="text/javascript">
 	/**
 	 * 
@@ -76,8 +106,8 @@
     
 	</script>
 	
-	<script src="earthFiles/jquery/jquery.js?v=$[randomNumber]"></script>
-	<script src="earthFiles/jquery/jquery-ui.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/jquery/jquery-3.3.1.min.js?v=$[randomNumber]"></script>
+	<script src="earthFiles/jquery/jquery-ui-1.12.1.min.js?v=$[randomNumber]"></script>
 	<script src="earthFiles/jquery/jquery.blockUI.js?v=$[randomNumber]"></script>
 	<script src="earthFiles/jquery/jquery.selectBoxIt.min.js?v=$[randomNumber]"></script>
 	<script src="earthFiles/jquery/jquery.steps.openforis.js?v=$[randomNumber]"></script>
@@ -93,32 +123,7 @@
 	
 	<script src="earthFiles/js/earth_new.js?v=$[randomNumber]"></script>
 	
-	<link href="earthFiles/jquery/jquery-ui.css?v=$[randomNumber]" rel="stylesheet" />
-	<link href="earthFiles/jquery/jquery.selectBoxIt.css?v=$[randomNumber]" rel="stylesheet" />
-	<link href="earthFiles/jquery/jquery-steps.css?v=$[randomNumber]" rel="stylesheet" />
-	<link href="earthFiles/bootstrap/bootstrap.css?v=$[randomNumber]" rel="stylesheet" />
-	<link href="earthFiles/bootstrap/bootstrap-datetimepicker.min.css?v=$[randomNumber]" rel="stylesheet"  />
-	
-	<link href="earthFiles/css/earth.css?v=$[randomNumber]" rel="stylesheet" />
-	<!--
-	
-		Handle the fonts for different languages that don't have their own glyphs opn the standard interface
-		Right now we only have Lao
-		
-		The TTF file needs to be loaded through the same URL than the balloon to avoid cross referencing issues
-		Use the two character code of the language as the name of the font  
-	-->
-	<style  type="text/css">
-	        @font-face {
-		      font-family: 'lo'; 
-			  src: url('$[host]generated/earthFiles/fonts/Phetsarath_OT.ttf');
-			}
-		
-			body {
-				font-family: "PLACEHOLDER_UI_LANGUAGE","Trebuchet MS", "Helvetica", "Arial", "Verdana",
-					"sans-serif";
-			}
-	</style>
+
 </head>
 
 <body>
@@ -180,6 +185,14 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 			</form>
 		</div>
 	</div>
-	<iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/ancillaryWindows?PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST" height="0" width="0"></iframe>
 </body>
+
+<script>
+	$.ajax({
+	  url: "http://127.0.0.1:$[local_port]/earth/ancillaryWindows?id=PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST",
+	  async : 'true'
+	  
+	});
+</script>
+
 </html>
