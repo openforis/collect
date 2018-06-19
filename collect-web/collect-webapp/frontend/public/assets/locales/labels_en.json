@@ -145,7 +145,8 @@
         "export": {
             "label": "Export",
             "toCsv": "to CSV/Excel",
-            "toCollectFormat": "to Collect/Calc format"
+            "toCollectFormat": "to Collect/Calc format",
+            "notCompatibleWithCSVDataImportNote": "Not compatible with CSV data import"
         },
         "import": {
             "label": "Import",

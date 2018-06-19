@@ -188,10 +188,10 @@ class CsvDataExportPage extends Component {
                                                 </Label>
                                             </FormGroup>
                                             <FormGroup row>
-                                                <Col sm={6}>
+                                                <Col md={6}>
                                                     <Label for="headingsSourceSelect">Source for file headings:</Label>
                                                 </Col>
-                                                <Col sm={6}>
+                                                <Col md={6}>
                                                     <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
                                                         onChange={e => this.setState({headingSource: e.target.value})}>
                                                         <option value="ATTRIBUTE_NAME">Attribute name</option>
@@ -201,6 +201,11 @@ class CsvDataExportPage extends Component {
                                                 </Col>
                                             </FormGroup>
                                             {additionalOptionsFormGroups}
+                                            <FormGroup row>
+                                                <Col md={12}>
+                                                    <Label>* = {L.l('dataManagement.export.notCompatibleWithCSVDataImportNote')}</Label>
+                                                </Col>
+                                            </FormGroup>
                                         </div>
                                     </ExpansionPanelDetails>
                                 </ExpansionPanel>
