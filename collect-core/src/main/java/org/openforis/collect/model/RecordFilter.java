@@ -29,6 +29,7 @@ public class RecordFilter {
 	private Step step;
 	private Step stepGreaterOrEqual;
 	private Date modifiedSince;
+	private Date modifiedUntil;
 	private List<String> keyValues;
 	private List<String> qualifiers;
 	private List<String> summaryValues;
@@ -142,6 +143,14 @@ public class RecordFilter {
 	
 	public void setModifiedSince(Date modifiedSince) {
 		this.modifiedSince = modifiedSince;
+	}
+	
+	public Date getModifiedUntil() {
+		return modifiedUntil;
+	}
+	
+	public void setModifiedUntil(Date modifiedUntil) {
+		this.modifiedUntil = modifiedUntil;
 	}
 	
 	public List<Integer> getOwnerIds() {

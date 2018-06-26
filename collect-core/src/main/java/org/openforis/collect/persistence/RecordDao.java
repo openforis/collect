@@ -358,6 +358,10 @@ public class RecordDao extends JooqDaoSupport {
 		if ( filter.getModifiedSince() != null ) {
 			q.addConditions(OFC_RECORD.DATE_MODIFIED.greaterOrEqual(new Timestamp(filter.getModifiedSince().getTime())));
 		}
+		//modified until
+		if ( filter.getModifiedUntil() != null ) {
+			q.addConditions(OFC_RECORD.DATE_MODIFIED.lessOrEqual(new Timestamp(filter.getModifiedUntil().getTime())));
+		}
 		//owners
 		if ( filter.getOwnerIds() != null && !filter.getOwnerIds().isEmpty() ) {
 			q.addConditions(OFC_RECORD.OWNER_ID.in(filter.getOwnerIds()));

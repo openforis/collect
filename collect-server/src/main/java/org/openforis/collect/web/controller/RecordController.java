@@ -229,7 +229,8 @@ public class RecordController extends BasicController implements Serializable {
 		result.put("count", count);
 		
 		if (params.isIncludeOwners()) {
-			Set<User> owners = recordManager.loadDistinctOwners(createRecordFilter(survey, user, userGroupManager, rootEntityDefinition.getId(), false));
+			Set<User> owners = recordManager.loadDistinctOwners(createRecordFilter(survey, user, userGroupManager, 
+					rootEntityDefinition.getId(), false));
 			Set<BasicUserProxy> ownerProxies = Proxies.fromSet(owners, BasicUserProxy.class);
 			result.put("owners", ownerProxies);
 		}
@@ -448,7 +449,8 @@ public class RecordController extends BasicController implements Serializable {
 		if (accessControlManager.canEdit(sessionManager.getLoggedUser(), record)) {
 			CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
 			CSVDataExportParameters parameters = new CSVDataExportParameters();
-			RecordFilter recordFilter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager, null, false);
+			RecordFilter recordFilter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager, 
+					null, false);
 			recordFilter.setRecordId(recordId);
 			recordFilter.setStepGreaterOrEqual(Step.valueOf(stepNumber));
 			parameters.setRecordFilter(recordFilter);
@@ -830,9 +832,14 @@ public class RecordController extends BasicController implements Serializable {
 			this.rootEntityKeyValues = rootEntityKeyValues;
 		}
 	}
-	
+
 	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager, 
 			Integer rootEntityId, boolean onlyOwnedRecords) {
+		return createRecordFilter(survey, user, userGroupManager, rootEntityId, onlyOwnedRecords, null, null);
+	}
+	
+	private static RecordFilter createRecordFilter(CollectSurvey survey, User user, UserGroupManager userGroupManager, 
+			Integer rootEntityId, boolean onlyOwnedRecords, Date modifiedSince, Date modifiedUntil) {
 		if (rootEntityId == null) {
 			rootEntityId = survey.getSchema().getFirstRootEntityDefinition().getId();
 		}
@@ -847,6 +854,8 @@ public class RecordController extends BasicController implements Serializable {
 				recordFilter.setQualifiersByName(qualifiers);
 			}
 		}
+		recordFilter.setModifiedSince(modifiedSince);
+		recordFilter.setModifiedUntil(modifiedUntil);
 		return recordFilter;
 	}
 	
@@ -873,10 +882,13 @@ public class RecordController extends BasicController implements Serializable {
 		private int maxExpandedCodeAttributeItems = 30;
 		private HeadingSource headingSource = HeadingSource.ATTRIBUTE_NAME;
 		private String languageCode = null;
+		private Date modifiedSince;
+		private Date modifiedUntil;
 		
 		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
 			CSVDataExportParameters result = new CSVDataExportParameters();
-			RecordFilter recordFilter = createRecordFilter(survey, user, userGroupManager, rootEntityId, exportOnlyOwnedRecords);
+			RecordFilter recordFilter = createRecordFilter(survey, user, userGroupManager, rootEntityId, exportOnlyOwnedRecords, 
+					modifiedSince, modifiedUntil);
 			recordFilter.setStepGreaterOrEqual(stepGreaterOrEqual);
 			result.setRecordFilter(recordFilter);
 			try {
@@ -1053,6 +1065,22 @@ public class RecordController extends BasicController implements Serializable {
 
 		public void setLanguageCode(String languageCode) {
 			this.languageCode = languageCode;
+		}
+		
+		public Date getModifiedSince() {
+			return modifiedSince;
+		}
+		
+		public void setModifiedSince(Date modifiedSince) {
+			this.modifiedSince = modifiedSince;
+		}
+		
+		public Date getModifiedUntil() {
+			return modifiedUntil;
+		}
+		
+		public void setModifiedUntil(Date modifiedUntil) {
+			this.modifiedUntil = modifiedUntil;
 		}
 	}
 }

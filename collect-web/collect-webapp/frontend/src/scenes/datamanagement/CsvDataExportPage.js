@@ -46,6 +46,8 @@ class CsvDataExportPage extends Component {
             this.state = {
                 exportFormat: null,
                 stepGreaterOrEqual: 'ENTRY',
+                modifiedSince: '',
+                modifiedUntil: '',
                 exportMode: 'ALL_ENTITIES',
                 selectedEntityDefinition: null,
                 entityId: null,
@@ -70,6 +72,8 @@ class CsvDataExportPage extends Component {
                 surveyId: survey.id,
                 rootEntityId: survey.schema.firstRootEntityDefinition.id,
                 stepGreaterOrEqual: this.state.stepGreaterOrEqual,
+                modifiedSince: this.state.modifiedSince,
+                modifiedUntil: this.state.modifiedUntil,
                 entityId: this.state.selectedEntityDefinition ? this.state.selectedEntityDefinition.id: null,
                 exportOnlyOwnedRecords: this.state.exportOnlyOwnedRecords,
                 headingSource: this.state.headingSource,
@@ -137,16 +141,16 @@ class CsvDataExportPage extends Component {
                         <FormGroup tag="fieldset">
                             <legend>Parameters</legend>
                             <FormGroup row>
-                                <Label for="stepSelect" sm={1}>Step:</Label>
-                                <Col sm={10}>
+                                <Label md={2} for="stepSelect">Step:</Label>
+                                <Col md={10}>
                                     <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
                                         value={this.state.stepGreaterOrEqual}
                                         onChange={e => this.setState({stepGreaterOrEqual: e.target.value})}>{stepsOptions}</Input>
                                 </Col>
                             </FormGroup>
                             <FormGroup row>
-                                <Label for="exportMode" sm={1}>Export mode:</Label>
-                                <Col sm={10}>
+                                <Label md={2} for="exportMode">Export mode:</Label>
+                                <Col md={10}>
                                     <FormGroup check>
                                         <Label check>
                                             <Input type="radio" value="ALL_ENTITIES" name="exportMode"
@@ -180,6 +184,20 @@ class CsvDataExportPage extends Component {
                                     </ExpansionPanelSummary>
                                     <ExpansionPanelDetails>
                                         <div>
+                                            <FormGroup row>
+                                                <Label md={3} for="modifiedSince">Modified since:</Label>
+                                                <Col md={4}>
+                                                    <Input type="date" name="modifiedSince" id="modifiedSince"
+                                                        value={this.state.modifiedSince}
+                                                        onChange={e => this.setState({modifiedSince: e.target.value})} />
+                                                </Col>
+                                                <Label md={1} for="modifiedUntil">until:</Label>
+                                                <Col md={4}>
+                                                    <Input type="date" name="modifiedUntil" id="modifiedUntil"
+                                                        value={this.state.modifiedUntil}
+                                                        onChange={e => this.setState({modifiedUntil: e.target.value})} />
+                                                </Col>
+                                            </FormGroup>
                                             <FormGroup check row>
                                                 <Label check>
                                                     <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
@@ -188,7 +206,7 @@ class CsvDataExportPage extends Component {
                                                 </Label>
                                             </FormGroup>
                                             <FormGroup row>
-                                                <Col md={6}>
+                                                <Col md={4}>
                                                     <Label for="headingsSourceSelect">Source for file headings:</Label>
                                                 </Col>
                                                 <Col md={6}>
