@@ -116,11 +116,15 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 		List<String> values = super.extractValues(axis);
 		if (hasExpandedItems) {
 			List<Node<?>> attributes = extractNodes(axis);
+			List<String> headings = new ArrayList<String>();
 			for (CodeListItem item : expandedItems) {
-				CodeAttribute attr = findAttributeByCode(attributes, item.getCode());
-				values.add(Boolean.valueOf(attr != null).toString());
-				if (item.isQualifiable()) {
-					values.add(attr == null ? "": attr.getValue().getQualifier());
+				String heading = ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + item.getCode();
+				if (! headings.contains(heading)) {
+					CodeAttribute attr = findAttributeByCode(attributes, item.getCode());
+					values.add(Boolean.valueOf(attr != null).toString());
+					if (item.isQualifiable()) {
+						values.add(attr == null ? "": attr.getValue().getQualifier());
+					}
 				}
 			}
 		}
