@@ -637,7 +637,7 @@ public class DataService {
 	}
 
 	private ProxyContext getProxyContext() {
-		if (proxyContext == null) {
+		if (proxyContext == null || !proxyContext.getLocale().equals(getCurrentLocale())) {
 			proxyContext = new ProxyContext(getCurrentLocale(), messageSource, surveyContext);
 		}
 		return proxyContext;
