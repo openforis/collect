@@ -178,4 +178,14 @@ export default class User extends Serializable {
     get canAccessBackupRestore() {
         return this.role === 'ADMIN'
     }
+
+    canFilterRecordsBySummaryAttribute(attr, surveyUserGroup) {
+        const userInGroup = this.findUserInGroupOrDescendants(surveyUserGroup)
+		const roleInGroup = userInGroup.role
+        const rootEntityDef = attr.rootEntity
+        const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
+        const prefix = 'summary_'
+        return ! isQualifier || roleInGroup === 'ADMINISTRATOR' || roleInGroup === 'OWNER'
+
+    }
 }

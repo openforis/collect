@@ -277,10 +277,8 @@ class RecordDataTable extends Component {
 		columns = columns.concat(keyAttributeColumns)
 
 		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => {
-			const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
-			const roleInGroup = userInGroup.role
 			const prefix = 'summary_'
-			const canFilterOrSort = ! isQualifier || roleInGroup === 'ADMINISTRATOR' || roleInGroup === 'OWNER'
+			const canFilterOrSort = loggedUser.canFilterRecordsBySummaryAttribute(attr, surveyUserGroup)
 			return <TableHeaderColumn key={prefix+i} dataSort={canFilterOrSort} dataField={prefix+i} 
 				dataFormat={shownInSummaryListFormatter} width="80"
 				filter={canFilterOrSort ? {type: 'TextFilter'} : null}

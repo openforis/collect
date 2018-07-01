@@ -119,6 +119,14 @@ export class NodeDefinition extends SurveyObject {
         this.survey = survey
         this.parent = parent
     }
+
+    get rootEntity() {
+        let currentParent = this.parent
+        while (currentParent.parent != null) {
+            currentParent = currentParent.parent
+        }
+        return currentParent
+    }
 }
 
 export class EntityDefinition extends NodeDefinition {

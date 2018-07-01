@@ -884,12 +884,16 @@ public class RecordController extends BasicController implements Serializable {
 		private String languageCode = null;
 		private Date modifiedSince;
 		private Date modifiedUntil;
+		private List<String> keyAttributeValues = new ArrayList<String>();
+		private List<String> summaryAttributeValues = new ArrayList<String>();
 		
 		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
 			CSVDataExportParameters result = new CSVDataExportParameters();
 			RecordFilter recordFilter = createRecordFilter(survey, user, userGroupManager, rootEntityId, exportOnlyOwnedRecords, 
 					modifiedSince, modifiedUntil);
 			recordFilter.setStepGreaterOrEqual(stepGreaterOrEqual);
+			recordFilter.setKeyValues(keyAttributeValues);
+			recordFilter.setSummaryValues(summaryAttributeValues);
 			result.setRecordFilter(recordFilter);
 			try {
 				PropertyUtils.copyProperties(result, this);
@@ -1081,6 +1085,22 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setModifiedUntil(Date modifiedUntil) {
 			this.modifiedUntil = modifiedUntil;
+		}
+		
+		public List<String> getKeyAttributeValues() {
+			return keyAttributeValues;
+		}
+		
+		public void setKeyAttributeValues(List<String> keyAttributeValues) {
+			this.keyAttributeValues = keyAttributeValues;
+		}
+		
+		public List<String> getSummaryAttributeValues() {
+			return summaryAttributeValues;
+		}
+		
+		public void setSummaryAttributeValues(List<String> summaryAttributeValues) {
+			this.summaryAttributeValues = summaryAttributeValues;
 		}
 	}
 }

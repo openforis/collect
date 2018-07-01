@@ -1,4 +1,7 @@
 {
+    "common": {
+        "parameters": "Parameters"
+    },
     "general": {
         "account": "Account",
         "cancel": "Cancel",
@@ -144,9 +147,34 @@
         },
         "export": {
             "label": "Export",
+            "additionalOptions": {
+                "label": "Additional options",
+                "includeKMLColumnForCoordinates": "Include KML column for coordinate attributes (for Fusion Tables)*",
+                "includeAllAncestorAttributes": "Include all ancestor attributes*",
+                "includeCompositeAttributeMergedColumn": "Include composite attributes merged column (e.g. date, time, coordinate)*",
+                "codeAttributeExpanded": "Expand code attributes (add boolean columns for each code value)*",
+                "includeCodeItemLabelColumn": "Include code item label column*"
+            },
+            "filter": "Filter",
+            "mode": {
+                "label": "Export mode",
+                "allEntities": "All entities",
+                "onlySelectedEntities": "Only selected entities"
+            },
+            "modifiedSince": "Modified since",
+            "modifiedUntil": "until",
+            "onlyOwnedRecords": "Export only owned records",
+            "notCompatibleWithCSVDataImportNote": "Not compatible with CSV data import",
+            "selectEntities": "Select entities to export",
+            "sourceForFileHeadings": {
+                "label": "Source for file headings",
+                "attributeName": "Attribute name",
+                "attributeLabel": "Attribute label",
+                "reportingLabel": "Reporting label (Saiku)"
+            },
+            "step": "Step",
             "toCsv": "to CSV/Excel",
-            "toCollectFormat": "to Collect/Calc format",
-            "notCompatibleWithCSVDataImportNote": "Not compatible with CSV data import"
+            "toCollectFormat": "to Collect/Calc format"
         },
         "import": {
             "label": "Import",

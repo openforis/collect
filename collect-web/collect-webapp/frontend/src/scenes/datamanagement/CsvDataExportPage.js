@@ -16,26 +16,11 @@ import Arrays from 'utils/Arrays'
 import L from 'utils/Labels';
 
 const csvExportAdditionalOptions = [
-    {
-        name: 'includeKMLColumnForCoordinates',
-        label: 'Include KML column for coordinate attributes (for Fusion Tables)*'
-    },
-    {
-        name: 'includeAllAncestorAttributes',
-        label: 'Include all ancestor attributes*'
-    },
-    {
-        name: 'includeCompositeAttributeMergedColumn',
-        label: 'Include composite attributes merged column (e.g. date, time, coordinate)*'
-    },
-    {
-        name: 'codeAttributeExpanded',
-        label: 'Expand code attributes (add boolean columns for each code value)*'
-    },
-    {
-        name: 'includeCodeItemLabelColumn',
-        label: 'Include code item label column*'
-    }
+    'includeKMLColumnForCoordinates', 
+    'includeAllAncestorAttributes',
+    'includeCompositeAttributeMergedColumn',
+    'codeAttributeExpanded',
+    'includeCodeItemLabelColumn'
 ]
 
 class CsvDataExportPage extends Component {
@@ -68,6 +53,13 @@ class CsvDataExportPage extends Component {
             const survey = this.props.survey
             const surveyId = survey.id
             
+            const rootEntityDef = survey.schema.firstRootEntityDefinition
+		    const keyAttributes = rootEntityDef.keyAttributeDefinitions
+            const summaryAttributes = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
+
+            const keyAttributeValues = keyAttributes.map((a, idx) => this.state['key'+ idx], this)
+            const summaryAttributeValues = summaryAttributes.map((a, idx) => this.state['summary'+ idx], this)
+
             const parameters = {
                 surveyId: survey.id,
                 rootEntityId: survey.schema.firstRootEntityDefinition.id,
@@ -77,11 +69,14 @@ class CsvDataExportPage extends Component {
                 entityId: this.state.selectedEntityDefinition ? this.state.selectedEntityDefinition.id: null,
                 exportOnlyOwnedRecords: this.state.exportOnlyOwnedRecords,
                 headingSource: this.state.headingSource,
-                alwaysGenerateZipFile: true
+                alwaysGenerateZipFile: true,
+                keyAttributeValues: keyAttributeValues,
+                summaryAttributeValues: summaryAttributeValues
             }
+
             csvExportAdditionalOptions.forEach(o => {
-                const val = this.state[o.name]
-                parameters[o.name] = Objects.isNullOrUndefined(val) ? null : val
+                const val = this.state[o]
+                parameters[o] = Objects.isNullOrUndefined(val) ? null : val
             })
             ServiceFactory.recordService.startCSVDataExport(surveyId, parameters).then(job => {
                 this.props.dispatch(JobActions.startJobMonitor({
@@ -116,32 +111,60 @@ class CsvDataExportPage extends Component {
         }
     
         render() {
-            if (!this.props.survey) {
+            const { survey, userGroups, loggedUser } = this.props
+            if (!survey) {
                 return <div>Select survey first</div>
             }
+            const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
+		   
             const additionalOptionsFormGroups = csvExportAdditionalOptions.map(o => {
-                return <FormGroup check key={o.name}>
+                return <FormGroup check key={o}>
                     <Label check>
                         <Input type="checkbox" onChange={event => {
                             const newProp = {}
-                            newProp[o.name] = event.target.checked
+                            newProp[o] = event.target.checked
                             this.setState(newProp)
                          }} />{' '}
-                        {o.label}
+                        {L.l('dataManagement.export.additionalOptions.' + o)}
                     </Label>
                 </FormGroup>
-            });
-    
+            })
+
             const steps = Workflow.STEPS
             const stepsOptions = Object.keys(steps).map(s => <option key={s} value={steps[s].code}>{steps[s].label}</option>)
             
+            const createAttributeFormGroup = function(context, attr, prefix, index) {
+                const name = prefix + index
+                const value = context.state[name]
+                return <FormGroup row key={name}>
+                    <Label md={4}>{attr.label}</Label>
+                    <Col md={8}>
+                        <Input name={name} value={value} onChange={e => {
+                            const newState = {}
+                            newState[name] = e.target.value
+                            context.setState(newState)
+                        }}/>
+                    </Col>
+                </FormGroup>
+            }
+
+            const rootEntityDef = survey.schema.firstRootEntityDefinition
+		    const keyAttributes = rootEntityDef.keyAttributeDefinitions
+            const summaryAttributes = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
+
+            const keyAttributeFormGroups = keyAttributes.map((attr, i) => createAttributeFormGroup(this, attr, 'key', i))
+
+            const filteredSummaryAttributes = summaryAttributes.filter(a => loggedUser.canFilterRecordsBySummaryAttribute(a, surveyUserGroup))
+
+            const summaryFormGroups = filteredSummaryAttributes.map((attr, i) => createAttributeFormGroup(this, attr, 'summary', i))
+
             return (
                 <Container>
                     <Form>
                         <FormGroup tag="fieldset">
-                            <legend>Parameters</legend>
+                            <legend>{L.l('common.parameters')}</legend>
                             <FormGroup row>
-                                <Label md={2} for="stepSelect">Step:</Label>
+                                <Label md={2} for="stepSelect">{L.l('dataManagement.export.step')}:</Label>
                                 <Col md={10}>
                                     <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
                                         value={this.state.stepGreaterOrEqual}
@@ -149,34 +172,68 @@ class CsvDataExportPage extends Component {
                                 </Col>
                             </FormGroup>
                             <FormGroup row>
-                                <Label md={2} for="exportMode">Export mode:</Label>
+                                <Label md={2} for="exportMode">{L.l('dataManagement.export.mode')}:</Label>
                                 <Col md={10}>
                                     <FormGroup check>
                                         <Label check>
                                             <Input type="radio" value="ALL_ENTITIES" name="exportMode"
                                                 checked={this.state.exportMode === 'ALL_ENTITIES'} 
                                                 onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
-                                            All entities
+                                            {L.l('dataManagement.export.mode.allEntities')}
                                         </Label>
                                         <span style={{display: 'inline-block', width: '40px'}}></span>
                                         <Label check>
                                             <Input type="radio" value="SELECTED_ENTITY" name="exportMode"
                                                 checked={this.state.exportMode === 'SELECTED_ENTITY'} 
                                                 onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
-                                            Only selected entities
+                                            {L.l('dataManagement.export.mode.onlySelectedEntities')}
                                         </Label>
                                     </FormGroup>
                                 </Col>
                             </FormGroup>
                             {this.state.exportMode === 'SELECTED_ENTITY' &&
                                 <FormGroup row>
-                                    <Label sm={1}>Select entities to export:</Label>
+                                    <Label sm={1}>{L.l('dataManagement.export.selectEntities')}:</Label>
                                     <Col sm={{size: 10 }}>
-                                        <SchemaTreeView survey={this.props.survey}
+                                        <SchemaTreeView survey={survey}
                                             handleNodeSelect={this.handleEntitySelect} />
                                     </Col>
                                 </FormGroup>
                             }
+                            <FormGroup row>
+                                <ExpansionPanel>
+                                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                                        <Typography>{L.l('dataManagement.export.filter')}</Typography>
+                                    </ExpansionPanelSummary>
+                                    <ExpansionPanelDetails>
+                                        <div>
+                                            <FormGroup check row>
+                                                <Label check>
+                                                    <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
+                                                        checked={this.state.exportOnlyOwnedRecords} />{' '}
+                                                    {L.l('dataManagement.export.onlyOwnedRecords')}
+                                                </Label>
+                                            </FormGroup>
+                                            <FormGroup row>
+                                                <Label md={3} for="modifiedSince">{L.l('dataManagement.export.modifiedSince')}:</Label>
+                                                <Col md={4}>
+                                                    <Input type="date" name="modifiedSince" id="modifiedSince"
+                                                        value={this.state.modifiedSince}
+                                                        onChange={e => this.setState({modifiedSince: e.target.value})} />
+                                                </Col>
+                                                <Label md={1} for="modifiedUntil">{L.l('dataManagement.export.modifiedUntil')}:</Label>
+                                                <Col md={4}>
+                                                    <Input type="date" name="modifiedUntil" id="modifiedUntil"
+                                                        value={this.state.modifiedUntil}
+                                                        onChange={e => this.setState({modifiedUntil: e.target.value})} />
+                                                </Col>
+                                            </FormGroup>
+                                            {keyAttributeFormGroups}
+                                            {summaryFormGroups}
+                                        </div>
+                                    </ExpansionPanelDetails>
+                                </ExpansionPanel>
+                            </FormGroup>
                             <FormGroup row>
                                 <ExpansionPanel>
                                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -185,36 +242,15 @@ class CsvDataExportPage extends Component {
                                     <ExpansionPanelDetails>
                                         <div>
                                             <FormGroup row>
-                                                <Label md={3} for="modifiedSince">Modified since:</Label>
-                                                <Col md={4}>
-                                                    <Input type="date" name="modifiedSince" id="modifiedSince"
-                                                        value={this.state.modifiedSince}
-                                                        onChange={e => this.setState({modifiedSince: e.target.value})} />
-                                                </Col>
-                                                <Label md={1} for="modifiedUntil">until:</Label>
-                                                <Col md={4}>
-                                                    <Input type="date" name="modifiedUntil" id="modifiedUntil"
-                                                        value={this.state.modifiedUntil}
-                                                        onChange={e => this.setState({modifiedUntil: e.target.value})} />
-                                                </Col>
-                                            </FormGroup>
-                                            <FormGroup check row>
-                                                <Label check>
-                                                    <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
-                                                        checked={this.state.exportOnlyOwnedRecords} />{' '}
-                                                    Export only owned records
-                                                </Label>
-                                            </FormGroup>
-                                            <FormGroup row>
-                                                <Col md={4}>
-                                                    <Label for="headingsSourceSelect">Source for file headings:</Label>
+                                                <Col md={6}>
+                                                    <Label for="headingsSourceSelect">{L.l('dataManagement.export.sourceForFileHeadings')}:</Label>
                                                 </Col>
                                                 <Col md={6}>
                                                     <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
                                                         onChange={e => this.setState({headingSource: e.target.value})}>
-                                                        <option value="ATTRIBUTE_NAME">Attribute name</option>
-                                                        <option value="INSTANCE_LABEL">Attribute label</option>
-                                                        <option value="REPORTING_LABEL">Reporting label (Saiku)</option>
+                                                        <option value="ATTRIBUTE_NAME">{L.l('dataManagement.export.sourceForFileHeadings.attributeName')}</option>
+                                                        <option value="INSTANCE_LABEL">{L.l('dataManagement.export.sourceForFileHeadings.attributeLabel')}</option>
+                                                        <option value="REPORTING_LABEL">{L.l('dataManagement.export.sourceForFileHeadings.reportingLabel')}</option>
                                                     </Input>
                                                 </Col>
                                             </FormGroup>
@@ -231,7 +267,7 @@ class CsvDataExportPage extends Component {
                         </FormGroup>
                         <Row>
                             <Col sm={{ size: 'auto', offset: 5 }}>
-                                <Button onClick={this.handleExportButtonClick} className="btn btn-success">Export</Button>
+                                <Button onClick={this.handleExportButtonClick} className="btn btn-success">{L.l('dataManagement.export')}</Button>
                             </Col>
                         </Row>
                     </Form>
@@ -243,9 +279,11 @@ class CsvDataExportPage extends Component {
     
     
     const mapStateToProps = state => {
-        const { survey } = state.preferredSurvey
-    
-        return { survey: survey }
+        return {
+            survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
+            userGroups: state.userGroups ? state.userGroups.items : null,
+            loggedUser: state.session ? state.session.loggedUser : null
+        }
     }
     
     export default connect(mapStateToProps)(CsvDataExportPage);
