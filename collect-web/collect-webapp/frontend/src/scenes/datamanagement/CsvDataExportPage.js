@@ -29,7 +29,7 @@ class CsvDataExportPage extends Component {
             super(props)
     
             this.state = {
-                exportFormat: null,
+                outputFormat: "CSV",
                 stepGreaterOrEqual: 'ENTRY',
                 modifiedSince: '',
                 modifiedUntil: '',
@@ -63,6 +63,7 @@ class CsvDataExportPage extends Component {
             const parameters = {
                 surveyId: survey.id,
                 rootEntityId: survey.schema.firstRootEntityDefinition.id,
+                outputFormat: this.state.outputFormat,
                 stepGreaterOrEqual: this.state.stepGreaterOrEqual,
                 modifiedSince: this.state.modifiedSince,
                 modifiedUntil: this.state.modifiedUntil,
@@ -81,8 +82,8 @@ class CsvDataExportPage extends Component {
             ServiceFactory.recordService.startCSVDataExport(surveyId, parameters).then(job => {
                 this.props.dispatch(JobActions.startJobMonitor({
                     jobId: job.id, 
-                    title: 'Exporting data',
-                    okButtonLabel: 'Download CSV file',                        
+                    title: L.l('dataManagement.export.exportDialog.title'),
+                    okButtonLabel: L.l('dataManagement.export.exportDialog.downloadExportedFile'),                        
                     handleOkButtonClick: this.handleCsvDataExportModalOkButtonClick
                 }))
             })
@@ -163,6 +164,26 @@ class CsvDataExportPage extends Component {
                     <Form>
                         <FormGroup tag="fieldset">
                             <legend>{L.l('common.parameters')}</legend>
+                            <FormGroup row>
+                                <Label md={2} for="outputFormat">{L.l('dataManagement.export.outputFormat')}:</Label>
+                                <Col md={10}>
+                                    <FormGroup check>
+                                        <Label check>
+                                            <Input type="radio" value="CSV" name="outputFormat"
+                                                checked={this.state.outputFormat === 'CSV'} 
+                                                onChange={(event) => this.setState({...this.state, outputFormat: event.target.value})} />
+                                            {L.l('dataManagement.export.outputFormat.csv')}
+                                        </Label>
+                                        <span style={{display: 'inline-block', width: '40px'}}></span>
+                                        <Label check>
+                                            <Input type="radio" value="XLSX" name="outputFormat"
+                                                checked={this.state.outputFormat === 'XLSX'} 
+                                                onChange={(event) => this.setState({...this.state, outputFormat: event.target.value})} />
+                                            {L.l('dataManagement.export.outputFormat.xlsx')}
+                                        </Label>
+                                    </FormGroup>
+                                </Col>
+                            </FormGroup>
                             <FormGroup row>
                                 <Label md={2} for="stepSelect">{L.l('dataManagement.export.step')}:</Label>
                                 <Col md={10}>

@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,7 +28,6 @@ import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
@@ -141,13 +138,12 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 //	}
 
 	private void exportData(OutputStream outputStream, int entityDefId) throws InvalidExpressionException, IOException, RecordPersistenceException {
-		Writer outputWriter = new OutputStreamWriter(outputStream, OpenForisIOUtils.UTF_8);
 		CSVDataExportColumnProviderGenerator csvDataExportColumnProviderGenerator = new CSVDataExportColumnProviderGenerator(recordFilter.getSurvey(), configuration);
 		DataTransformation transform = csvDataExportColumnProviderGenerator.generateDataTransformation(entityDefId);
 		
 		@SuppressWarnings("resource")
 		//closing modelWriter will close referenced output stream
-		ModelCsvWriter modelWriter = new ModelCsvWriter(outputWriter, transform);
+		ModelCsvWriter modelWriter = new ModelCsvWriter(outputStream, transform);
 		modelWriter.printColumnHeadings();
 		
 		CollectSurvey survey = recordFilter.getSurvey();

@@ -1,17 +1,17 @@
 package org.openforis.collect.io.data;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -20,15 +20,17 @@ import java.util.zip.ZipOutputStream;
 import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters.OutputFormat;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
+import org.openforis.collect.io.data.csv.ModelExcelWriter;
+import org.openforis.collect.io.data.csv.ModelWriter;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -114,7 +116,7 @@ public class CSVDataExportJob extends SurveyLockingJob {
 				} else {
 					//export entities into a zip file containing different csv files
 					zipOS = new ZipOutputStream(bufferedOutputStream);
-					EntryNameGenerator entryNameGenerator = new EntryNameGenerator();
+					EntryNameGenerator entryNameGenerator = new EntryNameGenerator(parameters.getOutputFormat());
 					for (EntityDefinition entity : entities) {
 						if (isRunning()) {
 							String entryName = entryNameGenerator.generateEntryName(entity);
@@ -132,14 +134,21 @@ public class CSVDataExportJob extends SurveyLockingJob {
 		}
 		
 		private void exportData(OutputStream outputStream, int entityDefId) throws InvalidExpressionException, IOException, RecordPersistenceException {
-			Writer outputWriter = new OutputStreamWriter(outputStream, OpenForisIOUtils.UTF_8);
 			RecordFilter recordFilter = parameters.getRecordFilter();
 			CSVDataExportColumnProviderGenerator csvDataExportColumnProviderGenerator = new CSVDataExportColumnProviderGenerator(recordFilter.getSurvey(), parameters);
 			DataTransformation transform = csvDataExportColumnProviderGenerator.generateDataTransformation(entityDefId);
 			
-			@SuppressWarnings("resource")
-			//closing modelWriter will close referenced output stream
-			ModelCsvWriter modelWriter = new ModelCsvWriter(outputWriter, transform, parameters.getNodeFilter());
+			ByteArrayOutputStream tempOutputStream = null;
+			ModelWriter modelWriter;
+			switch(parameters.getOutputFormat()) {
+			case XLSX:
+				tempOutputStream = new ByteArrayOutputStream();
+				modelWriter = new ModelExcelWriter(tempOutputStream, transform, parameters.getNodeFilter());
+				break;
+			case CSV:
+			default:
+				modelWriter = new ModelCsvWriter(outputStream, transform, parameters.getNodeFilter());
+			}
 			modelWriter.printColumnHeadings();
 			
 			CollectSurvey survey = recordFilter.getSurvey();
@@ -153,7 +162,13 @@ public class CSVDataExportJob extends SurveyLockingJob {
 					break;
 				}
 			}
-			modelWriter.flush();
+			if (modelWriter instanceof ModelExcelWriter) {
+				modelWriter.close();
+				tempOutputStream.writeTo(outputStream);
+			} else {
+				//closing modelWriter will close referenced output stream
+				modelWriter.flush();
+			}
 		}
 		
 		private Collection<EntityDefinition> getEntitiesToExport() {
@@ -180,14 +195,20 @@ public class CSVDataExportJob extends SurveyLockingJob {
 	
 	public static class EntryNameGenerator {
 		
+		private OutputFormat outputFormat;
 		private Set<String> entryNames;
 		
-		public EntryNameGenerator() {
+		public EntryNameGenerator(OutputFormat outputFormat) {
+			this.outputFormat = outputFormat;
 			entryNames = new HashSet<String>();
 		}
 		
+		public String getEntryExtension() {
+			return outputFormat.name().toLowerCase(Locale.ENGLISH);
+		}
+		
 		public String generateEntryName(EntityDefinition entity) {
-			String name = entity.getName() + ".csv";
+			String name = entity.getName() + "." + getEntryExtension();
 			if ( entryNames.contains(name) ) {
 				name = entity.getParentEntityDefinition().getName() + "_" + name;
 			}

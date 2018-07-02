@@ -13,7 +13,9 @@ public class CSVDataExportParameters {
 	public enum HeadingSource {
 		ATTRIBUTE_NAME, INSTANCE_LABEL, REPORTING_LABEL;
 	}
-	
+	public enum OutputFormat {
+		CSV, XLSX
+	}
 	private RecordFilter recordFilter;
 	private NodeFilter nodeFilter;
 	private Integer entityId;
@@ -32,6 +34,7 @@ public class CSVDataExportParameters {
 	private int maxExpandedCodeAttributeItems = 30;
 	private HeadingSource headingSource = HeadingSource.ATTRIBUTE_NAME;
 	private String languageCode = null;
+	private OutputFormat outputFormat = OutputFormat.CSV;
 	
 	public RecordFilter getRecordFilter() {
 		return recordFilter;
@@ -180,5 +183,13 @@ public class CSVDataExportParameters {
 	
 	public void setIncludeGroupingLabels(boolean includeGroupingLabels) {
 		this.includeGroupingLabels = includeGroupingLabels;
+	}
+	
+	public OutputFormat getOutputFormat() {
+		return outputFormat;
+	}
+	
+	public void setOutputFormat(OutputFormat outputFormat) {
+		this.outputFormat = outputFormat;
 	}
 }

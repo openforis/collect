@@ -155,6 +155,10 @@
                 "codeAttributeExpanded": "Expand code attributes (add boolean columns for each code value)*",
                 "includeCodeItemLabelColumn": "Include code item label column*"
             },
+            "exportDialog": {
+                "title": "Exporting data",
+                "downloadExportedFile": "Download exported file"
+            },
             "filter": "Filter",
             "mode": {
                 "label": "Export mode",
@@ -164,6 +168,11 @@
             "modifiedSince": "Modified since",
             "modifiedUntil": "until",
             "onlyOwnedRecords": "Export only owned records",
+            "outputFormat": {
+                "label": "Output format",
+                "csv": "CSV",
+                "xlsx": "Excel (.xlsx)"
+            },
             "notCompatibleWithCSVDataImportNote": "Not compatible with CSV data import",
             "selectEntities": "Select entities to export",
             "sourceForFileHeadings": {

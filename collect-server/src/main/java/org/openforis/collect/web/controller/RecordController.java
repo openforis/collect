@@ -51,6 +51,7 @@ import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters.OutputFormat;
 import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 import org.openforis.collect.manager.MessageSource;
@@ -507,8 +508,10 @@ public class RecordController extends BasicController implements Serializable {
 		RecordFilter recordFilter = csvDataExportJob.getParameters().getRecordFilter();
 		CollectSurvey survey = recordFilter.getSurvey();
 		String surveyName = survey.getName();
+		String outputFormat = csvDataExportJob.getParameters().getOutputFormat().name().toLowerCase(Locale.ENGLISH);
+		String fileName = String.format("collect-%s-data-export-%s-%s.zip", outputFormat, surveyName, Dates.formatLocalDateTime(new Date()));
 		Controllers.writeFileToResponse(response, file, 
-				String.format("collect-csv-data-export-%s-%s.zip", surveyName, Dates.formatLocalDateTime(new Date())), 
+				fileName, 
 				Controllers.ZIP_CONTENT_TYPE);
 	}
 	
@@ -886,6 +889,7 @@ public class RecordController extends BasicController implements Serializable {
 		private Date modifiedUntil;
 		private List<String> keyAttributeValues = new ArrayList<String>();
 		private List<String> summaryAttributeValues = new ArrayList<String>();
+		private CSVDataExportParameters.OutputFormat outputFormat = OutputFormat.CSV;
 		
 		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
 			CSVDataExportParameters result = new CSVDataExportParameters();
@@ -1101,6 +1105,14 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setSummaryAttributeValues(List<String> summaryAttributeValues) {
 			this.summaryAttributeValues = summaryAttributeValues;
+		}
+		
+		public CSVDataExportParameters.OutputFormat getOutputFormat() {
+			return outputFormat;
+		}
+		
+		public void setOutputFormat(CSVDataExportParameters.OutputFormat outputFormat) {
+			this.outputFormat = outputFormat;
 		}
 	}
 }
