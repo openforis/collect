@@ -13,6 +13,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.CodeParentValidator;
@@ -77,7 +78,11 @@ public class CollectValidator extends Validator {
 			/*
 			 * if the attribute is not empty and 'reason blank' has not been specified than validate it
 			 */
-			if (!(attribute.isEmpty() || isReasonBlankAlwaysSpecified(attribute)) || shouldValidateEvenIfEmpty(attribute)) {
+			if (attribute.isEmpty() || isReasonBlankAlwaysSpecified(attribute)) {
+				if (shouldValidateAncestorsEvenIfEmpty(attribute)) {
+					validateAncestors(attribute, results);
+				}
+			} else {
 				validateAttributeValue(attribute, results);
 				if (!results.hasErrors()) {
 					validateAttributeChecks(attribute, results);
@@ -94,9 +99,9 @@ public class CollectValidator extends Validator {
 		return results;
 	}
 
-	private boolean shouldValidateEvenIfEmpty(Attribute<?, ?> attribute) {
+	private boolean shouldValidateAncestorsEvenIfEmpty(Attribute<?, ?> attribute) {
 		return attribute instanceof CodeAttribute 
-				&& attribute.getDefinition().getParentDefinition() != null;
+				&& ((CodeAttributeDefinition) attribute.getDefinition()).getParentCodeAttributeDefinition() != null;
 	}
 
 	private boolean validateSpecified(Attribute<?, ?> attribute,

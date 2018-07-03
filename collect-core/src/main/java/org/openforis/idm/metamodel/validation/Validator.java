@@ -108,6 +108,21 @@ public class Validator {
 		}
 	}
 
+	protected boolean validateAncestors(Attribute<?, ?> attribute, ValidationResults results) {
+		if (attribute instanceof CodeAttribute) {
+			CodeParentValidator parentValidator = getCodeParentValidator();
+			ValidationResultFlag validParent = parentValidator.evaluate((CodeAttribute) attribute);
+			if (validParent == ValidationResultFlag.OK ) {
+				return true;
+			} else {
+				results.addResult(parentValidator, ValidationResultFlag.WARNING);
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+
 	protected void validateAttributeValue(Attribute<?, ?> attribute, ValidationResults results) {
 		if (attribute instanceof CodeAttribute) {
 			validateCodeAttributeValue((CodeAttribute) attribute, results);
@@ -151,16 +166,11 @@ public class Validator {
 	}
 
 	private void validateCodeAttributeValue(CodeAttribute attribute, ValidationResults results) {
-		CodeParentValidator parentValidator = getCodeParentValidator();
-		ValidationResultFlag validParent = parentValidator.evaluate(attribute);
-		if (validParent == ValidationResultFlag.OK ) {
-			if (! attribute.isEmpty()) {
-				CodeValidator codeValidator = getCodeValidator();
-				ValidationResultFlag result = codeValidator.evaluate(attribute);
-				results.addResult(codeValidator, result);
-			}
-		} else {
-			results.addResult(parentValidator, ValidationResultFlag.WARNING);
+		boolean validAncestors = validateAncestors(attribute, results);
+		if (validAncestors && !attribute.isEmpty()) {
+			CodeValidator codeValidator = getCodeValidator();
+			ValidationResultFlag result = codeValidator.evaluate(attribute);
+			results.addResult(codeValidator, result);
 		}
 	}
 	
