@@ -27,6 +27,7 @@ import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
 import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
 import org.openforis.collect.io.data.DataLine.EntityPositionIdentifier;
 import org.openforis.collect.io.data.DataLine.FieldValueKey;
+import org.openforis.collect.io.data.csv.CSVDataExportParameters.OutputFormat;
 import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
@@ -101,7 +102,7 @@ public class CSVDataImportJob extends Job {
 			List<String> processedFileNames = new ArrayList<String>(fileNames);
 			
 			Map<String, EntityDefinition> entityDefinitionsByFileName = 
-					new CSVDataExportJob.EntryNameGenerator().generateMultipleEntitesEntryMap(input.survey);
+					new CSVDataExportJob.EntryNameGenerator(OutputFormat.CSV).generateMultipleEntitesEntryMap(input.survey);
 			for (Entry<String, EntityDefinition> entry : entityDefinitionsByFileName.entrySet()) {
 				String fileName = entry.getKey();
 				File file = new File(tempInputFilesFolder, fileName);
