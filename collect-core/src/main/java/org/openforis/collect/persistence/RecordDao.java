@@ -373,11 +373,11 @@ public class RecordDao extends JooqDaoSupport {
 		}
 		//qualifiers
 		if (CollectionUtils.isNotEmpty(filter.getQualifiers())) {
-			addFilterByFieldsConditions(q, RECORD_QUALIFIER_FIELDS, false, true, filter.getQualifiers());
+			addFilterByFieldsConditions(q, RECORD_QUALIFIER_FIELDS, false, false, filter.getQualifiers());
 		}
 		//summary values
 		if (CollectionUtils.isNotEmpty(filter.getSummaryValues())) {
-			addFilterByFieldsConditions(q, RECORD_SUMMARY_FIELDS, false, true, filter.getSummaryValues());
+			addFilterByFieldsConditions(q, RECORD_SUMMARY_FIELDS, false, false, filter.getSummaryValues());
 		}
 		
 		
