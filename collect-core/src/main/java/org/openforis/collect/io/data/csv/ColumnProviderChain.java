@@ -20,7 +20,7 @@ import org.openforis.idm.model.Node;
 public class ColumnProviderChain extends BasicColumnProvider {
 	private List<ColumnProvider> providers;
 	private String headingPrefix;
-	private List<String> headings;
+	private List<Column> columns;
 	protected EntityDefinition entityDefinition; //optional
 	
 	public ColumnProviderChain(CSVDataExportParameters config, List<ColumnProvider> providers) {
@@ -47,7 +47,7 @@ public class ColumnProviderChain extends BasicColumnProvider {
 		this.entityDefinition = entityDefinition;
 		this.providers = providers;
 		this.headingPrefix = headingPrefix;
-		this.headings = generateColumnHeadingsInternal();
+		this.columns = generateColumnsInternal();
 		
 		for (ColumnProvider p : providers) {
 			if (p instanceof BasicColumnProvider) {
@@ -61,8 +61,9 @@ public class ColumnProviderChain extends BasicColumnProvider {
 		return "";
 	}
 	
-	public List<String> getColumnHeadings() {
-		return headings;
+	@Override
+	public List<Column> getColumns() {
+		return columns;
 	}
 
 	public List<ColumnProvider> getColumnProviders() {
@@ -76,19 +77,19 @@ public class ColumnProviderChain extends BasicColumnProvider {
 		return headingPrefix;
 	}
 	
-	private List<String> generateColumnHeadingsInternal() {
-		ArrayList<String> h = new ArrayList<String>(); 
+	private List<Column> generateColumnsInternal() {
+		List<Column> result = new ArrayList<Column>(); 
 		for (ColumnProvider p : providers) {
-			List<String> columnHeadings = p.getColumnHeadings();
-			for (String heading : columnHeadings) {
-				h.add(getHeadingPrefix() + heading);
+			List<Column> columns = p.getColumns();
+			for (Column c : columns) {
+				result.add(new Column(getHeadingPrefix() + c.getHeader(), c.getDataType()));
 			}
 		}
-		return Collections.unmodifiableList(h);
+		return Collections.unmodifiableList(result);
 	}
 
-	public List<String> extractValues(Node<?> axis) {
-		ArrayList<String> v = new ArrayList<String>();
+	public List<Object> extractValues(Node<?> axis) {
+		List<Object> v = new ArrayList<Object>();
 		for (ColumnProvider p : providers) {
 			v.addAll(p.extractValues(axis));
 		}
@@ -107,8 +108,8 @@ public class ColumnProviderChain extends BasicColumnProvider {
 		}
 	}
 	
-	protected List<String> emptyValues() {
-		return Collections.nCopies(headings.size(), "");
+	protected List<Object> emptyValues() {
+		return Collections.nCopies(columns.size(), null);
 	}
 	
 	@Override

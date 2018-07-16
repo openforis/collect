@@ -24,6 +24,7 @@ import org.openforis.collect.io.data.DataLine.SingleEntityIdentifierDefinition;
 import org.openforis.collect.io.data.csv.BasicColumnProvider;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CodeColumnProvider;
+import org.openforis.collect.io.data.csv.Column;
 import org.openforis.collect.io.data.csv.ColumnProvider;
 import org.openforis.collect.io.data.csv.ColumnProviderChain;
 import org.openforis.collect.io.exception.ParsingException;
@@ -106,12 +107,11 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			columnProvider.traverseProviders(new Visitor<ColumnProvider>() {
 				public void visit(ColumnProvider p) {
 					if (! (p instanceof ColumnProviderChain) && p instanceof BasicColumnProvider) {
-						List<String> finalColumnHeadings = ((BasicColumnProvider) p).generateFinalColumnHeadings();
-						if (finalColumnHeadings.contains(colName)) {
-							if (p instanceof CodeColumnProvider &&
-									colName.endsWith(csvExportConfig.getFieldHeadingSeparator() + CodeColumnProvider.ITEM_LABEL_SUFFIX)) {
-								ignored.setTrue();
-							}
+						List<Column> finalColumns = ((BasicColumnProvider) p).generateFinalColumns();
+						if (finalColumns.contains(new Column(colName)) 
+								&& p instanceof CodeColumnProvider 
+								&& colName.endsWith(csvExportConfig.getFieldHeadingSeparator() + CodeColumnProvider.ITEM_LABEL_SUFFIX)) {
+							ignored.setTrue();
 						}
 					}
 				}

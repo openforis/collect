@@ -6,6 +6,7 @@ package org.openforis.collect.io.data.csv;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.Column.DataType;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CoordinateAttribute;
@@ -44,20 +45,25 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 	}
 
 	@Override
-	protected String generateFieldHeading(String fieldName) {
+	protected Column generateFieldColumn(String fieldName, String suffix) {
 		if ( KML_FIELD_NAME.equals(fieldName) ) {
-			return "_" + ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + 
-					getConfig().getFieldHeadingSeparator() + KML_COLUMN_SUFFIX;
+			return new Column("_" + ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + 
+					getConfig().getFieldHeadingSeparator() + KML_COLUMN_SUFFIX + suffix);
+		} else if (CoordinateAttributeDefinition.X_FIELD_NAME.equals(fieldName) 
+				|| CoordinateAttributeDefinition.Y_FIELD_NAME.equals(fieldName)) {
+			Column column = super.generateFieldColumn(fieldName, suffix);
+			column.setDataType(DataType.DECIMAL);
+			return column;
 		} else {
-			return super.generateFieldHeading(fieldName);
+			return super.generateFieldColumn(fieldName, suffix);
 		}
 	}
 	
 	@Override
-	protected String extractValue(Attribute<?, ?> attr, String fieldName) {
+	protected Object extractValue(Attribute<?, ?> attr, String fieldName) {
 		if ( KML_FIELD_NAME.equals(fieldName) ) {
 			if ( attr.isEmpty() ) {
-				return "";
+				return null;
 			} else {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) attr;
 				String kml = String.format(kmlFormat, coordAttr.getXField().getValue(), coordAttr.getYField().getValue());

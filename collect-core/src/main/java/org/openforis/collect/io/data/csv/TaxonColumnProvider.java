@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
@@ -40,16 +39,16 @@ public class TaxonColumnProvider extends CompositeAttributeColumnProvider<TaxonA
 	protected String[] getFieldNames() {
 		CollectSurvey survey = attributeDefinition.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
-		List<String> visibleFields = new ArrayList<String>(Arrays.asList(
+		List<String> visibleFieldNames = new ArrayList<String>(Arrays.asList(
 				survey.getUIOptions().getVisibleFields(attributeDefinition)));
 		boolean showFamily = annotations.isShowFamily(attributeDefinition);
-		if (! visibleFields.contains(TaxonAttributeDefinition.CODE_FIELD_NAME)) {
+		if (! visibleFieldNames.contains(TaxonAttributeDefinition.CODE_FIELD_NAME)) {
 			//always include CODE field
-			visibleFields.add(0, TaxonAttributeDefinition.CODE_FIELD_NAME);
+			visibleFieldNames.add(0, TaxonAttributeDefinition.CODE_FIELD_NAME);
 		}
 		if (! showFamily) {
-			visibleFields.removeAll(Arrays.asList(FAMILY_FIELDS));
+			visibleFieldNames.removeAll(Arrays.asList(FAMILY_FIELDS));
 		}
-		return visibleFields.toArray(new String[visibleFields.size()]);
+		return visibleFieldNames.toArray(new String[visibleFieldNames.size()]);
 	}
 }

@@ -33,9 +33,9 @@ public class PivotExpressionColumnProvider extends ColumnProviderChain {
 		}
 	}
 
-	public List<String> extractValues(Node<?> n) {
+	public List<Object> extractValues(Node<?> n) {
 		try {
-			ArrayList<String> v = new ArrayList<String>();
+			List<Object> v = new ArrayList<Object>();
 			Node<?> axis = expression.evaluate(n, n);
 			if ( axis == null ) {
 				return emptyValues();

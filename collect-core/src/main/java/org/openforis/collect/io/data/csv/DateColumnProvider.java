@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.io.data.csv;
 
+import org.openforis.collect.io.data.csv.Column.DataType;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 
 /**
@@ -22,6 +23,13 @@ public class DateColumnProvider extends CompositeAttributeColumnProvider<DateAtt
 				DateAttributeDefinition.MONTH_FIELD_NAME,
 				DateAttributeDefinition.DAY_FIELD_NAME
 		};
+	}
+	
+	@Override
+	protected Column generateFieldColumn(String fieldName, String suffix) {
+		Column column = super.generateFieldColumn(fieldName, suffix);
+		column.setDataType(DataType.INTEGER);
+		return column;
 	}
 
 }

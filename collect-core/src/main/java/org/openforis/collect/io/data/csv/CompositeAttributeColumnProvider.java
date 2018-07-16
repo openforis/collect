@@ -6,7 +6,6 @@ package org.openforis.collect.io.data.csv;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -40,37 +39,37 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	}
 
 	@Override
-	protected List<String> generateSingleAttributeColumnHeadings() {
-		return generateAttributeColumnHeadings(0);
+	protected List<Column> generateSingleAttributeColumns() {
+		return generateAttributeColumns(0);
 	}
 	
 	@Override
-	protected List<String> generateAttributeColumnHeadings(int attributeIdx) {
-		List<String> headings = new ArrayList<String>();
+	protected List<Column> generateAttributeColumns(int attributeIdx) {
+		List<Column> columns = new ArrayList<Column>();
 		if (isMergedValueSupported()) {
-			headings.add(generateMergedValueHeading(attributeIdx));
+			columns.add(generateMergedValueColumn(attributeIdx));
 		}
-		headings.addAll(generateAttributeFieldHeadings(attributeIdx));
-		return headings;
+		columns.addAll(generateAttributeFieldColumns(attributeIdx));
+		return columns;
 	}
 	
-	protected List<String> generateAttributeFieldHeadings(int attributeIdx) {
-		List<String> headings = new ArrayList<String>(fieldNames.length);
+	protected List<Column> generateAttributeFieldColumns(int attributeIdx) {
+		List<Column> columns = new ArrayList<Column>(fieldNames.length);
 		String attrPosSuffix = generateAttributePositionSuffix(attributeIdx);
 		for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
-			headings.add(generateFieldHeading(fieldNames[fieldIdx]) + attrPosSuffix);
+			columns.add(generateFieldColumn(fieldNames[fieldIdx], attrPosSuffix));
 		}
-		return headings;
+		return columns;
 	}
 
 	protected abstract String[] getFieldNames();
 	
-	protected String generateMergedValueHeading(int attributeIdx) {
-		return generateHeadingPrefix() + generateAttributePositionSuffix(attributeIdx);
+	protected Column generateMergedValueColumn(int attributeIdx) {
+		return new Column(generateHeadingPrefix() + generateAttributePositionSuffix(attributeIdx));
 	}
 
-	protected String generateFieldHeading(String fieldName) {
-		return generateHeadingPrefix() + getConfig().getFieldHeadingSeparator() + fieldName;
+	protected Column generateFieldColumn(String fieldName, String suffix) {
+		return new Column(generateHeadingPrefix() + getConfig().getFieldHeadingSeparator() + fieldName + suffix);
 	}
 	
 	protected boolean isMergedValueSupported() {
@@ -91,12 +90,12 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	}
 	
 	@Override
-	public List<String> extractValues(Node<?> axis) {
+	public List<Object> extractValues(Node<?> axis) {
 		checkValidAxis(axis);
 		List<Node<?>> attributes = extractNodes(axis);
 		int maxAttributeValues = getMaxAttributeValues();
 		int totHeadings = fieldNames.length * maxAttributeValues;
-		List<String> values = new ArrayList<String>(totHeadings);
+		List<Object> values = new ArrayList<Object>(totHeadings);
 		
 		for (int attrIdx = 0; attrIdx < maxAttributeValues; attrIdx ++) {
 			Attribute<?, ?> attr = attrIdx < attributes.size() ? (Attribute<?, ?>) attributes.get(attrIdx): null;
@@ -105,10 +104,8 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 				values.add(val);
 			}
 			for (String fieldName : fieldNames) {
-				String val;
-				if (attr == null) {
-					val = "";
-				} else {
+				Object val = null;
+				if (attr != null) {
 					val = extractValue(attr, fieldName);
 				}
 				values.add(val);
@@ -128,7 +125,7 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 		if (! ancestorEntityDefs.isEmpty()) {
 			for (int i = ancestorEntityDefs.size() - 1; i >= 0; i--) {
 				EntityDefinition ancestorEntityDef = ancestorEntityDefs.get(i);
-				if (ancestorEntityDef.isMultiple()) {
+				if (ancestorEntityDef.isMultiple() && !ancestorEntityDef.isRoot()) {
 					throw new IllegalStateException(String.format(
 							"Error extracting values for composite attribute %s in survey %s: single entity expected but multiple found: %s", 
 							attributeDefinition.getPath(), attributeDefinition.getSurvey().getName(), ancestorEntityDef.getPath()));
@@ -148,12 +145,12 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 		}
 	}
 	
-	protected String extractValue(Field<?> field) {
+	protected Object extractValue(Field<?> field) {
 		Object value = field.getValue();
-		return value == null ? "" : StringUtils.trimToEmpty(value.toString());
+		return value;
 	}
 
-	protected String extractValue(Attribute<?, ?> attr, String fieldName) {
+	protected Object extractValue(Attribute<?, ?> attr, String fieldName) {
 		Field<?> field = attr.getField(fieldName);
 		return extractValue(field);
 	}

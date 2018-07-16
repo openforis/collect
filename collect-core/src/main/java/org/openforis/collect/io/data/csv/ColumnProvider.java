@@ -9,8 +9,8 @@ import org.openforis.idm.model.Node;
  */
 public interface ColumnProvider {
 	
-	List<String> getColumnHeadings();
+	List<Column> getColumns();
 	
-	List<String> extractValues(Node<?> n);
+	List<Object> extractValues(Node<?> n);
 	
 }

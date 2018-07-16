@@ -3,7 +3,6 @@ package org.openforis.collect.io.data.csv;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.commons.lang.Strings;
 
 /**
  * 
@@ -23,8 +22,8 @@ public abstract class BasicColumnProvider implements ColumnProvider {
 	/**
 	 * Returns column headings including ancestors heading prefixes
 	 */
-	public List<String> generateFinalColumnHeadings() {
-		List<String> columnHeadings = getColumnHeadings();
+	public List<Column> generateFinalColumns() {
+		List<Column> columns = getColumns();
 		ColumnProviderChain p = parentProvider;
 		if (parentProvider != null) {
 			StringBuilder ancestorPrefixSB = new StringBuilder();
@@ -34,9 +33,12 @@ public abstract class BasicColumnProvider implements ColumnProvider {
 				}
 				p = p.getParentProvider();
 			}
-			columnHeadings = Strings.prependToList(columnHeadings, ancestorPrefixSB.toString());
+			String prefix = ancestorPrefixSB.toString();
+			for (Column column : columns) {
+				column.setHeader(prefix + column.getHeader());
+			}
 		}
-		return columnHeadings;
+		return columns;
 	}
 	
 	protected abstract String generateHeadingPrefix();

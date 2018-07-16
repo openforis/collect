@@ -6,7 +6,9 @@ package org.openforis.collect.io.data.csv;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.Column.DataType;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.NumberAttribute;
@@ -32,24 +34,21 @@ public class NumberColumnProvider extends CompositeAttributeColumnProvider<Numbe
 	}
 	
 	@Override
-	protected String generateFieldHeading(String fieldName) {
+	protected Column generateFieldColumn(String fieldName, String suffix) {
 		if ( NumberAttributeDefinition.VALUE_FIELD.equals(fieldName) ) {
-			return ColumnProviders.generateHeadingPrefix(attributeDefinition, config);
+			return new Column(ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + suffix,
+					attributeDefinition.getType() == Type.INTEGER ? DataType.INTEGER : DataType.DECIMAL);
 		} else {
-			return super.generateFieldHeading(fieldName);
+			return super.generateFieldColumn(fieldName, suffix);
 		}
 	}
 	
 	@Override
-	protected String extractValue(Attribute<?, ?> attr, String fieldName) {
+	protected Object extractValue(Attribute<?, ?> attr, String fieldName) {
 		if (NumberAttributeDefinition.UNIT_NAME_FIELD.equals(fieldName)) {
 			NumberAttribute<?, ?> numAttr = (NumberAttribute<?, ?>) attr;
 			Unit unit = numAttr.getUnit();
-			if (unit == null) {
-				return "";
-			} else {
-				return unit.getName();
-			}
+			return unit == null ? null : unit.getName();
 		} else {
 			return super.extractValue(attr, fieldName);
 		}

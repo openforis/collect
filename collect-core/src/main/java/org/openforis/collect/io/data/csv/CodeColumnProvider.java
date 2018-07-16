@@ -6,6 +6,7 @@ package org.openforis.collect.io.data.csv;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.Column.DataType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -76,44 +77,45 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	}
 
 	@Override
-	public List<String> generateColumnHeadings() {
-		List<String> headings = super.generateColumnHeadings();
+	public List<Column> generateColumns() {
+		List<Column> columns = super.generateColumns();
 		if (hasExpandedItems) {
-			headings.addAll(generateExpandedItemsHeadings());
+			columns.addAll(generateExpandedItemsColumns());
 		}
-		return headings;
+		return columns;
 	}
 
-	private List<String> generateExpandedItemsHeadings() {
-		List<String> headings = new ArrayList<String>();
+	private List<Column> generateExpandedItemsColumns() {
+		List<Column> columns = new ArrayList<Column>();
 		for (CodeListItem item : expandedItems) {
-			String heading = ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + item.getCode();
-			if (! headings.contains(heading)) {
-				headings.add(heading);
+			String header = ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + item.getCode();
+			Column column = new Column(header);
+			if (! columns.contains(column)) {
+				columns.add(column);
 				if (item.isQualifiable()) {
-					headings.add(heading + getConfig().getFieldHeadingSeparator() + CodeAttributeDefinition.QUALIFIER_FIELD);
+					columns.add(new Column(header + getConfig().getFieldHeadingSeparator() + CodeAttributeDefinition.QUALIFIER_FIELD));
 				}
 			}
 		}
-		return headings;
+		return columns;
 	}
 	
 	@Override
-	protected String generateFieldHeading(String fieldName) {
+	protected Column generateFieldColumn(String fieldName, String suffix) {
 		if ( CodeAttributeDefinition.CODE_FIELD.equals(fieldName) ) {
-			return ColumnProviders.generateHeadingPrefix(attributeDefinition, config);
+			return new Column(ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + suffix);
 		} else if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
-			return "_" + ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + ITEM_POSITION_SUFFIX;
+			return new Column("_" + ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + ITEM_POSITION_SUFFIX + suffix, DataType.INTEGER);
 		} else if ( ITEM_LABEL_FIELD_NAME.equals(fieldName) ) {
-			return ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + ITEM_LABEL_SUFFIX;
+			return new Column(ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + ITEM_LABEL_SUFFIX + suffix);
 		} else {
-			return super.generateFieldHeading(fieldName);
+			return super.generateFieldColumn(fieldName, suffix);
 		}
 	}
 	
 	@Override
-	public List<String> extractValues(Node<?> axis) {
-		List<String> values = super.extractValues(axis);
+	public List<Object> extractValues(Node<?> axis) {
+		List<Object> values = super.extractValues(axis);
 		if (hasExpandedItems) {
 			List<Node<?>> attributes = extractNodes(axis);
 			List<String> headings = new ArrayList<String>();
@@ -121,9 +123,9 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 				String heading = ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + getConfig().getFieldHeadingSeparator() + item.getCode();
 				if (! headings.contains(heading)) {
 					CodeAttribute attr = findAttributeByCode(attributes, item.getCode());
-					values.add(Boolean.valueOf(attr != null).toString());
+					values.add(attr != null);
 					if (item.isQualifiable()) {
-						values.add(attr == null ? "": attr.getValue().getQualifier());
+						values.add(attr == null ? null: attr.getValue().getQualifier());
 					}
 				}
 			}
@@ -143,17 +145,17 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	}
 	
 	@Override
-	protected String extractValue(Attribute<?, ?> attr, String fieldName) {
+	protected Object extractValue(Attribute<?, ?> attr, String fieldName) {
 		if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) 
 				|| ITEM_LABEL_FIELD_NAME.equals(fieldName) ) {
 			CodeListService codeListService = getCodeListService();
 			CodeListItem item = codeListService.loadItem((CodeAttribute) attr);
 			if ( item == null ) {
-				return "";
+				return null;
 			} else if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
 				List<CodeListItem> items = codeListService.loadItems(attributeDefinition.getList(), attributeDefinition.getLevelPosition());
 				int position = items.indexOf(item) + 1;
-				return Integer.toString(position);
+				return position;
 			} else {
 				return item.getLabel(getConfig().getLanguageCode());
 			}

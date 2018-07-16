@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.collect.io.data.csv.Column.DataType;
 import org.openforis.idm.model.Node;
 
 /**
@@ -17,16 +18,16 @@ public class NodePositionColumnProvider implements ColumnProvider {
 		this.headerName = headerName;
 	}
 	
-	public List<String> getColumnHeadings() {
-		return Collections.unmodifiableList(Arrays.asList(headerName));
+	public List<Column> getColumns() {
+		return Collections.unmodifiableList(Arrays.asList(new Column(headerName, DataType.INTEGER)));
 	}
 
-	public List<String> extractValues(Node<?> axis) {
+	public List<Object> extractValues(Node<?> axis) {
 		if ( axis == null ) {
 			throw new NullPointerException("Axis must be non-null");
 		} else {
 			int position = axis.getIndex() + 1;
-			return Arrays.asList(Integer.toString(position));
+			return Arrays.<Object>asList(position);
 		}
 	}
 

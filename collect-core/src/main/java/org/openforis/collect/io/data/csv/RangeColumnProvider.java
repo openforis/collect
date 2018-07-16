@@ -18,7 +18,6 @@ public class RangeColumnProvider extends CompositeAttributeColumnProvider<RangeA
 		super(config, defn);
 	}
 
-
 	@Override
 	protected String[] getFieldNames() {
 		List<String> result = new ArrayList<String>();
@@ -30,8 +29,4 @@ public class RangeColumnProvider extends CompositeAttributeColumnProvider<RangeA
 		return result.toArray(new String[result.size()]);
 	}
 	
-	@Override
-	protected String generateFieldHeading(String fieldName) {
-		return super.generateFieldHeading(fieldName);
-	}
 }

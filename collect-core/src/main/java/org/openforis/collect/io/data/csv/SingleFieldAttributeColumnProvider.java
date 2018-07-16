@@ -28,31 +28,29 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 	}
 	
 	@Override
-	protected List<String> generateSingleAttributeColumnHeadings() {
-		return generateAttributeColumnHeadings(0);
+	protected List<Column> generateSingleAttributeColumns() {
+		return generateAttributeColumns(0);
 	}
 	
 	@Override
-	protected List<String> generateAttributeColumnHeadings(int i) {
-		return Arrays.asList(generateHeadingPrefix() + generateAttributePositionSuffix(i));
+	protected List<Column> generateAttributeColumns(int i) {
+		return Arrays.asList(new Column(generateHeadingPrefix() + generateAttributePositionSuffix(i)));
 	}
 	
-	public List<String> extractValues(Node<?> axis) {
+	public List<Object> extractValues(Node<?> axis) {
 		if ( axis == null ) {
 			throw new NullPointerException("Axis must be non-null");
 		} else if ( axis instanceof Entity ) {
 			Entity entity = (Entity) axis;
 			int maxAttrValues = getMaxAttributeValues();
-			List<String> values = new ArrayList<String>(maxAttrValues);
+			List<Object> values = new ArrayList<Object>(maxAttrValues);
 			Entity nearestParentEntity = getParentEntity(entity);
 			int attrCount = nearestParentEntity.getCount(attributeDefinition);
 			for (int attrIdx = 0; attrIdx < maxAttrValues; attrIdx++) {
-				String val;
+				Object val = null;
 				if (attrIdx < attrCount) {
 					Attribute<?, ?> attr = (Attribute<?, ?>) nearestParentEntity.getChild(attributeDefinition, attrIdx);
 					val = extractValue(attr);
-				} else {
-					val = "";
 				}
 				values.add(val);
 			}
@@ -80,12 +78,11 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 		return nearestParentEntity;
 	}
 
-	private String extractValue(Attribute<?, ?> attr) {
+	private Object extractValue(Attribute<?, ?> attr) {
 		String mainFieldName = attr.getDefinition().getMainFieldName();
 		Field<?> fld = attr.getField(mainFieldName);
 		Object v = fld.getValue();
-		String stringVal = v == null ? "" : v.toString();
-		return stringVal;
+		return v;
 	}
 
 }

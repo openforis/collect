@@ -17,7 +17,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition> extends BasicColumnProvider {
 
 	protected T attributeDefinition;
-	private List<String> columnHeadings;
+	private List<Column> columns;
 
 	public BasicAttributeColumnProvider(CSVDataExportParameters config, T attrDefn) {
 		super(config);
@@ -33,24 +33,24 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 	}
 	
 	@Override
-	public List<String> getColumnHeadings() {
-		if (columnHeadings == null) {
-			columnHeadings = generateColumnHeadings();
+	public List<Column> getColumns() {
+		if (columns == null) {
+			columns = generateColumns();
 		}
-		return columnHeadings;
+		return columns;
 	}
 
-	protected List<String> generateColumnHeadings() {
+	protected List<Column> generateColumns() {
 		if (attributeDefinition.isMultiple()) {
 			int maxAttrValues = getMaxAttributeValues();
 			int numberOfColumnsPerAttribute = getNumberOfColumnsPerAttribute();
-			List<String> headings = new ArrayList<String>(maxAttrValues * numberOfColumnsPerAttribute);
+			List<Column> columns = new ArrayList<Column>(maxAttrValues * numberOfColumnsPerAttribute);
 			for (int i = 0; i < maxAttrValues; i++) {
-				headings.addAll(generateAttributeColumnHeadings(i));
+				columns.addAll(generateAttributeColumns(i));
 			}
-			return headings;
+			return columns;
 		} else {
-			return generateSingleAttributeColumnHeadings();
+			return generateSingleAttributeColumns();
 		}
 	}
 	
@@ -61,9 +61,9 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 
 	protected abstract int getNumberOfColumnsPerAttribute();
 
-	protected abstract List<String> generateSingleAttributeColumnHeadings();
+	protected abstract List<Column> generateSingleAttributeColumns();
 
-	protected abstract List<String> generateAttributeColumnHeadings(int i);
+	protected abstract List<Column> generateAttributeColumns(int i);
 	
 	protected String generateAttributePositionSuffix(int attributeIdx) {
 		return attributeDefinition.isMultiple() ? "[" + (attributeIdx + 1) + "]": "";
@@ -74,7 +74,7 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 	public String toString() {
 		return new ToStringBuilder(null)
 			.append("Attribute", attributeDefinition.getName())
-			.append("Column headings", getColumnHeadings())
+			.append("Columns", getColumns())
 			.build();
 	}
 }

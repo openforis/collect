@@ -3,9 +3,12 @@ package org.openforis.collect.io.data.csv;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.io.data.NodeFilter;
+import org.openforis.commons.io.flat.Field;
+import org.openforis.commons.io.flat.Field.Type;
 import org.openforis.commons.io.flat.FlatDataWriter;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
@@ -46,13 +49,33 @@ public abstract class ModelWriter implements Closeable {
 	}
 
 	public void printColumnHeadings() throws IOException {
-		List<String> columnHeadings = xform.getColumnProvider().getColumnHeadings();
-		flatDataWriter.writeHeaders(columnHeadings);
+		List<Column> columns = xform.getColumnProvider().getColumns();
+		List<Field> fields = new ArrayList<Field>(columns.size());
+		for (Column column : columns) {
+			Type type;
+			switch(column.getDataType()) {
+			case DATE:
+				type = Type.DATE;
+				break;
+			case DECIMAL:
+				type = Type.DECIMAL;
+				break;
+			case INTEGER:
+				type = Type.INTEGER;
+				break;
+			case STRING:
+			default:
+				type = Type.STRING;
+			}
+			Field field = new Field(column.getHeader(), type);
+			fields.add(field);
+		}
+		flatDataWriter.writeHeaders(fields.toArray(new Field[fields.size()]));
 	}
 
 	public void printRow(Node<?> n) {
-		List<String> values = xform.getColumnProvider().extractValues(n);
-		flatDataWriter.writeNext(values);
+		List<Object> values = xform.getColumnProvider().extractValues(n);
+		flatDataWriter.writeNext(values.toArray(new Object[values.size()]));
 	}
 
 	public int printData(Record record) throws InvalidExpressionException {

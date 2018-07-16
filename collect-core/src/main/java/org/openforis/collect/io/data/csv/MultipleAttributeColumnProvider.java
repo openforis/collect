@@ -30,11 +30,11 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 		this.headerName = headerName;
 	}
 	
-	public List<String> getColumnHeadings() {
-		return Collections.unmodifiableList(Arrays.asList(headerName));
+	public List<Column> getColumns() {
+		return Collections.unmodifiableList(Arrays.asList(new Column(headerName)));
 	}
 	
-	public List<String> extractValues(Node<?> axis) {
+	public List<Object> extractValues(Node<?> axis) {
 		if ( axis instanceof Entity ) {
 			Entity entity = (Entity) axis;
 			int cnt = entity.getCount(defn.getName());
@@ -47,19 +47,19 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 				if (defn.hasMainField()) {
 					mainFieldName = defn.getMainFieldName();
 				}
-				String val = extractValue(entity, mainFieldName, i);
-				sb.append(val);
+				Object val = extractValue(entity, mainFieldName, i);
+				sb.append(val == null ? "" : val);
 			}
-			return Arrays.asList(sb.toString());
+			return Arrays.<Object>asList(sb.toString());
 		} else {
 			throw new UnsupportedOperationException();
 		}
 	}
 
-	private String extractValue(Entity entity, String fieldName, int i) {
+	private Object extractValue(Entity entity, String fieldName, int i) {
 		Attribute<?,?> attr = (Attribute<?, ?>) entity.getChild(defn, i);
 		if ( attr == null ) {
-			return ""; 
+			return null; 
 		} else {
 			Object v;
 			if (fieldName == null) {
@@ -68,7 +68,7 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 				Field<?> fld = attr.getField(fieldName);
 				v = fld.getValue();
 			}
-			return v == null ? "" : v.toString();
+			return v;
 		}
 	}
 }
