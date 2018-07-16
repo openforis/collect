@@ -118,7 +118,7 @@ class AlertDialog extends Component {
                     <DialogContentText>{message}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button raised color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{okButtonLabel}</Button>
+                    <Button variant="raised" color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{okButtonLabel}</Button>
                 </DialogActions>
             </Dialog>
         )

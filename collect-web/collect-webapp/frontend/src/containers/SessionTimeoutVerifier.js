@@ -103,7 +103,7 @@ export default class SessionTimeoutVerifier extends Component {
                     </DialogContent>
                     <DialogActions>
                         {this.state.sessionExpired && 
-                            <Button color="primary" raised
+                            <Button color="primary" variant="raised"
                                 onClick={this.handleRefreshButtonClick}>{L.l('global.refresh')}</Button>
                         }
                     </DialogActions>

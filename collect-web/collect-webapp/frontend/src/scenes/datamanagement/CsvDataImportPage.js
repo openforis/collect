@@ -154,7 +154,7 @@ class CsvDataImportPage extends Component {
         })
         const entitySelectionEnabled = this.state.importType === 'update'
         const entityNotSelected = entitySelectionEnabled && this.state.selectedEntityDefinition === null
-        const acceptedFileTypes = this.state.importType === 'multipleFiles' ? '.zip': '.csv,.xls,xlsx,.zip'
+        const acceptedFileTypes = this.state.importType === 'multipleFiles' ? '.zip': '.csv,.xls,.xlsx,.zip'
         const acceptedFileTypesDescription = this.state.importType === 'multipleFiles' ? 'ZIP (.zip)': 'CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip)'
 
         const formatErrorMessage = function(cell, row) {
@@ -238,7 +238,7 @@ class CsvDataImportPage extends Component {
                     </FormGroup>
                     <FormGroup row>
                         <Col sm={{size: 2, offset: 5}}>
-                            <Button color="primary" raised onClick={this.handleImportButtonClick}>{L.l('global.import')}</Button>
+                            <Button color="primary" variant="raised" onClick={this.handleImportButtonClick}>{L.l('global.import')}</Button>
                         </Col>
                     </FormGroup>
 
@@ -262,7 +262,7 @@ class CsvDataImportPage extends Component {
                             </BootstrapTable>
                         </DialogContent>
                         <DialogActions>
-                            <Button color="primary" raised 
+                            <Button color="primary" variant="raised" 
                                 onClick={this.handleErrorsModalCloseButtonClick}>{L.l('global.close')}</Button>
                         </DialogActions>
                     </Dialog>

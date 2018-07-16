@@ -66,7 +66,7 @@ class PasswordChangePage extends Component {
                     />
                 {error && <div class="error">{error}</div>}
                 <div>
-                    <Button raised color="primary" disabled={!anyTouched || error || submitting} type="submit">
+                    <Button variant="raised" color="primary" disabled={!anyTouched || error || submitting} type="submit">
                         {L.l('user.changePassword.change')}
                     </Button>
                 </div>

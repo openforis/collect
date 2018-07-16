@@ -85,14 +85,14 @@ class BackupPage extends Component {
                             <Input type="text" readOnly value={latestBackupInfo.updatedRecordsSinceBackup} />
                         </SimpleFormItem>
                         <Col sm={{offset: 4}}>
-                            <Button disabled={latestBackupInfo.date === null} raised onClick={this.handleDownloadLastBackupButtonClick}>{L.l('backup.lastBackup.download')}</Button>
+                            <Button disabled={latestBackupInfo.date === null} variant="raised" onClick={this.handleDownloadLastBackupButtonClick}>{L.l('backup.lastBackup.download')}</Button>
                         </Col>
                     </FormGroup>    
                 </Form>
                 <br/> <br/> <br/>
                 <Row>
                     <Col sm={{offset: 2}}>
-                        <Button raised color="primary" onClick={this.handleBackupButtonClick}>{L.l('backup.generateNewBackup')}</Button>
+                        <Button variant="raised" color="primary" onClick={this.handleBackupButtonClick}>{L.l('backup.generateNewBackup')}</Button>
                     </Col>
                 </Row>
             </Container>
