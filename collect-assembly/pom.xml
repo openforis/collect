@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.22.4</version>
+		<version>3.22.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-assembly</artifactId>
 	<packaging>pom</packaging>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-webapp-tomcat</artifactId>
-			<version>3.22.4</version>
+			<version>3.22.5-SNAPSHOT</version>
 			<type>war</type>
 		</dependency>
 	    <dependency>
