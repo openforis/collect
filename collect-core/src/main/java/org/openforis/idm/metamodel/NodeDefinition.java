@@ -391,11 +391,15 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	public List<EntityDefinition> getAncestorEntityDefinitionsUpTo(EntityDefinition upToEntityDef) {
 		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
 		EntityDefinition currentParent = getParentEntityDefinition();
-		while ( currentParent != null && currentParent != upToEntityDef ) {
-			result.add(currentParent);
-			currentParent = currentParent.getParentEntityDefinition();
+		while ( currentParent != null ) {
+			if (currentParent == upToEntityDef ) {
+				return result;
+			} else {
+				result.add(currentParent);
+				currentParent = currentParent.getParentEntityDefinition();
+			}
 		}
-		return result;
+		return Collections.emptyList(); //specified upToEntityDef is not an ancestor of this node
 	}
 	
 	/**

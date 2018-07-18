@@ -9,7 +9,6 @@ import java.util.List;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -115,26 +114,8 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	}
 	
 	protected List<Node<?>> extractNodes(Node<?> axis) {
-		Entity parentEntity = findNodesParentEntity((Entity) axis);
+		Entity parentEntity = getAttributeParentEntity((Entity) axis);
 		return parentEntity.getChildren(attributeDefinition);
-	}
-
-	private Entity findNodesParentEntity(Entity axis) {
-		List<EntityDefinition> ancestorEntityDefs = attributeDefinition.getAncestorEntityDefinitionsUpTo(axis.getDefinition());
-		Entity currentParentEntity = axis;
-		if (! ancestorEntityDefs.isEmpty()) {
-			for (int i = ancestorEntityDefs.size() - 1; i >= 0; i--) {
-				EntityDefinition ancestorEntityDef = ancestorEntityDefs.get(i);
-				if (ancestorEntityDef.isMultiple() && !ancestorEntityDef.isRoot()) {
-					throw new IllegalStateException(String.format(
-							"Error extracting values for composite attribute %s in survey %s: single entity expected but multiple found: %s", 
-							attributeDefinition.getPath(), attributeDefinition.getSurvey().getName(), ancestorEntityDef.getPath()));
-				} else {
-					currentParentEntity = currentParentEntity.getChild(ancestorEntityDef);
-				}
-			}
-		}
-		return currentParentEntity;
 	}
 
 	protected void checkValidAxis(Node<?> axis) {

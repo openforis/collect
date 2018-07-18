@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -44,7 +43,7 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 			Entity entity = (Entity) axis;
 			int maxAttrValues = getMaxAttributeValues();
 			List<Object> values = new ArrayList<Object>(maxAttrValues);
-			Entity nearestParentEntity = getParentEntity(entity);
+			Entity nearestParentEntity = getAttributeParentEntity(entity);
 			int attrCount = nearestParentEntity.getCount(attributeDefinition);
 			for (int attrIdx = 0; attrIdx < maxAttrValues; attrIdx++) {
 				Object val = null;
@@ -58,24 +57,6 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 		} else {
 			throw new UnsupportedOperationException("Axis must be an Entity");
 		}
-	}
-
-	/**
-	 * Attribute definition can be inside nested single entities inside the axis.
-	 * This method will look for the nearest parent entity for attributes to extract value for.
-	 */
-	private Entity getParentEntity(Entity axis) {
-		EntityDefinition entityDef = axis.getDefinition();
-		List<EntityDefinition> ancestorEntityDefinitions = attributeDefinition.getAncestorEntityDefinitionsInReverseOrder();
-		int indexOfAxis = ancestorEntityDefinitions.indexOf(entityDef);
-		Entity nearestParentEntity = axis;
-		if (indexOfAxis + 1 < ancestorEntityDefinitions.size()) {
-			List<EntityDefinition> relativeSingleEntityDefs = ancestorEntityDefinitions.subList(indexOfAxis + 1, ancestorEntityDefinitions.size());
-			for (EntityDefinition parentSingleEntityDef : relativeSingleEntityDefs) {
-				nearestParentEntity = (Entity) nearestParentEntity.getChild(parentSingleEntityDef);
-			}
-		}
-		return nearestParentEntity;
 	}
 
 	private Object extractValue(Attribute<?, ?> attr) {
