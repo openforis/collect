@@ -3,9 +3,10 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.22.2</version>
+		<version>3.22.3</version>
 	</parent>
 	<artifactId>collect-assembly</artifactId>
+  <version>3.22.2</version>
 	<packaging>pom</packaging>
 	<name>Open Foris Collect Tomcat Assembly</name>
 	<description>Collect web application packaged together with Apache Tomcat and related dependencies</description>
@@ -20,7 +21,7 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-webapp-tomcat</artifactId>
-			<version>${project.version}</version>
+			<version>3.22.3</version>
 			<type>war</type>
 		</dependency>
 	    <dependency>
