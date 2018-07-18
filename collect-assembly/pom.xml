@@ -6,7 +6,6 @@
 		<version>3.22.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-assembly</artifactId>
-  <version>3.22.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Open Foris Collect Tomcat Assembly</name>
 	<description>Collect web application packaged together with Apache Tomcat and related dependencies</description>

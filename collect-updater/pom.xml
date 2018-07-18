@@ -6,7 +6,6 @@
 		<version>3.22.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-updater</artifactId>
-  <version>3.22.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Open Foris Collect Updater</name>
 	<description>Module to create the updaters for Open Foris Collect</description>

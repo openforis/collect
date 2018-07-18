@@ -6,7 +6,6 @@
 		<version>3.22.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-control-panel</artifactId>
-  <version>3.22.3-SNAPSHOT</version>
 	<name>Open Foris Collect Control Panel</name>
 	<description>Starts up Collect using a Jetty application server</description>
 	<packaging>jar</packaging>

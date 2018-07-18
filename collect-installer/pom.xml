@@ -6,7 +6,6 @@
 		<version>3.22.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
-  <version>3.22.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Open Foris Collect Installer</name>
 	<description>Module to create the installers for Open Foris Collect</description>

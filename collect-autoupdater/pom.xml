@@ -6,7 +6,7 @@
 		<version>3.22.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-autoupdater</artifactId>
-  <version>3.22.3-SNAPSHOT</version>
+
 	<packaging>pom</packaging>
 	<name>Open Foris Collect Autoupdater</name>
 	<description>Module to create the autoupdater for Open Foris Collect</description>
