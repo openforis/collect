@@ -225,7 +225,7 @@ class RecordDataTable extends Component {
 		const loggedUser = this.props.loggedUser
 		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === survey.userGroupId)
 		const userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
-		const mostSpecificGroup = this.props.userGroups.find(ug => ug.id === userInGroup.groupId)
+		const mostSpecificGroup = userInGroup === null ? null : this.props.userGroups.find(ug => ug.id === userInGroup.groupId)
 
 		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
 

@@ -88,6 +88,8 @@ export default class User extends Serializable {
     canChangeRecordOwner(group) {
         const mainRole = this.role
         switch(mainRole) {
+            case 'ADMIN':
+                return true
             case 'VIEW':
             case 'ENTRY':
             case 'ENTRY_LIMITED':
