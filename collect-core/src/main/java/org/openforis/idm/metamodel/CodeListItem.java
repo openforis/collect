@@ -105,7 +105,7 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 		if ( language == null ) {
 			language = getSurvey().getDefaultLanguage();
 		}
-		return labels.getFailSafeText(getSurvey().getDefaultLanguage(), language);
+		return labels.getText(language);
 	}
 	
 	/**
