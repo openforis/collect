@@ -99,10 +99,24 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 	 * Returns the label in the specified language
 	 */
 	public String getLabel(String language) {
+		if (labels == null) {
+			return null;
+		}
 		if ( language == null ) {
 			language = getSurvey().getDefaultLanguage();
 		}
-		return labels == null ? null: labels.getText(language);
+		return labels.getFailSafeText(getSurvey().getDefaultLanguage(), language);
+	}
+	
+	/**
+	 * Returns the label in the specified language.
+	 * If not found, returns the one in the survey default language
+	 */
+	public String getFailSafeLabel(String language) {
+		if (labels == null) {
+			return null;
+		}
+		return labels.getFailSafeText(language, getSurvey().getDefaultLanguage());
 	}
 	
 	public void addLabel(LanguageSpecificText label) {
@@ -145,10 +159,24 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 	}
 	
 	public String getDescription(String language) {
+		if (descriptions == null) {
+			return null;
+		}
 		if ( language == null ) {
 			language = getSurvey().getDefaultLanguage();
 		}
-		return descriptions == null ? null: descriptions.getText(language);
+		return descriptions.getText(language);
+	}
+	
+	/**
+	 * Returns the description in the specified language.
+	 * If not found, returns the one in the survey default language
+	 */
+	public String getFailSafeDescription(String language) {
+		if (descriptions == null) {
+			return null;
+		}
+		return descriptions.getFailSafeText(language, getSurvey().getDefaultLanguage());
 	}
 	
 	public void setDescription(String language, String text) {
