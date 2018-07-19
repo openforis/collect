@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="earthFiles/jquery/jquery-ui.css?v=$[randomNumber]" rel="stylesheet" />
+	<link href="earthFiles/jquery/jquery-ui-1.12.1.css?v=$[randomNumber]" rel="stylesheet" />
 	<link href="earthFiles/jquery/jquery.selectBoxIt.css?v=$[randomNumber]" rel="stylesheet" />
 	<link href="earthFiles/jquery/jquery-steps.css?v=$[randomNumber]" rel="stylesheet" />
 	<link href="earthFiles/bootstrap/bootstrap.css?v=$[randomNumber]" rel="stylesheet" />
@@ -188,11 +188,12 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 </body>
 
 <script>
-	$.ajax({
-	  url: "http://127.0.0.1:$[local_port]/earth/ancillaryWindows?id=PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST",
-	  async : 'true'
-	  
-	});
+	if (!PREVIEW) {
+		$.ajax({
+		  url: "http://127.0.0.1:$[local_port]/earth/ancillaryWindows?id=PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST",
+		  async : 'true'
+		});
+	}
 </script>
 
 </html>
