@@ -7,8 +7,8 @@ import java.util.Date;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.BaseStorageManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.utils.Dates;
@@ -19,7 +19,7 @@ public class RestoredBackupStorageManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
 	
-	protected static Log LOG = LogFactory.getLog(RestoredBackupStorageManager.class);
+	protected static Logger LOG = LogManager.getLogger(RestoredBackupStorageManager.class);
 	
 	private static final String DEFAULT_STORAGE_SUBFOLDER = "restore";
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss-SSSZ";

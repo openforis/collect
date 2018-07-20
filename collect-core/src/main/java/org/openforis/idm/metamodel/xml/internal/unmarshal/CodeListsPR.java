@@ -1,7 +1,7 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.CODE_LISTS;
 
 /**
  * @author G. Miceli

@@ -18,8 +18,8 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -42,8 +42,8 @@ import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -68,7 +68,7 @@ public class RecordIndexManager extends BaseStorageManager {
 	protected static final String RECORD_ID_FIELD = "_record_id";
 	private static final Version LUCENE_VERSION = Version.LUCENE_36;
 
-	protected static Log LOG = LogFactory.getLog(RecordIndexManager.class);
+	protected static Logger LOG = LogManager.getLogger(RecordIndexManager.class);
 
 	public enum SearchType {
 		EQUAL, STARTS_WITH, CONTAINS;

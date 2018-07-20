@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignFileColumn;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -26,7 +26,7 @@ import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
  */
 public class SamplingDesignExportProcess {
 	
-	private final Log log = LogFactory.getLog(SamplingDesignExportProcess.class);
+	private final Logger LOG = LogManager.getLogger(SamplingDesignExportProcess.class);
 	
 	private SamplingDesignManager samplingDesignManager;
 	
@@ -59,7 +59,7 @@ public class SamplingDesignExportProcess {
 				writeSummary(writer, survey, item);
 			}
 		} catch (Exception e) {
-			log.error(e);
+			LOG.error(e);
 		} finally {
 			IOUtils.closeQuietly(writer);
 		}

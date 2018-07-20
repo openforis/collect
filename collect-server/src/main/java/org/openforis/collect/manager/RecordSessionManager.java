@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class RecordSessionManager extends SessionManager implements EventListener {
 
-//	private static Log LOG = LogFactory.getLog(RecordSessionManager.class);
+//	private static Logger LOG = Logger.getLogger(RecordSessionManager.class);
 
 	@Autowired
 	private transient SessionRecordFileManager recordFileManager;

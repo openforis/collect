@@ -12,8 +12,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.DataExportStatus.Format;
 import org.openforis.collect.manager.RecordFileManager;
@@ -22,8 +22,8 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 
 
-	private static Log LOG = LogFactory.getLog(XMLDataExportProcess.class);
+	private static Logger LOG = LogManager.getLogger(XMLDataExportProcess.class);
 
 	public static final String IDML_FILE_NAME = "idml.xml";
 	public static final String ZIP_DIRECTORY_SEPARATOR = "/";
@@ -158,9 +158,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			zipOutputStream.flush();
 		} catch (IOException e) {
 			String message = "Error while including idml into zip file: " + e.getMessage();
-			if (LOG.isErrorEnabled()) {
-				LOG.error(message, e);
-			}
+			LOG.error(message, e);
 			throw new RuntimeException(message, e);
 		}
 	}
@@ -180,9 +178,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			backupRecordFiles(zipOutputStream, record);
 		} catch (Exception e) {
 			String message = "Error while backing up " + id + " " + e.getMessage();
-			if (LOG.isErrorEnabled()) {
-				LOG.error(message, e);
-			}
+			LOG.error(message, e);
 			// throw new RuntimeException(message, e);
 		}
 	}

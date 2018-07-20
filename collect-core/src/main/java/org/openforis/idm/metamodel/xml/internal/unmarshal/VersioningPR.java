@@ -1,12 +1,18 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DATE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.ID;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.LABEL;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.NAME;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.VERSION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.VERSIONING;
+
 import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.XmlParseException;
-
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
  * @author G. Miceli

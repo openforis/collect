@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly=true, propagation=SUPPORTS)
 public class SamplingDesignManager {
 	
-	//private final Log log = LogFactory.getLog(SamplingDesignManager.class);
+	//private final Logger log = Logger.getLogger(SamplingDesignManager.class);
 	
 	@Autowired
 	private SamplingDesignDao samplingDesignDao;

@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
 import org.jooq.DeleteQuery;
@@ -63,7 +63,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
  */
 public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter, Closeable {
 	
-	private static final Log LOG = LogFactory.getLog(JooqDatabaseExporter.class);
+	private static final Logger LOG = LogManager.getLogger(JooqDatabaseExporter.class);
 	
 	private CollectDSLContext dsl;
 	private RelationalSchema schema;

@@ -11,12 +11,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.openforis.idm.metamodel.xml.internal.marshal.SurveyMarshaller;
+
+import junit.framework.Assert;
 
 /**
  * @author G. Miceli
@@ -24,7 +24,7 @@ import org.openforis.idm.metamodel.xml.internal.marshal.SurveyMarshaller;
  */
 public class XmlBindingIntegrationTest {
 
-	//private Log log = LogFactory.getLog(XmlBindingIntegrationTest.class);
+	//private Logger log = Logger.getLogger(XmlBindingIntegrationTest.class);
 
 	@Test
 	public void roundTripMarshallingTest() throws IdmlParseException, IOException {

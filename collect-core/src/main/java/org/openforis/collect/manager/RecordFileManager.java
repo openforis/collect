@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
@@ -28,7 +28,7 @@ public class RecordFileManager extends BaseStorageManager {
 	private static final long serialVersionUID = 1L;
 	private static final Pattern UUID_REGEX = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
-	protected static Log LOG = LogFactory.getLog(RecordFileManager.class);
+	protected static Logger LOG = LogManager.getLogger(RecordFileManager.class);
 
 	private static final String DEFAULT_RECORD_FILES_SUBFOLDER = "collect_upload";
 	

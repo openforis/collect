@@ -33,8 +33,8 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.Collect;
 import org.openforis.collect.datacleansing.manager.SurveyDataCleansingManager;
 import org.openforis.collect.event.EventQueue;
@@ -80,7 +80,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class SurveyManager {
 	
-	private static final Log LOG = LogFactory.getLog(SurveyManager.class);
+	private static final Logger LOG = LogManager.getLogger(SurveyManager.class);
 	private static final List<SurveySummarySortField> DEFAULT_SURVEY_SUMMARY_SORT_FIELDS = 
 			Arrays.asList(new SurveySummarySortField(Sortable.NAME));
 	private static final String URI_PREFIX = "http://www.openforis.org/idm/";

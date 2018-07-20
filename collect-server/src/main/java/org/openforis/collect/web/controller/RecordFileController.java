@@ -6,8 +6,8 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.utils.Controllers;
@@ -31,7 +31,7 @@ public class RecordFileController extends BasicController implements Serializabl
 	
 	private static final long serialVersionUID = 1L;
 
-	private static Log LOG = LogFactory.getLog(RecordFileController.class);
+	private static final Logger LOG = LogManager.getLogger(RecordFileController.class);
 	
 	@Autowired
 	private SessionRecordFileManager fileManager;

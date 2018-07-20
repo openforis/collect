@@ -1,6 +1,6 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.COORDINATE;
 
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 

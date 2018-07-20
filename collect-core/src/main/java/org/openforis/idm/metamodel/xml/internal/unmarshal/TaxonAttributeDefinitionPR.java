@@ -1,5 +1,10 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.HIGHEST_RANK;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.QUALIFIERS;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TAXON;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TAXONOMY;
+
 import java.io.IOException;
 
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -8,7 +13,6 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.xmlpull.v1.XmlPullParserException;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
  * @author G. Miceli

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.collect.model.CollectSurvey;
@@ -46,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class SpeciesManager {
 	
-	private final Log log = LogFactory.getLog(SpeciesManager.class);
+	private final Logger LOG = LogManager.getLogger(SpeciesManager.class);
 	
 	private static final int CONFIRMED_TAXON_STEP_NUMBER = 9;
 
@@ -328,9 +328,7 @@ public class SpeciesManager {
 					String qualifierValue = code.getValue().getCode();
 					qualifierValues[i] = qualifierValue;
 				} catch (Exception e) {
-					if ( log.isWarnEnabled() ) {
-						log.warn("Error evaluating taxon qualifiers: ", e);
-					}
+					LOG.warn("Error evaluating taxon qualifiers: ", e);
 					break;
 				}
 			}

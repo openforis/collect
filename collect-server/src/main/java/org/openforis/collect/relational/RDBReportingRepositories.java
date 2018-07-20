@@ -16,8 +16,8 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.event.AttributeCreatedEvent;
 import org.openforis.collect.event.AttributeEvent;
 import org.openforis.collect.event.AttributeUpdatedEvent;
@@ -41,8 +41,8 @@ import org.openforis.collect.io.metadata.collectearth.NewMondrianSchemaGenerator
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.relational.data.ColumnValuePair;
@@ -80,7 +80,7 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
  */
 public class RDBReportingRepositories implements ReportingRepositories {
 
-	private static final Log LOG = LogFactory.getLog(RDBReportingRepositories.class);
+	private static final Logger LOG = LogManager.getLogger(RDBReportingRepositories.class);
 	private static final String SQLITE_DRIVER_CLASS_NAME = "org.sqlite.JDBC";
 
 	private SurveyManager surveyManager;

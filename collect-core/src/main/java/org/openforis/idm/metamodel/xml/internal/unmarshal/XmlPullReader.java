@@ -24,7 +24,7 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public abstract class XmlPullReader {
 	
-//	private static Log LOG = LogFactory.getLog(XmlPullReader.class);
+//	private static Logger LOG = Logger.getLogger(XmlPullReader.class);
 	
 	private String tagName;
 	private String namespace;

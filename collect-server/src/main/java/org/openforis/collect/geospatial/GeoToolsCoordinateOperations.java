@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
@@ -43,7 +43,7 @@ import org.opengis.util.InternationalString;
  */
 public class GeoToolsCoordinateOperations extends CoordinateOperations {
 
-	private static final Log LOG = LogFactory.getLog(GeoToolsCoordinateOperations.class);
+	private static final Logger LOG = LogManager.getLogger(GeoToolsCoordinateOperations.class);
 
 	// private static CoordinateOperationFactory CO_FACTORY;
 	// private static Map<String, CoordinateReferenceSystem> SYSTEMS;
@@ -65,9 +65,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 			getOrCreateTransform(SpatialReferenceSystem.WGS84_SRS_ID, SpatialReferenceSystem.WEB_MERCATOR_SRS_ID);
 			getOrCreateTransform(SpatialReferenceSystem.WEB_MERCATOR_SRS_ID, SpatialReferenceSystem.WGS84_SRS_ID);
 		} catch (Exception e) {
-			if (LOG.isErrorEnabled()) {
-				LOG.error("Error while initializing CoordinateOperations", e);
-			}
+			LOG.error("Error while initializing CoordinateOperations", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -223,9 +221,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 			} catch (Exception e) {
 				//TODO throw exception
 				//throw new CoordinateOperationException(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
-				if (LOG.isErrorEnabled()) {
-					LOG.error(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
-				}
+				LOG.error(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
 				CRS_BY_SRS_ID.put(srsId, null);
 			}
 		}
@@ -259,9 +255,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 			DirectPosition src = new DirectPosition2D(x, y);
 			MathTransform transform = getOrCreateTransform(fromSrsId, toSrsId);
 			if (transform == null) {
-				if (LOG.isErrorEnabled()) {
-					LOG.error("Unknown CRS: " + toSrsId);
-				}
+				LOG.error("Unknown CRS: " + toSrsId);
 				return new Coordinate(0d, 0d, toSrsId);
 			} else {
 				DirectPosition directPosition = transform.transform(src, null);
@@ -269,9 +263,7 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 				return new Coordinate(coord[0], coord[1], toSrsId);
 			}
 		} catch (Throwable t) {
-			if (LOG.isErrorEnabled()) {
-				LOG.error("Error converting lat lon to web marcator: lat=" + y + " lon=" + x, t);
-			}
+			LOG.error("Error converting lat lon to web marcator: lat=" + y + " lon=" + x, t);
 			return new Coordinate(0d, 0d, toSrsId);
 		}
 	}
@@ -285,17 +277,13 @@ public class GeoToolsCoordinateOperations extends CoordinateOperations {
 			DirectPosition src = new DirectPosition2D(x, y);
 			MathTransform transform = getOrCreateTransform(fromSrsId, toSrsId);
 			if (transform == null) {
-				if (LOG.isErrorEnabled()) {
-					LOG.error(String.format("Cannot find transform from %s to %s", fromSrsId, toSrsId));
-				}
+				LOG.error(String.format("Cannot find transform from %s to %s", fromSrsId, toSrsId));
 				return new DirectPosition2D(0, 0);
 			}
 			DirectPosition directPosition = transform.transform(src, null);
 			return directPosition;
 		} catch (Throwable t) {
-			if (LOG.isErrorEnabled()) {
-				LOG.error("Error converting: x=" + x + " y=" + y + " srs=" + fromSrsId, t);
-			}
+			LOG.error("Error converting: x=" + x + " y=" + y + " srs=" + fromSrsId, t);
 			return new DirectPosition2D(0, 0);
 		}
 	}

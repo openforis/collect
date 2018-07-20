@@ -1,12 +1,12 @@
 package org.openforis.idm.model;
 
-import org.junit.Test;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.testfixture.TestFixture;
-
 import static org.junit.Assert.assertSame;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.rootEntityDef;
 import static org.openforis.idm.testfixture.TestFixture.survey;
+
+import org.junit.Test;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.testfixture.TestFixture;
 
 public class RecordTest {
 

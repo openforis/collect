@@ -1,6 +1,7 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.AFFIRMATIVE_ONLY;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.BOOLEAN;
 
 import java.io.IOException;
 

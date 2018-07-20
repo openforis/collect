@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SessionService {
 
-	//private static Log LOG = LogFactory.getLog(SessionService.class);
+	//private static Logger LOG = Logger.getLogger(SessionService.class);
 	@Autowired
 	protected RecordSessionManager sessionManager;
 	@Autowired

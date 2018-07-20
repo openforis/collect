@@ -7,8 +7,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.User;
 import org.openforis.collect.web.session.InvalidSessionException;
@@ -23,7 +23,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class SessionListener implements HttpSessionListener {
 
-	private static Log LOG = LogFactory.getLog(SessionListener.class);
+	private static Logger LOG = LogManager.getLogger(SessionListener.class);
 	
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {

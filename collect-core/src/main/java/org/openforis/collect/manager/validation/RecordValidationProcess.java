@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RecordValidationProcess extends AbstractProcess<Void, ProcessStatus> {
 
-//	private static Log LOG = LogFactory.getLog(RecordValidationProcess.class);
+//	private static Logger LOG = Logger.getLogger(RecordValidationProcess.class);
 	
 	@Autowired
 	private RecordManager recordManager;

@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.metamodel.TaxonSummaries;
@@ -26,7 +26,7 @@ public class SpeciesExportProcess {
 	private static final String LATIN_LANG_CODE = "lat";
 	private static final String VERNACULAR_NAMES_SEPARATOR = " / ";
 
-	private final Log log = LogFactory.getLog(SpeciesExportProcess.class);
+	private final Logger LOG = LogManager.getLogger(SpeciesExportProcess.class);
 	
 	private SpeciesManager speciesManager;
 	private String taxonomyName;
@@ -60,7 +60,7 @@ public class SpeciesExportProcess {
 				writeTaxonSummary(writer, vernacularNamesLangCodes, infoAttributeNames, item);
 			}
 		} catch (Exception e) {
-			log.error(e);
+			LOG.error(e);
 		} finally {
 			IOUtils.closeQuietly(writer);
 		}

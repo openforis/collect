@@ -1,5 +1,7 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.IDML3_NAMESPACE_URI;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -10,7 +12,6 @@ import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
  * @author G. Miceli

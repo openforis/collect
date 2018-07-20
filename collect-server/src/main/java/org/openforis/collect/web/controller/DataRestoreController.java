@@ -53,7 +53,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Scope(SCOPE_SESSION)
 public class DataRestoreController extends BasicController {
 
-	//private static Log LOG = LogFactory.getLog(RestoreController.class);
+	//private static Logger LOG = Logger.getLogger(RestoreController.class);
 	
 	@Autowired
 	private SurveyManager surveyManager;

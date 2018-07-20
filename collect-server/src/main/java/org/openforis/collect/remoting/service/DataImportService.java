@@ -6,8 +6,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
@@ -32,7 +32,7 @@ import org.springframework.security.access.annotation.Secured;
  */
 public class DataImportService {
 	
-	private static final Log log = LogFactory.getLog(DataImportService.class);	
+	private static final Logger LOG = LogManager.getLogger(DataImportService.class);	
 	
 	@Autowired
 	private RecordSessionManager sessionManager;
@@ -50,11 +50,11 @@ public class DataImportService {
 	public JobProxy startSummaryCreation(String filePath, String selectedSurveyUri, boolean overwriteAll,
 			boolean fullSummary) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
-			log.info("Starting data import summary creation");
+			LOG.info("Starting data import summary creation");
 			
 			packagedFile = new File(filePath);
 
-			log.info("Using file: " + packagedFile.getAbsolutePath());
+			LOG.info("Using file: " + packagedFile.getAbsolutePath());
 			
 			CollectSurvey survey = surveyManager.getByUri(selectedSurveyUri);
 
@@ -69,7 +69,7 @@ public class DataImportService {
 			
 			jobManager.start(job);
 		} else {
-			log.warn("Summary creation job already running");
+			LOG.warn("Summary creation job already running");
 		}
 		return getCurrentJob();
 	}
@@ -77,7 +77,7 @@ public class DataImportService {
 	@Secured(CLEANSING)
 	public JobProxy startImport(List<Integer> entryIdsToImport, boolean validateRecords, boolean processInTransaction) throws Exception {
 		if ( dataRestoreJob == null || ! dataRestoreJob.isRunning() ) {
-			log.info("Starting data restore");
+			LOG.info("Starting data restore");
 
 			DataRestoreJob job;
 			if (processInTransaction) {
@@ -100,7 +100,7 @@ public class DataImportService {
 			
 			jobManager.start(job);
 		} else {
-			log.warn("Data restore job already running");
+			LOG.warn("Data restore job already running");
 		}
 		return getCurrentJob();
 	}

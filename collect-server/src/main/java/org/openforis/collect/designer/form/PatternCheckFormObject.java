@@ -1,8 +1,8 @@
 package org.openforis.collect.designer.form;
 
-import liquibase.util.StringUtils;
-
 import org.openforis.idm.metamodel.validation.PatternCheck;
+
+import liquibase.util.StringUtils;
 
 /**
  * 

@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.idm.metamodel.expression.SchemaPathExpression;
 import org.openforis.idm.model.NodePathPointer;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
@@ -24,7 +24,7 @@ import org.openforis.idm.path.Path;
  */
 class StateDependencyMap {
 	
-	private static final Log LOG = LogFactory.getLog(StateDependencyMap.class);
+	private static final Logger LOG = LogManager.getLogger(StateDependencyMap.class);
 	
 	private ExpressionEvaluator expressionEvaluator;
 	private Map<NodeDefinition, Set<NodePathPointer>> dependentsBySource;
@@ -112,9 +112,7 @@ class StateDependencyMap {
 				registerSource(commonAncestor, sourceDef, dependentDef);
 			}
 		} catch (Exception e) {
-			if (LOG.isErrorEnabled()) {
-				LOG.error("Unable to register dependencies for node " + dependentDef.getPath() + " with expression " + expression, e);
-			}
+			LOG.error("Unable to register dependencies for node " + dependentDef.getPath() + " with expression " + expression, e);
 		}
 	}
 

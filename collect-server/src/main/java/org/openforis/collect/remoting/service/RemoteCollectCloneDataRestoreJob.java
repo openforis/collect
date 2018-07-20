@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -20,6 +18,8 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE) 
 public class RemoteCollectCloneDataRestoreJob extends Job {
 		
-	private static Log LOG = LogFactory.getLog(RemoteCollectCloneDataRestoreJob.class);
+	private static Logger LOG = LogManager.getLogger(RemoteCollectCloneDataRestoreJob.class);
 
 	@Autowired
 	private BackupStorageManager backupStorageManager;

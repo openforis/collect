@@ -25,7 +25,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 @Controller
 public class FileUploadController {
 
-	//private static Log LOG = LogFactory.getLog(FileUploadController.class);
+	//private static Logger LOG = Logger.getLogger(FileUploadController.class);
 
 	public static final String TEMP_PATH = "temp";
 

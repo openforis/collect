@@ -14,8 +14,8 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.exception.RecordFileException;
@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RecordFileBackupTask extends Task {
 	
-	private transient Log log = LogFactory.getLog(RecordFileBackupTask.class);
+	private transient Logger LOG = LogManager.getLogger(RecordFileBackupTask.class);
 
 	private RecordManager recordManager;
 	private RecordFileManager recordFileManager;
@@ -84,7 +84,7 @@ public class RecordFileBackupTask extends Task {
 					incrementProcessedItems();
 				} catch(Exception e) {
 					addSkippedRecord(summary);
-					log.error(String.format("Error backing up record files for record with id %d and keys %s", 
+					LOG.error(String.format("Error backing up record files for record with id %d and keys %s", 
 							summary.getId(), summary.getRootEntityKeyValues().toString()));
 				}
 			}
@@ -123,7 +123,7 @@ public class RecordFileBackupTask extends Task {
 					writeFile(file, entryName);
 				} else {
 					addSkippedFileError(summary, fileAttribute.getPath(), recordFileManager.getRepositoryFileAbsolutePath(fileAttribute));
-					log.error(String.format("Record file not found for record %s (%d) attribute %s (%d)", 
+					LOG.error(String.format("Record file not found for record %s (%d) attribute %s (%d)", 
 							StringUtils.join(record.getRootEntityKeyValues(), ','), record.getId(), fileAttribute.getPath(), fileAttribute.getInternalId()));
 					//throw new RecordFileException(message);
 				}

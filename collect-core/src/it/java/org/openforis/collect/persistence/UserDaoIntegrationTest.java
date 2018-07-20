@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  */
 public class UserDaoIntegrationTest extends CollectTest {
-	//private final Log log = LogFactory.getLog(ConfigurationDaoIntegrationTest.class);
+	//private final Logger log = Logger.getLogger(ConfigurationDaoIntegrationTest.class);
 	
 	@Autowired
 	protected UserDao userDao;

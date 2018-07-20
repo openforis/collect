@@ -1,6 +1,10 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.ALLOW_VALUES_SORTING;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.CODE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.LIST;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.PARENT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.STRICT;
 
 import java.io.IOException;
 

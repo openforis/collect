@@ -5,9 +5,9 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.datacleansing.DataCleansingStep;
+import org.openforis.collect.datacleansing.DataCleansingStep.DataCleansingStepType;
 import org.openforis.collect.datacleansing.DataCleansingStepValue;
 import org.openforis.collect.datacleansing.DataQuery;
-import org.openforis.collect.datacleansing.DataCleansingStep.DataCleansingStepType;
 import org.openforis.collect.datacleansing.form.DataCleansingStepForm;
 import org.openforis.collect.datacleansing.manager.DataCleansingStepManager;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;

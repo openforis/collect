@@ -1,7 +1,5 @@
 package org.openforis.idm.model;
 
-import org.openforis.idm.metamodel.NodeDefinition;
-
 import static junit.framework.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -9,6 +7,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.openforis.idm.metamodel.NodeDefinition;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class NodePointerDependencyGraphTest extends

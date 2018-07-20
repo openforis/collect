@@ -1,6 +1,8 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.EXTENSIONS;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.FILE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.MAX_SIZE;
 
 import java.io.IOException;
 

@@ -1,5 +1,9 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.APPLICATION_OPTIONS;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.OPTIONS;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TYPE;
+
 import java.io.IOException;
 
 import org.openforis.idm.metamodel.ApplicationOptions;
@@ -8,7 +12,6 @@ import org.openforis.idm.metamodel.xml.ApplicationOptionsBinder;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
  * @author G. Miceli

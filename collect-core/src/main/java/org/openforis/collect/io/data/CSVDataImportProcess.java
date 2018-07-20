@@ -18,8 +18,8 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.ReferenceDataImportStatus;
 import org.openforis.collect.io.data.DataLine.EntityIdentifier;
 import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
@@ -76,7 +76,7 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImportStatus<ParsingError>> {
 
-	private static Log LOG = LogFactory.getLog(CSVDataImportProcess.class);
+	private static Logger LOG = LogManager.getLogger(CSVDataImportProcess.class);
 
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "csvDataImport.error.internalErrorImportingFile";
 	private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";

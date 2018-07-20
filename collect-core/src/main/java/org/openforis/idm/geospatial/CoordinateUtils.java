@@ -1,6 +1,11 @@
 package org.openforis.idm.geospatial;
 
-import static org.openforis.idm.metamodel.SpatialReferenceSystem.*;
+import static org.openforis.idm.metamodel.SpatialReferenceSystem.LAT_LON_SRS;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.cts.CRSFactory;
 import org.cts.IllegalCoordinateException;
@@ -8,11 +13,6 @@ import org.cts.crs.GeodeticCRS;
 import org.cts.op.CoordinateOperation;
 import org.cts.op.CoordinateOperationFactory;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Daniel Wiell

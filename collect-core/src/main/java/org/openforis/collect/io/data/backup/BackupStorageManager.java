@@ -12,8 +12,8 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.BaseStorageManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.utils.Dates;
@@ -24,7 +24,7 @@ public class BackupStorageManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
 	
-	protected static Log LOG = LogFactory.getLog(BackupStorageManager.class);
+	protected static Logger LOG = LogManager.getLogger(BackupStorageManager.class);
 	
 	private static final String DEFAULT_BACKUP_STORAGE_SUBFOLDER = "backup";
 	

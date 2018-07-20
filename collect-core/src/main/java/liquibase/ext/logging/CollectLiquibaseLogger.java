@@ -5,12 +5,13 @@ import static liquibase.logging.LogLevel.DEBUG;
 import static liquibase.logging.LogLevel.INFO;
 import static liquibase.logging.LogLevel.SEVERE;
 import static liquibase.logging.LogLevel.WARNING;
-import liquibase.logging.LogLevel;
-import liquibase.logging.core.AbstractLogger;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import liquibase.logging.LogLevel;
+import liquibase.logging.core.AbstractLogger;
 
 
 /**
@@ -22,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CollectLiquibaseLogger extends AbstractLogger {
 	
-	private static final Log LOGGER = LogFactory.getLog(CollectLiquibaseLogger.class);
+	private static final Logger LOG = LogManager.getLogger(CollectLiquibaseLogger.class);
 	
 	@Override
 	public void setName(String name) {
@@ -88,16 +89,16 @@ public class CollectLiquibaseLogger extends AbstractLogger {
         }
         switch (logLevel) {
 		case SEVERE:
-			LOGGER.error(message, e);
+			LOG.error(message, e);
 			break;
 		case WARNING:
-			LOGGER.warn(message, e);
+			LOG.warn(message, e);
 			break;
 		case INFO:
-			LOGGER.info(message, e);
+			LOG.info(message, e);
 			break;
 		case DEBUG:
-			LOGGER.debug(message, e);
+			LOG.debug(message, e);
 			break;
 		default:
 			break;

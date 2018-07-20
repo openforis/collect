@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class DataExportService {
 
-//	private static Log LOG = LogFactory.getLog(DataExportService.class);
+//	private static Logger LOG = Logger.getLogger(DataExportService.class);
 
 	@Autowired
 	private RecordSessionManager sessionManager;

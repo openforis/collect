@@ -16,7 +16,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
  */
 public class AutomaticColumnProvider extends ColumnProviderChain {
 	
-//	private static final Log LOG = LogFactory.getLog(AutomaticColumnProvider.class);
+//	private static final Logger LOG = Logger.getLogger(AutomaticColumnProvider.class);
 	
 	public AutomaticColumnProvider(CSVDataExportParameters config, EntityDefinition entityDefinition) {
 		this(config, entityDefinition, null);

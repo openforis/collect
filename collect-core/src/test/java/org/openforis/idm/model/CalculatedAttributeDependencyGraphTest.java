@@ -1,12 +1,14 @@
 package org.openforis.idm.model;
 
-import org.junit.Test;
-import org.openforis.idm.metamodel.EntityDefinition;
+import static junit.framework.Assert.assertTrue;
+import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
+import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
+import static org.openforis.idm.testfixture.NodeDefinitionBuilder.rootEntityDef;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertTrue;
-import static org.openforis.idm.testfixture.NodeDefinitionBuilder.*;
+import org.junit.Test;
+import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
  * @author S. Ricci
