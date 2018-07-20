@@ -28,11 +28,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class CollectControlPanelController implements Initializable {
@@ -51,8 +53,8 @@ public class CollectControlPanelController implements Initializable {
 	private static final String SETTINGS_FILE_LOCATION_DEV = Files.getLocation(Files.getCurrentLocation(), SETTINGS_FILENAME);
 	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
 	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), DEFAULT_WEBAPPS_FOLDER_NAME);
-	private static final int LOG_OPENED_WINDOW_HEIGHT = 550;
-	private static final int LOG_CLOSED_WINDOW_HEIGHT = 210;
+	private static final int LOG_OPENED_WINDOW_HEIGHT = 580;
+	private static final int LOG_CLOSED_WINDOW_HEIGHT = 240;
 	private static final int LOG_TEXT_MAX_LENGTH = 5000;
 	private static final String CATALINA_BASE = "catalina.base";
 	
@@ -78,11 +80,14 @@ public class CollectControlPanelController implements Initializable {
 	@FXML
 	public Text statusTxt;
 	@FXML
+	public ProgressBar progressBar;
+	@FXML
 	public Text errorMessageTxt;
 	@FXML
 	private VBox runningAtUrlBox;
 		
 	private CollectControlPanel app;
+	private Stage stage;
 	private ApplicationServer server;
 	private ScheduledExecutorService executorService;
 	
@@ -258,15 +263,19 @@ public class CollectControlPanelController implements Initializable {
 		boolean runningAtUrlVisible = false;
 		boolean errorMessageVisible = false;
 		boolean shutdownBtnVisible = false;
+		boolean progressBarVisible = false;
 		String detailedErrorMessage = null;
 		String statusMessage = null;
 		String statusMessageClassName = "info";
+		
 		switch(status) {
 		case INITIALIZING:
 			statusMessage = "Initializing...";
+			progressBarVisible = true;
 			break;
 		case STARTING:
-			statusMessage = "Starting up...\r\n\r\nDO NOT CLOSE!";
+			statusMessage = "Starting up...";
+			progressBarVisible = true;
 			break;
 		case RUNNING:
 			statusMessage = "Running!";
@@ -295,6 +304,7 @@ public class CollectControlPanelController implements Initializable {
 		statusTxt.setText(statusMessage);
 		statusTxt.getStyleClass().clear();
 		statusTxt.getStyleClass().add(statusMessageClassName);
+		progressBar.setVisible(progressBarVisible);
 		serverConsole.setVisible(logOpened);
 	}
 	
@@ -356,6 +366,10 @@ public class CollectControlPanelController implements Initializable {
 	
 	public void setApp(CollectControlPanel app) {
 		this.app = app;
+	}
+	
+	public void setStage(Stage stage) {
+		this.stage = stage;
 	}
 	
 	public Status getStatus() {

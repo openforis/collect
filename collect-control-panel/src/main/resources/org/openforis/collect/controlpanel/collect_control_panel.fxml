@@ -21,7 +21,7 @@
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="applicationPane"
 	fx:controller="org.openforis.collect.controlpanel.CollectControlPanelController"
-	minHeight="210.0" maxHeight="550.0" prefHeight="210.0" 
+	minHeight="240.0" maxHeight="580.0" prefHeight="240.0" 
 	maxWidth="600.0" minWidth="600.0" prefWidth="600.0" 
 	styleClass="main-pane"
 	stylesheets="@org/openforis/collect/controlpanel/collect_control_panel.css">
@@ -32,9 +32,12 @@
 				<Image url="@org/openforis/collect/controlpanel/of-collect-logo.png" />
 			</image>
 		</ImageView>
-		<VBox alignment="TOP_CENTER" minWidth="400" >
+		<VBox alignment="TOP_CENTER" minWidth="400">
 			<HBox alignment="CENTER">
 				<Text fx:id="statusTxt" />
+			</HBox>
+			<HBox alignment="CENTER">
+				<ProgressBar fx:id="progressBar" prefWidth="300" progress="-1.0" />
 			</HBox>
 			<HBox minHeight="50" maxHeight="50" alignment="CENTER">
 				<Text fx:id="errorMessageTxt" wrappingWidth="400" />

@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class CollectControlPanel extends Application {
 
@@ -37,11 +39,26 @@ public class CollectControlPanel extends Application {
 			primaryStage.setTitle(TITLE);
 			primaryStage.setResizable(false);
 	
+			//prevent window close during initialization
+			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				public void handle(WindowEvent event) {
+					switch(controller.getStatus()) {
+					case INITIALIZING:
+					case STARTING:
+						event.consume();
+						break;
+					default:
+					}
+				}
+			});
+			
 			setLogo(primaryStage);
 	
 			//initialize controller
 			controller = fxmlLoader.getController();
 			controller.setApp(this);
+			controller.setStage(primaryStage);
+			
 			controller.closeLog();
 			
 			controller.startServer(() -> {
