@@ -23,47 +23,34 @@
 		</layout>
 	</appender>
 
-	<!-- Configure the Sentry appender, overriding the logging threshold to the ERROR level -->
-	<appender name="Sentry" class="io.sentry.log4j.SentryAppender">
-		<filter class="org.apache.log4j.varia.LevelRangeFilter">
-			<param name="levelMin" value="ERROR" />
-		</filter>
-	</appender>
-
 	<category name="org.openforis" additivity="false">
 		<priority value="info" />
 		<appender-ref ref="openforis" />
-		<appender-ref ref="Sentry" />
 	</category>
 
 	<category name="org.openforis.rmb" additivity="false">
 		<priority value="debug" />
 		<appender-ref ref="openforis" />
-		<appender-ref ref="Sentry" />
 	</category>
 	
 	<category name="flex.messaging" additivity="false">
 		<priority value="error" />
 		<appender-ref ref="openforis" />
-		<appender-ref ref="Sentry" />
 	</category>
 
 	<category name="liquibase" additivity="false">
 		<priority value="info" />
 		<appender-ref ref="openforis" />
-		<appender-ref ref="Sentry" />
 	</category>
 	
 	<category name="mondrian.sql">
 		<priority value="DEBUG" />
 		<appender-ref ref="openforis" />
-		<appender-ref ref="Sentry" />
 	</category>
 	
 	<category name="org.apache" additivity="false">
 		<priority value="error" />
 		<appender-ref ref="console" />
-		<appender-ref ref="Sentry" />
 	</category>
 
 <!-- 	<category name="org.springframework.aop.framework.CglibAopProxy" additivity="false"> -->
@@ -75,6 +62,5 @@
 	<root>
 		<priority value="info" />
 		<appender-ref ref="openforis" />
-		<appender-ref ref="Sentry" />
 	</root>
 </log4j:configuration>
