@@ -74,6 +74,7 @@
         "lessThanOneMinuteRemaining": "less than one minute"
     },
     "dataManagement": {
+        "formLanguage": "Form language",
         "csvDataImport": {
             "filename": "File Name",
             "row": "Row",

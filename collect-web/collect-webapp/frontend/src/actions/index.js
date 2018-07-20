@@ -1,5 +1,7 @@
 import ServiceFactory from 'services/ServiceFactory'
-import { Survey } from 'model/Survey';
+import { Survey } from 'model/Survey'
+import BrowserUtils from 'utils/BrowserUtils'
+import Arrays from 'utils/Arrays'
 
 export const REQUEST_APPLICATION_INFO = 'REQUEST_APPLICATION_INFO'
 export const RECEIVE_APPLICATION_INFO = 'RECEIVE_APPLICATION_INFO'
@@ -8,6 +10,8 @@ export const SELECT_PREFERRED_SURVEY = 'SELECT_PREFERRED_SURVEY'
 export const REQUEST_FULL_PREFERRED_SURVEY = 'REQUEST_FULL_PREFERRED_SURVEY'
 export const RECEIVE_FULL_PREFERRED_SURVEY = 'RECEIVE_FULL_PREFERRED_SURVEY'
 export const INVALIDATE_PREFERRED_SURVEY = 'INVALIDATE_PREFERRED_SURVEY'
+
+export const SELECT_PREFERRED_SURVEY_LANGUAGE = 'SELECT_PREFERRED_SURVEY_LANGUAGE'
 
 export const RECORD_DELETED = 'RECORD_DELETED'
 export const RECORDS_DELETED = 'RECORDS_DELETED'
@@ -40,12 +44,14 @@ export function selectPreferredSurvey(preferredSurveySummary) {
 	let surveyId = preferredSurveySummary.id;
 	return function (dispatch) {
 		dispatch(requestFullPreferredSurvey(surveyId))
-		ServiceFactory.surveyService.fetchById(surveyId).then(json => 
+		ServiceFactory.surveyService.fetchById(surveyId).then(json => {
 			dispatch(receiveFullPreferredSurvey(json))
-		)
+			const browserLangCode = BrowserUtils.determineBrowserLanguageCode()
+			const language = Arrays.contains(json.languages, browserLangCode) ? browserLangCode : json.languages[0]
+			dispatch(selectPreferredSurveyLanguage(language))
+		})
 	}
 }
-
 
 export function receiveFullPreferredSurvey(json) {
 	return {
@@ -58,7 +64,7 @@ export function receiveFullPreferredSurvey(json) {
 export function requestFullPreferredSurvey(surveyId) {
 	return {
 		type: REQUEST_FULL_PREFERRED_SURVEY,
-		surveyId,
+		surveyId: surveyId,
 		receivedAt: Date.now()
 	}
 }
@@ -66,7 +72,14 @@ export function requestFullPreferredSurvey(surveyId) {
 export function invalidatePreferredSurvey(preferredSurvey) {
 	return {
 		type: INVALIDATE_PREFERRED_SURVEY,
-		preferredSurvey
+		preferredSurvey: preferredSurvey
+	}
+}
+
+export function selectPreferredSurveyLanguage(language) {
+	return {
+		type: SELECT_PREFERRED_SURVEY_LANGUAGE,
+		language: language
 	}
 }
 

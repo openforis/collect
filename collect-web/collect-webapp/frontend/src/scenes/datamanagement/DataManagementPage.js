@@ -2,6 +2,11 @@ import React, { Component } from 'react'
 import RecordDataTable from 'components/datamanagement/RecordDataTable'
 import { Button, ButtonDropdown, 
 	DropdownToggle, DropdownMenu, DropdownItem, Row, Col, UncontrolledDropdown } from 'reactstrap'
+import FormControl from '@material-ui/core/FormControl'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import MenuItem from '@material-ui/core/MenuItem'
+import Select from '@material-ui/core/Select'
+
 import { connect } from 'react-redux'
 
 import * as Actions from 'actions'
@@ -54,7 +59,8 @@ class DataManagementPage extends Component {
 		this.handleDemoteCleansingToEntryButtonClick = this.handleDemoteCleansingToEntryButtonClick.bind(this)
 		this.handleMoveRecordsJobCompleted = this.handleMoveRecordsJobCompleted.bind(this)
 		this.handleWindowResize = this.handleWindowResize.bind(this)
-        this.updateTableHeight = this.updateTableHeight.bind(this)
+		this.updateTableHeight = this.updateTableHeight.bind(this)
+		this.handleSurveyLanguageChange = this.handleSurveyLanguageChange.bind(this)
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -243,19 +249,24 @@ class DataManagementPage extends Component {
 	handleMoveRecordsJobCompleted(job) {
 		this.recordDataTable.fetchData()		
 	}
+
+	handleSurveyLanguageChange(event) {
+		this.props.dispatch(Actions.selectPreferredSurveyLanguage(event.target.value))
+	}
 	
 	render() {
-		const { survey } = this.props
+		const { survey, loggedUser, userGroups, surveyLanguage } = this.props
 
 		if (! survey) {
 			return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
 		}
-		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === survey.userGroup.id)
-		const loggedUser = this.props.loggedUser
+
+		const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroup.id)
+		
 		return (
 			<MaxAvailableSpaceContainer ref={ r => this.mainContainer = r }>
 				<Row className="justify-content-between">
-					<Col sm={{size: 4}}>
+					<Col md={2}>
 						{loggedUser.canCreateRecords(surveyUserGroup) && 
 							<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
 						}{' '}
@@ -266,10 +277,10 @@ class DataManagementPage extends Component {
 							<Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/></Button>
 						}
 					</Col>
-					<Col sm={{size: 2}}>
+					<Col md={2}>
 						<Button color="success" onClick={this.handleValidationReportButtonClick}><i className="fa fa-exclamation-triangle" aria-hidden="true"></i> Validation Report</Button>
 					</Col>
-					<Col sm={{size: 2}}>
+					<Col md={2}>
 						<ButtonDropdown isOpen={this.state.exportDropdownOpen} 
 								toggle={() => this.setState({exportDropdownOpen: !this.state.exportDropdownOpen})}>
 							<DropdownToggle color="primary" caret><span className="fa fa-download"/>{L.l('dataManagement.export')}</DropdownToggle>
@@ -279,7 +290,7 @@ class DataManagementPage extends Component {
 							</DropdownMenu>
 						</ButtonDropdown>
 					</Col>
-					<Col sm={{size: 2}}>
+					<Col md={2}>
 						{loggedUser.canImportRecords(surveyUserGroup) &&
 							<ButtonDropdown isOpen={this.state.importDropdownOpen} 
 									toggle={() => this.setState({importDropdownOpen: !this.state.importDropdownOpen})}>
@@ -291,7 +302,7 @@ class DataManagementPage extends Component {
 							</ButtonDropdown>
 						}
 					</Col>
-					<Col sm={{size: 2}}>
+					<Col md={2}>
 						{loggedUser.canPromoteRecordsInBulk(surveyUserGroup) &&
 							<UncontrolledDropdown>
 								<DropdownToggle color="warning" caret><span className="fa fa-arrow-right"/>Workflow</DropdownToggle>
@@ -306,6 +317,16 @@ class DataManagementPage extends Component {
 								</DropdownMenu>
 							</UncontrolledDropdown>
 						}
+					</Col>
+					<Col md={2}>
+						<FormControl>
+							<Select
+								value={surveyLanguage}
+								onChange={this.handleSurveyLanguageChange}>
+								{survey.languages.map(l => <MenuItem value={l}>{L.l('languages.' + l) + ' ('+ l + ')'}</MenuItem>)}
+							</Select>
+							<FormHelperText>{L.l('dataManagement.formLanguage')}</FormHelperText>
+						</FormControl>
 					</Col>
 				</Row>
 				<Row>
@@ -330,6 +351,7 @@ class DataManagementPage extends Component {
 const mapStateToProps = state => {
 	return {
 		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
+		surveyLanguage: state.preferredSurvey ? state.preferredSurvey.language : null,
 		loggedUser: state.session ? state.session.loggedUser : null,
 		userGroups: state.userGroups ? state.userGroups.items : null
 	}

@@ -21,6 +21,7 @@ export class Survey extends Serializable {
     temporary
     published
     publishedId
+    languages = []
     
     constructor(jsonData) {
         super()
@@ -37,6 +38,7 @@ export class Survey extends Serializable {
             codeList.fillFromJSON(codeListJsonObj)
             return codeList
         })
+        this.languages = jsonObj.languages
         this.modelVersions = jsonObj.modelVersions
         this.schema = new Schema(this)
         this.schema.fillFromJSON(jsonObj.schema)

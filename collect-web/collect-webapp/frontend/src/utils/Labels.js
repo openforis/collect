@@ -1,6 +1,7 @@
 import T from 'i18n-react';
 import Constants from 'Constants'
 import Arrays from 'utils/Arrays'
+import BrowserUtils from 'utils/BrowserUtils'
 
 export default class Labels {
 
@@ -9,20 +10,10 @@ export default class Labels {
     static _ALL_TEXTS = {}
 
     static initialize(callback) {
-        const browserLangCode = Labels._determineBrowserLanguageCode()
+        const browserLangCode = BrowserUtils.determineBrowserLanguageCode()
         const langCode = Arrays.contains(Labels.SUPPORTED_LANG_CODES, browserLangCode) ? 
             browserLangCode : Labels.DEFAULT_LANG_CODE
         Labels.loadLabels(langCode, callback)
-    }
-
-    static _determineBrowserLanguageCode() {
-        const locale = navigator.language || (navigator.languages && navigator.languages[0])
-            || navigator.userLanguage
-        const langCode = locale.length > 2 ? 
-            locale.indexOf('_') > 0 ? locale.split('_')[0]
-                : locale.split('-')[0]
-            : locale
-        return langCode
     }
 
     static loadLabels(langCode, callback) {

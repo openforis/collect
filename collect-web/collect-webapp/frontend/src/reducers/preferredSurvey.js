@@ -2,13 +2,15 @@ import {
   SELECT_PREFERRED_SURVEY,
   REQUEST_FULL_PREFERRED_SURVEY, 
   RECEIVE_FULL_PREFERRED_SURVEY, 
-  INVALIDATE_PREFERRED_SURVEY
+  INVALIDATE_PREFERRED_SURVEY,
+  SELECT_PREFERRED_SURVEY_LANGUAGE
 } from '../actions'
 
 const initialState = {
 	isFetching: false,
 	didInvalidate: false,
-	survey: null
+	survey: null,
+	language: null
 }
 
 function preferredSurvey(
@@ -33,7 +35,11 @@ function preferredSurvey(
 		    didInvalidate: false,
 		    survey: action.survey,
 		    lastUpdated: action.receivedAt
-        })
+		})
+	case SELECT_PREFERRED_SURVEY_LANGUAGE:
+		return Object.assign({}, state, {
+			language: action.language
+		})
     default:
     	return state
   }
