@@ -186,7 +186,6 @@ export default class User extends Serializable {
 		const roleInGroup = userInGroup.role
         const rootEntityDef = attr.rootEntity
         const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
-        const prefix = 'summary_'
         return ! isQualifier || roleInGroup === 'ADMINISTRATOR' || roleInGroup === 'OWNER'
 
     }

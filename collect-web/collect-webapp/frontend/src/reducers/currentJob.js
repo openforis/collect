@@ -29,6 +29,7 @@ function currentJob(state = initialState, action) {
                         state.jobMonitorConfiguration.handleJobFailed(action.job)
                     }
                     break
+                default:
             }
             return { ...state, 
                 job: action.job
