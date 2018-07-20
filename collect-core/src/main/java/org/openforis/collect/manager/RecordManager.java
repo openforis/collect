@@ -583,11 +583,13 @@ public class RecordManager {
 		UserGroup group = userGroupManager.loadById(userInGroup.getGroupId());
 		Map<String, String> qualifiersByName = group.getQualifiersByName();
 		for (Entry<String, String> qualifier : qualifiersByName.entrySet()) {
-			String attributePath = record.getRootEntity().getName() + "/" + qualifier.getKey();
-			Attribute<?, Value> attribute = record.findNodeByPath(attributePath);
-			Value qualifierValue = attribute.getDefinition().createValue(qualifier.getValue());
-			NodeChangeSet changes = updater.updateAttribute(attribute, qualifierValue);
-			changeSet.addMergeChanges(changes);
+			String qualifierName = qualifier.getKey();
+			if (record.getRootEntity().getDefinition().containsChildDefinition(qualifierName)) {
+				Attribute<?, Value> attribute = record.getRootEntity().getChild(qualifierName);
+				Value qualifierValue = attribute.getDefinition().createValue(qualifier.getValue());
+				NodeChangeSet changes = updater.updateAttribute(attribute, qualifierValue);
+				changeSet.addMergeChanges(changes);
+			}
 		}
 	}
 
