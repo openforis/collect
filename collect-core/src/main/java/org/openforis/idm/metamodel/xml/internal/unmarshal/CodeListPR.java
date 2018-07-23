@@ -17,12 +17,12 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListLabel.Type;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
 

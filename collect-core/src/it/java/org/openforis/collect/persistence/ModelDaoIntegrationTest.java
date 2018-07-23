@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import junit.framework.Assert;
 
 public class ModelDaoIntegrationTest extends CollectIntegrationTest {
-	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
+	private final Logger LOG = LogManager.getLogger(ModelDaoIntegrationTest.class);
 	
 	@Autowired
 	protected RecordDao recordDao;
@@ -77,7 +77,7 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 		recordDao.insert(record);
 		
 		String saved = record.toString();
-		log.debug("Saving record:\n"+saved);
+		LOG.debug("Saving record:\n"+saved);
 		
 		// RELOAD
 		RecordFilter filter = new RecordFilter(survey, survey.getSchema().getRootEntityDefinition("cluster").getId());

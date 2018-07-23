@@ -13,8 +13,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.io.data.DataExportStatus.Format;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
 @Deprecated
 public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 	
-	private static Log LOG = LogFactory.getLog(CSVDataExportProcess.class);
+	private static Logger LOG = LogManager.getLogger(CSVDataExportProcess.class);
 
 	@Autowired
 	private RecordManager recordManager;

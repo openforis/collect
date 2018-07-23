@@ -14,26 +14,43 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.impl.DataSourceConnectionProvider;
+import org.openforis.collect.Collect;
 import org.openforis.collect.config.CollectConfiguration;
 import org.openforis.collect.config.CollectConfiguration.ServiceConfiguration;
 import org.openforis.collect.persistence.DbInitializer;
 import org.openforis.collect.persistence.DbUtils;
 
+import io.sentry.DefaultSentryClientFactory;
+import io.sentry.Sentry;
+import io.sentry.context.ContextManager;
+import io.sentry.context.SingletonContextManager;
+import io.sentry.dsn.Dsn;
+
 public class ApplicationInitializerServletContextListener implements ServletContextListener {
 
-	private final Log LOG = LogFactory.getLog(ApplicationInitializerServletContextListener.class);
+	private final Logger LOG = LogManager.getLogger(ApplicationInitializerServletContextListener.class);
+	private static final String SENTRY_DSN = "https://d3693c474ffb41f2b5e6265dc3411705@sentry.io/1246866?release=" + Collect.VERSION;
 	private static final String DEV_MODE_INIT_PARAMETER_NAME = "devMode";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		LOG.info("========Open Foris Collect - Starting initialization ==========");
+		initSentry();
+		
+		LOG.error("TEST");
 		initDB();
 		CollectConfiguration.setDevelopmentMode(determineIsDevelopmentMode(sce));
 		configureOfUsersModule(sce);
 		LOG.info("========Open Foris Collect - Initialized ======================");
+	}
+
+	private void initSentry() {
+		Sentry.init(SENTRY_DSN, new SentryClientFactory()); //use a custom client factory to support extra tags
+		
+//		Sentry.getContext().addTag( "ReleaseDate", UpdateIniUtils.getVersionInstalled() );
 	}
 
 	private boolean determineIsDevelopmentMode(ServletContextEvent sce) {
@@ -94,4 +111,11 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 	public void contextDestroyed(ServletContextEvent sce) {
 	}
 
+	private static class SentryClientFactory extends DefaultSentryClientFactory {
+
+		@Override
+		protected ContextManager getContextManager(Dsn dsn) {
+			return new SingletonContextManager();
+		}
+	}
 }

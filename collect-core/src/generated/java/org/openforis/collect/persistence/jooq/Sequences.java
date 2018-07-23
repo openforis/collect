@@ -8,7 +8,6 @@ import javax.annotation.Generated;
 
 import org.jooq.Sequence;
 import org.jooq.impl.SequenceImpl;
-import org.openforis.collect.persistence.jooq.Collect;
 
 
 /**

@@ -6,14 +6,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectRecordSummary;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordValidationReportGenerator;
 import org.openforis.collect.model.RecordValidationReportItem;
@@ -35,7 +35,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 			"Record","Phase","Attribute Schema Path",
 			"Field path","Field path (labels)","Error message"};
 
-	private static Log LOG = LogFactory.getLog(ValidationReportProcess.class);
+	private static Logger LOG = LogManager.getLogger(ValidationReportProcess.class);
 	
 	private OutputStream outputStream;
 	private RecordManager recordManager;
@@ -111,9 +111,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 				status.error();
 				String message = e.getMessage();
 				status.setErrorMessage(message);
-				if ( LOG.isErrorEnabled() ) {
-					LOG.error(message, e);
-				}
+				LOG.error(message, e);
 			}
 		}
 	}

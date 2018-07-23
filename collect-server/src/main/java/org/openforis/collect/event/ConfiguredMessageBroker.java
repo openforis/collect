@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -16,9 +15,8 @@ import java.util.concurrent.TimeUnit;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.Configuration;
 import org.openforis.collect.persistence.DbUtils;
 import org.openforis.rmb.MessageBroker;
@@ -48,7 +46,7 @@ import com.codahale.metrics.Timer;
  */
 public class ConfiguredMessageBroker implements MessageBroker {
 
-	private static final Logger LOG = Logger.getLogger(ConfiguredMessageBroker.class);
+	private static final Logger LOG = LogManager.getLogger(ConfiguredMessageBroker.class);
 	private static final String TABLE_PREFIX = "ofc_";
 	
 	private final SpringJdbcMessageBroker messageBroker;
@@ -142,24 +140,26 @@ public class ConfiguredMessageBroker implements MessageBroker {
 		}
 
 		private File getMetricsOutputFile() throws IOException {
-			@SuppressWarnings("unchecked")
-			Enumeration<Appender> e = Logger.getRootLogger().getAllAppenders();
-			while (e.hasMoreElements()) {
-				Appender app = e.nextElement();
-				if (app instanceof FileAppender) {
-					FileAppender fileAppender = (FileAppender) app;
-					File openforisAppenderFile = new File(fileAppender.getFile());
-					File logDir = openforisAppenderFile.getParentFile();
-					File file = new File(logDir, METRICS_LOG_FILE_NAME);
-					if (file.exists()) {
-						eraseFileContent(file);
-					} else {
-						file.createNewFile();
-					}
-					return file;
+			File logsDir = determineLogsFolder();
+			if (logsDir.exists()) {
+				File file = new File(logsDir, METRICS_LOG_FILE_NAME);
+				if (file.exists()) {
+					eraseFileContent(file);
+				} else {
+					file.createNewFile();
 				}
+				return file;
+			} else {
+				throw new IllegalStateException("Error generating metrics log file: missing logs folder");
 			}
-			throw new IOException("Error writing metrics log file");
+		}
+
+		private File determineLogsFolder() {
+			String baseFolder = System.getProperty("catalina.base");
+			if (baseFolder == null) {
+				baseFolder = new File(".").getAbsoluteFile().getParentFile().getAbsolutePath();
+			}
+			return new File(baseFolder, "logs");
 		}
 		
 		private ScheduledReporter createInternalReporter() throws FileNotFoundException {

@@ -18,8 +18,8 @@ import java.util.zip.ZipException;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.NewBackupFileExtractor;
 import org.openforis.collect.io.data.DataImportState.MainStep;
 import org.openforis.collect.io.data.DataImportState.SubStep;
@@ -69,7 +69,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 
 	private static final int MAX_QUERY_BUFFER_SIZE = 100;
 
-	private static Log LOG = LogFactory.getLog(XMLDataImportProcess.class);
+	private static Logger LOG = LogManager.getLogger(XMLDataImportProcess.class);
 
 	@Autowired
 	private RecordManager recordManager;

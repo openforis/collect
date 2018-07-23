@@ -1,13 +1,17 @@
 package org.openforis.idm.model.expression.internal;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.Function;
 import org.apache.commons.jxpath.Functions;
 import org.openforis.idm.metamodel.SpeciesListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.LookupProvider;
-
-import java.util.*;
 
 public abstract class CustomFunctions implements Functions {
 	

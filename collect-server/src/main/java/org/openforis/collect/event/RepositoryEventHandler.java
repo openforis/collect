@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.relational.event.InitializeRDBEvent;
 import org.openforis.collect.reporting.ReportingRepositories;
 import org.openforis.concurrency.Progress;
@@ -21,7 +21,7 @@ import org.openforis.rmb.KeepAliveMessageHandler;
  */
 public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 
-	private static final Log LOG = LogFactory.getLog(RepositoryEventHandler.class);
+	private static final Logger LOG = LogManager.getLogger(RepositoryEventHandler.class);
 	
 	private static final int DEFAULT_MAX_TRY_COUNT = 3;
 	private static final long DEFAULT_RETRY_DELAY = 3000;

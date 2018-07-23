@@ -1,7 +1,7 @@
 package org.openforis.idm.model;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.rootEntityDef;

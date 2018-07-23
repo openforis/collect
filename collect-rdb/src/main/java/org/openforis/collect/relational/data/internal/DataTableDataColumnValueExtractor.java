@@ -2,8 +2,8 @@ package org.openforis.collect.relational.data.internal;
 
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
@@ -23,7 +23,7 @@ import org.openforis.idm.model.TimeAttribute;
  */
 public class DataTableDataColumnValueExtractor<C extends DataColumn> extends ColumnValueExtractor<DataTable, C> {
 
-	private static final Log LOG = LogFactory.getLog(DataTableDataColumnValueExtractor.class);
+	private static final Logger LOG = LogManager.getLogger(DataTableDataColumnValueExtractor.class);
 	
 	public DataTableDataColumnValueExtractor(DataTable table, C column) {
 		super(table, column);

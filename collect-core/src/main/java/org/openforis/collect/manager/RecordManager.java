@@ -63,7 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly=true, propagation=SUPPORTS)
 public class RecordManager {
 
-//	private final Log log = LogFactory.getLog(RecordManager.class);
+//	private final Logger log = Logger.getLogger(RecordManager.class);
 	
 	private static final int DEFAULT_LOCK_TIMEOUT_MILLIS = 300000;
 	

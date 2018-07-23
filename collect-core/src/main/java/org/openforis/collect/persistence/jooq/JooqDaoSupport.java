@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.Query;
 import org.jooq.exception.DataAccessException;
 
@@ -18,7 +18,7 @@ import org.jooq.exception.DataAccessException;
  * @author S. Ricci
  */
 public abstract class JooqDaoSupport {
-	protected final Log log = LogFactory.getLog(getClass());
+	protected final Logger log = LogManager.getLogger(getClass());
 
 	private static final String CONSTRAINT_VIOLATION_CODE = "23";
 	private static final String CONSTRAINT_VIOLATION_MESSAGE = "constraint violation";
@@ -38,7 +38,7 @@ public abstract class JooqDaoSupport {
 		}
 	}
 	
-	protected Log getLog() {
+	protected Logger getLog() {
 		return log;
 	}
 	

@@ -123,7 +123,7 @@ public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	// private static Log LOG = LogFactory.getLog(DataController.class);
+	// private static Logger LOG = Logger.getLogger(DataController.class);
 
 	@Autowired
 	private RecordManager recordManager;

@@ -6,14 +6,14 @@ package org.openforis.collect.remoting.service;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.Collect;
 import org.openforis.collect.CollectInfo;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ConfigurationService {
 
-	protected static Log LOG = LogFactory.getLog(ConfigurationService.class);
+	protected static Logger LOG = LogManager.getLogger(ConfigurationService.class);
 	
 	@Autowired
 	private ConfigurationManager configurationManager;

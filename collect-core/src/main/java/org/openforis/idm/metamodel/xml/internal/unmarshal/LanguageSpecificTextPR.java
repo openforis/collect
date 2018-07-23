@@ -1,5 +1,9 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TYPE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.XML_LANG_ATTRIBUTE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.XML_NAMESPACE_URI;
+
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,8 +11,6 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
  * @author G. Miceli

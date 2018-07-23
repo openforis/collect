@@ -1,6 +1,17 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.ID;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.LABEL;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.MAX_COUNT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.MIN_COUNT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.MULTIPLE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.NAME;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.PROMPT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.RELEVANT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.REQUIRED;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.REQUIRED_IF;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TYPE;
 
 import java.io.IOException;
 import java.util.Locale;

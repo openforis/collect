@@ -1,6 +1,10 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DECIMAL_DIGITS;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DEFAULT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.PRECISION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TYPE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.UNIT;
 
 import java.io.IOException;
 import java.util.Locale;

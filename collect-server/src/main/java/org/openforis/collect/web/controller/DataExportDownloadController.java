@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.utils.Controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class DataExportDownloadController extends BasicController {
 
-	private static Log LOG = LogFactory.getLog(DataExportDownloadController.class);
+	private static Logger LOG = LogManager.getLogger(DataExportDownloadController.class);
 	
 	@RequestMapping(value = "/downloadDataExport.htm", method = RequestMethod.GET)
 	public void downloadDataExport(

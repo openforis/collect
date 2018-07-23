@@ -1,6 +1,7 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DEPRECATED;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.SINCE;
 
 import java.io.IOException;
 

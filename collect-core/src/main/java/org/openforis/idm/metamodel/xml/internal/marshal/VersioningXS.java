@@ -1,6 +1,12 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DATE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.ID;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.LABEL;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.NAME;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.VERSION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.VERSIONING;
 
 import java.io.IOException;
 import java.util.List;

@@ -5,15 +5,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Locale;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.ConnectionProvider;
 import org.jooq.impl.DialectAwareJooqConfiguration;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 
 public class DbInitializer {
 	
-	private static final Log LOG = LogFactory.getLog(DbInitializer.class);
+	private static final Logger LOG = LogManager.getLogger(DbInitializer.class);
 	
 	private ConnectionProvider connectionProvider;
 

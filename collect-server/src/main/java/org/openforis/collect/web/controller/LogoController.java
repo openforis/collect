@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.LogoManager;
 import org.openforis.collect.model.Logo;
 import org.openforis.collect.model.LogoPosition;
@@ -30,7 +30,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 @Controller
 public class LogoController extends BasicController {
 
-	private Log log = LogFactory.getLog(LogoController.class);
+	private static final Logger LOG = LogManager.getLogger(LogoController.class);
 	
 	@Autowired
 	private LogoManager logoManager;
@@ -66,7 +66,7 @@ public class LogoController extends BasicController {
 				String extension = "jpg";
 				Controllers.writeFileToResponse(response, is, "logo." + extension, contentType, data.length);
 			} catch (IOException e) {
-				log.error("Error writing logo in position: " + position, e);
+				LOG.error("Error writing logo in position: " + position, e);
 			}
 		}
 	}

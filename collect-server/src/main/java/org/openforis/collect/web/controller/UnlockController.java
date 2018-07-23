@@ -3,8 +3,8 @@ package org.openforis.collect.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.web.session.SessionState;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 public class UnlockController {
-	private static Log LOG = LogFactory.getLog(UnlockController.class);
+	private static final Logger LOG = LogManager.getLogger(UnlockController.class);
 	
 	@Autowired
 	private RecordManager recordManager;

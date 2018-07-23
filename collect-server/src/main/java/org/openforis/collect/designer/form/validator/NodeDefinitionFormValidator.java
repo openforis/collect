@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
-import static org.openforis.collect.designer.form.NodeDefinitionFormObject.*;
+import static org.openforis.collect.designer.form.NodeDefinitionFormObject.MULTIPLE_FIELD;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject.RelevanceType;

@@ -28,7 +28,7 @@ public abstract class Node<D extends NodeDefinition> implements Serializable, De
 
 	private static final long serialVersionUID = 1L;
 
-//	private final Log log = LogFactory.getLog(Node.class);
+//	private final Logger log = Logger.getLogger(Node.class);
 	
 	transient final D definition;
 	transient Record record;

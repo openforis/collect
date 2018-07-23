@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  */
 public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
-	//private final Log log = LogFactory.getLog(ConfigurationDaoIntegrationTest.class);
+	//private final Logger log = Logger.getLogger(ConfigurationDaoIntegrationTest.class);
 	
 	@Autowired
 	protected RecordIndexManager persistedRecordIndexManager;

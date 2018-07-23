@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
@@ -32,7 +32,7 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
  */
 public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportStatus> {
 
-	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
+	private static Logger LOG = LogManager.getLogger(CodeListImportProcess.class);
 
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "codeListImport.error.internalErrorImportingFile";
 	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";

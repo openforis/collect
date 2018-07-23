@@ -19,8 +19,8 @@ import java.io.IOException;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -35,7 +35,7 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 abstract class NodeDefinitionPR extends IdmlPullReader {
 	private static final NodeLabel.Type DEFAULT_LABEL_TYPE = NodeLabel.Type.INSTANCE;
-	private static final Log LOG = LogFactory.getLog(NodeDefinitionPR.class);
+	private static final Logger LOG = LogManager.getLogger(NodeDefinitionPR.class);
 	
 	private NodeDefinition definition;
 	private EntityDefinition parentDefinition;

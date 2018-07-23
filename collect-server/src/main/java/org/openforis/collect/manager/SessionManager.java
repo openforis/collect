@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.webapp.HttpGraniteContext;
 import org.openforis.collect.config.CollectConfiguration;
@@ -30,7 +30,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class SessionManager {
 
-	private static Log LOG = LogFactory.getLog(SessionManager.class);
+	private static Logger LOG = LogManager.getLogger(SessionManager.class);
 	private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
 	@Autowired

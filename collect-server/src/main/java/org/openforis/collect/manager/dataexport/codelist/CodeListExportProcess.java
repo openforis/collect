@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.codelistimport.CodeListCSVReader;
 import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
@@ -26,7 +26,7 @@ import org.openforis.idm.metamodel.CodeListLevel;
  */
 public class CodeListExportProcess {
 
-	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
+	private static Logger LOG = LogManager.getLogger(CodeListImportProcess.class);
 
 	private static final String FLAT_LIST_LEVEL_NAME = "item";
 	private static final char SEPARATOR = ',';

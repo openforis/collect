@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.ReferenceDataImportTask;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
@@ -34,7 +34,7 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
  */
 public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 
-	private static Log LOG = LogFactory.getLog(CodeListImportTask.class);
+	private static Logger LOG = LogManager.getLogger(CodeListImportTask.class);
 
 	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";
 	

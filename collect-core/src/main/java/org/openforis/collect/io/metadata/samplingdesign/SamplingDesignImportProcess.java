@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
@@ -33,7 +33,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	private static final String SURVEY_NOT_FOUND_ERROR_MESSAGE_KEY = "samplingDesignImport.error.surveyNotFound";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "samplingDesignImport.error.internalErrorImportingFile";
 	
-	private static Log LOG = LogFactory.getLog(SamplingDesignImportProcess.class);
+	private static Logger LOG = LogManager.getLogger(SamplingDesignImportProcess.class);
 	
 	private SamplingDesignManager samplingDesignManager;
 	private SurveyManager surveyManager;

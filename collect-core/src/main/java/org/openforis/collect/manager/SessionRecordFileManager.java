@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
@@ -31,7 +31,7 @@ public class SessionRecordFileManager implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	protected static Log LOG = LogFactory.getLog(SessionRecordFileManager.class);
+	protected static Logger LOG = LogManager.getLogger(SessionRecordFileManager.class);
 
 	@Autowired
 	private RecordFileManager recordFileManager;

@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.commons.collection.ItemAddVisitor;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -31,7 +31,7 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  */
 public abstract class DependencyGraph<T> {
 
-	private static final Log log = LogFactory.getLog(RelevanceDependencyGraph.class);
+	private static final Logger LOG = LogManager.getLogger(RelevanceDependencyGraph.class);
 
 	protected abstract boolean isDependentItemIncluded(T item);
 	
@@ -83,7 +83,7 @@ public abstract class DependencyGraph<T> {
 				};
 			});
 		} catch (InvalidExpressionException e) {
-			log.error(String.format("Error registering dependencies for node %s", toString(item)), e);
+			LOG.error(String.format("Error registering dependencies for node %s", toString(item)), e);
 		}
 	}
 

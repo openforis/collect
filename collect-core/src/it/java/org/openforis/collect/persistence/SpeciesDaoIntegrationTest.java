@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author E. Wibowo
  */
 public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
-//	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
+//	private final Logger log = Logger.getLogger(ModelDaoIntegrationTest.class);
 
 	@Autowired
 	private TaxonomyDao taxonomyDao;

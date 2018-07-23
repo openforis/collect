@@ -8,15 +8,15 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class DbUtils {
 	
 	public static final String DB_JNDI_RESOURCE_NAME = "jdbc/collectDs";
 	public static final String SCHEMA_NAME = "collect";
 	
-	private static final Log LOG = LogFactory.getLog(DbUtils.class);
+	private static final Logger LOG = LogManager.getLogger(DbUtils.class);
 	
 	public static Connection getConnection() {
 		try {

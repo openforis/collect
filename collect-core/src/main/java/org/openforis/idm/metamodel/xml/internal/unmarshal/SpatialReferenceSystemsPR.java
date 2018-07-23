@@ -1,10 +1,16 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.LABEL;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.SPATIAL_REFERENCE_SYSTEM;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.SPATIAL_REFERENCE_SYSTEMS;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.SRID;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.WKT;
+
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.XmlParseException;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
  * @author G. Miceli

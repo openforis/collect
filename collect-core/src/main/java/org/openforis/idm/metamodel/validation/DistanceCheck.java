@@ -3,8 +3,8 @@
  */
 package org.openforis.idm.metamodel.validation;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
@@ -23,7 +23,7 @@ import org.openforis.idm.path.Path;
 public class DistanceCheck extends Check<CoordinateAttribute> {
 
 	private static final long serialVersionUID = 1L;
-	private static final Log LOG = LogFactory.getLog(DistanceCheck.class);
+	private static final Logger LOG = LogManager.getLogger(DistanceCheck.class);
 
 	private String destinationPointExpression;
 	private String minDistanceExpression;
@@ -107,10 +107,8 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 			T result = expressionEvaluator.evaluateAttributeValue(thisNode.getParent(), thisNode, thisNode.getDefinition(), expression);
 			return result;
 		} catch (InvalidExpressionException e) {
-			if( LOG.isWarnEnabled() ){
-				LOG.warn(String.format("[survey %s: coordinate attribute: %s] Unable to evaluate expression %s" + 
-						thisNode.getSurvey().getName(), thisNode.getPath(), expression), e);
-			}
+			LOG.warn(String.format("[survey %s: coordinate attribute: %s] Unable to evaluate expression %s" + 
+					thisNode.getSurvey().getName(), thisNode.getPath(), expression), e);
 			return null;
 		}
 	}
@@ -125,10 +123,8 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 			T result = (T) expressionEvaluator.evaluateValue(thisNode.getParent(), thisNode, expression);
 			return result;
 		} catch (InvalidExpressionException e) {
-			if( LOG.isWarnEnabled() ){
-				LOG.warn(String.format("[survey %s: coordinate attribute: %s] Unable to evaluate expression %s" + 
-						thisNode.getSurvey().getName(), thisNode.getPath(), expression), e);
-			}
+			LOG.warn(String.format("[survey %s: coordinate attribute: %s] Unable to evaluate expression %s" + 
+					thisNode.getSurvey().getName(), thisNode.getPath(), expression), e);
 			return null;
 		}
 	}

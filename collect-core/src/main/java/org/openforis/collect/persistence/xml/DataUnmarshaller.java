@@ -12,8 +12,8 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.Collect;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
@@ -48,7 +48,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class DataUnmarshaller {
 
 	private static final String NAMESPACES_FEATURE = "http://xml.org/sax/features/namespaces";
-	private static final Log log = LogFactory.getLog(DataUnmarshaller.class);
+	private static final Logger log = LogManager.getLogger(DataUnmarshaller.class);
 
 	private DataHandler dataHandler;
 	private XMLReader reader;

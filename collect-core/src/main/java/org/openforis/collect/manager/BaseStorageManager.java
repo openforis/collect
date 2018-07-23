@@ -1,15 +1,16 @@
 package org.openforis.collect.manager;
 
-import java.io.File;
+import static org.openforis.collect.utils.Files.TEMP_FOLDER;
+import static org.openforis.collect.utils.Files.getReadableSysPropLocation;
 
+import java.io.File;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
-import static org.openforis.collect.utils.Files.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class BaseStorageManager implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static Log LOG = LogFactory.getLog(BaseStorageManager.class);
+	private static Logger LOG = LogManager.getLogger(BaseStorageManager.class);
 	
 	protected static final String DATA_FOLDER_NAME = "data";
 
