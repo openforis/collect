@@ -152,10 +152,6 @@
 			<groupId>taglibs</groupId>
 			<artifactId>standard</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
 		<!-- Provided by the application server -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
