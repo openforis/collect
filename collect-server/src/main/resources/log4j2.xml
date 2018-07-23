@@ -29,21 +29,26 @@
 			<AppenderRef ref="Sentry" level="error" />
 		</Logger>
 
+		<Logger name="io.sentry" level="info" additivity="false">
+			<AppenderRef ref="openforis" />
+		</Logger>
+		
 		<Logger name="liquibase" level="info" additivity="false">
 			<AppenderRef ref="openforis" />
 			<AppenderRef ref="Sentry" level="error" />
 		</Logger>
 
-		<Logger name="org.apache" level="error" additivity="false">
+		<Logger name="org.apache" level="info" additivity="false">
 			<AppenderRef ref="STDOUT" />
-			<AppenderRef ref="Sentry" level="error" />
-		</Logger>
-		
-		<Logger name="org.apache.log4j.xml" level="error" additivity="false">
 			<AppenderRef ref="openforis" />
 			<AppenderRef ref="Sentry" level="error" />
 		</Logger>
-
+		
+		<Logger name="org.jooq" level="info" additivity="false">
+			<AppenderRef ref="openforis" />
+			<AppenderRef ref="Sentry" level="error" />
+		</Logger>
+		
 		<Logger name="org.openforis" level="info" additivity="false">
 			<AppenderRef ref="openforis" />
 			<AppenderRef ref="Sentry" level="error" />
@@ -55,7 +60,7 @@
 		</Logger>
 		
 		<Root level="info">
-			<AppenderRef ref="openforis" />
+			<AppenderRef ref="STDOUT" />
 			<AppenderRef ref="Sentry" level="error" />
 		</Root>
 	</Loggers>
