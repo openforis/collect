@@ -247,6 +247,7 @@
             "COLLECT_EARTH_IPCC": "Collect Earth + IPCC"
         },
         "projectName": "Title",
+        "language": "Language",
         "defaultLanguage": "Default Language",
         "lastModified": "Last Modified",
         "unpublishedChanges": "Unpublished changes",

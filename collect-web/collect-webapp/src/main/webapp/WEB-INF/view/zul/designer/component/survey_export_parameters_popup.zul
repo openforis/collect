@@ -91,7 +91,7 @@
 			</columns>
 			<rows>
 				<row>
-					<label value="${labels.survey.export.earth.language}:" />
+					<label value="@load(fx.outputFormat eq 'MOBILE' ? labels.survey.export.mobile.default_language : labels.survey.export.earth.language)" />
 					<listbox id="languageListBox" model="@load(vm.surveyLanguages)"
 						selectedItem="@bind(fx.languageCode)"
 						mold="select">
@@ -99,7 +99,7 @@
 							<listitem label="${c:l(each)}"
 								value="@load(each)" />
 						</template>
-					</listbox>				
+					</listbox>
 				</row>
 			</rows>
 		</grid>

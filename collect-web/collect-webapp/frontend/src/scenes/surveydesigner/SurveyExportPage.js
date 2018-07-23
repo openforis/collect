@@ -129,9 +129,9 @@ class SurveyExportPage extends Component {
                                 </FormGroup>
                             </Col>
                         </FormGroup>
-                        {this.state.outputFormat === 'MOBILE' &&
+                        {(this.state.outputFormat === 'MOBILE' || this.state.outputFormat === 'EARTH') &&
                             <FormGroup row>
-                                <Label for="defaultLanguage" sm={4}>{L.l('survey.defaultLanguage')}:</Label>
+                                <Label for="defaultLanguage" sm={4}>{L.l(this.state.outputFormat === 'MOBILE' ? 'survey.defaultLanguage': 'survey.language')}:</Label>
                                 <Col sm={8}>
                                     <Input type="select" name="defaultLanguage" id="defaultLanguage" value={outputSurveyDefaultLanguage}
                                         onChange={(event) => this.setState({...this.state, outputSurveyDefaultLanguage: event.target.value})}>
