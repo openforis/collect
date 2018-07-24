@@ -357,8 +357,8 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 					OF.UI.Forms.populateSelect(el, possibleItems, "code", "label");
 					el.val(oldValue);
 					if (el.val() == null) {
-						//TODO set first option
-						el.val("-1"); //set N/A option by default
+						//select the first option
+						el.find("option:first").prop("selected", true);
 					}
 					break;
 				case "CODE_BUTTON_GROUP":
@@ -834,7 +834,8 @@ var setValueInInputField = function(inputField, value) {
 	case "SELECT":
 		inputField.val(value);
 		if (inputField.val() == null) {
-			inputField.val("-1");
+			//select the first option
+			inputField.find("option:first").prop("selected", true);
 		}
 		break;
 	}

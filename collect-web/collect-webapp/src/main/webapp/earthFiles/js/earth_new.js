@@ -56,7 +56,7 @@ $(function() {
 	// SAVING DATA WHEN USER SUBMITS
 	$form.submit(function(e) {
 		e.preventDefault();
-		
+
 		submitData();
 	});
 
@@ -357,8 +357,8 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 					OF.UI.Forms.populateSelect(el, possibleItems, "code", "label");
 					el.val(oldValue);
 					if (el.val() == null) {
-						//TODO set first option
-						el.val("-1"); //set N/A option by default
+						//select the first option
+						el.val(el.find("option:first").val());
 					}
 					break;
 				case "CODE_BUTTON_GROUP":
@@ -834,11 +834,16 @@ var setValueInInputField = function(inputField, value) {
 	case "SELECT":
 		inputField.val(value);
 		if (inputField.val() == null) {
-			inputField.val("-1");
+			//select the first option
+			inputField.val(inputField.find("option:first").val());
 		}
 		break;
 	}
 };
+
+function setValueInSelect(select, value) {
+	
+}
 
 function getVisibleComponent(components) {
 	if (components.length == 1) {
