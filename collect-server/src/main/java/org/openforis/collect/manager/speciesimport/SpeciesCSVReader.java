@@ -75,11 +75,12 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 	
 	public static class SpeciesCSVLineParser extends CSVReferenceDataLineParser<SpeciesLine> {
 		
+		protected static final String GENUS_SUFFIX = "sp.";
 		private static final String GENUS_PATTERN_STR = "[A-Z][a-z]+";
 		private static final String SPECIES_NAME_PATTERN_STR = "[a-z]+\\-?[a-z]+";
 		private static final String DEFAULT_HYBRID_FORMULA = "×";
 		private static final Pattern ONLY_GENUS_PATTERN = 
-				Pattern.compile("^(" + GENUS_PATTERN_STR + ")(\\s+spp\\.?)?$");
+				Pattern.compile("^(" + GENUS_PATTERN_STR + ")(\\s+(spp|sp)\\.?)?$");
 		private static final Pattern SPECIES_AND_ABOVE_PATTERN = 
 				Pattern.compile("^(" + GENUS_PATTERN_STR + ")\\s+(" + SPECIES_NAME_PATTERN_STR + ")(\\s+(ssp|subsp|var)\\.?\\s+([a-z]+))?$");
 		private static final Pattern HYBRID_SPECIES_PATTERN_1 = 
@@ -139,7 +140,7 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 				Matcher matcher = ONLY_GENUS_PATTERN.matcher(rawScientificName);
 				if (matcher.matches()) {
 					String genus = matcher.group(1);
-					return new ScientificNameParseResult(genus, null, genus + " spp.", TaxonRank.GENUS);
+					return new ScientificNameParseResult(genus, null, genus + " " + GENUS_SUFFIX, TaxonRank.GENUS);
 				}
 			}
 			//species rank and above

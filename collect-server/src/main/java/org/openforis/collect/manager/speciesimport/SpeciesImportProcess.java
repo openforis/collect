@@ -46,6 +46,8 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  */
 public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportStatus> {
 
+	private static final Logger LOG = LogManager.getLogger(SpeciesImportProcess.class);
+
 	private static final String RAW_SCIENTIFIC_NAME_TREE_NODE_METADATA = "rawScientificName";
 	private static final String LINE_NUMBER_TREE_NODE_METADATA = "lineNumber";
 	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
@@ -54,11 +56,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSpeciesName";
 	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
-	
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY, FORM};
-	public static final String GENUS_SUFFIX = "sp.";
-
-	private static final Logger LOG = LogManager.getLogger(SpeciesImportProcess.class);
 
 	//input
 	private SpeciesManager speciesManager;
@@ -293,7 +291,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			throw new ParsingException(error);
 		}
 		Taxon taxonFamily = createTaxonFamily(line);
-		String normalizedScientificName = StringUtils.join(genus, " ", GENUS_SUFFIX);
+		String normalizedScientificName = StringUtils.join(genus, " ", SpeciesCSVReader.SpeciesCSVLineParser.GENUS_SUFFIX);
 		return createTaxon(line, GENUS, taxonFamily, normalizedScientificName);
 	}
 
