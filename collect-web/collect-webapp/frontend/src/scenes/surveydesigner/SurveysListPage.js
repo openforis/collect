@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, DropdownItem, DropdownToggle, DropdownMenu,
-    Row, Col, UncontrolledButtonDropdown } from 'reactstrap';
+    Row, Col, UncontrolledButtonDropdown, UncontrolledTooltip } from 'reactstrap';
 
 import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
 import Dialogs from 'components/Dialogs';
@@ -210,13 +210,24 @@ class SurveysListPage extends Component {
         }
          
         function targetFormatter(cell, row) {
+            let logoClass, logoTooltip
             switch(cell) {
                 case "COLLECT_EARTH":
-                    return <span className="logo small collect-earth" />
+                    logoClass = 'collect-earth'
+                    logoTooltip = 'Collect Earth'
+                    break
                 case "COLLECT_DESKTOP":
                 default:
-                    return <span className="logo small collect-desktop" />
+                    logoClass = 'collect-desktop'
+                    logoTooltip = 'Collect Desktop'
             }
+            return <span>
+                    <span className={'logo small ' + logoClass} id={'survey_target_icon_' + row.id} />
+                    <UncontrolledTooltip placement="right" target={'survey_target_icon_' + row.id}>
+                        {logoTooltip}
+                    </UncontrolledTooltip>
+                </span>
+
         }
 
         function publishedIconFormatter(cell, row) {
