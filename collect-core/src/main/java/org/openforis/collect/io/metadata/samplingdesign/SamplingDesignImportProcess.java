@@ -33,7 +33,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	private static final String SURVEY_NOT_FOUND_ERROR_MESSAGE_KEY = "samplingDesignImport.error.surveyNotFound";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "samplingDesignImport.error.internalErrorImportingFile";
 	
-	private static Logger LOG = LogManager.getLogger(SamplingDesignImportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(SamplingDesignImportProcess.class);
 	
 	private SamplingDesignManager samplingDesignManager;
 	private SurveyManager surveyManager;

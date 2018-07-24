@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import junit.framework.Assert;
 
 public class ModelDaoIntegrationTest extends CollectIntegrationTest {
-	private final Logger LOG = LogManager.getLogger(ModelDaoIntegrationTest.class);
+	private static final Logger LOG = LogManager.getLogger(ModelDaoIntegrationTest.class);
 	
 	@Autowired
 	protected RecordDao recordDao;

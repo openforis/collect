@@ -31,7 +31,7 @@ import io.sentry.dsn.Dsn;
 
 public class ApplicationInitializerServletContextListener implements ServletContextListener {
 
-	private final Logger LOG = LogManager.getLogger(ApplicationInitializerServletContextListener.class);
+	private static final Logger LOG = LogManager.getLogger(ApplicationInitializerServletContextListener.class);
 	private static final String SENTRY_DSN = "https://d3693c474ffb41f2b5e6265dc3411705@sentry.io/1246866?release=" + Collect.VERSION;
 	private static final String DEV_MODE_INIT_PARAMETER_NAME = "devMode";
 
@@ -39,8 +39,6 @@ public class ApplicationInitializerServletContextListener implements ServletCont
 	public void contextInitialized(ServletContextEvent sce) {
 		LOG.info("========Open Foris Collect - Starting initialization ==========");
 		initSentry();
-		
-		LOG.error("TEST");
 		initDB();
 		CollectConfiguration.setDevelopmentMode(determineIsDevelopmentMode(sce));
 		configureOfUsersModule(sce);

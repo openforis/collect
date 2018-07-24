@@ -23,7 +23,7 @@ import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
  */
 public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 
-	private final Logger log = LogManager.getLogger(CollectSurveyIdmlBinder.class);
+	private static final Logger log = LogManager.getLogger(CollectSurveyIdmlBinder.class);
 	
 	public CollectSurveyIdmlBinder(SurveyContext surveyContext) {
 		super(surveyContext);

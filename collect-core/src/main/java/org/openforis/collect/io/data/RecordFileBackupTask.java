@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RecordFileBackupTask extends Task {
 	
-	private transient Logger LOG = LogManager.getLogger(RecordFileBackupTask.class);
+	private static final transient Logger LOG = LogManager.getLogger(RecordFileBackupTask.class);
 
 	private RecordManager recordManager;
 	private RecordFileManager recordFileManager;

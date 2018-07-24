@@ -30,7 +30,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class SessionManager {
 
-	private static Logger LOG = LogManager.getLogger(SessionManager.class);
+	private static final Logger LOG = LogManager.getLogger(SessionManager.class);
 	private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
 	@Autowired

@@ -28,7 +28,7 @@ public class RecordFileManager extends BaseStorageManager {
 	private static final long serialVersionUID = 1L;
 	private static final Pattern UUID_REGEX = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
-	protected static Logger LOG = LogManager.getLogger(RecordFileManager.class);
+	protected static final Logger LOG = LogManager.getLogger(RecordFileManager.class);
 
 	private static final String DEFAULT_RECORD_FILES_SUBFOLDER = "collect_upload";
 	

@@ -69,7 +69,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 
 	private static final int MAX_QUERY_BUFFER_SIZE = 100;
 
-	private static Logger LOG = LogManager.getLogger(XMLDataImportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(XMLDataImportProcess.class);
 
 	@Autowired
 	private RecordManager recordManager;

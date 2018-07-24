@@ -26,7 +26,7 @@ public class SpeciesExportProcess {
 	private static final String LATIN_LANG_CODE = "lat";
 	private static final String VERNACULAR_NAMES_SEPARATOR = " / ";
 
-	private final Logger LOG = LogManager.getLogger(SpeciesExportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(SpeciesExportProcess.class);
 	
 	private SpeciesManager speciesManager;
 	private String taxonomyName;

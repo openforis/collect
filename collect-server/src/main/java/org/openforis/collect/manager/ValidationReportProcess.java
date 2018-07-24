@@ -35,7 +35,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 			"Record","Phase","Attribute Schema Path",
 			"Field path","Field path (labels)","Error message"};
 
-	private static Logger LOG = LogManager.getLogger(ValidationReportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(ValidationReportProcess.class);
 	
 	private OutputStream outputStream;
 	private RecordManager recordManager;

@@ -34,7 +34,7 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
  */
 public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 
-	private static Logger LOG = LogManager.getLogger(CodeListImportTask.class);
+	private static final Logger LOG = LogManager.getLogger(CodeListImportTask.class);
 
 	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";
 	

@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ConfigurationService {
 
-	protected static Logger LOG = LogManager.getLogger(ConfigurationService.class);
+	protected static final Logger LOG = LogManager.getLogger(ConfigurationService.class);
 	
 	@Autowired
 	private ConfigurationManager configurationManager;

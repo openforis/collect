@@ -15,7 +15,7 @@ import org.granite.messaging.service.ServiceInvocationContext;
  */
 public class ServiceExceptionHandler extends DefaultServiceExceptionHandler  {
 
-	private static Logger LOG = LogManager.getLogger(ServiceExceptionHandler.class);
+	private static final Logger LOG = LogManager.getLogger(ServiceExceptionHandler.class);
 	
 	private static final long serialVersionUID = 1L;
 

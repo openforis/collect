@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SpringMessageSource implements MessageSource {
 
-	private final Logger LOG = LogManager.getLogger(SpringMessageSource.class);
+	private static final Logger LOG = LogManager.getLogger(SpringMessageSource.class);
 	
 	@Autowired
 	private ApplicationContext context;

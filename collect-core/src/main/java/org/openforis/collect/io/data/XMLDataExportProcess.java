@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 
 
-	private static Logger LOG = LogManager.getLogger(XMLDataExportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(XMLDataExportProcess.class);
 
 	public static final String IDML_FILE_NAME = "idml.xml";
 	public static final String ZIP_DIRECTORY_SEPARATOR = "/";

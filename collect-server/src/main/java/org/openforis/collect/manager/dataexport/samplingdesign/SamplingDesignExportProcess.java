@@ -26,7 +26,7 @@ import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
  */
 public class SamplingDesignExportProcess {
 	
-	private final Logger LOG = LogManager.getLogger(SamplingDesignExportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(SamplingDesignExportProcess.class);
 	
 	private SamplingDesignManager samplingDesignManager;
 	

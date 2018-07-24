@@ -26,7 +26,7 @@ import org.openforis.idm.metamodel.CodeListLevel;
  */
 public class CodeListExportProcess {
 
-	private static Logger LOG = LogManager.getLogger(CodeListImportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(CodeListImportProcess.class);
 
 	private static final String FLAT_LIST_LEVEL_NAME = "item";
 	private static final char SEPARATOR = ',';

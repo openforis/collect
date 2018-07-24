@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CollectRDBPublisher {
 	
-	protected static Logger LOG = LogManager.getLogger(CollectRDBPublisher.class);
+	protected static final Logger LOG = LogManager.getLogger(CollectRDBPublisher.class);
 
 	@Autowired
 	private SurveyManager surveyManager;

@@ -24,7 +24,7 @@ public class BackupStorageManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
 	
-	protected static Logger LOG = LogManager.getLogger(BackupStorageManager.class);
+	protected static final Logger LOG = LogManager.getLogger(BackupStorageManager.class);
 	
 	private static final String DEFAULT_BACKUP_STORAGE_SUBFOLDER = "backup";
 	

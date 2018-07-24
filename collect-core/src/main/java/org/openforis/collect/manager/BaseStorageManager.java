@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class BaseStorageManager implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger LOG = LogManager.getLogger(BaseStorageManager.class);
+	private static final Logger LOG = LogManager.getLogger(BaseStorageManager.class);
 	
 	protected static final String DATA_FOLDER_NAME = "data";
 

@@ -46,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class SpeciesManager {
 	
-	private final Logger LOG = LogManager.getLogger(SpeciesManager.class);
+	private static final Logger LOG = LogManager.getLogger(SpeciesManager.class);
 	
 	private static final int CONFIRMED_TAXON_STEP_NUMBER = 9;
 

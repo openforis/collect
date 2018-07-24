@@ -32,7 +32,7 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
  */
 public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportStatus> {
 
-	private static Logger LOG = LogManager.getLogger(CodeListImportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(CodeListImportProcess.class);
 
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "codeListImport.error.internalErrorImportingFile";
 	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";

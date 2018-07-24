@@ -19,7 +19,7 @@ public class RestoredBackupStorageManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
 	
-	protected static Logger LOG = LogManager.getLogger(RestoredBackupStorageManager.class);
+	protected static final Logger LOG = LogManager.getLogger(RestoredBackupStorageManager.class);
 	
 	private static final String DEFAULT_STORAGE_SUBFOLDER = "restore";
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss-SSSZ";

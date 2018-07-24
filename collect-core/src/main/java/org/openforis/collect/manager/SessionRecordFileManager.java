@@ -31,7 +31,7 @@ public class SessionRecordFileManager implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	protected static Logger LOG = LogManager.getLogger(SessionRecordFileManager.class);
+	protected static final Logger LOG = LogManager.getLogger(SessionRecordFileManager.class);
 
 	@Autowired
 	private RecordFileManager recordFileManager;

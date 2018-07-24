@@ -23,7 +23,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class SessionListener implements HttpSessionListener {
 
-	private static Logger LOG = LogManager.getLogger(SessionListener.class);
+	private static final Logger LOG = LogManager.getLogger(SessionListener.class);
 	
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {

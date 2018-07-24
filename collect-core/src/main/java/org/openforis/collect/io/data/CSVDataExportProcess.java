@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
 @Deprecated
 public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 	
-	private static Logger LOG = LogManager.getLogger(CSVDataExportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(CSVDataExportProcess.class);
 
 	@Autowired
 	private RecordManager recordManager;

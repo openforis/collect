@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE) 
 public class RemoteCollectCloneDataRestoreJob extends Job {
 		
-	private static Logger LOG = LogManager.getLogger(RemoteCollectCloneDataRestoreJob.class);
+	private static final Logger LOG = LogManager.getLogger(RemoteCollectCloneDataRestoreJob.class);
 
 	@Autowired
 	private BackupStorageManager backupStorageManager;

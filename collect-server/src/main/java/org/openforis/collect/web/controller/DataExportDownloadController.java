@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class DataExportDownloadController extends BasicController {
 
-	private static Logger LOG = LogManager.getLogger(DataExportDownloadController.class);
+	private static final Logger LOG = LogManager.getLogger(DataExportDownloadController.class);
 	
 	@RequestMapping(value = "/downloadDataExport.htm", method = RequestMethod.GET)
 	public void downloadDataExport(

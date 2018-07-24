@@ -58,7 +58,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY, FORM};
 	public static final String GENUS_SUFFIX = "sp.";
 
-	private static Logger LOG = LogManager.getLogger(SpeciesImportProcess.class);
+	private static final Logger LOG = LogManager.getLogger(SpeciesImportProcess.class);
 
 	//input
 	private SpeciesManager speciesManager;

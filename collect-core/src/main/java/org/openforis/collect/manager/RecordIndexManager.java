@@ -68,7 +68,7 @@ public class RecordIndexManager extends BaseStorageManager {
 	protected static final String RECORD_ID_FIELD = "_record_id";
 	private static final Version LUCENE_VERSION = Version.LUCENE_36;
 
-	protected static Logger LOG = LogManager.getLogger(RecordIndexManager.class);
+	protected static final Logger LOG = LogManager.getLogger(RecordIndexManager.class);
 
 	public enum SearchType {
 		EQUAL, STARTS_WITH, CONTAINS;
