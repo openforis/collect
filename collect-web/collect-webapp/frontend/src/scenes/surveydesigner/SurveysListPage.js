@@ -221,11 +221,10 @@ class SurveysListPage extends Component {
                     logoClass = 'collect-desktop'
                     logoTooltip = 'Collect Desktop'
             }
+            let logoElId = 'survey_target_icon_' + row.id
             return <span>
-                    <span className={'logo small ' + logoClass} id={'survey_target_icon_' + row.id} />
-                    <UncontrolledTooltip placement="right" target={'survey_target_icon_' + row.id}>
-                        {logoTooltip}
-                    </UncontrolledTooltip>
+                    <span className={'logo small ' + logoClass} id={logoElId} />
+                    <UncontrolledTooltip placement="right" target={logoElId}>{logoTooltip}</UncontrolledTooltip>
                 </span>
 
         }
