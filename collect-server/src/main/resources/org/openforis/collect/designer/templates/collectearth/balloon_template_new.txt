@@ -185,7 +185,7 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 <script>
 	if (!PREVIEW) {
 		$.ajax({
-		  url: "http://127.0.0.1:$[local_port]/earth/ancillaryWindows?id=PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST",
+		  url: "http://127.0.0.1:$[local_port]/earth/ancillaryWindows?PLACEHOLDER_FOR_EXTRA_ID_GET_REQUEST",
 		  async : 'true'
 		});
 	}
