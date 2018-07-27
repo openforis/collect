@@ -210,7 +210,7 @@
 		<dependency>
 			<groupId>org.mitre.dsmiley.httpproxy</groupId>
 			<artifactId>smiley-http-proxy-servlet</artifactId>
-			<version>1.7</version>
+			<version>1.10</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -227,7 +227,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.193</version>
+			<version>1.4.197</version>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
