@@ -196,6 +196,11 @@
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<version>2.11.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>1.7.25</version>
+		</dependency>
 		<!-- Provided by the application server -->
 		<dependency>
 			<groupId>javax.servlet</groupId>

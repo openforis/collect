@@ -75,7 +75,7 @@
 	
 	<authentication-manager alias="authenticationManager">
 		<authentication-provider user-service-ref="userDetailsService">
-			<password-encoder hash="md5" />
+			<password-encoder hash="bcrypt" />
 		</authentication-provider>
 	</authentication-manager>
 
