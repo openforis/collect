@@ -501,15 +501,14 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		return null;
 	}
 
+	public boolean hasCodeList(String name) {
+		return getCodeList(name) != null;
+	}
+	
 	public CodeList getCodeList(String name) {
-		if ( codeLists != null && name != null ) {
-			for (CodeList codeList : codeLists) {
-				if (name.equals(codeList.getName())) {
-					return codeList;
-				}
-			}
-		}
-		return null;
+		return codeLists != null && name != null ?
+			CollectionUtils.findItem(codeLists, name, "name")
+			: null;
 	}
 
 	public Unit getUnit(int id) {
@@ -850,6 +849,10 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 
 	public CodeList createCodeList() {
 		return new CodeList(this, nextId());
+	}
+	
+	public CodeList cloneCodeList(CodeList source) {
+		return new CodeList(this, nextId(), source);
 	}
 	
 	public Unit createUnit(int id) {

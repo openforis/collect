@@ -56,6 +56,8 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 		if (survey == source.getSurvey()) {
 			this.list = source.list;
 			this.parentCodeAttributeDefinition = source.parentCodeAttributeDefinition;
+		} else if (survey.hasCodeList(source.getListName())) {
+			this.list = survey.getCodeList(source.getListName());
 		}
 	}
 	

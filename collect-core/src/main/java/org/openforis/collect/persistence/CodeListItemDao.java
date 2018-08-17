@@ -188,6 +188,10 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	public void copyItems(int fromSurveyId, int toSurveyId) {
+		copyItems(fromSurveyId, null, toSurveyId, null);
+	}
+	
+	public void copyItems(int fromSurveyId, Integer fromCodeListId, int toSurveyId, Integer toCodeListId) {
 		JooqDSLContext jf = dsl(null);
 		int minId = loadMinId(jf, fromSurveyId);
 		int nextId = jf.nextId();
@@ -196,7 +200,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		selectFields.addAll(Arrays.<Field<?>>asList(
 				OFC_CODE_LIST.ID.add(idGap),
 				DSL.val(toSurveyId, OFC_CODE_LIST.SURVEY_ID),
-				OFC_CODE_LIST.CODE_LIST_ID,
+				toCodeListId == null ? OFC_CODE_LIST.CODE_LIST_ID : DSL.val(toCodeListId),
 				OFC_CODE_LIST.ITEM_ID,
 				OFC_CODE_LIST.PARENT_ID.add(idGap),
 				OFC_CODE_LIST.LEVEL,
@@ -212,9 +216,14 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		selectFields.addAll(Arrays.<Field<?>>asList(DESCRIPTION_FIELDS));
 		selectFields.addAll(Arrays.<Field<?>>asList(OFC_CODE_LIST.IMAGE_CONTENT));
 		
+		List<Condition> conditions = new ArrayList<Condition>(2);
+		conditions.add(OFC_CODE_LIST.SURVEY_ID.equal(fromSurveyId));
+		if (fromCodeListId != null) {
+			conditions.add((OFC_CODE_LIST.CODE_LIST_ID.equal(fromCodeListId)));
+		}
 		Select<?> select = jf.select(selectFields)
 			.from(OFC_CODE_LIST)
-			.where(OFC_CODE_LIST.SURVEY_ID.equal(fromSurveyId))
+			.where(conditions)
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
 		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, ALL_FIELDS).select(select);
 		insert.execute();

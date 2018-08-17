@@ -36,6 +36,16 @@ public class CodeList extends VersionableSurveyObject {
 	CodeList(Survey survey, int id) {
 		super(survey, id);
 	}
+	
+	CodeList(Survey survey, int id, CodeList source) {
+		super(survey, id);
+		this.name = source.name;
+		this.labels = source.labels == null ? null: new CodeListLabelMap(source.labels);
+		this.descriptions = source.descriptions == null ? null : new LanguageSpecificTextMap(source.descriptions);
+		this.codingScheme = source.codingScheme;
+		this.hierarchy = source.hierarchy == null ? null : CollectionUtils.clone(source.hierarchy);
+		this.items = null; //TODO
+	}
 
 	public String getName() {
 		return this.name;

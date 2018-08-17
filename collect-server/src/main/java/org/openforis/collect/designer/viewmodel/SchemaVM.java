@@ -41,6 +41,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM.NodeSelectedEvent;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -50,6 +51,8 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.controller.SurveyController;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -144,6 +147,8 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@WireVariable
 	private SurveyManager surveyManager;
+	@WireVariable
+	private CodeListManager codeListManager;
 
 	// transient
 	private Window rootEntityEditPopUp;
@@ -1558,6 +1563,13 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	private void duplicateNodeAndSelectIt(NodeDefinition node, SurveyObject parent) {
+		if (node instanceof CodeAttributeDefinition) {
+			CodeList sourceList = ((CodeAttributeDefinition) node).getList();
+			if (! survey.hasCodeList(sourceList.getName())) {
+				codeListManager.copyCodeList(sourceList, survey);
+				CodeListsVM.dispatchCodeListsUpdatedCommand();
+			}
+		}
 		NodeDefinition clone = survey.getSchema().cloneDefinition(node);
 		EntityDefinition parentEntity = determineRelatedEntity(parent);
 		clone.setName(generateDuplicateNodeName(clone, parentEntity));

@@ -251,15 +251,16 @@ public class SurveyDao extends JooqDaoSupport {
 	}
 	
 	protected CollectSurvey processSurveyRow(Record row) {
+		if (row == null) {
+			return null;
+		}
+		Integer surveyId = row.getValue(OFC_SURVEY.ID);
 		try {
-			if (row == null) {
-				return null;
-			}
 			String idml = row.getValue(OFC_SURVEY.IDML);
 			CollectSurvey s = unmarshalIdml(idml);
 			s.setCollectVersion(new Version(row.getValue(OFC_SURVEY.COLLECT_VERSION)));
 			s.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
-			s.setId(row.getValue(OFC_SURVEY.ID));
+			s.setId(surveyId);
 			s.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
 			s.setName(row.getValue(OFC_SURVEY.NAME));
 			s.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
@@ -269,7 +270,10 @@ public class SurveyDao extends JooqDaoSupport {
 			s.setUserGroupId(row.getValue(OFC_SURVEY.USERGROUP_ID));
 			return s;
 		} catch (IdmlParseException e) {
-			throw new RuntimeException("Error deserializing IDML from database", e);
+			throw new RuntimeException(
+				String.format("Error loading survey with id %d; error deserializing IDML from database: %s",
+					surveyId, e.getMessage())
+				, e);
 		}
 	}
 	

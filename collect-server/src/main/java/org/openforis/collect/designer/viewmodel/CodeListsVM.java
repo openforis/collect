@@ -165,7 +165,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		return new CodeListFormObject();
 	}
 
-	protected void dispatchCodeListsUpdatedCommand() {
+	public static void dispatchCodeListsUpdatedCommand() {
 		BindUtils.postGlobalCommand(null, null, CODE_LISTS_UPDATED_GLOBAL_COMMAND, null);
 	}
 	
@@ -433,6 +433,11 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		closePopUp(jobStatusPopUp);
 		jobStatusPopUp = null;
 	}
+	
+	@GlobalCommand
+	public void codeListsUpdated() {
+		notifyChange("items");
+	}
 
 	@GlobalCommand
 	public void jobAborted(@BindingParam("job") Job job) {
@@ -461,7 +466,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		if (job == batchExportJob) {
 			downloadFile(batchExportJob.getOutputFile(), survey.getName() + "_code_lists.zip");
 		} else if (job == batchImportJob) {
-			notifyChange("items");
+			codeListsUpdated();
 		}
 		clearJob(job);
 	}
@@ -694,7 +699,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@GlobalCommand
 	public void closeCodeListsManagerPopUp() {
 		resetEditedItem();
-		notifyChange("items");
+		codeListsUpdated();
 	}
 
 	private void addChildItemToCodeList() {
