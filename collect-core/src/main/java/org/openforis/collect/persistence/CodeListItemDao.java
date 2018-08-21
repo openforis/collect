@@ -33,6 +33,7 @@ import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -188,10 +189,6 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	public void copyItems(int fromSurveyId, int toSurveyId) {
-		copyItems(fromSurveyId, null, toSurveyId, null);
-	}
-	
-	public void copyItems(int fromSurveyId, Integer fromCodeListId, int toSurveyId, Integer toCodeListId) {
 		JooqDSLContext jf = dsl(null);
 		int minId = loadMinId(jf, fromSurveyId);
 		int nextId = jf.nextId();
@@ -200,7 +197,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		selectFields.addAll(Arrays.<Field<?>>asList(
 				OFC_CODE_LIST.ID.add(idGap),
 				DSL.val(toSurveyId, OFC_CODE_LIST.SURVEY_ID),
-				toCodeListId == null ? OFC_CODE_LIST.CODE_LIST_ID : DSL.val(toCodeListId),
+				OFC_CODE_LIST.CODE_LIST_ID,
 				OFC_CODE_LIST.ITEM_ID,
 				OFC_CODE_LIST.PARENT_ID.add(idGap),
 				OFC_CODE_LIST.LEVEL,
@@ -216,18 +213,33 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		selectFields.addAll(Arrays.<Field<?>>asList(DESCRIPTION_FIELDS));
 		selectFields.addAll(Arrays.<Field<?>>asList(OFC_CODE_LIST.IMAGE_CONTENT));
 		
-		List<Condition> conditions = new ArrayList<Condition>(2);
-		conditions.add(OFC_CODE_LIST.SURVEY_ID.equal(fromSurveyId));
-		if (fromCodeListId != null) {
-			conditions.add((OFC_CODE_LIST.CODE_LIST_ID.equal(fromCodeListId)));
-		}
 		Select<?> select = jf.select(selectFields)
 			.from(OFC_CODE_LIST)
-			.where(conditions)
+			.where(OFC_CODE_LIST.SURVEY_ID.equal(fromSurveyId))
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
 		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, ALL_FIELDS).select(select);
 		insert.execute();
 		restartIdSequence(jf);
+	}
+	
+	public void copyItems(CodeList fromCodeList, CodeList toCodeList) {
+		JooqDSLContext dsl = dsl(fromCodeList);
+		List<PersistedCodeListItem> fromItems = loadItems(fromCodeList);
+		int minId = findMin(CollectionUtils.<Integer, PersistedCodeListItem>project(fromItems, "id"));
+		int nextId = dsl.nextId();
+		int idGap = nextId - minId;
+		List<PersistedCodeListItem> newItems = new ArrayList<PersistedCodeListItem>(fromItems.size());
+		for (PersistedCodeListItem fromItem : fromItems) {
+			PersistedCodeListItem newItem = new PersistedCodeListItem(toCodeList, fromItem.getLevel());
+			newItem.copyProperties(fromItem);
+			newItem.setSortOrder(fromItem.getSortOrder());
+			newItem.setSystemId(nextId + idGap);
+			newItem.setParentId(fromItem.getParentId() == null ? null : fromItem.getParentId() + idGap);
+			newItems.add(newItem);
+			nextId ++;
+		}
+		insert(newItems);
+		dsl.restartSequence(nextId);
 	}
 
 	private void restartIdSequence(JooqDSLContext jf) {
@@ -517,6 +529,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return jf.fromResult(result);
 	}
 	
+	private List<PersistedCodeListItem> loadItems(CodeList list) {
+		JooqDSLContext jf = dsl(list);
+		SelectQuery<Record> q = createSelectFromCodeListQuery(jf, list);
+		Result<Record> result = q.fetch();
+		return jf.fromResult(result);
+	}
+	
 	public boolean isEmpty(CodeList list) {
 		return ! hasChildItems(list, (Integer) null);
 	}
@@ -734,6 +753,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		this.useCache = useCache;
 	}
 	
+	private int findMin(List<Integer> values) {
+		Integer[] valuesArr = values.toArray(new Integer[values.size()]);
+		Arrays.sort(valuesArr);
+		int min = valuesArr.length == 0 ? 0 : valuesArr[0];
+		return min;
+	}
+
 	protected static class JooqDSLContext extends MappingDSLContext<PersistedCodeListItem> {
 
 		private static final long serialVersionUID = 1L;

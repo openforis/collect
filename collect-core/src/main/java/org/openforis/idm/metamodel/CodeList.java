@@ -455,4 +455,8 @@ public class CodeList extends VersionableSurveyObject {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("CodeList [name=%s]", name);
+	}
 }

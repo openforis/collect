@@ -1576,6 +1576,8 @@ public class SchemaVM extends SurveyBaseVM {
 		editedNode = clone;
 		changeEditedNodeParent(parent, true);
 		editNode(false, parentEntity, editedNode);
+		
+		SurveyEditVM.dispatchSurveySaveCommand();
 	}
 
 	/**

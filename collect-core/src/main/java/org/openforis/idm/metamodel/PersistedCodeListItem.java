@@ -23,23 +23,27 @@ public class PersistedCodeListItem extends CodeListItem {
 	
 	public static PersistedCodeListItem fromItem(CodeListItem item) {
 		PersistedCodeListItem result = new PersistedCodeListItem(item.getCodeList(), item.getId(), item.getLevel());
-		result.setCode(item.getCode());
-		result.setQualifiable(item.isQualifiable());
-		result.setDeprecatedVersion(item.getDeprecatedVersion());
-		result.setSinceVersion(item.getSinceVersion());
+		result.copyProperties(item);
+		return result;
+	}
+	
+	public void copyProperties(CodeListItem item) {
+		this.setCode(item.getCode());
+		this.setQualifiable(item.isQualifiable());
+		this.setDeprecatedVersion(item.getDeprecatedVersion());
+		this.setSinceVersion(item.getSinceVersion());
 		List<LanguageSpecificText> descriptions = item.getDescriptions();
 		for (LanguageSpecificText languageSpecificText : descriptions) {
-			result.setDescription(languageSpecificText.getLanguage(), languageSpecificText.getText());
+			this.setDescription(languageSpecificText.getLanguage(), languageSpecificText.getText());
 		}
 		List<LanguageSpecificText> labels = item.getLabels();
 		for (LanguageSpecificText languageSpecificText : labels) {
-			result.setLabel(languageSpecificText.getLanguage(), languageSpecificText.getText());
+			this.setLabel(languageSpecificText.getLanguage(), languageSpecificText.getText());
 		}
 		Set<QName> annotationNames = item.getAnnotationNames();
 		for (QName qName : annotationNames) {
-			result.setAnnotation(qName, item.getAnnotation(qName));
+			this.setAnnotation(qName, item.getAnnotation(qName));
 		}
-		return result;
 	}
 
 	public PersistedCodeListItem(CodeList codeList, int level) {

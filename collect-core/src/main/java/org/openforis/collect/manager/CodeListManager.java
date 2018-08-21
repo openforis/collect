@@ -481,8 +481,7 @@ public class CodeListManager {
 	public CodeList copyCodeList(CodeList list, CollectSurvey toSurvey) {
 		CodeList destCodeList = toSurvey.cloneCodeList(list);
 		toSurvey.addCodeList(destCodeList);
-		codeListItemDao.copyItems(list.getSurvey().getId(), list.getId(), 
-				toSurvey.getId(), destCodeList.getId());
+		codeListItemDao.copyItems(list, destCodeList);
 		return destCodeList;
 	}
 	
