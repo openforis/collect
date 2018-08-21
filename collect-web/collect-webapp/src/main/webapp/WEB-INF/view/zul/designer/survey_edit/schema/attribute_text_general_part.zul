@@ -18,22 +18,22 @@
 					value="MEMO" />
 			</radiogroup>
 		</row>
-		<row visible="@load(not vm.collectEarthSurvey)">
-			<fieldErrorHandler message="@load(vmsgs['input'])">
-				<label value="${labels.survey.schema.attribute.text.input.$}:" />
-				<image popup="textInputInfoTooltip" style="cursor:pointer"
-					src="/assets/images/info-small.png" />
-	    	</fieldErrorHandler>
-			<radiogroup selectedItem="@bind(fx.input)" 
-				onCheck="@command('applyChanges')">
-				<radio
-					label="${labels.survey.schema.attribute.text.input.keyboard}"
-					value="KEYBOARD" />
-				<radio
-					label="${labels.survey.schema.attribute.text.input.barcode}"
-					value="BARCODE" />
-			</radiogroup>
-		</row>
+<!-- 		<row visible="@load(not vm.collectEarthSurvey)"> -->
+<!-- 			<fieldErrorHandler message="@load(vmsgs['input'])"> -->
+<!-- 				<label value="${labels.survey.schema.attribute.text.input.$}:" /> -->
+<!-- 				<image popup="textInputInfoTooltip" style="cursor:pointer" -->
+<!-- 					src="/assets/images/info-small.png" /> -->
+<!-- 	    	</fieldErrorHandler> -->
+<!-- 			<radiogroup selectedItem="@bind(fx.input)"  -->
+<!-- 				onCheck="@command('applyChanges')"> -->
+<!-- 				<radio -->
+<!-- 					label="${labels.survey.schema.attribute.text.input.keyboard}" -->
+<!-- 					value="KEYBOARD" /> -->
+<!-- 				<radio -->
+<!-- 					label="${labels.survey.schema.attribute.text.input.barcode}" -->
+<!-- 					value="BARCODE" /> -->
+<!-- 			</radiogroup> -->
+<!-- 		</row> -->
     </rows>
   </grid>
 
