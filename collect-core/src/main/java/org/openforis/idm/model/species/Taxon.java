@@ -18,7 +18,8 @@ public class Taxon {
 		SERIES		("series"), 
 		SPECIES		("species"), 
 		SUBSPECIES	("subspecies"), 
-		VARIETY		("variety"), 
+		VARIETY		("variety"),
+		CULTIVAR	("cultivar"),
 		FORM		("form");
 		
 		private final String name;
@@ -61,6 +62,7 @@ public class Taxon {
 		public TaxonRank getParent() {
 			switch (this) {
 			case FORM:
+			case CULTIVAR:
 			case VARIETY:
 			case SUBSPECIES:
 				return SPECIES;
@@ -84,8 +86,6 @@ public class Taxon {
 				return SUBSPECIES;
 			case SUBSPECIES:
 				return VARIETY;
-			case VARIETY:
-				return null;
 			default:
 				return null;
 			}
