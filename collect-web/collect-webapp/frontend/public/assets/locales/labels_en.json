@@ -273,7 +273,7 @@
         "import": {
             "file": "File",
             "acceptedFileTypesDescription": "Collect Survey (.collect) Collect Backup (.collect-backup), Collect Earth (.cep) or Collect Survey XML (.xml)",
-            "importingIntoExistingSurveyWarning": "Survey already existing! Applied changes will be override."
+            "importingIntoExistingSurveyWarning": "Survey already existing! Applied changes will be overridden."
         },
         "publishedSurvey": "Published survey",
         "selectPublishedSurveyDropdownHeading": "--- Published survey ---",
