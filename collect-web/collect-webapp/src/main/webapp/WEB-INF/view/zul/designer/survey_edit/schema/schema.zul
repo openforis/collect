@@ -38,6 +38,7 @@
                 	context="@load(vm.getPopupMenu(each.data))">
                 	<treerow>
                 		<treecell image="@load(each.icon)"
+                			tooltiptext="@load(each.tooltiptext)"
                 			label="@load(each.data.label)" />
                 	</treerow>
                 </treeitem>

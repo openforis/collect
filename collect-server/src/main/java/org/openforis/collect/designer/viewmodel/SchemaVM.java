@@ -3,6 +3,11 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.lowerCase;
 import static org.openforis.collect.designer.metamodel.AttributeType.BOOLEAN;
 import static org.openforis.collect.designer.metamodel.AttributeType.CODE;
 import static org.openforis.collect.designer.metamodel.AttributeType.DATE;
@@ -25,7 +30,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNode;
@@ -44,6 +48,7 @@ import org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM.Node
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.metamodel.CollectAnnotations.FileType;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -54,6 +59,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -94,6 +100,8 @@ import org.zkoss.zul.Window;
  */
 public class SchemaVM extends SurveyBaseVM {
 
+	public static final String EDITED_NODE_TYPE_CHANGED = "editedNodeTypeChanged";
+	
 	private static final String PATH_NULL_VALUES_REPLACE = "...";
 
 	private static final String TAB_NAME_LABEL_PATH = "labelTextbox";
@@ -412,6 +420,15 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 	
+	public static void dispatchEditedNodeTypeChangedGlobalCommand() {
+		BindUtils.postGlobalCommand(null, null, EDITED_NODE_TYPE_CHANGED, null);
+	}
+	
+	@GlobalCommand
+	public void editedNodeTypeChanged() {
+		updateTreeNodeIcon();
+	}
+	
 	// TODO move it to tree model class
 	private Treeitem getTreeItem(SurveyObject item) {
 		for (Treeitem treeItem : nodesTree.getItems()) {
@@ -651,7 +668,7 @@ public class SchemaVM extends SurveyBaseVM {
 			confirmMessageKey = CONFIRM_REMOVE_REFERENCED_ATTRIBUTE_MESSAGE_KEY;
 			List<String> referencedAttrNames = org.openforis.commons.collection.CollectionUtils
 					.project(((AttributeDefinition) nodeDefn).getReferencingAttributes(), "name");
-			extraMessageArgs = new String[] { StringUtils.join(referencedAttrNames, ", ") };
+			extraMessageArgs = new String[] { join(referencedAttrNames, ", ") };
 		} else {
 			confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
 		}
@@ -849,7 +866,7 @@ public class SchemaVM extends SurveyBaseVM {
 		UITab mainTab = survey.getUIOptions().getMainTab(rootTabSet);
 		if (SurveyController.DEFAULT_MAIN_TAB_LABEL.equals(mainTab.getLabel(currentLanguageCode))) {
 			String label = rootEntity.getLabel(Type.INSTANCE, currentLanguageCode);
-			if (StringUtils.isNotBlank(label)) {
+			if (isNotBlank(label)) {
 				mainTab.setLabel(currentLanguageCode, label);
 
 				updateTreeNodeLabel(mainTab, label);
@@ -1038,7 +1055,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	public String getAttributeTypeLabel(String typeValue) {
-		if (StringUtils.isNotBlank(typeValue)) {
+		if (isNotBlank(typeValue)) {
 			AttributeType type = AttributeType.valueOf(typeValue);
 			return type.getLabel();
 		} else {
@@ -1099,8 +1116,7 @@ public class SchemaVM extends SurveyBaseVM {
 		} else if (calculated) {
 			return imagesRootPath + "calculated-small.png";
 		} else {
-			AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) surveyObject);
-			return getAttributeIcon(attributeType.name());
+			return getAttributeIcon((AttributeDefinition) surveyObject);
 		}
 	}
 
@@ -1124,10 +1140,44 @@ public class SchemaVM extends SurveyBaseVM {
 		return NODE_TYPES_IMAGES_PATH + icon;
 	}
 
-	public static String getAttributeIcon(String type) {
-		AttributeType attributeType = AttributeType.valueOf(type);
-		String result = NODE_TYPES_IMAGES_PATH + attributeType.name().toLowerCase(Locale.ENGLISH) + "-small.png";
-		return result;
+	/**
+	 * Called from UI
+	 */
+	public String getAttributeIcon(String attributeTypeStr) {
+		return getAttributeIcon(attributeTypeStr, null);
+	}
+	
+	public static String getNodeTooltiptext(SurveyObject surveyObject) {
+		if (surveyObject instanceof AttributeDefinition) {
+			AttributeDefinition attrDef = (AttributeDefinition) surveyObject;
+			AttributeType attributeType = AttributeType.valueOf(attrDef);
+			String attrTypeLabel = capitalize(lowerCase(attributeType.name()));
+			if (attributeType == AttributeType.FILE) {
+				FileType fileType = ((CollectSurvey) attrDef.getSurvey()).getAnnotations().getFileType((FileAttributeDefinition) attrDef);
+				return attrTypeLabel + " (" + lowerCase(fileType.name()) + ")";
+			} else {
+				return attrTypeLabel;
+			}
+		} else {
+			return null;
+		}
+	}
+	
+	private static String getAttributeIcon(AttributeDefinition attrDef) {
+		return getAttributeIcon(AttributeType.valueOf(attrDef).name(), attrDef);
+	}
+
+	private static String getAttributeIcon(String attributeTypeStr, AttributeDefinition attrDef) {
+		AttributeType attributeType = AttributeType.valueOf(attributeTypeStr);
+		String filePrefix = NODE_TYPES_IMAGES_PATH + attributeType.name().toLowerCase(Locale.ENGLISH);
+		String fileSuffix = "-small.png";
+		
+		if (attributeType == AttributeType.FILE && attrDef != null) {
+			FileType fileType = ((CollectSurvey) attrDef.getSurvey()).getAnnotations().getFileType((FileAttributeDefinition) attrDef);
+			return filePrefix + "-" + fileType.name().toLowerCase(Locale.ENGLISH) + fileSuffix;
+		} else {
+			return filePrefix + fileSuffix;
+		}
 	}
 
 	@DependsOn("editedNode")
@@ -1295,7 +1345,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	protected boolean validateTabLabel(String label) {
-		if (StringUtils.isBlank(label)) {
+		if (isBlank(label)) {
 			MessageUtil.showWarning("survey.layout.tab.label.error.required");
 			return false;
 		} else {
