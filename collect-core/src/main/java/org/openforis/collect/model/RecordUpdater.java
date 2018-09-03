@@ -427,8 +427,12 @@ public class RecordUpdater {
 
 	private Set<Attribute<?, ?>> retainNotRelevantAttributes(Set<Node<?>> nodes) {
 		Set<Attribute<?, ?>> result = new HashSet<Attribute<?,?>>();
-		for (Node<?> node : nodes) {
-			if (node instanceof Attribute && ! node.isRelevant()) {
+		Deque<Node<?>> stack = new LinkedList<Node<?>>(nodes);
+		while (!stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			if (node instanceof Entity) {
+				stack.addAll(((Entity) node).getDescendants());
+			} else if (! node.isRelevant()) {
 				result.add((Attribute<?, ?>) node);
 			}
 		}
@@ -554,7 +558,12 @@ public class RecordUpdater {
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		
-		Set<Node<?>> nodesToBeDeleted = node.getDescendantsAndSelf();
+		Set<Node<?>> nodesToBeDeleted = new HashSet<Node<?>>();
+		nodesToBeDeleted.add(node);
+		if (node instanceof Entity) {
+			nodesToBeDeleted.addAll(((Entity) node).getDescendants());
+		}
+		
 		Set<NodePointer> pointersToBeDeleted = nodesToPointers(nodesToBeDeleted);
 
 		NodePointer nodePointer = new NodePointer(node);
