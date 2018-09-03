@@ -136,6 +136,7 @@ class CsvDataImportPage extends Component {
         if (survey === null) {
             return <div>Select a survey first</div>
         }
+        const {importType} = this.state
 
         const IMPORT_TYPES = ['update', 'newRecords', 'multipleFiles']
         const importTypeOptions = IMPORT_TYPES.map(type =>
@@ -152,10 +153,11 @@ class CsvDataImportPage extends Component {
                 </Label>
             )
         })
-        const entitySelectionEnabled = this.state.importType === 'update'
+
+        const entitySelectionEnabled = importType === 'update'
         const entityNotSelected = entitySelectionEnabled && this.state.selectedEntityDefinition === null
-        const acceptedFileTypes = this.state.importType === 'multipleFiles' ? '.zip': '.csv,.xls,.xlsx,.zip'
-        const acceptedFileTypesDescription = this.state.importType === 'multipleFiles' ? 'ZIP (.zip)': 'CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip)'
+        const acceptedFileTypes = importType === 'multipleFiles' ? '.zip': '.csv,.xls,.xlsx,.zip'
+        const acceptedFileTypesDescription = importType === 'multipleFiles' ? 'ZIP (.zip)': 'CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip)'
 
         const formatErrorMessage = function(cell, row) {
             return L.l(row.message, row.messageArgs)
@@ -174,11 +176,11 @@ class CsvDataImportPage extends Component {
                             <Label for="importType">{L.l('dataManagement.csvDataImport.importType.label')}:</Label>
                             <Col sm={10}>
                                 <Input type="select" name="importType" id="importType"
-                                    value={this.state.importType} 
+                                    value={importType} 
                                     onChange={e => this.setState({importType: e.target.value})}>{importTypeOptions}</Input>
                             </Col>
                         </FormGroup>
-                        {this.state.importType !== 'newRecords' &&
+                        {importType !== 'newRecords' &&
                             <FormGroup row>
                                 <Label>{L.l('dataManagement.csvDataImport.applyToSteps')}:</Label>
                                 <Col sm={10}>
@@ -245,15 +247,14 @@ class CsvDataImportPage extends Component {
                     <Dialog open={this.state.errorModalOpen} 
                         maxWidth="md"
                         fullWidth
-                        ignoreBackdropClick
-                        ignoreEscapeKeyUp>
+                        disableBackdropClick
+                        disableEscapeKeyDown>
                         <DialogTitle>{L.l('dataManagement.csvDataImport.errorsInUploadedFile')}</DialogTitle>
                         <DialogContent>
                             <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors.csv'}>
                                 <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
-                                {this.state.importType === 'multipleFiles' &&
-                                    <TableHeaderColumn dataField="fileName" width="200">{L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
-                                }
+                                <TableHeaderColumn dataField="fileName" width="200" hidden={importType !== 'multipleFiles'}>
+                                    {L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="row" width="80">{L.l('dataManagement.csvDataImport.row')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="columns" width="150">{L.l('dataManagement.csvDataImport.columns')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="errorType" width="160" dataFormat={formatErrorType}>{L.l('dataManagement.csvDataImport.error-type')}</TableHeaderColumn>
