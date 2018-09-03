@@ -5,6 +5,7 @@ package org.openforis.collect.designer.form;
 
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
+import org.openforis.collect.metamodel.CollectAnnotations.TextInput;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -18,7 +19,7 @@ import org.openforis.idm.metamodel.TextAttributeDefinition.Type;
 public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 
 	private String type;
-//	private String input;
+	private String input;
 	private String autocompleteGroup;
 	private boolean autoUppercase;
 	private boolean geometry;
@@ -39,8 +40,8 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 		uiOptions.setAutoUppercase(dest, autoUppercase);
 		
 		CollectAnnotations annotations = ((CollectSurvey) dest.getSurvey()).getAnnotations();
-//		TextInput textInput = TextInput.valueOf(input);
-//		annotations.setTextInput(dest, textInput);
+		TextInput textInput = TextInput.valueOf(input);
+		annotations.setTextInput(dest, textInput);
 		
 		annotations.setGeometry(dest, geometry);
 	}
@@ -59,19 +60,19 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 		autoUppercase = uiOptions.isAutoUppercase(source);
 		
 		CollectAnnotations annotations = ((CollectSurvey) source.getSurvey()).getAnnotations();
-//		TextInput textInput = annotations.getTextInput(source);
-//		input = textInput.name();
+		TextInput textInput = annotations.getTextInput(source);
+		input = textInput.name();
 		
 		geometry = annotations.isGeometry(source);
 	}
 
-//	public String getInput() {
-//		return input;
-//	}
-//	
-//	public void setInput(String input) {
-//		this.input = input;
-//	}
+	public String getInput() {
+		return input;
+	}
+	
+	public void setInput(String input) {
+		this.input = input;
+	}
 	
 	public String getType() {
 		return type;
