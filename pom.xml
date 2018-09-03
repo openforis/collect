@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.22.10</version>
+	<version>3.22.11-SNAPSHOT</version>
 	<organization>
 		<name>Open Foris</name>
 		<url>www.openforis.org</url>
@@ -51,7 +51,7 @@
 		<url>https://github.com/openforis/collect</url>
 		<connection>scm:git:git@github.com:openforis/collect.git</connection>
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
-		<tag>collect-3.22.10</tag>
+		<tag>HEAD</tag>
 	</scm>
 	
 	<profiles>
