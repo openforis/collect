@@ -102,10 +102,7 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 		if (labels == null) {
 			return null;
 		}
-		if ( language == null ) {
-			language = getSurvey().getDefaultLanguage();
-		}
-		return labels.getText(language);
+		return labels.getText(language,getSurvey().getDefaultLanguage(),true);
 	}
 	
 	/**
@@ -162,10 +159,8 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 		if (descriptions == null) {
 			return null;
 		}
-		if ( language == null ) {
-			language = getSurvey().getDefaultLanguage();
-		}
-		return descriptions.getText(language);
+
+		return descriptions.getText(language, getSurvey().getDefaultLanguage(), true);
 	}
 	
 	/**

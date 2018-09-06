@@ -152,7 +152,7 @@ public class CodeTableDataExtractor extends DataExtractor {
 			} else if ( col instanceof CodeListCodeColumn ) {
 				val = table.getDefaultCode();
 			} else if ( col instanceof CodeLabelColumn ) {
-				val = table.getDefaultCodeLabel(((CodeLabelColumn) col).getLanguageCode());
+				val = table.getDefaultCodeLabel(((CodeLabelColumn) col).getLanguageCode(), ( (CollectSurvey) table.getCodeList().getSurvey()).getDefaultLanguage() );
 			} else {
 				val = null;
 			}

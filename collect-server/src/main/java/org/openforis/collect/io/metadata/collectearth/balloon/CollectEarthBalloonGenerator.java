@@ -267,11 +267,7 @@ public class CollectEarthBalloonGenerator {
 
 	private CETab createTabComponent(EntityDefinition rootEntityDef, UIForm form, boolean main) {
 		final CollectAnnotations annotations = survey.getAnnotations();
-		String label = form.getLabel(language);
-		if (label == null && ! isDefaultLanguage()) {
-			String defaultLanguage = survey.getDefaultLanguage();
-			label = form.getLabel(defaultLanguage);
-		}
+		String label = form.getLabel(language,survey.getDefaultLanguage());
 		CETab tab = new CETab(rootEntityDef.getName(), label);
 		tab.setMain(main); //consider the first tab as the main one
 		for (UIFormComponent formComponent : form.getChildren()) {

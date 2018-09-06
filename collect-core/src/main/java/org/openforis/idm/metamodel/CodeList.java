@@ -112,10 +112,7 @@ public class CodeList extends VersionableSurveyObject {
 	}
 
 	public String getDescription(String language) {
-		if ( language == null ) {
-			language = getSurvey().getDefaultLanguage();
-		}
-		return descriptions == null ? null: descriptions.getText(language);
+		return descriptions.getText(language, getSurvey().getDefaultLanguage(),true );
 	}
 	
 	public void setDescription(String language, String description) {

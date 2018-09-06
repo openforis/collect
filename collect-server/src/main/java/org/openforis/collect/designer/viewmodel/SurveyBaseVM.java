@@ -399,7 +399,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public String getUnitLabel(Unit unit) {
 		String result = null;
 		if ( unit != null ) {
-			result = unit.getLabel(currentLanguageCode);
+			result = unit.getLabel(currentLanguageCode, survey.getDefaultLanguage());
 			if ( result == null ) {
 				result = unit.getName();
 			}

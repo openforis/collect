@@ -62,8 +62,8 @@ public class Unit extends IdentifiableSurveyObject<Unit> {
 		}
 	}
 	
-	public String getLabel(String language) {
-		return labels == null ? null: labels.getText(language);
+	public String getLabel(String language, String defaultLanguage) {
+		return labels == null ? null: labels.getText(language, defaultLanguage, true);
 	}
 	
 	public void addLabel(LanguageSpecificText label) {
@@ -92,8 +92,8 @@ public class Unit extends IdentifiableSurveyObject<Unit> {
 		}
 	}
 	
-	public String getAbbreviation(String language) {
-		return abbreviations == null ? null: abbreviations.getText(language);
+	public String getAbbreviation(String language, String defaultLanguage) {
+		return abbreviations == null ? null: abbreviations.getText(language, defaultLanguage, true);
 	}
 	
 	public void addAbbreviation(LanguageSpecificText label) {
