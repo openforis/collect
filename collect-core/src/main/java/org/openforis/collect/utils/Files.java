@@ -155,5 +155,14 @@ public class Files {
 			return null;
 		}
 	}
+
+	public static void deleteFolder(File folder) {
+		if (SystemUtils.isLinuxOs()) {
+			SystemUtils.runCommandQuietly("rm -r " + folder.getAbsolutePath());
+		} else {
+			FileUtils.deleteQuietly(folder);
+		}
+	}
+
 	
 }

@@ -1,5 +1,6 @@
 package org.openforis.collect.io.data;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +66,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Deprecated
-public class XMLDataImportProcess implements Callable<Void> {
+public class XMLDataImportProcess implements Callable<Void>, Closeable {
 
 	private static final int MAX_QUERY_BUFFER_SIZE = 100;
 
@@ -157,6 +158,11 @@ public class XMLDataImportProcess implements Callable<Void> {
 		call();
 		state.addObserver( observer );
 	}
+	
+	@Override
+	public void close() {
+		IOUtils.closeQuietly(backupFileExtractor);
+	}
 
 	private void beforeStart() throws ZipException, IOException {
 		backupFileExtractor = new NewBackupFileExtractor(file);
@@ -215,8 +221,6 @@ public class XMLDataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.ERROR);
 			state.setErrorMessage(e.getMessage());
 			LOG.error(e.getMessage(), e);
-		} finally {
-			IOUtils.closeQuietly(backupFileExtractor);
 		}
 	}
 
@@ -508,7 +512,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(parsedRecord.getRootEntityDefinitionId());
 		filter.setKeyValues(keyValues);
-		List<CollectRecordSummary> oldRecords = recordManager.loadFullSummaries(filter);
+		List<CollectRecordSummary> oldRecords = recordManager.loadSummaries(filter);
 		if ( oldRecords == null || oldRecords.isEmpty() ) {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {

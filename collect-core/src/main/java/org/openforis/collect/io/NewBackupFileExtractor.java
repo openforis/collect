@@ -12,7 +12,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
@@ -160,7 +159,7 @@ public class NewBackupFileExtractor implements Closeable {
 	@Override
 	public void close() throws IOException {
 		IOUtils.closeQuietly(zipFile);
-		FileUtils.deleteQuietly(tempUncompressedFolder);
+		Files.deleteFolder(tempUncompressedFolder);
 	}
 
 }

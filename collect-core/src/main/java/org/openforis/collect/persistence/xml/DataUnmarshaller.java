@@ -210,7 +210,7 @@ public class DataUnmarshaller {
 					// if root element, read audit data, version, and 
 					startRecord(name, attributes);
 				} else {
-					this.content = new StringBuilder();
+					resetContent();
 					this.attributes = attributes;
 					if ( node instanceof Entity ) {
 						startChildNode(name, attributes);
@@ -438,8 +438,7 @@ public class DataUnmarshaller {
 		}
 		
 		protected void setFieldData(Field<?> fld) {
-			String value = content == null ? null : content.toString().trim();
-			fld.setValueFromString(value);
+			fld.setValueFromString(content == null ? null : content.toString().trim());
 			String remarks = attributes.getValue(ATTRIBUTE_REMARKS);
 			fld.setRemarks(remarks);
 			String s = attributes.getValue(ATTRIBUTE_SYMBOL);
@@ -467,6 +466,14 @@ public class DataUnmarshaller {
 				}
 			}
 			return null;
+		}
+		
+		private void resetContent() {
+			if (content == null) {
+				content = new StringBuilder();
+			} else {
+				content.setLength(0); //clear StringBuilder
+			}
 		}
 		
 		@Override
