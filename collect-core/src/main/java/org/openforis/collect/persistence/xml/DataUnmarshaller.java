@@ -160,13 +160,13 @@ public class DataUnmarshaller {
 		private boolean failed;
 		private List<NodeUnmarshallingError> failures;
 		private List<NodeUnmarshallingError> warnings;
-		private StringBuilder content;
 		protected Attributes attributes;
 		private CollectSurvey recordSurvey;
 		private CollectSurvey publishedSurvey;
 		private int ignoreLevels;
 		private boolean recordValidationEnabled;
 		private boolean ignoreDuplicateRecordKeyValidationErrors;
+		private StringBuilder content = new StringBuilder();
 		
 		public DataHandler(CollectSurvey survey) {
 			this(survey, survey, true);
@@ -210,7 +210,6 @@ public class DataUnmarshaller {
 					// if root element, read audit data, version, and 
 					startRecord(name, attributes);
 				} else {
-					resetContent();
 					this.attributes = attributes;
 					if ( node instanceof Entity ) {
 						startChildNode(name, attributes);
@@ -359,7 +358,7 @@ public class DataUnmarshaller {
 					} else {
 						endEntityElement();
 					}
-					this.content = null;
+					resetContent();
 					if ( node == null ) {
 						endRecordElement();
 					}
@@ -469,11 +468,7 @@ public class DataUnmarshaller {
 		}
 		
 		private void resetContent() {
-			if (content == null) {
-				content = new StringBuilder();
-			} else {
-				content.setLength(0); //clear StringBuilder
-			}
+			content.setLength(0); //clear StringBuilder
 		}
 		
 		@Override
