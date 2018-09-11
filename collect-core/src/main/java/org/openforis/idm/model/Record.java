@@ -39,8 +39,9 @@ public class Record implements DeepComparable {
 	private Entity rootEntity;
 	private Integer rootEntityDefinitionId;
 	
-	boolean enableValidationDependencyGraphs;
-	boolean ignoreDuplicateRecordKeyValidationErrors;
+	boolean dependencyGraphsEnabled = true;
+	boolean validationDependencyGraphsEnabled = true;
+	boolean ignoreDuplicateRecordKeyValidationErrors = false;
 	NodeDependencyGraph calculatedAttributeDependencies;
 	RelevanceDependencyGraph relevanceDependencies;
 	MinCountDependencyGraph minCountDependencies;
@@ -51,18 +52,17 @@ public class Record implements DeepComparable {
 	List<DependencyGraph<?>> dependencyGraphs;
 	
 	public Record(Survey survey, String version, String rootEntityDefName) {
-		this(survey, version, survey.getSchema().getRootEntityDefinition(rootEntityDefName), true);
+		this(survey, version, survey.getSchema().getRootEntityDefinition(rootEntityDefName));
 	}
 	
 	public Record(Survey survey, String version, EntityDefinition rootEntityDefinition) {
-		this(survey, version, rootEntityDefinition, true);
+		this(survey, version, rootEntityDefinition, true, true, false);
 	}
 	
-	public Record(Survey survey, String version, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs) {
-		this(survey, version, rootEntityDefinition, enableValidationDependencyGraphs, false);
-	}
-	
-	public Record(Survey survey, String version, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs, boolean ignoreDuplicateRecordKeyValidationErrors) {
+	public Record(Survey survey, String version, EntityDefinition rootEntityDefinition, 
+			boolean dependencyGraphsEnabled,
+			boolean enableValidationDependencyGraphs, 
+			boolean ignoreDuplicateRecordKeyValidationErrors) {
 		if (survey == null) {
 			throw new IllegalArgumentException("Survey required");
 		}
@@ -80,7 +80,8 @@ public class Record implements DeepComparable {
 		if (rootEntityDefinition == null) {
 			rootEntityDefinition = survey.getSchema().getFirstRootEntityDefinition();
 		}
-		this.enableValidationDependencyGraphs = enableValidationDependencyGraphs;
+		this.dependencyGraphsEnabled = dependencyGraphsEnabled;
+		this.validationDependencyGraphsEnabled = enableValidationDependencyGraphs;
 		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 		reset();
 		setRootEntity((Entity) rootEntityDefinition.createNode());
@@ -129,52 +130,6 @@ public class Record implements DeepComparable {
 				validationDependencies,
 				codeAttributeDependencies
 				);
-	}
-
-	public Integer getId() {
-		return this.id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public SurveyContext getSurveyContext() {
-		return survey.getContext();
-	}
-
-	public Survey getSurvey() {
-		return this.survey;
-	}
-
-	public Entity getRootEntity() {
-		return this.rootEntity;
-	}
-	
-	public void setRootEntityDefinitionId(Integer rootEntityDefinitionId) {
-		this.rootEntityDefinitionId = rootEntityDefinitionId;
-	}
-	
-	public Integer getRootEntityDefinitionId() {
-		return rootEntityDefinitionId;
-	}
-
-	public ModelVersion getVersion() {
-		return this.modelVersion;
-	}
-
-	@Override
-	public String toString() {
-		StringWriter sw = new StringWriter();
-		sw.append("id: ").append(String.valueOf(id)).append("\n");
-		if (rootEntity != null) {
-			rootEntity.write(sw, 0);
-		}
-		return sw.toString();
-	}
-
-	public Node<?> getNodeByInternalId(int id) {
-		return this.nodesByInternalId.get(id);
 	}
 
 	/**
@@ -248,14 +203,71 @@ public class Record implements DeepComparable {
 		return nodesByInternalId.size();
 	}
 	
+	/**
+	 * Returns the percentage of all filled relevant attributes among the required ones
+	 */
+	public int calculateCompletionPercent() {
+		if (getRootEntity() == null) {
+			return -1;
+		}
+		int totalRequiredAttributes = 0;
+		int filledAttributes = 0;
+		Deque<Node<?>> stack = new LinkedList<Node<?>>();
+		stack.push(getRootEntity());
+		while (! stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			if (node.isRelevant()) {
+				if (node instanceof Attribute) {
+					if (node.isRequired()) {
+						totalRequiredAttributes ++;
+						if (! node.isEmpty()) {
+							filledAttributes ++;
+						}
+					}
+				} else {
+					stack.addAll(((Entity) node).getChildren());
+				}
+			}
+		}
+		if (totalRequiredAttributes == 0) {
+			return -1;
+		} else {
+			return Double.valueOf(Math.floor((double) (100 * filledAttributes / totalRequiredAttributes))).intValue();
+		}
+	}
+	
+	public int countTotalFilledAttributes() {
+		if (getRootEntity() == null) {
+			return -1;
+		}
+		int total = 0;
+		Deque<Node<?>> stack = new LinkedList<Node<?>>();
+		stack.push(getRootEntity());
+		while (! stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			if (node.isRelevant()) {
+				if (node instanceof Attribute) {
+					if (! node.isEmpty()) {
+						total ++;
+					}
+				} else {
+					stack.addAll(((Entity) node).getChildren());
+				}
+			}
+		}
+		return total;
+	}
+	
 	void put(Node<?> node) {
 		initialize(node);
-		if ( enableValidationDependencyGraphs ) {
-			registerInAllDependencyGraphs(node);
-		} else {
-			//register only calculated attribute dependencies
-			registerInDependencyGraph(calculatedAttributeDependencies, node);
-			registerInDependencyGraph(codeAttributeDependencies, node);
+		if (dependencyGraphsEnabled) {
+			if ( validationDependencyGraphsEnabled ) {
+				registerInAllDependencyGraphs(node);
+			} else {
+				//register only calculated attribute dependencies
+				registerInDependencyGraph(calculatedAttributeDependencies, node);
+				registerInDependencyGraph(codeAttributeDependencies, node);
+			}
 		}
 	}
 
@@ -303,9 +315,69 @@ public class Record implements DeepComparable {
 			graph.remove(node);
 		}
 	}
-
+	
 	int nextId() {
 		return nextId++;
+	}
+	
+	public Node<?> getNodeByInternalId(int id) {
+		return this.nodesByInternalId.get(id);
+	}
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public SurveyContext getSurveyContext() {
+		return survey.getContext();
+	}
+
+	public Survey getSurvey() {
+		return this.survey;
+	}
+
+	public Entity getRootEntity() {
+		return this.rootEntity;
+	}
+	
+	public void setRootEntityDefinitionId(Integer rootEntityDefinitionId) {
+		this.rootEntityDefinitionId = rootEntityDefinitionId;
+	}
+	
+	public Integer getRootEntityDefinitionId() {
+		return rootEntityDefinitionId;
+	}
+
+	public ModelVersion getVersion() {
+		return this.modelVersion;
+	}
+
+	public boolean isDependencyGraphsEnabled() {
+		return dependencyGraphsEnabled;
+	}
+	
+	public void setDependencyGraphsEnabled(boolean dependencyGraphsEnabled) {
+		this.dependencyGraphsEnabled = dependencyGraphsEnabled;
+	}
+	
+	public boolean isIgnoreDuplicateRecordKeyValidationErrors() {
+		return ignoreDuplicateRecordKeyValidationErrors;
+	}
+	
+	public boolean isValidationDependencyGraphsEnabled() {
+		return validationDependencyGraphsEnabled;
+	}
+	
+	public void setValidationDependencyGraphsEnabled(boolean validationDependencyGraphsEnabled) {
+		this.validationDependencyGraphsEnabled = validationDependencyGraphsEnabled;
+	}
+	
+	public void setIgnoreDuplicateRecordKeyValidationErrors(boolean ignoreDuplicateRecordKeyValidationErrors) {
+		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -366,65 +438,6 @@ public class Record implements DeepComparable {
 		return result; 
 	}
 	
-	public boolean isIgnoreDuplicateRecordKeyValidationErrors() {
-		return ignoreDuplicateRecordKeyValidationErrors;
-	}
-	
-	/**
-	 * Returns the percentage of all filled relevant attributes among the required ones
-	 */
-	public int calculateCompletionPercent() {
-		if (getRootEntity() == null) {
-			return -1;
-		}
-		int totalRequiredAttributes = 0;
-		int filledAttributes = 0;
-		Deque<Node<?>> stack = new LinkedList<Node<?>>();
-		stack.push(getRootEntity());
-		while (! stack.isEmpty()) {
-			Node<?> node = stack.pop();
-			if (node.isRelevant()) {
-				if (node instanceof Attribute) {
-					if (node.isRequired()) {
-						totalRequiredAttributes ++;
-						if (! node.isEmpty()) {
-							filledAttributes ++;
-						}
-					}
-				} else {
-					stack.addAll(((Entity) node).getChildren());
-				}
-			}
-		}
-		if (totalRequiredAttributes == 0) {
-			return -1;
-		} else {
-			return Double.valueOf(Math.floor((double) (100 * filledAttributes / totalRequiredAttributes))).intValue();
-		}
-	}
-	
-	public int countTotalFilledAttributes() {
-		if (getRootEntity() == null) {
-			return -1;
-		}
-		int total = 0;
-		Deque<Node<?>> stack = new LinkedList<Node<?>>();
-		stack.push(getRootEntity());
-		while (! stack.isEmpty()) {
-			Node<?> node = stack.pop();
-			if (node.isRelevant()) {
-				if (node instanceof Attribute) {
-					if (! node.isEmpty()) {
-						total ++;
-					}
-				} else {
-					stack.addAll(((Entity) node).getChildren());
-				}
-			}
-		}
-		return total;
-	}
-	
 	@Override
 	public boolean deepEquals(Object obj) {
 		if (this == obj)
@@ -483,4 +496,13 @@ public class Record implements DeepComparable {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		StringWriter sw = new StringWriter();
+		sw.append("id: ").append(String.valueOf(id)).append("\n");
+		if (rootEntity != null) {
+			rootEntity.write(sw, 0);
+		}
+		return sw.toString();
+	}
 }
