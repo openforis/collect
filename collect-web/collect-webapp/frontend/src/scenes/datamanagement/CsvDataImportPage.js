@@ -22,9 +22,44 @@ import Arrays from 'utils/Arrays'
 import * as JobActions from 'actions/job';
 import L from 'utils/Labels';
 
+const importTypes = {
+    newRecords: 'newRecords',
+    update: 'update',
+    multipleFiles: 'multipleFiles',
+}
+
+const supportedSingleFileTypes = {
+    csv: {
+        label: 'CSV',
+        extensions: ['csv']
+    },
+    excel: {
+        label: 'MS Excel',
+        extensions: ['xls', 'xlsx']
+    },
+}
+
+/*
+const supportedMultipleFileTypes = {
+    zip: {
+        label: 'ZIP',
+        extensions: ['zip']
+    }
+}
+*/
+
+const supportedSingleFilesDescription = Object.keys(supportedSingleFileTypes).map(typeKey => {
+    const type = supportedSingleFileTypes[typeKey]
+    return type.label + " (" + type.extensions.map(e => '.' + e).join(', ') + ")"
+}).join(', ')
+
+const supportedSingleFileExtensionsLabel = Object.keys(supportedSingleFileTypes).map(typeKey => {
+    const type = supportedSingleFileTypes[typeKey]
+    return type.extensions.map(e => '.' + e).join(',')
+ }).join(',')
+
 class CsvDataImportPage extends Component {
 
-    
     constructor(props) {
         super(props)
 
@@ -38,7 +73,7 @@ class CsvDataImportPage extends Component {
         this.handleErrorsModalCloseButtonClick = this.handleErrorsModalCloseButtonClick.bind(this)
 
         this.state = {
-            importType: 'update',
+            importType: importTypes.update,
             selectedSteps: Object.keys(Workflow.STEPS).map(s => Workflow.STEPS[s].code),
             validateRecords: true,
             deleteEntitiesBeforeImport: false,
@@ -65,7 +100,7 @@ class CsvDataImportPage extends Component {
             return
         }
         const survey = this.props.survey
-        const entityDef = this.state.importType === 'newRecords' ? 
+        const entityDef = this.state.importType === importTypes.newRecords ? 
             survey.schema.firstRootEntityDefinition
             : this.state.selectedEntityDefinition
         const entityDefId = entityDef === null ? null : entityDef.id
@@ -96,7 +131,7 @@ class CsvDataImportPage extends Component {
             alert(L.l('dataManagement.csvDataImport.validation.fileNotSelected'))
             return false
         }
-        if (this.state.importType === 'update' && this.state.selectedEntityDefinition === null) {
+        if (this.state.importType === importTypes.update && this.state.selectedEntityDefinition === null) {
             alert(L.l('dataManagement.csvDataImport.validation.entityNotSelected'))
             return false
         }
@@ -138,8 +173,7 @@ class CsvDataImportPage extends Component {
         }
         const {importType} = this.state
 
-        const IMPORT_TYPES = ['update', 'newRecords', 'multipleFiles']
-        const importTypeOptions = IMPORT_TYPES.map(type =>
+        const importTypeOptions = Object.keys(importTypes).map(type =>
             <option key={type} value={type}>{L.l('dataManagement.csvDataImport.importType.' + type)}</option> 
         )
         
@@ -154,10 +188,10 @@ class CsvDataImportPage extends Component {
             )
         })
 
-        const entitySelectionEnabled = importType === 'update'
+        const entitySelectionEnabled = importType === importTypes.update
         const entityNotSelected = entitySelectionEnabled && this.state.selectedEntityDefinition === null
-        const acceptedFileTypes = importType === 'multipleFiles' ? '.zip': '.csv,.xls,.xlsx,.zip'
-        const acceptedFileTypesDescription = importType === 'multipleFiles' ? 'ZIP (.zip)': 'CSV (.csv), MS Excel (.xls, .xlsx), or ZIP (.zip)'
+        const acceptedFileTypes = importType === importTypes.multipleFiles ? '.zip': supportedSingleFileExtensionsLabel
+        const acceptedFileTypesDescription = importType === importTypes.multipleFiles ? 'ZIP (.zip)': supportedSingleFilesDescription
 
         const formatErrorMessage = function(cell, row) {
             return L.l(row.message, row.messageArgs)
@@ -180,7 +214,7 @@ class CsvDataImportPage extends Component {
                                     onChange={e => this.setState({importType: e.target.value})}>{importTypeOptions}</Input>
                             </Col>
                         </FormGroup>
-                        {importType !== 'newRecords' &&
+                        {importType !== importTypes.newRecords &&
                             <FormGroup row>
                                 <Label>{L.l('dataManagement.csvDataImport.applyToSteps')}:</Label>
                                 <Col sm={10}>
@@ -253,7 +287,7 @@ class CsvDataImportPage extends Component {
                         <DialogContent>
                             <BootstrapTable data={this.state.errors} striped hover condensed exportCSV csvFileName={'ofc_csv_data_import_errors.csv'}>
                                 <TableHeaderColumn dataField="id" isKey hidden>Id</TableHeaderColumn>
-                                <TableHeaderColumn dataField="fileName" width="200" hidden={importType !== 'multipleFiles'}>
+                                <TableHeaderColumn dataField="fileName" width="200" hidden={importType !== importTypes.multipleFiles}>
                                     {L.l('dataManagement.csvDataImport.filename')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="row" width="80">{L.l('dataManagement.csvDataImport.row')}</TableHeaderColumn>
                                 <TableHeaderColumn dataField="columns" width="150">{L.l('dataManagement.csvDataImport.columns')}</TableHeaderColumn>

@@ -72,6 +72,7 @@ import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -90,6 +91,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping("/api/survey")
 @Scope(SCOPE_SESSION)
+@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class SurveyController extends BasicController {
 
 	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
@@ -145,6 +147,7 @@ public class SurveyController extends BasicController {
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method=GET)
+	@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 	public @ResponseBody
 	List<?> loadSurveys(
 			@RequestParam(value="userId", required=false) Integer userId,
@@ -184,8 +187,8 @@ public class SurveyController extends BasicController {
 		return generateView(survey, includeCodeListValues);
 	}
 	
-	@Transactional
 	@RequestMapping(method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody
 	Response createSurvey(@Valid SurveyCreationParameters params, BindingResult bindingResult) throws Exception {
 		if (bindingResult.hasErrors()) {
@@ -212,8 +215,8 @@ public class SurveyController extends BasicController {
 		return res;
 	}
 	
-	@Transactional
 	@RequestMapping(value="cloneintotemporary/{surveyId}", method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody
 	Response cloneIntoTemporarySurvey(@PathVariable int surveyId) throws Exception {
 		Response response = new Response();
@@ -284,6 +287,7 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="publish/{id}", method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody SurveyView publishSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		User activeUser = sessionManager.getLoggedUser();
@@ -292,6 +296,7 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="unpublish/{id}", method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id) throws SurveyStoreException {
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
@@ -299,6 +304,7 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="close/{id}", method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody SurveyView closeSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.close(survey);
@@ -306,6 +312,7 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="archive/{id}", method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody SurveyView archiveSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.archive(survey);
@@ -313,12 +320,14 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="delete/{id}", method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
 		surveyManager.deleteSurvey(id);
 		return new Response();
 	}
 	
 	@RequestMapping(value="clone", method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody JobView cloneSurvey(@Valid SurveyCloneParameters params) {
 		surveyCloneJob = new SurveyCloneJob(surveyManager);
 		surveyCloneJob.setOriginalSurveyName(params.originalSurveyName);
@@ -434,6 +443,7 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="changeusergroup/{id}", method=POST)
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable int id, @RequestParam int userGroupId) throws SurveyStoreException {
 		return surveyManager.updateUserGroup(id, userGroupId);
 	}
