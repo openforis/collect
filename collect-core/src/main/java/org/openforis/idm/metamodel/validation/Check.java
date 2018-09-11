@@ -77,12 +77,12 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 		}
 	}
 	
-	public String getMessage(String language, String defaultLanguage) {
-		return messages == null ? null: messages.getText(language, defaultLanguage, true);
+	public String getMessage(String language) {
+		return getMessage(language, null);
 	}
 	
-	protected String getFailSafeMessage(Survey survey, String preferredLanguage) {
-			return getMessage(preferredLanguage, survey.getDefaultLanguage());
+	public String getMessage(String language, String defaultLanguage) {
+		return messages == null ? null: messages.getText(language, defaultLanguage);
 	}
 	
 	public void setMessage(String language, String text) {
@@ -123,7 +123,7 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 	
 	public String getMessageWithEvaluatedExpressions(Attribute<?, ?> context, String preferredLanguage) {
 		Survey survey = context.getSurvey();
-		String message = getFailSafeMessage(survey, preferredLanguage);
+		String message = getMessage(preferredLanguage, survey.getDefaultLanguage());
 		if (StringUtils.isBlank(message)) {
 			return null;
 		} else {

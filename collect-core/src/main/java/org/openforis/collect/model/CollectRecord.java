@@ -211,7 +211,7 @@ public class CollectRecord extends Record {
 	}
 	
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean dependencyGraphsEnabled) {
-		this(survey, versionName, rootEntityName, dependencyGraphsEnabled, false, true);
+		this(survey, versionName, rootEntityName, dependencyGraphsEnabled, true, false);
 	}
 	
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, 

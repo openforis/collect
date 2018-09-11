@@ -73,7 +73,7 @@ public class RelationalSchemaConfig implements Cloneable {
 		if ( defaultCodeLabels == null ) {
 			return null;
 		} else {
-			return defaultCodeLabels.getText(langCode, defaultLanguage, true);
+			return defaultCodeLabels.getText(langCode, defaultLanguage);
 		}
 	}
 	

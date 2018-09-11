@@ -48,7 +48,11 @@ public class UITab extends UITabSet {
 	}
 	
 	public String getLabel(String language) {
-		return labels == null ? null : labels.getText(language, getSurvey().getDefaultLanguage(), true);
+		return getLabel(language, null);
+	}
+	
+	public String getLabel(String language, String defaultLanguage) {
+		return labels == null ? null : labels.getText(language, defaultLanguage);
 	}
 	
 	public void addLabel(LanguageSpecificText label) {

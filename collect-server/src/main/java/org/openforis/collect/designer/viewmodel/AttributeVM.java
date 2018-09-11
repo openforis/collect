@@ -501,7 +501,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	}
 	
 	public String getCheckMessage(Check<?> check) {
-		String result = check.getMessage(currentLanguageCode, survey.getDefaultLanguage());
+		String result = check.getMessage(currentLanguageCode);
 		if ( result == null ) {
 			CheckType type = CheckType.valueOf(check);
 			result = type.getDefaultMessage();

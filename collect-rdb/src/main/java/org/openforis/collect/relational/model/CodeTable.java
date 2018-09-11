@@ -45,7 +45,7 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 		if ( defaultCodeLabels == null ) {
 			return null;
 		} else {
-			return defaultCodeLabels.getText(langCode, defaultLanguage, true);
+			return defaultCodeLabels.getText(langCode, defaultLanguage);
 		}
 	}
 	

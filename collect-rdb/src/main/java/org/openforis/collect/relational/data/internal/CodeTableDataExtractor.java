@@ -113,12 +113,12 @@ public class CodeTableDataExtractor extends DataExtractor {
 	private Object extractValue(CodeListItem item, Column<?> col) {
 		if (col instanceof CodeLabelColumn) {
 			String langCode = ((CodeLabelColumn) col).getLanguageCode();
-			return item.getLabel(langCode);
+			return item.getLabel(langCode, true);
 		} else if (col instanceof CodeListCodeColumn) {
 			return item.getCode();
 		} else if (col instanceof CodeListDescriptionColumn) {
 			String langCode = ((CodeListDescriptionColumn) col).getLanguageCode();
-			return item.getDescription(langCode);
+			return item.getDescription(langCode, true);
 		} else if (col instanceof CodeParentKeyColumn) {
 			CodeList list = item.getCodeList();
 			if ( list.isExternal() ) {
@@ -152,7 +152,8 @@ public class CodeTableDataExtractor extends DataExtractor {
 			} else if ( col instanceof CodeListCodeColumn ) {
 				val = table.getDefaultCode();
 			} else if ( col instanceof CodeLabelColumn ) {
-				val = table.getDefaultCodeLabel(((CodeLabelColumn) col).getLanguageCode(), ( (CollectSurvey) table.getCodeList().getSurvey()).getDefaultLanguage() );
+				String defaultLanguage = ( (CollectSurvey) table.getCodeList().getSurvey()).getDefaultLanguage();
+				val = table.getDefaultCodeLabel(((CodeLabelColumn) col).getLanguageCode(), defaultLanguage );
 			} else {
 				val = null;
 			}

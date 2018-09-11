@@ -17,8 +17,8 @@ public class SpatialReferenceSystemFormObject extends FormObject<SpatialReferenc
 	@Override
 	public void loadFrom(SpatialReferenceSystem source, String languageCode) {
 		id = source.getId();
-		label = source.getLabel(languageCode,null);
-		description = source.getDescription(languageCode,null);
+		label = source.getLabel(languageCode);
+		description = source.getDescription(languageCode);
 		wellKnownText = source.getWellKnownText();
 	}
 	

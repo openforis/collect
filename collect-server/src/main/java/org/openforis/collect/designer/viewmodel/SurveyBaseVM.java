@@ -399,7 +399,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public String getUnitLabel(Unit unit) {
 		String result = null;
 		if ( unit != null ) {
-			result = unit.getLabel(currentLanguageCode, survey.getDefaultLanguage());
+			result = unit.getLabel(currentLanguageCode);
 			if ( result == null ) {
 				result = unit.getName();
 			}
@@ -409,12 +409,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	public boolean isDefaultLanguage() {
 		CollectSurvey survey = getSurvey();
-		if ( survey != null ) {
-			String defaultLanguageCode = survey.getDefaultLanguage();
-			return currentLanguageCode != null && currentLanguageCode.equals(defaultLanguageCode);
-		} else {
-			return false;
-		}
+		return survey == null ? false : survey.isDefaultLanguage(currentLanguageCode);
 	}
 	
 	public String getDefaultLanguageCode() {

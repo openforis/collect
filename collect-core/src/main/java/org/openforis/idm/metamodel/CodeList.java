@@ -76,7 +76,12 @@ public class CodeList extends VersionableSurveyObject {
 	}
 	
 	public String getLabel(CodeListLabel.Type type, String language) {
-		return labels == null ? null: labels.getText(type, language);
+		return getLabel(type, language, false);
+	}
+	
+	public String getLabel(CodeListLabel.Type type, String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage() : null;
+		return labels == null ? null: labels.getText(type, language, defaultLanguage);
 	}
 	
 	public void setLabel(CodeListLabel.Type type, String language, String text) {
@@ -112,7 +117,12 @@ public class CodeList extends VersionableSurveyObject {
 	}
 
 	public String getDescription(String language) {
-		return descriptions.getText(language, getSurvey().getDefaultLanguage(),true );
+		return getDescription(language, false);
+	}
+	
+	public String getDescription(String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage(): null;
+		return descriptions == null ? null : descriptions.getText(language, defaultLanguage);
 	}
 	
 	public void setDescription(String language, String description) {

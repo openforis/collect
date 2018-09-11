@@ -462,10 +462,7 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	public static String getItemLabel(CodeListItem item, String lang) {
-		String itemLabel = item.getLabel(lang);
-		if (StringUtils.isBlank(itemLabel) && ! lang.equals(item.getSurvey().getDefaultLanguage())) {
-			itemLabel = item.getLabel();
-		}
+		String itemLabel = item.getLabel(lang, true);
 		if (StringUtils.isBlank(itemLabel)) {
 			itemLabel = item.getCode();
 		}
@@ -473,10 +470,7 @@ public class CEComponentHTMLFormatter {
 	}
 
 	public static String getDescription(CodeListItem item, String lang) {
-		String description = item.getDescription(lang);
-		if (StringUtils.isBlank(description) && ! lang.equals(item.getSurvey().getDefaultLanguage())) {
-			description = item.getDescription();
-		}
+		String description = item.getDescription(lang, true);
 		return HtmlUnicodeEscaperUtil.escapeHtmlUnicode( description );
 	}
 

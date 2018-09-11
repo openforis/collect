@@ -21,7 +21,7 @@ public class CheckFormObject<T extends Check<?>> extends FormObject<T> {
 	public void loadFrom(T source, String languageCode) {
 		flag = source.getFlag().name();
 		condition = source.getCondition();
-		message = source.getMessage(languageCode,null);
+		message = source.getMessage(languageCode);
 	}
 	
 	@Override
