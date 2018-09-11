@@ -4,8 +4,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -165,8 +163,10 @@ public class XMLDataImportProcess implements Callable<Void>, Closeable {
 	}
 
 	private void beforeStart() throws ZipException, IOException {
-		backupFileExtractor = new NewBackupFileExtractor(file);
-		backupFileExtractor.init();
+		if (backupFileExtractor == null) {
+			backupFileExtractor = new NewBackupFileExtractor(file);
+			backupFileExtractor.init();
+		}
 	}
 
 	private void createDataImportSummary() throws DataImportExeption {
@@ -263,14 +263,17 @@ public class XMLDataImportProcess implements Callable<Void>, Closeable {
 		}
 	}
 	
-	private void createSummaryForEntry(String entryName, Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
-			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
-			Map<Integer, CollectRecordSummary> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
+	private void createSummaryForEntry(String entryName, 
+			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, 
+			Map<Integer, CollectRecord> packagedRecords, 
+			Map<Integer, List<Step>> packagedStepsPerRecord, 
+			Map<Step, Integer> totalPerStep, 
+			Map<Integer, CollectRecordSummary> conflictingPackagedRecords, 
+			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
 		RecordEntry recordEntry = RecordEntry.parse(entryName);
 		Step step = recordEntry.getStep();
 		InputStream is = backupFileExtractor.findEntryInputStream(entryName);
-		InputStreamReader reader = OpenForisIOUtils.toReader(is);
-		ParseRecordResult parseRecordResult = parseRecord(reader, false);
+		ParseRecordResult parseRecordResult = parseRecord(is, false);
 		CollectRecord parsedRecord = parseRecordResult.getRecord();
 		if ( ! parseRecordResult.isSuccess()) {
 			List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
@@ -405,8 +408,7 @@ public class XMLDataImportProcess implements Callable<Void>, Closeable {
 			String entryName = recordEntry.getName();
 			InputStream inputStream = backupFileExtractor.findEntryInputStream(entryName);
 			if ( inputStream != null ) {
-				InputStreamReader reader = OpenForisIOUtils.toReader(inputStream);
-				ParseRecordResult parseRecordResult = parseRecord(reader, validateRecords);
+				ParseRecordResult parseRecordResult = parseRecord(inputStream, validateRecords);
 				CollectRecord parsedRecord = parseRecordResult.getRecord();
 				if (parsedRecord == null) {
 					String message = parseRecordResult.getMessage();
@@ -540,9 +542,9 @@ public class XMLDataImportProcess implements Callable<Void>, Closeable {
 		}
 	}
 
-	private ParseRecordResult parseRecord(Reader reader, boolean validateAndLoadReferences) throws IOException {
-		dataUnmarshaller.setRecordValidationEnabled(validateAndLoadReferences);
-		ParseRecordResult result = dataUnmarshaller.parse(reader);
+	private ParseRecordResult parseRecord(InputStream is, boolean validateAndLoadReferences) throws IOException {
+		dataUnmarshaller.setRecordDependencyGraphsEnabled(validateAndLoadReferences);
+		ParseRecordResult result = dataUnmarshaller.parse(OpenForisIOUtils.toReader(is));
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
 			if (validateAndLoadReferences) {
@@ -577,7 +579,7 @@ public class XMLDataImportProcess implements Callable<Void>, Closeable {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		ModelVersion version = record.getVersion();
 		String versionName = version != null ? version.getName(): null;
-		CollectRecord result = new CollectRecord(survey, versionName, record.getRootEntity().getName());
+		CollectRecord result = new CollectRecord(survey, versionName, record.getRootEntity().getName(), false);
 		result.setCreatedBy(record.getCreatedBy());
 		result.setCreationDate(record.getCreationDate());
 		result.setEntityCounts(record.getEntityCounts());

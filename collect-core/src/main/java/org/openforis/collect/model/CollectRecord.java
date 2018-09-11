@@ -210,20 +210,26 @@ public class CollectRecord extends Record {
 		this(survey, versionName, rootEntityName, true);
 	}
 	
-	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs) {
-		this(survey, versionName, rootEntityName, enableValidationDependencyGraphs, false);
+	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean dependencyGraphsEnabled) {
+		this(survey, versionName, rootEntityName, dependencyGraphsEnabled, false, true);
+	}
+	
+	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, 
+			boolean dependencyGraphsEnabled, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
+		this(survey, versionName, survey.getSchema().getRootEntityDefinition(rootEntityName), dependencyGraphsEnabled, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
 	}
 
 	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
-		this(survey, versionName, survey.getSchema().getRootEntityDefinition(rootEntityName), enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
+		this(survey, versionName, survey.getSchema().getRootEntityDefinition(rootEntityName), true, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
 	}
 	
 	public CollectRecord(CollectSurvey survey, String versionName, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs) {
-		this(survey, versionName, rootEntityDefinition, enableValidationDependencyGraphs, false);
+		this(survey, versionName, rootEntityDefinition, true, enableValidationDependencyGraphs, false);
 	}
 	
-	public CollectRecord(CollectSurvey survey, String versionName, EntityDefinition rootEntityDefinition, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
-		super(survey, versionName, rootEntityDefinition, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
+	public CollectRecord(CollectSurvey survey, String versionName, EntityDefinition rootEntityDefinition, 
+			boolean dependencyGraphsEnabled, boolean enableValidationDependencyGraphs, boolean ignoreExistingRecordValidationErrors) {
+		super(survey, versionName, rootEntityDefinition, dependencyGraphsEnabled, enableValidationDependencyGraphs, ignoreExistingRecordValidationErrors);
 		this.applicationVersion = Collect.VERSION;
 		this.step = Step.ENTRY;
 		this.dataStep = Step.ENTRY;
