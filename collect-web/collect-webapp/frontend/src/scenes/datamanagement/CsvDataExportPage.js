@@ -23,6 +23,17 @@ const csvExportAdditionalOptions = [
     'includeCodeItemLabelColumn'
 ]
 
+const exportModes = {
+    allEntities: 'ALL_ENTITIES',
+    selectedEntity: 'SELECTED_ENTITY',
+}
+
+const headingSources = {
+    attributeName: 'ATTRIBUTE_NAME',
+    instanceLabel: 'INSTANCE_LABEL',
+    reportingLabel: 'REPORTING_LABEL',
+}
+
 class CsvDataExportPage extends Component {
     
         constructor(props) {
@@ -33,12 +44,12 @@ class CsvDataExportPage extends Component {
                 stepGreaterOrEqual: 'ENTRY',
                 modifiedSince: '',
                 modifiedUntil: '',
-                exportMode: 'ALL_ENTITIES',
+                exportMode: exportModes.allEntities,
                 selectedEntityDefinition: null,
                 entityId: null,
                 exportOnlyOwnedRecords: false,
                 includeRecordFiles: true,
-                headingSource: 'ATTRIBUTE_NAME'
+                headingSource: headingSources.attributeName,
             }
     
             this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
@@ -51,6 +62,7 @@ class CsvDataExportPage extends Component {
                 return
             }
             const survey = this.props.survey
+            const {exportMode, outputFormat, stepGreaterOrEqual, modifiedSince, modifiedUntil, selectedEntityDefinition, exportOnlyOwnedRecords, headingSource} = this.state
             const surveyId = survey.id
             
             const rootEntityDef = survey.schema.firstRootEntityDefinition
@@ -60,19 +72,26 @@ class CsvDataExportPage extends Component {
             const keyAttributeValues = keyAttributes.map((a, idx) => this.state['key'+ idx], this)
             const summaryAttributeValues = summaryAttributes.map((a, idx) => this.state['summary'+ idx], this)
 
+            const selectedEntityId = 
+                exportMode == exportModes.allEntities 
+                ? null 
+                : selectedEntityDefinition 
+                    ? selectedEntityDefinition.id
+                    : null
+
             const parameters = {
                 surveyId: survey.id,
                 rootEntityId: survey.schema.firstRootEntityDefinition.id,
-                outputFormat: this.state.outputFormat,
-                stepGreaterOrEqual: this.state.stepGreaterOrEqual,
-                modifiedSince: this.state.modifiedSince,
-                modifiedUntil: this.state.modifiedUntil,
-                entityId: this.state.selectedEntityDefinition ? this.state.selectedEntityDefinition.id: null,
-                exportOnlyOwnedRecords: this.state.exportOnlyOwnedRecords,
-                headingSource: this.state.headingSource,
+                outputFormat,
+                stepGreaterOrEqual,
+                modifiedSince,
+                modifiedUntil,
+                entityId: selectedEntityId,
+                exportOnlyOwnedRecords,
+                headingSource,
                 alwaysGenerateZipFile: true,
-                keyAttributeValues: keyAttributeValues,
-                summaryAttributeValues: summaryAttributeValues
+                keyAttributeValues,
+                summaryAttributeValues,
             }
 
             csvExportAdditionalOptions.forEach(o => {
@@ -90,7 +109,7 @@ class CsvDataExportPage extends Component {
         }
 
         validateForm() {
-            if (this.state.exportMode === 'SELECTED_ENTITY' && ! this.state.selectedEntityDefinition) {
+            if (this.state.exportMode === exportModes.selectedEntity && ! this.state.selectedEntityDefinition) {
                 alert('Please select an entity to export')
                 return false
             }
@@ -116,6 +135,7 @@ class CsvDataExportPage extends Component {
             if (!survey) {
                 return <div>Select survey first</div>
             }
+            const {outputFormat, stepGreaterOrEqual, exportMode, exportOnlyOwnedRecords, modifiedSince, modifiedUntil} = this.state
             const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
 		   
             const additionalOptionsFormGroups = csvExportAdditionalOptions.map(o => {
@@ -170,14 +190,14 @@ class CsvDataExportPage extends Component {
                                     <FormGroup check>
                                         <Label check>
                                             <Input type="radio" value="CSV" name="outputFormat"
-                                                checked={this.state.outputFormat === 'CSV'} 
+                                                checked={outputFormat === 'CSV'} 
                                                 onChange={(event) => this.setState({...this.state, outputFormat: event.target.value})} />
                                             {L.l('dataManagement.export.outputFormat.csv')}
                                         </Label>
                                         <span style={{display: 'inline-block', width: '40px'}}></span>
                                         <Label check>
                                             <Input type="radio" value="XLSX" name="outputFormat"
-                                                checked={this.state.outputFormat === 'XLSX'} 
+                                                checked={outputFormat === 'XLSX'} 
                                                 onChange={(event) => this.setState({...this.state, outputFormat: event.target.value})} />
                                             {L.l('dataManagement.export.outputFormat.xlsx')}
                                         </Label>
@@ -188,7 +208,7 @@ class CsvDataExportPage extends Component {
                                 <Label md={2} for="stepSelect">{L.l('dataManagement.export.step')}:</Label>
                                 <Col md={10}>
                                     <Input type="select" name="step" id="stepSelect" style={{ maxWidth: '100px' }} 
-                                        value={this.state.stepGreaterOrEqual}
+                                        value={stepGreaterOrEqual}
                                         onChange={e => this.setState({stepGreaterOrEqual: e.target.value})}>{stepsOptions}</Input>
                                 </Col>
                             </FormGroup>
@@ -197,22 +217,22 @@ class CsvDataExportPage extends Component {
                                 <Col md={10}>
                                     <FormGroup check>
                                         <Label check>
-                                            <Input type="radio" value="ALL_ENTITIES" name="exportMode"
-                                                checked={this.state.exportMode === 'ALL_ENTITIES'} 
+                                            <Input type="radio" value={exportModes.allEntities} name="exportMode"
+                                                checked={exportMode === exportModes.allEntities} 
                                                 onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
                                             {L.l('dataManagement.export.mode.allEntities')}
                                         </Label>
                                         <span style={{display: 'inline-block', width: '40px'}}></span>
                                         <Label check>
-                                            <Input type="radio" value="SELECTED_ENTITY" name="exportMode"
-                                                checked={this.state.exportMode === 'SELECTED_ENTITY'} 
+                                            <Input type="radio" value={exportModes.selectedEntity} name="exportMode"
+                                                checked={exportMode === exportModes.selectedEntity} 
                                                 onChange={(event) => this.setState({...this.state, exportMode: event.target.value})} />
                                             {L.l('dataManagement.export.mode.onlySelectedEntities')}
                                         </Label>
                                     </FormGroup>
                                 </Col>
                             </FormGroup>
-                            {this.state.exportMode === 'SELECTED_ENTITY' &&
+                            {exportMode === exportModes.selectedEntity &&
                                 <FormGroup row>
                                     <Label sm={1}>{L.l('dataManagement.export.selectEntities')}:</Label>
                                     <Col sm={{size: 10 }}>
@@ -231,7 +251,7 @@ class CsvDataExportPage extends Component {
                                             <FormGroup check row>
                                                 <Label check>
                                                     <Input type="checkbox" onChange={event => this.setState({exportOnlyOwnedRecords: event.target.checked})} 
-                                                        checked={this.state.exportOnlyOwnedRecords} />{' '}
+                                                        checked={exportOnlyOwnedRecords} />{' '}
                                                     {L.l('dataManagement.export.onlyOwnedRecords')}
                                                 </Label>
                                             </FormGroup>
@@ -239,13 +259,13 @@ class CsvDataExportPage extends Component {
                                                 <Label md={3} for="modifiedSince">{L.l('dataManagement.export.modifiedSince')}:</Label>
                                                 <Col md={4}>
                                                     <Input type="date" name="modifiedSince" id="modifiedSince"
-                                                        value={this.state.modifiedSince}
+                                                        value={modifiedSince}
                                                         onChange={e => this.setState({modifiedSince: e.target.value})} />
                                                 </Col>
                                                 <Label md={1} for="modifiedUntil">{L.l('dataManagement.export.modifiedUntil')}:</Label>
                                                 <Col md={4}>
                                                     <Input type="date" name="modifiedUntil" id="modifiedUntil"
-                                                        value={this.state.modifiedUntil}
+                                                        value={modifiedUntil}
                                                         onChange={e => this.setState({modifiedUntil: e.target.value})} />
                                                 </Col>
                                             </FormGroup>
@@ -269,9 +289,9 @@ class CsvDataExportPage extends Component {
                                                 <Col md={6}>
                                                     <Input type="select" name="headingsSource" id="headingsSourceSelect" style={{ maxWidth: '200px' }} 
                                                         onChange={e => this.setState({headingSource: e.target.value})}>
-                                                        <option value="ATTRIBUTE_NAME">{L.l('dataManagement.export.sourceForFileHeadings.attributeName')}</option>
-                                                        <option value="INSTANCE_LABEL">{L.l('dataManagement.export.sourceForFileHeadings.attributeLabel')}</option>
-                                                        <option value="REPORTING_LABEL">{L.l('dataManagement.export.sourceForFileHeadings.reportingLabel')}</option>
+                                                        <option value={headingSources.attributeName}>{L.l('dataManagement.export.sourceForFileHeadings.attributeName')}</option>
+                                                        <option value={headingSources.instanceLabel}>{L.l('dataManagement.export.sourceForFileHeadings.attributeLabel')}</option>
+                                                        <option value={headingSources.reportingLabel}>{L.l('dataManagement.export.sourceForFileHeadings.reportingLabel')}</option>
                                                     </Input>
                                                 </Col>
                                             </FormGroup>
