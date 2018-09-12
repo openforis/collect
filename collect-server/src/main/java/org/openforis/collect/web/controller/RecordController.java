@@ -449,6 +449,7 @@ public class RecordController extends BasicController implements Serializable {
 		RecordAccessControlManager accessControlManager = new RecordAccessControlManager();
 		if (accessControlManager.canEdit(sessionManager.getLoggedUser(), record)) {
 			CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
+			job.setSurvey(survey);
 			CSVDataExportParameters parameters = new CSVDataExportParameters();
 			RecordFilter recordFilter = createRecordFilter(survey, sessionManager.getLoggedUser(), userGroupManager, 
 					null, false);
@@ -459,9 +460,9 @@ public class RecordController extends BasicController implements Serializable {
 			job.setParameters(parameters);
 			File outputFile = File.createTempFile("record_export", ".zip");
 			job.setOutputFile(outputFile);
-			jobManager.startSurveyJob(job);
+			jobManager.startSurveyJob(job, false);
 			if (job.isCompleted()) {
-				String fileName = String.format("record_data_%s.zip", Dates.formatDate(new Date()));
+				String fileName = String.format("record_data_%d_%s.zip", recordId, Dates.formatDate(new Date()));
 				Controllers.writeFileToResponse(response, outputFile, fileName, MediaTypes.ZIP_CONTENT_TYPE);
 			}
 		}
