@@ -76,26 +76,23 @@ public abstract class BaseStorageManager implements Serializable {
 		
 		String customStoragePath = configuration.get(configurationItem);
 		
-		if ( StringUtils.isBlank(customStoragePath) ) {
-			storageDirectory = getDefaultStorageDirectory();
-		} else {
-			storageDirectory = new File(customStoragePath);
-		}
-		boolean result = storageDirectory.exists();
-		if (! result) {
+		this.storageDirectory = StringUtils.isBlank(customStoragePath) ? getDefaultStorageDirectory() : new File(customStoragePath);
+
+		boolean storageDirectoryAccessible = storageDirectory.exists();
+		if (! storageDirectoryAccessible) {
 			if (createIfNotExists) {
-				result = storageDirectory.mkdirs();
+				storageDirectoryAccessible = storageDirectory.mkdirs();
 			}
 		}
 		
 		if (LOG.isInfoEnabled() ) {
-			if (result) {
+			if (storageDirectoryAccessible) {
 				LOG.info(String.format("Using %s directory: %s", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
 			} else {
 				LOG.info(String.format("%s directory %s does not exist or it's not accessible", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
 			}
 		}
-		return result;
+		return storageDirectoryAccessible;
 	}
 
 	protected File getDefaultStorageRootDirectory() {
@@ -115,12 +112,9 @@ public abstract class BaseStorageManager implements Serializable {
 					}
 				}
 			}
-			if (result == null || ! result.exists()) {
-				result = TEMP_FOLDER;
-			}
-			return result;
+			return result == null || !result.exists() ? TEMP_FOLDER : result;
 		} else {
-			return new File(defaultRootStoragePath );
+			return new File(defaultRootStoragePath);
 		}
 	}
 	
@@ -141,6 +135,10 @@ public abstract class BaseStorageManager implements Serializable {
 		} else {
 			return new File(rootDir, defaultSubFolder);
 		}
+	}
+	
+	public File getStorageDirectory() {
+		return storageDirectory;
 	}
 	
 	protected void setDefaultSubFolder(String defaultSubFolder) {
