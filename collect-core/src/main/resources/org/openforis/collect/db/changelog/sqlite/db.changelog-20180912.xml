@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-sampling-design-info-3" author="ricci" dbms="sqlite">
+		<comment>Add other 10 sampling design info columns (total 30)</comment>
+		
+		<sql>
+			alter table ofc_sampling_design add column info21 varchar(255);
+			alter table ofc_sampling_design add column info22 varchar(255);
+			alter table ofc_sampling_design add column info23 varchar(255);
+			alter table ofc_sampling_design add column info24 varchar(255);
+			alter table ofc_sampling_design add column info25 varchar(255);
+			alter table ofc_sampling_design add column info26 varchar(255);
+			alter table ofc_sampling_design add column info27 varchar(255);
+			alter table ofc_sampling_design add column info28 varchar(255);
+			alter table ofc_sampling_design add column info29 varchar(255);
+			alter table ofc_sampling_design add column info30 varchar(255);
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>

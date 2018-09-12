@@ -172,19 +172,24 @@ public class Tables {
 	public static final OfcTaxon OFC_TAXON = org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;
 
 	/**
-	 * The table collect.ofc_taxon_vernacular_name
-	 */
-	public static final OfcTaxonVernacularName OFC_TAXON_VERNACULAR_NAME = org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
-
-	/**
 	 * The table collect.ofc_taxonomy
 	 */
 	public static final OfcTaxonomy OFC_TAXONOMY = org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY;
 
 	/**
+	 * The table collect.ofc_taxon_vernacular_name
+	 */
+	public static final OfcTaxonVernacularName OFC_TAXON_VERNACULAR_NAME = org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
+
+	/**
 	 * The table collect.ofc_user
 	 */
 	public static final OfcUser OFC_USER = org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
+
+	/**
+	 * The table collect.ofc_usergroup
+	 */
+	public static final OfcUsergroup OFC_USERGROUP = org.openforis.collect.persistence.jooq.tables.OfcUsergroup.OFC_USERGROUP;
 
 	/**
 	 * The table collect.ofc_user_role
@@ -195,9 +200,4 @@ public class Tables {
 	 * The table collect.ofc_user_usergroup
 	 */
 	public static final OfcUserUsergroup OFC_USER_USERGROUP = org.openforis.collect.persistence.jooq.tables.OfcUserUsergroup.OFC_USER_USERGROUP;
-
-	/**
-	 * The table collect.ofc_usergroup
-	 */
-	public static final OfcUsergroup OFC_USERGROUP = org.openforis.collect.persistence.jooq.tables.OfcUsergroup.OFC_USERGROUP;
 }

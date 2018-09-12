@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSamplingDesign implements Serializable {
 
-	private static final long serialVersionUID = -376082347;
+	private static final long serialVersionUID = -1096487517;
 
 	private Integer id;
 	private Integer surveyId;
@@ -50,6 +50,16 @@ public class OfcSamplingDesign implements Serializable {
 	private String  info18;
 	private String  info19;
 	private String  info20;
+	private String  info21;
+	private String  info22;
+	private String  info23;
+	private String  info24;
+	private String  info25;
+	private String  info26;
+	private String  info27;
+	private String  info28;
+	private String  info29;
+	private String  info30;
 
 	public OfcSamplingDesign() {}
 
@@ -80,6 +90,16 @@ public class OfcSamplingDesign implements Serializable {
 		this.info18 = value.info18;
 		this.info19 = value.info19;
 		this.info20 = value.info20;
+		this.info21 = value.info21;
+		this.info22 = value.info22;
+		this.info23 = value.info23;
+		this.info24 = value.info24;
+		this.info25 = value.info25;
+		this.info26 = value.info26;
+		this.info27 = value.info27;
+		this.info28 = value.info28;
+		this.info29 = value.info29;
+		this.info30 = value.info30;
 	}
 
 	public OfcSamplingDesign(
@@ -108,7 +128,17 @@ public class OfcSamplingDesign implements Serializable {
 		String  info17,
 		String  info18,
 		String  info19,
-		String  info20
+		String  info20,
+		String  info21,
+		String  info22,
+		String  info23,
+		String  info24,
+		String  info25,
+		String  info26,
+		String  info27,
+		String  info28,
+		String  info29,
+		String  info30
 	) {
 		this.id = id;
 		this.surveyId = surveyId;
@@ -136,6 +166,16 @@ public class OfcSamplingDesign implements Serializable {
 		this.info18 = info18;
 		this.info19 = info19;
 		this.info20 = info20;
+		this.info21 = info21;
+		this.info22 = info22;
+		this.info23 = info23;
+		this.info24 = info24;
+		this.info25 = info25;
+		this.info26 = info26;
+		this.info27 = info27;
+		this.info28 = info28;
+		this.info29 = info29;
+		this.info30 = info30;
 	}
 
 	public Integer getId() {
@@ -344,5 +384,85 @@ public class OfcSamplingDesign implements Serializable {
 
 	public void setInfo20(String info20) {
 		this.info20 = info20;
+	}
+
+	public String getInfo21() {
+		return this.info21;
+	}
+
+	public void setInfo21(String info21) {
+		this.info21 = info21;
+	}
+
+	public String getInfo22() {
+		return this.info22;
+	}
+
+	public void setInfo22(String info22) {
+		this.info22 = info22;
+	}
+
+	public String getInfo23() {
+		return this.info23;
+	}
+
+	public void setInfo23(String info23) {
+		this.info23 = info23;
+	}
+
+	public String getInfo24() {
+		return this.info24;
+	}
+
+	public void setInfo24(String info24) {
+		this.info24 = info24;
+	}
+
+	public String getInfo25() {
+		return this.info25;
+	}
+
+	public void setInfo25(String info25) {
+		this.info25 = info25;
+	}
+
+	public String getInfo26() {
+		return this.info26;
+	}
+
+	public void setInfo26(String info26) {
+		this.info26 = info26;
+	}
+
+	public String getInfo27() {
+		return this.info27;
+	}
+
+	public void setInfo27(String info27) {
+		this.info27 = info27;
+	}
+
+	public String getInfo28() {
+		return this.info28;
+	}
+
+	public void setInfo28(String info28) {
+		this.info28 = info28;
+	}
+
+	public String getInfo29() {
+		return this.info29;
+	}
+
+	public void setInfo29(String info29) {
+		this.info29 = info29;
+	}
+
+	public String getInfo30() {
+		return this.info30;
+	}
+
+	public void setInfo30(String info30) {
+		this.info30 = info30;
 	}
 }

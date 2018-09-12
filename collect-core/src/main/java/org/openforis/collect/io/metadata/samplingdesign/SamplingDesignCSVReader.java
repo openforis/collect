@@ -100,7 +100,7 @@ public class SamplingDesignCSVReader extends CSVReferenceDataImportReader<Sampli
 	
 	class Validator {
 		
-		private static final int MAX_INFO_COLUMNS = 20;
+		private static final int MAX_INFO_COLUMNS = 30;
 
 		public void validate() throws ParsingException {
 			validateHeaders();
@@ -111,7 +111,7 @@ public class SamplingDesignCSVReader extends CSVReferenceDataImportReader<Sampli
 			String[] requiredColumnNames = SamplingDesignFileColumn.REQUIRED_COLUMN_NAMES;
 			for (String requiredColumnName : requiredColumnNames) {
 				if ( ! colNames.contains(requiredColumnName) ) {
-					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, (String) null);
+					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1);
 					String messageArg = StringUtils.join(requiredColumnNames, ", ");
 					error.setMessageArgs(new String[]{messageArg});
 					throw new ParsingException(error);
@@ -125,8 +125,9 @@ public class SamplingDesignCSVReader extends CSVReferenceDataImportReader<Sampli
 				}
 			});
 			if (infoColumns.size() > MAX_INFO_COLUMNS) {
-				ParsingError error = new ParsingError(ErrorType.EXCEEDING_MAXIMUM_EXTRA_COLUMNS);
-				error.setMessageArgs(new String[]{String.valueOf(MAX_INFO_COLUMNS), String.valueOf(infoColumns.size())});
+				ParsingError error = new ParsingError(ErrorType.EXCEEDING_MAXIMUM_EXTRA_COLUMNS, 1);
+				error.setMessageArgs(new String[]{
+						String.valueOf(MAX_INFO_COLUMNS), String.valueOf(infoColumns.size())});
 				throw new ParsingException(error);
 			}
 		}

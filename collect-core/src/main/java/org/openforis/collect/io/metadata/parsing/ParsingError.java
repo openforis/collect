@@ -53,6 +53,10 @@ public class ParsingError {
 		this(ErrorType.INVALID_VALUE, row, column, (String) null);
 	}
 	
+	public ParsingError(ErrorType type, long row) {
+		this(type, row, (String) null);
+	}
+	
 	public ParsingError(ErrorType type, long row, String column) {
 		this(type, row, column, (String) null);
 	}
