@@ -148,15 +148,19 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	 * Return the label of the specified type in the default language
 	 */
 	public String getLabel(NodeLabel.Type type) {
-		String defaultLanguage = getSurvey().getDefaultLanguage();
-		return getLabel(type, defaultLanguage);
+		return getLabel(type, null, true);
 	}
 	
 	/**
 	 * Return the label of the specified type in the specified language
 	 */
 	public String getLabel(NodeLabel.Type type, String language) {
-		return labels == null ? null: labels.getText(type, language);
+		return getLabel(type, language, false);
+	}
+	
+	public String getLabel(NodeLabel.Type type, String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage() : null;
+		return labels == null ? null: labels.getText(type, language, defaultLanguage);
 	}
 	
 	/**
@@ -172,12 +176,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	 * otherwise returns the name of the node definition
 	 */
 	public String getFailSafeLabel(NodeLabel.Type type, String language) {
-		if (labels == null) {
-			return null;
-		} else {
-			String label = labels.getText(type, language, getSurvey().getDefaultLanguage());
-			return label == null ? name : label;
-		}
+		String label = getLabel(type, language, true);
+		return label == null ? name : label;
 	}
 
 	public String getFailSafeLabel(NodeLabel.Type... types) {
@@ -282,14 +282,15 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	}
 	
 	public String getDescription() {
-		return getDescription(null, getSurvey().getDefaultLanguage());
+		return getDescription(null, true);
 	}
 
 	public String getDescription(String language) {
-		return getDescription(language, null);
+		return getDescription(language, false);
 	}
 	
-	public String getDescription(String language, String defaultLanguage) {
+	public String getDescription(String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage() : null;
 		return descriptions == null ? null: descriptions.getText(language, defaultLanguage);
 	}
 	
