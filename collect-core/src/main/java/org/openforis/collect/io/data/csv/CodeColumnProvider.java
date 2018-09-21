@@ -157,7 +157,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 				int position = items.indexOf(item) + 1;
 				return position;
 			} else {
-				return item.getLabel(getConfig().getLanguageCode());
+				return item.getLabel(getConfig().getLanguageCode(), true);
 			}
 		} else {
 			return super.extractValue(attr, fieldName);
