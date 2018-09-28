@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-web</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.23.3</version>
+		<version>3.23.4-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
