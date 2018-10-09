@@ -21,7 +21,7 @@
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="applicationPane"
 	fx:controller="org.openforis.collect.controlpanel.CollectControlPanelController"
-	minHeight="240.0" maxHeight="580.0" prefHeight="240.0" 
+	minHeight="230.0" maxHeight="580.0" prefHeight="240.0" 
 	maxWidth="600.0" minWidth="600.0" prefWidth="600.0" 
 	styleClass="main-pane"
 	stylesheets="@org/openforis/collect/controlpanel/collect_control_panel.css">

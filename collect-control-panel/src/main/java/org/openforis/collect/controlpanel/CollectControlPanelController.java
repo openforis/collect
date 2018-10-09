@@ -54,7 +54,7 @@ public class CollectControlPanelController implements Initializable {
 	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
 	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), DEFAULT_WEBAPPS_FOLDER_NAME);
 	private static final int LOG_OPENED_WINDOW_HEIGHT = 580;
-	private static final int LOG_CLOSED_WINDOW_HEIGHT = 240;
+	private static final int LOG_CLOSED_WINDOW_HEIGHT = 230;
 	private static final int LOG_TEXT_MAX_LENGTH = 5000;
 	private static final String CATALINA_BASE = "catalina.base";
 	
