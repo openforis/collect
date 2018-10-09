@@ -243,28 +243,33 @@
   				visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated) and fx.multiple ne true)">
   				<label value="${labels.survey.schema.node.required}:" />
   				<vlayout>
-	  				<radiogroup selectedItem="@bind(fx.requirenessType)"
-							onCheck="@command('applyChanges')">
-						<radio
-							label="${labels.survey.schema.node.always_required}"
-							value="ALWAYS_REQUIRED" />
-						<radio 
-							label="${labels.survey.schema.node.not_required}"
-							value="NOT_REQUIRED" />
-						<radio
-							label="${labels.survey.schema.node.required_when}"
-							value="REQUIRED_WHEN" />
-	  				</radiogroup>
-	  				<hlayout spacing="2px" visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')">
-						<fieldErrorHandler
-		  					message="@load(vmsgs['requiredWhenExpression'])">
-		  					<textbox width="250px"
-		  						value="@bind(fx.requiredWhenExpression)"
-		  						onChange="@command('applyChanges')"
-		  						rows="4" />
-		  				</fieldErrorHandler>
-	  					<expressionInfoIcon />
-	  				</hlayout>
+	  				<fieldErrorHandler message="@load(vmsgs['requirenessType'])">
+		  				<radiogroup selectedItem="@bind(fx.requirenessType)"
+								onCheck="@command('applyChanges')">
+							<radio
+								label="${labels.survey.schema.node.always_required}"
+								value="ALWAYS_REQUIRED"
+								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
+							<radio 
+								label="${labels.survey.schema.node.not_required}"
+								value="NOT_REQUIRED"
+								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
+							<radio
+								label="${labels.survey.schema.node.required_when}"
+								value="REQUIRED_WHEN"
+								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
+		  				</radiogroup>
+		  				<hlayout spacing="2px" visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')">
+							<fieldErrorHandler
+			  					message="@load(vmsgs['requiredWhenExpression'])">
+			  					<textbox width="250px"
+			  						value="@bind(fx.requiredWhenExpression)"
+			  						onChange="@command('applyChanges')"
+			  						rows="4" />
+			  				</fieldErrorHandler>
+		  					<expressionInfoIcon />
+		  				</hlayout>
+	  				</fieldErrorHandler>
   				</vlayout>
   			</row>
   		</rows>

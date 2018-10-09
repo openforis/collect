@@ -27,9 +27,11 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 
 	protected static final String 	NODE_NAME_ALREADY_DEFINED_MESSAGE_KEY = "survey.schema.node.validation.name_already_defined";
 	private static final String 	BACKGROUND_COLOR_FORMAT_ERROR_MESSAGE_KEY = "survey.schema.node.validation.background_color";
-
+	private static final String 	KEY_ALWAYS_REQUIRED_MESSAGE_KEY = "survey.validation.node.requireness.key_attribute_always_required";
+			
 	protected static final String 	DESCRIPTION_FIELD = "description";
 	protected static final String 	NAME_FIELD = "name";
+	protected static final String 	KEY_FIELD = "key";
 	protected static final String 	MIN_COUNT_EXPRESSION_FIELD = "minCountExpression";
 	protected static final String 	MAX_COUNT_EXPRESSION_FIELD = "maxCountExpression";
 	protected static final String 	TAB_NAME_FIELD = "tabName";
@@ -52,8 +54,15 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 		validateDescription(ctx);
 		
 		NodeDefinition contextNode = getEditedNode(ctx);
+		
+		Boolean key = getValue(ctx, KEY_FIELD);
 		String requirenessTypeVal = getValue(ctx, REQUIRENESS_TYPE_FIELD);
 		RequirenessType requirenessType = RequirenessType.valueOf(requirenessTypeVal);
+		
+		if (Boolean.TRUE.equals(key) && requirenessType != RequirenessType.ALWAYS_REQUIRED) {
+			addInvalidMessage(ctx, REQUIRENESS_TYPE_FIELD, Labels.getLabel(KEY_ALWAYS_REQUIRED_MESSAGE_KEY));
+		}
+		
 		if (requirenessType == RequirenessType.REQUIRED_WHEN) {
 			if (validateRequired(ctx, REQUIRED_EXPR_FIELD)) {
 				validateBooleanExpressionField(ctx, contextNode, REQUIRED_EXPR_FIELD);
