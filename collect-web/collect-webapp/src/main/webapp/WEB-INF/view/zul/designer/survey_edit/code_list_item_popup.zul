@@ -42,7 +42,8 @@
 							</fieldErrorHandler>
 							<fieldErrorHandler
 								message="@load(vmsgs['label'])">
-								<textbox width="150px" 
+								<textbox width="300px" 
+									maxlength="255"
 									value="@bind(fx.label)"
 									placeholder="@load(fx.defaultLabel)"
 									onChange="@command('validate')" />
@@ -61,7 +62,9 @@
 								<textbox width="300px"
 									value="@bind(fx.description)"
 									placeholder="@load(fx.defaultDescription)" 
-									multiline="true" rows="4"
+									multiline="true" 
+									rows="4"
+									maxlength="1023"
 									onChange="@command('validate')" />
 							</fieldErrorHandler>
 						</row>
