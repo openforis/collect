@@ -278,9 +278,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if (dest instanceof AttributeDefinition) {
 			AttributeDefinition attrDef = (AttributeDefinition) dest;
 			annotations.setFromCollectEarthCSV(attrDef, fromCollectEarthCSV);
-			annotations.setIncludedInCollectEarthHeader(attrDef, includedInCollectEarthHeader);
-			annotations.setShowReadOnlyFieldInCollectEarth(attrDef, showReadOnlyFieldInCollectEarth);
-			annotations.setHideKeyInCollectEarthRecordList(attrDef, hideKeyInCollectEarthRecordList);
+			annotations.setIncludedInCollectEarthHeader(attrDef, fromCollectEarthCSV && includedInCollectEarthHeader);
+			annotations.setShowReadOnlyFieldInCollectEarth(attrDef, fromCollectEarthCSV && showReadOnlyFieldInCollectEarth);
+			annotations.setHideKeyInCollectEarthRecordList(attrDef, fromCollectEarthCSV && hideKeyInCollectEarthRecordList);
 			annotations.setShowInSummary(attrDef, showInSummary);
 			annotations.setQualifier(attrDef, qualifier);
 		}

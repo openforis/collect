@@ -598,7 +598,8 @@
     	</vlayout>
     </collapsiblepanel>
     
-    <collapsiblepanel captionLabel="${labels.survey.schema.attribute.collect_earth.section_title}" open="false"
+    <collapsiblepanel captionLabel="${labels.survey.schema.attribute.collect_earth.section_title}" 
+   		open="@load(fx.fromCollectEarthCSV)"
 		visible="@load(vm.attribute)">
     	<grid class="inner">
     		<columns>
@@ -616,23 +617,21 @@
 			    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" 
 			    				onCheck="@command('applyChanges')" />
 			    		</fieldErrorHandler>
-						<fieldErrorHandler message="@load(vmsgs['showReadOnlyFieldInCollectEarth'])" visible="@load(fx.fromCollectEarthCSV)">
+						<fieldErrorHandler message="@load(vmsgs['showReadOnlyFieldInCollectEarth'])" 
+								visible="@load(fx.fromCollectEarthCSV)">
 			    			<label value="${labels.survey.schema.attribute.collect_earth.show_readonly_field.$}:" />
 							<image popup="showReadOnlyFieldInCollectEarthInfoTooltip" style="cursor:pointer" src="/assets/images/info-small.png" />
 			    			<checkbox checked="@bind(fx.showReadOnlyFieldInCollectEarth)" 
 			    				onCheck="@command('applyChanges')" />
 			    		</fieldErrorHandler>
+			    		<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])"
+    							visible="@load(fx.fromCollectEarthCSV)">
+			    			<label value="${labels.survey.schema.attribute.collect_earth.includeInHeader}:" />
+			    			<checkbox
+			    				checked="@load(fx.includedInCollectEarthHeader eq true) @save(fx.includedInCollectEarthHeader)" 
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
 			    	</hbox>
-    			</row>
-    			<row>
-					<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])">
-		    			<label value="${labels.survey.schema.attribute.collect_earth.includeInHeader}:" />
-		    		</fieldErrorHandler>
-		    		<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])">
-		    			<checkbox
-		    				checked="@load(fx.includedInCollectEarthHeader eq true) @save(fx.includedInCollectEarthHeader)" 
-		    				onCheck="@command('applyChanges')" />
-		    		</fieldErrorHandler>
     			</row>
     		</rows>
     	</grid>
