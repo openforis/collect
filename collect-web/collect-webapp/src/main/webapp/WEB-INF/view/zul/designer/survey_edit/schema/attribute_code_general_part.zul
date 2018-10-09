@@ -12,7 +12,7 @@
     		<cell>
     			<hlayout>
     				<fieldErrorHandler message="@load(vmsgs['list'])">
-    					<listbox width="150px"
+    					<listbox width="300px"
     						model="@load(vm.codeLists)" selectedItem="@bind(fx.list)"
     						mold="select"
     						onSelect="@command('onListChanged', list=self.selectedItem.value)">

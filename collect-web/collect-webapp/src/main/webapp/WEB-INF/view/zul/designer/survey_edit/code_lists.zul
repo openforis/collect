@@ -103,7 +103,7 @@
 			        				</fieldErrorHandler>
 		        					<fieldErrorHandler
 		        						message="@load(vmsgs['itemLabel'])">
-		        						<textbox width="150px"
+		        						<textbox width="300px"
 		        							value="@bind(fx.itemLabel)"
 		        							placeholder="@load(fx.defaultItemLabel)"
 		        							onChange="@command('applyChanges')" />
