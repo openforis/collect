@@ -105,6 +105,8 @@
 						return "referenceDataImport.parsingError.type.missing_required_columns.message";
 					case ParsingError$ErrorType.DUPLICATE_VALUE:
 						return "referenceDataImport.parsingError.type.duplicate_value.message";
+					case ParsingError$ErrorType.EXCEEDING_MAXIMUM_EXTRA_COLUMNS:
+						return "referenceDataImport.parsingError.type.exceeding_maximum_extra_columns.message";
 					default:
 						return null;
 				}

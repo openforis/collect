@@ -200,7 +200,8 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		if (projectNames == null) {
 			return null;
 		}
-		return projectNames.getText(language, getDefaultLanguage(), defaultToDefaultLanguage);
+		String defaultLanguage = defaultToDefaultLanguage ? getDefaultLanguage() : null;
+		return projectNames.getText(language, defaultLanguage);
 	}
 	
 	public void setProjectName(String language, String text) {
@@ -242,11 +243,12 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 	
 	public String getDescription(String language) {
-		return descriptions == null ? null: descriptions.getText(language, getDefaultLanguage());
+		return getDescription(language, false);
 	}
 	
-	public String getFailSafeDescription(String language) {
-		return descriptions == null ? null: descriptions.getFailSafeText(language, getDefaultLanguage());
+	public String getDescription(String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getDefaultLanguage() : null;
+		return descriptions == null ? null: descriptions.getText(language, defaultLanguage);
 	}
 	
 	public void setDescription(String language, String description) {
@@ -501,15 +503,14 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		return null;
 	}
 
+	public boolean hasCodeList(String name) {
+		return getCodeList(name) != null;
+	}
+	
 	public CodeList getCodeList(String name) {
-		if ( codeLists != null && name != null ) {
-			for (CodeList codeList : codeLists) {
-				if (name.equals(codeList.getName())) {
-					return codeList;
-				}
-			}
-		}
-		return null;
+		return codeLists != null && name != null ?
+			CollectionUtils.findItem(codeLists, name, "name")
+			: null;
 	}
 
 	public Unit getUnit(int id) {
@@ -850,6 +851,10 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 
 	public CodeList createCodeList() {
 		return new CodeList(this, nextId());
+	}
+	
+	public CodeList cloneCodeList(CodeList source) {
+		return new CodeList(this, nextId(), source);
 	}
 	
 	public Unit createUnit(int id) {

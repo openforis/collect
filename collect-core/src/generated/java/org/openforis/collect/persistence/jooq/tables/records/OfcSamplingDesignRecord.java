@@ -24,7 +24,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSamplingDesignRecord extends UpdatableRecordImpl<OfcSamplingDesignRecord> {
 
-	private static final long serialVersionUID = 777071097;
+	private static final long serialVersionUID = -1557126570;
 
 	/**
 	 * Setter for <code>collect.ofc_sampling_design.id</code>.
@@ -390,6 +390,146 @@ public class OfcSamplingDesignRecord extends UpdatableRecordImpl<OfcSamplingDesi
 		return (String) getValue(25);
 	}
 
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info21</code>.
+	 */
+	public void setInfo21(String value) {
+		setValue(26, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info21</code>.
+	 */
+	public String getInfo21() {
+		return (String) getValue(26);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info22</code>.
+	 */
+	public void setInfo22(String value) {
+		setValue(27, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info22</code>.
+	 */
+	public String getInfo22() {
+		return (String) getValue(27);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info23</code>.
+	 */
+	public void setInfo23(String value) {
+		setValue(28, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info23</code>.
+	 */
+	public String getInfo23() {
+		return (String) getValue(28);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info24</code>.
+	 */
+	public void setInfo24(String value) {
+		setValue(29, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info24</code>.
+	 */
+	public String getInfo24() {
+		return (String) getValue(29);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info25</code>.
+	 */
+	public void setInfo25(String value) {
+		setValue(30, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info25</code>.
+	 */
+	public String getInfo25() {
+		return (String) getValue(30);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info26</code>.
+	 */
+	public void setInfo26(String value) {
+		setValue(31, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info26</code>.
+	 */
+	public String getInfo26() {
+		return (String) getValue(31);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info27</code>.
+	 */
+	public void setInfo27(String value) {
+		setValue(32, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info27</code>.
+	 */
+	public String getInfo27() {
+		return (String) getValue(32);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info28</code>.
+	 */
+	public void setInfo28(String value) {
+		setValue(33, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info28</code>.
+	 */
+	public String getInfo28() {
+		return (String) getValue(33);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info29</code>.
+	 */
+	public void setInfo29(String value) {
+		setValue(34, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info29</code>.
+	 */
+	public String getInfo29() {
+		return (String) getValue(34);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_sampling_design.info30</code>.
+	 */
+	public void setInfo30(String value) {
+		setValue(35, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_sampling_design.info30</code>.
+	 */
+	public String getInfo30() {
+		return (String) getValue(35);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -416,7 +556,7 @@ public class OfcSamplingDesignRecord extends UpdatableRecordImpl<OfcSamplingDesi
 	/**
 	 * Create a detached, initialised OfcSamplingDesignRecord
 	 */
-	public OfcSamplingDesignRecord(Integer id, Integer surveyId, String level1, String level2, String level3, String location, String info1, String info2, String info3, String info4, String info5, String info6, String info7, String info8, String info9, String info10, String info11, String info12, String info13, String info14, String info15, String info16, String info17, String info18, String info19, String info20) {
+	public OfcSamplingDesignRecord(Integer id, Integer surveyId, String level1, String level2, String level3, String location, String info1, String info2, String info3, String info4, String info5, String info6, String info7, String info8, String info9, String info10, String info11, String info12, String info13, String info14, String info15, String info16, String info17, String info18, String info19, String info20, String info21, String info22, String info23, String info24, String info25, String info26, String info27, String info28, String info29, String info30) {
 		super(OfcSamplingDesign.OFC_SAMPLING_DESIGN);
 
 		setValue(0, id);
@@ -445,5 +585,15 @@ public class OfcSamplingDesignRecord extends UpdatableRecordImpl<OfcSamplingDesi
 		setValue(23, info18);
 		setValue(24, info19);
 		setValue(25, info20);
+		setValue(26, info21);
+		setValue(27, info22);
+		setValue(28, info23);
+		setValue(29, info24);
+		setValue(30, info25);
+		setValue(31, info26);
+		setValue(32, info27);
+		setValue(33, info28);
+		setValue(34, info29);
+		setValue(35, info30);
 	}
 }

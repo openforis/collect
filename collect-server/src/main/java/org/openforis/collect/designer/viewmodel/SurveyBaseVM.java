@@ -409,12 +409,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	public boolean isDefaultLanguage() {
 		CollectSurvey survey = getSurvey();
-		if ( survey != null ) {
-			String defaultLanguageCode = survey.getDefaultLanguage();
-			return currentLanguageCode != null && currentLanguageCode.equals(defaultLanguageCode);
-		} else {
-			return false;
-		}
+		return survey == null ? false : survey.isDefaultLanguage(currentLanguageCode);
 	}
 	
 	public String getDefaultLanguageCode() {

@@ -105,11 +105,11 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 	}
 	
 	public String getLabel(String language) {
-		return labels == null ? null: labels.getText(language);
+		return getLabel(language, null);
 	}
 	
-	public String getFailSafeLabel(String language, String defaultLanguage) {
-		return labels == null ? null : labels.getFailSafeText(language, defaultLanguage);
+	public String getLabel(String language, String defaultLanguage) {
+		return labels == null ? null: labels.getText(language, defaultLanguage);
 	}
 	
 	public void addLabel(LanguageSpecificText label) {
@@ -137,9 +137,13 @@ public class SpatialReferenceSystem implements Serializable, DeepComparable {
 			return this.descriptions.values();
 		}
 	}
-
+	
 	public String getDescription(String language) {
-		return descriptions == null ? null: descriptions.getText(language);
+		return getDescription(language, null);
+	}
+	
+	public String getDescription(String language, String defaultLanguage) {
+		return descriptions == null ? null: descriptions.getText(language, defaultLanguage);
 	}
 	
 	public void setDescription(String language, String description) {

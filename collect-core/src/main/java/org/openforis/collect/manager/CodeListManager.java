@@ -478,6 +478,14 @@ public class CodeListManager {
 	}
 	
 	@Transactional
+	public CodeList copyCodeList(CodeList list, CollectSurvey toSurvey) {
+		CodeList destCodeList = toSurvey.cloneCodeList(list);
+		toSurvey.addCodeList(destCodeList);
+		codeListItemDao.copyItems(list, destCodeList);
+		return destCodeList;
+	}
+	
+	@Transactional
 	public void save(PersistedCodeListItem item) {
 		if ( item.getSystemId() == null ) {
 			codeListItemDao.insert(item);

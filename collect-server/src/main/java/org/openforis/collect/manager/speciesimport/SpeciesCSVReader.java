@@ -81,8 +81,13 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 		private static final String DEFAULT_HYBRID_FORMULA = "×";
 		private static final Pattern ONLY_GENUS_PATTERN = 
 				Pattern.compile("^(" + GENUS_PATTERN_STR + ")(\\s+(spp|sp)\\.?)?$");
+		private static final String CAPITALIZED_WORD_PATTERN_STR = "[A-Z][a-z]+";
+		private static final String CULTIVAR_NAME_PATTERN_STR = "'" + CAPITALIZED_WORD_PATTERN_STR + "(\\s+" + CAPITALIZED_WORD_PATTERN_STR + ")*'";
+		private static final String SUBSPECIES_NAME_PATTERN_STR = "[a-z]+|[a-z]+\\-[a-z]+";
 		private static final Pattern SPECIES_AND_ABOVE_PATTERN = 
-				Pattern.compile("^(" + GENUS_PATTERN_STR + ")\\s+(" + SPECIES_NAME_PATTERN_STR + ")(\\s+(ssp|subsp|var)\\.?\\s+([a-z]+))?$");
+				Pattern.compile("^(" + GENUS_PATTERN_STR + ")\\s+(" + SPECIES_NAME_PATTERN_STR + ")(\\s+(ssp|subsp|var|f)\\.?\\s+(" + SUBSPECIES_NAME_PATTERN_STR + "))?$");
+		private static final Pattern CULTIVAR_SPECIES_PATTERN = 
+				Pattern.compile("^(" + GENUS_PATTERN_STR + ")\\s+(" + SPECIES_NAME_PATTERN_STR + ")\\s+(" + CULTIVAR_NAME_PATTERN_STR + ")$");
 		private static final Pattern HYBRID_SPECIES_PATTERN_1 = 
 				Pattern.compile("^(" + GENUS_PATTERN_STR + ")\\s+([x|X|" + DEFAULT_HYBRID_FORMULA +"])\\s+(" + SPECIES_NAME_PATTERN_STR + ")$"); //e.g. Annona x atemoya
 		private static final Pattern HYBRID_SPECIES_PATTERN_2 = 
@@ -164,9 +169,9 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 						} else if ("subsp".equals(discriminator) || "ssp".equals(discriminator)) {
 							rank = TaxonRank.SUBSPECIES;
 							normalizedDiscriminator = "subsp.";
-						} else if ("form".equals(discriminator)) {
+						} else if ("f".equals(discriminator)) {
 							rank = TaxonRank.FORM;
-							normalizedDiscriminator = "form";
+							normalizedDiscriminator = "f.";
 						} else {
 							throw new IllegalArgumentException(String.format("Invalid discriminator %s found in scientific name %s", 
 									discriminator, rawScientificName));
@@ -207,6 +212,17 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 							(secondaryGenus == null ? "" : secondaryGenus + " ") +
 							secondarySpecies;
 					return new ScientificNameParseResult(genus, speciesName, speciesName, TaxonRank.SPECIES);
+				}
+			}
+			{
+				Matcher matcher = CULTIVAR_SPECIES_PATTERN.matcher(rawScientificName);
+				if (matcher.find()) {
+					String genus = matcher.group(1);
+					String species = matcher.group(2);
+					String cultivarName = matcher.group(3);
+					String speciesName = genus + " " + species;
+					String canonicalScientificName = speciesName + " " + cultivarName;
+					return new ScientificNameParseResult(genus, speciesName, canonicalScientificName, TaxonRank.CULTIVAR);
 				}
 			}
 			ParsingError error = createFieldParsingError(

@@ -138,6 +138,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
 		
 		updateMondrianSchemaFile(surveyName, preferredLanguage);
+		
 		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
 			writeSaikuDatasource(surveyName, recordStep);
 		}

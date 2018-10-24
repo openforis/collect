@@ -3,7 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,9 +35,13 @@ class StateDependencyMap {
 		this.sourcesByDependent = new HashMap<NodeDefinition, Set<NodePathPointer>>();
 	}
 	
-	Set<NodePathPointer> getDependents(NodeDefinition def){
-		Set<NodePathPointer> set = dependentsBySource.get(def);
-		return set == null ? Collections.<NodePathPointer>emptySet() : set;
+	Set<NodePathPointer> getDependents(NodeDefinition source){
+		Set<NodePathPointer> set = dependentsBySource.get(source);
+		if(set == null){
+			set = new HashSet<NodePathPointer>();
+			dependentsBySource.put(source, set);
+		}
+		return set;
 	}
 	
 	Set<NodeDefinition> getDependentNodeDefinitions(NodeDefinition def) {
@@ -46,9 +49,13 @@ class StateDependencyMap {
 		return getReferencedNodeDefinitions(dependents);
 	}
 	
-	Set<NodePathPointer> getSources(NodeDefinition def) {
-		Set<NodePathPointer> set = sourcesByDependent.get(def);
-		return set == null ? Collections.<NodePathPointer>emptySet() : set;
+	Set<NodePathPointer> getSources(NodeDefinition dependent) {
+		Set<NodePathPointer> set = sourcesByDependent.get(dependent);
+		if(set == null){
+			set = new HashSet<NodePathPointer>();
+			sourcesByDependent.put(dependent, set);
+		}
+		return set;
 	}
 	
 	Set<NodeDefinition> getSourceNodeDefinitions(NodeDefinition def) {
@@ -57,25 +64,17 @@ class StateDependencyMap {
 	}
 	
 	private void addDependency(NodeDefinition def, NodePathPointer value){
-		Set<NodePathPointer> set = dependentsBySource.get(def);
-		if(set == null){
-			set = new HashSet<NodePathPointer>();
-			dependentsBySource.put(def, set);
-		}
+		Set<NodePathPointer> set = getDependents(def);
 		set.add(value);
 	}
-	
+
 	void addDependency(NodeDefinition sourceNodeDef, String pathToDependentParent, NodeDefinition dependentNodeDef) {
 		NodePathPointer nodePointer = new NodePathPointer(pathToDependentParent, dependentNodeDef);
 		addDependency(sourceNodeDef, nodePointer);
 	}
 		
 	void addSource(NodeDefinition context, String dependentParentEntityPath, NodeDefinition dependentNodeDef) {
-		Set<NodePathPointer> set = sourcesByDependent.get(context);
-		if(set == null){
-			set = new HashSet<NodePathPointer>();
-			sourcesByDependent.put(context, set);
-		}
+		Set<NodePathPointer> set = getSources(context);
 		set.add(new NodePathPointer(dependentParentEntityPath, dependentNodeDef));
 	}
 

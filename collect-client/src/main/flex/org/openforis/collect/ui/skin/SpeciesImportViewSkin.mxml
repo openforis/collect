@@ -64,7 +64,8 @@
 			<s:DataGrid id="summaryDataGrid" 
 						height="100%"
 						width="100%"
-						rowHeight="22">
+						rowHeight="22"
+						sortableColumns="false">
 				<s:columns>
 					<s:ArrayList>
 						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.rank')}" 

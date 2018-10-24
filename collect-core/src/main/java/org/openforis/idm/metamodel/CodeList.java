@@ -36,6 +36,16 @@ public class CodeList extends VersionableSurveyObject {
 	CodeList(Survey survey, int id) {
 		super(survey, id);
 	}
+	
+	CodeList(Survey survey, int id, CodeList source) {
+		super(survey, id);
+		this.name = source.name;
+		this.labels = source.labels == null ? null: new CodeListLabelMap(source.labels);
+		this.descriptions = source.descriptions == null ? null : new LanguageSpecificTextMap(source.descriptions);
+		this.codingScheme = source.codingScheme;
+		this.hierarchy = source.hierarchy == null ? null : CollectionUtils.clone(source.hierarchy);
+		this.items = null; //TODO
+	}
 
 	public String getName() {
 		return this.name;
@@ -66,7 +76,12 @@ public class CodeList extends VersionableSurveyObject {
 	}
 	
 	public String getLabel(CodeListLabel.Type type, String language) {
-		return labels == null ? null: labels.getText(type, language);
+		return getLabel(type, language, false);
+	}
+	
+	public String getLabel(CodeListLabel.Type type, String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage() : null;
+		return labels == null ? null: labels.getText(type, language, defaultLanguage);
 	}
 	
 	public void setLabel(CodeListLabel.Type type, String language, String text) {
@@ -102,10 +117,12 @@ public class CodeList extends VersionableSurveyObject {
 	}
 
 	public String getDescription(String language) {
-		if ( language == null ) {
-			language = getSurvey().getDefaultLanguage();
-		}
-		return descriptions == null ? null: descriptions.getText(language);
+		return getDescription(language, false);
+	}
+	
+	public String getDescription(String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage(): null;
+		return descriptions == null ? null : descriptions.getText(language, defaultLanguage);
 	}
 	
 	public void setDescription(String language, String description) {
@@ -445,4 +462,8 @@ public class CodeList extends VersionableSurveyObject {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("CodeList [name=%s]", name);
+	}
 }

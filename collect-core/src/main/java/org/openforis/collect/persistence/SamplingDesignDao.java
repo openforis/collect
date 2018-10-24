@@ -73,7 +73,17 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		OFC_SAMPLING_DESIGN.INFO17,
 		OFC_SAMPLING_DESIGN.INFO18,
 		OFC_SAMPLING_DESIGN.INFO19,
-		OFC_SAMPLING_DESIGN.INFO20
+		OFC_SAMPLING_DESIGN.INFO20,
+		OFC_SAMPLING_DESIGN.INFO21,
+		OFC_SAMPLING_DESIGN.INFO22,
+		OFC_SAMPLING_DESIGN.INFO23,
+		OFC_SAMPLING_DESIGN.INFO24,
+		OFC_SAMPLING_DESIGN.INFO25,
+		OFC_SAMPLING_DESIGN.INFO26,
+		OFC_SAMPLING_DESIGN.INFO27,
+		OFC_SAMPLING_DESIGN.INFO28,
+		OFC_SAMPLING_DESIGN.INFO29,
+		OFC_SAMPLING_DESIGN.INFO30
 	}; 
 	
 	@SuppressWarnings("rawtypes")
@@ -339,7 +349,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		
 		@SuppressWarnings("unchecked")
 		protected Object[] extractValues(SamplingDesignItem item) {
-			List<Object> values = new ArrayList<Object>(3 + LEVEL_CODE_FIELDS.length + INFO_FIELDS.length);
+			List<Object> values = new ArrayList<Object>(BASE_FIELDS.length + LEVEL_CODE_FIELDS.length + INFO_FIELDS.length);
 			values.addAll(Arrays.asList(
 				item.getId(), 
 				item.getSurveyId(),

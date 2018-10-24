@@ -148,6 +148,13 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			expected.setTaxonRank(TaxonRank.SPECIES);
 			assertEquals(expected, occurrence);
 		}
+		{
+			String code = "ACH/MIL/CER";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(18, code, "Achillea millefolium 'Cerise Queen'");
+			expected.setTaxonRank(TaxonRank.CULTIVAR);
+			assertEquals(expected, occurrence);
+		}
 	}
 
 	@Test

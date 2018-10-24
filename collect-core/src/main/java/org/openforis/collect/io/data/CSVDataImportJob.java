@@ -105,14 +105,12 @@ public class CSVDataImportJob extends Job {
 					new CSVDataExportJob.EntryNameGenerator(OutputFormat.CSV).generateMultipleEntitesEntryMap(input.survey);
 			for (Entry<String, EntityDefinition> entry : entityDefinitionsByFileName.entrySet()) {
 				String fileName = entry.getKey();
+				EntityDefinition entityDef = entry.getValue();
 				File file = new File(tempInputFilesFolder, fileName);
 				if (file.exists()) {
-					EntityDefinition entityDef = entry.getValue();
 					CSVDataImportTask task = createTask(CSVDataImportTask.class);
 					CSVDataImportSettings settings = input.settings.clone();
-					if (! entityDef.isRoot()) {
-						settings.setInsertNewRecords(false);
-					}
+					settings.setInsertNewRecords(entityDef.isRoot());
 					task.input = new CSVDataImportInput(file, input.survey, input.steps, entityDef.getId(), settings);
 					addTask(task);
 					processedFileNames.add(fileName);

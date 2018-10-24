@@ -161,7 +161,7 @@ public class CollectEarthGridTemplateGenerator  {
 			
 					
 		} catch (Exception e) {
-			logger.error( "Error reading CSV file ", e);
+			logger.error( "Error reading CSV file. The file " +file.getAbsolutePath() + " doesn't seem to be a valid plot location file or does not exist.", e);
 			validationResults  = new CSVFileValidationResult(ErrorType.INVALID_FILE_TYPE);
 		} finally {
 			IOUtils.closeQuietly(csvReader);

@@ -31,8 +31,8 @@ public class UIForm extends UIFormContentContainer {
 		}
 	}
 	
-	public String getLabel(String language) {
-		return labels == null ? null: labels.getText(language);
+	public String getLabel(String language, String defaultLanguage) {
+		return labels == null ? null: labels.getText(language, defaultLanguage);
 	}
 	
 	public void addLabel(LanguageSpecificText label) {

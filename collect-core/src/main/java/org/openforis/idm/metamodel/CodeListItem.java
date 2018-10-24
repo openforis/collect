@@ -90,33 +90,27 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 	 * Returns the label in the default language
 	 */
 	public String getLabel() {
-		Survey survey = getSurvey();
-		String defaultLanguage = survey.getDefaultLanguage();
-		return getLabel(defaultLanguage);
+		return getLabel(null, true);
 	}
 	
 	/**
 	 * Returns the label in the specified language
+	 * (if language is null, it uses the default survey language)
 	 */
 	public String getLabel(String language) {
-		if (labels == null) {
-			return null;
-		}
-		if ( language == null ) {
-			language = getSurvey().getDefaultLanguage();
-		}
-		return labels.getText(language);
+		return getLabel(language, false);
 	}
 	
 	/**
 	 * Returns the label in the specified language.
 	 * If not found, returns the one in the survey default language
 	 */
-	public String getFailSafeLabel(String language) {
+	public String getLabel(String language, boolean defaultToSurveyDefaultLanguage) {
 		if (labels == null) {
 			return null;
 		}
-		return labels.getFailSafeText(language, getSurvey().getDefaultLanguage());
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage(): null;
+		return labels.getText(language, defaultLanguage);
 	}
 	
 	public void addLabel(LanguageSpecificText label) {
@@ -154,29 +148,23 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 	}
 
 	public String getDescription() {
-		String defaultLanguage = getSurvey().getDefaultLanguage();
-		return getDescription(defaultLanguage);
+		return getDescription(null, true);
 	}
 	
 	public String getDescription(String language) {
-		if (descriptions == null) {
-			return null;
-		}
-		if ( language == null ) {
-			language = getSurvey().getDefaultLanguage();
-		}
-		return descriptions.getText(language);
+		return getDescription(language, false);
 	}
 	
 	/**
 	 * Returns the description in the specified language.
 	 * If not found, returns the one in the survey default language
 	 */
-	public String getFailSafeDescription(String language) {
+	public String getDescription(String language, boolean defaultToSurveyDefaultLanguage) {
 		if (descriptions == null) {
 			return null;
 		}
-		return descriptions.getFailSafeText(language, getSurvey().getDefaultLanguage());
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage(): null;
+		return descriptions.getText(language, defaultLanguage);
 	}
 	
 	public void setDescription(String language, String text) {

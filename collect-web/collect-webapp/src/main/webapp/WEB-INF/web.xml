@@ -10,10 +10,6 @@
 		<param-name>webAppRootKey</param-name>
 		<param-value>collect.root</param-value>
 	</context-param>
-<!-- 	<context-param> -->
-<!-- 		<param-name>log4jConfigLocation</param-name> -->
-<!-- 		<param-value>/WEB-INF/conf/log4j.xml</param-value> -->
-<!-- 	</context-param> -->
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -25,9 +21,9 @@
         </param-value>
 	</context-param>
 	
-<!-- 	<listener> -->
-<!-- 	    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class> -->
-<!-- 	</listener> -->
+	<listener>
+		<listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
+	</listener>
 	<listener>
 		<listener-class>org.openforis.collect.web.listener.ApplicationInitializerServletContextListener</listener-class>
 	</listener>

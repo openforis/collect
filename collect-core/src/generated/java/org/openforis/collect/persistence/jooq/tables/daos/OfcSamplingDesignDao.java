@@ -237,4 +237,74 @@ public class OfcSamplingDesignDao extends DAOImpl<OfcSamplingDesignRecord, org.o
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo20(String... values) {
 		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO20, values);
 	}
+
+	/**
+	 * Fetch records that have <code>info21 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo21(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO21, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info22 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo22(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO22, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info23 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo23(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO23, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info24 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo24(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO24, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info25 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo25(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO25, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info26 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo26(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO26, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info27 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo27(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO27, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info28 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo28(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO28, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info29 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo29(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO29, values);
+	}
+
+	/**
+	 * Fetch records that have <code>info30 IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSamplingDesign> fetchByInfo30(String... values) {
+		return fetch(OfcSamplingDesign.OFC_SAMPLING_DESIGN.INFO30, values);
+	}
 }

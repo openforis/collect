@@ -11,9 +11,8 @@ import java.util.List;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openforis.collect.Collect;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
@@ -48,7 +47,6 @@ import org.xml.sax.helpers.DefaultHandler;
 public class DataUnmarshaller {
 
 	private static final String NAMESPACES_FEATURE = "http://xml.org/sax/features/namespaces";
-	private static final Logger log = LogManager.getLogger(DataUnmarshaller.class);
 
 	private DataHandler dataHandler;
 	private XMLReader reader;
@@ -65,8 +63,7 @@ public class DataUnmarshaller {
 	}
 
 	public ParseRecordResult parse(Reader reader) throws IOException {
-		InputSource is = new InputSource(reader);
-		return parse(is);
+		return parse(new InputSource(reader));
 	}
 
 	public ParseRecordResult parse(String filename) throws DataUnmarshallerException {
@@ -74,18 +71,11 @@ public class DataUnmarshaller {
 		try {
 			reader = new FileReader(filename);
 			ParseRecordResult result = parse(reader); 
-			reader.close();
 			return result;
 		} catch (IOException e) {
 			throw new DataUnmarshallerException(e);
 		} finally {
-			if ( reader != null ) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-					log.warn("Failed to close Reader: "+e);
-				}
-			}
+			IOUtils.closeQuietly(reader);
 		}
 	}
 	
@@ -117,8 +107,7 @@ public class DataUnmarshaller {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			// create a parser
-			SAXParser parser;
-			parser = factory.newSAXParser();
+			SAXParser parser = factory.newSAXParser();
 			// create the reader (scanner)
 			this.reader = parser.getXMLReader();
 			reader.setFeature(NAMESPACES_FEATURE, true);
@@ -128,6 +117,10 @@ public class DataUnmarshaller {
 		}
 	}
 
+	public void setRecordDependencyGraphsEnabled(boolean enabled) {
+		this.dataHandler.recordDependencyGraphsEnabled = enabled;
+	}
+	
 	public void setRecordValidationEnabled(boolean enabled) {
 		this.dataHandler.recordValidationEnabled = enabled;
 	}
@@ -160,14 +153,16 @@ public class DataUnmarshaller {
 		private boolean failed;
 		private List<NodeUnmarshallingError> failures;
 		private List<NodeUnmarshallingError> warnings;
-		private StringBuilder content;
 		protected Attributes attributes;
 		private CollectSurvey recordSurvey;
 		private CollectSurvey publishedSurvey;
 		private int ignoreLevels;
-		private boolean recordValidationEnabled;
-		private boolean ignoreDuplicateRecordKeyValidationErrors;
-		
+		private boolean recordDependencyGraphsEnabled = true;
+		private boolean recordValidationEnabled = true;
+		private boolean ignoreDuplicateRecordKeyValidationErrors = false;
+
+		private StringBuilder content = new StringBuilder();
+
 		public DataHandler(CollectSurvey survey) {
 			this(survey, survey, true);
 		}
@@ -210,7 +205,6 @@ public class DataUnmarshaller {
 					// if root element, read audit data, version, and 
 					startRecord(name, attributes);
 				} else {
-					this.content = new StringBuilder();
 					this.attributes = attributes;
 					if ( node instanceof Entity ) {
 						startChildNode(name, attributes);
@@ -239,9 +233,10 @@ public class DataUnmarshaller {
 			}
 		}
 
-		public void startRecord(String localName, Attributes attributes) {
+		public void startRecord(String rootEntityName, Attributes attributes) {
 			String versionName = extractVersionName(attributes);
-			record = new CollectRecord(publishedSurvey, versionName, localName, recordValidationEnabled, ignoreDuplicateRecordKeyValidationErrors);
+			record = new CollectRecord(publishedSurvey, versionName, rootEntityName, 
+					recordDependencyGraphsEnabled, recordValidationEnabled, ignoreDuplicateRecordKeyValidationErrors);
 			record.setApplicationVersion(recordApplicationVersion);
 			String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
 			State state = State.fromCode(stateAttr);
@@ -359,7 +354,7 @@ public class DataUnmarshaller {
 					} else {
 						endEntityElement();
 					}
-					this.content = null;
+					resetContent();
 					if ( node == null ) {
 						endRecordElement();
 					}
@@ -438,8 +433,7 @@ public class DataUnmarshaller {
 		}
 		
 		protected void setFieldData(Field<?> fld) {
-			String value = content == null ? null : content.toString().trim();
-			fld.setValueFromString(value);
+			fld.setValueFromString(content == null ? null : content.toString().trim());
 			String remarks = attributes.getValue(ATTRIBUTE_REMARKS);
 			fld.setRemarks(remarks);
 			String s = attributes.getValue(ATTRIBUTE_SYMBOL);
@@ -469,6 +463,10 @@ public class DataUnmarshaller {
 			return null;
 		}
 		
+		private void resetContent() {
+			content.setLength(0); //clear StringBuilder
+		}
+		
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			if ( content != null && node instanceof Attribute ) {
@@ -496,6 +494,9 @@ public class DataUnmarshaller {
 			this.recordValidationEnabled = recordValidationEnabled;
 		}
 		
+		public void setIgnoreDuplicateRecordKeyValidationErrors(boolean ignoreDuplicateRecordKeyValidationErrors) {
+			this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
+		}
 	}
 	
 	public class ParseRecordResult {

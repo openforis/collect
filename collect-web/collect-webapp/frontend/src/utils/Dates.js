@@ -3,7 +3,7 @@ import Moment from 'moment';
 export default class Dates {
 
     static DATE_FORMAT = 'DD/MM/YYYY'
-    static DATETIME_FORMAT = 'DD/MM/YYYY hh:mm'
+    static DATETIME_FORMAT = 'DD/MM/YYYY HH:mm'
     static MILLIS = 'millis'
     static DAYS = 'days'
     static MONTHS = 'months'

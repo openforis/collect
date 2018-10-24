@@ -6,9 +6,7 @@ package org.openforis.idm.model;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -85,15 +83,6 @@ public abstract class Node<D extends NodeDefinition> implements Serializable, De
 		return currentParent;
 	}
 	
-	public Set<Node<?>> getDescendantsAndSelf() {
-		Set<Node<?>> nodesToBeDeleted = new HashSet<Node<?>>();
-		nodesToBeDeleted.add(this);
-		if ( this instanceof Entity ) {
-			nodesToBeDeleted.addAll(((Entity) this).getDescendants());
-		}
-		return nodesToBeDeleted;
-	}
-
 	public List<Integer> getAncestorIds() {
 		List<Entity> ancestors = getAncestors();
 		List<Integer> ancestorIds = new ArrayList<Integer>(ancestors.size());

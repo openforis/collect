@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
 
@@ -49,15 +48,11 @@ public class UITab extends UITabSet {
 	}
 	
 	public String getLabel(String language) {
-		if ( labels == null ) {
-			return null;
-		} else if ( language == null ) {
-			CollectSurvey survey = uiOptions.getSurvey();
-			String defaultLanguage = survey.getDefaultLanguage();
-			return labels.getText(defaultLanguage);
-		} else {
-			return labels.getText(language);
-		}
+		return getLabel(language, null);
+	}
+	
+	public String getLabel(String language, String defaultLanguage) {
+		return labels == null ? null : labels.getText(language, defaultLanguage);
 	}
 	
 	public void addLabel(LanguageSpecificText label) {

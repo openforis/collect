@@ -1,5 +1,6 @@
 package org.openforis.collect.manager.speciesimport;
 
+import static org.openforis.idm.model.species.Taxon.TaxonRank.CULTIVAR;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.FORM;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
@@ -56,7 +57,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSpeciesName";
 	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
-	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY, FORM};
+	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY, CULTIVAR, FORM};
 
 	//input
 	private SpeciesManager speciesManager;
@@ -212,6 +213,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			return mostSpecificRank;
 		case SUBSPECIES:
 		case VARIETY:
+		case CULTIVAR:
 		case FORM:
 			Taxon parent = findParentTaxon(line);
 			if ( ! mostSpecificRank || parent == null ) {

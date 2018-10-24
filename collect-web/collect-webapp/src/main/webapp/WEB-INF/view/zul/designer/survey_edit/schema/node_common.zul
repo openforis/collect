@@ -243,28 +243,33 @@
   				visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated) and fx.multiple ne true)">
   				<label value="${labels.survey.schema.node.required}:" />
   				<vlayout>
-	  				<radiogroup selectedItem="@bind(fx.requirenessType)"
-							onCheck="@command('applyChanges')">
-						<radio
-							label="${labels.survey.schema.node.always_required}"
-							value="ALWAYS_REQUIRED" />
-						<radio 
-							label="${labels.survey.schema.node.not_required}"
-							value="NOT_REQUIRED" />
-						<radio
-							label="${labels.survey.schema.node.required_when}"
-							value="REQUIRED_WHEN" />
-	  				</radiogroup>
-	  				<hlayout spacing="2px" visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')">
-						<fieldErrorHandler
-		  					message="@load(vmsgs['requiredWhenExpression'])">
-		  					<textbox width="250px"
-		  						value="@bind(fx.requiredWhenExpression)"
-		  						onChange="@command('applyChanges')"
-		  						rows="4" />
-		  				</fieldErrorHandler>
-	  					<expressionInfoIcon />
-	  				</hlayout>
+	  				<fieldErrorHandler message="@load(vmsgs['requirenessType'])">
+		  				<radiogroup selectedItem="@bind(fx.requirenessType)"
+								onCheck="@command('applyChanges')">
+							<radio
+								label="${labels.survey.schema.node.always_required}"
+								value="ALWAYS_REQUIRED"
+								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
+							<radio 
+								label="${labels.survey.schema.node.not_required}"
+								value="NOT_REQUIRED"
+								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
+							<radio
+								label="${labels.survey.schema.node.required_when}"
+								value="REQUIRED_WHEN"
+								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
+		  				</radiogroup>
+		  				<hlayout spacing="2px" visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')">
+							<fieldErrorHandler
+			  					message="@load(vmsgs['requiredWhenExpression'])">
+			  					<textbox width="250px"
+			  						value="@bind(fx.requiredWhenExpression)"
+			  						onChange="@command('applyChanges')"
+			  						rows="4" />
+			  				</fieldErrorHandler>
+		  					<expressionInfoIcon />
+		  				</hlayout>
+	  				</fieldErrorHandler>
   				</vlayout>
   			</row>
   		</rows>
@@ -593,7 +598,8 @@
     	</vlayout>
     </collapsiblepanel>
     
-    <collapsiblepanel captionLabel="${labels.survey.schema.attribute.collect_earth.section_title}" open="false"
+    <collapsiblepanel captionLabel="${labels.survey.schema.attribute.collect_earth.section_title}" 
+   		open="@load(fx.fromCollectEarthCSV)"
 		visible="@load(vm.attribute)">
     	<grid class="inner">
     		<columns>
@@ -611,23 +617,21 @@
 			    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" 
 			    				onCheck="@command('applyChanges')" />
 			    		</fieldErrorHandler>
-						<fieldErrorHandler message="@load(vmsgs['showReadOnlyFieldInCollectEarth'])" visible="@load(fx.fromCollectEarthCSV)">
+						<fieldErrorHandler message="@load(vmsgs['showReadOnlyFieldInCollectEarth'])" 
+								visible="@load(fx.fromCollectEarthCSV)">
 			    			<label value="${labels.survey.schema.attribute.collect_earth.show_readonly_field.$}:" />
 							<image popup="showReadOnlyFieldInCollectEarthInfoTooltip" style="cursor:pointer" src="/assets/images/info-small.png" />
 			    			<checkbox checked="@bind(fx.showReadOnlyFieldInCollectEarth)" 
 			    				onCheck="@command('applyChanges')" />
 			    		</fieldErrorHandler>
+			    		<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])"
+    							visible="@load(fx.fromCollectEarthCSV)">
+			    			<label value="${labels.survey.schema.attribute.collect_earth.includeInHeader}:" />
+			    			<checkbox
+			    				checked="@load(fx.includedInCollectEarthHeader eq true) @save(fx.includedInCollectEarthHeader)" 
+			    				onCheck="@command('applyChanges')" />
+			    		</fieldErrorHandler>
 			    	</hbox>
-    			</row>
-    			<row>
-					<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])">
-		    			<label value="${labels.survey.schema.attribute.collect_earth.includeInHeader}:" />
-		    		</fieldErrorHandler>
-		    		<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])">
-		    			<checkbox
-		    				checked="@load(fx.includedInCollectEarthHeader eq true) @save(fx.includedInCollectEarthHeader)" 
-		    				onCheck="@command('applyChanges')" />
-		    		</fieldErrorHandler>
     			</row>
     		</rows>
     	</grid>

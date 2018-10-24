@@ -1,10 +1,9 @@
 package org.openforis.collect.io.data;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,7 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Deprecated
-public class XMLDataImportProcess implements Callable<Void> {
+public class XMLDataImportProcess implements Callable<Void>, Closeable {
 
 	private static final int MAX_QUERY_BUFFER_SIZE = 100;
 
@@ -157,10 +156,17 @@ public class XMLDataImportProcess implements Callable<Void> {
 		call();
 		state.addObserver( observer );
 	}
+	
+	@Override
+	public void close() {
+		IOUtils.closeQuietly(backupFileExtractor);
+	}
 
 	private void beforeStart() throws ZipException, IOException {
-		backupFileExtractor = new NewBackupFileExtractor(file);
-		backupFileExtractor.init();
+		if (backupFileExtractor == null) {
+			backupFileExtractor = new NewBackupFileExtractor(file);
+			backupFileExtractor.init();
+		}
 	}
 
 	private void createDataImportSummary() throws DataImportExeption {
@@ -215,8 +221,6 @@ public class XMLDataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.ERROR);
 			state.setErrorMessage(e.getMessage());
 			LOG.error(e.getMessage(), e);
-		} finally {
-			IOUtils.closeQuietly(backupFileExtractor);
 		}
 	}
 
@@ -259,14 +263,17 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 	
-	private void createSummaryForEntry(String entryName, Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
-			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
-			Map<Integer, CollectRecordSummary> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
+	private void createSummaryForEntry(String entryName, 
+			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, 
+			Map<Integer, CollectRecord> packagedRecords, 
+			Map<Integer, List<Step>> packagedStepsPerRecord, 
+			Map<Step, Integer> totalPerStep, 
+			Map<Integer, CollectRecordSummary> conflictingPackagedRecords, 
+			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
 		RecordEntry recordEntry = RecordEntry.parse(entryName);
 		Step step = recordEntry.getStep();
 		InputStream is = backupFileExtractor.findEntryInputStream(entryName);
-		InputStreamReader reader = OpenForisIOUtils.toReader(is);
-		ParseRecordResult parseRecordResult = parseRecord(reader, false);
+		ParseRecordResult parseRecordResult = parseRecord(is, false);
 		CollectRecord parsedRecord = parseRecordResult.getRecord();
 		if ( ! parseRecordResult.isSuccess()) {
 			List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
@@ -401,8 +408,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			String entryName = recordEntry.getName();
 			InputStream inputStream = backupFileExtractor.findEntryInputStream(entryName);
 			if ( inputStream != null ) {
-				InputStreamReader reader = OpenForisIOUtils.toReader(inputStream);
-				ParseRecordResult parseRecordResult = parseRecord(reader, validateRecords);
+				ParseRecordResult parseRecordResult = parseRecord(inputStream, validateRecords);
 				CollectRecord parsedRecord = parseRecordResult.getRecord();
 				if (parsedRecord == null) {
 					String message = parseRecordResult.getMessage();
@@ -508,7 +514,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(parsedRecord.getRootEntityDefinitionId());
 		filter.setKeyValues(keyValues);
-		List<CollectRecordSummary> oldRecords = recordManager.loadFullSummaries(filter);
+		List<CollectRecordSummary> oldRecords = recordManager.loadSummaries(filter);
 		if ( oldRecords == null || oldRecords.isEmpty() ) {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {
@@ -536,9 +542,9 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 
-	private ParseRecordResult parseRecord(Reader reader, boolean validateAndLoadReferences) throws IOException {
-		dataUnmarshaller.setRecordValidationEnabled(validateAndLoadReferences);
-		ParseRecordResult result = dataUnmarshaller.parse(reader);
+	private ParseRecordResult parseRecord(InputStream is, boolean validateAndLoadReferences) throws IOException {
+		dataUnmarshaller.setRecordDependencyGraphsEnabled(validateAndLoadReferences);
+		ParseRecordResult result = dataUnmarshaller.parse(OpenForisIOUtils.toReader(is));
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
 			if (validateAndLoadReferences) {
@@ -573,7 +579,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		ModelVersion version = record.getVersion();
 		String versionName = version != null ? version.getName(): null;
-		CollectRecord result = new CollectRecord(survey, versionName, record.getRootEntity().getName());
+		CollectRecord result = new CollectRecord(survey, versionName, record.getRootEntity().getName(), false);
 		result.setCreatedBy(record.getCreatedBy());
 		result.setCreationDate(record.getCreationDate());
 		result.setEntityCounts(record.getEntityCounts());

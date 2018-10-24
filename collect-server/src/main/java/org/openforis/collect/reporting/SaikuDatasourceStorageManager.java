@@ -76,7 +76,7 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 					, formatPath(mondrianSchemaFile.getAbsolutePath())
 			);
 			File file = getDatasourceFile(surveyName, recordStep);
-			FileUtils.write(file, content);
+			FileUtils.write(file, content, "UTF-8");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

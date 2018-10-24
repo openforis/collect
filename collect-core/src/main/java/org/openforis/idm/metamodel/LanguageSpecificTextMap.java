@@ -20,24 +20,16 @@ public class LanguageSpecificTextMap extends LanguageSpecificTextAbstractMap<Lan
 	}
 	
 	public String getText(String languageCode, String defaultLanguageCode) {
-		return getText(languageCode, defaultLanguageCode, false);
-	}
-		
-	public String getText(String languageCode, String defaultLanguageCode, boolean returnDefaultIfNotFound) {
 		if (languageCode == null) {
 			languageCode = defaultLanguageCode;
 		}
 		String text = getText(languageCode);
-		if (text == null && returnDefaultIfNotFound && defaultLanguageCode != null 
+		if (text == null && defaultLanguageCode != null 
 				&& !defaultLanguageCode.equals(languageCode)) {
 			return getText(defaultLanguageCode);
 		} else {
 			return text;
 		}
-	}
-	
-	public String getFailSafeText(String languageCode, String defaultLanguageCode) {
-		return getText(languageCode, defaultLanguageCode, true);
 	}
 	
 	public static void assignDefaultToVoidLanguageText(LanguageSpecificTextMap labels, String defaultLanguageCode) {

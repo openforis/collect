@@ -34,7 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcRecordDataRecord
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcRecordData extends TableImpl<OfcRecordDataRecord> {
 
-	private static final long serialVersionUID = -1540685795;
+	private static final long serialVersionUID = 1409339506;
 
 	/**
 	 * The reference instance of <code>collect.ofc_record_data</code>
@@ -232,7 +232,7 @@ public class OfcRecordData extends TableImpl<OfcRecordDataRecord> {
 	 */
 	@Override
 	public List<ForeignKey<OfcRecordDataRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<OfcRecordDataRecord, ?>>asList(Keys.OFC_RECORD_DATA__OFC_RECORD_DATA_RECORD_FKEY, Keys.OFC_RECORD_DATA__OFC_RECORD_DATA_CREATED_BY_FKEY, Keys.OFC_RECORD_DATA__OFC_RECORD_DATA_MODIFIED_BY_FKEY);
+		return Arrays.<ForeignKey<OfcRecordDataRecord, ?>>asList(Keys.OFC_RECORD_DATA__OFC_RECORD_DATA_RECORD_FKEY);
 	}
 
 	/**

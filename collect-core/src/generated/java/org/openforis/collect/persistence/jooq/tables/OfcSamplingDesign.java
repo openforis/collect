@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRe
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSamplingDesign extends TableImpl<OfcSamplingDesignRecord> {
 
-	private static final long serialVersionUID = 2039005365;
+	private static final long serialVersionUID = -1731276809;
 
 	/**
 	 * The reference instance of <code>collect.ofc_sampling_design</code>
@@ -177,6 +177,56 @@ public class OfcSamplingDesign extends TableImpl<OfcSamplingDesignRecord> {
 	 * The column <code>collect.ofc_sampling_design.info20</code>.
 	 */
 	public final TableField<OfcSamplingDesignRecord, String> INFO20 = createField("info20", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info21</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO21 = createField("info21", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info22</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO22 = createField("info22", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info23</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO23 = createField("info23", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info24</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO24 = createField("info24", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info25</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO25 = createField("info25", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info26</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO26 = createField("info26", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info27</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO27 = createField("info27", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info28</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO28 = createField("info28", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info29</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO29 = createField("info29", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_sampling_design.info30</code>.
+	 */
+	public final TableField<OfcSamplingDesignRecord, String> INFO30 = createField("info30", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_sampling_design</code> table reference

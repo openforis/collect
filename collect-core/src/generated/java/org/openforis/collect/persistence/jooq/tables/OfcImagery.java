@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcImageryRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcImagery extends TableImpl<OfcImageryRecord> {
 
-	private static final long serialVersionUID = -1254891450;
+	private static final long serialVersionUID = 1628013095;
 
 	/**
 	 * The reference instance of <code>collect.ofc_imagery</code>
@@ -66,7 +66,7 @@ public class OfcImagery extends TableImpl<OfcImageryRecord> {
 	/**
 	 * The column <code>collect.ofc_imagery.extent</code>.
 	 */
-	public final TableField<OfcImageryRecord, String> EXTENT = createField("extent", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
+	public final TableField<OfcImageryRecord, String> EXTENT = createField("extent", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * The column <code>collect.ofc_imagery.source_config</code>.

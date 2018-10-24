@@ -6,6 +6,7 @@ package org.openforis.collect.io.metadata.samplingdesign;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,8 @@ import org.openforis.collect.io.metadata.parsing.CSVReferenceDataLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignLine.SamplingDesignLineCodeKey;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.io.csv.CsvLine;
 
 /**
@@ -97,6 +100,8 @@ public class SamplingDesignCSVReader extends CSVReferenceDataImportReader<Sampli
 	
 	class Validator {
 		
+		private static final int MAX_INFO_COLUMNS = 30;
+
 		public void validate() throws ParsingException {
 			validateHeaders();
 		}
@@ -106,11 +111,24 @@ public class SamplingDesignCSVReader extends CSVReferenceDataImportReader<Sampli
 			String[] requiredColumnNames = SamplingDesignFileColumn.REQUIRED_COLUMN_NAMES;
 			for (String requiredColumnName : requiredColumnNames) {
 				if ( ! colNames.contains(requiredColumnName) ) {
-					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, (String) null);
+					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1);
 					String messageArg = StringUtils.join(requiredColumnNames, ", ");
 					error.setMessageArgs(new String[]{messageArg});
 					throw new ParsingException(error);
 				}
+			}
+			final List<String> requiredColumnNamesList = Arrays.asList(requiredColumnNames);
+			List<String> infoColumns = new ArrayList<String>(colNames);
+			CollectionUtils.filter(infoColumns, new Predicate<String>() {
+				public boolean evaluate(String item) {
+					return !requiredColumnNamesList.contains(item);
+				}
+			});
+			if (infoColumns.size() > MAX_INFO_COLUMNS) {
+				ParsingError error = new ParsingError(ErrorType.EXCEEDING_MAXIMUM_EXTRA_COLUMNS, 1);
+				error.setMessageArgs(new String[]{
+						String.valueOf(MAX_INFO_COLUMNS), String.valueOf(infoColumns.size())});
+				throw new ParsingException(error);
 			}
 		}
 

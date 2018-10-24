@@ -301,16 +301,18 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void saveLastModifiedRecord() throws RecordPersistenceException {
-		Step originalStep = lastModifiedRecordSummary.getStep();
-		
-		updateRecord(lastModifiedRecord, originalStep, step);
-		
-		if ( step.compareTo(originalStep) < 0 ) {
-			//reset record step to the original one
-			CollectRecord record = recordManager.load(survey, lastModifiedRecordSummary.getId(), originalStep, settings.isRecordValidationEnabled());
-			record.setStep(originalStep);
+		if( lastModifiedRecordSummary != null ) {
+			Step originalStep = lastModifiedRecordSummary.getStep();
 			
-			updateRecord(record, originalStep, originalStep);
+			updateRecord(lastModifiedRecord, originalStep, step);
+			
+			if ( step.compareTo(originalStep) < 0 ) {
+				//reset record step to the original one
+				CollectRecord record = recordManager.load(survey, lastModifiedRecordSummary.getId(), originalStep, settings.isRecordValidationEnabled());
+				record.setStep(originalStep);
+				
+				updateRecord(record, originalStep, originalStep);
+			}
 		}
 	}
 	

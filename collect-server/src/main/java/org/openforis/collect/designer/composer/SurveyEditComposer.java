@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.composer;
 
+import java.util.Arrays;
+
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
 import org.openforis.collect.designer.viewmodel.SurveyEditVM;
@@ -21,6 +23,7 @@ public class SurveyEditComposer extends BindComposer<Component> {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final String CODE_LISTS_TAB_ID = "codeListsTab";
 	private static final String SAMPLING_DESIGN_IMPORT_TAB_ID = "samplingDesignImportTab";
 
 	@Override
@@ -33,7 +36,8 @@ public class SurveyEditComposer extends BindComposer<Component> {
 	public void onSwitchTab(Event event) throws InterruptedException {
 		SurveyEditVM vm = (SurveyEditVM) getViewModel();
 		final Tab tab = (Tab) event.getTarget();
-		if ( SAMPLING_DESIGN_IMPORT_TAB_ID.equals(tab.getId()) && ( ! vm.isSurveyStored() || vm.isSurveyChanged() ) ) {
+		if ( Arrays.asList(CODE_LISTS_TAB_ID, SAMPLING_DESIGN_IMPORT_TAB_ID).contains(tab.getId()) 
+				&& ( ! vm.isSurveyStored() || vm.isSurveyChanged() ) ) {
 			MessageUtil.showWarning("global.message.save_first");
 		} else {
 			vm.checkCanLeaveForm(new SurveyBaseVM.CanLeaveFormConfirmHandler() {

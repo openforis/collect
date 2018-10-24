@@ -16,7 +16,7 @@
       <row>
         <label value="${labels.survey.schema.attribute.file.file_type.$}:" />
 		<cell>
-			<radiogroup selectedItem="@bind(fx.fileType)" onCheck="@command('applyChanges')">
+			<radiogroup selectedItem="@bind(fx.fileType)" onCheck="@command('typeChanged', fileType=self.selectedItem.value)">
 				<radio 
 					label="${labels.survey.schema.attribute.file.file_type.image}"
 					value="IMAGE" />

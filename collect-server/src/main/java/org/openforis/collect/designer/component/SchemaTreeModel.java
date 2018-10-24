@@ -344,6 +344,12 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaNodeData> {
 			return surveyObject == null ? null : SchemaVM.getIcon(surveyObject);
 		}
 		
+		public String getTooltiptext() {
+			SchemaNodeData data = getData();
+			SurveyObject surveyObject = data.getSurveyObject();
+			return surveyObject == null ? null : SchemaVM.getNodeTooltiptext(surveyObject);
+		}
+		
 		public int getIndexInModel() {
 			int result;
 			SchemaNodeData data = getData();

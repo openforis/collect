@@ -41,11 +41,11 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 		return defaultCodeLabels;
 	}
 	
-	public String getDefaultCodeLabel(String langCode) {
+	public String getDefaultCodeLabel(String langCode, String defaultLanguage) {
 		if ( defaultCodeLabels == null ) {
 			return null;
 		} else {
-			return defaultCodeLabels.getText(langCode);
+			return defaultCodeLabels.getText(langCode, defaultLanguage);
 		}
 	}
 	

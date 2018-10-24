@@ -22,7 +22,11 @@ public class CollectJobManager extends SpringJobManager {
 	}
 	
 	public void startSurveyJob(SurveyLockingJob job) {
-		start(job, getLockId(job.getSurvey().getId()));
+		startSurveyJob(job, true);
+	}
+	
+	public void startSurveyJob(SurveyLockingJob job, boolean async) {
+		start(job, getLockId(job.getSurvey().getId()), async);
 	}
 	
 	public SurveyLockingJob getSurveyJob(int surveyId) {

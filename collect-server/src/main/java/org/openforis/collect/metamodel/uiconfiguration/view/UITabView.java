@@ -13,8 +13,7 @@ public class UITabView extends UITabContentContainerView<UIForm> {
 		return "TAB";
 	}
 	
-	public String getLabel() {
-		//TODO do not use default language
-		return uiObject.getLabel(getSurvey().getDefaultLanguage());
+	public String getLabel(String language) {
+		return uiObject.getLabel(language, getSurvey().getDefaultLanguage());
 	}
 }

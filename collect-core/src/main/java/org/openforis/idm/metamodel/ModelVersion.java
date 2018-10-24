@@ -42,10 +42,12 @@ public class ModelVersion extends IdentifiableSurveyObject<ModelVersion> {
 	}
 	
 	public String getLabel(String language) {
-		if ( language == null ) {
-			language = getSurvey().getDefaultLanguage();
-		}
-		return labels == null ? null: labels.getText(language);
+		return getLabel(language, false);
+	}
+	
+	public String getLabel(String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage() : null;
+		return labels == null ? null: labels.getText(language, defaultLanguage);
 	}
 	
 	public void addLabel(LanguageSpecificText label) {
@@ -75,10 +77,12 @@ public class ModelVersion extends IdentifiableSurveyObject<ModelVersion> {
 	}
 
 	public String getDescription(String language) {
-		if ( language == null ) {
-			language = getSurvey().getDefaultLanguage();
-		}
-		return descriptions == null ? null: descriptions.getText(language);
+		return getDescription(language, false);
+	}
+	
+	public String getDescription(String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage() : null;
+		return descriptions == null ? null: descriptions.getText(language, defaultLanguage);
 	}
 	
 	public void setDescription(String language, String description) {

@@ -8,7 +8,7 @@
 
 		<!-- the following appenders write to files -->
 
-		<RollingFile name="openforis"
+		<RollingFile name="file"
 			fileName="${sys:catalina.base}/logs/collect.log"
 			filePattern="${sys:catalina.base}/logs/$${date:yyyy-MM}/collect-%d{MM-dd-yyyy}-%i.log.gz">
 			<PatternLayout>
@@ -24,43 +24,9 @@
 	</Appenders>
 
 	<Loggers>
-		<Logger name="flex.messaging" level="error" additivity="false">
-			<AppenderRef ref="openforis" />
-			<AppenderRef ref="Sentry" level="error" />
-		</Logger>
-
-		<Logger name="io.sentry" level="info" additivity="false">
-			<AppenderRef ref="openforis" />
-		</Logger>
-		
-		<Logger name="liquibase" level="info" additivity="false">
-			<AppenderRef ref="openforis" />
-			<AppenderRef ref="Sentry" level="error" />
-		</Logger>
-
-		<Logger name="org.apache" level="info" additivity="false">
-			<AppenderRef ref="STDOUT" />
-			<AppenderRef ref="openforis" />
-			<AppenderRef ref="Sentry" level="error" />
-		</Logger>
-		
-		<Logger name="org.jooq" level="info" additivity="false">
-			<AppenderRef ref="openforis" />
-			<AppenderRef ref="Sentry" level="error" />
-		</Logger>
-		
-		<Logger name="org.openforis" level="info" additivity="false">
-			<AppenderRef ref="openforis" />
-			<AppenderRef ref="Sentry" level="error" />
-		</Logger>
-		
-		<Logger name="org.springframework" level="info" additivity="false">
-			<AppenderRef ref="openforis" />
-			<AppenderRef ref="Sentry" level="error" />
-		</Logger>
-		
 		<Root level="info">
 			<AppenderRef ref="STDOUT" />
+			<AppenderRef ref="file" />
 			<AppenderRef ref="Sentry" level="error" />
 		</Root>
 	</Loggers>

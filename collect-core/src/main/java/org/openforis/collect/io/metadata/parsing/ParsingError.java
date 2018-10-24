@@ -10,7 +10,13 @@ import java.util.Arrays;
 public class ParsingError {
 
 	public enum ErrorType {
-		MISSING_REQUIRED_COLUMNS, WRONG_COLUMN_NAME, EMPTY, INVALID_VALUE, DUPLICATE_VALUE, IOERROR;
+		MISSING_REQUIRED_COLUMNS, 
+		WRONG_COLUMN_NAME, 
+		EMPTY, 
+		INVALID_VALUE, 
+		DUPLICATE_VALUE, 
+		EXCEEDING_MAXIMUM_EXTRA_COLUMNS,
+		IOERROR
 	}
 
 	private long row;
@@ -45,6 +51,10 @@ public class ParsingError {
 	
 	public ParsingError(long row, String column) {
 		this(ErrorType.INVALID_VALUE, row, column, (String) null);
+	}
+	
+	public ParsingError(ErrorType type, long row) {
+		this(type, row, (String) null);
 	}
 	
 	public ParsingError(ErrorType type, long row, String column) {

@@ -103,6 +103,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation() + "?id=" + surveyId);
 	}
 	
+	public static void dispatchSurveySaveCommand() {
+		BindUtils.postGlobalCommand(null, null, SurveyEditVM.BACKGROUD_SAVE_GLOBAL_COMMAND, null);
+	}
+	
 	@Init(superclass=false)
 	public void init(@QueryParam("id") Integer surveyId) {
 		super.init();

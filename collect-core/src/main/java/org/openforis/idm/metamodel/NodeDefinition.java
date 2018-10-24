@@ -148,15 +148,19 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	 * Return the label of the specified type in the default language
 	 */
 	public String getLabel(NodeLabel.Type type) {
-		String defaultLanguage = getSurvey().getDefaultLanguage();
-		return getLabel(type, defaultLanguage);
+		return getLabel(type, null, true);
 	}
 	
 	/**
 	 * Return the label of the specified type in the specified language
 	 */
 	public String getLabel(NodeLabel.Type type, String language) {
-		return labels == null ? null: labels.getText(type, language);
+		return getLabel(type, language, false);
+	}
+	
+	public String getLabel(NodeLabel.Type type, String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage() : null;
+		return labels == null ? null: labels.getText(type, language, defaultLanguage);
 	}
 	
 	/**
@@ -172,12 +176,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	 * otherwise returns the name of the node definition
 	 */
 	public String getFailSafeLabel(NodeLabel.Type type, String language) {
-		if (labels == null) {
-			return null;
-		} else {
-			String label = labels.getFailSafeText(type, language, getSurvey().getDefaultLanguage());
-			return label == null ? name : label;
-		}
+		String label = getLabel(type, language, true);
+		return label == null ? name : label;
 	}
 
 	public String getFailSafeLabel(NodeLabel.Type... types) {
@@ -240,7 +240,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	 * Returns the prompt in the specified language or the one in the survey default language
 	 */
 	public String getFailSafePrompt(Prompt.Type type, String language) {
-		return prompts == null ? null : prompts.getFailSafeText(type, language, getSurvey().getDefaultLanguage());
+		return prompts == null ? null : prompts.getText(type, language, getSurvey().getDefaultLanguage());
 	}
 	
 	public void setPrompt(Prompt.Type type, String language, String text) {
@@ -282,15 +282,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	}
 	
 	public String getDescription() {
-		return getDescription(null);
+		return getDescription(null, true);
 	}
 
 	public String getDescription(String language) {
-		return descriptions == null ? null: descriptions.getText(language, getSurvey().getDefaultLanguage());
+		return getDescription(language, false);
 	}
 	
-	public String getFailSafeDescription(String language) {
-		return descriptions == null ? null : descriptions.getFailSafeText(language, getSurvey().getDefaultLanguage());
+	public String getDescription(String language, boolean defaultToSurveyDefaultLanguage) {
+		String defaultLanguage = defaultToSurveyDefaultLanguage ? getSurvey().getDefaultLanguage() : null;
+		return descriptions == null ? null: descriptions.getText(language, defaultLanguage);
 	}
 	
 	public void setDescription(String language, String description) {

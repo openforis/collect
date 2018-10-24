@@ -155,5 +155,17 @@ public class Files {
 			return null;
 		}
 	}
-	
+
+	public static void deleteFolder(File folder) {
+		//for non empty big folders it's better to use command line...
+		if (SystemUtils.isWindows()) {
+			SystemUtils.runCommandQuietly("cmd /c rmdir /S/Q \"" + folder.getAbsolutePath() + "\"");
+		} else if (SystemUtils.isLinux()) {
+			SystemUtils.runCommandQuietly("rm -r " + folder.getAbsolutePath());
+		}
+		//when error occurs, try to delete folder with Apache Commons FileUtils (it deletes it's content first)
+		if (folder.exists()) {
+			FileUtils.deleteQuietly(folder);
+		}
+	}
 }
