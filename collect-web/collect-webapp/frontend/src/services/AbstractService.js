@@ -124,10 +124,10 @@ export default class AbstractService {
                         const itemVal = arr[i]
                         if (itemVal !== null && itemVal !== undefined) {
                             if (typeof itemVal === 'object') {
-                                const nestedPropPrefix = encodeURIComponent(key) + '[' + i +'].'
+                                const nestedPropPrefix = encodeURIComponent(`${key}[${i}]`) + '.'
                                 arrQueryDataParts.push(this._toQueryData(itemVal, nestedPropPrefix, includeNulls))
                             } else {
-                                arrQueryDataParts.push(encodeURIComponent(key) + '[' + i +']=' + itemVal)
+                                arrQueryDataParts.push(encodeURIComponent(`${key}[${i}]`) +'=' + itemVal)
                             }
                         }
                     }
