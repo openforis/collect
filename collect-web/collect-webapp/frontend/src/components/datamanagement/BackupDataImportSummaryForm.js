@@ -128,6 +128,7 @@ export default class BackupDataImportSummaryForm extends Component {
                             height='400px'
                             selectRow={ {mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue', 
                                 onSelect: this.props.handleConflictingRecordsRowSelect, 
+                                onSelectAll: this.props.handleAllConflictingRecordsSelect,
                                 selected: this.props.selectedConflictingRecordsIds} }
                             >
                             {conflictingRecordsColumns}

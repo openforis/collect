@@ -38,6 +38,7 @@ class BackupDataImportPage extends Component {
         this.handleRecordsToImportRowSelect = this.handleRecordsToImportRowSelect.bind(this)
         this.handleAllRecordsToImportSelect = this.handleAllRecordsToImportSelect.bind(this)
         this.handleConflictingRecordsRowSelect = this.handleConflictingRecordsRowSelect.bind(this)
+        this.handleAllConflictingRecordsSelect = this.handleAllConflictingRecordsSelect.bind(this)
     }
 
     handleGenerateSummaryButtonClick() {
@@ -91,14 +92,27 @@ class BackupDataImportPage extends Component {
     }
 
     handleSelectedRecordsToImportChange(newSelectedRecordsToImport) {
-        this.setState({selectedRecordsToImport: newSelectedRecordsToImport, 
-            selectedRecordsToImportIds: newSelectedRecordsToImport.map(item => item.entryId)})
+        this.setState({
+            selectedRecordsToImport: newSelectedRecordsToImport, 
+            selectedRecordsToImportIds: newSelectedRecordsToImport.map(item => item.entryId)
+        })
     }
 
     handleConflictingRecordsRowSelect(row, isSelected, e) {
         let newSelectedConflictingRecords = Arrays.addOrRemoveItem(this.state.selectedConflictingRecords, row, !isSelected)
-        this.setState({selectedConflictingRecords : newSelectedConflictingRecords, 
-            selectedConflictingRecordsIds: newSelectedConflictingRecords.map(item => item.entryId)})
+        this.handleConflictingRecordsToImportChange(newSelectedConflictingRecords)
+    }
+    
+    handleAllConflictingRecordsSelect(isSelected, rows) {
+        const newSelectedConflictingRecords = Arrays.addOrRemoveItems(this.state.selectedConflictingRecords, rows, !isSelected)
+        this.handleConflictingRecordsToImportChange(newSelectedConflictingRecords)		
+    }
+
+    handleConflictingRecordsToImportChange(newSelectedConflictingRecords) {
+        this.setState({
+            selectedConflictingRecords : newSelectedConflictingRecords, 
+            selectedConflictingRecordsIds: newSelectedConflictingRecords.map(item => item.entryId)
+        })
     }
 
     handleImportButtonClick() {
@@ -160,8 +174,9 @@ class BackupDataImportPage extends Component {
                             selectedRecordsToImportIds={this.state.selectedRecordsToImportIds}
                             handleAllRecordsToImportSelect={this.handleAllRecordsToImportSelect}
                             handleRecordsToImportRowSelect={this.handleRecordsToImportRowSelect}
-                            handleConflictingRecordsRowSelect={this.handleConflictingRecordsRowSelect}
                             selectedConflictingRecordsIds={this.state.selectedConflictingRecordsIds}
+                            handleAllConflictingRecordsSelect={this.handleAllConflictingRecordsSelect}
+                            handleConflictingRecordsRowSelect={this.handleConflictingRecordsRowSelect}
                             />
                         <Row>
                             <Col sm={{offset: 5, size: 2}} colSpan={2}>
