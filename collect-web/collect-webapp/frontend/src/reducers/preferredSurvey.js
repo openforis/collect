@@ -1,5 +1,4 @@
 import {
-  SELECT_PREFERRED_SURVEY,
   REQUEST_FULL_PREFERRED_SURVEY, 
   RECEIVE_FULL_PREFERRED_SURVEY, 
   INVALIDATE_PREFERRED_SURVEY,
@@ -18,8 +17,6 @@ function preferredSurvey(
 	action
 ) {
   switch (action.type) {
-  	case SELECT_PREFERRED_SURVEY:
-  		return action.survey
   	case INVALIDATE_PREFERRED_SURVEY:
     	return Object.assign({}, state, {
     		didInvalidate: true

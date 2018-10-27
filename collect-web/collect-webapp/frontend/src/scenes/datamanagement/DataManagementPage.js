@@ -323,7 +323,7 @@ class DataManagementPage extends Component {
 							<Select
 								value={surveyLanguage}
 								onChange={this.handleSurveyLanguageChange}>
-								{survey.languages.map(l => <MenuItem value={l}>{L.l('languages.' + l) + ' ('+ l + ')'}</MenuItem>)}
+								{survey.languages.map(l => <MenuItem key={l} value={l}>{L.l('languages.' + l) + ' ('+ l + ')'}</MenuItem>)}
 							</Select>
 							<FormHelperText>{L.l('dataManagement.formLanguage')}</FormHelperText>
 						</FormControl>

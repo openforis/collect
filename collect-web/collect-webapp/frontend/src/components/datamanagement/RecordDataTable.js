@@ -9,25 +9,23 @@ import OwnerColumnEditor from './OwnerColumnEditor'
 import RecordOwnerFilter from 'components/datamanagement/RecordOwnerFilter'
 import Tables from 'components/Tables'
 import L from 'utils/Labels'
+import { getDataManagementState } from 'dataManagement/state'
+import {
+	reloadRecordSummaries,
+	sortRecordSummaries, 
+	changeRecordSummariesPage, 
+	filterRecordSummaries, 
+	filterOnlyOwnedRecords,
+	updateRecordOwner
+} from 'dataManagement/recordDataTable/actions'
+import { 
+	getRecordDataTableState
+} from '../../dataManagement/recordDataTable/state';
 
 class RecordDataTable extends Component {
 
 	constructor(props) {
-		super(props);
-
-		this.state = {
-			records: [],
-			totalSize: 0,
-			page: 1,
-			recordsPerPage: 25,
-			keyValues: [],
-			summaryValues: [],
-			ownerIds: [],
-			sortFields: [],
-			availableOwners: [],
-			onlyMyOwnRecords: false
-		}
-		this.fetchData = this.fetchData.bind(this)
+		super(props)
 		this.handlePageChange = this.handlePageChange.bind(this)
 		this.handleCellEdit = this.handleCellEdit.bind(this)
 		this.handleSizePerPageChange = this.handleSizePerPageChange.bind(this)
@@ -41,7 +39,7 @@ class RecordDataTable extends Component {
 	}
 
 	componentDidMount() {
-		this.fetchData()
+		this.props.reloadRecordSummaries()
 		this.props.onRef(this)
 	}
 
@@ -49,11 +47,12 @@ class RecordDataTable extends Component {
 		this.props.onRef(undefined)
 	}
 
-	componentWillReceiveProps(nextProps) {
-		if (nextProps.survey !== null && (this.props.survey === null || 
-				nextProps.survey.id !== this.props.survey.id)) {
-			this.setState({records: null})
-			this.fetchData(this.state.page, this.state.recordsPerPage, nextProps.survey);
+	componentDidUpdate (prevProps) {
+		const {survey} = this.props
+		const {survey: prevSurvey} = prevProps
+		if (prevSurvey && 
+			(!survey || survey.id !== prevSurvey.id)) {
+			this.props.reloadRecordSummaries()
 		}
 	}
 
@@ -61,9 +60,7 @@ class RecordDataTable extends Component {
 		if (page === 0) {
 			page = 1
 		}
-		if (this.state.page !== page || this.state.recordsPerPage !== recordsPerPage) {
-			this.fetchData(page, recordsPerPage)
-		}
+		this.props.changeRecordSummariesPage(page, recordsPerPage)
 	}
 
 	handleSizePerPageChange(recordsPerPage) {
@@ -114,17 +111,17 @@ class RecordDataTable extends Component {
 	}
 
 	handleCellEdit(row, fieldName, value) {
+		const {updateRecordOwner} = this.props
+
 		if (fieldName === 'owner') {
-			const recordId = row.id
 			const newOwner = value.owner
-			ServiceFactory.recordService.updateOwner(row, newOwner).then(res => {
-				const newRecords = this.state.records.map(r => r.id === recordId ? { ...r, owner: newOwner } : r)
-				this.setState({ records: newRecords })
-			})
+			updateRecordOwner(row, newOwner)
 		}
 	}
 
 	handleSortChange(sortName, sortOrder) {
+		const {sortRecordSummaries} = this.props
+
 		let sortField
 		switch(sortName) {
 			case 'key1':
@@ -170,16 +167,13 @@ class RecordDataTable extends Component {
 				return
 		}
 		let sortFields = [{field: sortField, descending: sortOrder === 'desc'}]
-		this.fetchData(1, this.state.recordsPerPage, this.props.survey, 
-			{
-				keyValues: this.state.keyValues,
-				summaryValues: this.state.summaryValues,
-				ownerIds: this.state.ownerIds
-			}, 
-			sortFields)
+
+		sortRecordSummaries(sortFields)
 	}
 
 	handleFilterChange(filterObj) {
+		const {filterRecordSummaries} = this.props
+
 		const keyValues = []
 		const summaryValues = []
 		let ownerIds = []
@@ -197,35 +191,36 @@ class RecordDataTable extends Component {
 				}
 			}
 		}
-		this.fetchData(1, this.state.recordsPerPage, this.props.survey, {
-				keyValues: keyValues, 
-				summaryValues: summaryValues, 
-				ownerIds: ownerIds
-			})
+		filterRecordSummaries({keyValues, summaryValues, ownerIds})
 	}
 
 	handleOnlyMyOwnRecordsChange(event, checked) {
-		const ownerIds = checked ? [] : this.state.ownerIds
-		this.setState({
-			ownerIds: ownerIds, 
-			onlyMyOwnRecords: checked
-		}, () => this.fetchData())
+		this.props.filterOnlyOwnedRecords(checked)
 	}
 
 	render() {
-		const survey = this.props.survey
+		const {
+			survey, 
+			userGroups, 
+			loggedUser, 
+			availableOwners, 
+			page, 
+			records, 
+			totalSize, 
+			recordsPerPage,
+			keyValues,
+			summaryValues
+		} = this.props
 		if (survey === null) {
 			return <div>Please select a survey first</div>
 		}
-		const { availableOwners } = this.state
 
 		const rootEntityDef = survey.schema.firstRootEntityDefinition
 		const keyAttributes = rootEntityDef.keyAttributeDefinitions
 		const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
-		const loggedUser = this.props.loggedUser
-		const surveyUserGroup = this.props.userGroups.find(ug => ug.id === survey.userGroupId)
+		const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
 		const userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
-		const mostSpecificGroup = userInGroup === null ? null : this.props.userGroups.find(ug => ug.id === userInGroup.groupId)
+		const mostSpecificGroup = userInGroup === null ? null : userGroups.find(ug => ug.id === userInGroup.groupId)
 
 		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
 
@@ -257,12 +252,12 @@ class RecordDataTable extends Component {
             }
         }
 
-		function createKeyAttributeFilter(attrDef) {
+		function createAttributeFilter(attrDef, defaultValue) {
 			switch(attrDef.attributeType) {
 				case 'NUMBER':
-					return {type: 'NumberFilter'}
+					return {type: 'NumberFilter', defaultValue: {number: defaultValue}}
 				default:
-					return {type: 'TextFilter'}
+					return {type: 'TextFilter', defaultValue}
 			}
 		}
 
@@ -270,19 +265,26 @@ class RecordDataTable extends Component {
 		columns.push(<TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>);
 
 		const keyAttributeColumns = keyAttributes.map((keyAttr, i) => 
-			<TableHeaderColumn key={'key'+(i+1)} dataField={'key'+(i+1)} dataFormat={rootEntityKeyFormatter} width="80"
-				editable={false} dataSort 
-				filter={createKeyAttributeFilter(keyAttr)}
+			<TableHeaderColumn key={'key'+(i+1)} 
+				dataField={'key'+(i+1)} 
+				dataFormat={rootEntityKeyFormatter} width="80"
+				editable={false}
+				dataSort 
+				filter={createAttributeFilter(keyAttr, keyValues[i])}
 				>{keyAttr.label}</TableHeaderColumn>)
 		columns = columns.concat(keyAttributeColumns)
 
 		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => {
 			const prefix = 'summary_'
 			const canFilterOrSort = loggedUser.canFilterRecordsBySummaryAttribute(attr, surveyUserGroup)
-			return <TableHeaderColumn key={prefix+i} dataSort={canFilterOrSort} dataField={prefix+i} 
-				dataFormat={shownInSummaryListFormatter} width="80"
-				filter={canFilterOrSort ? {type: 'TextFilter'} : null}
-				editable={false}>{attr.label}</TableHeaderColumn>
+			return <TableHeaderColumn key={prefix+i} 
+				dataSort={canFilterOrSort} 
+				dataField={prefix+i} 
+				dataFormat={shownInSummaryListFormatter} 
+				width="80"
+				filter={canFilterOrSort ? createAttributeFilter(attr, summaryValues[i]): null}
+				editable={false}
+				>{attr.label}</TableHeaderColumn>
 		})
 		columns = columns.concat(attributeDefsShownInSummaryListColumns)
 
@@ -334,7 +336,7 @@ class RecordDataTable extends Component {
 		return (
 			<div>
 				<BootstrapTable
-					data={this.state.records}
+					data={records}
 					options={{
 						onPageChange: this.handlePageChange,
 						onSizePerPageList: this.handleSizePerPageChange,
@@ -342,13 +344,13 @@ class RecordDataTable extends Component {
 						onCellEdit: this.handleCellEdit,
 						onSortChange: this.handleSortChange,
 						onFilterChange: this.handleFilterChange,
-						page: this.state.page,
-						sizePerPage: this.state.recordsPerPage,
+						page,
+						sizePerPage: recordsPerPage,
 						sizePerPageList: [10, 25, 50, 100],
 						paginationShowsTotal: true,
 						sizePerPageDropDown: Tables.renderSizePerPageDropUp
 					}}
-					fetchInfo={{ dataTotalSize: this.state.totalSize }}
+					fetchInfo={{ dataTotalSize: totalSize }}
 					remote pagination striped hover condensed
 					height="100%"
 					selectRow={{
@@ -383,13 +385,22 @@ class RecordDataTable extends Component {
 }
 
 const mapStateToProps = state => {
+	const dataManagementState = getDataManagementState(state)
+	const recordDataTableState = getRecordDataTableState(dataManagementState)
 	return {
 		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
 		users: state.users ? state.users.users : null,
 		userGroups: state.userGroups ? state.userGroups.items : null,
 		loggedUser: state.session ? state.session.loggedUser : null,
-		records: state.records ? state.records.list : null
+		...recordDataTableState
 	}
 }
 
-export default connect(mapStateToProps)(RecordDataTable)
+export default connect(mapStateToProps, {
+	reloadRecordSummaries, 
+	sortRecordSummaries, 
+	changeRecordSummariesPage,
+	filterRecordSummaries, 
+	filterOnlyOwnedRecords,
+	updateRecordOwner
+})(RecordDataTable)
