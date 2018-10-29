@@ -48,7 +48,7 @@
     "redux-form": "^7.4.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "superagent": "^4.0.0-beta.5"
+    "superagent": "^3.8.3"
   },
   "scripts": {
     "start": "cross-env NODE_PATH=src react-scripts start",
