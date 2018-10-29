@@ -54,6 +54,8 @@ import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidat
 import org.openforis.collect.web.validator.SurveyCloneParametersValidator;
 import org.openforis.collect.web.validator.SurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyImportParametersValidator;
+import org.openforis.collect.web.websocket.SurveysWebSocket;
+import org.openforis.collect.web.websocket.SurveysWebSocket.UpdateType;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
@@ -61,7 +63,6 @@ import org.openforis.concurrency.JobManager;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,9 +86,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class SurveyController extends BasicController {
 
-	private static final String NEW_SURVEY_MESSAGE_DESTINATION = "/surveys/new";
-	private static final String SURVEY_UPDATED_MESSAGE_DESTINATION = "/surveys/survey/update";
-
 	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = "cep";
 
 	@Autowired
@@ -103,7 +101,7 @@ public class SurveyController extends BasicController {
 	@Autowired
 	private SurveyService surveyService;
 	@Autowired
-	private SimpMessagingTemplate simpMessagingTemplate;
+	private SurveysWebSocket surveysWebSocket;
 //	@Autowired
 //	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 
@@ -195,8 +193,9 @@ public class SurveyController extends BasicController {
 		CollectSurvey survey = surveyService.createNewSurvey(params);
 		
 		SurveySummary surveySummary = SurveySummary.createFromSurvey(survey);
+
+		surveysWebSocket.sendSurveyUpdatedMessage(surveySummary, UpdateType.CREATED);
 		
-		this.simpMessagingTemplate.convertAndSend(NEW_SURVEY_MESSAGE_DESTINATION, surveySummary);
 		Response res = new Response();
 		res.setObject(surveySummary);
 		return res;
@@ -220,12 +219,10 @@ public class SurveyController extends BasicController {
 		return response;
 	}
 	
-	
 	@RequestMapping(value="validatecreation", method=POST)
 	public @ResponseBody Response validateSurveyCreationParameters(@Valid SurveyCreationParameters params, BindingResult result) {
 		return generateFormValidationResponse(result);
 	}
-	
 	
 	@RequestMapping(value="publish/{id}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
@@ -233,6 +230,7 @@ public class SurveyController extends BasicController {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		User activeUser = sessionManager.getLoggedUser();
 		surveyManager.publish(survey, activeUser);
+		surveysWebSocket.sendSurveyUpdatedMessage(SurveySummary.createFromSurvey(survey), UpdateType.PUBLISHED);
 		return generateView(survey, false);
 	}
 	
@@ -241,6 +239,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id) throws SurveyStoreException {
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
+		surveysWebSocket.sendSurveyUpdatedMessage(SurveySummary.createFromSurvey(survey), UpdateType.UNPUBLISHED);
 		return generateView(survey, false);
 	}
 	
@@ -263,7 +262,8 @@ public class SurveyController extends BasicController {
 	@RequestMapping(value="delete/{id}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
-		surveyManager.deleteSurvey(id);
+		CollectSurvey survey = surveyManager.deleteSurvey(id);
+		surveysWebSocket.sendSurveyUpdatedMessage(SurveySummary.createFromSurvey(survey), UpdateType.DELETED);
 		return new Response();
 	}
 	

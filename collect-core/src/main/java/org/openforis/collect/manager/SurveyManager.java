@@ -972,7 +972,6 @@ public class SurveyManager {
 			temporarySurvey = createTemporarySurveyFromPublished(uri, false, false, activeUser);
 		} else {
 			temporarySurvey = loadSurvey(temporarySurveySummary.getId());
-			temporarySurvey.setPublished(false);
 			temporarySurvey.setPublishedId(null);
 			save(temporarySurvey);
 			if (dataCleansingManager != null) {
@@ -983,6 +982,7 @@ public class SurveyManager {
 		//delete published survey
 		deleteSurvey(surveyId);
 		
+		temporarySurvey.setPublished(false);
 		return temporarySurvey;
 	}
 	
@@ -1031,7 +1031,7 @@ public class SurveyManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void deleteSurvey(int id) {
+	public CollectSurvey deleteSurvey(int id) {
 		if ( isRecordValidationInProgress(id) ) {
 			cancelRecordValidation(id);
 		}
@@ -1061,6 +1061,8 @@ public class SurveyManager {
 		if ( ! temporary ) {
 			getPublishedSurveyCache().remove(publishedSurvey);
 		}
+		
+		return survey;
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)

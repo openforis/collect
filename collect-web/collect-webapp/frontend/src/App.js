@@ -27,6 +27,7 @@ import UsersPage from 'scenes/users/UsersPage'
 import UserGroupsPage from 'scenes/users/UserGroupsPage'
 import UserGroupDetailsPage from 'scenes/users/UserGroupDetailsPage'
 import PasswordChangePage from 'scenes/users/PasswordChangePage'
+import AppWebSocket from './websocket/appWebSocket'
 
 class App extends Component {
 
@@ -68,6 +69,7 @@ class App extends Component {
             </main>
           </div>
           <CurrentJobMonitorDialog />
+          <AppWebSocket />
         </div>
     );
   }

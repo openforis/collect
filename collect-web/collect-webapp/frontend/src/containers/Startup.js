@@ -26,7 +26,7 @@ class Startup extends Component {
         this.props.dispatch(UserGroupActions.fetchUserGroups())
         this.props.dispatch(SurveysActions.fetchSurveySummaries())
         
-        this.startReloadinInfoTimer()
+        //this.startReloadinInfoTimer()
     }
 
     componentWillReceiveProps(nextProps) {

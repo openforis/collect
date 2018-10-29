@@ -23,6 +23,8 @@ export const SURVEY_FILE_IMPORT_STARTED = 'SURVEY_FILE_IMPORT_STARTED'
 export const SURVEY_FILE_IMPORTED = 'SURVEY_FILE_IMPORTED'
 export const SURVEY_FILE_IMPORT_ERROR = 'SURVEY_FILE_IMPORT_ERROR'
 export const SURVEY_FILE_IMPORT_RESET = 'SURVEY_FILE_IMPORT_RESET'
+export const SURVEY_CREATED = 'SURVEY_CREATED'
+export const SURVEY_UPDATED = 'SURVEY_UPDATED'
 export const SURVEY_DELETED = 'SURVEY_DELETED'
 
 const SURVEY_IMPORT_FORM_NAME = 'surveyImportForm'
@@ -114,10 +116,10 @@ export function createNewSurvey(name, template, defaultLanguageCode, userGroupId
     }
 }
 
-function newSurveyCreated(newSurveySummary) {
+export function newSurveyCreated(newSurveySummary) {
     return {
         type: NEW_SURVEY_CREATED,
-        newSurveySummary: newSurveySummary
+        newSurveySummary
     }
 }
 
@@ -239,9 +241,23 @@ export function deleteSurvey(survey) {
     }
 }
 
-function surveyDeleted(survey) {
+export function surveyCreated(surveySummary) {
+    return {
+        type: SURVEY_CREATED,
+        surveySummary
+    }
+}
+
+export function surveyUpdated(surveySummary) {
+    return {
+        type: SURVEY_UPDATED,
+        surveySummary
+    }
+}
+
+export function surveyDeleted(surveySummary) {
     return {
         type: SURVEY_DELETED,
-        survey: survey
+        surveySummary
     }
 }

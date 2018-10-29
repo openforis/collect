@@ -4,7 +4,7 @@ import Arrays from 'utils/Arrays'
 
 import {
   REQUEST_SURVEY_SUMMARIES, RECEIVE_SURVEY_SUMMARIES, INVALIDATE_SURVEY_SUMMARIES, SURVEY_USER_GROUP_CHANGED,
-  NEW_SURVEY_CREATED, SURVEY_DELETED
+  NEW_SURVEY_CREATED, SURVEY_CREATED, SURVEY_UPDATED, SURVEY_DELETED
 } from 'actions/surveys'
 
 function surveySummaries(
@@ -46,14 +46,28 @@ function surveySummaries(
         items: newItems,
         lastUpdated: action.receivedAt
       })
-    case NEW_SURVEY_CREATED:
+    case SURVEY_CREATED:
+    case SURVEY_UPDATED: {
+      const {surveySummary} = action
+      const {items} = state
+
+      const oldSurveyIndex = items.findIndex(s => s.id === surveySummary.id)
+      const newItems = oldSurveyIndex < 0 
+        ? [surveySummary].concat(items)
+        : Arrays.replaceItemAt(items, oldSurveyIndex, surveySummary)
+      
       return Object.assign({}, state, {
-        items: Arrays.addItem(state.items, action.newSurveySummary)
-      })
+          items: newItems,
+          lastUpdated: action.receivedAt
+        })
+    }
     case SURVEY_DELETED: {
-        const oldItem = state.items.find(u => u.id === action.survey.id)
+        const {surveySummary} = action
+        const {items} = state
+
+        const oldItem = items.find(s => s.id === surveySummary.id)
         if (oldItem) {
-            let newItems = Arrays.removeItem(state.items, oldItem)
+            let newItems = Arrays.removeItem(items, oldItem)
             return Object.assign({}, state, {
               items: newItems,
               lastUpdated: action.receivedAt
