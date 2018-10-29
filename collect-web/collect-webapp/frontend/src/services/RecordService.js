@@ -86,11 +86,15 @@ export default class RecordService extends AbstractService {
         })
     }
 
-    generateBackupDataImportSummary(survey, rootEntityName, file) {
-        return this.postFormData('survey/' + survey.id + '/data/import/records/summary', {
-            rootEntityName: rootEntityName,
-            file: file
-        })
+    generateBackupDataImportSummary(survey, rootEntityName, file, onError, onProgress) {
+        return this.postFile(
+            'survey/' + survey.id + '/data/import/records/summary', 
+            file,
+            {
+                rootEntityName: rootEntityName,
+            }, 
+            onError, 
+            onProgress)
     }
 
     loadBackupDataImportSummary(survey) {

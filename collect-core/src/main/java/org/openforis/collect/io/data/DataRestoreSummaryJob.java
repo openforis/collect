@@ -20,6 +20,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 
 	//input
 	private boolean fullSummary;
+	private boolean deleteInputFileOnDestroy = false;
 	//output
 	private DataImportSummary summary;
 
@@ -59,6 +60,14 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			this.summary = ((DataRestoreSummaryTask) task).getSummary();
 		}
 	}
+	
+	@Override
+	public void destroy() {
+		super.destroy();
+		if (deleteInputFileOnDestroy) {
+			file.delete();
+		}
+	}
 
 	public UserManager getUserManager() {
 		return userManager;
@@ -92,6 +101,10 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	@Override
 	public void setValidateRecords(boolean validateRecords) {
 		throw new UnsupportedOperationException();
+	}
+	
+	public void setDeleteInputFileOnDestroy(boolean deleteInputFileOnDestroy) {
+		this.deleteInputFileOnDestroy = deleteInputFileOnDestroy;
 	}
 
 }

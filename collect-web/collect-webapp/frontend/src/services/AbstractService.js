@@ -1,3 +1,5 @@
+import Request from 'superagent';
+
 import Constants from 'Constants';
 import Objects from 'utils/Objects';
 import Strings from 'utils/Strings';
@@ -59,6 +61,22 @@ export default class AbstractService {
         })
     }
 
+    postFile(url, file, data, onError = null, onProgress = null) {
+        const req = Request.post(this.BASE_URL + url)
+            .withCredentials()
+            .attach('file', file)
+            .field(data)
+            
+        if (onError)
+            req.on('error', onError)
+        else req.on('error', error => {throw(error)})
+    
+        if (onProgress)
+            req.on('progress', onProgress)
+    
+        return req
+    }
+
     patch(url, data) {
         return this._getDeleteOrPatch('PATCH', url, data)
     }
@@ -77,7 +95,7 @@ export default class AbstractService {
                 if (response.ok) {
                     return response.json()
                 } else {
-                    throw Error(response.statusText)
+                    throw new Error(response.statusText)
                 }
             }, this._handleError)
             .catch(error => {
