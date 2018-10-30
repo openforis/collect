@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -7,13 +9,13 @@ import DialogActions from '@material-ui/core/DialogActions';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
 
-import * as SessionActions from 'actions/session'
+import {sessionExpired} from 'actions/session'
 import Preloader from 'components/Preloader'
 import ServiceFactory from 'services/ServiceFactory'
 import RouterUtils from 'utils/RouterUtils'
 import L from 'utils/Labels';
 
-export default class SessionTimeoutVerifier extends Component {
+class SessionTimeoutVerifier extends Component {
     
     timer
     intervalPeriod = 20000
@@ -67,11 +69,13 @@ export default class SessionTimeoutVerifier extends Component {
     }
 
     handlePingError(error) {
+        const {sessionExpired} = this.props
+
         const newOutOfServiceTime = this.state.outOfServiceTime + this.intervalPeriod
         if (newOutOfServiceTime > this.sessionTimeout) {
             clearTimeout(this.timer)
             this.setState({initializing: false, active: false, sessionExpired: true})
-            this.props.dispatch(SessionActions.sessionExpired())
+            sessionExpired()
         } else {
             this.startTimer()
             this.setState({initializing: false, active: false, outOfServiceTime: newOutOfServiceTime})
@@ -112,3 +116,5 @@ export default class SessionTimeoutVerifier extends Component {
         )
     }
 }
+
+export default connect(null, {sessionExpired})(SessionTimeoutVerifier)

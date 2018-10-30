@@ -19,6 +19,5 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         // SockJS is used (both client and server side) to allow alternative
         // messaging options if WebSocket is not available.
         registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
-
     }
 }

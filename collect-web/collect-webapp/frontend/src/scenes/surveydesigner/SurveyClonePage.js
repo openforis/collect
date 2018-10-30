@@ -32,9 +32,9 @@ class SurveyClonePage extends Component {
         this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
         this.handleCloneModalOkButtonClick = this.handleCloneModalOkButtonClick.bind(this)
     }
-
-    componentWillReceiveProps(nextProps) {
-        const { surveySummaries } = nextProps
+    
+    componentDidMount() {
+        const { surveySummaries } = this.props
         if (surveySummaries && surveySummaries.length > 0 && !this.state.originalSurveySummary) {
             const path = this.props.location.pathname
             const surveyName = path.substring(path.lastIndexOf('/') + 1)

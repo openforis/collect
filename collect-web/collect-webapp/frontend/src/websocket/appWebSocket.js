@@ -4,42 +4,29 @@ import SockJsClient from 'react-stomp'
 
 import Constants from '../Constants'
 import {surveyCreated, surveyUpdated, surveyDeleted} from 'actions/surveys'
+import handleSurveyMessage from './surveyMessageHandler'
 
-const surveysUpdateDestination = '/surveys/update'
-const surveyUpdateTypes = {
-    created: 'CREATED',
-    updated: 'UPDATED',
-    published: 'PUBLISHED',
-    unpublished: 'UNPUBLISHED',
-    deleted: 'DELETED'
-}
-const handleSurveysUpdatedMessage = (props, message) => {
-    const {surveyCreated, surveyUpdated, surveyDeleted} = props
-    const {updateType, survey} = message
+const eventsDestination = '/events'
 
-    switch(updateType) {
-        case surveyUpdateTypes.created:
-            surveyCreated(survey)
-            break
-        case surveyUpdateTypes.updated:
-        case surveyUpdateTypes.published:
-        case surveyUpdateTypes.unpublished:
-            surveyUpdated(survey)
-            break
-        case surveyUpdateTypes.deleted:
-            surveyDeleted(survey)
-            break
-    }
+const handleMessage = (props, message) => {
+    handleSurveyMessage(props, message)
 }
 
 const AppWebSocket = props => {
     return <SockJsClient url={`${Constants.BASE_URL}/ws`}
-                         topics={[surveysUpdateDestination]}
-                         onMessage={message => handleSurveysUpdatedMessage(props, message)} />
+                         topics={[eventsDestination]}
+                         onMessage={message => handleMessage(props, message)} />
 }
 
 function mapStateToProps(state) {
     return state
 }
 
-export default connect(mapStateToProps, {surveyCreated, surveyUpdated, surveyDeleted})(AppWebSocket)
+export default connect(
+    mapStateToProps, 
+    {
+        surveyCreated, 
+        surveyUpdated, 
+        surveyDeleted
+    }
+)(AppWebSocket)
