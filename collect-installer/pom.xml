@@ -90,9 +90,8 @@
 											<outputDirectory>${installer-build-path}/lib</outputDirectory>
 										</artifactItem>
 										<artifactItem>
-											<groupId>postgresql</groupId>
+											<groupId>org.postgresql</groupId>
 											<artifactId>postgresql</artifactId>
-											<version>9.1-901.jdbc4</version>
 											<type>jar</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/lib</outputDirectory>

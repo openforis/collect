@@ -55,10 +55,6 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.xerial</groupId>
-				<artifactId>sqlite-jdbc</artifactId>
-			</dependency>
-			<dependency>
 				<groupId>javax.el</groupId>
 				<artifactId>el-api</artifactId>
 				<version>2.2</version>

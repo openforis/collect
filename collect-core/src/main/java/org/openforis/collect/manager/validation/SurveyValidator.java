@@ -857,11 +857,11 @@ public class SurveyValidator {
 		}
 
 		public boolean hasErrors() {
-			return org.apache.commons.collections.CollectionUtils.isNotEmpty(errors);
+			return org.apache.commons.collections4.CollectionUtils.isNotEmpty(errors);
 		}
 
 		public boolean hasWarnings() {
-			return org.apache.commons.collections.CollectionUtils.isNotEmpty(warnings);
+			return org.apache.commons.collections4.CollectionUtils.isNotEmpty(warnings);
 		}
 
 		public boolean isOk() {

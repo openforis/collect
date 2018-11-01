@@ -38,9 +38,9 @@
 				<version>${jooq-codegen.version}</version>
 				<dependencies>
 					<dependency>
-						<groupId>postgresql</groupId>
+						<groupId>org.postgresql</groupId>
 						<artifactId>postgresql</artifactId>
-						<version>9.2-1002.jdbc4</version>
+						<version>42.2.5</version>
 					</dependency>
 				</dependencies>
 				<configuration>
@@ -323,6 +323,10 @@
 			<artifactId>java-xmlbuilder</artifactId>
 			<version>1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+		</dependency>
 		
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
@@ -336,7 +340,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>

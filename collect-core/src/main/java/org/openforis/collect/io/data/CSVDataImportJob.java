@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -882,10 +882,9 @@ public class CSVDataImportJob extends Job {
 			String[] colNames = DataCSVReader.getKeyAttributeColumnNames(parentEntityDefn, parentEntityDefn.getKeyAttributeDefinitions());
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), colNames, messageKey);
 			List<String> recordKeys = record.getRootEntityKeyValues();
-			CollectionUtils.filter(recordKeys, new Predicate() {
-				@Override
-				public boolean evaluate(Object object) {
-					return StringUtils.isNotBlank((String) object);
+			CollectionUtils.filter(recordKeys, new Predicate<String>() {
+				public boolean evaluate(String key) {
+					return StringUtils.isNotBlank(key);
 				}
 			});
 			String jointRecordKeys = StringUtils.join(recordKeys, ", ");

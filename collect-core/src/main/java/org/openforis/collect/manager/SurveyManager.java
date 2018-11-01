@@ -882,7 +882,7 @@ public class SurveyManager {
 		Set<Integer> surveyIdsToUpdate = new HashSet<Integer>();
 		surveyIdsToUpdate.add(surveySummary.getId());
 		//consider even updating associated published survey, if any
-		org.apache.commons.collections.CollectionUtils.addIgnoreNull(surveyIdsToUpdate, surveySummary.getPublishedId());
+		org.apache.commons.collections4.CollectionUtils.addIgnoreNull(surveyIdsToUpdate, surveySummary.getPublishedId());
 		for (Integer surveyId : surveyIdsToUpdate) {
 			CollectSurvey s = getOrLoadSurveyById(surveyId);
 			s.setUserGroup(userGroup);
