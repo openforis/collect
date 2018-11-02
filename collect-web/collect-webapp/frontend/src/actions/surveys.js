@@ -53,9 +53,11 @@ function surveyUserGroupChanged(surveyId, newUserGroupId) {
 export function fetchSurveySummaries() {
     return function (dispatch) {
         dispatch(requestSurveySummaries())
-        ServiceFactory.surveyService.fetchAllSummaries().then(json =>
-            dispatch(receiveSurveySummaries(json))
-        )
+        try {
+            ServiceFactory.surveyService.fetchAllSummaries().then(json =>
+                dispatch(receiveSurveySummaries(json))
+            )
+        } catch(e) {}
     }
 }
 

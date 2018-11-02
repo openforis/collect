@@ -151,7 +151,7 @@
 	</bean>
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
 	<bean id="surveyValidator" 				class="org.openforis.collect.manager.validation.SurveyValidator" />
-	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.jooq.JooqDatabaseLookupProvider" />
+	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 
 	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">

@@ -212,7 +212,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		addLevelKeyNullConditions(q, nextLevelIndex);
 
 		Record r = q.fetchAny();
-		return dsl.fromRecord(r);
+		return r == null ? null : dsl.fromRecord(r);
 	}
 
 	private void addParentKeysConditions(SelectQuery<Record> q, String... parentKeys) {

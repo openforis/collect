@@ -14,4 +14,6 @@ export default class Workflow {
             label: 'Analysis'
         }
     }
+
+    static STEP_CODES = Object.keys(Workflow.STEPS).map(s => Workflow.STEPS[s].code)
 }

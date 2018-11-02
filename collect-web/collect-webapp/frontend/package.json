@@ -43,12 +43,12 @@
     "react-redux-form": "^1.16.9",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "^1.1.4",
     "reactstrap": "^5.0.0",
     "redux": "^3.7.2",
     "redux-form": "^7.4.2",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "superagent": "^3.8.3"
   },
   "scripts": {
     "start": "cross-env NODE_PATH=src react-scripts start",

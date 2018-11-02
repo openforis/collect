@@ -46,7 +46,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	protected BackupStorageManager backupStorageManager;
 
 	//input parameters
-	private boolean restoreUploadedFiles;
+	private boolean restoreUploadedFiles= true;
 	private List<Integer> entryIdsToImport; //ignored when overwriteAll is true
 	private boolean storeRestoredFile;
 	private File tempFile;

@@ -361,6 +361,7 @@ public class RecordController extends BasicController implements Serializable {
 		job.setFile(file);
 		job.setPublishedSurvey(survey);
 		job.setCloseRecordProviderOnComplete(false);
+		job.setDeleteInputFileOnDestroy(true);
 		jobManager.start(job);
 		this.dataRestoreSummaryJob = job;
 		return new JobView(job);

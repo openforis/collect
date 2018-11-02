@@ -147,7 +147,7 @@ public class SurveyController extends BasicController {
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(method=GET)
-	@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public @ResponseBody
 	List<?> loadSurveys(
 			@RequestParam(value="userId", required=false) Integer userId,
