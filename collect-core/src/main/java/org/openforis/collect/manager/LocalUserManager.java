@@ -5,8 +5,6 @@ package org.openforis.collect.manager;
 
 import static org.springframework.transaction.annotation.Propagation.REQUIRED;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
@@ -177,16 +174,7 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 	}
 	
 	protected String encodePassword(String password) {
-		MessageDigest messageDigest;
-		try {
-			messageDigest = MessageDigest.getInstance("MD5");
-			byte[] bytes = password.getBytes();
-			byte[] digest = messageDigest.digest(bytes);
-			char[] resultChar = Hex.encodeHex(digest);
-			return new String(resultChar);
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("Error encoding user password", e);
-		}
+		return MD5PasswordEncoder.encode(password);
 	}
 	
 	public Boolean isDefaultAdminPasswordSet() {

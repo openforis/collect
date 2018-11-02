@@ -16,7 +16,7 @@
 <!-- 		<expression-handler ref="expressionHandler"  /> -->
 <!-- 		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER" /> -->
 <!-- 	</global-method-security> -->
-	
+
 	<http access-decision-manager-ref="accessDecisionManager" use-expressions="true">
 		<csrf disabled="true"/>
 		<http-basic />
@@ -73,12 +73,6 @@
 			logout-success-url="/login?logout=true" />
 	</http>
 	
-	<authentication-manager alias="authenticationManager">
-		<authentication-provider user-service-ref="userDetailsService">
-			<password-encoder hash="bcrypt" />
-		</authentication-provider>
-	</authentication-manager>
-
 	<!-- See 15.3.2 Built-In Expression @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator -->
 	<b:bean id="expressionHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
 		<!-- To use hasPermission() in expressions, configure a PermissionEvaluator -->

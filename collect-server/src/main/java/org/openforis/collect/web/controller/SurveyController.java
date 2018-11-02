@@ -145,7 +145,6 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	@RequestMapping(method=GET)
 	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public @ResponseBody
@@ -174,7 +173,7 @@ public class SurveyController extends BasicController {
 				views.add(surveySummary);
 			}
 		}
-		views.sort(Collections.reverseOrder(new BeanComparator("modifiedDate")));
+		views.sort(Collections.reverseOrder(new BeanComparator<Object>("modifiedDate")));
 		return views;
 	}
 
