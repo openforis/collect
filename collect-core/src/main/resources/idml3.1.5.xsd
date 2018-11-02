@@ -1,0 +1,1931 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  elementFormDefault="qualified" version="1.0"
+  xmlns:idml="http://www.openforis.org/idml/3.0" 
+  targetNamespace="http://www.openforis.org/idml/3.0"
+  xmlns="http://www.openforis.org/idml/3.0">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+Inventory Data Modeling Language 3.1.4
+January 2016
+
+Inventory Data Modeling Language (IDML) is an XML implementation of the Inventory Data Metamodel (IDMM), providing a formal language for defining and describing inventory data models.  It is an abstraction which enables the creation of software that is flexible and reuseable in a wider range of scenarios.  The IDMM also allows tools to interoperate on the same field data, regardless of platform or implementation.  For example, mobile or personal data recorder (PDR) software, web or desktop-based data management software and data modeling tools that are designed to work with the IDMM would all be able work together and exchange data, regardless of vendor or inventory-specific details or functionality.
+
+A specific usage or instance of the IDMM is called an inventory data model (IDM).  An inventory data model formally defines the variables recorded during an inventory, as well as metadata needed for transparent, consistent interpretation of collected data.  This includes definition of each entity and attribute and their respective data quality checks, precision, units, code lists and spatial reference systems.  Names and documentation for each of these elements may be specified in any number of languages.  These may then be used to generate standard reports for use in field manuals, online reporting and/or software help systems, for example.  This documentation is also essential for proper interpretation of primary data and results calculation.
+
+Other features include versioning, which allow data models to evolve over time in a managed way.  New elements may be added and old ones deprecated, however operations which would compromise data integraty and comparability are inherently prohibited.  This also facilitates creation of easy-to-use tools for data and database management.  Custom expressions are represented in the W3C standard XPath language.  String patterns may also be specified using standard POSIX-like regular expressions.  
+
+© Copyright 2013 Open Foris
+
+G. Miceli, M. Togna, S. Ricci, A. Pekkarinen
+
+Release Notes
+Changes from 3.0:
+* Code list hierarchy levels no longer contain id attribute; their natural order determines hierarchy rank
+* Languages in Survey
+* Added attribute types (integer/real) 
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+
+  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+  <!-- Types used throughout this schema -->
+  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+  <xs:simpleType name="id">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        A unique identifier of objects in the schema.  This allows for data consistency when renaming or moving nodes.  Once assigned, these may not be changed.   
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int"/>
+  </xs:simpleType>
+  
+  <xs:simpleType name="path">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+The path to one or more attributes or entities using a simplified form of W3C-standard XML Path Language (XPath).  See  idml:expression for details. 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(/?([a-z][a-z0-9_]+|parent\(\)|blank\(\)))+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="attributeValue">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+A literal (constant) value used to specify default attribute values.  May be boolean (true, false), numeric (12, 24.4) or text (ABC).  Note that text values do not need to be quoted.    
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  
+  <xs:simpleType name="expression">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+Expressions contain formulas and custom logic used for data checking, relevance features, default calculation and other features dependent on the values entered at run-time.  A subset of the W3C-standard XML Path Language (XPath) Version 1.0 is used for this purpose.  
+
+Paths and expressions are evaluated relative to one level above the entity or attribute where they are defined.  For example:
+      </xs:documentation>
+      <xs:documentation xml:lang="en">
+        <entity name="tree" multiple="true">
+          <number type="real" name="height"/>            
+          <number type="real" name="dbh">
+            <compare lte="height * 8" flag="error"/>
+          </number>
+        </entity>
+      </xs:documentation>
+      <xs:documentation xml:lang="en">
+This defines a tree with numeric height and dbh attributes, and a check on the tree's dbh which flags an error if it not less than or equal to 8x the tree's height.
+        
+Standard XPath axes are not supported (".", "..", "ancestor", "child", "descendant", etc.).  Instead, the following custom functions and special variable are provided to consistently resolve relative paths:
+        
+  parent()
+      the parent of the entity or attribute where the expression is defined
+  $this 
+      the value associated with the attribute where the expression is defined
+  node(id)
+      to be implemented in 3.0-rev2; resolves to the relative path of the nearest instance of nodes with the specified definition id.  In future versions, this will replace parent() and $this  
+        
+Additional helper functions:
+        
+  blank(node)
+      true if the attribute at the specified node has no value (symbols, units and other properties are ignored)
+  idm:lookup(table, valcol, idcol1, idexpr1, idcol2, idexpr2, ...)
+      retrieves a coordinate from specified 'table' and 'column', matching value of each 'idexpr' with value in each 'idcol'.  This is implementation dependent and assumes the presence of table-based data which may be referenced.  
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="versionName">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        A short text or number used to distinguish between versions of the data model and related field forms (e.g. DEC12 or 1.0).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token"/>
+  </xs:simpleType>
+  
+  <xs:complexType name="codeListItem">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+         An single entry in a code list.  In hierarchical lists, may also contain other sub-items.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="code" maxOccurs="unbounded" minOccurs="1">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            The code (e.g. 100, XYZ) associated with an code list item.  By default, codes within a given code list must be unique.  Special behavior may be defined using the <codingScheme/> element.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="label" maxOccurs="unbounded" minOccurs="0" type="unformattedText">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            A short, human-readable label for a particular code list item (e.g. "Other wooded land").
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="description" maxOccurs="unbounded" minOccurs="0" type="formattedText">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            Human-readable text describing the code list item.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="item" maxOccurs="unbounded" minOccurs="0" type="codeListItem">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            For hierarchical lists, sub-items are defined here.  In this case, the <hierarchy/> element should be used to define two or more list levels.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="id" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          Unique identifier of items in a code list.  Once assigned, this may not be changed. 
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="qualifiable" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          Specifies if additional information in the form of text may be provided when the code is used.  The most common use of this is for codes indicating "Other" or any other code with the parenthetical "(please specify)".  In these cases, the code may be associated with additional textual information qualifying the selection. 
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="since" type="versionName">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          The version of the model in which a particular list item was introduced.  The code list item is considered undefined before the specified version.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="deprecated" type="versionName">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          The version of the model from which a particular list item was no longer used.  The code list item is considered undefined on and after the specified version.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!--~~~~~~~~~~~~~~~~~~~~~~~-->
+  <!--~~~~~~~~~~~~~~~~~~~~~~~-->
+  <!-- Main Schema Hierarchy -->
+  <!--~~~~~~~~~~~~~~~~~~~~~~~-->
+  <!--~~~~~~~~~~~~~~~~~~~~~~~-->
+
+  <xs:element name="survey" id="survey">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+          Top level element representing an instance of a survey's data model.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="project" type="unformattedText" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Human-readable name of the survey in (e.g. Archenland NFI).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        
+        <xs:element name="uri" type="unformattedText" minOccurs="1" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Globally unique uniform resource identifier for the survey model.  This identifieris used to identify the data model when importing and updating metadata.  To guarantee uniqueness, it is recommended that the URL of the responsible institution be used, appending a unique code (UUID) or the name of the survey (e.g. http://www.openforis.org/idm/idnfi). 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:element name="cycle" type="unformattedText" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Name of survey project cycle in human-readable text (e.g. 2010-2015).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:element name="description" type="formattedText" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Human-readable text describing the survey project.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:element name="language" type="unformattedText" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              ISO 639-2 code of a language used in this survey model.  Each code consists of the two lower-case letters (e.g. "en", "es", "de"). 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+		
+        <xs:element name="applicationOptions" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Application-specific configuration and options.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="options" minOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A set of application-specific options, identified by type attribute.
+                    </xs:documentation>
+                </xs:annotation>
+                  <xs:complexType>
+                     <xs:sequence>
+                      <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation>
+                          <xs:documentation>
+                            Application-specific XML or text.  Software applications may use this to store UI and form layout, options, etc.
+                          </xs:documentation>
+                        </xs:annotation>
+                      </xs:any>
+                      </xs:sequence>
+                      <xs:attribute name="type" use="required">
+                          <xs:annotation>
+                            <xs:documentation>
+                              Type of application options contained in this element.
+                              </xs:documentation>
+                          </xs:annotation>
+                      </xs:attribute>
+                  </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <!--~~~~~~~~~~~~-->
+        <!-- Versioning -->
+        <!--~~~~~~~~~~~~-->
+
+        <xs:element name="versioning" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Container element for information on data model versions.  Versioning allows certain elements of the survey model to be added or removed without breaking data consistency.  Versions may also be used to document the changes made to a survey during the course of its execution.  This allows software and reports to display only values that apply to the point in time that data were collected.           
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="version" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    Defines a single version of the data model.  Usually there will be one version for each revision of the field forms or mobile computer software used to collect field data.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="label" minOccurs="0" maxOccurs="unbounded" type="unformattedText">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Human-readable name of the model version (e.g. Pilot, Main Phase, Extension).
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="description" minOccurs="0" maxOccurs="unbounded"
+                      type="formattedText">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Human-readable description of the model version.              
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="1" maxOccurs="1" name="date" type="xs:date">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Date from which data was collected using this version of the model.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="id" type="id" use="required">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        Unique identifier of versions in the schema.  Once assigned, this identifier must not be changed.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="name" type="versionName" use="required">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        Unique system name for this version of the data model to be referenced from other model elements (e.g. pilot, 1.0, 2.0).
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <xs:unique name="versionName">
+            <xs:selector xpath="idml:version" />
+            <xs:field xpath="@name" />
+          </xs:unique>
+        </xs:element>
+
+        <!--~~~~~~~~~~~~-->
+        <!-- Code Lists -->
+        <!--~~~~~~~~~~~~-->
+
+        <xs:element name="codeLists" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Definitions of code lists used by the survey.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="1" maxOccurs="unbounded" name="list">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    Definition of a single code list used by the survey.  Code lists may be flat (one level) or hierarchical (multiple levels).  Additional information about the structure of the list are defined in the <hierarchy/> and <codingScheme/> elements.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="label" minOccurs="0" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Human-readable name of the code list being defined.
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:extension base="unformattedText">
+                            <xs:attribute name="type" use="required">
+                              <xs:annotation>
+                                <xs:documentation xml:lang="en">
+                                  The type of label being defined (to be removed in future release)
+                                </xs:documentation>
+                              </xs:annotation>
+                              <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                  <xs:enumeration value="item">
+                                    <xs:annotation>
+                                      <xs:documentation xml:lang="en">
+                                        Indicates that the label refers items in the list (e.g. Administrative unit).  Note that for hierarchical code lists, additional per-level labels are defined in the <hierarchy/> element.   
+                                      </xs:documentation>
+                                    </xs:annotation>
+                                  </xs:enumeration>
+                                  <xs:enumeration value="list">
+                                    <xs:annotation>
+                                      <xs:documentation xml:lang="en">
+                                        Indicated that the label refers to the list itself (e.g. Administrative units)   
+                                      </xs:documentation>
+                                    </xs:annotation>
+                                  </xs:enumeration>
+                                </xs:restriction>
+                              </xs:simpleType>
+                            </xs:attribute>
+                            <xs:anyAttribute namespace="##other" processContents="lax">
+                              <xs:annotation>
+                                <xs:documentation>
+                                  Application-specific attributes. 
+                                </xs:documentation>
+                              </xs:annotation>
+                            </xs:anyAttribute>
+                          </xs:extension>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="description" minOccurs="0" maxOccurs="unbounded"
+                      type="formattedText">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Human-readable description of the code list.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="codingScheme" minOccurs="0" maxOccurs="1">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Additional settings on how code values are treated and interpreted.     
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <!--
+                        <xs:sequence>
+                          <xs:element name="label" maxOccurs="unbounded" minOccurs="0"
+                            type="unformattedText">
+                            <xs:annotation>
+                              <xs:documentation xml:lang="en">
+                                The human-readable name of the coding scheme (e.g. ISO 3166-1 Alpha-3 Country Codes)
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                          <xs:element name="description" maxOccurs="unbounded" minOccurs="0"
+                            type="formattedText">
+                            <xs:annotation>
+                              <xs:documentation xml:lang="en">
+                                The human-readable description of the coding scheme.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="name" use="optional" type="name">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              System name of the coding scheme (iso3). 
+                            </xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        -->
+                        <xs:attribute name="scope" use="optional" default="scheme">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              For hierarhical code lists, defines at which level codes are considered unique.
+                            </xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="scheme">
+                                <xs:annotation>
+                                  <xs:documentation xml:lang="en">
+                                    Codes are unique across the entire coding scheme (default).  The same code may not be used twice, even if under different parents in a hierarchical list.  This implies that each code in a hierachy completely identifies its related item.  For example, in a hierarchy of administrative units with two levels "Province" and "District", district code "002" may not be used under both province "A" and "B".  Instead, the district codes "A002" and "B002" could be used, both of which fully identify the district in question.
+                                  </xs:documentation>
+                                </xs:annotation>
+                              </xs:enumeration>
+                              <xs:enumeration value="local">
+                                <xs:annotation>
+                                  <xs:documentation xml:lang="en">
+                                    Codes are unique across the item's parent (in hierarchical lists only).  This implies that the same code may be used twice at different points in the hierarchy.  In this case, the code alone is not enough to identify the item in question; all ancestors are be required to do so.  In the above example, district code "002" would then be allowed below both province "A" and "B".  However to identify the district in this example, but province and district codes would be required.
+                                  </xs:documentation>
+                                </xs:annotation>
+                              </xs:enumeration>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <!-- 
+                        <xs:attribute name="type" use="required">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              The type of codes used in the scheme.
+                            </xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:enumeration value="numeric">
+                                <xs:annotation>
+                                  <xs:documentation xml:lang="en">
+                                    Codes are treated as numbers (integers or reals) when entering and searching, however the format specified in this list is maintained.  For example, if a numeric code is defined as "001", the values "1", "01" or "1.0" will also match this code and turn to "001".  
+                                  </xs:documentation>
+                                </xs:annotation>
+                              </xs:enumeration>
+                              <xs:enumeration value="alphanumeric">
+                                <xs:annotation>
+                                  <xs:documentation xml:lang="en">
+                                    Alpha-numeric codes may contain both text and numbers.  They are treated as case insensitive text for purposes of uniqueness and search, and as case-sensitive for text formatting.  For example, if a code "Fhm" is defined in a particular coding scheme, code "FHM" may not also be defined.  However if a user enters "FHM", the value is matched and replaced with "Fhm".  Therefore "FHM" and "Fhm" are equivalent value, but the user is always presented with the codes as they are formatted in this list. 
+                                  </xs:documentation>
+                                </xs:annotation>
+                              </xs:enumeration>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                         -->
+                        <!--
+                        <xs:attribute name="default" type="xs:boolean">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              When using multiple coding schemes, defines whether this scheme is the default scheme to be used in reports and user interfaces.
+                            </xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="since" type="versionName">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              From what version of the survey model the coding scheme was used.
+                            </xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="deprecated" type="versionName">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              From what version of the survey model the coding scheme was no longer used.
+                            </xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        -->
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="hierarchy" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Must be defined for code lists that are hierarchical in nature. 
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="level" minOccurs="1" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:documentation xml:lang="en">
+                                Represents a level in the hierarchy, in order from highest to lowest (e.g. country, region, distr)
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                  <xs:element name="label" type="unformattedText" minOccurs="0" maxOccurs="unbounded">
+                                  <xs:annotation>
+                                    <xs:documentation xml:lang="en">
+                                      The human-readable label of the hierarchy level. 
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="description" type="unformattedText" minOccurs="0" maxOccurs="unbounded">
+                                  <xs:annotation>
+                                    <xs:documentation xml:lang="en">
+                                      Human-readable text describing the details or significance of the hierarchy level.
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="name" type="name" use="required">
+                                <xs:annotation>
+                                  <xs:documentation xml:lang="en">
+                                    A short, unique system name for the level.  In relational database terms, this may be used as the name of the table containing the hierarchy level.
+                                  </xs:documentation>
+                                </xs:annotation>
+                              </xs:attribute>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <xs:unique name="levelNameKey">
+                        <xs:selector xpath="idml:level" />
+                        <xs:field xpath="@name" />
+                      </xs:unique>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="items">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Container for all items in a code list.
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element minOccurs="1" maxOccurs="unbounded" name="item" type="codeListItem">
+                            <xs:annotation>
+                              <xs:documentation xml:lang="en">
+                                Describes a single entry in a predefined code list.
+                              </xs:documentation>
+                            </xs:annotation>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:integer" use="required">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        Unique identifier of a code list in the schema.  Once assigned, this may not be changed.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="name" type="name" use="required">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        A short, unique system name for the code list.  In relational database terms, this may be used as the name of the table containing the code list.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="lookup" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+Used to link large code lists (e.g. cluster and plot ids or detailed lists of administrative units) to an external table.  This is an implementation dependent feature, which typically will pull codes from a database table, using the names of the levels in the hierarchy as the names of the columns containing the codes. For example:
+
+      <list id="487" lookup="sampling_design" name="sampling_design">
+        <label type="item">Sample Ids</label>
+        <codingScheme scope="local"/>
+        <hierarchy>
+          <level name="cluster">
+            <label>Cluster Id</label>
+          </level>
+          <level name="plot">
+            <label>Plot Id</label>
+          </level>
+        </hierarchy>
+      </list>
+
+...will take codes for the first level from sampling_design.cluster, and codes for the second level from sampling_design.plot.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="since" type="versionName">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        The version of the model in which a particular code list was introduced.  The code list is considered undefined before the specified version.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="deprecated" type="versionName">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        The version of the model from which a particular code list was no longer used.  The code list is considered undefined on and after the specified version.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <!--~~~~~~~~~~~~~~~~~~~~~~-->
+        <!-- Units of Measurement -->
+        <!--~~~~~~~~~~~~~~~~~~~~~~-->
+
+        <xs:element name="units" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Describes the units of measure used by the inventory.  Units are always stored with the primary data in order to avoid misinterpretation and to facilitate conversion between units.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="unit" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    Describes a single unit of measure referred to by the inventory data.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="label" minOccurs="0" maxOccurs="unbounded" type="unformattedText">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          The full name of the unit of measurement (e.g. kilometers, metres per hectare).
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="abbreviation" minOccurs="0" maxOccurs="unbounded"
+                      type="unformattedText">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          The standard abbreviation for the unit of measurement (e.g. km, m/ha)
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:integer" use="required">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        Unique identifer of the unit of measurement in the schema.  Once assigned, this may not be changed.
+                      </xs:documentation>
+                    </xs:annotation>                    
+                  </xs:attribute>
+                  <xs:attribute name="name" use="required" type="name">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        A short name for the unit of measurement.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="dimension" use="required" type="name">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        The dimension to which the unit belongs (e.g. length, volume, time).
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="conversionFactor" use="optional" type="xs:decimal">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        The conversion factor used to convert to other units in the same dimension.
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+        <!-- Spatial Reference Systems -->
+        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+        <xs:element name="spatialReferenceSystems" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Defines specific coordinate reference systems and their respective map projections used by the inventory.  This information is required for correct interpretation of coordinate and for related geospatial calculations (e.g. distance). 
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="spatialReferenceSystem" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    Defines a single coordinate reference system used by the system.  Note that when using Universal Transverse Mercator coordinate system (UTM), each zone is to be encoded as a separate spatial reference system.  
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="label" maxOccurs="unbounded" minOccurs="0"
+                      type="unformattedText">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Human-readable name of the spatial reference system (e.g. UTM Zone 38).
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="description" minOccurs="0" maxOccurs="unbounded"
+                      type="formattedText">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Human-readable description of the spatial reference system.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="wkt" minOccurs="1" maxOccurs="1" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Definition of the spatial reference system's parameters and projection in well-known text (WKT) format.  WKT is a standard defined in the Open Geospatial Consortium (OGC)'s Simple Feature Access and Coordinate Transformation Service specifications.
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="srid" type="xs:string">
+                    <xs:annotation>
+                      <xs:documentation xml:lang="en">
+                        User-defined unique ID of the spatial reference system (e.g. EPSG:21036)  
+                      </xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+          <xs:unique name="spatialReferenceSystemKey">
+            <xs:selector xpath="idml:spatialReferenceSystem" />
+            <xs:field xpath="@srid" />
+          </xs:unique>
+        </xs:element>
+		
+		<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+        <!-- Reference data schema -->
+        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+		
+		<xs:element name="referenceDataSchema" minOccurs="0" maxOccurs="1">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">
+					Defines information about the reference data, like the sampling points or the taxon list
+				</xs:documentation>
+			</xs:annotation>
+			<xs:complexType>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="samplingPoint" minOccurs="0" maxOccurs="1">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="attribute" type="referenceDataAttribute"
+									minOccurs="0" maxOccurs="unbounded" />
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="taxon" minOccurs="0" maxOccurs="1">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="attribute" type="referenceDataAttribute"
+									minOccurs="0" maxOccurs="unbounded" />
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:complexType>
+		</xs:element>
+        
+        <!--~~~~~~~~-->
+        <!-- Schema -->
+        <!--~~~~~~~~-->
+        <xs:element name="schema" minOccurs="1" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Contains the definition of the structure and contents of primary data, including types of entities studied and measurements or observations that will be made.  Quality checks to be applied during data collection and initial data processing are also defined here.
+              
+              A schema may contain one or more root entities which are considered the main unit of work for a survey. 
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="entity" type="entityBase" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    An entity represents an observation unit; a think or concept for which observations and measurements will be made.  Some common examples include "plot", "tree" and "household".  In IDM, entities may have any number of attributes and may contain one or more other entities (e.g. a "plot" contains many "tree" entities).  Top-level entities are special in that the are the container for all other entities and attributes, and represent the main unit of data collection.  For example, if socio-economic surveys are done as an integrated part of biophysical surveys, both "field_plot" and "household" may fall under one "cluster" entity.  However, if the interviews and field measurements are done separately and are not directly related, "household" and "cluster" may both be better represented as top-level entities. 
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:unique name="entityChildNames">
+                  <xs:selector xpath="*"/>
+                  <xs:field xpath="@name"/>
+                </xs:unique>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="lastId" use="required">
+          <xs:annotation>
+           <xs:documentation>
+             Contains the last id used for uniquely identifying objects in this survey model.  
+                  To avoid conflicts between instances and uses of the model, ids should not be 
+                  reused (i.e. lastId must increase each time a new object is added to the IDM)
+              </xs:documentation>
+          </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="published" type="xs:boolean" use="optional" default="false">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            If true, the survey is in use by some systems and cannot be entirely modified
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="created" use="optional" type="xs:dateTime" />
+      <xs:attribute name="modified" use="optional" type="xs:dateTime" />
+      <xs:anyAttribute namespace="##other" processContents="lax">
+	      <xs:annotation>
+	        <xs:documentation>
+	          Application-specific attributes imported from other namespaces. 
+	        </xs:documentation>
+	      </xs:annotation>
+	    </xs:anyAttribute>
+    </xs:complexType>
+    <xs:unique name="surveyObjectKey">
+      <xs:selector xpath=".//idml:version |
+      					  .//idml:list |
+      					  .//idml:item |
+      					  .//idml:unit |
+     					  .//idml:entity | 
+                          .//idml:boolean |
+                          .//idml:code | 
+                          .//idml:coordinate |
+                          .//idml:date |
+                          .//idml:file | 
+                          .//idml:number | 
+                          .//idml:range | 
+                          .//idml:taxon | 
+                          .//idml:text | 
+                          .//idml:time"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+  </xs:element>
+
+  <xs:complexType name="schemaObject">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        A common base type for entities and attribute.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="label" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            The human-readable label associated with an entity, entities, attribute value or values when displaying results, calculation and reporting.  
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="unformattedText">
+              <xs:attribute name="type" use="optional" default="instance">
+                 <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="abbreviated">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Indicates that the label is an abbreviation of the instance label. 
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="instance">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Indicates that the label applies to a single instance of an entity (e.g. "Tree") or attribute (e.g. "Use"). 
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="heading">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Indicates that the label applies to multiple instances of an entity (e.g. "Trees") or attribute (e.g. "Uses").  Frequently used as a heading when displaying or printing lists of values or entities. 
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="number">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Indicates the number associated with the attribute or entity.  This code commonly appears on field forms and PC or PDR software, and may be number (1, 2, 3) or alphanumeric (2a, IV).  
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="reporting">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Indicates that the label is used for data reporting (e.g. Saiku).
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:anyAttribute namespace="##other" processContents="lax">
+                <xs:annotation>
+                  <xs:documentation>
+                    Application-specific attributes imported from other namespaces. 
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:anyAttribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+
+      <xs:element name="prompt" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            The human-readable text used when eliciting a value or response from a user, field team, or interviewee.   
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="unformattedText">
+              <xs:attribute name="type" use="required">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="interview">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Question, phrase or statement posed to an interviewee during interviews.  
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="paper">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Text appearing next to the item associated with this entity or attribute on printed field forms. 
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="handheld">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Prompt shown on handheld computers when collecting data electronically in the field. 
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                    <xs:enumeration value="pc">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Prompt shown on PC-based software (e.g. Open Foris Collect.) when entering data in the field or office. 
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:enumeration>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:anyAttribute namespace="##other" processContents="lax">
+                <xs:annotation>
+                  <xs:documentation>
+                    Application-specific attributes imported from other namespaces. 
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:anyAttribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="description" minOccurs="0" maxOccurs="unbounded" type="formattedText">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            Human-readable description of addition details regarding the entity or attribute (e.g. plot size/shape, how the value is obtained).  Used for documentation and software help systems.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+     <xs:attribute name="id" type="xs:integer" use="required">
+       <xs:annotation>
+         <xs:documentation xml:lang="en">
+           Unique identifer of the entity or attribute in the schema.  Once assigned, this may not be changed.
+         </xs:documentation>
+       </xs:annotation>                    
+     </xs:attribute>
+    <xs:attribute name="name" type="name" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          A short, unique system name for the entity or attribute.  In relational database terms, this may be used as the name of the table containing the instances of an entity, or the prefix of the columns containing an attribute's values.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="since" type="versionName">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          The version of the model in which a particular entity or attribute was introduced.  The entity or attribute is considered undefined before the specified version.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="deprecated" type="versionName">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          The version of the model from which a particular entity or attribute was no longer used.  The entity or attribute is considered undefined on and after the specified version.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:anyAttribute namespace="##other" processContents="lax">
+      <xs:annotation>
+        <xs:documentation>
+          Application-specific attributes imported from other namespaces. 
+        </xs:documentation>
+      </xs:annotation>
+    </xs:anyAttribute>
+  </xs:complexType>
+
+  <xs:complexType name="entityBase">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        Common base type for entities.  An entity represents an observation unit; a think or concept for which observations and measurements will be made.  Some common examples include "plot", "tree" and "household".  In IDM, entities may have any number of attributes and may contain one or more other entities (e.g. a "plot" contains many "tree" entities).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="schemaObject">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+
+            <xs:element name="entity" type="innerEntity">
+              <xs:annotation>
+                <xs:documentation xml:lang="en">
+                  An entity represents an observation unit; a think or concept for which observations and measurements will be made.  Some common examples include "plot", "tree" and "household".  In IDM, entities may have any number of attributes and may contain one or more other entities (e.g. a "plot" contains many "tree" entities).
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:unique name="innerEntityChildNames">
+                <xs:selector xpath="*"/>
+                <xs:field xpath="@name"/>
+              </xs:unique>
+            </xs:element>
+
+            <xs:element name="number" type="numericAttribute">
+              <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    A single real or integer number (2.3, 5.1).  Units of measurement are also kept as a separate property of each value.
+                  </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+
+            <xs:element name="range" type="numericAttribute">
+              <xs:annotation>
+                <xs:documentation xml:lang="en">
+                  A range consists of either a single number (e.g. 12, 15.2, -12) or two numbers separated by a hyphen/dash (e.g. 4-12, 2-6.7) indicated a minimum and maximum value for the attribute.  The first number must always be less than or equal to the second.  Note that single values (e.g. 5) are treated as both 'from' and 'to' values (e.g. 5-5).  As with other number attributes,   units of measurement are also managed.  
+                  </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+
+            <xs:element name="date">
+              <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    A Gregorian date consisting of a year, month and day.
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="attribute">
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                      	<xs:element name="unique" type="uniquenessCheck"/>
+                        <xs:element name="compare" type="compareCheck">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              A check that the date occurs before, on, or after another date.
+                            </xs:documentation>
+                          </xs:annotation>
+                        </xs:element>
+                        <xs:element name="check" type="customCheck">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              A user-defined check on the date.
+                            </xs:documentation>
+                          </xs:annotation>
+                        </xs:element>
+                      </xs:choice>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>              
+            </xs:element>
+
+            <xs:element name="time">
+              <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    A time, consisting of the hour and minutes.
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="attribute">
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                      	<xs:element name="unique" type="uniquenessCheck"/>
+                        <xs:element name="compare" type="compareCheck">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              A check that the time occurs before, at, or after another time.
+                            </xs:documentation>
+                          </xs:annotation>
+                        </xs:element>
+                        <xs:element name="check" type="customCheck">
+                          <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                              A user-defined check on the time.
+                            </xs:documentation>
+                          </xs:annotation>
+                        </xs:element>
+                      </xs:choice>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="boolean">
+              <xs:annotation>
+                <xs:documentation>
+                  An attribute whose value may be true, false or null/blank.
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="attribute">
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="check" type="customCheck">
+                          <xs:annotation>
+                            <xs:documentation>
+                                A custom check on the state of the attribute (true, false, blank)
+                              </xs:documentation>
+                          </xs:annotation>
+                        </xs:element>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:attribute name="affirmativeOnly" type="xs:boolean" use="optional" default="false">
+                      <xs:annotation>
+                        <xs:documentation>
+Indicates that "false" or "no" values are not able to be specified explicitly by the user, but rather are explictly defined by the absence of a an affirmative action.  Concretely, if paper or electronic forms present two checkboxes, e.g.:    
+                          
+    Living   [ ] Yes  [x] No     
+    
+...the user has three choices; to check "Yes", to check "No", or to check neither.  Each of these actions corresponds to true, false and '', respectively. In this case, affirmativeOnly should be false, as the data may also contain negative values (false).     
+                          
+In cases where an attribute is represented by a single check box, e.g.:
+    [ ] Living
+    
+    ...the user has only two choices; to check "Yes", or to do nothing.  These actions correspond to true and '', respectively. In this case, affirmativeOnly would be true, as there is no explicit way to specify a negative value.  
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="file">
+              <xs:annotation>
+                <xs:documentation>
+                    Represents an image or file attachment.
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="attribute">
+                    <xs:attribute name="maxSize" use="required" type="xs:positiveInteger">
+                      <xs:annotation>
+                        <xs:documentation>
+                            Maximum file size expressed in number of bytes.
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="extensions" use="optional">
+                      <xs:annotation>
+                        <xs:documentation>
+                            Space-separated list of allowed file extensions.  Implementations may treat jpg or other extensions as special cases, presenting thumbnails or de-identifying metadata where appropriate.
+                          </xs:documentation>
+                      </xs:annotation>
+                      <xs:simpleType>
+                        <xs:list itemType="xs:string"/>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="code">
+              <xs:annotation>
+                <xs:documentation>
+                    Code attributes consist of one or more code values, with qualifying text when appropriate (e.g. Other (specify)). 
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="attribute">
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="compare" type="compareCheck"/>
+                        <xs:element name="pattern" type="patternCheck"/>
+                        <xs:element name="unique" type="uniquenessCheck"/>
+                        <xs:element name="check" type="customCheck"/>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:attribute name="strict" type="xs:boolean" use="optional" default="true">
+                      <xs:annotation>
+                        <xs:documentation>
+                            If true, the values are limited to those in the code list.  When false, unlisted values may be assigned to the attribute, indicated by a warning state on the attribute. 
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="allow_values_sorting" type="xs:boolean" use="optional" default="false">
+                      <xs:annotation>
+                        <xs:documentation>
+                            If true, the specified values can be sorted and the order gives them a priority. 
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="list" type="name">
+                      <xs:annotation>
+                        <xs:documentation>
+                          The name of the code list from which valid values for this attribute are defined.
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="parent" type="path">
+                      <xs:annotation>
+                        <xs:documentation>
+If the code attribute refers to the second or lower level of a hierarchical code list, the parent must points to the code attribute containing the value of the parent level. The valid values for descendents will then depend on the value specified for the ancestor levels.  For example, given the following code list:
+                            
+    <list id="126" name="admin_unit">
+      <hierarchy>
+        <level name="region">
+          <label>Region</label>
+        </level>
+        <level name="district">
+          <label>District</label>
+        </level>
+      </hierarchy>
+      ...
+    </list>
+                          
+...two attributes could then be defined, one for each level:
+  
+    <code id="811" list="admin_unit" name="region"/>
+    <code id="812" list="admin_unit" name="district" parent="region"/>
+
+In this case, the meaning and validity of the district code would then depend on the region code specified in the 'region' code attribute. 
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="key" type="xs:boolean" use="optional" default="false">
+                      <xs:annotation>
+                        <xs:documentation>
+                          Determines whether the code is to be included as part of the key which uniquely identifies the associated unit of observation within its parent.  Keys are not assumed to be globally unique, but rather unique relative to their parent entity. For example, code 'plot_id' and text 'plot_section' may be used as keys for a 'plot' entity within a cluster, while 'cluster_code' may uniquely identify a 'cluster' top-level entity within a survey.    
+                        </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="coordinate">
+              <xs:annotation>
+                <xs:documentation>
+                    A coordinate consists of an X value, Y value, and spatial reference system identifier (SRS ID).  The SRS defines the projection and other parameters necessary to correctly interpret and convert the X and Y values to other coordinate reference systems (latitude/longitude, UTM, etc.) 
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="attribute">
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                      <xs:element name="unique" type="uniquenessCheck"/>
+                      <xs:element name="distance" type="distanceCheck"/>
+                    </xs:choice>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="taxon">
+              <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    A taxon consists of a reference to a family, genus, species and/or sub-species by code, scientific name.  Optionally, it may also contain a local or common vernacular name, qualified by the name's ISO 639-3 language code.
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="attribute">
+                    <xs:attribute name="taxonomy" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                            The name of the taxonomic checklist from which species codes and names are taken. Implementation independent. 
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="highestRank">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Specifies the highest taxonomic rank allowed.  For example, if genus is selected, the value may refer to a genus, species or subspecies, but not a family.
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="family" />
+                          <xs:enumeration value="genus" />
+                          <xs:enumeration value="species" />
+                          <xs:enumeration value="subspecies" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                    <xs:attribute name="qualifiers" type="xs:string">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                            Implementation specified; a comma-separated list of expressions used to filter lookups in the checklist by one or more run-time values (e.g. to limit species by region).
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+
+            <xs:element name="text">
+              <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    An attribute containing free text.
+                  </xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="attribute">
+                    <xs:sequence>
+                      <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="unique" type="uniquenessCheck"/>
+                        <xs:element name="pattern" type="patternCheck"/>
+                        <xs:element name="check" type="customCheck"/>
+                      </xs:choice>
+                    </xs:sequence>
+                    <xs:attribute name="key" type="xs:boolean" use="optional" default="false">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                          Determines whether the text value is to be included as part of the key which uniquely identifies the associated unit of observation within its parent.  Keys are not assumed to be globally unique, but rather unique relative to their parent entity. For example, code 'plot_id' and text 'plot_section' may be used as keys for a 'plot' entity within a cluster, while 'cluster_code' may uniquely identify a 'cluster' top-level entity within a survey.
+                          </xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="type" use="optional" default="short">
+                      <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                             The sub-type of the text attribute.
+                          </xs:documentation>
+                      </xs:annotation>
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="short">
+                            <xs:annotation>
+                              <xs:documentation xml:lang="en">
+                                Short text consists of single line of upper-case text, numbers and symbols of up to 255 characters in length. Formatting is ignored, including leading and trailing spaces and carriage returns.    
+                                </xs:documentation>
+                            </xs:annotation>
+                          </xs:enumeration>
+                          <xs:enumeration value="memo">
+                            <xs:annotation>
+                              <xs:documentation xml:lang="en">
+                                  Memo fields contain any formatted text, up to 1024 characters in length.  Leading and training whitespace is trimmed, but other formatting (capitalization, carriage returns, etc.) is maintained.  
+                                </xs:documentation>
+                            </xs:annotation>
+                          </xs:enumeration>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="innerEntity">
+    <xs:complexContent>
+      <xs:extension base="entityBase">
+        <xs:attribute name="relevant" type="expression">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              A conditional expression which determines whether the entity is relevant.  For example, if stumps are only observed in permanent plots, the stump entity definition in plot may declare relevant="permanent".  All validation errors on associated attributes are reduced to warnings when this expression evaluates to false.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="required" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              A boolean value indicating that one or more instances of the entity is always required (deprecated, marked for removal).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="requiredIf" type="expression" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              A conditional expression which determines whether one or more of an entity is required (deprecated, marked for removal)
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="multiple" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Indicates that more than one instance of an entity may be specified (deprecated, marked for removal)
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="minCount" type="xs:nonNegativeInteger" use="optional" default="0">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              The minimum number of instances of the entity which must be provided.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="maxCount" type="xs:nonNegativeInteger" use="optional" default="0">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              The maximum number of instances of the entity which may be provided.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="attribute">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        Defines an inventory attribute.  An attribute defines variable for which a value will be recorded, including all field measurements, observations and survey questions.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="schemaObject">
+        <xs:sequence>
+        	<xs:element name="fieldLabel" minOccurs="0" maxOccurs="unbounded">
+		        <xs:annotation>
+		          <xs:documentation xml:lang="en">
+		            Custom field label  
+		          </xs:documentation>
+		        </xs:annotation>
+		        <xs:complexType>
+		          <xs:complexContent>
+		            <xs:extension base="unformattedText">
+		              <xs:attribute name="field" use="required" />
+		              <xs:anyAttribute namespace="##other" processContents="lax">
+		                <xs:annotation>
+		                  <xs:documentation>
+		                    Application-specific attributes imported from other namespaces. 
+		                  </xs:documentation>
+		                </xs:annotation>
+		              </xs:anyAttribute>
+		            </xs:extension>
+		          </xs:complexContent>
+		        </xs:complexType>
+		      </xs:element>
+		      
+          <xs:element name="default" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation>
+                Defines the behavior when values are missing.  When this is applied to field data is implementation dependent (e.g. Collect applies defaults when data is submitted for cleansing).   
+              </xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attribute name="value" type="attributeValue" use="optional">
+                <xs:annotation>
+                  <xs:documentation>
+                    A constant numeric, text or range to be applied as the default value. 
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="expr" type="expression" use="optional">
+                <xs:annotation>
+                  <xs:documentation>
+                    An expression that evaluates to the default numeric, text or range value.
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="if" type="expression" default="true">
+                <xs:annotation>
+                  <xs:documentation>
+                    A conditional expression indicating whether or not the default should be applied to a missing value.  Default rules are to be evaluated in order until an applicable rule is found (i.e. this expression evaluates to true)   
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="relevant" type="expression">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              A conditional expression defining when the attribute is relevant.  All validation errors on this are reduced to warnings when this expression evaluates to false. 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="required" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Indicates whether or not a value is always required.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="requiredIf" type="expression" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              A conditional expression indicating when when an attribute value is required (deprecated, marked for merging with @required attribute)
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="multiple" type="xs:boolean" use="optional" default="false">
+          <!-- TO-DO: move to code attribute -->
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Indicates whether multiple-responses are allowed for code attributes.    
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="minCount" type="xs:nonNegativeInteger" use="optional" default="0">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              For multiple attributes, indicates the minimum number of values allowed (deprecated, marked for removal).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="maxCount" type="xs:nonNegativeInteger" use="optional" default="0">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              For multiple attributes, indicates the maximum number of values allowed (deprecated, marked for removal).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+         <xs:attribute name="calculated" type="xs:boolean" use="optional" default="false">
+         	<xs:annotation>
+            <xs:documentation xml:lang="en">
+            	Indicates whether values are automatically calculated or user input is required to fill in values.
+            </xs:documentation>
+          </xs:annotation>
+       	</xs:attribute>
+       	<xs:attribute name="referencedAttribute" type="xs:nonNegativeInteger" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+            	Attribute references the specified key attribute in another entity.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Numeric Attributes -->
+
+  <xs:complexType name="numericAttribute">
+    <xs:complexContent>
+      <xs:extension base="attribute">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="precision" minOccurs="0" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:attribute name="unit" type="name">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    The short name of the unit of measurement.
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="decimalDigits" type="xs:integer">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    The number of decimal digits to round to when displaying values in reports and query results.
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="default" type="xs:boolean">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    Indicates whether this unit is the default unit of measurement for this attribute.  If not specied, the first <precision/> element will taken as the default.  The default unit of measurement is intended to be used when exporting and importing data to other systems and formats. 
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+            <xs:element name="compare" type="compareCheck"/>
+            <xs:element name="unique" type="uniquenessCheck"/>
+            <xs:element name="check" type="customCheck"/>
+        </xs:choice>
+        <xs:attribute name="key" type="xs:boolean" use="optional" default="false">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Determines whether the number is to be included as part of the key which uniquely identifies the associated unit of observation within its parent.  Keys are not assumed to be globally unique, but rather unique relative to their parent entity. For example, code 'plot_id' and text 'plot_section' may be used as keys for a 'plot' entity within a cluster, while 'cluster_code' may uniquely identify a 'cluster' top-level entity within a survey.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="type" default="real">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Specifies the sub-type of numeric attributes (number and range). 
+            </xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="real">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    Real values may be positive or negative numbers with zero or more decimal digits (e.g. 12, -4, 6.3, -18.422).
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+              <xs:enumeration value="integer">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">
+                    Integer values may be positive or negative numbers with no decimal digits (e.g. 12, -4, 6, -18).
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!--~~~~~~~~~~~~~~-->
+  <!-- Value Checks -->
+  <!--~~~~~~~~~~~~~~-->
+
+  <xs:complexType name="checkBase">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        The base type for checks define rules executed on primary data during data entry and data cleansing.   
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="message" type="unformattedText" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+            A custom message to be used when a check fails.  This is especially useful for custom checks, where the failed check is not clear from the default message.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="flag" use="required">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          With what severity to flag the value when the check fails. 
+        </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="error">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">
+                 The 'error' flag indicates that the value is invalid and must not be used for analysis.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="warn">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">
+                The 'warn' flag indicates that the valid is suspicious, but may still be correct.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="if" type="expression">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          A conditional expression which determines whether or not the check will be applied.  If the expression evaluates to 'false', the check should be completed ignored.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="compareCheck">
+    <xs:annotation>
+      <xs:documentation>
+        Asserts that a value is within a certain range.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="checkBase">
+        <xs:attribute name="gte" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+                An constant or expression which evaluates to the minimum allowed value (inclusive).
+              </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="lte" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+              An constant or expression which evaluates to the maximum allowed value (inclusive).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="gt" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+              An constant or expression which evaluates to the minimum allowed value (exclusive).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="lt" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+              An constant or expression which evaluates to the maximum allowed value (exclusive).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="eq" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+              An constant or expression which evaluates to the exact required value.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="distanceCheck">
+    <xs:annotation>
+      <xs:documentation>
+Asserts that a coordinate value is at least/most a certain distance from a known location.  Coordinates are typically matched by one or more ids and retrieved from a lookup table.  For example, the following coordinate checks:
+
+    <distance flag="error" max="100000" to="idm:lookup('sampling_design', 'coordinate', 'cluster', id, 'plot', '')"/>
+    <distance flag="warn" max="50000" to="idm:lookup('sampling_design', 'coordinate','cluster', id, 'plot', '')"/>
+        
+...states that it is an error when the coordinate is more than 100km from the planned location, and a warning when it is more than 50km.  The lookup() function retrieves the 'coordinate' column in the 'sampling_design' table, matching the 'cluster' column to the attribute 'id' of the entity where the coordinate is located, and the 'plot' column with the empty string ''.   
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="checkBase">
+        <xs:attribute name="min" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+              A constant or expression that evaluates to the minimum allowed distance, in meters.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="max" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+              A constant or expression that evaluates to the maximum allowed distance, in meters.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="from" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+              An expression that evaluates to a coordinate from which the distance should be checked (default is $this). 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="to" type="expression">
+          <xs:annotation>
+            <xs:documentation>
+              An expression that evaluates to a coordinate to which the distance should be checked.  This is usually a lookup function to retrieve the location from an implementation-dependent table (see example above).  
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="patternCheck">
+    <xs:annotation>
+      <xs:documentation>
+        Asserts that the value of a text or code attribute matches a regular expression pattern. 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="checkBase">
+        <xs:attribute name="regex" use="required">
+          <xs:simpleType>
+            <xs:annotation>
+              <xs:documentation xml:lang="en">
+                A regular expression which must match the value of the given code or text attribute.  In computing, regular expressions (regex) are used to define patterns for matching text. IDM uses the POSIX-style regular expressions provided with Java Platform SE 6. See http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html for detailed reference.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:restriction base="xs:string"/>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="customCheck">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+         Asserts that the expression specified in the test attribute is true. 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="checkBase">
+        <xs:attribute name="expr" type="expression" use="required">
+          <xs:annotation>
+            <xs:documentation>
+              Generates an error or warning when this expression evaluates to false.        
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="uniquenessCheck">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        Indicates that values in the context indicated by the check expression must be unique.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="checkBase">
+        <xs:attribute name="expr" type="expression" use="required">
+          <xs:annotation>
+            <xs:documentation>
+              Evaluates to a list of nodes (nodeset) whose values must be unique.   
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="name">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        A short name for use in various representations of data and metadata (e.g. XML element names, database table/column names).  The name may only contain lowercase letters ("a"-"z"), numeric digits ("0"-"9") and underscores ("_"), and must start with a lowercase letter.  Uppercase letters, spaces and special symbols are not allowed. 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NCName">
+      <xs:pattern value="[a-z][a-z0-9_]*"/>
+      <xs:minLength value="1"/>
+      <xs:maxLength value="40"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <!--~~~~~~~~~~~~~~~~~~~~~~~-->
+  <!-- Natural Language Text -->
+  <!--~~~~~~~~~~~~~~~~~~~~~~~-->
+
+  <xs:complexType name="unformattedText">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        A single line of human-readable text.  Leading and trailing spaces are ignored.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute ref="xml:lang" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Two-letter ISO 639-2 language code (e.g. "en", "es", "de").
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="formattedText">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        Human-readable text for use in documentation, user interfaces and interactive help.  
+        
+        Whitespace (spaces, returns, tabs, etc.) in the text is maintained.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute ref="xml:lang" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">
+              Two-letter ISO 639-2 language code (e.g. "en", "es", "de"). 
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+	<!--~~~~~~~~~~~~~~~ -->
+	<!-- Reference data -->
+	<!--~~~~~~~~~~~~~~~ -->
+	<xs:complexType name="referenceDataAttribute">
+		<xs:attribute name="name" use="required" type="name" />
+		<xs:attribute name="key" type="xs:boolean" />
+	</xs:complexType>
+	
+</xs:schema>
