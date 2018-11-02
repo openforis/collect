@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import { Button, DropdownItem, DropdownToggle, DropdownMenu,
-    Row, Col, UncontrolledButtonDropdown, UncontrolledTooltip } from 'reactstrap';
+import {
+    Button, DropdownItem, DropdownToggle, DropdownMenu,
+    Row, Col, UncontrolledButtonDropdown, UncontrolledTooltip
+} from 'reactstrap';
 
 import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
 import Dialogs from 'components/Dialogs';
@@ -13,7 +15,7 @@ import ServiceFactory from 'services/ServiceFactory';
 import L from 'utils/Labels';
 import Arrays from 'utils/Arrays';
 import RouterUtils from 'utils/RouterUtils';
-import * as SurveyActions  from 'actions/surveys';
+import { changeUserGroup, publishSurvey, unpublishSurvey, deleteSurvey } from 'actions/surveys';
 
 class SurveysListPage extends Component {
 
@@ -44,18 +46,19 @@ class SurveysListPage extends Component {
     }
 
     handleCellEdit(row, fieldName, value) {
-		if (fieldName === 'userGroupId') {
-			const surveyId = row.id
+        if (fieldName === 'userGroupId') {
+            const { changeUserGroup, loggedUser } = this.props
+            const surveySummary = row
             const newUserGroupId = value.userGroupId
-            const loggedUserId = this.props.loggedUser.id
-            this.props.dispatch(SurveyActions.changeUserGroup(surveyId, newUserGroupId, loggedUserId))
-		}
+            const loggedUserId = loggedUser.id
+            changeUserGroup(surveySummary, newUserGroupId, loggedUserId)
+        }
     }
 
     handleNewButtonClick() {
         RouterUtils.navigateToNewSurveyPage(this.props.history)
     }
-    
+
     handleRowDoubleClick(surveySummary) {
         if (surveySummary.temporary) {
             RouterUtils.navigateToSurveyEditPage(this.props.history, surveySummary.id)
@@ -78,16 +81,17 @@ class SurveysListPage extends Component {
             if (survey.temporary && !survey.publishedId) {
                 this.performSurveyDelete(survey)
             } else {
-                Dialogs.confirm(L.l('survey.delete.published.confirm.title'), 
-                                L.l('survey.delete.published.confirm.message', survey.name), () => {
-                    this.performSurveyDelete(survey)
-                }, null, {confirmButtonLabel: L.l('global.delete')})
+                Dialogs.confirm(L.l('survey.delete.published.confirm.title'),
+                    L.l('survey.delete.published.confirm.message', survey.name), () => {
+                        this.performSurveyDelete(survey)
+                    }, null, { confirmButtonLabel: L.l('global.delete') })
             }
-        }, null, {confirmButtonLabel: L.l('global.delete')})
+        }, null, { confirmButtonLabel: L.l('global.delete') })
     }
 
     performSurveyDelete(survey) {
-        this.props.dispatch(SurveyActions.deleteSurvey(survey))
+        const { deleteSurvey } = this.props
+        deleteSurvey(survey)
         this.resetSelection()
     }
 
@@ -104,32 +108,27 @@ class SurveysListPage extends Component {
     }
 
     handlePublishButtonClick() {
-        const survey = this.state.selectedSurvey
+        const { publishSurvey } = this.props
+        const { selectedSurvey: survey } = this.state
         const $this = this
         const confirmMessage = L.l('survey.publish.confirmMessage', survey.name)
-        Dialogs.confirm(L.l('survey.publish.confirmTitle', survey.name), confirmMessage, function() {
-            ServiceFactory.surveyService.publish(survey.id).then(s => {
-                Dialogs.alert(L.l('survey.publish.successDialog.title'), 
-                    L.l('survey.publish.successDialog.message', survey.name))
-                $this.resetSelection()
-            })
-        }, null, {confirmButtonLabel: L.l('survey.publish')})
+        Dialogs.confirm(L.l('survey.publish.confirmTitle', survey.name), confirmMessage, function () {
+            publishSurvey(survey)
+            $this.resetSelection()
+        }, null, { confirmButtonLabel: L.l('survey.publish') })
     }
 
     handleUnpublishButtonClick() {
-        const survey = this.state.selectedSurvey
+        const { unpublishSurvey } = this.props
+        const { selectedSurvey: survey } = this.state
         const $this = this
         const confirmMessage = L.l('survey.unpublish.confirmMessage', survey.name)
-        Dialogs.confirm(L.l('survey.unpublish.confirmTitle', survey.name), confirmMessage, function() {
-            const surveyId = survey.temporary ? survey.publishedId : survey.id
-            ServiceFactory.surveyService.unpublish(surveyId).then(s => {
-                Dialogs.alert(L.l('survey.unpublish.successDialog.title'), 
-                    L.l('survey.unpublish.successDialog.message', survey.name))
-                $this.resetSelection()
-            })
-        }, null, {confirmButtonLabel: L.l('survey.unpublish')})
+        Dialogs.confirm(L.l('survey.unpublish.confirmTitle', survey.name), confirmMessage, function () {
+            unpublishSurvey(survey)
+            $this.resetSelection()
+        }, null, { confirmButtonLabel: L.l('survey.unpublish') })
     }
-    
+
     handleCloneButtonClick() {
         RouterUtils.navigateToSurveyClonePage(this.props.history, this.state.selectedSurvey.name)
     }
@@ -137,25 +136,25 @@ class SurveysListPage extends Component {
     handleRowClick(row) {
         this.handleRowSelect(row, true)
     }
-    
+
     handleRowSelect(row, isSelected, e) {
         const newSelectedSurveys = isSelected ? [row] : []
-		this.handleSurveysSelection(newSelectedSurveys)
-	}
+        this.handleSurveysSelection(newSelectedSurveys)
+    }
 
-	handleSurveysSelection(newSelectedSurveys) {
-		this.setState({
-			...this.state,
-			selectedSurvey: Arrays.uniqueItemOrNull(newSelectedSurveys),
-			selectedSurveyIds: newSelectedSurveys.map(item => item.id),
-			selectedSurveys: newSelectedSurveys
-		})
+    handleSurveysSelection(newSelectedSurveys) {
+        this.setState({
+            ...this.state,
+            selectedSurvey: Arrays.uniqueItemOrNull(newSelectedSurveys),
+            selectedSurveyIds: newSelectedSurveys.map(item => item.id),
+            selectedSurveys: newSelectedSurveys
+        })
     }
 
     handleFilterChange(filterObj) {
         this.resetSelection()
     }
-    
+
     render() {
         const { surveySummaries, userGroups, loggedUser } = this.props
         if (surveySummaries === null || userGroups === null) {
@@ -166,7 +165,7 @@ class SurveysListPage extends Component {
             const userGroup = userGroups.find(u => u.id === s.userGroupId)
             s.userGroup = userGroup //update userGroup with cached one in UI
         })
-        
+
         const groupedByUriSummaries = Arrays.groupBy(surveySummaries, 'uri')
         const surveyUris = Object.keys(groupedByUriSummaries)
         const combinedSummaries = surveyUris.map(uri => {
@@ -176,7 +175,8 @@ class SurveysListPage extends Component {
             } else {
                 const publishedSurvey = tempAndPublished.filter(s => !s.temporary)[0]
                 const tempSurvey = tempAndPublished.filter(s => s.temporary)[0]
-                const merged = {...tempSurvey, 
+                const merged = {
+                    ...tempSurvey,
                     published: true,
                     publishedId: publishedSurvey.id
                 }
@@ -185,9 +185,9 @@ class SurveysListPage extends Component {
         })
 
         const selectedSurvey = this.state.selectedSurvey
-        
+
         const createUserGroupEditor = (onUpdate, props) => (<UserGroupColumnEditor onUpdate={onUpdate} {...props} />);
-        
+
         function userGroupFormatter(cell, row) {
             const userGroupId = cell
             const survey = row
@@ -197,10 +197,10 @@ class SurveysListPage extends Component {
 
                 if (loggedUser.canChangeSurveyUserGroup(survey)) {
                     return <span>
-                            <i className="fa fa-edit" aria-hidden="true" ></i>
-                            &nbsp;
+                        <i className="fa fa-edit" aria-hidden="true" ></i>
+                        &nbsp;
                             {userGroupLabel}
-                        </span>
+                    </span>
                 } else {
                     return userGroupLabel
                 }
@@ -208,10 +208,10 @@ class SurveysListPage extends Component {
                 return ''
             }
         }
-         
+
         function targetFormatter(cell, row) {
             let logoClass, logoTooltip
-            switch(cell) {
+            switch (cell) {
                 case "COLLECT_EARTH":
                     logoClass = 'collect-earth'
                     logoTooltip = 'Collect Earth'
@@ -223,9 +223,9 @@ class SurveysListPage extends Component {
             }
             let logoElId = 'survey_target_icon_' + row.id
             return <span>
-                    <span className={'logo small ' + logoClass} id={logoElId} />
-                    <UncontrolledTooltip placement="right" target={logoElId}>{logoTooltip}</UncontrolledTooltip>
-                </span>
+                <span className={'logo small ' + logoClass} id={logoElId} />
+                <UncontrolledTooltip placement="right" target={logoElId}>{logoTooltip}</UncontrolledTooltip>
+            </span>
 
         }
 
@@ -238,9 +238,9 @@ class SurveysListPage extends Component {
         return (
             <MaxAvailableSpaceContainer ref="survey-list-container">
                 <Row className="action-bar justify-content-between">
-					<Col sm={3}>
-						<Button color="info" onClick={this.handleNewButtonClick}>{L.l('general.new')}</Button>
-					</Col>
+                    <Col sm={3}>
+                        <Button color="info" onClick={this.handleNewButtonClick}>{L.l('general.new')}</Button>
+                    </Col>
                     {selectedSurvey &&
                         <Col sm={1}>
                             <Button color="success" onClick={this.handleEditButtonClick}>
@@ -266,14 +266,14 @@ class SurveysListPage extends Component {
                                         <DropdownItem color="warning" onClick={this.handlePublishButtonClick}><i className="fa fa-check-circle" aria-hidden="true"></i>{L.l('survey.publish')}</DropdownItem>
                                     }
                                     {selectedSurvey && selectedSurvey.temporary &&
-                                        <DropdownItem divider/>
+                                        <DropdownItem divider />
                                     }
                                     {selectedSurvey && selectedSurvey.published && (!selectedSurvey.temporary || selectedSurvey.publishedId) &&
                                         <DropdownItem color="warning" onClick={this.handleUnpublishButtonClick}><i className="fa fa-ban" aria-hidden="true"></i>{L.l('survey.unpublish')}</DropdownItem>
                                     }
                                     <DropdownItem color="primary" onClick={this.handleCloneButtonClick}><i className="fa fa-clone" aria-hidden="true"></i>{L.l('survey.clone')}</DropdownItem>
-                                    <DropdownItem divider/>
-                                    <DropdownItem color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash"/>{L.l('global.delete')}</DropdownItem>
+                                    <DropdownItem divider />
+                                    <DropdownItem color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash" />{L.l('global.delete')}</DropdownItem>
                                 </DropdownMenu>
                             </UncontrolledButtonDropdown>
                         </Col>
@@ -289,9 +289,9 @@ class SurveysListPage extends Component {
                         onSelect: this.handleRowSelect,
                         selected: this.state.selectedSurveyIds
                     }}
-                    cellEdit={{ 
-                        mode: 'click', 
-                        blurToSave: true, 
+                    cellEdit={{
+                        mode: 'click',
+                        blurToSave: true,
                         nonEditableRows: () => nonEditableRows
                     }}
                     options={{
@@ -302,16 +302,16 @@ class SurveysListPage extends Component {
                     }}
                 >
                     <TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>
-                    <TableHeaderColumn key="name" dataField="name" editable={false} filter={{type: 'TextFilter'}} dataSort width="200">{L.l('survey.name')}</TableHeaderColumn>
-                    <TableHeaderColumn key="projectName" dataField="projectName" editable={false} filter={{type: 'TextFilter'}} dataSort width="250">{L.l('survey.projectName')}</TableHeaderColumn>
+                    <TableHeaderColumn key="name" dataField="name" editable={false} filter={{ type: 'TextFilter' }} dataSort width="200">{L.l('survey.name')}</TableHeaderColumn>
+                    <TableHeaderColumn key="projectName" dataField="projectName" editable={false} filter={{ type: 'TextFilter' }} dataSort width="250">{L.l('survey.projectName')}</TableHeaderColumn>
                     <TableHeaderColumn key="modifiedDate" dataField="modifiedDate" dataFormat={Formatters.dateTimeFormatter}
-				        dataAlign="center" width="90" editable={false} dataSort>{L.l('survey.lastModified')}</TableHeaderColumn>
+                        dataAlign="center" width="90" editable={false} dataSort>{L.l('survey.lastModified')}</TableHeaderColumn>
                     <TableHeaderColumn key="target" dataField="target" dataFormat={targetFormatter}
-				        dataAlign="center" width="60" editable={false} dataSort>{L.l('survey.target')}</TableHeaderColumn>
+                        dataAlign="center" width="60" editable={false} dataSort>{L.l('survey.target')}</TableHeaderColumn>
                     <TableHeaderColumn key="temporary" dataField="temporary" dataFormat={Formatters.checkedIconFormatter}
-				        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.unpublishedChanges')}</TableHeaderColumn>
+                        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.unpublishedChanges')}</TableHeaderColumn>
                     <TableHeaderColumn key="published" dataField="published" dataFormat={publishedIconFormatter}
-				        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.published')}</TableHeaderColumn>
+                        dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.published')}</TableHeaderColumn>
                     <TableHeaderColumn key="userGroupId" dataField="userGroupId" dataFormat={userGroupFormatter}
                         customEditor={{ getElement: createUserGroupEditor, customEditorParameters: { userGroups: userGroups } }}
                         dataAlign="left" width="150" dataSort>{L.l('survey.userGroup')}</TableHeaderColumn>
@@ -321,15 +321,14 @@ class SurveysListPage extends Component {
     }
 }
 
-const mapStateToProps = state => {
-	return {
-		survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
-		users: state.users ? state.users.users : null,
-		userGroups: state.userGroups ? state.userGroups.items : null,
-		loggedUser: state.session ? state.session.loggedUser : null,
-		surveySummaries: state.surveySummaries ? state.surveySummaries.items : null
-	}
-}
+const mapStateToProps = state => ({
+    survey: state.preferredSurvey ? state.preferredSurvey.survey : null,
+    users: state.users ? state.users.users : null,
+    userGroups: state.userGroups ? state.userGroups.items : null,
+    loggedUser: state.session ? state.session.loggedUser : null,
+    surveySummaries: state.surveySummaries ? state.surveySummaries.items : null
+})
 
-export default connect(mapStateToProps)(SurveysListPage)
-    
+export default connect(mapStateToProps, {
+    publishSurvey, unpublishSurvey, deleteSurvey, changeUserGroup
+})(SurveysListPage)

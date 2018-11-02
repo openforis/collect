@@ -1,11 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import static org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator.PLACEMARK_FILE_NAME;
-import static org.openforis.collect.web.websocket.SurveyWebSocket.SurveyMessageType.SURVEY_CREATED;
-import static org.openforis.collect.web.websocket.SurveyWebSocket.SurveyMessageType.SURVEY_DELETED;
-import static org.openforis.collect.web.websocket.SurveyWebSocket.SurveyMessageType.SURVEY_PUBLISHED;
-import static org.openforis.collect.web.websocket.SurveyWebSocket.SurveyMessageType.SURVEY_UNPUBLISHED;
-import static org.openforis.collect.web.websocket.SurveyWebSocket.SurveyMessageType.SURVEY_UPDATED;
+import static org.openforis.collect.web.ws.AppWS.MessageType.SURVEYS_UPDATED;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -59,7 +55,7 @@ import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidat
 import org.openforis.collect.web.validator.SurveyCloneParametersValidator;
 import org.openforis.collect.web.validator.SurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyImportParametersValidator;
-import org.openforis.collect.web.websocket.SurveyWebSocket;
+import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
@@ -108,7 +104,7 @@ public class SurveyController extends BasicController {
 	@Autowired
 	private SurveyService surveyService;
 	@Autowired
-	private SurveyWebSocket surveysWebSocket;
+	private AppWS appWS;
 
 	//validators
 	@Autowired
@@ -199,7 +195,7 @@ public class SurveyController extends BasicController {
 		
 		SurveySummary surveySummary = SurveySummary.createFromSurvey(survey);
 
-		surveysWebSocket.sendMessage(SURVEY_CREATED, surveySummary);
+		appWS.sendMessage(SURVEYS_UPDATED);
 		
 		Response res = new Response();
 		res.setObject(surveySummary);
@@ -235,7 +231,7 @@ public class SurveyController extends BasicController {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		User activeUser = sessionManager.getLoggedUser();
 		surveyManager.publish(survey, activeUser);
-		surveysWebSocket.sendMessage(SURVEY_PUBLISHED, SurveySummary.createFromSurvey(survey));
+		appWS.sendMessage(SURVEYS_UPDATED);
 		return generateView(survey, false);
 	}
 	
@@ -244,10 +240,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id) throws SurveyStoreException {
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
-		if (id != survey.getId()) {
-			surveysWebSocket.sendMessage(SURVEY_DELETED, new SurveySummary(id, null, null));
-		}
-		surveysWebSocket.sendMessage(SURVEY_UPDATED, SurveySummary.createFromSurvey(survey));
+		appWS.sendMessage(SURVEYS_UPDATED);
 		return generateView(survey, false);
 	}
 	
@@ -256,7 +249,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView closeSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.close(survey);
-		surveysWebSocket.sendMessage(SURVEY_UNPUBLISHED, SurveySummary.createFromSurvey(survey));
+		appWS.sendMessage(SURVEYS_UPDATED);
 		return generateView(survey, false);
 	}
 	
@@ -265,15 +258,15 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView archiveSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.archive(survey);
-		surveysWebSocket.sendMessage(SURVEY_UNPUBLISHED, SurveySummary.createFromSurvey(survey));
+		appWS.sendMessage(SURVEYS_UPDATED);
 		return generateView(survey, false);
 	}
 	
 	@RequestMapping(value="delete/{id}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
-		CollectSurvey survey = surveyManager.deleteSurvey(id);
-		surveysWebSocket.sendMessage(SURVEY_DELETED, SurveySummary.createFromSurvey(survey));
+		surveyManager.deleteSurvey(id);
+		appWS.sendMessage(SURVEYS_UPDATED);
 		return new Response();
 	}
 	
@@ -382,8 +375,7 @@ public class SurveyController extends BasicController {
 		job.addStatusChangeListener(new WorkerStatusChangeListener() {
 			public void statusChanged(WorkerStatusChangeEvent event) {
 				if (event.getTo() == Status.COMPLETED) {
-					CollectSurvey survey = job.getSurvey();
-					surveysWebSocket.sendMessage(SURVEY_CREATED, SurveySummary.createFromSurvey(survey));
+					appWS.sendMessage(SURVEYS_UPDATED);
 				}
 			}
 		});
@@ -404,10 +396,12 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value="changeusergroup/{id}", method=POST)
+	@RequestMapping(value="{surveyName}/changeusergroup", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable int id, @RequestParam int userGroupId) throws SurveyStoreException {
-		return surveyManager.updateUserGroup(id, userGroupId);
+	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable String surveyName, @RequestParam int userGroupId) throws SurveyStoreException {
+		SurveySummary surveySummary = surveyManager.updateUserGroup(surveyName, userGroupId);
+		appWS.sendMessage(SURVEYS_UPDATED);
+		return surveySummary;
 	}
 	
 	@RequestMapping(value = "export/{id}", method=POST)

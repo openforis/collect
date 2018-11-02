@@ -51,7 +51,7 @@ function surveySummaries(
       const {surveySummary} = action
       const {items} = state
 
-      const oldSurveyIndex = items.findIndex(s => s.id === surveySummary.id)
+      const oldSurveyIndex = items.findIndex(s => s.uri === surveySummary.uri)
       const newItems = oldSurveyIndex < 0 
         ? [surveySummary].concat(items)
         : Arrays.replaceItemAt(items, oldSurveyIndex, surveySummary)
@@ -65,7 +65,7 @@ function surveySummaries(
         const {surveySummary} = action
         const {items} = state
 
-        const oldItem = items.find(s => s.id === surveySummary.id)
+        const oldItem = items.find(s => s.uri === surveySummary.uri)
         if (oldItem) {
             let newItems = Arrays.removeItem(items, oldItem)
             return Object.assign({}, state, {

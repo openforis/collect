@@ -1,9 +1,13 @@
-import ServiceFactory from 'services/ServiceFactory';
-import Forms from 'components/Forms';
 import { change } from 'redux-form';
-import * as JobActions from 'actions/job';
-import L from 'utils/Labels';
+
+import Forms from 'components/Forms';
 import Dialogs from 'components/Dialogs';
+
+import ServiceFactory from 'services/ServiceFactory';
+
+import L from 'utils/Labels';
+
+import * as JobActions from 'actions/job';
 
 export const REQUEST_SURVEY_SUMMARIES = 'REQUEST_SURVEY_SUMMARIES'
 export const RECEIVE_SURVEY_SUMMARIES = 'RECEIVE_SURVEY_SUMMARIES'
@@ -29,6 +33,9 @@ export const SURVEY_DELETED = 'SURVEY_DELETED'
 
 const SURVEY_IMPORT_FORM_NAME = 'surveyImportForm'
 
+const dispatchSurveyUpdated = (dispatch, surveySummary) =>
+    dispatch({ type: SURVEY_UPDATED, surveySummary })
+
 function requestSurveySummaries() {
     return {
         type: REQUEST_SURVEY_SUMMARIES
@@ -43,15 +50,6 @@ function receiveSurveySummaries(json) {
     }
 }
 
-function surveyUserGroupChanged(surveyId, newUserGroupId) {
-    return {
-        type: SURVEY_USER_GROUP_CHANGED,
-        surveyId: surveyId,
-        newUserGroupId: newUserGroupId,
-        receivedAt: Date.now()
-    }
-}
-
 export function fetchSurveySummaries() {
     return function (dispatch) {
         dispatch(requestSurveySummaries())
@@ -59,9 +57,32 @@ export function fetchSurveySummaries() {
             ServiceFactory.surveyService.fetchAllSummaries().then(json =>
                 dispatch(receiveSurveySummaries(json))
             )
-        } catch(e) {}
+        } catch (e) { }
     }
 }
+
+export const publishSurvey = (survey) =>
+    dispatch => {
+        ServiceFactory.surveyService.publish(survey.id)
+            .then(s => {
+                Dialogs.alert(L.l('survey.publish.successDialog.title'),
+                    L.l('survey.publish.successDialog.message', survey.name))
+                //survey update managed by WebSocket
+                //dispatchSurveyUpdated(dispatch, s)
+            })
+    }
+
+export const unpublishSurvey = survey =>
+    dispatch => {
+        const surveyId = survey.temporary ? survey.publishedId : survey.id
+        ServiceFactory.surveyService.unpublish(surveyId).then(s => {
+            Dialogs.alert(L.l('survey.unpublish.successDialog.title'),
+                L.l('survey.unpublish.successDialog.message', survey.name))
+            //survey update managed by WebSocket
+            //dispatchSurveyUpdated(dispatch, s)
+        })
+
+    }
 
 function requestUserGroupChange() {
     return {
@@ -69,12 +90,14 @@ function requestUserGroupChange() {
     }
 }
 
-export function changeUserGroup(surveyId, newUserGroupId, loggedUserId) {
+export function changeUserGroup(surveySummary, newUserGroupId, loggedUserId) {
     return function (dispatch) {
         dispatch(requestUserGroupChange())
-        ServiceFactory.surveyService.changeUserGroup(surveyId, newUserGroupId, loggedUserId).then(summary =>
-            dispatch(surveyUserGroupChanged(surveyId, newUserGroupId))
-        )
+        ServiceFactory.surveyService.changeUserGroup(surveySummary.name, newUserGroupId, loggedUserId)
+            .then(s => {
+                //survey update managed by WebSocket
+                //dispatchSurveyUpdated(dispatch, s)
+            })
     }
 }
 
@@ -130,7 +153,7 @@ export function resetNewSurveyForm() {
 }
 
 export function uploadSurveyFile(file) {
-    return function(dispatch) {
+    return function (dispatch) {
         dispatch(uploadingSurveyFile(file))
         return ServiceFactory.surveyService.uploadSurveyFile(file).then(res => {
             if (res.statusError) {
@@ -173,7 +196,7 @@ function surveyFileUploaded(surveyBackupInfo, importingIntoExistingSurvey) {
 }
 
 export function startSurveyFileImport(surveyName, userGroupId) {
-    return function(dispatch) {
+    return function (dispatch) {
         dispatch(surveyFileImportStarting(surveyName, userGroupId))
         return ServiceFactory.surveyService.startSurveyFileImport(surveyName, userGroupId).then(res => {
             if (res.statusError) {
@@ -233,7 +256,7 @@ export function resetSurveyFileImport() {
 }
 
 export function deleteSurvey(survey) {
-    return function(dispatch) {
+    return function (dispatch) {
         ServiceFactory.surveyService.delete(survey.id).then(r => {
             Dialogs.alert(L.l('survey.delete.success.title'), L.l('survey.delete.success.message', survey.name))
             dispatch(surveyDeleted(survey))

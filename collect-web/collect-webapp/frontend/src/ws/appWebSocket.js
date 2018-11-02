@@ -3,19 +3,27 @@ import { connect } from 'react-redux'
 import SockJsClient from 'react-stomp'
 
 import Constants from '../Constants'
-import {surveyCreated, surveyUpdated, surveyDeleted} from 'actions/surveys'
-import handleSurveyMessage from './surveyMessageHandler'
+import { fetchSurveySummaries } from 'actions/surveys'
 
 const eventsDestination = '/events'
 
+const messageTypes = {
+    surveysUpdated: 'SURVEYS_UPDATED',
+}
+
 const handleMessage = (props, message) => {
-    handleSurveyMessage(props, message)
+    switch (message.type) {
+        case messageTypes.surveysUpdated:
+            props.fetchSurveySummaries()
+            break
+        default:
+    }
 }
 
 const AppWebSocket = props => {
     return <SockJsClient url={`${Constants.BASE_URL}/ws`}
-                         topics={[eventsDestination]}
-                         onMessage={message => handleMessage(props, message)} />
+        topics={[eventsDestination]}
+        onMessage={message => handleMessage(props, message)} />
 }
 
 function mapStateToProps(state) {
@@ -23,10 +31,8 @@ function mapStateToProps(state) {
 }
 
 export default connect(
-    mapStateToProps, 
+    mapStateToProps,
     {
-        surveyCreated, 
-        surveyUpdated, 
-        surveyDeleted
+        fetchSurveySummaries,
     }
 )(AppWebSocket)

@@ -25,10 +25,10 @@ export default class SurveyService extends AbstractService {
         })
     }
 
-    changeUserGroup(surveyId, userGroupId, loggedUserId) {
-        return this.post('survey/changeusergroup/' + surveyId, {
-            userGroupId: userGroupId,
-            loggedUserId: loggedUserId
+    changeUserGroup(surveyName, userGroupId, loggedUserId) {
+        return this.post(`survey/${surveyName}/changeusergroup`, {
+            userGroupId,
+            loggedUserId
         })
     }
 

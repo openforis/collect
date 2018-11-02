@@ -1,4 +1,4 @@
-package org.openforis.collect.web.websocket;
+package org.openforis.collect.web.ws;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,7 +15,7 @@ public class WebSocketMessageSender {
 		this.simpMessagingTemplate.convertAndSend(DESTINATION, message);
 	}
 	
-	public static abstract class Message {
+	public static class Message {
 		
 		private String type;
 

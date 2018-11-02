@@ -876,9 +876,9 @@ public class SurveyManager {
 		}
 	}
 	
-	public SurveySummary updateUserGroup(int id, int userGroupId) throws SurveyStoreException {
+	public SurveySummary updateUserGroup(String surveyName, int userGroupId) throws SurveyStoreException {
 		UserGroup userGroup = userGroupManager.loadById(userGroupId);
-		SurveySummary surveySummary = loadSummaryById(id);
+		SurveySummary surveySummary = loadSummaryByName(surveyName);
 		Set<Integer> surveyIdsToUpdate = new HashSet<Integer>();
 		surveyIdsToUpdate.add(surveySummary.getId());
 		//consider even updating associated published survey, if any
@@ -888,7 +888,9 @@ public class SurveyManager {
 			s.setUserGroup(userGroup);
 			save(s);
 		}
-		return surveySummary;
+		//reload updated summary
+		SurveySummary reloadedSurveySummary = loadSummaryByName(surveyName);
+		return reloadedSurveySummary;
 	}
 
 	private void copyReferencedMetadata(CollectSurvey fromSurvey,
