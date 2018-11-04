@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.23.4-SNAPSHOT</version>
+	<version>3.23.5-SNAPSHOT</version>
 	<organization>
 		<name>Open Foris</name>
 		<url>www.openforis.org</url>
@@ -509,6 +509,16 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-webmvc</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-messaging</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-websocket</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
 			<dependency>

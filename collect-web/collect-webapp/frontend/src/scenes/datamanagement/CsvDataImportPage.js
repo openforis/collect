@@ -74,7 +74,7 @@ class CsvDataImportPage extends Component {
 
         this.state = {
             importType: importTypes.update,
-            selectedSteps: Object.keys(Workflow.STEPS).map(s => Workflow.STEPS[s].code),
+            selectedSteps: Workflow.STEP_CODES,
             validateRecords: true,
             deleteEntitiesBeforeImport: false,
             newRecordVersionName: null,

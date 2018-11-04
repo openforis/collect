@@ -1,64 +1,32 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
+
 import * as Actions from 'actions'
 import * as SurveysActions from 'actions/surveys'
 import * as SessionActions from 'actions/session'
 import * as UserActions from 'actions/users'
 import * as UserGroupActions from 'actions/usergroups'
+
 import Preloader from 'components/Preloader'
 
-class Startup extends Component {
-    
-    static SURVEY_RELOAD_TIMEOUT = 5000
-
-    surveyReloadTimer
-
-    constructor(props) {
-        super(props)
-
-        this.handleSurveysReloadTimeout = this.handleSurveysReloadTimeout.bind(this)
-    }
+class Startup extends React.Component {
 
     componentDidMount() {
-        this.props.dispatch(Actions.fetchApplicationInfo())
-        this.props.dispatch(SessionActions.fetchCurrentUser())
-        this.props.dispatch(UserActions.fetchUsers())
-        this.props.dispatch(UserGroupActions.fetchUserGroups())
-        this.props.dispatch(SurveysActions.fetchSurveySummaries())
-        
-        this.startReloadinInfoTimer()
-    }
+        const { dispatch } = this.props
 
-    componentWillReceiveProps(nextProps) {
-        const { sessionExpired, loggingOut, loggedOut } = nextProps
-        if (sessionExpired || loggingOut || loggedOut) {
-            this.stopReloadingInfoTimer()
-        }
-    }
-
-    startReloadinInfoTimer() {
-        this.surveyReloadTimer = setTimeout(this.handleSurveysReloadTimeout, Startup.SURVEY_RELOAD_TIMEOUT)        
-    }
-    
-    stopReloadingInfoTimer() {
-        if (this.surveyReloadTimer) {
-            clearTimeout(this.surveyReloadTimer)
-        }
-    }
-
-    handleSurveysReloadTimeout() {
-        this.props.dispatch(SurveysActions.fetchSurveySummaries())
-        this.startReloadinInfoTimer()
+        dispatch(Actions.fetchApplicationInfo())
+        dispatch(SessionActions.fetchCurrentUser())
+        dispatch(UserActions.fetchUsers())
+        dispatch(UserGroupActions.fetchUserGroups())
+        dispatch(SurveysActions.fetchSurveySummaries())
     }
 
     render() {
-        const p = this.props
-        const loading = !p.isLoggedUserReady || p.isFetchingLoggedUser 
-            || !p.isUsersReady || p.isFetchingUsers
-            || !p.isUserGroupsReady || p.isFetchingUserGroups
+        const { loading, children } = this.props
+
         return (
             <Preloader loading={loading}>
-                {this.props.children}
+                {children}
             </Preloader>
         )
     }
@@ -66,12 +34,8 @@ class Startup extends Component {
 
 function mapStateToProps(state) {
     const {
-        loggedUser,
         isFetching: isFetchingLoggedUser,
         initialized: isLoggedUserReady,
-        sessionExpired,
-        loggingOut,
-        loggedOut
     } = state.session || {
         loggedUser: null,
         isLoggedUserReady: false,
@@ -82,7 +46,6 @@ function mapStateToProps(state) {
     }
 
     const {
-        users,
         isFetching: isFetchingUsers,
         initialized: isUsersReady
     } = state.users || {
@@ -91,7 +54,6 @@ function mapStateToProps(state) {
     }
 
     const {
-        userGroups,
         isFetching: isFetchingUserGroups,
         initialized: isUserGroupsReady
     } = state.userGroups || {
@@ -99,19 +61,12 @@ function mapStateToProps(state) {
         isFetchingUserGroups: true
     }
 
+    const loading = !isLoggedUserReady || isFetchingLoggedUser
+        || !isUsersReady || isFetchingUsers
+        || !isUserGroupsReady || isFetchingUserGroups
+
     return {
-        isLoggedUserReady,
-        isFetchingLoggedUser,
-        loggedUser,
-        loggingOut,
-        sessionExpired,
-        loggedOut,
-        isUsersReady,
-        isFetchingUsers,
-        users,
-        isUserGroupsReady,
-        isFetchingUserGroups,
-        userGroups
+        loading
     }
 }
 

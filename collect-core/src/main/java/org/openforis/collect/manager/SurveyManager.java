@@ -876,9 +876,9 @@ public class SurveyManager {
 		}
 	}
 	
-	public SurveySummary updateUserGroup(int id, int userGroupId) throws SurveyStoreException {
+	public SurveySummary updateUserGroup(String surveyName, int userGroupId) throws SurveyStoreException {
 		UserGroup userGroup = userGroupManager.loadById(userGroupId);
-		SurveySummary surveySummary = loadSummaryById(id);
+		SurveySummary surveySummary = loadSummaryByName(surveyName);
 		Set<Integer> surveyIdsToUpdate = new HashSet<Integer>();
 		surveyIdsToUpdate.add(surveySummary.getId());
 		//consider even updating associated published survey, if any
@@ -888,7 +888,9 @@ public class SurveyManager {
 			s.setUserGroup(userGroup);
 			save(s);
 		}
-		return surveySummary;
+		//reload updated summary
+		SurveySummary reloadedSurveySummary = loadSummaryByName(surveyName);
+		return reloadedSurveySummary;
 	}
 
 	private void copyReferencedMetadata(CollectSurvey fromSurvey,
@@ -972,7 +974,6 @@ public class SurveyManager {
 			temporarySurvey = createTemporarySurveyFromPublished(uri, false, false, activeUser);
 		} else {
 			temporarySurvey = loadSurvey(temporarySurveySummary.getId());
-			temporarySurvey.setPublished(false);
 			temporarySurvey.setPublishedId(null);
 			save(temporarySurvey);
 			if (dataCleansingManager != null) {
@@ -983,6 +984,7 @@ public class SurveyManager {
 		//delete published survey
 		deleteSurvey(surveyId);
 		
+		temporarySurvey.setPublished(false);
 		return temporarySurvey;
 	}
 	
@@ -1031,7 +1033,7 @@ public class SurveyManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void deleteSurvey(int id) {
+	public CollectSurvey deleteSurvey(int id) {
 		if ( isRecordValidationInProgress(id) ) {
 			cancelRecordValidation(id);
 		}
@@ -1061,6 +1063,8 @@ public class SurveyManager {
 		if ( ! temporary ) {
 			getPublishedSurveyCache().remove(publishedSurvey);
 		}
+		
+		return survey;
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)

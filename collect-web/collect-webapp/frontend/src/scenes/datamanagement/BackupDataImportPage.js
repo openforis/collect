@@ -2,34 +2,47 @@ import React, { Component } from 'react';
 import { Button, Form, FormGroup, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 
+import Dialogs from 'components/Dialogs';
 import Dropzone from 'components/Dropzone';
+import UploadFileButton from 'components/UploadFileButton';
+
 import BackupDataImportSummaryForm from 'components/datamanagement/BackupDataImportSummaryForm'
+
 import ServiceFactory from 'services/ServiceFactory'
 import Arrays from 'utils/Arrays'
 import RouterUtils from 'utils/RouterUtils'
 import L from 'utils/Labels';
+
 import * as JobActions from 'actions/job';
 import * as UserActions from 'actions/users';
 
-class BackupDataImportPage extends Component {
+const importSteps = {
+    selectParameters: 'selectParameters',
+    showImportSummary: 'showImportSummary'
+}
 
-    static SELECT_PARAMETERS = 'SELECT_PARAMETERS'
-    static SHOW_IMPORT_SUMMARY = 'SHOW_IMPORT_SUMMARY'
+const defaultState = {
+    importStep: importSteps.selectParameters,
+    fileSelected: false,
+    fileToBeImportedPreview: null,
+    fileToBeImported: null,
+    uploadingFile: false,
+    uploadRequest: null,
+    fileUploadProgressPercent: 0,
+    fileUploadLoadedBytes: 0,
+    fileUploadTotalBytes: 0,
+    selectedRecordsToImport: [],
+    selectedRecordsToImportIds: [],
+    selectedConflictingRecords: [],
+    selectedConflictingRecordsIds: []
+}
+
+class BackupDataImportPage extends Component {
 
     constructor(props) {
         super(props)
     
-        this.state = {
-            importStep: BackupDataImportPage.SELECT_PARAMETERS,
-            fileSelected: false,
-            fileToBeImportedPreview: null,
-            fileToBeImported: null,
-            uploadingFile: false,
-            selectedRecordsToImport: [],
-            selectedRecordsToImportIds: [],
-            selectedConflictingRecords: [],
-            selectedConflictingRecordsIds: []
-        }
+        this.state = defaultState
         this.onFileDrop = this.onFileDrop.bind(this)
         this.handleGenerateSummaryButtonClick = this.handleGenerateSummaryButtonClick.bind(this)
         this.handleRecordSummaryGenerationComplete = this.handleRecordSummaryGenerationComplete.bind(this)
@@ -38,29 +51,70 @@ class BackupDataImportPage extends Component {
         this.handleRecordsToImportRowSelect = this.handleRecordsToImportRowSelect.bind(this)
         this.handleAllRecordsToImportSelect = this.handleAllRecordsToImportSelect.bind(this)
         this.handleConflictingRecordsRowSelect = this.handleConflictingRecordsRowSelect.bind(this)
+        this.handleAllConflictingRecordsSelect = this.handleAllConflictingRecordsSelect.bind(this)
+    }
+
+    componentDidUpdate(prevProps) {
+        const {survey} = this.props
+        const {survey: prevSurvey} = prevProps
+        if (survey && prevSurvey && survey.id !== prevSurvey.id) {
+            this.setState(defaultState)
+        }
+    }
+
+    handleFileUploadProgress(event) {
+        const {total, loaded, percent} = event
+        this.setState({
+            fileUploadLoadedBytes: loaded,
+            fileUploadTotalBytes: total,
+            fileUploadProgressPercent: percent
+        })
     }
 
     handleGenerateSummaryButtonClick() {
-        const survey = this.props.survey
-        this.setState({
-            uploadingFile: true
+        const {survey} = this.props
+        const {fileToBeImported} = this.state
+
+        const uploadRequest = ServiceFactory.recordService.generateBackupDataImportSummary(
+            survey, 
+            survey.schema.firstRootEntityDefinition.name,
+            fileToBeImported,
+            () => {
+                Dialogs.alert(L.l('global.error'), L.l('global.uploadingFile.error'))
+                this.resetUploadingState()
+            },
+            (event) => this.handleFileUploadProgress(event)
+        )
+        uploadRequest.then(res => {
+            this.resetUploadingState()
+            const job = res.body
+            this.props.dispatch(JobActions.startJobMonitor({
+                jobId: job.id, 
+                title: L.l('dataManagement.backupDataImport.generatingDataImportSummary'),
+                okButtonLabel: L.l('global.done'),                        
+                handleJobCompleted: this.handleRecordSummaryGenerationComplete
+            }))
         })
-        ServiceFactory.recordService.generateBackupDataImportSummary(
-                survey, 
-                survey.schema.firstRootEntityDefinition.name,
-                this.state.fileToBeImported
-            ).then(job => {
-                this.setState({
-                    uploadingFile: false
-                })
-                this.props.dispatch(JobActions.startJobMonitor({
-                    jobId: job.id, 
-                    title: L.l('dataManagement.backupDataImport.generatingDataImportSummary'),
-                    okButtonLabel: L.l('global.done'),                        
-                    handleJobCompleted: this.handleRecordSummaryGenerationComplete
-                }))
+        this.setState({
+            uploadingFile: true,
+            uploadRequest
         })
     }
+
+    resetUploadingState() {
+        this.setState({
+            uploadingFile: false,
+            uploadRequest: null,
+            fileUploadProgressPercent: 0,
+            fileUploadLoadedBytes: 0,
+            fileUploadTotalBytes: 0,
+        })
+    }
+
+    cancelImportFileUpload() {
+        this.state.uploadRequest.abort()
+        this.resetUploadingState()
+    }    
 
     onFileDrop(file) {
         this.setState({fileSelected: true, fileToBeImported: file, fileToBeImportedPreview: file.name})
@@ -71,7 +125,7 @@ class BackupDataImportPage extends Component {
         ServiceFactory.recordService.loadBackupDataImportSummary(this.props.survey).then(summary => {
             this.props.dispatch(JobActions.closeJobMonitor())
             $this.setState({ 
-                importStep: BackupDataImportPage.SHOW_IMPORT_SUMMARY, 
+                importStep: importSteps.showImportSummary, 
                 dataImportSummary: summary,
                 selectedRecordsToImport: summary.recordsToImport,
                 selectedRecordsToImportIds: summary.recordsToImport.map(item => item.entryId)
@@ -91,14 +145,27 @@ class BackupDataImportPage extends Component {
     }
 
     handleSelectedRecordsToImportChange(newSelectedRecordsToImport) {
-        this.setState({selectedRecordsToImport: newSelectedRecordsToImport, 
-            selectedRecordsToImportIds: newSelectedRecordsToImport.map(item => item.entryId)})
+        this.setState({
+            selectedRecordsToImport: newSelectedRecordsToImport, 
+            selectedRecordsToImportIds: newSelectedRecordsToImport.map(item => item.entryId)
+        })
     }
 
     handleConflictingRecordsRowSelect(row, isSelected, e) {
         let newSelectedConflictingRecords = Arrays.addOrRemoveItem(this.state.selectedConflictingRecords, row, !isSelected)
-        this.setState({selectedConflictingRecords : newSelectedConflictingRecords, 
-            selectedConflictingRecordsIds: newSelectedConflictingRecords.map(item => item.entryId)})
+        this.handleConflictingRecordsToImportChange(newSelectedConflictingRecords)
+    }
+    
+    handleAllConflictingRecordsSelect(isSelected, rows) {
+        const newSelectedConflictingRecords = Arrays.addOrRemoveItems(this.state.selectedConflictingRecords, rows, !isSelected)
+        this.handleConflictingRecordsToImportChange(newSelectedConflictingRecords)		
+    }
+
+    handleConflictingRecordsToImportChange(newSelectedConflictingRecords) {
+        this.setState({
+            selectedConflictingRecords : newSelectedConflictingRecords, 
+            selectedConflictingRecordsIds: newSelectedConflictingRecords.map(item => item.entryId)
+        })
     }
 
     handleImportButtonClick() {
@@ -120,48 +187,65 @@ class BackupDataImportPage extends Component {
     }
 
     render() {
-        const survey = this.props.survey
+        const {survey} = this.props
+        const {
+            importStep, 
+            fileUploadProgressPercent, 
+            fileToBeImportedPreview, 
+            fileSelected,
+            uploadingFile,
+            fileUploadLoadedBytes,
+            fileUploadTotalBytes,
+            dataImportSummary,
+            selectedRecordsToImportIds, 
+            selectedConflictingRecordsIds,
+        } = this.state
         if (survey == null) {
             return <div>Select a survey first</div>
         }
         const acceptedFileTypesDescription = L.l('dataManagement.backupDataImport.acceptedFileTypesDescription')
         
-        switch(this.state.importStep) {
-            case BackupDataImportPage.SELECT_PARAMETERS:
+        switch(importStep) {
+            case importSteps.selectParameters:
                 return (
                     <Form>
                         <FormGroup row>
-                            <Col sm={12}>
+                            <Col md={12}>
                                 <Dropzone 
                                     acceptedFileTypes={'.collect-backup,.collect-data,.zip'}
                                     acceptedFileTypesDescription={acceptedFileTypesDescription}
                                     handleFileDrop={this.onFileDrop}
                                     height="300px"
-                                    fileToBeImportedPreview={this.state.fileToBeImportedPreview} />
+                                    fileToBeImportedPreview={fileToBeImportedPreview} />
                             </Col>
                         </FormGroup>
-                        {this.state.fileSelected && 
+                        {fileSelected &&
                             <FormGroup row>
-                                <Col sm={{offset: 5, size: 2}} colSpan={2}>
-                                    <Button disabled={this.state.uploadingFile} onClick={this.handleGenerateSummaryButtonClick} 
-                                        className="btn btn-success">{L.l('dataManagement.backupDataImport.generateImportSummary')}</Button>
+                                <Col md={{offset: 4, size: 4}} colSpan={4}>
+                                    <UploadFileButton uploading={uploadingFile} 
+                                                      percent={fileUploadProgressPercent}
+                                                      totalBytes={fileUploadTotalBytes}
+                                                      loadedBytes={fileUploadLoadedBytes}
+                                                      label={L.l('dataManagement.backupDataImport.generateImportSummary')}
+                                                      onClick={this.handleGenerateSummaryButtonClick} 
+                                                      onCancel={() => this.cancelImportFileUpload()} />
                                 </Col>
                             </FormGroup>
-                        }
-                        
+                        }  
                     </Form>
                 )
-            case BackupDataImportPage.SHOW_IMPORT_SUMMARY:
+            case importSteps.showImportSummary:
                 return (
                     <FormGroup>
                         <BackupDataImportSummaryForm 
                             survey={survey} 
-                            dataImportSummary={this.state.dataImportSummary}
-                            selectedRecordsToImportIds={this.state.selectedRecordsToImportIds}
+                            dataImportSummary={dataImportSummary}
+                            selectedRecordsToImportIds={selectedRecordsToImportIds}
                             handleAllRecordsToImportSelect={this.handleAllRecordsToImportSelect}
                             handleRecordsToImportRowSelect={this.handleRecordsToImportRowSelect}
+                            selectedConflictingRecordsIds={selectedConflictingRecordsIds}
+                            handleAllConflictingRecordsSelect={this.handleAllConflictingRecordsSelect}
                             handleConflictingRecordsRowSelect={this.handleConflictingRecordsRowSelect}
-                            selectedConflictingRecordsIds={this.state.selectedConflictingRecordsIds}
                             />
                         <Row>
                             <Col sm={{offset: 5, size: 2}} colSpan={2}>
@@ -171,7 +255,7 @@ class BackupDataImportPage extends Component {
                     </FormGroup>
                 )
             default: 
-                throw new Error('Import step not supported: ' + this.state.importStep)
+                throw new Error('Import step not supported: ' + importStep)
         }
     }
 }

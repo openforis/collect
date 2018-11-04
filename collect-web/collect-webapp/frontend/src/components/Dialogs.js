@@ -142,7 +142,7 @@ export default class Dialogs {
             configuration={Object.assign({}, new ConfirmDialogConfiguration(), configuration)} />, targetDiv)
     }
 
-    static alert(title, message, onOk) {
+    static alert(title, message, onOk= null) {
         const targetDiv = Dialogs._createTargetDiv(ALERT_TARGET_DIV_ID)
         render(<AlertDialog title={title} message={message} onOk={onOk} />, targetDiv)
     }

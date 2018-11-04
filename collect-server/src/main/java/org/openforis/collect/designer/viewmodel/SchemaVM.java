@@ -54,7 +54,7 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.web.controller.SurveyController;
+import org.openforis.collect.web.service.SurveyService;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -864,7 +864,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private void updateRootTabLabel(Component view, EntityDefinition rootEntity) {
 		UITab mainTab = survey.getUIOptions().getMainTab(rootTabSet);
-		if (SurveyController.DEFAULT_MAIN_TAB_LABEL.equals(mainTab.getLabel(currentLanguageCode))) {
+		if (SurveyService.DEFAULT_MAIN_TAB_LABEL.equals(mainTab.getLabel(currentLanguageCode))) {
 			String label = rootEntity.getLabel(Type.INSTANCE, currentLanguageCode);
 			if (isNotBlank(label)) {
 				mainTab.setLabel(currentLanguageCode, label);
@@ -885,13 +885,13 @@ public class SchemaVM extends SurveyBaseVM {
 
 	protected EntityDefinition createRootEntityDefinition() {
 		EntityDefinition rootEntity = createEntityDefinition();
-		rootEntity.setName(SurveyController.DEFAULT_ROOT_ENTITY_NAME);
+		rootEntity.setName(SurveyService.DEFAULT_ROOT_ENTITY_NAME);
 		survey.getSchema().addRootEntityDefinition(rootEntity);
 
 		UIOptions uiOptions = survey.getUIOptions();
 		rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
-		mainTab.setLabel(currentLanguageCode, SurveyController.DEFAULT_MAIN_TAB_LABEL);
+		mainTab.setLabel(currentLanguageCode, SurveyService.DEFAULT_MAIN_TAB_LABEL);
 
 		notifyChange("rootEntities");
 

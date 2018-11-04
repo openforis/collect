@@ -123,4 +123,10 @@ export default class Arrays {
         }, {});
     }
 
+    static replaceItemAt(array, index, newItem) {
+        const cloned = Arrays.clone(array)
+        cloned[index] = newItem
+        return cloned
+    }
+
 }

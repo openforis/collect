@@ -31,6 +31,7 @@
         "delete": "Delete",
         "done": "Done",
         "edit": "Edit",
+        "error": "Error",
         "export": {
             "label": "Export"
         },
@@ -51,7 +52,12 @@
             "label": "Save",
             "success": "Saved successfully"
         },
-        "selectOne": "--- Select one ---"
+        "selectOne": "--- Select one ---",
+        "upload": "Upload",
+        "uploadingFile": {
+            "default": "Uploading file",
+            "error": "Error uploading file"
+        }
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
