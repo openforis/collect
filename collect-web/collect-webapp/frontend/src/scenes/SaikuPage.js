@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import * as JobActions from 'actions/job';
 import ServiceFactory from 'services/ServiceFactory'
 import Dates from 'utils/Dates'
-import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
+import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer';
 
 class SaikuPage extends Component {
 
@@ -136,7 +136,7 @@ class SaikuPage extends Component {
 const mapStateToProps = state => {
 	return {
 		applicationInfo: state.applicationInfo ? state.applicationInfo.info : null,
-		survey: state.preferredSurvey ? state.preferredSurvey.survey : null
+		survey: state.activeSurvey ? state.activeSurvey.survey : null
 	}
 }
 

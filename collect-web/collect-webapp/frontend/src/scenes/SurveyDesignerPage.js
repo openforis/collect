@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Constants from 'Constants';
-import MaxAvailableSpaceContainer from 'components/MaxAvailableSpaceContainer';
+import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer';
 
 class SurveyDesignerPage extends Component {
   render() {

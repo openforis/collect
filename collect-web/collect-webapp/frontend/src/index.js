@@ -11,15 +11,15 @@ import 'bootstrap/dist/css/bootstrap.css';
 // Containers
 import App from 'App'
 
-// Views
-import Signin from 'views/Pages/Signin/'
-import Register from 'views/Pages/Register/'
-import Page404 from 'views/Pages/Page404/'
-import Page500 from 'views/Pages/Page500/'
+// Pages
+import Signin from 'scenes/Pages/Signin/'
+import Register from 'scenes/Pages/Register/'
+import Page404 from 'scenes/Pages/Page404/'
+import Page500 from 'scenes/Pages/Page500/'
 
 import rootReducer from 'reducers'
-import Startup from 'containers/Startup'
-import SessionTimeoutVerifier from 'containers/SessionTimeoutVerifier'
+import Startup from 'common/containers/Startup'
+import SessionTimeoutVerifier from 'common/containers/SessionTimeoutVerifier'
 import Labels from 'utils/Labels'
 
 const loggerMiddleware = createLogger({

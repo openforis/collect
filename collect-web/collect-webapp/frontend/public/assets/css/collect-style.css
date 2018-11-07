@@ -339,3 +339,12 @@ span.survey-selector {
     width: 100%;
     margin: 1rem;
 }
+
+/**
+*====  USERS
+**/
+.users-data-table, 
+.user-groups-data-table {
+    height: calc(100vh - 175px);
+}
+
