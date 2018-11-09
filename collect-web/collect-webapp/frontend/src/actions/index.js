@@ -6,12 +6,11 @@ import Arrays from 'utils/Arrays'
 export const REQUEST_APPLICATION_INFO = 'REQUEST_APPLICATION_INFO'
 export const RECEIVE_APPLICATION_INFO = 'RECEIVE_APPLICATION_INFO'
 
-export const SELECT_PREFERRED_SURVEY = 'SELECT_PREFERRED_SURVEY'
-export const REQUEST_FULL_PREFERRED_SURVEY = 'REQUEST_FULL_PREFERRED_SURVEY'
-export const RECEIVE_FULL_PREFERRED_SURVEY = 'RECEIVE_FULL_PREFERRED_SURVEY'
-export const INVALIDATE_PREFERRED_SURVEY = 'INVALIDATE_PREFERRED_SURVEY'
+export const REQUEST_FULL_ACTIVE_SURVEY = 'REQUEST_FULL_ACTIVE_SURVEY'
+export const RECEIVE_FULL_ACTIVE_SURVEY = 'RECEIVE_FULL_ACTIVE_SURVEY'
+export const INVALIDATE_ACTIVE_SURVEY = 'INVALIDATE_ACTIVE_SURVEY'
 
-export const SELECT_PREFERRED_SURVEY_LANGUAGE = 'SELECT_PREFERRED_SURVEY_LANGUAGE'
+export const SELECT_ACTIVE_SURVEY_LANGUAGE = 'SELECT_ACTIVE_SURVEY_LANGUAGE'
 
 export const RECORD_DELETED = 'RECORD_DELETED'
 export const RECORDS_DELETED = 'RECORDS_DELETED'
@@ -35,65 +34,50 @@ export function fetchApplicationInfo() {
 function receiveApplicationInfo(info) {
 	return {
 		type: RECEIVE_APPLICATION_INFO,
-		info: info
+		info
 	}
 }
 
-//PREFERRED SURVEY
-export function selectPreferredSurvey(preferredSurveySummary) {
-	let surveyId = preferredSurveySummary.id;
+//ACTIVE SURVEY
+export function selectActiveSurvey(activeSurveySummary) {
+	let surveyId = activeSurveySummary.id;
 	return function (dispatch) {
-		dispatch(requestFullPreferredSurvey(surveyId))
+		dispatch(requestFullActiveSurvey(surveyId))
 		ServiceFactory.surveyService.fetchById(surveyId).then(json => {
-			dispatch(receiveFullPreferredSurvey(json))
 			const browserLangCode = BrowserUtils.determineBrowserLanguageCode()
 			const language = Arrays.contains(json.languages, browserLangCode) ? browserLangCode : json.languages[0]
-			dispatch(selectPreferredSurveyLanguage(language))
+			dispatch(receiveFullActiveSurvey(json, language))
 		})
 	}
 }
 
-export function receiveFullPreferredSurvey(json) {
+export function receiveFullActiveSurvey(json, language) {
 	return {
-		type: RECEIVE_FULL_PREFERRED_SURVEY,
+		type: RECEIVE_FULL_ACTIVE_SURVEY,
 		survey: new Survey(json),
+		language,
 		receivedAt: Date.now()
 	}
 }
 
-export function requestFullPreferredSurvey(surveyId) {
+export function requestFullActiveSurvey(surveyId) {
 	return {
-		type: REQUEST_FULL_PREFERRED_SURVEY,
+		type: REQUEST_FULL_ACTIVE_SURVEY,
 		surveyId: surveyId,
 		receivedAt: Date.now()
 	}
 }
 
-export function invalidatePreferredSurvey(preferredSurvey) {
+export function invalidateActiveSurvey(activeSurvey) {
 	return {
-		type: INVALIDATE_PREFERRED_SURVEY,
-		preferredSurvey: preferredSurvey
+		type: INVALIDATE_ACTIVE_SURVEY,
+		activeSurvey
 	}
 }
 
-export function selectPreferredSurveyLanguage(language) {
+export function selectActiveSurveyLanguage(language) {
 	return {
-		type: SELECT_PREFERRED_SURVEY_LANGUAGE,
-		language: language
-	}
-}
-
-//RECORDS
-export function recordDeleted(record) {
-	return {
-		type: RECORD_DELETED,
-		record: record
-	}
-}
-
-export function recordsDeleted(records) {
-	return {
-		type: RECORDS_DELETED,
-		records: records
+		type: SELECT_ACTIVE_SURVEY_LANGUAGE,
+		language
 	}
 }

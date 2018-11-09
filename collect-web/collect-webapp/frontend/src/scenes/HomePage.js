@@ -27,7 +27,7 @@ class DataManagementPage extends Component {
 
 const mapStateToProps = state => {
 	return {
-		survey: state.preferredSurvey ? state.preferredSurvey.survey : null
+		survey: state.activeSurvey ? state.activeSurvey.survey : null
 	}
 }
 

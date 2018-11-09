@@ -1,5 +1,8 @@
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.web.service.SurveyService.DEFAULT_MAIN_TAB_LABEL;
+import static org.openforis.collect.web.service.SurveyService.DEFAULT_ROOT_ENTITY_NAME;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +24,6 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyStoreException;
-import org.openforis.collect.web.controller.SurveyController;
 import org.openforis.collect.web.controller.SurveyController.SurveyCreationParameters.TemplateType;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
@@ -150,13 +152,13 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntity = schema.createEntityDefinition();
 		rootEntity.setMultiple(true);
-		rootEntity.setName(SurveyController.DEFAULT_ROOT_ENTITY_NAME);
+		rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
 		schema.addRootEntityDefinition(rootEntity);
 		//create root tab set
 		UIOptions uiOptions = survey.getUIOptions();
 		UITabSet rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
-		mainTab.setLabel(langCode, SurveyController.DEFAULT_MAIN_TAB_LABEL);
+		mainTab.setLabel(langCode, DEFAULT_MAIN_TAB_LABEL);
 		
 		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
 		surveyObjectsGenerator.addPredefinedObjects(survey);
