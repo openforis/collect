@@ -21,7 +21,7 @@ const handleMessage = (props, message) => {
 }
 
 const AppWebSocket = props => {
-    return <SockJsClient url={`${Constants.BASE_URL}/ws`}
+    return <SockJsClient url={`${Constants.BASE_URL}ws`}
         topics={[eventsDestination]}
         onMessage={message => handleMessage(props, message)} />
 }
