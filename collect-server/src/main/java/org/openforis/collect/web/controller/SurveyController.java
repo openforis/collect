@@ -153,13 +153,18 @@ public class SurveyController extends BasicController {
 			userId = sessionManager.getLoggedUser().getId();
 		}
 		Set<Integer> groupIds = getAvailableUserGroupIds(userId, groupId);
-		List<SurveySummary> summaries = new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, groupIds));
+		
+		List<SurveySummary> publishedSummaries =new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, groupIds));
+
+		List<SurveySummary> allSummaries = new ArrayList<SurveySummary>(publishedSummaries);
+		
 		if (includeTemporary) {
-			summaries.addAll(surveyManager.loadTemporarySummaries(languageCode, true, groupIds));
+			List<SurveySummary> tempSummaries = surveyManager.loadTemporarySummaries(languageCode, true, groupIds);
+			allSummaries.addAll(tempSummaries);
 		}
 		
-		List<Object> views = new ArrayList<Object>();
-		for (SurveySummary surveySummary : summaries) {
+		List<Object> views = new ArrayList<Object>(allSummaries.size());
+		for (SurveySummary surveySummary : allSummaries) {
 			if (fullSurveys) {
 				CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveySummary.getId());
 				views.add(generateView(survey, includeCodeListValues));
@@ -194,13 +199,13 @@ public class SurveyController extends BasicController {
 		
 		SurveySummary surveySummary = SurveySummary.createFromSurvey(survey);
 
-		appWS.sendMessage(SURVEYS_UPDATED);
+		sendSurveyUpdatedMessage();
 		
 		Response res = new Response();
 		res.setObject(surveySummary);
 		return res;
 	}
-	
+
 	@RequestMapping(value="cloneintotemporary/{surveyId}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody
@@ -230,7 +235,7 @@ public class SurveyController extends BasicController {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		User activeUser = sessionManager.getLoggedUser();
 		surveyManager.publish(survey, activeUser);
-		appWS.sendMessage(SURVEYS_UPDATED);
+		sendSurveyUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -239,7 +244,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id) throws SurveyStoreException {
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
-		appWS.sendMessage(SURVEYS_UPDATED);
+		sendSurveyUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -248,7 +253,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView closeSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.close(survey);
-		appWS.sendMessage(SURVEYS_UPDATED);
+		sendSurveyUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -257,7 +262,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView archiveSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.archive(survey);
-		appWS.sendMessage(SURVEYS_UPDATED);
+		sendSurveyUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -265,7 +270,7 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
 		surveyManager.deleteSurvey(id);
-		appWS.sendMessage(SURVEYS_UPDATED);
+		sendSurveyUpdatedMessage();
 		return new Response();
 	}
 	
@@ -374,7 +379,7 @@ public class SurveyController extends BasicController {
 		job.addStatusChangeListener(new WorkerStatusChangeListener() {
 			public void statusChanged(WorkerStatusChangeEvent event) {
 				if (event.getTo() == Status.COMPLETED) {
-					appWS.sendMessage(SURVEYS_UPDATED);
+					sendSurveyUpdatedMessage();
 				}
 			}
 		});
@@ -399,7 +404,7 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable String surveyName, @RequestParam int userGroupId) throws SurveyStoreException {
 		SurveySummary surveySummary = surveyManager.updateUserGroup(surveyName, userGroupId);
-		appWS.sendMessage(SURVEYS_UPDATED);
+		sendSurveyUpdatedMessage();
 		return surveySummary;
 	}
 	
@@ -519,6 +524,10 @@ public class SurveyController extends BasicController {
 		} catch (Exception e) {
 			throw new RuntimeException("Error extracting " + PLACEMARK_FILE_NAME + " from cep file", e);
 		}
+	}
+	
+	private void sendSurveyUpdatedMessage() {
+		appWS.sendMessage(SURVEYS_UPDATED, 500); //delay to allow transaction commit
 	}
 	
 	public static class SurveyCreationParameters {

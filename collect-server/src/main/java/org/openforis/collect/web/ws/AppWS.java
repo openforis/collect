@@ -1,5 +1,8 @@
 package org.openforis.collect.web.ws;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.web.ws.WebSocketMessageSender.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +19,15 @@ public class AppWS {
 	}
 	
 	public void sendMessage(MessageType type) {
-		messageSender.send(new Message(type.name()));
+		sendMessage(type, 0);
+	}
+	
+	public void sendMessage(MessageType type, int delay) {
+		new Timer().schedule(new TimerTask() {
+			public void run() {
+				messageSender.send(new Message(type.name()));
+			}
+		}, delay);
 	}
 	
 	public static class SurveyUpdateMessage extends Message {
