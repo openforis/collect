@@ -61,14 +61,25 @@ class CsvDataExportPage extends Component {
             if (! this.validateForm()) {
                 return
             }
-            const survey = this.props.survey
-            const {exportMode, outputFormat, stepGreaterOrEqual, modifiedSince, modifiedUntil, selectedEntityDefinition, exportOnlyOwnedRecords, headingSource} = this.state
+            const {
+                survey,
+                rootEntityDef,
+                keyAttributes,
+                summaryAttributes,
+            } = this.props
+            const {
+                exportMode, 
+                outputFormat, 
+                stepGreaterOrEqual, 
+                modifiedSince, 
+                modifiedUntil, 
+                selectedEntityDefinition, 
+                exportOnlyOwnedRecords, 
+                headingSource
+            } = this.state
+
             const surveyId = survey.id
             
-            const rootEntityDef = survey.schema.firstRootEntityDefinition
-		    const keyAttributes = rootEntityDef.keyAttributeDefinitions
-            const summaryAttributes = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
-
             const keyAttributeValues = keyAttributes.map((a, idx) => this.state['key'+ idx], this)
             const summaryAttributeValues = summaryAttributes.map((a, idx) => this.state['summary'+ idx], this)
 
@@ -81,7 +92,7 @@ class CsvDataExportPage extends Component {
 
             const parameters = {
                 surveyId: survey.id,
-                rootEntityId: survey.schema.firstRootEntityDefinition.id,
+                rootEntityId: rootEntityDef.id,
                 outputFormat,
                 stepGreaterOrEqual,
                 modifiedSince,
@@ -131,12 +142,17 @@ class CsvDataExportPage extends Component {
         }
     
         render() {
-            const { survey, userGroups, loggedUser } = this.props
+            const { 
+                survey, 
+                keyAttributes,
+                summaryAttributes,
+                loggedUser, 
+                roleInSurvey
+             } = this.props
             if (!survey) {
                 return <div>Select survey first</div>
             }
             const {outputFormat, stepGreaterOrEqual, exportMode, exportOnlyOwnedRecords, modifiedSince, modifiedUntil} = this.state
-            const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
 		   
             const additionalOptionsFormGroups = csvExportAdditionalOptions.map(o => {
                 return <FormGroup check key={o}>
@@ -169,13 +185,9 @@ class CsvDataExportPage extends Component {
                 </FormGroup>
             }
 
-            const rootEntityDef = survey.schema.firstRootEntityDefinition
-		    const keyAttributes = rootEntityDef.keyAttributeDefinitions
-            const summaryAttributes = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
-
             const keyAttributeFormGroups = keyAttributes.map((attr, i) => createAttributeFormGroup(this, attr, 'key', i))
 
-            const filteredSummaryAttributes = summaryAttributes.filter(a => loggedUser.canFilterRecordsBySummaryAttribute(a, surveyUserGroup))
+            const filteredSummaryAttributes = summaryAttributes.filter(a => loggedUser.canFilterRecordsBySummaryAttribute(a, roleInSurvey))
 
             const summaryFormGroups = filteredSummaryAttributes.map((attr, i) => createAttributeFormGroup(this, attr, 'summary', i))
 
@@ -320,10 +332,35 @@ class CsvDataExportPage extends Component {
     
     
     const mapStateToProps = state => {
+        const survey = state.activeSurvey ? state.activeSurvey.survey : null
+        const loggedUser = state.session ? state.session.loggedUser : null
+        const userGroups = state.userGroups ? state.userGroups.items : null
+        
+        let rootEntityDef = null,
+            keyAttributes = null,
+            summaryAttributes = null,
+            surveyUserGroup = null,
+            userInGroup = null,
+            roleInSurvey = null
+
+        if (survey) {
+            rootEntityDef = survey.schema.firstRootEntityDefinition
+            keyAttributes = rootEntityDef.keyAttributeDefinitions
+            summaryAttributes = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
+
+            surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
+    
+            userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
+            roleInSurvey = userInGroup.role
+        }
+
         return {
-            survey: state.activeSurvey ? state.activeSurvey.survey : null,
-            userGroups: state.userGroups ? state.userGroups.items : null,
-            loggedUser: state.session ? state.session.loggedUser : null
+            survey,
+            rootEntityDef,
+            keyAttributes,
+            summaryAttributes,
+            roleInSurvey,
+            loggedUser,
         }
     }
     

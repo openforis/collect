@@ -510,8 +510,10 @@ public class RecordController extends BasicController implements Serializable {
 		RecordFilter recordFilter = csvDataExportJob.getParameters().getRecordFilter();
 		CollectSurvey survey = recordFilter.getSurvey();
 		String surveyName = survey.getName();
-		String outputFormat = csvDataExportJob.getParameters().getOutputFormat().name().toLowerCase(Locale.ENGLISH);
-		String fileName = String.format("collect-%s-data-export-%s-%s.zip", outputFormat, surveyName, Dates.formatLocalDateTime(new Date()));
+		CSVDataExportParameters parameters = csvDataExportJob.getParameters();
+		String outputFormat = parameters.getOutputFormat().name().toLowerCase(Locale.ENGLISH);
+		String step = parameters.getRecordFilter().getStepGreaterOrEqual().name();
+		String fileName = String.format("collect-%s-data-export-%s-%s-%s.zip", outputFormat, surveyName, step, Dates.formatLocalDateTime(new Date()));
 		Controllers.writeFileToResponse(response, file, 
 				fileName, 
 				Controllers.ZIP_CONTENT_TYPE);

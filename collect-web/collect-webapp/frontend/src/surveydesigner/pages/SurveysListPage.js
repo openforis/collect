@@ -157,15 +157,10 @@ class SurveysListPage extends Component {
 
     render() {
         const { surveys, userGroups, loggedUser } = this.props
-        if (surveys === null || userGroups === null) {
+
+        if (surveys === null) {
             return <div>Loading...</div>
         }
-        //update user group with cached one
-        surveys.forEach(s => {
-            const userGroup = userGroups.find(u => u.id === s.userGroupId)
-            s.userGroup = userGroup //update userGroup with cached one in UI
-        })
-
         const groupedByUriSummaries = Arrays.groupBy(surveys, 'uri')
         const surveyUris = Object.keys(groupedByUriSummaries)
         const combinedSummaries = surveyUris.map(uri => {
@@ -321,13 +316,25 @@ class SurveysListPage extends Component {
     }
 }
 
-const mapStateToProps = state => ({
-    survey: state.activeSurvey ? state.activeSurvey.survey : null,
-    users: state.users ? state.users.users : null,
-    userGroups: state.userGroups ? state.userGroups.items : null,
-    loggedUser: state.session ? state.session.loggedUser : null,
-    surveys: state.surveyDesigner.surveysList ? state.surveyDesigner.surveysList.items : null
-})
+const mapStateToProps = state => {
+    const surveys = state.surveyDesigner.surveysList ? state.surveyDesigner.surveysList.items : null
+    const userGroups = state.userGroups ? state.userGroups.items : null
+
+    //update user group with cached one
+    if (surveys && userGroups) {
+        surveys.forEach(s => {
+            const userGroup = userGroups.find(u => u.id === s.userGroupId)
+            s.userGroup = userGroup
+        })
+    }
+    
+    return {
+        survey: state.activeSurvey ? state.activeSurvey.survey : null,
+        userGroups,
+        loggedUser: state.session ? state.session.loggedUser : null,
+        surveys,
+    }
+}
 
 export default connect(mapStateToProps, {
     publishSurvey, unpublishSurvey, deleteSurvey, changeUserGroup

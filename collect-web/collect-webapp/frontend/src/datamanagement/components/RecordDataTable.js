@@ -151,28 +151,25 @@ class RecordDataTable extends Component {
 
 	render() {
 		const {
-			survey, 
-			userGroups, 
+			surveyId, 
 			loggedUser, 
 			availableOwners, 
 			page, 
 			records, 
 			totalSize, 
 			recordsPerPage,
+			keyAttributes,
 			keyValues,
-			summaryValues
+			attributeDefsShownInSummaryList,
+			summaryValues,
+			userCanChangeRecordOwner,
+			roleInSurvey
 		} = this.props
-		if (survey === null) {
+
+		if (surveyId === null) {
 			return <div>Please select a survey first</div>
 		}
-
-		const rootEntityDef = survey.schema.firstRootEntityDefinition
-		const keyAttributes = rootEntityDef.keyAttributeDefinitions
-		const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
-		const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
-		const userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
-		const mostSpecificGroup = userInGroup === null ? null : userGroups.find(ug => ug.id === userInGroup.groupId)
-
+		
 		const createOwnerEditor = (onUpdate, props) => (<OwnerColumnEditor onUpdate={onUpdate} {...props} />);
 
 		function rootEntityKeyFormatter(cell, row) {
@@ -189,7 +186,7 @@ class RecordDataTable extends Component {
             const owner = cell
 
             if (owner) {
-                if (loggedUser.canChangeRecordOwner(mostSpecificGroup)) {
+                if (userCanChangeRecordOwner) {
                     return <span>
                             <i className="fa fa-edit" aria-hidden="true" ></i>
                             &nbsp;
@@ -225,9 +222,9 @@ class RecordDataTable extends Component {
 				>{keyAttr.label}</TableHeaderColumn>)
 		columns = columns.concat(keyAttributeColumns)
 
-		const attributeDefsShownInSummaryListColumns = attributeDefsShownInSummaryList.map((attr, i) => {
+		const summaryAttributeColumns = attributeDefsShownInSummaryList.map((attr, i) => {
 			const prefix = 'summary_'
-			const canFilterOrSort = loggedUser.canFilterRecordsBySummaryAttribute(attr, surveyUserGroup)
+			const canFilterOrSort = loggedUser.canFilterRecordsBySummaryAttribute(attr, roleInSurvey)
 			return <TableHeaderColumn key={prefix+i} 
 				dataSort={canFilterOrSort} 
 				dataField={prefix+i} 
@@ -237,7 +234,7 @@ class RecordDataTable extends Component {
 				editable={false}
 				>{attr.label}</TableHeaderColumn>
 		})
-		columns = columns.concat(attributeDefsShownInSummaryListColumns)
+		columns = columns.concat(summaryAttributeColumns)
 
 		/*
 		function createStepFilter(filterHandler, customFilterParameters) {
@@ -278,7 +275,7 @@ class RecordDataTable extends Component {
 			<TableHeaderColumn key="step" dataField="step" 
 				dataAlign="center" width="80" editable={false} dataSort>{L.l('dataManagement.step')}</TableHeaderColumn>,
 			<TableHeaderColumn key="owner" dataField="owner" dataFormat={ownerFormatter}
-				editable={loggedUser.canChangeRecordOwner(mostSpecificGroup)}
+				editable={userCanChangeRecordOwner}
 				filter={ { type: 'CustomFilter', getElement: createOwnerFilter } }
 				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
 				dataAlign="left" width="150" dataSort>Owner</TableHeaderColumn>
@@ -320,6 +317,26 @@ class RecordDataTable extends Component {
 const mapStateToProps = state => {
 	const dataManagementState = getDataManagementState(state)
 	const recordDataTableState = getRecordDataTableState(dataManagementState)
+
+	const survey = state.activeSurvey ? state.activeSurvey.survey : null
+	const userGroups = state.userGroups ? state.userGroups.items : null
+	const users = state.users ? state.users.users : null
+	const loggedUser = state.session ? state.session.loggedUser : null
+
+	const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
+		
+	const userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
+	const mostSpecificGroup = userInGroup === null ? null : userGroups.find(ug => ug.id === userInGroup.groupId)
+
+	const roleInSurvey = userInGroup.role
+        
+	const userCanChangeRecordOwner = loggedUser.canChangeRecordOwner(mostSpecificGroup)
+
+
+	const rootEntityDef = survey.schema.firstRootEntityDefinition
+	const keyAttributes = rootEntityDef.keyAttributeDefinitions
+	const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
+	
 	const {
 		page, 
 		records, 
@@ -329,18 +346,23 @@ const mapStateToProps = state => {
 		summaryValues,
 		availableOwners,
 	} = recordDataTableState
+
 	return {
-		survey: state.activeSurvey ? state.activeSurvey.survey : null,
-		users: state.users ? state.users.users : null,
-		userGroups: state.userGroups ? state.userGroups.items : null,
-		loggedUser: state.session ? state.session.loggedUser : null,
+		surveyId : survey ? survey.id : null,
+		users,
+		userGroups,
+		loggedUser,
 		page, 
 		records, 
 		totalSize, 
 		recordsPerPage,
+		keyAttributes,
 		keyValues,
+		attributeDefsShownInSummaryList,
 		summaryValues,
 		availableOwners,
+		userCanChangeRecordOwner,
+		roleInSurvey,
 	}
 }
 

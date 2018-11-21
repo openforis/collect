@@ -181,12 +181,10 @@ export default class User extends Serializable {
         return this.role === 'ADMIN'
     }
 
-    canFilterRecordsBySummaryAttribute(attr, surveyUserGroup) {
-        const userInGroup = this.findUserInGroupOrDescendants(surveyUserGroup)
-		const roleInGroup = userInGroup.role
+    canFilterRecordsBySummaryAttribute(attr, roleInSurvey) {
         const rootEntityDef = attr.rootEntity
         const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
-        return ! isQualifier || roleInGroup === 'ADMINISTRATOR' || roleInGroup === 'OWNER'
+        return ! isQualifier || roleInSurvey === 'ADMINISTRATOR' || roleInSurvey === 'OWNER'
 
     }
 }
