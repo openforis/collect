@@ -72,6 +72,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 	public void start() throws Exception {
 		if (portAvailable()) {
 			server = new Server(port);
+			server.setStopAtShutdown(true);
 			
 			registerWebapps();
 			
