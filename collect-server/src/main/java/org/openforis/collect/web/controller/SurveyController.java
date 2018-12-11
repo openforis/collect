@@ -199,7 +199,7 @@ public class SurveyController extends BasicController {
 		
 		SurveySummary surveySummary = SurveySummary.createFromSurvey(survey);
 
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		
 		Response res = new Response();
 		res.setObject(surveySummary);
@@ -235,7 +235,7 @@ public class SurveyController extends BasicController {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		User activeUser = sessionManager.getLoggedUser();
 		surveyManager.publish(survey, activeUser);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -244,7 +244,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id) throws SurveyStoreException {
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -253,7 +253,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView closeSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.close(survey);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -262,7 +262,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView archiveSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.archive(survey);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -270,7 +270,7 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
 		surveyManager.deleteSurvey(id);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return new Response();
 	}
 	
@@ -379,7 +379,7 @@ public class SurveyController extends BasicController {
 		job.addStatusChangeListener(new WorkerStatusChangeListener() {
 			public void statusChanged(WorkerStatusChangeEvent event) {
 				if (event.getTo() == Status.COMPLETED) {
-					sendSurveyUpdatedMessage();
+					sendSurveysUpdatedMessage();
 				}
 			}
 		});
@@ -404,7 +404,7 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable String surveyName, @RequestParam int userGroupId) throws SurveyStoreException {
 		SurveySummary surveySummary = surveyManager.updateUserGroup(surveyName, userGroupId);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return surveySummary;
 	}
 	
@@ -526,7 +526,7 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	private void sendSurveyUpdatedMessage() {
+	private void sendSurveysUpdatedMessage() {
 		appWS.sendMessage(SURVEYS_UPDATED, 500); //delay to allow transaction commit
 	}
 	

@@ -240,6 +240,7 @@ public class SurveyDao extends JooqDaoSupport {
 		storeQuery.addValue(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()));
 		storeQuery.addValue(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()));
 		storeQuery.addValue(OFC_SURVEY.USERGROUP_ID, survey.getUserGroupId());
+		storeQuery.addValue(OFC_SURVEY.TITLE, survey.getProjectName());
 	}
 
 	private void addNewSurveyValues(StoreQuery<OfcSurveyRecord> storeQuery,
@@ -292,6 +293,7 @@ public class SurveyDao extends JooqDaoSupport {
 		s.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
 		s.setUserGroupId(row.getValue(OFC_SURVEY.USERGROUP_ID));
 		s.setAvailability(s.isTemporary() ? UNPUBLISHED: PUBLISHED);
+		s.setProjectName(row.getValue(OFC_SURVEY.TITLE));
 		return s;
 	}
 	
