@@ -118,4 +118,12 @@ public class DatabaseLookupProvider implements LookupProvider {
 		}
 		return null;
 	}
+	
+	public void setDynamicTableDao(DynamicTableDao dynamicTableDao) {
+		this.dynamicTableDao = dynamicTableDao;
+	}
+	
+	public void setSamplingDesignDao(SamplingDesignDao samplingDesignDao) {
+		this.samplingDesignDao = samplingDesignDao;
+	}
 }

@@ -725,6 +725,7 @@ public class SurveyManager {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		List<SurveySummary> filteredSummaries = filterSummariesUserGroups(summaries, groupIds);
 		fillSummariesReferencedItems(filteredSummaries);
+		/*
 		if ( includeDetails ) {
 			for (SurveySummary summary : filteredSummaries) {
 				CollectSurvey survey = surveyDao.loadById(summary.getId());
@@ -739,6 +740,7 @@ public class SurveyManager {
 				summary.setLanguages(survey.getLanguages());
 			}
 		}
+		*/
 		return filteredSummaries;
 	}
 	

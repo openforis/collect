@@ -41,6 +41,8 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.MediaTypes;
+import org.openforis.collect.web.ws.AppWS;
+import org.openforis.collect.web.ws.AppWS.MessageType;
 import org.openforis.concurrency.Job;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -93,6 +95,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private SurveyValidator surveyValidator;
 	@WireVariable
 	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	@WireVariable
+	private AppWS appWS;
 	
 	private boolean changed;
 	private Window jobStatusPopUp;
@@ -326,6 +330,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		changed = false;
 		notifyChange("surveyStored","surveyId","surveyPublished","surveyChanged");
 		dispatchSurveySavedCommand();
+		appWS.sendMessage(MessageType.SURVEYS_UPDATED);
 	}
 	
 	private void dispatchSurveySavedCommand() {
