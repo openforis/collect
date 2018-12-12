@@ -49,14 +49,17 @@
 	<filter>
 		<filter-name>corsFilter</filter-name>
 		<filter-class>org.openforis.collect.web.filter.CollectCorsFilter</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 	<filter>
 		<filter-name>localizationFilter</filter-name>
 		<filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 	<filter>
 		<filter-name>characterEncodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
@@ -65,12 +68,14 @@
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<async-supported>true</async-supported>
 	</filter>
 	<!-- swf cache filter (adds max-age=0 in response header to prevent wrong 
 		caching of swf files) -->
 	<filter>
 		<filter-name>swfCache</filter-name>
 		<filter-class>com.samaxes.filter.CacheFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>private</param-name>
 			<param-value>true</param-value>
@@ -107,6 +112,7 @@
 	<servlet>
 		<servlet-name>dispatcher</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<async-supported>true</async-supported>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	

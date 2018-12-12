@@ -724,7 +724,6 @@ public class SurveyManager {
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, Set<Integer> groupIds) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		List<SurveySummary> filteredSummaries = filterSummariesUserGroups(summaries, groupIds);
-		fillSummariesReferencedItems(filteredSummaries);
 		/*
 		if ( includeDetails ) {
 			for (SurveySummary summary : filteredSummaries) {
@@ -1147,19 +1146,6 @@ public class SurveyManager {
 		}
 	}
 
-	private void fillSummariesReferencedItems(Collection<SurveySummary> summaries) {
-		for (SurveySummary s : summaries) {
-			fillReferencedItems(s);
-		}
-	}
-	
-	private void fillReferencedItems(SurveySummary summary) {
-		if (userGroupManager != null) {
-			UserGroup userGroup = loadUserGroup(summary.getUserGroupId());
-			summary.setUserGroup(userGroup);
-		}
-	}
-	
 	public byte[] loadSurveyFileContent(SurveyFile surveyFile) {
 		return surveyFileDao.loadContent(surveyFile);
 	}
