@@ -351,7 +351,7 @@ class CsvDataExportPage extends Component {
             surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
     
             userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
-            roleInSurvey = userInGroup.role
+            roleInSurvey = userInGroup ? userInGroup.role : null
         }
 
         return {
