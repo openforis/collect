@@ -42,10 +42,9 @@ class RecordDataTable extends Component {
 	}
 
 	componentDidUpdate (prevProps) {
-		const {survey} = this.props
-		const {survey: prevSurvey} = prevProps
-		if (prevSurvey && 
-			(!survey || survey.id !== prevSurvey.id)) {
+		const {surveyId} = this.props
+		const {surveyId: prevSurveyId} = prevProps
+		if (surveyId && (!prevSurveyId || surveyId !== prevSurveyId)) {
 			this.props.reloadRecordSummaries()
 		}
 	}
@@ -328,7 +327,7 @@ const mapStateToProps = state => {
 	const userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
 	const mostSpecificGroup = userInGroup === null ? null : userGroups.find(ug => ug.id === userInGroup.groupId)
 
-	const roleInSurvey = userInGroup.role
+	const roleInSurvey = userInGroup ? userInGroup.role : null
         
 	const userCanChangeRecordOwner = loggedUser.canChangeRecordOwner(mostSpecificGroup)
 

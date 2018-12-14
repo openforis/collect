@@ -184,7 +184,7 @@ export default class User extends Serializable {
     canFilterRecordsBySummaryAttribute(attr, roleInSurvey) {
         const rootEntityDef = attr.rootEntity
         const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
-        return ! isQualifier || roleInSurvey === 'ADMINISTRATOR' || roleInSurvey === 'OWNER'
+        return ! isQualifier || this.role === 'ADMIN' || roleInSurvey === 'ADMINISTRATOR' || roleInSurvey === 'OWNER'
 
     }
 }
