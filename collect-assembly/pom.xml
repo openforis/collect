@@ -11,7 +11,7 @@
 	<description>Collect web application packaged together with Apache Tomcat and related dependencies</description>
 
 	<properties>
-		<tomcat.version>7.0.37</tomcat.version>
+		<tomcat.version>9.0.14</tomcat.version>
 		<output.directory>collect-server</output.directory>
 		<output.finalName>collect-server-${project.version}</output.finalName>
 	</properties>
@@ -19,7 +19,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
-			<artifactId>collect-webapp-tomcat</artifactId>
+			<artifactId>collect-webapp</artifactId>
 			<version>3.23.8-SNAPSHOT</version>
 			<type>war</type>
 		</dependency>
@@ -36,7 +36,6 @@
 	    <dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.7.2</version>
 		</dependency>	
 	    <dependency>
 	      <groupId>org.postgresql</groupId>
