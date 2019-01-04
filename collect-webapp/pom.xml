@@ -2,10 +2,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>collect-web</artifactId>
+		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
 		<version>3.23.8-SNAPSHOT</version>
-		<relativePath>..</relativePath>
 	</parent>
 
 	<artifactId>collect-webapp</artifactId>
@@ -181,15 +180,25 @@
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-server</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openforis.collect</groupId>
+			<artifactId>collect-client</artifactId>
+			<version>${project.version}</version>
+			<type>swf</type>
+			<scope>runtime</scope>
 		</dependency>
 		<!-- JSTL -->
 		<dependency>
 			<groupId>javax.servlet.jsp.jstl</groupId>
 			<artifactId>jstl-api</artifactId>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>taglibs</groupId>
 			<artifactId>standard</artifactId>
+			<version>1.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -204,11 +213,13 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>
 			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -220,6 +231,7 @@
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
+			<version>2.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

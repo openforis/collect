@@ -39,7 +39,7 @@
 										<!-- Collect WebApp -->
 										<artifactItem>
 											<groupId>org.openforis.collect</groupId>
-											<artifactId>collect-webapp-jetty</artifactId>
+											<artifactId>collect-webapp</artifactId>
 											<version>${project.version}</version>
 											<type>war</type>
 											<overWrite>false</overWrite>
