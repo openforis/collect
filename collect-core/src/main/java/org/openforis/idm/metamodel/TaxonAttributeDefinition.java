@@ -12,6 +12,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.Value;
+import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
 /**
@@ -84,7 +85,13 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	@Override
 	@SuppressWarnings("unchecked")
 	public TaxonOccurrence createValue(String string) {
-		return new TaxonOccurrence(string, null);
+		SpeciesListService speciesListService = getSurvey().getContext().getSpeciesListService();
+		if (speciesListService == null) {
+			return new TaxonOccurrence(string);
+		} else {
+			Taxon taxon = speciesListService.loadTaxonByCode(getSurvey(), getTaxonomy(), string);
+			return taxon == null ? new TaxonOccurrence(string) : new TaxonOccurrence(taxon);
+		}
 	}
 	
 	@Override

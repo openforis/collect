@@ -40,7 +40,11 @@ public final class TaxonOccurrence extends AbstractValue {
 	}
 	
 	public TaxonOccurrence() {
-		this((String) null, (String) null);
+		this((String) null);
+	}
+
+	public TaxonOccurrence(String code) {
+		this(code, (String) null);
 	}
 
 	public TaxonOccurrence(String code, String scientificName) {
