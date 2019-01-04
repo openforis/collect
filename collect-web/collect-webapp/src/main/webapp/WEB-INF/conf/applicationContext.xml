@@ -26,8 +26,10 @@
 	<mvc:annotation-driven />
 	
 	<mvc:resources mapping="favicon.ico" location="favicon.ico" />
+	<mvc:resources mapping="login.html" location="login.html" />
 	<mvc:resources mapping="index.html" location="index.html" />
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
+	<mvc:resources mapping="old_client.html" location="old_client.html" />
 	<mvc:resources mapping="/assets/**" location="/assets/" />
 	<mvc:resources mapping="/datacleansing/**" location="/datacleansing/" />
 	<mvc:resources mapping="/datamanager/**" location="/datamanager/" />
@@ -46,15 +48,6 @@
 	<util:map id="urlMappings">
 		<!-- <entry key="**/messagebroker/**" value-ref="_messageBroker" /> -->
 		<entry key="/api/**" value-ref="fileNameViewController" />
-		<entry key="/old_client.htm" value-ref="fileNameViewController" />
-		<entry key="/index.htm" value-ref="fileNameViewController" />
-		<entry key="/error.htm" value-ref="fileNameViewController" />
-		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
-		<entry key="/designer.htm" value-ref="fileNameViewController" />
-		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
-		<entry key="/editSurvey.htm" value-ref="fileNameViewController" />
-		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
-		<entry key="/logout.htm" value-ref="fileNameViewController" />
 		<entry key="/logoUpload" value-ref="fileNameViewController" />
 		<entry key="/speciesImport" value-ref="fileNameViewController" />
 		<entry key="/species/export/*" value-ref="fileNameViewController" />
@@ -64,12 +57,6 @@
 		
 		<entry key="/*.json" value-ref="fileNameViewController" />
 	</util:map>
-
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
-		<property name="prefix" value="/WEB-INF/view/jsp/" />
-		<property name="suffix" value=".jsp" />
-	</bean>
 
 	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
 		<property name="urlMap" ref="urlMappings" />

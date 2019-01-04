@@ -145,3 +145,9 @@ div.error {
 div.warn {
 	color: blue;
 }
+
+#logged-out-message, 
+#session-expired-message,
+#login-unsuccessfull-message {
+	display: none;
+}

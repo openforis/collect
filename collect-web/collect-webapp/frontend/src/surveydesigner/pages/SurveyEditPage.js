@@ -8,7 +8,7 @@ class SurveEditPage extends Component {
 		const surveyId = path.substring(path.lastIndexOf('/') + 1)
 	  return (
 	    <MaxAvailableSpaceContainer>
-	      <iframe src={Constants.BASE_URL + 'editSurvey.htm?id=' + surveyId} 
+	      <iframe src={Constants.BASE_URL + 'surveydesigner/survey_edit.zul?id=' + surveyId} 
 						title="Open Foris Collect - Survey Designer"
 						width="100%" height="100%" />
 	    </MaxAvailableSpaceContainer>

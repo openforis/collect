@@ -134,7 +134,7 @@
 
 	<error-page>
 		<error-code>403</error-code>
-		<location>/error.htm</location>
+		<location>/error.html</location>
 	</error-page>
 
 </web-app>

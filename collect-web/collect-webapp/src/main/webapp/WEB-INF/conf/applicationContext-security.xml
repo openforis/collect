@@ -36,9 +36,8 @@
 		<intercept-url access="permitAll" pattern="/images/**" />
 		<intercept-url access="permitAll" pattern="/locales/**" />
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
-		<intercept-url access="permitAll" pattern="/keepSessionAlive.htm" />
-		<intercept-url access="permitAll" pattern="/login" />
-		<intercept-url access="permitAll" pattern="/logout.htm" />
+		<intercept-url access="permitAll" pattern="/login.html" />
+		<intercept-url access="permitAll" pattern="/ws" />
 		<intercept-url access="permitAll" pattern="/zkau" />
 <!-- 		security disabled for these urls because of an issue with flash player -->
 <!-- 		for netscape compatible browser and uplaod to a secured url -->
@@ -65,12 +64,13 @@
 
 		<intercept-url access="hasRole('ROLE_USER')" pattern="/**" />
 
-		<form-login login-page="/login" 
+		<form-login login-page="/login.html" 
+			login-processing-url="/perform_login"
 			default-target-url="/"
-			authentication-failure-url="/login?login_error=1" />
+			authentication-failure-url="/login.html?login_error=true" />
 		
 		<logout logout-url="/j_spring_security_logout" 
-			logout-success-url="/login?logout=true" />
+			logout-success-url="/login.html?logout=true" />
 	</http>
 	
 	<!-- See 15.3.2 Built-In Expression @http://static.springsource.org/spring-security/site/docs/3.0.x/reference/el-access.html#el-permission-evaluator -->

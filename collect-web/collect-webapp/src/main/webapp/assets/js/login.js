@@ -1,9 +1,26 @@
 $(window, document, undefined).ready(function() {
-
 	const DEFAULT_PASSWORD_ACTIVE_ENDPOINT = "api/defaultpasswordactive"
 	const DEFAULT_USERNAME = 'admin';
 	const DEFAULT_PASSWORD = 'admin';
 	
+	const urlParams = new URLSearchParams(window.location.search);
+	
+	const LOGGED_OUT = urlParams.get("logout");
+	const ERROR = urlParams.get("login_error");
+	const SESSION_EXPIRED = urlParams.get("session_expired");
+	
+	if (LOGGED_OUT) {
+		$("#logged-out-message").show();
+	}
+	
+	if (ERROR) {
+		$("#login-unsuccessfull-message").show();
+	}
+	
+	if (SESSION_EXPIRED) {
+		$("#session-expired-message").show();
+	}
+
 	if (LOGGED_OUT || ERROR) {
 		initializeForm();
 	} else {

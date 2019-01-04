@@ -13,11 +13,10 @@ public class Resources {
 	public enum Page {
 	
 		INDEX("/"),
-		LOGOUT("logout.htm"),
 		DESIGNER("designer.htm"),
-		SURVEY_EDIT("editSurvey.htm"),
+		SURVEY_EDIT("/surveydesigner/survey_edit.zul"),
 		COLLECT_SWF("collect.swf"),
-		PREVIEW_PATH("old_client.htm");
+		PREVIEW_PATH("old_client.html");
 		
 		private String location;
 	

@@ -36,7 +36,8 @@ class OldClientRecordEditPage extends Component {
         if (loading) {
             return <div>Loading...</div>
         }
-        const url = Constants.BASE_URL + 'old_client.htm?edit=true'
+        const url = Constants.BASE_URL + 'old_client.html?'
+            + 'edit=true'
             + '&surveyId=' + surveyId 
             + '&recordId=' + recordId
             + '&locale=' + surveyLanguage
