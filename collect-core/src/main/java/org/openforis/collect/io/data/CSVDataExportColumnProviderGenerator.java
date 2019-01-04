@@ -8,6 +8,7 @@ import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.ColumnProvider;
 import org.openforis.collect.io.data.csv.ColumnProviderChain;
 import org.openforis.collect.io.data.csv.ColumnProviders;
+import org.openforis.collect.io.data.csv.CreatedByUserColumnProvider;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.NodePositionColumnProvider;
 import org.openforis.collect.io.data.csv.PivotExpressionColumnProvider;
@@ -54,11 +55,16 @@ public class CSVDataExportColumnProviderGenerator {
 		if ( isPositionColumnRequired(entityDefn) ) {
 			columnProviders.add(createPositionColumnProvider(entityDefn));
 		}
+		
 		columnProviders.add(entityColumnProvider);
+
+		//created by user column
+		if (configuration.isIncludeCreatedByUserColumn()) {
+			columnProviders.add(new CreatedByUserColumnProvider());
+		}
 		
 		//create data transformation
-		ColumnProviderChain provider = new ColumnProviderChain(configuration, columnProviders);
-		return provider;
+		return new ColumnProviderChain(configuration, columnProviders);
 	}
 	
 	protected AutomaticColumnProvider createEntityColumnProvider(EntityDefinition entityDefn) {

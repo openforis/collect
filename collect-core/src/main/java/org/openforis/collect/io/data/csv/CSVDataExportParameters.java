@@ -29,6 +29,7 @@ public class CSVDataExportParameters {
 	private boolean includeCompositeAttributeMergedColumn = false;
 	private boolean includeCodeItemLabelColumn = false;
 	private boolean includeGroupingLabels = true;
+	private boolean includeCreatedByUserColumn = false;
 	private boolean codeAttributeExpanded = false;
 	private int maxMultipleAttributeValues = 10;
 	private int maxExpandedCodeAttributeItems = 30;
@@ -183,6 +184,14 @@ public class CSVDataExportParameters {
 	
 	public void setIncludeGroupingLabels(boolean includeGroupingLabels) {
 		this.includeGroupingLabels = includeGroupingLabels;
+	}
+	
+	public boolean isIncludeCreatedByUserColumn() {
+		return includeCreatedByUserColumn;
+	}
+	
+	public void setIncludeCreatedByUserColumn(boolean includeCreatedByUserColumn) {
+		this.includeCreatedByUserColumn = includeCreatedByUserColumn;
 	}
 	
 	public OutputFormat getOutputFormat() {
