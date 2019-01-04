@@ -160,7 +160,8 @@
                 "includeAllAncestorAttributes": "Include all ancestor attributes*",
                 "includeCompositeAttributeMergedColumn": "Include composite attributes merged column (e.g. date, time, coordinate)*",
                 "codeAttributeExpanded": "Expand code attributes (add boolean columns for each code value)*",
-                "includeCodeItemLabelColumn": "Include code item label column*"
+                "includeCodeItemLabelColumn": "Include code item label column*",
+                "includeCreatedByUserColumn": "Include 'created by user' column*"
             },
             "exportDialog": {
                 "title": "Exporting data",

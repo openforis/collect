@@ -20,7 +20,8 @@ const csvExportAdditionalOptions = [
     'includeAllAncestorAttributes',
     'includeCompositeAttributeMergedColumn',
     'codeAttributeExpanded',
-    'includeCodeItemLabelColumn'
+    'includeCodeItemLabelColumn',
+    'includeCreatedByUserColumn'
 ]
 
 const exportModes = {
@@ -67,6 +68,7 @@ class CsvDataExportPage extends Component {
                 keyAttributes,
                 summaryAttributes,
             } = this.props
+
             const {
                 exportMode, 
                 outputFormat, 
@@ -149,6 +151,7 @@ class CsvDataExportPage extends Component {
                 loggedUser, 
                 roleInSurvey
              } = this.props
+             
             if (!survey) {
                 return <div>Select survey first</div>
             }
@@ -158,9 +161,9 @@ class CsvDataExportPage extends Component {
                 return <FormGroup check key={o}>
                     <Label check>
                         <Input type="checkbox" onChange={event => {
-                            const newProp = {}
-                            newProp[o] = event.target.checked
-                            this.setState(newProp)
+                            this.setState({
+                                [o]: event.target.checked
+                            })
                          }} />{' '}
                         {L.l('dataManagement.export.additionalOptions.' + o)}
                     </Label>
