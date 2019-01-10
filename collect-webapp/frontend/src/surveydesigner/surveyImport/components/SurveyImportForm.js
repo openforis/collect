@@ -42,6 +42,7 @@ class SurveyImportForm extends Component {
         const { userGroups, error, handleSubmit, submitting,
             uploadingSurveyFile, surveyFileToBeImportedPreview, surveyFileUploaded, importingIntoExistingSurvey,
             surveyFileUploadError, surveyFileUploadErrorMessage } = this.props
+        
         const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
         
         return (

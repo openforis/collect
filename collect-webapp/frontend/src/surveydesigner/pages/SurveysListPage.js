@@ -48,10 +48,7 @@ class SurveysListPage extends Component {
     handleCellEdit(row, fieldName, value) {
         if (fieldName === 'userGroupId') {
             const { changeUserGroup, loggedUser } = this.props
-            const surveySummary = row
-            const newUserGroupId = value.userGroupId
-            const loggedUserId = loggedUser.id
-            changeUserGroup(surveySummary, newUserGroupId, loggedUserId)
+            changeUserGroup(row, value.userGroupId, loggedUser.id)
         }
     }
 
@@ -190,7 +187,7 @@ class SurveysListPage extends Component {
             if (userGroupId) {
                 const userGroupLabel = survey.userGroup.label
 
-                if (loggedUser.canChangeSurveyUserGroup(survey)) {
+                if (loggedUser.canChangeSurveyUserGroup(survey.userInGroupRole)) {
                     return <span>
                         <i className="fa fa-edit" aria-hidden="true" ></i>
                         &nbsp;
@@ -228,7 +225,7 @@ class SurveysListPage extends Component {
             return <CheckedIconFormatter checked={row.published && (!row.temporary || row.publishedId)} />
         }
 
-        const nonEditableRows = combinedSummaries.filter(s => loggedUser.canChangeSurveyUserGroup(s))
+        const nonEditableRows = combinedSummaries.filter(s => loggedUser.canChangeSurveyUserGroup(s.userInGroupRole))
 
         return (
             <MaxAvailableSpaceContainer ref="survey-list-container">
@@ -323,8 +320,7 @@ const mapStateToProps = state => {
     //update user group with cached one
     if (surveys && userGroups) {
         surveys.forEach(s => {
-            const userGroup = userGroups.find(u => u.id === s.userGroupId)
-            s.userGroup = userGroup
+            s.userGroup = userGroups.find(u => u.id === s.userGroupId)
         })
     }
     

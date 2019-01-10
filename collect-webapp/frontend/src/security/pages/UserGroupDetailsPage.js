@@ -5,6 +5,7 @@ import { Alert, Button, Container, Row, Col,
     Form, FormGroup, Label, Input, FormFeedback, UncontrolledTooltip } from 'reactstrap';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 
+import User from '../../model/User';
 import * as UserGroupActions from 'actions/usergroups' 
 import AbstractItemDetailsPage from 'common/components/AbstractItemDetailsPage'
 import UserGroupService from 'services/UserGroupService';
@@ -64,8 +65,8 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                         username: loggedUser.username, 
                         userEnabled: loggedUser.enabled, 
                         userRole: loggedUser.role,
-                        role: 'OWNER',
-                        joinStatus: 'ACCEPTED'
+                        role: User.ROLE_IN_GROUP.OWNER,
+                        joinStatus: User.USER_GROUP_JOIN_STATUS.ACCEPTED
                     }]
                 }
             } else {
@@ -100,7 +101,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                     selectedAvailableUsersIds: [],
                     selectedUsersInGroup: [],
                     selectedUsersInGroupIds: [],
-                    newUserRoleCode: "OPERATOR"
+                    newUserRoleCode: User.ROLE_IN_GROUP.OPERATOR
                 })
             }
         }
@@ -161,7 +162,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                 userRole: user.role,
                 userEnabled: user.enabled, 
                 role: role,
-                joinStatus: 'ACCEPTED'
+                joinStatus: User.USER_GROUP_JOIN_STATUS.ACCEPTED
             }
         })
         const newAvailableUsers = this.state.availableUsers.filter(u => selectedUsers.indexOf(u) < 0)
@@ -220,23 +221,23 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
             return <div>Loading...</div>;
         }
         const loggedUserRole = this.props.loggedUser.role
-        const roles = ['OWNER', 'ADMINISTRATOR', 'SUPERVISOR', 'OPERATOR', 'VIEWER']
+        const roles = Object.keys(User.ROLE_IN_GROUP)
         const availableRoles = roles.filter(r => {
             switch(loggedUserRole) {
-                case 'ADMIN':
+                case User.ROLE.ADMIN:
                     return true
-                case 'DESIGN':
-                case 'ANALYSIS':
-                case 'CLEANSING':
-                    return r !== 'OWNER'
-                case 'ENTRY':
-                case 'ENTRY_LIMITED':
-                    return r === 'OPERATOR' || r === 'VIEWER'
+                case User.ROLE.DESIGN:
+                case User.ROLE.ANALYSIS:
+                case User.ROLE.CLEANSING:
+                    return r !== User.ROLE_IN_GROUP.OWNER
+                case User.ROLE.ENTRY:
+                case User.ROLE.ENTRY_LIMITED:
+                    return r === User.ROLE_IN_GROUP.OPERATOR || r === User.ROLE_IN_GROUP.VIEWER
                 default:
                     return false
             }
         })
-        const joinStatuses = ['ACCEPTED', 'PENDING', 'REJECTED']
+        const joinStata = Object.keys(User.USER_GROUP_JOIN_STATUS)
 
         const createRoleEditor = (onUpdate, props) => (<UserRoleDropdownEditor onUpdate={ onUpdate } {...props}/>);
         
@@ -436,7 +437,7 @@ class UserGroupDetailsPage extends AbstractItemDetailsPage {
                                     <TableHeaderColumn dataField="username" editable={false}>Username</TableHeaderColumn>
                                     <TableHeaderColumn dataField="role" width="140"
                                         customEditor={ { getElement: createRoleEditor, customEditorParameters: {roles: roles} } }>Role</TableHeaderColumn>
-                                    <TableHeaderColumn dataField="joinStatus" editable={ { type: 'select', options: { values: joinStatuses } } }
+                                    <TableHeaderColumn dataField="joinStatus" editable={ { type: 'select', options: { values: joinStata } } }
                                         width="120">Status</TableHeaderColumn>
                                 </BootstrapTable>
                                 {this.state.errorFeedback['users'] &&

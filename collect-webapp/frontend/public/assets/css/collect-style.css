@@ -171,6 +171,7 @@ fieldset legend {
 
 span.checked,
 span.circle-red,
+span.circle-orange,
 span.circle-green, 
 span.equal-sign {
   display: block;
@@ -220,6 +221,10 @@ span.circle-red {
   background-image: url('../img/generic/red_circle_32x32.png');
 }
 
+span.circle-orange {
+    background-image: url('../img/generic/orange_circle_32x32.png');
+  }
+  
 span.circle-green {
   background-image: url('../img/generic/green_circle_32x32.png');
 }

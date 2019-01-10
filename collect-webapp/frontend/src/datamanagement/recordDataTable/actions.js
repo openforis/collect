@@ -17,7 +17,7 @@ const dispatchRecordDataTableStateUpdate = (dispatch, filter) =>
     dispatch({ type: RECORD_DATA_TABLE_STATE_UPDATE, ...filter })
 
 export const sortRecordSummaries = (sortFields) => dispatch => {
-    dispatchRecordDataTableStateUpdate(dispatch, { sortFields })
+    dispatchRecordDataTableStateUpdate(dispatch, { sortFields, records: [] })
     dispatch(fetchRecordSummaries())
 }
 

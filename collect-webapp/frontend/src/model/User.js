@@ -1,9 +1,33 @@
 import Serializable from './Serializable'
 import Arrays from 'utils/Arrays'
+import Workflow from './Workflow';
 
 export default class User extends Serializable {
 
-    static ROLES = ['VIEW', 'ENTRY_LIMITED', 'ENTRY', 'CLEANSING', 'ANALYSIS', 'DESIGN', 'ADMIN']
+    static ROLE = {
+        VIEW: 'VIEW',
+        ENTRY_LIMITED: 'ENTRY_LIMITED',
+        ENTRY: 'ENTRY',
+        CLEANSING: 'CLEANSING',
+        ANALYSIS: 'ANALYSIS',
+        DESIGN: 'DESIGN',
+        ADMIN: 'ADMIN'
+    }
+
+    static ROLE_IN_GROUP = {
+        OWNER: 'OWNER', 
+        ADMINISTRATOR: 'ADMINISTRATOR',
+        SUPERVISOR: 'SUPERVISOR',
+        OPERATOR: 'OPERATOR',
+        VIEWER: 'VIEWER',
+        DATA_ANALYZER: 'DATA_ANALYZER'
+    }
+
+    static USER_GROUP_JOIN_STATUS = {
+        ACCEPTED: 'ACCEPTED',
+        PENDING: 'PENDING',
+        REJECTED: 'REJECTED'
+    }
 
     enabled
     id
@@ -15,28 +39,22 @@ export default class User extends Serializable {
         this.fillFromJSON(jsonData)
     }
 
-    determineRoleInGroup(group) {
-        const userInGroup = this.findUserInGroupOrDescendants(group)
-        return userInGroup == null ? null : userInGroup.role
-    }
-
-    canCreateRecords(group) {
+    canCreateRecords(roleInSurveyGroup) {
         const mainRole = this.role
         switch(mainRole) {
-            case 'VIEW':
-            case 'ENTRY_LIMITED':
+            case User.ROLE.VIEW:
+            case User.ROLE.ENTRY_LIMITED:
                 return false
             default:
-                const roleInGroup = this.determineRoleInGroup(group)
-                if (roleInGroup === null) {
+                if (roleInSurveyGroup === null) {
                     return false
                 }
-                switch(roleInGroup) {
-                    case 'OWNER':
-                    case 'ADMINISTRATOR':
-                    case 'SUPERVISOR':
-                    case 'DATA_ANALYZER':
-                    case 'OPERATOR':
+                switch(roleInSurveyGroup) {
+                    case User.ROLE_IN_GROUP.OWNER:
+                    case User.ROLE_IN_GROUP.ADMINISTRATOR:
+                    case User.ROLE_IN_GROUP.SUPERVISOR:
+                    case User.ROLE_IN_GROUP.DATA_ANALYZER:
+                    case User.ROLE_IN_GROUP.OPERATOR:
                         return true
                     default:
                         return false
@@ -44,66 +62,64 @@ export default class User extends Serializable {
         }
     }
 
-    canEditRecords(group) {
-        return this.canCreateRecords(group)
+    canEditRecords(roleInSurveyGroup) {
+        return this.canCreateRecords(roleInSurveyGroup)
     }
 
-    canDeleteRecords(group, records) {
-        const canDeleteRecordsInGeneral = this.canCreateRecords(group)
+    canDeleteRecords(roleInSurveyGroup, records) {
+        const canDeleteRecordsInGeneral = this.canCreateRecords(roleInSurveyGroup)
         if (! canDeleteRecordsInGeneral) {
             return false
         }
         switch (this.role) {
-            case 'ENTRY':
-                return ! Arrays.contains(records, r => r.step !== 'ENTRY' || r.ownerId !== this.id)
+            case User.ROLE.ENTRY:
+                return ! Arrays.contains(records, r => r.step !== Workflow.STEPS.entry.code || r.ownerId !== this.id)
             default:
                 return true
         }
     }
 
-    canImportRecords(group) {
-        const role = this.determineRoleInGroup(group)
-        if (role === null) {
+    canImportRecords(roleInSurveyGroup) {
+        if (roleInSurveyGroup === null) {
             return false
         }
-        switch(role) {
-            case 'OWNER':
-            case 'ADMINISTRATOR':
-            case 'SUPERVISOR':
-            case 'DATA_ANALYZER':
+        switch(roleInSurveyGroup) {
+            case User.ROLE_IN_GROUP.OWNER:
+            case User.ROLE_IN_GROUP.ADMINISTRATOR:
+            case User.ROLE_IN_GROUP.SUPERVISOR:
+            case User.ROLE_IN_GROUP.DATA_ANALYZER:
                 return true
             default:
                 return false
         }
     }
 
-    canPromoteRecordsInBulk(group) {
-        return this.canChangeRecordOwner(group)
+    canPromoteRecordsInBulk(roleInSurveyGroup) {
+        return this.canChangeRecordOwner(roleInSurveyGroup)
     }
 
-    canDemoteRecordsInBulk(group) {
-        return this.canPromoteRecordsInBulk(group)
+    canDemoteRecordsInBulk(roleInSurveyGroup) {
+        return this.canPromoteRecordsInBulk(roleInSurveyGroup)
     }
 
-    canChangeRecordOwner(group) {
+    canChangeRecordOwner(roleInSurveyGroup) {
         const mainRole = this.role
         switch(mainRole) {
             case 'ADMIN':
                 return true
-            case 'VIEW':
-            case 'ENTRY':
-            case 'ENTRY_LIMITED':
+            case User.ROLE.VIEW:
+            case User.ROLE.ENTRY:
+            case User.ROLE.ENTRY_LIMITED:
                 return false
             default:
-                const role = this.determineRoleInGroup(group)
-                if (role === null) {
+                if (roleInSurveyGroup === null) {
                     return false
                 }
-                switch(role) {
-                    case 'OWNER':
-                    case 'ADMINISTRATOR':
-                    case 'SUPERVISOR':
-                    case 'DATA_ANALYZER':
+                switch(roleInSurveyGroup) {
+                    case User.ROLE_IN_GROUP.OWNER:
+                    case User.ROLE_IN_GROUP.ADMINISTRATOR:
+                    case User.ROLE_IN_GROUP.SUPERVISOR:
+                    case User.ROLE_IN_GROUP.DATA_ANALYZER:
                         return true
                     default:
                         return false
@@ -111,43 +127,27 @@ export default class User extends Serializable {
         }
     }
     
-    findUserInGroupOrDescendants(group) {
-        const stack = []
-        stack.push(group)
-        while(stack.length > 0) {
-            let currentGroup = stack.pop()
-            let userInGroup = currentGroup.users.find(uig => uig.userId === this.id)
-            if (userInGroup) {
-                return userInGroup
-            } else {
-                currentGroup.children.forEach(g => stack.push(g))
-            }
-        }
-        return null
-    }
-
     get canAccessSurveyDesigner() {
         switch(this.role) {
-        	case 'ADMIN':
-            case 'DESIGN':
+        	case User.ROLE.ADMIN:
+            case User.ROLE.DESIGN:
                 return true
             default:
                 return false
         }
     }
 
-    canChangeSurveyUserGroup(survey) {
+    canChangeSurveyUserGroup(roleInSurveyGroup) {
         switch(this.role) {
-            case 'ADMIN':
+            case User.ROLE.ADMIN:
                 return true
-            case 'DESIGN':
-                const role = this.determineRoleInGroup(survey.userGroup)
-                if (role === null) {
+            case User.ROLE.DESIGN:
+                if (roleInSurveyGroup === null) {
                     return false
                 }
-                switch(role) {
-                    case 'OWNER':
-                    case 'ADMINISTRATOR':
+                switch(roleInSurveyGroup) {
+                    case User.ROLE_IN_GROUP.OWNER:
+                    case User.ROLE_IN_GROUP.ADMINISTRATOR:
                         return true
                     default:
                         return false
@@ -158,7 +158,7 @@ export default class User extends Serializable {
     }
 
     get canAccessUsersManagement() {
-        return this.role === 'ADMIN'
+        return this.role === User.ROLE.ADMIN
     }
 
     get canAccessSaiku() {
@@ -167,10 +167,10 @@ export default class User extends Serializable {
 
     get canAccessDataCleansing() {
         switch(this.role) {
-            case 'CLEANSING':
-            case 'ANALYSIS':
-            case 'DESIGN':
-            case 'ADMIN':
+            case User.ROLE.CLEANSING:
+            case User.ROLE.ANALYSIS:
+            case User.ROLE.DESIGN:
+            case User.ROLE.ADMIN:
                 return true
             default:
                 return false
@@ -178,13 +178,20 @@ export default class User extends Serializable {
     }
 
     get canAccessBackupRestore() {
-        return this.role === 'ADMIN'
+        return this.role === User.ROLE.ADMIN
     }
 
     canFilterRecordsBySummaryAttribute(attr, roleInSurvey) {
         const rootEntityDef = attr.rootEntity
         const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
-        return ! isQualifier || this.role === 'ADMIN' || roleInSurvey === 'ADMINISTRATOR' || roleInSurvey === 'OWNER'
+        return ! isQualifier 
+        || this.role === User.ROLE.ADMIN 
+        || roleInSurvey === User.ROLE_IN_GROUP.ADMINISTRATOR 
+        || roleInSurvey === User.ROLE_IN_GROUP.OWNER
 
+    }
+
+    canUnlockRecords() {
+        return this.role === User.ROLE.ADMIN
     }
 }

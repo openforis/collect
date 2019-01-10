@@ -11,22 +11,33 @@ class OldClientRecordEditPage extends Component {
         super(props)
 
         this.state = {
-            loading: true
+            loading: true,
+            surveyId: null,
+            recordId: null
         }
     }
 
     componentDidMount() {
-        let idParam = this.props.match.params.id;
-        let recordId = parseInt(idParam, 10);
+        const recordId = this.getRecordIdFromParams()
 
         ServiceFactory.recordService.fetchSurveyId(recordId).then(res => {
-            let surveyId = parseInt(res, 10)
+            const surveyId = parseInt(res, 10)
             this.setState({
                 loading: false,
                 surveyId: surveyId,
                 recordId: recordId
             })
         })
+    }
+
+    componentWillUnmount () {
+        const {surveyId, recordId} = this.state
+        ServiceFactory.recordService.releaseLock(surveyId, recordId)
+    }
+
+    getRecordIdFromParams () {
+        const idParam = this.props.match.params.id;
+        return parseInt(idParam, 10);
     }
 
     render() {
@@ -53,7 +64,7 @@ class OldClientRecordEditPage extends Component {
 
 const mapStateToProps = state => {
 	return {
-		surveyLanguage: state.activeSurvey ? state.activeSurvey.language : null
+        surveyLanguage: state.activeSurvey ? state.activeSurvey.language : null
 	}
 }
 

@@ -18,6 +18,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.collect.web.ws.AppWS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +40,8 @@ public class SessionManager {
 	private transient UserManager userManager;
 	@Autowired
 	private transient RecordManager recordManager;
+	@Autowired
+	private transient AppWS appWS;
 	
 	public void createSessionState(HttpSession session) {
 		String sessionId = session.getId();
@@ -203,6 +206,7 @@ public class SessionManager {
 		CollectRecord activeRecord = sessionState.getActiveRecord();
 		if ( activeRecord != null && activeRecord.getId() != null ) {
 			recordManager.releaseLock(activeRecord.getId());
+			appWS.sendMessage(new AppWS.RecordUnlockedMessage(activeRecord.getId()));
 		}
 		sessionState.setActiveRecord(null);
 	}

@@ -27,7 +27,6 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
@@ -89,12 +88,12 @@ public class DataRestoreTask extends Task {
 	@Override
 	protected void validateInput() throws Throwable {
 		super.validateInput();
-		UserGroup surveyGroup = targetSurvey.getUserGroup();
 		String surveyName = targetSurvey.getName();
-		if (surveyGroup == null) {
+		Integer userGroupId = targetSurvey.getUserGroupId();
+		if (userGroupId == null) {
 			throw new IllegalStateException(String.format("No user group for survey %s found", surveyName));
 		}
-		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyGroup, user);
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(userGroupId, user.getId());
 		if (userInGroup == null || !DATA_RESTORE_ALLOWED_USER_GROUP_ROLES.contains(userInGroup.getRole())) {
 			throw new IllegalStateException(String.format("User %s is not allowed to restore data for survey %s", 
 					user.getUsername(), surveyName));

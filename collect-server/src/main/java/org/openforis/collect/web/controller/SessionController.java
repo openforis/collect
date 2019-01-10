@@ -10,10 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.web.controller.UserController.UserForm;
 import org.openforis.collect.web.session.SessionState;
@@ -40,6 +43,8 @@ public class SessionController extends BasicController {
 	private RecordSessionManager sessionManager;
 	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
+	private UserGroupManager userGroupManager;
 	
 	@RequestMapping(value = "ping", method = GET)
 	public @ResponseBody Response ping(@RequestParam(value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
@@ -63,12 +68,16 @@ public class SessionController extends BasicController {
 			HttpResponses.setNoContentStatus(response);
 			return null;
 		} else {
-			Locale locale = sessionManager.getSessionState().getLocale();
+			SessionState sessionState = sessionManager.getSessionState();
+			Locale locale = sessionState.getLocale();
 			if (locale == null) {
 				locale = Locale.ENGLISH;
 			}
 			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale.getLanguage());
-			SurveyView view = viewGenerator.generateView(survey);
+			
+			UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), sessionState.getUser().getId());
+			UserGroup userGroup = userInSurveyGroup == null ? null : userGroupManager.loadById(userInSurveyGroup.getGroupId());
+			SurveyView view = viewGenerator.generateView(survey, userGroup, userInSurveyGroup == null ? null : userInSurveyGroup.getRole());
 			return view;
 		}
 	}

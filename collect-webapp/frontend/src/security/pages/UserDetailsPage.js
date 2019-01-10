@@ -119,7 +119,7 @@ class UserDetailsPage extends AbstractItemDetailsPage {
                             onBlur={e => this.validateForm()}
                             state={this.getFieldState('role')}
                             value={this.state.role}>
-                            {User.ROLES.map(role => <option key={role} value={role}>{role}</option>)}
+                            {Object.keys(User.ROLE).map(role => <option key={role} value={role}>{role}</option>)}
                         </Input>
                     </SimpleFormItem>
                     <SimpleFormItem fieldId='rawPassword' 

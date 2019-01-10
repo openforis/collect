@@ -244,10 +244,14 @@ public class RecordController extends BasicController implements Serializable {
 	RecordProxy loadRecord(
 			@PathVariable("surveyId") int surveyId, 
 			@PathVariable("recordId") int recordId,
-			@RequestParam(value="step", required=false) Integer stepNumber) throws RecordPersistenceException {
+			@RequestParam(value="step", required=false) Integer stepNumber,
+			@RequestParam(value="lock", required=false, defaultValue="false") boolean lock) throws RecordPersistenceException {
 		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		CollectRecord record = recordManager.load(survey, recordId, Step.valueOf(stepNumber));
+		Step step = Step.valueOf(stepNumber);
+		CollectRecord record = lock 
+				? recordManager.checkout(survey, sessionManager.getLoggedUser(), recordId, step, sessionManager.getSessionState().getSessionId(), true)
+				: recordManager.load(survey, recordId, step);
 		return toProxy(record);
 	}
 
@@ -657,7 +661,7 @@ public class RecordController extends BasicController implements Serializable {
 		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
 		User loggedUser = sessionManager.getLoggedUser();
 		RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
-		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroup(), loggedUser);
+		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), loggedUser.getId());
 		boolean canDeleteRecords = userInSurveyGroup != null && recordAccessControlManager.canDeleteRecords(loggedUser, userInSurveyGroup.getRole(), recordSummaries);
 		return canDeleteRecords;
 	}
@@ -856,7 +860,7 @@ public class RecordController extends BasicController implements Serializable {
 			recordFilter.setOwnerId(user.getId());
 		}
 		if (user.getRole() != UserRole.ADMIN) {
-			Map<String, String> qualifiers = userGroupManager.getQualifiers(survey.getUserGroup(), user);
+			Map<String, String> qualifiers = userGroupManager.getQualifiers(survey.getUserGroupId(), user.getId());
 			if (! qualifiers.isEmpty()) {
 				recordFilter.setQualifiersByName(qualifiers);
 			}

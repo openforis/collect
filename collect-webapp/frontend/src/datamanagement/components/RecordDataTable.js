@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table'
+import { UncontrolledTooltip } from 'reactstrap'
 
 import * as Formatters from 'common/components/datatable/formatters'
 import OwnerColumnEditor from './OwnerColumnEditor'
@@ -197,7 +198,22 @@ class RecordDataTable extends Component {
             } else {
                 return ''
             }
-        }
+		}
+		
+		const lockedByFormatter = (cell, row) => {
+			if (!cell) {
+				return ''
+			}
+			const iconClass = cell === loggedUser.username || loggedUser.canUnlockRecords()
+				? "circle-orange"
+				: "circle-red"
+
+			const iconId = `record-table-${row.id}-locked-by-icon`
+			return <span>
+				<span className={iconClass} id={iconId}></span>
+				<UncontrolledTooltip placement="top" target={iconId}>{L.l('dataManagement.recordLockedBy', cell)}</UncontrolledTooltip>
+			</span>
+		}
 
 		function createAttributeFilter(attrDef, defaultValue) {
 			switch(attrDef.attributeType) {
@@ -277,7 +293,11 @@ class RecordDataTable extends Component {
 				editable={userCanChangeRecordOwner}
 				filter={ { type: 'CustomFilter', getElement: createOwnerFilter } }
 				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
-				dataAlign="left" width="150" dataSort>Owner</TableHeaderColumn>
+				dataAlign="left" width="150" dataSort>Owner</TableHeaderColumn>,
+			<TableHeaderColumn key="lockedBy" dataField="lockedBy" dataFormat={lockedByFormatter}
+				dataAlign="center" width="30" dataSort headerTitle="Lock">
+				<i className="fa fa-lock" aria-hidden="true"/>
+			</TableHeaderColumn>
 		);
 
 		return (
@@ -318,19 +338,12 @@ const mapStateToProps = state => {
 	const recordDataTableState = getRecordDataTableState(dataManagementState)
 
 	const survey = state.activeSurvey ? state.activeSurvey.survey : null
-	const userGroups = state.userGroups ? state.userGroups.items : null
 	const users = state.users ? state.users.users : null
 	const loggedUser = state.session ? state.session.loggedUser : null
 
-	const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
-		
-	const userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
-	const mostSpecificGroup = userInGroup === null ? null : userGroups.find(ug => ug.id === userInGroup.groupId)
-
-	const roleInSurvey = userInGroup ? userInGroup.role : null
-        
-	const userCanChangeRecordOwner = loggedUser.canChangeRecordOwner(mostSpecificGroup)
-
+	const roleInSurvey = survey.userInGroupRole
+    
+	const userCanChangeRecordOwner = loggedUser.canChangeRecordOwner(survey.userInGroupRole)
 
 	const rootEntityDef = survey.schema.firstRootEntityDefinition
 	const keyAttributes = rootEntityDef.keyAttributeDefinitions
@@ -349,7 +362,6 @@ const mapStateToProps = state => {
 	return {
 		surveyId : survey ? survey.id : null,
 		users,
-		userGroups,
 		loggedUser,
 		page, 
 		records, 

@@ -146,10 +146,13 @@ class DataManagementPage extends Component {
 	}
 
 	handleRowDoubleClick(record) {
-		const loggedUser = this.props.loggedUser
-		const userGroup = this.props.userGroups.find(ug => ug.id === this.props.survey.userGroup.id)
-		if (loggedUser.canEditRecords(userGroup)) {
-			this.navigateToItemEditView(record.id)
+		const {loggedUser, userRoleInSurveyGroup} = this.props
+		if (loggedUser.canEditRecords(userRoleInSurveyGroup)) {
+			if (record.lockedBy && !loggedUser.canUnlockRecords()) {
+				Dialogs.alert('recordLockedAlertTitle', 'recordLockedAlertMessage')
+			} else {
+				this.navigateToItemEditView(record.id)
+			}
 		}
 	}
 
@@ -258,25 +261,23 @@ class DataManagementPage extends Component {
 	}
 
 	render() {
-		const { survey, loggedUser, userGroups, surveyLanguage } = this.props
+		const { survey, loggedUser, surveyLanguage, userRoleInSurveyGroup } = this.props
 
 		if (!survey) {
 			return <div>{L.l('survey.selectPublishedSurveyFirst')}</div>
 		}
 
-		const surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroup.id)
-
 		return (
 			<MaxAvailableSpaceContainer ref={this.mainContainer}>
 				<Row className="justify-content-between">
 					<Col md={2}>
-						{loggedUser.canCreateRecords(surveyUserGroup) &&
+						{loggedUser.canCreateRecords(userRoleInSurveyGroup) &&
 							<Button color="info" onClick={this.handleNewButtonClick}>New</Button>
 						}{' '}
-						{loggedUser.canEditRecords(surveyUserGroup) && this.state.selectedItem &&
+						{loggedUser.canEditRecords(userRoleInSurveyGroup) && this.state.selectedItem &&
 							<Button color="success" onClick={this.handleEditButtonClick}>Edit</Button>
 						}{' '}
-						{loggedUser.canDeleteRecords(surveyUserGroup, this.state.selectedItems) && this.state.selectedItemIds.length > 0 &&
+						{loggedUser.canDeleteRecords(userRoleInSurveyGroup, this.state.selectedItems) && this.state.selectedItemIds.length > 0 &&
 							<Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash" /></Button>
 						}
 					</Col>
@@ -294,7 +295,7 @@ class DataManagementPage extends Component {
 						</ButtonDropdown>
 					</Col>
 					<Col md={2}>
-						{loggedUser.canImportRecords(surveyUserGroup) &&
+						{loggedUser.canImportRecords(userRoleInSurveyGroup) &&
 							<ButtonDropdown isOpen={this.state.importDropdownOpen}
 								toggle={() => this.setState({ importDropdownOpen: !this.state.importDropdownOpen })}>
 								<DropdownToggle color="warning" caret><span className="fa fa-upload" />{L.l('dataManagement.import')}</DropdownToggle>
@@ -306,7 +307,7 @@ class DataManagementPage extends Component {
 						}
 					</Col>
 					<Col md={2}>
-						{loggedUser.canPromoteRecordsInBulk(surveyUserGroup) &&
+						{loggedUser.canPromoteRecordsInBulk(userRoleInSurveyGroup) &&
 							<UncontrolledDropdown>
 								<DropdownToggle color="warning" caret><span className="fa fa-arrow-right" />Workflow</DropdownToggle>
 								<DropdownMenu>
@@ -361,7 +362,7 @@ const mapStateToProps = state => {
 		surveyLanguage: state.activeSurvey.language,
 		loggedUser,
 		loggedUserId,
-		userGroups: state.userGroups ? state.userGroups.items : null
+		userRoleInSurveyGroup: survey ? survey.userInGroupRole : null
 	}
 }
 

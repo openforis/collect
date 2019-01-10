@@ -337,24 +337,17 @@ class CsvDataExportPage extends Component {
     const mapStateToProps = state => {
         const survey = state.activeSurvey ? state.activeSurvey.survey : null
         const loggedUser = state.session ? state.session.loggedUser : null
-        const userGroups = state.userGroups ? state.userGroups.items : null
         
         let rootEntityDef = null,
             keyAttributes = null,
             summaryAttributes = null,
-            surveyUserGroup = null,
-            userInGroup = null,
             roleInSurvey = null
 
         if (survey) {
             rootEntityDef = survey.schema.firstRootEntityDefinition
             keyAttributes = rootEntityDef.keyAttributeDefinitions
             summaryAttributes = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
-
-            surveyUserGroup = userGroups.find(ug => ug.id === survey.userGroupId)
-    
-            userInGroup = loggedUser.findUserInGroupOrDescendants(surveyUserGroup)
-            roleInSurvey = userInGroup ? userInGroup.role : null
+            roleInSurvey = survey.userInGroupRole
         }
 
         return {

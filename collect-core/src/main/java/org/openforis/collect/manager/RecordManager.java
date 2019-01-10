@@ -368,7 +368,7 @@ public class RecordManager {
 		updater.initializeRecord(r);
 		return r;
 	}
-
+	
 	private void loadDetachedObjects(List<CollectRecordSummary> summaries) {
 		for (CollectRecordSummary summary : summaries) {
 			loadDetachedObjects(summary);
@@ -384,6 +384,11 @@ public class RecordManager {
 		for (StepSummary stepSummary : stepSummaries) {
 			stepSummary.setCreatedBy(loadUser(stepSummary.getCreatedBy()));
 			stepSummary.setModifiedBy(loadUser(stepSummary.getModifiedBy()));
+		}
+		
+		RecordLock recordLock = lockManager.getLock(s.getId());
+		if (recordLock != null) {
+			s.setLockedBy(recordLock.getUser().getUsername());
 		}
 	}
 	
@@ -575,7 +580,7 @@ public class RecordManager {
 		NodeChangeMap changeSet = new NodeChangeMap();
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		UserGroup surveyUserGrup = survey.getUserGroup();
-		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGrup, user);
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGrup.getId(), user.getId());
 		if (userInGroup == null) {
 			throw new IllegalArgumentException(String.format("User %s is not allowed to create records for survey %s", 
 					user.getUsername(), survey.getName()));

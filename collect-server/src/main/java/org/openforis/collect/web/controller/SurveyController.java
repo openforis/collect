@@ -43,6 +43,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Controllers;
@@ -154,12 +155,12 @@ public class SurveyController extends BasicController {
 		}
 		Set<Integer> groupIds = getAvailableUserGroupIds(userId, groupId);
 		
-		List<SurveySummary> publishedSummaries =new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, groupIds));
+		List<SurveySummary> publishedSummaries = new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, userId, groupIds));
 
 		List<SurveySummary> allSummaries = new ArrayList<SurveySummary>(publishedSummaries);
 		
 		if (includeTemporary) {
-			List<SurveySummary> tempSummaries = surveyManager.loadTemporarySummaries(languageCode, true, groupIds);
+			List<SurveySummary> tempSummaries = surveyManager.loadTemporarySummaries(languageCode, true, userId, groupIds);
 			allSummaries.addAll(tempSummaries);
 		}
 		
@@ -499,7 +500,9 @@ public class SurveyController extends BasicController {
 		}
 		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH.getLanguage());
 		viewGenerator.setIncludeCodeListValues(includeCodeListValues);
-		SurveyView view = viewGenerator.generateView(survey);
+		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), sessionManager.getLoggedUser().getId());
+		UserGroup userGroup = userInSurveyGroup == null ? null : userGroupManager.loadById(userInSurveyGroup.getGroupId());
+		SurveyView view = viewGenerator.generateView(survey, userGroup, userInSurveyGroup == null ? null : userInSurveyGroup.getRole());
 		return view;
 	}
 	

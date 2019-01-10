@@ -31,17 +31,17 @@ public interface UserGroupManager extends ItemManager<UserGroup, Integer> {
 
 	List<UserGroup> findByUser(User user);
 	
-	List<UserInGroup> findUsersInGroup(UserGroup userGroup);
+	List<UserInGroup> findUsersInGroup(int userGroupId);
 	
-	UserInGroup findUserInGroup(UserGroup userGroup, User user);
+	UserInGroup findUserInGroup(int userGroupId, int userId);
 	
-	UserInGroup findUserInGroupOrDescendants(UserGroup userGroup, User user);
+	UserInGroup findUserInGroupOrDescendants(int userGroupId, int userId);
 
 	UserGroup findUserGroupByResource(String resourceType, String resourceId);
 	
 	List<String> findResourcesByUserGroup(int userGroupId, String resourceType);
 	
-	Map<String, String> getQualifiers(UserGroup group, User user);
+	Map<String, String> getQualifiers(int userGroupId, int userId);
 	
 	void associateResource(int userGroupId, String resourceType, String resourceId);
 	

@@ -94,7 +94,7 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 			Set<User> users = new TreeSet<User>();
 			List<UserGroup> userGroups = groupManager.findByUser(availableTo);
 			for (UserGroup userGroup : userGroups) {
-				List<UserInGroup> groupUsers = groupManager.findUsersInGroup(userGroup);
+				List<UserInGroup> groupUsers = groupManager.findUsersInGroup(userGroup.getId());
 				for (UserInGroup userInGroup : groupUsers) {
 					Integer userId = userInGroup.getUserId();
 					User user = loadById(userId);

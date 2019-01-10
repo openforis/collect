@@ -10,6 +10,7 @@ import org.openforis.collect.metamodel.uiconfiguration.view.UIConfigurationView;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveyAvailability;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 import org.openforis.collect.persistence.xml.CeoApplicationOptions;
 
 public class SurveyView {
@@ -24,6 +25,9 @@ public class SurveyView {
 	private SurveyTarget target;
 	private int userGroupId;
 	private UserGroup userGroup;
+	private UserGroupRole userInGroupRole;
+	private String userGroupQualifierName;
+	private String userGroupQualifierValue;
 	private SchemaView schema;
 	private List<CodeListView> codeLists = new ArrayList<CodeListView>();
 	private List<ModelVersionView> modelVersions = new ArrayList<ModelVersionView>();
@@ -138,6 +142,30 @@ public class SurveyView {
 	
 	public void setUserGroup(UserGroup userGroup) {
 		this.userGroup = userGroup;
+	}
+	
+	public String getUserGroupQualifierName() {
+		return userGroupQualifierName;
+	}
+	
+	public void setUserGroupQualifierName(String userGroupQualifierName) {
+		this.userGroupQualifierName = userGroupQualifierName;
+	}
+	
+	public String getUserGroupQualifierValue() {
+		return userGroupQualifierValue;
+	}
+	
+	public void setUserGroupQualifierValue(String userGroupQualifierValue) {
+		this.userGroupQualifierValue = userGroupQualifierValue;
+	}
+	
+	public UserGroupRole getUserInGroupRole() {
+		return userInGroupRole;
+	}
+	
+	public void setUserInGroupRole(UserGroupRole userInGroupRole) {
+		this.userInGroupRole = userInGroupRole;
 	}
 	
 	public List<CodeListView> getCodeLists() {

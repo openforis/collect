@@ -185,4 +185,8 @@ public class RecordSummaryProxy implements Proxy {
 		return Proxies.fromObject(summary.getOwner(), UserProxy.class);
 	}
 	
+	@ExternalizedProperty
+	public String getLockedBy() {
+		return summary.getLockedBy();
+	}
 }

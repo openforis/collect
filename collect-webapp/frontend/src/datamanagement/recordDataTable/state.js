@@ -45,3 +45,13 @@ export const getRecordDataTableOwnerIds = (state) =>
 
 export const updateRecordDataTableState = (state, newProps) => 
     ({...state, ...newProps})
+
+export const updateRecordLockState = (state, recordId, lockedBy) => {
+    const records = Array.from(getRecordDataTableRecords(state))
+    const recordIndex = records.findIndex(record => record.id === recordId)
+    if (recordIndex >= 0) {
+        const record = records[recordIndex]
+        record.lockedBy = lockedBy
+    }
+    return updateRecordDataTableState(state, {records})
+}

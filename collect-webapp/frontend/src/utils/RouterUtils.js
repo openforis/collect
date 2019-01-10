@@ -11,7 +11,7 @@ export default class RouterUtils {
     }
 
     static navigateToLoginPage(logout = false) {
-        window.location.assign(Constants.BASE_URL + 'login?logout=true')
+        window.location.assign(Constants.BASE_URL + 'login.html?logout=true')
     }
 
     static navigateToPasswordChangePage(history) {

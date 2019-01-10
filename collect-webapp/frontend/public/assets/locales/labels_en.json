@@ -241,7 +241,10 @@
         "step": "Step",
         "formVersioning": {
             "selectFormVersion": "Select Form Version"
-        }
+        },
+        "recordLockedBy": "Record locked by {0}",
+        "recordLockedAlertTitle": "Record is being edited",
+        "recordLockedAlertMessage": "Record is already being edited by '{0}'"
     },
     "survey": {
         "name": "Name",

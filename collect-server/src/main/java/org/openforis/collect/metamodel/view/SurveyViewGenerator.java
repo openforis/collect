@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -43,7 +45,17 @@ public class SurveyViewGenerator {
 	}
 	
 	public SurveyView generateView(final CollectSurvey survey) {
+		return generateView(survey, null, null);
+	}
+	
+	public SurveyView generateView(final CollectSurvey survey, UserGroup userGroup, UserInGroup.UserGroupRole userInSurveyGroupRole) {
 		final SurveyView surveyView = new SurveyView(survey);
+
+		if (userGroup != null) {
+			surveyView.setUserGroupQualifierName(userGroup.getQualifierName());
+			surveyView.setUserGroupQualifierValue(userGroup.getQualifierValue());
+			surveyView.setUserInGroupRole(userInSurveyGroupRole);
+		}
 
 		for (CodeList codeList : survey.getCodeLists()) {
 			CodeListView codeListView = new CodeListView();

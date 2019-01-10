@@ -23,8 +23,13 @@ export default class RecordService extends AbstractService {
         return this.get('data/records/' + recordId + '/surveyId')
     }
 
-    fetchById(survey, recordId) {
-        return this.get('survey/' + survey.id + '/data/records/' + recordId).then(res => new Record(survey, res))
+    fetchById(survey, recordId, lock = false) {
+        return this.get('survey/' + survey.id + '/data/records/' + recordId, {lock})
+            .then(res => new Record(survey, res))
+    }
+
+    releaseLock(surveyId, recordId) {
+        return this.post(`survey/${surveyId}/data/records/releaselock/${recordId}`)
     }
 
     loadRecordsStats(survey) {
