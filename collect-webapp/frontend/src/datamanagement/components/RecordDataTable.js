@@ -295,8 +295,8 @@ class RecordDataTable extends Component {
 				customEditor={{ getElement: createOwnerEditor, customEditorParameters: { users: this.props.users } }}
 				dataAlign="left" width="150" dataSort>Owner</TableHeaderColumn>,
 			<TableHeaderColumn key="lockedBy" dataField="lockedBy" dataFormat={lockedByFormatter}
-				dataAlign="center" width="30" dataSort headerTitle="Lock">
-				<i className="fa fa-lock" aria-hidden="true"/>
+				dataAlign="center" width="30">
+				<i className="fa fa-lock" aria-hidden="true" title={L.l('dataManagement.recordLocked')}/>
 			</TableHeaderColumn>
 		);
 

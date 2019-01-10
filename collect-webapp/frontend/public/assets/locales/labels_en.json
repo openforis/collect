@@ -242,6 +242,7 @@
         "formVersioning": {
             "selectFormVersion": "Select Form Version"
         },
+        "recordLocked": "Locked",
         "recordLockedBy": "Record locked by {0}",
         "recordLockedAlert": {
             "title": "Record is being edited",
