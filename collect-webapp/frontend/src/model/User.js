@@ -39,6 +39,10 @@ export default class User extends Serializable {
         this.fillFromJSON(jsonData)
     }
 
+    get canAccessUsersManagement() {
+        return this.role === User.ROLE.ADMIN
+    }
+
     canCreateRecords(roleInSurveyGroup) {
         const mainRole = this.role
         switch(mainRole) {
@@ -94,6 +98,24 @@ export default class User extends Serializable {
         }
     }
 
+    canFilterRecordsBySummaryAttribute(attr, roleInSurvey) {
+        const rootEntityDef = attr.rootEntity
+        const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
+        return ! isQualifier 
+        || this.role === User.ROLE.ADMIN 
+        || roleInSurvey === User.ROLE_IN_GROUP.ADMINISTRATOR 
+        || roleInSurvey === User.ROLE_IN_GROUP.OWNER
+
+    }
+
+    canUnlockRecords() {
+        return this.role === User.ROLE.ADMIN
+    }
+
+    canEditNotOwnedRecords() {
+        return this.role === User.ROLE.ADMIN
+    }
+
     canPromoteRecordsInBulk(roleInSurveyGroup) {
         return this.canChangeRecordOwner(roleInSurveyGroup)
     }
@@ -126,7 +148,27 @@ export default class User extends Serializable {
                 }
         }
     }
-    
+
+    get canAccessSaiku() {
+        return this.canAccessDataCleansing
+    }
+
+    get canAccessDataCleansing() {
+        switch(this.role) {
+            case User.ROLE.CLEANSING:
+            case User.ROLE.ANALYSIS:
+            case User.ROLE.DESIGN:
+            case User.ROLE.ADMIN:
+                return true
+            default:
+                return false
+        }
+    }
+
+    get canAccessBackupRestore() {
+        return this.role === User.ROLE.ADMIN
+    }
+
     get canAccessSurveyDesigner() {
         switch(this.role) {
         	case User.ROLE.ADMIN:
@@ -155,43 +197,5 @@ export default class User extends Serializable {
             default:
                 return false
         }
-    }
-
-    get canAccessUsersManagement() {
-        return this.role === User.ROLE.ADMIN
-    }
-
-    get canAccessSaiku() {
-        return this.canAccessDataCleansing
-    }
-
-    get canAccessDataCleansing() {
-        switch(this.role) {
-            case User.ROLE.CLEANSING:
-            case User.ROLE.ANALYSIS:
-            case User.ROLE.DESIGN:
-            case User.ROLE.ADMIN:
-                return true
-            default:
-                return false
-        }
-    }
-
-    get canAccessBackupRestore() {
-        return this.role === User.ROLE.ADMIN
-    }
-
-    canFilterRecordsBySummaryAttribute(attr, roleInSurvey) {
-        const rootEntityDef = attr.rootEntity
-        const isQualifier = rootEntityDef.qualifierAttributeDefinitions.find(qDef => qDef.name === attr.name) != null
-        return ! isQualifier 
-        || this.role === User.ROLE.ADMIN 
-        || roleInSurvey === User.ROLE_IN_GROUP.ADMINISTRATOR 
-        || roleInSurvey === User.ROLE_IN_GROUP.OWNER
-
-    }
-
-    canUnlockRecords() {
-        return this.role === User.ROLE.ADMIN
     }
 }

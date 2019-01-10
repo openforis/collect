@@ -149,7 +149,10 @@ class DataManagementPage extends Component {
 		const {loggedUser, userRoleInSurveyGroup} = this.props
 		if (loggedUser.canEditRecords(userRoleInSurveyGroup)) {
 			if (record.lockedBy && !loggedUser.canUnlockRecords()) {
-				Dialogs.alert('recordLockedAlertTitle', 'recordLockedAlertMessage')
+				Dialogs.alert(L.l('dataManagement.recordLockedAlert.title'), L.l('dataManagement.recordLockedAlert.message', record.lockedBy))
+			} else if (record.owner && record.owner.id !== loggedUser.id && !loggedUser.canEditNotOwnedRecords()) {
+				Dialogs.alert(L.l('dataManagement.recordOwnedByAnotherUserAlert.title'), 
+					L.l('dataManagement.recordOwnedByAnotherUserAlert.message', record.owner.username))
 			} else {
 				this.navigateToItemEditView(record.id)
 			}

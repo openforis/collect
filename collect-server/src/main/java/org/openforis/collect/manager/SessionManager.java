@@ -168,21 +168,19 @@ public class SessionManager {
 	}
 
 	private Object getSessionAttribute(String attributeName) {
-		Object result = null;
-		
 		//try to get session attribute from GraniteDS context
 		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
 		if (graniteContext != null) {
-			result = graniteContext.getSessionMap().get(attributeName);
+			return graniteContext.getSessionMap().get(attributeName);
 		} else {
 			//try to get session attribute from current request context holder session
 			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 			if ( requestAttributes != null ) {
-				HttpSession session = requestAttributes.getRequest().getSession();
-				result = session.getAttribute(attributeName);
+				HttpSession session = requestAttributes.getRequest().getSession(false);
+				return session == null ? null : session.getAttribute(attributeName);
 			}
 		}
-		return result;
+		return null;
 	}
 	
 	public void invalidateSession() {

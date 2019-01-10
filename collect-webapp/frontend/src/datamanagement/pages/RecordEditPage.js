@@ -107,7 +107,7 @@ class RecordUpdater {
         attr.setFieldValue(1, event.y);
         attr.setFieldValue(2, event.srsId);
     } else if (event instanceof DateAttributeUpdatedEvent) {
-        let date: Date = event.date;
+        let date = event.date;
         attr.setFieldValue(0, date.getFullYear());
         attr.setFieldValue(1, date.getMonth());
         attr.setFieldValue(2, date.getDay());

@@ -81,7 +81,8 @@ export const fetchRecordSummaries = () => (dispatch, getState) => {
 }
 
 export const updateRecordOwner = (recordSummary, owner) => (dispatch, getState) => {
-    const recordDataTableState = getRecordDataTableState(getState())
+    const dataManagementState = getDataManagementState(getState())
+    const recordDataTableState = getRecordDataTableState(dataManagementState)
     const records = getRecordDataTableRecords(recordDataTableState)
     const newRecords = records.map(r => r.id === recordSummary.id ? { ...r, owner } : r)
     dispatchRecordDataTableStateUpdate(dispatch, { records: newRecords })

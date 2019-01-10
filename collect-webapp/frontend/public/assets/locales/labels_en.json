@@ -243,8 +243,14 @@
             "selectFormVersion": "Select Form Version"
         },
         "recordLockedBy": "Record locked by {0}",
-        "recordLockedAlertTitle": "Record is being edited",
-        "recordLockedAlertMessage": "Record is already being edited by '{0}'"
+        "recordLockedAlert": {
+            "title": "Record is being edited",
+            "message": "Record is already being edited by '{0}'"
+        },
+        "recordOwnedByAnotherUserAlert": {
+            "title": "Record owned by another user",
+            "message": "Record is owned by another user ({0}) and cannot be edited"
+        }
     },
     "survey": {
         "name": "Name",

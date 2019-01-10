@@ -52,11 +52,14 @@ public class SessionListener implements HttpSessionListener {
 		if ( LOG.isInfoEnabled() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			User user = sessionState == null ? null : sessionState.getUser();
-
-			LOG.info("Session " + 
-					(created ? " created" : "destroyed") + 
-					": " + se.getSession().getId() + 
-					(user == null ? "": " user: " + user.getUsername()));
+			
+			if (user != null) {
+				LOG.info("Session " + 
+						(created ? " created" : "destroyed") + 
+						": " + se.getSession().getId() + 
+						" user: " + user.getUsername()
+				);
+			}
 		}
 	}
 
