@@ -37,7 +37,7 @@
 	<mvc:resources mapping="/org/**" location="/org/" />
 	<mvc:resources mapping="/static/**" location="/static/" />
 	
-	<mvc:view-controller path="/" view-name="index" />
+	<mvc:view-controller path="/" view-name="index.html" />
 	
 <!-- 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" /> -->
 <!-- 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" /> -->

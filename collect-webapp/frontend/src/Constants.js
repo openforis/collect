@@ -1,5 +1,12 @@
 import Objects from 'utils/Objects'
 
+
+const getWindowLocationBaseUrl = () => {
+    const l = window.location;
+    const context = l.pathname.split('/')[1]
+    return `${l.origin}/${context}/`;
+}
+
 export default class Constants {
 
     static APP_VERSION = Objects.defaultIfNull(process.env.REACT_APP_COLLECT_PROJECT_VERSION, "3.20.1-SNAPSHOT")
@@ -11,14 +18,12 @@ export default class Constants {
         if (Constants.isDevReact()) {
             return "http://127.0.0.1:8080/collect/";
         } else {
-            let l = window.location;
-            return l.origin + l.pathname;
+            return getWindowLocationBaseUrl()
         }
     }
 
     static determineBaseAssetsURL() {
-        let l = window.location;
-        return l.origin + l.pathname + 'assets/';
+        return `${getWindowLocationBaseUrl()}assets/`;
     }
 
     static isDevReact() {
