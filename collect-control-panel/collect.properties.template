@@ -2,7 +2,7 @@
 collect.http_port=8380
 collect.webapps_location=${user.home}/OpenForis/Collect/webapps
 #db
-collect.db.jndiName=collectDs
+collect.db.jndiName=jdbc/collectDs
 collect.db.driverClassName=org.sqlite.JDBC
 collect.db.url=jdbc:sqlite:${user.home}/OpenForis/Collect/data/collect.db
 collect.db.username=

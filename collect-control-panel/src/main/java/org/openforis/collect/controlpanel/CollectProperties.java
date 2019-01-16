@@ -1,8 +1,5 @@
 package org.openforis.collect.controlpanel;
 
-import java.io.File;
-
-import org.openforis.utils.Files;
 import org.openforis.web.server.JndiDataSourceConfiguration;
 
 public class CollectProperties {

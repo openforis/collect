@@ -326,8 +326,8 @@ public class CollectControlPanelController implements Initializable {
 	private CollectProperties loadProperties() throws IOException {
 		Properties properties = new Properties();
 		String[] possibleLocations = new String[]{
-			SETTINGS_FILE_LOCATION, 
-			SETTINGS_FILE_LOCATION_DEV
+			SETTINGS_FILE_LOCATION_DEV,
+			SETTINGS_FILE_LOCATION
 		};
 		File propertiesFile = null;
 		for (String location : possibleLocations) {
