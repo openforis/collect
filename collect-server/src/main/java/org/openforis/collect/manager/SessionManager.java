@@ -85,6 +85,11 @@ public class SessionManager {
 		SessionState sessionState = getSessionState();
 		return sessionState.getUser();
 	}
+	
+	public String getLoggedUsername() {
+		User user = getLoggedUser();
+		return user == null ? null : user.getUsername();
+	}
 
 	public CollectSurvey getActiveDesignerSurvey() {
 		SessionStatus designerSessionStatus = getDesignerSessionStatus();

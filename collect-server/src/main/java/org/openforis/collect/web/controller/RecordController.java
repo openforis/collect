@@ -94,6 +94,7 @@ import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.RecordStatsGenerator.RecordsStats;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.proxy.JobProxy;
@@ -151,6 +152,8 @@ public class RecordController extends BasicController implements Serializable {
 	private RecordStatsGenerator recordStatsGenerator;
 	@Autowired
 	private transient EventQueue eventQueue;
+	@Autowired
+	private AppWS appWS;
 	
 	private CSVDataExportJob csvDataExportJob;
 	private SurveyBackupJob fullBackupJob;
@@ -597,6 +600,23 @@ public class RecordController extends BasicController implements Serializable {
 			jobView.putExtra("dataBackupErrors", fullBackupJob.getDataBackupErrors());
 			return jobView;
 		}
+	}
+	
+	@RequestMapping(value="survey/{surveyId}/data/records/releaselock/{recordId}", method=POST)
+	public @ResponseBody Response releaseRecordLock(@PathVariable int recordId) {
+		CollectRecord activeRecord = sessionManager.getActiveRecord();
+		Response res = new Response();
+		if (activeRecord != null && activeRecord.getId() != null && activeRecord.getId().equals(recordId)) {
+			recordManager.releaseLock(recordId);
+			appWS.sendMessage(new AppWS.RecordUnlockedMessage(recordId));
+		} else {
+			res.setErrorStatus();
+			res.setErrorMessage(String.format(
+					"Cannot unlock record with id %d: it is not being edited by user %s", 
+					recordId, sessionManager.getLoggedUsername()
+			));
+		}
+		return res;
 	}
 	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {

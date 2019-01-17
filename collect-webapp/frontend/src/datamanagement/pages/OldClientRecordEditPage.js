@@ -29,12 +29,7 @@ class OldClientRecordEditPage extends Component {
             })
         })
     }
-
-    componentWillUnmount () {
-        const {surveyId, recordId} = this.state
-        ServiceFactory.recordService.releaseLock(surveyId, recordId)
-    }
-
+    
     getRecordIdFromParams () {
         const idParam = this.props.match.params.id;
         return parseInt(idParam, 10);
