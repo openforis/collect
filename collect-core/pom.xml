@@ -311,7 +311,7 @@
 		<dependency>
 			<groupId>org.orbisgis</groupId>
 			<artifactId>cts</artifactId>
-			<version>1.5.1</version>
+			<version>1.4.0</version><!-- Version 1.5.0 requires Java 7 and it's not compatible with Collect Mobile -->
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
