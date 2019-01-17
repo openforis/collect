@@ -3,13 +3,11 @@ package org.openforis.collect.controlpanel;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,30 +37,33 @@ import javafx.stage.Window;
 
 public class CollectControlPanelController implements Initializable {
 
-
 	private static final Logger LOG = LogManager.getLogger(CollectControlPanelController.class);
 
-	private static final String COLLECT_USER_HOME_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis", "Collect");
+	private static final String COLLECT_USER_HOME_LOCATION = Files.getLocation(Files.getUserHomeLocation(), "OpenForis",
+			"Collect");
 	private static final String COLLECT_DATA_FOLDER_NAME = "data";
 	private static final String LOGS_LOCATION = Files.getLocation(Files.getCurrentLocation(), "logs");
 	private static final String SERVER_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect_server.log");
 	private static final String COLLECT_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "collect.log");
 	private static final String SAIKU_LOG_FILE_LOCATION = Files.getLocation(LOGS_LOCATION, "saiku.log");
 	private static final String SETTINGS_FILENAME = "collect.properties";
-	private static final String SETTINGS_FILE_LOCATION = Files.getLocation(COLLECT_USER_HOME_LOCATION, SETTINGS_FILENAME);
-	private static final String SETTINGS_FILE_LOCATION_DEV = Files.getLocation(Files.getCurrentLocation(), SETTINGS_FILENAME);
+	private static final String SETTINGS_FILE_LOCATION = Files.getLocation(COLLECT_USER_HOME_LOCATION,
+			SETTINGS_FILENAME);
+	private static final String SETTINGS_FILE_LOCATION_DEV = Files.getLocation(Files.getCurrentLocation(),
+			SETTINGS_FILENAME);
 	private static final String DEFAULT_WEBAPPS_FOLDER_NAME = "webapps";
-	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(), DEFAULT_WEBAPPS_FOLDER_NAME);
+	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(),
+			DEFAULT_WEBAPPS_FOLDER_NAME);
 	private static final int LOG_OPENED_WINDOW_HEIGHT = 580;
 	private static final int LOG_CLOSED_WINDOW_HEIGHT = 230;
-	private static final int LOG_TEXT_MAX_LENGTH = 5000;
+	private static final int LOG_TEXT_MAX_LENGTH = 20000;
 	private static final String CATALINA_BASE = "catalina.base";
-	
+
 	public enum Status {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
 	}
-	
-	//ui elements
+
+	// ui elements
 	@FXML
 	private Pane applicationPane;
 	@FXML
@@ -85,20 +86,20 @@ public class CollectControlPanelController implements Initializable {
 	public Text errorMessageTxt;
 	@FXML
 	private VBox runningAtUrlBox;
-		
+
 	private CollectControlPanel app;
 	private Stage stage;
 	private ApplicationServer server;
 	private ScheduledExecutorService executorService;
-	
+
 	private String webappsLocation;
 	private Status status = Status.INITIALIZING;
 	private String errorMessage;
 	private boolean logOpened = false;
-	private FileLinesProcessor serverLogFileLinesProcessor;
-	private FileLinesProcessor collectLogFileLinesProcessor;
-	private FileLinesProcessor saikuLogFileLinesProcessor;
-	
+	private ConsoleLogFileReader serverLogFileReader;
+	private ConsoleLogFileReader collectLogFileReader;
+	private ConsoleLogFileReader saikuLogFileReader;
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		LOG.info("initializing control panel");
@@ -106,7 +107,7 @@ public class CollectControlPanelController implements Initializable {
 			executorService = Executors.newScheduledThreadPool(5);
 
 			File collectHomeFolder = new File(COLLECT_USER_HOME_LOCATION);
-			if (! collectHomeFolder.exists()) {
+			if (!collectHomeFolder.exists()) {
 				initializeCollectHomeFolder();
 				CollectProperties collectProperties = new CollectProperties();
 				new CollectPropertiesHandler().write(collectProperties, new File(collectHomeFolder, SETTINGS_FILENAME));
@@ -119,19 +120,20 @@ public class CollectControlPanelController implements Initializable {
 			File webappsFolder = new File(webappsLocation);
 
 			deleteBrokenTemporaryFiles();
-			
-			//if running on a Jetty server, set catalina.base system property to current location
-			//to prevent Saiku from storing log files in a wrong location
+
+			// if running on a Jetty server, set catalina.base system property to current
+			// location
+			// to prevent Saiku from storing log files in a wrong location
 			if (System.getProperty(CATALINA_BASE) == null) {
 				System.setProperty(CATALINA_BASE, Files.getCurrentLocation());
 			}
-			
-			server = new CollectJettyServer(collectProperties.getHttpPort(),
-					webappsFolder, collectProperties.getCollectDataSourceConfiguration());
+
+			server = new CollectJettyServer(collectProperties.getHttpPort(), webappsFolder,
+					collectProperties.getCollectDataSourceConfiguration());
 			server.initialize();
-			
+
 			initLogFileReaders();
-			
+
 			urlHyperlink.setText(server.getUrl());
 		} catch (Exception e) {
 			LOG.error("error initializing Collect: " + e.getMessage(), e);
@@ -151,40 +153,38 @@ public class CollectControlPanelController implements Initializable {
 	 * @throws IOException
 	 */
 	private void initLogFileReaders() throws IOException {
-		this.serverLogFileLinesProcessor = new ConsoleLogFileProcessor(
-				new File(SERVER_LOG_FILE_LOCATION), serverConsole);
-		this.collectLogFileLinesProcessor = new ConsoleLogFileProcessor(
-				new File(COLLECT_LOG_FILE_LOCATION), collectConsole);
-		this.saikuLogFileLinesProcessor = new ConsoleLogFileProcessor(
-				new File(SAIKU_LOG_FILE_LOCATION), saikuConsole);
-		
-		//write logging info to console
+		this.serverLogFileReader = new ConsoleLogFileReader(new File(SERVER_LOG_FILE_LOCATION), serverConsole);
+		this.collectLogFileReader = new ConsoleLogFileReader(new File(COLLECT_LOG_FILE_LOCATION),
+				collectConsole);
+		this.saikuLogFileReader = new ConsoleLogFileReader(new File(SAIKU_LOG_FILE_LOCATION), saikuConsole);
+
+		// write logging info to console
 		executorService.scheduleWithFixedDelay(() -> {
 			Platform.runLater(() -> {
-				serverLogFileLinesProcessor.processNextLines();
-				collectLogFileLinesProcessor.processNextLines();
-				saikuLogFileLinesProcessor.processNextLines();
+				serverLogFileReader.readFile();
+				collectLogFileReader.readFile();
+				saikuLogFileReader.readFile();
 			});
 		}, 3, 3, TimeUnit.SECONDS);
 	}
-	
+
 	public void startServer(MouseEvent event) throws Exception {
 		startServer((Runnable) null);
 	}
-	
+
 	public void startServer(Runnable onComplete) throws Exception {
 		executorService.schedule(() -> {
 			changeStatus(Status.STARTING);
-			
+
 			try {
 				server.start();
-				
+
 				changeStatus(Status.RUNNING);
-				
+
 				if (onComplete != null) {
 					onComplete.run();
 				}
-			} catch(Exception e) {
+			} catch (Exception e) {
 				handleException(e);
 			}
 		}, 0, TimeUnit.SECONDS);
@@ -203,13 +203,13 @@ public class CollectControlPanelController implements Initializable {
 
 			try {
 				server.stop();
-			
+
 				waitUntilConditionIsVerifiedThenRun(() -> {
 					changeStatus(Status.IDLE);
 				}, () -> {
 					return server.isRunning();
 				}, 1000);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				handleException(e);
 			}
 		}
@@ -218,11 +218,8 @@ public class CollectControlPanelController implements Initializable {
 	void stop() throws Exception {
 		stopServer();
 		executorService.shutdownNow();
-		closeQuietly(serverLogFileLinesProcessor);
-		closeQuietly(collectLogFileLinesProcessor);
-		closeQuietly(saikuLogFileLinesProcessor);
 	}
-	
+
 	@FXML
 	void openBrowserFromLink(MouseEvent event) {
 		openBrowser();
@@ -233,18 +230,18 @@ public class CollectControlPanelController implements Initializable {
 		stop();
 		Platform.exit();
 	}
-	
+
 	void openBrowser() {
 		HostServicesDelegate hostServices = HostServicesFactory.getInstance(app);
 		String url = server.getUrl();
 		hostServices.showDocument(url);
 	}
-	
+
 	@FXML
-	public void toggleLog( MouseEvent event ) {
-		setLogVisible(! logOpened);
+	public void toggleLog(MouseEvent event) {
+		setLogVisible(!logOpened);
 	}
-	
+
 	public void closeLog() {
 		setLogVisible(false);
 	}
@@ -254,12 +251,12 @@ public class CollectControlPanelController implements Initializable {
 		logBtn.setText(visible ? "Hide Log" : "Show Log");
 		updateUI();
 	}
-	
+
 	private void updateUI() {
 		int windowHeight = this.logOpened ? LOG_OPENED_WINDOW_HEIGHT : LOG_CLOSED_WINDOW_HEIGHT;
 		Window window = applicationPane.getScene().getWindow();
 		window.setHeight(windowHeight);
-		
+
 		boolean runningAtUrlVisible = false;
 		boolean errorMessageVisible = false;
 		boolean shutdownBtnVisible = false;
@@ -267,8 +264,8 @@ public class CollectControlPanelController implements Initializable {
 		String detailedErrorMessage = null;
 		String statusMessage = null;
 		String statusMessageClassName = "info";
-		
-		switch(status) {
+
+		switch (status) {
 		case INITIALIZING:
 			statusMessage = "Initializing...";
 			progressBarVisible = true;
@@ -289,8 +286,8 @@ public class CollectControlPanelController implements Initializable {
 			break;
 		case ERROR:
 			statusMessage = "Error";
-			detailedErrorMessage = String.format("An error has occurred: %s\n"
-					+ "Open Log for more detals", errorMessage);
+			detailedErrorMessage = String.format("An error has occurred: %s\n" + "Open Log for more detals",
+					errorMessage);
 			errorMessageVisible = true;
 			break;
 		default:
@@ -307,28 +304,27 @@ public class CollectControlPanelController implements Initializable {
 		progressBar.setVisible(progressBarVisible);
 		serverConsole.setVisible(logOpened);
 	}
-	
+
 	private void handleException(Exception e) {
 		e.printStackTrace();
 		errorMessage = e.getMessage();
 		changeStatus(Status.ERROR);
 	}
 
-	private void waitUntilConditionIsVerifiedThenRun(Runnable runnable, Verifier sleepConditionVerifier, int sleepInterval) {
+	private void waitUntilConditionIsVerifiedThenRun(Runnable runnable, Verifier sleepConditionVerifier,
+			int sleepInterval) {
 		while (sleepConditionVerifier.verify()) {
 			try {
 				Thread.sleep(sleepInterval);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+			}
 		}
 		Platform.runLater(runnable);
 	}
-	
+
 	private CollectProperties loadProperties() throws IOException {
 		Properties properties = new Properties();
-		String[] possibleLocations = new String[]{
-			SETTINGS_FILE_LOCATION_DEV,
-			SETTINGS_FILE_LOCATION
-		};
+		String[] possibleLocations = new String[] { SETTINGS_FILE_LOCATION_DEV, SETTINGS_FILE_LOCATION };
 		File propertiesFile = null;
 		for (String location : possibleLocations) {
 			propertiesFile = new File(location);
@@ -336,42 +332,43 @@ public class CollectControlPanelController implements Initializable {
 				break;
 			}
 		}
-		if (! propertiesFile.exists()) {
+		if (!propertiesFile.exists()) {
 			throw new IllegalStateException(String.format("Cannot find %s file", SETTINGS_FILENAME));
 		}
 		FileInputStream is = new FileInputStream(propertiesFile);
 		properties.load(is);
 		return new CollectPropertiesHandler().parse(properties);
 	}
-	
+
 	private void deleteBrokenTemporaryFiles() throws IOException {
 		File webappsFolder = new File(webappsLocation);
 		File collectWebappFolder = new File(webappsFolder, CollectJettyServer.WEBAPP_NAME);
 		if (collectWebappFolder.exists() && collectWebappFolder.isDirectory()) {
 			String[] folderContent = collectWebappFolder.list();
-			if (folderContent.length == 0 || ! Arrays.<String>asList(folderContent).contains("index.html")) {
+			if (folderContent.length == 0 || !Arrays.<String>asList(folderContent).contains("index.html")) {
 				LOG.info("deleting empty Collect webapps folder");
 				try {
 					FileUtils.forceDelete(collectWebappFolder);
 					LOG.info("Collect webapps folder deleted successfully");
-				} catch(IOException e) {
-					String message = String.format("Error deleting folder %s: %s. Please delete it manually and start Collect again",
+				} catch (IOException e) {
+					String message = String.format(
+							"Error deleting folder %s: %s. Please delete it manually and start Collect again",
 							collectWebappFolder.getAbsolutePath(), e.getMessage());
 					throw new IOException(message, e);
 				}
 			}
 		}
-		
+
 	}
-	
+
 	public void setApp(CollectControlPanel app) {
 		this.app = app;
 	}
-	
+
 	public void setStage(Stage stage) {
 		this.stage = stage;
 	}
-	
+
 	public Status getStatus() {
 		return status;
 	}
@@ -386,84 +383,36 @@ public class CollectControlPanelController implements Initializable {
 	}
 
 	private static void createFolder(File folder) {
-		if (! folder.mkdirs()) {
+		if (!folder.mkdirs()) {
 			throw new RuntimeException(String.format("Cannot create folder: %s", folder.getAbsolutePath()));
 		}
 	}
-	
-	/**
-	 * Reads a file and process it's content with a TextProcessor
-	 */
-	private static class FileLinesProcessor implements Closeable {
 
+	private static class ConsoleLogFileReader {
 		private File file;
-		private TextProcessor lineProcessor;
-		private int readLines;
-		private boolean closed;
+		private TextArea textArea;
 
-		public FileLinesProcessor(File file, TextProcessor lineProcessor) {
+		public ConsoleLogFileReader(File file, TextArea textArea) {
 			this.file = file;
-			this.lineProcessor = lineProcessor;
+			this.textArea = textArea;
 		}
 
-		public void processNextLines() {
-			if (this.closed) {
-				return;
-			}
-			Scanner scanner = null;
-			try {
-				scanner = new Scanner(this.file);
-				int count = 0;
-				while (scanner.hasNextLine() && count < readLines) {
-					if (this.closed) {
-						return;
-					}
-					scanner.nextLine();
-					count ++;
-				}
-				//process only new lines
-				while (scanner.hasNextLine()) {
-					if (this.closed) {
-						return;
-					}
-					String line = scanner.nextLine();
-					lineProcessor.process(line);
-					readLines ++;
-				}
-			} catch (FileNotFoundException e) {
-				//ignore it, file not ready
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				closeQuietly(scanner);
+		public void readFile() {
+			String content = Files.tail(file, LOG_TEXT_MAX_LENGTH);
+			String oldContent = textArea.getText();
+			if (!content.equals(oldContent)) {
+				textArea.setText(content);
+				textArea.setScrollTop(Double.MAX_VALUE);
 			}
 		}
-
-		public void close() throws IOException {
-			this.closed = true;
-		}
 	}
-	
-	private static class ConsoleLogFileProcessor extends FileLinesProcessor {
 
-		public ConsoleLogFileProcessor(File file, TextArea textArea) {
-			super(file, text -> {
-				textArea.appendText(text);
-				int extraCharacters = textArea.getLength() - LOG_TEXT_MAX_LENGTH;
-				if (extraCharacters > 0) {
-					textArea.deleteText(0, extraCharacters);
-				}
-				textArea.appendText("\n");
-			});
-		}
-	}
-	
 	private interface TextProcessor {
 		void process(String text);
 	}
-	
+
 	private interface Verifier {
 		boolean verify();
 	}
-	
+
 }

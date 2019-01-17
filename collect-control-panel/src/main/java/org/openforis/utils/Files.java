@@ -1,6 +1,9 @@
 package org.openforis.utils;
 
 import java.io.File;
+import java.io.RandomAccessFile;
+
+import org.apache.commons.io.IOUtils;
 
 public abstract class Files {
 	
@@ -21,6 +24,32 @@ public abstract class Files {
 			}
 		}
 		return sb.toString();
+	}
+
+	public static String tail(File file, long maxSize) {
+		StringBuilder sb = new StringBuilder(new Long(maxSize).intValue());
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(file, "r");
+			long position = 0;
+			long size = raf.length();
+			if (size > maxSize) {
+				position = size - maxSize;
+				raf.seek(position);
+			}
+			String line = raf.readLine();
+			while (line != null && position < size) {
+				position += line.length() + 1;
+				sb.append(line);
+				sb.append('\n');
+				line = raf.readLine();
+			}
+			return sb.toString();
+		} catch (Exception e) {
+			return "";
+		} finally {
+			IOUtils.closeQuietly(raf);
+		}
 	}
 
 }
