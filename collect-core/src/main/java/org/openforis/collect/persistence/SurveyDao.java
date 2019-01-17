@@ -10,9 +10,11 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -241,6 +243,7 @@ public class SurveyDao extends JooqDaoSupport {
 		storeQuery.addValue(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()));
 		storeQuery.addValue(OFC_SURVEY.USERGROUP_ID, survey.getUserGroupId());
 		storeQuery.addValue(OFC_SURVEY.TITLE, survey.getProjectName());
+		storeQuery.addValue(OFC_SURVEY.LANGS, StringUtils.join(survey.getLanguages(), ','));
 	}
 
 	private void addNewSurveyValues(StoreQuery<OfcSurveyRecord> storeQuery,
@@ -285,7 +288,9 @@ public class SurveyDao extends JooqDaoSupport {
 		Integer id = row.getValue(OFC_SURVEY.ID);
 		String name = row.getValue(OFC_SURVEY.NAME);
 		String uri = row.getValue(OFC_SURVEY.URI);
+		
 		SurveySummary s = new SurveySummary(id, name, uri);
+		
 		s.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
 		s.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
 		s.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
@@ -294,6 +299,9 @@ public class SurveyDao extends JooqDaoSupport {
 		s.setUserGroupId(row.getValue(OFC_SURVEY.USERGROUP_ID));
 		s.setAvailability(s.isTemporary() ? UNPUBLISHED: PUBLISHED);
 		s.setProjectName(row.getValue(OFC_SURVEY.TITLE));
+		String langs = StringUtils.defaultString(row.getValue(OFC_SURVEY.LANGS));
+		s.setLanguages(Arrays.asList(StringUtils.split(langs, ',')));
+		
 		return s;
 	}
 	

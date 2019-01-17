@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurvey implements Serializable {
 
-	private static final long serialVersionUID = -1375508675;
+	private static final long serialVersionUID = -1135226792;
 
 	private Integer   id;
 	private String    name;
@@ -38,6 +38,7 @@ public class OfcSurvey implements Serializable {
 	private Integer   usergroupId;
 	private String    availability;
 	private String    title;
+	private String    langs;
 
 	public OfcSurvey() {}
 
@@ -55,6 +56,7 @@ public class OfcSurvey implements Serializable {
 		this.usergroupId = value.usergroupId;
 		this.availability = value.availability;
 		this.title = value.title;
+		this.langs = value.langs;
 	}
 
 	public OfcSurvey(
@@ -70,7 +72,8 @@ public class OfcSurvey implements Serializable {
 		Integer   publishedId,
 		Integer   usergroupId,
 		String    availability,
-		String    title
+		String    title,
+		String    langs
 	) {
 		this.id = id;
 		this.name = name;
@@ -85,6 +88,7 @@ public class OfcSurvey implements Serializable {
 		this.usergroupId = usergroupId;
 		this.availability = availability;
 		this.title = title;
+		this.langs = langs;
 	}
 
 	public Integer getId() {
@@ -189,5 +193,13 @@ public class OfcSurvey implements Serializable {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getLangs() {
+		return this.langs;
+	}
+
+	public void setLangs(String langs) {
+		this.langs = langs;
 	}
 }

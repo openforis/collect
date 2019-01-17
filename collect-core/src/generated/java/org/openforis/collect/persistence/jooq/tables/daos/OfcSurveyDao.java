@@ -147,4 +147,11 @@ public class OfcSurveyDao extends DAOImpl<OfcSurveyRecord, org.openforis.collect
 	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSurvey> fetchByTitle(String... values) {
 		return fetch(OfcSurvey.OFC_SURVEY.TITLE, values);
 	}
+
+	/**
+	 * Fetch records that have <code>langs IN (values)</code>
+	 */
+	public List<org.openforis.collect.persistence.jooq.tables.pojos.OfcSurvey> fetchByLangs(String... values) {
+		return fetch(OfcSurvey.OFC_SURVEY.LANGS, values);
+	}
 }

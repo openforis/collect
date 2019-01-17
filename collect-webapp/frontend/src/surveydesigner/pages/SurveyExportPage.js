@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import ServiceFactory from 'services/ServiceFactory';
 import * as JobActions from 'actions/job';
 import L from 'utils/Labels'
+import Labels from '../../utils/Labels';
 
 class SurveyExportPage extends Component {
 
@@ -53,7 +54,9 @@ class SurveyExportPage extends Component {
             this.setState({
                 surveySummary,
                 surveyType: surveySummary.temporary ? 'TEMPORARY' : 'PUBLISHED',
-                availableLanguages: surveySummary.languages,
+                availableLanguages: surveySummary.languages && surveySummary.languages.length > 0
+                    ? surveySummary.languages 
+                    : [Labels.DEFAULT_LANG_CODE], //TODO don't default it!
                 outputSurveyDefaultLanguage: surveySummary.defaultLanguage
             })
         }
