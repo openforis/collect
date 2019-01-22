@@ -1,6 +1,7 @@
 package org.openforis.collect.remoting.service;
 
 import java.io.InputStream;
+import java.net.InetAddress;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
@@ -93,11 +94,18 @@ public class CollectInfoService {
 
 	private String determineSaikuUrl(HttpServletRequest request) {
 		String protocol = request.isSecure() ? "https" : "http";
-		String localAddr = request.getLocalAddr();
-		if (DEV_REQUEST_LOCAL_ADDRESS.equals(localAddr)) {
-			localAddr = DEV_LOCAL_ADDRESS;
+		String localHostName = request.getLocalAddr();
+		if (localHostName == null) {
+			try {
+				InetAddress localHost = InetAddress.getLocalHost();
+				localHostName = localHost.getHostName();
+			} catch (Exception e) {
+			}
 		}
-		String url = String.format(SAIKU_URL_FORMAT, protocol, localAddr, request.getLocalPort(), saikuConfiguration.getContextPath());
+		if (DEV_REQUEST_LOCAL_ADDRESS.equals(localHostName)) {
+			localHostName = DEV_LOCAL_ADDRESS;
+		}
+		String url = String.format(SAIKU_URL_FORMAT, protocol, localHostName, request.getLocalPort(), saikuConfiguration.getContextPath());
 		return url;
 	}
 }

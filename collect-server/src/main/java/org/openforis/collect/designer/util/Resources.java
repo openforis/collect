@@ -8,13 +8,13 @@ package org.openforis.collect.designer.util;
 public class Resources {
 	
 	public static final String PAGES_BASE_PATH = "/";
-	public static final String COMPONENTS_BASE_PATH = "/surveydesigner/";
+	public static final String COMPONENTS_BASE_PATH = "/zk/surveydesigner/";
 	
 	public enum Page {
 	
 		INDEX("/"),
 		DESIGNER("designer.htm"),
-		SURVEY_EDIT("/surveydesigner/survey_edit.zul"),
+		SURVEY_EDIT(COMPONENTS_BASE_PATH + "survey_edit.zul"),
 		COLLECT_SWF("collect.swf"),
 		PREVIEW_PATH("old_client.html");
 		
