@@ -13,7 +13,7 @@ import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.CSVDataExportProcess;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
-import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
+import org.openforis.collect.io.data.csv.CSVDataExportParametersBase.HeadingSource;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 import org.openforis.collect.manager.RecordManager;

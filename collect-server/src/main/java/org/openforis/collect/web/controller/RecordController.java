@@ -50,8 +50,7 @@ import org.openforis.collect.io.data.RecordProviderConfiguration;
 import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
-import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
-import org.openforis.collect.io.data.csv.CSVDataExportParameters.OutputFormat;
+import org.openforis.collect.io.data.csv.CSVDataExportParametersBase;
 import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 import org.openforis.collect.manager.MessageSource;
@@ -890,35 +889,17 @@ public class RecordController extends BasicController implements Serializable {
 		return recordFilter;
 	}
 	
-	public static class CSVExportParametersForm {
+	public static class CSVExportParametersForm extends CSVDataExportParametersBase {
 		
 		private Integer surveyId;
 		private Integer rootEntityId;
-		private Integer entityId;
 		private Integer recordId;
 		private Step stepGreaterOrEqual;
 		private boolean exportOnlyOwnedRecords = false;
-		private boolean alwaysGenerateZipFile = false;
-		private String multipleAttributeValueSeparator = ", ";
-		private String fieldHeadingSeparator = "_";
-		private boolean includeAllAncestorAttributes = false;
-		private boolean includeCodeItemPositionColumn = false;
-		private boolean includeKMLColumnForCoordinates = false;
-		private boolean includeEnumeratedEntities = false;
-		private boolean includeCompositeAttributeMergedColumn = false;
-		private boolean includeCodeItemLabelColumn = false;
-		private boolean includeGroupingLabels = true;
-		private boolean includeCreatedByUserColumn = false;
-		private boolean codeAttributeExpanded = false;
-		private int maxMultipleAttributeValues = 10;
-		private int maxExpandedCodeAttributeItems = 30;
-		private HeadingSource headingSource = HeadingSource.ATTRIBUTE_NAME;
-		private String languageCode = null;
 		private Date modifiedSince;
 		private Date modifiedUntil;
 		private List<String> keyAttributeValues = new ArrayList<String>();
 		private List<String> summaryAttributeValues = new ArrayList<String>();
-		private CSVDataExportParameters.OutputFormat outputFormat = OutputFormat.CSV;
 		
 		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
 			CSVDataExportParameters result = new CSVDataExportParameters();
@@ -952,14 +933,6 @@ public class RecordController extends BasicController implements Serializable {
 			this.rootEntityId = rootEntityId;
 		}
 
-		public Integer getEntityId() {
-			return entityId;
-		}
-
-		public void setEntityId(Integer entityId) {
-			this.entityId = entityId;
-		}
-
 		public Integer getRecordId() {
 			return recordId;
 		}
@@ -982,134 +955,6 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setExportOnlyOwnedRecords(boolean exportOnlyOwnedRecords) {
 			this.exportOnlyOwnedRecords = exportOnlyOwnedRecords;
-		}
-		
-		public boolean isAlwaysGenerateZipFile() {
-			return alwaysGenerateZipFile;
-		}
-
-		public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
-			this.alwaysGenerateZipFile = alwaysGenerateZipFile;
-		}
-
-		public String getMultipleAttributeValueSeparator() {
-			return multipleAttributeValueSeparator;
-		}
-
-		public void setMultipleAttributeValueSeparator(String multipleAttributeValueSeparator) {
-			this.multipleAttributeValueSeparator = multipleAttributeValueSeparator;
-		}
-
-		public String getFieldHeadingSeparator() {
-			return fieldHeadingSeparator;
-		}
-
-		public void setFieldHeadingSeparator(String fieldHeadingSeparator) {
-			this.fieldHeadingSeparator = fieldHeadingSeparator;
-		}
-
-		public boolean isIncludeAllAncestorAttributes() {
-			return includeAllAncestorAttributes;
-		}
-
-		public void setIncludeAllAncestorAttributes(boolean includeAllAncestorAttributes) {
-			this.includeAllAncestorAttributes = includeAllAncestorAttributes;
-		}
-
-		public boolean isIncludeCodeItemPositionColumn() {
-			return includeCodeItemPositionColumn;
-		}
-
-		public void setIncludeCodeItemPositionColumn(boolean includeCodeItemPositionColumn) {
-			this.includeCodeItemPositionColumn = includeCodeItemPositionColumn;
-		}
-
-		public boolean isIncludeKMLColumnForCoordinates() {
-			return includeKMLColumnForCoordinates;
-		}
-
-		public void setIncludeKMLColumnForCoordinates(boolean includeKMLColumnForCoordinates) {
-			this.includeKMLColumnForCoordinates = includeKMLColumnForCoordinates;
-		}
-
-		public boolean isIncludeEnumeratedEntities() {
-			return includeEnumeratedEntities;
-		}
-
-		public void setIncludeEnumeratedEntities(boolean includeEnumeratedEntities) {
-			this.includeEnumeratedEntities = includeEnumeratedEntities;
-		}
-
-		public boolean isIncludeCompositeAttributeMergedColumn() {
-			return includeCompositeAttributeMergedColumn;
-		}
-
-		public void setIncludeCompositeAttributeMergedColumn(boolean includeCompositeAttributeMergedColumn) {
-			this.includeCompositeAttributeMergedColumn = includeCompositeAttributeMergedColumn;
-		}
-
-		public boolean isIncludeCodeItemLabelColumn() {
-			return includeCodeItemLabelColumn;
-		}
-
-		public void setIncludeCodeItemLabelColumn(boolean includeCodeItemLabelColumn) {
-			this.includeCodeItemLabelColumn = includeCodeItemLabelColumn;
-		}
-
-		public boolean isIncludeGroupingLabels() {
-			return includeGroupingLabels;
-		}
-
-		public void setIncludeGroupingLabels(boolean includeGroupingLabels) {
-			this.includeGroupingLabels = includeGroupingLabels;
-		}
-		
-		public boolean isIncludeCreatedByUserColumn() {
-			return includeCreatedByUserColumn;
-		}
-		
-		public void setIncludeCreatedByUserColumn(boolean includeCreatedByUserColumn) {
-			this.includeCreatedByUserColumn = includeCreatedByUserColumn;
-		}
-
-		public boolean isCodeAttributeExpanded() {
-			return codeAttributeExpanded;
-		}
-
-		public void setCodeAttributeExpanded(boolean codeAttributeExpanded) {
-			this.codeAttributeExpanded = codeAttributeExpanded;
-		}
-
-		public int getMaxMultipleAttributeValues() {
-			return maxMultipleAttributeValues;
-		}
-
-		public void setMaxMultipleAttributeValues(int maxMultipleAttributeValues) {
-			this.maxMultipleAttributeValues = maxMultipleAttributeValues;
-		}
-
-		public int getMaxExpandedCodeAttributeItems() {
-			return maxExpandedCodeAttributeItems;
-		}
-
-		public void setMaxExpandedCodeAttributeItems(int maxExpandedCodeAttributeItems) {
-			this.maxExpandedCodeAttributeItems = maxExpandedCodeAttributeItems;
-		}
-
-		public HeadingSource getHeadingSource() {
-			return headingSource;
-		}
-
-		public void setHeadingSource(HeadingSource headingSource) {
-			this.headingSource = headingSource;
-		}
-
-		public String getLanguageCode() {
-			return languageCode;
-		}
-
-		public void setLanguageCode(String languageCode) {
-			this.languageCode = languageCode;
 		}
 		
 		public Date getModifiedSince() {
@@ -1142,14 +987,6 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setSummaryAttributeValues(List<String> summaryAttributeValues) {
 			this.summaryAttributeValues = summaryAttributeValues;
-		}
-		
-		public CSVDataExportParameters.OutputFormat getOutputFormat() {
-			return outputFormat;
-		}
-		
-		public void setOutputFormat(CSVDataExportParameters.OutputFormat outputFormat) {
-			this.outputFormat = outputFormat;
 		}
 	}
 }

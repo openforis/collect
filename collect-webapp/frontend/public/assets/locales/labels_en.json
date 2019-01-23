@@ -184,11 +184,12 @@
             "notCompatibleWithCSVDataImportNote": "Not compatible with CSV data import",
             "selectEntities": "Select entities to export",
             "sourceForFileHeadings": {
-                "label": "Source for file headings",
+                "label": "Source for headings",
                 "attributeName": "Attribute name",
-                "attributeLabel": "Attribute label",
+                "instanceLabel": "Attribute label",
                 "reportingLabel": "Reporting label (Saiku)"
             },
+            "fileHeadingsLanguage": "Headings language",
             "step": "Step",
             "toCsv": "to CSV/Excel",
             "toCollectFormat": "to Collect/Calc format"

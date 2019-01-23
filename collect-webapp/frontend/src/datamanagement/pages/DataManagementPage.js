@@ -7,8 +7,6 @@ import {
 } from 'reactstrap'
 import FormControl from '@material-ui/core/FormControl'
 import FormHelperText from '@material-ui/core/FormHelperText'
-import MenuItem from '@material-ui/core/MenuItem'
-import Select from '@material-ui/core/Select'
 
 import RecordDataTable from 'datamanagement/components/RecordDataTable'
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer'
@@ -17,6 +15,7 @@ import ServiceFactory from 'services/ServiceFactory'
 import Arrays from 'utils/Arrays'
 import Containers from 'common/components/Containers'
 import Dialogs from 'common/components/Dialogs'
+import SurveyLanguagesSelect from '../../common/components/SurveyLanguagesSelect'
 import NewRecordParametersDialog from 'datamanagement/components/NewRecordParametersDialog'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
@@ -259,8 +258,8 @@ class DataManagementPage extends Component {
 		setTimeout(() => this.props.fetchRecordSummaries(), 100)
 	}
 
-	handleSurveyLanguageChange(event) {
-		this.props.selectActiveSurveyLanguage(event.target.value)
+	handleSurveyLanguageChange(lang) {
+		this.props.selectActiveSurveyLanguage(lang)
 	}
 
 	render() {
@@ -327,11 +326,7 @@ class DataManagementPage extends Component {
 					</Col>
 					<Col md={2}>
 						<FormControl>
-							<Select
-								value={surveyLanguage}
-								onChange={this.handleSurveyLanguageChange}>
-								{survey.languages.map(l => <MenuItem key={l} value={l}>{L.l('languages.' + l) + ' (' + l + ')'}</MenuItem>)}
-							</Select>
+							<SurveyLanguagesSelect survey={survey} value={surveyLanguage} onChange={this.handleSurveyLanguageChange}/>
 							<FormHelperText>{L.l('dataManagement.formLanguage')}</FormHelperText>
 						</FormControl>
 					</Col>

@@ -27,7 +27,7 @@ import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
 import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
 import org.openforis.collect.io.data.DataLine.EntityPositionIdentifier;
 import org.openforis.collect.io.data.DataLine.FieldValueKey;
-import org.openforis.collect.io.data.csv.CSVDataExportParameters.OutputFormat;
+import org.openforis.collect.io.data.csv.CSVDataExportParametersBase.OutputFormat;
 import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
