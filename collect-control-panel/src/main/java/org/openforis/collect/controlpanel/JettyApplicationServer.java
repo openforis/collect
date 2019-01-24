@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 import javax.naming.NamingException;
@@ -15,10 +13,6 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.SimpleInstanceManager;
-import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
-import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.plus.jndi.Resource;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -149,8 +143,6 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 		    "org.eclipse.jetty.webapp.JettyWebXmlConfiguration"
 		});
 
-		webapp.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
-		webapp.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
 		webapp.setParentLoaderPriority(true);
 
 		String warFileName = warFile.getName();
@@ -180,12 +172,6 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 	    } catch (IOException ignored) {
 	        return true;
 	    }
-	}
-
-	private List<ContainerInitializer> jspInitializers() {
-		JettyJasperInitializer sci = new JettyJasperInitializer();
-		ContainerInitializer initializer = new ContainerInitializer(sci, null);
-		return Arrays.asList(initializer);
 	}
 
 	private void registerDbJndiResource(WebAppContext context, JndiDataSourceConfiguration jndiDataSourceConfig) throws IOException, Exception, NamingException {

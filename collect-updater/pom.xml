@@ -49,25 +49,8 @@
 										</artifactItem>
 										<!-- Libraries -->
 										<artifactItem>
-											<groupId>commons-dbcp</groupId>
-											<artifactId>commons-dbcp</artifactId>
-											<version>1.4</version>
-											<type>jar</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>commons-pool</groupId>
-											<artifactId>commons-pool</artifactId>
-											<version>1.5.4</version>
-											<type>jar</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
 											<groupId>com.h2database</groupId>
 											<artifactId>h2</artifactId>
-											<version>1.4.193</version>
 											<type>jar</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/lib</outputDirectory>
@@ -75,7 +58,6 @@
 										<artifactItem>
 											<groupId>org.xerial</groupId>
 											<artifactId>sqlite-jdbc</artifactId>
-											<version>3.7.2</version>
 											<type>jar</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/lib</outputDirectory>

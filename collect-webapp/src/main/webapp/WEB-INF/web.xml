@@ -14,11 +14,11 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-            /WEB-INF/conf/applicationContext.xml
-            /WEB-INF/conf/applicationContext-database.xml
+			/WEB-INF/conf/applicationContext.xml
+			/WEB-INF/conf/applicationContext-database.xml
 			/WEB-INF/conf/applicationContext-security.xml
 			/WEB-INF/conf/applicationContext-graniteds.xml
-        </param-value>
+		</param-value>
 	</context-param>
 
 	<listener>
@@ -117,11 +117,6 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<servlet-mapping>
-		<servlet-name>dispatcher</servlet-name>
-		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-
 	<servlet>
 		<description>ZK loader for evaluating ZUML pages</description>
 		<servlet-name>zkLoader</servlet-name>
@@ -134,6 +129,17 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup><!-- MUST -->
 	</servlet>
+	<servlet>
+		<description>The asynchronous update engine for ZK</description>
+		<servlet-name>auEngine</servlet-name>
+		<servlet-class>org.zkoss.zk.au.http.DHtmlUpdateServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>zkLoader</servlet-name>
 		<url-pattern>*.zul</url-pattern>
@@ -142,11 +148,6 @@
 		<servlet-name>zkLoader</servlet-name>
 		<url-pattern>*.zhtml</url-pattern>
 	</servlet-mapping>
-	<servlet>
-		<description>The asynchronous update engine for ZK</description>
-		<servlet-name>auEngine</servlet-name>
-		<servlet-class>org.zkoss.zk.au.http.DHtmlUpdateServlet</servlet-class>
-	</servlet>
 	<servlet-mapping>
 		<servlet-name>auEngine</servlet-name>
 		<url-pattern>/zkau/*</url-pattern>

@@ -117,8 +117,8 @@ check_for_updates = 1</text>
 			<showMessageOnError>0</showMessageOnError>
 		</copyFile>
 		<copyFile>
-			<origin>${installdir}/lib/collect-control-panel-*.jar</origin>
-			<destination>${backup_dir}</destination>
+			<origin>${installdir}/lib/*.jar</origin>
+			<destination>${backup_dir}/lib</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
 		</copyFile>
@@ -134,9 +134,9 @@ check_for_updates = 1</text>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
 		</deleteFile>
-		<!-- delete old Control Panel files -->
+		<!-- delete old lib files -->
 		<deleteFile>
-			<path>${installdir}/lib/collect-control-panel-*.jar</path>
+			<path>${installdir}/lib/*.jar</path>
 		</deleteFile>
 	</readyToInstallActionList>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
