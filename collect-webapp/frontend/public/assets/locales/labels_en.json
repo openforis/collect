@@ -61,7 +61,7 @@
     },
     "forms": {
         "fileDropMessage": "Click to select a {0} file or drop it here.",
-        "selectOne": "--- Please select one ---" 
+        "selectOne": "--- Please select one ---"
     },
     "header": {
         "select-survey": "Select survey: "
@@ -258,10 +258,10 @@
         "name": "Name",
         "identifier": "Identifier",
         "templateType": {
-            "label" : "Template",
-            "BLANK": "Blank", 
-            "BIOPHYSICAL": "Biophysical", 
-            "COLLECT_EARTH": "Collect Earth", 
+            "label": "Template",
+            "BLANK": "Blank",
+            "BIOPHYSICAL": "Biophysical",
+            "COLLECT_EARTH": "Collect Earth",
             "COLLECT_EARTH_IPCC": "Collect Earth + IPCC"
         },
         "projectName": "Title",
@@ -272,9 +272,6 @@
         "published": "Published",
         "userGroup": "User Group",
         "target": "Target",
-        "validation": {
-            "nameAlreadyInUse": "Identifier already in use"            
-        },
         "surveyType": {
             "label": "Type",
             "temporary": "Unpublished changes",
@@ -304,6 +301,10 @@
             "successDialog": {
                 "title": "Survey published",
                 "message": "Survey \"{0}\" successfully published"
+            },
+            "confirmDialog": {
+                "publishWithWarningsTitle": "Confirm publish survey {0}",
+                "errorsFoundTitle": "Cannot publish survey {0}: errors found"
             }
         },
         "unpublish": {
@@ -337,14 +338,119 @@
                 "confirm": {
                     "title": "Delete published survey",
                     "message": "The survey \"{0}\" has been published.\n\nIf you delete it, all the records collected with this survey will be deleted.\n\nDo you want to continue?"
-                }    
+                }
             },
             "success": {
                 "title": "Survey deleted",
                 "message": "Survey \"{0}\" deleted successfully"
             }
         },
-        "noPublishedSurveysFound": "No published surveys found"
+        "noPublishedSurveysFound": "No published surveys found",
+        "validation": {
+            "nameAlreadyInUse": "Identifier already in use",
+            "error": {
+                "duplicate_name": "Another survey with the same name already exists",
+                "duplicate_uri": "Another survey with the same URI already exists",
+                "key_attribute_not_specified": "Key attribute(s) not specified",
+                "maximum_key_attribute_definitions_exceeded": "Only a maximum of 3 Key Attribute Definitions are allowed for each sampling unit",
+                "maximum_count_in_record_list_entity_definitions_exceeded": "Only a maximum of 5 entities can be configured to be counted in record summary list",
+                "empty_entity": "Empty entity",
+                "nested_tables": "Nested multiple entities with table layout are not supported",
+                "invalid_expression": "Invalid expression: {0}",
+                "circular_reference": "The expression generates a circular reference",
+                "parent_changed": "Parent changed",
+                "data_type_changed": "Data type changed",
+                "cardinality_changed_from_multiple_to_single": "Cardinality changed from multiple to single",
+                "enumerating_code_list_changed": {
+                    "code_removed": "Code removed in fixed-rows table generating code list"
+                },
+                "reserved_name": "Cannot use a reserved name",
+                "empty_code_list": "Empty code list",
+                "unused_code_list": "Unused code list"
+            },
+            "node": {
+                "name": {
+                    "error": {
+                        "max_length_exceeded": "Max length exceeded. The length of the name, including the sum of the lengths of every ancestor single entity, is {0} but it must not exceed {1} characters."
+                    }
+                },
+                "requireness": {
+                    "key_attribute_always_required": "A key attribute has to be 'Always required'"
+                },
+                "error": {
+                    "invalid_min_count_expression": "''Min Count'' expression is invalid ({0})",
+                    "invalid_max_count_expression": "''Max Count'' expression is invalid ({0})",
+                    "invalid_relevant_expression": "''Relevant when'' expression is invalid ({0})"
+                }
+            },
+            "entity": {
+                "error": {
+                    "generator_expression": "Invalid generator expression ({0})",
+                    "virtual_node_not_found_in_source_entity": "Virtual node '{0}' not found in source entity '{1}'",
+                    "missing_virtual_node": "Missing node '{0}' in virtual entity",
+                    "invalid_virtual_node_type": "Invalid type for virtual node '{0}'",
+                    "source_node_not_found_for_virtual_node": "Source node '{0}' for virtual entity not found in source entity '{1}'"
+                }
+            },
+            "attribute": {
+                "cannot_specify_checks_for_calculated_attribute": "Cannot specify checks for calculated attribute",
+                "code": {
+                    "invalid_parent_expression": "Invalid parent expression ({0})",
+                    "invalid_parent_attribute_relation": "Invalid parent code attribute specified; please check that the code list hierarchy is respected.",
+                    "invalid_parent_attribute_relation_in_referenced_parent_attribute": "Parent code attribute has a wrong code list hierarchical level; please check that the code list hierarchy is respected.",
+                    "parent_attribute_specified_for_a_flat_list": "Parent code attribute specified but code list is not hierarchical; please delete this releationship."
+                },
+                "taxon": {
+                    "error": {
+                        "invalid_qualifier_expression": "Invalid qualifier expression specified ({0})"
+                    },
+                    "invalid_taxonomy": "Invalid species list specified: {0}"
+                },
+                "default_value": {
+                    "error": {
+                        "invalid_condition_expression": "''Apply when'' condition in attribute default is invalid ({0})",
+                        "invalid_value": "Invalid value in attribute default",
+                        "invalid_expression": "''Expression'' in attribute default is invalid ({0})"
+                    }
+                },
+                "key_attribute_cannot_be_multiple": "Cannot have multiple values when 'is key' has been specified",
+                "invalid_referenced_key_attribute": "Invalid referenced key attribute: it must be the unique key attribute of an entity and have the same type of the current attribute",
+                "referenced_attribute_deleted": "Referenced attribute has been deleted"
+            },
+            "check": {
+                "error": {
+                    "invalid_condition_expression": "Apply when' condition in check is invalid ({0})"
+                },
+                "comparison": {
+                    "error": {
+                        "invalid_comparison_expression": "'Expression' in Comparison check is invalid ({0})"
+                    }
+                },
+                "custom": {
+                    "error": {
+                        "invalid_custom_expression": "'Expression' in Custom check is invalid ({0})"
+                    }
+                },
+                "distance": {
+                    "error": {
+                        "invalid_min_distance_expression": "'Min distance' expression in Distance check is invalid ({0})",
+                        "invalid_max_distance_expression": "'Max distance' expression in Distance check is invalid ({0})",
+                        "invalid_source_point_expression": "'Source' expression in Distance check is invalid ({0})",
+                        "invalid_destination_point_expression": "'Destination' expression in Distance check is invalid ({0})"
+                    }
+                },
+                "pattern": {
+                    "error": {
+                        "invalid_pattern_expression": "Invalid regular expression in Pattern check ({0})"
+                    }
+                },
+                "uniqueness": {
+                    "error": {
+                        "invalid_uniqueness_expression": "Invalid expression in Uniqueness check ({0})"
+                    }
+                }
+            }
+        }
     },
     "backupRestore": {
         "label": "Backup/Restore"
@@ -416,7 +522,10 @@
         "errorsInTheForm": "Errors in the form",
         "minLength": "It must be at least {0} characters",
         "required_field": "Required field",
-        "duplicate_value": "Duplicate value"
+        "duplicate_value": "Duplicate value",
+        "severity": "Severity",
+        "path": "Path",
+        "message": "Message"
     },
     "connection": {
         "serverConnectionError": {

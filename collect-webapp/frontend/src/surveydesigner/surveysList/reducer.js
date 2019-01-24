@@ -6,11 +6,15 @@ import {
     REQUEST_SURVEY_SUMMARIES, RECEIVE_SURVEY_SUMMARIES, INVALIDATE_SURVEY_SUMMARIES, SURVEY_USER_GROUP_CHANGED,
     SURVEY_CREATED, SURVEY_UPDATED, SURVEY_DELETED
 } from 'actions/surveys'
+import { SHOW_SURVEY_VALIDATION, HIDE_SURVEY_VALIDATION } from '../../actions/surveys';
 
 const defaultState = {
     isFetching: false,
     didInvalidate: false,
-    items: []
+    items: [],
+    validationResultShown: false,
+    validationResult: null,
+    validationSurvey: null,
 }
 
 function surveysList(
@@ -78,7 +82,21 @@ function surveysList(
                 return state
             }
         }
-
+        case SHOW_SURVEY_VALIDATION:
+            const {validationResult, survey} = action
+            return {
+                ...state,
+                validationResultShown: true,
+                validationResult,
+                validationSurvey: survey
+            }
+        case HIDE_SURVEY_VALIDATION:
+            return {
+                ...state,
+                validationResultShown: false,
+                validationResult: null,
+                validationSurvey: null
+            }
         default:
             return state
     }

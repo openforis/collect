@@ -81,8 +81,10 @@ export default class SurveyService extends AbstractService {
         return this.downloadFile(this.BASE_URL + 'survey/export/' + surveyId + '/result')
     }
 
-    publish(surveyId) {
-        return this.post('survey/publish/' + surveyId)
+    publish(surveyId, ignoreWarnings = false) {
+        return this.post('survey/publish/' + surveyId, {
+            ignoreWarnings
+        })
     }
 
     unpublish(surveyId) {

@@ -10,13 +10,12 @@ export const INVALIDATE_SURVEY_SUMMARIES = 'INVALIDATE_SURVEY_SUMMARIES'
 export const CHANGE_SURVEY_USER_GROUP = 'CHANGE_SURVEY_USER_GROUP'
 export const REQUEST_SURVEY_USER_GROUP_CHANGE = 'REQUEST_SURVEY_USER_GROUP_CHANGE'
 export const SURVEY_USER_GROUP_CHANGED = 'SURVEY_USER_GROUP_CHANGED'
+export const SHOW_SURVEY_VALIDATION = 'SHOW_SURVEY_VALIDATION'
+export const HIDE_SURVEY_VALIDATION = 'HIDE_SURVEY_VALIDATION'
 
 export const SURVEY_CREATED = 'SURVEY_CREATED'
 export const SURVEY_UPDATED = 'SURVEY_UPDATED'
 export const SURVEY_DELETED = 'SURVEY_DELETED'
-
-const dispatchSurveyUpdated = (dispatch, surveySummary) =>
-    dispatch({ type: SURVEY_UPDATED, surveySummary })
 
 function requestSurveySummaries() {
     return {
@@ -32,6 +31,16 @@ function receiveSurveySummaries(json) {
     }
 }
 
+const showSurveyValidation = (survey, validationResult) => ({
+    type: SHOW_SURVEY_VALIDATION,
+    survey,
+    validationResult
+})
+
+export const hideSurveyValidation = () => ({
+    type: HIDE_SURVEY_VALIDATION
+})
+
 export function fetchSurveySummaries() {
     return function (dispatch) {
         dispatch(requestSurveySummaries())
@@ -43,14 +52,19 @@ export function fetchSurveySummaries() {
     }
 }
 
-export const publishSurvey = (survey) =>
+export const publishSurvey = (survey, ignoreWarnings = false) =>
     dispatch => {
-        ServiceFactory.surveyService.publish(survey.id)
-            .then(s => {
-                Dialogs.alert(L.l('survey.publish.successDialog.title'),
+        dispatch(hideSurveyValidation())
+        ServiceFactory.surveyService.publish(survey.id, ignoreWarnings)
+            .then(response => {
+                if (response.validationResult) {
+                    dispatch(showSurveyValidation(survey, response.validationResult))
+                } else {
+                    Dialogs.alert(L.l('survey.publish.successDialog.title'),
                     L.l('survey.publish.successDialog.message', survey.name))
-                //survey update managed by WebSocket
-                //dispatchSurveyUpdated(dispatch, s)
+                    //survey update managed by WebSocket
+                    //dispatchSurveyUpdated(dispatch, s)
+                }
             })
     }
 

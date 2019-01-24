@@ -16,6 +16,7 @@ import L from 'utils/Labels';
 import Arrays from 'utils/Arrays';
 import RouterUtils from 'utils/RouterUtils';
 import { changeUserGroup, publishSurvey, unpublishSurvey, deleteSurvey } from 'actions/surveys';
+import SurveyValidationResultDialog from '../components/SurveyValidationResultDialog';
 
 class SurveysListPage extends Component {
 
@@ -153,7 +154,7 @@ class SurveysListPage extends Component {
     }
 
     render() {
-        const { surveys, userGroups, loggedUser } = this.props
+        const { surveys, userGroups, loggedUser, validationResultShown } = this.props
 
         if (surveys === null) {
             return <div>Loading...</div>
@@ -229,6 +230,10 @@ class SurveysListPage extends Component {
 
         return (
             <MaxAvailableSpaceContainer ref="survey-list-container">
+                {
+                    validationResultShown &&
+                    <SurveyValidationResultDialog />
+                }
                 <Row className="action-bar justify-content-between">
                     <Col sm={3}>
                         <Button color="info" onClick={this.handleNewButtonClick}>{L.l('general.new')}</Button>
@@ -314,7 +319,8 @@ class SurveysListPage extends Component {
 }
 
 const mapStateToProps = state => {
-    const surveys = state.surveyDesigner.surveysList ? state.surveyDesigner.surveysList.items : null
+    const surveysListState = state.surveyDesigner.surveysList
+    const surveys = surveysListState ? surveysListState.items : null
     const userGroups = state.userGroups ? state.userGroups.items : null
 
     //update user group with cached one
@@ -323,12 +329,13 @@ const mapStateToProps = state => {
             s.userGroup = userGroups.find(u => u.id === s.userGroupId)
         })
     }
-    
+
     return {
         survey: state.activeSurvey ? state.activeSurvey.survey : null,
         userGroups,
         loggedUser: state.session ? state.session.loggedUser : null,
         surveys,
+        validationResultShown: surveysListState.validationResultShown
     }
 }
 

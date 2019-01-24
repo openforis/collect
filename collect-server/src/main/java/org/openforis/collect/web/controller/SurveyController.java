@@ -12,9 +12,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +38,12 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
@@ -107,7 +114,7 @@ public class SurveyController extends BasicController {
 	@Autowired
 	private AppWS appWS;
 
-	//validators
+	// validators
 	@Autowired
 	private SurveyCreationParametersValidator surveyCreationParametersValidator;
 	@Autowired
@@ -116,6 +123,10 @@ public class SurveyController extends BasicController {
 	private SurveyImportParametersValidator surveyImportParametersValidator;
 	@Autowired
 	private SurveyCloneParametersValidator surveyCloneParametersValidator;
+	@Autowired
+	private SurveyValidator surveyValidator;
+	@Autowired
+	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 
 	private SurveyBackupInfoExtractorJob surveyBackupInfoExtractorJob;
 	private File uploadedSurveyFile;
@@ -217,6 +228,9 @@ public class SurveyController extends BasicController {
 		if (survey.isPublished()) {
 			String surveyUri = survey.getUri();
 			CollectSurvey temporarySurvey = surveyManager.createTemporarySurveyFromPublished(surveyUri, loggedUser);
+			
+			sendSurveysUpdatedMessage();
+			
 			response.setObject(temporarySurvey.getId());
 		} else {
 			response.setErrorStatus();
@@ -232,12 +246,23 @@ public class SurveyController extends BasicController {
 	
 	@RequestMapping(value="publish/{id}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public @ResponseBody SurveyView publishSurvey(@PathVariable int id) throws SurveyImportException {
+	public @ResponseBody Map<String, Object> publishSurvey(@PathVariable int id, @RequestParam boolean ignoreWarnings) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		User activeUser = sessionManager.getLoggedUser();
-		surveyManager.publish(survey, activeUser);
-		sendSurveysUpdatedMessage();
-		return generateView(survey, false);
+		SurveyValidator surveyValidator = getSurveyValidator(survey);
+		ValidationParameters validationParameters = new ValidationParameters();
+		validationParameters.setWarnOnEmptyCodeLists(!ignoreWarnings);
+		validationParameters.setWarnOnUnusedCodeLists(!ignoreWarnings);
+		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
+		Map<String, Object> response = new HashMap<String, Object>();
+		if (results.hasErrors() || results.hasWarnings()) {
+			response.put("validationResult", results);
+		} else {
+			User activeUser = sessionManager.getLoggedUser();
+			surveyManager.publish(survey, activeUser);
+			sendSurveysUpdatedMessage();
+			response.put("survey", generateView(survey, false));
+		}
+		return response;
 	}
 	
 	@RequestMapping(value="unpublish/{id}", method=POST)
@@ -531,6 +556,10 @@ public class SurveyController extends BasicController {
 	
 	private void sendSurveysUpdatedMessage() {
 		appWS.sendMessage(SURVEYS_UPDATED, 500); //delay to allow transaction commit
+	}
+	
+	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
+		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
 	}
 	
 	public static class SurveyCreationParameters {
