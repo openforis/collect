@@ -24,7 +24,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.CESurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -484,7 +484,7 @@ public class SurveyController extends BasicController {
 //			surveyBackupJob.setIncludeData(parameters.isIncludeData());
 //			surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
 			job.setOutputFormat(org.openforis.collect.io.SurveyBackupJob.OutputFormat.valueOf(params.getOutputFormat().name()));
-			job.setOutputSurveyDefaultLanguage(ObjectUtils.defaultIfNull(params.getLanguageCode(), loadedSurvey.getDefaultLanguage()));
+			job.setOutputSurveyDefaultLanguage(StringUtils.defaultIfEmpty(params.getLanguageCode(), loadedSurvey.getDefaultLanguage()));
 			jobManager.start(job, String.valueOf(loadedSurvey.getId()));
 			this.surveyBackupJob = job;
 			return new JobView(job);

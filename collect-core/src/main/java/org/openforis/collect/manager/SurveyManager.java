@@ -836,6 +836,9 @@ public class SurveyManager {
 			if ( temporarySurvey.getSamplingDesignCodeList() == null ) {
 				temporarySurvey.addSamplingDesignCodeList();
 			}
+			UserGroup userGroup = userGroupManager.loadById(temporarySurvey.getUserGroupId());
+			temporarySurvey.setUserGroup(userGroup);
+
 			surveyDao.insert(temporarySurvey);
 			
 			publishedSurvey = getByUri(uri);
