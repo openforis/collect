@@ -183,18 +183,27 @@ public class SurveyValidator {
 	/**
 	 * Verifies that the survey is compatible with an existing one and that replacing the old one
 	 * will not break the inserted data (if any). 
-	 * 
 	 */
 	public SurveyValidationResults validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
-		SurveyValidationResults results = validate(newSurvey);
+		return validateCompatibility(oldPublishedSurvey, newSurvey, new ValidationParameters());
+	}
+	
+	public SurveyValidationResults validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey, 
+			ValidationParameters parameters) {
+		SurveyValidationResults results = validate(newSurvey, parameters);
 		if ( oldPublishedSurvey != null ) {
 			results.addResults(validateChanges(oldPublishedSurvey, newSurvey));
 		}
 		return results;
 	}
-	
+
 	public void checkCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) throws SurveyValidationException {
-		SurveyValidationResults results = validateCompatibility(oldPublishedSurvey, newSurvey);
+		checkCompatibility(oldPublishedSurvey, newSurvey, new ValidationParameters());
+	}
+
+	public void checkCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey, 
+			ValidationParameters parameters) throws SurveyValidationException {
+		SurveyValidationResults results = validateCompatibility(oldPublishedSurvey, newSurvey, parameters);
 		if ( results.hasErrors() ) {
 			throw new SurveyValidationException("The survey is not compatible with the old published one");
 		}
@@ -1109,6 +1118,10 @@ public class SurveyValidator {
 
 		public void setValidateOnlyFirstLines(boolean validateOnlyFirstLines) {
 			this.validateOnlyFirstLines = validateOnlyFirstLines;
+		}
+		
+		public void setWarningsIgnored(boolean warningsIgnored) {
+			this.warnOnEmptyCodeLists = this.warnOnUnusedCodeLists = !warningsIgnored;
 		}
 	}
 }
