@@ -191,6 +191,10 @@
 			</folderList>
 			
 			<postInstallationActionList>
+				<createDirectory>
+					<path>${installdir}/autoupdate</path>
+					<abortOnError>0</abortOnError>
+				</createDirectory>
 				<unzip>
 					<destinationDirectory>${installdir}/autoupdate</destinationDirectory>
 					<zipFile>${installdir}/temp/autoupdate-osx.app.zip</zipFile>
