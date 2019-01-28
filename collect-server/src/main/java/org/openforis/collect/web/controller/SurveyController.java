@@ -12,11 +12,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -246,23 +244,23 @@ public class SurveyController extends BasicController {
 	
 	@RequestMapping(value="publish/{id}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public @ResponseBody Map<String, Object> publishSurvey(@PathVariable int id, @RequestParam boolean ignoreWarnings) throws SurveyImportException {
+	public @ResponseBody SurveyPublishResult publishSurvey(
+			@PathVariable int id, @RequestParam boolean ignoreWarnings) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		SurveyValidator surveyValidator = getSurveyValidator(survey);
+		CollectSurvey publishedSurvey = survey.isPublished() ? surveyManager
+				.getByUri(survey.getUri()) : null;
+		SurveyValidator validator = getSurveyValidator(survey);
 		ValidationParameters validationParameters = new ValidationParameters();
-		validationParameters.setWarnOnEmptyCodeLists(!ignoreWarnings);
-		validationParameters.setWarnOnUnusedCodeLists(!ignoreWarnings);
-		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
-		Map<String, Object> response = new HashMap<String, Object>();
+		validationParameters.setWarningsIgnored(ignoreWarnings);
+		SurveyValidationResults results = validator.validateCompatibility(publishedSurvey, survey, validationParameters);
 		if (results.hasErrors() || results.hasWarnings()) {
-			response.put("validationResult", results);
+			return new SurveyPublishResult(results);
 		} else {
 			User activeUser = sessionManager.getLoggedUser();
 			surveyManager.publish(survey, activeUser);
 			sendSurveysUpdatedMessage();
-			response.put("survey", generateView(survey, false));
+			return new SurveyPublishResult(generateView(survey, false));
 		}
-		return response;
 	}
 	
 	@RequestMapping(value="unpublish/{id}", method=POST)
@@ -792,4 +790,26 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
+	public class SurveyPublishResult {
+		private SurveyView survey;
+		private SurveyValidationResults validationResult;
+		
+		public SurveyPublishResult(SurveyView survey) {
+			super();
+			this.survey = survey;
+		}
+
+		public SurveyPublishResult(SurveyValidationResults validationResult) {
+			super();
+			this.validationResult = validationResult;
+		}
+		
+		public SurveyView getSurvey() {
+			return survey;
+		}
+		
+		public SurveyValidationResults getValidationResult() {
+			return validationResult;
+		}
+	}
 }

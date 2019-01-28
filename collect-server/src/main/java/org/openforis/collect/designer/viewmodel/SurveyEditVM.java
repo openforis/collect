@@ -389,8 +389,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			String confirmButtonLabel, boolean showWarnings) {
 		SurveyValidator surveyValidator = getSurveyValidator(survey);
 		ValidationParameters validationParameters = new ValidationParameters();
-		validationParameters.setWarnOnEmptyCodeLists(showWarnings);
-		validationParameters.setWarnOnUnusedCodeLists(showWarnings);
+		validationParameters.setWarningsIgnored(showWarnings);
 		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
 		if ( results.hasErrors() || results.hasWarnings() ) {
 			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm, 

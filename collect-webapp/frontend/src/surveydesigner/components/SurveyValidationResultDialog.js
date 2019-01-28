@@ -43,7 +43,7 @@ class SurveyValidationResultDialog extends Component {
                 <DialogTitle>{L.l(`survey.publish.confirmDialog.${hasErrors ? 'errorsFoundTitle' : 'publishWithWarningsTitle'}`,
                     validationSurvey.name)}</DialogTitle>
                 <DialogContent>
-                    <BootstrapTable
+                    <BootstrapTable height={400}
                         data={validationResult.results}>
                         <TableHeaderColumn key="flag" dataField="flag"
                             width="100" dataSort>{L.l('validation.severity')}</TableHeaderColumn>
