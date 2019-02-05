@@ -1,4 +1,4 @@
-$(window, document, undefined).ready(function() {
+$(window, document).ready(function() {
 	const DEFAULT_PASSWORD_ACTIVE_ENDPOINT = "api/defaultpasswordactive"
 	const DEFAULT_USERNAME = 'admin';
 	const DEFAULT_PASSWORD = 'admin';
@@ -106,8 +106,3 @@ $(window, document, undefined).ready(function() {
 		$('body').addClass('loaded');
 	}
 });
-
-/*
-
-
-*/

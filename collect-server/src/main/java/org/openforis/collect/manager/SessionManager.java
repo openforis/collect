@@ -45,9 +45,8 @@ public class SessionManager {
 	
 	public void createSessionState(HttpSession session) {
 		String sessionId = session.getId();
-		boolean developmentMode = CollectConfiguration.isDevelopmentMode();
 		SessionState sessionState = new SessionState(sessionId);
-		if (developmentMode) {
+		if (CollectConfiguration.isDevelopmentMode()) {
 			sessionState.setUser(userManager.loadAdminUser());
 //			sessionState.setUser(userManager.loadByUserName("view"));
 //			sessionState.setUser(userManager.loadByUserName("entry"));
