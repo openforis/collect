@@ -306,6 +306,12 @@ public class SurveyController extends BasicController {
 		surveyCloneJob.setNewName(params.newSurveyName);
 		surveyCloneJob.setOriginalSurveyType(params.originalSurveyType);
 		surveyCloneJob.setActiveUser(sessionManager.getLoggedUser());
+		surveyCloneJob.addStatusChangeListener(new WorkerStatusChangeListener() {
+			public void statusChanged(WorkerStatusChangeEvent event) {
+				if (event.getTo() == Status.COMPLETED)
+					sendSurveysUpdatedMessage();
+			}
+		});
 		jobManager.start(surveyCloneJob);
 		return new JobView(surveyCloneJob);
 	}
