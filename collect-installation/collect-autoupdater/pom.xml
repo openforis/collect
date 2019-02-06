@@ -1,0 +1,164 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.openforis.collect</groupId>
+		<artifactId>collect-installation</artifactId>
+		<version>3.24.9-SNAPSHOT</version>
+	</parent>
+	<artifactId>collect-autoupdater</artifactId>
+
+	<packaging>pom</packaging>
+	<name>Open Foris Collect Autoupdater</name>
+	<description>Module to create the autoupdater for Open Foris Collect</description>
+
+	<properties>
+		<!-- to avoid replacing relative path to images and other resources used 
+			by the installer -->
+		<installer-build-path>${project.build.directory}/installer</installer-build-path>
+		<installbuilder-autoupdate-configuration-file-name>installbuilder-autoupdate.xml</installbuilder-autoupdate-configuration-file-name>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>installer</id>
+			<build>
+				<plugins>
+					<!-- 1. copy resource files -->
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.6</version>
+						<executions>
+							<execution>
+								<id>copy-installbuilder-source-file</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${installer-build-path}</outputDirectory>
+									<resources>
+										<resource>
+											<directory>src/main/resources</directory>
+											<includes>
+												<include>**</include>
+											</includes>
+										</resource>
+									</resources>
+									<overwrite>true</overwrite>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+		
+					<!-- 2. replace application version into the xml installbuilder source 
+						file -->
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>replacer</artifactId>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<basedir>${installer-build-path}</basedir>
+							<includes>
+								<include>${installbuilder-autoupdate-configuration-file-name}</include>
+							</includes>
+							<regex>false</regex>
+							<replacements>
+								<replacement>
+									<token>PROJECT_VERSION</token>
+									<value>${project.version}</value>
+								</replacement>
+								<replacement>
+									<token>UPDATE_XML_URL</token>
+									<value>${collect.update.url}</value>
+								</replacement>
+							</replacements>
+						</configuration>
+					</plugin>
+		
+					<!-- 3. execute installbuilder to produce the autoupdaters -->
+					<plugin>
+						<groupId>com.soebes.maven.plugins</groupId>
+						<artifactId>iterator-maven-plugin</artifactId>
+						<executions>
+							<!-- generate autoupdaters -->
+							<execution>
+								<id>generate-autoupdater</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>iterator</goal>
+								</goals>
+								<configuration>
+									<pluginExecutors>
+										<pluginExecutor>
+											<plugin>
+												<groupId>org.codehaus.mojo</groupId>
+												<artifactId>exec-maven-plugin</artifactId>
+											</plugin>
+											<goal>exec</goal>
+											<configuration>
+												<executable>${installbuilder.home}/autoupdate/bin/${installbuilder.autoupdate.executable}</executable>
+												<arguments>
+													<argument>build</argument>
+													<argument>${installer-build-path}/${installbuilder-autoupdate-configuration-file-name}</argument>
+													<argument>${installer.classifier}</argument>
+												</arguments>
+											</configuration>
+										</pluginExecutor>
+										<!-- move generated autoupdater files into the target folder -->
+										<pluginExecutor>
+											<plugin>
+												<groupId>org.apache.maven.plugins</groupId>
+												<artifactId>maven-antrun-plugin</artifactId>
+											</plugin>
+											<goal>run</goal>
+											<configuration>
+												<target>
+													<move file="${installbuilder.autoupdate.output}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" tofile="${project.build.directory}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}" failonerror="true" />
+												</target>
+											</configuration>
+										</pluginExecutor>
+									</pluginExecutors>
+								</configuration>
+							</execution>
+							<!-- attach autoupdaters as artifacts -->
+							<execution>
+								<id>attach-installer-artifacts</id>
+								<phase>package</phase>
+								<goals>
+									<goal>iterator</goal>
+								</goals>
+								<configuration>
+									<pluginExecutors>
+										<pluginExecutor>
+											<plugin>
+												<groupId>org.codehaus.mojo</groupId>
+												<artifactId>build-helper-maven-plugin</artifactId>
+											</plugin>
+											<goal>attach-artifact</goal>
+											<configuration>
+												<artifacts>
+													<artifact>
+														<file>${project.build.directory}/autoupdate-${installer.classifier}.${installer.autoupdater.extension}</file>
+														<classifier>${installer.classifier}</classifier>
+														<type>${installer.artifact.type}</type>
+													</artifact>
+												</artifacts>
+											</configuration>
+										</pluginExecutor>
+									</pluginExecutors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

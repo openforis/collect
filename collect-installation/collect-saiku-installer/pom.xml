@@ -1,0 +1,231 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.openforis.collect</groupId>
+		<artifactId>collect-installation</artifactId>
+		<version>3.24.9-SNAPSHOT</version>
+	</parent>
+	<artifactId>collect-saiku-installer</artifactId>
+	<packaging>pom</packaging>
+	<name>Open Foris Collect Saiku</name>
+	<description>Add Saiku webapp to Open Foris Collect</description>
+	
+	<properties>
+		<!-- to avoid replacing relative path to images and other resources used by the installer -->
+		<installer-build-path>${project.build.directory}/installer</installer-build-path>
+		<installbuilder-saiku-installer-file-name>installbuilder-saiku-installer.xml</installbuilder-saiku-installer-file-name>
+		<autoupdate-xml-file-name>update.xml</autoupdate-xml-file-name>
+		<saiku-version>2.6</saiku-version>
+		<!-- saiku installer file names -->
+		<windows-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-windows-installer.exe</windows-saiku-installer-file-name>
+		<linux-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-linux-installer.run</linux-saiku-installer-file-name>
+		<osx-saiku-installer-file-name>OpenForisCollectSaiku-${installer-version-id}-osx-installer.dmg</osx-saiku-installer-file-name>
+	</properties>
+	
+	<profiles>
+		<profile>
+			<id>installer</id>
+			<build>
+				<plugins>
+					
+					<!-- 1. copy webapp war file -->
+					<plugin>
+		                      <groupId>org.apache.maven.plugins</groupId>
+		                      <artifactId>maven-dependency-plugin</artifactId>
+		                      <executions>
+		                  		<execution>
+								<id>copy-saiku-webapp</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>meteorite.bi</groupId>
+											<artifactId>saiku-webapp-full</artifactId>
+											<version>${saiku-version}</version>
+											<type>war</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/</outputDirectory>
+											<destFileName>saiku.war</destFileName>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					
+					<!-- 2. copy resource files -->
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.6</version>
+						<executions>
+							<execution>
+								<id>copy-installbuilder-source-file</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${installer-build-path}</outputDirectory>
+									<resources>
+										<resource>
+											<directory>src/main/resources</directory>
+											<includes>
+								                <include>**</include>
+								            </includes>
+										</resource>
+									</resources>
+						            <overwrite>true</overwrite>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					
+					<!-- 3. replace application version into the xml installbuilder source 
+						file -->
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>replacer</artifactId>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<basedir>${installer-build-path}</basedir>
+							<includes>
+								<include>${installbuilder-saiku-installer-file-name}</include>
+							</includes>
+							<regex>false</regex>
+							<replacements>
+								<replacement>
+									<token>VERSION_ID</token>
+									<value>${installer-version-id}</value>
+								</replacement>
+							</replacements>
+						</configuration>
+					</plugin>
+					
+					<!-- 4. execute installbuilder to produce the installers -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<!-- Linux -->
+							<execution>
+								<id>linux-installer</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
+										<argument>linux</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<!-- Windows -->
+							<execution>
+								<id>windows-installer</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
+										<argument>windows</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<!-- OS X -->
+							<execution>
+								<id>osx-installer</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder.home}/bin/${installbuilder.builder.executable}</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-saiku-installer-file-name}</argument>
+										<argument>osx</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					
+					<!--  5. move the installers into the target folder -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>run-ant-move-installers-into-build-directory</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<move file="${installbuilder.builder.output}/${windows-saiku-installer-file-name}" tofile="${project.build.directory}/${windows-saiku-installer-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${linux-saiku-installer-file-name}" tofile="${project.build.directory}/${linux-saiku-installer-file-name}" failonerror="false" />
+										<move file="${installbuilder.builder.output}/${osx-saiku-installer-file-name}" tofile="${project.build.directory}/${osx-saiku-installer-file-name}" failonerror="false" />
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+		
+			    	<!-- 6. attach installers as artifact -->
+					<plugin>
+					    <groupId>org.codehaus.mojo</groupId>
+					    <artifactId>build-helper-maven-plugin</artifactId>
+					    <executions>
+					        <execution>
+					            <id>attach-installer-artifacts</id>
+					            <phase>package</phase>
+					            <goals>
+					                <goal>attach-artifact</goal>
+					            </goals>
+					            <configuration>
+					                <artifacts>
+					                    <artifact>
+					                        <file>${project.build.directory}/${windows-saiku-installer-file-name}</file>
+					                        <classifier>windows</classifier>
+					                        <type>exe</type>
+					                    </artifact>
+					                    <artifact>
+					                        <file>${project.build.directory}/${linux-saiku-installer-file-name}</file>
+					                        <classifier>linux</classifier>
+					                        <type>run</type>
+					                    </artifact>
+					                    <artifact>
+					                        <file>${project.build.directory}/${osx-saiku-installer-file-name}</file>
+					                        <classifier>osx</classifier>
+					                        <type>zip</type>
+					                    </artifact>
+					                </artifacts>
+					            </configuration>
+					        </execution>
+					    </executions>
+					</plugin>
+				</plugins>
+			</build>		
+		</profile>
+	</profiles>
+
+</project>

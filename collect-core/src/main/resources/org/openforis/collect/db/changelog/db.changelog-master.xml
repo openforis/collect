@@ -7,4 +7,5 @@
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-sqlite.xml" />
   <include file="org/openforis/collect/db/changelog/h2/db.changelog-h2.xml" />
   
+  <includeAll path="org/openforis/collect/db/changelog/standard/postgresql"/>
 </databaseChangeLog>

@@ -1,0 +1,991 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+	
+	<changeSet author="admin" id="standard-0000-baseline" dbms="DBMS_ID">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="ofc_application_info" />
+			</not>
+		</preConditions>
+		<createTable tableName="ofc_application_info">
+			<column name="version" type="VARCHAR(25)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_code_list">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_code_list_pkey" />
+			</column>
+			<column name="survey_id" type="int4" />
+			<column name="code_list_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="item_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="parent_id" type="int4" />
+			<column name="sort_order" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="code" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="qualifiable" type="bool" />
+			<column name="since_version_id" type="int4" />
+			<column name="deprecated_version_id" type="int4" />
+			<column name="label1" type="VARCHAR(255)" />
+			<column name="label2" type="VARCHAR(255)" />
+			<column name="label3" type="VARCHAR(255)" />
+			<column name="label4" type="VARCHAR(255)" />
+			<column name="label5" type="VARCHAR(255)" />
+			<column name="description1" type="VARCHAR(1023)" />
+			<column name="description2" type="VARCHAR(1023)" />
+			<column name="description3" type="VARCHAR(1023)" />
+			<column name="description4" type="VARCHAR(1023)" />
+			<column name="description5" type="VARCHAR(1023)" />
+			<column name="level" type="int4" />
+			<column name="image_content" type="bytea" />
+			<column name="image_file_name" type="VARCHAR(255)" />
+			<column name="color" type="char(6)" />
+		</createTable>
+		<createTable tableName="ofc_config">
+			<column name="name" type="VARCHAR(25)">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_config_pkey" />
+			</column>
+			<column name="value" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_data_cleansing_chain">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_cleansing_chain_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP WITH TIME ZONE">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="TIMESTAMP WITH TIME ZONE" />
+		</createTable>
+		<createTable tableName="ofc_data_cleansing_chain_steps">
+			<column name="chain_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="step_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="pos" type="int4">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_data_cleansing_report">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_cleansing_report_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="cleansing_chain_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="record_step" type="int4" />
+			<column name="dataset_size" type="int4" />
+			<column name="last_record_modified_date"
+				type="TIMESTAMP WITH TIME ZONE" />
+			<column name="cleansed_records" type="int4" />
+			<column name="cleansed_nodes" type="int4" />
+			<column name="creation_date" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="modified_date" type="TIMESTAMP WITH TIME ZONE" />
+		</createTable>
+		<createTable tableName="ofc_data_cleansing_step">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_cleansing_step_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="query_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP WITH TIME ZONE">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="TIMESTAMP WITH TIME ZONE" />
+			<column defaultValue="a" name="type" type="char(1)" />
+		</createTable>
+		<createTable tableName="ofc_data_cleansing_step_value">
+			<column name="step_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="sort_order" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="condition" type="VARCHAR(512)" />
+			<column name="type" type="char(1)" />
+			<column name="fix_expression" type="VARCHAR(512)" />
+			<column name="field_fix_expression1" type="VARCHAR(512)" />
+			<column name="field_fix_expression2" type="VARCHAR(512)" />
+			<column name="field_fix_expression3" type="VARCHAR(512)" />
+			<column name="field_fix_expression4" type="VARCHAR(512)" />
+			<column name="field_fix_expression5" type="VARCHAR(512)" />
+			<column name="field_fix_expression6" type="VARCHAR(512)" />
+		</createTable>
+		<createTable tableName="ofc_data_query">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_query_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="modified_date" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="entity_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="attribute_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="conditions" type="TEXT" />
+			<column name="type_id" type="int4" />
+			<column defaultValue="n" name="severity" type="char(1)" />
+		</createTable>
+		<createTable tableName="ofc_data_query_group">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_query_group_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="modified_date" type="TIMESTAMP WITH TIME ZONE" />
+		</createTable>
+		<createTable tableName="ofc_data_query_group_query">
+			<column name="group_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="query_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="sort_order" type="int4">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_data_query_type">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_query_type_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="code" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="label" type="VARCHAR(255)" />
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="modified_date" type="TIMESTAMP WITH TIME ZONE" />
+		</createTable>
+		<createTable tableName="ofc_data_report">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_report_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="query_group_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="record_step" type="int4" />
+			<column name="dataset_size" type="int4" />
+			<column name="last_record_modified_date"
+				type="TIMESTAMP WITH TIME ZONE" />
+			<column name="creation_date" type="TIMESTAMP WITH TIME ZONE" />
+		</createTable>
+		<createTable tableName="ofc_data_report_item">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_report_item_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="report_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="query_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="record_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="parent_entity_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="node_index" type="int4" />
+			<column name="value" type="VARCHAR(255)" />
+			<column name="status" type="char(1)" />
+		</createTable>
+		<createTable tableName="ofc_imagery">
+			<column autoIncrement="true" name="id" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_imagery_pkey" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="attribution" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="extent" type="VARCHAR(255)" />
+			<column name="source_config" type="VARCHAR(2047)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="N" name="visibility"
+				remarks="N=Private, P=Public" type="char(1)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_logo">
+			<column name="pos" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_logo_pkey" />
+			</column>
+			<column name="image" type="bytea">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_message">
+			<column name="id" type="VARCHAR(2147483647)">
+				<constraints nullable="false" />
+			</column>
+			<column autoIncrement="true" name="sequence_no" type="serial">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_ofc_message" />
+			</column>
+			<column name="publication_time"
+				type="TIMESTAMP WITH TIME ZONE">
+				<constraints nullable="false" />
+			</column>
+			<column name="queue_id" type="VARCHAR(2147483647)">
+				<constraints nullable="false" />
+			</column>
+			<column name="message_string" type="VARCHAR(2147483647)" />
+			<column name="message_bytes" type="bytea" />
+		</createTable>
+		<createTable tableName="ofc_message_processing">
+			<column name="message_id" type="VARCHAR(2147483647)">
+				<constraints nullable="false" />
+			</column>
+			<column name="consumer_id" type="VARCHAR(2147483647)">
+				<constraints nullable="false" />
+			</column>
+			<column name="version_id" type="VARCHAR(2147483647)">
+				<constraints nullable="false" />
+			</column>
+			<column name="state" type="VARCHAR(2147483647)">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_updated" type="TIMESTAMP WITH TIME ZONE">
+				<constraints nullable="false" />
+			</column>
+			<column name="times_out" type="TIMESTAMP WITH TIME ZONE">
+				<constraints nullable="false" />
+			</column>
+			<column name="retries" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="error_message" type="TEXT" />
+		</createTable>
+		<createTable tableName="ofc_record">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_record_pkey" />
+			</column>
+			<column name="survey_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="root_entity_definition_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="created_by_id" type="int4" />
+			<column name="date_modified" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="modified_by_id" type="int4" />
+			<column name="model_version" type="VARCHAR(255)" />
+			<column name="step" type="int4" />
+			<column name="data_seq_num" type="int4" />
+			<column name="state" type="char(1)" />
+			<column name="skipped" type="int4" />
+			<column name="missing" type="int4" />
+			<column name="errors" type="int4" />
+			<column name="warnings" type="int4" />
+			<column name="key1" type="VARCHAR(2048)" />
+			<column name="key2" type="VARCHAR(2048)" />
+			<column name="key3" type="VARCHAR(2048)" />
+			<column name="count1" type="int4" />
+			<column name="count2" type="int4" />
+			<column name="count3" type="int4" />
+			<column name="count4" type="int4" />
+			<column name="count5" type="int4" />
+			<column name="qualifier1" type="VARCHAR(255)" />
+			<column name="qualifier2" type="VARCHAR(255)" />
+			<column name="qualifier3" type="VARCHAR(255)" />
+			<column name="summary1" type="VARCHAR(255)" />
+			<column name="summary2" type="VARCHAR(255)" />
+			<column name="summary3" type="VARCHAR(255)" />
+			<column name="owner_id" type="int4" />
+			<column defaultValue="3.9.0" name="app_version"
+				type="VARCHAR(63)" />
+		</createTable>
+		<createTable tableName="ofc_record_data">
+			<column name="record_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="seq_num" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="step" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="state" type="char(1)" />
+			<column name="date_created" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="created_by" type="int4" />
+			<column name="date_modified" type="TIMESTAMP WITH TIME ZONE" />
+			<column name="modified_by" type="int4" />
+			<column name="skipped" type="int4" />
+			<column name="missing" type="int4" />
+			<column name="errors" type="int4" />
+			<column name="warnings" type="int4" />
+			<column name="count1" type="int4" />
+			<column name="count2" type="int4" />
+			<column name="count3" type="int4" />
+			<column name="count4" type="int4" />
+			<column name="count5" type="int4" />
+			<column name="data" type="bytea">
+				<constraints nullable="false" />
+			</column>
+			<column name="app_version" type="VARCHAR(63)">
+				<constraints nullable="false" />
+			</column>
+			<column name="key1" type="VARCHAR(2048)" />
+			<column name="key2" type="VARCHAR(2048)" />
+			<column name="key3" type="VARCHAR(2048)" />
+			<column name="qualifier1" type="VARCHAR(255)" />
+			<column name="qualifier2" type="VARCHAR(255)" />
+			<column name="qualifier3" type="VARCHAR(255)" />
+			<column name="summary1" type="VARCHAR(255)" />
+			<column name="summary2" type="VARCHAR(255)" />
+			<column name="summary3" type="VARCHAR(255)" />
+		</createTable>
+		<createTable tableName="ofc_sampling_design">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="pk_ofc_sampling_design" />
+			</column>
+			<column name="survey_id" type="int4" />
+			<column name="level1" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="level2" type="VARCHAR(255)" />
+			<column name="level3" type="VARCHAR(255)" />
+			<column name="location" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="info1" type="VARCHAR(255)" />
+			<column name="info2" type="VARCHAR(255)" />
+			<column name="info3" type="VARCHAR(255)" />
+			<column name="info4" type="VARCHAR(255)" />
+			<column name="info5" type="VARCHAR(255)" />
+			<column name="info6" type="VARCHAR(255)" />
+			<column name="info7" type="VARCHAR(255)" />
+			<column name="info8" type="VARCHAR(255)" />
+			<column name="info9" type="VARCHAR(255)" />
+			<column name="info10" type="VARCHAR(255)" />
+			<column name="info11" type="VARCHAR(255)" />
+			<column name="info12" type="VARCHAR(255)" />
+			<column name="info13" type="VARCHAR(255)" />
+			<column name="info14" type="VARCHAR(255)" />
+			<column name="info15" type="VARCHAR(255)" />
+			<column name="info16" type="VARCHAR(255)" />
+			<column name="info17" type="VARCHAR(255)" />
+			<column name="info18" type="VARCHAR(255)" />
+			<column name="info19" type="VARCHAR(255)" />
+			<column name="info20" type="VARCHAR(255)" />
+			<column name="info21" type="VARCHAR(255)" />
+			<column name="info22" type="VARCHAR(255)" />
+			<column name="info23" type="VARCHAR(255)" />
+			<column name="info24" type="VARCHAR(255)" />
+			<column name="info25" type="VARCHAR(255)" />
+			<column name="info26" type="VARCHAR(255)" />
+			<column name="info27" type="VARCHAR(255)" />
+			<column name="info28" type="VARCHAR(255)" />
+			<column name="info29" type="VARCHAR(255)" />
+			<column name="info30" type="VARCHAR(255)" />
+		</createTable>
+		<createTable tableName="ofc_survey">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_survey_pkey" />
+			</column>
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="uri" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="idml" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="CD" name="target" type="VARCHAR(5)" />
+			<column defaultValueDate="2018-09-12T09:33:09.0"
+				name="date_created" type="TIMESTAMP WITH TIME ZONE" />
+			<column defaultValueDate="2018-09-12T09:33:09.0"
+				name="date_modified" type="TIMESTAMP WITH TIME ZONE" />
+			<column defaultValue="3.4.0" name="collect_version"
+				type="VARCHAR(55)" />
+			<column defaultValueBoolean="false" name="temporary"
+				type="bool">
+				<constraints nullable="false" />
+			</column>
+			<column name="published_id" type="int4" />
+			<column name="usergroup_id" type="int4" />
+			<column name="availability" type="char(1)" />
+			<column name="title" type="VARCHAR(255)" />
+			<column name="langs" type="VARCHAR(20)" />
+		</createTable>
+		<createTable tableName="ofc_survey_file">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_survey_file_pkey" />
+			</column>
+			<column name="survey_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="type" type="VARCHAR(15)">
+				<constraints nullable="false" />
+			</column>
+			<column name="filename" type="VARCHAR(255)" />
+			<column name="content" type="bytea" />
+		</createTable>
+		<createTable tableName="ofc_taxon">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxon_pkey" />
+			</column>
+			<column name="taxon_id" type="int4" />
+			<column name="code" type="VARCHAR(32)" />
+			<column name="scientific_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="taxon_rank" type="VARCHAR(128)">
+				<constraints nullable="false" />
+			</column>
+			<column name="taxonomy_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="step" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="parent_id" type="int4" />
+			<column name="info01" type="VARCHAR(255)" />
+			<column name="info02" type="VARCHAR(255)" />
+			<column name="info03" type="VARCHAR(255)" />
+			<column name="info04" type="VARCHAR(255)" />
+			<column name="info05" type="VARCHAR(255)" />
+			<column name="info06" type="VARCHAR(255)" />
+			<column name="info07" type="VARCHAR(255)" />
+			<column name="info08" type="VARCHAR(255)" />
+			<column name="info09" type="VARCHAR(255)" />
+			<column name="info10" type="VARCHAR(255)" />
+			<column name="info11" type="VARCHAR(255)" />
+			<column name="info12" type="VARCHAR(255)" />
+			<column name="info13" type="VARCHAR(255)" />
+			<column name="info14" type="VARCHAR(255)" />
+			<column name="info15" type="VARCHAR(255)" />
+			<column name="info16" type="VARCHAR(255)" />
+			<column name="info17" type="VARCHAR(255)" />
+			<column name="info18" type="VARCHAR(255)" />
+			<column name="info19" type="VARCHAR(255)" />
+			<column name="info20" type="VARCHAR(255)" />
+		</createTable>
+		<createTable tableName="ofc_taxon_vernacular_name">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxon_vernacular_name_pkey" />
+			</column>
+			<column name="vernacular_name" type="VARCHAR(255)" />
+			<column name="language_code" type="VARCHAR(3)">
+				<constraints nullable="false" />
+			</column>
+			<column name="language_variety"
+				remarks="Dialect, lect, sublanguage or other" type="VARCHAR(255)" />
+			<column name="taxon_id" type="int4" />
+			<column name="step" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="qualifier1" type="VARCHAR(255)" />
+			<column name="qualifier2" type="VARCHAR(255)" />
+			<column name="qualifier3" type="VARCHAR(255)" />
+		</createTable>
+		<createTable tableName="ofc_taxonomy">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_taxonomy_pkey" />
+			</column>
+			<column name="survey_id" type="int4" />
+			<column name="name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="metadata" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_user">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_user_pkey" />
+			</column>
+			<column name="username" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="password" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValue="Y" name="enabled" type="char(1)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<createTable tableName="ofc_user_role">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_user_role_pkey" />
+			</column>
+			<column name="user_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="role" type="VARCHAR(255)" />
+		</createTable>
+		<createTable tableName="ofc_user_usergroup">
+			<column name="user_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="group_id" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="role_code"
+				remarks="Role in the group: O=Owner, A=Administrator, D=Data analyzer, U=User/Operator, V=Viewer"
+				type="char(1)">
+				<constraints nullable="false" />
+			</column>
+			<column name="status_code"
+				remarks="P=Pending,A=Accepted,R=Rejected" type="char(1)">
+				<constraints nullable="false" />
+			</column>
+			<column name="request_date" type="TIMESTAMP WITH TIME ZONE">
+				<constraints nullable="false" />
+			</column>
+			<column name="member_since" type="TIMESTAMP WITH TIME ZONE" />
+		</createTable>
+		<createTable tableName="ofc_usergroup">
+			<column name="id" type="int4">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_usergroup_pkey" />
+			</column>
+			<column name="parent_id" type="int4" />
+			<column name="name" type="VARCHAR(63)">
+				<constraints nullable="false" />
+			</column>
+			<column name="label" type="VARCHAR(127)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="created_by" type="int4">
+				<constraints nullable="false" />
+			</column>
+			<column name="creation_date" type="TIMESTAMP WITH TIME ZONE">
+				<constraints nullable="false" />
+			</column>
+			<column name="visibility_code" remarks="P=Public, N=Private"
+				type="char(1)">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueBoolean="true" name="enabled" type="bool">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueBoolean="false" name="system_defined"
+				type="bool">
+				<constraints nullable="false" />
+			</column>
+			<column name="qualifier1_name" type="VARCHAR(255)" />
+			<column name="qualifier1_value" type="VARCHAR(255)" />
+		</createTable>
+		<addPrimaryKey columnNames="group_id, query_id"
+			constraintName="ofc_data_query_group_query_pkey"
+			tableName="ofc_data_query_group_query" />
+		<addPrimaryKey columnNames="record_id, seq_num"
+			constraintName="ofc_record_data_pkey" tableName="ofc_record_data" />
+		<addPrimaryKey columnNames="user_id, group_id"
+			constraintName="ofc_user_usergroup_pkey"
+			tableName="ofc_user_usergroup" />
+		<addUniqueConstraint columnNames="name, temporary"
+			constraintName="ofc_survey_name_key" deferrable="false"
+			disabled="false" initiallyDeferred="false" tableName="ofc_survey" />
+		<addUniqueConstraint columnNames="uri, temporary"
+			constraintName="ofc_survey_uri_key" deferrable="false"
+			disabled="false" initiallyDeferred="false" tableName="ofc_survey" />
+		<addUniqueConstraint
+			columnNames="taxon_id, taxonomy_id" constraintName="ofc_taxon_id_key"
+			deferrable="false" disabled="false" initiallyDeferred="false"
+			tableName="ofc_taxon" />
+		<addUniqueConstraint columnNames="survey_id, name"
+			constraintName="ofc_taxonomy_name_key" deferrable="false"
+			disabled="false" initiallyDeferred="false" tableName="ofc_taxonomy" />
+		<addUniqueConstraint columnNames="username"
+			constraintName="ofc_user_username_key" deferrable="false"
+			disabled="false" initiallyDeferred="false" tableName="ofc_user" />
+		<addUniqueConstraint columnNames="name"
+			constraintName="ofc_usergroup_name_key" deferrable="false"
+			disabled="false" initiallyDeferred="false" tableName="ofc_usergroup" />
+		<addForeignKeyConstraint
+			baseColumnNames="parent_id" baseTableName="ofc_code_list"
+			constraintName="ofc_code_list_parent_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_code_list"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_code_list"
+			constraintName="ofc_code_list_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_data_cleansing_chain"
+			constraintName="ofc_data_cleansing_chain_survey_fkey"
+			deferrable="false" initiallyDeferred="false" onDelete="NO ACTION"
+			onUpdate="NO ACTION" referencedColumnNames="id"
+			referencedTableName="ofc_survey" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="chain_id"
+			baseTableName="ofc_data_cleansing_chain_steps"
+			constraintName="ofc_data_cleansing_chain_steps_chain_fkey"
+			deferrable="false" initiallyDeferred="false" onDelete="NO ACTION"
+			onUpdate="NO ACTION" referencedColumnNames="id"
+			referencedTableName="ofc_data_cleansing_chain"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="step_id"
+			baseTableName="ofc_data_cleansing_chain_steps"
+			constraintName="ofc_data_cleansing_chain_steps_step_fkey"
+			deferrable="false" initiallyDeferred="false" onDelete="NO ACTION"
+			onUpdate="NO ACTION" referencedColumnNames="id"
+			referencedTableName="ofc_data_cleansing_step"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="cleansing_chain_id"
+			baseTableName="ofc_data_cleansing_report"
+			constraintName="ofc_data_cleansing_chain_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id"
+			referencedTableName="ofc_data_cleansing_chain"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="query_id" baseTableName="ofc_data_cleansing_step"
+			constraintName="ofc_data_cleansing_step_query_fkey"
+			deferrable="false" initiallyDeferred="false" onDelete="NO ACTION"
+			onUpdate="NO ACTION" referencedColumnNames="id"
+			referencedTableName="ofc_data_query" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="step_id"
+			baseTableName="ofc_data_cleansing_step_value"
+			constraintName="ofc_data_cleansing_step_value_fkey"
+			deferrable="false" initiallyDeferred="false" onDelete="NO ACTION"
+			onUpdate="NO ACTION" referencedColumnNames="id"
+			referencedTableName="ofc_data_cleansing_step"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_data_query"
+			constraintName="ofc_data_query_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="type_id" baseTableName="ofc_data_query"
+			constraintName="ofc_data_query_type_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_data_query_type"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_data_query_group"
+			constraintName="ofc_data_query_group_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="group_id" baseTableName="ofc_data_query_group_query"
+			constraintName="ofc_data_query_group_group_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_data_query_group"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="query_id" baseTableName="ofc_data_query_group_query"
+			constraintName="ofc_data_query_group_query_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_data_query"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_data_query_type"
+			constraintName="ofc_data_query_type_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="query_group_id" baseTableName="ofc_data_report"
+			constraintName="ofc_data_report_query_group_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_data_query_group"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="query_id" baseTableName="ofc_data_report_item"
+			constraintName="ofc_data_report_item_query_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_data_query"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="record_id" baseTableName="ofc_data_report_item"
+			constraintName="ofc_data_report_item_record_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_record"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="report_id" baseTableName="ofc_data_report_item"
+			constraintName="ofc_data_report_item_report_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_data_report"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_record"
+			constraintName="ofc_record_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="record_id" baseTableName="ofc_record_data"
+			constraintName="ofc_record_data_record_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_record"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_sampling_design"
+			constraintName="ofc_sampling_design_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="usergroup_id" baseTableName="ofc_survey"
+			constraintName="ofc_survey_usergroup_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_usergroup"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_survey_file"
+			constraintName="ofc_survey_file_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="parent_id" baseTableName="ofc_taxon"
+			constraintName="ofc_taxon_parent_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_taxon"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="taxonomy_id" baseTableName="ofc_taxon"
+			constraintName="ofc_taxon_taxonomy_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_taxonomy"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="taxon_id" baseTableName="ofc_taxon_vernacular_name"
+			constraintName="ofc_taxon_vernacular_name_taxon_fkey"
+			deferrable="false" initiallyDeferred="false" onDelete="NO ACTION"
+			onUpdate="NO ACTION" referencedColumnNames="id"
+			referencedTableName="ofc_taxon" referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="survey_id" baseTableName="ofc_taxonomy"
+			constraintName="ofc_taxonomy_survey_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_survey"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="user_id" baseTableName="ofc_user_role"
+			constraintName="ofc_user_user_role_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_user"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="group_id" baseTableName="ofc_user_usergroup"
+			constraintName="ofc_user_usergroup_group_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_usergroup"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="user_id" baseTableName="ofc_user_usergroup"
+			constraintName="ofc_user_usergroup_user_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_user"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="created_by" baseTableName="ofc_usergroup"
+			constraintName="ofc_usergroup_created_by_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_user"
+			referencesUniqueColumn="false" />
+		<addForeignKeyConstraint
+			baseColumnNames="parent_id" baseTableName="ofc_usergroup"
+			constraintName="ofc_usergroup_parent_fkey" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedColumnNames="id" referencedTableName="ofc_usergroup"
+			referencesUniqueColumn="false" />
+		<createIndex indexName="ofc_code_list_child_item_idx"
+			tableName="ofc_code_list" unique="true">
+			<column name="survey_id" />
+			<column name="code_list_id" />
+			<column name="parent_id" />
+			<column name="code" />
+		</createIndex>
+		<createIndex indexName="ofc_code_list_child_items_idx"
+			tableName="ofc_code_list" unique="false">
+			<column name="survey_id" />
+			<column name="code_list_id" />
+			<column name="parent_id" />
+		</createIndex>
+		<createIndex
+			indexName="ofc_data_report_item_report_record_idx"
+			tableName="ofc_data_report_item" unique="false">
+			<column name="report_id" />
+			<column name="record_id" />
+		</createIndex>
+		<createIndex indexName="ofc_message_idx"
+			tableName="ofc_message" unique="true">
+			<column name="id" />
+		</createIndex>
+		<createIndex indexName="ofc_message_processing_pkey"
+			tableName="ofc_message_processing" unique="true">
+			<column name="message_id" />
+			<column name="consumer_id" />
+		</createIndex>
+		<createIndex indexName="ofc_record_created_by_idx"
+			tableName="ofc_record" unique="false">
+			<column name="created_by_id" />
+		</createIndex>
+		<createIndex indexName="ofc_record_date_modified_idx"
+			tableName="ofc_record" unique="false">
+			<column name="survey_id" />
+			<column name="root_entity_definition_id" />
+			<column name="date_modified" />
+		</createIndex>
+		<createIndex indexName="ofc_record_key1_idx"
+			tableName="ofc_record" unique="false">
+			<column name="survey_id" />
+			<column name="root_entity_definition_id" />
+			<column name="key1" />
+		</createIndex>
+		<createIndex indexName="ofc_record_key2_idx"
+			tableName="ofc_record" unique="false">
+			<column name="survey_id" />
+			<column name="root_entity_definition_id" />
+			<column name="key1" />
+			<column name="key2" />
+		</createIndex>
+		<createIndex indexName="ofc_record_key3_idx"
+			tableName="ofc_record" unique="false">
+			<column name="survey_id" />
+			<column name="root_entity_definition_id" />
+			<column name="key1" />
+			<column name="key2" />
+			<column name="key3" />
+		</createIndex>
+		<createIndex indexName="ofc_record_modified_by_idx"
+			tableName="ofc_record" unique="false">
+			<column name="modified_by_id" />
+		</createIndex>
+		<createIndex indexName="ofc_record_owner_idx"
+			tableName="ofc_record" unique="false">
+			<column name="owner_id" />
+		</createIndex>
+		<createIndex indexName="ofc_record_data_created_by_idx"
+			tableName="ofc_record_data" unique="false">
+			<column name="created_by" />
+		</createIndex>
+		<createIndex indexName="ofc_record_data_idx"
+			tableName="ofc_record_data" unique="true">
+			<column name="record_id" />
+			<column name="seq_num" />
+			<column name="step" />
+			<column name="state" />
+		</createIndex>
+		<createIndex indexName="ofc_record_data_modified_by_idx"
+			tableName="ofc_record_data" unique="false">
+			<column name="modified_by" />
+		</createIndex>
+		<createIndex indexName="ofc_sampling_design_key_idx"
+			tableName="ofc_sampling_design" unique="true">
+			<column name="survey_id" />
+			<column name="level1" />
+			<column name="level2" />
+			<column name="level3" />
+		</createIndex>
+		<createSequence sequenceName="ofc_code_list_id_seq" />
+		<createSequence
+			sequenceName="ofc_data_cleansing_chain_id_seq" />
+		<createSequence
+			sequenceName="ofc_data_cleansing_report_id_seq" />
+		<createSequence
+			sequenceName="ofc_data_cleansing_step_id_seq" />
+		<createSequence
+			sequenceName="ofc_data_query_group_id_seq" />
+		<createSequence sequenceName="ofc_data_query_id_seq" />
+		<createSequence
+			sequenceName="ofc_data_query_type_id_seq" />
+		<createSequence sequenceName="ofc_data_report_id_seq" />
+		<createSequence
+			sequenceName="ofc_data_report_item_id_seq" />
+		<createSequence sequenceName="ofc_record_id_seq" />
+		<createSequence
+			sequenceName="ofc_sampling_design_id_seq" />
+		<createSequence sequenceName="ofc_survey_file_id_seq" />
+		<createSequence sequenceName="ofc_survey_id_seq" />
+		<createSequence sequenceName="ofc_taxon_id_seq" />
+		<createSequence
+			sequenceName="ofc_taxon_vernacular_name_id_seq" />
+		<createSequence sequenceName="ofc_taxonomy_id_seq" />
+		<createSequence sequenceName="ofc_user_id_seq" />
+		<createSequence sequenceName="ofc_user_role_id_seq" />
+		<createSequence sequenceName="ofc_usergroup_id_seq" />
+	</changeSet>
+</databaseChangeLog>

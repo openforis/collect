@@ -1,5 +1,0 @@
-To build this assembly (Collect+Tomcat), build Collect with:
-
-   mvn package -Passembly
-
-The resulting ZIP will be created in target/
