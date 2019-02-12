@@ -1,5 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<name>Open Foris Collect Installation parent module</name>
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
@@ -7,7 +11,6 @@
 	</parent>
 	<artifactId>collect-installation</artifactId>
 	<packaging>pom</packaging>
-	<name>Open Foris Collect Installation parent module</name>
 
 	<modules>
 		<module>collect-assembly</module>
@@ -16,12 +19,13 @@
 		<module>collect-installer</module>
 		<module>collect-saiku-installer</module>
 		<module>collect-updater</module>
-		<module>collect-updater2</module>
+		<module>collect-updater-2</module>
 	</modules>
 
 	<properties>
-		<!-- install builder application version id (used by auto updater): it must be a progressive number -->
-		<installer-version-id>${buildNumber}</installer-version-id> 
+		<!-- install builder application version id (used by auto updater): it 
+			must be a progressive number -->
+		<installer-version-id>${buildNumber}</installer-version-id>
 		<installer.jre.version.major>1.8</installer.jre.version.major>
 		<installer.jre.version>1.8.0</installer.jre.version>
 		<installer.jre.version.full>1.8.0_121</installer.jre.version.full>
@@ -41,10 +45,11 @@
 			</modules>
 		</profile>
 	</profiles>
-	
+
 	<build>
 		<plugins>
-			<!--  Create a build number to use for the InstallBuilder auto updater and set a ${buildNumber} variable --> 
+			<!-- Create a build number to use for the InstallBuilder auto updater 
+				and set a ${buildNumber} variable -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
@@ -135,5 +140,4 @@
 		</pluginManagement>
 	</build>
 
-	
 </project>

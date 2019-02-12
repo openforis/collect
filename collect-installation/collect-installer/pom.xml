@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.openforis.collect</groupId>
@@ -94,7 +96,7 @@
 							</execution>
 						</executions>
 					</plugin>
-		
+
 					<!-- 2. copy resource files -->
 					<plugin>
 						<artifactId>maven-resources-plugin</artifactId>
@@ -121,7 +123,7 @@
 							</execution>
 						</executions>
 					</plugin>
-		
+
 					<!-- 3. replace application version into the InstallBuilder XML source 
 						file replace Java version into the InstallBuilder java.xml file -->
 					<plugin>
@@ -168,13 +170,13 @@
 									<value>${collect.update_2.url}</value>
 								</replacement>
 								<replacement>
-			                        <token>VERSION</token>
-			                        <value>${project.version}</value>
-			                    </replacement>
+									<token>VERSION</token>
+									<value>${project.version}</value>
+								</replacement>
 							</replacements>
 						</configuration>
 					</plugin>
-					
+
 					<!-- 4. iterate over platforms and prepare updaters -->
 					<plugin>
 						<groupId>com.soebes.maven.plugins</groupId>
@@ -188,7 +190,7 @@
 								</goals>
 								<configuration>
 									<pluginExecutors>
-										<!-- download and extract jre -->
+										<!-- download and extract JRE -->
 										<pluginExecutor>
 											<plugin>
 												<groupId>org.apache.maven.plugins</groupId>
@@ -243,7 +245,7 @@
 								</goals>
 								<configuration>
 									<pluginExecutors>
-										<!-- 4. execute installbuilder to produce the installers -->
+										<!-- 4. execute InstallBuilder to produce the installers -->
 										<pluginExecutor>
 											<plugin>
 												<groupId>org.codehaus.mojo</groupId>
@@ -271,7 +273,10 @@
 											<configuration>
 												<skip>${installer.skip}</skip>
 												<target>
-													<move file="${installbuilder.builder.output}/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-installer.${installer.extension}" failonerror="true" />
+													<move
+														file="${installbuilder.builder.output}/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}"
+														tofile="${project.build.directory}/${installer.classifier}-installer.${installer.extension}"
+														failonerror="true" />
 												</target>
 											</configuration>
 										</pluginExecutor>
