@@ -315,13 +315,21 @@ div.z-listbox-header th.z-listheader-sort-over {
 	border-color: transparent;
 }
 
-.z-menubar-hor.withicons .z-menuitem-btn {
-	height: 26px;
+.z-menubar-hor.withicons .z-menuitem-btn,
+.z-menuitem.icon-button .z-menuitem-btn {
+	height: 30px;
 	width: 26px;
 }
 
-.z-menubar-hor.withicons .z-menuitem-body-over {
+.z-menubar-hor.withicons .z-menuitem-body-over,
+.z-menuitem.icon-button.z-menuitem-body-over .z-menuitem-btn {
 	background-image: none;
+}
+
+.z-menuitem.icon-button.with-label .z-menuitem-btn,
+.z-menuitem.icon-button.with-label.z-menuitem-body-over .z-menuitem-btn {
+	padding-left: 28px;
+	width: auto;
 }
 
 .small .z-listcell-cnt {

@@ -32,17 +32,23 @@
 								</listitem>
 							</template>
 						</listbox>
-						<menubar sclass="withicons">
+						<menubar>
 							<menuitem 
-								tooltiptext="${labels.global.add_item}"
+								sclass="icon-button with-label" 
+								label="${labels.survey.code_list.add_list}"
 								image="/assets/images/add.png" 
-								onClick="@command('newItem')" />
+								onClick="@command('newItem')"
+								width="70px" />
 							<menuitem
+								sclass="iconbutton"
 								tooltiptext="${labels.global.delete_item}"
 								image="/assets/images/delete.png"
 								disabled="@load(empty vm.selectedItem)"
 								onClick="@command('deleteCodeList', item=vm.selectedItem)" />
-							<menu image="/assets/images/settings-small.png" tooltiptext="${labels.survey.code_list.import_export}">
+							<menu
+								sclass="iconbutton" 
+								image="/assets/images/settings-small.png" 
+								tooltiptext="${labels.survey.code_list.import_export}">
 								<menupopup>
 									<menuitem label="${labels.survey.code_list.batch_import}"
 										upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />
@@ -207,7 +213,7 @@
 		        							<toolbar height="30px">
 		        								<toolbarbutton
 		        									image="/assets/images/add-small.png"
-		        									tooltiptext="${labels.survey.code_list.add_child_item}"
+		        									label="${labels.survey.code_list.add_child_item}"
 		        									visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex + 1)"
 		        									onClick="@command('addItemInLevel', levelIndex=forEachStatus.index)" />
 		        								<toolbarbutton
