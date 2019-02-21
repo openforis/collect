@@ -128,7 +128,7 @@
 		  						rows="4" />
 		  				</fieldErrorHandler>
 	  					<expressionInfoIcon />
-	  					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />  					
+	  					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />
 	  					<checkbox
 	  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
 	  						onCheck="@command('applyChanges')" />
@@ -242,7 +242,7 @@
   			<row
   				visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated) and fx.multiple ne true)">
   				<label value="${labels.survey.schema.node.required}:" />
-  				<vlayout>
+				<vlayout>
 	  				<fieldErrorHandler message="@load(vmsgs['requirenessType'])">
 		  				<radiogroup selectedItem="@bind(fx.requirenessType)"
 								onCheck="@command('applyChanges')">
@@ -259,17 +259,17 @@
 								value="REQUIRED_WHEN"
 								disabled="@load(fx.key and fx.requirenessType eq 'ALWAYS_REQUIRED')" />
 		  				</radiogroup>
-		  				<hlayout spacing="2px" visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')">
-							<fieldErrorHandler
-			  					message="@load(vmsgs['requiredWhenExpression'])">
-			  					<textbox width="250px"
-			  						value="@bind(fx.requiredWhenExpression)"
-			  						onChange="@command('applyChanges')"
-			  						rows="4" />
-			  				</fieldErrorHandler>
-		  					<expressionInfoIcon />
-		  				</hlayout>
 	  				</fieldErrorHandler>
+	  				<hlayout spacing="2px" visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')">
+						<fieldErrorHandler
+		  					message="@load(vmsgs['requiredWhenExpression'])">
+		  					<textbox width="250px"
+		  						value="@bind(fx.requiredWhenExpression)"
+		  						onChange="@command('applyChanges')"
+		  						rows="4" />
+		  				</fieldErrorHandler>
+	  					<expressionInfoIcon />
+	  				</hlayout>
   				</vlayout>
   			</row>
   		</rows>

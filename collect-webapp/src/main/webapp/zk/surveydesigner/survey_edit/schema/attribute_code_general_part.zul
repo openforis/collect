@@ -30,13 +30,6 @@
     			</hlayout>
     		</cell>
     	</row>
-    	<row>
-    		<label
-    			value="${labels.survey.schema.attribute.code.strict}:" />
-    		<checkbox
-    			checked="@load(fx.strict eq true) @save(fx.strict)"
-    			onCheck="@command('applyChanges')" />
-    	</row>
     	<row visible="@load(fx.list.hierarchical)">
     		<fieldErrorHandler message="@load(vmsgs['parentCodeAttributeDefinitionPath'])">
 	    		<label
