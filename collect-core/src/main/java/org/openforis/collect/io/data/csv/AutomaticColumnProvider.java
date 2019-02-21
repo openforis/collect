@@ -44,7 +44,7 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 				if (childDefn instanceof EntityDefinition) {
 					createEntityProviders(config, (EntityDefinition) childDefn, cols);
 				} else if (childDefn instanceof AttributeDefinition && surveyAnnotations.isIncludedInDataExport(childDefn) ) {
-					cols.add(ColumnProviders.createAttributeProvider(config, (AttributeDefinition) childDefn));
+					cols.add(ColumnProviders.createAttributeProvider(config, (AttributeDefinition) childDefn, false));
 				}
 			}
 		}

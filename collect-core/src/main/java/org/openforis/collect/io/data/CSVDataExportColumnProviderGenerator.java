@@ -98,7 +98,7 @@ public class CSVDataExportColumnProviderGenerator {
 			for (AttributeDefinition keyDefn : keyAttrDefns) {
 				String relativePath = contextEntityDefn.getRelativePath(ancestorEntityDefn);
 				
-				ColumnProvider keyColumnProvider = ColumnProviders.createAttributeProvider(configuration, keyDefn);
+				ColumnProvider keyColumnProvider = ColumnProviders.createAttributeProvider(configuration, keyDefn, true);
 				String headingPrefix = configuration.isIncludeGroupingLabels() ?
 						ColumnProviders.generateHeadingPrefix(keyDefn.getParentEntityDefinition(), configuration) + configuration.getFieldHeadingSeparator()
 						: "";
