@@ -28,7 +28,7 @@ public abstract class JettyApplicationServer implements ApplicationServer {
 
 	private static final Logger LOG = LogManager.getLogger(JettyApplicationServer.class);
 
-	private static final String LOCALHOST_ADDRESS = "127.0.0.1";
+	private static final String LOCALHOST_ADDRESS = "localhost";
 	
 	protected int port;
 	protected JndiDataSourceConfiguration[] jndiDsConfigurations;
