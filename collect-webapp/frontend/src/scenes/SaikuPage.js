@@ -84,7 +84,7 @@ class SaikuPage extends Component {
 				</MaxAvailableSpaceContainer>
 			:
 			<div>
-				<FormGroup tag="fieldset" style={{width: "500px"}}>
+				<FormGroup tag="fieldset" style={{width: "530px"}}>
 					<legend>Prepare Saiku database</legend>
 					<Form sm={4}>
 						<FormGroup row inline>
