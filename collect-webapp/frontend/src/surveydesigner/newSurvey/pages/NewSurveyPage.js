@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
-import { Col, Container, Row } from 'reactstrap'
 import { connect } from 'react-redux'
+import Grid from '@material-ui/core/Grid'
 
 import NewSurveyParametersForm from '../components/NewSurveyParametersForm'
 import * as NewSurveyActions from 'surveydesigner/newSurvey/actions'
 import RouterUtils from 'utils/RouterUtils'
 
 class NewSurveyPage extends Component {
-    
+
     componentWillReceiveProps(nextProps) {
         if (nextProps.newSurveyCreated) {
             const newSurveySummary = nextProps.newSurveySummary
@@ -18,20 +18,19 @@ class NewSurveyPage extends Component {
 
     render() {
         return (
-            <Container fluid>
-                <Row>
-                    <Col sm={{ size: 6, offset: 3 }}>
-                        <NewSurveyParametersForm  style={{width: "500px"}} />
-                    </Col>
-                </Row>
-            </Container>
+            <Grid container
+                justify="center">
+                <Grid item>
+                    <NewSurveyParametersForm style={{ width: "500px" }} />
+                </Grid>
+            </Grid>
         )
     }
 
 }
 
 const mapStateToProps = state => {
-    const { newSurveyCreated, newSurveySummary} = state.surveyDesigner.newSurvey
+    const { newSurveyCreated, newSurveySummary } = state.surveyDesigner.newSurvey
     return {
         newSurveyCreated, newSurveySummary
     }

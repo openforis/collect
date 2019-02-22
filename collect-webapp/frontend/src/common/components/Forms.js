@@ -96,8 +96,9 @@ export default class Forms {
         return <Input readOnly={contentEditable === false} valid={touched && error ? false : null} {...input} type={type} />
     }
 
-    static renderFormItemSelect({ input, label, type, options, contentEditable, meta: { asyncValidating, touched, error } }) {
-        return <FormItem label={label} touched={touched} error={error}>
+    static renderFormItemSelect({ input, label, type, options, contentEditable, labelColSpan=2, fieldColSpan=10, meta: { asyncValidating, touched, error }}) {
+        return <FormItem label={label} touched={touched} error={error}
+                    labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
                 <Input readOnly={contentEditable === false} 
                     valid={touched && error ? false : null}
                     invalid={touched && error ? true: null} 

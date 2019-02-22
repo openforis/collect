@@ -40,30 +40,43 @@ class NewSurveyParametersForm extends Component {
             .sort((a, b) => Strings.compare(L.l('languages.' + a), L.l('languages.' + b)))
             .map(l => <option key={l} value={l}>{L.l('languages.' + l) + ' (' + l + ')'}</option>)
 
+        const fieldsProps = {labelColSpan: 4, fieldColSpan: 8}
         return (
             <Form onSubmit={handleSubmit(this.submit)}>
                 <Field
                     name="name"
                     type="text"
-                    component={Forms.renderFormItemInputField}
+                    component={props => Forms.renderFormItemInputField({
+                        ...props,
+                        ...fieldsProps
+                    })}
                     label={L.l('survey.name')}
                     normalize={Forms.normalizeInternalName}
                 />
                 <Field
                     name="templateType"
-                    component={Forms.renderFormItemSelect}
+                    component={props => Forms.renderFormItemSelect({
+                        ...props,
+                        ...fieldsProps
+                    })}
                     label={L.l('survey.templateType')}
                     options={templateTypeOptions}
                 />
                 <Field
                     name="defaultLanguageCode"
-                    component={Forms.renderFormItemSelect}
+                    component={props => Forms.renderFormItemSelect({
+                        ...props,
+                        ...fieldsProps
+                    })}
                     label={L.l('survey.defaultLanguage')}
                     options={languageOptions}
                 />
                 <Field
                     name="userGroupId"
-                    component={Forms.renderFormItemSelect}
+                    component={props => Forms.renderFormItemSelect({
+                        ...props,
+                        ...fieldsProps
+                    })}
                     label={L.l('survey.userGroup')}
                     options={userGroupOptions}
                 />
