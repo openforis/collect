@@ -501,5 +501,4 @@ public abstract class SurveyBaseVM extends BaseVM {
 	protected boolean isSurveyRelatedToPublishedSurvey() {
 		return survey.isTemporary() && survey.getPublishedId() != null;
 	}
-
 }

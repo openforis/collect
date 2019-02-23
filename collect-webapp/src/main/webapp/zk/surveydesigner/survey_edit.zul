@@ -25,12 +25,6 @@
 		self="@define(content)"
 		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
-		<north border="none">
-			<box width="100%" align="center">
-				<label sclass="mainTitleEditing"
-					value="@load(vm.surveyEditTitle)" />
-			</box>
-		</north>
 		<center border="none">
 			<absolutelayout hflex="1" vflex="1">
 				<absolutechildren hflex="1" vflex="1">
@@ -38,9 +32,10 @@
 					<tabbox id="tb" hflex="1" vflex="1">
 						<tabs id="tabs">
 							<tab id="genericTab"
-								label="${labels.survey.$}" 
+								label="${labels.global.message.title.info}" 
 								w:_sel="switchTab"
-								forward="onSwitchTab=onSwitchTab" />
+								forward="onSwitchTab=onSwitchTab"
+								style="max-width: 230px" />
 							<tab id="codeListsTab"
 								label="${labels.survey.code_lists}" 
 								w:_sel="switchTab"
@@ -155,7 +150,11 @@
 		</center>
 		<south height="30px" border="none">
 			<borderlayout hflex="1">
-				<west border="none" size="20%">
+				<west border="none" size="30%" vflex="1">
+					<hlayout hflex="1" vflex="1" valign="middle">
+						<label value="${labels.survey.$}:"/>
+						<label value="@load(vm.survey.name)" hflex="1"/>
+					</hlayout>
 				</west>
 				<center border="none">
 					<box width="100%" align="center">
@@ -171,7 +170,7 @@
 						</hlayout>
 					</box>
 				</center>
-				<east border="none" size="20%">
+				<east border="none" size="30%">
 					<hlayout hflex="1"
 							style="text-align: right;">
 		    					  

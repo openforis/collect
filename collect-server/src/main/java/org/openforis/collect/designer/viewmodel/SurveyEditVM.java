@@ -638,11 +638,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		return url;
 	}
 
-	public String getSurveyEditTitle() {
-		String surveyName = survey == null ? null: survey.getName();
-		return Labels.getLabel("designer_title_editing_survey", new Object[] {surveyName});
-	}
-	
 	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
 		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
 	}
