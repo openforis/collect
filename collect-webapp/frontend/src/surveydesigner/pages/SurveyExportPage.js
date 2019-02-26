@@ -5,7 +5,17 @@ import { connect } from 'react-redux';
 import ServiceFactory from 'services/ServiceFactory';
 import * as JobActions from 'actions/job';
 import L from 'utils/Labels'
-import Labels from '../../utils/Labels';
+
+const surveyTypes = {
+    temporary: 'TEMPORARY',
+    published: 'PUBLISHED'
+}
+
+const outputFormats = {
+    desktop: 'DESKTOP',
+    earth: 'EARTH',
+    mobile: 'MOBILE'
+}
 
 class SurveyExportPage extends Component {
 
@@ -15,7 +25,7 @@ class SurveyExportPage extends Component {
 
         this.state = {
             surveySummary: null,
-            outputFormat: 'DESKTOP',
+            outputFormat: outputFormats.desktop,
             surveyType: null,
             skipValidation: true,
             outputSurveyDefaultLanguage: null,
@@ -53,10 +63,10 @@ class SurveyExportPage extends Component {
         if (surveySummary) {
             this.setState({
                 surveySummary,
-                surveyType: surveySummary.temporary ? 'TEMPORARY' : 'PUBLISHED',
+                surveyType: surveySummary.temporary ? surveyTypes.temporary : surveyTypes.published,
                 availableLanguages: surveySummary.languages && surveySummary.languages.length > 0
                     ? surveySummary.languages 
-                    : [Labels.DEFAULT_LANG_CODE], //TODO don't default it!
+                    : [L.DEFAULT_LANG_CODE], //TODO don't default it!
                 outputSurveyDefaultLanguage: surveySummary.defaultLanguage
             })
         }
@@ -66,13 +76,15 @@ class SurveyExportPage extends Component {
         if (!this.validateForm()) {
             return
         }
+        const { surveySummary, surveyType, outputFormat, outputSurveyDefaultLanguage, skipValidation } = this.state
+        
         ServiceFactory.surveyService.startExport(
-            this.state.surveySummary.id,
-            this.state.surveySummary.uri,
-            this.state.surveyType,
-            this.state.outputFormat,
-            this.state.outputSurveyDefaultLanguage,
-            this.state.skipValidation
+            surveySummary.id,
+            surveySummary.uri,
+            surveyType,
+            outputFormat,
+            outputFormat === outputFormats.earth || outputFormat === outputFormats.mobile ? outputSurveyDefaultLanguage: null,
+            skipValidation
         ).then(job => {
             this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id,
@@ -97,32 +109,30 @@ class SurveyExportPage extends Component {
     }
 
     render() {
-        const { surveySummary, availableLanguages, outputSurveyDefaultLanguage } = this.state
+        const { surveySummary, availableLanguages, surveyType, outputFormat, outputSurveyDefaultLanguage } = this.state
         if (!surveySummary) {
             return <div>Loading...</div>
         }
 
-        const surveyTypes = ['TEMPORARY', 'PUBLISHED']
-        const surveyTypeCheckBoxes = surveyTypes.map(type =>
+        const surveyTypeCheckBoxes = Object.values(surveyTypes).map(type =>
             <FormGroup>
                 <Label key={type} check>
                     <Input type="radio" value={type} name="surveyType"
-                        checked={this.state.surveyType === type}
-                        onChange={(event) => this.setState({ ...this.state, surveyType: event.target.value })}
-                        disabled={(type === 'PUBLISHED' && surveySummary.temporary && !surveySummary.publishedId)
-                            || (type === 'TEMPORARY' && !surveySummary.temporary)}
+                        checked={surveyType === type}
+                        onChange={(event) => this.setState({ surveyType: event.target.value })}
+                        disabled={(type === surveyTypes.published && surveySummary.temporary && !surveySummary.publishedId)
+                            || (type === surveyTypes.temporary && !surveySummary.temporary)}
                     />
                     {L.l('survey.surveyType.' + type.toLowerCase())}
                 </Label>
             </FormGroup>
         )
-        const outputFormats = ['DESKTOP', 'EARTH', 'MOBILE']
-        const outputFormatCheckboxes = outputFormats.map(mode =>
+        const outputFormatCheckboxes = Object.values(outputFormats).map(mode =>
             <FormGroup>
                 <Label key={mode} check>
                     <Input type="radio" value={mode} name="outputFormat"
-                        checked={this.state.outputFormat === mode}
-                        onChange={(event) => this.setState({ ...this.state, outputFormat: event.target.value })} />
+                        checked={outputFormat === mode}
+                        onChange={(event) => this.setState({ outputFormat: event.target.value })} />
                     {L.l('survey.export.mode.' + mode.toLowerCase())}
                 </Label>
             </FormGroup>
@@ -150,12 +160,12 @@ class SurveyExportPage extends Component {
                                 </FormGroup>
                             </Col>
                         </FormGroup>
-                        {(this.state.outputFormat === 'MOBILE' || this.state.outputFormat === 'EARTH') &&
+                        {(outputFormat === outputFormats.mobile || outputFormat === outputFormats.earth) &&
                             <FormGroup row>
-                                <Label for="defaultLanguage" sm={4}>{L.l(this.state.outputFormat === 'MOBILE' ? 'survey.defaultLanguage' : 'survey.language')}:</Label>
+                                <Label for="defaultLanguage" sm={4}>{L.l(outputFormat === outputFormats.mobile ? 'survey.defaultLanguage' : 'survey.language')}:</Label>
                                 <Col sm={8}>
                                     <Input type="select" name="defaultLanguage" id="defaultLanguage" value={outputSurveyDefaultLanguage}
-                                        onChange={(event) => this.setState({ ...this.state, outputSurveyDefaultLanguage: event.target.value })}>
+                                        onChange={(event) => this.setState({ outputSurveyDefaultLanguage: event.target.value })}>
                                         {languageOptions}
                                     </Input>
                                 </Col>
