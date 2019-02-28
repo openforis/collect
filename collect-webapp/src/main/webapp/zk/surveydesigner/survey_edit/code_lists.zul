@@ -40,13 +40,13 @@
 								onClick="@command('newItem')"
 								width="70px" />
 							<menuitem
-								sclass="iconbutton"
+								sclass="icon-button"
 								tooltiptext="${labels.global.delete_item}"
 								image="/assets/images/delete.png"
 								disabled="@load(empty vm.selectedItem)"
 								onClick="@command('deleteCodeList', item=vm.selectedItem)" />
 							<menu
-								sclass="iconbutton" 
+								sclass="icon-button" 
 								image="/assets/images/settings-small.png" 
 								tooltiptext="${labels.survey.code_list.import_export}">
 								<menupopup>
