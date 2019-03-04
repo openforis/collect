@@ -107,7 +107,7 @@ button.icon {
 	background: url("../images/minus-small.png") no-repeat 0 0px;;
 }
 .z-menu.icon-button .z-menu-btn, 
-	.z-menuitem.icon-button .z-menuitem-btn  {
+.z-menuitem.icon-button .z-menuitem-btn  {
 	width: 24px;
 	height: 24px;
 	padding-left: 20px;
