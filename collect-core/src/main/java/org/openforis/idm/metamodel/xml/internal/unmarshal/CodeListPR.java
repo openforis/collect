@@ -144,7 +144,7 @@ class CodeListPR extends IdmlPullReader {
 			list.addLabel(label);
 		}
 
-		private Type parseType(String typeStr) throws XmlParseException {
+		private Type parseType(String typeStr) {
 			if (StringUtils.isNotBlank(typeStr)) {
 				try {
 					return CodeListLabel.Type.valueOf(typeStr.toUpperCase(Locale.ENGLISH));
