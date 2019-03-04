@@ -145,16 +145,14 @@ class CodeListPR extends IdmlPullReader {
 		}
 
 		private Type parseType(String typeStr) throws XmlParseException {
-			if (StringUtils.isBlank(typeStr)) {
-				return Type.ITEM;
-			} else {
+			if (StringUtils.isNotBlank(typeStr)) {
 				try {
 					return CodeListLabel.Type.valueOf(typeStr.toUpperCase(Locale.ENGLISH));
 				} catch (IllegalArgumentException e) {
 					//throw new XmlParseException(getParser(), "invalid type for code list label: " + typeStr, e);
-					return Type.ITEM;
 				}
 			}
+			return Type.ITEM;
 		}
 	}
 
