@@ -72,7 +72,7 @@ class CodeListPR extends IdmlPullReader {
 				throws XmlParseException, XmlPullParserException, IOException {
 			String scopeStr = getAttribute(SCOPE, true);
 			try {
-				CodeScope scope = CodeList.CodeScope.valueOf(scopeStr.toUpperCase());
+				CodeScope scope = CodeList.CodeScope.valueOf(scopeStr.toUpperCase(Locale.ENGLISH));
 				list.setCodeScope(scope);
 			} catch ( IllegalArgumentException ex ) {
 				throw new XmlParseException(getParser(), "invalid scope "+scopeStr);

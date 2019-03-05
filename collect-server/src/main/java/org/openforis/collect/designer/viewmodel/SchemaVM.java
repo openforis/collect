@@ -918,7 +918,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if (survey == null) {
 			// TODO session expired...?
 		} else {
-			TreeViewType viewType = TreeViewType.valueOf(selectedTreeViewType.toUpperCase());
+			TreeViewType viewType = TreeViewType.valueOf(selectedTreeViewType.toUpperCase(Locale.ENGLISH));
 			SurveyObjectTreeModelCreator modelCreator;
 			switch (viewType) {
 			case ENTRY:

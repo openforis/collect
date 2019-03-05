@@ -11,6 +11,7 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import java.util.List;
 import java.util.Stack;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectSurvey;
@@ -47,11 +48,8 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 
 		List<Taxon> results = taxonDao.findByCode(taxonomy1, FAMILY, match, maxResults);
 		assertEquals(expectedResults, results.size());
-		match = match.toUpperCase();
 		for (Taxon taxon : results) {
-			String code = taxon.getCode();
-			code = (code == null) ? "" : code.toUpperCase();
-			assertTrue(code.startsWith(match));
+			assertTrue(StringUtils.startsWithIgnoreCase(taxon.getCode(), match));
 		}
 	}
 	
@@ -90,11 +88,8 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		
 		List<Taxon> results = taxonDao.findByScientificName(taxonomy1, FAMILY, match, maxResults);
 		assertEquals(expectedResults, results.size());
-		match = match.toUpperCase();
 		for (Taxon taxon : results) {
-			String name = taxon.getScientificName();
-			name = name.toUpperCase();
-			assertTrue(name.startsWith(match));
+			assertTrue(StringUtils.startsWithIgnoreCase(taxon.getScientificName(), match));
 		}
 	}
 
@@ -125,11 +120,8 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		
 		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(taxonomy1.getId(), match, maxResults);
 		assertEquals(expectedResults, results.size());
-		match = match.toUpperCase();
 		for (TaxonVernacularName tvn : results) {
-			String name = tvn.getVernacularName();
-			name = name.toUpperCase();
-			assertTrue(name.contains(match));
+			assertTrue(StringUtils.containsIgnoreCase(tvn.getVernacularName(), match));
 		}
 	}
 
@@ -479,11 +471,8 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		
 		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, maxResults);
 		assertEquals(expectedResults, results.size());
-		match = match.toUpperCase();
 		for (TaxonVernacularName tvn : results) {
-			String name = tvn.getVernacularName();
-			name = name.toUpperCase();
-			assertTrue(name.contains(match));
+			assertTrue(StringUtils.containsIgnoreCase(tvn.getVernacularName(), match));
 		}
 	}
 	
@@ -509,11 +498,8 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		
 		List<TaxonVernacularName> results = taxonVernacularNameDao.findByVernacularName(match, qualifiers, maxResults);//already using qualifer1 as the criteria
 		assertEquals(expectedResults, results.size());
-		match = match.toUpperCase();
 		for (TaxonVernacularName tvn : results) {
-			String name = tvn.getVernacularName();
-			name = name.toUpperCase();
-			assertTrue(name.contains(match));
+			assertTrue(StringUtils.containsIgnoreMatch(tvn.getVernacularName(), match));
 		}
 	}
 	

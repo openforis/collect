@@ -2,6 +2,7 @@ package org.openforis.collect.persistence.jooq;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.jooq.Configuration;
 import org.jooq.DeleteQuery;
@@ -69,7 +70,7 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 			throw new IllegalArgumentException("Search string required");
 		}
 		SelectQuery<?> select = selectQuery(getTable());
-		searchString = searchString.toUpperCase() + "%";
+		searchString = searchString.toUpperCase(Locale.ENGLISH) + "%";
 		select.addConditions(DSL.upper(field).like(searchString));
 		return select;
 	}
@@ -79,7 +80,7 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 			throw new IllegalArgumentException("Search string required");
 		}
 		SelectQuery<?> select = selectQuery(getTable());
-		searchString = "%" + searchString.toUpperCase() + "%";
+		searchString = "%" + searchString.toUpperCase(Locale.ENGLISH) + "%";
 		select.addConditions(DSL.upper(field).like(searchString));
 		return select;
 	}

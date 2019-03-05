@@ -31,6 +31,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.UNIT;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.VALUE;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -150,7 +151,7 @@ abstract class AttributeDefinitionPR extends NodeDefinitionPR {
 			String flagStr = getAttribute(FLAG, true);
 			Check.Flag flag;
 			try {
-				flag = Check.Flag.valueOf(flagStr.toUpperCase());
+				flag = Check.Flag.valueOf(flagStr.toUpperCase(Locale.ENGLISH));
 			} catch ( IllegalArgumentException e ) {
 				throw new XmlParseException(getParser(), "invalid flag "+flagStr);
 			}

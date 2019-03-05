@@ -26,7 +26,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		abbreviation = source.getAbbreviation(languageCode);
 		String dimensionValue = source.getDimension();
 		if ( dimensionValue != null ) {
-			Dimension dimension = Dimension.valueOf(dimensionValue.toUpperCase());
+			Dimension dimension = Dimension.valueOf(dimensionValue.toUpperCase(Locale.ENGLISH));
 			dimensionLabel = UnitsVM.getDimensionLabel(dimension);
 		} else {
 			dimensionLabel = null;
