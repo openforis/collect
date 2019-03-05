@@ -135,53 +135,6 @@
 				</configuration>
 			</plugin>
 			
-			<!-- generate standard SQL DB migrations for supported DBMSs -->
-			<plugin>
-				<groupId>com.soebes.maven.plugins</groupId>
-				<artifactId>iterator-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>generate-standard-db-migrations</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>iterator</goal>
-						</goals>
-						<configuration>
-							<items>
-								<item>db2</item>
-								<item>h2</item>
-								<item>mysql</item>
-								<item>mssql</item>
-								<item>oracle</item>
-								<item>postgresql</item>
-								<item>sybase</item>
-							</items>
-							<pluginExecutors>
-								<pluginExecutor>
-									<plugin>
-										<groupId>com.google.code.maven-replacer-plugin</groupId>
-										<artifactId>replacer</artifactId>
-									</plugin>
-									<goal>replace</goal>
-									<configuration>
-										<basedir>${project.build.outputDirectory}/org/openforis/collect/db/changelog/standard_templates</basedir>
-										<outputDir>../standard/@item@</outputDir>
-										<includes>
-											<include>*.xml</include>
-										</includes>
-										<regex>false</regex>
-										<!-- the name of the token to replace -->
-										<token>DBMS_ID</token>
-										<!-- replace it with the current DBMS ID -->
-										<value>@item@</value>
-									</configuration>
-								</pluginExecutor>
-							</pluginExecutors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			
 			<!-- Add generated sources to build path -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>

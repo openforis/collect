@@ -4,7 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 	
-	<changeSet author="admin" id="standard-0000-baseline" dbms="DBMS_ID">
+	<changeSet author="admin" id="standard-0000-baseline">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="ofc_application_info" />
