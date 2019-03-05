@@ -140,7 +140,7 @@ class BackupDataImportPage extends Component {
 
     
     handleAllRecordsToImportSelect(isSelected, rows) {
-        const newSelectedRecordsToImport = Arrays.addOrRemoveItems(this.state.selectedRecordsToImport, rows, !isSelected)
+        const newSelectedRecordsToImport = isSelected ? this.state.dataImportSummary.recordsToImport : []
 		this.handleSelectedRecordsToImportChange(newSelectedRecordsToImport)
     }
 
@@ -157,7 +157,7 @@ class BackupDataImportPage extends Component {
     }
     
     handleAllConflictingRecordsSelect(isSelected, rows) {
-        const newSelectedConflictingRecords = Arrays.addOrRemoveItems(this.state.selectedConflictingRecords, rows, !isSelected)
+        const newSelectedConflictingRecords = isSelected ? this.state.dataImportSummary.conflictingRecords : []
         this.handleConflictingRecordsToImportChange(newSelectedConflictingRecords)		
     }
 

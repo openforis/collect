@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.io.data;
 
+import org.openforis.collect.io.data.RecordProviderInitializerTask.Input;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.concurrency.Worker;
@@ -48,8 +49,16 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setRecordProvider(recordProvider);
 			t.setSurvey(publishedSurvey);
 			t.setUserManager(userManager);
+		} else {
+			super.initializeTask(task);
 		}
-		super.initializeTask(task);
+	}
+	
+	@Override
+	protected Input createRecordProviderInitializerTaskInput() {
+		Input input = super.createRecordProviderInitializerTaskInput();
+		input.setInitializeRecords(false);
+		return input;
 	}
 	
 	@Override

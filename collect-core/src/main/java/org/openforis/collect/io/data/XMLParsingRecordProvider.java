@@ -36,9 +36,10 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	private final File file;
 	private final CollectSurvey packagedSurvey;
 	private final CollectSurvey existingSurvey;
+	private boolean initializeRecords;
 	private boolean validateRecords;
 	private boolean ignoreDuplicateRecordKeyValidationErrors;
-	private RecordProviderConfiguration config = new RecordProviderConfiguration();;
+	private RecordProviderConfiguration config = new RecordProviderConfiguration();
 	
 	//internal
 	private NewBackupFileExtractor backupFileExtractor;
@@ -50,12 +51,14 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	
 	
 	public XMLParsingRecordProvider(File file, CollectSurvey packagedSurvey, CollectSurvey existingSurvey, 
-			User activeUser, UserManager userManager, boolean validateRecords, boolean ignoreDuplicateRecordKeyValidationErrors) {
+			User activeUser, UserManager userManager, boolean initializeRecords, boolean validateRecords, 
+			boolean ignoreDuplicateRecordKeyValidationErrors) {
 		this.file = file;
 		this.packagedSurvey = packagedSurvey;
 		this.existingSurvey = existingSurvey;
 		this.activeUser = activeUser;
 		this.userManager = userManager;
+		this.initializeRecords = initializeRecords;
 		this.validateRecords = validateRecords;
 		this.ignoreDuplicateRecordKeyValidationErrors = ignoreDuplicateRecordKeyValidationErrors;
 	}
@@ -70,14 +73,22 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		this.backupFileExtractor = new NewBackupFileExtractor(file);
 		this.backupFileExtractor.init(progressListener);
 		this.dataUnmarshaller = new DataUnmarshaller(existingSurvey == null ? packagedSurvey : existingSurvey, packagedSurvey);
-		this.dataUnmarshaller.setRecordValidationEnabled(validateRecords);
-		this.dataUnmarshaller.setIgnoreDuplicateRecordKeyValidationErrors(ignoreDuplicateRecordKeyValidationErrors);
-		this.dataUnmarshaller.setRecordApplicationVersion(backupFileExtractor.getInfo().getCollectVersion());
-		this.recordUpdater = new RecordUpdater();
-		this.recordUpdater.setValidateAfterUpdate(validateRecords);
+		initDataUnmarshaller();
+		initRecordUpdater();
 		initializeRecordUserLoader();
 	}
+
+	private void initDataUnmarshaller() {
+		this.dataUnmarshaller.setRecordValidationEnabled(initializeRecords && validateRecords);
+		this.dataUnmarshaller.setIgnoreDuplicateRecordKeyValidationErrors(ignoreDuplicateRecordKeyValidationErrors);
+		this.dataUnmarshaller.setRecordApplicationVersion(backupFileExtractor.getInfo().getCollectVersion());
+	}
 	
+	private void initRecordUpdater() {
+		this.recordUpdater = new RecordUpdater();
+		this.recordUpdater.setValidateAfterUpdate(initializeRecords && validateRecords);
+	}
+
 	private void initializeRecordUserLoader() {
 		this.recordUserLoader = new RecordUserLoader(userManager, activeUser, config.isCreateUsersFoundInRecords());
 	}
@@ -106,7 +117,8 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		if (parseRecordResult.isSuccess()) {
 			CollectRecord record = parseRecordResult.getRecord();
 			recordUserLoader.adjustUserReferences(record);
-			recordUpdater.initializeRecord(record);
+			if (initializeRecords)
+				recordUpdater.initializeRecord(record);
 		}
 		return parseRecordResult;
 	}
@@ -174,9 +186,14 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	
 	public void setValidateRecords(boolean validateRecords) {
 		this.validateRecords = validateRecords;
-		if (dataUnmarshaller != null) {
-			dataUnmarshaller.setRecordValidationEnabled(validateRecords);
-		}
+		initDataUnmarshaller();
+		initRecordUpdater();
+	}
+	
+	public void setInitializeRecords(boolean initializeRecords) {
+		this.initializeRecords = initializeRecords;
+		initDataUnmarshaller();
+		initRecordUpdater();
 	}
 	
 	public static class RecordUserLoader {

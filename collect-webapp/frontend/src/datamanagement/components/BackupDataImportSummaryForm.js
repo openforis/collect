@@ -62,6 +62,7 @@ const NewRecordsTable = props => {
     return <BootstrapTable
         data={recordsToImport}
         striped hover condensed
+        pagination
         height='400px'
         selectRow={{
             mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',
@@ -129,6 +130,7 @@ const ConflictingRecordsTable = props => {
         <BootstrapTable
             data={conflictingRecords}
             striped hover condensed
+            pagination
             height='400px'
             selectRow={{
                 mode: 'checkbox', clickToSelect: true, hideSelectionColumn: true, bgColor: 'lightBlue',

@@ -49,6 +49,7 @@ import org.openforis.collect.io.data.RecordProvider;
 import org.openforis.collect.io.data.RecordProviderConfiguration;
 import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
+import org.openforis.collect.io.data.XMLParsingRecordProvider;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParametersBase;
 import org.openforis.collect.io.data.csv.CSVDataImportSettings;
@@ -361,6 +362,7 @@ public class RecordController extends BasicController implements Serializable {
 		File file = File.createTempFile("ofc_data_restore", ".collect-data");
 		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		
 		DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
 		job.setUser(sessionManager.getLoggedUser());
 		job.setFullSummary(true);
@@ -368,6 +370,7 @@ public class RecordController extends BasicController implements Serializable {
 		job.setPublishedSurvey(survey);
 		job.setCloseRecordProviderOnComplete(false);
 		job.setDeleteInputFileOnDestroy(true);
+		
 		jobManager.start(job);
 		this.dataRestoreSummaryJob = job;
 		return new JobView(job);
@@ -388,6 +391,8 @@ public class RecordController extends BasicController implements Serializable {
 	JobView startRecordImport(@PathVariable("surveyId") int surveyId, @RequestParam List<Integer> entryIdsToImport, 
 			@RequestParam(defaultValue="true") boolean validateRecords) throws IOException {
 		RecordProvider recordProvider = dataRestoreSummaryJob.getRecordProvider();
+		if (recordProvider instanceof XMLParsingRecordProvider)
+			((XMLParsingRecordProvider) recordProvider).setInitializeRecords(true);
 		recordProvider.setConfiguration(new RecordProviderConfiguration(true));
 		DataRestoreJob job = jobManager.createJob(TransactionalDataRestoreJob.class);
 		job.setFile(dataRestoreSummaryJob.getFile());
@@ -399,7 +404,6 @@ public class RecordController extends BasicController implements Serializable {
 		job.setEntryIdsToImport(entryIdsToImport);
 		job.setRecordFilesToBeDeleted(dataRestoreSummaryJob.getSummary().getConflictingRecordFiles(entryIdsToImport));
 		job.setRestoreUploadedFiles(true);
-		job.setValidateRecords(validateRecords);
 		jobManager.start(job);
 		return new JobView(job);
 	}
