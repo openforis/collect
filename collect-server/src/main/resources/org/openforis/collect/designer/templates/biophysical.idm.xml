@@ -398,10 +398,13 @@
       <codingScheme scope="local" />
       <hierarchy>
         <level name="level1">
-          <label xml:lang="en">Cluster Id</label>
+          <label xml:lang="en">level1</label>
         </level>
         <level name="level2">
-          <label xml:lang="en">Plot Id</label>
+          <label xml:lang="en">level2</label>
+        </level>
+        <level name="level3">
+          <label xml:lang="en">level3</label>
         </level>
       </hierarchy>
     </list>
