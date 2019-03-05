@@ -12,8 +12,8 @@
 
 	<properties>
 		<dev.jetty.port>8580</dev.jetty.port>
-		<node.version>v10.13.0</node.version>
-		<npm.version>6.4.1</npm.version>
+		<node.version>v10.15.3</node.version>
+		<npm.version>6.8.0</npm.version>
 	</properties>
 
 	<build>
