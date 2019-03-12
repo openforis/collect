@@ -7,10 +7,7 @@
 	<changeSet author="admin" id="standard-0000-baseline">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<or>
-					<dbms type="sqlite" />
-					<tableExists tableName="ofc_application_info" />
-				</or>
+				<tableExists tableName="ofc_application_info" />
 			</not>
 		</preConditions>
 		<createTable tableName="ofc_application_info">

@@ -134,7 +134,7 @@
 					<value>${project.version}</value>
 				</configuration>
 			</plugin>
-
+			
 			<!-- Add generated sources to build path -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>

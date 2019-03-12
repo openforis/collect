@@ -1,0 +1,93 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+	<id>distribution</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<!-- Include files from unpacked Tomcat distribution -->
+		<fileSet>
+			<directory>${project.build.directory}/apache-tomcat-${tomcat.version}</directory>
+			<outputDirectory>${output.directory}/tomcat</outputDirectory>
+			<excludes>
+				<exclude>**/webapps/ROOT/**</exclude>
+				<exclude>**/webapps/docs/**</exclude>
+				<exclude>**/webapps/examples/**</exclude>
+				<exclude>bin/*.sh</exclude>
+			</excludes>
+		</fileSet>
+		<!-- Include sh files from unpacked Tomcat distribution with execute permissions -->
+		<fileSet>
+			<directory>${project.build.directory}/apache-tomcat-${tomcat.version}/bin</directory>
+			<outputDirectory>${output.directory}/tomcat/bin</outputDirectory>
+			<includes>
+				<include>*.sh</include>
+			</includes>
+			<fileMode>755</fileMode>
+		</fileSet>
+		<!-- Include custom startup scripts (e.g. setenv.sh/setenv.bat) -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/resources/tomcat/bin</directory>
+			<outputDirectory>${output.directory}/tomcat/bin</outputDirectory>
+			<includes>
+				<include>**/**</include>
+			</includes>
+			<fileMode>755</fileMode>
+		</fileSet>
+		<!-- Include Collect context config -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/resources/tomcat/conf</directory>
+			<outputDirectory>${output.directory}/tomcat/conf</outputDirectory>
+			<includes>
+				<include>**/**</include>
+			</includes>
+		</fileSet>
+		<!-- Include empty data directory -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/resources/tomcat/data</directory>
+			<outputDirectory>${output.directory}/tomcat/data</outputDirectory>
+		</fileSet>
+		<!-- Include startup/shutdown batch files -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/resources</directory>
+			<outputDirectory>${output.directory}</outputDirectory>
+			<includes>
+				<include>*</include>
+			</includes>
+			<fileMode>755</fileMode>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<!-- Add SQLite, PostgreSQL and connection pool dependencies for server installations -->
+			<outputDirectory>${output.directory}/tomcat/lib</outputDirectory>
+			<includes>
+				<include>org.xerial:sqlite-jdbc:jar</include>
+				<include>postgresql:postgresql:jar</include>
+				<include>commons-pool:commons-pool:jar</include>
+				<include>commons-dbcp:commons-dbcp:jar</include>
+			</includes>
+		</dependencySet>
+		<!-- Add the actual Collect webapp (unpacked) -->
+		<dependencySet>
+			<outputDirectory>${output.directory}/tomcat/webapps</outputDirectory>
+			<includes>
+				<include>org.openforis.collect:collect-webapp-tomcat</include>
+			</includes>
+			<unpack>false</unpack>
+			<outputFileNameMapping>collect.war</outputFileNameMapping>
+		</dependencySet>
+		<!-- Add Saiku webapp -->
+		<dependencySet>
+			<outputDirectory>${output.directory}/tomcat/webapps</outputDirectory>
+			<includes>
+				<include>meteorite.bi:saiku-webapp-full</include>
+			</includes>
+			<unpack>false</unpack>
+			<outputFileNameMapping>saiku.war</outputFileNameMapping>
+		</dependencySet>
+	</dependencySets>
+</assembly>
