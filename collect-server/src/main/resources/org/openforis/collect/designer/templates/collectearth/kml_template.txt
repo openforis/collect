@@ -174,9 +174,33 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 						${coord.longitude},${coord.latitude},0
 					</#list>  
 					<#-- Iterate over shape points -- END -->
+					<#list placemark.buffers as buffer>
+						<#-- Iterate over buffer polygons -- START -->
+						<#list buffer.shape as coord>
+							${coord.longitude},${coord.latitude},0
+						</#list>  
+					</#list>
 					</coordinates>
 				</LinearRing>
 			</outerBoundaryIs>
+			
+			<#list placemark.buffers as buffer>
+			<outerBoundaryIs>
+				<LinearRing>
+					<extrude>0</extrude>
+   					
+					<coordinates>
+					<#-- Iterate over shape coordinates, store values in variable placemark -- START -->
+					<#list buffer.shape as coord>
+						${coord.longitude},${coord.latitude},0
+					</#list>  
+					<#-- Iterate over shape points -- END -->
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+			</#list>
+			
+			
 			<innerBoundaryIs>
 			<#list placemark.points as square>
 
