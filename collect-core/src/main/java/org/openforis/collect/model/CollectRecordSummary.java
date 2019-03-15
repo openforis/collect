@@ -59,6 +59,7 @@ public class CollectRecordSummary {
 	private Step step;
 	private Integer workflowSequenceNumber;
 	private User owner;
+	private String lockedBy;
 	private List<File> files;
 	private Map<Step, StepSummary> stepSummaries = new LinkedHashMap<Step, StepSummary>();
 	
@@ -188,6 +189,14 @@ public class CollectRecordSummary {
 	
 	public void setOwner(User owner) {
 		this.owner = owner;
+	}
+	
+	public String getLockedBy() {
+		return lockedBy;
+	}
+	
+	public void setLockedBy(String lockedBy) {
+		this.lockedBy = lockedBy;
 	}
 
 	public List<File> getFiles() {

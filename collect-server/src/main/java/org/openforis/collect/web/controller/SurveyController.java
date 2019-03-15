@@ -22,7 +22,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.CESurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -36,13 +36,19 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Controllers;
@@ -106,7 +112,7 @@ public class SurveyController extends BasicController {
 	@Autowired
 	private AppWS appWS;
 
-	//validators
+	// validators
 	@Autowired
 	private SurveyCreationParametersValidator surveyCreationParametersValidator;
 	@Autowired
@@ -115,6 +121,10 @@ public class SurveyController extends BasicController {
 	private SurveyImportParametersValidator surveyImportParametersValidator;
 	@Autowired
 	private SurveyCloneParametersValidator surveyCloneParametersValidator;
+	@Autowired
+	private SurveyValidator surveyValidator;
+	@Autowired
+	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 
 	private SurveyBackupInfoExtractorJob surveyBackupInfoExtractorJob;
 	private File uploadedSurveyFile;
@@ -154,12 +164,12 @@ public class SurveyController extends BasicController {
 		}
 		Set<Integer> groupIds = getAvailableUserGroupIds(userId, groupId);
 		
-		List<SurveySummary> publishedSummaries =new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, groupIds));
+		List<SurveySummary> publishedSummaries = new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, userId, groupIds));
 
 		List<SurveySummary> allSummaries = new ArrayList<SurveySummary>(publishedSummaries);
 		
 		if (includeTemporary) {
-			List<SurveySummary> tempSummaries = surveyManager.loadTemporarySummaries(languageCode, true, groupIds);
+			List<SurveySummary> tempSummaries = surveyManager.loadTemporarySummaries(languageCode, true, userId, groupIds);
 			allSummaries.addAll(tempSummaries);
 		}
 		
@@ -199,7 +209,7 @@ public class SurveyController extends BasicController {
 		
 		SurveySummary surveySummary = SurveySummary.createFromSurvey(survey);
 
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		
 		Response res = new Response();
 		res.setObject(surveySummary);
@@ -216,6 +226,9 @@ public class SurveyController extends BasicController {
 		if (survey.isPublished()) {
 			String surveyUri = survey.getUri();
 			CollectSurvey temporarySurvey = surveyManager.createTemporarySurveyFromPublished(surveyUri, loggedUser);
+			
+			sendSurveysUpdatedMessage();
+			
 			response.setObject(temporarySurvey.getId());
 		} else {
 			response.setErrorStatus();
@@ -231,12 +244,23 @@ public class SurveyController extends BasicController {
 	
 	@RequestMapping(value="publish/{id}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public @ResponseBody SurveyView publishSurvey(@PathVariable int id) throws SurveyImportException {
+	public @ResponseBody SurveyPublishResult publishSurvey(
+			@PathVariable int id, @RequestParam boolean ignoreWarnings) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		User activeUser = sessionManager.getLoggedUser();
-		surveyManager.publish(survey, activeUser);
-		sendSurveyUpdatedMessage();
-		return generateView(survey, false);
+		CollectSurvey publishedSurvey = survey.isPublished() ? surveyManager
+				.getByUri(survey.getUri()) : null;
+		SurveyValidator validator = getSurveyValidator(survey);
+		ValidationParameters validationParameters = new ValidationParameters();
+		validationParameters.setWarningsIgnored(ignoreWarnings);
+		SurveyValidationResults results = validator.validateCompatibility(publishedSurvey, survey, validationParameters);
+		if (results.hasErrors() || results.hasWarnings()) {
+			return new SurveyPublishResult(results);
+		} else {
+			User activeUser = sessionManager.getLoggedUser();
+			surveyManager.publish(survey, activeUser);
+			sendSurveysUpdatedMessage();
+			return new SurveyPublishResult(generateView(survey, false));
+		}
 	}
 	
 	@RequestMapping(value="unpublish/{id}", method=POST)
@@ -244,7 +268,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id) throws SurveyStoreException {
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -253,7 +277,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView closeSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.close(survey);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -262,7 +286,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView archiveSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.archive(survey);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -270,7 +294,7 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
 		surveyManager.deleteSurvey(id);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return new Response();
 	}
 	
@@ -282,6 +306,12 @@ public class SurveyController extends BasicController {
 		surveyCloneJob.setNewName(params.newSurveyName);
 		surveyCloneJob.setOriginalSurveyType(params.originalSurveyType);
 		surveyCloneJob.setActiveUser(sessionManager.getLoggedUser());
+		surveyCloneJob.addStatusChangeListener(new WorkerStatusChangeListener() {
+			public void statusChanged(WorkerStatusChangeEvent event) {
+				if (event.getTo() == Status.COMPLETED)
+					sendSurveysUpdatedMessage();
+			}
+		});
 		jobManager.start(surveyCloneJob);
 		return new JobView(surveyCloneJob);
 	}
@@ -379,7 +409,7 @@ public class SurveyController extends BasicController {
 		job.addStatusChangeListener(new WorkerStatusChangeListener() {
 			public void statusChanged(WorkerStatusChangeEvent event) {
 				if (event.getTo() == Status.COMPLETED) {
-					sendSurveyUpdatedMessage();
+					sendSurveysUpdatedMessage();
 				}
 			}
 		});
@@ -404,7 +434,7 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable String surveyName, @RequestParam int userGroupId) throws SurveyStoreException {
 		SurveySummary surveySummary = surveyManager.updateUserGroup(surveyName, userGroupId);
-		sendSurveyUpdatedMessage();
+		sendSurveysUpdatedMessage();
 		return surveySummary;
 	}
 	
@@ -458,7 +488,7 @@ public class SurveyController extends BasicController {
 //			surveyBackupJob.setIncludeData(parameters.isIncludeData());
 //			surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
 			job.setOutputFormat(org.openforis.collect.io.SurveyBackupJob.OutputFormat.valueOf(params.getOutputFormat().name()));
-			job.setOutputSurveyDefaultLanguage(ObjectUtils.defaultIfNull(params.getLanguageCode(), loadedSurvey.getDefaultLanguage()));
+			job.setOutputSurveyDefaultLanguage(StringUtils.defaultIfEmpty(params.getLanguageCode(), loadedSurvey.getDefaultLanguage()));
 			jobManager.start(job, String.valueOf(loadedSurvey.getId()));
 			this.surveyBackupJob = job;
 			return new JobView(job);
@@ -499,7 +529,9 @@ public class SurveyController extends BasicController {
 		}
 		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH.getLanguage());
 		viewGenerator.setIncludeCodeListValues(includeCodeListValues);
-		SurveyView view = viewGenerator.generateView(survey);
+		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), sessionManager.getLoggedUser().getId());
+		UserGroup userGroup = userInSurveyGroup == null ? null : userGroupManager.loadById(userInSurveyGroup.getGroupId());
+		SurveyView view = viewGenerator.generateView(survey, userGroup, userInSurveyGroup == null ? null : userInSurveyGroup.getRole());
 		return view;
 	}
 	
@@ -526,8 +558,12 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	private void sendSurveyUpdatedMessage() {
+	private void sendSurveysUpdatedMessage() {
 		appWS.sendMessage(SURVEYS_UPDATED, 500); //delay to allow transaction commit
+	}
+	
+	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
+		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
 	}
 	
 	public static class SurveyCreationParameters {
@@ -760,4 +796,26 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
+	public class SurveyPublishResult {
+		private SurveyView survey;
+		private SurveyValidationResults validationResult;
+		
+		public SurveyPublishResult(SurveyView survey) {
+			super();
+			this.survey = survey;
+		}
+
+		public SurveyPublishResult(SurveyValidationResults validationResult) {
+			super();
+			this.validationResult = validationResult;
+		}
+		
+		public SurveyView getSurvey() {
+			return survey;
+		}
+		
+		public SurveyValidationResults getValidationResult() {
+			return validationResult;
+		}
+	}
 }

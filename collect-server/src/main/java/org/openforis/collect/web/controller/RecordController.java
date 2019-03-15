@@ -49,9 +49,9 @@ import org.openforis.collect.io.data.RecordProvider;
 import org.openforis.collect.io.data.RecordProviderConfiguration;
 import org.openforis.collect.io.data.TransactionalCSVDataImportJob;
 import org.openforis.collect.io.data.TransactionalDataRestoreJob;
+import org.openforis.collect.io.data.XMLParsingRecordProvider;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
-import org.openforis.collect.io.data.csv.CSVDataExportParameters.HeadingSource;
-import org.openforis.collect.io.data.csv.CSVDataExportParameters.OutputFormat;
+import org.openforis.collect.io.data.csv.CSVDataExportParametersBase;
 import org.openforis.collect.io.data.csv.CSVDataImportSettings;
 import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 import org.openforis.collect.manager.MessageSource;
@@ -94,6 +94,7 @@ import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.RecordStatsGenerator.RecordsStats;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.proxy.JobProxy;
@@ -151,6 +152,8 @@ public class RecordController extends BasicController implements Serializable {
 	private RecordStatsGenerator recordStatsGenerator;
 	@Autowired
 	private transient EventQueue eventQueue;
+	@Autowired
+	private AppWS appWS;
 	
 	private CSVDataExportJob csvDataExportJob;
 	private SurveyBackupJob fullBackupJob;
@@ -244,10 +247,14 @@ public class RecordController extends BasicController implements Serializable {
 	RecordProxy loadRecord(
 			@PathVariable("surveyId") int surveyId, 
 			@PathVariable("recordId") int recordId,
-			@RequestParam(value="step", required=false) Integer stepNumber) throws RecordPersistenceException {
+			@RequestParam(value="step", required=false) Integer stepNumber,
+			@RequestParam(value="lock", required=false, defaultValue="false") boolean lock) throws RecordPersistenceException {
 		stepNumber = getStepNumberOrDefault(stepNumber);
 		CollectSurvey survey = surveyManager.getById(surveyId);
-		CollectRecord record = recordManager.load(survey, recordId, Step.valueOf(stepNumber));
+		Step step = Step.valueOf(stepNumber);
+		CollectRecord record = lock 
+				? recordManager.checkout(survey, sessionManager.getLoggedUser(), recordId, step, sessionManager.getSessionState().getSessionId(), true)
+				: recordManager.load(survey, recordId, step);
 		return toProxy(record);
 	}
 
@@ -355,6 +362,7 @@ public class RecordController extends BasicController implements Serializable {
 		File file = File.createTempFile("ofc_data_restore", ".collect-data");
 		FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
 		CollectSurvey survey = surveyManager.getById(surveyId);
+		
 		DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
 		job.setUser(sessionManager.getLoggedUser());
 		job.setFullSummary(true);
@@ -362,6 +370,7 @@ public class RecordController extends BasicController implements Serializable {
 		job.setPublishedSurvey(survey);
 		job.setCloseRecordProviderOnComplete(false);
 		job.setDeleteInputFileOnDestroy(true);
+		
 		jobManager.start(job);
 		this.dataRestoreSummaryJob = job;
 		return new JobView(job);
@@ -382,6 +391,8 @@ public class RecordController extends BasicController implements Serializable {
 	JobView startRecordImport(@PathVariable("surveyId") int surveyId, @RequestParam List<Integer> entryIdsToImport, 
 			@RequestParam(defaultValue="true") boolean validateRecords) throws IOException {
 		RecordProvider recordProvider = dataRestoreSummaryJob.getRecordProvider();
+		if (recordProvider instanceof XMLParsingRecordProvider)
+			((XMLParsingRecordProvider) recordProvider).setInitializeRecords(true);
 		recordProvider.setConfiguration(new RecordProviderConfiguration(true));
 		DataRestoreJob job = jobManager.createJob(TransactionalDataRestoreJob.class);
 		job.setFile(dataRestoreSummaryJob.getFile());
@@ -393,7 +404,6 @@ public class RecordController extends BasicController implements Serializable {
 		job.setEntryIdsToImport(entryIdsToImport);
 		job.setRecordFilesToBeDeleted(dataRestoreSummaryJob.getSummary().getConflictingRecordFiles(entryIdsToImport));
 		job.setRestoreUploadedFiles(true);
-		job.setValidateRecords(validateRecords);
 		jobManager.start(job);
 		return new JobView(job);
 	}
@@ -595,6 +605,23 @@ public class RecordController extends BasicController implements Serializable {
 		}
 	}
 	
+	@RequestMapping(value="survey/{surveyId}/data/records/releaselock/{recordId}", method=POST)
+	public @ResponseBody Response releaseRecordLock(@PathVariable int recordId) {
+		CollectRecord activeRecord = sessionManager.getActiveRecord();
+		Response res = new Response();
+		if (activeRecord != null && activeRecord.getId() != null && activeRecord.getId().equals(recordId)) {
+			recordManager.releaseLock(recordId);
+			appWS.sendMessage(new AppWS.RecordUnlockedMessage(recordId));
+		} else {
+			res.setErrorStatus();
+			res.setErrorMessage(String.format(
+					"Cannot unlock record with id %d: it is not being edited by user %s", 
+					recordId, sessionManager.getLoggedUsername()
+			));
+		}
+		return res;
+	}
+	
 	private Integer getStepNumberOrDefault(Integer stepNumber) {
 		if (stepNumber == null) {
 			stepNumber = Step.ENTRY.getStepNumber();
@@ -657,7 +684,7 @@ public class RecordController extends BasicController implements Serializable {
 		List<CollectRecordSummary> recordSummaries = recordManager.loadSummaries(filter);
 		User loggedUser = sessionManager.getLoggedUser();
 		RecordAccessControlManager recordAccessControlManager = new RecordAccessControlManager();
-		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroup(), loggedUser);
+		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), loggedUser.getId());
 		boolean canDeleteRecords = userInSurveyGroup != null && recordAccessControlManager.canDeleteRecords(loggedUser, userInSurveyGroup.getRole(), recordSummaries);
 		return canDeleteRecords;
 	}
@@ -856,7 +883,7 @@ public class RecordController extends BasicController implements Serializable {
 			recordFilter.setOwnerId(user.getId());
 		}
 		if (user.getRole() != UserRole.ADMIN) {
-			Map<String, String> qualifiers = userGroupManager.getQualifiers(survey.getUserGroup(), user);
+			Map<String, String> qualifiers = userGroupManager.getQualifiers(survey.getUserGroupId(), user.getId());
 			if (! qualifiers.isEmpty()) {
 				recordFilter.setQualifiersByName(qualifiers);
 			}
@@ -866,34 +893,17 @@ public class RecordController extends BasicController implements Serializable {
 		return recordFilter;
 	}
 	
-	public static class CSVExportParametersForm {
+	public static class CSVExportParametersForm extends CSVDataExportParametersBase {
 		
 		private Integer surveyId;
 		private Integer rootEntityId;
-		private Integer entityId;
 		private Integer recordId;
 		private Step stepGreaterOrEqual;
 		private boolean exportOnlyOwnedRecords = false;
-		private boolean alwaysGenerateZipFile = false;
-		private String multipleAttributeValueSeparator = ", ";
-		private String fieldHeadingSeparator = "_";
-		private boolean includeAllAncestorAttributes = false;
-		private boolean includeCodeItemPositionColumn = false;
-		private boolean includeKMLColumnForCoordinates = false;
-		private boolean includeEnumeratedEntities = false;
-		private boolean includeCompositeAttributeMergedColumn = false;
-		private boolean includeCodeItemLabelColumn = false;
-		private boolean includeGroupingLabels = true;
-		private boolean codeAttributeExpanded = false;
-		private int maxMultipleAttributeValues = 10;
-		private int maxExpandedCodeAttributeItems = 30;
-		private HeadingSource headingSource = HeadingSource.ATTRIBUTE_NAME;
-		private String languageCode = null;
 		private Date modifiedSince;
 		private Date modifiedUntil;
 		private List<String> keyAttributeValues = new ArrayList<String>();
 		private List<String> summaryAttributeValues = new ArrayList<String>();
-		private CSVDataExportParameters.OutputFormat outputFormat = OutputFormat.CSV;
 		
 		public CSVDataExportParameters toExportParameters(CollectSurvey survey, User user, UserGroupManager userGroupManager) {
 			CSVDataExportParameters result = new CSVDataExportParameters();
@@ -927,14 +937,6 @@ public class RecordController extends BasicController implements Serializable {
 			this.rootEntityId = rootEntityId;
 		}
 
-		public Integer getEntityId() {
-			return entityId;
-		}
-
-		public void setEntityId(Integer entityId) {
-			this.entityId = entityId;
-		}
-
 		public Integer getRecordId() {
 			return recordId;
 		}
@@ -957,126 +959,6 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setExportOnlyOwnedRecords(boolean exportOnlyOwnedRecords) {
 			this.exportOnlyOwnedRecords = exportOnlyOwnedRecords;
-		}
-		
-		public boolean isAlwaysGenerateZipFile() {
-			return alwaysGenerateZipFile;
-		}
-
-		public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
-			this.alwaysGenerateZipFile = alwaysGenerateZipFile;
-		}
-
-		public String getMultipleAttributeValueSeparator() {
-			return multipleAttributeValueSeparator;
-		}
-
-		public void setMultipleAttributeValueSeparator(String multipleAttributeValueSeparator) {
-			this.multipleAttributeValueSeparator = multipleAttributeValueSeparator;
-		}
-
-		public String getFieldHeadingSeparator() {
-			return fieldHeadingSeparator;
-		}
-
-		public void setFieldHeadingSeparator(String fieldHeadingSeparator) {
-			this.fieldHeadingSeparator = fieldHeadingSeparator;
-		}
-
-		public boolean isIncludeAllAncestorAttributes() {
-			return includeAllAncestorAttributes;
-		}
-
-		public void setIncludeAllAncestorAttributes(boolean includeAllAncestorAttributes) {
-			this.includeAllAncestorAttributes = includeAllAncestorAttributes;
-		}
-
-		public boolean isIncludeCodeItemPositionColumn() {
-			return includeCodeItemPositionColumn;
-		}
-
-		public void setIncludeCodeItemPositionColumn(boolean includeCodeItemPositionColumn) {
-			this.includeCodeItemPositionColumn = includeCodeItemPositionColumn;
-		}
-
-		public boolean isIncludeKMLColumnForCoordinates() {
-			return includeKMLColumnForCoordinates;
-		}
-
-		public void setIncludeKMLColumnForCoordinates(boolean includeKMLColumnForCoordinates) {
-			this.includeKMLColumnForCoordinates = includeKMLColumnForCoordinates;
-		}
-
-		public boolean isIncludeEnumeratedEntities() {
-			return includeEnumeratedEntities;
-		}
-
-		public void setIncludeEnumeratedEntities(boolean includeEnumeratedEntities) {
-			this.includeEnumeratedEntities = includeEnumeratedEntities;
-		}
-
-		public boolean isIncludeCompositeAttributeMergedColumn() {
-			return includeCompositeAttributeMergedColumn;
-		}
-
-		public void setIncludeCompositeAttributeMergedColumn(boolean includeCompositeAttributeMergedColumn) {
-			this.includeCompositeAttributeMergedColumn = includeCompositeAttributeMergedColumn;
-		}
-
-		public boolean isIncludeCodeItemLabelColumn() {
-			return includeCodeItemLabelColumn;
-		}
-
-		public void setIncludeCodeItemLabelColumn(boolean includeCodeItemLabelColumn) {
-			this.includeCodeItemLabelColumn = includeCodeItemLabelColumn;
-		}
-
-		public boolean isIncludeGroupingLabels() {
-			return includeGroupingLabels;
-		}
-
-		public void setIncludeGroupingLabels(boolean includeGroupingLabels) {
-			this.includeGroupingLabels = includeGroupingLabels;
-		}
-
-		public boolean isCodeAttributeExpanded() {
-			return codeAttributeExpanded;
-		}
-
-		public void setCodeAttributeExpanded(boolean codeAttributeExpanded) {
-			this.codeAttributeExpanded = codeAttributeExpanded;
-		}
-
-		public int getMaxMultipleAttributeValues() {
-			return maxMultipleAttributeValues;
-		}
-
-		public void setMaxMultipleAttributeValues(int maxMultipleAttributeValues) {
-			this.maxMultipleAttributeValues = maxMultipleAttributeValues;
-		}
-
-		public int getMaxExpandedCodeAttributeItems() {
-			return maxExpandedCodeAttributeItems;
-		}
-
-		public void setMaxExpandedCodeAttributeItems(int maxExpandedCodeAttributeItems) {
-			this.maxExpandedCodeAttributeItems = maxExpandedCodeAttributeItems;
-		}
-
-		public HeadingSource getHeadingSource() {
-			return headingSource;
-		}
-
-		public void setHeadingSource(HeadingSource headingSource) {
-			this.headingSource = headingSource;
-		}
-
-		public String getLanguageCode() {
-			return languageCode;
-		}
-
-		public void setLanguageCode(String languageCode) {
-			this.languageCode = languageCode;
 		}
 		
 		public Date getModifiedSince() {
@@ -1109,14 +991,6 @@ public class RecordController extends BasicController implements Serializable {
 		
 		public void setSummaryAttributeValues(List<String> summaryAttributeValues) {
 			this.summaryAttributeValues = summaryAttributeValues;
-		}
-		
-		public CSVDataExportParameters.OutputFormat getOutputFormat() {
-			return outputFormat;
-		}
-		
-		public void setOutputFormat(CSVDataExportParameters.OutputFormat outputFormat) {
-			this.outputFormat = outputFormat;
 		}
 	}
 }

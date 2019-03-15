@@ -4,6 +4,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.TEXT;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.TYPE;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -28,7 +29,7 @@ class TextAttributeDefinitionPR extends AttributeDefinitionPR {
 		String typeStr = getAttribute(TYPE, false); 
 		TextAttributeDefinition defn = (TextAttributeDefinition) getDefinition();
 		try {
-			defn.setType(typeStr == null ? Type.SHORT : Type.valueOf(typeStr.toUpperCase()));
+			defn.setType(typeStr == null ? Type.SHORT : Type.valueOf(typeStr.toUpperCase(Locale.ENGLISH)));
 		} catch (IllegalArgumentException e) {
 			throw new XmlParseException(getParser(), "invalid type "+typeStr);
 		}

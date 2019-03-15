@@ -1,0 +1,40 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column />
+    </columns>
+    <rows>
+      <row>
+        <label value="${labels.survey.schema.entity.layout.type_label}:" />
+        <fieldErrorHandler message="@load(vmsgs['layoutType'])">
+          <div>
+            <radiogroup selectedItem="@bind(fx.layoutType)"
+              onCheck="@command('applyChanges')">
+              <radio value="FORM" disabled="${empty parentEntity}"
+                label="${labels.survey.schema.entity.layout.type.form}" />
+              <radio value="TABLE" disabled="${empty parentEntity}"
+                label="${labels.survey.schema.entity.layout.type.table}" />
+            </radiogroup>
+          </div>
+        </fieldErrorHandler>
+      </row>
+      <row visible="@load(fx.layoutType eq 'TABLE')">
+        <label value="${labels.survey.schema.entity.layout.direction_label}:" />
+        <fieldErrorHandler message="@load(vmsgs['direction'])">
+          <div>
+            <radiogroup selectedItem="@bind(fx.direction)"
+              onCheck="@command('applyChanges')">
+              <radio value="byRows" disabled="${empty parentEntity}"
+                label="${labels.survey.schema.entity.layout.direction.byRows}" />
+              <radio value="byColumns" disabled="${empty parentEntity}"
+                label="${labels.survey.schema.entity.layout.direction.byColumns}" />
+            </radiogroup>
+          </div>
+        </fieldErrorHandler>
+      </row>
+    </rows>
+  </grid>
+</zk>

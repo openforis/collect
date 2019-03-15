@@ -15,6 +15,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.REQUIRED_IF;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.SINCE;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.xml.namespace.QName;
 
@@ -174,7 +175,7 @@ abstract class NodeDefinitionPR extends IdmlPullReader {
 				return DEFAULT_LABEL_TYPE;
 			}
 			try { 
-				return NodeLabel.Type.valueOf(name.toUpperCase());
+				return NodeLabel.Type.valueOf(name.toUpperCase(Locale.ENGLISH));
 			} catch (IllegalArgumentException e) {
 				LOG.error("Invalid label type: " + name);
 				return DEFAULT_LABEL_TYPE;
@@ -190,7 +191,7 @@ abstract class NodeDefinitionPR extends IdmlPullReader {
 		@Override
 		protected void processText(String lang, String typeStr, String text) throws XmlParseException {
 			try {
-				Prompt.Type type = Prompt.Type.valueOf(typeStr.toUpperCase()); 
+				Prompt.Type type = Prompt.Type.valueOf(typeStr.toUpperCase(Locale.ENGLISH)); 
 				Prompt p = new Prompt(type, lang, text);
 				definition.addPrompt(p);
 			} catch (IllegalArgumentException e) {

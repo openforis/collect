@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -172,13 +173,13 @@ public class DynamicTableDao extends JooqDaoSupport {
 		ResultSet columnRs = metaData.getColumns(null, schemaName, tableName, null);
 		boolean metaDataFound = columnRs.next();
 		if (! metaDataFound) {
-			columnRs = metaData.getColumns(null, schemaName.toUpperCase(), tableName.toUpperCase(), null);
+			columnRs = metaData.getColumns(null, schemaName.toUpperCase(Locale.ENGLISH), tableName.toUpperCase(Locale.ENGLISH), null);
+			metaDataFound = columnRs.next();
 		}
-		metaDataFound = columnRs.next();
 		if (metaDataFound) {
 			TableMetaData tableMetaData = new TableMetaData();
 			do {
-				String colName = columnRs.getString("COLUMN_NAME").toLowerCase();
+				String colName = columnRs.getString("COLUMN_NAME").toLowerCase(Locale.ENGLISH);
 				int dataType = columnRs.getInt("DATA_TYPE");
 				tableMetaData.addColumnMetaData(new ColumnMetaData(colName, dataType));
 			} while (columnRs.next());

@@ -47,23 +47,23 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public UserInGroup findUserInGroup(UserGroup userGroup, final User user) {
-		List<UserInGroup> userInGroups = findUsersInGroup(userGroup);
+	public UserInGroup findUserInGroup(int userGroupId, final int userId) {
+		List<UserInGroup> userInGroups = findUsersInGroup(userGroupId);
 		return (UserInGroup) CollectionUtils.find(userInGroups, new Predicate() {
 			public boolean evaluate(Object userInGroup) {
-				return ((UserInGroup) userInGroup).getUserId().equals(user.getId());
+				return ((UserInGroup) userInGroup).getUserId().equals(userId);
 			}
 		});
 	}
 	
 	@SuppressWarnings("rawtypes")
 	@Override
-	public List<UserInGroup> findUsersInGroup(UserGroup userGroup) {
-		List<Map> userGroupRelations = getList(getUsersRestfulApiUrl() + "/group/" + userGroup.getId() + "/users", Map.class);
+	public List<UserInGroup> findUsersInGroup(int userGroupId) {
+		List<Map> userGroupRelations = getList(getUsersRestfulApiUrl() + "/group/" + userGroupId + "/users", Map.class);
 		List<UserInGroup> result = new ArrayList<UserInGroup>();
 		for (Map userGroupRelation : userGroupRelations) {
 			UserInGroup userInGroup = new UserInGroup();
-			userInGroup.setGroupId(userGroup.getId());
+			userInGroup.setGroupId(userGroupId);
 			userInGroup.setUserId(((Double)userGroupRelation.get("userId")).intValue());
 			userInGroup.setJoinStatus(UserGroupJoinRequestStatus.fromCode((String) userGroupRelation.get("statusCode")));
 			userInGroup.setRole(UserGroupRole.fromCode((String) userGroupRelation.get("roleCode")));
@@ -90,8 +90,8 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public UserInGroup findUserInGroupOrDescendants(UserGroup userGroup, User user) {
-		return findUserInGroup(userGroup, user); //TODO
+	public UserInGroup findUserInGroupOrDescendants(int userGroupId, int userId) {
+		return findUserInGroup(userGroupId, userId); //TODO
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class ClientUserGroupManager extends AbstractClient implements UserGroupM
 	}
 	
 	@Override
-	public Map<String, String> getQualifiers(UserGroup group, User user) {
+	public Map<String, String> getQualifiers(int groupId, int userId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

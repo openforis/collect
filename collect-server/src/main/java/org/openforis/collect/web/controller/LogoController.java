@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,7 +45,7 @@ public class LogoController extends BasicController {
 		IOUtils.copy(is, output);
 		byte[] byteArray = output.toByteArray();
 		String contentType = fileData.getContentType();
-		LogoPosition p = LogoPosition.valueOf(position.toUpperCase());
+		LogoPosition p = LogoPosition.valueOf(position.toUpperCase(Locale.ENGLISH));
 		Logo logo = new Logo(p, byteArray, contentType);
 		logoManager.save(logo);
 		return "ok";
@@ -52,7 +53,7 @@ public class LogoController extends BasicController {
 	
 	@RequestMapping(value = "/downloadLogo.htm", method = RequestMethod.GET)
 	public @ResponseBody void downloadLogo(HttpServletRequest request, HttpServletResponse response, @RequestParam String position) {
-		LogoPosition p = LogoPosition.valueOf(position.toUpperCase());
+		LogoPosition p = LogoPosition.valueOf(position.toUpperCase(Locale.ENGLISH));
 		Logo logo = logoManager.loadLogo(p);
 		if ( logo != null ) {
 			byte[] data = logo.getImage();

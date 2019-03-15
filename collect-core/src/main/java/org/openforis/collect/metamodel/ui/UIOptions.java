@@ -561,7 +561,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 				return Layout.FORM;
 			}
 		}
-		return layoutValue == null ? null : Layout.valueOf(layoutValue.toUpperCase());
+		return layoutValue == null ? null : Layout.valueOf(layoutValue.toUpperCase(Locale.ENGLISH));
 	}
 
 	public void setLayout(EntityDefinition entityDefn, Layout layout) {
@@ -595,7 +595,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		if ( value == null ) {
 			return CoordinateAttributeFieldsOrder.DEFAULT;
 		} else {
-			return CoordinateAttributeFieldsOrder.valueOf(value.toUpperCase());
+			return CoordinateAttributeFieldsOrder.valueOf(value.toUpperCase(Locale.ENGLISH));
 		}
 	}
 	
@@ -768,11 +768,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private String getAnnotationStringValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
-			if ( annotation.getDefaultValue() == null ) {
-				return null;
-			} else {
-				return annotation.getDefaultValue();
-			}
+			return annotation.getDefaultValue();
 		} else {
 			return annotationValue;
 		}
@@ -781,12 +777,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private Integer getAnnotationIntegerValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
-			if ( annotation.getDefaultValue() == null ) {
-				return null;
-			} else {
-				Integer defaultValue = annotation.getDefaultValue();
-				return defaultValue;
-			}
+			return annotation.getDefaultValue();
 		} else {
 			return Integer.valueOf(annotationValue);
 		}
@@ -795,13 +786,9 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private <E extends Enum<E>> E getAnnotationEnumValue(NodeDefinition defn, Annotation annotation, Class<E> enumType) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
-			if ( annotation.getDefaultValue() == null ) {
-				return null;
-			} else {
-				return annotation.<E>getDefaultValue();
-			}
+			return annotation.getDefaultValue();
 		} else {
-			return Enum.valueOf(enumType, annotationValue.toUpperCase());
+			return Enum.valueOf(enumType, annotationValue.toUpperCase(Locale.ENGLISH));
 		}
 	}
 	

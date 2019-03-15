@@ -1,6 +1,7 @@
 package org.openforis.collect.utils;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * 
@@ -12,7 +13,7 @@ public abstract class SystemUtils {
 	private static final OS CURRENT_OS = determineCurrentOs();
 	
 	private static OS determineCurrentOs() {
-		String osName = System.getProperty("os.name").toLowerCase();
+		String osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
 		for (OS os : OS.values()) {
 			if (osName.startsWith(os.name)) {
 				return os;

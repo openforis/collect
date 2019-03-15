@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">	
+    <head>
+		<title>Open Foris Collect</title>
+		
+		<link rel="shortcut icon" href="assets/images/favicon.ico" />
+		
+	    <meta http-equiv="cache-control" content="no-store, no-cache, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-store, no-cache" />
+		<meta http-equiv="Expires" content="0" />
+		<meta name="google" value="notranslate" />         
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />		
+
+     	<style type="text/css" media="screen"> 
+			html, body	{ height:100%; }
+			body {
+				margin:0;
+				padding:0;
+				overflow: hidden;
+				text-align:center;
+			    background-color: #ffffff;
+			}
+			object:focus {
+				outline:none;
+			}
+		</style>
+
+		<script type="text/javascript" src="assets/js/jquery/3.3.1/jquery-3.3.1.min.js"></script>
+		<script type="text/javascript" src="assets/js/urlsearchparams-support-ie11.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="assets/js/swfobject.js"></script>
+		<script type="text/javascript" src="assets/js/openforis.js"></script>
+		<script type="text/javascript" src="assets/js/sessionping.js"></script>
+		<script type="text/javascript">
+			// For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection. 
+			var swfVersionStr = "10.2.0";
+			// To use express install, set to playerProductInstall.swf, otherwise the empty string. 
+			var xiSwfUrlStr = "flash/playerProductInstall.swf";
+			
+			var flashvars = {};
+			
+			//pass request parameters as flash vars
+			var urlParams = new URLSearchParams(window.location.search);
+			for (let param of urlParams) {
+				flashvars[param[0]] = param[1]
+			}
+			if ( ! flashvars.locale ) {
+				var language;
+				if (window.navigator.languages) {
+				    language = window.navigator.languages[0];
+				} else {
+				    language = window.navigator.userLanguage || window.navigator.language;
+				}
+				flashvars.locale = language;
+			}
+			
+	        var params = {
+        		wmode: "opaque",
+   	        	quality: "high",
+	        	bgcolor: "#ffffff",
+	        	allowscriptaccess: "sameDomain",
+	        	allowfullscreen: "true"
+	        };
+	        
+	        var attributes = {
+    			id: "collect",
+	    		name: "collect",
+	    		align: "middle",
+	        };
+	        
+	        swfobject.embedSWF(
+	            "collect.swf", "flashContent", 
+	            "100%", "100%", 
+	            swfVersionStr, xiSwfUrlStr, 
+	            flashvars, params, attributes);
+	        // JavaScript enabled so display the flashContent div in case it is not replaced with a swf object.
+	        swfobject.createCSS("#flashContent", "display:block;text-align:left;");
+	        
+	        OPENFORIS.init();
+		</script>
+    </head>
+	<body>
+		<!-- 
+			SWFObject's dynamic embed method replaces this alternative HTML content with Flash content when enough 
+           	JavaScript and Flash plug-in support is available. The div is initially hidden so that it doesn't show
+           	when JavaScript is disabled.
+      	-->
+		<div id="flashContent">
+			<p>To view this page ensure that Adobe Flash Player version 10.2.0 or greater is installed.</p>
+			<script type="text/javascript"> 
+		         document.write("<a href='http://www.adobe.com/go/getflashplayer'><img src='assets/images/get_flash_player.gif' alt='Get Adobe Flash player' /></a>" ); 
+		    </script>
+		</div>
+		<noscript>Please enable JavaScript in your browser.</noscript>
+	</body>
+</html>

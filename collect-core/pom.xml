@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.23.6-SNAPSHOT</version>
+		<version>3.24.13-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
@@ -134,7 +134,7 @@
 					<value>${project.version}</value>
 				</configuration>
 			</plugin>
-
+			
 			<!-- Add generated sources to build path -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -311,7 +311,7 @@
 		<dependency>
 			<groupId>org.orbisgis</groupId>
 			<artifactId>cts</artifactId>
-			<version>1.5.1</version>
+			<version>1.4.0</version><!-- Version 1.5.0 requires Java 7 and it's not compatible with Collect Mobile -->
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -340,8 +340,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -353,12 +353,6 @@
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -366,6 +360,10 @@
 			<artifactId>sqlite-jdbc</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

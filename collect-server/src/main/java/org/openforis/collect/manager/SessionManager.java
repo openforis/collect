@@ -18,6 +18,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.collect.web.ws.AppWS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,12 +40,13 @@ public class SessionManager {
 	private transient UserManager userManager;
 	@Autowired
 	private transient RecordManager recordManager;
+	@Autowired
+	private transient AppWS appWS;
 	
 	public void createSessionState(HttpSession session) {
 		String sessionId = session.getId();
-		boolean developmentMode = CollectConfiguration.isDevelopmentMode();
 		SessionState sessionState = new SessionState(sessionId);
-		if (developmentMode) {
+		if (CollectConfiguration.isDevelopmentMode()) {
 			sessionState.setUser(userManager.loadAdminUser());
 //			sessionState.setUser(userManager.loadByUserName("view"));
 //			sessionState.setUser(userManager.loadByUserName("entry"));
@@ -81,6 +83,11 @@ public class SessionManager {
 	public User getLoggedUser() {
 		SessionState sessionState = getSessionState();
 		return sessionState.getUser();
+	}
+	
+	public String getLoggedUsername() {
+		User user = getLoggedUser();
+		return user == null ? null : user.getUsername();
 	}
 
 	public CollectSurvey getActiveDesignerSurvey() {
@@ -165,21 +172,19 @@ public class SessionManager {
 	}
 
 	private Object getSessionAttribute(String attributeName) {
-		Object result = null;
-		
 		//try to get session attribute from GraniteDS context
 		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
 		if (graniteContext != null) {
-			result = graniteContext.getSessionMap().get(attributeName);
+			return graniteContext.getSessionMap().get(attributeName);
 		} else {
 			//try to get session attribute from current request context holder session
 			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 			if ( requestAttributes != null ) {
-				HttpSession session = requestAttributes.getRequest().getSession();
-				result = session.getAttribute(attributeName);
+				HttpSession session = requestAttributes.getRequest().getSession(false);
+				return session == null ? null : session.getAttribute(attributeName);
 			}
 		}
-		return result;
+		return null;
 	}
 	
 	public void invalidateSession() {
@@ -203,6 +208,7 @@ public class SessionManager {
 		CollectRecord activeRecord = sessionState.getActiveRecord();
 		if ( activeRecord != null && activeRecord.getId() != null ) {
 			recordManager.releaseLock(activeRecord.getId());
+			appWS.sendMessage(new AppWS.RecordUnlockedMessage(activeRecord.getId()));
 		}
 		sessionState.setActiveRecord(null);
 	}

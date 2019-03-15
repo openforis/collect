@@ -174,9 +174,12 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		return q;
 	}
 
+	public List<SamplingDesignItem> loadChildItems(int surveyId, List<String> parentKeys) {
+		return loadChildItems(surveyId, parentKeys.toArray(new String[parentKeys.size()]));
+	}
+	
 	/**
 	 * Return the items in the level next to the one defined by the parent keys with level codes different from null
-	 * 
 	 */
 	public List<SamplingDesignItem> loadChildItems(int surveyId, String... parentKeys) {
 		SamplingDesignDSLContext dsl = dsl();

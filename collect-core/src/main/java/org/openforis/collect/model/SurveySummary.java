@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.metamodel.SurveyTarget;
+import org.openforis.collect.model.UserInGroup.UserGroupRole;
 
 /**
  * @author M. Togna
@@ -30,7 +31,10 @@ public class SurveySummary {
 	private String defaultLanguage;
 	private List<String> languages;
 	private Integer userGroupId;
-	private UserGroup userGroup;
+	private String userGroupLabel;
+	private UserGroupRole userInGroupRole;
+	private String userGroupQualifierName;
+	private String userGroupQualifierValue;
 	private SurveyAvailability availability;
 	
 	public SurveySummary() {
@@ -60,16 +64,16 @@ public class SurveySummary {
 		return summary;
 	}
 
-	public void fillFromSurvey(CollectSurvey survey, String lang) {
-		this.setProjectName(survey.getProjectName(lang, true));
-		this.setTemporary(survey.isTemporary());
-		this.setCreationDate(survey.getCreationDate());
-		this.setModifiedDate(survey.getModifiedDate());
-		this.setTarget(survey.getTarget());
-		this.setDefaultLanguage(survey.getDefaultLanguage());
-		this.setLanguages(survey.getLanguages());
-		this.setUserGroupId(survey.getUserGroupId());
-		this.setUserGroup(survey.getUserGroup());
+	public void fillFromSurvey(CollectSurvey s, String lang) {
+		this.setProjectName(s.getProjectName(lang, true));
+		this.setTemporary(s.isTemporary());
+		this.setCreationDate(s.getCreationDate());
+		this.setModifiedDate(s.getModifiedDate());
+		this.setTarget(s.getTarget());
+		this.setDefaultLanguage(s.getDefaultLanguage());
+		this.setLanguages(s.getLanguages());
+		this.setUserGroupId(s.getUserGroupId());
+		this.setUserGroupLabel(s.getUserGroup() == null ? null : s.getUserGroup().getLabel());
 	}
 	
 	public boolean isRecordValidationInProgress() {
@@ -184,18 +188,37 @@ public class SurveySummary {
 	public void setUserGroupId(Integer userGroupId) {
 		this.userGroupId = userGroupId;
 	}
-
-	public UserGroup getUserGroup() {
-		return userGroup;
-	}
 	
 	public String getUserGroupLabel() {
-		return userGroup == null ? null : userGroup.getLabel();
+		return userGroupLabel;
+	}
+	
+	public void setUserGroupLabel(String userGroupLabel) {
+		this.userGroupLabel = userGroupLabel;
 	}
 
-	public void setUserGroup(UserGroup userGroup) {
-		this.userGroup = userGroup;
-		this.userGroupId = userGroup == null ? null: userGroup.getId();
+	public String getUserGroupQualifierName() {
+		return userGroupQualifierName;
+	}
+	
+	public void setUserGroupQualifierName(String userGroupQualifierName) {
+		this.userGroupQualifierName = userGroupQualifierName;
+	}
+	
+	public String getUserGroupQualifierValue() {
+		return userGroupQualifierValue;
+	}
+	
+	public void setUserGroupQualifierValue(String userGroupQualifierValue) {
+		this.userGroupQualifierValue = userGroupQualifierValue;
+	}
+	
+	public UserGroupRole getUserInGroupRole() {
+		return userInGroupRole;
+	}
+	
+	public void setUserInGroupRole(UserGroupRole userInGroupRole) {
+		this.userInGroupRole = userInGroupRole;
 	}
 	
 	public SurveyAvailability getAvailability() {

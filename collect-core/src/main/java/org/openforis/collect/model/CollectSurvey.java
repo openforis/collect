@@ -36,6 +36,7 @@ public class CollectSurvey extends Survey {
 	private static final long serialVersionUID = 1L;
 	
 	public static final String SAMPLING_DESIGN_CODE_LIST_NAME = "sampling_design";
+	private static final String SAMPLING_DESIGN_TABLE_NAME = OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName();
 	
 	private boolean temporary;
 	private Version collectVersion;
@@ -94,7 +95,7 @@ public class CollectSurvey extends Survey {
 	
 	public CodeList getSamplingDesignCodeList() {
 		for (CodeList list : getCodeLists()) {
-			if ( OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName().equals(list.getLookupTable()) ) {
+			if ( SAMPLING_DESIGN_TABLE_NAME.equals(list.getLookupTable()) ) {
 				return list;
 			}
 		}
@@ -104,7 +105,7 @@ public class CollectSurvey extends Survey {
 	public CodeList addSamplingDesignCodeList() {
 		CodeList list = createCodeList();
 		list.setName(SAMPLING_DESIGN_CODE_LIST_NAME);
-		list.setLookupTable(OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName());
+		list.setLookupTable(SAMPLING_DESIGN_TABLE_NAME);
 		//add hierarchy levels
 		String[] levels = new String[] { 
 				OfcSamplingDesign.OFC_SAMPLING_DESIGN.LEVEL1.getName(), 

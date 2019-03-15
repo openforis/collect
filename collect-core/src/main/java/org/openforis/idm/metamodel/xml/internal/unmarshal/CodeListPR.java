@@ -14,6 +14,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.SCOPE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.SINCE;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeList;
@@ -71,7 +72,7 @@ class CodeListPR extends IdmlPullReader {
 				throws XmlParseException, XmlPullParserException, IOException {
 			String scopeStr = getAttribute(SCOPE, true);
 			try {
-				CodeScope scope = CodeList.CodeScope.valueOf(scopeStr.toUpperCase());
+				CodeScope scope = CodeList.CodeScope.valueOf(scopeStr.toUpperCase(Locale.ENGLISH));
 				list.setCodeScope(scope);
 			} catch ( IllegalArgumentException ex ) {
 				throw new XmlParseException(getParser(), "invalid scope "+scopeStr);
@@ -143,16 +144,15 @@ class CodeListPR extends IdmlPullReader {
 			list.addLabel(label);
 		}
 
-		private Type parseType(String typeStr) throws XmlParseException {
-			if (StringUtils.isBlank(typeStr)) {
-				return Type.ITEM;
-			} else {
+		private Type parseType(String typeStr) {
+			if (StringUtils.isNotBlank(typeStr)) {
 				try {
-					return CodeListLabel.Type.valueOf(typeStr.toUpperCase());
+					return CodeListLabel.Type.valueOf(typeStr.toUpperCase(Locale.ENGLISH));
 				} catch (IllegalArgumentException e) {
-					throw new XmlParseException(getParser(), "invalid type for code list label: " + typeStr, e);
+					//throw new XmlParseException(getParser(), "invalid type for code list label: " + typeStr, e);
 				}
 			}
+			return Type.ITEM;
 		}
 	}
 

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +64,7 @@ import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SurveyObject;
@@ -916,7 +918,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if (survey == null) {
 			// TODO session expired...?
 		} else {
-			TreeViewType viewType = TreeViewType.valueOf(selectedTreeViewType.toUpperCase());
+			TreeViewType viewType = TreeViewType.valueOf(selectedTreeViewType.toUpperCase(Locale.ENGLISH));
 			SurveyObjectTreeModelCreator modelCreator;
 			switch (viewType) {
 			case ENTRY:
@@ -1613,12 +1615,20 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	private void duplicateNodeAndSelectIt(NodeDefinition node, SurveyObject parent) {
-		if (node instanceof CodeAttributeDefinition) {
-			CodeList sourceList = ((CodeAttributeDefinition) node).getList();
-			if (! survey.hasCodeList(sourceList.getName())) {
-				codeListManager.copyCodeList(sourceList, survey);
+		if (node instanceof EntityDefinition) {
+			AtomicBoolean codeListsUpdated = new AtomicBoolean(false);
+			((EntityDefinition) node).traverse(new NodeDefinitionVisitor() {
+				public void visit(NodeDefinition descendant) {
+					if (descendant instanceof CodeAttributeDefinition) {
+						if (addMissingCodeList((CodeAttributeDefinition) descendant))
+							codeListsUpdated.set(true);
+					}
+				}
+			});
+			if (codeListsUpdated.get())
 				CodeListsVM.dispatchCodeListsUpdatedCommand();
-			}
+		} else if (node instanceof CodeAttributeDefinition) {
+			addMissingCodeList((CodeAttributeDefinition) node);
 		}
 		NodeDefinition clone = survey.getSchema().cloneDefinition(node);
 		EntityDefinition parentEntity = determineRelatedEntity(parent);
@@ -1628,6 +1638,16 @@ public class SchemaVM extends SurveyBaseVM {
 		editNode(false, parentEntity, editedNode);
 		
 		SurveyEditVM.dispatchSurveySaveCommand();
+	}
+	
+	private boolean addMissingCodeList(CodeAttributeDefinition node) {
+		CodeList sourceList = node.getList();
+		if (survey.hasCodeList(sourceList.getName())) {
+			return false;
+		} else {
+			codeListManager.copyCodeList(sourceList, survey);
+			return true;
+		}
 	}
 
 	/**

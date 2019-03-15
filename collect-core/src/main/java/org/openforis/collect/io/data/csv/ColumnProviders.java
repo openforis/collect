@@ -13,9 +13,9 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 public class ColumnProviders {
 
-	public static ColumnProvider createAttributeProvider(CSVDataExportParameters config, AttributeDefinition defn) {
+	public static ColumnProvider createAttributeProvider(CSVDataExportParameters config, AttributeDefinition defn, boolean ancestorDef) {
 		if ( defn instanceof CodeAttributeDefinition ) {
-			return new CodeColumnProvider(config, (CodeAttributeDefinition) defn);
+			return new CodeColumnProvider(config, (CodeAttributeDefinition) defn, ancestorDef);
 		} else if(defn instanceof CoordinateAttributeDefinition){
 			return new CoordinateColumnProvider(config, (CoordinateAttributeDefinition) defn);
 		} else if(defn instanceof DateAttributeDefinition) {

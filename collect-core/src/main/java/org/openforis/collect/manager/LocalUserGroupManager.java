@@ -149,22 +149,22 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	}
 
 	@Override
-	public List<UserInGroup> findUsersInGroup(UserGroup userGroup) {
-		return dao.findUsersByGroup(userGroup.getId());
+	public List<UserInGroup> findUsersInGroup(int userGroupId) {
+		return dao.findUsersByGroup(userGroupId);
 	}
 	
 	@Override
-	public UserInGroup findUserInGroup(UserGroup userGroup, User user) {
-		return dao.findUserInGroup(userGroup.getId(), user.getId());
+	public UserInGroup findUserInGroup(int userGroupId, int userId) {
+		return dao.findUserInGroup(userGroupId, userId);
 	}
 	
 	@Override
-	public UserInGroup findUserInGroupOrDescendants(UserGroup userGroup, User user) {
-		UserInGroup userInGroup = findUserInGroup(userGroup, user);
+	public UserInGroup findUserInGroupOrDescendants(int userGroupId, int userId) {
+		UserInGroup userInGroup = findUserInGroup(userGroupId, userId);
 		if (userInGroup == null) {
-			List<Integer> descendantGroupIds = dao.findChildrenGroupIds(userGroup.getId());
+			List<Integer> descendantGroupIds = dao.findChildrenGroupIds(userGroupId);
 			for (Integer descendantGroupId : descendantGroupIds) {
-				userInGroup = dao.findUserInGroup(descendantGroupId, user.getId());
+				userInGroup = dao.findUserInGroup(descendantGroupId, userId);
 				if (userInGroup != null) {
 					return userInGroup;
 				}
@@ -305,11 +305,11 @@ public class LocalUserGroupManager extends AbstractPersistedObjectManager<UserGr
 	}
 	
 	@Override
-	public Map<String, String> getQualifiers(UserGroup group, User user) {
-		UserInGroup userInGroup = findUserInGroupOrDescendants(group, user);
+	public Map<String, String> getQualifiers(int userGroupId, int userId) {
+		UserInGroup userInGroup = findUserInGroupOrDescendants(userGroupId, userId);
 		if (userInGroup == null) {
 			throw new IllegalArgumentException(String.format("User %s not allowed to see records for user group %s", 
-					user.getUsername(), group.getName()));
+					userId, userGroupId));
 		}
 		UserGroup associatedGroup = loadById(userInGroup.getGroupId());
 		return associatedGroup.getQualifiersByName();

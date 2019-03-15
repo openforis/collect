@@ -1,0 +1,22 @@
+Updater for versions of Collect >= 3.12.25
+
+Required Maven parameters:
+
+- collect.update_2.url = Remote URL of AutoUpdate tool update_2.xml file
+- installbuilder-home = InstallBuilder installation folder
+
+# Autoupdater remote site FTP parameters 
+- collect.autoupdater.ftp.username 
+- collect.autoupdater.ftp.password
+- collect.autoupdater.ftp.host
+- collect.autoupdater.ftp.remotefolder
+
+To build the installer, use the "updater" profile:
+
+mnv build -Pupdater
+
+The installers will be generated in the "target" folder.
+
+Using the profile "publishupdater", the file update_2.xml will be uploaded remotely using the specified autoupdater ftp paramters. 
+
+(see BitRock InstallBuilder AutoUpdate Tool for reference http://installbuilder.bitrock.com/docs/installbuilder-userguide/ar01s23.html) 

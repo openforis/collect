@@ -3,14 +3,13 @@ package org.openforis.idm.geospatial;
 import static org.openforis.idm.metamodel.SpatialReferenceSystem.LAT_LON_SRS;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.cts.CRSFactory;
 import org.cts.crs.GeodeticCRS;
 import org.cts.op.CoordinateOperation;
-import org.cts.op.CoordinateOperationException;
 import org.cts.op.CoordinateOperationFactory;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 
@@ -43,7 +42,7 @@ public class CoordinateUtils {
     
     private static final CRSFactory CRS_FACTORY = new CRSFactory();
     private static Map<String, GeodeticCRS> crsCache = new ConcurrentHashMap<String, GeodeticCRS>();
-    private static Map<String, Set<CoordinateOperation>> operationCache = new ConcurrentHashMap<String, Set<CoordinateOperation>>();
+    private static Map<String, List<CoordinateOperation>> operationCache = new ConcurrentHashMap<String, List<CoordinateOperation>>();
 
     public static double[] transform(SpatialReferenceSystem from, double[] coord, SpatialReferenceSystem to) {
         if (from.equals(LAT_LON_SRS)) {
@@ -56,7 +55,7 @@ public class CoordinateUtils {
 
     private static double[] doTransform(SpatialReferenceSystem from, double[] coord, SpatialReferenceSystem to) {
         try {
-	        Set<CoordinateOperation> coordOps = coordinateOperations(from, to);
+        	List<CoordinateOperation> coordOps = coordinateOperations(from, to);
 	        double[] result = Arrays.copyOf(coord, coord.length); // Need to copy since operations might change array in place
 	        if (!coordOps.isEmpty()) {
 	            for (CoordinateOperation op : coordOps) {
@@ -69,9 +68,9 @@ public class CoordinateUtils {
         }
     }
 
-    private static Set<CoordinateOperation> coordinateOperations(SpatialReferenceSystem from, SpatialReferenceSystem to) throws CoordinateOperationException {
+    private static List<CoordinateOperation> coordinateOperations(SpatialReferenceSystem from, SpatialReferenceSystem to) throws CoordinateOperationException {
         String key = operationCacheKey(from, to);
-        Set<CoordinateOperation> coordOps = operationCache.get(key);
+        List<CoordinateOperation> coordOps = operationCache.get(key);
         if (coordOps == null) {
 	        coordOps = CoordinateOperationFactory.createCoordinateOperations(crs(from), crs(to));
 	        operationCache.put(key, coordOps);

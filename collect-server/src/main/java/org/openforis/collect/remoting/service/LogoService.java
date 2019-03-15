@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.remoting.service;
 
+import java.util.Locale;
+
 import org.openforis.collect.manager.LogoManager;
 import org.openforis.collect.model.Logo;
 import org.openforis.collect.model.LogoPosition;
@@ -18,11 +20,11 @@ public class LogoService {
 	private LogoManager logoManager;
 
 	public Logo loadLogo(String position) {
-		return logoManager.loadLogo(LogoPosition.valueOf(position.toUpperCase()));
+		return logoManager.loadLogo(LogoPosition.valueOf(position.toUpperCase(Locale.ENGLISH)));
 	}
 	
 	public void deleteLogo(String position) {
-		Logo logo = logoManager.loadLogo(LogoPosition.valueOf(position.toUpperCase()));
+		Logo logo = logoManager.loadLogo(LogoPosition.valueOf(position.toUpperCase(Locale.ENGLISH)));
 		if ( logo != null ) {
 			logoManager.delete(logo);
 		}

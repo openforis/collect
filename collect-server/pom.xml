@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.23.6-SNAPSHOT</version>
+		<version>3.24.13-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-server</artifactId>
@@ -297,14 +297,8 @@
 			<version>${graniteds.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -460,12 +454,12 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.9.7</version>
+			<version>2.9.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.9.7</version>
+			<version>2.9.8</version>
 		</dependency>
 		<dependency>
 			<groupId>de.micromata.jak</groupId>

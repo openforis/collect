@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.granite.messaging.service.DefaultServiceExceptionHandler;
 import org.granite.messaging.service.ServiceException;
 import org.granite.messaging.service.ServiceInvocationContext;
+import org.openforis.collect.persistence.RecordLockedException;
 
 /**
  * @author S. Ricci
@@ -26,8 +27,9 @@ public class ServiceExceptionHandler extends DefaultServiceExceptionHandler  {
 	 */
 	@Override
 	public ServiceException handleInvocationException(ServiceInvocationContext serviceInvocationContext, Throwable cause) {
-		LOG.error("Error while communicating with collect server", cause);
-		
+		if (!(cause instanceof RecordLockedException)) {
+			LOG.error("Error while communicating with collect server", cause);
+		}
 		String code = cause.getClass().getName();
 		String message = cause.getMessage();
 		String detail = null;
