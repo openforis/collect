@@ -52,7 +52,7 @@ export function fetchSurveySummaries() {
     }
 }
 
-export const publishSurvey = (survey, ignoreWarnings = false) =>
+export const publishSurvey = (survey, ignoreWarnings = false, onComplete = null) =>
     dispatch => {
         dispatch(hideSurveyValidation())
         ServiceFactory.surveyService.publish(survey.id, ignoreWarnings)
@@ -65,6 +65,8 @@ export const publishSurvey = (survey, ignoreWarnings = false) =>
                     //survey update managed by WebSocket
                     //dispatchSurveyUpdated(dispatch, s)
                 }
+                if (onComplete)
+                    onComplete()
             })
     }
 

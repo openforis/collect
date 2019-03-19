@@ -1,66 +1,87 @@
-import React, { Component } from 'react';
-import { render, unmountComponentAtNode, findDOMNode } from 'react-dom';
-import Button from '@material-ui/core/Button';
+import React, { Component } from 'react'
+import { render, unmountComponentAtNode, findDOMNode } from 'react-dom'
+
+import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogActions from '@material-ui/core/DialogActions'
-import L from 'utils/Labels';
+import LinearProgress from '@material-ui/core/LinearProgress'
+
+import L from 'utils/Labels'
 
 const CONFIRM_TARGET_DIV_ID = 'ofc-confirm-dialog'
 const ALERT_TARGET_DIV_ID = 'ofc-alert-dialog'
+const LOADING_TARGET_DIV_ID = 'ofc-loading-dialog'
 
-class ConfirmDialog extends Component {
+class BaseDialog extends Component {
 
+    okButton = null
     cancelButton = null
-    
+
     constructor(props) {
         super(props)
 
+        const { targetDivId } = props
+
+        this.targetDivId = targetDivId
+
         this.handleEntering = this.handleEntering.bind(this)
-        this.handleConfirm = this.handleConfirm.bind(this)
+        this.handleOk = this.handleOk.bind(this)
         this.handleCancel = this.handleCancel.bind(this)
         this.close = this.close.bind(this)
     }
 
     handleEntering() {
-        findDOMNode(this.cancelButton).focus()
+        const focusBtn = this.okButton
+            ? this.okButton
+            : this.cancelButton
+        if (focusBtn)
+            findDOMNode(focusBtn).focus()
     }
 
-    handleConfirm() {
-        if (this.props.onConfirm) {
-            this.props.onConfirm()
-        }
+    handleOk() {
+        const { onOk } = this.props
+
+        if (onOk)
+            onOk()
+
         this.close()
     }
 
     handleCancel() {
-        if (this.props.onCancel) {
-            this.props.onCancel()
-        }
+        const { onCancel } = this.props
+
+        if (onCancel)
+            onCancel()
+
         this.close()
     }
 
     close() {
-        Dialogs._removeTargetDiv(CONFIRM_TARGET_DIV_ID)
+        Dialogs._removeTargetDiv(this.targetDivId)
     }
+}
+
+class ConfirmDialog extends BaseDialog {
 
     render() {
         const { title, message, configuration } = this.props
+
         const { confirmButtonLabel, cancelButtonLabel } = configuration
-        
+
         return (
             <Dialog open={true}
-                    onEntering={this.handleEntering}
-                    onBackdropClick={this.handleCancel}
-                    onEscapeKeyDown={this.handleCancel}>
+                onEntering={this.handleEntering}
+                onBackdropClick={this.handleCancel}
+                onEscapeKeyDown={this.handleCancel}>
                 <DialogTitle>{title}</DialogTitle>
-                <DialogContent style={{width: '400px'}}>
+                <DialogContent style={{ width: '400px' }}>
                     <DialogContentText>{message}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="raised" color="primary" onClick={this.handleConfirm}>{confirmButtonLabel}</Button>
+                    <Button variant="raised" color="primary" onClick={this.handleOk}>{confirmButtonLabel}</Button>
                     {' '}
                     <Button onClick={this.handleCancel} ref={n => this.cancelButton = n}>{cancelButtonLabel}</Button>
                 </DialogActions>
@@ -70,60 +91,51 @@ class ConfirmDialog extends Component {
 
 }
 
-class AlertDialog extends Component {
-
-    okButton = null
-
-    constructor(props) {
-        super(props)
-
-        this.handleEntering = this.handleEntering.bind(this)
-        this.handleOk = this.handleOk.bind(this)
-        this.handleCancel = this.handleCancel.bind(this)
-        this.close = this.close.bind(this)
-    }
-
-    handleEntering() {
-        findDOMNode(this.okButton).focus()
-    }
-
-    handleOk() {
-        if (this.props.onOk) {
-            this.props.onOk()
-        }
-        this.close()
-    }
-
-    handleCancel() {
-        if (this.props.onCancel) {
-            this.props.onCancel()
-        }
-        this.close()
-    }
-
-    close() {
-        Dialogs._removeTargetDiv(ALERT_TARGET_DIV_ID)
-    }
+class AlertDialog extends BaseDialog {
 
     render() {
         const { title, message } = this.props
-        const okButtonLabel = L.l('global.ok')
+
         return (
             <Dialog open={true}
-                    onEntering={this.handleEntering}
-                    onBackdropClick={this.handleCancel}
-                    onEscapeKeyDown={this.handleCancel}>
+                onEntering={this.handleEntering}
+                onBackdropClick={this.handleCancel}
+                onEscapeKeyDown={this.handleCancel}>
                 <DialogTitle>{title}</DialogTitle>
-                <DialogContent style={{width: '400px'}}>
+                <DialogContent style={{ width: '400px' }}>
                     <DialogContentText>{message}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="raised" color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{okButtonLabel}</Button>
+                    <Button variant="raised" color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{L.l('global.ok')}</Button>
                 </DialogActions>
             </Dialog>
         )
     }
+}
 
+class LoadingDialog extends BaseDialog {
+
+    render() {
+        const { title, allowCancel } = this.props
+        return (
+            <Dialog
+                open={true}
+                onEntering={this.handleEntering}>
+                <DialogTitle>{title}</DialogTitle>
+                <DialogContent style={{ width: '400px' }}>
+                    <LinearProgress />
+                </DialogContent>
+                {
+                    allowCancel &&
+                    <DialogActions>
+                        <Button variant="raised" color="primary" ref={n => this.cancelButton = n} onClick={this.handleCancel}>
+                            {L.l('global.cancel')}
+                        </Button>
+                    </DialogActions>
+                }
+            </Dialog>
+        )
+    }
 }
 
 class ConfirmDialogConfiguration {
@@ -136,15 +148,33 @@ class ConfirmDialogConfiguration {
 
 export default class Dialogs {
 
-    static confirm(title, message, onConfirm, onCancel, configuration) {
-        const targetDiv = Dialogs._createTargetDiv(CONFIRM_TARGET_DIV_ID)
-        render(<ConfirmDialog title={title} message={message} onConfirm={onConfirm} onCancel={onCancel} 
-            configuration={Object.assign({}, new ConfirmDialogConfiguration(), configuration)} />, targetDiv)
+    static confirm(title, message, onOk, onCancel, configuration) {
+        render(<ConfirmDialog
+            targetDivId={CONFIRM_TARGET_DIV_ID}
+            title={title}
+            message={message}
+            onOk={onOk}
+            onCancel={onCancel}
+            configuration={Object.assign({}, new ConfirmDialogConfiguration(), configuration)}
+        />, Dialogs._createTargetDiv(CONFIRM_TARGET_DIV_ID))
     }
 
-    static alert(title, message, onOk= null) {
-        const targetDiv = Dialogs._createTargetDiv(ALERT_TARGET_DIV_ID)
-        render(<AlertDialog title={title} message={message} onOk={onOk} />, targetDiv)
+    static alert(title, message, onOk = null) {
+        render(<AlertDialog
+            targetDivId={ALERT_TARGET_DIV_ID}
+            title={title}
+            message={message}
+            onOk={onOk}
+        />, Dialogs._createTargetDiv(ALERT_TARGET_DIV_ID))
+    }
+
+    static showLoadingDialog(allowCancel = false, onCancel = null, title = L.l('global.loading')) {
+        return render(<LoadingDialog
+            targetDivId={LOADING_TARGET_DIV_ID}
+            title={title}
+            allowCancel={allowCancel}
+            onCancel={onCancel}
+        />, Dialogs._createTargetDiv(LOADING_TARGET_DIV_ID))
     }
 
     static _createTargetDiv(targetDivId) {

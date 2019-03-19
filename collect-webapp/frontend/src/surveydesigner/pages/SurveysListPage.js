@@ -111,8 +111,11 @@ class SurveysListPage extends Component {
         const $this = this
         const confirmMessage = L.l('survey.publish.confirmMessage', survey.name)
         Dialogs.confirm(L.l('survey.publish.confirmTitle', survey.name), confirmMessage, function () {
-            publishSurvey(survey)
-            $this.resetSelection()
+            const loadingDialog = Dialogs.showLoadingDialog()
+            publishSurvey(survey, false , () => {
+                $this.resetSelection()
+                loadingDialog.close()
+            })
         }, null, { confirmButtonLabel: L.l('survey.publish') })
     }
 
