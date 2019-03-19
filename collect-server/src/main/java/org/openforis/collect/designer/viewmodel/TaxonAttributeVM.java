@@ -8,7 +8,6 @@ import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
 import static org.openforis.collect.designer.model.LabelKeys.RANK_PREFIX;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,6 +39,12 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 
 	private static final String QUALIFIERS_FIELD = "qualifiers";
+	
+	private static final TaxonRank[] AVAILABLE_HIGHEST_RANKS = new TaxonRank[] {
+			TaxonRank.FAMILY,
+			TaxonRank.GENUS,
+			TaxonRank.SPECIES
+	};
 	
 	@WireVariable
 	private SpeciesManager speciesManager;
@@ -111,8 +116,14 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	
 	public List<String> getRanks() {
 		List<String> result = new ArrayList<String>();
+		
 		result.add(Labels.getLabel(EMPTY_OPTION));
-		result.addAll(Arrays.asList(TaxonRank.names()));
+		
+		for (int i = 0; i < AVAILABLE_HIGHEST_RANKS.length; i++) {
+			TaxonRank rank = AVAILABLE_HIGHEST_RANKS[i];
+			result.add(rank.getName());
+		}
+		
 		return result;
 	}
 	
