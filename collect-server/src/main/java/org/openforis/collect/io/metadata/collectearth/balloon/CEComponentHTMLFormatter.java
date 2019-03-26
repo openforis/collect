@@ -150,7 +150,7 @@ public class CEComponentHTMLFormatter {
 			formGroupBuilder.e("label") //$NON-NLS-1$
 				.a("for", elId) //$NON-NLS-1$
 				.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
-				.t(  comp.getLabelOrName() );
+				.t( comp.getLabelOrName() );
 			
 			String tooltip = comp.getTooltip();
 			addTooltip(formGroupBuilder, tooltip);
@@ -447,7 +447,8 @@ public class CEComponentHTMLFormatter {
 				put(javax.xml.transform.OutputKeys.METHOD, "html"); //$NON-NLS-1$
 			}};
 			builder.toWriter(writer, outputProperties);
-			return writer.toString();
+			String result = writer.toString();
+			return result.replaceAll("&amp;#", "&#"); //to avoid double escaping unicode characters
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
