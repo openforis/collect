@@ -69,7 +69,7 @@ public class DatabaseExternalCodeListProvider implements
 	public ExternalCodeListItem getItem(CodeAttribute attribute) {
 		CodeAttributeDefinition defn = attribute.getDefinition();
 		CodeList list = defn.getList();
-		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+		if (isSamplingDesignLookupTable(list)) {
 			return getItemFromSamplingDesign(attribute);
 		} else {
 			List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
@@ -132,7 +132,7 @@ public class DatabaseExternalCodeListProvider implements
 
 	@Override
 	public List<ExternalCodeListItem> getRootItems(CodeList list) {
-		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+		if (isSamplingDesignLookupTable(list)) {
 			List<SamplingDesignItem> samplingDesignItems = samplingDesignDao.loadChildItems(list.getSurvey().getId());
 			return samplingDesignItemsToItems(list, samplingDesignItems, 1);
 		} else {
@@ -194,7 +194,7 @@ public class DatabaseExternalCodeListProvider implements
 		if (childrenLevel > list.getHierarchy().size()) {
 			return Collections.emptyList();
 		}
-		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+		if (isSamplingDesignLookupTable(list)) {
 			List<String> ancestorKeys = new ArrayList<String>(item.getParentKeys());
 			ancestorKeys.add(item.getCode());
 			List<SamplingDesignItem> samplingDesignItems = samplingDesignDao.loadChildItems(list.getSurvey().getId(), ancestorKeys);
@@ -214,7 +214,7 @@ public class DatabaseExternalCodeListProvider implements
 			return result;
 		}
 	}
-	
+
 	public boolean hasChildItems(ExternalCodeListItem item) {
 		CodeList list = item.getCodeList();
 		List<NameValueEntry> filters = createChildItemsFilters(item);
@@ -421,11 +421,15 @@ public class DatabaseExternalCodeListProvider implements
 		return codes;
 	}
 
-    public DynamicTableDao getDynamicTableDao() {
-        return dynamicTableDao;
-    }
+	private boolean isSamplingDesignLookupTable(CodeList list) {
+		return CollectSurvey.SAMPLING_DESIGN_TABLE_NAME.equals(list.getLookupTable());
+	}
+	
+	public DynamicTableDao getDynamicTableDao() {
+		return dynamicTableDao;
+	}
 
-    public void setDynamicTableDao(DynamicTableDao dynamicTableDao) {
-        this.dynamicTableDao = dynamicTableDao;
-    }
+	public void setDynamicTableDao(DynamicTableDao dynamicTableDao) {
+		this.dynamicTableDao = dynamicTableDao;
+	}
 }

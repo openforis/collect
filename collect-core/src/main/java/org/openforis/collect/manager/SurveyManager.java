@@ -55,6 +55,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.persistence.RecordFileDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyFileDao;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -98,6 +99,8 @@ public class SurveyManager {
 	private SurveyDao surveyDao;
 	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private RecordFileDao recordFileDao;
 	@Autowired
 	private CollectSurveyContext collectSurveyContext;
 	@Autowired
@@ -1053,6 +1056,7 @@ public class SurveyManager {
 
 		//delete records
 		if ( ! temporary ) {
+			recordFileDao.deleteBySurveyId(id);
 			recordDao.deleteBySurvey(id);
 		}
 

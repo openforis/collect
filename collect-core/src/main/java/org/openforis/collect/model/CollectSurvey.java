@@ -36,7 +36,7 @@ public class CollectSurvey extends Survey {
 	private static final long serialVersionUID = 1L;
 	
 	public static final String SAMPLING_DESIGN_CODE_LIST_NAME = "sampling_design";
-	private static final String SAMPLING_DESIGN_TABLE_NAME = OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName();
+	public static final String SAMPLING_DESIGN_TABLE_NAME = OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName();
 	
 	private boolean temporary;
 	private Version collectVersion;

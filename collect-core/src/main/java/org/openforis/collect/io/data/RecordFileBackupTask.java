@@ -122,7 +122,7 @@ public class RecordFileBackupTask extends Task {
 					String entryName = determineRecordFileEntryName(fileAttribute);
 					writeFile(file, entryName);
 				} else {
-					addSkippedFileError(summary, fileAttribute.getPath(), recordFileManager.getRepositoryFileAbsolutePath(fileAttribute));
+					addSkippedFileError(summary, fileAttribute.getPath(), fileAttribute.getFilename());
 					LOG.error(String.format("Record file not found for record %s (%d) attribute %s (%d)", 
 							StringUtils.join(record.getRootEntityKeyValues(), ','), record.getId(), fileAttribute.getPath(), fileAttribute.getInternalId()));
 					//throw new RecordFileException(message);

@@ -1,11 +1,11 @@
 package org.openforis.collect.model;
 
-import java.io.File;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.manager.RecordFileManager.RecordFileHandle;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -60,7 +60,7 @@ public class CollectRecordSummary {
 	private Integer workflowSequenceNumber;
 	private User owner;
 	private String lockedBy;
-	private List<File> files;
+	private List<RecordFileHandle> fileHandles;
 	private Map<Step, StepSummary> stepSummaries = new LinkedHashMap<Step, StepSummary>();
 	
 	public StepSummary getCurrentStepSummary() {
@@ -199,12 +199,12 @@ public class CollectRecordSummary {
 		this.lockedBy = lockedBy;
 	}
 
-	public List<File> getFiles() {
-		return files;
+	public List<RecordFileHandle> getFileHandles() {
+		return fileHandles;
 	}
 	
-	public void setFiles(List<File> files) {
-		this.files = files;
+	public void setFileHandles(List<RecordFileHandle> handles) {
+		this.fileHandles = handles;
 	}
 
 	public static class StepSummary {

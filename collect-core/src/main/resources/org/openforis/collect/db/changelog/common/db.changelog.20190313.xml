@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="record-file-table" author="ricci">
+
+		<comment>Add record file table</comment>
+
+		<createTable tableName="ofc_record_file">
+			<column name="uuid" type="CHAR(36)">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_record_file_pkey" />
+			</column>
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false"
+					foreignKeyName="ofc_record_file_survey_fkey"
+					references="ofc_survey(id)" />
+			</column>
+			<column name="record_id" type="INTEGER">
+				<constraints nullable="false"
+					foreignKeyName="ofc_record_file_record_fkey"
+					references="ofc_record(id)" />
+			</column>
+			<column name="attribute_def_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="original_name" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="size" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="content" type="BYTEA">
+				<constraints nullable="false" />
+			</column>
+			<column name="date_created" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_by_id" type="INTEGER">
+				<constraints
+					nullable="false"
+					foreignKeyName="ofc_record_file_created_by_user_fkey"
+					references="ofc_user(id)" />
+			</column>
+			<column name="date_modified" type="TIMESTAMP" />
+			<column name="modified_by_id" type="INTEGER">
+				<constraints
+					foreignKeyName="ofc_record_file_modified_by_user_fkey"
+					references="ofc_user(id)" />
+			</column>
+		</createTable>
+
+		<!-- INDEXES -->
+		<createIndex indexName="ofc_record_file_uuid_idx"
+			tableName="ofc_record_file" unique="true">
+			<column name="uuid" type="CHAR(36)" />
+		</createIndex>
+		<createIndex indexName="ofc_record_file_survey_idx"
+			tableName="ofc_record_file" unique="false">
+			<column name="survey_id" type="INTEGER" />
+		</createIndex>
+		<createIndex indexName="ofc_record_file_record_idx"
+			tableName="ofc_record_file" unique="false">
+			<column name="record_id" type="INTEGER" />
+		</createIndex>
+		
+	</changeSet>
+
+</databaseChangeLog>

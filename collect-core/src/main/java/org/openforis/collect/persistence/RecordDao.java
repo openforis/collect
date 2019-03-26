@@ -945,12 +945,6 @@ public class RecordDao extends JooqDaoSupport {
 			.execute();
 	}
 	
-	public void deleteByIds(Set<Integer> ids) {
-		for (Integer id : ids) {
-			delete(id);
-		}
-	}
-
 	public void assignOwner(int recordId, Integer ownerId) {
 		dsl().update(OFC_RECORD)
 			.set(OFC_RECORD.OWNER_ID, ownerId)

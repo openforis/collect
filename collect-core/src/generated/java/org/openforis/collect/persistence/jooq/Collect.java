@@ -34,6 +34,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcMessage;
 import org.openforis.collect.persistence.jooq.tables.OfcMessageProcessing;
 import org.openforis.collect.persistence.jooq.tables.OfcRecord;
 import org.openforis.collect.persistence.jooq.tables.OfcRecordData;
+import org.openforis.collect.persistence.jooq.tables.OfcRecordFile;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
 import org.openforis.collect.persistence.jooq.tables.OfcSurvey;
 import org.openforis.collect.persistence.jooq.tables.OfcSurveyFile;
@@ -59,7 +60,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcUsergroup;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends SchemaImpl {
 
-	private static final long serialVersionUID = -1607884800;
+	private static final long serialVersionUID = 1451740586;
 
 	/**
 	 * The reference instance of <code>collect</code>
@@ -98,11 +99,11 @@ public class Collect extends SchemaImpl {
 			Sequences.OFC_SURVEY_FILE_ID_SEQ,
 			Sequences.OFC_SURVEY_ID_SEQ,
 			Sequences.OFC_TAXON_ID_SEQ,
-			Sequences.OFC_TAXONOMY_ID_SEQ,
 			Sequences.OFC_TAXON_VERNACULAR_NAME_ID_SEQ,
-			Sequences.OFC_USERGROUP_ID_SEQ,
+			Sequences.OFC_TAXONOMY_ID_SEQ,
 			Sequences.OFC_USER_ID_SEQ,
-			Sequences.OFC_USER_ROLE_ID_SEQ);
+			Sequences.OFC_USER_ROLE_ID_SEQ,
+			Sequences.OFC_USERGROUP_ID_SEQ);
 	}
 
 	@Override
@@ -134,15 +135,16 @@ public class Collect extends SchemaImpl {
 			OfcMessageProcessing.OFC_MESSAGE_PROCESSING,
 			OfcRecord.OFC_RECORD,
 			OfcRecordData.OFC_RECORD_DATA,
+			OfcRecordFile.OFC_RECORD_FILE,
 			OfcSamplingDesign.OFC_SAMPLING_DESIGN,
 			OfcSurvey.OFC_SURVEY,
 			OfcSurveyFile.OFC_SURVEY_FILE,
 			OfcTaxon.OFC_TAXON,
-			OfcTaxonomy.OFC_TAXONOMY,
 			OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME,
+			OfcTaxonomy.OFC_TAXONOMY,
 			OfcUser.OFC_USER,
-			OfcUsergroup.OFC_USERGROUP,
 			OfcUserRole.OFC_USER_ROLE,
-			OfcUserUsergroup.OFC_USER_USERGROUP);
+			OfcUserUsergroup.OFC_USER_USERGROUP,
+			OfcUsergroup.OFC_USERGROUP);
 	}
 }

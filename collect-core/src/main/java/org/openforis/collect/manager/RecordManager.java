@@ -37,6 +37,7 @@ import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.persistence.RecordFileDao;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordNotOwnedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -69,6 +70,8 @@ public class RecordManager {
 	
 	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private RecordFileDao recordFileDao;
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
@@ -250,7 +253,9 @@ public class RecordManager {
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void deleteByIds(Set<Integer> ids) throws RecordPersistenceException {
-		getRecordDao().deleteByIds(ids);
+		for (Integer id : ids) {
+			delete(id);
+		}
 	}
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
@@ -260,12 +265,14 @@ public class RecordManager {
 			User lockUser = lock.getUser();
 			throw new RecordLockedException(lockUser.getUsername());
 		} else {
+			recordFileDao.deleteByRecordId(recordId);
 			recordDao.delete(recordId);
 		}
 	}
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void deleteBySurvey(int surveyId) {
+		recordFileDao.deleteBySurveyId(surveyId);
 		recordDao.deleteBySurvey(surveyId);
 	}
 	

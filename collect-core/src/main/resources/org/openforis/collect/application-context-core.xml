@@ -91,6 +91,9 @@
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
   		<property name="dsl" ref="dsl" />
 	</bean>
+	<bean id="recordFileDao" class="org.openforis.collect.persistence.RecordFileDao">
+  		<constructor-arg ref="jooqConfig" />
+	</bean>
 	<bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
 		<property name="dsl" ref="dsl" />
 	</bean>

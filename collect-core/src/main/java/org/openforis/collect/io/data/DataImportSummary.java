@@ -1,10 +1,10 @@
 package org.openforis.collect.io.data;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.manager.RecordFileManager.RecordFileHandle;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.xml.NodeUnmarshallingError;
 
@@ -31,18 +31,18 @@ public class DataImportSummary {
 		this.full = full;
 	}
 
-	public List<File> getConflictingRecordFiles() {
+	public List<RecordFileHandle> getConflictingRecordFiles() {
 		return getConflictingRecordFiles(null);
 	}
 	
-	public List<File> getConflictingRecordFiles(List<Integer> entryIds) {
+	public List<RecordFileHandle> getConflictingRecordFiles(List<Integer> entryIds) {
 		if (! full) {
 			return null;
 		}
-		List<File> result = new ArrayList<File>();
+		List<RecordFileHandle> result = new ArrayList<RecordFileHandle>();
 		for (DataImportSummaryItem conflictingRecordItem : conflictingRecords) {
 			if (entryIds == null || entryIds.contains(conflictingRecordItem.getEntryId())) {
-				result.addAll(conflictingRecordItem.getConflictingRecordSummary().getFiles());
+				result.addAll(conflictingRecordItem.getConflictingRecordSummary().getFileHandles());
 			}
 		}
 		return result;

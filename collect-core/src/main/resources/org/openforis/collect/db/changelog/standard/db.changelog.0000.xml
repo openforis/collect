@@ -987,5 +987,22 @@
 		<createSequence sequenceName="ofc_user_id_seq" />
 		<createSequence sequenceName="ofc_user_role_id_seq" />
 		<createSequence sequenceName="ofc_usergroup_id_seq" />
+		
+		<!-- INSERT VERSION -->
+		<insert tableName="ofc_application_info">
+			<column name="version" value="3.25.0" />
+		</insert>
+		<!-- INSERT admin" USER WITH PASSWORD "admin" -->
+		<insert tableName="ofc_user">
+			<column name="id" valueComputed="nextval('collect.ofc_user_id_seq')" />
+			<column name="username" value="admin" />
+			<column name="password" value="21232f297a57a5a743894a0e4a801fc3" />
+			<column name="enabled" value="Y" />
+		</insert>
+		<insert tableName="ofc_user_role">
+			<column name="id" valueComputed="nextval('collect.ofc_user_role_id_seq')" />
+			<column name="user_id" valueComputed="currval('collect.ofc_user_id_seq')" />
+			<column name="role" value="ROLE_ADMIN" />
+		</insert>
 	</changeSet>
 </databaseChangeLog>

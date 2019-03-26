@@ -310,7 +310,7 @@ public class DataRestoreSummaryTask extends Task {
 			CollectRecordSummary summary = oldRecordSummaries.get(0);
 			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep(), fullSummary);
 			CollectRecordSummary recordSummary = CollectRecordSummary.fromRecord(record);
-			recordSummary.setFiles(recordFileManager.getAllFiles(record));
+			recordSummary.setFileHandles(recordFileManager.getAllFileHandles(record));
 			return recordSummary;
 		} else {
 			String errorMessage = String.format("Data file: %s - multiple records found in survey %s with key(s) %s", 

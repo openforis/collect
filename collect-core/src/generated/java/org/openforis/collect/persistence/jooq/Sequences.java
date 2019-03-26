@@ -72,12 +72,12 @@ public class Sequences {
 	/**
 	 * The sequence <code>collect.ofc_imagery_id_seq</code>
 	 */
-	public static final Sequence<Long> OFC_IMAGERY_ID_SEQ = new SequenceImpl<Long>("ofc_imagery_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> OFC_IMAGERY_ID_SEQ = new SequenceImpl<Integer>("ofc_imagery_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>collect.ofc_message_sequence_no_seq</code>
 	 */
-	public static final Sequence<Long> OFC_MESSAGE_SEQUENCE_NO_SEQ = new SequenceImpl<Long>("ofc_message_sequence_no_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> OFC_MESSAGE_SEQUENCE_NO_SEQ = new SequenceImpl<Integer>("ofc_message_sequence_no_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>collect.ofc_record_id_seq</code>
@@ -105,19 +105,14 @@ public class Sequences {
 	public static final Sequence<Long> OFC_TAXON_ID_SEQ = new SequenceImpl<Long>("ofc_taxon_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>collect.ofc_taxonomy_id_seq</code>
-	 */
-	public static final Sequence<Long> OFC_TAXONOMY_ID_SEQ = new SequenceImpl<Long>("ofc_taxonomy_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
 	 * The sequence <code>collect.ofc_taxon_vernacular_name_id_seq</code>
 	 */
 	public static final Sequence<Long> OFC_TAXON_VERNACULAR_NAME_ID_SEQ = new SequenceImpl<Long>("ofc_taxon_vernacular_name_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>collect.ofc_usergroup_id_seq</code>
+	 * The sequence <code>collect.ofc_taxonomy_id_seq</code>
 	 */
-	public static final Sequence<Long> OFC_USERGROUP_ID_SEQ = new SequenceImpl<Long>("ofc_usergroup_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Long> OFC_TAXONOMY_ID_SEQ = new SequenceImpl<Long>("ofc_taxonomy_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>collect.ofc_user_id_seq</code>
@@ -128,4 +123,9 @@ public class Sequences {
 	 * The sequence <code>collect.ofc_user_role_id_seq</code>
 	 */
 	public static final Sequence<Long> OFC_USER_ROLE_ID_SEQ = new SequenceImpl<Long>("ofc_user_role_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_usergroup_id_seq</code>
+	 */
+	public static final Sequence<Long> OFC_USERGROUP_ID_SEQ = new SequenceImpl<Long>("ofc_usergroup_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 }
