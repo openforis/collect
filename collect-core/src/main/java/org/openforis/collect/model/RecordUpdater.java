@@ -464,8 +464,12 @@ public class RecordUpdater {
 	private List<Attribute<?, ?>> recalculateValues(Collection<Attribute<?, ?>> attributesToRecalculate) {
 		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		for (Attribute calcAttr : attributesToRecalculate) {
+			CollectSurvey survey = (CollectSurvey) calcAttr.getSurvey();
+			CollectAnnotations annotations = survey.getAnnotations();
 			Value previousValue = calcAttr.getValue();
-			Value newValue = recalculateValue(calcAttr);
+			Value newValue = !annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty() 
+					? recalculateValue(calcAttr)
+					: previousValue;
 			if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
 				calcAttr.setValue(newValue);
 				calcAttr.updateSummaryInfo();

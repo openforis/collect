@@ -3,6 +3,11 @@
  */
 package org.openforis.idm.metamodel.validation;
 
+import static org.openforis.idm.metamodel.validation.ValidationResultFlag.ERROR;
+import static org.openforis.idm.metamodel.validation.ValidationResultFlag.OK;
+import static org.openforis.idm.metamodel.validation.ValidationResultFlag.WARNING;
+
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.model.CodeAttribute;
@@ -23,12 +28,14 @@ public class CodeValidator implements ValidationRule<CodeAttribute> {
 			CodeListItem item = getCodeListItem(attribute);
 			if (item == null) {
 				if (isAllowedUnlisted(attribute)) {
-					return ValidationResultFlag.WARNING;
+					return WARNING;
 				} else {
-					return ValidationResultFlag.ERROR;
+					return ERROR;
 				}
+			} else if (item.isQualifiable() && StringUtils.isBlank(attribute.getQualifierField().getValue())) {
+				return ERROR;
 			} else {
-				return ValidationResultFlag.OK;
+				return OK;
 			}
 		}
 	}
