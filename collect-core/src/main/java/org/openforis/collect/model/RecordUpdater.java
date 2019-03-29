@@ -94,7 +94,7 @@ public class RecordUpdater {
 		List<Node<?>> children = parentEntity.getChildren(attrDef);
 		Set<Node<?>> oldAttributes = new HashSet<Node<?>>(children);
 		
-		Set<Attribute<?, ?>> dependentCalculatedAttributes = new HashSet<Attribute<?,?>>();
+		Set<Attribute<?, ?>> dependentCalculatedAttributes = new LinkedHashSet<Attribute<?,?>>();
 		dependentCalculatedAttributes.addAll(record.determineCalculatedAttributes(oldAttributes));
 		dependentCalculatedAttributes.removeAll(oldAttributes);
 		
