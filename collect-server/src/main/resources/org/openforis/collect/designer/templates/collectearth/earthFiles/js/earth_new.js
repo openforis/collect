@@ -617,6 +617,9 @@ var initSteps = function() {
 					nextStepIndex = stepHeadings.length - 1;
 				}
 				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
+				currentStepIndex = nextStepIndex;
+			}else{
+				currentStepIndex = currentIndex;
 			}
 			updateStepsErrorFeedback();
 		},
