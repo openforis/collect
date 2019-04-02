@@ -1,0 +1,111 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk>
+	<custom-attributes survey="${arg.survey}" />
+
+	<zscript>String[] titleArgs = new String[]{((org.openforis.collect.model.SurveySummary) arg.get("survey")).getName()};</zscript>
+	
+	<window id="surveyExportParametersPopup"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyExportParametersVM')"
+		form="@id('fx')
+			@init(vm.tempForm) 
+			@load(vm.formObject) 
+			@save(vm.formObject, before={'export'})"
+		title="${c:l2('survey.export.popup.title', titleArgs)}"
+		width="400px"
+		border="normal" 
+		position="center" 
+		closable="true">
+
+		<grid>
+			<columns>
+				<column width="170px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.export.type.$}:" />
+					<radiogroup id="typeRadiogroup" orient="horizontal" 
+							onCheck="@command('typeChanged')"
+							selectedItem="@bind(fx.type)">
+						<radio id="publishedTypeRadio" label="${labels.survey.export.type.published}" value="PUBLISHED"
+								disabled="@load(vm.survey.notLinkedToPublishedSurvey)" />
+						<radio id="temporaryTypeRadio" label="${labels.survey.export.type.temporary}" value="TEMPORARY" 
+								disabled="@load(! vm.survey.temporary)" />
+					</radiogroup>
+				</row>
+				<row>
+					<label value="${labels.survey.export.output_format.$}:" />
+					<radiogroup id="outputFormatRadiogroup" orient="vertical" 
+							selectedItem="@bind(fx.outputFormat)"
+							onCheck="@command('outputFormatChanged')">
+						<radio label="${labels.survey.export.output_format.desktop}" value="DESKTOP" selected="true" />
+						<radio label="${labels.survey.export.output_format.mobile}" value="MOBILE" />
+						<radio label="${labels.survey.export.output_format.collect_earth}" value="EARTH"
+							visible="@load(vm.collectEarthSurvey)" />
+						<radio label="${labels.survey.export.output_format.rdb}" value="RDB" />
+					</radiogroup>
+				</row>
+				<row visible="@load(vm.includeDataVisible)">
+					<label value="${labels.survey.export.include_data}:" />
+					<checkbox id="includeDataCheckbox"
+						checked="@bind(fx.includeData) @command('includeDataChanged')" />
+				</row>
+			</rows>
+		</grid>
+		
+		<grid visible="@bind(fx.outputFormat eq 'RDB')">
+			<columns>
+				<column width="170px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.export.rdb.dialect.$}:" />
+					<listbox id="dialectListbox" mold="select" 
+						selectedItem="@bind(fx.rdbDialect)">
+						<listitem value="STANDARD" 
+									label="${labels.survey.export.rdb.dialect.standard}" />
+						<listitem value="SQLITE" 
+							label="${labels.survey.export.rdb.dialect.sqlite}" />
+   					</listbox>
+				</row>
+				<row>
+					<label value="${labels.survey.export.rdb.target_schema_name}:" />
+					<textbox width="200px" maxlength="40"
+  						value="@bind(fx.rdbTargetSchemaName)"
+  						disabled="@bind(fx.rdbDialect eq 'SQLITE')" />
+				</row>
+				<row>
+					<label value="${labels.survey.export.rdb.format.datetime}:" />
+					<textbox width="200px" maxlength="40"
+  						value="@bind(fx.rdbDateTimeFormat)" />
+				</row>
+			</rows>
+		</grid>
+		
+		<grid visible="@bind(fx.outputFormat eq 'EARTH' or fx.outputFormat eq 'MOBILE')">
+			<columns>
+				<column width="170px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="@load(fx.outputFormat eq 'MOBILE' ? labels.survey.export.mobile.default_language : labels.survey.export.earth.language)" />
+					<listbox id="languageListBox" model="@load(vm.surveyLanguages)"
+						selectedItem="@bind(fx.languageCode)"
+						mold="select">
+						<template name="model">
+							<listitem label="${c:l(each)}"
+								value="@load(each)" />
+						</template>
+					</listbox>
+				</row>
+			</rows>
+		</grid>
+		
+		<box width="100%" align="center">
+			<button id="okButton" onClick="@command('export')" label="${labels.survey.export.$}" />
+		</box>
+	</window>
+</zk>

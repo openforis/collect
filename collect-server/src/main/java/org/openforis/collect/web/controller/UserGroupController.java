@@ -99,7 +99,8 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 	@RequestMapping(method=DELETE)
 	public @ResponseBody
 	Response delete(@Valid UserGroupsDeleteParameters parameters) {
-		List<SurveySummary> surveys = surveyManager.loadCombinedSummaries(Locale.getDefault().getLanguage(), false, 
+		List<SurveySummary> surveys = surveyManager.loadCombinedSummaries(Locale.getDefault().getLanguage(), false,
+				parameters.getLoggedUserId(),
 				new HashSet<Integer>(parameters.getUserGroupIds()), null);
 		if (! surveys.isEmpty()) {
 			throw new IllegalArgumentException("Cannot delete user group, there is one survey associated to the specified user groups: " + parameters.getUserGroupIds());

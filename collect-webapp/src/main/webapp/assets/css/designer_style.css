@@ -1,0 +1,351 @@
+.mainContainer {
+	background-color: #F0F0F0;
+}
+
+.footer .z-label {
+	font-size: 10px;
+	font-style: italic;
+	color: #222;
+}
+
+.footer .z-label.appVersion {
+	color: #eee;
+	padding-left: 2em;
+}
+
+.footer .icon.app-version-latest {
+	background-image: url("../images/check-green-small.png");
+	background-repeat: no-repeat;
+}
+
+.footer .icon.app-version-not-verified {
+	background-image: url("../images/warning-red-small.png");
+	background-repeat: no-repeat;
+}
+
+.footer .icon.app-version-newer-available {
+	background-image: url("../images/warning-small.png");
+	background-repeat: no-repeat;
+}
+
+.error {
+	color: red;
+}
+button.icon {
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+.nowrap {
+	white-space: nowrap;
+}
+
+.z-west-header, .z-center-header, .z-east-header, .z-north-header, .z-south-header {
+	background: #f6f6f6;
+}
+
+.z-hlayout.controlBar .z-hlayout-inner {
+	vertical-align: middle;
+}
+.z-textbox, .z-decimalbox, .z-intbox, .z-longbox, .z-doublebox {
+	border: 2px inset #E7E7E7;
+}
+.z-textbox-focus, .z-textbox-focus input, 
+	.z-decimalbox-focus, .z-decimalbox-focus input, 
+	.z-intbox-focus, .z-intbox-focus input,
+	.z-longbox-focus, .z-longbox-focus input,
+	.z-doublebox-focus, .z-doublebox-focus input {
+	border: 2px inset #41A4FF;
+}
+.z-textbox-readonly, .z-textbox-text-disd, 
+	.z-intbox-readonly, .z-intbox-text-disd, 
+	.z-longbox-readonly, .z-longbox-text-disd, 
+	.z-doublebox-readonly, .z-doublebox-text-disd, 
+	.z-decimalbox-readonly,	.z-decimalbox-text-disd {
+	background: #EEEEEE;
+}
+.nopadding {
+	padding: 0px;
+}
+.z-groupbox-3d.collapsible {
+	margin: 5px;
+}
+.collapsible .z-groupbox-3d-cnt {
+	padding: 5px;
+}
+
+.collapsible .z-groupbox-3d-hm {
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.collapsible.closed .z-groupbox-3d-hm,
+.collapsible.open .z-groupbox-3d-cnt {
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+
+.z-groupbox-3d-hm {
+	background: #dff1fc;
+}
+
+.collapsible.error .z-groupbox-3d-hm {
+	background: #f93f3f;
+}
+
+.collapsible.error .z-caption .z-label {
+	color: white;
+}
+
+.z-groupbox-3d .z-caption-l {
+	height: 16px;
+}
+.z-groupbox-3d .open-false .z-caption-l {
+	background: url("../images/plus-small.png") no-repeat 0 0px;
+}
+.z-groupbox-3d .open-true .z-caption-l {
+	background: url("../images/minus-small.png") no-repeat 0 0px;;
+}
+.z-menu.icon-button .z-menu-btn, 
+.z-menuitem.icon-button .z-menuitem-btn  {
+	width: 24px;
+	height: 24px;
+	padding-left: 20px;
+}
+.z-treecell {
+	font-style: bold;
+	font-size: 14px;
+}
+.z-treecell.associated {
+	color: grey;
+	font-style: italic;
+}
+.z-treecell-cnt {
+	white-space: nowrap;
+}
+.z-textbox.error, .z-intbox.error, .z-select.error, .z-datebox.error {
+	border: 2px inset #FF0000;
+	color: #000000;
+}
+.z-groupbox.error .z-groupbox-hr, 
+.z-groupbox.error .z-groupbox-cnt {
+	border-color: red;
+	border-width: 2px;
+}
+
+div.z-listbox {
+	background: #f6f6f6;
+}
+
+div.z-listbox-header tr.z-listhead, div.z-listbox-header tr.z-auxhead {
+	background: #f6f6f6;
+}
+
+div.z-listbox-header th.z-listheader-sort-over {
+	background: #dff1fc;
+}
+
+.z-toolbar, .z-menubar-hor, .z-menubar-ver {
+	background: #f7f7f7;
+}
+.z-toolbarbutton-cnt {
+	zoom: 1.2;
+}
+
+.z-groupbox-header span.z-caption-cnt, 
+.z-groupbox-title-cnt {
+	font-size: 1.2em;
+}
+.z-groupbox-header span.z-caption-cnt > .z-label {
+	font-size: 1.0em;
+}
+.z-caption .z-caption-r .z-label {
+	font-size: 1.2em;
+}
+.z-caption .z-caption-l {
+	width: 30px;
+}
+
+/**
+* Checkbox style
+*/
+.z-checkbox input[type="checkbox"] {
+	-webkit-appearance: none;
+	background-color: #fff;
+	border: 2px inset #cacece;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	padding: 7px;
+	border-radius: 3px;
+	display: inline-block;
+	position: relative;
+	margin: 0px;
+}
+.z-checkbox input[type="checkbox"]:active, .z-checkbox input[type="checkbox"]:checked:active {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+.z-checkbox input[type="checkbox"]:checked {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.1);
+}
+.z-checkbox input[type="checkbox"]:checked:after {
+	content: '\2714';
+	font-size: 14px;
+	position: absolute;
+	top: 0px;
+	left: 2px;
+	color: #666;
+}
+.z-checkbox.error input[type="checkbox"] {
+	background-color: #D10909;
+}
+.z-checkbox.error input[type="checkbox"]:checked:after {
+	color: white;
+}
+.z-checkbox input[type="checkbox"]:disabled {
+	background-color: lightGrey;
+}
+
+/**
+* end of Checkbox style
+*/
+.z-popup.error .z-popup-cnt {
+	background: #CE2929;
+	color: #FFFFFF;
+}
+
+/* START OF TITLES */
+.mainTitle {
+	font-size: 16px;
+	font-weight: bold;
+}
+.mainTitleEditing {
+	font-size: 14px;
+	font-weight: bold;
+}
+.sectionTitle {
+	font-size: 12px;
+	font-weight: bold;
+}
+/* END OF TITLES */
+
+/* START OF MESSAGES STYLE */
+.alertMessage {
+	color: red;
+}
+.tipMessage {
+	font-style: italic;
+}
+.infoMessage {
+	font-size: 12px;
+	font-weight: normal;
+}
+/* END OF MESSAGES STYLE */
+
+/* START OF GROUPBOX STYLE */
+.form .z-groupbox .z-groupbox-cnt {
+	padding: 0px;
+}
+.z-groupbox.tableFieldSet .z-groupbox-cnt {
+	padding: 10px;
+}
+/* END OF GROUPBOX STYLE */
+
+/* START OF GRID STYLE */
+.z-grid.inner {
+	border: none;
+}
+.form div.z-grid {
+	border: none;
+	background: none;
+}
+.form.compact tr.z-row td.z-row-inner, 
+  .form.compact tr.z-row td.z-cell, 
+  .form.compact tr.z-group td.z-group-inner,
+  .form.compact tr.z-groupfoot td.z-groupfoot-inner {
+  padding: 1px 1px 1px 2px;
+}
+.form div.z-grid tr.z-grid-odd td.z-row-inner, 
+	.form div.z-grid tr.z-grid-odd .z-cell, 
+	.form div.z-grid tr.z-grid-odd {
+	background: transparent;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-left: 1px solid transparent;
+}
+.form tr.z-row-over > td.z-row-inner,
+	.form tr.z-row-over > .z-cell {
+	background-image: none;
+	border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+.form tr.z-row {
+	vertical-align: top;
+}
+/* END OF GRID STYLE */
+
+/* START OF LANGUAGES LIST STYLE */
+.z-listbox.languagesList div.z-listbox-body .z-listcell {
+	padding: 1px;
+}
+/* END OF LANGUAGES LIST STYLE */
+
+.z-flash.maximised {
+	height: 100%;
+	width: 100%;
+}
+
+.node-type-header .z-label {
+/* 	margin-left: -10px; */
+/* 	padding-right: 14px; */
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.path-label {
+	text-align: right;
+	display: inline-block;
+}
+
+.z-panel.without-header .z-panel-tl, 
+.z-panel.without-header .z-panel-hl {
+	display: none;
+}
+
+.z-menubar-hor.transparentbackground {
+	background: transparent;
+	border-color: transparent;
+}
+
+.z-menubar-hor.withicons .z-menuitem-btn,
+.z-menuitem.icon-button .z-menuitem-btn {
+	height: 30px;
+	width: 26px;
+}
+
+.z-menubar-hor.withicons .z-menuitem-body-over,
+.z-menuitem.icon-button.z-menuitem-body-over .z-menuitem-btn {
+	background-image: none;
+}
+
+.z-menuitem.icon-button.with-label .z-menuitem-btn,
+.z-menuitem.icon-button.with-label.z-menuitem-body-over .z-menuitem-btn {
+	padding-left: 28px;
+	width: auto;
+}
+
+.small .z-listcell-cnt {
+	font-size: 10px;
+}
+
+.expression-info {
+	cursor: pointer;
+}
+
+.icon.loading {
+	background-image: url("../images/loading-small.gif");
+	background-repeat: no-repeat;
+}
+
+.fielderrorhandler.full-width .z-hlayout-inner {
+	width: 100%;
+}
+

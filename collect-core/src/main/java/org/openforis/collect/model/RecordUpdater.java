@@ -94,7 +94,7 @@ public class RecordUpdater {
 		List<Node<?>> children = parentEntity.getChildren(attrDef);
 		Set<Node<?>> oldAttributes = new HashSet<Node<?>>(children);
 		
-		Set<Attribute<?, ?>> dependentCalculatedAttributes = new HashSet<Attribute<?,?>>();
+		Set<Attribute<?, ?>> dependentCalculatedAttributes = new LinkedHashSet<Attribute<?,?>>();
 		dependentCalculatedAttributes.addAll(record.determineCalculatedAttributes(oldAttributes));
 		dependentCalculatedAttributes.removeAll(oldAttributes);
 		
@@ -464,8 +464,12 @@ public class RecordUpdater {
 	private List<Attribute<?, ?>> recalculateValues(Collection<Attribute<?, ?>> attributesToRecalculate) {
 		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		for (Attribute calcAttr : attributesToRecalculate) {
+			CollectSurvey survey = (CollectSurvey) calcAttr.getSurvey();
+			CollectAnnotations annotations = survey.getAnnotations();
 			Value previousValue = calcAttr.getValue();
-			Value newValue = recalculateValue(calcAttr);
+			Value newValue = !annotations.isCalculatedOnlyOneTime(calcAttr.getDefinition()) || calcAttr.isEmpty() 
+					? recalculateValue(calcAttr)
+					: previousValue;
 			if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
 				calcAttr.setValue(newValue);
 				calcAttr.updateSummaryInfo();

@@ -30,9 +30,7 @@ public class SessionListener implements HttpSessionListener {
 		SessionManager sessionManager = getSessionManager(se);
 		sessionManager.createSessionState(se.getSession());
 		
-		if ( LOG.isInfoEnabled() ) {
-			LOG.info("Session created: " + se.getSession().getId());
-		}
+		logSessionStatusChange(se, sessionManager, true);
 	}
 
 	@Override
@@ -40,22 +38,26 @@ public class SessionListener implements HttpSessionListener {
 		SessionManager sessionManager = getSessionManager(se);
 		try {
 			SessionState sessionState = sessionManager.getSessionState();
-			User user = null;
-			if (sessionState != null) {
-				user = sessionState.getUser();
-				if (user != null) {
-					sessionManager.sessionDestroyed();
-				}
+			User user = sessionState == null ? null : sessionState.getUser();
+			if (user != null) {
+				sessionManager.sessionDestroyed();
 			}
-			if ( LOG.isInfoEnabled() ) {
-				String message = "Session destroyed: " + se.getSession().getId();
-				if ( user != null ) {
-					message += " username: " +user.getUsername();
-				}
-				LOG.info(message);
-			}
+			logSessionStatusChange(se, sessionManager, false);
 		} catch(InvalidSessionException e) {
 			//ignore it, session was anonymous
+		}
+	}
+	
+	private void logSessionStatusChange(HttpSessionEvent se, SessionManager sessionManager, boolean created) {
+		if ( LOG.isInfoEnabled() ) {
+			SessionState sessionState = sessionManager.getSessionState();
+			User user = sessionState == null ? null : sessionState.getUser();
+			
+			LOG.info("Session " + 
+					(created ? "created" : "destroyed") + 
+					": " + se.getSession().getId() + 
+					(user == null ? "" : " user: " + user.getUsername())
+			);
 		}
 	}
 

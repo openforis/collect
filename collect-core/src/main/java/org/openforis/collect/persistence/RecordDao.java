@@ -22,10 +22,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.jooq.Batch;
 import org.jooq.Condition;
 import org.jooq.Cursor;
@@ -435,7 +436,7 @@ public class RecordDao extends JooqDaoSupport {
 					} else if (caseSensitiveValues) {
 						condition = field.equal(value);
 					} else {
-						condition = field.upper().equal(value.toUpperCase());
+						condition = field.upper().equal(value.toUpperCase(Locale.ENGLISH));
 					}
 					q.addConditions(condition);
 				} else if (isNullWhenNotSpecified) {

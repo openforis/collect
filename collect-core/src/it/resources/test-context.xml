@@ -42,4 +42,6 @@
 		scope="prototype">
 	</bean>
 	
+	<bean id="lookupProvider" class="org.openforis.idm.model.TestLookupProvider" />
+	
 </beans>

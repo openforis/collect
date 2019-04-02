@@ -11,7 +11,7 @@ public class RecordProviderConfiguration {
 		super();
 		this.createUsersFoundInRecords = createUsersFoundInRecords;
 	}
-
+	
 	public boolean isCreateUsersFoundInRecords() {
 		return createUsersFoundInRecords;
 	}

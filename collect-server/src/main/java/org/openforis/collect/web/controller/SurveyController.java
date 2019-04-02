@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import static org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator.PLACEMARK_FILE_NAME;
+import static org.openforis.collect.web.ws.AppWS.MessageType.SURVEYS_UPDATED;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -9,7 +10,6 @@ import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSIO
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ import javax.validation.Valid;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.CESurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -34,21 +34,21 @@ import org.openforis.collect.io.ZipFileExtractor;
 import org.openforis.collect.manager.CollectEarthSurveyExportJob;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.manager.validation.SurveyValidator.ValidationParameters;
 import org.openforis.collect.metamodel.SimpleSurveyCreationParameters;
 import org.openforis.collect.metamodel.SurveyTarget;
-import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UITab;
-import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Controllers;
@@ -56,19 +56,20 @@ import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.SurveyController.SurveyCloneParameters.SurveyType;
-import org.openforis.collect.web.controller.SurveyController.SurveyCreationParameters.TemplateType;
+import org.openforis.collect.web.service.SurveyService;
 import org.openforis.collect.web.validator.SimpleSurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyCloneParametersValidator;
 import org.openforis.collect.web.validator.SurveyCreationParametersValidator;
 import org.openforis.collect.web.validator.SurveyImportParametersValidator;
+import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.openforis.concurrency.Worker.Status;
+import org.openforis.concurrency.WorkerStatusChangeEvent;
+import org.openforis.concurrency.WorkerStatusChangeListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -94,9 +95,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
 public class SurveyController extends BasicController {
 
-	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
-	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_sampling_unit";
-	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
 	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = "cep";
 
 	@Autowired
@@ -109,10 +107,12 @@ public class SurveyController extends BasicController {
 	private JobManager jobManager;
 	@Autowired
 	private SessionManager sessionManager;
-//	@Autowired
-//	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	@Autowired
+	private SurveyService surveyService;
+	@Autowired
+	private AppWS appWS;
 
-	//validators
+	// validators
 	@Autowired
 	private SurveyCreationParametersValidator surveyCreationParametersValidator;
 	@Autowired
@@ -121,6 +121,10 @@ public class SurveyController extends BasicController {
 	private SurveyImportParametersValidator surveyImportParametersValidator;
 	@Autowired
 	private SurveyCloneParametersValidator surveyCloneParametersValidator;
+	@Autowired
+	private SurveyValidator surveyValidator;
+	@Autowired
+	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 
 	private SurveyBackupInfoExtractorJob surveyBackupInfoExtractorJob;
 	private File uploadedSurveyFile;
@@ -145,9 +149,8 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	@RequestMapping(method=GET)
-	@Transactional(readOnly=true, propagation=Propagation.SUPPORTS)
+	@Transactional(readOnly=true, propagation=Propagation.REQUIRED)
 	public @ResponseBody
 	List<?> loadSurveys(
 			@RequestParam(value="userId", required=false) Integer userId,
@@ -160,13 +163,18 @@ public class SurveyController extends BasicController {
 			userId = sessionManager.getLoggedUser().getId();
 		}
 		Set<Integer> groupIds = getAvailableUserGroupIds(userId, groupId);
-		List<SurveySummary> summaries = new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, groupIds));
+		
+		List<SurveySummary> publishedSummaries = new ArrayList<SurveySummary>(surveyManager.getSurveySummaries(languageCode, userId, groupIds));
+
+		List<SurveySummary> allSummaries = new ArrayList<SurveySummary>(publishedSummaries);
+		
 		if (includeTemporary) {
-			summaries.addAll(surveyManager.loadTemporarySummaries(languageCode, true, groupIds));
+			List<SurveySummary> tempSummaries = surveyManager.loadTemporarySummaries(languageCode, true, userId, groupIds);
+			allSummaries.addAll(tempSummaries);
 		}
 		
-		List<Object> views = new ArrayList<Object>();
-		for (SurveySummary surveySummary : summaries) {
+		List<Object> views = new ArrayList<Object>(allSummaries.size());
+		for (SurveySummary surveySummary : allSummaries) {
 			if (fullSurveys) {
 				CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveySummary.getId());
 				views.add(generateView(survey, includeCodeListValues));
@@ -174,7 +182,7 @@ public class SurveyController extends BasicController {
 				views.add(surveySummary);
 			}
 		}
-		views.sort(Collections.reverseOrder(new BeanComparator("modifiedDate")));
+		views.sort(Collections.reverseOrder(new BeanComparator<Object>("modifiedDate")));
 		return views;
 	}
 
@@ -197,24 +205,17 @@ public class SurveyController extends BasicController {
 			res.addObject("errors", bindingResult.getFieldErrors());
 			return res;
 		}
-		CollectSurvey survey;
-		switch (params.getTemplateType()) {
-		case BLANK:
-			survey = createEmptySurvey(params.getName(), params.getDefaultLanguageCode());
-			break;
-		default:
-			survey = createNewSurveyFromTemplate(params.getName(), params.getDefaultLanguageCode(), params.getTemplateType());
-		}
-		UserGroup userGroup = userGroupManager.loadById(params.getUserGroupId());
-		survey.setUserGroupId(userGroup.getId());
-		surveyManager.save(survey);
+		CollectSurvey survey = surveyService.createNewSurvey(params);
 		
 		SurveySummary surveySummary = SurveySummary.createFromSurvey(survey);
+
+		sendSurveysUpdatedMessage();
+		
 		Response res = new Response();
 		res.setObject(surveySummary);
 		return res;
 	}
-	
+
 	@RequestMapping(value="cloneintotemporary/{surveyId}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody
@@ -225,6 +226,9 @@ public class SurveyController extends BasicController {
 		if (survey.isPublished()) {
 			String surveyUri = survey.getUri();
 			CollectSurvey temporarySurvey = surveyManager.createTemporarySurveyFromPublished(surveyUri, loggedUser);
+			
+			sendSurveysUpdatedMessage();
+			
 			response.setObject(temporarySurvey.getId());
 		} else {
 			response.setErrorStatus();
@@ -233,66 +237,30 @@ public class SurveyController extends BasicController {
 		return response;
 	}
 	
-	
 	@RequestMapping(value="validatecreation", method=POST)
 	public @ResponseBody Response validateSurveyCreationParameters(@Valid SurveyCreationParameters params, BindingResult result) {
 		return generateFormValidationResponse(result);
 	}
 	
-	private CollectSurvey createNewSurveyFromTemplate(String name, String langCode, TemplateType templateType)
-			throws IdmlParseException, SurveyValidationException {
-		String templateFileName = String.format(IDM_TEMPLATE_FILE_NAME_FORMAT, templateType.name().toLowerCase(Locale.ENGLISH));
-		InputStream surveyFileIs = this.getClass().getResourceAsStream(templateFileName);
-		CollectSurvey survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
-		survey.setName(name);
-		survey.setTemporary(true);
-		survey.setUri(surveyManager.generateSurveyUri(name));
-		survey.setDefaultLanguage(langCode);
-		SurveyTarget target;
-		switch (templateType) {
-		case COLLECT_EARTH:
-		case COLLECT_EARTH_IPCC:
-			target = SurveyTarget.COLLECT_EARTH;
-			break;
-		default:
-			target = SurveyTarget.COLLECT_DESKTOP;
-		}
-		survey.setTarget(target);
-		
-		if ( survey.getSamplingDesignCodeList() == null ) {
-			survey.addSamplingDesignCodeList();
-		}
-		return survey;
-	}
-
-	private CollectSurvey createEmptySurvey(String name, String langCode) {
-		//create empty survey
-		CollectSurvey survey = surveyManager.createTemporarySurvey(name, langCode);
-		//add default root entity
-		Schema schema = survey.getSchema();
-		EntityDefinition rootEntity = schema.createEntityDefinition();
-		rootEntity.setMultiple(true);
-		rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
-		schema.addRootEntityDefinition(rootEntity);
-		//create root tab set
-		UIOptions uiOptions = survey.getUIOptions();
-		UITabSet rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
-		UITab mainTab = uiOptions.getMainTab(rootTabSet);
-		mainTab.setLabel(langCode, DEFAULT_MAIN_TAB_LABEL);
-		
-		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
-		surveyObjectsGenerator.addPredefinedObjects(survey);
-		
-		return survey;
-	}
-	
 	@RequestMapping(value="publish/{id}", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public @ResponseBody SurveyView publishSurvey(@PathVariable int id) throws SurveyImportException {
+	public @ResponseBody SurveyPublishResult publishSurvey(
+			@PathVariable int id, @RequestParam boolean ignoreWarnings) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		User activeUser = sessionManager.getLoggedUser();
-		surveyManager.publish(survey, activeUser);
-		return generateView(survey, false);
+		CollectSurvey publishedSurvey = survey.isPublished() ? surveyManager
+				.getByUri(survey.getUri()) : null;
+		SurveyValidator validator = getSurveyValidator(survey);
+		ValidationParameters validationParameters = new ValidationParameters();
+		validationParameters.setWarningsIgnored(ignoreWarnings);
+		SurveyValidationResults results = validator.validateCompatibility(publishedSurvey, survey, validationParameters);
+		if (results.hasErrors() || results.hasWarnings()) {
+			return new SurveyPublishResult(results);
+		} else {
+			User activeUser = sessionManager.getLoggedUser();
+			surveyManager.publish(survey, activeUser);
+			sendSurveysUpdatedMessage();
+			return new SurveyPublishResult(generateView(survey, false));
+		}
 	}
 	
 	@RequestMapping(value="unpublish/{id}", method=POST)
@@ -300,6 +268,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView unpublishSurvey(@PathVariable int id) throws SurveyStoreException {
 		User activeUser = sessionManager.getLoggedUser();
 		CollectSurvey survey = surveyManager.unpublish(id, activeUser);
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -308,6 +277,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView closeSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.close(survey);
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -316,6 +286,7 @@ public class SurveyController extends BasicController {
 	public @ResponseBody SurveyView archiveSurvey(@PathVariable int id) throws SurveyImportException {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		surveyManager.archive(survey);
+		sendSurveysUpdatedMessage();
 		return generateView(survey, false);
 	}
 	
@@ -323,6 +294,7 @@ public class SurveyController extends BasicController {
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public @ResponseBody Response deleteSurvey(@PathVariable int id) throws SurveyImportException {
 		surveyManager.deleteSurvey(id);
+		sendSurveysUpdatedMessage();
 		return new Response();
 	}
 	
@@ -334,6 +306,12 @@ public class SurveyController extends BasicController {
 		surveyCloneJob.setNewName(params.newSurveyName);
 		surveyCloneJob.setOriginalSurveyType(params.originalSurveyType);
 		surveyCloneJob.setActiveUser(sessionManager.getLoggedUser());
+		surveyCloneJob.addStatusChangeListener(new WorkerStatusChangeListener() {
+			public void statusChanged(WorkerStatusChangeEvent event) {
+				if (event.getTo() == Status.COMPLETED)
+					sendSurveysUpdatedMessage();
+			}
+		});
 		jobManager.start(surveyCloneJob);
 		return new JobView(surveyCloneJob);
 	}
@@ -426,6 +404,16 @@ public class SurveyController extends BasicController {
 		job.setRestoreIntoPublishedSurvey(false);
 		job.setValidateSurvey(false);
 		job.setActiveUser(sessionManager.getLoggedUser());
+		
+		//on job complete, send survey created message to WS
+		job.addStatusChangeListener(new WorkerStatusChangeListener() {
+			public void statusChanged(WorkerStatusChangeEvent event) {
+				if (event.getTo() == Status.COMPLETED) {
+					sendSurveysUpdatedMessage();
+				}
+			}
+		});
+		
 		jobManager.start(job);
 		this.surveyImportJob = job;
 		Response res = new Response();
@@ -442,10 +430,12 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
-	@RequestMapping(value="changeusergroup/{id}", method=POST)
+	@RequestMapping(value="{surveyName}/changeusergroup", method=POST)
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable int id, @RequestParam int userGroupId) throws SurveyStoreException {
-		return surveyManager.updateUserGroup(id, userGroupId);
+	public @ResponseBody SurveySummary changeSurveyUserGroup(@PathVariable String surveyName, @RequestParam int userGroupId) throws SurveyStoreException {
+		SurveySummary surveySummary = surveyManager.updateUserGroup(surveyName, userGroupId);
+		sendSurveysUpdatedMessage();
+		return surveySummary;
 	}
 	
 	@RequestMapping(value = "export/{id}", method=POST)
@@ -498,7 +488,7 @@ public class SurveyController extends BasicController {
 //			surveyBackupJob.setIncludeData(parameters.isIncludeData());
 //			surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
 			job.setOutputFormat(org.openforis.collect.io.SurveyBackupJob.OutputFormat.valueOf(params.getOutputFormat().name()));
-			job.setOutputSurveyDefaultLanguage(ObjectUtils.defaultIfNull(params.getLanguageCode(), loadedSurvey.getDefaultLanguage()));
+			job.setOutputSurveyDefaultLanguage(StringUtils.defaultIfEmpty(params.getLanguageCode(), loadedSurvey.getDefaultLanguage()));
 			jobManager.start(job, String.valueOf(loadedSurvey.getId()));
 			this.surveyBackupJob = job;
 			return new JobView(job);
@@ -539,7 +529,9 @@ public class SurveyController extends BasicController {
 		}
 		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH.getLanguage());
 		viewGenerator.setIncludeCodeListValues(includeCodeListValues);
-		SurveyView view = viewGenerator.generateView(survey);
+		UserInGroup userInSurveyGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), sessionManager.getLoggedUser().getId());
+		UserGroup userGroup = userInSurveyGroup == null ? null : userGroupManager.loadById(userInSurveyGroup.getGroupId());
+		SurveyView view = viewGenerator.generateView(survey, userGroup, userInSurveyGroup == null ? null : userInSurveyGroup.getRole());
 		return view;
 	}
 	
@@ -564,6 +556,14 @@ public class SurveyController extends BasicController {
 		} catch (Exception e) {
 			throw new RuntimeException("Error extracting " + PLACEMARK_FILE_NAME + " from cep file", e);
 		}
+	}
+	
+	private void sendSurveysUpdatedMessage() {
+		appWS.sendMessage(SURVEYS_UPDATED, 500); //delay to allow transaction commit
+	}
+	
+	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
+		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
 	}
 	
 	public static class SurveyCreationParameters {
@@ -796,4 +796,26 @@ public class SurveyController extends BasicController {
 		}
 	}
 	
+	public class SurveyPublishResult {
+		private SurveyView survey;
+		private SurveyValidationResults validationResult;
+		
+		public SurveyPublishResult(SurveyView survey) {
+			super();
+			this.survey = survey;
+		}
+
+		public SurveyPublishResult(SurveyValidationResults validationResult) {
+			super();
+			this.validationResult = validationResult;
+		}
+		
+		public SurveyView getSurvey() {
+			return survey;
+		}
+		
+		public SurveyValidationResults getValidationResult() {
+			return validationResult;
+		}
+	}
 }

@@ -46,6 +46,7 @@ public class CollectAnnotations {
 	public enum Annotation {
 		//collect namespace
 		INCLUDE_IN_DATA_EXPORT(new QName(COLLECT_NAMESPACE_URI, "includeInDataExport"), true),
+		CALCULATED_ONLY_ONE_TIME(new QName(COLLECT_NAMESPACE_URI, "calculatedOnlyOneTime"), false),
 		PHASE_TO_APPLY_DEFAULT_VALUE(new QName(COLLECT_NAMESPACE_URI, "phaseToApplyDefaultValue"), Step.ENTRY),
 		EDITABLE(new QName(COLLECT_NAMESPACE_URI, "editable"), true),
 		FILE_TYPE(new QName(COLLECT_NAMESPACE_URI, "fileType"), FileType.IMAGE),
@@ -143,6 +144,14 @@ public class CollectAnnotations {
 	
 	public void setIncludeInDataExport(NodeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.INCLUDE_IN_DATA_EXPORT, value);
+	}
+	
+	public boolean isCalculatedOnlyOneTime(NodeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.CALCULATED_ONLY_ONE_TIME);
+	}
+	
+	public void setCalculatedOnlyOneTime(NodeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.CALCULATED_ONLY_ONE_TIME, value);
 	}
 	
 	public String getAutoCompleteGroup(TextAttributeDefinition def) {

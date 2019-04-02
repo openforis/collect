@@ -1,0 +1,43 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
+<zk>
+  <window id="surveyValidationResultsPopUp"
+  	title="${labels.survey.validation.popup.title}"
+    border="normal" 
+    position="center"
+    height="80%"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM')"
+    onUpload="@command('fileUploaded')"
+    closable="true"
+    onClose="@global-command('closeValidationResultsPopUp')"
+    >
+    
+    <vbox align="center" vflex="true">
+      <listbox id="listbox" 
+        rows="10"
+        width="710px" vflex="true"
+        model="@load(vm.results)">
+        <listhead>
+          <listheader label="${labels.survey.validation.severity}" width="90px" 
+            sort="auto(flag)" />
+          <listheader label="${labels.survey.validation.path}" width="400px" 
+            sort="auto(path)" />
+          <listheader label="${labels.survey.validation.message}" width="200px"
+            sort="auto(messageKey, path)" />
+        </listhead>
+        <template name="model">
+          <listitem>
+            <listcell label="@load(each.flag)" />
+            <listcell label="@load(each.path)" />
+            <listcell label="${c:l2(each.messageKey, each.messageArgs)}" />
+          </listitem>
+        </template>
+      </listbox>
+  
+      <button id="confirmBtn" 
+      	visible="@load(vm.showConfirm)"
+      	label="@load(vm.confirmButtonLabel)"
+        onClick="@command('confirm')" />
+    </vbox>
+  </window>
+</zk>

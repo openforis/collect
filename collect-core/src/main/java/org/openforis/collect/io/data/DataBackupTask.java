@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;

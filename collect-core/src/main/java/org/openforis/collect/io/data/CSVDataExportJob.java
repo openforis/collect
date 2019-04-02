@@ -20,7 +20,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
-import org.openforis.collect.io.data.csv.CSVDataExportParameters.OutputFormat;
+import org.openforis.collect.io.data.csv.CSVDataExportParametersBase.OutputFormat;
 import org.openforis.collect.io.data.csv.DataTransformation;
 import org.openforis.collect.io.data.csv.ModelCsvWriter;
 import org.openforis.collect.io.data.csv.ModelExcelWriter;

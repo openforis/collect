@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NameValueEntry;
+import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -47,6 +48,8 @@ public class DatabaseExternalCodeListProvider implements
 
 	@Autowired
 	private DynamicTableDao dynamicTableDao;
+	@Autowired
+	private SamplingDesignDao samplingDesignDao;
 
 	@Override
 	@Deprecated
@@ -66,28 +69,50 @@ public class DatabaseExternalCodeListProvider implements
 	public ExternalCodeListItem getItem(CodeAttribute attribute) {
 		CodeAttributeDefinition defn = attribute.getDefinition();
 		CodeList list = defn.getList();
-		
-		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
-		addSurveyFilter(list, filters);
-		CodeAttribute codeParent = attribute.getCodeParent();
-		while (codeParent != null) {
-			String colName = getLevelKeyColumnName(codeParent);
-			String codeValue = getCodeValue(codeParent);
-			filters.add(new NameValueEntry(colName, codeValue));
-			codeParent = codeParent.getCodeParent();
-		}
-		String colName = getLevelKeyColumnName(attribute);
-		String codeValue = getCodeValue(attribute);
-		filters.add(new NameValueEntry(colName, codeValue));
-		int level = defn.getLevelPosition();
-		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, level);
-		filters.addAll(emptyNextLevelsFilters);
-		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new NameValueEntry[filters.size()]));
-		if ( row == null ) {
-			return null;
+		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+			return getItemFromSamplingDesign(attribute);
 		} else {
-			ExternalCodeListItem result = parseRow(row, list, level);
-			return result;
+			List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
+			addSurveyFilter(list, filters);
+			CodeAttribute codeParent = attribute.getCodeParent();
+			while (codeParent != null) {
+				String colName = getLevelKeyColumnName(codeParent);
+				String codeValue = getCodeValue(codeParent);
+				filters.add(new NameValueEntry(colName, codeValue));
+				codeParent = codeParent.getCodeParent();
+			}
+			String colName = getLevelKeyColumnName(attribute);
+			String codeValue = getCodeValue(attribute);
+			filters.add(new NameValueEntry(colName, codeValue));
+			int level = defn.getLevelPosition();
+			List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, level);
+			filters.addAll(emptyNextLevelsFilters);
+			Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), 
+					filters.toArray(new NameValueEntry[filters.size()]));
+			if ( row == null ) {
+				return null;
+			} else {
+				ExternalCodeListItem result = parseRow(row, list, level);
+				return result;
+			}
+		}
+	}
+
+	private ExternalCodeListItem getItemFromSamplingDesign(CodeAttribute attribute) {
+		CodeAttributeDefinition defn = attribute.getDefinition();
+		CodeList list = defn.getList();
+		Survey survey = defn.getSurvey();
+		
+		List<CodeAttribute> codeAncestors = attribute.getCodeAncestors();
+		if (defn.getLevelIndex() == codeAncestors.size() && !attribute.isEmpty()) {
+			String codeValue = attribute.getValue().getCode();
+			List<String> codeAncestorCodes = getCodeValues(codeAncestors);
+			List<String> parentKeys = new ArrayList<String>(codeAncestorCodes);
+			parentKeys.add(codeValue);
+			SamplingDesignItem samplingDesignItem = samplingDesignDao.loadItem(survey.getId(), parentKeys.toArray(new String[parentKeys.size()]));
+			return samplingDesignItemToItem(samplingDesignItem, list, defn.getLevelPosition());
+		} else {
+			return null;
 		}
 	}
 
@@ -101,24 +126,52 @@ public class DatabaseExternalCodeListProvider implements
 		int parentLevel = level - 1;
 		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, parentLevel);
 		filters.addAll(emptyNextLevelsFilters);
-		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new NameValueEntry[0]));
+		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new NameValueEntry[filters.size()]));
 		return parseRow(row, list, parentLevel);
 	}
 
 	@Override
 	public List<ExternalCodeListItem> getRootItems(CodeList list) {
-		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
-		addSurveyFilter(list, filters);
-		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
-		filters.addAll(emptyNextLevelsFilters);
-		List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
-				filters.toArray(new NameValueEntry[0]));
-		List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
-		for (Map<String, String> row : rows) {
-			ExternalCodeListItem item = parseRow(row, list, 1);
-			result.add(item);
+		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+			List<SamplingDesignItem> samplingDesignItems = samplingDesignDao.loadChildItems(list.getSurvey().getId());
+			return samplingDesignItemsToItems(list, samplingDesignItems, 1);
+		} else {
+			List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
+			addSurveyFilter(list, filters);
+			List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
+			filters.addAll(emptyNextLevelsFilters);
+			List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
+					filters.toArray(new NameValueEntry[0]));
+			List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
+			for (Map<String, String> row : rows) {
+				ExternalCodeListItem item = parseRow(row, list, 1);
+				result.add(item);
+			}
+			return result;
 		}
-		return result;
+	}
+
+	private List<ExternalCodeListItem> samplingDesignItemsToItems(CodeList list, List<SamplingDesignItem> samplingDesignItems, int level) {
+		List<ExternalCodeListItem> items = new ArrayList<ExternalCodeListItem>(samplingDesignItems.size());
+		for (SamplingDesignItem samplingDesignItem : samplingDesignItems) {
+			ExternalCodeListItem item = samplingDesignItemToItem(samplingDesignItem, list, level);
+			items.add(item);
+		}
+		return items;
+	}
+
+	private ExternalCodeListItem samplingDesignItemToItem(SamplingDesignItem samplingDesignItem, CodeList list, int level) {
+		if (samplingDesignItem == null)
+			return null;
+		
+		Map<String, String> parentKeyByLevel = new HashMap<String, String>();
+		for (int ancestorLevelIndex = 0; ancestorLevelIndex < level; ancestorLevelIndex ++) {
+			String ancestorLevelName = list.getHierarchy().get(ancestorLevelIndex).getName();
+			parentKeyByLevel.put(ancestorLevelName, samplingDesignItem.getLevelCode(ancestorLevelIndex + 1));
+		}
+		ExternalCodeListItem item = new ExternalCodeListItem(list, samplingDesignItem.getId(), parentKeyByLevel, level);
+		item.setCode(samplingDesignItem.getLevelCode(level));
+		return item;
 	}
 	
 	public ExternalCodeListItem getRootItem(CodeList list, String code) {
@@ -141,18 +194,25 @@ public class DatabaseExternalCodeListProvider implements
 		if (childrenLevel > list.getHierarchy().size()) {
 			return Collections.emptyList();
 		}
-		List<NameValueEntry> filters = createChildItemsFilters(item);
-		String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
-		String[] notNullColumns = new String[]{childrenKeyColName};
-		List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
-				filters.toArray(new NameValueEntry[filters.size()]),
-				notNullColumns);
-		List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
-		for (Map<String, String> row : rows) {
-			ExternalCodeListItem child = parseRow(row, list, childrenLevel);
-			result.add(child);
+		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+			List<String> ancestorKeys = new ArrayList<String>(item.getParentKeys());
+			ancestorKeys.add(item.getCode());
+			List<SamplingDesignItem> samplingDesignItems = samplingDesignDao.loadChildItems(list.getSurvey().getId(), ancestorKeys);
+			return samplingDesignItemsToItems(list, samplingDesignItems, childrenLevel);
+		} else {			
+			List<NameValueEntry> filters = createChildItemsFilters(item);
+			String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
+			String[] notNullColumns = new String[]{childrenKeyColName};
+			List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
+					filters.toArray(new NameValueEntry[filters.size()]),
+					notNullColumns);
+			List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
+			for (Map<String, String> row : rows) {
+				ExternalCodeListItem child = parseRow(row, list, childrenLevel);
+				result.add(child);
+			}
+			return result;
 		}
-		return result;
 	}
 	
 	public boolean hasChildItems(ExternalCodeListItem item) {
@@ -347,6 +407,18 @@ public class DatabaseExternalCodeListProvider implements
 		} else {
 			return null;
 		}
+	}
+	
+	private List<String> getCodeValues(List<CodeAttribute> attributes) {
+		List<String> codes = new ArrayList<String>(attributes.size());
+		for (CodeAttribute attribute: attributes) {
+			if (attribute.isEmpty()) {
+				codes.add(null);
+			} else {
+				codes.add(attribute.getValue().getCode());
+			}
+		}
+		return codes;
 	}
 
     public DynamicTableDao getDynamicTableDao() {

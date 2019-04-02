@@ -28,7 +28,7 @@ public class RecordProviderInitializerTask extends Task {
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
 		output = new XMLParsingRecordProvider(input.file, input.packagedSurvey, input.existingSurvey, input.activeUser, 
-				input.userManager, input.validateRecords, true);
+				input.userManager, input.initializeRecords, input.validateRecords, true);
 	}
 	
 	@Override
@@ -39,6 +39,10 @@ public class RecordProviderInitializerTask extends Task {
 				setProcessedItems(progress.getProcessedItems());
 			}
 		});
+	}
+	
+	public Input getInput() {
+		return input;
 	}
 	
 	public void setInput(Input input) {
@@ -56,6 +60,7 @@ public class RecordProviderInitializerTask extends Task {
 		private User activeUser;
 		private UserManager userManager;
 		private boolean validateRecords;
+		private boolean initializeRecords;
 		
 		public File getFile() {
 			return file;
@@ -103,6 +108,14 @@ public class RecordProviderInitializerTask extends Task {
 		
 		public void setValidateRecords(boolean validateRecords) {
 			this.validateRecords = validateRecords;
+		}
+		
+		public boolean isInitializeRecords() {
+			return initializeRecords;
+		}
+		
+		public void setInitializeRecords(boolean initializeRecords) {
+			this.initializeRecords = initializeRecords;
 		}
 	}
 	

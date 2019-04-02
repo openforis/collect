@@ -78,7 +78,7 @@ public class SurveyValidator {
 	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
-	private static final String IDML_XSD_3_1_4_FILE_NAME = "idml3.1.4.xsd";
+	private static final String IDML_XSD_3_1_5_FILE_NAME = "idml3.1.5.xsd";
 	private static final String IDML_UI_XSD_FILE_NAME = "idml3-ui.xsd";
 
 	private static final String[] SURVEY_XSD_3_0_FILE_NAMES = new String[] {
@@ -89,7 +89,7 @@ public class SurveyValidator {
 	
 	private static final String[] SURVEY_LATEST_VERSION_XSD_FILE_NAMES = new String[] {
 		XML_XSD_FILE_NAME, 
-		IDML_XSD_3_1_4_FILE_NAME,
+		IDML_XSD_3_1_5_FILE_NAME,
 		IDML_UI_XSD_FILE_NAME 
 	};
 	
@@ -98,6 +98,79 @@ public class SurveyValidator {
 
 	private static final int MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT = 5;
 
+	private static final String NESTED_TABLES_MESSAGE_KEY = 
+			"survey.validation.error.nested_tables";
+	private static final String EMPTY_ENTITY_MESSAGE_KEY = 
+			"survey.validation.error.empty_entity";
+	private static final String EMPTY_CODE_LIST_MESSAGE_KEY = 
+			"survey.validation.error.empty_code_list";
+	private static final String UNUSED_CODE_LIST_MESSAGE_KEY = 
+			"survey.validation.error.unused_code_list";
+	private static final String MAXIMUM_COUNT_IN_RECORD_LIST_ENTITY_DEFINITIONS_EXCEEDED_MESSAGE_KEY = 
+			"survey.validation.error.maximum_count_in_record_list_entity_definitions_exceeded";
+	private static final String MAXIMUM_KEY_ATTRIBUTE_DEFINITIONS_EXCEEDED_MESSAGE_KEY = 
+			"survey.validation.error.maximum_key_attribute_definitions_exceeded";
+	private static final String KEY_ATTRIBUTE_NOT_SPECIFIED_MESSAGE_KEY = 
+			"survey.validation.error.key_attribute_not_specified";
+	private static final String ERROR_ENUMERATING_CODE_LIST_CHANGED_CODE_REMOVED_MESSAGE_KEY = 
+			"survey.validation.error.enumerating_code_list_changed.code_removed";
+	private static final String CARDINALITY_CHANGED_FROM_MULTIPLE_TO_SINGLE_MESSAGE_KEY = 
+			"survey.validation.error.cardinality_changed_from_multiple_to_single";
+	private static final String DATA_TYPE_CHANGED_MESSAGE_KEY = 
+			"survey.validation.error.data_type_changed";
+	private static final String PARENT_CHANGED_MESSAGE_KEY = 
+			"survey.validation.error.parent_changed";
+	private static final String GENERATOR_EXPRESSION_ERROR_MESSAGE_KEY = 
+			"survey.validation.entity.error.generator_expression";
+	private static final String SOURCE_NODE_NOT_FOUND_FOR_VIRTUAL_NODE_MESSAGE_KEY = 
+			"survey.validation.entity.error.source_node_not_found_for_virtual_node";
+	private static final String MISSING_VIRTUAL_NODE = 
+			"survey.validation.entity.error.missing_virtual_node";
+	private static final String INVALID_VIRTUAL_NODE_TYPE_MESSAGE_KEY = 
+			"survey.validation.entity.error.invalid_virtual_node_type";
+	private static final String DEFAULT_VALUE_INVALID_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.attribute.default_value.error.invalid_expression";
+	private static final String DEFAULT_VALUE_INVALID_VALUE_MESSAGE_KEY = 
+			"survey.validation.attribute.default_value.error.invalid_value";
+	private static final String DEFAULT_VALUE_INVALID_CONDITION_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.attribute.default_value.error.invalid_condition_expression";
+	private static final String INVALID_RELEVANT_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.node.error.invalid_relevant_expression";
+	private static final String INVALID_PARENT_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.attribute.code.invalid_parent_expression";
+	private static final String INVALID_QUALIFIER_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.attribute.taxon.error.invalid_qualifier_expression";
+	private static final String INVALID_REFERENCED_KEY_ATTRIBUTE_MESSAGE_KEY = 
+			"survey.validation.attribute.invalid_referenced_key_attribute";
+	private static final String KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY = 
+			"survey.validation.attribute.key_attribute_cannot_be_multiple";
+	private static final String INVALID_TAXONOMY_MESSAGE_KEY = 
+			"survey.validation.attribute.taxon.invalid_taxonomy";
+	private static final String INVALID_PARENT_ATTRIBUTE_RELATION_MESSAGE_KEY = 
+			"survey.validation.attribute.code.invalid_parent_attribute_relation";
+	private static final String CHECK_UNIQUENESS_INVALID_UNIQUENESS_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.uniqueness.error.invalid_uniqueness_expression";
+	private static final String CHECK_PATTERN_INVALID_PATTERN_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.pattern.error.invalid_pattern_expression";
+	private static final String CHECK_DISTANCE_INVALID_MAX_DISTANCE_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.distance.error.invalid_max_distance_expression";
+	private static final String CHECK_DISTANCE_INVALID_MIN_DISTANCE_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.distance.error.invalid_min_distance_expression";
+	private static final String CHECK_DISTANCE_INVALID_DESTINATION_POINT_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.distance.error.invalid_destination_point_expression";
+	private static final String CHECK_DISTANCE_INVALID_SOURCE_POINT_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.distance.error.invalid_source_point_expression";
+	private static final String CHECK_CUSTOM_ERROR_INVALID_CUSTOM_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.custom.error.error.invalid_custom_expression";
+	private static final String CHECK_COMPARISON_INVALID_COMPARISON_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.comparison.error.invalid_comparison_expression";
+	private static final String CHECK_INVALID_CONDITION_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.check.error.invalid_condition_expression";
+	private static final String INVALID_MAX_COUNT_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.node.error.invalid_max_count_expression";
+	private static final String INVALID_MIN_COUNT_EXPRESSION_MESSAGE_KEY = 
+			"survey.validation.node.error.invalid_min_count_expression";
+	
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -110,18 +183,27 @@ public class SurveyValidator {
 	/**
 	 * Verifies that the survey is compatible with an existing one and that replacing the old one
 	 * will not break the inserted data (if any). 
-	 * 
 	 */
 	public SurveyValidationResults validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
-		SurveyValidationResults results = validate(newSurvey);
+		return validateCompatibility(oldPublishedSurvey, newSurvey, new ValidationParameters());
+	}
+	
+	public SurveyValidationResults validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey, 
+			ValidationParameters parameters) {
+		SurveyValidationResults results = validate(newSurvey, parameters);
 		if ( oldPublishedSurvey != null ) {
 			results.addResults(validateChanges(oldPublishedSurvey, newSurvey));
 		}
 		return results;
 	}
-	
+
 	public void checkCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) throws SurveyValidationException {
-		SurveyValidationResults results = validateCompatibility(oldPublishedSurvey, newSurvey);
+		checkCompatibility(oldPublishedSurvey, newSurvey, new ValidationParameters());
+	}
+
+	public void checkCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey, 
+			ValidationParameters parameters) throws SurveyValidationException {
+		SurveyValidationResults results = validateCompatibility(oldPublishedSurvey, newSurvey, parameters);
 		if ( results.hasErrors() ) {
 			throw new SurveyValidationException("The survey is not compatible with the old published one");
 		}
@@ -149,11 +231,11 @@ public class SurveyValidator {
 			List<AttributeDefinition> keyAttributeDefinitions = rootEntityDef.getKeyAttributeDefinitions();
 			if ( keyAttributeDefinitions.isEmpty() ) {
 				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
-						"survey.validation.error.key_attribute_not_specified");
+						KEY_ATTRIBUTE_NOT_SPECIFIED_MESSAGE_KEY);
 				results.add(validationResult);
 			} else if ( keyAttributeDefinitions.size() > MAX_KEY_ATTRIBUTE_DEFINITION_COUNT ) {
 				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
-						"survey.validation.error.maximum_key_attribute_definitions_exceeded");
+						MAXIMUM_KEY_ATTRIBUTE_DEFINITIONS_EXCEEDED_MESSAGE_KEY);
 				results.add(validationResult);
 			}
 		}
@@ -166,7 +248,7 @@ public class SurveyValidator {
 			List<EntityDefinition> countableEntities = survey.getSchema().getCountableEntitiesInRecordList(rootEntityDef);
 			if (countableEntities.size() > MAX_SHOW_COUNT_IN_RECORD_LIST_ENTITY_COUNT) {
 				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntityDef.getPath(), 
-						"survey.validation.error.maximum_count_in_record_list_entity_definitions_exceeded");
+						MAXIMUM_COUNT_IN_RECORD_LIST_ENTITY_DEFINITIONS_EXCEEDED_MESSAGE_KEY);
 				results.add(validationResult);
 			}
 		}
@@ -180,12 +262,12 @@ public class SurveyValidator {
 				if ( validationParameters.warnOnUnusedCodeLists && ! codeListManager.isInUse(list) ) {
 					//unused code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
-							String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.unused_code_list");
+							String.format(CODE_LIST_PATH_FORMAT, list.getName()), UNUSED_CODE_LIST_MESSAGE_KEY);
 					results.add(validationResult);
 				} else if ( validationParameters.warnOnEmptyCodeLists && ! list.isExternal() && codeListManager.isEmpty(list) ) {
 					//empty code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
-							String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.empty_code_list");
+							String.format(CODE_LIST_PATH_FORMAT, list.getName()), EMPTY_CODE_LIST_MESSAGE_KEY);
 					results.add(validationResult);
 				}
 			}
@@ -376,7 +458,7 @@ public class SurveyValidator {
 		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		if ( childDefinitions.size() == 0 ) {
 			//empty entity
-			results.add(new SurveyValidationResult(entityDef.getPath(), "survey.validation.error.empty_entity"));
+			results.add(new SurveyValidationResult(entityDef.getPath(), EMPTY_ENTITY_MESSAGE_KEY));
 		}
 		if (entityDef.isMultiple()) {
 			UIOptions uiOptions = ((CollectSurvey) entityDef.getSurvey()).getUIOptions();
@@ -385,7 +467,7 @@ public class SurveyValidator {
 				Layout layout = uiOptions.getLayout(entityDef);
 				Layout parentLayout = uiOptions.getLayout(parentEntity);
 				if (TABLE == layout && TABLE == parentLayout) {
-					results.add(new SurveyValidationResult(entityDef.getPath(), "survey.validation.error.nested_tables"));
+					results.add(new SurveyValidationResult(entityDef.getPath(), NESTED_TABLES_MESSAGE_KEY));
 				}
 			}
 		}
@@ -400,18 +482,18 @@ public class SurveyValidator {
 						NodeDefinition foundChildDef = entityDef.getChildDefinition(sourceChildDef.getName());
 						if (foundChildDef.getClass() != sourceChildDef.getClass()) {
 							results.add(new SurveyValidationResult(Flag.ERROR, entityDef.getPath(), 
-									"survey.validation.entity.error.invalid_virtual_node_type", foundChildDef.getName()));
+									INVALID_VIRTUAL_NODE_TYPE_MESSAGE_KEY, foundChildDef.getName()));
 						}
 					} else {
 						results.add(new SurveyValidationResult(Flag.WARNING, entityDef.getPath(), 
-								"survey.validation.entity.error.missing_virtual_node", sourceChildDef.getName()));
+								MISSING_VIRTUAL_NODE, sourceChildDef.getName()));
 					}
 				}
 			}
 			for (NodeDefinition virtualChildDef : entityDef.getChildDefinitions()) {
 				if (! sourceEntityDef.containsChildDefinition(virtualChildDef.getName())) {
 					results.add(new SurveyValidationResult(Flag.WARNING, entityDef.getPath(), 
-							"survey.validation.entity.error.source_node_not_found_for_virtual_node", 
+							SOURCE_NODE_NOT_FOUND_FOR_VIRTUAL_NODE_MESSAGE_KEY, 
 							virtualChildDef.getName(), sourceEntityDef.getName()));
 				}
 			}
@@ -438,7 +520,7 @@ public class SurveyValidator {
 			return new SurveyValidationResult();
 		} catch (Exception e) {
 			return new SurveyValidationResult(attrDef.getPath(), 
-					"survey.validation.attribute.code.invalid_parent_attribute_relation");
+					INVALID_PARENT_ATTRIBUTE_RELATION_MESSAGE_KEY);
 		}
 	}
 
@@ -450,7 +532,7 @@ public class SurveyValidator {
 			String taxonomyName = attrDef.getTaxonomy();
 			CollectTaxonomy taxonomy = findTaxonomy(survey, taxonomyName);
 			if (taxonomy == null) {
-				return new SurveyValidationResult(attrDef.getPath(), "survey.validation.attribute.taxon.invalid_taxonomy", taxonomyName);
+				return new SurveyValidationResult(attrDef.getPath(), INVALID_TAXONOMY_MESSAGE_KEY, taxonomyName);
 			}
 		}
 		return new SurveyValidationResult();
@@ -459,7 +541,7 @@ public class SurveyValidator {
 	protected SurveyValidationResult validateKeyAttribute(KeyAttributeDefinition keyDefn) {
 		if ( keyDefn.isKey() && ((NodeDefinition) keyDefn).isMultiple() ) {
 			return new SurveyValidationResult(((NodeDefinition) keyDefn).getPath(), 
-					"survey.validation.attribute.key_attribute_cannot_be_multiple");
+					KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY);
 		} else {
 			return new SurveyValidationResult();
 		}
@@ -476,7 +558,7 @@ public class SurveyValidator {
 			Set<AttributeDefinition> referenceableAttributes = referenceableKeyAttributeHelper.determineReferenceableAttributes();
 			if (! referenceableAttributes.contains(referencedAttribute)) {
 				return new SurveyValidationResult(attrDef.getPath(), 
-						"survey.validation.attribute.invalid_referenced_key_attribute");
+						INVALID_REFERENCED_KEY_ATTRIBUTE_MESSAGE_KEY);
 			}
 		}
 		return new SurveyValidationResult();
@@ -498,7 +580,7 @@ public class SurveyValidator {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		if (node.isVirtual()) {
 			addSchemaPathExpressionValidationResult(results, node, node.getGeneratorExpression(),
-					"survey.validation.entity.error.generator_expression");
+					GENERATOR_EXPRESSION_ERROR_MESSAGE_KEY);
 		}
 		return results;
 	}
@@ -507,13 +589,13 @@ public class SurveyValidator {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		if ( node instanceof CodeAttributeDefinition ) {
 			addSchemaPathExpressionValidationResult(results, node, ((CodeAttributeDefinition) node).getParentExpression(),
-					"survey.validation.attribute.code.invalid_parent_expression");
+					INVALID_PARENT_EXPRESSION_MESSAGE_KEY);
 		} else if ( node instanceof TaxonAttributeDefinition ) {
 			List<String> qualifiers = ((TaxonAttributeDefinition) node).getQualifiers();
 			if ( qualifiers != null ) {
 				for (String expr : qualifiers) {
 					addSchemaPathExpressionValidationResult(results, node, expr,
-							"survey.validation.attribute.taxon.error.invalid_qualifier_expression");
+							INVALID_QUALIFIER_EXPRESSION_MESSAGE_KEY);
 				}
 			}
 		}
@@ -529,15 +611,15 @@ public class SurveyValidator {
 
 		// validate min count expression
 		addValueExpressionValidationResult(results, node, node.getMinCountExpression(), 
-				"survey.validation.node.error.invalid_min_count_expression");
+				INVALID_MIN_COUNT_EXPRESSION_MESSAGE_KEY);
 		
 		// validate max count expression
 		addValueExpressionValidationResult(results, node, node.getMaxCountExpression(), 
-				"survey.validation.node.error.invalid_max_count_expression");
+				INVALID_MAX_COUNT_EXPRESSION_MESSAGE_KEY);
 		
 		//validate required expression
 		addBooleanExpressionValidationResult(results, node, node.getRelevantExpression(), 
-				"survey.validation.node.error.invalid_relevant_expression");
+				INVALID_RELEVANT_EXPRESSION_MESSAGE_KEY);
 		return results;
 	}
 
@@ -563,18 +645,18 @@ public class SurveyValidator {
 	private void validateAttributeDefault(List<SurveyValidationResult> results,
 			AttributeDefinition node, AttributeDefault attributeDefault) {
 		addBooleanExpressionValidationResult(results, node, attributeDefault.getCondition(), 
-				"survey.validation.attribute.default_value.error.invalid_condition_expression");
+				DEFAULT_VALUE_INVALID_CONDITION_EXPRESSION_MESSAGE_KEY);
 		String value = attributeDefault.getValue();
 		if ( StringUtils.isNotBlank(value)) {
 			try {
 				node.createValue(value);
 			} catch ( Exception e) {
 				results.add(new SurveyValidationResult(node.getPath(), 
-					"survey.validation.attribute.default_value.error.invalid_value"));
+					DEFAULT_VALUE_INVALID_VALUE_MESSAGE_KEY));
 			}
 		}
 		addValueExpressionValidationResult(results, node, attributeDefault.getExpression(), 
-				"survey.validation.attribute.default_value.error.invalid_expression");
+				DEFAULT_VALUE_INVALID_EXPRESSION_MESSAGE_KEY);
 	}
 
 	private List<SurveyValidationResult> validateCheck(AttributeDefinition node, Check<?> check) {
@@ -582,33 +664,33 @@ public class SurveyValidator {
 
 		//validate condition expression
 		addBooleanExpressionValidationResult(results, node, check.getCondition(), 
-				"survey.validation.check.error.invalid_condition_expression");
+				CHECK_INVALID_CONDITION_EXPRESSION_MESSAGE_KEY);
 		
 		if ( check instanceof ComparisonCheck ) {
 			addBooleanExpressionValidationResult(results, node, ((ComparisonCheck) check).getExpression(),
-					"survey.validation.check.comparison.error.invalid_comparison_expression");
+					CHECK_COMPARISON_INVALID_COMPARISON_EXPRESSION_MESSAGE_KEY);
 		} else if ( check instanceof CustomCheck ) {
 			addBooleanExpressionValidationResult(results, node, ((CustomCheck) check).getExpression(),
-					"survey.validation.check.custom.error.error.invalid_custom_expression");
+					CHECK_CUSTOM_ERROR_INVALID_CUSTOM_EXPRESSION_MESSAGE_KEY);
 		} else if ( check instanceof DistanceCheck ) {
 			//validate source point
 			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getSourcePointExpression(), 
-					"survey.validation.check.distance.error.invalid_source_point_expression");
+					CHECK_DISTANCE_INVALID_SOURCE_POINT_EXPRESSION_MESSAGE_KEY);
 			//validate destination point
 			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getDestinationPointExpression(), 
-					"survey.validation.check.distance.error.invalid_destination_point_expression");
+					CHECK_DISTANCE_INVALID_DESTINATION_POINT_EXPRESSION_MESSAGE_KEY);
 			//validate min distance
 			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getMinDistanceExpression(),
-					"survey.validation.check.distance.error.invalid_min_distance_expression");
+					CHECK_DISTANCE_INVALID_MIN_DISTANCE_EXPRESSION_MESSAGE_KEY);
 			//validate max distance
 			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getMaxDistanceExpression(),
-					"survey.validation.check.distance.error.invalid_max_distance_expression");
+					CHECK_DISTANCE_INVALID_MAX_DISTANCE_EXPRESSION_MESSAGE_KEY);
 		} else if ( check instanceof PatternCheck ) {
 			String regEx = ((PatternCheck) check).getRegularExpression();
 			if ( StringUtils.isNotBlank(regEx) ) {
 				ExpressionValidationResult result = expressionValidator.validateRegularExpression(regEx);
 				if (result.isError()) {
-					results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.pattern.error.invalid_pattern_expression", result.getMessage()));
+					results.add(new SurveyValidationResult(node.getPath(), CHECK_PATTERN_INVALID_PATTERN_EXPRESSION_MESSAGE_KEY, result.getMessage()));
 				}
 			}
 		} else if ( check instanceof UniquenessCheck ) {
@@ -616,7 +698,7 @@ public class SurveyValidator {
 			if ( StringUtils.isNotBlank(expression) ) {
 				ExpressionValidationResult result = expressionValidator.validateUniquenessExpression(node.getParentEntityDefinition(), node, expression);
 				if (result.isError()) {
-					results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.uniqueness.error.invalid_uniqueness_expression", result.getMessage()));
+					results.add(new SurveyValidationResult(node.getPath(), CHECK_UNIQUENESS_INVALID_UNIQUENESS_EXPRESSION_MESSAGE_KEY, result.getMessage()));
 				}
 			}
 		}
@@ -666,9 +748,7 @@ public class SurveyValidator {
 					int parentDefnId = parentDefn == null ? -1: parentDefn.getId();
 					int oldParentDefnId = oldParentDefn == null ? -1: oldParentDefn.getId();
 					if ( parentDefnId != oldParentDefnId ) {
-						String messageKey = "survey.validation.error.parent_changed";
-						String path = nodeDefn.getPath();
-						SurveyValidationResult validationResult = new SurveyValidationResult(path, messageKey);
+						SurveyValidationResult validationResult = new SurveyValidationResult(nodeDefn.getPath(), PARENT_CHANGED_MESSAGE_KEY);
 						addResult(validationResult);
 					}
 				}
@@ -688,9 +768,7 @@ public class SurveyValidator {
 					(oldDefn.getClass() != nodeDefn.getClass() || 
 					oldDefn instanceof NumericAttributeDefinition && 
 						((NumericAttributeDefinition) oldDefn).getType() != ((NumericAttributeDefinition) nodeDefn).getType())) {
-					String messageKey = "survey.validation.error.data_type_changed";
-					String path = nodeDefn.getPath();
-					SurveyValidationResult result = new SurveyValidationResult(path, messageKey);
+					SurveyValidationResult result = new SurveyValidationResult(nodeDefn.getPath(), DATA_TYPE_CHANGED_MESSAGE_KEY);
 					addResult(result);
 				}
 			}
@@ -706,9 +784,8 @@ public class SurveyValidator {
 			public void visit(NodeDefinition nodeDefn) {
 				NodeDefinition oldDefn = oldSchema.getDefinitionById(nodeDefn.getId());
 				if ( oldDefn != null && oldDefn.isMultiple() && ! nodeDefn.isMultiple() ) {
-					String messageKey = "survey.validation.error.cardinality_changed_from_multiple_to_single";
-					String path = nodeDefn.getPath();
-					SurveyValidationResult result = new SurveyValidationResult(path, messageKey);
+					SurveyValidationResult result = new SurveyValidationResult(
+							nodeDefn.getPath(), CARDINALITY_CHANGED_FROM_MULTIPLE_TO_SINGLE_MESSAGE_KEY);
 					addResult(result);
 				}
 			}
@@ -736,7 +813,7 @@ public class SurveyValidator {
 		for (CodeListItem oldItem : oldItems) {
 			CodeListItem newItem = codeListManager.loadRootItem(codeList, oldItem.getCode(), null);
 			if ( newItem == null ) {
-				String messageKey = "survey.validation.error.enumerating_code_list_changed.code_removed";
+				String messageKey = ERROR_ENUMERATING_CODE_LIST_CHANGED_CODE_REMOVED_MESSAGE_KEY;
 				String codeListPath = String.format(CODE_LIST_PATH_FORMAT, codeList.getName());
 				String path = codeListPath + "/" + oldItem.getCode();
 				SurveyValidationResult validationError = new SurveyValidationResult(path, messageKey);
@@ -857,11 +934,11 @@ public class SurveyValidator {
 		}
 
 		public boolean hasErrors() {
-			return org.apache.commons.collections.CollectionUtils.isNotEmpty(errors);
+			return org.apache.commons.collections4.CollectionUtils.isNotEmpty(errors);
 		}
 
 		public boolean hasWarnings() {
-			return org.apache.commons.collections.CollectionUtils.isNotEmpty(warnings);
+			return org.apache.commons.collections4.CollectionUtils.isNotEmpty(warnings);
 		}
 
 		public boolean isOk() {
@@ -869,7 +946,6 @@ public class SurveyValidator {
 		}
 		
 		public void addResult(SurveyValidationResult result) {
-			//dfgdfg
 			switch ( result.getFlag() ) {
 			case ERROR:
 				errors.add(result);
@@ -1042,6 +1118,10 @@ public class SurveyValidator {
 
 		public void setValidateOnlyFirstLines(boolean validateOnlyFirstLines) {
 			this.validateOnlyFirstLines = validateOnlyFirstLines;
+		}
+		
+		public void setWarningsIgnored(boolean warningsIgnored) {
+			this.warnOnEmptyCodeLists = this.warnOnUnusedCodeLists = !warningsIgnored;
 		}
 	}
 }

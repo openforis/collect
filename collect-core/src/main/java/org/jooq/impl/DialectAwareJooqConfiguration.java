@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.Configuration;
 import org.jooq.ConnectionProvider;
 import org.jooq.SQLDialect;
@@ -18,13 +20,17 @@ import org.jooq.conf.Settings;
 public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOG = LogManager.getLogger(DialectAwareJooqConfiguration.class);
 	
 	private enum Database {
 		POSTGRES("PostgreSQL", SQLDialect.POSTGRES),
 		DERBY("Apache Derby", SQLDialect.DERBY),
 		SQLITE("SQLite", SQLDialect.SQLITE),
 		SQLITE_FOR_ANDROID("SQLite for Android", SQLDialect.SQLITE),
-        H2("H2", SQLDialect.H2);
+        H2("H2", SQLDialect.H2),
+        MYSQL("MySQL", SQLDialect.MYSQL),
+        MS_SQL_SERVER("Microsoft SQL Server", SQLDialect.DEFAULT);
 		
 		private String productName;
 		private SQLDialect dialect;
@@ -87,9 +93,11 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 			String dbName = metaData.getDatabaseProductName();
 			Database db = Database.getByProductName(dbName);
 			if ( db == null ) {
-				throw new IllegalArgumentException("Unknown database "+dbName);
+				LOG.warn("Unknown database type: " + dbName);
+				return SQLDialect.DEFAULT;
+			} else {
+				return db.getDialect();
 			}
-			return db.getDialect();
 		} catch (SQLException e) {
 			throw new RuntimeException("Error getting database name", e);
 		} finally {

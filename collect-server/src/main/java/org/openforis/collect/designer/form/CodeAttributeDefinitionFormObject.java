@@ -22,7 +22,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	private CodeList list;
 	private CodeAttributeDefinition parentCodeAttributeDefinition;
 	private String parentCodeAttributeDefinitionPath;
-	private boolean strict;
 	private boolean allowValuesSorting;
 	private String layoutType;
 	private boolean showAllowedValuesPreview;
@@ -32,7 +31,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	
 	public CodeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
-		strict = true;
 		allowValuesSorting = false;
 		showAllowedValuesPreview = (Boolean) Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue();
 		layoutType = ((CodeAttributeLayoutType) Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE.getDefaultValue()).name();
@@ -44,7 +42,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	public void saveTo(CodeAttributeDefinition dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setList(list);
-		dest.setAllowUnlisted(! strict);
 		dest.setParentCodeAttributeDefinition(parentCodeAttributeDefinition);
 		dest.setAllowValuesSorting(dest.isMultiple() && allowValuesSorting);
 		
@@ -63,7 +60,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		list = source.getList();
 		setParentCodeAttributeDefinition(source.getParentCodeAttributeDefinition());
 		hierarchicalLevel = extractHierarchicalLevel(source);
-		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 		
 		CollectSurvey survey = (CollectSurvey) source.getSurvey();
@@ -94,14 +90,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	
 	public void setList(CodeList list) {
 		this.list = list;
-	}
-	
-	public boolean isStrict() {
-		return strict;
-	}
-
-	public void setStrict(boolean strict) {
-		this.strict = strict;
 	}
 	
 	public boolean isAllowValuesSorting() {

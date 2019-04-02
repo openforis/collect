@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurvey implements Serializable {
 
-	private static final long serialVersionUID = -1911362416;
+	private static final long serialVersionUID = -1135226792;
 
 	private Integer   id;
 	private String    name;
@@ -37,6 +37,8 @@ public class OfcSurvey implements Serializable {
 	private Integer   publishedId;
 	private Integer   usergroupId;
 	private String    availability;
+	private String    title;
+	private String    langs;
 
 	public OfcSurvey() {}
 
@@ -53,6 +55,8 @@ public class OfcSurvey implements Serializable {
 		this.publishedId = value.publishedId;
 		this.usergroupId = value.usergroupId;
 		this.availability = value.availability;
+		this.title = value.title;
+		this.langs = value.langs;
 	}
 
 	public OfcSurvey(
@@ -67,7 +71,9 @@ public class OfcSurvey implements Serializable {
 		Boolean   temporary,
 		Integer   publishedId,
 		Integer   usergroupId,
-		String    availability
+		String    availability,
+		String    title,
+		String    langs
 	) {
 		this.id = id;
 		this.name = name;
@@ -81,6 +87,8 @@ public class OfcSurvey implements Serializable {
 		this.publishedId = publishedId;
 		this.usergroupId = usergroupId;
 		this.availability = availability;
+		this.title = title;
+		this.langs = langs;
 	}
 
 	public Integer getId() {
@@ -177,5 +185,21 @@ public class OfcSurvey implements Serializable {
 
 	public void setAvailability(String availability) {
 		this.availability = availability;
+	}
+
+	public String getTitle() {
+		return this.title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getLangs() {
+		return this.langs;
+	}
+
+	public void setLangs(String langs) {
+		this.langs = langs;
 	}
 }

@@ -3,9 +3,11 @@ package org.openforis.idm.model;
 import java.io.IOException;
 import java.util.List;
 
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Survey;
 
 import com.dyuproject.protostuff.Input;
 import com.dyuproject.protostuff.Output;
@@ -65,7 +67,7 @@ public class EntitySchema extends SchemaSupport<Entity> {
 				} catch(IllegalArgumentException e) {
 					//not existing child definition
 				}
-        		if ( defn == null || ( defn instanceof AttributeDefinition && ((AttributeDefinition) defn).isCalculated() ) ) {
+        		if ( defn == null || !isNodeDefToBeSaved(defn) ) {
 	        		skipNode(input);
         		} else {
 	        		Node<?> node = defn.createNode();
@@ -96,18 +98,19 @@ public class EntitySchema extends SchemaSupport<Entity> {
 	}
 
 	protected boolean isNodeToBeSaved(Node<?> node) {
-		if (node instanceof Attribute) {
-			AttributeDefinition attrDef = (AttributeDefinition) node.getDefinition();
-			if (attrDef.isCalculated()) {
-				return false;
-			} else {
-				return node.hasData();
-    		}
-    	} else {
-    		return true;
-    	}
+		return isNodeDefToBeSaved(node.getDefinition())
+			? node.hasData()
+			: false;
 	}
-
+	
+	protected boolean isNodeDefToBeSaved(NodeDefinition nodeDef) {
+		if (nodeDef instanceof AttributeDefinition && ((AttributeDefinition) nodeDef).isCalculated()) {
+			return nodeDef.<CollectSurvey>getSurvey().getAnnotations().isCalculatedOnlyOneTime(nodeDef);
+		} else {
+			return true;
+		}
+	}
+	
 	protected void skipNode(Input input) throws IOException, ProtostuffException {
 		readAndCheckFieldNumber(input, NODE_FIELD_NUMBER);
 		input.handleUnknownField(NODE_FIELD_NUMBER, this);

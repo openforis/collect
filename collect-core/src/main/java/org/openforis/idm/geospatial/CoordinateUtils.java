@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.cts.CRSFactory;
-import org.cts.IllegalCoordinateException;
 import org.cts.crs.GeodeticCRS;
 import org.cts.op.CoordinateOperation;
 import org.cts.op.CoordinateOperationFactory;
@@ -25,7 +24,7 @@ public class CoordinateUtils {
      * href="http://en.wikipedia.org/wiki/Earth_radius#Authalic_radius"
      * target="_blank">Wikipedia</a>).
      */
-    private static final double EARTH_RADIUS_MEAN = 6371.0072;
+//    private static final double EARTH_RADIUS_MEAN = 6371.0072;
 
     /**
      * The equatorial radius of the earth [6378.1370 km] (see <a
@@ -55,21 +54,21 @@ public class CoordinateUtils {
     }
 
     private static double[] doTransform(SpatialReferenceSystem from, double[] coord, SpatialReferenceSystem to) {
-        List<CoordinateOperation> coordOps = coordinateOperations(from, to);
-        double[] result = Arrays.copyOf(coord, coord.length); // Need to copy since operations might change array in place
-        if (!coordOps.isEmpty()) {
-            for (CoordinateOperation op : coordOps) {
-                try {
-                    result = op.transform(result); // This might change the array in-place
-                } catch (IllegalCoordinateException e) {
-                    throw new IllegalStateException("Failed to transform " + Arrays.asList(coord) + " from" + from + " to " + to, e);
-                }
-    		}
-    	}
-        return result;
+        try {
+        	List<CoordinateOperation> coordOps = coordinateOperations(from, to);
+	        double[] result = Arrays.copyOf(coord, coord.length); // Need to copy since operations might change array in place
+	        if (!coordOps.isEmpty()) {
+	            for (CoordinateOperation op : coordOps) {
+	                    result = op.transform(result); // This might change the array in-place
+	    		}
+	    	}
+	        return result;
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to transform " + Arrays.asList(coord) + " from" + from + " to " + to, e);
+        }
     }
 
-    private static List<CoordinateOperation> coordinateOperations(SpatialReferenceSystem from, SpatialReferenceSystem to) {
+    private static List<CoordinateOperation> coordinateOperations(SpatialReferenceSystem from, SpatialReferenceSystem to) throws CoordinateOperationException {
         String key = operationCacheKey(from, to);
         List<CoordinateOperation> coordOps = operationCache.get(key);
         if (coordOps == null) {

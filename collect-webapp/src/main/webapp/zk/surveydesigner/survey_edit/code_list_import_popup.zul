@@ -1,0 +1,20 @@
+<zk>
+	<custom-attributes codeListId="${arg.codeListId}" />
+	<window id="codeListImportPopUp"
+		title="${labels.survey.code_list.import_data.title}" border="normal"
+		position="center" 
+		sclass="form"
+		closable="false" 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListImportVM')"
+		validationMessages="@id('vmsgs')">
+
+		<vbox align="center">
+			<flash src="@load(vm.codeListImportModuleUrl)"
+				height="500px" width="1000px" />
+			<button label="${labels.global.close}"
+				onClick="@command('close')" />
+		</vbox>
+
+	</window>
+</zk>

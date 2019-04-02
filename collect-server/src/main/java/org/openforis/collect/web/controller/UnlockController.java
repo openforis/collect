@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.collect.web.ws.AppWS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,8 @@ public class UnlockController {
 	
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private AppWS appWS;
 	
 	@RequestMapping(value = "/clearActiveRecord.htm", method = RequestMethod.POST)
 	public @ResponseBody String clearActiveRecord(HttpServletRequest request) {
@@ -40,6 +43,7 @@ public class UnlockController {
 						Integer recordId = activeRecord.getId();
 						if ( recordId != null) {
 							recordManager.releaseLock(recordId);
+							appWS.sendMessage(new AppWS.RecordUnlockedMessage(recordId));
 						}
 						//clear session state
 						sessionState.setActiveRecord(null);

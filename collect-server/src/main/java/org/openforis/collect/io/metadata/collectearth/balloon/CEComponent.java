@@ -28,7 +28,7 @@ class CEComponent {
 	}
 
 	public String getLabelOrName() {
-		return  HtmlUnicodeEscaperUtil.escapeHtmlUnicode( StringUtils.isBlank(label) ? name: label );
+		return HtmlUnicodeEscaperUtil.escapeHtmlUnicode( StringUtils.isBlank(label) ? name: label );
 	}
 
 	public String getHtmlParameterName() {

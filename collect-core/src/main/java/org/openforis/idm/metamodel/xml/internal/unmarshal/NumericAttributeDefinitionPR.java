@@ -1,6 +1,7 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
@@ -13,6 +14,8 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
  */
 abstract class NumericAttributeDefinitionPR extends AttributeDefinitionPR {
 
+	private static final Type DEFAULT_TYPE = Type.REAL;
+
 	public NumericAttributeDefinitionPR(String tagName) {
 		super(tagName);
 	}
@@ -23,7 +26,7 @@ abstract class NumericAttributeDefinitionPR extends AttributeDefinitionPR {
 		String typeStr = getAttribute(TYPE, false);
 		NumericAttributeDefinition defn = (NumericAttributeDefinition) getDefinition();
 		try {
-			Type type = typeStr == null ? Type.REAL : Type.valueOf(typeStr.toUpperCase());
+			Type type = typeStr == null ? DEFAULT_TYPE : Type.valueOf(typeStr.toUpperCase(Locale.ENGLISH));
 			defn.setType(type);
 		} catch (IllegalArgumentException e) {
 			throw new XmlParseException(getParser(), "unknown type " + typeStr);

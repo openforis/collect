@@ -53,6 +53,7 @@ import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
+import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyFileDao;
@@ -395,14 +396,17 @@ public class SurveyManager {
 	public List<SurveySummary> getSurveySummaries(String lang, User availableToUser) {
 		Set<UserGroup> userGroups = getAvailableUserGroups(availableToUser);
 		List<Integer> userGroupIds = CollectionUtils.project(userGroups, "id");
-		return getSurveySummaries(lang, new HashSet<Integer>(userGroupIds));
+		return getSurveySummaries(lang, availableToUser.getId(), new HashSet<Integer>(userGroupIds));
 	}
 
-	public List<SurveySummary> getSurveySummaries(String lang, Set<Integer> userGroupIds) {
+	public List<SurveySummary> getSurveySummaries(String lang, int userId, Set<Integer> allowedUserGroupIds) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (CollectSurvey survey : getPublishedSurveyCache().surveys) {
-			if (userGroupIds == null || userGroupIds.contains(survey.getUserGroupId())) {
+			if (allowedUserGroupIds == null || allowedUserGroupIds.contains(survey.getUserGroupId())) {
 				SurveySummary summary = SurveySummary.createFromSurvey(survey, lang);
+				
+				addUserInGroupInfoToSummary(summary, userId);
+				
 				if ( summary.isPublished() ) {
 					int publishedSurveyId = summary.isTemporary() ? summary.getPublishedId(): summary.getId();
 					summary.setRecordValidationProcessStatus(getRecordValidationProcessStatus(publishedSurveyId));
@@ -413,7 +417,7 @@ public class SurveyManager {
 		sortSummaries(summaries);
 		return summaries;
 	}
-	
+
 	public SurveySummary getPublishedSummaryByUri(String uri) {
 		CollectSurvey survey = getByUri(uri);
 		if ( survey == null ) {
@@ -621,12 +625,12 @@ public class SurveyManager {
 	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, User availableToUser, List<SurveySummarySortField> sortFields) {
 		Set<UserGroup> userGroups = getAvailableUserGroups(availableToUser);
 		List<Integer> userGroupIds = CollectionUtils.project(userGroups, "id");
-		return loadCombinedSummaries(labelLang, includeDetails, new HashSet<Integer>(userGroupIds), sortFields);
+		return loadCombinedSummaries(labelLang, includeDetails, availableToUser.getId(), new HashSet<Integer>(userGroupIds), sortFields);
 	}
 		
-	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, Set<Integer> groupIds, List<SurveySummarySortField> sortFields) {
-		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang, groupIds);
-		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails, groupIds);
+	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails, int availableToUserId, Set<Integer> groupIds, List<SurveySummarySortField> sortFields) {
+		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang, availableToUserId, groupIds);
+		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails, availableToUserId, groupIds);
 		List<SurveySummary> result = new ArrayList<SurveySummary>();
 		Map<String, SurveySummary> summariesByUri = new HashMap<String, SurveySummary>();
 		for (SurveySummary tempSummary : temporarySurveySummaries) {
@@ -718,13 +722,16 @@ public class SurveyManager {
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, User availableToUser) {
 		Set<UserGroup> groups = getAvailableUserGroups(availableToUser);
 		List<Integer> groupIds = CollectionUtils.project(groups, "id");
-		return loadTemporarySummaries(labelLang, includeDetails, new HashSet<Integer>(groupIds));
+		return loadTemporarySummaries(labelLang, includeDetails, availableToUser.getId(), new HashSet<Integer>(groupIds));
 	}
 	
-	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, Set<Integer> groupIds) {
+	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails, int availableToUserId, Set<Integer> groupIds) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		List<SurveySummary> filteredSummaries = filterSummariesUserGroups(summaries, groupIds);
-		fillSummariesReferencedItems(filteredSummaries);
+		for (SurveySummary surveySummary : filteredSummaries) {
+			addUserInGroupInfoToSummary(surveySummary, availableToUserId);
+		}
+		/*
 		if ( includeDetails ) {
 			for (SurveySummary summary : filteredSummaries) {
 				CollectSurvey survey = surveyDao.loadById(summary.getId());
@@ -739,6 +746,7 @@ public class SurveyManager {
 				summary.setLanguages(survey.getLanguages());
 			}
 		}
+		*/
 		return filteredSummaries;
 	}
 	
@@ -828,6 +836,9 @@ public class SurveyManager {
 			if ( temporarySurvey.getSamplingDesignCodeList() == null ) {
 				temporarySurvey.addSamplingDesignCodeList();
 			}
+			UserGroup userGroup = userGroupManager.loadById(temporarySurvey.getUserGroupId());
+			temporarySurvey.setUserGroup(userGroup);
+
 			surveyDao.insert(temporarySurvey);
 			
 			publishedSurvey = getByUri(uri);
@@ -876,19 +887,21 @@ public class SurveyManager {
 		}
 	}
 	
-	public SurveySummary updateUserGroup(int id, int userGroupId) throws SurveyStoreException {
+	public SurveySummary updateUserGroup(String surveyName, int userGroupId) throws SurveyStoreException {
 		UserGroup userGroup = userGroupManager.loadById(userGroupId);
-		SurveySummary surveySummary = loadSummaryById(id);
+		SurveySummary surveySummary = loadSummaryByName(surveyName);
 		Set<Integer> surveyIdsToUpdate = new HashSet<Integer>();
 		surveyIdsToUpdate.add(surveySummary.getId());
 		//consider even updating associated published survey, if any
-		org.apache.commons.collections.CollectionUtils.addIgnoreNull(surveyIdsToUpdate, surveySummary.getPublishedId());
+		org.apache.commons.collections4.CollectionUtils.addIgnoreNull(surveyIdsToUpdate, surveySummary.getPublishedId());
 		for (Integer surveyId : surveyIdsToUpdate) {
 			CollectSurvey s = getOrLoadSurveyById(surveyId);
 			s.setUserGroup(userGroup);
 			save(s);
 		}
-		return surveySummary;
+		//reload updated summary
+		SurveySummary reloadedSurveySummary = loadSummaryByName(surveyName);
+		return reloadedSurveySummary;
 	}
 
 	private void copyReferencedMetadata(CollectSurvey fromSurvey,
@@ -972,7 +985,6 @@ public class SurveyManager {
 			temporarySurvey = createTemporarySurveyFromPublished(uri, false, false, activeUser);
 		} else {
 			temporarySurvey = loadSurvey(temporarySurveySummary.getId());
-			temporarySurvey.setPublished(false);
 			temporarySurvey.setPublishedId(null);
 			save(temporarySurvey);
 			if (dataCleansingManager != null) {
@@ -983,6 +995,7 @@ public class SurveyManager {
 		//delete published survey
 		deleteSurvey(surveyId);
 		
+		temporarySurvey.setPublished(false);
 		return temporarySurvey;
 	}
 	
@@ -1031,7 +1044,7 @@ public class SurveyManager {
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
-	public void deleteSurvey(int id) {
+	public CollectSurvey deleteSurvey(int id) {
 		if ( isRecordValidationInProgress(id) ) {
 			cancelRecordValidation(id);
 		}
@@ -1061,6 +1074,8 @@ public class SurveyManager {
 		if ( ! temporary ) {
 			getPublishedSurveyCache().remove(publishedSurvey);
 		}
+		
+		return survey;
 	}
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
@@ -1141,19 +1156,6 @@ public class SurveyManager {
 		}
 	}
 
-	private void fillSummariesReferencedItems(Collection<SurveySummary> summaries) {
-		for (SurveySummary s : summaries) {
-			fillReferencedItems(s);
-		}
-	}
-	
-	private void fillReferencedItems(SurveySummary summary) {
-		if (userGroupManager != null) {
-			UserGroup userGroup = loadUserGroup(summary.getUserGroupId());
-			summary.setUserGroup(userGroup);
-		}
-	}
-	
 	public byte[] loadSurveyFileContent(SurveyFile surveyFile) {
 		return surveyFileDao.loadContent(surveyFile);
 	}
@@ -1209,6 +1211,17 @@ public class SurveyManager {
 			return new LinkedHashSet<UserGroup>(userGroups);
 		} else {
 			return null;
+		}
+	}
+	
+	private void addUserInGroupInfoToSummary(SurveySummary summary, int userId) {
+		UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(summary.getUserGroupId(), userId);
+		if (userInGroup != null) {
+			UserGroup mostSpecificGroup = userGroupManager.loadById(userInGroup.getGroupId());
+			
+			summary.setUserInGroupRole(userInGroup.getRole());
+			summary.setUserGroupQualifierName(mostSpecificGroup.getQualifier1Name());
+			summary.setUserGroupQualifierValue(mostSpecificGroup.getQualifier1Value());
 		}
 	}
 

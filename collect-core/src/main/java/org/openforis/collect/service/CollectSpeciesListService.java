@@ -85,6 +85,12 @@ public class CollectSpeciesListService implements SpeciesListService {
 		}
 	}
 	
+	@Override
+	public Taxon loadTaxonByCode(Survey survey, String taxonomyName, String code) {
+		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName((CollectSurvey) survey, taxonomyName);
+		return speciesManager.loadTaxonByCode(taxonomy, code);
+	}
+	
 	public void setSpeciesManager(SpeciesManager speciesManager) {
 		this.speciesManager = speciesManager;
 	}

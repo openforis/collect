@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx" 
 	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
 	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="
-    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
-    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
-    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd"
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd"
 	default-lazy-init="true"
 	default-autowire="byName">
 	
@@ -57,7 +61,7 @@
 	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase"
 			lazy-init="false">
 		<property name="dataSource" ref="transactionAwareDataSource" />
-		<property name="changeLog" value="classpath:org/openforis/collect/db/changelog/db.changelog-master.xml" />
+		<property name="changeLog" value="classpath:org/openforis/collect/db/changelog/db.changelog-DBMS_ID.xml" />
 		<property name="defaultSchema" value="collect" />
 	</bean>
 	
@@ -147,7 +151,7 @@
 	</bean>
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
 	<bean id="surveyValidator" 				class="org.openforis.collect.manager.validation.SurveyValidator" />
-	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.jooq.JooqDatabaseLookupProvider" />
+	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 
 	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">

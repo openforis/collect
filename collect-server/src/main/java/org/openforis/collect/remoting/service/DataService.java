@@ -74,6 +74,7 @@ import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateReq
 import org.openforis.collect.remoting.service.concurrency.proxy.SurveyLockingJobProxy;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -119,6 +120,8 @@ public class DataService {
 	private transient SessionEventDispatcher sessionEventDispatcher;
 	@Autowired
 	private transient EventQueue eventQueue;
+	@Autowired
+	private AppWS appWS;
 	
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -150,6 +153,7 @@ public class DataService {
 				: recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
+		appWS.sendMessage(new AppWS.RecordLockedMessage(id, user.getUsername()));
 		return toProxy(record);
 	}
 
@@ -512,9 +516,8 @@ public class DataService {
 	public List<CodeListItemProxy> findAssignableCodeListItems(int parentEntityId, String attrName){
 		CollectRecord record = getActiveRecord();
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		UserGroup surveyUserGroup = survey.getUserGroup();
 		User user = sessionManager.getLoggedUser();
-		final UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(surveyUserGroup, user);
+		final UserInGroup userInGroup = userGroupManager.findUserInGroupOrDescendants(survey.getUserGroupId(), user.getId());
 		if (userInGroup == null) {
 			throw new IllegalStateException(String.format("User %s not allowed to access survey %s", user.getUsername(), survey.getName()));
 		}

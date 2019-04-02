@@ -101,8 +101,6 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 	/**
 	 * Returns a list of ancestors CodeAttribute objects, starting from the root.
 	 * It is applicable only to hierarchical code lists.
-	 * 
-	 * @return
 	 */
 	public List<CodeAttribute> getCodeAncestors() {
 		List<CodeAttribute> result = new ArrayList<CodeAttribute>();

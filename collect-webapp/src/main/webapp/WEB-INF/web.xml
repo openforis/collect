@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<display-name>collect</display-name>
+
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>collect.root</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			/WEB-INF/conf/applicationContext.xml
+			/WEB-INF/conf/applicationContext-database.xml
+			/WEB-INF/conf/applicationContext-security.xml
+			/WEB-INF/conf/applicationContext-graniteds.xml
+		</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.openforis.collect.web.listener.ApplicationInitializerServletContextListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.granite.config.GraniteConfigListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.openforis.collect.web.listener.SessionListener</listener-class>
+	</listener>
+	<listener>
+		<description>Used to cleanup when a session is destroyed</description>
+		<display-name>ZK Session cleaner</display-name>
+		<listener-class>org.zkoss.zk.ui.http.HttpSessionListener</listener-class>
+	</listener>
+
+	<!-- ========== FILTERS ========== -->
+	<filter>
+		<filter-name>corsFilter</filter-name>
+		<filter-class>org.openforis.collect.web.filter.CollectCorsFilter</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+	<filter>
+		<filter-name>localizationFilter</filter-name>
+		<filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<async-supported>true</async-supported>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<async-supported>true</async-supported>
+	</filter>
+	<!-- swf cache filter (adds max-age=0 in response header to prevent wrong 
+		caching of swf files) -->
+	<filter>
+		<filter-name>swfCache</filter-name>
+		<filter-class>com.samaxes.filter.CacheFilter</filter-class>
+		<async-supported>true</async-supported>
+		<init-param>
+			<param-name>private</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>expiration</param-name>
+			<param-value>0</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>corsFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>localizationFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- start of cache filter mapping -->
+	<filter-mapping>
+		<filter-name>swfCache</filter-name>
+		<url-pattern>*.swf</url-pattern>
+	</filter-mapping>
+	<!-- end of cache filter mapping -->
+
+	<!-- ========== SERVLETS ========== -->
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<async-supported>true</async-supported>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<description>ZK loader for evaluating ZUML pages</description>
+		<servlet-name>zkLoader</servlet-name>
+		<servlet-class>org.zkoss.zk.ui.http.DHtmlLayoutServlet</servlet-class>
+		<!-- Must. Specifies URI of the update engine (DHtmlUpdateServlet). It 
+			must be the same as <url-pattern> for the update engine. -->
+		<init-param>
+			<param-name>update-uri</param-name>
+			<param-value>/zkau</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup><!-- MUST -->
+	</servlet>
+	<servlet>
+		<description>The asynchronous update engine for ZK</description>
+		<servlet-name>auEngine</servlet-name>
+		<servlet-class>org.zkoss.zk.au.http.DHtmlUpdateServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>zkLoader</servlet-name>
+		<url-pattern>*.zul</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>zkLoader</servlet-name>
+		<url-pattern>*.zhtml</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>auEngine</servlet-name>
+		<url-pattern>/zkau/*</url-pattern>
+	</servlet-mapping>
+
+	<session-config>
+		<session-timeout>2</session-timeout>
+	</session-config>
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+	<error-page>
+		<error-code>403</error-code>
+		<location>/error.html</location>
+	</error-page>
+
+</web-app>

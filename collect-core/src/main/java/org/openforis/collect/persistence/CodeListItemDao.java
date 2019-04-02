@@ -165,26 +165,35 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	 * @param items
 	 */
 	public void insert(List<PersistedCodeListItem> items) {
+		insert(items, true);
+	}
+	
+	public void insert(List<PersistedCodeListItem> items, boolean assignIds) {
 		if ( items != null && items.size() > 0 ) {
 			PersistedCodeListItem firstItem = items.get(0);
 			CodeList list = firstItem.getCodeList();
 			JooqDSLContext jf = dsl(list);
-			int nextId = jf.nextId();
+			int nextId = assignIds ? jf.nextId() : 0;
 			int maxId = nextId;
 			Insert<OfcCodeListRecord> query = jf.createInsertStatement();
 			BatchBindStep batch = jf.batch(query);
 			for (PersistedCodeListItem item : items) {
-				Integer id = item.getSystemId();
-				if ( id == null ) {
-					id = nextId++;
-					item.setSystemId(id);
+				if (assignIds && item.getSystemId() == null) {
+					item.setSystemId(nextId++);
 				}
 				List<Object> values = jf.extractValues(item);
 				batch.bind(values.toArray(new Object[values.size()]));
-				maxId = Math.max(maxId, id);
+				if (assignIds)
+					maxId = Math.max(maxId, item.getSystemId());
 			}
-			batch.execute();
-			jf.restartSequence(maxId + 1);
+			try {
+				batch.execute();
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+			if (assignIds) {
+				jf.restartSequence(maxId + 1);
+			}
 		}
 	}
 	
@@ -224,21 +233,21 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	public void copyItems(CodeList fromCodeList, CodeList toCodeList) {
 		JooqDSLContext dsl = dsl(fromCodeList);
-		List<PersistedCodeListItem> fromItems = loadItems(fromCodeList);
-		int minId = findMin(CollectionUtils.<Integer, PersistedCodeListItem>project(fromItems, "id"));
+		List<PersistedCodeListItem> fromItems = loadAllItems(fromCodeList);
+		int minId = findMin(CollectionUtils.<Integer, PersistedCodeListItem>project(fromItems, "systemId"));
 		int nextId = dsl.nextId();
 		int idGap = nextId - minId;
 		List<PersistedCodeListItem> newItems = new ArrayList<PersistedCodeListItem>(fromItems.size());
-		for (PersistedCodeListItem fromItem : fromItems) {
-			PersistedCodeListItem newItem = new PersistedCodeListItem(toCodeList, fromItem.getLevel());
-			newItem.copyProperties(fromItem);
-			newItem.setSortOrder(fromItem.getSortOrder());
-			newItem.setSystemId(nextId + idGap);
-			newItem.setParentId(fromItem.getParentId() == null ? null : fromItem.getParentId() + idGap);
+		for (PersistedCodeListItem source : fromItems) {
+			PersistedCodeListItem newItem = new PersistedCodeListItem(toCodeList, source.getLevel());
+			newItem.copyProperties(source);
+			newItem.setSortOrder(source.getSortOrder());
+			newItem.setSystemId(source.getSystemId() + idGap);
+			newItem.setParentId(source.getParentId() == null ? null : source.getParentId() + idGap);
 			newItems.add(newItem);
 			nextId ++;
 		}
-		insert(newItems);
+		insert(newItems, false);
 		dsl.restartSequence(nextId);
 	}
 
@@ -529,9 +538,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return jf.fromResult(result);
 	}
 	
-	private List<PersistedCodeListItem> loadItems(CodeList list) {
+	/**
+	 * Loads all the items and sorts them by level and sort_order
+	 */
+	private List<PersistedCodeListItem> loadAllItems(CodeList list) {
 		JooqDSLContext jf = dsl(list);
 		SelectQuery<Record> q = createSelectFromCodeListQuery(jf, list);
+		q.addOrderBy(OFC_CODE_LIST.LEVEL, OFC_CODE_LIST.SORT_ORDER);
 		Result<Record> result = q.fetch();
 		return jf.fromResult(result);
 	}
@@ -754,10 +767,12 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	private int findMin(List<Integer> values) {
+		if (values.isEmpty()) {
+			return 0;
+		}
 		Integer[] valuesArr = values.toArray(new Integer[values.size()]);
 		Arrays.sort(valuesArr);
-		int min = valuesArr.length == 0 ? 0 : valuesArr[0];
-		return min;
+		return valuesArr[0];
 	}
 
 	protected static class JooqDSLContext extends MappingDSLContext<PersistedCodeListItem> {

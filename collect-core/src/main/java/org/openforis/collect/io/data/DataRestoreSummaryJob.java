@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.io.data;
 
+import org.openforis.collect.io.data.RecordProviderInitializerTask.Input;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.concurrency.Worker;
@@ -20,6 +21,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 
 	//input
 	private boolean fullSummary;
+	private boolean deleteInputFileOnDestroy = false;
 	//output
 	private DataImportSummary summary;
 
@@ -47,8 +49,16 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setRecordProvider(recordProvider);
 			t.setSurvey(publishedSurvey);
 			t.setUserManager(userManager);
+		} else {
+			super.initializeTask(task);
 		}
-		super.initializeTask(task);
+	}
+	
+	@Override
+	protected Input createRecordProviderInitializerTaskInput() {
+		Input input = super.createRecordProviderInitializerTaskInput();
+		input.setInitializeRecords(false);
+		return input;
 	}
 	
 	@Override
@@ -57,6 +67,14 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 		if ( task instanceof DataRestoreSummaryTask ) {
 			//get output survey and set it into job instance instance variable
 			this.summary = ((DataRestoreSummaryTask) task).getSummary();
+		}
+	}
+	
+	@Override
+	public void destroy() {
+		super.destroy();
+		if (deleteInputFileOnDestroy) {
+			file.delete();
 		}
 	}
 
@@ -92,6 +110,10 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	@Override
 	public void setValidateRecords(boolean validateRecords) {
 		throw new UnsupportedOperationException();
+	}
+	
+	public void setDeleteInputFileOnDestroy(boolean deleteInputFileOnDestroy) {
+		this.deleteInputFileOnDestroy = deleteInputFileOnDestroy;
 	}
 
 }

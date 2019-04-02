@@ -171,6 +171,12 @@ public class SpeciesManager {
 		List<String> infoAttributeNames = taxonDefinition.getAttributeNames();
 		return new TaxonSummaries(totalCount, items, sortedVernacularNamesLanguageCodes, infoAttributeNames);
 	}
+	
+	public Taxon loadTaxonByCode(CollectTaxonomy taxonomy, String code) {
+		TaxonTree taxonTree = loadTaxonTree(taxonomy);
+		Node node = taxonTree.getNodeByCode(code);
+		return node == null ? null : node.getTaxon();
+	}
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void save(CollectTaxonomy taxonomy) {

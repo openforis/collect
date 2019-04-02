@@ -146,16 +146,21 @@ public abstract class DataRestoreBaseJob extends Job {
 			t.setValidate(false);
 		} else if (task instanceof RecordProviderInitializerTask) {
 			RecordProviderInitializerTask t = (RecordProviderInitializerTask) task;
-			Input input = new Input();
-			input.setActiveUser(user);
-			input.setExistingSurvey(publishedSurvey);
-			input.setFile(file);
-			input.setPackagedSurvey(packagedSurvey);
-			input.setUserManager(userManager);
-			input.setValidateRecords(validateRecords);
-			t.setInput(input);
+			t.setInput(createRecordProviderInitializerTaskInput());
 		}
 		super.initializeTask(task);
+	}
+
+	protected Input createRecordProviderInitializerTaskInput() {
+		Input input = new Input();
+		input.setActiveUser(user);
+		input.setExistingSurvey(publishedSurvey);
+		input.setFile(file);
+		input.setPackagedSurvey(packagedSurvey);
+		input.setUserManager(userManager);
+		input.setValidateRecords(validateRecords);
+		input.setInitializeRecords(validateRecords);
+		return input;
 	}
 	
 	@Override

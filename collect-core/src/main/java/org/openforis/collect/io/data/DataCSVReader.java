@@ -390,8 +390,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				throw new ParsingException(error);
 			}
 			
-			
-			List<String> attributeColumnNames = colNames.subList(expectedEntityKeyColumns.size(), colNames.size());
+			List<String> attributeColumnNames = new ArrayList<String>(colNames);
+			attributeColumnNames.removeAll(expectedEntityKeyColumns);
 			
 			validateAttributeHeaders(attributeColumnNames);
 		}

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -127,7 +128,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@Command
 	public void addCheck(@BindingParam("checkType") String checkType) {
 		if (checkCanAddCheck()) {
-			CheckType type = CheckType.valueOf(checkType.toUpperCase());
+			CheckType type = CheckType.valueOf(checkType.toUpperCase(Locale.ENGLISH));
 			editingNewCheck = true;
 			editedCheck = CheckType.createCheck(type);
 			openCheckEditPopUp();
@@ -185,6 +186,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		setTempFormObjectFieldValue(MULTIPLE_FIELD, false);
 		setTempFormObjectFieldValue("showInUI", true);
 		setTempFormObjectFieldValue("includeInDataExport", Annotation.INCLUDE_IN_DATA_EXPORT.getDefaultValue());
+		setTempFormObjectFieldValue("calculatedOnlyOneTime", Annotation.CALCULATED_ONLY_ONE_TIME.getDefaultValue());
 		setTempFormObjectFieldValue("editable", Annotation.EDITABLE.getDefaultValue());
 		setTempFormObjectFieldValue("phaseToApplyDefaultValue", ((Step) Annotation.PHASE_TO_APPLY_DEFAULT_VALUE.getDefaultValue()).name());
 		dispatchKeyChangingCommand(false);

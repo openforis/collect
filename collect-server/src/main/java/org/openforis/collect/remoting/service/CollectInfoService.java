@@ -1,6 +1,7 @@
 package org.openforis.collect.remoting.service;
 
 import java.io.InputStream;
+import java.net.InetAddress;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
@@ -19,6 +20,7 @@ import org.openforis.collect.CollectInternalInfo;
 import org.openforis.collect.reporting.SaikuConfiguration;
 import org.openforis.commons.versioning.Version;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,7 +34,6 @@ public class CollectInfoService {
 			"http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-installer/maven-metadata.xml";
 	private static final int RELEASE_FETCH_TIMEOUT = 10000;
 	
-	private static final String SAIKU_URL_FORMAT = "%s://%s:%s/%s";
 	private static final String DEV_LOCAL_ADDRESS = "127.0.0.1";
 	private static final String DEV_REQUEST_LOCAL_ADDRESS = "0:0:0:0:0:0:0:1";
 	
@@ -93,11 +94,28 @@ public class CollectInfoService {
 
 	private String determineSaikuUrl(HttpServletRequest request) {
 		String protocol = request.isSecure() ? "https" : "http";
-		String localAddr = request.getLocalAddr();
-		if (DEV_REQUEST_LOCAL_ADDRESS.equals(localAddr)) {
-			localAddr = DEV_LOCAL_ADDRESS;
+		String host = determineHost(request);
+		return String.format("%s://%s/%s", protocol, host, saikuConfiguration.getContextPath());
+	}
+	
+	private String determineHost(HttpServletRequest request) {
+		String host = request.getHeader(HttpHeaders.HOST);
+		if (host == null) {
+			int port = request.getLocalPort();
+			String localHostName = request.getLocalAddr();
+			if (localHostName == null) {
+				try {
+					InetAddress localHost = InetAddress.getLocalHost();
+					localHostName = localHost.getHostName();
+				} catch (Exception e) {
+				}
+			}
+			if (DEV_REQUEST_LOCAL_ADDRESS.equals(localHostName)) {
+				localHostName = DEV_LOCAL_ADDRESS;
+			}
+			return String.format("%s:%d", localHostName, port);
+		} else {
+			return host;
 		}
-		String url = String.format(SAIKU_URL_FORMAT, protocol, localAddr, request.getLocalPort(), saikuConfiguration.getContextPath());
-		return url;
 	}
 }

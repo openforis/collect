@@ -5,10 +5,12 @@ package org.openforis.collect.persistence.liquibase;
 
 import java.sql.Connection;
 
+import liquibase.Liquibase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
+import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
 
 /**
@@ -17,24 +19,72 @@ import liquibase.integration.spring.SpringLiquibase;
  */
 public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 
-	private static final String SQLITE_DBNAME = "SQLite";
+	private static final String STANDARD_DIALECT = "standard";
+	private static final String DBMS_PLACEHOLDER = "DBMS_ID";
 
+	enum CustomDialectDatabase {
+		
+		POSTGRESQL("PostgreSQL", "postgresql"),
+		SQLITE("SQLite", "sqlite"),
+		SQLITE_ANDROID("SQLite for Android", "sqlite");
+		
+		private String productName;
+		private String liquibaseDbms;
+		
+		CustomDialectDatabase(String productName, String liquibaseDbms) {
+			this.productName = productName;
+			this.liquibaseDbms = liquibaseDbms;
+		}
+		
+		public String getProductName() {
+			return productName;
+		}
+		
+		public String getLiquibaseDbms() {
+			return liquibaseDbms;
+		}
+		
+		public static CustomDialectDatabase findByProductName(String productName) {
+			for (CustomDialectDatabase db : values()) {
+				if (db.productName.equalsIgnoreCase(productName))
+					return db;
+			}
+			return null;
+		}
+
+	}
+	
 	@Override
 	protected Database createDatabase(Connection c) throws DatabaseException {
-		String dbProductName = getDatabaseProductName(c);
-		if ( SQLITE_DBNAME.equals(dbProductName) ) {
-			//schemas are not supported
-			DatabaseFactory dbFactory = DatabaseFactory.getInstance();
-			JdbcConnection jdbcConnection = new JdbcConnection(c);
-			return dbFactory.findCorrectDatabaseImplementation(jdbcConnection);
+		Database database = getDatabase(c);
+		if (CustomDialectDatabase.SQLITE.getProductName().equals(database.getDatabaseProductName()) ||
+			CustomDialectDatabase.SQLITE_ANDROID.getProductName().equals(database.getDatabaseProductName())) {
+			// schemas are not supported
+			return database;
 		} else {
 			return super.createDatabase(c);
 		}
 	}
 
-	private String getDatabaseProductName(Connection c) throws DatabaseException {
-		Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c));
-		return database.getDatabaseProductName();
+	@Override
+	protected Liquibase createLiquibase(Connection c) throws LiquibaseException {
+		Database database = createDatabase(c);
+		String changeLog = getChangeLog().replaceAll(DBMS_PLACEHOLDER, getMigrationDialect(database));
+		Liquibase liquibase = new Liquibase(changeLog, createResourceOpener(), database);
+		if (isDropFirst()) {
+			liquibase.dropAll();
+		}
+		return liquibase;
 	}
-	
+
+	private String getMigrationDialect(Database database) {
+		String dbProductName = database.getDatabaseProductName();
+		CustomDialectDatabase customDialectDb = CustomDialectDatabase.findByProductName(dbProductName);
+		return customDialectDb == null ? STANDARD_DIALECT : customDialectDb.getLiquibaseDbms();
+	}
+
+	private Database getDatabase(Connection c) throws DatabaseException {
+		return DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(c));
+	}
+
 }

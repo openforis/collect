@@ -1,0 +1,131 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<window id="unitsManagerPopUp" title="${labels.survey.unit.manager.title}" 
+		width="600px"
+		height="370px"
+		border="normal"
+		position="center" 
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.UnitsVM')"
+		validationMessages="@id('vmsgs')"
+		closable="false">
+		<borderlayout>
+			<west width="220px">
+				<borderlayout>
+					<center border="none"
+						title="${labels.global.items.header.inserted}:">
+    			        <listbox id="itemsListBox"
+    			        	selectedItem="@load(vm.selectedItem)"
+    			        	model="@load(vm.items)"
+    			        	onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+    			        	width="220px"
+			        		vflex="true">
+    			        	<listhead>
+    							<listheader label="" width="100%" />
+    						</listhead>
+    			            <template name="model">
+    			                <listitem>
+    			                    <listcell label="@load(each.name)" />
+    			                </listitem>
+    			            </template>
+    			        </listbox>
+                    </center>
+                    <south border="none">
+		              <toolbar height="30px">
+      			       <toolbarbutton tooltiptext="${labels.global.add_item}" 
+                            image="/assets/images/add.png"
+                            onClick="@command('newItem')" />
+                        <toolbarbutton tooltiptext="${labels.global.delete_item}"
+                            image="/assets/images/delete.png"
+                            disabled="@load(empty vm.selectedItem)"
+                            onClick="@command('deleteUnit', item=vm.selectedItem)" />
+                      </toolbar>
+                    </south>
+                </borderlayout>
+			</west>
+		    <center>
+		    	<absolutelayout>
+					<absolutechildren hflex="1" vflex="1">
+						<box pack="center" align="center" hflex="1" vflex="1"
+						 	visible="@load(not vm.editingItem)">
+		        			<label value="${labels.global.item.select_or_create_new_one}" />
+	        			</box>
+					</absolutechildren>
+					<absolutechildren hflex="1" vflex="1">
+				        <vbox
+				        	id="formContainer"
+				        	visible="@load(vm.editingItem)"
+		                    sclass="form"
+							form="@id('fx') 
+								@load(vm.formObject)
+		                        @save(vm.formObject, before={'validate','applyChanges'})
+								@validator('org.openforis.collect.designer.form.validator.UnitFormValidator')"
+							hflex="1" vflex="1">
+							<grid>
+								<columns>
+									<column width="150px" />
+									<column />
+								</columns>
+								<rows>
+									<row>
+		                                <fieldErrorHandler message="@load(vmsgs['name'])">
+											<label value="${labels.survey.unit.name}:" />
+										</fieldErrorHandler>
+		                                <fieldErrorHandler message="@load(vmsgs['name'])">
+											<textbox id="nameTextbox" width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+		                                <fieldErrorHandler message="@load(vmsgs['label'])">
+											<label
+			  									use="org.openforis.collect.designer.component.FieldLabel"
+												value="${labels.survey.unit.label}" 
+			                                  	languageCode="@load(vm.currentLanguageCode)" />
+                                  		</fieldErrorHandler>
+		                                <fieldErrorHandler message="@load(vmsgs['label'])">
+											<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+		                                <fieldErrorHandler message="@load(vmsgs['abbreviation'])">
+											<label
+			  									use="org.openforis.collect.designer.component.FieldLabel"
+												value="${labels.survey.unit.abbreviation}" 
+			                                  	languageCode="@load(vm.currentLanguageCode)" />
+			                            </fieldErrorHandler>
+		                                <fieldErrorHandler message="@load(vmsgs['abbreviation'])">
+											<textbox width="150px" value="@bind(fx.abbreviation)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<label value="${labels.survey.unit.dimension.$}:" />
+		                                <fieldErrorHandler message="@load(vmsgs['dimensionLabel'])">
+											<listbox width="150px" model="@load(vm.availableDimensions)"
+												selectedItem="@bind(fx.dimensionLabel)" mold="select"
+												onSelect="@command('applyChanges')" >
+												<template name="model">
+													<listitem label="@load(each)" />
+												</template>
+											</listbox>
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<label value="${labels.survey.unit.conversionFactor}:" />
+		                                <fieldErrorHandler message="@load(vmsgs['conversionFactor'])">
+											<doublebox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+								</rows>
+							</grid>
+						</vbox>
+					</absolutechildren>
+				</absolutelayout>
+			</center>
+			<south>
+				<box align="center" width="100%">
+					<button label="${labels.global.apply}" onClick="@command('apply')" />
+				</box>
+			</south>
+	    </borderlayout>
+	</window>
+</zk>

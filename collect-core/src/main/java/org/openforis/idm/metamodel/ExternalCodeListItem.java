@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +51,21 @@ public class ExternalCodeListItem extends CodeListItem {
 	
 	public int getLevel() {
 		return getParentKeyByLevel().size() + 1;
+	}
+	
+	public List<String> getParentKeys() {
+		if (parentKeyByLevel == null) {
+			return Collections.emptyList();
+		} else {
+			int size = parentKeyByLevel.size();
+			List<String> parentKeys = new ArrayList<String>(size);
+			for(int ancestorLevelIndex = 0; ancestorLevelIndex < size; ancestorLevelIndex ++ ) {
+				String ancestorLevelName = getCodeList().getHierarchy().get(ancestorLevelIndex).getName();
+				String ancestorKey = parentKeyByLevel.get(ancestorLevelName);
+				parentKeys.add(ancestorKey);
+			}
+			return parentKeys;
+		}
 	}
 
 	public Integer getSystemId() {

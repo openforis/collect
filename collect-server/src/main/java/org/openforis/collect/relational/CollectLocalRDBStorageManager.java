@@ -62,10 +62,10 @@ public class CollectLocalRDBStorageManager extends BaseStorageManager {
 	}
 
 	private String getRDBFileName(String surveyName, RecordStep step) {
-		return String.format("%s_%s.db", surveyName, step.name().toLowerCase());
+		return String.format("%s_%s.db", surveyName, step.nameLowerCase());
 	}
 
 	private String getRDBJournalFileName(String surveyName, RecordStep step) {
-		return String.format("%s_%s.db-journal", surveyName, step.name().toLowerCase());
+		return String.format("%s_%s.db-journal", surveyName, step.nameLowerCase());
 	}
 }

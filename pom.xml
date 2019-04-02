@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.23.4-SNAPSHOT</version>
+	<version>3.24.16-SNAPSHOT</version>
 	<organization>
 		<name>Open Foris</name>
 		<url>www.openforis.org</url>
@@ -16,22 +16,17 @@
 		<module>collect-rdb</module>
 		<module>collect-server</module>
 		<module>collect-client</module>
-		<module>collect-web</module>
+		<module>collect-webapp</module>
 	</modules>
 
 	<properties>
-		<!-- install builder application version id (used by auto updater): it must be a progressive number -->
-		<installer-version-id>${buildNumber}</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.1.10</openforis.commons.version>
-		<spring.version>4.3.12.RELEASE</spring.version>
-		<spring-security.version>4.2.3.RELEASE</spring-security.version>
+		<openforis.commons.version>0.1.11</openforis.commons.version>
+		<spring.version>5.1.1.RELEASE</spring.version>
+		<spring-security.version>5.1.1.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
-		<jetty.version>9.4.2.v20170220</jetty.version>
-		<installer.jre.version.major>1.8</installer.jre.version.major>
-		<installer.jre.version>1.8.0</installer.jre.version>
-		<installer.jre.version.full>1.8.0_121</installer.jre.version.full>
+		<jetty.version>9.4.12.v20180830</jetty.version>
 	</properties>
 
 	<distributionManagement>
@@ -58,13 +53,7 @@
 		<profile>
 			<id>installer</id>
 			<modules>
-				<module>collect-assembly</module>
-				<module>collect-control-panel</module>
-				<module>collect-autoupdater</module>
-				<module>collect-installer</module>
-				<module>collect-updater</module>
-				<module>collect-updater-2</module>
-				<module>collect-saiku-installer</module>
+				<module>collect-installation</module>
 			</modules>
 		</profile>
 	</profiles>
@@ -197,7 +186,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>2.0.2</version>
+					<version>3.8.0</version>
 					<configuration>
 						<source>1.6</source>
 						<target>1.6</target>
@@ -207,78 +196,19 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.7</version>
+					<version>1.8</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>1.9</version>
+					<version>3.0.0</version>
 				</plugin>
 				<plugin>
 					<groupId>com.soebes.maven.plugins</groupId>
-				    <artifactId>iterator-maven-plugin</artifactId>
-				    <version>0.5.0</version>
-				    <configuration>
-						<itemsWithProperties>
-							<itemWithProperty>
-								<name>linux</name>
-								<properties>
-									<jre.classifier>linux</jre.classifier>
-									<installer.skip>false</installer.skip>
-									<installer.classifier>linux</installer.classifier>
-									<installer.artifact.type>run</installer.artifact.type>
-									<installer.autoupdater.extension>run</installer.autoupdater.extension>
-									<installer.extension>run</installer.extension>
-								</properties>
-							</itemWithProperty>
-							<itemWithProperty>
-								<name>linux-x64</name>
-								<properties>
-									<jre.classifier>linux-x64</jre.classifier>
-									<installer.skip>false</installer.skip>
-									<installer.classifier>linux-x64</installer.classifier>
-									<installer.artifact.type>run</installer.artifact.type>
-									<installer.autoupdater.extension>run</installer.autoupdater.extension>
-									<installer.extension>run</installer.extension>
-								</properties>
-							</itemWithProperty>
-							<itemWithProperty>
-								<name>osx</name>
-								<properties>
-									<jre.classifier>osx</jre.classifier>
-									<installer.skip>false</installer.skip>
-									<installer.classifier>osx</installer.classifier>
-									<installer.artifact.type>zip</installer.artifact.type>
-									<installer.autoupdater.extension>app.zip</installer.autoupdater.extension>
-									<installer.extension>dmg</installer.extension>
-								</properties>
-							</itemWithProperty>
-							<itemWithProperty>
-								<name>windows</name>
-								<properties>
-									<jre.classifier>windows-i386</jre.classifier>
-									<installer.skip>false</installer.skip>
-									<installer.classifier>windows</installer.classifier>
-									<installer.artifact.type>exe</installer.artifact.type>
-									<installer.autoupdater.extension>exe</installer.autoupdater.extension>
-									<installer.extension>exe</installer.extension>
-								</properties>
-							</itemWithProperty>
-							<itemWithProperty>
-								<name>windows-x64</name>
-								<properties>
-									<jre.classifier>windows-x64</jre.classifier>
-									<installer.skip>true</installer.skip>
-									<installer.classifier>windows</installer.classifier>
-									<installer.artifact.type>exe</installer.artifact.type>
-									<installer.autoupdater.extension>exe</installer.autoupdater.extension>
-									<installer.extension>exe</installer.extension>
-								</properties>
-							</itemWithProperty>
-						</itemsWithProperties>
-					</configuration>
-			    </plugin>
-			    <plugin>
+					<artifactId>iterator-maven-plugin</artifactId>
+					<version>0.5.1</version>
+				</plugin>
+				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>1.6.0</version>
@@ -286,9 +216,9 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.10</version>
-			    </plugin>
-			    <plugin>
+					<version>3.1.1</version>
+				</plugin>
+				<plugin>
 					<groupId>com.google.code.maven-replacer-plugin</groupId>
 					<artifactId>replacer</artifactId>
 					<version>1.5.3</version>
@@ -296,7 +226,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.1.0</version>
 				</plugin>
 				
 				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
@@ -331,6 +261,11 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>2.7</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -402,6 +337,11 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.2</version>
+			</dependency>
+			<dependency>
 				<groupId>org.openforis.commons</groupId>
 				<artifactId>of-commons-io</artifactId>
 				<version>${openforis.commons.version}</version>
@@ -444,7 +384,7 @@
 			<dependency>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.9</version>
+				<version>3.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -454,17 +394,37 @@
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-api</artifactId>
-				<version>2.11.0</version>
+				<version>2.11.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-core</artifactId>
-				<version>2.11.0</version>
+				<version>2.11.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-jcl</artifactId>
-				<version>2.11.0</version>
+				<version>2.11.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-slf4j-impl</artifactId>
+				<version>2.11.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.25</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-nop</artifactId>
+				<version>1.7.25</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-jdk14</artifactId>
+				<version>1.7.25</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-logging</groupId>
@@ -479,12 +439,12 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.4</version>
+				<version>3.8.1</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-collections</groupId>
-				<artifactId>commons-collections</artifactId>
-				<version>3.2.2</version>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-collections4</artifactId>
+				<version>4.2</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -494,12 +454,12 @@
 			<dependency>
 				<groupId>commons-fileupload</groupId>
 				<artifactId>commons-fileupload</artifactId>
-				<version>1.2.2</version>
+				<version>1.3.3</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-vfs</groupId>
-				<artifactId>commons-vfs</artifactId>
-				<version>1.0</version>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-vfs2</artifactId>
+				<version>2.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -509,6 +469,16 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-webmvc</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-messaging</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-websocket</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
@@ -546,6 +516,37 @@
 				<artifactId>spring-security-taglibs</artifactId>
 				<version>${spring-security.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-dbcp</groupId>
+				<artifactId>commons-dbcp</artifactId>
+				<version>1.4</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-pool</groupId>
+				<artifactId>commons-pool</artifactId>
+				<version>1.5.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.xerial</groupId>
+				<artifactId>sqlite-jdbc</artifactId>
+				<version>3.25.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>9.4.1212</version>
+			</dependency>
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.4.193</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>2.0.2-beta</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	
 </project>

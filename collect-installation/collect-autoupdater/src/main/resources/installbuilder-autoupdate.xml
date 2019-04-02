@@ -1,0 +1,11 @@
+<autoUpdateProject>
+	<fullName>Open Foris Collect</fullName>
+	<shortName>OpenForisCollect</shortName>
+	<version>PROJECT_VERSION</version>
+	<vendor>Open Foris</vendor>
+	<singleInstanceCheck>1</singleInstanceCheck>
+	<requireInstallationByRootUser>0</requireInstallationByRootUser>
+	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
+	<logoImage>images/of-collect-logo-small.png</logoImage>
+	<createOsxBundleZip>1</createOsxBundleZip>
+</autoUpdateProject>

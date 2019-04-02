@@ -41,6 +41,8 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.MediaTypes;
+import org.openforis.collect.web.ws.AppWS;
+import org.openforis.collect.web.ws.AppWS.MessageType;
 import org.openforis.concurrency.Job;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -93,6 +95,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private SurveyValidator surveyValidator;
 	@WireVariable
 	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	@WireVariable
+	private AppWS appWS;
 	
 	private boolean changed;
 	private Window jobStatusPopUp;
@@ -326,6 +330,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		changed = false;
 		notifyChange("surveyStored","surveyId","surveyPublished","surveyChanged");
 		dispatchSurveySavedCommand();
+		appWS.sendMessage(MessageType.SURVEYS_UPDATED);
 	}
 	
 	private void dispatchSurveySavedCommand() {
@@ -384,8 +389,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			String confirmButtonLabel, boolean showWarnings) {
 		SurveyValidator surveyValidator = getSurveyValidator(survey);
 		ValidationParameters validationParameters = new ValidationParameters();
-		validationParameters.setWarnOnEmptyCodeLists(showWarnings);
-		validationParameters.setWarnOnUnusedCodeLists(showWarnings);
+		validationParameters.setWarningsIgnored(showWarnings);
 		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
 		if ( results.hasErrors() || results.hasWarnings() ) {
 			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm, 
@@ -634,11 +638,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		return url;
 	}
 
-	public String getSurveyEditTitle() {
-		String surveyName = survey == null ? null: survey.getName();
-		return Labels.getLabel("designer_title_editing_survey", new Object[] {surveyName});
-	}
-	
 	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
 		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
 	}

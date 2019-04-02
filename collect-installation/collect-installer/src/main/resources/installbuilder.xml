@@ -1,0 +1,349 @@
+<project>
+	<shortName>OpenForisCollect</shortName>
+	<fullName>Open Foris Collect</fullName>
+	<version>VERSION_ID</version>
+	<vendor>Open Foris</vendor>
+
+	<logoImage>images/of-collect-logo-small.png</logoImage>
+	<componentList>
+		<component>
+			<name>default</name>
+			<description>Default Component</description>
+			<canBeEdited>1</canBeEdited>
+			<selected>1</selected>
+			<show>1</show>
+			
+			<folderList>
+				<folder>
+					<name>programfiles</name>
+					<description>Program Files</description>
+					<destination>${installdir}</destination>
+					<platforms>all</platforms>
+					<distributionFileList>
+						<distributionDirectory>
+							<origin>images</origin>
+						</distributionDirectory>
+						<distributionDirectory>
+							<origin>lib</origin>
+						</distributionDirectory>
+						<distributionDirectory>
+							<origin>webapps</origin>
+						</distributionDirectory>
+						<distributionFile>
+							<origin>launcher.properties</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>user_files</name>
+					<description>User configuration and data files</description>
+					<destination>${collect_root_user_dir}</destination>
+					<platforms>all</platforms>
+					<distributionFileList>
+						<distributionFile>
+							<allowWildcards>1</allowWildcards>
+							<origin>collect.properties</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+			</folderList>
+			
+			<!-- start of Linux desktop shortcuts -->
+			<desktopShortcutList>
+				<shortcut>
+					<name>Open Foris Collect</name>
+					<comment>Launch Open Foris Collect</comment>
+					<exec>${java_launcher_destination}/${java_launcher_binary_name}</exec>
+					<path>${java_launcher_destination}</path>
+					<icon>${java_launcher_startmenu_shortcut_icon}</icon>
+					<platforms>linux linux-x64</platforms>
+					<runAsAdmin>0</runAsAdmin>
+					<runInTerminal>0</runInTerminal>
+				</shortcut>
+				<shortcut>
+					<name>Update Open Foris Collect</name>
+					<comment>Update Open Foris Collect</comment>
+					<exec>${installdir}/autoupdate/autoupdate-${platform_name}.${platform_exec_suffix}</exec>
+					<path>${installdir}/autoupdate</path>
+					<icon>${installdir}/images/update.png</icon>
+					<platforms>linux linux-x64</platforms>
+					<runAsAdmin>0</runAsAdmin>
+					<runInTerminal>0</runInTerminal>
+				</shortcut>
+			</desktopShortcutList>
+			<!-- end of Linux desktop shortcuts -->
+			
+			<!-- start of Windows start menu shortcuts -->
+			<startMenuShortcutList>
+				<startMenuShortcut>
+					<name>Update Open Foris Collect</name>
+					<comment>Update Open Foris Collect</comment>
+					<runAsAdmin>0</runAsAdmin>
+					<runInTerminal>0</runInTerminal>
+					<windowsExec>${installdir}/autoupdate/autoupdate-windows.exe</windowsExec>
+					<windowsExecArgs></windowsExecArgs>
+					<windowsIcon>${installdir}/images/update.ico</windowsIcon>
+				</startMenuShortcut>
+			</startMenuShortcutList>
+			<!-- end of Windows start menu shortcuts -->
+			
+        	<postInstallationActionList>
+        		<if>
+        			<conditionRuleList>
+				        <platformTest type="windows-x86" />
+				        <platformTest type="linux-x86" />
+				    </conditionRuleList>
+				    <conditionRuleEvaluationLogic>or</conditionRuleEvaluationLogic>
+	        		<actionList>
+		        		<propertiesFileSet>
+		        			<file>${installdir}/launcher.properties</file>
+		        			<key>additional_vm_parameters</key>
+		        			<value>-Xmx1024m -Duser.language=en -Duser.country=US</value>
+		        		</propertiesFileSet>
+	        		</actionList>
+	        		<elseActionList>
+		        		<propertiesFileSet>
+		        			<file>${installdir}/launcher.properties</file>
+		        			<key>additional_vm_parameters</key>
+		        			<value>-Xmx2048m -Duser.language=en -Duser.country=US</value>
+		        		</propertiesFileSet>
+	        		</elseActionList>
+        		</if>
+        		
+        		<!-- rename launcher.properties file according to the current platform -->
+        		<renameFile>
+        			<origin>${installdir}/launcher.properties</origin>
+        			<destination>${installdir}/launcher.properties</destination>
+        			<ruleList>
+		        		<platformTest type="osx" />
+					</ruleList>
+        		</renameFile>
+        		<renameFile>
+        			<origin>${installdir}/launcher.properties</origin>
+        			<destination>${installdir}/OpenForisCollect-launcher.run.properties</destination>
+        			<ruleList>
+		        		<platformTest type="linux" />
+		        		<platformTest type="linux-x64" />
+					</ruleList>
+        		</renameFile>
+        		<renameFile>
+        			<origin>${installdir}/launcher.properties</origin>
+        			<destination>${installdir}/OpenForisCollect-launcher.properties</destination>
+        			<ruleList>
+		        		<platformTest type="windows" />
+					</ruleList>
+        		</renameFile>
+        		<!-- end of rename launcher.properties -->
+        		
+        		<!-- create launcher shortcut for MacOS -->
+		        <createSymLink target="${java_launcher_destination}/${java_launcher_binary_name}" 
+			        	linkName="~/Desktop/${java_launcher_startmenu_shortcut_name}">
+		        	<ruleList>
+		        		<platformTest type="osx" />
+					</ruleList>
+	        	</createSymLink>
+        		
+				<!-- create Data folder -->
+				<createDirectory>
+					<path>${data_dir}</path>
+				</createDirectory>
+				<!-- create Log folder -->
+				<createDirectory>
+					<path>${log_dir}</path>
+				</createDirectory>
+				<!-- Find free http port -->
+		        <getFreePort>
+		            <initialPort>8380</initialPort>
+		            <finalPort>8399</finalPort>
+		            <variable>http_port</variable>
+		        </getFreePort>
+		        <!-- Write the ports configuration in collect.properties file -->
+		        <propertiesFileSet>
+		        	<file>${collect_root_user_dir}/collect.properties</file>
+		        	<key>collect.http_port</key>
+		        	<value>${http_port}</value>
+		        </propertiesFileSet>
+			</postInstallationActionList>
+		</component>
+		<component>
+			<name>autoupdater</name>
+			<description>includes tool to perform updates</description>
+			<canBeEdited>0</canBeEdited>
+			<selected>1</selected>
+			<show>0</show>
+			<folderList>
+				<folder>
+					<name>autoupdater</name>
+					<destination>${installdir}/autoupdate</destination>
+					<platforms>windows linux linux-x64</platforms>
+					<distributionFileList>
+						<distributionFile origin="autoupdate-${platform_name}.${platform_exec_suffix}" />
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>tempfiles</name>
+					<destination>${installdir}/temp</destination>
+					<platforms>osx</platforms>
+					<distributionFileList>
+						<distributionFile origin="autoupdate-osx.app.zip" />
+					</distributionFileList>
+				</folder>
+			</folderList>
+			
+			<postInstallationActionList>
+				<createDirectory>
+					<path>${installdir}/autoupdate</path>
+					<abortOnError>0</abortOnError>
+				</createDirectory>
+				<unzip>
+					<destinationDirectory>${installdir}/autoupdate</destinationDirectory>
+					<zipFile>${installdir}/temp/autoupdate-osx.app.zip</zipFile>
+					<ruleList>
+						<platformTest type="osx" />
+					</ruleList>
+				</unzip>
+				<createSymLink target="${installdir}/autoupdate/autoupdate-osx.app" 
+			        	linkName="~/Desktop/Update Open Foris Collect">
+		        	<ruleList>
+		        		<platformTest type="osx" />
+					</ruleList>
+	        	</createSymLink>
+				<writeFile>
+					<path>${installdir}/autoupdate/update.ini</path>
+					<text>[Update]
+url = UPDATE_XML_URL
+version_id = VERSION_ID
+update_download_location = ${system_temp_directory}
+check_for_updates = 1</text>
+				</writeFile>
+				<deleteFile>
+					<path>${installdir}/temp/</path>
+					<abortOnError>0</abortOnError>
+				</deleteFile>
+			</postInstallationActionList>
+		</component>
+		<include>
+			<file>java.xml</file>
+		</include>
+	</componentList>
+	<preInstallationActionList>
+		<!-- define installdir variable -->
+		<if>
+        	<actionList>
+        		<setInstallerVariable>
+        			<name>installdir</name>
+        			<value>${env(SYSTEMDRIVE)}/OpenForis/Collect</value> 
+        		</setInstallerVariable>
+        		<setInstallerVariable>
+        			<name>old_installdir</name>
+        			<value>${env(SYSTEMDRIVE)}/opt/openforis/collect</value> 
+        		</setInstallerVariable>
+        	</actionList>
+        	<conditionRuleList>
+        		<platformTest type="windows" />
+			</conditionRuleList> 
+			<elseActionList>
+				<setInstallerVariable>
+					<name>installdir</name>
+					<value>~/OpenForis/Collect</value>
+				</setInstallerVariable>
+				<setInstallerVariable>
+					<name>old_installdir</name>
+					<value>/opt/openforis/collect</value>
+				</setInstallerVariable>
+			</elseActionList>
+		</if>
+		<setInstallerVariable>
+			<name>collect_root_user_dir</name>
+			<value>${user_home_directory}/OpenForis/Collect</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>data_dir</name>
+			<value>${collect_root_user_dir}/data</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>log_dir</name>
+			<value>${installdir}/logs</value>
+		</setInstallerVariable>
+		<!--  Java Launcher variables -->
+		<setInstallerVariable>
+			<name>java_launcher_mainClass</name>
+			<value>org.openforis.collect.controlpanel.CollectControlPanel</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>java_launcher_classpath</name>
+			<value>lib/*;</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>java_launcher_startmenu_shortcut_icon</name>
+			<value>${installdir}/images/of-collect-logo.png</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>java_launcher_startmenu_shortcut_windows_icon</name>
+			<value>${installdir}/images/of-collect-logo.ico</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>java_launcher_osx_icon</name>
+			<value>${installdir}/images/of-collect-logo.icns</value>
+		</setInstallerVariable>
+		<setInstallerVariable>
+			<name>java_launcher_startmenu_shortcut_name</name>
+			<value>${project.fullName}</value>
+		</setInstallerVariable>
+		<!-- End of Java Launcher variables -->
+		<throwError>
+			<explanation>Open Foris Collect has been already installed</explanation>
+			<text>Open Foris Collect has been already installed.
+Please run Update Open Foris Collect if you want to update it
+or delete the folder ${installdir} and try again.</text>
+			<ruleEvaluationLogic>or</ruleEvaluationLogic>
+			<ruleList>
+				<fileTest path="${installdir}" condition="is_not_empty" />
+				<fileTest path="${old_installdir}" condition="is_not_empty" />
+			</ruleList>
+        </throwError>
+	</preInstallationActionList>
+	<postInstallationActionList>
+		<changePermissions>
+			<files>${installdir}/autoupdate/*.run</files>
+			<permissions>0775</permissions>
+		</changePermissions>
+		<!-- delete temporary files (if any, from previous installations) -->
+        <deleteFile>
+  			<path>${installdir}/webapps/collect</path>
+			<abortOnError>0</abortOnError>
+		</deleteFile>
+	</postInstallationActionList>
+	<postUninstallationActionList>
+		<deleteFile>
+			<path>${project.rollbackBackupDirectory}</path>
+		</deleteFile>
+	</postUninstallationActionList>
+	<compressionAlgorithm>lzma-ultra</compressionAlgorithm>
+	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>
+	<defaultUnixFilePermissions>777</defaultUnixFilePermissions>
+	<defaultUnixOwner>${env(SUDO_USER)}</defaultUnixOwner>
+	<enableRollback>1</enableRollback>
+	<enableTimestamp>1</enableTimestamp>
+	<rebootRequired>0</rebootRequired>
+	<requireInstallationByRootUser>0</requireInstallationByRootUser>
+	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
+	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
+	<saveRelativePaths>1</saveRelativePaths>
+	<createOsxBundleDmg>1</createOsxBundleDmg>
+	<parameterList>
+		<directoryParameter>
+			<name>installdir</name>
+			<description>Installer.Parameter.installdir.description</description>
+			<explanation>Installer.Parameter.installdir.explanation</explanation>
+			<value></value>
+			<default>${platform_install_prefix}/${product_shortname}</default>
+			<allowEmptyValue>0</allowEmptyValue>
+			<cliOptionName>prefix</cliOptionName>
+			<mustBeWritable>1</mustBeWritable>
+			<mustExist>0</mustExist>
+			<width>30</width>
+		</directoryParameter>
+	</parameterList>
+</project>
+

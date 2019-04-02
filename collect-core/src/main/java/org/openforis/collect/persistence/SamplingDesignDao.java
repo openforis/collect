@@ -174,9 +174,12 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		return q;
 	}
 
+	public List<SamplingDesignItem> loadChildItems(int surveyId, List<String> parentKeys) {
+		return loadChildItems(surveyId, parentKeys.toArray(new String[parentKeys.size()]));
+	}
+	
 	/**
 	 * Return the items in the level next to the one defined by the parent keys with level codes different from null
-	 * 
 	 */
 	public List<SamplingDesignItem> loadChildItems(int surveyId, String... parentKeys) {
 		SamplingDesignDSLContext dsl = dsl();
@@ -212,7 +215,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		addLevelKeyNullConditions(q, nextLevelIndex);
 
 		Record r = q.fetchAny();
-		return dsl.fromRecord(r);
+		return r == null ? null : dsl.fromRecord(r);
 	}
 
 	private void addParentKeysConditions(SelectQuery<Record> q, String... parentKeys) {

@@ -2,8 +2,8 @@ package org.openforis.collect.manager;
 
 import java.util.Collection;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Predicate;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectRecordSummary;
@@ -48,9 +48,8 @@ public class RecordAccessControlManager {
 	}
 
 	private boolean containsOnlyEntryOwnedRecords(Collection<CollectRecordSummary> recordSummaries, final User user) {
-		return CollectionUtils.find(recordSummaries, new Predicate() {
-			public boolean evaluate(Object obj) {
-				CollectRecordSummary s = (CollectRecordSummary) obj;
+		return IterableUtils.find(recordSummaries, new Predicate<CollectRecordSummary>() {
+			public boolean evaluate(CollectRecordSummary s) {
 				return s.getStep() != Step.ENTRY || (s.getOwner() != null && s.getOwner().getId() != user.getId());
 			}
 		}) == null;

@@ -28,11 +28,13 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	private static final String ITEM_LABEL_FIELD_NAME = "item_label";
 	public static final String ITEM_LABEL_SUFFIX = "label";
 	
+	private boolean ancestorDef;
 	private boolean hasExpandedItems = false;
 	private List<CodeListItem> expandedItems = null;
 	
-	public CodeColumnProvider(CSVDataExportParameters config, CodeAttributeDefinition defn) {
+	public CodeColumnProvider(CSVDataExportParameters config, CodeAttributeDefinition defn, boolean ancestorDef) {
 		super(config, defn);
+		this.ancestorDef = ancestorDef;
 		init();
 	}
 
@@ -60,18 +62,24 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 		List<String> result = new ArrayList<String>();
 		//code field
 		result.add(CodeAttributeDefinition.CODE_FIELD);
-		//qualifier field
-		CodeList list = attributeDefinition.getList();
-		if ( hasQualifiableItems(list) ) {
-			result.add(CodeAttributeDefinition.QUALIFIER_FIELD);
-		}
-		//item position field
-		if ( getConfig().isIncludeCodeItemPositionColumn() && ! list.isExternal() ) {
-			result.add(ITEM_POSITION_FIELD_NAME);
-		}
-		//label field
-		if ( getConfig().isIncludeCodeItemLabelColumn() && ! list.isExternal() ) {
-			result.add(ITEM_LABEL_FIELD_NAME);
+		if (!ancestorDef) {
+			// if the code attribute is an ancestor key attribute,
+			// only the code value is necessary; 
+			// other columns can be exported with the belonging entity
+			
+			// qualifier field
+			CodeList list = attributeDefinition.getList();
+			if ( hasQualifiableItems(list) ) {
+				result.add(CodeAttributeDefinition.QUALIFIER_FIELD);
+			}
+			//item position field
+			if ( getConfig().isIncludeCodeItemPositionColumn() && ! list.isExternal() ) {
+				result.add(ITEM_POSITION_FIELD_NAME);
+			}
+			//label field
+			if ( getConfig().isIncludeCodeItemLabelColumn() && ! list.isExternal() ) {
+				result.add(ITEM_LABEL_FIELD_NAME);
+			}
 		}
 		return result.toArray(new String[result.size()]);
 	}

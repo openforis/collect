@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.23.4-SNAPSHOT</version>
+		<version>3.24.16-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-rdb</artifactId>
 	<packaging>jar</packaging>
@@ -25,6 +25,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.ddlutils</groupId>
 			<artifactId>ddlutils</artifactId>
 			<version>1.0</version>
@@ -37,13 +42,11 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.9.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
