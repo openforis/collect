@@ -154,7 +154,7 @@ class RecordDataTable extends Component {
 			surveyId, 
 			loggedUser, 
 			availableOwners, 
-			page, 
+			currentPage, 
 			records, 
 			totalSize, 
 			recordsPerPage,
@@ -311,7 +311,7 @@ class RecordDataTable extends Component {
 						onCellEdit: this.handleCellEdit,
 						onSortChange: this.handleSortChange,
 						onFilterChange: this.handleFilterChange,
-						page,
+						page: currentPage,
 						sizePerPage: recordsPerPage,
 						sizePerPageList: [10, 25, 50, 100],
 						paginationShowsTotal: true,
@@ -350,7 +350,7 @@ const mapStateToProps = state => {
 	const attributeDefsShownInSummaryList = rootEntityDef.attributeDefinitionsShownInRecordSummaryList
 	
 	const {
-		page, 
+		currentPage, 
 		records, 
 		totalSize, 
 		recordsPerPage,
@@ -363,7 +363,7 @@ const mapStateToProps = state => {
 		surveyId : survey ? survey.id : null,
 		users,
 		loggedUser,
-		page, 
+		currentPage, 
 		records, 
 		totalSize, 
 		recordsPerPage,
