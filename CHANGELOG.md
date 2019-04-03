@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.24.16] - 2019-04-03
+### Fixed
+- Collect Earth: edited plot not opening at last edited tab
+
 ## [3.24.15] - 2019-03-29
 ### Fixed
 - Calculated attributes chain evaluation
