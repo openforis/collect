@@ -304,16 +304,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 			final Runnable runAfterSave) throws SurveyStoreException {
 		dispatchValidateAllCommand();
 		if ( checkCanSave() ) {
-			return checkValidity(true, new Runnable() {
-				public void run() {
-					try {
-						backgroundSurveySave();
-						if (runAfterSave != null) {
-							runAfterSave.run();
-						}
-					} catch (SurveyStoreException e) {
-						throw new RuntimeException(e);
+			return checkValidity(true, () -> {
+				try {
+					backgroundSurveySave();
+					if (runAfterSave != null) {
+						runAfterSave.run();
 					}
+				} catch (SurveyStoreException e) {
+					throw new RuntimeException(e);
 				}
 			}, Labels.getLabel("survey.save.confirm_save_with_errors"), false);
 		} else {
@@ -375,21 +373,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void validate() {
-		checkValidity(false, new Runnable() {
-			public void run() {
-				MessageUtil.showInfo("survey.successfully_validated");
-			}
-		}, null, true);
+		checkValidity(false, () -> MessageUtil.showInfo("survey.successfully_validated"), null, false);
 	}
 	
 	/**
 	 * Returns true if the validation didn't give any errors, false if a confirm PopUp will be shown
 	 */
 	private boolean checkValidity(boolean showConfirm, final Runnable runIfValid, 
-			String confirmButtonLabel, boolean showWarnings) {
+			String confirmButtonLabel, boolean ignoreWarnings) {
 		SurveyValidator surveyValidator = getSurveyValidator(survey);
 		ValidationParameters validationParameters = new ValidationParameters();
-		validationParameters.setWarningsIgnored(showWarnings);
+		validationParameters.setWarningsIgnored(ignoreWarnings);
 		SurveyValidationResults results = surveyValidator.validate(survey, validationParameters);
 		if ( results.hasErrors() || results.hasWarnings() ) {
 			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm, 
@@ -577,15 +571,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 		}
 		previewStep = recordStep;
 
-		Runnable openPreviewPopupRunnable = new Runnable() {
-			public void run() {
-				openPreviewPopUp();
-			}
-		};
 		if (survey.getId() == null || changed)  {
-			save(null, openPreviewPopupRunnable);
+			save(null, this::openPreviewPopUp);
 		} else {
-			checkValidity(true, openPreviewPopupRunnable, Labels.getLabel("survey.preview.show_preview"), false);
+			checkValidity(true, this::openPreviewPopUp, Labels.getLabel("survey.preview.show_preview"), true);
 		}
 	}
 

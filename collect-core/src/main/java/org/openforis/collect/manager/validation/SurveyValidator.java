@@ -213,7 +213,7 @@ public class SurveyValidator {
 		return validate(survey, new ValidationParameters());
 	}
 
-	public SurveyValidationResults validate(CollectSurvey survey, ValidationParameters validationParameters) {
+	public SurveyValidationResults validate(CollectSurvey survey, final ValidationParameters validationParameters) {
 		SurveyValidationResults results = new SurveyValidationResults();
 		
 		results.addResults(validateRootKeyAttributeSpecified(survey));
@@ -221,6 +221,7 @@ public class SurveyValidator {
 		results.addResults(validateSchemaNodes(survey));
 		results.addResults(validateCodeLists(survey, validationParameters));
 		results.addResults(validateSurveyFiles(survey, validationParameters ));
+		
 		return results;
 	}
 	
@@ -259,12 +260,12 @@ public class SurveyValidator {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		for (CodeList list : survey.getCodeLists()) {
 			if ( ! survey.isPredefinedCodeList(list) ) {
-				if ( validationParameters.warnOnUnusedCodeLists && ! codeListManager.isInUse(list) ) {
+				if ( !validationParameters.warningsIgnored && ! codeListManager.isInUse(list) ) {
 					//unused code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
 							String.format(CODE_LIST_PATH_FORMAT, list.getName()), UNUSED_CODE_LIST_MESSAGE_KEY);
 					results.add(validationResult);
-				} else if ( validationParameters.warnOnEmptyCodeLists && ! list.isExternal() && codeListManager.isEmpty(list) ) {
+				} else if ( !validationParameters.warningsIgnored && ! list.isExternal() && codeListManager.isEmpty(list) ) {
 					//empty code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
 							String.format(CODE_LIST_PATH_FORMAT, list.getName()), EMPTY_CODE_LIST_MESSAGE_KEY);
@@ -343,7 +344,7 @@ public class SurveyValidator {
 				
 			default:
 			}
-			if( validationResult != null )
+			if( validationResult != null && (!validationParameters.warningsIgnored || validationResult.getFlag() != Flag.WARNING))
 				results.add(validationResult);
 		}
 		return results;
@@ -1092,25 +1093,9 @@ public class SurveyValidator {
 
 	public static class ValidationParameters {
 		
-		private boolean warnOnUnusedCodeLists = true;
-		private boolean warnOnEmptyCodeLists = true;
+		private boolean warningsIgnored = false;
 		private boolean validateOnlyFirstLines = true;
 
-		public boolean isWarnOnUnusedCodeLists() {
-			return warnOnUnusedCodeLists;
-		}
-
-		public void setWarnOnUnusedCodeLists(boolean warnOnUnusedCodeLists) {
-			this.warnOnUnusedCodeLists = warnOnUnusedCodeLists;
-		}
-
-		public boolean isWarnOnEmptyCodeLists() {
-			return warnOnEmptyCodeLists;
-		}
-
-		public void setWarnOnEmptyCodeLists(boolean warnOnEmptyCodeLists) {
-			this.warnOnEmptyCodeLists = warnOnEmptyCodeLists;
-		}
 
 		public boolean isValidateOnlyFirstLines() {
 			return validateOnlyFirstLines;
@@ -1120,8 +1105,12 @@ public class SurveyValidator {
 			this.validateOnlyFirstLines = validateOnlyFirstLines;
 		}
 		
+		public boolean isWarningsIgnored() {
+			return warningsIgnored;
+		}
+		
 		public void setWarningsIgnored(boolean warningsIgnored) {
-			this.warnOnEmptyCodeLists = this.warnOnUnusedCodeLists = !warningsIgnored;
+			this.warningsIgnored = warningsIgnored;
 		}
 	}
 }
