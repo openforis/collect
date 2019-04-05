@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.24.17] - 2019-04-05
+### Fixed
+- Fixed bug preventing survey publishing when there are only warnings in the survey
+
 ## [3.24.16] - 2019-04-03
 ### Fixed
 - Collect Earth: edited plot not opening at last edited tab
