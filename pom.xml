@@ -12,6 +12,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>collect-base</module>
 		<module>collect-core</module>
 		<module>collect-rdb</module>
 		<module>collect-server</module>

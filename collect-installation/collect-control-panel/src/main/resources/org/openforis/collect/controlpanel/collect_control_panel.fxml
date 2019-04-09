@@ -21,10 +21,27 @@
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="applicationPane"
 	fx:controller="org.openforis.collect.controlpanel.CollectControlPanelController"
-	minHeight="230.0" maxHeight="580.0" prefHeight="240.0" 
-	maxWidth="600.0" minWidth="600.0" prefWidth="600.0" 
+	minHeight="260.0" prefHeight="260.0" maxHeight="580.0" 
+	minWidth="600.0" prefWidth="600.0" maxWidth="600.0" 
 	styleClass="main-pane"
 	stylesheets="@org/openforis/collect/controlpanel/collect_control_panel.css">
+	
+	<MenuBar fx:id="menuBar">
+		<menus>
+			<Menu text="File">
+				<items>
+					<MenuItem text="Exit" onAction="#handleExitAction"/>
+				</items>
+			</Menu>
+			<Menu text="Help">
+				<items>
+					<MenuItem text="Online Manual" onAction="#handleShowOnlineManual"/>
+					<SeparatorMenuItem />
+					<MenuItem text="About" onAction="#handleAboutAction"/>
+				</items>
+			</Menu>
+		</menus>
+	</MenuBar>
 	
 	<HBox alignment="TOP_LEFT" minWidth="600">
 		<ImageView>
@@ -66,6 +83,7 @@
 				onMouseClicked="#toggleLog" text="Show Log" />
 		</HBox>
 	</HBox>
+
 	<TabPane prefWidth="560.0" prefHeight="400" tabClosingPolicy="UNAVAILABLE">
 		<tabs>
 			<Tab text="Server">

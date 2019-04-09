@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -22,8 +23,12 @@ import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
 import com.sun.javafx.application.HostServicesDelegate;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ProgressBar;
@@ -32,6 +37,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -55,9 +61,10 @@ public class CollectControlPanelController implements Initializable {
 	private static final String DEFAULT_WEBAPPS_LOCATION = Files.getLocation(Files.getCurrentLocation(),
 			DEFAULT_WEBAPPS_FOLDER_NAME);
 	private static final int LOG_OPENED_WINDOW_HEIGHT = 580;
-	private static final int LOG_CLOSED_WINDOW_HEIGHT = 230;
+	private static final int LOG_CLOSED_WINDOW_HEIGHT = 260;
 	private static final int LOG_TEXT_MAX_LENGTH = 20000;
 	private static final String CATALINA_BASE = "catalina.base";
+	private static final String ONLINE_MANUAL_URI = "http://www.openforis.org/tools/collect.html";
 
 	public enum Status {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
@@ -154,8 +161,7 @@ public class CollectControlPanelController implements Initializable {
 	 */
 	private void initLogFileReaders() throws IOException {
 		this.serverLogFileReader = new ConsoleLogFileReader(new File(SERVER_LOG_FILE_LOCATION), serverConsole);
-		this.collectLogFileReader = new ConsoleLogFileReader(new File(COLLECT_LOG_FILE_LOCATION),
-				collectConsole);
+		this.collectLogFileReader = new ConsoleLogFileReader(new File(COLLECT_LOG_FILE_LOCATION), collectConsole);
 		this.saikuLogFileReader = new ConsoleLogFileReader(new File(SAIKU_LOG_FILE_LOCATION), saikuConsole);
 
 		// write logging info to console
@@ -204,11 +210,10 @@ public class CollectControlPanelController implements Initializable {
 			try {
 				server.stop();
 
-				waitUntilConditionIsVerifiedThenRun(() -> {
-					changeStatus(Status.IDLE);
-				}, () -> {
-					return server.isRunning();
-				}, 1000);
+				waitUntilConditionIsVerifiedThenRun(
+						() -> changeStatus(Status.IDLE), 
+						(Void) -> server.isRunning(),
+						1000);
 			} catch (Exception e) {
 				handleException(e);
 			}
@@ -240,6 +245,37 @@ public class CollectControlPanelController implements Initializable {
 	@FXML
 	public void toggleLog(MouseEvent event) {
 		setLogVisible(!logOpened);
+	}
+	
+	@FXML
+	public void handleShowOnlineManual(ActionEvent event) {
+		app.getHostServices().showDocument(ONLINE_MANUAL_URI);
+	}
+
+	@FXML
+	public void handleAboutAction(ActionEvent event) throws IOException {
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about_dialog.fxml"));
+		Parent parent = fxmlLoader.load();
+		AboutController aboutController = fxmlLoader.getController();
+		aboutController.setHostServices(app.getHostServices());
+
+		Scene scene = new Scene(parent, 300, 200);
+		Stage dialogStage = new Stage();
+		dialogStage.setTitle("About");
+		dialogStage.initModality(Modality.APPLICATION_MODAL);
+		dialogStage.setScene(scene);
+		dialogStage.showAndWait();
+	}
+
+	@FXML
+	public void handleExitAction(ActionEvent event) {
+		if (status == Status.RUNNING || status == Status.ERROR) {
+			try {
+				shutdown(null);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	public void closeLog() {
@@ -311,9 +347,9 @@ public class CollectControlPanelController implements Initializable {
 		changeStatus(Status.ERROR);
 	}
 
-	private void waitUntilConditionIsVerifiedThenRun(Runnable runnable, Verifier sleepConditionVerifier,
+	private void waitUntilConditionIsVerifiedThenRun(Runnable runnable, Predicate<Void> sleepConditionVerifier,
 			int sleepInterval) {
-		while (sleepConditionVerifier.verify()) {
+		while (sleepConditionVerifier.test(null)) {
 			try {
 				Thread.sleep(sleepInterval);
 			} catch (InterruptedException e) {
@@ -405,14 +441,6 @@ public class CollectControlPanelController implements Initializable {
 				textArea.setScrollTop(Double.MAX_VALUE);
 			}
 		}
-	}
-
-	private interface TextProcessor {
-		void process(String text);
-	}
-
-	private interface Verifier {
-		boolean verify();
 	}
 
 }

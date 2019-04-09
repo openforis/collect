@@ -166,10 +166,11 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
  		Media media = event.getMedia();
 		String fileName = media.getName();
 		File tempFile;
+		String extension = FilenameUtils.getExtension(fileName);
 		if (media.isBinary()) {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), FilenameUtils.getExtension(fileName));
+			tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), extension);
 		} else {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), FilenameUtils.getExtension(fileName));
+			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
 		}
 		this.uploadedFile = tempFile;
 		this.uploadedFileName = normalizeFilename(fileName);

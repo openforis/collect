@@ -197,6 +197,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.openforis.collect</groupId>
+			<artifactId>collect-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.openforis.commons</groupId>
 			<artifactId>of-commons-lang</artifactId>
 		</dependency>
@@ -224,10 +229,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>

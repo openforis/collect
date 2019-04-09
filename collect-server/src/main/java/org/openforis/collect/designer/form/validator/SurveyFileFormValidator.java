@@ -52,6 +52,7 @@ public class SurveyFileFormValidator extends FormValidator {
 		String typeName = getValue(ctx, TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
 		switch (type) {
+		case SURVEY_GUIDE:
 		case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
 		case COLLECT_EARTH_EE_SCRIPT:
 			if (containsFileWithType(otherSurveyFiles, type)) {

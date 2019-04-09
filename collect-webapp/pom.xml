@@ -13,7 +13,7 @@
 	<properties>
 		<dev.jetty.port>8580</dev.jetty.port>
 		<node.version>v10.15.3</node.version>
-		<npm.version>6.8.0</npm.version>
+		<npm.version>6.9.0</npm.version>
 	</properties>
 
 	<build>
