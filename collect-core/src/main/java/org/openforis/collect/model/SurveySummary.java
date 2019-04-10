@@ -70,8 +70,8 @@ public class SurveySummary {
 		this.setCreationDate(s.getCreationDate());
 		this.setModifiedDate(s.getModifiedDate());
 		this.setTarget(s.getTarget());
-		this.setDefaultLanguage(s.getDefaultLanguage());
 		this.setLanguages(s.getLanguages());
+		this.setDefaultLanguage(s.getDefaultLanguage());
 		this.setUserGroupId(s.getUserGroupId());
 		this.setUserGroupLabel(s.getUserGroup() == null ? null : s.getUserGroup().getLabel());
 	}
