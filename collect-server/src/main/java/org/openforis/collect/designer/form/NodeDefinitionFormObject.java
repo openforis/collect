@@ -49,6 +49,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean calculated;
 	private boolean includeInDataExport;
 	private boolean showInUI;
+	private boolean calculatedOnlyOneTime;
 	private boolean fromCollectEarthCSV;
 	private boolean includedInCollectEarthHeader;
 	private boolean showReadOnlyFieldInCollectEarth;
@@ -207,6 +208,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			showInUI = ! uiOptions.isHidden(source);
 			
 			includeInDataExport = annotations.isIncludedInDataExport(source);
+			
+			calculatedOnlyOneTime = annotations.isCalculatedOnlyOneTime(source);
 		}
 		backgroundColor = annotations.getBackgroundColor(source);
 		backgroundTransparency = fromAlphaToTransparency(annotations.getBackgroundAlpha(source));
@@ -295,11 +298,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( dest instanceof Calculable ) {
 			((Calculable) dest).setCalculated(calculated);
 			
-			//include in data export
 			annotations.setIncludeInDataExport(dest, includeInDataExport);
 			
-			//show in ui
 			uiOptions.setHidden(dest, ! showInUI);
+			
+			annotations.setCalculatedOnlyOneTime(dest, calculatedOnlyOneTime);
 		}
 		annotations.setBackgroundColor(dest, backgroundColor);
 		annotations.setBackgroundAlpha(dest, fromTransparencyToAlpha(backgroundTransparency));
@@ -384,6 +387,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setShowInUI(boolean showInUI) {
 		this.showInUI = showInUI;
+	}
+	
+	public boolean isCalculatedOnlyOneTime() {
+		return calculatedOnlyOneTime;
+	}
+	
+	public void setCalculatedOnlyOneTime(boolean calculatedOnlyOneTime) {
+		this.calculatedOnlyOneTime = calculatedOnlyOneTime;
 	}
 	
 	public String getHeadingLabel() {

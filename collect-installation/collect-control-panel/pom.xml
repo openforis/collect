@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect-installation</artifactId>
-		<version>3.24.13-SNAPSHOT</version>
+		<version>3.24.20-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-control-panel</artifactId>
 	<name>Open Foris Collect Control Panel</name>
@@ -55,6 +55,11 @@
 	</profiles>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.openforis.collect</groupId>
+			<artifactId>collect-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>net.lingala.zip4j</groupId>
 			<artifactId>zip4j</artifactId>

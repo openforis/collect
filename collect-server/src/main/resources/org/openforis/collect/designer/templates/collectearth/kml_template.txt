@@ -211,6 +211,20 @@ PLACEHOLDER_FOR_EXTRA_CSV_DATA
 		           </#list>
 		          </coordinates>
 		        </LinearRing>
+		        
+		        <#if square.points?? >
+				<#list square.points as innerpoint>
+
+					<LinearRing>
+					  <coordinates>
+					  <#list innerpoint.shape as squareCorners>
+					   ${squareCorners.longitude},${squareCorners.latitude},0
+					   </#list>
+					  </coordinates>
+					</LinearRing>
+				 
+				  </#list>
+				  </#if>
 		     
 		      </#list>  
 		       </innerBoundaryIs>

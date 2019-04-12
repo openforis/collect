@@ -16,6 +16,7 @@ public class SurveyFile extends PersistedSurveyObject {
 		COLLECT_EARTH_GRID("ce_grid"),
 		COLLECT_EARTH_EE_SCRIPT("ce_eescript", "eePlaygroundScript.fmt"),
 		COLLECT_EARTH_SAIKU_QUERY("ce_saiku_query"),
+		SURVEY_GUIDE("survey_guide", "survey_guide.pdf"),
 		GENERIC("generic");
 		
 		public static SurveyFileType fromCode(String code) {

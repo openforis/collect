@@ -358,7 +358,7 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 					el.val(oldValue);
 					if (el.val() == null) {
 						//select the first option
-						el.val(el.find("option:first").val());
+						el.find("option:first").prop("selected", true);
 					}
 					break;
 				case "CODE_BUTTON_GROUP":
@@ -617,6 +617,9 @@ var initSteps = function() {
 					nextStepIndex = stepHeadings.length - 1;
 				}
 				$stepsContainer.steps('setCurrentIndex', nextStepIndex);
+				currentStepIndex = nextStepIndex;
+			}else{
+				currentStepIndex = currentIndex;
 			}
 			updateStepsErrorFeedback();
 		},
@@ -835,15 +838,11 @@ var setValueInInputField = function(inputField, value) {
 		inputField.val(value);
 		if (inputField.val() == null) {
 			//select the first option
-			inputField.val(inputField.find("option:first").val());
+			inputField.find("option:first").prop("selected", true);
 		}
 		break;
 	}
 };
-
-function setValueInSelect(select, value) {
-	
-}
 
 function getVisibleComponent(components) {
 	if (components.length == 1) {

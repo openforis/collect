@@ -186,6 +186,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		setTempFormObjectFieldValue(MULTIPLE_FIELD, false);
 		setTempFormObjectFieldValue("showInUI", true);
 		setTempFormObjectFieldValue("includeInDataExport", Annotation.INCLUDE_IN_DATA_EXPORT.getDefaultValue());
+		setTempFormObjectFieldValue("calculatedOnlyOneTime", Annotation.CALCULATED_ONLY_ONE_TIME.getDefaultValue());
 		setTempFormObjectFieldValue("editable", Annotation.EDITABLE.getDefaultValue());
 		setTempFormObjectFieldValue("phaseToApplyDefaultValue", ((Step) Annotation.PHASE_TO_APPLY_DEFAULT_VALUE.getDefaultValue()).name());
 		dispatchKeyChangingCommand(false);

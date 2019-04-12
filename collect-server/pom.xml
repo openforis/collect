@@ -4,14 +4,14 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.24.13-SNAPSHOT</version>
+		<version>3.24.20-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-server</artifactId>
 	<packaging>jar</packaging>
 
 	<properties>
-		<collectearth.version>1.7.5</collectearth.version>
+		<collectearth.version>1.7.12</collectearth.version>
 		<repository-message-broker.version>0.1.3</repository-message-broker.version>
 		<geotools.version>20.0</geotools.version>
 		<graniteds.version>2.3.0.GA</graniteds.version>

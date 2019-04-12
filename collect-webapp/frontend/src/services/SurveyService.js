@@ -68,12 +68,12 @@ export default class SurveyService extends AbstractService {
 
     startExport(surveyId, surveyUri, surveyType, outputFormat, languageCode, skipValidation) {
         return this.post('survey/export/' + surveyId, {
-            surveyId: surveyId,
-            surveyUri: surveyUri,
-            surveyType: surveyType,
-            outputFormat: outputFormat,
-            languageCode: languageCode,
-            skipValidation: skipValidation
+            surveyId,
+            surveyUri,
+            surveyType,
+            outputFormat,
+            languageCode,
+            skipValidation
         })
     }
 

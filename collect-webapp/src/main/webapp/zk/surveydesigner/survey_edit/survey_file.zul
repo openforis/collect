@@ -39,6 +39,9 @@
 	              <listitem selected="true"
 	                label="${labels.survey.file.type.generic}"
 	                value="GENERIC" />
+	              <listitem selected="true"
+	                label="${labels.survey.file.type.survey_guide}"
+	                value="SURVEY_GUIDE" />
 	              <listitem visible="@load(vm.collectEarthSurvey)"
 	                label="${labels.survey.file.type.collect_earth_area_per_attribute}"
 	                value="COLLECT_EARTH_AREA_PER_ATTRIBUTE" />
@@ -87,7 +90,8 @@
           	</fieldErrorHandler>
         	<fieldErrorHandler message="@load(vmsgs['filename'])">
             	<textbox width="300px" value="@bind(fx.filename)"
-                	onChange="@command('applyChanges')" readonly="@load(fx.type eq 'COLLECT_EARTH_AREA_PER_ATTRIBUTE' or fx.type eq 'COLLECT_EARTH_EE_SCRIPT')" />
+                	onChange="@command('applyChanges')" 
+                	readonly="@load(fx.type eq 'COLLECT_EARTH_AREA_PER_ATTRIBUTE' or fx.type eq 'COLLECT_EARTH_EE_SCRIPT' or fx.type eq 'SURVEY_GUIDE')" />
        		</fieldErrorHandler>
         </row>
       </rows>

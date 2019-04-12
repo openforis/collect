@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,7 +13,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class CollectControlPanel extends Application {
 
@@ -33,22 +31,20 @@ public class CollectControlPanel extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader();
-			Pane pane = (Pane) fxmlLoader.load(getClass().getResourceAsStream(CONTROL_PANEL_FXML));
+			Pane pane = fxmlLoader.load(getClass().getResourceAsStream(CONTROL_PANEL_FXML));
 			Scene scene = new Scene(pane);
 			primaryStage.setScene(scene);
 			primaryStage.setTitle(TITLE);
 			primaryStage.setResizable(false);
 	
 			//prevent window close during initialization
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-				public void handle(WindowEvent event) {
-					switch(controller.getStatus()) {
-					case INITIALIZING:
-					case STARTING:
-						event.consume();
-						break;
-					default:
-					}
+			primaryStage.setOnCloseRequest(event -> {
+				switch(controller.getStatus()) {
+				case INITIALIZING:
+				case STARTING:
+					event.consume();
+					break;
+				default:
 				}
 			});
 			
@@ -86,8 +82,6 @@ public class CollectControlPanel extends Application {
 	}
 	
 	private static void showErrorDialog(Throwable e) {
-        StringWriter errorDetailsSW = new StringWriter();
-        e.printStackTrace(new PrintWriter(errorDetailsSW));
         Stage dialog = new Stage();
         dialog.setTitle(ERROR_DIALOG_TITLE);
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -95,8 +89,10 @@ public class CollectControlPanel extends Application {
         FXMLLoader loader = new FXMLLoader();
         try {
         	Parent root = loader.load(CollectControlPanel.class.getResourceAsStream("error_dialog.fxml"));
-            ErrorController errorController = (ErrorController)loader.getController();
+            ErrorController errorController = loader.getController();
             errorController.setMainText("Error initializing Collect");
+            StringWriter errorDetailsSW = new StringWriter();
+            e.printStackTrace(new PrintWriter(errorDetailsSW));
             errorController.setErrorText(errorDetailsSW.toString());
             dialog.setScene(new Scene(root, 400, 300));
             dialog.show();

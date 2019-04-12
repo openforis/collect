@@ -1252,6 +1252,14 @@ public class SurveyManager {
 	public void setSurveyDao(SurveyDao surveyDao) {
 		this.surveyDao = surveyDao;
 	}
+	
+	public SurveyFileDao getSurveyFileDao() {
+		return surveyFileDao;
+	}
+	
+	public void setSurveyFileDao(SurveyFileDao surveyFileDao) {
+		this.surveyFileDao = surveyFileDao;
+	}
 
 	public CollectSurveyContext getCollectSurveyContext() {
 		return collectSurveyContext;

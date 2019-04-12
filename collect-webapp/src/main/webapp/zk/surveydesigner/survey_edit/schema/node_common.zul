@@ -147,22 +147,37 @@
 		    				checked="@load(fx.calculated eq true) @save(fx.calculated)"
 		    				onCheck="@command('calculatedChanged', changed=self.checked)" />
 		    		</fieldErrorHandler>
-		    		<hlayout visible="@load(fx.calculated)" spacing="15px">
-			    		<fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
-				        	<label value="${labels.survey.schema.attribute.include_in_data_export}:" />
-				        </fieldErrorHandler>
-				        <fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
-					        <checkbox checked="@load(fx.includeInDataExport eq true) @save(fx.includeInDataExport)"
-					        	onCheck="@command('applyChanges')" />
-					    </fieldErrorHandler>
-				        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
-					    	<label value="${labels.survey.schema.attribute.show_in_ui}:" />
-				        </fieldErrorHandler>
-				        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
-					        <checkbox checked="@load(fx.showInUI eq true) @save(fx.showInUI)"
-					        	onCheck="@command('applyChanges')" />
-					    </fieldErrorHandler>
-				 	</hlayout>
+		    		<vlayout visible="@load(fx.calculated)" spacing="15px">
+						<hlayout spacing="15px">
+							<fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+								<label value="${labels.survey.schema.attribute.include_in_data_export}:" />
+							</fieldErrorHandler>
+							<fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+								<checkbox checked="@load(fx.includeInDataExport eq true) @save(fx.includeInDataExport)"
+									onCheck="@command('applyChanges')" />
+							</fieldErrorHandler>
+							<fieldErrorHandler message="@load(vmsgs['showInUI'])">
+								<label value="${labels.survey.schema.attribute.show_in_ui}:" />
+							</fieldErrorHandler>
+							<fieldErrorHandler message="@load(vmsgs['showInUI'])">
+								<checkbox
+									checked="@load(fx.showInUI eq true) @save(fx.showInUI)"
+									onCheck="@command('applyChanges')" />
+							</fieldErrorHandler>
+						</hlayout>
+						<hlayout spacing="15px">
+							<fieldErrorHandler message="@load(vmsgs['calculatedOnlyOneTime'])">
+								<label value="${labels.survey.schema.attribute.calculated_only_one_time.$}:" />
+								<image popup="calculatedOnlyOneTimeInfoTooltip" style="cursor:pointer"
+										src="/assets/images/info-small.png" />
+							</fieldErrorHandler>
+							<fieldErrorHandler message="@load(vmsgs['calculatedOnlyOneTime'])">
+								<checkbox
+									checked="@load(fx.calculatedOnlyOneTime eq true) @save(fx.calculatedOnlyOneTime)"
+									onCheck="@command('applyChanges')" />
+							</fieldErrorHandler>
+					 	</hlayout>
+		    		</vlayout>
 	    		</hlayout>
 	    	</row>
 	    	<row visible="${vm.attribute}">
@@ -655,6 +670,11 @@
     <popup id="calculatedInfoTooltip" width="300px">
 		<html><![CDATA[
       		${labels.survey.schema.attribute.calculated.info}
+      	]]></html>
+	</popup>
+	<popup id="calculatedOnlyOneTimeInfoTooltip" width="300px">
+		<html><![CDATA[
+      		${labels.survey.schema.attribute.calculated_only_one_time.info}
       	]]></html>
 	</popup>
 	<popup id="autoGenerateMinItemsInfoTooltip" width="300px">
