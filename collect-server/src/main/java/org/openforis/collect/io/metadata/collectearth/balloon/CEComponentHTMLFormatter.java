@@ -335,7 +335,7 @@ public class CEComponentHTMLFormatter {
 			}
 			
 			if(!hasNAoption){
-				selectBuilder.e("option").a("selected","true").a("value", "").t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.119", language) )); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				selectBuilder.e("option").a("selected","true").a("value", "").t( Messages.getString("CEComponentHTMLFormatter.119", language) ); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			
 			for (CodeListItem item : rootItems) {
