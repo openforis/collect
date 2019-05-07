@@ -77,13 +77,17 @@ class SurveyExportPage extends Component {
             return
         }
         const { surveySummary, surveyType, outputFormat, outputSurveyDefaultLanguage, skipValidation } = this.state
+
+        const languageCode = outputFormat === outputFormats.earth || outputFormat === outputFormats.mobile 
+            ? outputSurveyDefaultLanguage
+            : null
         
         ServiceFactory.surveyService.startExport(
             surveySummary.id,
             surveySummary.uri,
             surveyType,
             outputFormat,
-            outputFormat === outputFormats.earth || outputFormat === outputFormats.mobile ? outputSurveyDefaultLanguage: null,
+            languageCode,
             skipValidation
         ).then(job => {
             this.props.dispatch(JobActions.startJobMonitor({

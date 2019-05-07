@@ -301,6 +301,7 @@ public class SurveyDao extends JooqDaoSupport {
 		s.setProjectName(row.getValue(OFC_SURVEY.TITLE));
 		String langs = StringUtils.defaultString(row.getValue(OFC_SURVEY.LANGS));
 		s.setLanguages(Arrays.asList(StringUtils.split(langs, ',')));
+		s.setDefaultLanguage(s.getLanguages().isEmpty() ? null : s.getLanguages().get(0));
 		
 		return s;
 	}
