@@ -12,44 +12,41 @@ import org.jooq.impl.DialectAwareJooqConfiguration;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 
 public class DbInitializer {
-	
+
 	private static final Logger LOG = LogManager.getLogger(DbInitializer.class);
-	
+
 	private ConnectionProvider connectionProvider;
 
 	public DbInitializer(ConnectionProvider connectionProvider) {
 		this.connectionProvider = connectionProvider;
 	}
-	
+
 	public void start() {
 		DialectAwareJooqConfiguration jooqConf = new DialectAwareJooqConfiguration(connectionProvider);
 		CollectDSLContext dslContext = new CollectDSLContext(jooqConf);
-		if (! dslContext.isSchemaLess()) {
+		if (!dslContext.isSchemaLess()) {
 			createDbSchema();
 		}
 	}
-	
+
 	private void createDbSchema() {
 		Connection conn = null;
 		try {
 			LOG.info("Acquiring connection...");
-			
+
 			conn = connectionProvider.acquire();
 			conn.setAutoCommit(false);
-			
+
 			LOG.info("Connection acquired!");
 			LOG.info(String.format("Creating schema %s if not exists...", DbUtils.SCHEMA_NAME));
 
 			if (createSchemaIfNotExists(conn)) {
 				LOG.info(String.format("Schema '%s' created (if not existing already)", DbUtils.SCHEMA_NAME));
 			} else {
-				LOG.info("Try to create schema withoud 'NOT EXISTS' clause");
+				LOG.info("Try to create schema without 'IF NOT EXISTS' clause");
 				boolean schemaCreated = createSchema(conn);
-				if (schemaCreated) {
-					LOG.info(String.format("Schema '%s' created", DbUtils.SCHEMA_NAME));
-				} else {
-					LOG.info(String.format("Schema '%s' already exists", DbUtils.SCHEMA_NAME));
-				}
+				LOG.info(String.format("Schema '%s' %s", DbUtils.SCHEMA_NAME,
+						schemaCreated ? "created" : "already exists"));
 			}
 		} catch (Exception e) {
 		} finally {
@@ -62,22 +59,23 @@ public class DbInitializer {
 	/**
 	 * Creates the schema using a CREATE SCHEMA IF NOT EXISTS statement.
 	 * 
-	 * @return 'true' if the statement is executed correctly, false if the syntax is not supported
+	 * @return 'true' if the statement is executed correctly, false if the syntax is
+	 *         not supported
 	 */
 	private boolean createSchemaIfNotExists(Connection conn) {
 		try {
 			Statement stmt = conn.createStatement();
 			stmt.execute(String.format("CREATE SCHEMA IF NOT EXISTS %s", DbUtils.SCHEMA_NAME));
 			return true;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			LOG.info("CREATE SCHEMA IF NOT EXISTS is not supported by this DBMS");
 			return false;
 		} finally {
-			//commit transaction anyway
+			// commit transaction anyway
 			commitQuietly(conn);
 		}
 	}
-	
+
 	/**
 	 * Creates a new schema using a CREATE SCHEMA statement.
 	 * 
@@ -88,8 +86,8 @@ public class DbInitializer {
 			Statement stmt = conn.createStatement();
 			stmt.execute(String.format("CREATE SCHEMA %s", DbUtils.SCHEMA_NAME));
 			return true;
-		} catch(Exception e) {
-			boolean schemaAlreadyExists = e.getMessage().toLowerCase(Locale.ENGLISH).contains("already exists");
+		} catch (Exception e) {
+			boolean schemaAlreadyExists = e.getMessage().toLowerCase(Locale.ENGLISH).contains(" already ");
 			if (schemaAlreadyExists) {
 				return false;
 			} else {
@@ -98,7 +96,7 @@ public class DbInitializer {
 				throw new RuntimeException(errorMessage, e);
 			}
 		} finally {
-			//commit transaction anyway
+			// commit transaction anyway
 			commitQuietly(conn);
 		}
 	}
@@ -106,7 +104,8 @@ public class DbInitializer {
 	private void commitQuietly(Connection conn) {
 		try {
 			conn.commit();
-		} catch (SQLException e) {}
+		} catch (SQLException e) {
+		}
 	}
-	
+
 }
