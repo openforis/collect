@@ -4,18 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.BaseStorageManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.utils.Dates;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RestoredBackupStorageManager extends BaseStorageManager {
+public class RestoredBackupStorageManager extends BaseStorageManager implements InitializingBean {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -29,7 +28,11 @@ public class RestoredBackupStorageManager extends BaseStorageManager {
 		super(DEFAULT_STORAGE_SUBFOLDER);
 	}
 	
-	@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		init();
+	}
+	
 	public void init() {
 		initStorageDirectory();
 	}

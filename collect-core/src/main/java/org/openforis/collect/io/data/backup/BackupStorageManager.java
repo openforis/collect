@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,10 +15,11 @@ import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.BaseStorageManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.utils.Dates;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BackupStorageManager extends BaseStorageManager {
+public class BackupStorageManager extends BaseStorageManager implements InitializingBean {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -34,7 +33,11 @@ public class BackupStorageManager extends BaseStorageManager {
 		super(DEFAULT_BACKUP_STORAGE_SUBFOLDER);
 	}
 	
-	@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		init();
+	}
+	
 	public void init() {
 		initStorageDirectory();
 	}

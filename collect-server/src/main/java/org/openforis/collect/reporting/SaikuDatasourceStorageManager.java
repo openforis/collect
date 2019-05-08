@@ -3,8 +3,6 @@ package org.openforis.collect.reporting;
 import java.io.File;
 import java.util.Locale;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FileUtils;
 import org.openforis.collect.CollectInternalInfo;
 import org.openforis.collect.event.RecordStep;
@@ -12,6 +10,7 @@ import org.openforis.collect.manager.BaseStorageManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.relational.CollectLocalRDBStorageManager;
 import org.openforis.collect.remoting.service.CollectInfoService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class SaikuDatasourceStorageManager extends BaseStorageManager {
+public class SaikuDatasourceStorageManager extends BaseStorageManager implements InitializingBean {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -45,7 +44,11 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 	@Autowired
 	private CollectLocalRDBStorageManager rdbStorageManager;
 	
-	@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		init();
+	}
+
 	public void init() {
 		CollectInternalInfo info = infoService.getInternalInfo();
 		this.setDefaultRootStoragePath(info.getWebappsPath());

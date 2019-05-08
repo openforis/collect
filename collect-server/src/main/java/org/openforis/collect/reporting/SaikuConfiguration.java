@@ -1,10 +1,9 @@
 package org.openforis.collect.reporting;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class SaikuConfiguration {
+public class SaikuConfiguration implements InitializingBean {
 
 	private static final String DEFAULT_CONTEXT = "saiku";
 
@@ -23,7 +22,11 @@ public class SaikuConfiguration {
 	
 	private String contextPath;
 	
-	@PostConstruct
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		init();
+	}
+
 	public void init() {
 		this.contextPath = ObjectUtils.defaultIfNull(configurationManager.getConfiguration().get(ConfigurationItem.SAIKU_CONTEXT),
 				DEFAULT_CONTEXT);
