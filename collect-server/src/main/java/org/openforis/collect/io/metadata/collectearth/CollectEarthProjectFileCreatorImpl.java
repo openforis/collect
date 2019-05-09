@@ -172,7 +172,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
 		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
 		p.put("open_street_view", isStreetViewEnabled(survey));
-		p.put("extra_map_url_UNCOMMENT", "http://url?lat=LATITUDE&long=LONGITUDE");
+		p.put("extra_map_url", getExtraMapUrl(survey));
 		p.put("coordinates_reference_system", getSRSUsed(survey));
 
 		File file = File.createTempFile("collect-earth-project", ".properties");
@@ -202,6 +202,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private String getBingMapsKey(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getBingMapsKey();
+	}
+	
+	private String getExtraMapUrl(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.getExtraMapUrl();
 	}
 	
 	private String isBingMapsEnabled(CollectSurvey survey){

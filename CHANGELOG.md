@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.24.20] - 2019-05-09
+### Added
+- Added support to Extra Map URL (Collect Earth)
+
 ## [3.24.19] - 2019-04-10
 ### Fixed
 - Default language not set properly in Collect Earth project export

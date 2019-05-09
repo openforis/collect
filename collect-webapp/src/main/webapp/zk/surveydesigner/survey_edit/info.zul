@@ -1,219 +1,261 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <?component name="collapsiblepanel" class="org.openforis.collect.designer.component.CollapsiblePanel"?>
 <zk>
-  <div id="formContainer"
-  	validationMessages="@id('vmsgs')"
-    apply="org.zkoss.bind.BindComposer"
-    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyMainInfoVM')"
-    form="@id('fx') @load(vm.formObject) @save(vm.formObject, before={'validate','applyChanges'})
+	<div id="formContainer" validationMessages="@id('vmsgs')"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyMainInfoVM')"
+		form="@id('fx') @load(vm.formObject) @save(vm.formObject, before={'validate','applyChanges'})
 			@validator('org.openforis.collect.designer.form.validator.SurveyMainInfoFormValidator')"
-    sclass="form">
-    <groupbox width="100%" closable="false">
-      <caption label="${labels.survey.details}"/>
-      <grid>
-        <columns>
-          <column width="150px" />
-          <column />
-        </columns>
-        <rows>
-          <row>
-            <label value="${labels.survey.name}:" />
-            <fieldErrorHandler message="@load(vmsgs['name'])">
-              <textbox width="350px" value="@bind(fx.name)"
-                readonly="true" />
-            </fieldErrorHandler>
-          </row>
-          <row>
-            <fieldErrorHandler message="@load(vmsgs['projectName'])">
-	            <label
-					use="org.openforis.collect.designer.component.FieldLabel"
-	 				value="${labels.survey.project_name}" 
-	              	languageCode="@load(vm.currentLanguageCode)" />
-	        </fieldErrorHandler>
-            <fieldErrorHandler message="@load(vmsgs['projectName'])">
-              <textbox width="350px" value="@bind(fx.projectName)"
-              		placeholder="@bind(fx.defaultProjectName)"
-                	onChange="@command('applyChanges')" />
-            </fieldErrorHandler>
-          </row>
-          <row>
-            <fieldErrorHandler message="@load(vmsgs['description'])">
-	            <label
-					use="org.openforis.collect.designer.component.FieldLabel"
-	 				value="${labels.survey.description}" 
-	              	languageCode="@load(vm.currentLanguageCode)" />
-	        </fieldErrorHandler>
-            <fieldErrorHandler message="@load(vmsgs['description'])">
-              	<textbox width="350px" value="@bind(fx.description)"
-	                multiline="true" rows="4"
-	                placeholder="@bind(fx.defaultDescription)"
-	                onChange="@command('applyChanges')" />
-            </fieldErrorHandler>
-          </row>
-        </rows>
-      </grid>
-    </groupbox>
-    
-    <hlayout spacing="30px" style="padding: 30px">
-    	<hlayout>
-    		<button label="${labels.survey.versioning_manager}"
-              onClick="@global-command('openVersioningManagerPopUp')"
-              image="/assets/images/edit-big.png"
-              height="32" />
-         </hlayout>
-    	<hlayout>
-			<button label="${labels.survey.srs.$}"
-              onClick="@global-command('openSRSManagerPopUp')"
-              image="/assets/images/compass-medium.png"
-              height="32" />
-         </hlayout>
-    	<hlayout>
-            <button label="${labels.survey.unit.manager.title}"
-              onClick="@global-command('openUnitsManagerPopUp')"
-              image="/assets/images/ruler-medium.png"
-              height="32" />
-         </hlayout>
-    </hlayout>
+		sclass="form">
+		<groupbox width="100%" closable="false">
+			<caption label="${labels.survey.details}" />
+			<grid>
+				<columns>
+					<column width="150px" />
+					<column />
+				</columns>
+				<rows>
+					<row>
+						<label value="${labels.survey.name}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['name'])">
+							<textbox width="350px" value="@bind(fx.name)"
+								readonly="true" />
+						</fieldErrorHandler>
+					</row>
+					<row>
+						<fieldErrorHandler
+							message="@load(vmsgs['projectName'])">
+							<label
+								use="org.openforis.collect.designer.component.FieldLabel"
+								value="${labels.survey.project_name}"
+								languageCode="@load(vm.currentLanguageCode)" />
+						</fieldErrorHandler>
+						<fieldErrorHandler
+							message="@load(vmsgs['projectName'])">
+							<textbox width="350px" value="@bind(fx.projectName)"
+								placeholder="@bind(fx.defaultProjectName)"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row>
+						<fieldErrorHandler
+							message="@load(vmsgs['description'])">
+							<label
+								use="org.openforis.collect.designer.component.FieldLabel"
+								value="${labels.survey.description}"
+								languageCode="@load(vm.currentLanguageCode)" />
+						</fieldErrorHandler>
+						<fieldErrorHandler
+							message="@load(vmsgs['description'])">
+							<textbox width="350px" value="@bind(fx.description)"
+								multiline="true" rows="4"
+								placeholder="@bind(fx.defaultDescription)"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+				</rows>
+			</grid>
+		</groupbox>
 
-    <collapsiblepanel open="${not empty vm.surveyFiles}" captionLabel="${labels.survey.files}">
-    	<box>
-			<include src="survey_edit/survey_file_list.zul" />
-      	</box>
-	</collapsiblepanel>
-    
-	 <groupbox width="100%" closable="false"
-	 	visible="@load(vm.collectEarthSurvey)">
-      <caption label="${labels.survey.collect_earth.plot_layout.$}"/>
-      <hlayout style="padding: 10px">
-            <label value="${labels.survey.collect_earth.plot_layout.plot_area}:" />
-            <fieldErrorHandler message="@load(vmsgs['collectEarthPlotArea'])">
-				<listbox mold="select" rows="1" 
-					selectedItem="@load(fx.collectEarthPlotArea) @save(fx.collectEarthPlotArea)"
-					onSelect="@command('applyChanges')">
-					<listitem label="0.25 ha" value="0_25" />
-					<listitem label="0.50 ha" value="0_5" />
-					<listitem label="1 ha" value="1" />
-					<listitem label="5 ha" value="5" />
-					<listitem label="10 ha" value="10" />
-				</listbox>
-            </fieldErrorHandler>
-            <space width="100px" />
-            <label value="${labels.survey.collect_earth.plot_layout.sample_points}:"  />
-            <fieldErrorHandler message="@load(vmsgs['collectEarthSamplePoints'])">
-            	<listbox mold="select" rows="1" 
-					selectedItem="@load(fx.collectEarthSamplePoints) @save(fx.collectEarthSamplePoints)"
-					onSelect="@command('applyChanges')">
-					<listitem label="Empty square" value="0" />
-					<listitem label="Central point" value="1" />
-					<listitem label="3x3" value="9" />
-					<listitem label="5x5" value="25" />
-					<listitem label="7x7" value="49" />
-				</listbox>
-            </fieldErrorHandler>
-      </hlayout>
-      </groupbox>
-      
-      <groupbox width="100%" closable="false"
-	 	visible="@load(vm.collectEarthSurvey)">
-        <caption label="${labels.survey.collect_earth.other_settings.$}"/>
-        <hlayout style="padding: 10px">
+		<hlayout spacing="30px" style="padding: 30px">
+			<hlayout>
+				<button label="${labels.survey.versioning_manager}"
+					onClick="@global-command('openVersioningManagerPopUp')"
+					image="/assets/images/edit-big.png" height="32" />
+			</hlayout>
+			<hlayout>
+				<button label="${labels.survey.srs.$}"
+					onClick="@global-command('openSRSManagerPopUp')"
+					image="/assets/images/compass-medium.png" height="32" />
+			</hlayout>
+			<hlayout>
+				<button label="${labels.survey.unit.manager.title}"
+					onClick="@global-command('openUnitsManagerPopUp')"
+					image="/assets/images/ruler-medium.png" height="32" />
+			</hlayout>
+		</hlayout>
 
-         <fieldErrorHandler message="@load(vmsgs['bingMapsKey'])">
-	            <label
-					use="org.openforis.collect.designer.component.FieldLabel"
-	 				value="${labels.survey.collect_earth.other_settings.bing_maps}"  />
-	        </fieldErrorHandler>
-            <fieldErrorHandler message="@load(vmsgs['bingMapsKey'])">
-              <textbox width="350px" value="@bind(fx.bingMapsKey)"
-                onChange="@command('applyChanges')" />
-            </fieldErrorHandler>
-            
-		<button sclass="icon" 
-		      tooltiptext="${labels.survey.collect_earth.other_settings.bing_maps_tooltip}"
-		      href="http://www.bingmapsportal.com" target="_blank"
-		      image="/assets/images/info-small.png" />
-		 </hlayout>
-		 
-		 
-		  <hlayout style="padding: 10px">
-			
-            <fieldErrorHandler message="@load(vmsgs['openBingMaps'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_bing_maps}:" />
-	  					<checkbox
-	  						checked="@load(fx.openBingMaps eq true) @save(fx.openBingMaps)"
-	  						onCheck="@command('applyChanges')" />
-	  		</fieldErrorHandler>
-	  		
-	  		<space width="30px" />
-	  		
-	  		<fieldErrorHandler message="@load(vmsgs['openGEEExplorer'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />
-	  					<checkbox
-	  						checked="@load(fx.openGEEExplorer eq true) @save(fx.openGEEExplorer)"
-	  						onCheck="@command('applyChanges')" />
-	  		</fieldErrorHandler>
-	  		
-	  		<space width="30px" />
-	  		
-	  		 <fieldErrorHandler message="@load(vmsgs['openGEECodeEditor'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_gee_code_editor}:" />
-	  					<checkbox
-	  						checked="@load(fx.openGEECodeEditor eq true) @save(fx.openGEECodeEditor)"
-	  						onCheck="@command('applyChanges')" />
-	  		</fieldErrorHandler>
-	  		
-	  		<space width="30px" />
-	  		
-	  		 <fieldErrorHandler message="@load(vmsgs['openStreetView'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_street_view}:" />
-	  					<checkbox
-	  						checked="@load(fx.openStreetView eq true) @save(fx.openStreetView)"
-	  						onCheck="@command('applyChanges')" />
-	  		</fieldErrorHandler>
-	  		
-	  		<space width="30px" />
-	  		
-	  		 <fieldErrorHandler message="@load(vmsgs['openYandexMaps'])">
-		 		<label value="${labels.survey.collect_earth.other_settings.open_yandex_maps}:" />
-	  					<checkbox
-	  						checked="@load(fx.openYandexMaps eq true) @save(fx.openYandexMaps)"
-	  						onCheck="@command('applyChanges')" />
-	  		</fieldErrorHandler>
-	  	   </hlayout>
-            
-     </groupbox>
-     
-   	<collapsiblepanel open="false" visible="@load(not(vm.collectEarthSurvey))"
-		captionLabel="${labels.survey.other_options}">
-		<grid>
-			<columns>
-				<column width="250px" />
-				<column />
-			</columns>
-			<rows>
-				<row visible="@load(not(vm.collectEarthSurvey))">
-					<fieldErrorHandler
-						message="@load(vmsgs['keyChangeAllowed'])">
-						<label value="${labels.survey.key_change_allowed.$}" />
-						<image popup="keyChangeAllowedInfoTooltip"
-							style="cursor:pointer" src="/assets/images/info-small.png" />
-					</fieldErrorHandler>
-					<fieldErrorHandler
-						message="@load(vmsgs['keyChangeAllowed'])">
-						<checkbox checked="@bind(fx.keyChangeAllowed)"
-							onCheck="@command('applyChanges')" />
-					</fieldErrorHandler>
-				</row>
-			</rows>
-		</grid>
-	</collapsiblepanel>
-     
-  </div>
+		<collapsiblepanel open="${not empty vm.surveyFiles}"
+			captionLabel="${labels.survey.files}">
+			<box>
+				<include src="survey_edit/survey_file_list.zul" />
+			</box>
+		</collapsiblepanel>
 
-    <popup id="keyChangeAllowedInfoTooltip" width="300px">
-        <html><![CDATA[
+		<groupbox width="100%" closable="false"
+			visible="@load(vm.collectEarthSurvey)">
+			<caption label="${labels.survey.collect_earth.plot_layout.$}" />
+			<hlayout style="padding: 10px">
+				<label
+					value="${labels.survey.collect_earth.plot_layout.plot_area}:" />
+				<fieldErrorHandler
+					message="@load(vmsgs['collectEarthPlotArea'])">
+					<listbox mold="select" rows="1"
+						selectedItem="@load(fx.collectEarthPlotArea) @save(fx.collectEarthPlotArea)"
+						onSelect="@command('applyChanges')">
+						<listitem label="0.25 ha" value="0_25" />
+						<listitem label="0.50 ha" value="0_5" />
+						<listitem label="1 ha" value="1" />
+						<listitem label="5 ha" value="5" />
+						<listitem label="10 ha" value="10" />
+					</listbox>
+				</fieldErrorHandler>
+				<space width="100px" />
+				<label
+					value="${labels.survey.collect_earth.plot_layout.sample_points}:" />
+				<fieldErrorHandler
+					message="@load(vmsgs['collectEarthSamplePoints'])">
+					<listbox mold="select" rows="1"
+						selectedItem="@load(fx.collectEarthSamplePoints) @save(fx.collectEarthSamplePoints)"
+						onSelect="@command('applyChanges')">
+						<listitem label="Empty square" value="0" />
+						<listitem label="Central point" value="1" />
+						<listitem label="3x3" value="9" />
+						<listitem label="5x5" value="25" />
+						<listitem label="7x7" value="49" />
+					</listbox>
+				</fieldErrorHandler>
+			</hlayout>
+		</groupbox>
+
+		<groupbox width="100%" closable="false"
+			visible="@load(vm.collectEarthSurvey)">
+			<caption
+				label="${labels.survey.collect_earth.other_settings.$}" />
+			<hlayout style="padding: 10px">
+
+				<fieldErrorHandler
+					message="@load(vmsgs['bingMapsKey'])">
+					<label
+						use="org.openforis.collect.designer.component.FieldLabel"
+						value="${labels.survey.collect_earth.other_settings.bing_maps}" />
+				</fieldErrorHandler>
+				<fieldErrorHandler
+					message="@load(vmsgs['bingMapsKey'])">
+					<textbox width="350px" value="@bind(fx.bingMapsKey)"
+						onChange="@command('applyChanges')" />
+				</fieldErrorHandler>
+
+				<button sclass="icon"
+					tooltiptext="${labels.survey.collect_earth.other_settings.bing_maps_tooltip}"
+					href="http://www.bingmapsportal.com" target="_blank"
+					image="/assets/images/info-small.png" />
+			</hlayout>
+
+
+			<hlayout style="padding: 10px">
+
+				<fieldErrorHandler
+					message="@load(vmsgs['openBingMaps'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_bing_maps}:" />
+					<checkbox
+						checked="@load(fx.openBingMaps eq true) @save(fx.openBingMaps)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+
+				<space width="30px" />
+
+				<fieldErrorHandler
+					message="@load(vmsgs['openGEEExplorer'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />
+					<checkbox
+						checked="@load(fx.openGEEExplorer eq true) @save(fx.openGEEExplorer)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+
+				<space width="30px" />
+
+				<fieldErrorHandler
+					message="@load(vmsgs['openGEECodeEditor'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_gee_code_editor}:" />
+					<checkbox
+						checked="@load(fx.openGEECodeEditor eq true) @save(fx.openGEECodeEditor)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+
+				<space width="30px" />
+
+				<fieldErrorHandler
+					message="@load(vmsgs['openStreetView'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_street_view}:" />
+					<checkbox
+						checked="@load(fx.openStreetView eq true) @save(fx.openStreetView)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+
+				<space width="30px" />
+
+				<fieldErrorHandler
+					message="@load(vmsgs['openYandexMaps'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_yandex_maps}:" />
+					<checkbox
+						checked="@load(fx.openYandexMaps eq true) @save(fx.openYandexMaps)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+			</hlayout>
+
+			<hlayout style="padding: 10px">
+				<fieldErrorHandler
+					message="@load(vmsgs['extraMapUrl'])">
+					<label
+						use="org.openforis.collect.designer.component.FieldLabel"
+						value="${labels.survey.collect_earth.other_settings.extra_map_url}" />
+				</fieldErrorHandler>
+				<fieldErrorHandler
+					message="@load(vmsgs['extraMapUrl'])">
+					<textbox width="350px" value="@bind(fx.extraMapUrl)"
+						placeholder="${labels.survey.collect_earth.other_settings.extra_map_url_placeholder}"
+						onChange="@command('applyChanges')" />
+				</fieldErrorHandler>
+
+				<image popup="extraMapUrlInfoTooltip"
+					style="cursor:pointer" src="/assets/images/info-small.png" />
+			</hlayout>
+		</groupbox>
+
+		<collapsiblepanel open="false"
+			visible="@load(not(vm.collectEarthSurvey))"
+			captionLabel="${labels.survey.other_options}">
+			<grid>
+				<columns>
+					<column width="250px" />
+					<column />
+				</columns>
+				<rows>
+					<row visible="@load(not(vm.collectEarthSurvey))">
+						<fieldErrorHandler
+							message="@load(vmsgs['keyChangeAllowed'])">
+							<label value="${labels.survey.key_change_allowed.$}" />
+							<image popup="keyChangeAllowedInfoTooltip"
+								style="cursor:pointer" src="/assets/images/info-small.png" />
+						</fieldErrorHandler>
+						<fieldErrorHandler
+							message="@load(vmsgs['keyChangeAllowed'])">
+							<checkbox checked="@bind(fx.keyChangeAllowed)"
+								onCheck="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+				</rows>
+			</grid>
+		</collapsiblepanel>
+
+	</div>
+
+	<popup id="keyChangeAllowedInfoTooltip" width="300px">
+		<html><![CDATA[
     		${labels.survey.key_change_allowed.tooltip}
         ]]></html>
-    </popup>
+	</popup>
 
+	<popup id="extraMapUrlInfoTooltip" width="300px">
+		<html><![CDATA[
+    		${labels.survey.collect_earth.other_settings.extra_map_url_tooltip}
+        ]]></html>
+	</popup>
 </zk>

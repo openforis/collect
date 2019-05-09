@@ -18,6 +18,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String collectEarthSamplePoints;
 	private String collectEarthPlotArea;
 	private String bingMapsKey;
+	private String extraMapUrl;
 	private boolean openBingMaps;
 	private boolean openYandexMaps;
 	private boolean openGEEExplorer;
@@ -43,6 +44,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
 		bingMapsKey = annotations.getBingMapsKey();
+		extraMapUrl = annotations.getExtraMapUrl();
 		openBingMaps = annotations.isBingMapsEnabled();
 		openYandexMaps = annotations.isYandexMapsEnabled();
 		openStreetView = annotations.isStreetViewEnabled();
@@ -66,6 +68,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		annotations.setCollectEarthPlotArea(fromListitemValueToDouble(collectEarthPlotArea));
 		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
 		annotations.setBingMapsKey(bingMapsKey);
+		annotations.setExtraMapUrl(extraMapUrl);
 		annotations.setBingMapsEnabled( openBingMaps );
 		annotations.setYandexMapsEnabled( openYandexMaps );
 		annotations.setStreetViewEnabled( openStreetView );
@@ -139,6 +142,14 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		this.bingMapsKey = bingMapsKey;
 	}
 
+	public String getExtraMapUrl() {
+		return extraMapUrl;
+	}
+	
+	public void setExtraMapUrl(String extraMapUrl) {
+		this.extraMapUrl = extraMapUrl;
+	}
+	
 	public boolean isOpenBingMaps() {
 		return openBingMaps;
 	}
