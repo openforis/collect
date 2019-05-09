@@ -65,6 +65,7 @@ public class CollectControlPanelController implements Initializable {
 	private static final int LOG_TEXT_MAX_LENGTH = 20000;
 	private static final String CATALINA_BASE = "catalina.base";
 	private static final String ONLINE_MANUAL_URI = "http://www.openforis.org/tools/collect.html";
+	private static final String CHANGELOG_URI = "https://github.com/openforis/collect/blob/master/CHANGELOG.md";
 
 	public enum Status {
 		INITIALIZING, STARTING, RUNNING, STOPPING, ERROR, IDLE;
@@ -252,6 +253,11 @@ public class CollectControlPanelController implements Initializable {
 		app.getHostServices().showDocument(ONLINE_MANUAL_URI);
 	}
 
+	@FXML
+	public void handleShowChangelog(ActionEvent event) {
+		app.getHostServices().showDocument(CHANGELOG_URI);
+	}
+	
 	@FXML
 	public void handleAboutAction(ActionEvent event) throws IOException {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("about_dialog.fxml"));
