@@ -6,21 +6,26 @@ import static org.openforis.collect.persistence.jooq.Tables.OFC_SURVEY_FILE;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.ResultQuery;
 import org.jooq.Select;
 import org.jooq.StoreQuery;
+import org.jooq.Table;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
+import org.openforis.collect.Environment;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.persistence.SurveyFileDao.SurveyFileDSLContext;
+import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
+import org.openforis.collect.persistence.jooq.tables.OfcSurveyFile;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord;
 
 /**
@@ -29,6 +34,15 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord
  *
  */
 public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile, SurveyFileDSLContext> {
+	
+	private static final int BLOB_CHUNK_SIZE = 1000000;
+
+	private static final Field<?>[] SUMMARY_FIELDS = new Field<?>[] {
+		OFC_SURVEY_FILE.ID,
+		OFC_SURVEY_FILE.SURVEY_ID, 
+		OFC_SURVEY_FILE.TYPE,
+		OFC_SURVEY_FILE.FILENAME
+	};
 	
 	private static final Field<?>[] ALL_FIELDS = new Field<?>[] {
 		OFC_SURVEY_FILE.ID,
@@ -43,24 +57,30 @@ public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile,
 	}
 	
 	public byte[] loadContent(SurveyFile item) {
-		SurveyFileDSLContext dsl = dsl();
-		ResultQuery<?> selectQuery = dsl.selectByIdQuery(item.getId());
-		Record r = selectQuery.fetchOne();
-		if ( r == null ) {
-			return null;
+		OfcSurveyFile table = OFC_SURVEY_FILE;
+		TableField<OfcSurveyFileRecord, byte[]> field = table.CONTENT;
+		Condition condition = table.ID.eq(item.getId());
+		if (Environment.isAndroid()) {
+			return readInChunks(table, field, condition);
 		} else {
-			return r.getValue(OFC_SURVEY_FILE.CONTENT);
+			Record record = dsl()
+					.select(field)
+					.from(table)
+					.where(condition)
+					.fetchOne();
+			return record == null ? null : record.getValue(OFC_SURVEY_FILE.CONTENT);
 		}
 	}
+
 	
 	@Override
 	public List<SurveyFile> loadBySurvey(CollectSurvey survey) {
 		SurveyFileDSLContext dsl = dsl(survey);
-		Select<OfcSurveyFileRecord> select = 
-			dsl.selectFrom(OFC_SURVEY_FILE)
+		Select<Record> select = dsl.select(SUMMARY_FIELDS)
+				.from(OFC_SURVEY_FILE)
 				.where(OFC_SURVEY_FILE.SURVEY_ID.eq(survey.getId()))
 				.orderBy(OFC_SURVEY_FILE.ID);
-		Result<OfcSurveyFileRecord> result = select.fetch();
+		Result<Record> result = select.fetch();
 		return dsl.fromResult(result);
 	}
 	
@@ -128,6 +148,34 @@ public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile,
 				.from(OFC_SURVEY_FILE)
 				.fetchOne(0, Integer.class);
 		return result == null ? 0: result.intValue();
+	}
+	
+	private byte[] readInChunks(Table<?> table, TableField<?, byte[]> field,
+			Condition condition) {
+		CollectDSLContext dsl = dsl();
+		int size = dsl
+				.select(DSL.field(String.format("length(%s)", field.getName()), Integer.class))
+				.from(table)
+				.where(condition)
+				.fetchOne()
+				.getValue(0, Integer.class);
+		byte[] content = new byte[size];
+		
+		int startingPosition = 1;
+		while (startingPosition <= size) {
+			byte[] part = (byte[]) dsl
+					.select(DSL.field(String.format("substr(%s, %d, %d)", field.getName(), startingPosition, BLOB_CHUNK_SIZE)))
+					.from(table)
+					.where(condition)
+					.fetchOne()
+					.getValue(0);
+			//copy into content array
+			for (int i = 0; i < part.length; i++) {
+				content[startingPosition - 1 + i] = part[i];
+			}
+			startingPosition += BLOB_CHUNK_SIZE;
+		}
+		return content;
 	}
 	
 	public static class SurveyFileDSLContext extends SurveyObjectMappingDSLContext<SurveyFile> {
