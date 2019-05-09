@@ -37,6 +37,8 @@
 				<items>
 					<MenuItem text="Online Manual" onAction="#handleShowOnlineManual"/>
 					<SeparatorMenuItem />
+					<MenuItem text="Changelog" onAction="#handleShowChangelog"/>
+					<SeparatorMenuItem />
 					<MenuItem text="About" onAction="#handleAboutAction"/>
 				</items>
 			</Menu>
