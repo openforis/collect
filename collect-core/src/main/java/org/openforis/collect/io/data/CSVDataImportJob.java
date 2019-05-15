@@ -750,11 +750,7 @@ public class CSVDataImportJob extends Job {
 		}
 
 		private void updateRecordData(final CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
-			performRecordUpdate(record, dataStep, record.getDataWorkflowSequenceNumber());
-		}
-		
-		private void performRecordUpdate(final CollectRecord record, Step step, int sequenceNumber) {
-			recordManager.updateRecordStepDataAndRun(record, step, sequenceNumber, adminUser, false, new Runnable() {
+			recordManager.updateRecordStepDataAndRun(record, dataStep, record.getDataWorkflowSequenceNumber(), adminUser, false, new Runnable() {
 				public void run() {
 					if (nodeChangeBatchProcessor != null) {
 						nodeChangeBatchProcessor.process(record);
