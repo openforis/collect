@@ -72,8 +72,8 @@ public class CollectEarthSurveyValidator extends SurveyValidator {
 	 * Only single entities or multiple enumerated entities are supported
 	 */
 	@Override
-	protected List<SurveyValidationResult> validateEntity(EntityDefinition def) {
-		List<SurveyValidationResult> results = super.validateEntity(def);
+	protected List<SurveyValidationResult> validateEntity(EntityDefinition def, ValidationParameters validationParameters) {
+		List<SurveyValidationResult> results = super.validateEntity(def, validationParameters);
 		EntityDefinition rootEntityDef = def.getRootEntity();
 		if (def != rootEntityDef) {
 			if (def.getAncestorEntityDefinitions().size() > 1) {

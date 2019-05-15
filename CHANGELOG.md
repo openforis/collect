@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.24.21] - 2019-05-16
 ### Fixed
 - Fixed bug: code list items not showing properly in hierarchical code lists (sampling point data)
+- Fixed bug: cannot publish survey with missing virtual entity node definitions
 
 ## [3.24.20] - 2019-05-09
 ### Added

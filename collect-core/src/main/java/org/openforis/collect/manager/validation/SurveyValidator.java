@@ -218,7 +218,7 @@ public class SurveyValidator {
 		
 		results.addResults(validateRootKeyAttributeSpecified(survey));
 		results.addResults(validateShowCountInRecordListEntityCount(survey));
-		results.addResults(validateSchemaNodes(survey));
+		results.addResults(validateSchemaNodes(survey, validationParameters));
 		results.addResults(validateCodeLists(survey, validationParameters));
 		results.addResults(validateSurveyFiles(survey, validationParameters ));
 		
@@ -258,18 +258,20 @@ public class SurveyValidator {
 	
 	private List<SurveyValidationResult> validateCodeLists(CollectSurvey survey, ValidationParameters validationParameters) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
-		for (CodeList list : survey.getCodeLists()) {
-			if ( ! survey.isPredefinedCodeList(list) ) {
-				if ( !validationParameters.warningsIgnored && ! codeListManager.isInUse(list) ) {
-					//unused code list not allowed
-					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
-							String.format(CODE_LIST_PATH_FORMAT, list.getName()), UNUSED_CODE_LIST_MESSAGE_KEY);
-					results.add(validationResult);
-				} else if ( !validationParameters.warningsIgnored && ! list.isExternal() && codeListManager.isEmpty(list) ) {
-					//empty code list not allowed
-					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
-							String.format(CODE_LIST_PATH_FORMAT, list.getName()), EMPTY_CODE_LIST_MESSAGE_KEY);
-					results.add(validationResult);
+		if (!validationParameters.warningsIgnored) {
+			for (CodeList list : survey.getCodeLists()) {
+				if ( ! survey.isPredefinedCodeList(list) ) {
+					if ( ! codeListManager.isInUse(list) ) {
+						//unused code list not allowed
+						SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
+								String.format(CODE_LIST_PATH_FORMAT, list.getName()), UNUSED_CODE_LIST_MESSAGE_KEY);
+						results.add(validationResult);
+					} else if ( ! list.isExternal() && codeListManager.isEmpty(list) ) {
+						//empty code list not allowed
+						SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
+								String.format(CODE_LIST_PATH_FORMAT, list.getName()), EMPTY_CODE_LIST_MESSAGE_KEY);
+						results.add(validationResult);
+					}
 				}
 			}
 		}
@@ -308,16 +310,13 @@ public class SurveyValidator {
 						fileValidationResult.getExpectedHeaders().toString(), 
 						fileValidationResult.getFoundHeaders().toString());
 				break;
-				
 			case INVALID_VALUES_IN_CSV:
-				validationResult = new SurveyValidationResult(
-						Flag.WARNING, 
+				validationResult = new SurveyValidationResult(Flag.WARNING, 
 						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
 						"survey.file.error.invalid_content", 
 						getRowValidationMessages(fileValidationResult.getRowValidations())
 						);
 				break;
-			
 			case INVALID_NUMBER_OF_COLUMNS:
 				validationResult = new SurveyValidationResult(Flag.WARNING, 
 						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
@@ -332,16 +331,12 @@ public class SurveyValidator {
 						"survey.file.error.error_csv_size", 
 						fileValidationResult.getNumberOfRows().toString());
 				break;
-				
 			case INVALID_NUMBER_OF_PLOTS_WARNING:
 				validationResult = new SurveyValidationResult(Flag.WARNING, 
 						String.format(SURVEY_FILE_PATH_FORMAT, surveyFile.getFilename()), 
 						"survey.file.error.warning_csv_size", 
 						fileValidationResult.getNumberOfRows().toString());
 				break;
-			
-				
-				
 			default:
 			}
 			if( validationResult != null && (!validationParameters.warningsIgnored || validationResult.getFlag() != Flag.WARNING))
@@ -379,19 +374,19 @@ public class SurveyValidator {
 	 * @param survey
 	 * @return
 	 */
-	protected List<SurveyValidationResult> validateSchemaNodes(CollectSurvey survey) {
+	protected List<SurveyValidationResult> validateSchemaNodes(CollectSurvey survey, final ValidationParameters validationParameters) {
 		final List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
 		schema.traverse(new NodeDefinitionVisitor() {
 			@Override
 			public void visit(NodeDefinition def) {
-				results.addAll(validateSchemaNode(def));
+				results.addAll(validateSchemaNode(def, validationParameters));
 			}
 		});
 		return results;
 	}
 
-	private List<SurveyValidationResult> validateSchemaNode(NodeDefinition def) {
+	private List<SurveyValidationResult> validateSchemaNode(NodeDefinition def, ValidationParameters validationParameters) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		
 		if (! validateNodeName(def.getName())) {
@@ -406,7 +401,7 @@ public class SurveyValidator {
 		results.addAll(validateExpressions(def));
 		
 		if (def instanceof EntityDefinition) {
-			results.addAll(validateEntity((EntityDefinition) def));
+			results.addAll(validateEntity((EntityDefinition) def, validationParameters));
 		} else {
 			results.addAll(validateAttribute((AttributeDefinition) def));
 		}
@@ -454,7 +449,7 @@ public class SurveyValidator {
 		return fullInternalName;
 	}
 	
-	protected List<SurveyValidationResult> validateEntity(EntityDefinition entityDef) {
+	protected List<SurveyValidationResult> validateEntity(EntityDefinition entityDef, ValidationParameters validationParameters) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		List<NodeDefinition> childDefinitions = entityDef.getChildDefinitions();
 		if ( childDefinitions.size() == 0 ) {
@@ -477,7 +472,8 @@ public class SurveyValidator {
 			String sourceEntityPath = Path.getAbsolutePath(generatorExpression);
 			EntityDefinition sourceEntityDef = (EntityDefinition) entityDef.getParentDefinition().getDefinitionByPath(sourceEntityPath);
 			for (NodeDefinition sourceChildDef : sourceEntityDef.getChildDefinitions()) {
-				boolean skipNode = sourceChildDef instanceof AttributeDefinition && ((AttributeDefinition) sourceChildDef).getReferencedAttribute() != null;
+				boolean skipNode = sourceChildDef instanceof AttributeDefinition && 
+						((AttributeDefinition) sourceChildDef).getReferencedAttribute() != null;
 				if (! skipNode) {
 					if (entityDef.containsChildDefinition(sourceChildDef.getName())) {
 						NodeDefinition foundChildDef = entityDef.getChildDefinition(sourceChildDef.getName());
@@ -485,17 +481,19 @@ public class SurveyValidator {
 							results.add(new SurveyValidationResult(Flag.ERROR, entityDef.getPath(), 
 									INVALID_VIRTUAL_NODE_TYPE_MESSAGE_KEY, foundChildDef.getName()));
 						}
-					} else {
+					} else if (!validationParameters.isWarningsIgnored()) {
 						results.add(new SurveyValidationResult(Flag.WARNING, entityDef.getPath(), 
 								MISSING_VIRTUAL_NODE, sourceChildDef.getName()));
 					}
 				}
 			}
-			for (NodeDefinition virtualChildDef : entityDef.getChildDefinitions()) {
-				if (! sourceEntityDef.containsChildDefinition(virtualChildDef.getName())) {
-					results.add(new SurveyValidationResult(Flag.WARNING, entityDef.getPath(), 
-							SOURCE_NODE_NOT_FOUND_FOR_VIRTUAL_NODE_MESSAGE_KEY, 
-							virtualChildDef.getName(), sourceEntityDef.getName()));
+			if (!validationParameters.isWarningsIgnored()) {
+				for (NodeDefinition virtualChildDef : entityDef.getChildDefinitions()) {
+					if (! sourceEntityDef.containsChildDefinition(virtualChildDef.getName())) {
+						results.add(new SurveyValidationResult(Flag.WARNING, entityDef.getPath(), 
+								SOURCE_NODE_NOT_FOUND_FOR_VIRTUAL_NODE_MESSAGE_KEY, 
+								virtualChildDef.getName(), sourceEntityDef.getName()));
+					}
 				}
 			}
 		}
