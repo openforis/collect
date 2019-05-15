@@ -69,7 +69,7 @@ public class DatabaseExternalCodeListProvider implements
 	public ExternalCodeListItem getItem(CodeAttribute attribute) {
 		CodeAttributeDefinition defn = attribute.getDefinition();
 		CodeList list = defn.getList();
-		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+		if (isSamplingDesignCodeList(list)) {
 			return getItemFromSamplingDesign(attribute);
 		} else {
 			List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
@@ -132,7 +132,7 @@ public class DatabaseExternalCodeListProvider implements
 
 	@Override
 	public List<ExternalCodeListItem> getRootItems(CodeList list) {
-		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+		if (isSamplingDesignCodeList(list)) {
 			List<SamplingDesignItem> samplingDesignItems = samplingDesignDao.loadChildItems(list.getSurvey().getId());
 			return samplingDesignItemsToItems(list, samplingDesignItems, 1);
 		} else {
@@ -165,7 +165,7 @@ public class DatabaseExternalCodeListProvider implements
 			return null;
 		
 		Map<String, String> parentKeyByLevel = new HashMap<String, String>();
-		for (int ancestorLevelIndex = 0; ancestorLevelIndex < level; ancestorLevelIndex ++) {
+		for (int ancestorLevelIndex = 0; ancestorLevelIndex < level - 1; ancestorLevelIndex ++) {
 			String ancestorLevelName = list.getHierarchy().get(ancestorLevelIndex).getName();
 			parentKeyByLevel.put(ancestorLevelName, samplingDesignItem.getLevelCode(ancestorLevelIndex + 1));
 		}
@@ -194,7 +194,7 @@ public class DatabaseExternalCodeListProvider implements
 		if (childrenLevel > list.getHierarchy().size()) {
 			return Collections.emptyList();
 		}
-		if (CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME.equals(list.getName())) {
+		if (isSamplingDesignCodeList(list)) {
 			List<String> ancestorKeys = new ArrayList<String>(item.getParentKeys());
 			ancestorKeys.add(item.getCode());
 			List<SamplingDesignItem> samplingDesignItems = samplingDesignDao.loadChildItems(list.getSurvey().getId(), ancestorKeys);
@@ -421,11 +421,15 @@ public class DatabaseExternalCodeListProvider implements
 		return codes;
 	}
 
-    public DynamicTableDao getDynamicTableDao() {
-        return dynamicTableDao;
-    }
+	private boolean isSamplingDesignCodeList(CodeList list) {
+		return ((CollectSurvey) list.getSurvey()).isSamplingDesignCodeList(list);
+	}
 
-    public void setDynamicTableDao(DynamicTableDao dynamicTableDao) {
-        this.dynamicTableDao = dynamicTableDao;
-    }
+	public DynamicTableDao getDynamicTableDao() {
+		return dynamicTableDao;
+	}
+
+	public void setDynamicTableDao(DynamicTableDao dynamicTableDao) {
+		this.dynamicTableDao = dynamicTableDao;
+	}
 }

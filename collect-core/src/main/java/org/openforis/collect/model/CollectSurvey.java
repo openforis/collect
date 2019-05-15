@@ -95,11 +95,15 @@ public class CollectSurvey extends Survey {
 	
 	public CodeList getSamplingDesignCodeList() {
 		for (CodeList list : getCodeLists()) {
-			if ( SAMPLING_DESIGN_TABLE_NAME.equals(list.getLookupTable()) ) {
+			if ( isSamplingDesignCodeList(list) ) {
 				return list;
 			}
 		}
 		return null;
+	}
+	
+	public boolean isSamplingDesignCodeList(CodeList list) {
+		return SAMPLING_DESIGN_TABLE_NAME.equals(list.getLookupTable());
 	}
 	
 	public CodeList addSamplingDesignCodeList() {

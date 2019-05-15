@@ -16,6 +16,7 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.path.InvalidPathException;
+import org.openforis.idm.path.Path;
 
 /**
  * @author G. Miceli
@@ -160,8 +161,8 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 			EntityDefinition firstCommonAncestor = parentCodeAttributeDefinition.getParentEntityDefinition();
 			EntityDefinition ancestor = this.getParentEntityDefinition();
 			while ( ancestor != null && ancestor != firstCommonAncestor ) {
-				sb.append("parent()");
-				sb.append("/");
+				sb.append(Path.PARENT_FUNCTION);
+				sb.append(Path.SEPARATOR);
 				ancestor = ancestor.getParentEntityDefinition();
 			}
 			if ( ancestor == firstCommonAncestor ) {
