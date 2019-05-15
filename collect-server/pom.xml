@@ -13,7 +13,7 @@
 	<properties>
 		<collectearth.version>1.8.1</collectearth.version>
 		<repository-message-broker.version>0.1.3</repository-message-broker.version>
-		<geotools.version>20.0</geotools.version>
+		<geotools.version>20.3</geotools.version>
 		<graniteds.version>2.3.0.GA</graniteds.version>
 		<aspectj.version>1.9.2</aspectj.version>
 		<zk.version>6.5.1.1</zk.version>
