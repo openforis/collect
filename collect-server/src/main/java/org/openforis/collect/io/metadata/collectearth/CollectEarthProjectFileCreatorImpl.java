@@ -172,7 +172,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
 		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
 		p.put("open_street_view", isStreetViewEnabled(survey));
-		p.put("extra_map_url", getExtraMapUrl(survey));
+		p.put("extra_map_url", StringUtils.trimToEmpty(getExtraMapUrl(survey)));
 		p.put("coordinates_reference_system", getSRSUsed(survey));
 
 		File file = File.createTempFile("collect-earth-project", ".properties");
