@@ -1,11 +1,13 @@
 package org.openforis.collect.io.metadata.samplingdesign;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.jooq.tools.StringUtils;
 import org.openforis.collect.io.metadata.parsing.ReferenceDataLine;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
@@ -76,10 +78,19 @@ public class SamplingDesignLine extends ReferenceDataLine {
 		return item;
 	}
 	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
+
 	public static class SamplingDesignLineCodeKey implements Comparable<SamplingDesignLineCodeKey> {
 		
 		private List<String> levelCodes;
 
+		public SamplingDesignLineCodeKey(String ...levelCodes) {
+			this(Arrays.asList(levelCodes));
+		}
+		
 		public SamplingDesignLineCodeKey(List<String> levelCodes) {
 			super();
 			this.levelCodes = levelCodes;
@@ -110,22 +121,19 @@ public class SamplingDesignLine extends ReferenceDataLine {
 			return result;
 		}
 
+		/**
+		 * Compares level codes with natural sort order
+		 */
 		private int compareLevelCodes(String code1, String code2) {
-			if (NumberUtils.isNumber(code1) && NumberUtils.isNumber(code2)) {
-				Integer int1 = toInt(code1);
-				Integer int2 = toInt(code2);
-				if (int1 != null && int2 != null) {
-					return NumberUtils.compare(int1, int2);
-				}
-			}
-			return code1.compareTo(code2);
-		}
-		
-		public Integer toInt(String value) {
-			try {
-				return Integer.parseInt(value);
-			} catch (NumberFormatException e) {
-				return null;
+			int maxLength = Math.max(code1.length(), code2.length());
+			String code1Pad = StringUtils.leftPad(code1, maxLength, '0');
+			String code2Pad = StringUtils.leftPad(code2, maxLength, '0');
+			int result = code1Pad.compareTo(code2Pad);
+			if (result == 0 && code1.length() != code2.length()) {
+				//avoid codes collision
+				return code1.compareTo(code2);
+			} else {
+				return result;
 			}
 		}
 		
@@ -157,7 +165,11 @@ public class SamplingDesignLine extends ReferenceDataLine {
 				return false;
 			return true;
 		}
-		
+
+		@Override
+		public String toString() {
+			return levelCodes.toString();
+		}
 	}
 
 }

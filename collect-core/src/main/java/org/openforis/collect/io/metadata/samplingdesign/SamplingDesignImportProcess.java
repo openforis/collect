@@ -107,12 +107,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 				try {
 					SamplingDesignLine line = reader.readNextLine();
 					if ( line != null ) {
-						List<SamplingDesignLine> lines = linesByKey.get(line.getKey());
-						if (lines == null) {
-							lines = new ArrayList<SamplingDesignLine>();
-							linesByKey.put(line.getKey(), lines);
-						}
-						lines.add(line);
+						addLineToLinesByKey(line);
 					}
 					if ( ! reader.isReady() ) {
 						break;
@@ -135,7 +130,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 			IOUtils.closeQuietly(reader);
 		}
 	}
-	
+
 	protected void processLines() {
 		for (List<SamplingDesignLine> lines : linesByKey.values()) {
 			for (SamplingDesignLine line : lines) {
@@ -173,14 +168,6 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 				throwDuplicateLineException(line, existingLine, new SamplingDesignFileColumn[]{lastLevelCol});
 			}
 		}
-//		for (SamplingDesignLine currentLine : lines) {
-//			if ( currentLine.getLineNumber() != line.getLineNumber() ) {
-//				if ( line.getLevelCodes().equals(currentLine.getLevelCodes()) ) {
-//					SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getLevelCodes().size() - 1];
-//					throwDuplicateLineException(line, currentLine, new SamplingDesignFileColumn[]{lastLevelCol});
-//				}
-//			}
-//		}
 	}
 	
 	protected void throwDuplicateLineException(SamplingDesignLine line, SamplingDesignLine duplicateLine, 
@@ -241,6 +228,15 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		return items;
 	}
 	
+	private void addLineToLinesByKey(SamplingDesignLine line) {
+		List<SamplingDesignLine> lines = linesByKey.get(line.getKey());
+		if (lines == null) {
+			lines = new ArrayList<SamplingDesignLine>();
+			linesByKey.put(line.getKey(), lines);
+		}
+		lines.add(line);
+	}
+	
 	public List<String> getInfoColumnNames() {
 		return reader.getInfoColumnNames();
 	}
@@ -248,4 +244,5 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
+	
 }
