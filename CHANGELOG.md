@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.24.23] - 2019-05-29
+### Fixed
+- Fixed error importing sampling point data
+- Allow importing data generated with a survey where node definition cardinality was "single" and became "multiple"
+
 ## [3.24.22] - 2019-05-17
 ### Fixed
 - Fixed bug: Collect Earth survey export error
