@@ -181,34 +181,38 @@ public class SurveyValidator {
 	private ExpressionValidator expressionValidator;
 
 	/**
-	 * Verifies that the survey is compatible with an existing one and that replacing the old one
-	 * will not break the inserted data (if any). 
+	 * Verifies that the published survey is compatible with the new one and that there won't be any data data loss.
 	 */
-	public SurveyValidationResults validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
-		return validateCompatibility(oldPublishedSurvey, newSurvey, new ValidationParameters());
+	public SurveyValidationResults validateCompatibilityForPublishing(CollectSurvey publishedSurvey, CollectSurvey newSurvey) {
+		return validateCompatibilityForPublishing(publishedSurvey, newSurvey, new ValidationParameters());
 	}
 	
-	public SurveyValidationResults validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey, 
+	public SurveyValidationResults validateCompatibilityForPublishing(CollectSurvey publishedSurvey, CollectSurvey newSurvey, 
 			ValidationParameters parameters) {
 		SurveyValidationResults results = validate(newSurvey, parameters);
-		if ( oldPublishedSurvey != null ) {
-			results.addResults(validateChanges(oldPublishedSurvey, newSurvey));
+		if ( publishedSurvey != null ) {
+			results.addResults(validateChanges(publishedSurvey, newSurvey));
 		}
 		return results;
 	}
 
-	public void checkCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) throws SurveyValidationException {
-		checkCompatibility(oldPublishedSurvey, newSurvey, new ValidationParameters());
-	}
-
-	public void checkCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey, 
-			ValidationParameters parameters) throws SurveyValidationException {
-		SurveyValidationResults results = validateCompatibility(oldPublishedSurvey, newSurvey, parameters);
-		if ( results.hasErrors() ) {
-			throw new SurveyValidationException("The survey is not compatible with the old published one");
-		}
+	
+	/**
+	 * Verifies that the published survey is compatible with the one packaged with the data to import
+	 */
+	public SurveyValidationResults validateCompatibilityForDataImport(CollectSurvey publishedSurvey, CollectSurvey dataToImportSurvey) {
+		return validateCompatibilityForDataImport(publishedSurvey, dataToImportSurvey, new ValidationParameters());
 	}
 	
+	public SurveyValidationResults validateCompatibilityForDataImport(CollectSurvey publishedSurvey, CollectSurvey dataToImportSurvey, 
+			ValidationParameters parameters) {
+		SurveyValidationResults results = validate(dataToImportSurvey, parameters);
+		if ( publishedSurvey != null ) {
+			results.addResults(validateChanges(dataToImportSurvey, publishedSurvey));
+		}
+		return results;
+	}
+
 	public SurveyValidationResults validate(CollectSurvey survey) {
 		return validate(survey, new ValidationParameters());
 	}

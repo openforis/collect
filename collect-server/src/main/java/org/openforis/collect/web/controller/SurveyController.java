@@ -252,7 +252,7 @@ public class SurveyController extends BasicController {
 		SurveyValidator validator = getSurveyValidator(survey);
 		ValidationParameters validationParameters = new ValidationParameters();
 		validationParameters.setWarningsIgnored(ignoreWarnings);
-		SurveyValidationResults results = validator.validateCompatibility(publishedSurvey, survey, validationParameters);
+		SurveyValidationResults results = validator.validateCompatibilityForPublishing(publishedSurvey, survey, validationParameters);
 		if (results.hasErrors() || results.hasWarnings()) {
 			return new SurveyPublishResult(results);
 		} else {

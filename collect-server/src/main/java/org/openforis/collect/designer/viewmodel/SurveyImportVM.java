@@ -387,7 +387,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected boolean validateSurveyForPublishing(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
-		SurveyValidationResults validationResults = surveyValidator.validateCompatibility(oldPublishedSurvey, survey);
+		SurveyValidationResults validationResults = surveyValidator.validateCompatibilityForPublishing(oldPublishedSurvey, survey);
 		if ( validationResults.isOk() ) {
 			return true;
 		} else {

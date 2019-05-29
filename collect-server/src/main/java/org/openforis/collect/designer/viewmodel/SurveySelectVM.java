@@ -198,7 +198,7 @@ public class SurveySelectVM extends BaseVM {
 		final CollectSurvey publishedSurvey = selectedSurvey.isPublished() ? surveyManager
 				.getByUri(survey.getUri()) : null;
 		SurveyValidator validator = getSurveyValidator(survey);
-		SurveyValidationResults validationResults = validator.validateCompatibility(publishedSurvey, survey);
+		SurveyValidationResults validationResults = validator.validateCompatibilityForPublishing(publishedSurvey, survey);
 		if (validationResults.isOk()) {
 			askConfirmThenPublishSurvey(survey, binder);
 		} else {

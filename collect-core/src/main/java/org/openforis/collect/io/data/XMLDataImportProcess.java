@@ -225,18 +225,18 @@ public class XMLDataImportProcess implements Callable<Void>, Closeable {
 	}
 
 	private void validatePackagedSurvey() throws DataImportExeption {
-		CollectSurvey existingSurvey = getExistingSurvey();
-		if ( packagedSurvey == null && existingSurvey == null ) {
+		CollectSurvey publishedSurvey = getExistingSurvey();
+		if ( packagedSurvey == null && publishedSurvey == null ) {
 			throw new IllegalStateException("Published survey not found and " + XMLDataExportProcess.IDML_FILE_NAME + " not found in packaged file");
 		} else if ( packagedSurvey == null ) {
-			packagedSurvey = existingSurvey;
+			packagedSurvey = publishedSurvey;
 		} else {
 			String packagedSurveyUri = packagedSurvey.getUri();
 			if ( surveyUri != null && !surveyUri.equals(packagedSurveyUri) ) {
 				throw new IllegalArgumentException("Cannot import data related to survey '" + packagedSurveyUri + 
 						"' into on a different survey (" + surveyUri + ")");
 			}
-			SurveyValidationResults compatibilityResult = surveyValidator.validateCompatibility(existingSurvey, packagedSurvey);
+			SurveyValidationResults compatibilityResult = surveyValidator.validateCompatibilityForDataImport(publishedSurvey, packagedSurvey);
 			if ( compatibilityResult.hasErrors() ) {
 				throw new DataImportExeption("Packaged survey is not compatible with the survey already present into the system.\n" +
 						"Please try to import it using the Designer to get the list of errors.");
