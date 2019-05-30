@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed error importing sampling point data
 - Allow importing data generated with a survey where node definition cardinality was "single" and became "multiple"
+- Fixed Saiku DB generation in PostgreSQL (coordinate attributes)
 
 ## [3.24.22] - 2019-05-17
 ### Fixed

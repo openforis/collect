@@ -81,12 +81,8 @@ public class CollectDSLContext extends DefaultDSLContext {
 		Class<?> jooqType;
 		if (type == Date.class) {
 			jooqType = java.sql.Date.class;
-		} else if (type == Double.class) {
-			if (dialect() == SQLDialect.SQLITE) {
-				jooqType = Float.class; //it will be translated into an SQL REAL data type
-			} else {
-				jooqType = BigDecimal.class;
-			}
+		} else if (type == Double.class && dialect() == SQLDialect.SQLITE) {
+			jooqType = Float.class; //it will be translated into an SQL REAL data type
 		} else {
 			jooqType = type;
 		}
@@ -94,12 +90,7 @@ public class CollectDSLContext extends DefaultDSLContext {
 	}
 	
 	private boolean isSequenceSupported() {
-		switch (configuration().dialect()) {
-		case SQLITE:
-			return false;
-		default:
-			return true;
-		}
+		return configuration().dialect() != SQLDialect.SQLITE;
 	}
 	
 	public boolean isSchemaLess() {
