@@ -1,8 +1,10 @@
+import 'react-datepicker/dist/react-datepicker.css';
+
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 import { Line } from 'react-chartjs-2';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
-import 'react-datepicker/dist/react-datepicker.css';import { connect } from 'react-redux'
 
 import Dates from 'utils/Dates';
 import L from 'utils/Labels';
