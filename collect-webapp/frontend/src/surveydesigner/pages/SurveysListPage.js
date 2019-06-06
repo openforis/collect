@@ -264,7 +264,7 @@ class SurveysListPage extends Component {
                                     {selectedSurvey && selectedSurvey.temporary &&
                                         <DropdownItem divider />
                                     }
-                                    {selectedSurvey && selectedSurvey.published && (!selectedSurvey.temporary || selectedSurvey.publishedId) &&
+                                    {selectedSurvey && selectedSurvey.published &&
                                         <DropdownItem color="warning" onClick={this.handleUnpublishButtonClick}><i className="fa fa-ban" aria-hidden="true"></i>{L.l('survey.unpublish')}</DropdownItem>
                                     }
                                     <DropdownItem color="primary" onClick={this.handleCloneButtonClick}><i className="fa fa-clone" aria-hidden="true"></i>{L.l('survey.clone')}</DropdownItem>
