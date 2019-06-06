@@ -32,72 +32,67 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(SCOPE_PROTOTYPE)
 public class ValidationReportJob extends Job {
-	
-	private static final String[] VALIDATION_REPORT_HEADERS = new String[] {
-			"Record","Phase","Attribute Schema Path",
-			"Field path","Field path (labels)","Error message"};
+
+	private static final String[] VALIDATION_REPORT_HEADERS = new String[] { "Record", "Phase", "Attribute Schema Path",
+			"Field path", "Field path (labels)", "Error message", "Severity" };
 
 	public enum ReportType {
 		CSV
 	}
-	
+
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
 	private MessageSource messageSource;
-	
+
 	private Input input;
 
 	private ValidationMessageBuilder validationMessageBuilder;
 	private CsvWriter csvWriter;
 	private OutputStream outputStream;
 	private File outputFile;
-	
+
 	@Override
 	protected void initializeInternalVariables() throws Throwable {
 		super.initializeInternalVariables();
-		
+
 		validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
 		outputFile = File.createTempFile("of_collect_validation_report", ".csv");
 		outputStream = new FileOutputStream(outputFile);
-		
-		switch (input.reportType) {
-		case CSV:
+
+		if (input.reportType == ReportType.CSV) {
 			csvWriter = new CsvWriter(outputStream, IOUtils.UTF_8, ',', '"');
-			break;
 		}
 	}
-	
+
 	@Override
 	protected void buildTasks() throws Throwable {
 		ValidationReportTask task = new ValidationReportTask();
 		addTask(task);
 	}
-	
+
 	@Override
 	protected void onEnd() {
 		super.onEnd();
-		switch (input.reportType) {
-		case CSV:
+		if (input.reportType == ReportType.CSV) {
 			org.apache.commons.io.IOUtils.closeQuietly(csvWriter);
-			break;
 		}
 	}
-	
+
 	public Input getInput() {
 		return this.input;
 	}
-	
+
 	public void setInput(Input input) {
 		this.input = input;
 	}
-	
+
 	public File getOutputFile() {
 		return outputFile;
 	}
-	
+
 	public static class Input {
-		
+
 		private ReportType reportType = ReportType.CSV;
 		private RecordFilter recordFilter;
 		private boolean includeConfirmedErrors = true;
@@ -135,18 +130,18 @@ public class ValidationReportJob extends Job {
 			this.locale = locale;
 		}
 	}
-	
+
 	private class ValidationReportTask extends Task {
 
 		@Override
 		protected void execute() throws Throwable {
 			writeHeader();
-			
+
 			CollectSurvey survey = input.recordFilter.getSurvey();
-			
+
 			recordManager.visitSummaries(input.recordFilter, null, new Visitor<CollectRecordSummary>() {
 				public void visit(CollectRecordSummary summary) {
-					if ( isRunning() ) {
+					if (isRunning()) {
 						try {
 							Step step = summary.getStep();
 							Integer recordId = summary.getId();
@@ -160,21 +155,19 @@ public class ValidationReportJob extends Job {
 				}
 			});
 		}
-		
+
 		protected void writeValidationReport(CollectRecord record) throws IOException {
 			RecordValidationReportGenerator reportGenerator = new RecordValidationReportGenerator(record);
-			List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(
-					input.locale, ValidationResultFlag.ERROR, input.includeConfirmedErrors);
+			List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(input.locale,
+					ValidationResultFlag.WARNING, input.includeConfirmedErrors);
 			for (RecordValidationReportItem item : validationItems) {
 				writeValidationReportLine(record, item);
 			}
 		}
-		
+
 		protected void writeHeader() throws IOException {
-			switch (input.reportType) {
-			case CSV:
+			if (input.reportType == ReportType.CSV) {
 				csvWriter.writeHeaders(VALIDATION_REPORT_HEADERS);
-			break;
 			}
 		}
 
@@ -183,11 +176,11 @@ public class ValidationReportJob extends Job {
 			String phase = record.getStep().name();
 			String absolutePath = Path.getAbsolutePath(item.getPath());
 			NodeDefinition nodeDef = record.getSurvey().getSchema().getDefinitionByPath(absolutePath);
-			String[] line = new String[]{recordKey, phase, nodeDef.getPath(), item.getPath(), item.getPrettyFormatPath(), item.getMessage()};
-			switch (input.reportType) {
-			case CSV:
+			String[] line = new String[] { recordKey, phase, nodeDef.getPath(), item.getPath(),
+					item.getPrettyFormatPath(), item.getMessage(),
+					item.getSeverity().name().toLowerCase(Locale.ENGLISH) };
+			if (input.reportType == ReportType.CSV) {
 				csvWriter.writeNext(line);
-				break;
 			}
 		}
 	}
