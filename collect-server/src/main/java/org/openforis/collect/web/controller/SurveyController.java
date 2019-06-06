@@ -174,13 +174,13 @@ public class SurveyController extends BasicController {
 		}
 		
 		List<Object> views = new ArrayList<Object>(allSummaries.size());
-		for (SurveySummary surveySummary : allSummaries) {
-			if (fullSurveys) {
+		if (fullSurveys) {
+			for (SurveySummary surveySummary : allSummaries) {
 				CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveySummary.getId());
 				views.add(generateView(survey, includeCodeListValues));
-			} else {
-				views.add(surveySummary);
 			}
+		} else {
+			views.addAll(allSummaries);
 		}
 		views.sort(Collections.reverseOrder(new BeanComparator<Object>("modifiedDate")));
 		return views;
