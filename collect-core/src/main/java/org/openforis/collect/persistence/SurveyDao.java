@@ -148,6 +148,7 @@ public class SurveyDao extends JooqDaoSupport {
 		for (Record row : results) {
 			SurveySummary survey = processSurveySummaryRow(row);
 			if (survey != null) {
+				survey.setPublished(false);
 				surveys.add(survey);
 			}
 		}
@@ -302,7 +303,9 @@ public class SurveyDao extends JooqDaoSupport {
 		String langs = StringUtils.defaultString(row.getValue(OFC_SURVEY.LANGS));
 		s.setLanguages(Arrays.asList(StringUtils.split(langs, ',')));
 		s.setDefaultLanguage(s.getLanguages().isEmpty() ? null : s.getLanguages().get(0));
-		
+
+		//determine is published
+		s.setPublished(!(s.isTemporary() && s.getPublishedId() != null));
 		return s;
 	}
 	

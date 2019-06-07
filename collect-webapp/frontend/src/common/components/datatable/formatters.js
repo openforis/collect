@@ -1,19 +1,13 @@
 import React from 'react';
-import Moment from 'moment';
+
+import Dates from '../../../utils/Dates';
 import CheckedIconFormatter from './CheckedIconFormatter'
 
-export function dateFormatter(cell, row) {
-    if (cell > 0){
-        return Moment(new Date(cell)).format('DD/MM/YYYY');
-    }
-}
+export const dateFormatter = (cell, row) =>
+    cell > 0 ? Dates.format(new Date(cell)) : ''
 
-export function dateTimeFormatter(cell, row) {
-    if (cell > 0){
-        return Moment(new Date(cell)).format('DD/MM/YYYY HH:mm');
-    }
-}
+export const dateTimeFormatter = (cell, row) =>
+    cell > 0 ? Dates.formatDatetime(new Date(cell)) : ''
 
-export function checkedIconFormatter(cell, row) {
-    return <CheckedIconFormatter checked={cell} />
-}
+export const checkedIconFormatter = (cell, row) =>
+    <CheckedIconFormatter checked={cell} />

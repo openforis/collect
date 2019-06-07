@@ -266,16 +266,17 @@ class RecordDataTable extends Component {
 		*/
 
 		function createOwnerFilter(filterHandler, customFilterParameters) {
-			const filterItems = availableOwners.map(u => {
-				return {
-					value: u.id,
-					label: u.username
-				}
-			})
 			if (availableOwners.length === 0 ) {
 				return <div />
+			} else {
+				const filterItems = availableOwners.map(u => {
+					return {
+						value: u.id,
+						label: u.username
+					}
+				})
+				return <RecordOwnerFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
 			}
-			return <RecordOwnerFilter multiple filterHandler={filterHandler} dataSource={filterItems} /> 
 		}
 
 		columns.push(

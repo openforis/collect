@@ -10,10 +10,6 @@ export default class OwnerColumnEditor extends Component {
         this.handleInputChange = this.handleInputChange.bind(this)
     }
 
-    focus() {
-        //this.refs.inputRef.focus();
-    }
-
     handleInputChange(event) {
         const ownerId = parseInt(event.target.value, 10)
         const newOwner = ownerId > 0 ? this.props.users.find(u => u.id === ownerId) : null
@@ -26,7 +22,7 @@ export default class OwnerColumnEditor extends Component {
         const userOptions = [emptyOption].concat(this.props.users.map(u => <option key={u.id} value={u.id}>{u.username}</option>))
         return (
             <span>
-                <Input ref="inputRef" type="select" value={owner ? owner.id : '-1'} onChange={this.handleInputChange}>
+                <Input type="select" value={owner ? owner.id : '-1'} onChange={this.handleInputChange}>
                     {userOptions}
                 </Input>
             </span>

@@ -225,10 +225,6 @@ class SurveysListPage extends Component {
 
         }
 
-        function publishedIconFormatter(cell, row) {
-            return <CheckedIconFormatter checked={row.published && (!row.temporary || row.publishedId)} />
-        }
-
         const nonEditableRows = combinedSummaries.filter(s => loggedUser.canChangeSurveyUserGroup(s.userInGroupRole))
 
         return (
@@ -268,7 +264,7 @@ class SurveysListPage extends Component {
                                     {selectedSurvey && selectedSurvey.temporary &&
                                         <DropdownItem divider />
                                     }
-                                    {selectedSurvey && selectedSurvey.published && (!selectedSurvey.temporary || selectedSurvey.publishedId) &&
+                                    {selectedSurvey && selectedSurvey.published &&
                                         <DropdownItem color="warning" onClick={this.handleUnpublishButtonClick}><i className="fa fa-ban" aria-hidden="true"></i>{L.l('survey.unpublish')}</DropdownItem>
                                     }
                                     <DropdownItem color="primary" onClick={this.handleCloneButtonClick}><i className="fa fa-clone" aria-hidden="true"></i>{L.l('survey.clone')}</DropdownItem>
@@ -310,7 +306,7 @@ class SurveysListPage extends Component {
                         dataAlign="center" width="60" editable={false} dataSort>{L.l('survey.target')}</TableHeaderColumn>
                     <TableHeaderColumn key="temporary" dataField="temporary" dataFormat={Formatters.checkedIconFormatter}
                         dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.unpublishedChanges')}</TableHeaderColumn>
-                    <TableHeaderColumn key="published" dataField="published" dataFormat={publishedIconFormatter}
+                    <TableHeaderColumn key="published" dataField="published" dataFormat={Formatters.checkedIconFormatter}
                         dataAlign="center" width="80" editable={false} dataSort>{L.l('survey.published')}</TableHeaderColumn>
                     <TableHeaderColumn key="userGroupId" dataField="userGroupId" dataFormat={userGroupFormatter}
                         customEditor={{ getElement: createUserGroupEditor, customEditorParameters: { userGroups: userGroups } }}
