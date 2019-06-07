@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Line } from 'react-chartjs-2';
 import DatePicker from 'react-datepicker';
-import moment from 'moment';
 
 import Dates from 'utils/Dates';
 import L from 'utils/Labels';
@@ -17,6 +16,8 @@ const createdRecordsLineColor = '#993300';
 const modifiedRecordsLineColor = '#63c2de';
 const enteredRecordsLineColor = '#FF9900';
 const cleansedRecordsLineColor = '#009900';
+
+const DATE_PICKER_DATE_FORMAT = 'dd/MM/yyyy';
 
 class DashboardPage extends Component {
 
@@ -306,12 +307,12 @@ class DashboardPage extends Component {
     this.setState({ timeUnit: event.target.value }, this.updateChartsData)
   }
 
-  handlePeriodFromChange(moment) {
-    this.setState({periodFrom: moment.toDate()}, this.updateChartsData)
+  handlePeriodFromChange(date) {
+    this.setState({periodFrom: date}, this.updateChartsData)
   }
 
-  handlePeriodToChange(moment) {
-    this.setState({periodTo: moment.toDate()}, this.updateChartsData)
+  handlePeriodToChange(date) {
+    this.setState({periodTo: date}, this.updateChartsData)
   }
   
   handleRecordTypeVisibilityChange(event) {
@@ -334,22 +335,25 @@ class DashboardPage extends Component {
   }
 
   render() {
-    if (this.state.noRecordsFound) {
+    const {noRecordsFound, periodFrom, minPeriodFrom, maxPeriodTo, 
+      createdRecordsVisible, modifiedRecordsVisible, enteredRecordsVisible, cleansedRecordsVisible,
+      dailyChartData, monthlyChartData, yearlyChartData,
+      timeUnit
+    } = this.state
+    if (noRecordsFound) {
       return <div>No records found</div>
     }
-    const timeUnit = this.state.timeUnit
-
     let chartData
     switch (timeUnit) {
       case 'DAY':
-        chartData = this.state.dailyChartData
+        chartData = dailyChartData
         break
       case 'MONTH':
-        chartData = this.state.monthlyChartData
+        chartData = monthlyChartData
         break
       case 'YEAR':
       default:
-        chartData = this.state.yearlyChartData
+        chartData = yearlyChartData
     }
 
     if (chartData == null) {
@@ -369,16 +373,18 @@ class DashboardPage extends Component {
                   <legend>Period</legend>
                   <form className="form-inline">
                     <label>From: </label>
-                    <DatePicker dateFormat="DD/MM/YYYY"
-                      selected={moment(this.state.periodFrom)} 
-                      minDate={moment(this.state.minPeriodFrom)}
-                      maxDate={moment(this.state.maxPeriodTo)}
+                    <DatePicker 
+                      dateFormat={DATE_PICKER_DATE_FORMAT}
+                      selected={periodFrom} 
+                      minDate={minPeriodFrom}
+                      maxDate={maxPeriodTo}
                       onChange={this.handlePeriodFromChange} />
                     <label>To: </label>
-                    <DatePicker dateFormat="DD/MM/YYYY" 
-                      selected={moment(this.state.periodTo)} 
-                      minDate={moment(this.state.minPeriodFrom)}
-                      maxDate={moment(this.state.maxPeriodTo)}
+                    <DatePicker 
+                      dateFormat={DATE_PICKER_DATE_FORMAT}
+                      selected={periodFrom} 
+                      minDate={minPeriodFrom}
+                      maxDate={maxPeriodTo}
                       onChange={this.handlePeriodToChange} />
                   </form>
                 </fieldset>
@@ -388,28 +394,28 @@ class DashboardPage extends Component {
                     <label htmlFor="createdRecordsVisibilityCheckBox" style={{color: createdRecordsLineColor}}>
                       <input id="createdRecordsVisibilityCheckBox" type="checkbox"
                         className="form-control form-check-input" 
-                        checked={this.state.createdRecordsVisible}
+                        checked={createdRecordsVisible}
                         onChange={this.handleRecordTypeVisibilityChange} />Created
                     </label>
                     <span style={{width: '40px'}}></span>
                     <label htmlFor="modifiedRecordsVisibilityCheckBox" style={{color: modifiedRecordsLineColor}}>
                       <input id="modifiedRecordsVisibilityCheckBox" type="checkbox"
                         className="form-control form-check-input"
-                        checked={this.state.modifiedRecordsVisible}
+                        checked={modifiedRecordsVisible}
                         onChange={this.handleRecordTypeVisibilityChange} />Modified
                     </label>
                     <span style={{width: '40px'}}></span>
                     <label htmlFor="enteredRecordsVisibilityCheckBox" style={{color: enteredRecordsLineColor}}>
                       <input id="enteredRecordsVisibilityCheckBox" type="checkbox"
                         className="form-control form-check-input" 
-                        checked={this.state.enteredRecordsVisible}
+                        checked={enteredRecordsVisible}
                         onChange={this.handleRecordTypeVisibilityChange} />Entered
                     </label>
                     <span style={{width: '40px'}}></span>
                     <label htmlFor="cleansedRecordsVisibilityCheckBox" style={{color: cleansedRecordsLineColor}}>
                       <input id="cleansedRecordsVisibilityCheckBox" type="checkbox"
                         className="form-control form-check-input" 
-                        checked={this.state.cleansedRecordsVisible}
+                        checked={cleansedRecordsVisible}
                         onChange={this.handleRecordTypeVisibilityChange} />Cleansed
                     </label>
                   </form>
@@ -418,15 +424,15 @@ class DashboardPage extends Component {
             </div>
             <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }}>
               <h5>By day</h5>
-              <Line data={this.state.dailyChartData.data} options={this.state.dailyChartData.opts} height={500} />
+              <Line data={dailyChartData.data} options={dailyChartData.opts} height={500} />
             </div>
             <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }}>
               <h5>By month</h5>
-              <Line data={this.state.monthlyChartData.data} options={this.state.monthlyChartData.opts} height={500} />
+              <Line data={monthlyChartData.data} options={monthlyChartData.opts} height={500} />
             </div>
             <div className="chart-wrapper" style={{ height: 300 + 'px', marginTop: 40 + 'px' }}>
               <h5>By year</h5>
-              <Line data={this.state.yearlyChartData.data} options={this.state.yearlyChartData.opts} height={500} />
+              <Line data={yearlyChartData.data} options={yearlyChartData.opts} height={500} />
             </div>
           </div>
         </div>
