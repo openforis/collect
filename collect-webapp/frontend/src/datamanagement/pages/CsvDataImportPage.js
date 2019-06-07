@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Container, Form, FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
+
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
@@ -11,9 +13,9 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
 
-import { connect } from 'react-redux';
-import Dropzone from 'react-dropzone';
 import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+
+import Dropzone from '../../common/components/Dropzone';
 
 import ServiceFactory from 'services/ServiceFactory';
 import SchemaTreeView from '../components/SchemaTreeView';
@@ -148,8 +150,7 @@ class CsvDataImportPage extends Component {
         this.loadErrorsPage(job)
     }
 
-    handleFileDrop(files) {
-        const file = files[0]
+    handleFileDrop(file) {
         this.setState({fileSelected: true, fileToBeImported: file, fileToBeImportedPreview: file.name})
     }
 
@@ -236,16 +237,12 @@ class CsvDataImportPage extends Component {
                         <FormGroup row>
                             <Label for="file">File:</Label>
                             <Col sm={10}>
-                                <Dropzone accept={acceptedFileTypes} onDrop={(files) => this.handleFileDrop(files)} style={{
-                                    width: '100%', height: '200px', 
-                                    borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
-                                    borderStyle: 'dashed', borderRadius: '5px'
-                                }}>
-                                {this.state.fileToBeImportedPreview ?
-                                    <p style={{fontSize: '2em', textAlign: 'center'}}><span className="checked large" />{this.state.fileToBeImportedPreview}</p>
-                                    : <p>Click to select a {acceptedFileTypesDescription} file or drop it here.</p>
-                                }
-                                </Dropzone>
+                                 <Dropzone 
+                                    acceptedFileTypes={acceptedFileTypes}
+                                    acceptedFileTypesDescription={acceptedFileTypesDescription}
+                                    handleFileDrop={file => this.handleFileDrop(file)}
+                                    height="300px"
+                                    fileToBeImportedPreview={this.state.fileToBeImportedPreview} />
                             </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -274,7 +271,7 @@ class CsvDataImportPage extends Component {
                     </FormGroup>
                     <FormGroup row>
                         <Col sm={{size: 2, offset: 5}}>
-                            <Button color="primary" variant="raised" onClick={this.handleImportButtonClick}>{L.l('global.import')}</Button>
+                            <Button color="primary" variant="contained" onClick={this.handleImportButtonClick}>{L.l('global.import')}</Button>
                         </Col>
                     </FormGroup>
 
@@ -297,7 +294,7 @@ class CsvDataImportPage extends Component {
                             </BootstrapTable>
                         </DialogContent>
                         <DialogActions>
-                            <Button color="primary" variant="raised" 
+                            <Button color="primary" variant="contained" 
                                 onClick={this.handleErrorsModalCloseButtonClick}>{L.l('global.close')}</Button>
                         </DialogActions>
                     </Dialog>

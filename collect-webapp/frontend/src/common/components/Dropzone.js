@@ -1,8 +1,11 @@
-import React, { Component } from 'react';
+import './dropzone.css'
+
+import React from 'react';
 import ReactDropzone from 'react-dropzone';
+
 import L from 'utils/Labels';
 
-export default class Dropzone extends Component {
+export default class Dropzone extends React.Component {
 
     constructor(props) {
         super(props)
@@ -19,19 +22,28 @@ export default class Dropzone extends Component {
     }
 
     render() {
-        const { acceptedFileTypes, acceptedFileTypesDescription, fileToBeImportedPreview, width='100%', height='200px'} = this.props
+        const { acceptedFileTypes, acceptedFileTypesDescription, fileToBeImportedPreview, width = '100%', height = '200px' } = this.props
 
-        return <ReactDropzone accept={acceptedFileTypes} onDrop={this.handleFilesDrop} style={{
-                width: width, height: height, 
-                borderWidth: '2px', borderColor: 'rgb(102, 102, 102)', 
-                borderStyle: 'dashed', borderRadius: '5px'
-            }}>
-            {fileToBeImportedPreview ?
-                <p style={{fontSize: '2em', textAlign: 'center'}}>
-                    <span className="checked large" />{fileToBeImportedPreview}
-                </p>
-                : <p>{L.l('forms.fileDropMessage', [acceptedFileTypesDescription])}</p>
-            }
+        return <ReactDropzone
+            accept={acceptedFileTypes}
+            onDrop={this.handleFilesDrop}
+            style={{width, height}}>
+            {({ getRootProps, getInputProps }) => (
+                <div {...getRootProps({className: 'dropzone'})} style={{width, height}}>
+                    <input {...getInputProps()} />
+                    {fileToBeImportedPreview ?
+                        <p className="fileDroppedMessage">
+                            <span className="checked large" />{fileToBeImportedPreview}
+                        </p>
+                        : <div className="fileSelectContainer">
+                            <p>{L.l('forms.dropzone.selectFile')}</p>
+                            <br/>
+                            <br/>
+                            <p>{L.l('forms.dropzone.supportedFileTypes', [acceptedFileTypesDescription])}</p>
+                        </div>
+                    }
+                </div>
+            )}
         </ReactDropzone>
     }
 }

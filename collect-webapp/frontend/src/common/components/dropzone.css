@@ -1,0 +1,31 @@
+.dropzone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-width: 2px;
+  border-radius: 2px;
+  border-color: #eeeeee;
+  border-style: dashed;
+  background-color: #fafafa;
+  font-size: 1.2em;
+  outline: none;
+  transition: border .24s ease-in-out;
+}
+  
+.dropzone:focus {
+  border-color: #2196f3;
+}
+
+.dropzone.disabled {
+  opacity: 0.6;
+}
+
+.dropzone .fileDroppedMessage {
+  font-size: 1.4em;
+}
+
+.dropzone .fileSelectContainer {
+  text-align: center;
+}

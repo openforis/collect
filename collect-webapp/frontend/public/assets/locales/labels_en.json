@@ -60,7 +60,10 @@
         }
     },
     "forms": {
-        "fileDropMessage": "Click to select a {0} file or drop it here.",
+        "dropzone": {
+            "selectFile": "Click to select a file or drop it here.",
+            "supportedFileTypes": "Supported file types: {0}"
+        },
         "selectOne": "--- Please select one ---"
     },
     "header": {

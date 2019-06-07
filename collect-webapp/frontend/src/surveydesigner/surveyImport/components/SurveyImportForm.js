@@ -89,7 +89,7 @@ class SurveyImportForm extends Component {
                 }
                 {error && <Alert color="danger">{error}</Alert>}
                 <Row>
-                    <Col xs={{offset: 5}}>
+                    <Col xs={{offset: 6}}>
                         <Button color="primary" type="submit" disabled={submitting}>{L.l('general.import')}</Button>
                     </Col>
                 </Row>
