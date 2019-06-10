@@ -52,7 +52,7 @@ export default class JobMonitorDialog extends Component {
                         <Button disabled={cancellingJob} onClick={handleCancelButtonClick}>{L.l('general.cancel')}</Button>}
                     {' '}
                     {job && job.completed && 
-                        <Button variant="raised" color="primary" onClick={handleOkButtonClick}>{okButtonLabel}</Button>}
+                        <Button variant="contained" color="primary" onClick={handleOkButtonClick}>{okButtonLabel}</Button>}
                     {' '}
                     {job && job.failed &&
                         <Button onClick={handleCloseButtonClick}>{L.l('general.close')}</Button>}

@@ -156,7 +156,7 @@ class RestorePage extends Component {
                     <br/>
                     <Row>
                         <Col md={{offset: 5}}>
-                            <Button variant="raised" color="primary" disabled={!restoreButtonEnabled} onClick={this.handleRestoreButtonClick}>{L.l('restore')}</Button>
+                            <Button variant="contained" color="primary" disabled={!restoreButtonEnabled} onClick={this.handleRestoreButtonClick}>{L.l('restore')}</Button>
                         </Col>
                     </Row>
                 </Form>

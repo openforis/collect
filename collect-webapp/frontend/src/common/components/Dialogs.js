@@ -81,7 +81,7 @@ class ConfirmDialog extends BaseDialog {
                     <DialogContentText>{message}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="raised" color="primary" onClick={this.handleOk}>{confirmButtonLabel}</Button>
+                    <Button variant="contained" color="primary" onClick={this.handleOk}>{confirmButtonLabel}</Button>
                     {' '}
                     <Button onClick={this.handleCancel} ref={n => this.cancelButton = n}>{cancelButtonLabel}</Button>
                 </DialogActions>
@@ -106,7 +106,7 @@ class AlertDialog extends BaseDialog {
                     <DialogContentText>{message}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="raised" color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{L.l('global.ok')}</Button>
+                    <Button variant="contained" color="primary" ref={n => this.okButton = n} onClick={this.handleOk}>{L.l('global.ok')}</Button>
                 </DialogActions>
             </Dialog>
         )
@@ -128,7 +128,7 @@ class LoadingDialog extends BaseDialog {
                 {
                     allowCancel &&
                     <DialogActions>
-                        <Button variant="raised" color="primary" ref={n => this.cancelButton = n} onClick={this.handleCancel}>
+                        <Button variant="contained" color="primary" ref={n => this.cancelButton = n} onClick={this.handleCancel}>
                             {L.l('global.cancel')}
                         </Button>
                     </DialogActions>

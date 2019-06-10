@@ -55,7 +55,7 @@ class SurveyValidationResultDialog extends Component {
                 </DialogContent>
                 <DialogActions>
                     {!hasErrors &&
-                        <Button variant="raised" color="secondary"
+                        <Button variant="contained" color="secondary"
                             onClick={this.handleConfirm}>{L.l('survey.publish')}</Button>}
                     {' '}
                     <Button onClick={this.handleClose}>{L.l('general.close')}</Button>

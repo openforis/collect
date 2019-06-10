@@ -37,7 +37,7 @@ const UploadFileButton = props => {
                 <Button disabled={disabled}
                         onClick={onClick}
                         color="primary"
-                        variant="raised">{label}</Button>
+                        variant="contained">{label}</Button>
             )
     )
 }
