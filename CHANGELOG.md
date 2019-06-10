@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.24.24] - 2019-06-10
+### Fixed
+- Surveys list sort by "Published" column
+### Added
+- Included severity (Error or Warning) in records validation report
+
 ## [3.24.23] - 2019-05-29
 ### Fixed
 - Fixed error importing sampling point data
