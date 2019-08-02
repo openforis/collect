@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<survey xmlns="http://www.openforis.org/idml/3.0" 
+<survey xmlns="http://www.openforis.org/idml/3.0"
 	xmlns:collect="http://www.openforis.org/collect/3.0/collect"
-	xmlns:ui="http://www.openforis.org/collect/3.0/ui" 
-	xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" 
+	xmlns:ui="http://www.openforis.org/collect/3.0/ui"
+	xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.openforis.org/idml/3.0 
 		https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd      
 		http://www.openforis.org/collect/3.0/ui 
 		https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
-	lastId="1000">
+	lastId="1300">
 	<project>Collect Earth - blank project please fill name</project>
 	<uri>http://www.openforis.org/idm/collectEarth</uri>
 	<description></description>
@@ -17,7 +17,8 @@
 	<language>fr</language>
 	<applicationOptions>
 		<options type="ui">
-			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="plot_tab_set">
+			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui"
+				name="plot_tab_set">
 				<tab name="plot_tab">
 					<label xml:lang="en">Plot</label>
 					<label xml:lang="es">Parcela</label>
@@ -26,11 +27,358 @@
 			</tabSet>
 		</options>
 	</applicationOptions>
-	
+	<codeLists>
+		<list id="1145" name="elevation_ranges">
+			<label type="item">Elevation ranges</label>
+			<codingScheme scope="local" />
+			<items>
+				<item id="1146">
+					<code>1</code>
+					<label>0-100</label>
+				</item>
+				<item id="1147">
+					<code>2</code>
+					<label>101-200</label>
+				</item>
+				<item id="1148">
+					<code>3</code>
+					<label>201-300</label>
+				</item>
+				<item id="1149">
+					<code>4</code>
+					<label>301-400</label>
+				</item>
+				<item id="1150">
+					<code>5</code>
+					<label>401-500</label>
+				</item>
+				<item id="1151">
+					<code>6</code>
+					<label>501-600</label>
+				</item>
+				<item id="1152">
+					<code>7</code>
+					<label>601-700</label>
+				</item>
+				<item id="1153">
+					<code>8</code>
+					<label>701-800</label>
+				</item>
+				<item id="1154">
+					<code>9</code>
+					<label>801-900</label>
+				</item>
+				<item id="1155">
+					<code>10</code>
+					<label>901-1000</label>
+				</item>
+				<item id="1156">
+					<code>11</code>
+					<label>1001-1100</label>
+				</item>
+				<item id="1157">
+					<code>12</code>
+					<label>1101-1200</label>
+				</item>
+				<item id="1158">
+					<code>13</code>
+					<label>1201-1300</label>
+				</item>
+				<item id="1159">
+					<code>14</code>
+					<label>1301-1400</label>
+				</item>
+				<item id="1160">
+					<code>15</code>
+					<label>1401-1500</label>
+				</item>
+				<item id="1161">
+					<code>16</code>
+					<label>1501-1600</label>
+				</item>
+				<item id="1162">
+					<code>17</code>
+					<label>1601-1700</label>
+				</item>
+				<item id="1163">
+					<code>18</code>
+					<label>1701-1800</label>
+				</item>
+				<item id="1164">
+					<code>19</code>
+					<label>1801-1900</label>
+				</item>
+				<item id="1165">
+					<code>20</code>
+					<label>1901-2000</label>
+				</item>
+				<item id="1166">
+					<code>21</code>
+					<label>2001-2100</label>
+				</item>
+				<item id="1167">
+					<code>22</code>
+					<label>2101-2200</label>
+				</item>
+				<item id="1168">
+					<code>23</code>
+					<label>2201-2300</label>
+				</item>
+				<item id="1169">
+					<code>24</code>
+					<label>2301-2400</label>
+				</item>
+				<item id="1170">
+					<code>25</code>
+					<label>2401-2500</label>
+				</item>
+				<item id="1171">
+					<code>26</code>
+					<label>2501-2600</label>
+				</item>
+				<item id="1172">
+					<code>27</code>
+					<label>2601-2700</label>
+				</item>
+				<item id="1173">
+					<code>28</code>
+					<label>2701-2800</label>
+				</item>
+				<item id="1174">
+					<code>29</code>
+					<label>2801-2900</label>
+				</item>
+				<item id="1175">
+					<code>30</code>
+					<label>2901-3000</label>
+				</item>
+				<item id="1176">
+					<code>31</code>
+					<label>3001-3100</label>
+				</item>
+				<item id="1177">
+					<code>32</code>
+					<label>3101-3200</label>
+				</item>
+				<item id="1178">
+					<code>33</code>
+					<label>3201-3300</label>
+				</item>
+				<item id="1179">
+					<code>34</code>
+					<label>3301-3400</label>
+				</item>
+				<item id="1180">
+					<code>35</code>
+					<label>3401-3500</label>
+				</item>
+				<item id="1181">
+					<code>36</code>
+					<label>3501-3600</label>
+				</item>
+				<item id="1182">
+					<code>37</code>
+					<label>3601-3700</label>
+				</item>
+				<item id="1183">
+					<code>38</code>
+					<label>3701-3800</label>
+				</item>
+				<item id="1184">
+					<code>39</code>
+					<label>3801-3900</label>
+				</item>
+				<item id="1185">
+					<code>40</code>
+					<label>3901-4000</label>
+				</item>
+				<item id="1186">
+					<code>41</code>
+					<label>4001-4100</label>
+				</item>
+				<item id="1187">
+					<code>42</code>
+					<label>4101-4200</label>
+				</item>
+				<item id="1188">
+					<code>43</code>
+					<label>4201-4300</label>
+				</item>
+				<item id="1189">
+					<code>44</code>
+					<label>4301-4400</label>
+				</item>
+				<item id="1190">
+					<code>45</code>
+					<label>4401-4500</label>
+				</item>
+				<item id="1191">
+					<code>46</code>
+					<label>4501-4600</label>
+				</item>
+				<item id="1192">
+					<code>47</code>
+					<label>4601-4700</label>
+				</item>
+				<item id="1193">
+					<code>48</code>
+					<label>4701-4800</label>
+				</item>
+				<item id="1194">
+					<code>49</code>
+					<label>4801-4900</label>
+				</item>
+				<item id="1195">
+					<code>50</code>
+					<label>4901-5000</label>
+				</item>
+				<item id="1196">
+					<code>51</code>
+					<label>5001-5100</label>
+				</item>
+				<item id="1197">
+					<code>52</code>
+					<label>5101-5200</label>
+				</item>
+				<item id="1198">
+					<code>53</code>
+					<label>5201-5300</label>
+				</item>
+				<item id="1199">
+					<code>54</code>
+					<label>5301-5400</label>
+				</item>
+				<item id="1200">
+					<code>55</code>
+					<label>5401-5500</label>
+				</item>
+				<item id="1201">
+					<code>56</code>
+					<label>5501-5600</label>
+				</item>
+				<item id="1202">
+					<code>57</code>
+					<label>5601-5700</label>
+				</item>
+				<item id="1203">
+					<code>58</code>
+					<label>5701-5800</label>
+				</item>
+				<item id="1204">
+					<code>59</code>
+					<label>5801-5900</label>
+				</item>
+				<item id="1205">
+					<code>60</code>
+					<label>5901-6000</label>
+				</item>
+				<item id="1206">
+					<code>61</code>
+					<label>6001-6100</label>
+				</item>
+				<item id="1207">
+					<code>62</code>
+					<label>6101-6200</label>
+				</item>
+				<item id="1208">
+					<code>63</code>
+					<label>6201-6300</label>
+				</item>
+				<item id="1209">
+					<code>0</code>
+					<label>-100 / 0</label>
+				</item>
+				<item id="1210">
+					<code>-1</code>
+					<label>-200 / -100</label>
+				</item>
+			</items>
+		</list>
+		<list id="1212" name="orientation">
+			<label type="item">Orientation</label>
+			<codingScheme scope="local" />
+			<items>
+				<item id="1213">
+					<code>N</code>
+					<label>North</label>
+				</item>
+				<item id="1214">
+					<code>NE</code>
+					<label>North East</label>
+				</item>
+				<item id="1215">
+					<code>E</code>
+					<label>East</label>
+				</item>
+				<item id="1216">
+					<code>SE</code>
+					<label>South East</label>
+				</item>
+				<item id="1217">
+					<code>S</code>
+					<label>South</label>
+				</item>
+				<item id="1218">
+					<code>SW</code>
+					<label>South West</label>
+				</item>
+				<item id="1219">
+					<code>W</code>
+					<label>West</label>
+				</item>
+				<item id="1220">
+					<code>NW</code>
+					<label>North West</label>
+				</item>
+				<item id="1221">
+					<code>na</code>
+					<label>N/A</label>
+				</item>
+			</items>
+		</list>
+		<list id="1223" name="slope_classes">
+			<label type="item">Slope classes</label>
+			<codingScheme scope="local" />
+			<items>
+				<item id="1224">
+					<code>FLAT</code>
+					<label>0-5 °</label>
+				</item>
+				<item id="1225">
+					<code>SLIGHT</code>
+					<label>6-15 °</label>
+				</item>
+				<item id="1226">
+					<code>STEEP</code>
+					<label>16-30 °</label>
+				</item>
+				<item id="1227">
+					<code>VERY_STEEP</code>
+					<label>31-45 °</label>
+				</item>
+				<item id="1228">
+					<code>EXTREME</code>
+					<label>46-60 °</label>
+				</item>
+				<item id="1229">
+					<code>FALL</code>
+					<label>61-90 °</label>
+				</item>
+				<item id="1230">
+					<code>NA</code>
+					<label>NA</label>
+				</item>
+			</items>
+		</list>
+	</codeLists>
+
 	<spatialReferenceSystems>
 		<spatialReferenceSystem srid="EPSG:4326">
 			<label xml:lang="en">EPSG:4326</label>
-			<description xml:lang="en">EPSG:World Geodetic System 1984 Horizontal component of 3D system. Used by the GPS satellite navigation system and for NATO military geodetic surveying.</description>
+			<description xml:lang="en">EPSG:World Geodetic System 1984
+				Horizontal component of 3D system. Used by the GPS satellite
+				navigation system and for NATO military geodetic surveying.
+			</description>
 			<wkt><![CDATA[
 	        GEOGCS["WGS 84", 
 			  DATUM["World Geodetic System 1984", 
@@ -44,9 +392,9 @@
 			]]></wkt>
 		</spatialReferenceSystem>
 	</spatialReferenceSystems>
-	
 	<schema>
-		<entity id="1" name="plot" ui:tabSet="plot_tab_set" ui:tab="plot_tab">
+		<entity id="1" name="plot" ui:tabSet="plot_tab_set"
+			ui:tab="plot_tab">
 			<label xml:lang="en">Plot</label>
 			<label xml:lang="es">Parcela</label>
 			<label xml:lang="fr">Parcelle</label>
@@ -66,17 +414,20 @@
 				<label xml:lang="fr">Opérateur</label>
 			</text>
 
-			<number id="5" name="elevation" type="integer" collectearth:fromcsv="true">
+			<number id="5" name="elevation" type="integer"
+				collectearth:fromcsv="true">
 				<label xml:lang="en">Elevation</label>
 				<label xml:lang="es">Elevacion</label>
 				<label xml:lang="fr">Elevation</label>
 			</number>
-			<number id="6" name="slope" type="real" collectearth:fromcsv="true">
+			<number id="6" name="slope" type="real"
+				collectearth:fromcsv="true">
 				<label xml:lang="en">Slope</label>
 				<label xml:lang="es">Pendiente</label>
 				<label xml:lang="fr">Pente</label>
 			</number>
-			<number id="7" name="aspect"  type="real" collectearth:fromcsv="true">
+			<number id="7" name="aspect" type="real"
+				collectearth:fromcsv="true">
 				<label xml:lang="en">Aspect</label>
 				<label xml:lang="es">Exposicion</label>
 				<label xml:lang="fr">Aspect</label>
@@ -92,11 +443,49 @@
 				<label xml:lang="es">Guardado por ultima vez</label>
 				<label xml:lang="fr">Sauvé la dernière fois sur</label>
 			</date>
-			<text id="10" name="plot_file" required="false" relevant="false()">
+			<text id="10" name="plot_file" required="false"
+				relevant="false()">
 				<label xml:lang="en">CSV file that contains the plot</label>
 				<label xml:lang="es">Archivo CSV que contiene al plot</label>
 				<label xml:lang="fr">Fichier CSV qui contient le point</label>
 			</text>
+			<code id="11" name="calculated_elevation_range" ui:hide="true"
+				ui:tab="plot_tab" calculated="true" list="elevation_ranges">
+				<label type="instance">DEM - Elevation - range</label>
+				<label type="instance" xml:lang="fr">MNT - Gamme d'altitude</label>
+				<default
+					expr=" format-number(ceiling(elevation div 100 ), '#')" />
+			</code>
+			<code id="12" name="calculated_aspect" ui:hide="true"
+				ui:tab="plot_tab" calculated="true" list="orientation">
+				<label type="instance">DEM - Aspect - ranges</label>
+				<label type="instance" xml:lang="fr">MNT - Gamme d'exposition</label>
+				<default value="na" if="aspect=0 and slope=0" />
+				<default value="N" if="aspect&gt;337.5 or aspect&lt;=22.5" />
+				<default value="NE" if="aspect&gt;22.5 and aspect&lt;=67.5" />
+				<default value="E" if="aspect&gt;67.5 and aspect&lt;=112.5" />
+				<default value="SE"
+					if="aspect&gt;112.5 and aspect&lt;=157.5" />
+				<default value="S" if="aspect&gt;157.5 and aspect&lt;=202.5" />
+				<default value="SW"
+					if="aspect&gt;202.5 and aspect&lt;=247.5" />
+				<default value="W" if="aspect&gt;247.5 and aspect&lt;=292.5" />
+				<default value="NW"
+					if="aspect&gt;292.5 and aspect&lt;=337.5" />
+			</code>
+			<code id="13" name="calculated_slope" ui:hide="true"
+				ui:tab="plot_tab" calculated="true" list="slope_classes">
+				<label type="instance">DEM - Slope - ranges</label>
+				<label type="instance" xml:lang="fr">MNT - Gamme de pente</label>
+				<default value="FLAT" if="slope&gt;=0 and slope&lt;6" />
+				<default value="SLIGHT" if="slope&gt;=6 and slope&lt;16" />
+				<default value="STEEP" if="slope&gt;=16 and slope&lt;31" />
+				<default value="VERY_STEEP"
+					if="slope&gt;=31 and slope&lt;45" />
+				<default value="EXTREME" if="slope&gt;=46 and slope&lt;61" />
+				<default value="FALL" if="slope&gt;=60" />
+				<default value="NA" if="idm:blank(aspect)" />
+			</code>
 		</entity>
 	</schema>
 </survey>
