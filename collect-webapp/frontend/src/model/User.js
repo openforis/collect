@@ -4,6 +4,8 @@ import Workflow from './Workflow';
 
 export default class User extends Serializable {
 
+    static DEFAULT_ADMIN_NAME = 'admin'
+
     static ROLE = {
         VIEW: 'VIEW',
         ENTRY_LIMITED: 'ENTRY_LIMITED',

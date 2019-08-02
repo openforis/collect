@@ -186,17 +186,19 @@ public class LocalUserManager extends AbstractPersistedObjectManager<User, Integ
 	@Override
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void deleteById(Integer id) throws CannotDeleteUserException {
-		if ( recordDao.hasAssociatedRecords(id) ) {
-			throw new CannotDeleteUserException();
-		}
 		User user = userDao.loadById(id);
-		groupManager.deleteAllUserRelations(user);
-		userDao.delete(id);
-		
-		User cachedUser = userById.get(id);
-		if (cachedUser != null) {
-			userById.remove(id);
-			userByName.remove(cachedUser.getUsername());
+		if (user.getUsername().equals(UserManager.ADMIN_USER_NAME) 
+				|| recordDao.hasAssociatedRecords(id) ) {
+			throw new CannotDeleteUserException();
+		} else {
+			groupManager.deleteAllUserRelations(user);
+			userDao.delete(id);
+			
+			User cachedUser = userById.get(id);
+			if (cachedUser != null) {
+				userById.remove(id);
+				userByName.remove(cachedUser.getUsername());
+			}
 		}
 	}
 	

@@ -4,11 +4,15 @@ import { connect } from 'react-redux'
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { Button, Container, Row, Col } from 'reactstrap';
 
+import User from 'model/User'
+
 import UserDetailsPage from './UserDetailsPage';
 import AbstractItemsListPage from 'common/components/AbstractItemsListPage';
 import * as UserActions from 'actions/users'
 import Dialogs from 'common/components/Dialogs'
 import L from 'utils/Labels'
+
+const findById = items => id => items.find(u => u.id === id)
 
 class UsersPage extends AbstractItemsListPage {
 
@@ -20,9 +24,11 @@ class UsersPage extends AbstractItemsListPage {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (this.state.selectedItemIds.length > 0 && nextProps.users) {
-			const newSelectedItemIds = this.state.selectedItemIds.filter(id => nextProps.users.find(u => u.id === id))
-			const newSelectedItems = newSelectedItemIds.map(id => nextProps.users.find(u => u.id === id))
+		const { selectedItemIds } = this.state
+		const { users } = nextProps
+		if (selectedItemIds.length > 0 && users) {
+			const newSelectedItemIds = selectedItemIds.filter(findById(users))
+			const newSelectedItems = newSelectedItemIds.map(findById(users))
 			const newEditedItem = newSelectedItems.length === 1 ? newSelectedItems[0] : null
 			this.setState({
 				selectedItemIds: newSelectedItemIds,
@@ -36,27 +42,54 @@ class UsersPage extends AbstractItemsListPage {
 		return {id: null, username: '', enabled: true, role: 'ENTRY'};
 	}
 
+	checkCanDeleteUsers() {
+		const { selectedItemIds } = this.state
+		const { users, loggedUser } = this.props
+
+		if (selectedItemIds.length === 0) {
+			return false
+		} else if (selectedItemIds.indexOf(loggedUser.id) >= 0) {
+			Dialogs.alert(L.l('general.warning'), L.l('user.delete.cannotDeleteCurrentUser'))
+			return false
+		} else {
+			const defaultAdminSelected = selectedItemIds.find(id => {
+				const user = findById(users)(id)
+				return user.username === User.DEFAULT_ADMIN_NAME
+			})
+			if (defaultAdminSelected) {
+				Dialogs.alert(L.l('general.warning'), L.l('user.delete.cannotDeleteDefaultAdminUser'))
+				return false
+			} else {
+				return true
+			}
+		}
+	}
+
 	handleDeleteButtonClick() {
-		const ids = this.state.selectedItemIds
-		const confirmMessageKey = ids.length === 1 ? 'user.delete.confirmDeleteOneUserMessage': 'user.delete.confirmDeleteMultipleUsersMessage'
-		const confirmMessage = L.l(confirmMessageKey, [ids.length])
-		Dialogs.confirm(L.l('user.delete.confirmTitle'), confirmMessage, () => {
-			const loggedUser = this.props.loggedUser
-			this.props.dispatch(UserActions.deleteUsers(loggedUser.id, ids))
-		}, null, {confirmButtonLabel: L.l('global.delete')})
+		const { selectedItemIds } = this.state
+		const { loggedUser, dispatch } = this.props
+
+		const confirmMessageKey = selectedItemIds.length === 1 ? 'user.delete.confirmDeleteOneUserMessage': 'user.delete.confirmDeleteMultipleUsersMessage'
+
+		if (this.checkCanDeleteUsers()) {
+			Dialogs.confirm(L.l('user.delete.confirmTitle'), L.l(confirmMessageKey, [selectedItemIds.length]), () => {
+				dispatch(UserActions.deleteUsers(loggedUser.id, selectedItemIds))
+			}, null, {confirmButtonLabel: L.l('global.delete')})
+		}
 	}
 
   	render() {
 		const { isFetching, users} = this.props
+		const { selectedItemIds, editedItem } = this.state
 
 		if (isFetching) {
 			return <div>Loading...</div>
 		}
 		
 		let editedItemContainer = null;
-		if (this.state.editedItem != null) {
-			let editedItemForm = <UserDetailsPage user={this.state.editedItem} />;
-			let editedItemLegendText = this.state.editedItem.id == null ? 'New user': 'Edit user: ' + this.state.editedItem.username;
+		if (editedItem != null) {
+			const editedItemForm = <UserDetailsPage user={editedItem} />;
+			const editedItemLegendText = editedItem.id == null ? 'New user': 'Edit user: ' + editedItem.username;
 			editedItemContainer = 
 				<fieldset>
 					<legend>{editedItemLegendText}</legend>
@@ -69,7 +102,7 @@ class UsersPage extends AbstractItemsListPage {
 					<Col>
 						<Button color="success" onClick={this.handleNewButtonClick}>New</Button>
 						{' '}
-						{this.state.selectedItemIds.length > 0 &&
+						{selectedItemIds.length > 0 &&
 							<Button color="danger" onClick={this.handleDeleteButtonClick}><i className="fa fa-trash" aria-hidden="true" /></Button>
 						}
 					</Col>
@@ -87,7 +120,7 @@ class UsersPage extends AbstractItemsListPage {
 								bgColor: 'lightBlue', 
 								onSelectAll: this.handleAllRowsSelect,
 								onSelect: this.handleRowSelect, 
-								selected: this.state.selectedItemIds} 
+								selected: selectedItemIds} 
 							}
 							>
 							<TableHeaderColumn dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>
