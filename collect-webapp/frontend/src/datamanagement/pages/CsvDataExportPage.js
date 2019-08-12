@@ -20,9 +20,10 @@ const csvExportAdditionalOptions = [
     'includeKMLColumnForCoordinates', 
     'includeAllAncestorAttributes',
     'includeCompositeAttributeMergedColumn',
+    'includeEnumeratedEntities',
     'codeAttributeExpanded',
     'includeCodeItemLabelColumn',
-    'includeCreatedByUserColumn'
+    'includeCreatedByUserColumn',
 ]
 
 const exportModes = {

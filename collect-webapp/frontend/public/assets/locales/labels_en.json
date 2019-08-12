@@ -165,7 +165,8 @@
                 "includeCompositeAttributeMergedColumn": "Include composite attributes merged column (e.g. date, time, coordinate)*",
                 "codeAttributeExpanded": "Expand code attributes (add boolean columns for each code value)*",
                 "includeCodeItemLabelColumn": "Include code item label column*",
-                "includeCreatedByUserColumn": "Include 'created by user' column*"
+                "includeCreatedByUserColumn": "Include 'created by user' column*",
+                "includeEnumeratedEntities": "Include enumerated multiple entities as additional columns"
             },
             "exportDialog": {
                 "title": "Exporting data",
