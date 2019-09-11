@@ -29,7 +29,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
@@ -233,8 +236,16 @@ public class CollectControlPanelController implements Initializable {
 
 	@FXML
 	void shutdown(MouseEvent event) throws Exception {
-		stop();
-		Platform.exit();
+		Alert alert = new Alert(AlertType.CONFIRMATION, "Shutdown Collect ?", ButtonType.YES, ButtonType.CANCEL);
+		alert.showAndWait();
+		if (alert.getResult() == ButtonType.YES) {
+			try {
+				stop();
+				Platform.exit();
+			} catch(Exception e) {
+				LOG.error(e);
+			}
+		}
 	}
 
 	void openBrowser() {

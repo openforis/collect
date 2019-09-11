@@ -5,7 +5,11 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,8 +17,11 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class CollectControlPanel extends Application {
+
+	private static final Logger LOG = LogManager.getLogger(CollectControlPanel.class);
 
 	private static final String TITLE = "Open Foris Collect - Control Panel";
 	private static final String CONTROL_PANEL_FXML = "collect_control_panel.fxml";
@@ -36,33 +43,25 @@ public class CollectControlPanel extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.setTitle(TITLE);
 			primaryStage.setResizable(false);
-	
-			//prevent window close during initialization
-			primaryStage.setOnCloseRequest(event -> {
-				switch(controller.getStatus()) {
-				case INITIALIZING:
-				case STARTING:
-					event.consume();
-					break;
-				default:
-				}
-			});
-			
+
+			// prevent window close during initialization
+			primaryStage.setOnCloseRequest(new OnCloseHandler());
+
 			setLogo(primaryStage);
-	
-			//initialize controller
+
+			// initialize controller
 			controller = fxmlLoader.getController();
 			controller.setApp(this);
 			controller.setStage(primaryStage);
-			
+
 			controller.closeLog();
-			
+
 			controller.startServer(() -> {
 				controller.openBrowser();
 			});
-			
+
 			primaryStage.show();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			showErrorDialog(e.getCause());
 		}
 	}
@@ -72,7 +71,7 @@ public class CollectControlPanel extends Application {
 		Image logo = new Image(logoIs);
 		primaryStage.getIcons().add(logo);
 	}
-	
+
 	@Override
 	public void stop() throws Exception {
 		super.stop();
@@ -80,25 +79,42 @@ public class CollectControlPanel extends Application {
 			controller.stop();
 		}
 	}
-	
+
 	private static void showErrorDialog(Throwable e) {
-        Stage dialog = new Stage();
-        dialog.setTitle(ERROR_DIALOG_TITLE);
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setResizable(false);
-        FXMLLoader loader = new FXMLLoader();
-        try {
-        	Parent root = loader.load(CollectControlPanel.class.getResourceAsStream("error_dialog.fxml"));
-            ErrorController errorController = loader.getController();
-            errorController.setMainText("Error initializing Collect");
-            StringWriter errorDetailsSW = new StringWriter();
-            e.printStackTrace(new PrintWriter(errorDetailsSW));
-            errorController.setErrorText(errorDetailsSW.toString());
-            dialog.setScene(new Scene(root, 400, 300));
-            dialog.show();
-        } catch (IOException exc) {
-            exc.printStackTrace();
-        }
-    }
+		Stage dialog = new Stage();
+		dialog.setTitle(ERROR_DIALOG_TITLE);
+		dialog.initModality(Modality.APPLICATION_MODAL);
+		dialog.setResizable(false);
+		FXMLLoader loader = new FXMLLoader();
+		try {
+			Parent root = loader.load(CollectControlPanel.class.getResourceAsStream("error_dialog.fxml"));
+			ErrorController errorController = loader.getController();
+			errorController.setMainText("Error initializing Collect");
+			StringWriter errorDetailsSW = new StringWriter();
+			e.printStackTrace(new PrintWriter(errorDetailsSW));
+			errorController.setErrorText(errorDetailsSW.toString());
+			dialog.setScene(new Scene(root, 400, 300));
+			dialog.show();
+		} catch (IOException exc) {
+			LOG.error(exc);
+		}
+	}
+
+	private class OnCloseHandler implements EventHandler<WindowEvent> {
+		public void handle(WindowEvent event) {
+			event.consume();
+			switch (controller.getStatus()) {
+			case INITIALIZING:
+			case STARTING:
+				break;
+			default:
+				try {
+					controller.shutdown(null);
+				} catch (Exception e) {
+					LOG.error(e);
+				}
+			}
+		}
+	}
 
 }
