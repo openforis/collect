@@ -31,8 +31,11 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserRoles;
 import org.openforis.collect.web.controller.upload.UploadItem;
+import org.openforis.collect.web.ws.AppWS;
+import org.openforis.collect.web.ws.AppWS.MessageType;
 import org.openforis.commons.web.JobStatusResponse;
 import org.openforis.concurrency.Job;
+import org.openforis.concurrency.Worker.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.annotation.Secured;
@@ -67,6 +70,8 @@ public class DataRestoreController extends BasicController {
 	private UserManager userManager;
 	@Autowired
 	private UserGroupManager userGroupManager;
+	@Autowired
+	private AppWS appWS;
 	
 	@Secured({UserRoles.ENTRY})
 	@RequestMapping(value = "/surveys/restore/data", method=POST, consumes=MULTIPART_FORM_DATA_VALUE)
@@ -187,6 +192,12 @@ public class DataRestoreController extends BasicController {
 		job.setRestoreUploadedFiles(true);
 		job.setValidateRecords(validateRecords);
 		job.setDeleteAllRecordsBeforeRestore(deleteAllRecords);
+		//on complete, dispatch surveys_updated event to WS
+		job.addStatusChangeListener(event -> {
+			if (event.getTo() == Status.COMPLETED) {
+				appWS.sendMessage(MessageType.SURVEYS_UPDATED);
+			}
+		});
 		
 		String lockId = extractSurveyUri(tempFile);
 		jobManager.start(job, lockId);
