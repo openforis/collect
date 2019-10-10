@@ -128,18 +128,20 @@ class RecordDataTable extends Component {
 		const keyValues = []
 		const summaryValues = []
 		let ownerIds = []
-		if (Object.keys(filterObj).length > 0) {
-			for (const fieldName in filterObj) {
-				let val = filterObj[fieldName].value
-				if (fieldName.startsWith('key')) {
-					const keyValueIdx = parseInt(fieldName.substr(3), 10) - 1
-					keyValues[keyValueIdx] = val
-				} else if (fieldName.startsWith('summary_')) {
-					const summaryValueIdx = parseInt(fieldName.substring(fieldName.indexOf('_') + 1), 10)
-					summaryValues[summaryValueIdx] = val
-				} else if (fieldName === 'owner') {
-					ownerIds = val
-				}
+		for (const [fieldName, filterObjField] of Object.entries(filterObj)) {
+			const filterValue = filterObjField.value
+			const val = filterObjField.type === 'NumberFilter' 
+				? filterValue.number 
+				: filterValue
+			
+			if (fieldName.startsWith('key')) {
+				const keyValueIdx = parseInt(fieldName.substr(3), 10) - 1
+				keyValues[keyValueIdx] = val
+			} else if (fieldName.startsWith('summary_')) {
+				const summaryValueIdx = parseInt(fieldName.substring(fieldName.indexOf('_') + 1), 10)
+				summaryValues[summaryValueIdx] = val
+			} else if (fieldName === 'owner') {
+				ownerIds = val
 			}
 		}
 		filterRecordSummaries({keyValues, summaryValues, ownerIds})
@@ -215,14 +217,7 @@ class RecordDataTable extends Component {
 			</span>
 		}
 
-		function createAttributeFilter(attrDef, defaultValue) {
-			switch(attrDef.attributeType) {
-				case 'NUMBER':
-					return {type: 'NumberFilter', defaultValue: {number: defaultValue}}
-				default:
-					return {type: 'TextFilter', defaultValue}
-			}
-		}
+		const createAttributeFilter = (attrDef, defaultValue) => ({type: 'TextFilter', defaultValue})
 
 		var columns = [];
 		columns.push(<TableHeaderColumn key="id" dataField="id" isKey hidden dataAlign="center">Id</TableHeaderColumn>);
