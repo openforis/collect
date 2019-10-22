@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.lucene.util.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.io.data.csv.CSVDataExportParameters;
 import org.openforis.collect.io.data.csv.CSVDataExportParametersBase.OutputFormat;
@@ -87,24 +87,19 @@ public class CSVDataExportJob extends SurveyLockingJob {
 	private class CSVDataExportTask extends Task {
 		
 		@Override
-		protected void initializeInternalVariables() throws Throwable {
-			super.initializeInternalVariables();
-		}
-		
-		@Override
 		protected long countTotalItems() {
 			int totalRecords = recordManager.countRecords(parameters.getRecordFilter());
 			Collection<EntityDefinition> entitiesToExport = getEntitiesToExport();
-			int result = totalRecords * entitiesToExport.size();
-			return result;
+			return totalRecords * entitiesToExport.size();
 		}
 		
 		@Override
 		protected void execute() throws Throwable {
+			FileOutputStream fileOutputStream = null;
 			BufferedOutputStream bufferedOutputStream = null;
 			ZipOutputStream zipOS = null;
 			try {
-				FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+				fileOutputStream = new FileOutputStream(outputFile);
 				bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 				
 				Collection<EntityDefinition> entities = getEntitiesToExport();
@@ -128,8 +123,9 @@ public class CSVDataExportJob extends SurveyLockingJob {
 					}
 				}
 			} finally {
-				IOUtils.close(zipOS);
-				IOUtils.close(bufferedOutputStream);
+				IOUtils.closeQuietly(zipOS);
+				IOUtils.closeQuietly(bufferedOutputStream);
+				IOUtils.closeQuietly(fileOutputStream);
 			}
 		}
 		
@@ -179,14 +175,18 @@ public class CSVDataExportJob extends SurveyLockingJob {
 				EntityDefinition rootEntity = schema.getRootEntityDefinition(recordFilter.getRootEntityId());
 				rootEntity.traverse(new NodeDefinitionVisitor() {
 					@Override
-					public void visit(NodeDefinition node) {
-						if ( node instanceof EntityDefinition && node.isMultiple() ) {
-							result.add((EntityDefinition) node);
+					public void visit(NodeDefinition nodeDef) {
+						if ( nodeDef instanceof EntityDefinition && nodeDef.isMultiple() && 
+								(!parameters.isIncludeEnumeratedEntities() 
+										|| ((EntityDefinition) nodeDef).isRoot() 
+										|| !((EntityDefinition) nodeDef).isEnumerable()
+						)) {
+							result.add((EntityDefinition) nodeDef);
 						}
 					}
 				});
 			} else {
-				EntityDefinition entity = (EntityDefinition) schema.getDefinitionById(parameters.getEntityId());
+				EntityDefinition entity = schema.getDefinitionById(parameters.getEntityId());
 				result.add(entity);
 			}
 			return result;

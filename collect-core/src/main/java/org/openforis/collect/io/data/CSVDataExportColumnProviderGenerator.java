@@ -35,7 +35,7 @@ public class CSVDataExportColumnProviderGenerator {
 
 	public DataTransformation generateDataTransformation(int entityDefId) throws InvalidExpressionException {
 		Schema schema = survey.getSchema();
-		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityDefId);
+		EntityDefinition entityDefn = schema.getDefinitionById(entityDefId);
 		
 		ColumnProvider provider = generateColumnProviderChain(entityDefn);
 		String axisPath = entityDefn.getPath();
@@ -68,8 +68,7 @@ public class CSVDataExportColumnProviderGenerator {
 	}
 	
 	protected AutomaticColumnProvider createEntityColumnProvider(EntityDefinition entityDefn) {
-		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(configuration, "", entityDefn, null);
-		return entityColumnProvider;
+		return new AutomaticColumnProvider(configuration, "", entityDefn, null);
 	}
 	
 	private List<ColumnProvider> createAncestorsColumnsProvider(EntityDefinition entityDefn) {
