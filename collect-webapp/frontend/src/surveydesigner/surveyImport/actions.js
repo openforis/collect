@@ -1,4 +1,4 @@
-import { change } from 'redux-form'
+//import { change } from 'react-final-form'
 
 import Forms from 'common/components/Forms'
 
@@ -26,9 +26,9 @@ export function uploadSurveyFile(file) {
             } else {
                 const backupInfo = res.objects.surveyBackupInfo
                 const importingIntoExistingSurvey = res.objects.importingIntoExistingSurvey
-                dispatch(change(SURVEY_IMPORT_FORM_NAME, 'name', backupInfo.surveyName))
+                //dispatch(change(SURVEY_IMPORT_FORM_NAME, 'name', backupInfo.surveyName))
                 if (importingIntoExistingSurvey) {
-                    dispatch(change(SURVEY_IMPORT_FORM_NAME, 'userGroupId', res.objects.existingSurveyUserGroupId))
+                    //dispatch(change(SURVEY_IMPORT_FORM_NAME, 'userGroupId', res.objects.existingSurveyUserGroupId))
                 }
                 dispatch(surveyFileUploaded(backupInfo, importingIntoExistingSurvey))
             }

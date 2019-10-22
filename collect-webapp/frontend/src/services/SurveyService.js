@@ -7,22 +7,12 @@ export default class SurveyService extends AbstractService {
         return this.get('survey/' + surveyId).then(res => new Survey(res))
     }
 
-    createNewSurvey(name, templateType, defaultLanguageCode, userGroupId) {
-        return this.post('survey', {
-            name: name,
-            templateType: templateType,
-            defaultLanguageCode:  defaultLanguageCode,
-            userGroupId: userGroupId
-        })
+    createNewSurvey(surveyFormObj) {
+        return this.post('survey', surveyFormObj)
     }
 
-    validateSurveyCreation(name, templateType, defaultLanguageCode, userGroupId) {
-        return this.post('survey/validatecreation', {
-            name: name,
-            templateType: templateType,
-            defaultLanguageCode:  defaultLanguageCode,
-            userGroupId: userGroupId
-        })
+    validateSurveyCreation(surveyFormObj) {
+        return this.post('survey/validatecreation', surveyFormObj)
     }
 
     changeUserGroup(surveyName, userGroupId, loggedUserId) {

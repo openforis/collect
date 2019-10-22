@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Formik } from 'formik';
 import { FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
@@ -22,22 +23,22 @@ export class SimpleFormItem extends Component {
     }
 
     render() {
-        const {fieldId, label, fieldState, errorFeedback, validationErrors, check=false, row=true, labelColSpan=2, fieldColSpan=10} = this.props
+        const { fieldId, label, fieldState, errorFeedback, validationErrors, check = false, row = true, labelColSpan = 2, fieldColSpan = 10 } = this.props
         const errorMessage = this.extractErrorMessage(fieldId, errorFeedback, validationErrors)
-        const formGroupColor = fieldState ? fieldState : errorMessage ? 'danger': null
+        const formGroupColor = fieldState ? fieldState : errorMessage ? 'danger' : null
 
         return (
             <FormGroup row={row} color={formGroupColor} check={check}>
                 <Label check={check} for={fieldId} sm={labelColSpan}>{L.l(label)}:</Label>
                 <Col sm={fieldColSpan}>
-                    {check && 
+                    {check &&
                         <FormGroup check>
                             <Label check>
                                 {this.props.children}
                             </Label>
                         </FormGroup>
                     }
-                    {! check && this.props.children}
+                    {!check && this.props.children}
                     {errorMessage && <FormFeedback>{errorMessage}</FormFeedback>}
                 </Col>
             </FormGroup>
@@ -47,8 +48,8 @@ export class SimpleFormItem extends Component {
 
 export class FormItem extends Component {
     render() {
-        const { label, error, touched, asyncValidating, labelColSpan=2, fieldColSpan=10 } = this.props
-        
+        const { label, error, touched, asyncValidating, labelColSpan = 2, fieldColSpan = 10 } = this.props
+
         return (
             <FormGroup row>
                 <Label sm={labelColSpan}>{label}</Label>
@@ -62,6 +63,20 @@ export class FormItem extends Component {
 }
 
 export default class Forms {
+
+    static asyncValidate = validateFn => values =>
+        new Promise((resolve, reject) => {
+            validateFn(values)
+                .then(r => {
+                    try {
+                        Forms.handleValidationResponse(r)
+                        resolve()
+                    } catch (error) {
+                        reject(error)
+                    }
+                })
+                .catch(reject)
+        })
 
     static handleValidationResponse(r) {
         if (r.statusError) {
@@ -81,29 +96,32 @@ export default class Forms {
         }
     }
 
-    static renderFormItemInputField({ input, label, type, contentEditable, labelColSpan=2, fieldColSpan=10, meta: { asyncValidating, touched, error } }) {
-        return <FormItem label={label} asyncValidating={asyncValidating} touched={touched} error={error} 
-                    labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
-                <Input readOnly={contentEditable === false} 
-                    valid={touched && error ? false : null}
-                    invalid={touched && error ? true: null} 
-                    type={type}
-                    {...input} />
-            </FormItem>
+    static renderFormItemInputField({ input: { onChange, value }, label, type, contentEditable, labelColSpan = 2, fieldColSpan = 10, meta: { asyncValidating, touched, error } }) {
+        return <FormItem label={label} asyncValidating={asyncValidating} touched={touched} error={error}
+            labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
+            <Input readOnly={contentEditable === false}
+                valid={touched && error ? false : null}
+                invalid={touched && error ? true : null}
+                type={type}
+                onChange={onChange}
+                value={value} />
+        </FormItem>
     }
 
     static renderInputField({ input, label, type, contentEditable, meta: { asyncValidating, touched, error } }) {
         return <Input readOnly={contentEditable === false} valid={touched && error ? false : null} {...input} type={type} />
     }
 
-    static renderFormItemSelect({ input, label, type, options, contentEditable, labelColSpan=2, fieldColSpan=10, meta: { asyncValidating, touched, error }}) {
+    static renderFormItemSelect({ input: { onChange, value }, label, type, options, contentEditable, labelColSpan = 2, fieldColSpan = 10, meta: { asyncValidating, touched, error } }) {
         return <FormItem label={label} touched={touched} error={error}
-                    labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
-                <Input readOnly={contentEditable === false} 
-                    valid={touched && error ? false : null}
-                    invalid={touched && error ? true: null} 
-                    type="select" {...input}>{options}</Input>
-            </FormItem>
+            labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
+            <Input readOnly={contentEditable === false}
+                valid={touched && error ? false : null}
+                invalid={touched && error ? true : null}
+                type="select"
+                onChange={onChange}
+                value={value}>{options}</Input>
+        </FormItem>
     }
 
     static renderSelect({ input, label, type, options, contentEditable, meta: { asyncValidating, touched, error } }) {
@@ -127,10 +145,64 @@ export default class Forms {
     }
 
     static getValidState(fieldId, validationErrors) {
-        return validationErrors ? 
-                validationErrors.find(e => e.field === fieldId) ? false 
+        return validationErrors ?
+            validationErrors.find(e => e.field === fieldId) ? false
                 : null
             : null
     }
 
+}
+
+export const SelectFormItem = ({ name, label, touched, errors,
+    labelColSpan, fieldColSpan,
+    contentEditable, options, values,
+    handleChange, handleBlur }) => {
+        const value = values[name] || ''
+    const error = errors[name]
+    const fieldTouched = touched[name]
+    return <FormItem label={label} touched={fieldTouched} error={error}
+        labelColSpan={labelColSpan} fieldColSpan={fieldColSpan} >
+        <Input
+            name={name}
+            readOnly={contentEditable === false}
+            valid={fieldTouched && error ? false : null}
+            invalid={fieldTouched && error ? true : null}
+            type="select"
+            onBlur={handleBlur}
+            onChange={handleChange}
+            value={value}>{options}</Input>
+    </FormItem >
+}
+
+export const TextFormItem = ({ name, type = "text", label, asyncValidating, touched, errors,
+    labelColSpan, fieldColSpan,
+    contentEditable,
+    values,
+    handleChange,
+    handleBlur
+}) => {
+    const value = values[name] || ''
+    const error = errors[name]
+    const fieldTouched = touched[name]
+    return <FormItem label={label} asyncValidating={asyncValidating} touched={fieldTouched} error={error}
+        labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
+        <Input
+            name={name}
+            readOnly={contentEditable === false}
+            valid={fieldTouched && error ? false : null}
+            invalid={fieldTouched && error ? true : null}
+            type={type}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            value={value} />
+    </FormItem>
+}
+
+export class Form extends Formik {
+    constructor(props) {
+        super({
+            ...props,
+            onSubmit: (values, {setSubmitting}) => props.onSubmit(values).finally(setSubmitting(false))
+        })
+    }
 }

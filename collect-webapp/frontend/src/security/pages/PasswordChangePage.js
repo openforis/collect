@@ -1,87 +1,79 @@
 import React, { Component } from 'react';
-import { Field, reduxForm } from 'redux-form'
+import { Formik } from 'formik';
+
 import Button from '@material-ui/core/Button';
 
 import ServiceFactory from 'services/ServiceFactory';
-import Forms from 'common/components/Forms';
+import Forms, { TextFormItem } from 'common/components/Forms';
 import Dialogs from 'common/components/Dialogs'
 import L from 'utils/Labels';
 import RouterUtils from 'utils/RouterUtils';
+import Objects from '../../utils/Objects'
 
-const asyncValidate = (values /*, dispatch */) => {
-    return ServiceFactory.userService.validatePasswordChange(values.oldPassword, values.newPassword, values.retypedPassword)
-        .then(r => Forms.handleValidationResponse(r))
+const PasswordChangePage = props => {
+    const { history } = props
+
+    const fieldProps = { labelColSpan: 3, fieldColSpan: 9 }
+
+    return (
+        <Formik
+            onSubmit={(values, { setSubmitting }) =>
+                ServiceFactory.userService.changePassword(values.oldPassword, values.newPassword)
+                    .then(r => {
+                        Forms.handleValidationResponse(r)
+                        if (r.statusOk) {
+                            Dialogs.alert(L.l('global.info'), L.l('user.changePassword.passwordChanged'))
+                            RouterUtils.navigateToHomePage(history)
+                        }
+                    })
+                    .finally(() => setSubmitting(false))
+            }
+            validate={values =>
+                ServiceFactory.userService.validatePasswordChange(values.oldPassword, values.newPassword, values.retypedPassword)
+                    .then(r => Forms.handleValidationResponse(r))}>
+            {formProps => {
+                const {
+                    errors,
+                    handleSubmit,
+                    isSubmitting,
+                    touched,
+                } = formProps
+
+                return <form onSubmit={handleSubmit} style={{ width: '700px' }}>
+                    <TextFormItem
+                        name="oldPassword"
+                        type="password"
+                        fullWidth={true}
+                        label={L.l('user.oldPassword')}
+                        {...fieldProps}
+                        {...formProps}
+                    />
+                    <TextFormItem
+                        name="newPassword"
+                        type="password"
+                        fullWidth={true}
+                        label={L.l('user.newPassword')}
+                        {...fieldProps}
+                        {...formProps}
+                    />
+                    <TextFormItem
+                        name="retypedPassword"
+                        type="password"
+                        fullWidth={true}
+                        label={L.l('user.retypedPassword')}
+                        {...fieldProps}
+                        {...formProps}
+                    />
+                    <div>
+                        <Button variant="contained" color="primary"
+                            disabled={Objects.isEmpty(touched) || Objects.isNotEmpty(errors) || isSubmitting} type="submit">
+                            {L.l('user.changePassword.change')}
+                        </Button>
+                    </div>
+                </form>
+            }}
+        </Formik>
+    )
 }
 
-class PasswordChangePage extends Component {
-
-    constructor(props) {
-        super(props)
-
-        this.submit = this.submit.bind(this)
-    }
-
-    submit(values) {
-        return ServiceFactory.userService.changePassword(values.oldPassword, values.newPassword)
-            .then(r => {
-                Forms.handleValidationResponse(r)
-                if (r.statusOk) {
-                    Dialogs.alert(L.l('global.info'), L.l('user.changePassword.passwordChanged'))
-                    RouterUtils.navigateToHomePage(this.props.history)
-                }
-            })
-    }
-    
-    render() {
-        const { handleSubmit, submitting, anyTouched, error } = this.props
-
-        return (
-            <form onSubmit={handleSubmit(this.submit)} style={{width: '700px'}}>
-                <Field
-                    name="oldPassword"
-                    type="password"
-                    component={Forms.renderFormItemInputField}
-                    fullWidth={true}
-                    labelColSpan={3}
-                    fieldColSpan={9}
-                    label={L.l('user.oldPassword')}
-                    />
-                <Field
-                    name="newPassword"
-                    type="password"
-                    component={Forms.renderFormItemInputField}
-                    fullWidth={true}
-                    labelColSpan={3}
-                    fieldColSpan={9}
-                    label={L.l('user.newPassword')}
-                    />
-                <Field
-                    name="retypedPassword"
-                    type="password"
-                    component={Forms.renderFormItemInputField}
-                    fullWidth={true}
-                    labelColSpan={3}
-                    fieldColSpan={9}
-                    label={L.l('user.retypedPassword')}
-                    />
-                {error && <div class="error">{error}</div>}
-                <div>
-                    <Button variant="contained" color="primary" disabled={!anyTouched || error || submitting} type="submit">
-                        {L.l('user.changePassword.change')}
-                    </Button>
-                </div>
-            </form>
-        )
-    }
-}
-
-export default reduxForm({ 
-    form: 'passwordChangeForm',
-    initialValues: {
-        oldPassword: '',
-        newPassword: '',
-        retypedPassword: ''
-    },
-    asyncValidate,
-    asyncBlurFields: ['oldPassword', 'newPassword', 'retypedPassword']
-})(PasswordChangePage)
+export default PasswordChangePage

@@ -24,6 +24,14 @@ export default class Objects {
         return ! Objects.isNullOrUndefined(obj)
     }
 
+    static isNotEmpty(obj) {
+        return typeof obj === 'object' && Object.keys(obj).length > 0
+    }
+
+    static isEmpty(obj) {
+        return !Objects.isNotEmpty(obj)
+    }
+
     static defaultIfNull(obj, defaultVal) {
         if (Objects.isNullOrUndefined(obj)) {
             return defaultVal
