@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Formik } from 'formik';
+import { withFormik } from 'formik';
 import { FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
@@ -64,38 +64,6 @@ export class FormItem extends Component {
 
 export default class Forms {
 
-    static asyncValidate = validateFn => values =>
-        new Promise((resolve, reject) => {
-            validateFn(values)
-                .then(r => {
-                    try {
-                        Forms.handleValidationResponse(r)
-                        resolve()
-                    } catch (error) {
-                        reject(error)
-                    }
-                })
-                .catch(reject)
-        })
-
-    static handleValidationResponse(r) {
-        if (r.statusError) {
-            let result = {}
-            const errors = r.objects.errors
-            if (errors) {
-                errors.forEach(error => {
-                    result[error.field] = L.l(error.code, error.arguments)
-                })
-            }
-            let errorMessage = L.l('validation.errorsInTheForm')
-            if (r.errorMessage) {
-                errorMessage += ': ' + r.errorMessage
-            }
-            result._error = errorMessage
-            throw result
-        }
-    }
-
     static renderFormItemInputField({ input: { onChange, value }, label, type, contentEditable, labelColSpan = 2, fieldColSpan = 10, meta: { asyncValidating, touched, error } }) {
         return <FormItem label={label} asyncValidating={asyncValidating} touched={touched} error={error}
             labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
@@ -153,11 +121,43 @@ export default class Forms {
 
 }
 
+export const handleValidationResponse = r => {
+    if (r.statusError) {
+        let result = {}
+        const errors = r.objects.errors
+        if (errors) {
+            errors.forEach(error => {
+                result[error.field] = L.l(error.code, error.arguments)
+            })
+        }
+        let errorMessage = L.l('validation.errorsInTheForm')
+        if (r.errorMessage) {
+            errorMessage += ': ' + r.errorMessage
+        }
+        result._error = errorMessage
+        throw result
+    }
+}
+
+export const asyncValidate = validateFn => values =>
+    new Promise((resolve, reject) => {
+        validateFn(values)
+            .then(r => {
+                try {
+                    handleValidationResponse(r)
+                    resolve()
+                } catch (error) {
+                    reject(error)
+                }
+            })
+            .catch(reject)
+    })
+
 export const SelectFormItem = ({ name, label, touched, errors,
     labelColSpan, fieldColSpan,
     contentEditable, options, values,
     handleChange, handleBlur }) => {
-        const value = values[name] || ''
+    const value = values[name] || ''
     const error = errors[name]
     const fieldTouched = touched[name]
     return <FormItem label={label} touched={fieldTouched} error={error}
@@ -196,13 +196,4 @@ export const TextFormItem = ({ name, type = "text", label, asyncValidating, touc
             onChange={handleChange}
             value={value} />
     </FormItem>
-}
-
-export class Form extends Formik {
-    constructor(props) {
-        super({
-            ...props,
-            onSubmit: (values, {setSubmitting}) => props.onSubmit(values).finally(setSubmitting(false))
-        })
-    }
 }
