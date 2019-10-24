@@ -16,6 +16,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
+import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM.NodeSelectedEvent;
@@ -23,7 +24,6 @@ import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.SurveyObjects;
-import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -97,15 +97,13 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
  		Media media = event.getMedia();
 		String fileName = media.getName();
 		String extension = FilenameUtils.getExtension(fileName);
-		File tempFile;
 		if (Files.CSV_FILE_EXTENSION.equalsIgnoreCase(extension)) {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
+			this.uploadedFile = MediaUtil.copyToTempFile(media);
+			this.uploadedFileName = fileName;
+			notifyChange("uploadedFileName");
 		} else {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
+			throw new RuntimeException(String.format("Only CSV file upload is supported, found: %s", extension));
 		}
-		this.uploadedFile = tempFile;
-		this.uploadedFileName = fileName;
-		notifyChange("uploadedFileName");
 	}
 
 	@Command

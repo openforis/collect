@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyFileFormObject;
+import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.metadata.collectearth.CSVFileValidationResult;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthGridTemplateGenerator;
@@ -25,7 +25,6 @@ import org.openforis.collect.model.SurveyFile;
 import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.MediaTypes;
-import org.openforis.commons.io.OpenForisIOUtils;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -164,16 +163,8 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	public void fileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event,
 			@ContextParam(ContextType.BINDER) Binder binder) {
  		Media media = event.getMedia();
-		String fileName = media.getName();
-		File tempFile;
-		String extension = FilenameUtils.getExtension(fileName);
-		if (media.isBinary()) {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), extension);
-		} else {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
-		}
-		this.uploadedFile = tempFile;
-		this.uploadedFileName = normalizeFilename(fileName);
+		this.uploadedFile = MediaUtil.copyToTempFile(media);
+		this.uploadedFileName = normalizeFilename(media.getName());
 		notifyChange(SurveyFileFormObject.UPLOADED_FILE_NAME_FIELD);
 		updateForm(binder);
 	}

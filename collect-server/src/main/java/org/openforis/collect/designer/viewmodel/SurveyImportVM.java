@@ -16,6 +16,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.SurveyNameValidator;
 import org.openforis.collect.designer.model.LabelledItem;
+import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.MessageType;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
@@ -32,7 +33,6 @@ import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidation
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.UserGroup;
-import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.versioning.Version;
 import org.openforis.commons.versioning.Version.Significance;
 import org.openforis.concurrency.Job;
@@ -165,19 +165,13 @@ public class SurveyImportVM extends SurveyBaseVM {
  		Media media = event.getMedia();
 		String fileName = media.getName();
 		if ( validateBackupFile(fileName) ) {
-			File tempFile;
+			File tempFile = MediaUtil.copyToTempFile(media);
 			String extension = FilenameUtils.getExtension(fileName);
-			boolean xmlFileUploaded = XML_FILE_EXTENSION.equalsIgnoreCase(extension);
-			if ( xmlFileUploaded ) {
-				tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
-			} else {
-				tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), extension);
-			}
+			boolean xmlFileUploaded = XML_FILE_EXTENSION.equalsIgnoreCase(extension);			
 			this.uploadedFile = tempFile;
 			this.uploadedFileName = fileName;
 			notifyChange("uploadedFileName");
 			updateForm();
-
 			prepareSurveyImport(xmlFileUploaded);
 		}
 	}

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
@@ -23,6 +22,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.validator.BaseValidator;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
+import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
@@ -37,7 +37,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.commons.collection.CollectionUtils;
-import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Job;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -62,7 +61,6 @@ import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.DropEvent;
@@ -400,11 +398,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	@Command
 	public void batchImportFileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
- 		Media media = event.getMedia();
-		String fileName = media.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		File tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), extension);
-
+ 		File tempFile = MediaUtil.copyToTempFile(event.getMedia());
+		
 		batchImportJob = new CodeListBatchImportJob();
 		batchImportJob.setJobManager(jobManager);
 		batchImportJob.setCodeListManager(codeListManager);
@@ -462,7 +457,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		if (job == batchExportJob) {
 			downloadFile(batchExportJob.getOutputFile(), survey.getName() + "_code_lists.zip");
 		} else if (job == batchImportJob) {
+			MessageUtil.showInfo("survey.code_list.batch_import_completed");
 			codeListsUpdated();
+			resetEditedItem();
 			SurveyEditVM.dispatchSurveySaveCommand();
 		}
 		clearJob(job);
