@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import { compose } from "redux";
-import { withFormik } from 'formik';
-import { Button, Form, Row, Col, Input } from 'reactstrap';
-import { connect } from 'react-redux';
+import React from 'react'
+import { compose } from "redux"
+import { connect } from 'react-redux'
+import { withFormik } from 'formik'
+import { Button, Form, Row, Col, Input } from 'reactstrap'
 
 import User from '../../../model/User'
 
@@ -22,13 +22,12 @@ const NewSurveyParametersForm = props => {
         isSubmitting,
     } = props
 
-
     const templateTypeOptions = templateTypes.map(type =>
         <option key={type} value={type}>{L.l('survey.templateType.' + type)}</option>)
 
     const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(
         userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
-    
+
     const langCodes = L.keys('languages')
     const langItems = langCodes.map(code => ({ code, label: L.l('languages.' + code) }))
     const languageOptions = langItems.sort((a, b) => Strings.compare(a.label, b.label)).map(item =>

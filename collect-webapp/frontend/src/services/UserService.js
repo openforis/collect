@@ -16,8 +16,8 @@ export default class UserService extends AbstractService {
 
     deleteUsers(loggedUserId, userIds) {
         return this.delete('user', {
-            loggedUserId: loggedUserId,
-            userIds: userIds
+            loggedUserId,
+            userIds
         })
     }
 
@@ -25,18 +25,18 @@ export default class UserService extends AbstractService {
         return this.post('login', credentials);
     }
 
-    validatePasswordChange(oldPassword, newPassword, retypedPassword) {
+    validatePasswordChange({ oldPassword, newPassword, retypedPassword }) {
         return this.post('user/validatepasswordchange', {
-            oldPassword: oldPassword,
-            newPassword: newPassword,
-            retypedPassword:  retypedPassword
+            oldPassword,
+            newPassword,
+            retypedPassword
         })
     }
 
     changePassword(oldPassword, newPassword) {
         return this.post('user/changepassword', {
-            oldPassword: oldPassword,
-            newPassword: newPassword
+            oldPassword,
+            newPassword
         })
     }
 
