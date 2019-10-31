@@ -2,11 +2,11 @@ import React from 'react'
 import { compose } from "redux"
 import { connect } from 'react-redux'
 import { withFormik } from 'formik'
-import { Button, Form, Row, Col, Input } from 'reactstrap'
+import { Form, Row, Col } from 'reactstrap'
 
 import User from '../../../model/User'
 
-import Forms, { TextFormItem, SelectFormItem, asyncValidate } from 'common/components/Forms'
+import { TextFormItem, SelectFormItem, SubmitButton, normalizeInternalName, asyncValidate } from 'common/components/Forms'
 import { createNewSurvey } from 'surveydesigner/newSurvey/actions'
 import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels'
@@ -20,6 +20,7 @@ const NewSurveyParametersForm = props => {
         userGroups,
         handleSubmit,
         isSubmitting,
+        handleChange,
     } = props
 
     const templateTypeOptions = templateTypes.map(type =>
@@ -39,9 +40,12 @@ const NewSurveyParametersForm = props => {
             <TextFormItem
                 name="name"
                 label={L.l('survey.name')}
-                normalize={Forms.normalizeInternalName}
                 {...fieldProps}
                 {...props}
+                handleChange={e => {
+                    e.target.value = normalizeInternalName(e.target.value)
+                    handleChange(e)
+                }}
             />
             <SelectFormItem
                 name="templateType"
@@ -63,11 +67,10 @@ const NewSurveyParametersForm = props => {
                 options={userGroupOptions}
                 {...fieldProps}
                 {...props}
-
             />
             <Row>
                 <Col sm={{ size: 1, offset: 5 }}>
-                    <Button color="primary" type="submit" disabled={isSubmitting}>{L.l('general.new')}</Button>
+                    <SubmitButton {...props}>{L.l('general.new')}</SubmitButton>
                 </Col>
             </Row>
         </Form>

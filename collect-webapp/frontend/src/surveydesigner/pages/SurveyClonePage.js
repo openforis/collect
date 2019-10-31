@@ -6,7 +6,7 @@ import {
 import { connect } from 'react-redux';
 
 import * as JobActions from 'actions/job';
-import Forms, { SimpleFormItem } from 'common/components/Forms';
+import { SimpleFormItem, normalizeInternalName, getValidState } from 'common/components/Forms';
 import Dialogs from 'common/components/Dialogs';
 import ServiceFactory from 'services/ServiceFactory';
 import Arrays from 'utils/Arrays';
@@ -17,7 +17,7 @@ class SurveyClonePage extends Component {
 
     constructor(props) {
         super(props)
-        
+
         this.state = {
             originalSurveySummary: null,
             originalSurveyType: null,
@@ -32,7 +32,7 @@ class SurveyClonePage extends Component {
         this.handleCloneButtonClick = this.handleCloneButtonClick.bind(this)
         this.handleCloneModalOkButtonClick = this.handleCloneModalOkButtonClick.bind(this)
     }
-    
+
     componentDidMount() {
         const { surveys } = this.props
         if (surveys && surveys.length > 0 && !this.state.originalSurveySummary) {
@@ -41,7 +41,7 @@ class SurveyClonePage extends Component {
             const surveySummary = surveys.find(s => s.name === surveyName)
             this.setState({
                 originalSurveySummary: surveySummary,
-                originalSurveyType: surveySummary.temporary ? 'TEMPORARY': 'PUBLISHED',
+                originalSurveyType: surveySummary.temporary ? 'TEMPORARY' : 'PUBLISHED',
                 newSurveyName: this.findUnusedSurveyName(surveys, surveySummary)
             })
         }
@@ -69,22 +69,21 @@ class SurveyClonePage extends Component {
     }
 
     validateFormAsync() {
-        this.setState({validating: true})
-        const originalSurveyName = this.state.originalSurveySummary.name
-        const originalSurveyType = this.state.originalSurveyType
-        const newSurveyName = this.state.newSurveyName
+        this.setState({ validating: true })
+        const { originalSurveySummary, originalSurveyType, newSurveyName } = this.state
+        const originalSurveyName = originalSurveySummary.name
 
         ServiceFactory.surveyService.validateClone(originalSurveyName, originalSurveyType, newSurveyName).then(r => {
             const validationErrors = r.status === 'OK' ? null : r.objects.errors
             this.setState({
-                validating: false, 
+                validating: false,
                 validationErrors: validationErrors
             })
         })
     }
 
     handleNameChange(e) {
-        this.setState({newSurveyName: Forms.normalizeInternalName(e.target.value)})
+        this.setState({ newSurveyName: normalizeInternalName(e.target.value) })
     }
 
     handleCloneModalOkButtonClick(job) {
@@ -103,7 +102,7 @@ class SurveyClonePage extends Component {
 
     render() {
         const { error, originalSurveySummary, originalSurveyType, newSurveyName, validating, validationErrors } = this.state
-        if (! originalSurveySummary) {
+        if (!originalSurveySummary) {
             return <div>Loading...</div>
         }
         const surveyTypes = ['TEMPORARY', 'PUBLISHED']
@@ -111,14 +110,14 @@ class SurveyClonePage extends Component {
             <Label key={type} check>
                 <Input type="radio" value={type} name="originalSurveyType"
                     checked={originalSurveyType === type}
-                    onChange={(e) => this.setState({originalSurveyType: e.target.value })}
-                    disabled={(type === 'PUBLISHED' && !originalSurveySummary.published) 
+                    onChange={(e) => this.setState({ originalSurveyType: e.target.value })}
+                    disabled={(type === 'PUBLISHED' && !originalSurveySummary.published)
                         || (type === 'TEMPORARY' && !originalSurveySummary.temporary)}
-                    />
+                />
                 {L.l('survey.surveyType.' + type.toLowerCase())}
             </Label>
         )
-       
+
         return (
             <Container>
                 <FormGroup tag="fieldset">
@@ -149,15 +148,15 @@ class SurveyClonePage extends Component {
                             name="newSurveyName"
                             validationErrors={validationErrors}
                             type="text">
-                            <Input type="text" 
-                                value={newSurveyName} 
-                                onChange={this.handleNameChange} 
-                                onBlur={this.validateFormAsync} 
-                                valid={Forms.getValidState('newSurveyName', validationErrors)} />
+                            <Input type="text"
+                                value={newSurveyName}
+                                onChange={this.handleNameChange}
+                                onBlur={this.validateFormAsync}
+                                valid={getValidState('newSurveyName', validationErrors)} />
                         </SimpleFormItem>
                         {error && <Alert color="danger">{error}</Alert>}
                         <Row>
-                            <Col xs={{offset: 5}}>
+                            <Col xs={{ offset: 5 }}>
                                 <Button color="primary" disabled={validationErrors || validating}
                                     onClick={this.handleCloneButtonClick}>{L.l('survey.clone')}</Button>
                             </Col>
@@ -170,10 +169,10 @@ class SurveyClonePage extends Component {
 }
 
 const mapStateToProps = state => {
-	return {
-		loggedUser: state.session ? state.session.loggedUser : null,
-		surveys: state.surveyDesigner.surveysList.items
-	}
+    return {
+        loggedUser: state.session ? state.session.loggedUser : null,
+        surveys: state.surveyDesigner.surveysList.items
+    }
 }
 
 export default connect(mapStateToProps)(SurveyClonePage)

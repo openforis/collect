@@ -40,15 +40,15 @@ export default class SurveyService extends AbstractService {
 
     validateSurveyImport(name, userGroupId) {
         return this.post('survey/validateimport', {
-            name: name,
-            userGroupId: userGroupId
+            name,
+            userGroupId
         })
     }
 
     startSurveyFileImport(name, userGroupId) {
         return this.post('survey/startimport', {
-            name: name,
-            userGroupId: userGroupId
+            name,
+            userGroupId
         })
     }
 

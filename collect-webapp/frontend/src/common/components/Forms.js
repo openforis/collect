@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import { withFormik } from 'formik';
-import { FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
+import React from 'react';
+import { Button, FormFeedback, FormGroup, Label, Input, Col } from 'reactstrap';
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
+import Objects from '../../utils/Objects';
 
-export class SimpleFormItem extends Component {
+export const SimpleFormItem = props => {
 
-    extractErrorMessage(fieldId, errorFeedback, validationErrors) {
+    const extractErrorMessage = (fieldId, errorFeedback, validationErrors) => {
         let errorMessage = null
         let errorMessageArgs = null
         if (errorFeedback) {
@@ -22,104 +22,113 @@ export class SimpleFormItem extends Component {
         return errorMessage
     }
 
-    render() {
-        const { fieldId, label, fieldState, errorFeedback, validationErrors, check = false, row = true, labelColSpan = 2, fieldColSpan = 10 } = this.props
-        const errorMessage = this.extractErrorMessage(fieldId, errorFeedback, validationErrors)
-        const formGroupColor = fieldState ? fieldState : errorMessage ? 'danger' : null
 
-        return (
-            <FormGroup row={row} color={formGroupColor} check={check}>
-                <Label check={check} for={fieldId} sm={labelColSpan}>{L.l(label)}:</Label>
-                <Col sm={fieldColSpan}>
-                    {check &&
-                        <FormGroup check>
-                            <Label check>
-                                {this.props.children}
-                            </Label>
-                        </FormGroup>
-                    }
-                    {!check && this.props.children}
-                    {errorMessage && <FormFeedback>{errorMessage}</FormFeedback>}
-                </Col>
-            </FormGroup>
-        )
-    }
+    const { fieldId, label, fieldState, errorFeedback, validationErrors, check = false, row = true, labelColSpan = 2, fieldColSpan = 10 } = props
+    const errorMessage = extractErrorMessage(fieldId, errorFeedback, validationErrors)
+    const formGroupColor = fieldState ? fieldState : errorMessage ? 'danger' : null
+
+    return (
+        <FormGroup row={row} color={formGroupColor} check={check}>
+            <Label check={check} for={fieldId} sm={labelColSpan}>{L.l(label)}:</Label>
+            <Col sm={fieldColSpan}>
+                {check &&
+                    <FormGroup check>
+                        <Label check>
+                            {props.children}
+                        </Label>
+                    </FormGroup>
+                }
+                {!check && props.children}
+                {errorMessage && <FormFeedback>{errorMessage}</FormFeedback>}
+            </Col>
+        </FormGroup>
+    )
 }
 
-export class FormItem extends Component {
-    render() {
-        const { label, error, touched, asyncValidating, labelColSpan = 2, fieldColSpan = 10 } = this.props
 
-        return (
-            <FormGroup row>
-                <Label sm={labelColSpan}>{label}</Label>
-                <Col sm={fieldColSpan} className={asyncValidating ? 'async-validating' : ''}>
-                    {this.props.children}
-                    {touched && error && <FormFeedback>{error}</FormFeedback>}
-                </Col>
-            </FormGroup>
-        )
-    }
+export const FormItem = props => {
+    const { label, error, touched, asyncValidating, labelColSpan = 2, fieldColSpan = 10 } = props
+
+    return (
+        <FormGroup row>
+            <Label sm={labelColSpan}>{label}</Label>
+            <Col sm={fieldColSpan} className={asyncValidating ? 'async-validating' : ''}>
+                {props.children}
+                {touched && error && <FormFeedback>{error}</FormFeedback>}
+            </Col>
+        </FormGroup>
+    )
 }
 
-export default class Forms {
 
-    static renderFormItemInputField({ input: { onChange, value }, label, type, contentEditable, labelColSpan = 2, fieldColSpan = 10, meta: { asyncValidating, touched, error } }) {
-        return <FormItem label={label} asyncValidating={asyncValidating} touched={touched} error={error}
+export const SelectFormItem = props => {
+    const {
+        name, label, touched, errors,
+        labelColSpan, fieldColSpan,
+        readOnly = false, options, values,
+        handleChange, handleBlur
+    } = props
+    const value = values[name] || ''
+    const error = errors[name]
+    const fieldTouched = touched[name]
+    return (
+        <FormItem label={label} touched={fieldTouched} error={error}
+            labelColSpan={labelColSpan} fieldColSpan={fieldColSpan} >
+            <Input
+                name={name}
+                readOnly={readOnly}
+                valid={fieldTouched && error ? false : null}
+                invalid={fieldTouched && error ? true : null}
+                type="select"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={value}>{options}</Input>
+        </FormItem >
+    )
+}
+
+export const TextFormItem = props => {
+    const {
+        name, type = "text", label, asyncValidating, touched, errors,
+        labelColSpan, fieldColSpan,
+        readOnly = false,
+        values,
+        handleChange, handleBlur
+    } = props
+    const value = values[name] || ''
+    const error = errors[name]
+    const fieldTouched = touched[name]
+    return (
+        <FormItem label={label} asyncValidating={asyncValidating} touched={fieldTouched} error={error}
             labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
-            <Input readOnly={contentEditable === false}
-                valid={touched && error ? false : null}
-                invalid={touched && error ? true : null}
+            <Input
+                name={name}
+                readOnly={readOnly}
+                valid={fieldTouched && error ? false : null}
+                invalid={fieldTouched && error ? true : null}
                 type={type}
-                onChange={onChange}
+                onBlur={handleBlur}
+                onChange={handleChange}
                 value={value} />
         </FormItem>
-    }
-
-    static renderInputField({ input, label, type, contentEditable, meta: { asyncValidating, touched, error } }) {
-        return <Input readOnly={contentEditable === false} valid={touched && error ? false : null} {...input} type={type} />
-    }
-
-    static renderFormItemSelect({ input: { onChange, value }, label, type, options, contentEditable, labelColSpan = 2, fieldColSpan = 10, meta: { asyncValidating, touched, error } }) {
-        return <FormItem label={label} touched={touched} error={error}
-            labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
-            <Input readOnly={contentEditable === false}
-                valid={touched && error ? false : null}
-                invalid={touched && error ? true : null}
-                type="select"
-                onChange={onChange}
-                value={value}>{options}</Input>
-        </FormItem>
-    }
-
-    static renderSelect({ input, label, type, options, contentEditable, meta: { asyncValidating, touched, error } }) {
-        return <Input readOnly={contentEditable === false} valid={touched && error ? false : null} type="select" {...input}>{options}</Input>
-    }
-    /*
-    static renderMaterialUIField = ({input, label, type, fullWidth, meta: { asyncValidating, touched, error }}) => 
-        <FormControl error={touched && error} fullWidth={fullWidth} className={asyncValidating ? 'async-validating' : ''}>
-                <InputLabel>{label}</InputLabel>
-                <Input {...input} type={type}  />
-                {touched && error && <FormHelperText>{error}</FormHelperText>}
-        </FormControl>
-    }
-    */
-    static normalizeInternalName = value => {
-        if (value) {
-            return Strings.replaceAll(value.toLowerCase(), '\\W', '_')
-        } else {
-            return value
-        }
-    }
-
-    static getValidState(fieldId, validationErrors) {
-        return validationErrors ?
-            validationErrors.find(e => e.field === fieldId) ? false
-                : null
-            : null
-    }
-
+    )
 }
+
+export const SubmitButton = props => {
+    const { submitting, errors, children } = props
+
+    return <Button color="primary" type="submit" disabled={submitting || Objects.isNotEmpty(errors)}>{children}</Button>
+}
+
+export const normalizeInternalName = value =>
+    value
+        ? Strings.replaceAll(value.toLowerCase(), '\\W', '_')
+        : value
+
+export const getValidState = (fieldId, validationErrors) =>
+    validationErrors && validationErrors.find(e => e.field === fieldId)
+        ? false
+        : null
 
 export const handleValidationResponse = r => {
     if (r.statusError) {
@@ -139,9 +148,9 @@ export const handleValidationResponse = r => {
     }
 }
 
-export const asyncValidate = validateFn => values =>
+export const asyncValidate = validateFn => (...params) =>
     new Promise((resolve, reject) => {
-        validateFn(values)
+        validateFn.apply(null, params)
             .then(r => {
                 try {
                     handleValidationResponse(r)
@@ -152,48 +161,3 @@ export const asyncValidate = validateFn => values =>
             })
             .catch(reject)
     })
-
-export const SelectFormItem = ({ name, label, touched, errors,
-    labelColSpan, fieldColSpan,
-    contentEditable, options, values,
-    handleChange, handleBlur }) => {
-    const value = values[name] || ''
-    const error = errors[name]
-    const fieldTouched = touched[name]
-    return <FormItem label={label} touched={fieldTouched} error={error}
-        labelColSpan={labelColSpan} fieldColSpan={fieldColSpan} >
-        <Input
-            name={name}
-            readOnly={contentEditable === false}
-            valid={fieldTouched && error ? false : null}
-            invalid={fieldTouched && error ? true : null}
-            type="select"
-            onBlur={handleBlur}
-            onChange={handleChange}
-            value={value}>{options}</Input>
-    </FormItem >
-}
-
-export const TextFormItem = ({ name, type = "text", label, asyncValidating, touched, errors,
-    labelColSpan, fieldColSpan,
-    contentEditable,
-    values,
-    handleChange,
-    handleBlur
-}) => {
-    const value = values[name] || ''
-    const error = errors[name]
-    const fieldTouched = touched[name]
-    return <FormItem label={label} asyncValidating={asyncValidating} touched={fieldTouched} error={error}
-        labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
-        <Input
-            name={name}
-            readOnly={contentEditable === false}
-            valid={fieldTouched && error ? false : null}
-            invalid={fieldTouched && error ? true : null}
-            type={type}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            value={value} />
-    </FormItem>
-}

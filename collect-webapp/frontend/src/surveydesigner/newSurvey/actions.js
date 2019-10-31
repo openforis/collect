@@ -1,4 +1,4 @@
-import Forms from 'common/components/Forms';
+import * as Forms from 'common/components/Forms';
 
 import ServiceFactory from 'services/ServiceFactory';
 

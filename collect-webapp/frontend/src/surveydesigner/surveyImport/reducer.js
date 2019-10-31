@@ -41,7 +41,8 @@ export default function (
                 uploadingSurveyFile: false,
                 surveyFileUploaded: true,
                 surveyBackupInfo: action.surveyBackupInfo,
-                importingIntoExistingSurvey: action.importingIntoExistingSurvey
+                importingIntoExistingSurvey: action.importingIntoExistingSurvey,
+                existingSurveyUserGroupId: action.existingSurveyUserGroupId,
             })
         case SURVEY_FILE_UPLOAD_ERROR:
             return Object.assign({}, state, {
