@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withFormik } from 'formik'
 import { Form, Row, Col } from 'reactstrap'
 
-import User from '../../../model/User'
+import User from 'model/User'
 
 import { TextFormItem, SelectFormItem, SubmitButton, normalizeInternalName, asyncValidate } from 'common/components/Forms'
 import { createNewSurvey } from 'surveydesigner/newSurvey/actions'
@@ -19,7 +19,6 @@ const NewSurveyParametersForm = props => {
     const {
         userGroups,
         handleSubmit,
-        isSubmitting,
         handleChange,
     } = props
 
@@ -50,24 +49,21 @@ const NewSurveyParametersForm = props => {
             <SelectFormItem
                 name="templateType"
                 label={L.l('survey.templateType')}
-                options={templateTypeOptions}
                 {...fieldProps}
                 {...props}
-            />
+            >{templateTypeOptions}</SelectFormItem>
             <SelectFormItem
                 name="defaultLanguageCode"
                 label={L.l('survey.defaultLanguage')}
-                options={languageOptions}
                 {...fieldProps}
                 {...props}
-            />
+            >{languageOptions}</SelectFormItem>
             <SelectFormItem
                 name="userGroupId"
                 label={L.l('survey.userGroup')}
-                options={userGroupOptions}
                 {...fieldProps}
                 {...props}
-            />
+            >{userGroupOptions}</SelectFormItem>
             <Row>
                 <Col sm={{ size: 1, offset: 5 }}>
                     <SubmitButton {...props}>{L.l('general.new')}</SubmitButton>

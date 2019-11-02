@@ -60,40 +60,13 @@ export const FormItem = props => {
     )
 }
 
-
-export const SelectFormItem = props => {
+export const InputFormItem = props => {
     const {
-        name, label, touched, errors,
-        labelColSpan, fieldColSpan,
-        readOnly = false, options, values,
-        handleChange, handleBlur
-    } = props
-    const value = values[name] || ''
-    const error = errors[name]
-    const fieldTouched = touched[name]
-    return (
-        <FormItem label={label} touched={fieldTouched} error={error}
-            labelColSpan={labelColSpan} fieldColSpan={fieldColSpan} >
-            <Input
-                name={name}
-                readOnly={readOnly}
-                valid={fieldTouched && error ? false : null}
-                invalid={fieldTouched && error ? true : null}
-                type="select"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={value}>{options}</Input>
-        </FormItem >
-    )
-}
-
-export const TextFormItem = props => {
-    const {
-        name, type = "text", label, asyncValidating, touched, errors,
-        labelColSpan, fieldColSpan,
-        readOnly = false,
+        name, type, label, readOnly = false, disabled = false,
+        asyncValidating, touched, errors,
         values,
-        handleChange, handleBlur
+        handleChange, handleBlur,
+        labelColSpan, fieldColSpan,
     } = props
     const value = values[name] || ''
     const error = errors[name]
@@ -103,16 +76,22 @@ export const TextFormItem = props => {
             labelColSpan={labelColSpan} fieldColSpan={fieldColSpan}>
             <Input
                 name={name}
-                readOnly={readOnly}
-                valid={fieldTouched && error ? false : null}
-                invalid={fieldTouched && error ? true : null}
                 type={type}
+                value={value}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={value} />
+                readOnly={readOnly}
+                disabled={disabled}
+                valid={fieldTouched && error ? false : null}
+                invalid={fieldTouched && error ? true : null}
+            >{props.children}</Input>
         </FormItem>
     )
 }
+
+
+export const TextFormItem = props => <InputFormItem type="text" {...props} />
+export const SelectFormItem = props => <InputFormItem type="select" {...props} />
 
 export const SubmitButton = props => {
     const { submitting, errors, children } = props

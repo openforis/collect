@@ -8,6 +8,7 @@ import Dropzone from 'common/components/Dropzone'
 import { TextFormItem, SelectFormItem, SubmitButton, normalizeInternalName, asyncValidate } from 'common/components/Forms'
 import { startSurveyFileImport, resetSurveyFileImport, uploadSurveyFile } from 'surveydesigner/surveyImport/actions'
 import ServiceFactory from 'services/ServiceFactory'
+import User from 'model/User'
 import L from 'utils/Labels'
 
 const SURVEY_IMPORT_ACCEPTED_FILE_TYPES = ".collect,.collect-backup,.cep,.xml"
@@ -15,7 +16,7 @@ const SURVEY_IMPORT_ACCEPTED_FILE_TYPES = ".collect,.collect-backup,.cep,.xml"
 const SurveyImportForm = props => {
     const {
         userGroups,
-        handleSubmit, submitting, handleChange,
+        handleSubmit, handleChange,
         uploadingSurveyFile, surveyFileToBeImportedPreview, surveyFileUploaded, importingIntoExistingSurvey,
         surveyFileUploadError, surveyFileUploadErrorMessage,
         resetSurveyFileImport, uploadSurveyFile
@@ -65,11 +66,10 @@ const SurveyImportForm = props => {
                     />
                     <SelectFormItem
                         name="userGroupId"
-                        readOnly={importingIntoExistingSurvey}
+                        disabled={importingIntoExistingSurvey}
                         label={L.l('survey.userGroup')}
-                        options={userGroupOptions}
                         {...props}
-                    />
+                    >{userGroupOptions}</SelectFormItem>
                     <Row>
                         <Col xs={{ offset: 6 }}>
                             <SubmitButton {...props}>{L.l('general.import')}</SubmitButton>
@@ -99,10 +99,11 @@ const mapStateToProps = state => {
 }
 
 const mapPropsToValues = props => {
-    const { surveyBackupInfo, importingIntoExistingSurvey, existingSurveyUserGroupId } = props
+    const { surveyBackupInfo, importingIntoExistingSurvey, existingSurveyUserGroupId, userGroups } = props
+    const defaultPublicGroup = userGroups.find(userGroup => userGroup.name === User.DEFAULT_PUBLIC_GROUP_NAME)
     return {
         name: surveyBackupInfo ? normalizeInternalName(surveyBackupInfo.surveyName) : '',
-        userGroupId: importingIntoExistingSurvey ? existingSurveyUserGroupId : ''
+        userGroupId: importingIntoExistingSurvey ? existingSurveyUserGroupId : defaultPublicGroup ? defaultPublicGroup.id : ''
     }
 }
 

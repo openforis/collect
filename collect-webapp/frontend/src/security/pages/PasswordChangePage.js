@@ -4,7 +4,7 @@ import { withFormik } from 'formik'
 import Button from '@material-ui/core/Button'
 
 import ServiceFactory from 'services/ServiceFactory'
-import Forms, { TextFormItem, asyncValidate, handleValidationResponse } from 'common/components/Forms'
+import { TextFormItem, asyncValidate, handleValidationResponse } from 'common/components/Forms'
 import Dialogs from 'common/components/Dialogs'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
