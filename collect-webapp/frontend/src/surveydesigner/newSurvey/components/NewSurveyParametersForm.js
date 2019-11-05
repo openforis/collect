@@ -1,113 +1,101 @@
-import React, { Component } from 'react';
-import { Field, reduxForm } from 'redux-form'
-import { Alert, Button, Form, Row, Col } from 'reactstrap';
-import { connect } from 'react-redux';
+import React from 'react'
+import { compose } from "redux"
+import { connect } from 'react-redux'
+import { withFormik } from 'formik'
+import { Form, Row, Col } from 'reactstrap'
 
-import Forms from 'common/components/Forms'
-import * as NewSurveyActions from 'surveydesigner/newSurvey/actions';
+import User from 'model/User'
+
+import { TextFormItem, SelectFormItem, SubmitButton, normalizeInternalName, asyncValidate } from 'common/components/Forms'
+import { createNewSurvey } from 'surveydesigner/newSurvey/actions'
 import ServiceFactory from 'services/ServiceFactory'
 import L from 'utils/Labels'
 import Strings from 'utils/Strings'
 
 const templateTypes = ['BLANK', 'BIOPHYSICAL', 'COLLECT_EARTH', 'COLLECT_EARTH_IPCC']
 
-const asyncValidate = (values /*, dispatch */) => {
-    return ServiceFactory.surveyService.validateSurveyCreation(values.name, values.templateType,
-        values.defaultLanguageCode, values.userGroupId).then(r => {
-            Forms.handleValidationResponse(r)
-        })
-}
+const NewSurveyParametersForm = props => {
 
-class NewSurveyParametersForm extends Component {
+    const {
+        userGroups,
+        handleSubmit,
+        handleChange,
+    } = props
 
-    constructor(props) {
-        super(props)
+    const templateTypeOptions = templateTypes.map(type =>
+        <option key={type} value={type}>{L.l('survey.templateType.' + type)}</option>)
 
-        this.submit = this.submit.bind(this)
-    }
+    const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(
+        userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
 
-    submit(values) {
-        return this.props.dispatch(NewSurveyActions.createNewSurvey(values.name, values.templateType,
-            values.defaultLanguageCode, values.userGroupId))
-    }
-    
-    render() {
-        const { userGroups, error, handleSubmit, submitting, submitFailed, submitSucceded } = this.props
+    const langCodes = L.keys('languages')
+    const langItems = langCodes.map(code => ({ code, label: L.l('languages.' + code) }))
+    const languageOptions = langItems.sort((a, b) => Strings.compare(a.label, b.label)).map(item =>
+        <option key={item.code} value={item.code}>{item.label + ' (' + item.code + ')'}</option>)
 
-        const templateTypeOptions = templateTypes.map(type => <option key={type} value={type}>{L.l('survey.templateType.' + type)}</option>)
-        const userGroupOptions = [<option key="-1" value="">{L.l('forms.selectOne')}</option>].concat(userGroups.map(g => <option key={g.id} value={g.id}>{g.label}</option>))
-        const languageOptions = L.keys('languages')
-            .sort((a, b) => Strings.compare(L.l('languages.' + a), L.l('languages.' + b)))
-            .map(l => <option key={l} value={l}>{L.l('languages.' + l) + ' (' + l + ')'}</option>)
-
-        const fieldsProps = {labelColSpan: 4, fieldColSpan: 8}
-        return (
-            <Form onSubmit={handleSubmit(this.submit)}>
-                <Field
-                    name="name"
-                    type="text"
-                    component={props => Forms.renderFormItemInputField({
-                        ...props,
-                        ...fieldsProps
-                    })}
-                    label={L.l('survey.name')}
-                    normalize={Forms.normalizeInternalName}
-                />
-                <Field
-                    name="templateType"
-                    component={props => Forms.renderFormItemSelect({
-                        ...props,
-                        ...fieldsProps
-                    })}
-                    label={L.l('survey.templateType')}
-                    options={templateTypeOptions}
-                />
-                <Field
-                    name="defaultLanguageCode"
-                    component={props => Forms.renderFormItemSelect({
-                        ...props,
-                        ...fieldsProps
-                    })}
-                    label={L.l('survey.defaultLanguage')}
-                    options={languageOptions}
-                />
-                <Field
-                    name="userGroupId"
-                    component={props => Forms.renderFormItemSelect({
-                        ...props,
-                        ...fieldsProps
-                    })}
-                    label={L.l('survey.userGroup')}
-                    options={userGroupOptions}
-                />
-                {error && (submitFailed || submitSucceded) && <Alert color="danger">{error}</Alert>}
-                <Row>
-                    <Col sm={{ size: 1, offset: 5 }}>
-                        <Button color="primary" type="submit" disabled={submitting}>{L.l('general.new')}</Button>
-                    </Col>
-                </Row>
-            </Form>
-        )
-    }
+    const fieldProps = { labelColSpan: 4, fieldColSpan: 8 }
+    return (
+        <Form onSubmit={handleSubmit}>
+            <TextFormItem
+                name="name"
+                label={L.l('survey.name')}
+                {...fieldProps}
+                {...props}
+                handleChange={e => {
+                    e.target.value = normalizeInternalName(e.target.value)
+                    handleChange(e)
+                }}
+            />
+            <SelectFormItem
+                name="templateType"
+                label={L.l('survey.templateType')}
+                {...fieldProps}
+                {...props}
+            >{templateTypeOptions}</SelectFormItem>
+            <SelectFormItem
+                name="defaultLanguageCode"
+                label={L.l('survey.defaultLanguage')}
+                {...fieldProps}
+                {...props}
+            >{languageOptions}</SelectFormItem>
+            <SelectFormItem
+                name="userGroupId"
+                label={L.l('survey.userGroup')}
+                {...fieldProps}
+                {...props}
+            >{userGroupOptions}</SelectFormItem>
+            <Row>
+                <Col sm={{ size: 1, offset: 5 }}>
+                    <SubmitButton {...props}>{L.l('general.new')}</SubmitButton>
+                </Col>
+            </Row>
+        </Form>
+    )
 }
 
 const mapStateToProps = state => {
-    const {items: userGroups} = state.userGroups
+    const { items: userGroups } = state.userGroups
+
     return {
-        userGroups
+        userGroups,
     }
 }
 
-NewSurveyParametersForm = connect(mapStateToProps)(NewSurveyParametersForm)
-
-export default reduxForm({ 
-    form: 'newSurveyParametersForm',
-    asyncValidate,
-    asyncBlurFields: ['name', 'templateType', 'userGroupId', 'defaultLanguageCode'],
-    initialValues: {
+const mapPropsToValues = props => {
+    const defaultPublicGroup = props.userGroups.find(ug => ug.name === User.DEFAULT_PUBLIC_GROUP_NAME)
+    return {
         name: '',
-        templateType: 'BLANK', 
+        templateType: 'BLANK',
         defaultLanguageCode: 'en',
-        userGroupId: ''
+        userGroupId: defaultPublicGroup ? defaultPublicGroup.id : ''
     }
-})(NewSurveyParametersForm)
+}
+
+export default compose(
+    connect(mapStateToProps, { createNewSurvey }),
+    withFormik({
+        mapPropsToValues,
+        validate: asyncValidate(ServiceFactory.surveyService.validateSurveyCreation.bind(ServiceFactory.surveyService)),
+        handleSubmit: (values, { props }) => props.createNewSurvey(values)
+    })
+)(NewSurveyParametersForm)
