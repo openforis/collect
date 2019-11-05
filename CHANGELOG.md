@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.24.29] - 2019-11-05
+### Fixed
+- Fixed new survey form issues (loose focus on text input)
+### Added
+- CSV data export option to avoid prepending grouping (single entity) name to column name
+
 ## [3.24.28] - 2019-10-24
 ### Fixed
 - Fixed survey schema attributes import (error uploading CSV file)
