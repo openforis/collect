@@ -24,6 +24,7 @@ const csvExportAdditionalOptions = [
     'codeAttributeExpanded',
     'includeCodeItemLabelColumn',
     'includeCreatedByUserColumn',
+    'includeGroupingLabels',
 ]
 
 const exportModes = {
@@ -48,7 +49,8 @@ const defaultState = {
     exportOnlyOwnedRecords: false,
     includeRecordFiles: true,
     headingSource: headingSources.attributeName,
-    languageCode: ''
+    languageCode: '',
+    includeGroupingLabels: true,
 }
 
 class CsvDataExportPage extends Component {
@@ -189,18 +191,21 @@ class CsvDataExportPage extends Component {
             languageCode
         } = this.state
         
-        const additionalOptionsFormGroups = csvExportAdditionalOptions.map(o => {
-            return <FormGroup check key={o}>
+        const additionalOptionsFormGroups = csvExportAdditionalOptions.map(o =>
+            <FormGroup check key={o}>
                 <Label check>
-                    <Input type="checkbox" onChange={event => {
-                        this.setState({
-                            [o]: event.target.checked
-                        })
-                        }} />{' '}
+                    <Input type="checkbox" 
+                        onChange={event => {
+                            this.setState({
+                                [o]: event.target.checked
+                            })
+                        }}
+                        checked={this.state[o]}
+                    />{' '}
                     {L.l('dataManagement.export.additionalOptions.' + o)}
                 </Label>
             </FormGroup>
-        })
+        )
 
         const steps = Workflow.STEPS
         const stepsOptions = Object.keys(steps).map(s => <option key={s} value={steps[s].code}>{steps[s].label}</option>)
