@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect-installation</artifactId>
-		<version>3.24.30-SNAPSHOT</version>
+		<version>3.24.30</version>
 	</parent>
 	<artifactId>collect-updater-2</artifactId>
 	<packaging>pom</packaging>
