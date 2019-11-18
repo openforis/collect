@@ -91,40 +91,12 @@ public class NewMondrianSchemaGenerator {
 				}
 			}
 		});
-		/*
-		VirtualCube virtualCube = new VirtualCube("Survey Data");
-		List<Cube> cubes = schema.cubes;
-		List<CubeUsage> cubeUsages = new ArrayList<CubeUsage>(cubes.size());
-		List<VirtualCubeDimension> cubeDimensions = new ArrayList<VirtualCubeDimension>();
-		List<VirtualCubeMeasure> cubeMeasures = new ArrayList<VirtualCubeMeasure>();
-		for (Cube cube : cubes) {
-			CubeUsage cubeUsage = new CubeUsage(cube.name);
-			cubeUsage.cubeName = cube.name;
-			cubeUsages.add(cubeUsage);
-			for (Dimension dimension : cube.dimensions) {
-				VirtualCubeDimension virtualCubeDimension = new VirtualCubeDimension(dimension.name);
-				virtualCubeDimension.cubeName = cube.name;
-				cubeDimensions.add(virtualCubeDimension);
-			}
-			for (Measure measure : cube.measures) {
-				VirtualCubeMeasure virtualCubeMeasure = new VirtualCubeMeasure("[Measures].[" + measure.name + "]");
-				virtualCubeMeasure.cubeName = cube.name;
-				cubeMeasures.add(virtualCubeMeasure);
-			}
-		}
-		virtualCube.cubeUsages = new CubeUsages("");
-		virtualCube.cubeUsages.cubeUsages = cubeUsages;
-		virtualCube.virtualCubeDimensions = cubeDimensions;
-		virtualCube.virtualCubeMeasures = cubeMeasures;
-		schema.virtualCubes.add(virtualCube);
-		 */
 		return schema;
 	}
 
 	private RelationalSchema generateRdbSchema() {
 		RelationalSchemaGenerator generator = new RelationalSchemaGenerator(rdbConfig);
-		RelationalSchema rdbSchema = generator.generateSchema(survey, dbSchemaName);
-		return rdbSchema;
+		return generator.generateSchema(survey, dbSchemaName);
 	}
 
 	private Cube generateCube(EntityDefinition multipleEntityDef) {
@@ -143,10 +115,14 @@ public class NewMondrianSchemaGenerator {
 		for (EntityDefinition entityDef : viewEntityDefinitions) {
 			List<AttributeDefinition> attributes = entityDef.getNestedAttributes();
 			for (AttributeDefinition attrDef : attributes) {
-				if (canBeMeasured(attrDef)) {
-					Dimension dimension = generateDimension(cube, attrDef);
-					cube.dimensions.add(dimension);
-					addMeasures(cube, attrDef);
+				if (survey.getAnnotations().isIncludedInDataExport(attrDef)) {
+					if (hasDimension(attrDef)) {
+						Dimension dimension = generateDimension(cube, attrDef);
+						cube.dimensions.add(dimension);
+					}
+					if (canBeMeasured(attrDef)) {
+						addMeasures(cube, attrDef);
+					}
 				}
 			}
 		}
@@ -188,17 +164,15 @@ public class NewMondrianSchemaGenerator {
 	}
 
 	private void addMeasures(Cube cube, AttributeDefinition attrDef) {
-		if (attrDef instanceof NumberAttributeDefinition) {
-			String attrName = attrDef.getName();
-			for (String aggregator : MEASURE_AGGREGATORS) {
-				Measure measure = new Measure(attrName + "_" + aggregator);
-				measure.column = attrName;
-				measure.caption = String.format("%s %s", extractLabel(attrDef), aggregator);
-				measure.aggregator = aggregator;
-				measure.datatype = NUMERIC_DATATYPE;
-				measure.formatString = "#.##";
-				cube.measures.add(measure);
-			}
+		String attrName = attrDef.getName();
+		for (String aggregator : MEASURE_AGGREGATORS) {
+			Measure measure = new Measure(attrName + "_" + aggregator);
+			measure.column = attrName;
+			measure.caption = String.format("%s %s", extractLabel(attrDef), aggregator);
+			measure.aggregator = aggregator;
+			measure.datatype = NUMERIC_DATATYPE;
+			measure.formatString = "#.##";
+			cube.measures.add(measure);
 		}
 	}
 
@@ -390,15 +364,20 @@ public class NewMondrianSchemaGenerator {
 	}
 
 	private boolean canBeMeasured(AttributeDefinition def) {
-		return (def instanceof CodeAttributeDefinition
-				|| def instanceof DateAttributeDefinition
-				|| def instanceof NumberAttributeDefinition
-				|| def instanceof TaxonAttributeDefinition
-				|| def instanceof TextAttributeDefinition
-				|| def instanceof TimeAttributeDefinition)
-			&& survey.getAnnotations().isIncludedInDataExport(def);
+		return def instanceof NumberAttributeDefinition;
 	}
 
+	private boolean hasDimension(AttributeDefinition def) {
+		return def instanceof CodeAttributeDefinition
+			|| def instanceof CoordinateAttributeDefinition
+			|| def instanceof DateAttributeDefinition
+			|| def instanceof NumberAttributeDefinition
+			|| def instanceof TaxonAttributeDefinition
+			|| def instanceof TextAttributeDefinition
+			|| def instanceof TimeAttributeDefinition
+			;
+	}
+	
 	private static class MondrianSchemaObject {
 
 		@XStreamAsAttribute
