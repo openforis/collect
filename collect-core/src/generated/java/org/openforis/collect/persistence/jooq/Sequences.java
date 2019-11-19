@@ -72,12 +72,12 @@ public class Sequences {
 	/**
 	 * The sequence <code>collect.ofc_imagery_id_seq</code>
 	 */
-	public static final Sequence<Long> OFC_IMAGERY_ID_SEQ = new SequenceImpl<Long>("ofc_imagery_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> OFC_IMAGERY_ID_SEQ = new SequenceImpl<Integer>("ofc_imagery_id_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>collect.ofc_message_sequence_no_seq</code>
 	 */
-	public static final Sequence<Long> OFC_MESSAGE_SEQUENCE_NO_SEQ = new SequenceImpl<Long>("ofc_message_sequence_no_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> OFC_MESSAGE_SEQUENCE_NO_SEQ = new SequenceImpl<Integer>("ofc_message_sequence_no_seq", Collect.COLLECT, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>collect.ofc_record_id_seq</code>

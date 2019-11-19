@@ -22,13 +22,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcCodeList implements Serializable {
 
-	private static final long serialVersionUID = -1175190175;
+	private static final long serialVersionUID = 1507899045;
 
-	private Integer id;
+	private Long    id;
 	private Integer surveyId;
 	private Integer codeListId;
 	private Integer itemId;
-	private Integer parentId;
+	private Long    parentId;
 	private Integer sortOrder;
 	private String  code;
 	private Boolean qualifiable;
@@ -79,11 +79,11 @@ public class OfcCodeList implements Serializable {
 	}
 
 	public OfcCodeList(
-		Integer id,
+		Long    id,
 		Integer surveyId,
 		Integer codeListId,
 		Integer itemId,
-		Integer parentId,
+		Long    parentId,
 		Integer sortOrder,
 		String  code,
 		Boolean qualifiable,
@@ -130,11 +130,11 @@ public class OfcCodeList implements Serializable {
 		this.color = color;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -162,11 +162,11 @@ public class OfcCodeList implements Serializable {
 		this.itemId = itemId;
 	}
 
-	public Integer getParentId() {
+	public Long getParentId() {
 		return this.parentId;
 	}
 
-	public void setParentId(Integer parentId) {
+	public void setParentId(Long parentId) {
 		this.parentId = parentId;
 	}
 

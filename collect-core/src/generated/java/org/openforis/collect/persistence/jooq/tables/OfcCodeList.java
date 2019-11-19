@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcCodeList extends TableImpl<OfcCodeListRecord> {
 
-	private static final long serialVersionUID = -898295103;
+	private static final long serialVersionUID = -862354079;
 
 	/**
 	 * The reference instance of <code>collect.ofc_code_list</code>
@@ -51,7 +51,7 @@ public class OfcCodeList extends TableImpl<OfcCodeListRecord> {
 	/**
 	 * The column <code>collect.ofc_code_list.id</code>.
 	 */
-	public final TableField<OfcCodeListRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<OfcCodeListRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_code_list.survey_id</code>.
@@ -71,7 +71,7 @@ public class OfcCodeList extends TableImpl<OfcCodeListRecord> {
 	/**
 	 * The column <code>collect.ofc_code_list.parent_id</code>.
 	 */
-	public final TableField<OfcCodeListRecord, Integer> PARENT_ID = createField("parent_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<OfcCodeListRecord, Long> PARENT_ID = createField("parent_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * The column <code>collect.ofc_code_list.sort_order</code>.
