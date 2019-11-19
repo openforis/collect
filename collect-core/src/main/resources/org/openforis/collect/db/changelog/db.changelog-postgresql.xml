@@ -6,5 +6,7 @@
   <include file="org/openforis/collect/db/changelog/postgresql/db.changelog-postgresql.xml" />
   
 <!--   <includeAll path="org/openforis/collect/db/changelog/standard"/> -->
+
+  <include file="org/openforis/collect/db/changelog/standard/db.changelog.0001.xml" />
   
 </databaseChangeLog>
