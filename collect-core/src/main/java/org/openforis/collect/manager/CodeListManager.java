@@ -62,7 +62,7 @@ public class CodeListManager {
 	
 	@Transactional
 	public void importCodeLists(CollectSurvey survey, InputStream is) throws CodeListImportException {
-		int nextSystemId = codeListItemDao.nextSystemId();
+		long nextSystemId = codeListItemDao.nextSystemId();
 		CollectCodeListService service = new CollectCodeListService();
 		service.setCodeListManager(this);
 		CodeListImporter binder = new CodeListImporter(service, nextSystemId);
@@ -174,7 +174,7 @@ public class CodeListManager {
 			List<CodeAttribute> codeAncestors = attribute.getCodeAncestors();
 			for (int i = 0; i < codeAncestors.size(); i++) {
 				CodeAttribute ancestor = codeAncestors.get(i);
-				Integer lastParentItemId = lastParentItem == null ? null: lastParentItem.getSystemId();
+				Long lastParentItemId = lastParentItem == null ? null: lastParentItem.getSystemId();
 				Code code = ancestor.getValue();
 				lastParentItem = codeListItemDao.loadItem(list, lastParentItemId, code.getCode(), version);
 				if ( lastParentItem == null ) {
@@ -440,7 +440,7 @@ public class CodeListManager {
 		if ( list.isExternal() ) {
 			return (T) provider.getParentItem((ExternalCodeListItem) item);
 		} else if ( list.isEmpty() ) {
-			Integer parentId = ((PersistedCodeListItem) item).getParentId();
+			Long parentId = ((PersistedCodeListItem) item).getParentId();
 			if ( parentId != null ) {
 				return (T) codeListItemDao.loadById(list, parentId);
 			} else {
@@ -506,14 +506,14 @@ public class CodeListManager {
 	}
 	
 	protected List<PersistedCodeListItem> createPersistedItems(Collection<CodeListItem> items,
-			int nextId,
-			Integer parentItemId) {
+			long nextId,
+			Long parentItemId) {
 		List<PersistedCodeListItem> result = new ArrayList<PersistedCodeListItem>();
 		int sortOrder = 1;
 		for (CodeListItem item : items) {
 			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
 			persistedChildItem.setParentId(parentItemId);
-			int id = nextId++;
+			long id = nextId++;
 			persistedChildItem.setSystemId(id);
 			persistedChildItem.setSortOrder(sortOrder++);
 			result.add(persistedChildItem);
@@ -681,7 +681,7 @@ public class CodeListManager {
 		codeListItemDao.deleteImageContent(item);
 	}
 	
-	public int nextSystemId() {
+	public long nextSystemId() {
 		return codeListItemDao.nextSystemId();
 	}
 	

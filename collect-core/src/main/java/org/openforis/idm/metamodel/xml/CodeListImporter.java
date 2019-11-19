@@ -25,13 +25,13 @@ public class CodeListImporter {
 	private CodeListService service;
 
 	private List<PersistedCodeListItem> itemsToPersistBuffer;
-	private int nextItemId;
+	private long nextItemId;
 	
 	public CodeListImporter(CodeListService service) {
 		this(service, 1);
 	}
 	
-	public CodeListImporter(CodeListService service, int nextItemSystemId) {
+	public CodeListImporter(CodeListService service, long nextItemSystemId) {
 		this.service = service;
 		this.nextItemId = nextItemSystemId;
 		this.itemsToPersistBuffer = new ArrayList<PersistedCodeListItem>();
@@ -65,7 +65,7 @@ public class CodeListImporter {
 		return service;
 	}
 
-	public int nextItemId() {
+	public long nextItemId() {
 		return nextItemId++;
 	}
 

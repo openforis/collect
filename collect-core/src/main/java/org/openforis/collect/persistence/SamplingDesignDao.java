@@ -36,7 +36,7 @@ import org.openforis.idm.model.Coordinate;
 /**
  * @author S. Ricci
  */
-public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem, SamplingDesignDao.SamplingDesignDSLContext> {
+public class SamplingDesignDao extends MappingJooqDaoSupport<Integer, SamplingDesignItem, SamplingDesignDao.SamplingDesignDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
 	private static final TableField[] BASE_FIELDS = {
@@ -92,26 +92,6 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 
 	public SamplingDesignDao() {
 		super(SamplingDesignDao.SamplingDesignDSLContext.class);
-	}
-
-	@Override
-	public SamplingDesignItem loadById(int id) {
-		return super.loadById(id);
-	}
-
-	@Override
-	public void insert(SamplingDesignItem entity) {
-		super.insert(entity);
-	}
-
-	@Override
-	public void update(SamplingDesignItem entity) {
-		super.update(entity);
-	}
-
-	@Override
-	public void delete(int id) {
-		super.delete(id);
 	}
 
 	public int countBySurvey(int surveyId) {
@@ -301,7 +281,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		}
 	}
 
-	protected static class SamplingDesignDSLContext extends MappingDSLContext<SamplingDesignItem> {
+	protected static class SamplingDesignDSLContext extends MappingDSLContext<Integer, SamplingDesignItem> {
 
 		private static final long serialVersionUID = 1L;
 
@@ -367,7 +347,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		}
 
 		@Override
-		protected void setId(SamplingDesignItem t, int id) {
+		protected void setId(SamplingDesignItem t, Integer id) {
 			t.setId(id);
 		}
 
@@ -382,12 +362,11 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			} else {
 				DecimalFormat formatter = new DecimalFormat(LOCATION_POINT_FORMAT, 
 						DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-				String result = MessageFormat.format(LOCATION_PATTERN, 
+				return MessageFormat.format(LOCATION_PATTERN, 
 						i.getSrsId(), 
 						formatter.format(i.getX()),
 						formatter.format(i.getY())
 						);
-				return result;
 			}
 		}
 		

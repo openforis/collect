@@ -18,7 +18,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord;
 /**
  * @author G. Miceli
  */
-public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, TaxonomyDao.TaxonomyDSLContext> {
+public class TaxonomyDao extends MappingJooqDaoSupport<Integer, CollectTaxonomy, TaxonomyDao.TaxonomyDSLContext> {
 
 	public TaxonomyDao() {
 		super(TaxonomyDao.TaxonomyDSLContext.class);
@@ -69,7 +69,7 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 		return new TaxonomyDSLContext(getConfiguration(), survey);
 	}
 
-	protected static class TaxonomyDSLContext extends MappingDSLContext<CollectTaxonomy> {
+	protected static class TaxonomyDSLContext extends MappingDSLContext<Integer, CollectTaxonomy> {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -97,7 +97,7 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 		}
 
 		@Override
-		protected void setId(CollectTaxonomy taxonomy, int id) {
+		protected void setId(CollectTaxonomy taxonomy, Integer id) {
 			taxonomy.setId(id);
 		}
 

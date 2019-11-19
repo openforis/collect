@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.persistence.jooq.tables.pojos.OfcUsergroup;
 import org.openforis.idm.metamodel.PersistedObject;
 
-public class UserGroup extends OfcUsergroup implements PersistedObject {
+public class UserGroup extends OfcUsergroup implements PersistedObject<Integer> {
 
 	private static final long serialVersionUID = 1L;
 

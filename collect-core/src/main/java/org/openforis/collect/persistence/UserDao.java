@@ -29,7 +29,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcUserRoleRecord;
  * @author S. Ricci
  * 
  */
-public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> implements PersistedObjectDao<User, Integer> {
+public class UserDao extends MappingJooqDaoSupport<Integer, User, UserDSLContext> implements PersistedObjectDao<User, Integer> {
 
 	public UserDao() {
 		super(UserDao.UserDSLContext.class);
@@ -99,7 +99,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> impleme
 		super.delete(id);
 	}
 	
-	public static class UserDSLContext extends MappingDSLContext<User> {
+	public static class UserDSLContext extends MappingDSLContext<Integer, User> {
 
 		private static final long serialVersionUID = 1L;
 
@@ -108,7 +108,7 @@ public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> impleme
 		}
 
 		@Override
-		protected void setId(User user, int id) {
+		protected void setId(User user, Integer id) {
 			user.setId(id);
 		}
 

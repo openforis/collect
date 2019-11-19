@@ -16,14 +16,14 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
  * @author S. Ricci
  *
  */
-public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurveyObject, C extends SurveyObjectMappingDSLContext<T>> 
-	extends MappingJooqDaoSupport<T, C> implements PersistedObjectDao<T, Integer>  {
+public abstract class SurveyObjectMappingJooqDaoSupport<I extends Number, T extends PersistedSurveyObject<I>, C extends SurveyObjectMappingDSLContext<I, T>> 
+	extends MappingJooqDaoSupport<I, T, C> implements PersistedObjectDao<T, I>  {
 
 	public SurveyObjectMappingJooqDaoSupport(Class<C> jooqFactoryClass) {
 		super(jooqFactoryClass);
 	}
 
-	public T loadById(CollectSurvey survey, int id) {
+	public T loadById(CollectSurvey survey, I id) {
 		C dsl = dsl(survey);
 		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
@@ -33,11 +33,6 @@ public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurve
 	public abstract List<T> loadBySurvey(CollectSurvey survey);
 	
 	public abstract void deleteBySurvey(CollectSurvey survey);
-	
-	@Override
-	public T loadById(Integer id) {
-		return super.loadById(id);
-	}
 	
 	@Override
 	public void insert(T item) {
@@ -51,11 +46,6 @@ public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurve
 		dsl.updateQuery(item).execute();
 	}
 	
-	@Override
-	public void delete(Integer id) {
-		super.delete(id);
-	}
-	
 	protected C dsl(CollectSurvey survey) {
 		try {
 			return jooqFactoryClass.getConstructor(Configuration.class, CollectSurvey.class)
@@ -65,5 +55,4 @@ public abstract class SurveyObjectMappingJooqDaoSupport<T extends PersistedSurve
 		}
 	}
 
-	
 }

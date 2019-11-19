@@ -9,17 +9,17 @@ import org.openforis.commons.lang.Identifiable;
  * @author A. Modragon
  *
  */
-public class AbstractPersistedObject implements Identifiable, PersistedObject {
+public class AbstractPersistedObject<I extends Number> implements Identifiable<I>, PersistedObject<I> {
 
-	private Integer id;
+	private I id;
 
 	@Override
-	public Integer getId() {
+	public I getId() {
 		return id;
 	}
 	
 	@Override
-	public void setId(Integer id) {
+	public void setId(I id) {
 		this.id = id;
 	}
 

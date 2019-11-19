@@ -7,7 +7,7 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
  * @author S. Ricci
  *
  */
-public class SurveyFile extends PersistedSurveyObject {
+public class SurveyFile extends PersistedSurveyObject<Integer> {
 	
 	private static final long serialVersionUID = 1L;
 	

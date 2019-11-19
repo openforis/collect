@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author S. Ricci
  *
  */
-public abstract class AbstractSurveyObjectEditFormController<T extends PersistedSurveyObject, 
+public abstract class AbstractSurveyObjectEditFormController<I extends Number, T extends PersistedSurveyObject<I>, 
 			F extends PersistedObjectForm<T>, 
 			M extends AbstractSurveyObjectManager<T, ?>>  
 			extends AbstractPersistedObjectEditFormController<T, F, M> {

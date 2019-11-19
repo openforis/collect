@@ -14,17 +14,12 @@ import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 /**
  * @author S. Ricci
  */
-public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.LogoDSLContext> {
+public class LogoDao extends MappingJooqDaoSupport<Integer, Logo, LogoDao.LogoDSLContext> {
 	
 	public LogoDao() {
 		super(LogoDao.LogoDSLContext.class);
 	}
 
-	@Override
-	public Logo loadById(int id) {
-		return super.loadById(id);
-	}
-	
 	public Logo loadByPosition(LogoPosition position) {
 		int id = getInternalId(position);
 		return loadById(id);
@@ -39,16 +34,6 @@ public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.LogoDSLContext>
 		super.insert(entity);
 	}
 
-	@Override
-	public void update(Logo entity) {
-		super.update(entity);
-	}
-
-	@Override
-	public void delete(int id) {
-		super.delete(id);
-	}
-	
 	public void deleteByPosition(LogoPosition position) {
 		int id = getInternalId(position);
 		delete(id);
@@ -81,7 +66,7 @@ public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.LogoDSLContext>
 		}
 	}
 
-	protected static class LogoDSLContext extends MappingDSLContext<Logo> {
+	protected static class LogoDSLContext extends MappingDSLContext<Integer, Logo> {
 
 		private static final long serialVersionUID = 1L;
 
@@ -112,7 +97,7 @@ public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.LogoDSLContext>
 		}
 
 		@Override
-		protected void setId(Logo l, int id) {
+		protected void setId(Logo l, Integer id) {
 			l.setId(id);
 		}
 

@@ -13,7 +13,7 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
  * @author S. Ricci
  *
  */
-public class DataQueryGroup extends PersistedSurveyObject {
+public class DataQueryGroup extends PersistedSurveyObject<Integer> {
 
 	private static final long serialVersionUID = 1L;
 	

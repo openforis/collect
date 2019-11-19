@@ -32,7 +32,7 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  * @author E. Wibowo
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.TaxonVernacularNameDSLContext> {
+public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Integer, TaxonVernacularName, TaxonVernacularNameDao.TaxonVernacularNameDSLContext> {
 	
 	private static final TableField[] QUALIFIER_FIELDS = {OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, OFC_TAXON_VERNACULAR_NAME.QUALIFIER2, OFC_TAXON_VERNACULAR_NAME.QUALIFIER3};
 
@@ -53,26 +53,6 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		super(TaxonVernacularNameDao.TaxonVernacularNameDSLContext.class);
 	}
 
-	@Override
-	public TaxonVernacularName loadById(int id) {
-		return super.loadById(id);
-	}
-
-	@Override
-	public void insert(TaxonVernacularName entity) {
-		super.insert(entity);
-	}
-
-	@Override
-	public void update(TaxonVernacularName entity) {
-		super.update(entity);
-	}
-
-	@Override
-	public void delete(int id) {
-		super.delete(id);
-	}
-	
 	public List<TaxonVernacularName> findByVernacularName(int taxonomyId, String searchString, int maxResults) {
 		return findByVernacularName(taxonomyId, searchString, null, maxResults);
 	}	
@@ -187,7 +167,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		return dsl().nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
 	}
 
-	protected static class TaxonVernacularNameDSLContext extends MappingDSLContext<TaxonVernacularName> {
+	protected static class TaxonVernacularNameDSLContext extends MappingDSLContext<Integer, TaxonVernacularName> {
 
 		private static final long serialVersionUID = 1L;
 
@@ -259,7 +239,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		}
 
 		@Override
-		protected void setId(TaxonVernacularName t, int id) {
+		protected void setId(TaxonVernacularName t, Integer id) {
 			t.setId(id);
 		}
 

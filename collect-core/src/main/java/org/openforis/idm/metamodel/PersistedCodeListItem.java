@@ -17,8 +17,8 @@ public class PersistedCodeListItem extends CodeListItem {
 
 	private static final long serialVersionUID = 1L;
 
-	private Integer systemId;
-	private Integer parentId;
+	private Long systemId;
+	private Long parentId;
 	private Integer sortOrder;
 	
 	public static PersistedCodeListItem fromItem(CodeListItem item) {
@@ -54,19 +54,19 @@ public class PersistedCodeListItem extends CodeListItem {
 		super(codeList, id, level);
 	}
 
-	public Integer getSystemId() {
+	public Long getSystemId() {
 		return systemId;
 	}
 
-	public void setSystemId(Integer systemId) {
+	public void setSystemId(Long systemId) {
 		this.systemId = systemId;
 	}
 
-	public Integer getParentId() {
+	public Long getParentId() {
 		return parentId;
 	}
 
-	public void setParentId(Integer parentId) {
+	public void setParentId(Long parentId) {
 		this.parentId = parentId;
 	}
 

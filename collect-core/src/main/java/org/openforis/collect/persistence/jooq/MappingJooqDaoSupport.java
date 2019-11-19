@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author G. Miceli
  */
-public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends JooqDaoSupport {
+public class MappingJooqDaoSupport<I extends Number, E, C extends MappingDSLContext<I, E>> extends JooqDaoSupport {
 	protected Class<C> jooqFactoryClass;
 
 	public MappingJooqDaoSupport(Class<C> jooqFactoryClass) {
@@ -57,12 +57,12 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 	}
 	
 	@Transactional
-	public E loadById(int id) {
+	public E loadById(I id) {
 		C dsl = dsl();
 		return loadById(dsl, id);
 	}
 
-	protected E loadById(C dsl, int id) {
+	protected E loadById(C dsl, I id) {
 		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
 		if ( r == null ) {
@@ -91,7 +91,7 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 	}
 
 	@Transactional
-	public void delete(int id) {
+	public void delete(I id) {
 		dsl().deleteQuery(id).execute();
 	}
 	

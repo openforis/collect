@@ -15,14 +15,14 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
  * @author S. Ricci
  *
  */
-public abstract class SurveyObjectMappingDSLContext<T extends PersistedSurveyObject> extends MappingDSLContext<T> {
+public abstract class SurveyObjectMappingDSLContext<I extends Number, T extends PersistedSurveyObject<I>> extends MappingDSLContext<I, T> {
 
 	private static final long serialVersionUID = 1L;
 	
 	protected CollectSurvey survey;
 
 	public SurveyObjectMappingDSLContext(Configuration config,
-			TableField<?, Integer> idField,
+			TableField<?, I> idField,
 			Sequence<? extends Number> idSequence, 
 			Class<T> clazz, CollectSurvey survey) {
 		super(config, idField, idSequence, clazz);
@@ -40,12 +40,12 @@ public abstract class SurveyObjectMappingDSLContext<T extends PersistedSurveyObj
 	}
 	
 	@Override
-	protected void setId(T entity, int id) {
+	protected void setId(T entity, I id) {
 		entity.setId(id);
 	}
 
 	@Override
-	protected Integer getId(T entity) {
+	protected I getId(T entity) {
 		return entity.getId();
 	}
 	

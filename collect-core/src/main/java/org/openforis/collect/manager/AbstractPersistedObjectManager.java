@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
-public abstract class AbstractPersistedObjectManager<T extends PersistedObject, I extends Object, 
+public abstract class AbstractPersistedObjectManager<T extends PersistedObject<I>, I extends Number, 
 		D extends PersistedObjectDao<T, I>> implements ItemManager<T, I> {
 
 	protected D dao;

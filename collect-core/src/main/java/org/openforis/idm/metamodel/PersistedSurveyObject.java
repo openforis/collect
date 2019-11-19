@@ -12,10 +12,10 @@ import org.openforis.commons.lang.IdentifiableDeepComparable;
  * 
  * @author A. Modragon
  */
-public abstract class PersistedSurveyObject extends SurveyObject implements PersistedObject, IdentifiableDeepComparable {
+public abstract class PersistedSurveyObject<I extends Number> extends SurveyObject implements PersistedObject<I>, IdentifiableDeepComparable {
 	private static final long serialVersionUID = 1L;
 	
-	private Integer id;
+	private I id;
 	private UUID uuid;
 	private Date creationDate;
 	private Date modifiedDate;
@@ -31,12 +31,12 @@ public abstract class PersistedSurveyObject extends SurveyObject implements Pers
 	}
 	
 	@Override
-	public Integer getId() {
+	public I getId() {
 		return id;
 	}
 	
 	@Override
-	public void setId(Integer id) {
+	public void setId(I id) {
 		this.id = id;
 	}
 	
@@ -100,12 +100,12 @@ public abstract class PersistedSurveyObject extends SurveyObject implements Pers
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + id;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -113,13 +113,17 @@ public abstract class PersistedSurveyObject extends SurveyObject implements Pers
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		PersistedSurveyObject other = (PersistedSurveyObject) obj;
-		if (id != other.id)
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
+	
 }

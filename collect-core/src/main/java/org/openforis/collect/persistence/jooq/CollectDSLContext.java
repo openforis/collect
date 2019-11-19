@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.Date;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.jooq.CollectCreateIndexStep;
 import org.jooq.Configuration;
 import org.jooq.DataType;
@@ -47,18 +48,15 @@ public class CollectDSLContext extends DefaultDSLContext {
         return new CollectCreateIndexImpl(configuration(), index);
     }
 
-	public int nextId(TableField<?, Integer> idField, Sequence<? extends Number> idSequence) {
+	public <I extends Number> I nextId(TableField<?, I> idField, Sequence<? extends Number> idSequence) {
 		if (isSQLite()){
-			Integer id = (Integer) select(DSL.max(idField))
+			I id = (I) select(DSL.max(idField))
 					.from(idField.getTable())
 					.fetchOne(0);
-			if ( id == null ) {
-				return 1;
-			} else {
-				return id + 1;
-			}
+			Long result = id == null ? 1 : id.longValue() + 1;
+			return idField.getType() == Integer.class ? (I) new Integer(result.intValue()) : (I) result;
 		} else {
-			return nextval(idSequence).intValue();	
+			return (I) nextval(idSequence);	
 		}	
 	}
 

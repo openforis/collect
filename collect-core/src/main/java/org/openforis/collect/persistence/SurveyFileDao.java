@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyFileRecord
  * @author S. Ricci
  *
  */
-public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile, SurveyFileDSLContext> {
+public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<Integer, SurveyFile, SurveyFileDSLContext> {
 	
 	private static final int BLOB_CHUNK_SIZE = 1000000;
 
@@ -178,7 +178,7 @@ public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile,
 		return content;
 	}
 	
-	public static class SurveyFileDSLContext extends SurveyObjectMappingDSLContext<SurveyFile> {
+	public static class SurveyFileDSLContext extends SurveyObjectMappingDSLContext<Integer, SurveyFile> {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -197,7 +197,7 @@ public class SurveyFileDao extends SurveyObjectMappingJooqDaoSupport<SurveyFile,
 		}
 		
 		@Override
-		protected void setId(SurveyFile o, int id) {
+		protected void setId(SurveyFile o, Integer id) {
 			o.setId(id);
 		}
 

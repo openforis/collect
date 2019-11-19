@@ -14,12 +14,12 @@ import org.openforis.idm.metamodel.PersistedObject;
  * @author S. Ricci
  *
  */
-public abstract class PersistedObjectMappingDSLContext<T extends PersistedObject> extends MappingDSLContext<T> {
+public abstract class PersistedObjectMappingDSLContext<I extends Number, T extends PersistedObject<I>> extends MappingDSLContext<I, T> {
 
 	private static final long serialVersionUID = 1L;
 	
 	public PersistedObjectMappingDSLContext(Configuration config,
-			TableField<?, Integer> idField,
+			TableField<?, I> idField,
 			Sequence<? extends Number> idSequence, Class<T> clazz) {
 		super(config, idField, idSequence, clazz);
 	}
@@ -34,12 +34,12 @@ public abstract class PersistedObjectMappingDSLContext<T extends PersistedObject
 	}
 	
 	@Override
-	protected void setId(T entity, int id) {
+	protected void setId(T entity, I id) {
 		entity.setId(id);
 	}
 
 	@Override
-	protected Integer getId(T entity) {
+	protected I getId(T entity) {
 		return entity.getId();
 	}
 	

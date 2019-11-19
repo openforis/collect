@@ -19,7 +19,7 @@ public class CodeListItemCache {
 	
 	private Map<Integer, SurveyCodeListItemCache> cacheBySurveyId = new HashMap<Integer, CodeListItemCache.SurveyCodeListItemCache>();
 	
-	public PersistedCodeListItem getItem(CodeList codeList, Integer parentId, String code, ModelVersion version) {
+	public PersistedCodeListItem getItem(CodeList codeList, Long parentId, String code, ModelVersion version) {
 		List<PersistedCodeListItem> items = getItems(codeList, parentId);
 		if (items == null) {
 			return null;
@@ -32,7 +32,7 @@ public class CodeListItemCache {
 		return null;
 	}
 	
-	public List<PersistedCodeListItem> getItems(CodeList codeList, Integer parentId) {
+	public List<PersistedCodeListItem> getItems(CodeList codeList, Long parentId) {
 		int surveyId = codeList.getSurvey().getId();
 		SurveyCodeListItemCache surveyCache = getSurveyCache(surveyId);
 		if (surveyCache == null) {
@@ -46,7 +46,7 @@ public class CodeListItemCache {
 		return items;
 	}
 
-	public void putItems(CodeList codeList, Integer parentId, List<PersistedCodeListItem> items) {
+	public void putItems(CodeList codeList, Long parentId, List<PersistedCodeListItem> items) {
 		int surveyId = codeList.getSurvey().getId();
 		SurveyCodeListItemCache surveyCache = getOrCreateSurveyCache(surveyId);
 		InternalCodeListItemCache codeListCache = surveyCache.getOrCreateCodeListCache(codeList.getId());
@@ -57,7 +57,7 @@ public class CodeListItemCache {
 		cacheBySurveyId.clear();
 	}
 	
-	public void clearItems(CodeList codeList, Integer parentId) {
+	public void clearItems(CodeList codeList, Long parentId) {
 		int surveyId = codeList.getSurvey().getId();
 		SurveyCodeListItemCache surveyCache = getOrCreateSurveyCache(surveyId);
 		InternalCodeListItemCache codeListCache = surveyCache.getOrCreateCodeListCache(codeList.getId());
@@ -114,21 +114,21 @@ public class CodeListItemCache {
 	
 	private static class InternalCodeListItemCache {
 		
-		private Map<Integer, List<PersistedCodeListItem>> itemsByParentId = new HashMap<Integer, List<PersistedCodeListItem>>();
+		private Map<Long, List<PersistedCodeListItem>> itemsByParentId = new HashMap<Long, List<PersistedCodeListItem>>();
 		
-		public List<PersistedCodeListItem> getItemsByParentId(Integer parentId) {
+		public List<PersistedCodeListItem> getItemsByParentId(Long parentId) {
 			return itemsByParentId.get(createMapKeyByParentId(parentId));
 		}
 		
-		public void putItems(Integer parentId, List<PersistedCodeListItem> items) {
+		public void putItems(Long parentId, List<PersistedCodeListItem> items) {
 			itemsByParentId.put(createMapKeyByParentId(parentId), items);
 		}
 
-		public void clearItems(Integer parentId) {
+		public void clearItems(Long parentId) {
 			itemsByParentId.remove(parentId);
 		}
 		
-		private Integer createMapKeyByParentId(Integer parentId) {
+		private Long createMapKeyByParentId(Long parentId) {
 			return parentId == null ? 0 : parentId;
 		}
 		

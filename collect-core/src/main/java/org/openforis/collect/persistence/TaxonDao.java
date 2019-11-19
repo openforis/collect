@@ -35,7 +35,7 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  * @author G. Miceli
  * @author S. Ricci
  */
-public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLContext> {
+public class TaxonDao extends MappingJooqDaoSupport<Integer, Taxon, TaxonDao.TaxonDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
 	private static Field[] GENERIC_FIELDS = {
@@ -83,7 +83,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 	}
 
 	@Override
-	public Taxon loadById(int id) {
+	public Taxon loadById(Integer id) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -238,7 +238,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		return new TaxonDSLContext(getConfiguration(), taxonomy);
 	}
 
-	protected static class TaxonDSLContext extends MappingDSLContext<Taxon> {
+	protected static class TaxonDSLContext extends MappingDSLContext<Integer, Taxon> {
 
 		private static final long serialVersionUID = 1L;
 		private CollectTaxonomy taxonomy;
@@ -309,7 +309,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.TaxonDSLCont
 		}
 
 		@Override
-		protected void setId(Taxon t, int id) {
+		protected void setId(Taxon t, Integer id) {
 			t.setSystemId(id);
 		}
 

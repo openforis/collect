@@ -3,7 +3,7 @@ package org.openforis.collect.model;
 import org.openforis.collect.persistence.jooq.tables.pojos.OfcImagery;
 import org.openforis.idm.metamodel.PersistedObject;
 
-public class Imagery extends OfcImagery implements PersistedObject {
+public class Imagery extends OfcImagery implements PersistedObject<Integer> {
 
 	private static final long serialVersionUID = 1L;
 

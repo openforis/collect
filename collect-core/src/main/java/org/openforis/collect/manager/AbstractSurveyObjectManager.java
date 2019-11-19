@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public abstract class AbstractSurveyObjectManager
-		<T extends PersistedSurveyObject, D extends SurveyObjectMappingJooqDaoSupport<T, ?>> 
-		extends AbstractPersistedObjectManager<T, Integer, D> {
+		<I extends Number, T extends PersistedSurveyObject<I>, D extends SurveyObjectMappingJooqDaoSupport<I, T, ?>> 
+		extends AbstractPersistedObjectManager<T, I, D> {
 
 //	private PersistedSurveyObjectCache<T> cache;
 	
 	@Override
-	public T loadById(Integer id) {
+	public T loadById(I id) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -32,7 +32,7 @@ public abstract class AbstractSurveyObjectManager
 		throw new UnsupportedOperationException();
 	}
 	
-	public T loadById(CollectSurvey survey, int id) {
+	public T loadById(CollectSurvey survey, I id) {
 		T obj = dao.loadById(survey, id);
 		initializeItem(obj);
 		return obj;
@@ -82,7 +82,7 @@ public abstract class AbstractSurveyObjectManager
 	}
 
 	@Override
-	public void deleteById(Integer id) {
+	public void deleteById(I id) {
 		dao.delete(id);
 	}
 	

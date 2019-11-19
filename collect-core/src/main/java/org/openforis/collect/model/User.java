@@ -13,7 +13,7 @@ import org.openforis.idm.metamodel.PersistedObject;
  * @author S. Ricci
  * 
  */
-public class User implements PersistedObject, Comparable<User>, DeepComparable {
+public class User implements PersistedObject<Integer>, Comparable<User>, DeepComparable {
 
 	private Boolean enabled;
 	private Integer id;

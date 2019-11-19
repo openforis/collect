@@ -45,7 +45,7 @@ import org.openforis.idm.metamodel.SurveyObject;
 /**
  * @author S. Ricci
  */
-public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem, CodeListItemDao.JooqDSLContext> {
+public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeListItem, CodeListItemDao.JooqDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
 	private static final TableField[] LABEL_FIELDS = {
@@ -107,9 +107,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		cache = new CodeListItemCache();
 	}
 
-	public PersistedCodeListItem loadById(CodeList list, int id) {
+	public PersistedCodeListItem loadById(CodeList list, long systemId) {
 		JooqDSLContext dsl = dsl(list);
-		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
+		ResultQuery<?> selectQuery = dsl.selectByIdQuery(systemId);
 		Record r = selectQuery.fetchOne();
 		if ( r == null ) {
 			return null;
@@ -140,7 +140,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		dsl.update(dsl.getTable())
 			.set(OFC_CODE_LIST.IMAGE_CONTENT, fileWrapper.getContent())
 			.set(OFC_CODE_LIST.IMAGE_FILE_NAME, fileWrapper.getFileName())
-			.where(OFC_CODE_LIST.ID.eq(((PersistedCodeListItem) item).getSystemId()))
+			.where(OFC_CODE_LIST.ID.eq(item.getSystemId()))
 			.execute();
 	}
 	
@@ -149,7 +149,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		dsl.update(dsl.getTable())
 			.set(OFC_CODE_LIST.IMAGE_CONTENT, (byte[]) null)
 			.set(OFC_CODE_LIST.IMAGE_FILE_NAME, (String) null)
-			.where(OFC_CODE_LIST.ID.eq(((PersistedCodeListItem) item).getSystemId()))
+			.where(OFC_CODE_LIST.ID.eq(item.getSystemId()))
 			.execute();
 	}
 	
@@ -173,8 +173,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			PersistedCodeListItem firstItem = items.get(0);
 			CodeList list = firstItem.getCodeList();
 			JooqDSLContext jf = dsl(list);
-			int nextId = assignIds ? jf.nextId() : 0;
-			int maxId = nextId;
+			long nextId = assignIds ? jf.nextId() : 0;
+			long maxId = nextId;
 			Insert<OfcCodeListRecord> query = jf.createInsertStatement();
 			BatchBindStep batch = jf.batch(query);
 			for (PersistedCodeListItem item : items) {
@@ -199,9 +199,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	public void copyItems(int fromSurveyId, int toSurveyId) {
 		JooqDSLContext jf = dsl(null);
-		int minId = loadMinId(jf, fromSurveyId);
-		int nextId = jf.nextId();
-		int idGap = nextId - minId;
+		long minId = loadMinId(jf, fromSurveyId);
+		long nextId = jf.nextId();
+		long idGap = nextId - minId;
 		List<Field<?>> selectFields = new ArrayList<Field<?>>(ALL_FIELDS.length);
 		selectFields.addAll(Arrays.<Field<?>>asList(
 				OFC_CODE_LIST.ID.add(idGap),
@@ -234,9 +234,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	public void copyItems(CodeList fromCodeList, CodeList toCodeList) {
 		JooqDSLContext dsl = dsl(fromCodeList);
 		List<PersistedCodeListItem> fromItems = loadAllItems(fromCodeList);
-		int minId = findMin(CollectionUtils.<Integer, PersistedCodeListItem>project(fromItems, "systemId"));
-		int nextId = dsl.nextId();
-		int idGap = nextId - minId;
+		long minId = findMin(CollectionUtils.<Integer, PersistedCodeListItem>project(fromItems, "systemId"));
+		long nextId = dsl.nextId();
+		long idGap = nextId - minId;
 		List<PersistedCodeListItem> newItems = new ArrayList<PersistedCodeListItem>(fromItems.size());
 		for (PersistedCodeListItem source : fromItems) {
 			PersistedCodeListItem newItem = new PersistedCodeListItem(toCodeList, source.getLevel());
@@ -252,7 +252,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	private void restartIdSequence(JooqDSLContext jf) {
-		int maxId = loadMaxId(jf);
+		long maxId = loadMaxId(jf);
 		jf.restartSequence(OFC_CODE_LIST_ID_SEQ, maxId + 1);
 	}
 
@@ -489,7 +489,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	public List<PersistedCodeListItem> loadRootItems(CodeList codeList) {
-		return loadChildItems(codeList, (Integer) null, (ModelVersion) null);
+		return loadChildItems(codeList, (Long) null, (ModelVersion) null);
 	}
 	
 	public PersistedCodeListItem loadRootItem(CodeList codeList, String code) {
@@ -497,7 +497,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	public PersistedCodeListItem loadRootItem(CodeList codeList, String code, ModelVersion version) {
-		return loadItem(codeList, (Integer) null, code, version);
+		return loadItem(codeList, (Long) null, code, version);
 	}
 	
 	public List<PersistedCodeListItem> loadChildItems(PersistedCodeListItem item) {
@@ -508,11 +508,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return loadChildItems(item.getCodeList(), item.getSystemId(), version);
 	}
 	
-	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Integer parentItemId) {
+	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Long parentItemId) {
 		return loadChildItems(codeList, parentItemId, (ModelVersion) null);
 	}
 	
-	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Integer parentItemId, ModelVersion version) {
+	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Long parentItemId, ModelVersion version) {
 		List<PersistedCodeListItem> items = null;
 		boolean usingCache = isCacheInUse(codeList);
 		if (usingCache) {
@@ -550,10 +550,10 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	public boolean isEmpty(CodeList list) {
-		return ! hasChildItems(list, (Integer) null);
+		return ! hasChildItems(list, (Long) null);
 	}
 
-	public boolean hasChildItems(CodeList codeList, Integer parentItemId) {
+	public boolean hasChildItems(CodeList codeList, Long parentItemId) {
 		JooqDSLContext jf = dsl(codeList);
 		SelectQuery<Record> q = createSelectChildItemsQuery(jf, codeList, parentItemId, false);
 		q.addSelect(DSL.count());
@@ -597,7 +597,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 	}
 	
-	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code, ModelVersion version) {
+	public PersistedCodeListItem loadItem(CodeList codeList, Long parentItemId, String code, ModelVersion version) {
 		boolean usingCache = isCacheInUse(codeList);
 		if ( usingCache ) {
 			PersistedCodeListItem item = cache.getItem(codeList, parentItemId, code, version);
@@ -651,7 +651,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		visitChildItems(list, null, visitor, version);
 	}
 	
-	public void visitChildItems(CodeList list, Integer parentItemId, Visitor<CodeListItem> visitor, ModelVersion version) {
+	public void visitChildItems(CodeList list, Long parentItemId, Visitor<CodeListItem> visitor, ModelVersion version) {
 		JooqDSLContext dsl = dsl(list);
 		SelectQuery<Record> q = createSelectChildItemsQuery(dsl, list, parentItemId, true);
 		Cursor<Record> cursor = null;
@@ -693,14 +693,14 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return result == null ? 0: result.intValue();
 	}
 
-	protected int loadMaxId(JooqDSLContext jf) {
-		Integer result = jf.select(DSL.max(OFC_CODE_LIST.ID))
+	protected long loadMaxId(JooqDSLContext jf) {
+		Long result = jf.select(DSL.max(OFC_CODE_LIST.ID))
 				.from(OFC_CODE_LIST)
-				.fetchOne(0, Integer.class);
-		return result == null ? 0: result.intValue();
+				.fetchOne(0, Long.class);
+		return result == null ? 0: result.longValue();
 	}
 
-	protected static SelectQuery<Record> createSelectChildItemsQuery(JooqDSLContext jf, CodeList codeList, Integer parentItemId, boolean addOrderByClause) {
+	protected static SelectQuery<Record> createSelectChildItemsQuery(JooqDSLContext jf, CodeList codeList, Long parentItemId, boolean addOrderByClause) {
 		SelectQuery<Record> q = createSelectFromCodeListQuery(jf, codeList);
 		addFilterByParentItemConditions(q, codeList, parentItemId);
 		if ( addOrderByClause ) {
@@ -710,7 +710,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	protected static void addFilterByParentItemConditions(SelectQuery<Record> select,
-			CodeList codeList, Integer parentItemId) {
+			CodeList codeList, Long parentItemId) {
 		Condition condition;
 		if ( parentItemId == null ) {
 			condition = OFC_CODE_LIST.PARENT_ID.isNull();
@@ -753,7 +753,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return new JooqDSLContext(getConfiguration(), codeList);
 	}
 	
-	public int nextSystemId() {
+	public long nextSystemId() {
 		JooqDSLContext jf = dsl(null);
 		return jf.nextId();
 	}
@@ -775,7 +775,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return valuesArr[0];
 	}
 
-	protected static class JooqDSLContext extends MappingDSLContext<PersistedCodeListItem> {
+	protected static class JooqDSLContext extends MappingDSLContext<Long, PersistedCodeListItem> {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -855,7 +855,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		@Override
 		public void fromObject(PersistedCodeListItem item, StoreQuery<?> q) {
 			q.addValue(OFC_CODE_LIST.ID, item.getSystemId());
-			CollectSurvey survey = (CollectSurvey) item.getSurvey();
+			CollectSurvey survey = item.getSurvey();
 			Integer surveyId = survey.getId();
 			q.addValue(OFC_CODE_LIST.SURVEY_ID, surveyId);
 			q.addValue(OFC_CODE_LIST.CODE_LIST_ID, item.getCodeList().getId());
@@ -888,7 +888,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		
 		protected List<Object> extractValues(PersistedCodeListItem item) {
 			CodeList list = item.getCodeList();
-			CollectSurvey survey = (CollectSurvey) item.getSurvey();
+			CollectSurvey survey = item.getSurvey();
 			Integer surveyId = survey.getId();
 			ModelVersion sinceVersion = item.getSinceVersion();
 			Integer sinceVersionId = sinceVersion == null ? null: sinceVersion.getId();
@@ -969,23 +969,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 		
 		@Override
-		protected void setId(PersistedCodeListItem t, int id) {
+		protected void setId(PersistedCodeListItem t, Long id) {
 			t.setSystemId(id);
 		}
 
 		@Override
-		protected Integer getId(PersistedCodeListItem t) {
+		protected Long getId(PersistedCodeListItem t) {
 			return t.getSystemId();
-		}
-		
-		@Override
-		public int nextId() {
-			return super.nextId();
-		}
-		
-		@Override
-		public void restartSequence(Number value) {
-			super.restartSequence(value);
 		}
 	}
 

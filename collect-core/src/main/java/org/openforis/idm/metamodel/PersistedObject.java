@@ -1,9 +1,9 @@
 package org.openforis.idm.metamodel;
 
-public interface PersistedObject {
+public interface PersistedObject<I extends Number> {
 
-	Integer getId();
+	I getId();
 
-	void setId(Integer id);
+	void setId(I id);
 
 }

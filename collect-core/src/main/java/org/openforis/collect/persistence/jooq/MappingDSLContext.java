@@ -23,38 +23,38 @@ import org.jooq.impl.TableImpl;
  * @author S. Ricci
  *
  */
-public abstract class MappingDSLContext<E> extends CollectDSLContext {
+public abstract class MappingDSLContext<I extends Number,E> extends CollectDSLContext {
 
 	private static final long serialVersionUID = 1L;
 	
-	private TableField<?,Integer> idField;
+	private TableField<?,I> idField;
 	private Sequence<? extends Number> idSequence;
 	private Class<E> clazz;
 	
-	public MappingDSLContext(Configuration config, TableField<?,Integer> idField, Sequence<? extends Number> idSequence, Class<E> clazz) {
+	public MappingDSLContext(Configuration config, TableField<?,I> idField, Sequence<? extends Number> idSequence, Class<E> clazz) {
 		super(config);
 		this.idField = idField;
 		this.idSequence = idSequence;
 		this.clazz = clazz;
 	}
 	
-	protected abstract void setId(E entity, int id);
+	protected abstract void setId(E entity, I id);
 
-	protected abstract Integer getId(E entity);
+	protected abstract I getId(E entity);
 	
 	protected abstract void fromRecord(Record r, E object);
 	
 	protected abstract void fromObject(E object, StoreQuery<?> q);
 
-	public SelectQuery<?> selectByIdQuery(int id) {
+	public SelectQuery<?> selectByIdQuery(I id) {
 		SelectQuery<?> select = selectQuery(getTable());
-		select.addConditions(idField.equal(id));
+		select.addConditions(idField.eq(id));
 		return select;
 	}
 
 	public <T> SelectQuery<?> selectByFieldQuery(TableField<?,T> field, T value) {
 		SelectQuery<?> select = selectQuery(getTable());
-		select.addConditions(field.equal(value));
+		select.addConditions(field.eq(value));
 		return select;
 	}
 
@@ -85,13 +85,13 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 		return select;
 	}
 	
-	public DeleteQuery<?> deleteQuery(int id) {
+	public DeleteQuery<?> deleteQuery(I id) {
 		DeleteQuery<?> delete = deleteQuery(getTable());
 		delete.addConditions(idField.equal(id));
 		return delete;
 	}
 
-	public TableField<?,Integer> getIdField() {
+	public TableField<?,I> getIdField() {
 		return idField;
 	}
 	
@@ -105,9 +105,9 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 	
 	@SuppressWarnings({"rawtypes"})
 	public InsertQuery insertQuery(E object) {
-		Integer id = getId(object);
+		I id = getId(object);
 		if ( id == null ) {
-			int nextId = nextId();
+			I nextId = nextId();
 			setId(object, nextId);
 		}
 		InsertQuery insert = insertQuery(getTable());
@@ -115,7 +115,7 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 		return insert;
 	}
 
-	public int nextId() {
+	public I nextId() {
 		return nextId(idField, idSequence);
 	}
 	
@@ -127,7 +127,7 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 	public UpdateQuery updateQuery(E object) {
 		UpdateQuery update = updateQuery(getTable());
 		fromObject(object, update);
-		Integer id = getId(object);
+		I id = getId(object);
 		if ( id == null ) {
 			throw new IllegalArgumentException("Cannot update with null id");
 		}
