@@ -223,4 +223,8 @@ public final class Date extends AbstractValue {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		return toPrettyFormatString();
+	}
 }

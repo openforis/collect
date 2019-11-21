@@ -543,7 +543,8 @@ public class CSVDataImportJob extends Job {
 			Value[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 			RecordFilter filter = new RecordFilter(input.survey);
 			filter.setRootEntityId(rootEntityDefn.getId());
-			filter.setKeyValues(Values.toStringValues(recordKeyValues));
+			String[] recordKeysStringValues = Values.toStringValues(recordKeyValues);
+			filter.setKeyValues(recordKeysStringValues);
 			int recordCount = recordManager.countRecords(filter);
 			String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
 					parentEntityDefn,
@@ -563,7 +564,7 @@ public class CSVDataImportJob extends Job {
 			} else {
 				ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
 						currentRowNumber, recordKeyColumnNames, errorMessageKey);
-				parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
+				parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeysStringValues, ", ")});
 				dataImportStatus.addParsingError(currentRowNumber, parsingError);
 				return false;
 			}
