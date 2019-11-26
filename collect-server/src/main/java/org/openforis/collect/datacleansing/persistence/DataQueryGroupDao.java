@@ -22,7 +22,6 @@ import org.openforis.collect.datacleansing.DataQueryGroup;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
-import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryGroupRecord;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component("dataQueryGroupDao")
 @Transactional
-public class DataQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<DataQueryGroup, DataQueryGroupDao.JooqDSLContext> {
+public class DataQueryGroupDao extends DataCleansingItemDao<DataQueryGroup, DataQueryGroupDao.JooqDSLContext> {
 
 	public DataQueryGroupDao() {
 		super(DataQueryGroupDao.JooqDSLContext.class);
@@ -121,7 +120,7 @@ public class DataQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<DataQue
 			.where(OFC_DATA_QUERY_GROUP.SURVEY_ID.eq(survey.getId()));
 	}
 
-	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataQueryGroup> {
+	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<Integer, DataQueryGroup> {
 
 		private static final long serialVersionUID = 1L;
 		

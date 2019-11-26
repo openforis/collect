@@ -28,9 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author S. Ricci
  *
  */
-public abstract class AbstractPersistedObjectEditFormController<T extends PersistedObject, 
-											F extends PersistedObjectForm<T>, 
-											M extends ItemManager<T, Integer>> extends BasicController {
+public abstract class AbstractPersistedObjectEditFormController<I extends Number, T extends PersistedObject<I>, 
+		F extends PersistedObjectForm<I, T>, M extends ItemManager<T, I>> extends BasicController {
 	
 	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate", "uuid"};
 	
@@ -48,7 +47,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 	
 	@RequestMapping(value = "/{id}", method=GET)
 	public @ResponseBody
-	F load(@PathVariable int id) {
+	F load(@PathVariable I id) {
 		T item = loadItem(id);
 		F form = createFormInstance(item);
 		return form;
@@ -83,7 +82,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 	
 	@RequestMapping(value="/{id}/duplicate", method=POST)
 	public @ResponseBody
-	Response duplicate(@RequestParam int itemId, BindingResult result) {
+	Response duplicate(@RequestParam I itemId, BindingResult result) {
 		T item = itemManager.loadById(itemId);
 		T newItem = item; //TODO clone?!
 		newItem.setId(null);
@@ -102,7 +101,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 	
 	@RequestMapping(value = "/{id}", method=DELETE)
 	public @ResponseBody
-	Response delete(@PathVariable int id) {
+	Response delete(@PathVariable I id) {
 		try {
 			T item = loadItem(id);
 			itemManager.delete(item);
@@ -120,7 +119,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		}
 	}
 
-	protected T loadItem(int id) {
+	protected T loadItem(I id) {
 		return itemManager.loadById(id);
 	}
 	

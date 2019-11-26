@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component("dataReportItemDao")
 @Transactional
-public class DataReportItemDao extends MappingJooqDaoSupport<DataReportItem, DataReportItemDao.JooqDSLContext> {
+public class DataReportItemDao extends MappingJooqDaoSupport<Integer, DataReportItem, DataReportItemDao.JooqDSLContext> {
 
 	private static Field<?>[] FIELDS = new Field<?>[] {
 		OFC_DATA_REPORT_ITEM.ID,
@@ -137,7 +137,7 @@ public class DataReportItemDao extends MappingJooqDaoSupport<DataReportItem, Dat
 		return new JooqDSLContext(getConfiguration(), report);
 	}
 	
-	protected static class JooqDSLContext extends PersistedObjectMappingDSLContext<DataReportItem> {
+	protected static class JooqDSLContext extends PersistedObjectMappingDSLContext<Integer, DataReportItem> {
 
 		private static final long serialVersionUID = 1L;
 		

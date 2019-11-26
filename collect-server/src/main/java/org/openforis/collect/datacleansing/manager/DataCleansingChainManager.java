@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  */
 @Component
-public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataCleansingChain, DataCleansingChainDao> {
+public class DataCleansingChainManager extends AbstractSurveyObjectManager<Integer, DataCleansingChain, DataCleansingChainDao> {
 
 	@Autowired
 	private DataCleansingStepManager dataCleansingStepManager;

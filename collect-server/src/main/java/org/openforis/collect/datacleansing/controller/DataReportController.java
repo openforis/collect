@@ -65,7 +65,7 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
 @RequestMapping(value = "api/datacleansing/datareports")
-public class DataReportController extends AbstractSurveyObjectEditFormController<DataReport, DataReportForm, DataReportManager> {
+public class DataReportController extends AbstractSurveyObjectEditFormController<Integer, DataReport, DataReportForm, DataReportManager> {
 	
 	private static final String DATA_REPORT_CSV_FILE_NAME_FORMAT = "%s (data report - %s).csv";
 	@Autowired

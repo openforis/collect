@@ -6,13 +6,12 @@ package org.openforis.collect.datacleansing;
 import java.util.UUID;
 
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
  * @author A. Modragon
  *
  */
-public class DataQueryType extends PersistedSurveyObject<Integer> {
+public class DataQueryType extends DataCleansingItem {
 
 	private static final long serialVersionUID = 1L;
 	

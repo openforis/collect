@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/api/imagery")
-public class ImageryController extends AbstractPersistedObjectEditFormController<Imagery, ImageryForm, ImageryManager> {
+public class ImageryController extends AbstractPersistedObjectEditFormController<Integer, Imagery, ImageryForm, ImageryManager> {
 	
 	@Autowired
 	private ImageryValidator validator;
@@ -46,7 +46,7 @@ public class ImageryController extends AbstractPersistedObjectEditFormController
 		return super.update(form, result);
 	}
 
-	public static class ImageryForm extends PersistedObjectForm<Imagery> {
+	public static class ImageryForm extends PersistedObjectForm<Integer, Imagery> {
 
 		private String title;
 		private String attribution;

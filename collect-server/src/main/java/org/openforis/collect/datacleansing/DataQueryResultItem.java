@@ -19,7 +19,7 @@ import org.openforis.idm.model.Value;
  * @author S. Ricci
  *
  */
-public class DataQueryResultItem extends AbstractPersistedObject {
+public class DataQueryResultItem extends AbstractPersistedObject<Integer> {
 	
 	private UUID uuid;
 	private DataQuery query;

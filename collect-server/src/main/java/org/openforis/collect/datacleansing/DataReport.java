@@ -7,14 +7,13 @@ import java.util.UUID;
 
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
  * 
  * @author A. Modragon
  *
  */
-public class DataReport extends PersistedSurveyObject {
+public class DataReport extends DataCleansingItem {
 	
 	private static final long serialVersionUID = 1L;
 	

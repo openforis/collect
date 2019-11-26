@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  *
  */
 public abstract class AbstractSurveyObjectEditFormController<I extends Number, T extends PersistedSurveyObject<I>, 
-			F extends PersistedObjectForm<T>, 
-			M extends AbstractSurveyObjectManager<T, ?>>  
-			extends AbstractPersistedObjectEditFormController<T, F, M> {
+			F extends PersistedObjectForm<I, T>, 
+			M extends AbstractSurveyObjectManager<I, T, ?>>  
+			extends AbstractPersistedObjectEditFormController<I, T, F, M> {
 	
 	@Autowired
 	@Qualifier("sessionManager")
@@ -44,7 +44,7 @@ public abstract class AbstractSurveyObjectEditFormController<I extends Number, T
 	}
 	
 	@Override
-	protected T loadItem(int id) {
+	protected T loadItem(I id) {
 		CollectSurvey survey = getActiveSurvey();
 		return itemManager.loadById(survey, id);
 	}

@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.UUID;
 
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataCleansingStep extends PersistedSurveyObject<Integer> {
+public class DataCleansingStep extends DataCleansingItem {
 	
 	private static final long serialVersionUID = 1L;
 

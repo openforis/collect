@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component("dataQueryTypeManager")
-public class DataQueryTypeManager extends AbstractSurveyObjectManager<DataQueryType, DataQueryTypeDao> {
+public class DataQueryTypeManager extends AbstractSurveyObjectManager<Integer, DataQueryType, DataQueryTypeDao> {
 	
 	@Autowired
 	private DataQueryManager dataQueryManager;

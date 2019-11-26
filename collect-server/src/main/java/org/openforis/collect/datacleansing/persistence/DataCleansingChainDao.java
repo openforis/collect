@@ -21,7 +21,6 @@ import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
-import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingChainRecord;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component("dataCleansingChainDao")
 @Transactional
-public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<DataCleansingChain, DataCleansingChainDao.JooqDSLContext> {
+public class DataCleansingChainDao extends DataCleansingItemDao<DataCleansingChain, DataCleansingChainDao.JooqDSLContext> {
 
 	public DataCleansingChainDao() {
 		super(DataCleansingChainDao.JooqDSLContext.class);
@@ -117,7 +116,7 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		batch.execute();
 	}
 	
-	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataCleansingChain> {
+	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<Integer, DataCleansingChain> {
 
 		private static final long serialVersionUID = 1L;
 		

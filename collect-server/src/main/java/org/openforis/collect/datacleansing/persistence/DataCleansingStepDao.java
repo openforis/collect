@@ -29,7 +29,6 @@ import org.openforis.collect.datacleansing.DataCleansingStepValue.UpdateType;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
-import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepValueRecord;
 import org.springframework.stereotype.Component;
@@ -40,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component("dataCleansingStepDao")
 @Transactional
-public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<DataCleansingStep, DataCleansingStepDao.JooqDSLContext> {
+public class DataCleansingStepDao extends DataCleansingItemDao<DataCleansingStep, DataCleansingStepDao.JooqDSLContext> {
 
 	private static final TableField<?, ?>[] FIELD_FIX_EXPRESSION_FIELDS = new TableField<?, ?>[] {
 		OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION1, 
@@ -159,7 +158,7 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			.execute();
 	}
 
-	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataCleansingStep> {
+	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<Integer, DataCleansingStep> {
 
 		private static final long serialVersionUID = 1L;
 		

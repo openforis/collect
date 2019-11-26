@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component("dataReportManager")
-public class DataReportManager extends AbstractSurveyObjectManager<DataReport, DataReportDao> {
+public class DataReportManager extends AbstractSurveyObjectManager<Integer, DataReport, DataReportDao> {
 
 	@Autowired
 	private RecordManager recordManager;

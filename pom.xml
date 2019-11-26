@@ -23,7 +23,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.1.13</openforis.commons.version>
+		<openforis.commons.version>0.1.15</openforis.commons.version>
 		<spring.version>5.2.1.RELEASE</spring.version>
 		<spring-security.version>5.2.1.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>

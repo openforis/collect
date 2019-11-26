@@ -16,7 +16,6 @@ import org.openforis.collect.datacleansing.form.DataQueryGroupForm;
 import org.openforis.collect.datacleansing.form.DataQueryTypeForm;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
-import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
  * 
@@ -101,7 +100,7 @@ public class DataCleansingMetadataView {
 	
 	private static class PersistedSurveyObjects {
 		
-		public static <F extends DataCleansingItemForm<T>, T extends PersistedSurveyObject> List<F> convert(List<T> items, Class<F> resultType) {
+		public static <F extends DataCleansingItemForm<T>, T extends DataCleansingItem> List<F> convert(List<T> items, Class<F> resultType) {
 			List<F> result = new ArrayList<F>(items.size());
 			for (T i : items) {
 				try {
@@ -115,7 +114,7 @@ public class DataCleansingMetadataView {
 			return result;
 		}
 		
-		private static <T extends PersistedSurveyObject> Map<Integer, T> createObjectFromIdMap(Collection<T> items) {
+		private static <T extends DataCleansingItem> Map<Integer, T> createObjectFromIdMap(Collection<T> items) {
 			Map<Integer, T> result = new HashMap<Integer, T>(items.size());
 			for (T item : items) {
 				result.put(item.getId(), item);
@@ -123,13 +122,13 @@ public class DataCleansingMetadataView {
 			return result;
 		}
 		
-		private static <T extends PersistedSurveyObject> void resetIds(Collection<T> items) {
+		private static <T extends DataCleansingItem> void resetIds(Collection<T> items) {
 			for (T item : items) {
 				item.setId(null);
 			}
 		}
 		
-		private static <I extends PersistedSurveyObject, F extends DataCleansingItemForm<I>> List<I> toItems(
+		private static <I extends DataCleansingItem, F extends DataCleansingItemForm<I>> List<I> toItems(
 				CollectSurvey survey, List<F> formItems, Class<I> itemType) {
 			if (org.apache.commons.collections.CollectionUtils.isEmpty(formItems)) {
 				return Collections.emptyList();

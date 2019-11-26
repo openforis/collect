@@ -6,14 +6,13 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataQuery extends PersistedSurveyObject<Integer> {
+public class DataQuery extends DataCleansingItem {
 
 	private static final long serialVersionUID = 1L;
 	

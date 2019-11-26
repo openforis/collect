@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  */
 @Component
-public class DataQueryGroupManager extends AbstractSurveyObjectManager<DataQueryGroup, DataQueryGroupDao> {
+public class DataQueryGroupManager extends AbstractSurveyObjectManager<Integer, DataQueryGroup, DataQueryGroupDao> {
 
 	@Autowired
 	private DataQueryManager dataQueryManager;

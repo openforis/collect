@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class DataCleansingReportManager extends AbstractSurveyObjectManager<DataCleansingReport, DataCleansingReportDao> {
+public class DataCleansingReportManager extends AbstractSurveyObjectManager<Integer, DataCleansingReport, DataCleansingReportDao> {
 
 	public List<DataCleansingReport> loadByCleansingChain(DataCleansingChain chain) {
 		List<DataCleansingReport> items = dao.loadByCleansingChain(chain);

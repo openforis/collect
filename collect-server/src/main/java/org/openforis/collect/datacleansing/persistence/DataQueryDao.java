@@ -17,7 +17,6 @@ import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
 import org.openforis.collect.datacleansing.DataQueryType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
-import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component("dataQueryDao")
 @Transactional
-public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, DataQueryDao.JooqDSLContext> {
+public class DataQueryDao extends DataCleansingItemDao<DataQuery, DataQueryDao.JooqDSLContext> {
 
 	public DataQueryDao() {
 		super(DataQueryDao.JooqDSLContext.class);
@@ -62,7 +61,7 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 		return dsl.fromResult(result);
 	}
 	
-	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataQuery> {
+	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<Integer, DataQuery> {
 
 		private static final long serialVersionUID = 1L;
 		

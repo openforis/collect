@@ -111,7 +111,7 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	@Transactional
 	@Override
 	public void deleteMetadata(CollectSurvey survey) {
-		List<AbstractSurveyObjectManager<?, ?>> managers = Arrays.<AbstractSurveyObjectManager<?, ?>>asList(
+		List<AbstractSurveyObjectManager<Integer, ?, ?>> managers = Arrays.<AbstractSurveyObjectManager<Integer, ?, ?>>asList(
 				dataCleansingReportManager,
 				dataCleansingChainManager, 
 				dataCleansingStepManager, 
@@ -119,7 +119,7 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 				dataQueryGroupManager,
 				dataQueryManager, 
 				dataTypeManager);
-		for (AbstractSurveyObjectManager<?, ?> manager : managers) {
+		for (AbstractSurveyObjectManager<Integer, ?, ?> manager : managers) {
 			manager.deleteBySurvey(survey);
 		}
 	}
@@ -132,7 +132,7 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 		saveMetadata(toSurvey, metadata, false, activeUser);
 	}
 	
-	private <T extends PersistedSurveyObject> void saveItems(AbstractSurveyObjectManager<T, ?> manager, 
+	private <T extends PersistedSurveyObject<Integer>> void saveItems(AbstractSurveyObjectManager<Integer, T, ?> manager, 
 			CollectSurvey survey, List<T> items, boolean skipErrors, User activeUser) {
 		List<T> oldItems = manager.loadBySurvey(survey);
 		for (T item : items) {

@@ -3,9 +3,9 @@ package org.openforis.collect.datacleansing.form;
 import java.util.Date;
 import java.util.UUID;
 
+import org.openforis.collect.datacleansing.DataCleansingItem;
 import org.openforis.collect.datacleansing.json.CollectDateSerializer;
 import org.openforis.commons.web.PersistedObjectForm;
-import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * 
  * @author S. Ricci
  */
-public abstract class DataCleansingItemForm<T extends PersistedSurveyObject> extends PersistedObjectForm<T> {
+public abstract class DataCleansingItemForm<T extends DataCleansingItem> extends PersistedObjectForm<Integer, T> {
 
 	private UUID uuid;
 	private Date creationDate;

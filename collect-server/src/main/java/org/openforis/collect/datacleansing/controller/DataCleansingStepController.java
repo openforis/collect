@@ -25,7 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
 @RequestMapping(value = "api/datacleansing/datacleansingsteps")
-public class DataCleansingStepController extends AbstractSurveyObjectEditFormController<DataCleansingStep, DataCleansingStepForm, DataCleansingStepManager> {
+public class DataCleansingStepController extends AbstractSurveyObjectEditFormController<Integer, DataCleansingStep, DataCleansingStepForm, DataCleansingStepManager> {
 	
 	@Autowired
 	private DataCleansingStepManager dataCleansingStepManager;

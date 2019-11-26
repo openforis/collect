@@ -43,7 +43,7 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @RequestMapping("/api/usergroup")
 @Scope(WebApplicationContext.SCOPE_SESSION)
-public class UserGroupController extends AbstractPersistedObjectEditFormController<UserGroup, UserGroupForm, UserGroupManager> {
+public class UserGroupController extends AbstractPersistedObjectEditFormController<Integer, UserGroup, UserGroupForm, UserGroupManager> {
 
 	@Autowired
 	private UserGroupValidator userGroupValidator;
@@ -111,7 +111,7 @@ public class UserGroupController extends AbstractPersistedObjectEditFormControll
 		return new Response();
 	}
 	
-	public static class UserGroupForm extends PersistedObjectForm<UserGroup> {
+	public static class UserGroupForm extends PersistedObjectForm<Integer, UserGroup> {
 		
 		private String    name;
 		private String    label;

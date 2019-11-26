@@ -2,11 +2,9 @@ package org.openforis.collect.persistence.jooq;
 
 import static org.jooq.impl.DSL.name;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.Date;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.jooq.CollectCreateIndexStep;
 import org.jooq.Configuration;
 import org.jooq.DataType;
@@ -49,15 +47,18 @@ public class CollectDSLContext extends DefaultDSLContext {
     }
 
 	public <I extends Number> I nextId(TableField<?, I> idField, Sequence<? extends Number> idSequence) {
+		Number result;
 		if (isSQLite()){
-			I id = (I) select(DSL.max(idField))
+			Long id = select(DSL.max(idField))
 					.from(idField.getTable())
-					.fetchOne(0);
-			Long result = id == null ? 1 : id.longValue() + 1;
-			return idField.getType() == Integer.class ? (I) new Integer(result.intValue()) : (I) result;
+					.fetchOne(0, Long.class);
+			result = id == null ? 1 : id.longValue() + 1;
 		} else {
-			return (I) nextval(idSequence);	
+			result = nextval(idSequence);
 		}	
+		return idField.getType() == Integer.class 
+				? (I) new Integer(result.intValue()) 
+				: (I) result;
 	}
 
 	public void restartSequence(Sequence<?> sequence, Number restartValue) {

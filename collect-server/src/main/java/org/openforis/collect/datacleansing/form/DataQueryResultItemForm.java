@@ -12,7 +12,7 @@ import org.openforis.idm.model.AbstractValue;
  * @author S. Ricci
  *
  */
-public class DataQueryResultItemForm extends PersistedObjectForm<DataQueryResultItem> {
+public class DataQueryResultItemForm extends PersistedObjectForm<Integer, DataQueryResultItem> {
 
 	private String key1;
 	private String key2;

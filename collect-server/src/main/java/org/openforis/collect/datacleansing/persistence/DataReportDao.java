@@ -20,7 +20,6 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
-import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.OfcDataReport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component("dataReportDao")
 @Transactional
-public class DataReportDao extends SurveyObjectMappingJooqDaoSupport<DataReport, DataReportDao.JooqDSLContext> {
+public class DataReportDao extends DataCleansingItemDao<DataReport, DataReportDao.JooqDSLContext> {
 
 	public DataReportDao() {
 		super(DataReportDao.JooqDSLContext.class);
@@ -82,7 +81,7 @@ public class DataReportDao extends SurveyObjectMappingJooqDaoSupport<DataReport,
 				);
 	}
 	
-	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataReport> {
+	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<Integer, DataReport> {
 
 		private static final long serialVersionUID = 1L;
 		

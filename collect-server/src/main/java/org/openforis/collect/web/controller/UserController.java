@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/api/user")
 @Scope(SCOPE_SESSION)
-public class UserController extends AbstractPersistedObjectEditFormController<User, UserForm, UserManager> {
+public class UserController extends AbstractPersistedObjectEditFormController<Integer, User, UserForm, UserManager> {
 	
 	@Autowired
 	private SurveyManager surveyManager;
@@ -135,7 +135,7 @@ public class UserController extends AbstractPersistedObjectEditFormController<Us
 		}
 	}
 	
-	public static class UserForm extends PersistedObjectForm<User> {
+	public static class UserForm extends PersistedObjectForm<Integer, User> {
 		
 		private boolean enabled = true;
 		private String username;

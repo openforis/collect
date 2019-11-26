@@ -38,8 +38,8 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 	
 	@Override
 	public void validateForm(DataCleansingStepForm target, Errors errors) {
-		validateRequiredFields(errors, TITLE_FIELD);
-		if (validateRequiredFields(errors, QUERY_ID_FIELD) && validateUniqueness(target, errors)) {
+		if (validateRequiredFields(errors, TITLE_FIELD, QUERY_ID_FIELD, TYPE_CODE_FIELD) 
+				&& validateUniqueness(target, errors)) {
 			String typeCode = (String) errors.getFieldValue(TYPE_CODE_FIELD);
 			if (typeCode.length() == 1 && typeCode.charAt(0) == DataCleansingStepType.ATTRIBUTE_UPDATE.getCode()) {
 				validateUpdateValues(target, errors);
