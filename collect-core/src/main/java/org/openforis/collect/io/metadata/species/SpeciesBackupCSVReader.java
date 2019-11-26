@@ -115,12 +115,12 @@ public class SpeciesBackupCSVReader extends CSVReferenceDataImportReader<Species
 			return line;
 		}
 
-		protected Integer extractId(boolean required) throws ParsingException {
-			return getColumnValue(SpeciesBackupFileColumn.ID.getColumnName(), required, Integer.class);
+		protected Long extractId(boolean required) throws ParsingException {
+			return getColumnValue(SpeciesBackupFileColumn.ID.getColumnName(), required, Long.class);
 		}
 
-		protected Integer extractParentId(boolean required) throws ParsingException {
-			return getColumnValue(SpeciesBackupFileColumn.PARENT_ID.getColumnName(), required, Integer.class);
+		protected Long extractParentId(boolean required) throws ParsingException {
+			return getColumnValue(SpeciesBackupFileColumn.PARENT_ID.getColumnName(), required, Long.class);
 		}
 
 		private TaxonRank extractRank() throws ParsingException {

@@ -97,7 +97,7 @@ public class SpeciesBackupExportTask extends Task {
 
 	protected void writeTaxonSummary(CsvWriter writer, TaxonSummary item) {
 		List<String> lineValues = new ArrayList<String>();
-		lineValues.add(Integer.toString(item.getTaxonSystemId()));
+		lineValues.add(Long.toString(item.getTaxonSystemId()));
 		lineValues.add(item.getParentSystemId() == null ? null : item.getParentSystemId().toString());
 		lineValues.add(item.getRank().getName());
 		lineValues.add(item.getTaxonId() == null ? null: item.getTaxonId().toString());

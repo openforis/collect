@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonVernacularN
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcTaxonVernacularName extends TableImpl<OfcTaxonVernacularNameRecord> {
 
-	private static final long serialVersionUID = 588610948;
+	private static final long serialVersionUID = -1462825738;
 
 	/**
 	 * The reference instance of <code>collect.ofc_taxon_vernacular_name</code>
@@ -51,7 +51,7 @@ public class OfcTaxonVernacularName extends TableImpl<OfcTaxonVernacularNameReco
 	/**
 	 * The column <code>collect.ofc_taxon_vernacular_name.id</code>.
 	 */
-	public final TableField<OfcTaxonVernacularNameRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<OfcTaxonVernacularNameRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_taxon_vernacular_name.vernacular_name</code>.
@@ -71,7 +71,7 @@ public class OfcTaxonVernacularName extends TableImpl<OfcTaxonVernacularNameReco
 	/**
 	 * The column <code>collect.ofc_taxon_vernacular_name.taxon_id</code>.
 	 */
-	public final TableField<OfcTaxonVernacularNameRecord, Integer> TAXON_ID = createField("taxon_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<OfcTaxonVernacularNameRecord, Long> TAXON_ID = createField("taxon_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * The column <code>collect.ofc_taxon_vernacular_name.step</code>.

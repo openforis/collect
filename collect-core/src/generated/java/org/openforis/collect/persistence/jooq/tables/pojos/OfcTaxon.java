@@ -22,16 +22,16 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcTaxon implements Serializable {
 
-	private static final long serialVersionUID = -270613182;
+	private static final long serialVersionUID = -1035424582;
 
-	private Integer id;
+	private Long    id;
 	private Integer taxonId;
 	private String  code;
 	private String  scientificName;
 	private String  taxonRank;
 	private Integer taxonomyId;
 	private Integer step;
-	private Integer parentId;
+	private Long    parentId;
 	private String  info01;
 	private String  info02;
 	private String  info03;
@@ -87,14 +87,14 @@ public class OfcTaxon implements Serializable {
 	}
 
 	public OfcTaxon(
-		Integer id,
+		Long    id,
 		Integer taxonId,
 		String  code,
 		String  scientificName,
 		String  taxonRank,
 		Integer taxonomyId,
 		Integer step,
-		Integer parentId,
+		Long    parentId,
 		String  info01,
 		String  info02,
 		String  info03,
@@ -146,11 +146,11 @@ public class OfcTaxon implements Serializable {
 		this.info20 = info20;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -202,11 +202,11 @@ public class OfcTaxon implements Serializable {
 		this.step = step;
 	}
 
-	public Integer getParentId() {
+	public Long getParentId() {
 		return this.parentId;
 	}
 
-	public void setParentId(Integer parentId) {
+	public void setParentId(Long parentId) {
 		this.parentId = parentId;
 	}
 

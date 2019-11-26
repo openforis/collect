@@ -24,20 +24,20 @@ import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSamplingDesignRecord extends UpdatableRecordImpl<OfcSamplingDesignRecord> {
 
-	private static final long serialVersionUID = -1557126570;
+	private static final long serialVersionUID = 1156753686;
 
 	/**
 	 * Setter for <code>collect.ofc_sampling_design.id</code>.
 	 */
-	public void setId(Integer value) {
+	public void setId(Long value) {
 		setValue(0, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_sampling_design.id</code>.
 	 */
-	public Integer getId() {
-		return (Integer) getValue(0);
+	public Long getId() {
+		return (Long) getValue(0);
 	}
 
 	/**
@@ -538,7 +538,7 @@ public class OfcSamplingDesignRecord extends UpdatableRecordImpl<OfcSamplingDesi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Record1<Integer> key() {
+	public Record1<Long> key() {
 		return (Record1) super.key();
 	}
 
@@ -556,7 +556,7 @@ public class OfcSamplingDesignRecord extends UpdatableRecordImpl<OfcSamplingDesi
 	/**
 	 * Create a detached, initialised OfcSamplingDesignRecord
 	 */
-	public OfcSamplingDesignRecord(Integer id, Integer surveyId, String level1, String level2, String level3, String location, String info1, String info2, String info3, String info4, String info5, String info6, String info7, String info8, String info9, String info10, String info11, String info12, String info13, String info14, String info15, String info16, String info17, String info18, String info19, String info20, String info21, String info22, String info23, String info24, String info25, String info26, String info27, String info28, String info29, String info30) {
+	public OfcSamplingDesignRecord(Long id, Integer surveyId, String level1, String level2, String level3, String location, String info1, String info2, String info3, String info4, String info5, String info6, String info7, String info8, String info9, String info10, String info11, String info12, String info13, String info14, String info15, String info16, String info17, String info18, String info19, String info20, String info21, String info22, String info23, String info24, String info25, String info26, String info27, String info28, String info29, String info30) {
 		super(OfcSamplingDesign.OFC_SAMPLING_DESIGN);
 
 		setValue(0, id);

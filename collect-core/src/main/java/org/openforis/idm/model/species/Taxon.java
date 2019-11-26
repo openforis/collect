@@ -125,9 +125,9 @@ public class Taxon {
 		
 	}
 	
-	private Integer systemId;
+	private Long systemId;
 	private Integer taxonId;
-	private Integer parentId;
+	private Long parentId;
 	private Integer taxonomyId;
 	private String code;
 	private String scientificName;
@@ -137,11 +137,11 @@ public class Taxon {
 	
 	private Taxonomy taxonomy;
 	
-	public Integer getSystemId() {
+	public Long getSystemId() {
 		return systemId;
 	}
 
-	public void setSystemId(Integer systemId) {
+	public void setSystemId(Long systemId) {
 		this.systemId = systemId;
 	}
 
@@ -193,11 +193,11 @@ public class Taxon {
 		this.step = step;
 	}
 
-	public Integer getParentId() {
+	public Long getParentId() {
 		return parentId;
 	}
 
-	public void setParentId(Integer parentId) {
+	public void setParentId(Long parentId) {
 		this.parentId = parentId;
 	}
 	

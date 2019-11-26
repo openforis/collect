@@ -28,8 +28,8 @@ public class TaxonSummary {
 	private static final String SYNONYM_VERNACULAR_LANG_CODE = "lat";
 	private static final String VERNACULAR_NAMES_SEPARATOR = ", ";
 
-	private int taxonSystemId;
-	private Integer parentSystemId;
+	private long taxonSystemId;
+	private Long parentSystemId;
 	private Integer taxonId;
 	private String code;
 	private String familyName;
@@ -148,19 +148,19 @@ public class TaxonSummary {
 		return infoByName;
 	}
 	
-	public int getTaxonSystemId() {
+	public long getTaxonSystemId() {
 		return taxonSystemId;
 	}
 	
-	public void setTaxonSystemId(int taxonSystemId) {
+	public void setTaxonSystemId(long taxonSystemId) {
 		this.taxonSystemId = taxonSystemId;
 	}
 	
-	public Integer getParentSystemId() {
+	public Long getParentSystemId() {
 		return parentSystemId;
 	}
 
-	public void setParentSystemId(Integer parentSystemId) {
+	public void setParentSystemId(Long parentSystemId) {
 		this.parentSystemId = parentSystemId;
 	}
 	

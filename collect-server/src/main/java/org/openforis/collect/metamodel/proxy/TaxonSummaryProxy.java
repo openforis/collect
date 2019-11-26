@@ -67,7 +67,7 @@ public class TaxonSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public int getTaxonSystemId() {
+	public long getTaxonSystemId() {
 		return summary.getTaxonSystemId();
 	}
 

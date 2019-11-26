@@ -22,13 +22,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcTaxonVernacularName implements Serializable {
 
-	private static final long serialVersionUID = -146267869;
+	private static final long serialVersionUID = -1653439725;
 
-	private Integer id;
+	private Long    id;
 	private String  vernacularName;
 	private String  languageCode;
 	private String  languageVariety;
-	private Integer taxonId;
+	private Long    taxonId;
 	private Integer step;
 	private String  qualifier1;
 	private String  qualifier2;
@@ -49,11 +49,11 @@ public class OfcTaxonVernacularName implements Serializable {
 	}
 
 	public OfcTaxonVernacularName(
-		Integer id,
+		Long    id,
 		String  vernacularName,
 		String  languageCode,
 		String  languageVariety,
-		Integer taxonId,
+		Long    taxonId,
 		Integer step,
 		String  qualifier1,
 		String  qualifier2,
@@ -70,11 +70,11 @@ public class OfcTaxonVernacularName implements Serializable {
 		this.qualifier3 = qualifier3;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -102,11 +102,11 @@ public class OfcTaxonVernacularName implements Serializable {
 		this.languageVariety = languageVariety;
 	}
 
-	public Integer getTaxonId() {
+	public Long getTaxonId() {
 		return this.taxonId;
 	}
 
-	public void setTaxonId(Integer taxonId) {
+	public void setTaxonId(Long taxonId) {
 		this.taxonId = taxonId;
 	}
 

@@ -253,7 +253,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 	
 	private Taxon testInsertAndLoadTaxon(CollectTaxonomy taxonomy, int taxonId, String code, String scientificName,
 			TaxonRank rank, int step, Taxon parent) {
-		Integer parentId = parent == null ? null : parent.getSystemId();
+		Long parentId = parent == null ? null : parent.getSystemId();
 		
 		// Insert
 		Taxon t = new Taxon();
@@ -280,7 +280,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 
 	
 	private Taxon testUpdateAndLoadTaxon(CollectTaxonomy taxonomy, Taxon t, String scientificName, TaxonRank rank, int step, Taxon parent) {
-		Integer parentId = parent == null ? null : parent.getSystemId();
+		Long parentId = parent == null ? null : parent.getSystemId();
 		
 		// Insert
 		t.setScientificName(scientificName);
@@ -322,7 +322,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 
 	private TaxonVernacularName testUpdateAndLoadVernacularName(TaxonVernacularName tvn, Taxon taxon1, String name, String lang, String variety, int step) {
 		// Insert
-		Integer id = tvn.getId();
+		Long id = tvn.getId();
 		tvn.setVernacularName(name);
 		tvn.setLanguageCode(lang);
 		tvn.setLanguageVariety(variety);

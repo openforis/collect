@@ -32,7 +32,7 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  * @author E. Wibowo
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Integer, TaxonVernacularName, TaxonVernacularNameDao.TaxonVernacularNameDSLContext> {
+public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Long, TaxonVernacularName, TaxonVernacularNameDao.TaxonVernacularNameDSLContext> {
 	
 	private static final TableField[] QUALIFIER_FIELDS = {OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, OFC_TAXON_VERNACULAR_NAME.QUALIFIER2, OFC_TAXON_VERNACULAR_NAME.QUALIFIER3};
 
@@ -83,12 +83,12 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Integer, Taxon
 		return entities;
 	}
 
-	public List<TaxonVernacularName> findByTaxon(int taxonId) {
+	public List<TaxonVernacularName> findByTaxon(long taxonSystemId) {
 		TaxonVernacularNameDSLContext dsl = dsl();
 		
 		SelectConditionStep selectConditionStep = dsl.select(OFC_TAXON_VERNACULAR_NAME.fields())
 			.from(OFC_TAXON_VERNACULAR_NAME)
-			.where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.equal(taxonId));
+			.where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.equal(taxonSystemId));
 		
 		Result<?> result = selectConditionStep.fetch();
 		List<TaxonVernacularName> entities = dsl.fromResult(result);
@@ -110,8 +110,8 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Integer, Taxon
 	public void insert(List<TaxonVernacularName> items) {
 		if ( items != null && ! items.isEmpty() ) {
 			TaxonVernacularNameDSLContext dsl = dsl();
-			int id = dsl.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
-			int maxId = id;
+			long id = dsl.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
+			long maxId = id;
 			Insert<OfcTaxonVernacularNameRecord> query = dsl.createInsertStatement();
 			BatchBindStep batch = dsl.batch(query);
 			for (TaxonVernacularName item : items) {
@@ -128,11 +128,11 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Integer, Taxon
 	}
 
 	public void duplicateVernacularNames(int oldTaxonomyId,
-			int taxonIdGap) {
+			long taxonIdGap) {
 		TaxonVernacularNameDSLContext dsl = dsl();
-		int nextId = dsl.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
-		int minId = loadMinId(dsl, oldTaxonomyId);
-		int idGap = nextId - minId;
+		long nextId = dsl.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
+		long minId = loadMinId(dsl, oldTaxonomyId);
+		long idGap = nextId - minId;
 		Field<?>[] selectFields = {
 				OFC_TAXON_VERNACULAR_NAME.ID.add(idGap),
 				OFC_TAXON_VERNACULAR_NAME.TAXON_ID.add(taxonIdGap),
@@ -153,21 +153,21 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Integer, Taxon
 		dsl.restartSequence(OFC_TAXON_VERNACULAR_NAME_ID_SEQ, nextId);
 	}
 	
-	protected int loadMinId(TaxonVernacularNameDSLContext jf, int taxonomyId) {
-		Integer minId = jf.select(DSL.min(OFC_TAXON_VERNACULAR_NAME.ID))
+	protected long loadMinId(TaxonVernacularNameDSLContext jf, int taxonomyId) {
+		Long minId = jf.select(DSL.min(OFC_TAXON_VERNACULAR_NAME.ID))
 				.from(OFC_TAXON_VERNACULAR_NAME)
 					.join(OFC_TAXON)
 					.on(OFC_TAXON.ID.equal(OFC_TAXON_VERNACULAR_NAME.TAXON_ID))
 				.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId))
-				.fetchOne(0, Integer.class);
-		return minId == null ? 0: minId.intValue();
+				.fetchOne(0, Long.class);
+		return minId == null ? 0: minId.longValue();
 	}
 
-	public int nextId() {
+	public long nextId() {
 		return dsl().nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
 	}
 
-	protected static class TaxonVernacularNameDSLContext extends MappingDSLContext<Integer, TaxonVernacularName> {
+	protected static class TaxonVernacularNameDSLContext extends MappingDSLContext<Long, TaxonVernacularName> {
 
 		private static final long serialVersionUID = 1L;
 
@@ -239,12 +239,12 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Integer, Taxon
 		}
 
 		@Override
-		protected void setId(TaxonVernacularName t, Integer id) {
+		protected void setId(TaxonVernacularName t, Long id) {
 			t.setId(id);
 		}
 
 		@Override
-		protected Integer getId(TaxonVernacularName t) {
+		protected Long getId(TaxonVernacularName t) {
 			return t.getId();
 		}
 	}

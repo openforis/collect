@@ -39,7 +39,7 @@ public class SamplingDesignItemProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
-	public Integer getId() {
+	public Long getId() {
 		return item.getId();
 	}
 

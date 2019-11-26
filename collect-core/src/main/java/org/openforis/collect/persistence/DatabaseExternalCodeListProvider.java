@@ -169,7 +169,8 @@ public class DatabaseExternalCodeListProvider implements
 			String ancestorLevelName = list.getHierarchy().get(ancestorLevelIndex).getName();
 			parentKeyByLevel.put(ancestorLevelName, samplingDesignItem.getLevelCode(ancestorLevelIndex + 1));
 		}
-		ExternalCodeListItem item = new ExternalCodeListItem(list, samplingDesignItem.getId(), parentKeyByLevel, level);
+		int id = Long.valueOf(samplingDesignItem.getId()).intValue();
+		ExternalCodeListItem item = new ExternalCodeListItem(list, id, parentKeyByLevel, level);
 		item.setCode(samplingDesignItem.getLevelCode(level));
 		return item;
 	}

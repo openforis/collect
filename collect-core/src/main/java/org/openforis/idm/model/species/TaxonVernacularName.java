@@ -12,19 +12,19 @@ import org.openforis.commons.collection.CollectionUtils;
  */
 public class TaxonVernacularName {
 
-	private Integer id;
+	private Long id;
 	private String vernacularName;
 	private String languageCode;
 	private String languageVariety;
-	private Integer taxonSystemId;
+	private Long taxonSystemId;
 	private int step;
 	private List<String> qualifiers;
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -52,11 +52,11 @@ public class TaxonVernacularName {
 		this.languageVariety = languageVariety;
 	}
 
-	public Integer getTaxonSystemId() {
+	public Long getTaxonSystemId() {
 		return taxonSystemId;
 	}
 
-	public void setTaxonSystemId(Integer taxonId) {
+	public void setTaxonSystemId(Long taxonId) {
 		this.taxonSystemId = taxonId;
 	}
 

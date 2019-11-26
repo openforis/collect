@@ -22,9 +22,9 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSamplingDesign implements Serializable {
 
-	private static final long serialVersionUID = -1096487517;
+	private static final long serialVersionUID = -1769582769;
 
-	private Integer id;
+	private Long    id;
 	private Integer surveyId;
 	private String  level1;
 	private String  level2;
@@ -103,7 +103,7 @@ public class OfcSamplingDesign implements Serializable {
 	}
 
 	public OfcSamplingDesign(
-		Integer id,
+		Long    id,
 		Integer surveyId,
 		String  level1,
 		String  level2,
@@ -178,11 +178,11 @@ public class OfcSamplingDesign implements Serializable {
 		this.info30 = info30;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

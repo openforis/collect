@@ -13,8 +13,8 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  */
 public class SpeciesBackupLine extends ReferenceDataLine {
 	
-	private Integer Id;
-	private Integer parentId;
+	private Long Id;
+	private Long parentId;
 	private TaxonRank rank;
 	private Integer no;
 	private String code;
@@ -29,19 +29,19 @@ public class SpeciesBackupLine extends ReferenceDataLine {
 		}
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return Id;
 	}
 	
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		Id = id;
 	}
 	
-	public Integer getParentId() {
+	public Long getParentId() {
 		return parentId;
 	}
 	
-	public void setParentId(Integer parentId) {
+	public void setParentId(Long parentId) {
 		this.parentId = parentId;
 	}
 	

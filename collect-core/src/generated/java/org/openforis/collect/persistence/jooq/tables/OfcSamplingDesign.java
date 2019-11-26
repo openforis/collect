@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRe
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSamplingDesign extends TableImpl<OfcSamplingDesignRecord> {
 
-	private static final long serialVersionUID = -1731276809;
+	private static final long serialVersionUID = -1796393990;
 
 	/**
 	 * The reference instance of <code>collect.ofc_sampling_design</code>
@@ -51,7 +51,7 @@ public class OfcSamplingDesign extends TableImpl<OfcSamplingDesignRecord> {
 	/**
 	 * The column <code>collect.ofc_sampling_design.id</code>.
 	 */
-	public final TableField<OfcSamplingDesignRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<OfcSamplingDesignRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_sampling_design.survey_id</code>.

@@ -222,8 +222,8 @@ public class SpeciesManager {
 		}
 		final List<Taxon> taxonInsertBuffer = new ArrayList<Taxon>();
 		final List<TaxonVernacularName> taxonVernacularNameInsertBuffer = new ArrayList<TaxonVernacularName>();
-		int nextTaxonId = taxonDao.nextId(taxonomy);
-		int nextTaxonVernacularNameId = taxonVernacularNameDao.nextId();
+		long nextTaxonId = taxonDao.nextId(taxonomy);
+		long nextTaxonVernacularNameId = taxonVernacularNameDao.nextId();
 		tree.assignSystemIds(nextTaxonId, nextTaxonVernacularNameId);
 		tree.depthFirstVisit(new TaxonTree.NodeVisitor() {
 			public void visit(Node node) {
@@ -315,7 +315,7 @@ public class SpeciesManager {
 	}
 
 	protected void copyTaxons(CollectTaxonomy oldTaxonomy, CollectTaxonomy newTaxonomy) {
-		int taxonIdShift = taxonDao.duplicateTaxons(oldTaxonomy, newTaxonomy);
+		long taxonIdShift = taxonDao.duplicateTaxons(oldTaxonomy, newTaxonomy);
 		taxonVernacularNameDao.duplicateVernacularNames(oldTaxonomy.getId(), taxonIdShift);
 	}
 	
@@ -349,10 +349,10 @@ public class SpeciesManager {
 			TaxonomyDefinition taxonDefinition = taxonomy.getSurvey().getReferenceDataSchema().getTaxonomyDefinition(taxonomyName);
 			List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(taxonomy);
 			tree = new TaxonTree(taxonDefinition);
-			Map<Integer, Taxon> idToTaxon = new HashMap<Integer, Taxon>();
+			Map<Long, Taxon> idToTaxon = new HashMap<Long, Taxon>();
 			for (Taxon taxon : taxons) {
-				Integer systemId = taxon.getSystemId();
-				Integer parentId = taxon.getParentId();
+				Long systemId = taxon.getSystemId();
+				Long parentId = taxon.getParentId();
 				Taxon parent = parentId == null ? null: idToTaxon.get(parentId);
 				Node newNode = tree.addNode(parent, taxon);
 				List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(systemId);
@@ -402,7 +402,7 @@ public class SpeciesManager {
 		return result;
 	}
 
-	private void includeUniqueVernacularNameIfAny(int taxonSystemId, TaxonOccurrence o) {
+	private void includeUniqueVernacularNameIfAny(long taxonSystemId, TaxonOccurrence o) {
 		List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonSystemId);
 		if (vernacularNames.size() == 1) {
 			TaxonVernacularName vernacularName = vernacularNames.get(0);

@@ -4,7 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-	<changeSet author="admin" id="standard-0001-code-list-id">
+	<changeSet author="admin" id="standard-0001-code-list-sampling-design-taxon-id-bigint">
 		<modifyDataType
 			tableName="ofc_code_list" 
 			columnName="id" 
@@ -13,6 +13,31 @@
 		 <modifyDataType
 			tableName="ofc_code_list" 
 			columnName="parent_id" 
+			newDataType="bigint"
+		 />
+		<modifyDataType
+			tableName="ofc_sampling_design" 
+			columnName="id" 
+			newDataType="bigint"
+		 />
+		 <modifyDataType
+			tableName="ofc_taxon" 
+			columnName="id" 
+			newDataType="bigint"
+		 />
+		 <modifyDataType
+			tableName="ofc_taxon" 
+			columnName="parent_id" 
+			newDataType="bigint"
+		 />
+		 <modifyDataType
+			tableName="ofc_taxon_vernacular_name" 
+			columnName="id" 
+			newDataType="bigint"
+		 />
+		 <modifyDataType
+			tableName="ofc_taxon_vernacular_name" 
+			columnName="taxon_id" 
 			newDataType="bigint"
 		 />
 	</changeSet>

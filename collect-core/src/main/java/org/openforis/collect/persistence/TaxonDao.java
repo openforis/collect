@@ -35,7 +35,7 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  * @author G. Miceli
  * @author S. Ricci
  */
-public class TaxonDao extends MappingJooqDaoSupport<Integer, Taxon, TaxonDao.TaxonDSLContext> {
+public class TaxonDao extends MappingJooqDaoSupport<Long, Taxon, TaxonDao.TaxonDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
 	private static Field[] GENERIC_FIELDS = {
@@ -78,12 +78,12 @@ public class TaxonDao extends MappingJooqDaoSupport<Integer, Taxon, TaxonDao.Tax
 		super(TaxonDao.TaxonDSLContext.class);
 	}
 
-	public Taxon loadById(CollectTaxonomy taxonomy, int taxonId) {
-		return super.loadById(dsl(taxonomy), taxonId);
+	public Taxon loadById(CollectTaxonomy taxonomy, long taxonSystemId) {
+		return super.loadById(dsl(taxonomy), taxonSystemId);
 	}
 
 	@Override
-	public Taxon loadById(Integer id) {
+	public Taxon loadById(Long id) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -169,8 +169,8 @@ public class TaxonDao extends MappingJooqDaoSupport<Integer, Taxon, TaxonDao.Tax
 	public void insert(CollectTaxonomy taxonomy, List<Taxon> items) {
 		if ( items != null && ! items.isEmpty() ) {
 			TaxonDSLContext dsl = dsl(taxonomy);
-			int id = dsl.nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
-			int maxId = id;
+			long id = dsl.nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
+			long maxId = id;
 			Insert<OfcTaxonRecord> query = dsl.createInsertStatement();
 			BatchBindStep batch = dsl.batch(query);
 			for (Taxon item : items) {
@@ -186,11 +186,11 @@ public class TaxonDao extends MappingJooqDaoSupport<Integer, Taxon, TaxonDao.Tax
 		}
 	}
 
-	public int duplicateTaxons(CollectTaxonomy oldTaxonomy, CollectTaxonomy newTaxonomy) {
+	public long duplicateTaxons(CollectTaxonomy oldTaxonomy, CollectTaxonomy newTaxonomy) {
 		TaxonDSLContext dsl = dsl(oldTaxonomy);
-		int nextId = dsl.nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
-		int minId = loadMinId(dsl, oldTaxonomy.getId());
-		int idShift = nextId - minId;
+		long nextId = dsl.nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
+		long minId = loadMinId(dsl, oldTaxonomy.getId());
+		long idShift = nextId - minId;
 		
 		List<Field<?>> selectFields = new ArrayList<Field<?>>();
 		selectFields.addAll(Arrays.<Field<?>>asList(
@@ -217,15 +217,15 @@ public class TaxonDao extends MappingJooqDaoSupport<Integer, Taxon, TaxonDao.Tax
 		return idShift;
 	}
 	
-	protected int loadMinId(TaxonDSLContext jf, int taxonomyId) {
-		Integer minId = jf.select(DSL.min(OFC_TAXON.ID))
+	protected long loadMinId(TaxonDSLContext jf, int taxonomyId) {
+		Long minId = jf.select(DSL.min(OFC_TAXON.ID))
 				.from(OFC_TAXON)
 				.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId))
-				.fetchOne(0, Integer.class);
-		return minId == null ? 0: minId.intValue();
+				.fetchOne(0, Long.class);
+		return minId == null ? 0: minId.longValue();
 	}
 
-	public int nextId(CollectTaxonomy taxonomy) {
+	public long nextId(CollectTaxonomy taxonomy) {
 		return dsl(taxonomy).nextId(OFC_TAXON.ID, OFC_TAXON_ID_SEQ);
 	}
 	
@@ -238,7 +238,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Integer, Taxon, TaxonDao.Tax
 		return new TaxonDSLContext(getConfiguration(), taxonomy);
 	}
 
-	protected static class TaxonDSLContext extends MappingDSLContext<Integer, Taxon> {
+	protected static class TaxonDSLContext extends MappingDSLContext<Long, Taxon> {
 
 		private static final long serialVersionUID = 1L;
 		private CollectTaxonomy taxonomy;
@@ -309,12 +309,12 @@ public class TaxonDao extends MappingJooqDaoSupport<Integer, Taxon, TaxonDao.Tax
 		}
 
 		@Override
-		protected void setId(Taxon t, Integer id) {
+		protected void setId(Taxon t, Long id) {
 			t.setSystemId(id);
 		}
 
 		@Override
-		protected Integer getId(Taxon t) {
+		protected Long getId(Taxon t) {
 			return t.getSystemId();
 		}
 	}

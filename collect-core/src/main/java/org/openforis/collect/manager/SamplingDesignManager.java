@@ -30,7 +30,7 @@ public class SamplingDesignManager {
 	@Autowired
 	private SamplingDesignDao samplingDesignDao;
 
-	public SamplingDesignItem loadById(int id) {
+	public SamplingDesignItem loadById(long id) {
 		return samplingDesignDao.loadById(id);
 	}
 
@@ -101,8 +101,7 @@ public class SamplingDesignManager {
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)
 	public void delete(SamplingDesignItem item) {
-		Integer id = item.getId();
-		samplingDesignDao.delete(id);
+		samplingDesignDao.delete(item.getId());
 	}
 	
 	@Transactional(readOnly=false, propagation=REQUIRED)

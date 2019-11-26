@@ -217,7 +217,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		}
 		{
 			Taxon taxon = findTaxonByCode("ALB/ADI");
-			Integer taxonId = taxon.getSystemId();
+			Long taxonId = taxon.getSystemId();
 			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
 			assertTrue(contains(vernacularNames, "ksb", "Mchao"));
 			assertTrue(contains(vernacularNames, "ksb", "Mkengemshaa"));
@@ -231,7 +231,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		{
 			Taxon taxon = findTaxonByCode("BOU/PET");
 			assertEquals("Bourreria petiolaris", taxon.getScientificName());
-			Integer taxonId = taxon.getSystemId();
+			Long taxonId = taxon.getSystemId();
 			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
 			assertEquals(1, vernacularNames.size());
 			assertTrue(contains(vernacularNames, "swh", "Mpanda jongoo"));
@@ -239,7 +239,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		{
 			Taxon taxon = findTaxonByCode("BOM/RHO");
 			assertEquals("Bombax rhodognaphalon", taxon.getScientificName());
-			Integer taxonId = taxon.getSystemId();
+			Long taxonId = taxon.getSystemId();
 			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(taxonId);
 			assertEquals(1, vernacularNames.size());
 			assertTrue(contains(vernacularNames, "swh", "Msufi mwitu"));
@@ -257,7 +257,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertNotNull(variety);
 			assertEquals(VARIETY, variety.getTaxonRank());
 			
-			Integer speciesId = variety.getParentId();
+			Long speciesId = variety.getParentId();
 			assertNotNull(speciesId);
 			Taxon species = taxonDao.loadById(taxonomy, speciesId);
 			assertNotNull(species);
@@ -265,7 +265,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertEquals(SPECIES, species.getTaxonRank());
 			assertEquals("Albizia schimperiana", species.getScientificName());
 			
-			Integer genusId = species.getParentId();
+			Long genusId = species.getParentId();
 			assertNotNull(genusId);
 			Taxon genus = taxonDao.loadById(taxonomy, genusId);
 			assertNotNull(genus);
@@ -273,7 +273,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertEquals(GENUS, genus.getTaxonRank());
 			assertEquals("Albizia sp.", genus.getScientificName());
 			
-			Integer familyId = genus.getParentId();
+			Long familyId = genus.getParentId();
 			assertNotNull(familyId);
 			Taxon family = taxonDao.loadById(taxonomy, familyId);
 			assertNotNull(family);
@@ -286,7 +286,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertNotNull(subspecies);
 			assertEquals(SUBSPECIES, subspecies.getTaxonRank());
 			
-			Integer speciesId = subspecies.getParentId();
+			Long speciesId = subspecies.getParentId();
 			assertNotNull(speciesId);
 			Taxon species = taxonDao.loadById(taxonomy, speciesId);
 			assertNotNull(species);

@@ -13,7 +13,7 @@ import org.openforis.idm.model.Coordinate;
  */
 public class SamplingDesignItem {
 
-	private Integer id;
+	private Long id;
 	private Integer surveyId;
 	private List<String> levelCodes = new ArrayList<String>();
 	private String srsId;
@@ -47,11 +47,11 @@ public class SamplingDesignItem {
 		this.srsId = c.getSrsId();
 	}
 	
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	

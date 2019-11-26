@@ -14,11 +14,10 @@ import org.openforis.commons.collection.CollectionUtils;
  * @author S. Ricci
  *
  */
-public class ExternalCodeListItem extends CodeListItem {
+public class ExternalCodeListItem extends PersistedCodeListItem {
 
 	private static final long serialVersionUID = 1L;
 
-	private Integer systemId;
 	private Map<String, String> parentKeyByLevel;
 	
 	public ExternalCodeListItem(CodeList codeList, int itemId, int level) {
@@ -68,14 +67,6 @@ public class ExternalCodeListItem extends CodeListItem {
 		}
 	}
 
-	public Integer getSystemId() {
-		return systemId;
-	}
-
-	public void setSystemId(Integer systemId) {
-		this.systemId = systemId;
-	}
-
 	@Override
 	public boolean deepEquals(Object obj) {
 		if (this == obj)
@@ -89,11 +80,6 @@ public class ExternalCodeListItem extends CodeListItem {
 			if (other.parentKeyByLevel != null)
 				return false;
 		} else if (!parentKeyByLevel.equals(other.parentKeyByLevel))
-			return false;
-		if (systemId == null) {
-			if (other.systemId != null)
-				return false;
-		} else if (!systemId.equals(other.systemId))
 			return false;
 		return true;
 	}

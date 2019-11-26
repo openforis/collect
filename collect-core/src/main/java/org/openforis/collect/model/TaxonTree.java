@@ -36,10 +36,10 @@ public class TaxonTree {
 	Map<String, Node> scientificNameToNode;
 	Map<String, Node> codeToNode;
 	Map<Integer, Node> taxonIdToNode;
-	Map<Integer, Node> systemIdToNode;
+	Map<Long, Node> systemIdToNode;
 	Set<String> vernacularLanguageCodes;
-	Integer lastTaxonId;
-	Integer lastTaxonVernacularNameId;
+	Long lastTaxonId;
+	Long lastTaxonVernacularNameId;
 
 	public TaxonTree(TaxonomyDefinition taxonDefinition) {
 		super();
@@ -48,7 +48,7 @@ public class TaxonTree {
 		scientificNameToNode = new HashMap<String, TaxonTree.Node>();
 		codeToNode = new HashMap<String, TaxonTree.Node>();
 		taxonIdToNode = new HashMap<Integer, TaxonTree.Node>();
-		systemIdToNode = new HashMap<Integer, TaxonTree.Node>();
+		systemIdToNode = new HashMap<Long, TaxonTree.Node>();
 	}
 	
 	public List<Node> getRoots() {
@@ -239,7 +239,7 @@ public class TaxonTree {
 		if ( taxonId != null ) {
 			taxonIdToNode.put(taxonId, node);
 		}
-		Integer systemId = taxon.getSystemId();
+		Long systemId = taxon.getSystemId();
 		if ( systemId != null ) {
 			systemIdToNode.put(systemId, node);
 		}
@@ -267,7 +267,7 @@ public class TaxonTree {
 		return foundNode;
 	}
 	
-	public Node getNodeBySystemId(Integer id) {
+	public Node getNodeBySystemId(Long id) {
 		Node foundNode = systemIdToNode.get(id);
 		return foundNode;
 	}
@@ -369,7 +369,7 @@ public class TaxonTree {
 		return CollectionUtils.unmodifiableSet(vernacularLanguageCodes);
 	}
 	
-	public void assignSystemIds(int startFromTaxonId, int startFromVernacularNameId) {
+	public void assignSystemIds(long startFromTaxonId, long startFromVernacularNameId) {
 		lastTaxonId = startFromTaxonId;
 		lastTaxonVernacularNameId = startFromVernacularNameId;
 		depthFirstVisit(new NodeVisitor() {

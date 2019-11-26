@@ -36,7 +36,7 @@ import org.openforis.idm.model.Coordinate;
 /**
  * @author S. Ricci
  */
-public class SamplingDesignDao extends MappingJooqDaoSupport<Integer, SamplingDesignItem, SamplingDesignDao.SamplingDesignDSLContext> {
+public class SamplingDesignDao extends MappingJooqDaoSupport<Long, SamplingDesignItem, SamplingDesignDao.SamplingDesignDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
 	private static final TableField[] BASE_FIELDS = {
@@ -216,8 +216,8 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Integer, SamplingDe
 	public void insert(List<SamplingDesignItem> items) {
 		if ( items != null && ! items.isEmpty() ) {
 			SamplingDesignDSLContext dsl = dsl();
-			int id = dsl.nextId(OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ);
-			int maxId = id;
+			long id = dsl.nextId(OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ);
+			long maxId = id;
 			Insert<OfcSamplingDesignRecord> query = dsl.createInsertStatement();
 			BatchBindStep batch = dsl.batch(query);
 			for (SamplingDesignItem item : items) {
@@ -235,9 +235,9 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Integer, SamplingDe
 	
 	public void copyItems(int oldSurveyId, int newSurveyId) {
 		SamplingDesignDSLContext dsl = dsl();
-		int minId = loadMinId(dsl, oldSurveyId);
-		int nextId = dsl.nextId(OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ);
-		int idGap = nextId - minId;
+		long minId = loadMinId(dsl, oldSurveyId);
+		long nextId = dsl.nextId(OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ);
+		long idGap = nextId - minId;
 		Field<?>[] selectFields = {
 				OFC_SAMPLING_DESIGN.ID.add(idGap),
 				DSL.val(newSurveyId, OFC_SAMPLING_DESIGN.SURVEY_ID),
@@ -257,12 +257,12 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Integer, SamplingDe
 		dsl.restartSequence(OFC_SAMPLING_DESIGN_ID_SEQ, nextId);
 	}
 	
-	protected int loadMinId(SamplingDesignDSLContext jf, int surveyId) {
-		Integer minId = jf.select(DSL.min(OFC_SAMPLING_DESIGN.ID))
+	protected long loadMinId(SamplingDesignDSLContext jf, int surveyId) {
+		Long minId = jf.select(DSL.min(OFC_SAMPLING_DESIGN.ID))
 				.from(OFC_SAMPLING_DESIGN)
 				.where(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId))
-				.fetchOne(0, Integer.class);
-		return minId == null ? 0: minId.intValue();
+				.fetchOne(0, Long.class);
+		return minId == null ? 0: minId.longValue();
 	}
 
 	public void moveItems(int fromSurveyId, int toSurveyId) {
@@ -281,7 +281,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Integer, SamplingDe
 		}
 	}
 
-	protected static class SamplingDesignDSLContext extends MappingDSLContext<Integer, SamplingDesignItem> {
+	protected static class SamplingDesignDSLContext extends MappingDSLContext<Long, SamplingDesignItem> {
 
 		private static final long serialVersionUID = 1L;
 
@@ -347,12 +347,12 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Integer, SamplingDe
 		}
 
 		@Override
-		protected void setId(SamplingDesignItem t, Integer id) {
+		protected void setId(SamplingDesignItem t, Long id) {
 			t.setId(id);
 		}
 
 		@Override
-		protected Integer getId(SamplingDesignItem t) {
+		protected Long getId(SamplingDesignItem t) {
 			return t.getId();
 		}
 		

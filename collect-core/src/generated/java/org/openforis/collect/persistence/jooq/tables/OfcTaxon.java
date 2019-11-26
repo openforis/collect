@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcTaxon extends TableImpl<OfcTaxonRecord> {
 
-	private static final long serialVersionUID = 864863638;
+	private static final long serialVersionUID = -1356966154;
 
 	/**
 	 * The reference instance of <code>collect.ofc_taxon</code>
@@ -51,7 +51,7 @@ public class OfcTaxon extends TableImpl<OfcTaxonRecord> {
 	/**
 	 * The column <code>collect.ofc_taxon.id</code>.
 	 */
-	public final TableField<OfcTaxonRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<OfcTaxonRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_taxon.taxon_id</code>.
@@ -86,7 +86,7 @@ public class OfcTaxon extends TableImpl<OfcTaxonRecord> {
 	/**
 	 * The column <code>collect.ofc_taxon.parent_id</code>.
 	 */
-	public final TableField<OfcTaxonRecord, Integer> PARENT_ID = createField("parent_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<OfcTaxonRecord, Long> PARENT_ID = createField("parent_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
 	/**
 	 * The column <code>collect.ofc_taxon.info01</code>.

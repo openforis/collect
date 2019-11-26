@@ -24,20 +24,20 @@ import org.openforis.collect.persistence.jooq.tables.OfcTaxon;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcTaxonRecord extends UpdatableRecordImpl<OfcTaxonRecord> {
 
-	private static final long serialVersionUID = 265450045;
+	private static final long serialVersionUID = -987566403;
 
 	/**
 	 * Setter for <code>collect.ofc_taxon.id</code>.
 	 */
-	public void setId(Integer value) {
+	public void setId(Long value) {
 		setValue(0, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_taxon.id</code>.
 	 */
-	public Integer getId() {
-		return (Integer) getValue(0);
+	public Long getId() {
+		return (Long) getValue(0);
 	}
 
 	/**
@@ -127,15 +127,15 @@ public class OfcTaxonRecord extends UpdatableRecordImpl<OfcTaxonRecord> {
 	/**
 	 * Setter for <code>collect.ofc_taxon.parent_id</code>.
 	 */
-	public void setParentId(Integer value) {
+	public void setParentId(Long value) {
 		setValue(7, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_taxon.parent_id</code>.
 	 */
-	public Integer getParentId() {
-		return (Integer) getValue(7);
+	public Long getParentId() {
+		return (Long) getValue(7);
 	}
 
 	/**
@@ -426,7 +426,7 @@ public class OfcTaxonRecord extends UpdatableRecordImpl<OfcTaxonRecord> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Record1<Integer> key() {
+	public Record1<Long> key() {
 		return (Record1) super.key();
 	}
 
@@ -444,7 +444,7 @@ public class OfcTaxonRecord extends UpdatableRecordImpl<OfcTaxonRecord> {
 	/**
 	 * Create a detached, initialised OfcTaxonRecord
 	 */
-	public OfcTaxonRecord(Integer id, Integer taxonId, String code, String scientificName, String taxonRank, Integer taxonomyId, Integer step, Integer parentId, String info01, String info02, String info03, String info04, String info05, String info06, String info07, String info08, String info09, String info10, String info11, String info12, String info13, String info14, String info15, String info16, String info17, String info18, String info19, String info20) {
+	public OfcTaxonRecord(Long id, Integer taxonId, String code, String scientificName, String taxonRank, Integer taxonomyId, Integer step, Long parentId, String info01, String info02, String info03, String info04, String info05, String info06, String info07, String info08, String info09, String info10, String info11, String info12, String info13, String info14, String info15, String info16, String info17, String info18, String info19, String info20) {
 		super(OfcTaxon.OFC_TAXON);
 
 		setValue(0, id);
