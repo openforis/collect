@@ -40,5 +40,4 @@
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20180912.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20181212.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20190117.xml" />
-  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20191126.xml" />
 </databaseChangeLog>
