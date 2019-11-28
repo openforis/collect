@@ -685,12 +685,12 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 		}
 	}
 	
-	protected int loadMinId(JooqDSLContext jf, int surveyId) {
-		Integer result = jf.select(DSL.min(OFC_CODE_LIST.ID))
+	protected long loadMinId(JooqDSLContext jf, int surveyId) {
+		Long result = jf.select(DSL.min(OFC_CODE_LIST.ID))
 				.from(OFC_CODE_LIST)
 				.where(OFC_CODE_LIST.SURVEY_ID.equal(surveyId))
-				.fetchOne(0, Integer.class);
-		return result == null ? 0: result.intValue();
+				.fetchOne(0, Long.class);
+		return result == null ? 0: result.longValue();
 	}
 
 	protected long loadMaxId(JooqDSLContext jf) {
