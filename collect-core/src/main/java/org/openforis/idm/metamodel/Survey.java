@@ -82,7 +82,6 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	}
 
 	private void initSchemaDefinitions() {
-		Schema schema = getSchema();
 		if ( schema != null ) {
 			for (EntityDefinition entityDefinition : schema.getRootEntityDefinitions()) {
 				entityDefinition.traverse(new NodeDefinitionVisitor() {
@@ -695,7 +694,6 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	public Set<NodePathPointer> getRelatedCodeSources(CodeAttributeDefinition definition) {
 		return getSurveyDependencies().getRelatedCodeSources(definition);
 	}
-	
 	
 	public void refreshSurveyDependencies() {
 		surveyDependencies = new SurveyDependencies(this);
