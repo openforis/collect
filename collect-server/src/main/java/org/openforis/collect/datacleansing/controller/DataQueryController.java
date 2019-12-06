@@ -29,6 +29,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.utils.Controllers;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.commons.web.Forms;
@@ -137,7 +138,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 //		File file = csvExportItemProcessor.getOutputFile();
 		File file = exportJob.getOutputFile();
-		Controllers.writeFileToResponse(response, file, "collect-query.csv", Controllers.CSV_CONTENT_TYPE);
+		Controllers.writeFileToResponse(response, file, "collect-query.csv", MediaTypes.CSV_CONTENT_TYPE);
 	}
 	
 	@RequestMapping(value = "test-result.json", method = RequestMethod.GET)

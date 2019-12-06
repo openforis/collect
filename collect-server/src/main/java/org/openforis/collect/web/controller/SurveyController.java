@@ -54,6 +54,7 @@ import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.SurveyController.SurveyCloneParameters.SurveyType;
 import org.openforis.collect.web.service.SurveyService;
@@ -519,7 +520,7 @@ public class SurveyController extends BasicController {
 				}
 			}
 			String fileName = String.format("%s_%s.%s", projectName, Dates.formatCompactDateTime(survey.getModifiedDate()), outputFileExtension);
-			Controllers.writeFileToResponse(response, outputFile, fileName, Controllers.ZIP_CONTENT_TYPE);
+			Controllers.writeFileToResponse(response, outputFile, fileName, MediaTypes.ZIP_CONTENT_TYPE);
 		}
 	}
 	

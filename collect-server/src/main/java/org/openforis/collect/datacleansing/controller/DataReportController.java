@@ -33,6 +33,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.PaginatedResponse;
@@ -134,7 +135,7 @@ public class DataReportController extends AbstractSurveyObjectEditFormController
 		String outputFileName = String.format(DATA_REPORT_CSV_FILE_NAME_FORMAT, 
 				report.getQueryGroup().getTitle(), 
 				Dates.formatDate(report.getCreationDate()));
-		Controllers.writeFileToResponse(response, file, outputFileName, Controllers.CSV_CONTENT_TYPE);
+		Controllers.writeFileToResponse(response, file, outputFileName, MediaTypes.CSV_CONTENT_TYPE);
 	}
 	
 	@RequestMapping(value="{reportId}/items.json", method=GET)

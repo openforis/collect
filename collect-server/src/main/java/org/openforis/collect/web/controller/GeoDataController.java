@@ -1,6 +1,5 @@
 package org.openforis.collect.web.controller;
 
-import static org.openforis.collect.utils.Controllers.KML_CONTENT_TYPE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeProcessor;
 import org.openforis.collect.model.RecordCoordinatesKmlGeneratorJob;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
@@ -94,7 +94,7 @@ public class GeoDataController {
 		return result;
 	}
 
-	@RequestMapping(value = "survey/{surveyId}/data/coordinatesvalues.kml", method=GET, produces=KML_CONTENT_TYPE)
+	@RequestMapping(value = "survey/{surveyId}/data/coordinatesvalues.kml", method=GET, produces=MediaTypes.KML_CONTENT_TYPE)
 	public void createCoordinateValuesKML(
 			@PathVariable("surveyId") int surveyId, 
 			@RequestParam int stepNum,

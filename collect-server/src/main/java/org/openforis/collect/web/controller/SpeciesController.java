@@ -9,6 +9,8 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.species.SpeciesExportProcess;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.Controllers;
+import org.openforis.collect.utils.MediaTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +32,7 @@ public class SpeciesController {
 	public @ResponseBody String exportSpecies(HttpServletResponse response,
 			@PathVariable("surveyId") Integer surveyId,
 			@PathVariable("taxonomyId") Integer taxonomyId) throws IOException {
-		response.setHeader("Content-Disposition", "attachment; filename=" + SPECIES_LIST_CSV_FILE_NAME);
-		response.setContentType("text/csv"); 
+		Controllers.setOutputContent(response, SPECIES_LIST_CSV_FILE_NAME, MediaTypes.CSV_CONTENT_TYPE);
 		ServletOutputStream out = response.getOutputStream();
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		SpeciesExportProcess process = new SpeciesExportProcess(speciesManager);

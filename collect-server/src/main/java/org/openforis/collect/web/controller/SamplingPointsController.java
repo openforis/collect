@@ -1,7 +1,5 @@
 package org.openforis.collect.web.controller;
 
-import static org.openforis.collect.utils.Controllers.CSV_CONTENT_TYPE;
-import static org.openforis.collect.utils.Controllers.KML_CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -30,6 +28,7 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.utils.Controllers;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
@@ -77,7 +76,7 @@ public class SamplingPointsController extends BasicController {
 		SamplingDesignExportProcess process = new SamplingDesignExportProcess(samplingDesignManager);
 		ServletOutputStream out = response.getOutputStream();
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
-		Controllers.setOutputContent(response, SAMPLING_DESIGN_CSV_FILE_NAME, CSV_CONTENT_TYPE);
+		Controllers.setOutputContent(response, SAMPLING_DESIGN_CSV_FILE_NAME, MediaTypes.CSV_CONTENT_TYPE);
 		process.exportToCSV(out, survey);
 		return "ok";
 	}
@@ -89,7 +88,7 @@ public class SamplingPointsController extends BasicController {
 		return item;
 	}
 
-	@RequestMapping(value = "api/survey/{surveyId}/sampling_point_data.kml", method=GET, produces=KML_CONTENT_TYPE)
+	@RequestMapping(value = "api/survey/{surveyId}/sampling_point_data.kml", method=GET, produces=MediaTypes.KML_CONTENT_TYPE)
 	public void loadSamplingPointKmlData(@PathVariable int surveyId, HttpServletResponse response) throws Exception {
 		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		SamplingPointDataKmlGenerator samplingPointDataKmlGenerator = new SamplingPointDataKmlGenerator(samplingDesignManager, survey);

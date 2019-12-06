@@ -84,7 +84,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
 	public static final String CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND = "closeCodeListImportPopUp";
-	private static final String CSV_CONTENT_TYPE = "text/csv";
 	
 	private List<List<CodeListItem>> itemsPerLevel;
 	private boolean newChildItem;
@@ -646,7 +645,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		File tempFile = File.createTempFile("code_list_" + editedItem.getName(), ".csv");
 		FileOutputStream os = new FileOutputStream(tempFile);
 		codeListExportProcess.exportToCSV(os, survey, editedItem.getId());
-		Filedownload.save(tempFile, CSV_CONTENT_TYPE);
+		Filedownload.save(tempFile, MediaTypes.CSV_CONTENT_TYPE);
 	}
 
 	@GlobalCommand
