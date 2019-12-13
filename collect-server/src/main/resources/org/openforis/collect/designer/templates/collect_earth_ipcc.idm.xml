@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<survey lastId="3383" created="2016-01-21T14:33:28.351+01:00" modified="2016-01-22T15:06:15.524+01:00" collectearth:plotarea="0.5" collectearth:samplepoints="49" collect:target="CE" collect:collectVersion="3.8.27" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<survey lastId="100001" created="2016-01-21T14:33:28.351+01:00" modified="2016-01-22T15:06:15.524+01:00" collectearth:plotarea="0.5" collectearth:samplepoints="49" collect:target="CE" collect:collectVersion="3.8.27" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <project>Generic IPCC survey - CHANGE NAME</project>
   <uri>http://www.openforis.org/idm/ipcc_afolu_generic</uri>
   <cycle>2013-2014</cycle>
@@ -722,6 +722,10 @@ For more information or questions post a question in the forum : www.openforis.o
         <item id="159">
           <code>bing</code>
           <label>Bing Maps</label>
+        </item>
+        <item id="100000">
+          <code>planet</code>
+          <label>Planet Maps</label>
         </item>
         <item id="160">
           <code>googleEarth</code>

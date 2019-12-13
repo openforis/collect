@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "strict": true,
+        "strictNullChecks": false,
+        "preserveConstEnums": true,
+        "outDir": "../dist/",
+        "declaration": false
+    }
+}

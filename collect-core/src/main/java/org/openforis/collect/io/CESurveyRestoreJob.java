@@ -125,6 +125,9 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			CollectAnnotations annotations = survey.getAnnotations();
 			annotations.setBingMapsKey((String) p.get("bing_maps_key"));
 			annotations.setBingMapsEnabled(Boolean.parseBoolean(p.getProperty("open_bing_maps")));
+			annotations.setPlanetMapsKey((String) p.get("planet_maps_key"));
+			annotations.setPlanetMapsEnabled(Boolean.parseBoolean(p.getProperty("open_planet_maps")));
+
 			annotations.setYandexMapsEnabled(Boolean.parseBoolean(p.getProperty("open_yandex_maps")));
 			annotations.setStreetViewEnabled(Boolean.parseBoolean(p.getProperty("open_street_view")));
 			annotations.setGEEExplorerEnabled(Boolean.parseBoolean(p.getProperty("open_earth_engine")));

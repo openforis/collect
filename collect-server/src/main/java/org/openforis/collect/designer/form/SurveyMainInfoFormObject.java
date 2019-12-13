@@ -18,8 +18,10 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String collectEarthSamplePoints;
 	private String collectEarthPlotArea;
 	private String bingMapsKey;
+	private String planetMapsKey;
 	private String extraMapUrl;
 	private boolean openBingMaps;
+	private boolean openPlanetMaps;
 	private boolean openYandexMaps;
 	private boolean openGEEExplorer;
 	private boolean openGEECodeEditor;
@@ -44,8 +46,10 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
 		bingMapsKey = annotations.getBingMapsKey();
+		planetMapsKey = annotations.getPlanetMapsKey();
 		extraMapUrl = annotations.getExtraMapUrl();
 		openBingMaps = annotations.isBingMapsEnabled();
+		openPlanetMaps = annotations.isPlanetMapsEnabled();
 		openYandexMaps = annotations.isYandexMapsEnabled();
 		openStreetView = annotations.isStreetViewEnabled();
 		openGEEExplorer = annotations.isGEEExplorerEnabled();
@@ -68,8 +72,10 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		annotations.setCollectEarthPlotArea(fromListitemValueToDouble(collectEarthPlotArea));
 		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
 		annotations.setBingMapsKey(bingMapsKey);
+		annotations.setPlanetMapsKey(planetMapsKey);
 		annotations.setExtraMapUrl(extraMapUrl);
 		annotations.setBingMapsEnabled( openBingMaps );
+		annotations.setPlanetMapsEnabled( openPlanetMaps );
 		annotations.setYandexMapsEnabled( openYandexMaps );
 		annotations.setStreetViewEnabled( openStreetView );
 		annotations.setGEECodeEditorEnabled( openGEECodeEditor );
@@ -98,6 +104,22 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		return published;
 	}
 	
+	public String getPlanetMapsKey() {
+		return planetMapsKey;
+	}
+
+	public void setPlanetMapsKey(String planetMapsKey) {
+		this.planetMapsKey = planetMapsKey;
+	}
+
+	public boolean isOpenPlanetMaps() {
+		return openPlanetMaps;
+	}
+
+	public void setOpenPlanetMaps(boolean openPlanetMaps) {
+		this.openPlanetMaps = openPlanetMaps;
+	}
+
 	public void setPublished(boolean published) {
 		this.published = published;
 	}
