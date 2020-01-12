@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 public class Files {
 	
 	public static final String CSV_FILE_EXTENSION = "csv";
+	public static final String EXCEL_FILE_EXTENSION = "xlsx";
 	public static final String ZIP_FILE_EXTENSION = "zip";
 	public static final String XML_FILE_EXTENSION = "xml";
 	

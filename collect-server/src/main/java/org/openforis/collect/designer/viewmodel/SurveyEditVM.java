@@ -40,6 +40,7 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.collect.web.ws.AppWS.MessageType;
@@ -406,7 +407,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		SchemaSummaryCSVExportJob job = new SchemaSummaryCSVExportJob();
 		job.setJobManager(jobManager);
 		job.setSurvey(survey);
-		job.setLabelLanguage(currentLanguageCode);
 		jobManager.start(job, survey.getId().toString());
 		
 		String statusPopUpTitle = Labels.getLabel("survey.schema.export_summary.process_status_popup.message", new String[] { survey.getName() });
@@ -488,7 +488,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			File file = ((SchemaSummaryCSVExportJob) job).getOutputFile();
 			String surveyName = survey.getName();
 			String dateStr = Dates.formatLocalDateTime(new Date());
-			String fileName = String.format(SCHEMA_SUMMARY_FILE_NAME_PATTERN, surveyName, dateStr, "csv");
+			String fileName = String.format(SCHEMA_SUMMARY_FILE_NAME_PATTERN, surveyName, dateStr, Files.EXCEL_FILE_EXTENSION);
 			String contentType = URLConnection.guessContentTypeFromName(fileName);
 			try {
 				FileInputStream is = new FileInputStream(file);
