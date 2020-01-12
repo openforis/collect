@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.24.36] - 2019-12-13
+### Added
+- Added support for Collect Earth integration with Planet Maps
+
+## [3.24.35] - 2019-12-05
+### Fixed
+- Fixed error uploading pictures with invalid characters in file name
+
+## [3.24.34] - 2019-12-04
+### Added
+- Support filter by summary attributes in Collect Earth data export 
+
+## [3.24.33] - 2019-11-29
+### Fixed
+- MacOS installer: support latest version of OSx
+- Fixed error editing surveys in PostgreSQL (id column exceeding maximum value)
+
 ## [3.24.32] - 2019-11-22
 ### Fixed
 - CSV Data Import: fixed error importing CSV file (record not found) on surveys with Date  record key attributes

@@ -68,6 +68,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private String rootEntityName;
 	private boolean includeIdm;
 	private Date modifiedSince;
+	private List<String> summaryValues;
 	
 	public XMLDataExportProcess() {
 		super();
@@ -129,6 +130,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setRootEntityId(survey.getSchema().getRootEntityDefinition(rootEntityName).getId());
 		filter.setModifiedSince(modifiedSince);
+		filter.setSummaryValues(summaryValues);
 		List<CollectRecordSummary> summaries = recordManager.loadSummaries(filter);
 		return summaries;
 	}
@@ -269,4 +271,11 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		this.modifiedSince = modifiedSince;
 	}
 	
+	public List<String> getSummaryValues() {
+		return summaryValues;
+	}
+	
+	public void setSummaryValues(List<String> summaryValues) {
+		this.summaryValues = summaryValues;
+	}
 }

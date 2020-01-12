@@ -142,6 +142,26 @@
 					href="http://www.bingmapsportal.com" target="_blank"
 					image="/assets/images/info-small.png" />
 			</hlayout>
+			
+			<hlayout style="padding: 10px">
+
+				<fieldErrorHandler
+					message="@load(vmsgs['planetMapsKey'])">
+					<label
+						use="org.openforis.collect.designer.component.FieldLabel"
+						value="${labels.survey.collect_earth.other_settings.planet_maps}" />
+				</fieldErrorHandler>
+				<fieldErrorHandler
+					message="@load(vmsgs['planetMapsKey'])">
+					<textbox width="350px" value="@bind(fx.planetMapsKey)"
+						onChange="@command('applyChanges')" />
+				</fieldErrorHandler>
+
+				<button sclass="icon"
+					tooltiptext="${labels.survey.collect_earth.other_settings.planet_maps_tooltip}"
+					href="https://www.planet.com" target="_blank"
+					image="/assets/images/info-small.png" />
+			</hlayout>
 
 
 			<hlayout style="padding: 10px">
@@ -196,6 +216,17 @@
 						value="${labels.survey.collect_earth.other_settings.open_yandex_maps}:" />
 					<checkbox
 						checked="@load(fx.openYandexMaps eq true) @save(fx.openYandexMaps)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+				
+				<space width="30px" />
+
+				<fieldErrorHandler
+					message="@load(vmsgs['openPlanetMaps'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_planet_maps}:" />
+					<checkbox
+						checked="@load(fx.openPlanetMaps eq true) @save(fx.openPlanetMaps)"
 						onCheck="@command('applyChanges')" />
 				</fieldErrorHandler>
 			</hlayout>

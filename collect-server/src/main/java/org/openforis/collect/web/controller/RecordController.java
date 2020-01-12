@@ -524,9 +524,7 @@ public class RecordController extends BasicController implements Serializable {
 		String outputFormat = parameters.getOutputFormat().name().toLowerCase(Locale.ENGLISH);
 		String step = parameters.getRecordFilter().getStepGreaterOrEqual().name();
 		String fileName = String.format("collect-%s-data-export-%s-%s-%s.zip", outputFormat, surveyName, step, Dates.formatLocalDateTime(new Date()));
-		Controllers.writeFileToResponse(response, file, 
-				fileName, 
-				Controllers.ZIP_CONTENT_TYPE);
+		Controllers.writeFileToResponse(response, file, fileName, MediaTypes.ZIP_CONTENT_TYPE);
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/startbackupexport", method=POST)
@@ -553,7 +551,7 @@ public class RecordController extends BasicController implements Serializable {
 		String surveyName = survey.getName();
 		Controllers.writeFileToResponse(response, file, 
 				String.format("%s-%s.collect-data", surveyName, Dates.formatLocalDateTime(new Date())), 
-				Controllers.ZIP_CONTENT_TYPE);
+				MediaTypes.ZIP_CONTENT_TYPE);
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/stats", method=GET)
@@ -591,7 +589,7 @@ public class RecordController extends BasicController implements Serializable {
 		String surveyName = survey.getName();
 		Controllers.writeFileToResponse(response, file, 
 				String.format("collect-validation-report-%s-%s.csv", surveyName, Dates.formatDate(new Date())), 
-				Controllers.CSV_CONTENT_TYPE);
+				MediaTypes.CSV_CONTENT_TYPE);
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/data/records/backupexportjob", method=GET)

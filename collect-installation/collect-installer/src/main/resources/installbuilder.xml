@@ -331,6 +331,7 @@ or delete the folder ${installdir} and try again.</text>
 	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
 	<saveRelativePaths>1</saveRelativePaths>
 	<createOsxBundleDmg>1</createOsxBundleDmg>
+	<osxPlatforms>osx-intel osx-x86_64</osxPlatforms>
 	<parameterList>
 		<directoryParameter>
 			<name>installdir</name>

@@ -168,6 +168,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("ui_language", language);
 		p.put("bing_maps_key", getBingMapsKey(survey));
 		p.put("open_bing_maps", isBingMapsEnabled(survey));
+		p.put("planet_maps_key", getPlanetMapsKey(survey));
+		p.put("open_planet_maps", isPlanetMapsEnabled(survey));
 		p.put("open_yandex_maps", isYandexMapsEnabled(survey));
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
 		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
@@ -204,6 +206,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return annotations.getBingMapsKey();
 	}
 	
+	private String getPlanetMapsKey(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.getPlanetMapsKey();
+	}
+	
 	private String getExtraMapUrl(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getExtraMapUrl();
@@ -212,6 +219,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private String isBingMapsEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isBingMapsEnabled()?"true":"false";
+	}
+	
+	private String isPlanetMapsEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isPlanetMapsEnabled()?"true":"false";
 	}
 	
 	private String isYandexMapsEnabled(CollectSurvey survey){

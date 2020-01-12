@@ -22,7 +22,9 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.collect.spring.SpringMessageSource;
+import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.commons.collection.Visitor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,9 +119,8 @@ public class ValidationController extends BasicController {
 				print(outputStream, "Survey not found");
 				return;
 			}
-			response.setContentType("text/csv");
 			String outputFileName = String.format("%s_validation_report_%s.csv", surveyName, Dates.formatDateTime(new Date()));
-			response.setHeader("Content-Disposition", "attachment; fileName=" + outputFileName);
+			Controllers.setOutputContent(response, outputFileName, MediaTypes.CSV_CONTENT_TYPE);
 			SessionState sessionState = getSessionState(request);
 			User user = sessionState.getUser();
 			String sessionId = sessionState.getSessionId();

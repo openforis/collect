@@ -16,6 +16,8 @@ import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.metamodel.view.CodeListItemView;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.Controllers;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -31,7 +33,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("api")
 public class CodeListController {
 
-	private static final String CSV_CONTENT_TYPE = "text/csv";
 	private static final String CSV_EXTENSION = ".csv";
 	
 	@Autowired
@@ -68,9 +69,7 @@ public class CodeListController {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		CodeList list = survey.getCodeListById(codeListId);
 		String fileName = list.getName() + CSV_EXTENSION;
-		
-		response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-		response.setContentType(CSV_CONTENT_TYPE); 
+		Controllers.setOutputContent(response, fileName, MediaTypes.CSV_CONTENT_TYPE);
 		ServletOutputStream out = response.getOutputStream();
 		CodeListExportProcess process = new CodeListExportProcess(codeListManager);
 		process.exportToCSV(out, survey, codeListId);

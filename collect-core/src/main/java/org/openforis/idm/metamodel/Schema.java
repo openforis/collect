@@ -188,6 +188,10 @@ public class Schema extends SurveyObject {
 		}, false, onlyFirstLevel);
 	}
 	
+	public List<AttributeDefinition> getRootEntitySummaryAttributeDefinitions() {
+		return getSummaryAttributeDefinitions(getFirstRootEntityDefinition());
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

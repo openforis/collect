@@ -148,4 +148,5 @@ check_for_updates = 1</text>
 	<installationType>upgrade</installationType>
 	<overwritePolicy>always</overwritePolicy>
 	<createOsxBundleDmg>1</createOsxBundleDmg>
+	<osxPlatforms>osx-intel osx-x86_64</osxPlatforms>
 </project>

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.activation.FileTypeMap;
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,18 +17,14 @@ import org.apache.commons.io.IOUtils;
  * @author S. Ricci
  *
  */
-public class Controllers {
-
-	public static final String KML_CONTENT_TYPE = "application/vnd.google-earth.kml+xml";
-	public static final String CSV_CONTENT_TYPE = "text/csv";
-	public static final String ZIP_CONTENT_TYPE = "application/zip";
+public abstract class Controllers {
 
 	public static void writeFileToResponse(HttpServletResponse response, File file) throws IOException {
 		writeFileToResponse(response, file, file.getName());
 	}
 	
 	public static void writeFileToResponse(HttpServletResponse response, File file, String outputFileName) throws FileNotFoundException, IOException {
-		FileTypeMap defaultFileTypeMap = MimetypesFileTypeMap.getDefaultFileTypeMap();
+		FileTypeMap defaultFileTypeMap = FileTypeMap.getDefaultFileTypeMap();
 		String contentType = defaultFileTypeMap.getContentType(outputFileName);
 		writeFileToResponse(response, file, outputFileName, contentType);
 	}
@@ -57,12 +52,12 @@ public class Controllers {
 	
 	public static void setOutputContent(HttpServletResponse response, String outputFileName, String contentType, Long contentLength) {
 		response.setContentType(contentType); 
-		response.setHeader("Content-Disposition", "attachment; filename=" + outputFileName);
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + outputFileName + "\"");
 		if (contentLength != null) {
 			if (contentLength <= Integer.MAX_VALUE) {
 				response.setContentLength(contentLength.intValue());
 			} else {
-				response.addHeader("Content-length", contentLength.toString());
+				response.setHeader("Content-length", contentLength.toString());
 			}
 		}
 	}

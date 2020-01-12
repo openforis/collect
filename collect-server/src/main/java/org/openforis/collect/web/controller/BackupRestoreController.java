@@ -24,6 +24,7 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.concurrency.proxy.JobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +110,7 @@ public class BackupRestoreController {
 		Date date = backupStorageManager.getLastBackupDate(surveyName);
 		Controllers.writeFileToResponse(response, file, 
 				String.format("%s-%s.%s", surveyName, Dates.formatLocalDateTime(date), BACKUP_FILE_EXTENSION), 
-				Controllers.ZIP_CONTENT_TYPE);
+				MediaTypes.ZIP_CONTENT_TYPE);
 	}
 	
 	@RequestMapping(value="survey/{surveyId}/backup/result", method=GET)
@@ -119,7 +120,7 @@ public class BackupRestoreController {
 		String surveyName = survey.getName();
 		Controllers.writeFileToResponse(response, file, 
 				String.format("%s-%s.%s", surveyName, Dates.formatLocalDateTime(new Date()), BACKUP_FILE_EXTENSION), 
-				Controllers.ZIP_CONTENT_TYPE);
+				MediaTypes.ZIP_CONTENT_TYPE);
 	}
 	
 	private RecordFilter createRecordFilter(CollectSurvey survey, Integer rootEntityId, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {

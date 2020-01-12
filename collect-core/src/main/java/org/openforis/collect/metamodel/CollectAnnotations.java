@@ -98,9 +98,11 @@ public class CollectAnnotations {
 		COLLECT_EARTH_INCLUDE_IN_HEADER(new QName(COLLECT_EARTH_NAMESPACE_URI, "includeinheader"), false),
 		COLLECT_EARTH_PLOT_AREA(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotarea"), 1d),
 		COLLECT_EARTH_BING_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "bingKey"), "GENERATE YOUR OWN BING MAPS KEY AT https://www.bingmapsportal.com"),
+		COLLECT_EARTH_PLANET_KEY(new QName(COLLECT_EARTH_NAMESPACE_URI, "planetKey"), "GENERATE YOUR OWN PLANET API KEY AT https://www.planet.com/"),
 		COLLECT_EARTH_EXTRA_MAP_URL(new QName(COLLECT_EARTH_NAMESPACE_URI, "extraMapUrl")),
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25), //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
-		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false), 
+		COLLECT_EARTH_OPEN_BING_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openBingMaps"), false),
+		COLLECT_EARTH_OPEN_PLANET_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openPlanetMaps"), false), 
 		COLLECT_EARTH_OPEN_YANDEX_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openYandexMaps"), false),
 		COLLECT_EARTH_OPEN_GEE_EXPLORER(new QName(COLLECT_EARTH_NAMESPACE_URI, "openExplorer"), true), 
 		COLLECT_EARTH_OPEN_GEE_CODE_EDITOR(new QName(COLLECT_EARTH_NAMESPACE_URI, "openCodeEditor"), true), 
@@ -140,7 +142,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isIncludedInDataExport(NodeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.INCLUDE_IN_DATA_EXPORT);
+		return getAnnotationValueBoolean(defn, Annotation.INCLUDE_IN_DATA_EXPORT);
 	}
 	
 	public void setIncludeInDataExport(NodeDefinition defn, boolean value) {
@@ -148,7 +150,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isCalculatedOnlyOneTime(NodeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.CALCULATED_ONLY_ONE_TIME);
+		return getAnnotationValueBoolean(defn, Annotation.CALCULATED_ONLY_ONE_TIME);
 	}
 	
 	public void setCalculatedOnlyOneTime(NodeDefinition defn, boolean value) {
@@ -164,10 +166,7 @@ public class CollectAnnotations {
 	}
 	
 	public Version getCollectVersion() {
-		String versionStr = survey.getAnnotation(Annotation.COLLECT_VERSION.getQName());
-		if (StringUtils.isBlank(versionStr)) {
-			versionStr = Annotation.COLLECT_VERSION.getDefaultValue();
-		}
+		String versionStr = getAnnotationValueString(survey, Annotation.COLLECT_VERSION);
 		return new Version(versionStr);
 	}
 
@@ -190,7 +189,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isKeyChangeAllowed() {
-		return getAnnotationBooleanValue(survey, Annotation.KEY_CHANGE_ALLOWED);
+		return getAnnotationValueBoolean(survey, Annotation.KEY_CHANGE_ALLOWED);
 	}
 	
 	public void setKeyChangeAllowed(boolean value) {
@@ -198,15 +197,15 @@ public class CollectAnnotations {
 	}
 
 	public Step getPhaseToApplyDefaultValue(AttributeDefinition def) {
-		return (Step) getAnnotationEnumValue(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE, Step.class);
+		return (Step) getAnnotationValueEnum(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE, Step.class);
 	}
 
 	public void setPhaseToApplyDefaultValue(AttributeDefinition def, Step value) {
-		setAnnotationEnumValue(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE, value);
+		setAnnotationValueEnum(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE, value);
 	}
 
 	public boolean isEditable(AttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.EDITABLE);
+		return getAnnotationValueBoolean(defn, Annotation.EDITABLE);
 	}
 	
 	public void setEditable(AttributeDefinition defn, boolean value) {
@@ -214,7 +213,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isQualifier(AttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.QUALIFIER);
+		return getAnnotationValueBoolean(defn, Annotation.QUALIFIER);
 	}
 	
 	public void setQualifier(AttributeDefinition defn, boolean value) {
@@ -222,7 +221,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isShowInSummary(AttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.SHOW_IN_SUMMARY_LIST);
+		return getAnnotationValueBoolean(defn, Annotation.SHOW_IN_SUMMARY_LIST);
 	}
 	
 	public void setShowInSummary(AttributeDefinition defn, boolean value) {
@@ -230,7 +229,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isMeasurementAttribute(AttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.MEASUREMENT);
+		return getAnnotationValueBoolean(defn, Annotation.MEASUREMENT);
 	}
 	
 	public void setMeasurementAttribute(AttributeDefinition defn, boolean value) {
@@ -238,7 +237,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isShowFamily(TaxonAttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.TAXON_ATTRIBUTE_SHOW_FAMILY);
+		return getAnnotationValueBoolean(defn, Annotation.TAXON_ATTRIBUTE_SHOW_FAMILY);
 	}
 	
 	public void setShowFamily(TaxonAttributeDefinition defn, boolean value) {
@@ -246,7 +245,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isIncludeUniqueVernacularName(TaxonAttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.TAXON_ATTRIBUTE_INCLUDE_UNIQUE_VERNACULAR_NAME);
+		return getAnnotationValueBoolean(defn, Annotation.TAXON_ATTRIBUTE_INCLUDE_UNIQUE_VERNACULAR_NAME);
 	}
 	
 	public void setIncludeUniqueVernacularName(TaxonAttributeDefinition defn, boolean value) {
@@ -254,7 +253,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isAllowUnlisted(TaxonAttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.TAXON_ATTRIBUTE_ALLOW_UNLISTED);
+		return getAnnotationValueBoolean(defn, Annotation.TAXON_ATTRIBUTE_ALLOW_UNLISTED);
 	}
 	
 	public void setAllowUnlisted(TaxonAttributeDefinition defn, boolean value) {
@@ -262,7 +261,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isEnumerate(EntityDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.ENUMERATE);
+		return getAnnotationValueBoolean(defn, Annotation.ENUMERATE);
 	}
 	
 	public void setEnumerate(EntityDefinition defn, boolean value) {
@@ -270,7 +269,7 @@ public class CollectAnnotations {
 	}
 	
 	public Boolean isAutoGenerateMinItems(NodeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.AUTO_GENERATE_MIN_ITEMS);
+		return getAnnotationValueBoolean(defn, Annotation.AUTO_GENERATE_MIN_ITEMS);
 	}
 	
 	public void setAutoGenerateMinItems(NodeDefinition defn, boolean value) {
@@ -278,7 +277,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isHideKeyInCollectEarthRecordList(AttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_HIDE_IN_RECORD_LIST);
+		return getAnnotationValueBoolean(defn, Annotation.COLLECT_EARTH_HIDE_IN_RECORD_LIST);
 	}
 	
 	public void setHideKeyInCollectEarthRecordList(AttributeDefinition defn, boolean value) {
@@ -286,7 +285,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isFromCollectEarthCSV(AttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_FROM_CSV);
+		return getAnnotationValueBoolean(defn, Annotation.COLLECT_EARTH_FROM_CSV);
 	}
 	
 	public void setFromCollectEarthCSV(AttributeDefinition defn, boolean value) {
@@ -294,7 +293,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isShowReadOnlyFieldInCollectEarth(AttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_SHOW_READONLY_FIELD);
+		return getAnnotationValueBoolean(defn, Annotation.COLLECT_EARTH_SHOW_READONLY_FIELD);
 	}
 	
 	public void setShowReadOnlyFieldInCollectEarth(AttributeDefinition defn, boolean value) {
@@ -302,7 +301,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isIncludedInCollectEarthHeader(AttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_INCLUDE_IN_HEADER);
+		return getAnnotationValueBoolean(defn, Annotation.COLLECT_EARTH_INCLUDE_IN_HEADER);
 	}
 	
 	public void setIncludedInCollectEarthHeader(AttributeDefinition defn, boolean value) {
@@ -310,7 +309,7 @@ public class CollectAnnotations {
 	}
 	
 	public Double getCollectEarthPlotArea() {
-		return getAnnotationDoubleValue(survey, Annotation.COLLECT_EARTH_PLOT_AREA);
+		return getAnnotationValueDouble(survey, Annotation.COLLECT_EARTH_PLOT_AREA);
 	}
 	
 	public void setCollectEarthPlotArea(Double value) {
@@ -318,19 +317,23 @@ public class CollectAnnotations {
 	}
 	
 	public String getBingMapsKey() {
-		String bingMapsKey = survey.getAnnotation(Annotation.COLLECT_EARTH_BING_KEY.getQName());
-		if (StringUtils.isBlank(bingMapsKey)) {
-			bingMapsKey = Annotation.COLLECT_EARTH_BING_KEY.getDefaultValue();
-		}
-		return bingMapsKey;
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_BING_KEY);
 	}
 	
 	public void setBingMapsKey(String value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_BING_KEY, value);
 	}
 	
+	public String getPlanetMapsKey() {
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_PLANET_KEY);
+	}
+	
+	public void setPlanetMapsKey(String value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLANET_KEY, value);
+	}
+	
 	public String getExtraMapUrl() {
-		return survey.getAnnotation(Annotation.COLLECT_EARTH_EXTRA_MAP_URL.getQName());
+		return getAnnotationValueString(survey, Annotation.COLLECT_EARTH_EXTRA_MAP_URL);
 	}
 	
 	public void setExtraMapUrl(String value) {
@@ -338,15 +341,23 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isBingMapsEnabled() {
-		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS);
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS);
 	}
 	
 	public void setBingMapsEnabled( boolean value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_BING_MAPS, value);
 	}
 	
+	public boolean isPlanetMapsEnabled() {
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_PLANET_MAPS);
+	}
+	
+	public void setPlanetMapsEnabled( boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_PLANET_MAPS, value);
+	}
+	
 	public boolean isYandexMapsEnabled() {
-		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_YANDEX_MAPS);
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_YANDEX_MAPS);
 	}
 	
 	public void setYandexMapsEnabled( boolean value) {
@@ -354,7 +365,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isGEEExplorerEnabled() {
-		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_EXPLORER);
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_EXPLORER);
 	}
 	
 	public void setGEEExplorerEnabled( boolean value) {
@@ -362,7 +373,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isGEECodeEditorEnabled() {
-		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR);
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR);
 	}
 	
 	public void setGEECodeEditorEnabled( boolean value) {
@@ -370,7 +381,7 @@ public class CollectAnnotations {
 	}
 
 	public boolean isStreetViewEnabled() {
-		return getAnnotationBooleanValue(survey, Annotation.COLLECT_EARTH_OPEN_STREET_VIEW);
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_STREET_VIEW);
 	}
 	
 	public void setStreetViewEnabled( boolean value) {
@@ -378,7 +389,7 @@ public class CollectAnnotations {
 	}
 	
 	public int getCollectEarthSamplePoints() {
-		return getAnnotationIntegerValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS);
+		return getAnnotationValueInteger(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS);
 	}
 	
 	public void setCollectEarthSamplePoints(Integer value) {
@@ -386,7 +397,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def) {
-		return getAnnotationBooleanValue(def, Annotation.COLLECT_MOBILE_ALLOW_ONLY_DEVICE_COORDINATE);
+		return getAnnotationValueBoolean(def, Annotation.COLLECT_MOBILE_ALLOW_ONLY_DEVICE_COORDINATE);
 	}
 	
 	public void setAllowOnlyDeviceCoordinate(CoordinateAttributeDefinition def, boolean value) {
@@ -394,7 +405,7 @@ public class CollectAnnotations {
 	}
 	
 	public FileType getFileType(FileAttributeDefinition def) {
-		return (FileType) getAnnotationEnumValue(def, Annotation.FILE_TYPE, FileType.class);
+		return (FileType) getAnnotationValueEnum(def, Annotation.FILE_TYPE, FileType.class);
 	}
 	
 	public void setFileType(FileAttributeDefinition def, FileType fileType) {
@@ -402,7 +413,7 @@ public class CollectAnnotations {
 	}
 	
 	public TextInput getTextInput(TextAttributeDefinition def) {
-		return (TextInput) getAnnotationEnumValue(def, Annotation.TEXT_INPUT, TextInput.class);
+		return (TextInput) getAnnotationValueEnum(def, Annotation.TEXT_INPUT, TextInput.class);
 	}
 	
 	public void setTextInput(TextAttributeDefinition def, TextInput textInput) {
@@ -410,7 +421,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isGeometry(TextAttributeDefinition def) {
-		return getAnnotationBooleanValue(def, Annotation.GEOMETRY);
+		return getAnnotationValueBoolean(def, Annotation.GEOMETRY);
 	}
 
 	public void setGeometry(TextAttributeDefinition def, boolean geometry) {
@@ -418,7 +429,7 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isShowInMapBalloon(AttributeDefinition def) {
-		return getAnnotationBooleanValue(def, Annotation.SHOW_IN_MAP_BALLOON);
+		return getAnnotationValueBoolean(def, Annotation.SHOW_IN_MAP_BALLOON);
 	}
 	
 	public void setShowInMapBalloon(AttributeDefinition def, boolean showInMapBalloon) {
@@ -434,7 +445,7 @@ public class CollectAnnotations {
 	}
 	
 	public Double getBackgroundAlpha(NodeDefinition def) {
-		return getAnnotationDoubleValue(def, Annotation.BACKGROUND_ALPHA);
+		return getAnnotationValueDouble(def, Annotation.BACKGROUND_ALPHA);
 	}
 
 	public void setBackgroundAlpha(NodeDefinition def, Double alpha) {
@@ -442,14 +453,14 @@ public class CollectAnnotations {
 	}
 	
 	public boolean isShowSrsField(CoordinateAttributeDefinition def) {
-		return getAnnotationBooleanValue(def, Annotation.COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD);
+		return getAnnotationValueBoolean(def, Annotation.COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD);
 	}
 	
 	public void setShowSrsField(CoordinateAttributeDefinition def, boolean showSrsField) {
 		setAnnotationValue(def, Annotation.COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD, showSrsField);
 	}
 
-	private <T extends Enum<T>> Enum<T> getAnnotationEnumValue(AttributeDefinition def, Annotation annotation, Class<T> enumType) {
+	private <T extends Enum<T>> Enum<T> getAnnotationValueEnum(AttributeDefinition def, Annotation annotation, Class<T> enumType) {
 		String enumName = def.getAnnotation(annotation.getQName());
 		if(StringUtils.isBlank(enumName)) {
 			return annotation.getDefaultValue();
@@ -458,7 +469,7 @@ public class CollectAnnotations {
 		}
 	}
 	
-	private void setAnnotationEnumValue(Annotatable def, Annotation annotation, Enum<?> value) {
+	private void setAnnotationValueEnum(Annotatable def, Annotation annotation, Enum<?> value) {
 		String enumName;
 		if ( value == null || value == annotation.getDefaultValue() ) {
 			enumName = null;
@@ -468,7 +479,7 @@ public class CollectAnnotations {
 		def.setAnnotation(annotation.getQName(), enumName);
 	}
 	
-	private Boolean getAnnotationBooleanValue(Annotatable annotatable, Annotation annotation) {
+	private Boolean getAnnotationValueBoolean(Annotatable annotatable, Annotation annotation) {
 		String annotationValue = annotatable.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
 			Boolean defaultValue = annotation.getDefaultValue();
@@ -477,7 +488,7 @@ public class CollectAnnotations {
 			return Boolean.valueOf(annotationValue);
 		}
 	}
-
+	
 	private void setAnnotationValue(Annotatable annotatable, Annotation annotation, boolean value) {
 		String annotationValue;
 		if ( annotation.getDefaultValue() != null && annotation.getDefaultValue().equals(value) ) {
@@ -488,24 +499,18 @@ public class CollectAnnotations {
 		annotatable.setAnnotation(annotation.getQName(), annotationValue);
 	}
 
-	private Integer getAnnotationIntegerValue(Annotatable annotatable, Annotation annotation) {
+	private Integer getAnnotationValueInteger(Annotatable annotatable, Annotation annotation) {
 		String annotationValue = annotatable.getAnnotation(annotation.getQName());
-		if ( StringUtils.isBlank(annotationValue) ) {
-			Integer defaultValue = annotation.getDefaultValue();
-			return defaultValue;
-		} else {
-			return Integer.parseInt(annotationValue);
-		}
+		return StringUtils.isBlank(annotationValue)
+			? (Integer) annotation.getDefaultValue()
+			: Integer.parseInt(annotationValue);
 	}
 	
-	private Double getAnnotationDoubleValue(Annotatable annotatable, Annotation annotation) {
+	private Double getAnnotationValueDouble(Annotatable annotatable, Annotation annotation) {
 		String annotationValue = annotatable.getAnnotation(annotation.getQName());
-		if ( StringUtils.isBlank(annotationValue) ) {
-			Double defaultValue = annotation.getDefaultValue();
-			return defaultValue;
-		} else {
-			return Double.parseDouble(annotationValue);
-		}		
+		return StringUtils.isBlank(annotationValue)
+			? (Double) annotation.getDefaultValue()
+			: Double.parseDouble(annotationValue);
 	}
 	
 	private void setAnnotationValue(Annotatable annotatable, Annotation annotation, Object value) {
@@ -518,6 +523,13 @@ public class CollectAnnotations {
 		annotatable.setAnnotation(annotation.getQName(), annotationValue);
 	}
 	
+	private String getAnnotationValueString(Annotatable annotatable, Annotation annotation) {
+		String annotationValue = annotatable.getAnnotation(annotation.getQName());
+		return StringUtils.isBlank(annotationValue)
+			? (String) annotation.getDefaultValue()
+			: annotationValue;
+	}
+
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
