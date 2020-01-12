@@ -190,6 +190,12 @@ public class MathFunctionsTest extends AbstractExpressionTest {
 		assertEquals("4", max);
 	}
 	
+	@Test
+	public void testRandom() throws InvalidExpressionException {
+		Object value = evaluateExpression(cluster, "math:random()");
+		assertTrue(value instanceof Double && ((Double) value < 1 && (Double) value >= 0));
+	}
+	
 	private static void assertAlmostEquals(double expected, double value) {
 		assertAlmostEquals(expected, value, DEFAULT_TOLERACE);
 	}

@@ -470,6 +470,14 @@
 					returns the base 10 logarithm of <i>value</i>.
 				</dd>
 			</dl>
+			<dl>
+				<dt>
+					<i>math:random()</i>
+				</dt>
+				<dd>
+					returns a value with a positive sign, greater than or equal to 0.0 and less than 1.0.
+				</dd>
+			</dl>
 			<a name="Geospatial_functions" id="Geospatial_functions"></a>
 			<h4>
 				<span class="mw-headline"> Geospatial functions </span>

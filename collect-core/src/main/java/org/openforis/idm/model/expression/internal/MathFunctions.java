@@ -91,6 +91,11 @@ public class MathFunctions extends CustomFunctions {
 				return rad(number);
 			}
 		});
+		register("random", new CustomFunction(0) {
+			public Object invoke(ExpressionContext context, Object[] args) {
+				return Math.random();
+			}
+		});
 		register("sin", new SingleArgMathFunction() {
 			public Number execute(Number number) {
 				return sin(number);
