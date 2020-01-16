@@ -126,7 +126,7 @@ class Sidebar extends Component {
           </div>
           <div style={{position: 'fixed', bottom: '0px'}}>
             <VersionInfo />
-            <span><a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer">Open Foris</a> &copy; 2018</span>
+            <span><a href="http://www.openforis.org" target="_blank" rel="noopener noreferrer">Open Foris</a> &copy; 2020</span>
           </div>
         </nav>
       </div>
