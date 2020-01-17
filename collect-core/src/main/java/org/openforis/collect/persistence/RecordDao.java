@@ -26,7 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.jooq.Batch;
 import org.jooq.Condition;
 import org.jooq.Cursor;
@@ -59,6 +58,7 @@ import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordDataRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcRecordRecord;
 import org.openforis.collect.utils.Numbers;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.commons.versioning.Version;

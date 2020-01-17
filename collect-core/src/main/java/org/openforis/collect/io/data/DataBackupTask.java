@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
@@ -26,6 +25,7 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.ZipFiles;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Task;

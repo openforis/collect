@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +43,8 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -670,7 +670,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 		String[] colNames = DataCSVReader.getKeyAttributeColumnNames(parentEntityDefn, parentEntityDefn.getKeyAttributeDefinitions());
 		ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), colNames, messageKey);
-		List<String> recordKeys = record.getRootEntityKeyValues();
+		List<String> recordKeys = new ArrayList<String>(record.getRootEntityKeyValues());
 		CollectionUtils.filter(recordKeys, new Predicate<String>() {
 			public boolean evaluate(String key) {
 				return StringUtils.isNotBlank(key);

@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -48,6 +46,8 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
@@ -878,7 +878,7 @@ public class CSVDataImportJob extends Job {
 
 			String[] colNames = DataCSVReader.getKeyAttributeColumnNames(parentEntityDefn, parentEntityDefn.getKeyAttributeDefinitions());
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), colNames, messageKey);
-			List<String> recordKeys = record.getRootEntityKeyValues();
+			List<String> recordKeys = new ArrayList<String>(record.getRootEntityKeyValues());
 			CollectionUtils.filter(recordKeys, new Predicate<String>() {
 				public boolean evaluate(String key) {
 					return StringUtils.isNotBlank(key);

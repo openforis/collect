@@ -9,8 +9,8 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
