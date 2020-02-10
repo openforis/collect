@@ -23,6 +23,7 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	private String srsFieldLabel;
 	private boolean allowOnlyDeviceCoordinate;
 	private boolean showSrsField;
+	private boolean includeAltitudeAndAccuracy;
 	
 	CoordinateAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -39,6 +40,7 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		CollectAnnotations annotations = ((CollectSurvey) dest.getSurvey()).getAnnotations();
 		annotations.setAllowOnlyDeviceCoordinate(dest, allowOnlyDeviceCoordinate);
 		annotations.setShowSrsField(dest, showSrsField);
+		annotations.setIncludeAltitudeAndAccuracy(dest, includeAltitudeAndAccuracy);
 	}
 
 	protected void saveFieldOrderValue(T dest) {
@@ -64,6 +66,7 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		CollectAnnotations annotations = ((CollectSurvey) source.getSurvey()).getAnnotations();
 		allowOnlyDeviceCoordinate = annotations.isAllowOnlyDeviceCoordinate(source);
 		showSrsField = annotations.isShowSrsField(source);
+		includeAltitudeAndAccuracy = annotations.isIncludeAltitudeAndAccuracy(source);
 	}
 
 	protected void loadFieldsOrderValue(T source) {
@@ -119,5 +122,13 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	
 	public void setShowSrsField(boolean showSrsField) {
 		this.showSrsField = showSrsField;
+	}
+	
+	public boolean isIncludeAltitudeAndAccuracy() {
+		return includeAltitudeAndAccuracy;
+	}
+	
+	public void setIncludeAltitudeAndAccuracy(boolean includeAltitudeAndAccuracy) {
+		this.includeAltitudeAndAccuracy = includeAltitudeAndAccuracy;
 	}
 }

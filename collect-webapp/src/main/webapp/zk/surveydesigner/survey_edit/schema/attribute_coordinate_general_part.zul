@@ -14,12 +14,26 @@
 	    		onCheck="@command('applyChanges')" />
         </fieldErrorHandler>
       </row>
+      <row visible="@load(not fx.calculated)">
+        <fieldErrorHandler message="@load(vmsgs['includeAltitudeAndAccuracy'])">
+	        <label value="${labels.survey.schema.attribute.coordinate.include_altitude_and_accuracy.$}:" />
+	        <image popup="includeAltitudeAndAccuracyInfoTooltip" style="cursor:pointer"
+				src="/assets/images/info-small.png" />
+	        <checkbox checked="@bind(fx.includeAltitudeAndAccuracy)"
+	    		onCheck="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
     </rows>
   </grid>
 
   <popup id="showReadOnlyFieldInCollectEarthInfoTooltip" width="300px">
   	<html><![CDATA[
 		${labels.survey.schema.attribute.coordinate.allow_only_device_coordinates.tooltip}
+  	]]></html>
+  </popup>
+  <popup id="includeAltitudeAndAccuracyInfoTooltip" width="300px">
+  	<html><![CDATA[
+		${labels.survey.schema.attribute.coordinate.include_altitude_and_accuracy.tooltip}
   	]]></html>
   </popup>
 </zk>

@@ -90,6 +90,7 @@ public class CollectAnnotations {
 		BACKGROUND_COLOR(new QName(UI_NAMESPACE_URI, UIOptionsConstants.BACKGROUND_COLOR)),
 		BACKGROUND_ALPHA(new QName(UI_NAMESPACE_URI, UIOptionsConstants.BACKGROUND_ALPHA), 0.5),
 		COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_SRS_FIELD), true),
+		COORDINATE_ATTRIBUTE_INCLUDE_ALTITUDE_AND_ACCURACY(new QName(UI_NAMESPACE_URI, UIOptionsConstants.INCLUDE_ALTITUDE_AND_ACCURACY), false),
 		
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
@@ -458,6 +459,14 @@ public class CollectAnnotations {
 	
 	public void setShowSrsField(CoordinateAttributeDefinition def, boolean showSrsField) {
 		setAnnotationValue(def, Annotation.COORDINATE_ATTRIBUTE_SHOW_SRS_FIELD, showSrsField);
+	}
+	
+	public boolean isIncludeAltitudeAndAccuracy(CoordinateAttributeDefinition def) {
+		return getAnnotationValueBoolean(def, Annotation.COORDINATE_ATTRIBUTE_INCLUDE_ALTITUDE_AND_ACCURACY);
+	}
+	
+	public void setIncludeAltitudeAndAccuracy(CoordinateAttributeDefinition def, boolean includeAltitudeAndAccuracy) {
+		setAnnotationValue(def, Annotation.COORDINATE_ATTRIBUTE_INCLUDE_ALTITUDE_AND_ACCURACY, includeAltitudeAndAccuracy);
 	}
 
 	private <T extends Enum<T>> Enum<T> getAnnotationValueEnum(AttributeDefinition def, Annotation annotation, Class<T> enumType) {
