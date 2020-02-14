@@ -16,7 +16,7 @@ public class Collect {
 	private static final String INFO_PROPERTIES_FILE_NAME = "info.properties";
 	private static final String VERSION_PROPERTY_KEY = Collect.class.getPackage().getName() + ".version";
 	private static final String VOID_VERSION = "PROJECT_VERSION"; //token was not being replaced into version.properties in previous releases
-	private static final Version DEV_VERSION = new Version("3.24.0-SNAPSHOT");
+	private static final Version DEV_VERSION = new Version("3.25.1-SNAPSHOT");
 	
 	public static final Version VERSION;
 	
