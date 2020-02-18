@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -26,7 +28,7 @@
 			<url>http://mavensync.zkoss.org/maven2</url>
 		</repository>
 	</repositories>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -69,7 +71,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- Add generated sources to build path -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -103,43 +105,17 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!-- copy Designer options from user settings into the options.properties file -->
-			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>replacer</artifactId>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>replace</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<basedir>${project.build.outputDirectory}</basedir>
-					<includes>
-						<include>org/openforis/collect/designer/options.properties</include>
-					</includes>
-					<regex>false</regex>
-					<replacements>
-						<replacement>
-							<token>IDM_EXPRESSION_LANGUAGE_WIKI_URL</token>
-							<value>${collect.wiki.idm.expression-language.url}</value>
-						</replacement>
-					</replacements>
-				</configuration>
-			</plugin>
+
 			<!-- run "mvn javadoc:javadoc" to use this plugin -->
-	      	<plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.4</version>
 			</plugin>
 			<plugin>
-			    <groupId>io.github.swagger2markup</groupId>
+				<groupId>io.github.swagger2markup</groupId>
 				<artifactId>swagger2markup-maven-plugin</artifactId>
-				<version>1.2.0</version>
+				<version>1.3.7</version>
 				<configuration>
 					<swaggerInput>${basedir}/doc/restful_api/restful_api.yaml</swaggerInput>
 					<outputFile>${project.build.directory}/generated-docs/asciidoc/RESTful_API_Doc</outputFile>
@@ -187,31 +163,31 @@
 			<artifactId>of-commons-web-spring</artifactId>
 		</dependency>
 		<dependency>
-	        <groupId>org.openforis.rmb</groupId>
-	        <artifactId>repository-message-broker-core</artifactId>
-	        <version>${repository-message-broker.version}</version>
-	    </dependency>
-	    <dependency>
-	        <groupId>org.openforis.rmb</groupId>
-	        <artifactId>repository-message-broker-metrics</artifactId>
-	        <version>${repository-message-broker.version}</version>
-	    </dependency>
-	    <dependency>
-	        <groupId>org.openforis.rmb</groupId>
-	        <artifactId>repository-message-broker-slf4j</artifactId>
-	        <version>${repository-message-broker.version}</version>
-	    </dependency>
-	    <dependency>
-	        <groupId>org.openforis.rmb</groupId>
-	        <artifactId>repository-message-broker-spring</artifactId>
-	        <version>${repository-message-broker.version}</version>
-	    </dependency>
-	    <dependency>
-	        <groupId>org.openforis.rmb</groupId>
-	        <artifactId>repository-message-broker-xstream</artifactId>
-	        <version>${repository-message-broker.version}</version>
-	    </dependency>
-	    
+			<groupId>org.openforis.rmb</groupId>
+			<artifactId>repository-message-broker-core</artifactId>
+			<version>${repository-message-broker.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openforis.rmb</groupId>
+			<artifactId>repository-message-broker-metrics</artifactId>
+			<version>${repository-message-broker.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openforis.rmb</groupId>
+			<artifactId>repository-message-broker-slf4j</artifactId>
+			<version>${repository-message-broker.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openforis.rmb</groupId>
+			<artifactId>repository-message-broker-spring</artifactId>
+			<version>${repository-message-broker.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openforis.rmb</groupId>
+			<artifactId>repository-message-broker-xstream</artifactId>
+			<version>${repository-message-broker.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -381,7 +357,7 @@
 			<version>${zk.spring.version}</version>
 		</dependency>
 		<!-- end of ZK dependencies -->
-		
+
 		<!-- GeoTools -->
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -405,10 +381,10 @@
 			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-epsg-hsql</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-hsql</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-wkt</artifactId>
@@ -482,22 +458,20 @@
 			<version>2.0.2.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 	</dependencies>
-	
+
+
 	<pluginRepositories>
-		<pluginRepository>
-			<id>jcenter-snapshots</id>
-			<name>jcenter</name>
-			<url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
-		</pluginRepository>
+		<!-- swagger2markup-maven-plugin -->
 		<pluginRepository>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 			<id>jcenter-releases</id>
 			<name>jcenter</name>
-			<url>http://jcenter.bintray.com</url>
+			<url>https://jcenter.bintray.com</url>
 		</pluginRepository>
 	</pluginRepositories>
+
 </project>
