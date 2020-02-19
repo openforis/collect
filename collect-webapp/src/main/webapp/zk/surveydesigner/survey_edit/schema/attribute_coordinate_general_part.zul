@@ -1,39 +1,68 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
+<vbox>
   <grid class="inner">
     <columns>
-      <column />
-    </columns>
+		<column width="200px" />
+		<column />
+	</columns>
     <rows>
       <row visible="@load(not fx.calculated)">
         <fieldErrorHandler message="@load(vmsgs['allowOnlyDeviceCoordinate'])">
 	        <label value="${labels.survey.schema.attribute.coordinate.allow_only_device_coordinates.$}:" />
 	        <image popup="showReadOnlyFieldInCollectEarthInfoTooltip" style="cursor:pointer"
 				src="/assets/images/info-small.png" />
+		</fieldErrorHandler>
+		<fieldErrorHandler message="@load(vmsgs['allowOnlyDeviceCoordinate'])">
 	        <checkbox checked="@bind(fx.allowOnlyDeviceCoordinate)"
 	    		onCheck="@command('applyChanges')" />
         </fieldErrorHandler>
       </row>
-      <row visible="@load(not fx.calculated)">
-        <fieldErrorHandler message="@load(vmsgs['includeAltitudeAndAccuracy'])">
-	        <label value="${labels.survey.schema.attribute.coordinate.include_altitude_and_accuracy.$}:" />
-	        <image popup="includeAltitudeAndAccuracyInfoTooltip" style="cursor:pointer"
+      </rows>
+    </grid>
+  <grid class="inner">
+    <columns>
+		<column width="150px" />
+		<column />
+	</columns> 
+	<rows>
+      <row>
+        <fieldErrorHandler message="@load(vmsgs['includeAltitude'])">
+	        <label value="${labels.survey.schema.attribute.coordinate.include_altitude.$}:" />
+	        <image popup="includeAltitudeInfoTooltip" style="cursor:pointer"
 				src="/assets/images/info-small.png" />
-	        <checkbox checked="@bind(fx.includeAltitudeAndAccuracy)"
-	    		onCheck="@command('applyChanges')" />
-        </fieldErrorHandler>
+		</fieldErrorHandler>
+		<hbox spacing="20px">
+			<fieldErrorHandler message="@load(vmsgs['includeAltitude'])">
+		        <checkbox checked="@bind(fx.includeAltitude)"
+		    		onCheck="@command('applyChanges')" />
+        	</fieldErrorHandler>
+        	<fieldErrorHandler message="@load(vmsgs['includeAccuracy'])">
+		        <label value="${labels.survey.schema.attribute.coordinate.include_accuracy.$}:" />
+		        <image popup="includeAccuracyInfoTooltip" style="cursor:pointer"
+					src="/assets/images/info-small.png" />
+		        <checkbox checked="@bind(fx.includeAccuracy)"
+		    		onCheck="@command('applyChanges')" />
+	        </fieldErrorHandler>
+        </hbox>
       </row>
     </rows>
   </grid>
+  </vbox>
 
   <popup id="showReadOnlyFieldInCollectEarthInfoTooltip" width="300px">
   	<html><![CDATA[
 		${labels.survey.schema.attribute.coordinate.allow_only_device_coordinates.tooltip}
   	]]></html>
   </popup>
-  <popup id="includeAltitudeAndAccuracyInfoTooltip" width="300px">
+  <popup id="includeAltitudeInfoTooltip" width="300px">
   	<html><![CDATA[
-		${labels.survey.schema.attribute.coordinate.include_altitude_and_accuracy.tooltip}
+		${labels.survey.schema.attribute.coordinate.include_altitude.tooltip}
+  	]]></html>
+  </popup>
+  <popup id="includeAccuracyInfoTooltip" width="300px">
+  	<html><![CDATA[
+		${labels.survey.schema.attribute.coordinate.include_accuracy.tooltip}
   	]]></html>
   </popup>
 </zk>

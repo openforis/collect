@@ -35,7 +35,8 @@ public interface UIOptionsConstants {
 	String SHOW_CODE = "showCode";
 	String SHOW_FAMILY = "showFamily";
 	String SHOW_SRS_FIELD = "showSrsField";
-	String INCLUDE_ALTITUDE_AND_ACCURACY = "includeAltitudeAndAccuracy";
+	String INCLUDE_ALTITUDE = "includeAltitude";
+	String INCLUDE_ACCURACY = "includeAccuracy";
 	String INCLUDE_UNIQUE_VERNACULAR_NAME = "includeUniqueVernacularName";
 	String HIDE = "hide";
 	String COLUMN = "column";

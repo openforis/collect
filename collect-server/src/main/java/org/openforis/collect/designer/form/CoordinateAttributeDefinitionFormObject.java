@@ -23,7 +23,8 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	private String srsFieldLabel;
 	private boolean allowOnlyDeviceCoordinate;
 	private boolean showSrsField;
-	private boolean includeAltitudeAndAccuracy;
+	private boolean includeAltitude;
+	private boolean includeAccuracy;
 	
 	CoordinateAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -40,7 +41,8 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		CollectAnnotations annotations = ((CollectSurvey) dest.getSurvey()).getAnnotations();
 		annotations.setAllowOnlyDeviceCoordinate(dest, allowOnlyDeviceCoordinate);
 		annotations.setShowSrsField(dest, showSrsField);
-		annotations.setIncludeAltitudeAndAccuracy(dest, includeAltitudeAndAccuracy);
+		annotations.setIncludeCoordinateAltitude(dest, includeAltitude);
+		annotations.setIncludeCoordinateAccuracy(dest, includeAccuracy);
 	}
 
 	protected void saveFieldOrderValue(T dest) {
@@ -66,7 +68,8 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		CollectAnnotations annotations = ((CollectSurvey) source.getSurvey()).getAnnotations();
 		allowOnlyDeviceCoordinate = annotations.isAllowOnlyDeviceCoordinate(source);
 		showSrsField = annotations.isShowSrsField(source);
-		includeAltitudeAndAccuracy = annotations.isIncludeAltitudeAndAccuracy(source);
+		includeAltitude = annotations.isIncludeCoordinateAltitude(source);
+		includeAccuracy = annotations.isIncludeCoordinateAccuracy(source);
 	}
 
 	protected void loadFieldsOrderValue(T source) {
@@ -124,11 +127,19 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 		this.showSrsField = showSrsField;
 	}
 	
-	public boolean isIncludeAltitudeAndAccuracy() {
-		return includeAltitudeAndAccuracy;
+	public boolean isIncludeAltitude() {
+		return includeAltitude;
 	}
 	
-	public void setIncludeAltitudeAndAccuracy(boolean includeAltitudeAndAccuracy) {
-		this.includeAltitudeAndAccuracy = includeAltitudeAndAccuracy;
+	public void setIncludeAltitude(boolean includeAltitude) {
+		this.includeAltitude = includeAltitude;
+	}
+	
+	public boolean isIncludeAccuracy() {
+		return includeAccuracy;
+	}
+	
+	public void setIncludeAccuracy(boolean includeAccuracy) {
+		this.includeAccuracy = includeAccuracy;
 	}
 }
