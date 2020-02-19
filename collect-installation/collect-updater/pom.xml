@@ -190,7 +190,7 @@
 											<configuration>
 												<artifactItems>
 													<artifactItem>
-														<groupId>com.oracle.java</groupId>
+														<groupId>net.java.openjdk</groupId>
 														<artifactId>jre</artifactId>
 														<version>${installer.jre.version.full}</version>
 														<classifier>${jre.classifier}</classifier>

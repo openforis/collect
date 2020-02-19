@@ -81,7 +81,6 @@
         			<origin>${installdir}/launcher.properties</origin>
         			<destination>${installdir}/OpenForisCollect-launcher.run.properties</destination>
         			<ruleList>
-		        		<platformTest type="linux" />
 		        		<platformTest type="linux-x64" />
 					</ruleList>
         		</renameFile>
@@ -359,7 +358,6 @@ The old shortcuts (Startup Open Foris Collect, Shutdown Open Foris Collect) won'
 More information: 
 http://www.openforis.org/tools/collect/tutorials/installation.html</text>
 			<ruleList>
-        		<platformTest type="linux" />
         		<platformTest type="linux-x64"/>
         		<platformTest type="osx"/>
 			</ruleList>

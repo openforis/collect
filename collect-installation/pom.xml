@@ -26,7 +26,7 @@
 		<installer-version-id>${buildNumber}</installer-version-id>
 		<installer.jre.version.major>1.8</installer.jre.version.major>
 		<installer.jre.version>1.8.0</installer.jre.version>
-		<installer.jre.version.full>1.8.0_121</installer.jre.version.full>
+		<installer.jre.version.full>1.8.0_232</installer.jre.version.full>
 	</properties>
 
 	<profiles>
@@ -76,17 +76,6 @@
 					<version>0.5.1</version>
 					<configuration>
 						<itemsWithProperties>
-							<itemWithProperty>
-								<name>linux</name>
-								<properties>
-									<jre.classifier>linux</jre.classifier>
-									<installer.skip>false</installer.skip>
-									<installer.classifier>linux</installer.classifier>
-									<installer.artifact.type>run</installer.artifact.type>
-									<installer.autoupdater.extension>run</installer.autoupdater.extension>
-									<installer.extension>run</installer.extension>
-								</properties>
-							</itemWithProperty>
 							<itemWithProperty>
 								<name>linux-x64</name>
 								<properties>

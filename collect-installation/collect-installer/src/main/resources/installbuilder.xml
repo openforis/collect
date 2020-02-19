@@ -56,7 +56,7 @@
 					<exec>${java_launcher_destination}/${java_launcher_binary_name}</exec>
 					<path>${java_launcher_destination}</path>
 					<icon>${java_launcher_startmenu_shortcut_icon}</icon>
-					<platforms>linux linux-x64</platforms>
+					<platforms>linux-x64</platforms>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
 				</shortcut>
@@ -66,7 +66,7 @@
 					<exec>${installdir}/autoupdate/autoupdate-${platform_name}.${platform_exec_suffix}</exec>
 					<path>${installdir}/autoupdate</path>
 					<icon>${installdir}/images/update.png</icon>
-					<platforms>linux linux-x64</platforms>
+					<platforms>linux-x64</platforms>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
 				</shortcut>
@@ -122,7 +122,6 @@
         			<origin>${installdir}/launcher.properties</origin>
         			<destination>${installdir}/OpenForisCollect-launcher.run.properties</destination>
         			<ruleList>
-		        		<platformTest type="linux" />
 		        		<platformTest type="linux-x64" />
 					</ruleList>
         		</renameFile>
@@ -175,7 +174,7 @@
 				<folder>
 					<name>autoupdater</name>
 					<destination>${installdir}/autoupdate</destination>
-					<platforms>windows linux linux-x64</platforms>
+					<platforms>windows linux-x64</platforms>
 					<distributionFileList>
 						<distributionFile origin="autoupdate-${platform_name}.${platform_exec_suffix}" />
 					</distributionFileList>

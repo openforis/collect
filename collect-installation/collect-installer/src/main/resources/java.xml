@@ -40,21 +40,6 @@
             </ruleList>
         </folder>
         <folder>
-            <description>Java binaries - Linux</description>
-            <destination>${installdir}/java</destination>
-            <name>java_linux</name>
-            <platforms>linux</platforms>
-            <distributionFileList>
-                <distributionFile>
-                    <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre%JRE_VERSION_FULL%-linux/java-linux/*</origin>
-                </distributionFile>
-            </distributionFileList>
-            <ruleList>
-                <isTrue value="${java_install_jre}"/>
-            </ruleList>
-        </folder>
-        <folder>
             <description>Java binaries - Linux-x64</description>
             <destination>${installdir}/java</destination>
             <name>java_linux_x64</name>
@@ -191,55 +176,6 @@
         </changePermissions>
 
         <!-- Create symbolic links on various platforms -->
-        <actionGroup>
-            <actionList>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/bin"/>
-                        <fileExists path="${installdir}/java/jre/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/i386/client/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/i386/client"/>
-                        <fileExists path="${installdir}/java/jre/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/jre/lib/i386/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/jre/lib/i386/server"/>
-                        <fileExists path="${installdir}/java/jre/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/bin"/>
-                        <fileExists path="${installdir}/java/bin/jcontrol"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/i386/client/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/i386/client"/>
-                        <fileExists path="${installdir}/java/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-                <createSymLink linkName="${installdir}/java/lib/i386/server/libjsig.so" target="../libjsig.so">
-                    <ruleList>
-                        <fileExists path="${installdir}/java/lib/i386/server"/>
-                        <fileExists path="${installdir}/java/lib/i386/libjsig.so"/>
-                    </ruleList>
-                </createSymLink>
-            </actionList>
-            <ruleList>
-                <platformTest type="linux"/>
-            </ruleList>
-        </actionGroup>
         <actionGroup>
             <actionList>
                 <createSymLink linkName="${installdir}/java/bin/ControlPanel" target="jcontrol">
