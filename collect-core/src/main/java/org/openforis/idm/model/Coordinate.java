@@ -3,6 +3,8 @@ package org.openforis.idm.model;
 import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.SRS_FIELD_NAME;
 import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.X_FIELD_NAME;
 import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.Y_FIELD_NAME;
+import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.ALTITUDE_FIELD_NAME;
+import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.ACCURACY_FIELD_NAME;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -24,6 +26,8 @@ public final class Coordinate extends AbstractValue {
 	private Double x;
 	private Double y;
 	private String srsId;
+	private Double altitude;
+	private Double accuracy;
 
 	/**
 	 * Returns a Coordinate parsed from the string in input the string representation is based on posgis data type
@@ -56,9 +60,15 @@ public final class Coordinate extends AbstractValue {
 	}
 	
 	public Coordinate(Double x, Double y, String srsId) {
+		this(x, y, srsId, null, null);
+	}
+	
+	public Coordinate(Double x, Double y, String srsId, Double altitude, Double accuracy) {
 		this.x = x;
 		this.y = y;
 		this.srsId = srsId;
+		this.altitude = altitude;
+		this.accuracy = accuracy;
 	}
 	
 	@Override
@@ -68,6 +78,8 @@ public final class Coordinate extends AbstractValue {
 			put(X_FIELD_NAME, x);
 			put(Y_FIELD_NAME, y);
 			put(SRS_FIELD_NAME, srsId);
+			put(ALTITUDE_FIELD_NAME, altitude);
+			put(ACCURACY_FIELD_NAME, accuracy);
 		}};
 	}
 	
@@ -98,6 +110,22 @@ public final class Coordinate extends AbstractValue {
 	public void setSrsId( String srsId) {
 		this.srsId = srsId;
 	}
+	
+	public Double getAltitude() {
+		return altitude;
+	}
+	
+	public void setAltitude(Double altitude) {
+		this.altitude = altitude;
+	}
+	
+	public Double getAccuracy() {
+		return accuracy;
+	}
+	
+	public void setAccuracy(Double accuracy) {
+		this.accuracy = accuracy;
+	}
 
 	@Override
 	public String toPrettyFormatString() {
@@ -121,6 +149,8 @@ public final class Coordinate extends AbstractValue {
 		result = prime * result + ((srsId == null) ? 0 : srsId.hashCode());
 		result = prime * result + ((x == null) ? 0 : x.hashCode());
 		result = prime * result + ((y == null) ? 0 : y.hashCode());
+		result = prime * result + ((altitude == null) ? 0 : altitude.hashCode());
+		result = prime * result + ((accuracy == null) ? 0 : accuracy.hashCode());
 		return result;
 	}
 
@@ -148,6 +178,16 @@ public final class Coordinate extends AbstractValue {
 				return false;
 		} else if (!y.equals(other.y))
 			return false;
+		if (altitude == null) {
+			if (other.altitude != null)
+				return false;
+		} else if (!altitude.equals(other.altitude))
+			return false;
+		if (accuracy == null) {
+			if (other.accuracy != null)
+				return false;
+		} else if (!accuracy.equals(other.accuracy))
+			return false;		
 		return true;
 	}
 

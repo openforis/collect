@@ -27,8 +27,17 @@ public class CoordinateAttributeDefinitionProxy extends AttributeDefinitionProxy
 	
 	@ExternalizedProperty
 	public boolean isShowSrsField() {
-		CollectAnnotations annotations = getAnnotations();
-		return annotations.isShowSrsField((CoordinateAttributeDefinition) nodeDefinition);
+		return getAnnotations().isShowSrsField((CoordinateAttributeDefinition) nodeDefinition);
+	}
+
+	@ExternalizedProperty
+	public boolean isIncludeAltitudeField() {
+		return getAnnotations().isIncludeCoordinateAltitude((CoordinateAttributeDefinition) nodeDefinition);
+	}
+
+	@ExternalizedProperty
+	public boolean isIncludeAccuracyField() {
+		return getAnnotations().isIncludeCoordinateAccuracy((CoordinateAttributeDefinition) nodeDefinition);
 	}
 
 }

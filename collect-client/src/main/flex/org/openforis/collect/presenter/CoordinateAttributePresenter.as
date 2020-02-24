@@ -55,6 +55,10 @@ package org.openforis.collect.presenter
 			updReqSet.addRequest(xUpdateOp);
 			var yUpdateOp:NodeUpdateRequestProxy = view.yTextInput.presenter.createValueUpdateRequest();
 			updReqSet.addRequest(yUpdateOp);
+			var altUpdateOp:NodeUpdateRequestProxy = view.altitudeTextInput.presenter.createValueUpdateRequest();
+			updReqSet.addRequest(altUpdateOp);
+			var accUpdateOp:NodeUpdateRequestProxy = view.accuracyTextInput.presenter.createValueUpdateRequest();
+			updReqSet.addRequest(accUpdateOp);
 			
 			var srsUpdateOp:FieldUpdateRequestProxy = createSrsUpdateOperation();
 			if ( srsUpdateOp != null ) {
@@ -97,6 +101,8 @@ package org.openforis.collect.presenter
 				view.srsDropDownList.defaultValue = srs.id;
 			}
 			view.showSrsField = attrDefn.showSrsField || !singleSrs;
+			view.includeAltitudeField = attrDefn.includeAltitudeField;
+			view.includeAccuracyField = attrDefn.includeAccuracyField;
 			
 			if(attrDefn.parentLayout == UIUtil.LAYOUT_TABLE) {
 				if ( attrDefn.parent.direction == UIOptions$Direction.BY_COLUMNS ) {

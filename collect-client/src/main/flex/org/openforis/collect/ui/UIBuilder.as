@@ -227,7 +227,14 @@ package org.openforis.collect.ui {
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					return 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2;
+					var widthCoordAttr:Number = 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2;
+					if (CoordinateAttributeDefinitionProxy(def).includeAltitudeField) {
+						widthCoordAttr += 50 + COMPOSITE_ATTRIBUTE_H_GAP;
+					}
+					if (CoordinateAttributeDefinitionProxy(def).includeAccuracyField) {
+						widthCoordAttr += 50 + COMPOSITE_ATTRIBUTE_H_GAP;
+					}
+					return widthCoordAttr;
 				} else {
 					return 100;
 				}
@@ -615,7 +622,6 @@ package org.openforis.collect.ui {
 		
 		private static function addCoordinateAttributeLabels(compositeAttributeLabelsGroup:Group, 
 															 defn:CoordinateAttributeDefinitionProxy, directionByColumns:Boolean):void {
-			var fieldsOrder:UIOptions$CoordinateAttributeFieldsOrder = CoordinateAttributeDefinitionProxy(defn).fieldsOrder;
 			var srsLabelText:String = defn.getFieldLabelText("srs", Message.get('edit.coordinate.srs'));
 			var srsLabel:Label = getLabel(srsLabelText, 100, HEADER_LABEL_STYLE, directionByColumns);
 			srsLabel.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
@@ -625,7 +631,7 @@ package org.openforis.collect.ui {
 			var yLabelText:String = defn.getFieldLabelText("y", Message.get('edit.coordinate.y'));
 			var yLabel:Label = getLabel(yLabelText, 70, HEADER_LABEL_STYLE, directionByColumns);
 			yLabel.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-			switch(fieldsOrder) {
+			switch(defn.fieldsOrder) {
 				case UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y:
 					compositeAttributeLabelsGroup.addElement(srsLabel);
 					compositeAttributeLabelsGroup.addElement(xLabel);
@@ -646,6 +652,16 @@ package org.openforis.collect.ui {
 					compositeAttributeLabelsGroup.addElement(xLabel);
 					compositeAttributeLabelsGroup.addElement(srsLabel);
 					break;
+			}
+			if (defn.includeAltitudeField) {
+				var altitudeLabelText:String = defn.getFieldLabelText("altitude", Message.get('edit.coordinate.altitude'));
+				var altitudeLabel:Label = getLabel(altitudeLabelText, 50, HEADER_LABEL_STYLE, directionByColumns);
+				compositeAttributeLabelsGroup.addElement(altitudeLabel);
+			}
+			if (defn.includeAccuracyField) {
+				var accuracyLabelText:String = defn.getFieldLabelText("accuracy", Message.get('edit.coordinate.accuracy'));
+				var accuracyLabel:Label = getLabel(accuracyLabelText, 50, HEADER_LABEL_STYLE, directionByColumns);
+				compositeAttributeLabelsGroup.addElement(accuracyLabel);
 			}
 		}
 		

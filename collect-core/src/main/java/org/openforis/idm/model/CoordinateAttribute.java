@@ -28,13 +28,26 @@ public class CoordinateAttribute extends Attribute<CoordinateAttributeDefinition
 	public Field<String> getSrsIdField() {
 		return (Field<String>) getField(2);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Field<Double> getAltitudeField() {
+		return (Field<Double>) getField(3);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Field<Double> getAccuracyField() {
+		return (Field<Double>) getField(4);
+	}
 
 	@Override
 	public Coordinate getValue() {
 		Double x = getXField().getValue();
 		Double y = getYField().getValue();
 		String srsId = getSrsIdField().getValue();
-		return new Coordinate(x, y, srsId);
+		Double altitude = getAltitudeField().getValue();
+		Double accuracy = getAccuracyField().getValue();
+		
+		return new Coordinate(x, y, srsId, altitude, accuracy);
 	}
 
 	@Override
@@ -42,9 +55,14 @@ public class CoordinateAttribute extends Attribute<CoordinateAttributeDefinition
 		Double x = value.getX();
 		Double y = value.getY();
 		String srsId = value.getSrsId();
+		Double altitude = getAltitudeField().getValue();
+		Double accuracy = getAccuracyField().getValue();
+		
 		getXField().setValue(x);
 		getYField().setValue(y);
 		getSrsIdField().setValue(srsId);
+		getAltitudeField().setValue(altitude);
+		getAccuracyField().setValue(accuracy);
 	}
 	
 }

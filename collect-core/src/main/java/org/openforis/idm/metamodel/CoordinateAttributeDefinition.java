@@ -25,12 +25,18 @@ public class CoordinateAttributeDefinition extends AttributeDefinition  {
 	public static final String SRS_FIELD_NAME = "srs";
 	public static final String X_FIELD_NAME = "x";
 	public static final String Y_FIELD_NAME = "y";
+	public static final String ALTITUDE_FIELD_NAME = "altitude";
+	public static final String ACCURACY_FIELD_NAME = "accuracy";
 	
 	private final FieldDefinition<Double> xField = new FieldDefinition<Double>(X_FIELD_NAME, "x", "x", Double.class, this);
 	private final FieldDefinition<Double> yField = new FieldDefinition<Double>(Y_FIELD_NAME, "y", "y", Double.class, this);
 	private final FieldDefinition<String> srsIdField = new FieldDefinition<String>(SRS_FIELD_NAME, "srs", "srs", String.class, this);
+	private final FieldDefinition<Double> altitudeField = 
+		new FieldDefinition<Double>(ALTITUDE_FIELD_NAME, "alt", "alt", Double.class, this);
+	private final FieldDefinition<Double> accuracyField = 
+		new FieldDefinition<Double>(ACCURACY_FIELD_NAME, "acc", "acc", Double.class, this);
 
-	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(xField, yField, srsIdField);
+	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(xField, yField, srsIdField, altitudeField, accuracyField);
 
 	CoordinateAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
@@ -122,5 +128,13 @@ public class CoordinateAttributeDefinition extends AttributeDefinition  {
 	
 	public FieldDefinition<String> getSrsIdField() {
 		return srsIdField;
+	}
+	
+	public FieldDefinition<Double> getAltitudeField() {
+		return altitudeField;
+	}
+	
+	public FieldDefinition<Double> getAccuracyField() {
+		return accuracyField;
 	}
 }

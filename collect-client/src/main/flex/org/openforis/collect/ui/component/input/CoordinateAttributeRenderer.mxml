@@ -29,6 +29,10 @@
 			private var _singleSrs:Boolean = false;
 			[Bindable]
 			private var _showSrsField:Boolean = true;
+			[Bindable]
+			private var _includeAltitudeField:Boolean = false;
+			[Bindable]
+			private var _includeAccuracyField:Boolean = false;
 			
 			override protected function initPresenter():void {
 				this.presenter = new CoordinateAttributePresenter(this);
@@ -69,6 +73,24 @@
 			
 			public function set showSrsField(value:Boolean):void {
 				this._showSrsField = value;
+			}
+			
+			[Bindable]
+			public function get includeAltitudeField():Boolean {
+				return this._includeAltitudeField;
+			}
+			
+			public function set includeAltitudeField(value:Boolean):void {
+				this._includeAltitudeField = value;
+			}
+			
+			[Bindable]
+			public function get includeAccuracyField():Boolean {
+				return this._includeAccuracyField;
+			}
+			
+			public function set includeAccuracyField(value:Boolean):void {
+				this._includeAccuracyField = value;
 			}
 		]]>
 	</fx:Script>
@@ -112,6 +134,16 @@
 								 attribute="{attribute}" attributeDefinition="{attributeDefinition}"
 								 fieldIndex="1" itemCreationPolicy="immediate"
 								 parentEntity="{parentEntity}"/>
+		<input:NumericInputField id="altitudeTextInput" includeIn="horizontal_srs_x_y" width="50"
+							     attribute="{attribute}" attributeDefinition="{attributeDefinition}"
+							     fieldIndex="3" itemCreationPolicy="immediate"
+							     parentEntity="{parentEntity}"
+							     visible="{includeAltitudeField}" includeInLayout="{includeAltitudeField}"/>
+		<input:NumericInputField id="accuracyTextInput" includeIn="horizontal_srs_x_y" width="50"
+							     attribute="{attribute}" attributeDefinition="{attributeDefinition}"
+							     fieldIndex="4" itemCreationPolicy="immediate"
+							     parentEntity="{parentEntity}"
+							     visible="{includeAccuracyField}" includeInLayout="{includeAccuracyField}"/>
 	</s:HGroup>
 	
 	<s:HGroup includeIn="horizontal_srs_y_x" gap="6">
@@ -123,6 +155,12 @@
 		</s:HGroup>
 		<s:HGroup>
 			<fx:Reparent includeIn="horizontal_srs_y_x" target="xTextInput"/>
+		</s:HGroup>
+		<s:HGroup visible="{includeAltitudeField}" includeInLayout="{includeAltitudeField}">
+			<fx:Reparent includeIn="horizontal_srs_y_x" target="altitudeTextInput"/>
+		</s:HGroup>
+		<s:HGroup visible="{includeAccuracyField}" includeInLayout="{includeAccuracyField}">
+			<fx:Reparent includeIn="horizontal_srs_y_x" target="accuracyTextInput"/>
 		</s:HGroup>
 	</s:HGroup>
 	
@@ -136,6 +174,12 @@
 		<s:HGroup>
 			<fx:Reparent includeIn="horizontal_x_y_srs" target="srsSelectionContainer"/>
 		</s:HGroup>
+		<s:HGroup visible="{includeAltitudeField}" includeInLayout="{includeAltitudeField}">
+			<fx:Reparent includeIn="horizontal_x_y_srs" target="altitudeTextInput"/>
+		</s:HGroup>
+		<s:HGroup visible="{includeAccuracyField}" includeInLayout="{includeAccuracyField}">
+			<fx:Reparent includeIn="horizontal_x_y_srs" target="accuracyTextInput"/>
+		</s:HGroup>
 	</s:HGroup>
 	
 	<s:HGroup includeIn="horizontal_y_x_srs" gap="6">
@@ -147,6 +191,12 @@
 		</s:HGroup>
 		<s:HGroup>
 			<fx:Reparent includeIn="horizontal_y_x_srs" target="srsSelectionContainer"/>
+		</s:HGroup>
+		<s:HGroup visible="{includeAltitudeField}" includeInLayout="{includeAltitudeField}">
+			<fx:Reparent includeIn="horizontal_y_x_srs" target="altitudeTextInput"/>
+		</s:HGroup>
+		<s:HGroup visible="{includeAccuracyField}" includeInLayout="{includeAccuracyField}">
+			<fx:Reparent includeIn="horizontal_y_x_srs" target="accuracyTextInput"/>
 		</s:HGroup>
 	</s:HGroup>
 	
@@ -173,6 +223,20 @@
 											defaultText="{Message.get('edit.coordinate.y')}"
 											field="y" showTruncationTip="true" styleName="bold"/>
 				<fx:Reparent includeIn="vertical_srs_x_y" target="yTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0" visible="{includeAltitudeField}" includeInLayout="{includeAltitudeField}">
+				<detail:AttributeFieldLabel includeIn="vertical_form_srs_x_y" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.altitude')}"
+											field="altitude" showTruncationTip="true" styleName="bold"/>
+				<fx:Reparent includeIn="vertical_srs_x_y" target="altitudeTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0" visible="{includeAccuracyField}" includeInLayout="{includeAccuracyField}">
+				<detail:AttributeFieldLabel includeIn="vertical_form_srs_x_y" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.accuracy')}"
+											field="accuracy" showTruncationTip="true" styleName="bold"/>
+				<fx:Reparent includeIn="vertical_srs_x_y" target="accuracyTextInput"/>
 			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>
@@ -210,6 +274,20 @@
 						 					styleName="bold"/>
 				<fx:Reparent includeIn="vertical_srs_y_x" target="xTextInput"/>
 			</s:HGroup>
+			<s:HGroup gap="0" visible="{includeAltitudeField}" includeInLayout="{includeAltitudeField}">
+				<detail:AttributeFieldLabel includeIn="vertical_form_srs_y_x" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.altitude')}"
+											field="altitude" showTruncationTip="true" styleName="bold"/>
+				<fx:Reparent includeIn="vertical_srs_y_x" target="altitudeTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0" visible="{includeAccuracyField}" includeInLayout="{includeAccuracyField}">
+				<detail:AttributeFieldLabel includeIn="vertical_form_srs_y_x" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.accuracy')}"
+											field="accuracy" showTruncationTip="true" styleName="bold"/>
+				<fx:Reparent includeIn="vertical_srs_y_x" target="accuracyTextInput"/>
+			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>
 	
@@ -245,6 +323,20 @@
 											showTruncationTip="true" 
 											styleName="bold" />
 				<fx:Reparent includeIn="vertical_y_x_srs" target="srsSelectionContainer"/>
+			</s:HGroup>
+			<s:HGroup gap="0" visible="{includeAltitudeField}" includeInLayout="{includeAltitudeField}">
+				<detail:AttributeFieldLabel includeIn="vertical_form_y_x_srs" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.altitude')}"
+											field="altitude" showTruncationTip="true" styleName="bold"/>
+				<fx:Reparent includeIn="vertical_y_x_srs" target="altitudeTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0" visible="{includeAccuracyField}" includeInLayout="{includeAccuracyField}">
+				<detail:AttributeFieldLabel includeIn="vertical_form_y_x_srs" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.accuracy')}"
+											field="accuracy" showTruncationTip="true" styleName="bold"/>
+				<fx:Reparent includeIn="vertical_y_x_srs" target="accuracyTextInput"/>
 			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>
@@ -282,6 +374,21 @@
 											styleName="bold" />
 				<fx:Reparent includeIn="vertical_x_y_srs" target="srsSelectionContainer"/>
 			</s:HGroup>
+			<s:HGroup gap="0" visible="{includeAltitudeField}" includeInLayout="{includeAltitudeField}">
+				<detail:AttributeFieldLabel includeIn="vertical_form_x_y_srs" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.altitude')}"
+											field="altitude" showTruncationTip="true" styleName="bold"/>
+				<fx:Reparent includeIn="vertical_x_y_srs" target="altitudeTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0"  visible="{includeAccuracyField}" includeInLayout="{includeAccuracyField}">
+				<detail:AttributeFieldLabel includeIn="vertical_form_x_y_srs" width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.accuracy')}"
+											field="accuracy" showTruncationTip="true" styleName="bold"/>
+				<fx:Reparent includeIn="vertical_x_y_srs" target="accuracyTextInput"/>
+			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>
+	
 </detail:CompositeAttributeRenderer>
