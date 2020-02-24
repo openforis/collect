@@ -609,6 +609,7 @@ public class RecordController extends BasicController implements Serializable {
 		Response res = new Response();
 		if (activeRecord != null && activeRecord.getId() != null && activeRecord.getId().equals(recordId)) {
 			recordManager.releaseLock(recordId);
+			sessionManager.clearActiveRecord();
 			appWS.sendMessage(new AppWS.RecordUnlockedMessage(recordId));
 		} else {
 			res.setErrorStatus();
