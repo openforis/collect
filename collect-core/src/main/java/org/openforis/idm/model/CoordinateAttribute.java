@@ -52,17 +52,11 @@ public class CoordinateAttribute extends Attribute<CoordinateAttributeDefinition
 
 	@Override
 	protected void setValueInFields(Coordinate value) {
-		Double x = value.getX();
-		Double y = value.getY();
-		String srsId = value.getSrsId();
-		Double altitude = getAltitudeField().getValue();
-		Double accuracy = getAccuracyField().getValue();
-		
-		getXField().setValue(x);
-		getYField().setValue(y);
-		getSrsIdField().setValue(srsId);
-		getAltitudeField().setValue(altitude);
-		getAccuracyField().setValue(accuracy);
+		getXField().setValue(value.getX());
+		getYField().setValue(value.getY());
+		getSrsIdField().setValue(value.getSrsId());
+		getAltitudeField().setValue(value.getAltitude());
+		getAccuracyField().setValue(value.getAccuracy());
 	}
 	
 }
