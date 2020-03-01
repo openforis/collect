@@ -11,7 +11,6 @@ import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.SpeciesListService;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
@@ -22,7 +21,7 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  * @author S. Ricci
  * 
  */
-public class CollectSurveyContext implements SurveyContext, Serializable {
+public class CollectSurveyContext implements SurveyContext<CollectSurvey>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -57,7 +56,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	}
 	
 	@Override
-	public Survey createSurvey() {
+	public CollectSurvey createSurvey() {
 		CollectSurvey survey = new CollectSurvey(this);
 		//application options
 		UIOptions uiOptions = survey.createUIOptions();
@@ -119,4 +118,5 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	public void setCoordinateOperations(CoordinateOperations coordinateOperations) {
 		this.coordinateOperations = coordinateOperations;
 	}
+	
 }

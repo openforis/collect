@@ -11,7 +11,7 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  * @author G. Miceli
  * @author S. Ricci
  */
-public class DefaultSurveyContext implements SurveyContext {
+public class DefaultSurveyContext implements SurveyContext<Survey> {
 
 	private ExpressionFactory expressionFactory;
 	private ExpressionEvaluator expressionEvaluator;
@@ -63,7 +63,7 @@ public class DefaultSurveyContext implements SurveyContext {
 	public CoordinateOperations getCoordinateOperations() {
 		return coordinateOperations;
 	}
-
+	
 	@Override
 	public Survey createSurvey() {
 		return new Survey(this);

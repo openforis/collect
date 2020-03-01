@@ -559,13 +559,12 @@ public class SurveyManager {
 	public CollectSurvey unmarshalSurvey(Reader reader,
 			boolean validate, boolean includeCodeListItems)
 			throws IdmlParseException, SurveyValidationException {
-		CollectSurvey survey;
 		File tempFile = OpenForisIOUtils.copyToTempFile(reader);
 		if ( validate ) {
 			//validate against schema
 			validateSurveyXMLAgainstSchema(tempFile);
 		}
-		survey = unmarshalSurvey(tempFile, includeCodeListItems);
+		CollectSurvey survey = unmarshalSurvey(tempFile, includeCodeListItems);
 		if ( validate ) {
 			surveyValidator.validate(survey);
 		}

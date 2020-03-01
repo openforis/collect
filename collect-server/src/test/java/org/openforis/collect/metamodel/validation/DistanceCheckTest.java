@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.model.CollectTestSurveyContext;
+import org.openforis.collect.model.TestLookupProviderImpl;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.metamodel.validation.ValidationResult;
@@ -30,8 +31,9 @@ public class DistanceCheckTest extends ValidationTest {
 	@Before
 	public void setup() {
 		CollectTestSurveyContext surveyContext = (CollectTestSurveyContext) record.getSurveyContext();
-		surveyContext.lookupProvider.coordinate = TEST_COORDINATE;
-		surveyContext.lookupProvider.samplingPointData = TEST_SAMPLING_POINT_DATA;
+		TestLookupProviderImpl lookupProvider = (TestLookupProviderImpl) surveyContext.getExpressionFactory().getLookupProvider();
+		lookupProvider.coordinate = TEST_COORDINATE;
+		lookupProvider.samplingPointData = TEST_SAMPLING_POINT_DATA;
 	}
 
 	@Test

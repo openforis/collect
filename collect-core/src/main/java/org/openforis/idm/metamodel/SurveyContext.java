@@ -13,7 +13,7 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  * @author G. Miceli
  * @author S. Ricci
  */
-public interface SurveyContext {
+public interface SurveyContext<S extends Survey> {
 
 	ExpressionFactory getExpressionFactory();
 	
@@ -29,5 +29,5 @@ public interface SurveyContext {
 	
 	CoordinateOperations getCoordinateOperations();
 	
-	Survey createSurvey();
+	S createSurvey();
 }

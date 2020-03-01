@@ -49,7 +49,7 @@ public class CollectSurvey extends Survey {
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
 	
-	protected CollectSurvey(SurveyContext surveyContext) {
+	protected CollectSurvey(SurveyContext<CollectSurvey> surveyContext) {
 		super(surveyContext);
 		this.temporary = false;
 		this.target = SurveyTarget.COLLECT_DESKTOP;

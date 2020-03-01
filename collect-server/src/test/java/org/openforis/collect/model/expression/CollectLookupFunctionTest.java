@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.AbstractTest;
 import org.openforis.collect.model.CollectTestSurveyContext;
+import org.openforis.collect.model.TestLookupProviderImpl;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.EntityBuilder;
@@ -26,7 +27,7 @@ public class CollectLookupFunctionTest extends AbstractTest {
 	@Before
 	public void setup() {
 		CollectTestSurveyContext surveyContext = (CollectTestSurveyContext) record.getSurveyContext();
-		surveyContext.lookupProvider.coordinate = TEST_COORDINATE;
+		((TestLookupProviderImpl) surveyContext.getExpressionFactory().getLookupProvider()).coordinate = TEST_COORDINATE;
 		expressionEvaluator = surveyContext.getExpressionEvaluator();
 	}
 	

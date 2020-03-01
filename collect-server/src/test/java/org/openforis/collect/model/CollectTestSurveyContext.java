@@ -4,16 +4,16 @@ import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.SpeciesListService;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.ExpressionFactory;
 
-public class CollectTestSurveyContext implements SurveyContext {
+public class CollectTestSurveyContext implements SurveyContext<CollectSurvey> {
 
 	private ExpressionFactory expressionFactory;
-	public TestLookupProviderImpl lookupProvider;
+	private LookupProvider lookupProvider;
 	private ExpressionEvaluator expressionEvaluator;
 	private CoordinateOperations coordinateOperations;	
 
@@ -31,7 +31,7 @@ public class CollectTestSurveyContext implements SurveyContext {
 	public ExpressionFactory getExpressionFactory() {
 		return expressionFactory;
 	}
-
+	
 	@Override
 	public ExpressionEvaluator getExpressionEvaluator() {
 		return expressionEvaluator;
@@ -63,7 +63,7 @@ public class CollectTestSurveyContext implements SurveyContext {
 	}
 	
 	@Override
-	public Survey createSurvey() {
+	public CollectSurvey createSurvey() {
 		return new CollectSurvey(this);
 	}
 
