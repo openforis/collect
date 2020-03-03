@@ -426,11 +426,11 @@ public class DatabaseExternalCodeListProvider implements
 		return ((CollectSurvey) list.getSurvey()).isSamplingDesignCodeList(list);
 	}
 
-	public DynamicTableDao getDynamicTableDao() {
-		return dynamicTableDao;
-	}
-
 	public void setDynamicTableDao(DynamicTableDao dynamicTableDao) {
 		this.dynamicTableDao = dynamicTableDao;
+	}
+	
+	public void setSamplingDesignDao(SamplingDesignDao samplingDesignDao) {
+		this.samplingDesignDao = samplingDesignDao;
 	}
 }
