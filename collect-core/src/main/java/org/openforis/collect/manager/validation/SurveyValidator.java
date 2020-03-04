@@ -30,6 +30,7 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult.Flag;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
@@ -44,6 +45,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -136,8 +138,12 @@ public class SurveyValidator {
 			"survey.validation.attribute.default_value.error.invalid_condition_expression";
 	private static final String INVALID_RELEVANT_EXPRESSION_MESSAGE_KEY = 
 			"survey.validation.node.error.invalid_relevant_expression";
+	private static final String INVALID_PARENT_ATTRIBUTE_RELATION_MESSAGE_KEY = 
+			"survey.validation.attribute.code.invalid_parent_attribute_relation";
 	private static final String INVALID_PARENT_EXPRESSION_MESSAGE_KEY = 
 			"survey.validation.attribute.code.invalid_parent_expression";
+	private static final String INCOMPATIBILITY_WITH_CALC_COORDINATE_ATTRIBUTE =
+			"survey.validation.attribute.coordinate.incompatibility_with_calc";
 	private static final String INVALID_QUALIFIER_EXPRESSION_MESSAGE_KEY = 
 			"survey.validation.attribute.taxon.error.invalid_qualifier_expression";
 	private static final String INVALID_REFERENCED_KEY_ATTRIBUTE_MESSAGE_KEY = 
@@ -146,8 +152,6 @@ public class SurveyValidator {
 			"survey.validation.attribute.key_attribute_cannot_be_multiple";
 	private static final String INVALID_TAXONOMY_MESSAGE_KEY = 
 			"survey.validation.attribute.taxon.invalid_taxonomy";
-	private static final String INVALID_PARENT_ATTRIBUTE_RELATION_MESSAGE_KEY = 
-			"survey.validation.attribute.code.invalid_parent_attribute_relation";
 	private static final String CHECK_UNIQUENESS_INVALID_UNIQUENESS_EXPRESSION_MESSAGE_KEY = 
 			"survey.validation.check.uniqueness.error.invalid_uniqueness_expression";
 	private static final String CHECK_PATTERN_INVALID_PATTERN_EXPRESSION_MESSAGE_KEY = 
@@ -508,6 +512,8 @@ public class SurveyValidator {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		if (attrDef instanceof CodeAttributeDefinition) {
 			addIfNotOk(results, validateCodeAttribute((CodeAttributeDefinition) attrDef));
+		} else if (attrDef instanceof CoordinateAttributeDefinition) {
+			addIfNotOk(results, validateCoordinateAttribute((CoordinateAttributeDefinition) attrDef));
 		} else if (attrDef instanceof TaxonAttributeDefinition) {
 			addIfNotOk(results, validateTaxonomy((TaxonAttributeDefinition) attrDef));
 		}
@@ -527,6 +533,13 @@ public class SurveyValidator {
 		}
 	}
 
+	private SurveyValidationResult validateCoordinateAttribute(CoordinateAttributeDefinition attrDef) {
+		CollectAnnotations annotations = attrDef.<CollectSurvey>getSurvey().getAnnotations();
+		return annotations.isIncludeCoordinateAccuracy(attrDef) || annotations.isIncludeCoordinateAltitude(attrDef)
+			? new SurveyValidationResult(Flag.WARNING, attrDef.getPath(), INCOMPATIBILITY_WITH_CALC_COORDINATE_ATTRIBUTE)
+			: null;
+	}
+	
 	private SurveyValidationResult validateTaxonomy(TaxonAttributeDefinition attrDef) {
 		CollectSurvey survey = (CollectSurvey) attrDef.getSurvey();
 		boolean surveyIsStored = survey.getId() != null;
@@ -895,7 +908,7 @@ public class SurveyValidator {
 	}
 	
 	private void addIfNotOk(List<SurveyValidationResult> results, SurveyValidationResult result) {
-		if (result.getFlag() != Flag.OK) {
+		if (result != null && result.getFlag() != Flag.OK) {
 			results.add(result);
 		}
 	}
