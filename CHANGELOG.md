@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.26.0] - 2020-03-04
+### Added
+- Added altitude and accuracy fields (optional) to Coordinate attributes
+
 ## [3.25.0] - 2020-01-13
 ### Added
 - Added Reporting label (Saiku) to Schema summary export; changed exported type to Excel
