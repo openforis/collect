@@ -59,4 +59,9 @@ public class CoordinateAttribute extends Attribute<CoordinateAttributeDefinition
 		getAccuracyField().setValue(value.getAccuracy());
 	}
 	
+	@Override
+	public boolean isFilled() {
+		return !(getSrsIdField().isEmpty() || getXField().isEmpty() || getYField().isEmpty());
+	}
+	
 }

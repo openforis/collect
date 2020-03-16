@@ -129,7 +129,9 @@ public final class Coordinate extends AbstractValue {
 
 	@Override
 	public String toPrettyFormatString() {
-		return String.format(Locale.ENGLISH, TO_STRING_FORMAT, srsId, x, y);
+		return x != null || y != null || srsId != null 
+				? String.format(Locale.ENGLISH, TO_STRING_FORMAT, srsId, x, y)
+				: "";
 	}
 
 	@Override

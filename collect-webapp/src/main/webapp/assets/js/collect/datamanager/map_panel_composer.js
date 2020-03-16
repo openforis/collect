@@ -17,43 +17,42 @@ Collect.DataManager.MapPanelComposer = function(panel) {
 	this.samplingPointStyleCache = {};
 }
 
-Collect.DataManager.MapPanelComposer.SAMPLING_POINT_STYLE = new ol.style.Style({
-	image : new ol.style.Circle({
-		fill : new ol.style.Fill({
-			color : [0,0,255,0.1] //almost transparent fill
-		}),
-		stroke: new ol.style.Stroke({
-			color : "#0000FF",
-			width: 2
-		}),
-		radius : 5
-	})
-});
+Collect.DataManager.MapPanelComposer._SRS_ID = 'EPSG:3857';
 
-Collect.DataManager.MapPanelComposer.DATA_ENTRY_RECORD_STYLE = new ol.style.Style({
-	image : new ol.style.Circle({
-		fill : new ol.style.Fill({
-			color : "#FF0000"
-		}),
-		radius : 5
+Collect.DataManager.MapPanelComposer._newCircleStyle = function (fillColor, radius = 5, strokeColor = null, strokeWidth = null) {
+	return new ol.style.Style({
+		image : new ol.style.Circle({
+			fill : new ol.style.Fill({
+				color : fillColor
+			}),
+			radius,
+			...strokeColor
+				? {
+					stroke: new ol.style.Stroke({
+						color : strokeColor,
+						width: strokeWidth
+					}),
+				}
+				: {}
+		})
 	})
-});
-Collect.DataManager.MapPanelComposer.DATA_CLEANSING_RECORD_STYLE = new ol.style.Style({
-	image : new ol.style.Circle({
-		fill : new ol.style.Fill({
-			color : "#FF9933"
-		}),
-		radius : 5
-	})
-});
-Collect.DataManager.MapPanelComposer.DATA_ANALYSIS_RECORD_STYLE = new ol.style.Style({
-	image : new ol.style.Circle({
-		fill : new ol.style.Fill({
-			color : "#00FF00"
-		}),
-		radius : 5
-	})
-});
+}
+
+Collect.DataManager.MapPanelComposer.SAMPLING_POINT_STYLE = Collect.DataManager.MapPanelComposer._newCircleStyle(
+	[0,0,255,0.1], //almost transparent fill
+	5,
+	"#0000FF", //blue
+	2,
+);
+Collect.DataManager.MapPanelComposer.DATA_ENTRY_RECORD_STYLE = Collect.DataManager.MapPanelComposer._newCircleStyle(
+    "#FF0000", //red
+);
+Collect.DataManager.MapPanelComposer.DATA_CLEANSING_RECORD_STYLE = Collect.DataManager.MapPanelComposer._newCircleStyle(
+    "#FF9933",
+);
+Collect.DataManager.MapPanelComposer.DATA_ANALYSIS_RECORD_STYLE = Collect.DataManager.MapPanelComposer._newCircleStyle(
+	"#00FF00", //green
+);
 
 Collect.DataManager.MapPanelComposer.prototype.init = function(onComplete) {
 	var $this = this;
@@ -122,7 +121,7 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 			surveysOverlayGroup
 		],
 		view : new ol.View({
-			projection: 'EPSG:4326',
+			projection: Collect.DataManager.MapPanelComposer._SRS_ID,
 			center : [$this.startLon, $this.startLat],
 			zoom : $this.startZoom
 		}),
@@ -452,10 +451,8 @@ Collect.DataManager.MapPanelComposer.prototype.createBaseMapsLayer = function() 
 		type : 'base',
 		visible : false,
 		source : new ol.source.XYZ({
-			attributions : [ new ol.Attribution({
-				html : 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
-					'rest/services/World_Topo_Map/MapServer">ArcGIS</a>'
-			}) ],
+			attributions : 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
+					'rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
 			url : 'https://server.arcgisonline.com/ArcGIS/rest/services/' +
 				'World_Topo_Map/MapServer/tile/{z}/{y}/{x}'
 		})
@@ -467,10 +464,8 @@ Collect.DataManager.MapPanelComposer.prototype.createBaseMapsLayer = function() 
 		visible : true,
 		// Esri_WorldImagery
 		source : new ol.source.XYZ({
-			attributions : [ new ol.Attribution({
-				html : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
-					'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-			}) ],
+			attributions : 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, ' +
+					'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
 			url : 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 		})
 	});
@@ -497,9 +492,9 @@ Collect.DataManager.MapPanelComposer.prototype.onTileVisibleChange = function(ev
 	
 	var tile = event.target;
 	if (tile.getVisible()) {
-		var survey = tile.get('survey');
+		if (tile.getSource && tile.getSource() == null) {
+			var survey = tile.get('survey');
 
-		if (tile.getSource() == null) {
 			switch (tile.get('type')) {
 			case 'sampling_points':
 				$this.createSamplingPointDataSource(survey, function(source) {
@@ -536,7 +531,7 @@ Collect.DataManager.MapPanelComposer.prototype.onTileVisibleChange = function(ev
 
 Collect.DataManager.MapPanelComposer.prototype.zoomToLayer = function(tile) {
 	$this = this;
-	if (tile.getSource() != null) {
+	if (tile.getSource && tile.getSource() != null) {
 		var extent = tile.getSource().getExtent();
 		if (extent.length > 0 && isFinite(extent[0])) {
 			$this.map.getView().fit(extent, {
@@ -654,9 +649,8 @@ Collect.DataManager.MapPanelComposer.prototype.createGeometryDataSource = functi
 		};
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset) {
-			var srsId = 'EPSG:4326';
 			collect.geoDataService.loadGeometryValues(survey.id, attributeDef.id, 
-					srsId, blockOffset, batchSize, processGeometries);
+					Collect.DataManager.MapPanelComposer._SRS_ID, blockOffset, batchSize, processGeometries);
 		}, 500);
 
 		jobDialog.cancelBtn.click(function() {
@@ -725,9 +719,8 @@ Collect.DataManager.MapPanelComposer.prototype.createCoordinateDataSource = func
 		};
 
 		var batchProcessor = new OF.Batch.BatchProcessor(totalItems, batchSize, function(blockOffset) {
-			var srsId = 'EPSG:4326';
 			collect.geoDataService.loadCoordinateValues(survey.id, coordinateAttributeDef.id, 
-					srsId, blockOffset, batchSize, processCoordinateValues);
+					Collect.DataManager.MapPanelComposer._SRS_ID, blockOffset, batchSize, processCoordinateValues);
 		}, 500);
 
 		jobDialog.cancelBtn.click(function() {
