@@ -411,7 +411,7 @@ public class SurveyValidator {
 		if (def instanceof EntityDefinition) {
 			results.addAll(validateEntity((EntityDefinition) def, validationParameters));
 		} else {
-			results.addAll(validateAttribute((AttributeDefinition) def));
+			results.addAll(validateAttribute((AttributeDefinition) def, validationParameters));
 		}
 		return results;
 	}
@@ -508,12 +508,12 @@ public class SurveyValidator {
 		return results;
 	}
 	
-	protected List<SurveyValidationResult> validateAttribute(AttributeDefinition attrDef) {
+	protected List<SurveyValidationResult> validateAttribute(AttributeDefinition attrDef, ValidationParameters validationParameters) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		if (attrDef instanceof CodeAttributeDefinition) {
 			addIfNotOk(results, validateCodeAttribute((CodeAttributeDefinition) attrDef));
 		} else if (attrDef instanceof CoordinateAttributeDefinition) {
-			addIfNotOk(results, validateCoordinateAttribute((CoordinateAttributeDefinition) attrDef));
+			addIfNotOk(results, validateCoordinateAttribute((CoordinateAttributeDefinition) attrDef, validationParameters));
 		} else if (attrDef instanceof TaxonAttributeDefinition) {
 			addIfNotOk(results, validateTaxonomy((TaxonAttributeDefinition) attrDef));
 		}
@@ -533,9 +533,11 @@ public class SurveyValidator {
 		}
 	}
 
-	private SurveyValidationResult validateCoordinateAttribute(CoordinateAttributeDefinition attrDef) {
+	private SurveyValidationResult validateCoordinateAttribute(CoordinateAttributeDefinition attrDef, ValidationParameters validationParameters) {
 		CollectAnnotations annotations = attrDef.<CollectSurvey>getSurvey().getAnnotations();
-		return annotations.isIncludeCoordinateAccuracy(attrDef) || annotations.isIncludeCoordinateAltitude(attrDef)
+		return !validationParameters.isWarningsIgnored() && (
+				annotations.isIncludeCoordinateAccuracy(attrDef) || annotations.isIncludeCoordinateAltitude(attrDef)
+			)
 			? new SurveyValidationResult(Flag.WARNING, attrDef.getPath(), INCOMPATIBILITY_WITH_CALC_COORDINATE_ATTRIBUTE)
 			: null;
 	}
