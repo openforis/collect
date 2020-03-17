@@ -146,8 +146,10 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5.3</version>
 				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<!-- During release:perform, enable these profiles -->
-					<releaseProfiles>installer,publishupdater</releaseProfiles>
+<!-- 					<releaseProfiles>installer,publishupdater</releaseProfiles> -->
+					<releaseProfiles>installer</releaseProfiles>
 				</configuration>
 	    	</plugin>
 <!-- 	    	<plugin> -->
