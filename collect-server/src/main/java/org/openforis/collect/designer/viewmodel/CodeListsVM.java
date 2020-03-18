@@ -33,8 +33,10 @@ import org.openforis.collect.io.metadata.codelist.CodeListImportTask;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
+import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess.OutputFormat;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
+import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.concurrency.Job;
@@ -639,12 +641,22 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@Command
-	public void exportCodeList() throws IOException {
+	public void exportCodeListToCsv() throws IOException {
+		exportCodeList(OutputFormat.CSV);
+	}
+	
+	@Command
+	public void exportCodeListToExcel() throws IOException {
+		exportCodeList(OutputFormat.EXCEL);
+	}
+	
+	private void exportCodeList(OutputFormat outputFormat) throws IOException {
 		CollectSurvey survey = getSurvey();
 		CodeListExportProcess codeListExportProcess = new CodeListExportProcess(codeListManager);
-		File tempFile = File.createTempFile("code_list_" + editedItem.getName(), ".csv");
+		String extension = outputFormat == OutputFormat.CSV ? Files.CSV_FILE_EXTENSION : Files.EXCEL_FILE_EXTENSION;
+		File tempFile = File.createTempFile("code_list_" + editedItem.getName(), "." + extension);
 		FileOutputStream os = new FileOutputStream(tempFile);
-		codeListExportProcess.exportToCSV(os, survey, editedItem.getId());
+		codeListExportProcess.export(os, survey, editedItem.getId(), outputFormat);
 		Filedownload.save(tempFile, MediaTypes.CSV_CONTENT_TYPE);
 	}
 

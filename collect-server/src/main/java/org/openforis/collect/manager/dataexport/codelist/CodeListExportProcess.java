@@ -15,6 +15,8 @@ import org.openforis.collect.manager.codelistimport.CodeListCSVReader;
 import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.io.csv.CsvWriter;
+import org.openforis.commons.io.excel.ExcelFlatValuesWriter;
+import org.openforis.commons.io.flat.FlatDataWriter;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -32,6 +34,10 @@ public class CodeListExportProcess {
 	private static final char SEPARATOR = ',';
 	private static final char QUOTECHAR = '"';
 	
+	public enum OutputFormat {
+		CSV, EXCEL
+	}
+	
 	private CodeListManager codeListManager;
 	
 	public CodeListExportProcess(CodeListManager codeListManager) {
@@ -40,10 +46,16 @@ public class CodeListExportProcess {
 	}
 
 	public void exportToCSV(OutputStream out, CollectSurvey survey, int codeListId) {
-		CsvWriter writer = null;
+		export(out, survey, codeListId, OutputFormat.CSV);
+	}
+
+	public void export(OutputStream out, CollectSurvey survey, int codeListId, OutputFormat outputFormat) {
+		FlatDataWriter writer = null;
 		try {
 			OutputStreamWriter osWriter = new OutputStreamWriter(out, Charset.forName("UTF-8"));
-			writer = new CsvWriter(osWriter, SEPARATOR, QUOTECHAR);
+			writer = outputFormat == OutputFormat.CSV 
+					? new CsvWriter(osWriter, SEPARATOR, QUOTECHAR)
+				    : new ExcelFlatValuesWriter(out);
 			CodeList list = survey.getCodeListById(codeListId);
 			initHeaders(writer, survey, list);
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
@@ -58,7 +70,7 @@ public class CodeListExportProcess {
 		}
 	}
 
-	private void initHeaders(CsvWriter writer, CollectSurvey survey,
+	private void initHeaders(FlatDataWriter writer, CollectSurvey survey,
 			CodeList list) {
 		ArrayList<String> colNames = new ArrayList<String>();
 		List<CodeListLevel> levels = list.getHierarchy();
@@ -85,7 +97,7 @@ public class CodeListExportProcess {
 		writer.writeHeaders(colNames);
 	}
 
-	protected void writeItem(CsvWriter writer, CodeListItem item, List<CodeListItem> ancestors) {
+	protected void writeItem(FlatDataWriter writer, CodeListItem item, List<CodeListItem> ancestors) {
 		List<String> lineValues = new ArrayList<String>();
 		addAncestorsLineValues(lineValues, ancestors);
 		addItemLineValues(lineValues, item);
