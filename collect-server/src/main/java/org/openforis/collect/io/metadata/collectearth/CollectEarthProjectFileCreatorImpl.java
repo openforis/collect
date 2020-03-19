@@ -172,6 +172,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_planet_maps", isPlanetMapsEnabled(survey));
 		p.put("open_yandex_maps", isYandexMapsEnabled(survey));
 		p.put("open_earth_engine", isGEEExplorerEnabled(survey));
+		p.put("open_gee_app", isGEEAppEnabled(survey));
+		p.put("open_maxar_securewatch", isSecureWatchEnabled(survey));
 		p.put("open_gee_playground", isGEECodeEditorEnabled(survey));
 		p.put("open_street_view", isStreetViewEnabled(survey));
 		p.put("extra_map_url", StringUtils.trimToEmpty(getExtraMapUrl(survey)));
@@ -239,6 +241,16 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private String isGEECodeEditorEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isGEECodeEditorEnabled()?"true":"false";
+	}
+	
+	private String isGEEAppEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isGEEAppEnabled()?"true":"false";
+	}
+	
+	private String isSecureWatchEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isSecureWatchEnabled()?"true":"false";
 	}
 	
 	private String isStreetViewEnabled(CollectSurvey survey){

@@ -132,6 +132,8 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			annotations.setStreetViewEnabled(Boolean.parseBoolean(p.getProperty("open_street_view")));
 			annotations.setGEEExplorerEnabled(Boolean.parseBoolean(p.getProperty("open_earth_engine")));
 			annotations.setGEECodeEditorEnabled(Boolean.parseBoolean(p.getProperty("open_gee_playground")));
+			annotations.setGEEAppEnabled(Boolean.parseBoolean(p.getProperty("open_gee_app")));
+			annotations.setSecureWatchEnabled(Boolean.parseBoolean(p.getProperty("open_maxar_securewatch")));
 			annotations.setCollectEarthSamplePoints(getIntegerProperty(p, "number_of_sampling_points_in_plot", 9));
 			annotations.setCollectEarthPlotArea(calculatePlotArea(p));
 			surveyManager.save(survey);

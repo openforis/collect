@@ -178,15 +178,16 @@
 				<space width="30px" />
 
 				<fieldErrorHandler
-					message="@load(vmsgs['openGEEExplorer'])">
+					message="@load(vmsgs['openPlanetMaps'])">
 					<label
-						value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />
+						value="${labels.survey.collect_earth.other_settings.open_planet_maps}:" />
 					<checkbox
-						checked="@load(fx.openGEEExplorer eq true) @save(fx.openGEEExplorer)"
+						checked="@load(fx.openPlanetMaps eq true) @save(fx.openPlanetMaps)"
 						onCheck="@command('applyChanges')" />
 				</fieldErrorHandler>
-
+				
 				<space width="30px" />
+				
 
 				<fieldErrorHandler
 					message="@load(vmsgs['openGEECodeEditor'])">
@@ -194,6 +195,31 @@
 						value="${labels.survey.collect_earth.other_settings.open_gee_code_editor}:" />
 					<checkbox
 						checked="@load(fx.openGEECodeEditor eq true) @save(fx.openGEECodeEditor)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+				
+				<space width="30px" />
+
+				<fieldErrorHandler
+					message="@load(vmsgs['openGEEApp'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_gee_app}:" />
+					<checkbox
+						checked="@load(fx.openGEEApp eq true) @save(fx.openGEEApp)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+
+			</hlayout>
+
+
+			<hlayout style="padding: 10px">
+
+				<fieldErrorHandler
+					message="@load(vmsgs['openGEEExplorer'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_gee_explorer}:" />
+					<checkbox
+						checked="@load(fx.openGEEExplorer eq true) @save(fx.openGEEExplorer)"
 						onCheck="@command('applyChanges')" />
 				</fieldErrorHandler>
 
@@ -221,14 +247,6 @@
 				
 				<space width="30px" />
 
-				<fieldErrorHandler
-					message="@load(vmsgs['openPlanetMaps'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_planet_maps}:" />
-					<checkbox
-						checked="@load(fx.openPlanetMaps eq true) @save(fx.openPlanetMaps)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
 			</hlayout>
 
 			<hlayout style="padding: 10px">

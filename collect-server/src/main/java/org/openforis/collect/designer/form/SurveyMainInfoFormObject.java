@@ -25,6 +25,8 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private boolean openYandexMaps;
 	private boolean openGEEExplorer;
 	private boolean openGEECodeEditor;
+	private boolean openGEEApp;
+	private boolean openSecureWatch;
 	private boolean openStreetView;
 	
 	private String defaultDescription;
@@ -54,6 +56,8 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		openStreetView = annotations.isStreetViewEnabled();
 		openGEEExplorer = annotations.isGEEExplorerEnabled();
 		openGEECodeEditor = annotations.isGEECodeEditorEnabled();
+		openGEEApp = annotations.isGEEAppEnabled();
+		openSecureWatch = annotations.isSecureWatchEnabled();
 		keyChangeAllowed = annotations.isKeyChangeAllowed();
 	}
 
@@ -79,6 +83,8 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		annotations.setYandexMapsEnabled( openYandexMaps );
 		annotations.setStreetViewEnabled( openStreetView );
 		annotations.setGEECodeEditorEnabled( openGEECodeEditor );
+		annotations.setGEEAppEnabled( openGEEApp );
+		annotations.setSecureWatchEnabled( openSecureWatch );
 		annotations.setGEEExplorerEnabled(openGEEExplorer );
 		annotations.setKeyChangeAllowed(keyChangeAllowed);
 	}
@@ -202,6 +208,22 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 
 	public void setOpenGEECodeEditor(boolean openGEECodeEditor) {
 		this.openGEECodeEditor = openGEECodeEditor;
+	}
+	
+	public boolean isOpenGEEApp() {
+		return openGEEApp;
+	}
+
+	public void setOpenGEEApp(boolean openGEEApp) {
+		this.openGEEApp = openGEEApp;
+	}
+	
+	public boolean isOpenSecureWatch() {
+		return openSecureWatch;
+	}
+
+	public void setOpenSecureWatch(boolean openSecureWatch) {
+		this.openSecureWatch = openSecureWatch;
 	}
 
 	public boolean isOpenStreetView() {

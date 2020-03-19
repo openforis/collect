@@ -107,7 +107,9 @@ public class CollectAnnotations {
 		COLLECT_EARTH_OPEN_PLANET_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openPlanetMaps"), false), 
 		COLLECT_EARTH_OPEN_YANDEX_MAPS(new QName(COLLECT_EARTH_NAMESPACE_URI, "openYandexMaps"), false),
 		COLLECT_EARTH_OPEN_GEE_EXPLORER(new QName(COLLECT_EARTH_NAMESPACE_URI, "openExplorer"), true), 
-		COLLECT_EARTH_OPEN_GEE_CODE_EDITOR(new QName(COLLECT_EARTH_NAMESPACE_URI, "openCodeEditor"), true), 
+		COLLECT_EARTH_OPEN_GEE_CODE_EDITOR(new QName(COLLECT_EARTH_NAMESPACE_URI, "openCodeEditor"), true),
+		COLLECT_EARTH_OPEN_GEE_APP(new QName(COLLECT_EARTH_NAMESPACE_URI, "openGEEApp"), true),
+		COLLECT_EARTH_OPEN_SECUREWATCH(new QName(COLLECT_EARTH_NAMESPACE_URI, "openSecureWatch"), true),
 		COLLECT_EARTH_OPEN_STREET_VIEW(new QName(COLLECT_EARTH_NAMESPACE_URI, "openStreetView"), false),
 		
 		//Collect Mobile
@@ -378,8 +380,24 @@ public class CollectAnnotations {
 		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR);
 	}
 	
+	public boolean isGEEAppEnabled() {
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_GEE_APP);
+	}
+	
+	public boolean isSecureWatchEnabled() {
+		return getAnnotationValueBoolean(survey, Annotation.COLLECT_EARTH_OPEN_SECUREWATCH);
+	}
+	
 	public void setGEECodeEditorEnabled( boolean value) {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_CODE_EDITOR, value);
+	}
+	
+	public void setGEEAppEnabled( boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_GEE_APP, value);
+	}
+	
+	public void setSecureWatchEnabled( boolean value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_OPEN_SECUREWATCH, value);
 	}
 
 	public boolean isStreetViewEnabled() {
