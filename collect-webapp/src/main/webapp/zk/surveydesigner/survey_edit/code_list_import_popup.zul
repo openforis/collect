@@ -1,20 +1,48 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
-	<custom-attributes codeListId="${arg.codeListId}" />
-	<window id="codeListImportPopUp"
-		title="${labels.survey.code_list.import_data.title}" border="normal"
-		position="center" 
-		sclass="form"
-		closable="false" 
-		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListImportVM')"
-		validationMessages="@id('vmsgs')">
+  <window id="codeListImportPopUp"
+    title="${labels.survey.code_list.import_data.title}"
+    width="500px" border="normal" position="center"
+    apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListImportVM')"
+    validationMessages="@id('vmsgs')"
+    onUpload="@command('fileUploaded')"
+    closable="true">
 
-		<vbox align="center">
-			<flash src="@load(vm.codeListImportModuleUrl)"
-				height="500px" width="1000px" />
-			<button label="${labels.global.close}"
-				onClick="@command('close')" />
-		</vbox>
+  <zscript deferred="true"><![CDATA[
+     import org.zkoss.util.media.Media;
+  
+     Executions.getCurrent().getDesktop().setAttribute(
+             "org.zkoss.zul.Fileupload.target", codeListImportPopUp);
+   ]]></zscript>
+   
+    <grid>
+      <columns>
+        <column width="130px" />
+        <column width="100%" />
+      </columns>
+      <rows>
+        <row>
+          <label value="${labels.global.file_name}:" />
+          <cell>
+            <hbox hflex="1">
+              <hbox hflex="1">
+                <label visible="@load(not empty vm.uploadedFileName)" value="@load(vm.uploadedFileName)" />
+                <label visible="@load(empty vm.uploadedFileName)" value="${labels.global.file_not_selected}" />
+              </hbox>
+              <button id="selectFileBtn" label="${labels.global.select_file_to_upload}"
+                upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
+            </hbox>
+          </cell>
+        </row>
+      </rows>
+    </grid>
 
-	</window>
+    <box width="100%" align="center">
+     <hlayout>
+       <button id="okBtn" label="${labels.survey.schema.attributes_import.start_import}"
+          onClick="@command('importAttributes')" />
+     </hlayout>
+    </box>
+  </window>
 </zk>

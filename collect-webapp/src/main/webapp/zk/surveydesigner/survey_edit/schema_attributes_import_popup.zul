@@ -66,7 +66,7 @@
 
     <box width="100%" align="center">
      <hlayout>
-       <button id="okBtn" label="${labels.survey.schema.attributes_import.start_import}"
+       <button id="okBtn" label="${labels.global.import_start}"
           onClick="@command('importAttributes')" />
      </hlayout>
     </box>
