@@ -163,7 +163,6 @@
 					image="/assets/images/info-small.png" />
 			</hlayout>
 
-
 			<hlayout style="padding: 10px">
 
 				<fieldErrorHandler
@@ -188,6 +187,52 @@
 				
 				<space width="30px" />
 				
+				<fieldErrorHandler
+					message="@load(vmsgs['openYandexMaps'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_yandex_maps}:" />
+					<checkbox
+						checked="@load(fx.openYandexMaps eq true) @save(fx.openYandexMaps)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+				
+				<space width="30px" />
+			
+			</hlayout>
+			
+			<hlayout style="padding: 10px">
+				<fieldErrorHandler
+					message="@load(vmsgs['openStreetView'])">
+					<label
+						value="${labels.survey.collect_earth.other_settings.open_street_view}:" />
+					<checkbox
+						checked="@load(fx.openStreetView eq true) @save(fx.openStreetView)"
+						onCheck="@command('applyChanges')" />
+				</fieldErrorHandler>
+				
+				<space width="30px" />
+				
+				<hlayout>
+					<fieldErrorHandler
+						message="@load(vmsgs['openSecureWatch'])">
+						<label
+							use="org.openforis.collect.designer.component.FieldLabel"
+							value="${labels.survey.collect_earth.other_settings.open_securewatch_maps}" />
+					</fieldErrorHandler>
+					<fieldErrorHandler
+						message="@load(vmsgs['openSecureWatch'])">
+						<checkbox
+							checked="@load(fx.openSecureWatch eq true) @save(fx.openSecureWatch)"
+							onCheck="@command('applyChanges')" />
+					</fieldErrorHandler>
+	
+					<image popup="openSecureWatchInfoTooltip"
+						style="cursor:pointer" src="/assets/images/info-small.png" />
+				</hlayout>
+				
+			</hlayout>
+
+			<hlayout style="padding: 10px">
 
 				<fieldErrorHandler
 					message="@load(vmsgs['openGEECodeEditor'])">
@@ -208,12 +253,9 @@
 						checked="@load(fx.openGEEApp eq true) @save(fx.openGEEApp)"
 						onCheck="@command('applyChanges')" />
 				</fieldErrorHandler>
-
-			</hlayout>
-
-
-			<hlayout style="padding: 10px">
-
+				
+				<space width="30px" />
+				
 				<fieldErrorHandler
 					message="@load(vmsgs['openGEEExplorer'])">
 					<label
@@ -223,33 +265,9 @@
 						onCheck="@command('applyChanges')" />
 				</fieldErrorHandler>
 
-				<space width="30px" />
-
-				<fieldErrorHandler
-					message="@load(vmsgs['openStreetView'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_street_view}:" />
-					<checkbox
-						checked="@load(fx.openStreetView eq true) @save(fx.openStreetView)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-
-				<space width="30px" />
-
-				<fieldErrorHandler
-					message="@load(vmsgs['openYandexMaps'])">
-					<label
-						value="${labels.survey.collect_earth.other_settings.open_yandex_maps}:" />
-					<checkbox
-						checked="@load(fx.openYandexMaps eq true) @save(fx.openYandexMaps)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-				
-				<space width="30px" />
-
 			</hlayout>
 
-			<hlayout style="padding: 10px">
+			<hlayout>
 				<fieldErrorHandler
 					message="@load(vmsgs['extraMapUrl'])">
 					<label
@@ -307,4 +325,11 @@
     		${labels.survey.collect_earth.other_settings.extra_map_url_tooltip}
         ]]></html>
 	</popup>
+	
+	<popup id="openSecureWatchInfoTooltip" width="300px">
+		<html><![CDATA[
+    		${labels.survey.collect_earth.other_settings.securewatch_maps_tooltip}
+        ]]></html>
+	</popup>
+	
 </zk>
