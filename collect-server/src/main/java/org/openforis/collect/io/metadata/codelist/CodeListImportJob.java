@@ -34,7 +34,6 @@ public class CodeListImportJob extends Job {
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
 		is = new FileInputStream(file);
-		
 	}
 	
 	@Override
@@ -54,7 +53,7 @@ public class CodeListImportJob extends Job {
 
 	@Override
 	protected void buildTasks() throws Throwable {
-		addTask(CodeListImportTask.class);
+		addTask(new CodeListImportTask());
 	}
 	
 	@Override
@@ -64,6 +63,7 @@ public class CodeListImportJob extends Job {
 		t.setInputStream(is);
 		t.setCodeList(codeList);
 		t.setOverwriteData(overwriteData);
+		super.initializeTask(t);
 	}
 
 	@Override

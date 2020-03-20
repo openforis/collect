@@ -173,8 +173,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 	 * @return
 	 */
 	protected boolean isDuplicate(String code, CodeListItem parentItem) {
-		CodeListItem duplicateItem;
-		duplicateItem = getChildItem(parentItem, code);
+		CodeListItem duplicateItem = getChildItem(parentItem, code);
 		return duplicateItem != null;
 	}
 	

@@ -39,8 +39,7 @@ public class JobStatusPopUpVM extends BaseVM {
 		args.put(JobStatusPopUpVM.MESSAGE_ARG, message);
 		args.put(JobStatusPopUpVM.JOB_ARG, job);
 		args.put(JobStatusPopUpVM.CANCELABLE_ARG, cancelable);
-		Window popUp = PopUpUtil.openPopUp(Resources.Component.JOB_STATUS_POPUP.getLocation(), true, args);
-		return popUp;
+		return PopUpUtil.openPopUp(Resources.Component.JOB_STATUS_POPUP.getLocation(), true, args);
 	}
 	
 	@Init

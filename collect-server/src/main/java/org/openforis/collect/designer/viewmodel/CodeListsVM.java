@@ -408,7 +408,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		batchImportJob.setOverwriteData(true);
 		batchImportJob.setFile(tempFile);
 		jobManager.start(batchImportJob);
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.batch_import"), batchImportJob, true);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.import_data.title"), batchImportJob, true);
 	}
 	
 	@Command

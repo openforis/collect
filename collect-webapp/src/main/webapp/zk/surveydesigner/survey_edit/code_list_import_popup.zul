@@ -40,8 +40,8 @@
 
     <box width="100%" align="center">
      <hlayout>
-       <button id="okBtn" label="${labels.survey.schema.attributes_import.start_import}"
-          onClick="@command('importAttributes')" />
+       <button id="okBtn" label="${labels.global.import_start}"
+          onClick="@command('importCodeList')" />
      </hlayout>
     </box>
   </window>
