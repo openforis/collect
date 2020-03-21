@@ -7,17 +7,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
 import org.openforis.collect.io.metadata.codelist.CodeListImportJob;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Files;
+import org.openforis.concurrency.Job;
 import org.openforis.idm.metamodel.CodeList;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
-import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Window;
 
@@ -79,6 +81,21 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 		job.setOverwriteData(true);
 		jobManager.start(job);
 		
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.batch_import"), job, true);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.import_data.title", job, true, new JobEndHandler() {
+			@Override
+			public void onJobEnd(Job job) {
+				closePopUp(jobStatusPopUp);
+				switch(job.getStatus()) {
+				case COMPLETED:
+					MessageUtil.showInfo("survey.code_list.import_data.completed");
+					break;
+				case FAILED:
+					
+					break;
+				default:
+				}
+				//SurveyEditVM.dispatchSurveySaveCommand();
+			}
+		});
 	}
 }

@@ -408,7 +408,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		batchImportJob.setOverwriteData(true);
 		batchImportJob.setFile(tempFile);
 		jobManager.start(batchImportJob);
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.import_data.title"), batchImportJob, true);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.import_data.title", batchImportJob, true);
 	}
 	
 	@Command
@@ -418,7 +418,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		batchExportJob.setCodeListManager(codeListManager);
 		batchExportJob.setSurvey(survey);
 		jobManager.start(batchExportJob);
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.batch_export"), batchExportJob, true);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.batch_export", batchExportJob, true);
 	}
 	
 	protected void closeJobStatusPopUp() {
