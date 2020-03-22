@@ -2,7 +2,7 @@
 <zk>
   <window id="codeListImportPopUp"
     title="${labels.survey.code_list.import_data.title}"
-    width="500px" border="normal" position="center"
+    width="600px" border="normal" position="center"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListImportVM')"
     validationMessages="@id('vmsgs')"
@@ -18,10 +18,22 @@
    
     <grid>
       <columns>
-        <column width="130px" />
+        <column width="100px" />
         <column width="100%" />
       </columns>
       <rows>
+      	<row>
+          <cell colspan="2">
+          	<hbox hflex="1">
+	          <label 
+	          	value="${labels.survey.code_list.import_data.introduction}" multiline="true" />
+          	  <image popup="codeListImportInfoTooltip"
+			    style="cursor:pointer" src="/assets/images/info-small.png" />
+		      <button id="exampleFileBtn" label="${labels.global.download_example}"
+                onClick="@command('downloadExample')" />
+            </hbox>
+          </cell>
+       	</row>
         <row>
           <label value="${labels.global.file_name}:" />
           <cell>
@@ -45,4 +57,10 @@
      </hlayout>
     </box>
   </window>
+  
+  <popup id="codeListImportInfoTooltip" width="400px">
+	<html><![CDATA[
+		${labels.survey.code_list.import_data.info_tooltip}
+    ]]></html>
+</popup>
 </zk>

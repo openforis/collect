@@ -9,18 +9,21 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
+import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM;
 import org.openforis.collect.io.metadata.codelist.CodeListImportJob;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Files;
-import org.openforis.concurrency.Job;
+import org.openforis.collect.utils.MediaTypes;
 import org.openforis.idm.metamodel.CodeList;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Window;
 
 /**
@@ -81,21 +84,29 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 		job.setOverwriteData(true);
 		jobManager.start(job);
 		
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.import_data.title", job, true, new JobEndHandler() {
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.import_data.title", job, true, new JobEndHandler<CodeListImportJob>() {
 			@Override
-			public void onJobEnd(Job job) {
+			public void onJobEnd(CodeListImportJob job) {
 				closePopUp(jobStatusPopUp);
 				switch(job.getStatus()) {
 				case COMPLETED:
 					MessageUtil.showInfo("survey.code_list.import_data.completed");
 					break;
 				case FAILED:
-					
+					String title = Labels.getLabel("survey.code_list.import_data.error_popup.title", new String[] {getUploadedFileName()});
+					ReferenceDataImportErrorsPopUpVM.showPopUp(job.getErrors(), title);
 					break;
 				default:
 				}
 				//SurveyEditVM.dispatchSurveySaveCommand();
 			}
 		});
+	}
+	
+	@Command
+	public void downloadExample() {
+		String fileName = "code-list-import-example.xlsx";
+		String filePath = getSession().getWebApp().getServletContext().getRealPath("WEB-INF/resources/io/" + fileName);
+		Filedownload.save(filePath, MediaTypes.XLSX_CONTENT_TYPE, fileName);
 	}
 }

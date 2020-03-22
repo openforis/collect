@@ -19,7 +19,7 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
-public class JobStatusPopUpVM extends BaseVM {
+public class JobStatusPopUpVM<J extends Job> extends BaseVM {
 
 	public static final String JOB_FAILED_COMMAND = "jobFailed";
 	public static final String JOB_COMPLETED_COMMAND = "jobCompleted";
@@ -34,14 +34,14 @@ public class JobStatusPopUpVM extends BaseVM {
 	private String message;
 	private boolean cancelable;
 
-	private Job job;
-	private JobEndHandler jobEndHandler;
+	private J job;
+	private JobEndHandler<J> jobEndHandler;
 	
 	public static <J extends Job> Window openPopUp(String messageKey, J job, boolean cancelable) {
 		return openPopUp(messageKey, job, cancelable, null);
 	}
 	
-	public static <J extends Job> Window openPopUp(String messageKey, J job, boolean cancelable, JobEndHandler jobEndHandler) {
+	public static <J extends Job> Window openPopUp(String messageKey, J job, boolean cancelable, JobEndHandler<J> jobEndHandler) {
 		String message = Labels.getLabel(messageKey);
 		if (message == null) {
 			message = messageKey;
@@ -55,9 +55,9 @@ public class JobStatusPopUpVM extends BaseVM {
 	}
 	
 	@Init
-	public <J extends Job> void init(@ExecutionArgParam(MESSAGE_ARG) String message, 
+	public void init(@ExecutionArgParam(MESSAGE_ARG) String message, 
 			@ExecutionArgParam(JOB_ARG) J job,
-			@ExecutionArgParam(JOB_END_HANDLER_ARG) JobEndHandler jobEndHandler,
+			@ExecutionArgParam(JOB_END_HANDLER_ARG) JobEndHandler<J> jobEndHandler,
 			@ExecutionArgParam(CANCELABLE_ARG) boolean cancelable) {
 		this.message = message;
 		this.job = job;
@@ -121,7 +121,7 @@ public class JobStatusPopUpVM extends BaseVM {
 		dispatchJobAbortedCommand();
 	}
 	
-	public interface JobEndHandler {
-		void onJobEnd(Job job);
+	public interface JobEndHandler<J extends Job> {
+		void onJobEnd(J job);
 	}
 }

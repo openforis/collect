@@ -26,7 +26,7 @@ import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorPopUpVM;
+import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM;
 import org.openforis.collect.io.metadata.codelist.CodeListBatchExportJob;
 import org.openforis.collect.io.metadata.codelist.CodeListBatchImportJob;
 import org.openforis.collect.io.metadata.codelist.CodeListImportTask;
@@ -442,7 +442,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		closeJobStatusPopUp();
 		if (job instanceof CodeListBatchImportJob && job.getCurrentTask() != null) {
 			CodeListImportTask lastTask = (CodeListImportTask) ((CodeListBatchImportJob) job).getCurrentTask();
-			dataImportErrorPopUp = ReferenceDataImportErrorPopUpVM.showPopUp(lastTask.getErrors(), 
+			dataImportErrorPopUp = ReferenceDataImportErrorsPopUpVM.showPopUp(lastTask.getErrors(), 
 					Labels.getLabel("survey.code_list.import_data.error_popup.title", new String[]{lastTask.getEntryName()}));
 		} else {
 			String errorMessageKey = job.getErrorMessage();
