@@ -82,13 +82,11 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 	}
 	
 	private static String[] getPossibleDefaultLanguageLabelColumnNames(String defaultLanguage, String level) {
-		String[] colNames = {level, level + LABEL_COLUMN_SUFFIX, level + LABEL_COLUMN_SUFFIX + "_" + defaultLanguage};
-		return colNames;
+		return new String[] {level, level + LABEL_COLUMN_SUFFIX, level + LABEL_COLUMN_SUFFIX + "_" + defaultLanguage};
 	}
 
 	private static String[] getPossibleDefaultLanguageDescriptionColumnNames(String defaultLanguage, String level) {
-		String[] colNames = {level, level + DESCRIPTION_COLUMN_SUFFIX, level + DESCRIPTION_COLUMN_SUFFIX + "_" + defaultLanguage};
-		return colNames;
+		return new String[] {level, level + DESCRIPTION_COLUMN_SUFFIX, level + DESCRIPTION_COLUMN_SUFFIX + "_" + defaultLanguage};
 	}
 	
 	public List<String> getLevels() {

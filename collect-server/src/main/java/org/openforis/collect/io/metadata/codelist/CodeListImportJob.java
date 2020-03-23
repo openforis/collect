@@ -6,8 +6,10 @@ package org.openforis.collect.io.metadata.codelist;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
@@ -34,7 +36,6 @@ public class CodeListImportJob extends Job {
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
 		is = new FileInputStream(file);
-		
 	}
 	
 	@Override
@@ -54,7 +55,7 @@ public class CodeListImportJob extends Job {
 
 	@Override
 	protected void buildTasks() throws Throwable {
-		addTask(CodeListImportTask.class);
+		addTask(new CodeListImportTask());
 	}
 	
 	@Override
@@ -64,12 +65,17 @@ public class CodeListImportJob extends Job {
 		t.setInputStream(is);
 		t.setCodeList(codeList);
 		t.setOverwriteData(overwriteData);
+		super.initializeTask(t);
 	}
 
 	@Override
 	protected void onEnd() {
 		super.onEnd();
 		IOUtils.closeQuietly(is);
+	}
+	
+	public List<ParsingError> getErrors() {
+		return getTasks().isEmpty() ? null : ((CodeListImportTask) getTasks().get(0)).getErrors();
 	}
 	
 	public void setCodeListManager(CodeListManager codeListManager) {

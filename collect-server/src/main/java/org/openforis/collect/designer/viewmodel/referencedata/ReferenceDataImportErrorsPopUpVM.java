@@ -22,7 +22,7 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
-public class ReferenceDataImportErrorPopUpVM extends BaseVM {
+public class ReferenceDataImportErrorsPopUpVM extends BaseVM {
 	
 	private static final String ERRORS_PARAM = "errors";
 	private static final String TITLE_PARAM = "title";
@@ -34,7 +34,7 @@ public class ReferenceDataImportErrorPopUpVM extends BaseVM {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(ERRORS_PARAM, errors);
 		args.put(TITLE_PARAM, title);
-		return PopUpUtil.openPopUp(Resources.Component.REFERENCE_DATA_IMPORT_ERROR_POPUP.getLocation(), true, args);
+		return PopUpUtil.openPopUp(Resources.Component.REFERENCE_DATA_IMPORT_ERRORS_POPUP.getLocation(), true, args);
 	}
 	
 	@Init

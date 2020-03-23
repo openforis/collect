@@ -74,7 +74,7 @@ import org.zkoss.zul.Window;
  */
 public class SurveyEditVM extends SurveyBaseVM {
 
-	private static final Log log = Log.lookup(SurveySelectVM.class);
+	private static final Log log = Log.lookup(SurveyEditVM.class);
 
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	public static final String BACKGROUD_SAVE_GLOBAL_COMMAND = "backgroundSurveySave";

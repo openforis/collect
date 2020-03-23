@@ -16,7 +16,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
-import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.viewmodel.SchemaObjectSelectorPopUpVM.NodeSelectedEvent;
@@ -42,7 +41,6 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zul.Window;
 
 /**
@@ -50,10 +48,8 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
-public class SchemaAttributesImportVM extends SurveyBaseVM {
+public class SchemaAttributesImportVM extends BaseSurveyFileImportVM {
 
-	private File uploadedFile;
-	private String uploadedFileName;
 	private EntityDefinition parentEntityDefinition;
 	private boolean booleanAsCode;
 	private boolean labelsInSecondRow;
@@ -70,15 +66,6 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		notifyChange("parentEntityDefinitionPath");
 	}
 
-	protected void reset() {
-		if ( uploadedFile != null ) {
-			uploadedFile.delete();
-			uploadedFile = null;
-		}
-		uploadedFileName = null;
-		notifyChange("uploadedFileName");
-	}
-	
 	@Command
 	public void importAttributes(@ContextParam(ContextType.BIND_CONTEXT) BindContext ctx) {
 		if ( validateForm(ctx) ) {
@@ -92,16 +79,11 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		}
 	}
 	
-	@Command
-	public void fileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
- 		Media media = event.getMedia();
+	@Override
+	protected void checkCanImportFile(Media media) {
 		String fileName = media.getName();
 		String extension = FilenameUtils.getExtension(fileName);
-		if (Files.CSV_FILE_EXTENSION.equalsIgnoreCase(extension)) {
-			this.uploadedFile = MediaUtil.copyToTempFile(media);
-			this.uploadedFileName = fileName;
-			notifyChange("uploadedFileName");
-		} else {
+		if (!Files.CSV_FILE_EXTENSION.equalsIgnoreCase(extension)) {
 			throw new RuntimeException(String.format("Only CSV file upload is supported, found: %s", extension));
 		}
 	}
@@ -133,25 +115,8 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		});
 	}
 	
-	protected boolean validateForm(BindContext ctx) {
-		String messageKey = null;
-		if ( uploadedFile == null ) {
-			messageKey = "global.file_not_selected";
-		}
-		if ( messageKey == null ) {
-			return true;
-		} else {
-			MessageUtil.showWarning(messageKey);
-			return false;
-		}
-	}
-	
 	public String getParentEntityDefinitionPath() {
 		return parentEntityDefinition == null ? null : parentEntityDefinition.getPath();
-	}
-	
-	public String getUploadedFileName() {
-		return uploadedFileName;
 	}
 	
 	public boolean isBooleanAsCode() {

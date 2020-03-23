@@ -254,10 +254,16 @@
 	       							label="${labels.global.import_data}"
 	       							visible="@load(not vm.newItem and empty vm.editedItem.lookupTable)"
 	       							onClick="@command('openCodeListImportPopUp')" />
-	       						<button
-	       							label="${labels.global.export_data}"
-	       							visible="@load(not vm.newItem and empty vm.editedItem.lookupTable)"
-	       							onClick="@command('exportCodeList')" />
+								<combobutton label="${labels.global.export_data}" 
+									visible="@load(not vm.newItem and empty vm.editedItem.lookupTable)"
+									onClick="@command('exportCodeListToExcel')">
+									<menupopup>
+										<menuitem label="${labels.global.export_to_excel}"
+											onClick="@command('exportCodeListToExcel')" />
+										<menuitem label="${labels.global.export_to_csv}"
+											onClick="@command('exportCodeListToCsv')" />
+									</menupopup>
+								</combobutton>
 	       					</hbox>
       					</box>
 			        </vlayout>
