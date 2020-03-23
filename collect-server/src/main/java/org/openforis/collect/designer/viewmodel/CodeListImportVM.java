@@ -3,8 +3,9 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
+
+import javax.servlet.ServletContext;
 
 import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -18,10 +19,13 @@ import org.openforis.collect.utils.MediaTypes;
 import org.openforis.idm.metamodel.CodeList;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Window;
@@ -35,7 +39,7 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 
 	@WireVariable
 	private CodeListManager codeListManager;
-	
+
 	// input
 	private int codeListId;
 
@@ -49,15 +53,9 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 	}
 
 	@Command
-	public void close() {
-		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				Map<String, Object> args = new HashMap<String, Object>();
-				args.put("undoChanges", confirmed);
-				BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND, args);
-			}
-		});
+	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
+		event.stopPropagation();
+		BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND, null);
 	}
 
 	@Override
@@ -83,30 +81,34 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 		job.setFile(uploadedFile);
 		job.setOverwriteData(true);
 		jobManager.start(job);
-		
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.import_data.title", job, true, new JobEndHandler<CodeListImportJob>() {
-			@Override
-			public void onJobEnd(CodeListImportJob job) {
-				closePopUp(jobStatusPopUp);
-				switch(job.getStatus()) {
-				case COMPLETED:
-					MessageUtil.showInfo("survey.code_list.import_data.completed");
-					break;
-				case FAILED:
-					String title = Labels.getLabel("survey.code_list.import_data.error_popup.title", new String[] {getUploadedFileName()});
-					ReferenceDataImportErrorsPopUpVM.showPopUp(job.getErrors(), title);
-					break;
-				default:
-				}
-				//SurveyEditVM.dispatchSurveySaveCommand();
-			}
-		});
+
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.import_data.title", job, true,
+				new JobEndHandler<CodeListImportJob>() {
+					@Override
+					public void onJobEnd(CodeListImportJob job) {
+						closePopUp(jobStatusPopUp);
+						switch (job.getStatus()) {
+						case COMPLETED:
+							MessageUtil.showInfo("survey.code_list.import_data.completed");
+							// Survey has been updated (last id changed for new code list items): save it!
+							SurveyEditVM.dispatchSurveySaveCommand();
+							break;
+						case FAILED:
+							String title = Labels.getLabel("survey.code_list.import_data.error_popup.title",
+									new String[] { getUploadedFileName() });
+							ReferenceDataImportErrorsPopUpVM.showPopUp(job.getErrors(), title);
+							break;
+						default:
+						}
+					}
+				});
 	}
-	
+
 	@Command
 	public void downloadExample() {
+		ServletContext context = getSession().getWebApp().getServletContext();
 		String fileName = "code-list-import-example.xlsx";
-		String filePath = getSession().getWebApp().getServletContext().getRealPath("WEB-INF/resources/io/" + fileName);
-		Filedownload.save(filePath, MediaTypes.XLSX_CONTENT_TYPE, fileName);
+		InputStream is = context.getResourceAsStream("/WEB-INF/resources/io/" + fileName);
+		Filedownload.save(is, MediaTypes.XLSX_CONTENT_TYPE, fileName);
 	}
 }

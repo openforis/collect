@@ -6,7 +6,7 @@
     position="center"
     height="80%"
     apply="org.zkoss.bind.BindComposer"
-    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorPopUpVM')"
+    viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM')"
     closable="true"
     onClose="@global-command('closeReferenceDataImportErrorPopUp')"
     >

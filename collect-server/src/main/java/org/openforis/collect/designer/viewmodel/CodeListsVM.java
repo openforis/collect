@@ -26,6 +26,7 @@ import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
 import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM;
 import org.openforis.collect.io.metadata.codelist.CodeListBatchExportJob;
 import org.openforis.collect.io.metadata.codelist.CodeListBatchImportJob;
@@ -105,8 +106,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private CodeListManager codeListManager;
 	
 	private Window jobStatusPopUp;
-	private CodeListBatchExportJob batchExportJob;
-	private CodeListBatchImportJob batchImportJob;
 	private Window dataImportErrorPopUp;
 	
 	public CodeListsVM() {
@@ -400,70 +399,66 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Command
 	public void batchImportFileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
  		File tempFile = MediaUtil.copyToTempFile(event.getMedia());
-		
-		batchImportJob = new CodeListBatchImportJob();
+		CodeListBatchImportJob batchImportJob = new CodeListBatchImportJob();
 		batchImportJob.setJobManager(jobManager);
 		batchImportJob.setCodeListManager(codeListManager);
 		batchImportJob.setSurvey(survey);
 		batchImportJob.setOverwriteData(true);
 		batchImportJob.setFile(tempFile);
 		jobManager.start(batchImportJob);
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.import_data.title", batchImportJob, true);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.import_data.title", batchImportJob, true, 
+				new JobEndHandler<CodeListBatchImportJob>() {
+			public void onJobEnd(CodeListBatchImportJob job) {
+				closeJobStatusPopUp();
+				switch(job.getStatus()) {
+				case COMPLETED:
+					MessageUtil.showInfo("survey.code_list.batch_import_completed");
+					codeListsUpdated();
+					resetEditedItem();
+					SurveyEditVM.dispatchSurveySaveCommand();
+					break;	
+				case FAILED:
+					if (job.getCurrentTask() != null) {
+						CodeListImportTask lastTask = (CodeListImportTask) ((CodeListBatchImportJob) job).getCurrentTask();
+						dataImportErrorPopUp = ReferenceDataImportErrorsPopUpVM.showPopUp(lastTask.getErrors(), 
+								Labels.getLabel("survey.code_list.import_data.error_popup.title", new String[]{lastTask.getEntryName()}));
+					} else {
+						showJobErrorMessage(job);
+					}
+					break;
+				default:
+				}
+			}
+		});
 	}
 	
 	@Command
 	public void batchExport() {
-		batchExportJob = new CodeListBatchExportJob();
+		CodeListBatchExportJob batchExportJob = new CodeListBatchExportJob();
 		batchExportJob.setJobManager(jobManager);
 		batchExportJob.setCodeListManager(codeListManager);
 		batchExportJob.setSurvey(survey);
 		jobManager.start(batchExportJob);
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.batch_export", batchExportJob, true);
-	}
-	
-	protected void closeJobStatusPopUp() {
-		closePopUp(jobStatusPopUp);
-		jobStatusPopUp = null;
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp("survey.code_list.batch_export", batchExportJob, true, 
+				new JobEndHandler<CodeListBatchExportJob>() {
+			public void onJobEnd(CodeListBatchExportJob job) {
+				closeJobStatusPopUp();
+				switch(job.getStatus()) {
+				case COMPLETED:
+					downloadFile(batchExportJob.getOutputFile(), survey.getName() + "_code_lists.zip");
+					break;
+				case FAILED:
+					showJobErrorMessage(job);
+					break;
+				default:
+				}
+			}
+		});
 	}
 	
 	@GlobalCommand
 	public void codeListsUpdated() {
 		notifyChange("items");
-	}
-
-	@GlobalCommand
-	public void jobAborted(@BindingParam("job") Job job) {
-		closeJobStatusPopUp();
-		clearJob(job);
-	}
-
-	@GlobalCommand
-	public void jobFailed(@BindingParam("job") Job job) {
-		closeJobStatusPopUp();
-		if (job instanceof CodeListBatchImportJob && job.getCurrentTask() != null) {
-			CodeListImportTask lastTask = (CodeListImportTask) ((CodeListBatchImportJob) job).getCurrentTask();
-			dataImportErrorPopUp = ReferenceDataImportErrorsPopUpVM.showPopUp(lastTask.getErrors(), 
-					Labels.getLabel("survey.code_list.import_data.error_popup.title", new String[]{lastTask.getEntryName()}));
-		} else {
-			String errorMessageKey = job.getErrorMessage();
-			String errorMessage = StringUtils.defaultIfBlank(Labels.getLabel(errorMessageKey), errorMessageKey);
-			MessageUtil.showError("global.job_status.failed.message", errorMessage);
-		}
-		clearJob(job);
-	}
-	
-	@GlobalCommand
-	public void jobCompleted(@BindingParam("job") Job job) {
-		closeJobStatusPopUp();
-		if (job == batchExportJob) {
-			downloadFile(batchExportJob.getOutputFile(), survey.getName() + "_code_lists.zip");
-		} else if (job == batchImportJob) {
-			MessageUtil.showInfo("survey.code_list.batch_import_completed");
-			codeListsUpdated();
-			resetEditedItem();
-			SurveyEditVM.dispatchSurveySaveCommand();
-		}
-		clearJob(job);
 	}
 
 	private void downloadFile(File file, String fileName) {
@@ -474,14 +469,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 	}
 
-	private void clearJob(Job job) {
-		if (job == batchExportJob) {
-			batchExportJob = null;
-		} else if (job == batchImportJob) {
-			batchImportJob = null;
-		}
-	}
-	
 	protected String generateItemCode(CodeListItem item) {
 		return "item_" + item.getId();
 	}
@@ -699,7 +686,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			initItemsPerLevel();
 			notifyChange("formObject","listLevels","selectedItemsPerLevel");
 		}
-		SurveyEditVM.dispatchSurveySaveCommand();
 	}
 	
 	@GlobalCommand
@@ -836,6 +822,17 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 				BindUtils.postGlobalCommand((String) null, (String) null, "closeCodeListsManagerPopUp", params);
 			}
 		});
+	}
+	
+	private void showJobErrorMessage(Job job) {
+		String errorMessageKey = job.getErrorMessage();
+		String errorMessage = StringUtils.defaultIfBlank(Labels.getLabel(errorMessageKey), errorMessageKey);
+		MessageUtil.showError("global.job_status.failed.message", errorMessage);
+	}
+	
+	protected void closeJobStatusPopUp() {
+		closePopUp(jobStatusPopUp);
+		jobStatusPopUp = null;
 	}
 	
 }

@@ -7,7 +7,8 @@
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListImportVM')"
     validationMessages="@id('vmsgs')"
     onUpload="@command('fileUploaded')"
-    closable="true">
+    closable="true"
+    onClose="@command('close')">
 
   <zscript deferred="true"><![CDATA[
      import org.zkoss.util.media.Media;
@@ -53,14 +54,16 @@
     <box width="100%" align="center">
      <hlayout>
        <button id="okBtn" label="${labels.global.import_start}"
+   		  visible="@load(not empty vm.uploadedFileName)"
           onClick="@command('importCodeList')" />
      </hlayout>
     </box>
+    
+    <popup id="codeListImportInfoTooltip" width="400px">
+		<html><![CDATA[
+			${labels.survey.code_list.import_data.info_tooltip}
+	    ]]></html>
+	</popup>
   </window>
   
-  <popup id="codeListImportInfoTooltip" width="400px">
-	<html><![CDATA[
-		${labels.survey.code_list.import_data.info_tooltip}
-    ]]></html>
-</popup>
 </zk>
