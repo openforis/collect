@@ -640,11 +640,12 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private void exportCodeList(OutputFormat outputFormat) throws IOException {
 		CollectSurvey survey = getSurvey();
 		CodeListExportProcess codeListExportProcess = new CodeListExportProcess(codeListManager);
-		String extension = outputFormat == OutputFormat.CSV ? Files.CSV_FILE_EXTENSION : Files.EXCEL_FILE_EXTENSION;
+		boolean csv = outputFormat == OutputFormat.CSV;
+		String extension = csv ? Files.CSV_FILE_EXTENSION : Files.EXCEL_FILE_EXTENSION;
 		File tempFile = File.createTempFile("code_list_" + editedItem.getName(), "." + extension);
 		FileOutputStream os = new FileOutputStream(tempFile);
 		codeListExportProcess.export(os, survey, editedItem.getId(), outputFormat);
-		Filedownload.save(tempFile, MediaTypes.CSV_CONTENT_TYPE);
+		Filedownload.save(tempFile, csv ? MediaTypes.CSV_CONTENT_TYPE : MediaTypes.XLSX_CONTENT_TYPE);
 	}
 
 	@GlobalCommand

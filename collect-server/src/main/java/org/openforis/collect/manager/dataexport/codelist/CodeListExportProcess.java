@@ -52,10 +52,12 @@ public class CodeListExportProcess {
 	public void export(OutputStream out, CollectSurvey survey, int codeListId, OutputFormat outputFormat) {
 		FlatDataWriter writer = null;
 		try {
-			OutputStreamWriter osWriter = new OutputStreamWriter(out, Charset.forName("UTF-8"));
-			writer = outputFormat == OutputFormat.CSV 
-					? new CsvWriter(osWriter, SEPARATOR, QUOTECHAR)
-				    : new ExcelFlatValuesWriter(out);
+			if (outputFormat == OutputFormat.CSV) {
+				OutputStreamWriter osWriter = new OutputStreamWriter(out, Charset.forName("UTF-8"));
+				writer = new CsvWriter(osWriter, SEPARATOR, QUOTECHAR);
+			} else {
+				writer = new ExcelFlatValuesWriter(out);
+			}
 			CodeList list = survey.getCodeListById(codeListId);
 			initHeaders(writer, survey, list);
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
