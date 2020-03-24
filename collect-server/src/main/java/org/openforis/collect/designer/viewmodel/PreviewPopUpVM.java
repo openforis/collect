@@ -8,8 +8,12 @@ import java.net.URISyntaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.persistence.RecordUnlockedException;
+import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 
 /**
@@ -19,6 +23,9 @@ import org.zkoss.bind.annotation.Init;
 public class PreviewPopUpVM extends SurveyBaseVM {
 
 	private String uri;
+	
+	@WireVariable
+	private SessionManager sessionManager;
 
 	@Init(superclass=false)
 	public void init(
@@ -47,4 +54,12 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 		return uri;
 	}
 	
+	@Command
+	public void close() {
+		try {
+			sessionManager.releaseRecord();
+		} catch(RecordUnlockedException e) {
+			// Ignore it
+		}
+	}
 }
