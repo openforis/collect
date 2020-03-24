@@ -4,9 +4,12 @@
 package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openforis.collect.io.data.csv.Column.DataType;
+import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CoordinateAttribute;
@@ -23,11 +26,11 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 
 	private String kmlFormat;
 	
-	public CoordinateColumnProvider(CSVDataExportParameters config,CoordinateAttributeDefinition defn) {
+	public CoordinateColumnProvider(CSVDataExportParameters config, CoordinateAttributeDefinition defn) {
 		this(config, defn, KML_POINT_FORMAT);
 	}
 	
-	public CoordinateColumnProvider(CSVDataExportParameters config,CoordinateAttributeDefinition defn, String kmlFormat) {
+	public CoordinateColumnProvider(CSVDataExportParameters config, CoordinateAttributeDefinition defn, String kmlFormat) {
 		super(config, defn);
 		this.kmlFormat = kmlFormat;
 	}
@@ -38,6 +41,13 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 		result.add(CoordinateAttributeDefinition.SRS_FIELD_NAME); 
 		result.add(CoordinateAttributeDefinition.X_FIELD_NAME);
 		result.add(CoordinateAttributeDefinition.Y_FIELD_NAME);
+		CollectAnnotations annotations = attributeDefinition.<CollectSurvey>getSurvey().getAnnotations();
+		if (annotations.isIncludeCoordinateAccuracy(attributeDefinition)) {
+			result.add(CoordinateAttributeDefinition.ACCURACY_FIELD_NAME);
+		}
+		if (annotations.isIncludeCoordinateAltitude(attributeDefinition)) {
+			result.add(CoordinateAttributeDefinition.ALTITUDE_FIELD_NAME);
+		}
 		if ( getConfig().isIncludeKMLColumnForCoordinates() ) {
 			result.add(KML_FIELD_NAME);
 		}
@@ -49,8 +59,12 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 		if ( KML_FIELD_NAME.equals(fieldName) ) {
 			return new Column("_" + ColumnProviders.generateHeadingPrefix(attributeDefinition, config) + 
 					getConfig().getFieldHeadingSeparator() + KML_COLUMN_SUFFIX + suffix);
-		} else if (CoordinateAttributeDefinition.X_FIELD_NAME.equals(fieldName) 
-				|| CoordinateAttributeDefinition.Y_FIELD_NAME.equals(fieldName)) {
+		} else if (Arrays.asList(
+					CoordinateAttributeDefinition.X_FIELD_NAME, 
+					CoordinateAttributeDefinition.Y_FIELD_NAME,
+					CoordinateAttributeDefinition.ALTITUDE_FIELD_NAME,
+					CoordinateAttributeDefinition.ACCURACY_FIELD_NAME
+				).contains(fieldName)) {
 			Column column = super.generateFieldColumn(fieldName, suffix);
 			column.setDataType(DataType.DECIMAL);
 			return column;

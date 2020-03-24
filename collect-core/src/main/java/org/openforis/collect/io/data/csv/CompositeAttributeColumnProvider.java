@@ -127,8 +127,7 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	}
 	
 	protected Object extractValue(Field<?> field) {
-		Object value = field.getValue();
-		return value;
+		return field.getValue();
 	}
 
 	protected Object extractValue(Attribute<?, ?> attr, String fieldName) {
