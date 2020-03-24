@@ -8,11 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.codelistimport.CodeListCSVReader;
-import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.io.excel.ExcelFlatValuesWriter;
@@ -27,8 +24,6 @@ import org.openforis.idm.metamodel.CodeListLevel;
  *
  */
 public class CodeListExportProcess {
-
-	private static final Logger LOG = LogManager.getLogger(CodeListImportProcess.class);
 
 	private static final String FLAT_LIST_LEVEL_NAME = "item";
 	private static final char SEPARATOR = ',';
@@ -50,6 +45,7 @@ public class CodeListExportProcess {
 	}
 
 	public void export(OutputStream out, CollectSurvey survey, int codeListId, OutputFormat outputFormat) {
+		CodeList list = survey.getCodeListById(codeListId);
 		FlatDataWriter writer = null;
 		try {
 			if (outputFormat == OutputFormat.CSV) {
@@ -58,7 +54,6 @@ public class CodeListExportProcess {
 			} else {
 				writer = new ExcelFlatValuesWriter(out);
 			}
-			CodeList list = survey.getCodeListById(codeListId);
 			initHeaders(writer, survey, list);
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
 			for (CodeListItem item : rootItems) {
@@ -66,7 +61,7 @@ public class CodeListExportProcess {
 				writeItem(writer, item, ancestors);
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			throw new RuntimeException(String.format("Error exporting code list %s: %s", list.getName(), e.getMessage()), e);
 		} finally {
 			IOUtils.closeQuietly(writer);
 		}
