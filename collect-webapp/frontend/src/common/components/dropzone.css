@@ -29,3 +29,7 @@
 .dropzone .fileSelectContainer {
   text-align: center;
 }
+
+.dropzone.active {
+  border-color: #2196f3;
+}
