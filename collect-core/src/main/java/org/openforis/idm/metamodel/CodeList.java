@@ -381,6 +381,16 @@ public class CodeList extends VersionableSurveyObject {
 		return false;
 	}
 	
+	public boolean isQualifiableLevel(int levelIdx) {
+		List<CodeListItem> items = getItems(levelIdx);
+		for (CodeListItem item : items) {
+			if (item.isQualifiable()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void removeVersioningRecursive(ModelVersion version) {
 		removeVersioning(version);
 		if ( ! isExternal() ) {

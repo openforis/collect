@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openforis.collect.io.exception.ParsingException;
+import org.openforis.collect.io.metadata.codelist.CodeListImportJob;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.parsing.CSVFileOptions;
@@ -28,7 +29,7 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
 /**
  * 
  * @author S. Ricci
- * 
+ * @deprecated Use {@link CodeListImportJob} instead
  */
 public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportStatus> {
 
@@ -152,7 +153,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		} catch (Exception e) {
 			status.error();
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.toString()));
-			LOG.error("Error importing species CSV file", e);
+			LOG.error("Error importing code list CSV file", e);
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}

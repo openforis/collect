@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.manager.CodeListManager;
@@ -34,6 +35,7 @@ public class CodeListExportProcess {
 	}
 	
 	private CodeListManager codeListManager;
+
 	
 	public CodeListExportProcess(CodeListManager codeListManager) {
 		super();
@@ -46,6 +48,7 @@ public class CodeListExportProcess {
 
 	public void export(OutputStream out, CollectSurvey survey, int codeListId, OutputFormat outputFormat) {
 		CodeList list = survey.getCodeListById(codeListId);
+		Map<Integer, Boolean> qualifiableByLevel = codeListManager.hasQualifiableItemsByLevel(list);
 		FlatDataWriter writer = null;
 		try {
 			if (outputFormat == OutputFormat.CSV) {
@@ -54,11 +57,11 @@ public class CodeListExportProcess {
 			} else {
 				writer = new ExcelFlatValuesWriter(out);
 			}
-			initHeaders(writer, survey, list);
+			initHeaders(writer, survey, list, qualifiableByLevel);
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
 			for (CodeListItem item : rootItems) {
 				List<CodeListItem> ancestors = Collections.emptyList();
-				writeItem(writer, item, ancestors);
+				writeItem(writer, qualifiableByLevel, item, ancestors);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("Error exporting code list %s: %s", list.getName(), e.getMessage()), e);
@@ -68,7 +71,7 @@ public class CodeListExportProcess {
 	}
 
 	private void initHeaders(FlatDataWriter writer, CollectSurvey survey,
-			CodeList list) {
+			CodeList list, Map<Integer, Boolean> qualifiableByLevel) {
 		ArrayList<String> colNames = new ArrayList<String>();
 		List<CodeListLevel> levels = list.getHierarchy();
 		List<String> levelNames = new ArrayList<String>();
@@ -81,6 +84,7 @@ public class CodeListExportProcess {
 				levelNames.add(levelName);
 			}
 		}
+		int levelIdx = 0;
 		for (String levelName : levelNames) {
 			colNames.add(levelName + CodeListCSVReader.CODE_COLUMN_SUFFIX);
 			List<String> langs = survey.getLanguages();
@@ -90,14 +94,19 @@ public class CodeListExportProcess {
 			for (String lang : langs) {
 				colNames.add(levelName + CodeListCSVReader.DESCRIPTION_COLUMN_SUFFIX + "_" + lang);
 			}
+			if (qualifiableByLevel.get(levelIdx)) {
+				colNames.add(levelName + CodeListCSVReader.QUALIFIABLE_COLUMN_SUFFIX);
+			}
+			levelIdx++;
 		}
 		writer.writeHeaders(colNames);
 	}
 
-	protected void writeItem(FlatDataWriter writer, CodeListItem item, List<CodeListItem> ancestors) {
+	protected void writeItem(FlatDataWriter writer, Map<Integer, Boolean> qualifiableByLevel, 
+			CodeListItem item, List<CodeListItem> ancestors) {
 		List<String> lineValues = new ArrayList<String>();
-		addAncestorsLineValues(lineValues, ancestors);
-		addItemLineValues(lineValues, item);
+		lineValues.addAll(getAncestorsLineValues(qualifiableByLevel, ancestors));
+		lineValues.addAll(getItemLineValues(qualifiableByLevel, item));
 
 		writer.writeNext(lineValues);
 		
@@ -105,11 +114,12 @@ public class CodeListExportProcess {
 		List<CodeListItem> childAncestors = new ArrayList<CodeListItem>(ancestors);
 		childAncestors.add(item);
 		for (CodeListItem child : children) {
-			writeItem(writer, child, childAncestors);
+			writeItem(writer, qualifiableByLevel, child, childAncestors);
 		}
 	}
 
-	protected void addItemLineValues(List<String> lineValues, CodeListItem item) {
+	protected List<String> getItemLineValues(Map<Integer, Boolean> qualifiableByLevel, CodeListItem item) {
+		List<String> lineValues = new ArrayList<String>();
 		lineValues.add(item.getCode());
 		CollectSurvey survey = (CollectSurvey) item.getSurvey();
 		List<String> langs = survey.getLanguages();
@@ -123,13 +133,18 @@ public class CodeListExportProcess {
 			String text = item.getDescription(lang);
 			lineValues.add(text);
 		}
+		if (qualifiableByLevel.get(item.getLevel() - 1)) {
+			lineValues.add(String.valueOf(item.isQualifiable()));
+		}
+		return lineValues;
 	}
 
-	protected void addAncestorsLineValues(List<String> lineValues,
-			List<CodeListItem> ancestors) {
+	protected List<String> getAncestorsLineValues(Map<Integer, Boolean> qualifiableByLevel, List<CodeListItem> ancestors) {
+		List<String> lineValues = new ArrayList<String>();
 		for (CodeListItem item : ancestors) {
-			addItemLineValues(lineValues, item);
+			lineValues.addAll(getItemLineValues(qualifiableByLevel, item));
 		}
+		return lineValues;
 	}
 	
 }

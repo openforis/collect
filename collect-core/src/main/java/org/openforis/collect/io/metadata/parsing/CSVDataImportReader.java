@@ -47,8 +47,12 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 	}
 	
 	public void init() throws IOException, ParsingException {
-		csvReader.readHeaders();
+		readHeaders();
 		validateAllFile();
+	}
+
+	protected void readHeaders() throws IOException {
+		csvReader.readHeaders();
 	}
 	
 	@Override

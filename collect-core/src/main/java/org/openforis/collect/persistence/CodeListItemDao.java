@@ -579,15 +579,23 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 	}
 
 	public boolean hasQualifiableItems(CodeList codeList) {
+		return hasQualifiableItems(codeList, null);
+	}
+	
+	public boolean hasQualifiableItems(CodeList codeList, Integer levelIdx) {
 		JooqDSLContext jf = dsl(codeList);
 		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		List<Condition> whereConditions = new ArrayList<Condition>(Arrays.asList(
+			OFC_CODE_LIST.SURVEY_ID.equal(survey.getId()),
+			OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
+			OFC_CODE_LIST.QUALIFIABLE.equal(Boolean.TRUE)
+		));
+		if (levelIdx != null) {
+			whereConditions.add(OFC_CODE_LIST.LEVEL.equal(levelIdx + 1));
+		}
 		SelectConditionStep<Record1<Integer>> q = jf.selectCount()
 				.from(OFC_CODE_LIST)
-				.where(
-					OFC_CODE_LIST.SURVEY_ID.equal(survey.getId()),
-					OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
-					OFC_CODE_LIST.QUALIFIABLE.equal(Boolean.TRUE)
-				);
+				.where(whereConditions);
 		Record r = q.fetchOne();
 		if ( r == null ) {
 			return false;

@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.codelistimport.CodeListCSVReader;
@@ -28,16 +29,20 @@ public class CodeListExportTask extends Task {
 	private static final char SEPARATOR = ',';
 	private static final char QUOTECHAR = '"';
 	
-	private OutputStream out;
-	private CodeList list;
+	// Input
 	private CodeListManager codeListManager;
+	private CodeList list;
+	// Output
+	private OutputStream out;
 
 	//transient
 	private CsvWriter writer;
+	private Map<Integer, Boolean> qualifiableByLevel; // Each entry is true when the code list has qualifiable items for that level
 
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
+		qualifiableByLevel = codeListManager.hasQualifiableItemsByLevel(list);
 		OutputStreamWriter osWriter = new OutputStreamWriter(out, OpenForisIOUtils.UTF_8);
 		writer = new CsvWriter(osWriter, SEPARATOR, QUOTECHAR);
 	}
@@ -73,9 +78,10 @@ public class CodeListExportTask extends Task {
 				levelNames.add(levelName);
 			}
 		}
+		List<String> langs = list.getSurvey().getLanguages();
+		int levelIdx = 0;
 		for (String levelName : levelNames) {
 			colNames.add(levelName + CodeListCSVReader.CODE_COLUMN_SUFFIX);
-			List<String> langs = list.getSurvey().getLanguages();
 			//add label columns
 			for (String lang : langs) {
 				colNames.add(levelName + CodeListCSVReader.LABEL_COLUMN_SUFFIX + "_" + lang);
@@ -84,14 +90,19 @@ public class CodeListExportTask extends Task {
 			for (String lang : langs) {
 				colNames.add(levelName + CodeListCSVReader.DESCRIPTION_COLUMN_SUFFIX + "_" + lang);
 			}
+			if (qualifiableByLevel.get(levelIdx)) {
+				colNames.add(levelName + CodeListCSVReader.QUALIFIABLE_COLUMN_SUFFIX);
+			}
+			levelIdx++;
 		}
+		
 		writer.writeHeaders(colNames);
 	}
 
 	protected void writeItem(CodeListItem item, List<CodeListItem> ancestors) {
 		List<String> lineValues = new ArrayList<String>();
-		addAncestorsLineValues(lineValues, ancestors);
-		addItemLineValues(lineValues, item);
+		lineValues.addAll(extractAncestorsLineValues(ancestors));
+		lineValues.addAll(extractItemLineValues(item));
 
 		writer.writeNext(lineValues);
 		
@@ -103,7 +114,8 @@ public class CodeListExportTask extends Task {
 		}
 	}
 
-	protected void addItemLineValues(List<String> lineValues, CodeListItem item) {
+	protected List<String> extractItemLineValues(CodeListItem item) {
+		List<String> lineValues = new ArrayList<String>();
 		lineValues.add(item.getCode());
 		CollectSurvey survey = (CollectSurvey) item.getSurvey();
 		List<String> langs = survey.getLanguages();
@@ -115,13 +127,18 @@ public class CodeListExportTask extends Task {
 			String descr = item.getDescription(lang);
 			lineValues.add(descr);
 		}
+		if (qualifiableByLevel.get(item.getLevel() - 1)) {
+			lineValues.add(String.valueOf(item.isQualifiable()));
+		}
+		return lineValues;
 	}
 
-	protected void addAncestorsLineValues(List<String> lineValues,
-			List<CodeListItem> ancestors) {
+	protected List<String> extractAncestorsLineValues(List<CodeListItem> ancestors) {
+		List<String> lineValues = new ArrayList<String>();
 		for (CodeListItem item : ancestors) {
-			addItemLineValues(lineValues, item);
+			lineValues.addAll(extractItemLineValues(item));
 		}
+		return lineValues;
 	}
 
 	public void setOut(OutputStream out) {

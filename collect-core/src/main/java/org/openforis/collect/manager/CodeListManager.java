@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +29,7 @@ import org.openforis.commons.collection.Visitor;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -34,7 +37,6 @@ import org.openforis.idm.metamodel.NodeDefinitionVerifier;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.CodeListImporter;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Code;
@@ -339,9 +341,7 @@ public class CodeListManager {
 	
 	protected CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
 		try {
-			Survey survey = context.getSurvey();
-			SurveyContext surveyContext = survey.getContext();
-			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
+			ExpressionEvaluator expressionEvaluator = context.getSurvey().getContext().getExpressionEvaluator();
 			String parentExpr = def.getParentExpression();
 			Node<?> parentNode = expressionEvaluator.evaluateNode(context, null, parentExpr);
 			if (parentNode != null && parentNode instanceof CodeAttribute) {
@@ -420,6 +420,24 @@ public class CodeListManager {
 		} else {
 			return list.isQualifiable();
 		}
+	}
+	
+	public Map<Integer, Boolean> hasQualifiableItemsByLevel(CodeList list) {
+		List<CodeListLevel> hierarchy = list.getHierarchy();
+		int levelsSize = hierarchy.isEmpty() ? 1 : hierarchy.size();
+		Map<Integer, Boolean> result = new HashMap<Integer, Boolean>(levelsSize);
+		for (int levelIdx = 0; levelIdx < levelsSize; levelIdx++) {
+			boolean qualifiable;
+			if ( list.isExternal() ) {
+				qualifiable = false;
+			} else if ( list.isEmpty() ) {
+				qualifiable = codeListItemDao.hasQualifiableItems(list, levelIdx);
+			} else {
+				qualifiable = list.isQualifiableLevel(levelIdx);
+			}
+			result.put(levelIdx, qualifiable);
+		}
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")

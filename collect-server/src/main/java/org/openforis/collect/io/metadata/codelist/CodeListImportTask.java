@@ -150,7 +150,8 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		if ( result == null ) {
 			result = codeList.createItem(levelIdx + 1);
 			List<LanguageSpecificText> descriptions = line.getDescriptionItems(levelIdx);
-			fillItem(result, code, labels, descriptions);
+			boolean qualifiable = line.isQualifiable(levelIdx);
+			fillItem(result, code, labels, descriptions, qualifiable);
 			if ( parent == null ) {
 				codeToRootItem.put(code, result);
 			} else {
@@ -237,7 +238,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		return null;
 	}
 	private void fillItem(CodeListItem item, String code, List<LanguageSpecificText> labelItems,
-			List<LanguageSpecificText> descriptionItems) {
+			List<LanguageSpecificText> descriptionItems, boolean qualifiable) {
 		item.setCode(code);
 		for (LanguageSpecificText labelItem : labelItems) {
 			item.setLabel(labelItem.getLanguage(), labelItem.getText());
@@ -245,6 +246,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		for (LanguageSpecificText textItem : descriptionItems) {
 			item.setDescription(textItem.getLanguage(), textItem.getText());
 		}
+		item.setQualifiable(qualifiable);
 	}
 
 	private void addLevelsToCodeList() {

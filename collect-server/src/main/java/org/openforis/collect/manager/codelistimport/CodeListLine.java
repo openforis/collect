@@ -17,15 +17,10 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
  */
 public class CodeListLine extends Line {
 
-	private List<String> levelCodes;
-	private Map<Integer, List<LanguageSpecificText>> levelToLabels;
-	private Map<Integer, List<LanguageSpecificText>> levelToDescriptions;
-	
-	public CodeListLine() {
-		levelCodes = new ArrayList<String>();
-		levelToLabels = new HashMap<Integer, List<LanguageSpecificText>>();
-		levelToDescriptions = new HashMap<Integer, List<LanguageSpecificText>>();
-	}
+	private List<String> levelCodes = new ArrayList<String>();
+	private Map<Integer, List<LanguageSpecificText>> levelToLabels = new HashMap<Integer, List<LanguageSpecificText>>();
+	private Map<Integer, List<LanguageSpecificText>> levelToDescriptions = new HashMap<Integer, List<LanguageSpecificText>>();
+	private Map<Integer, Boolean> levelToQualifiable = new HashMap<Integer, Boolean>();
 	
 	public void addLevelCode(String code) {
 		levelCodes.add(code);
@@ -39,6 +34,10 @@ public class CodeListLine extends Line {
 		addLocalizedText(levelToDescriptions, levelIdx, lang, text);
 	}
 
+	public void setQualifiable(int levelIdx, boolean qualifiable) {
+		levelToQualifiable.put(levelIdx, qualifiable);
+	}
+	
 	private void addLocalizedText(
 			Map<Integer, List<LanguageSpecificText>> levelToLocalizedTexts,
 			int levelIdx, String lang, String label) {
@@ -61,6 +60,11 @@ public class CodeListLine extends Line {
 
 	public List<String> getLevelCodes() {
 		return levelCodes;
+	}
+	
+	public boolean isQualifiable(int levelIdx) {
+		Boolean qualifiable = levelToQualifiable.get(levelIdx);
+		return qualifiable != null && qualifiable.booleanValue();
 	}
 	
 
