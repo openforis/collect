@@ -34,7 +34,7 @@ var OPENFORIS = {
 
 		if ( OPENFORIS.isEditingRecord() && ! OPENFORIS.isPreview() ) {
 			var mainApp = OPENFORIS.getFlexApp();
-			var leavingPageMessage = mainApp.getLeavingPageMessage();
+			var leavingPageMessage = mainApp && mainApp.getLeavingPageMessage && mainApp.getLeavingPageMessage();
 			return leavingPageMessage;
 		}
 	},

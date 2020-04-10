@@ -822,15 +822,20 @@ Collect.DataManager.MapPanelComposer.openRecordEditPopUp = function(surveyId, re
 
 	$(modalContainer).on("resize", resizeIFrame);
 
-	modalContainer.on('show.bs.modal', function() {
-		iframe.attr("src", "old_client.htm?edit=true"
-			+ "&surveyId=" + surveyId
-			+ "&recordId=" + recordId
-			+ "&locale=" + OF.i18n.currentLocale());
-		$(this).find('.modal-body').css({
-			'max-height' : '100%'
+	modalContainer
+		.on('show.bs.modal', function() {
+			iframe.attr("src", "old_client.html?edit=true"
+				+ "&surveyId=" + surveyId
+				+ "&recordId=" + recordId
+				+ "&locale=" + OF.i18n.currentLocale());
+			$(this).find('.modal-body').css({
+				'max-height' : '100%'
+			});
+		})
+		.on('hide.bs.modal', function() {
+			collect.sessionService.clearActiveRecord(function() {});
 		});
-	});
+	
 	var options = {
 		backdrop : "static",
 		keyboard : false

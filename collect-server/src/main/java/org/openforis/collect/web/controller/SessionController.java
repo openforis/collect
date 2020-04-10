@@ -2,6 +2,7 @@ package org.openforis.collect.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 
 import java.util.Locale;
 
@@ -102,6 +103,15 @@ public class SessionController extends BasicController {
 			sessionState.setLocale(request.getLocale());
 		}
 		return new UserController.UserForm(user);
+	}
+	
+	@RequestMapping(value="record", method=DELETE)
+	public @ResponseBody void clearActiveRecord() {
+		try {
+			sessionManager.releaseRecord();
+		} catch (RecordUnlockedException e) {
+			// Ignore it
+		}
 	}
 	
 	@RequestMapping(value="invalidate", method=POST)

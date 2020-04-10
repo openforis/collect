@@ -16,3 +16,7 @@ Collect.SessionService.prototype.getActiveSurvey = function(onSuccess, onError) 
 Collect.SessionService.prototype.getLoggedUser = function(onSuccess, onError) {
 	this.send("user", null, "GET", onSuccess, onError);
 };
+
+Collect.SessionService.prototype.clearActiveRecord = function(onSuccess, onError) {
+	this.send("record", null, "DELETE", onSuccess, onError);
+};
