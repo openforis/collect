@@ -11,7 +11,7 @@
 	<packaging>swf</packaging>
 	
 	<properties>
-		<graniteds.version>2.3.0.GA</graniteds.version>
+		<graniteds.version>2.3.2.GA</graniteds.version>
 		<flex.framework.version>4.5.1.21328</flex.framework.version>
 <!-- 		<flex.framework.version>4.5.0.18623</flex.framework.version> -->
 <!-- 		<flex.framework.version>4.1.0.16076</flex.framework.version> -->
