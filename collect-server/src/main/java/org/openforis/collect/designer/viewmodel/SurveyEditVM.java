@@ -314,7 +314,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 				} catch (SurveyStoreException e) {
 					throw new RuntimeException(e);
 				}
-			}, Labels.getLabel("survey.save.confirm_save_with_errors"), false);
+			}, Labels.getLabel("survey.save.confirm_save_with_errors"), true);
 		} else {
 			return false;
 		}

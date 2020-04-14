@@ -21,6 +21,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.SuccessHandler;
+import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM.SurveyType;
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
@@ -45,11 +46,9 @@ import org.openforis.concurrency.Job;
 import org.springframework.http.MediaType;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
-import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
-import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.logging.Log;
 import org.zkoss.util.resource.Labels;
@@ -97,9 +96,6 @@ public class SurveyExportParametersVM extends BaseVM {
 	private SurveyExportParametersFormObject formObject;
 	private Form tempForm;
 	
-	private RDBPrintJob rdbExportJob;
-	private SurveyBackupJob surveyBackupJob;
-	
 	private Window jobStatusPopUp;
 
 	public static void openPopUp(SurveySummary surveySummary) throws IOException {
@@ -139,9 +135,6 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	@Command
 	public void export() {
-		rdbExportJob = null;
-		surveyBackupJob = null;
-		
 		String uri = surveySummary.getUri();
 		final CollectSurvey loadedSurvey;
 		if ( surveySummary.isTemporary() && SurveyType.valueOf(formObject.getType()) == TEMPORARY ) {
@@ -173,42 +166,6 @@ public class SurveyExportParametersVM extends BaseVM {
 		}
 	}
 	
-	@GlobalCommand
-	public void jobCompleted(@BindingParam("job") Job job) {
-		boolean jobStartedByThis = isJobStartedByThis(job);
-		if ( job == surveyBackupJob ) {
-			File file = surveyBackupJob.getOutputFile();
-			downloadFile(file, surveyBackupJob.getOutputFormat().getOutputFileExtension(), MediaType.APPLICATION_OCTET_STREAM_VALUE, 
-					surveyBackupJob.getSurvey(), surveyBackupJob.getOutputSurveyDefaultLanguage());
-			final List<DataBackupError> dataBackupErrors = surveyBackupJob.getDataBackupErrors();
-			if (! dataBackupErrors.isEmpty()) {
-				DataExportErrorsPopUpVM.showPopUp(dataBackupErrors);
-			}
-		} else if ( job == rdbExportJob ) {
-			File file = rdbExportJob.getOutputFile();
-			CollectSurvey survey = rdbExportJob.getSurvey();
-			String extension = "sql";
-			downloadFile(file, extension, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
-		}
-		if (jobStartedByThis) {
-			onJobEnd(job);
-		}
-	}
-	
-	private boolean isJobStartedByThis(Job job) {
-		return job == surveyBackupJob || job == rdbExportJob;
-	}
-	
-	private void onJobEnd(Job job) {
-		if (job == surveyBackupJob) {
-			surveyBackupJob = null;
-		} else if (job == rdbExportJob) {
-			rdbExportJob = null;
-		}
-		MessageUtil.showInfo("survey.export.completed");
-		closeJobStatusPopUp();
-	}
-	
 	private void downloadFile(File file, String extension, String contentType, CollectSurvey survey, String defaultLanguageCode) {
 		String surveyName = survey.getName();
 		String dateStr = Dates.formatLocalDateTime(survey.getModifiedDate());
@@ -228,23 +185,32 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	private void startRDBSurveyExportJob(final CollectSurvey survey,
 			final SurveyExportParametersFormObject parameters) {
-		rdbExportJob = new RDBPrintJob();
-		rdbExportJob.setSurvey(survey);
-		rdbExportJob.setTargetSchemaName(survey.getName());
-		rdbExportJob.setRecordManager(recordManager);
+		RDBPrintJob job = new RDBPrintJob();
+		job.setSurvey(survey);
+		job.setTargetSchemaName(survey.getName());
+		job.setRecordManager(recordManager);
 		RecordFilter recordFilter = new RecordFilter(survey);
-		rdbExportJob.setRecordFilter(recordFilter);
-		rdbExportJob.setIncludeData(parameters.isIncludeData());
-		rdbExportJob.setDialect(parameters.getRdbDialectEnum());
-		rdbExportJob.setDateTimeFormat(parameters.getRdbDateTimeFormat());
-		rdbExportJob.setTargetSchemaName(parameters.getRdbTargetSchemaName());
-		jobManager.start(rdbExportJob, String.valueOf(survey.getId()));
-		openSurveyExportStatusPopUp(survey.getName(), rdbExportJob);
+		job.setRecordFilter(recordFilter);
+		job.setIncludeData(parameters.isIncludeData());
+		job.setDialect(parameters.getRdbDialectEnum());
+		job.setDateTimeFormat(parameters.getRdbDateTimeFormat());
+		job.setTargetSchemaName(parameters.getRdbTargetSchemaName());
+		jobManager.start(job, String.valueOf(survey.getId()));
+		openJobStatusPopUp(survey.getName(), job, new ExportJobEndHandler<RDBPrintJob>() {
+			@Override
+			protected void onJobCompleted() {
+				File file = job.getOutputFile();
+				CollectSurvey survey = job.getSurvey();
+				String extension = "sql";
+				downloadFile(file, extension, MediaType.TEXT_PLAIN_VALUE, survey, survey.getDefaultLanguage());
+				super.onJobCompleted();
+			}
+		});
 	}
 	
-	protected void openSurveyExportStatusPopUp(String surveyName, Job job) {
+	private  <J extends Job> void openJobStatusPopUp(String surveyName, J job, JobEndHandler<J> jobEndHandler) {
 		String title = Labels.getLabel("survey.export_survey.process_status_popup.message", new String[] { surveyName });
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp(title, job, true);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(title, job, true, jobEndHandler);
 	}
 
 	private void exportCollectEarthSurvey(final CollectSurvey survey,
@@ -271,14 +237,45 @@ public class SurveyExportParametersVM extends BaseVM {
 
 	protected void startCollectSurveyExportJob(CollectSurvey survey,
 			SurveyExportParametersFormObject parameters) {
-		surveyBackupJob = jobManager.createJob(SurveyBackupJob.class);
-		surveyBackupJob.setSurvey(survey);
-		surveyBackupJob.setIncludeData(parameters.isIncludeData());
-		surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
-		surveyBackupJob.setOutputFormat(org.openforis.collect.io.SurveyBackupJob.OutputFormat.valueOf(parameters.getOutputFormat()));
-		surveyBackupJob.setOutputSurveyDefaultLanguage(ObjectUtils.defaultIfNull(parameters.getLanguageCode(), survey.getDefaultLanguage()));
-		jobManager.start(surveyBackupJob, String.valueOf(survey.getId()));
-		openSurveyExportStatusPopUp(survey.getName(), surveyBackupJob);
+		SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
+		job.setSurvey(survey);
+		job.setIncludeData(parameters.isIncludeData());
+		job.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
+		job.setOutputFormat(org.openforis.collect.io.SurveyBackupJob.OutputFormat.valueOf(parameters.getOutputFormat()));
+		job.setOutputSurveyDefaultLanguage(ObjectUtils.defaultIfNull(parameters.getLanguageCode(), survey.getDefaultLanguage()));
+		jobManager.start(job, String.valueOf(survey.getId()));
+		openJobStatusPopUp(survey.getName(), job, new ExportJobEndHandler<SurveyBackupJob>() {
+			@Override
+			protected void onJobCompleted() {
+				File file = job.getOutputFile();
+				downloadFile(file, job.getOutputFormat().getOutputFileExtension(), MediaType.APPLICATION_OCTET_STREAM_VALUE, 
+						job.getSurvey(), job.getOutputSurveyDefaultLanguage());
+				final List<DataBackupError> dataBackupErrors = job.getDataBackupErrors();
+				if (! dataBackupErrors.isEmpty()) {
+					DataExportErrorsPopUpVM.showPopUp(dataBackupErrors);
+				}
+				super.onJobCompleted();
+			}
+		});
+	}
+	
+	private class ExportJobEndHandler<J extends Job> implements JobEndHandler<J> {
+		public void onJobEnd(J job) {
+			switch(job.getStatus()) {
+			case COMPLETED:
+				onJobCompleted();
+				break;
+			case FAILED:
+				MessageUtil.showError("survey.export.error", Labels.getLabel(job.getErrorMessage(), job.getErrorMessageArgs()));
+				break;
+			default:
+			}
+			closeJobStatusPopUp();
+		}
+
+		protected void onJobCompleted() {
+			MessageUtil.showInfo("survey.export.completed");
+		}
 	}
 
 	private void validateSurvey(CollectSurvey survey, SurveyValidator validator, final SuccessHandler successHandler, boolean showWarningConfirm) {
