@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<survey lastId="100001" created="2016-01-21T14:33:28.351+01:00" modified="2016-01-22T15:06:15.524+01:00" collectearth:plotarea="0.5" collectearth:samplepoints="49" collect:target="CE" collect:collectVersion="3.8.27" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <project>Generic IPCC survey - CHANGE NAME</project>
+<survey lastId="100356" created="2016-01-21T14:33:28.351+01:00" modified="2020-04-29T17:42:46.838+02:00" collectearth:plotarea="0.5" collectearth:samplepoints="49" collect:target="CE" collect:collectVersion="3.26.7" xsi:schemaLocation="http://www.openforis.org/idml/3.0  &#9;&#9;https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd       &#9;&#9;http://www.openforis.org/collect/3.0/ui  &#9;&#9;https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd" xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect" xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <project>IPCC Land Use Change 2000/2020</project>
   <uri>http://www.openforis.org/idm/ipcc_afolu_generic</uri>
   <cycle>2013-2014</cycle>
   <description>This is a generic survey that can be used as the base for assessments of Land Use, Land Use Change and Forestry (LULUCF) that are compliant with the IPCC guidelines.
@@ -16,21 +16,21 @@ For more information or questions post a question in the forum : www.openforis.o
   <applicationOptions>
     <options type="ui">
 <n0:tabSet name="plot_tab_set" xmlns:n0="http://www.openforis.org/collect/3.0/ui">
+  <n0:tab name="tab_1013">
+    <n0:label>Imagery</n0:label>
+  </n0:tab>
+  <n0:tab name="tab_1015">
+    <n0:label>Land cover</n0:label>
+  </n0:tab>
   <n0:tab name="plot_tab">
     <n0:label>IPCC</n0:label>
     <n0:label xml:lang="es">Parcela</n0:label>
   </n0:tab>
-  <n0:tab name="tab_1015">
-    <n0:label>Element</n0:label>
-  </n0:tab>
-  <n0:tab name="tab_1014">
-    <n0:label>Accessibility</n0:label>
-  </n0:tab>
   <n0:tab name="tab_1012">
     <n0:label>Disturbance</n0:label>
   </n0:tab>
-  <n0:tab name="tab_1013">
-    <n0:label>RS Info</n0:label>
+  <n0:tab name="tab_100300">
+    <n0:label>Notes</n0:label>
   </n0:tab>
 </n0:tabSet>
     </options>
@@ -45,160 +45,227 @@ For more information or questions post a question in the forum : www.openforis.o
         <level name="subdivision" />
       </hierarchy>
       <items>
-        <item id="3250">
-          <code>forest</code>
+        <item id="100161">
+          <code>F</code>
           <label>Forest</label>
-          <item id="3251">
-            <code>EF</code>
-            <label>Evergreen</label>
+          <item id="100162">
+            <code>broadleaf_dec</code>
+            <label>Broadleaf deciduous</label>
           </item>
-          <item id="3252">
-            <code>MD</code>
-            <label>Mixed deciduous</label>
+          <item id="100163">
+            <code>broadleaf_ever</code>
+            <label>Broadleaf evergreen</label>
           </item>
-          <item id="3253">
-            <code>DD</code>
-            <label>Dry dipterocarp</label>
+          <item id="100164">
+            <code>broadleaf_mix</code>
+            <label>Broadleaf mixed</label>
           </item>
-          <item id="3254">
-            <code>CF</code>
-            <label>Coniferous forest</label>
+          <item id="100165">
+            <code>coniferous_dec</code>
+            <label>Coniferous deciduous</label>
           </item>
-          <item id="3255">
-            <code>MCB</code>
-            <label>Mixed Coniferous and Broadleaved forest</label>
+          <item id="100166">
+            <code>coniferous_ever</code>
+            <label>Coniferous evergreen</label>
           </item>
-          <item id="3256">
-            <code>UNF</code>
-            <label>Unknown Natural Forest</label>
+          <item id="100167">
+            <code>coniferous_mix</code>
+            <label>Coniferous mixed</label>
           </item>
-          <item id="3338">
-            <code>BB</code>
-            <label>Bamboo</label>
+          <item id="100168">
+            <code>mixed_forest</code>
+            <label>Mixed forest (brod-con)</label>
           </item>
-          <item id="3259">
-            <code>plantation</code>
-            <label>Plantation</label>
+          <item id="100169">
+            <code>riparian</code>
+            <label>Riparian forest</label>
+          </item>
+          <item id="100170">
+            <code>mangrove</code>
+            <label>Mangrove forest</label>
+          </item>
+          <item id="100171">
+            <code>coniferous_plant</code>
+            <label>Coniferous plantation</label>
+          </item>
+          <item id="100172">
+            <code>acacia_plant</code>
+            <label>Acacia plantation</label>
+          </item>
+          <item id="100173">
+            <code>eucalyptus_plant</code>
+            <label>Eucalyptus plantation</label>
+          </item>
+          <item id="100174">
+            <code>other_plant</code>
+            <label>Other plantation</label>
           </item>
         </item>
-        <item id="3260">
-          <code>cropland</code>
+        <item id="100175">
+          <code>C</code>
           <label>Cropland</label>
-          <item id="3261">
-            <code>UC</code>
-            <label>Upland crop</label>
+          <item id="100176">
+            <code>permanent_crops</code>
+            <label>Land under permanent crops</label>
           </item>
-          <item id="3262">
-            <code>RP</code>
+          <item id="100177">
+            <code>temporary_crops</code>
+            <label>Land under temporary crops</label>
+          </item>
+          <item id="100178">
+            <code>orchard</code>
+            <label>Orchard</label>
+          </item>
+          <item id="100179">
+            <code>rice</code>
             <label>Rice paddy</label>
           </item>
-          <item id="3263">
-            <code>AP</code>
-            <label>Agricultural plantation</label>
+          <item id="100180">
+            <code>palm</code>
+            <label>Palm</label>
           </item>
-          <item id="3264">
-            <code>OA</code>
-            <label>Other agriculture</label>
-          </item>
-          <item id="3265">
-            <code>UA</code>
-            <label>Unknown agriculture</label>
-          </item>
-          <item id="3306">
-            <code>shifting_ag</code>
-            <label>Shifting agriculture</label>
+          <item id="100181">
+            <code>greenhouse</code>
+            <label>Greenhouse</label>
           </item>
         </item>
-        <item id="3266">
-          <code>grassland</code>
+        <item id="100182">
+          <code>G</code>
           <label>Grassland</label>
-          <item id="3267">
-            <code>SA</code>
-            <label>Savannah</label>
-          </item>
-          <item id="3268">
-            <code>SC</code>
-            <label>Scrub</label>
-          </item>
-          <item id="3269">
-            <code>G</code>
+          <item id="100183">
+            <code>grassland</code>
             <label>Grassland</label>
+            <description>Grassland without trees or shrubs.</description>
           </item>
-          <item id="3270">
-            <code>UG</code>
-            <label>Unknown grassland</label>
+          <item id="100184">
+            <code>grassland_trees</code>
+            <label>Grassland with trees</label>
+            <description>Grasslands with up to 10% of tree cover.</description>
+          </item>
+          <item id="100185">
+            <code>grassland_shrubs</code>
+            <label>Grassland with shrubs</label>
+            <description>Grassland with shrub cover between 2 and 10%.</description>
+          </item>
+          <item id="100186">
+            <code>grassland_trees_shrubs</code>
+            <label>Grassland with trees and shrubs</label>
+            <description>Grassland with tree cover and shrub cover between 2 and 10%.</description>
+          </item>
+          <item id="100187">
+            <code>shrubland</code>
+            <label>Shrubland</label>
+            <description>Grassland with more than 10% of shrubs.</description>
+          </item>
+          <item id="100188">
+            <code>shrubland_trees</code>
+            <label>Shrubland with trees</label>
+            <description>Grassland with more than 10% of shrub cover and tree cover between 2 and 10%.</description>
+          </item>
+          <item id="100189">
+            <code>lichens_mosses</code>
+            <label>Lichens and mosses</label>
           </item>
         </item>
-        <item id="3271">
-          <code>settlement</code>
+        <item id="100190">
+          <code>S</code>
           <label>Settlement</label>
-          <item id="3272">
-            <code>CS</code>
+          <item id="100191">
+            <code>city</code>
             <label>City</label>
           </item>
-          <item id="3273">
-            <code>VS</code>
+          <item id="100192">
+            <code>village</code>
             <label>Village</label>
+            <description>Anything that is not town or city</description>
           </item>
-          <item id="3274">
-            <code>RS</code>
-            <label>Road</label>
-          </item>
-          <item id="3275">
-            <code>IS</code>
-            <label>Infrastructure</label>
-          </item>
-          <item id="3276">
-            <code>MS</code>
+          <item id="100193">
+            <code>mining</code>
             <label>Mining</label>
           </item>
+          <item id="100194">
+            <code>infrastructure</code>
+            <label>Infrastructure</label>
+            <description>roads, railway, power lines, harbors, airports, landfills, etc.</description>
+          </item>
+          <item id="100195">
+            <code>built_up</code>
+            <label>Built up</label>
+            <description>Buildings, farms, houses, barns, stables, etc.</description>
+          </item>
+          <item id="100196">
+            <code>urban_park</code>
+            <label>Urban park</label>
+          </item>
         </item>
-        <item id="3277">
-          <code>otherland</code>
-          <label>Other Land</label>
-          <item id="3278">
-            <code>RO</code>
-            <label>Rock</label>
+        <item id="100197">
+          <code>W</code>
+          <label>Wetland</label>
+          <item id="100198">
+            <code>permanent_lake</code>
+            <label>Permanent lake</label>
           </item>
-          <item id="3279">
-            <code>BO</code>
-            <label>Barren land</label>
+          <item id="100199">
+            <code>seasonal_lake</code>
+            <label>Seasonal lake</label>
           </item>
-        </item>
-        <item id="3280">
-          <code>wetland</code>
-          <label>Wet Land</label>
-          <item id="3281">
-            <code>LW</code>
-            <label>Lake</label>
+          <item id="100200">
+            <code>permanent_river</code>
+            <label>Permanent River</label>
           </item>
-          <item id="3282">
-            <code>RW</code>
-            <label>River</label>
+          <item id="100201">
+            <code>seasonal_river</code>
+            <label>Seasonal river</label>
           </item>
-          <item id="3283">
-            <code>WW</code>
-            <label>Water reservoir</label>
-          </item>
-          <item id="3284">
-            <code>SW</code>
+          <item id="100202">
+            <code>swamp</code>
             <label>Swamp</label>
           </item>
+          <item id="100203">
+            <code>lagoon</code>
+            <label>Lagoon</label>
+            <description>Coastal water body</description>
+          </item>
+          <item id="100204">
+            <code>peatland</code>
+            <label>Peatland</label>
+          </item>
+          <item id="100205">
+            <code>salt_extraction</code>
+            <label>Salt extraction</label>
+          </item>
+          <item id="100206">
+            <code>other</code>
+            <label>Other</label>
+          </item>
+          <item id="100207">
+            <code>art_water_body</code>
+            <label>Artificial Water Bodies</label>
+            <description>Dams, reservoirs (irrigation, hydroelectricity, ...)</description>
+          </item>
         </item>
-        <item id="3285">
-          <code>noData</code>
-          <label>No data</label>
-          <item id="3287">
-            <code>CL</code>
-            <label>Clouds</label>
+        <item id="100208">
+          <code>O</code>
+          <label>Otherland</label>
+          <item id="100209">
+            <code>rock_stone</code>
+            <label>Rocks / Stone</label>
           </item>
-          <item id="3288">
-            <code>SH</code>
-            <label>Shadow</label>
+          <item id="100210">
+            <code>sand_dunes</code>
+            <label>Sand / Dunes</label>
           </item>
-          <item id="3289">
-            <code>other_reason</code>
-            <label>Other reason</label>
+          <item id="100211">
+            <code>snow</code>
+            <label>Snow / Glaciers / Ice</label>
+          </item>
+          <item id="100212">
+            <code>barren_soil</code>
+            <label>Barren soil</label>
+          </item>
+          <item id="100213">
+            <code>other</code>
+            <label>Other</label>
           </item>
         </item>
       </items>
@@ -209,110 +276,115 @@ For more information or questions post a question in the forum : www.openforis.o
       <description>These are the default FAO GEZ ( download here: http://www.fao.org/geonetwork/srv/en/resources.get?id=47105&amp;fname=gez2010.zip&amp;access=private - more info  http://www.fao.org/docrep/017/ap861e/ap861e00.pdf ) ecological zones that are used as the standard classes in the GHG inventory software ALU (http://www.nrel.colostate.edu/projects/ALUsoftware/).</description>
       <codingScheme scope="local" />
       <items>
-        <item id="3340">
-          <code>Ba</code>
+        <item id="100269">
+          <code>41</code>
           <label>Ba</label>
           <description>Boreal coniferous forest</description>
         </item>
-        <item id="3341">
-          <code>P</code>
-          <label>P</label>
-          <description>Polar</description>
-        </item>
-        <item id="3342">
-          <code>TeM</code>
-          <label>TeM</label>
-          <description>Temperate mountain system</description>
-        </item>
-        <item id="3343">
-          <code>TBSh</code>
-          <label>TBSh</label>
-          <description>Tropical shrubland</description>
-        </item>
-        <item id="3344">
-          <code>BM</code>
+        <item id="100270">
+          <code>43</code>
           <label>BM</label>
           <description>Boreal mountain system</description>
         </item>
-        <item id="3345">
-          <code>TeBSk</code>
-          <label>TeBSk</label>
-          <description>Temperate steppe</description>
-        </item>
-        <item id="3346">
-          <code>Bb</code>
+        <item id="100271">
+          <code>42</code>
           <label>Bb</label>
           <description>Boreal tundra woodland</description>
         </item>
-        <item id="3347">
-          <code>SM</code>
-          <label>SM</label>
-          <description>Subtropical mountain system</description>
+        <item id="100272">
+          <code>50</code>
+          <label>P</label>
+          <description>Polar</description>
         </item>
-        <item id="3348">
-          <code>TeDc</code>
-          <label>TeDc</label>
-          <description>Temperate continental forest</description>
-        </item>
-        <item id="3349">
-          <code>TAr</code>
-          <label>TAr</label>
-          <description>Tropical rainforest</description>
-        </item>
-        <item id="3350">
-          <code>SBWh</code>
+        <item id="100273">
+          <code>24</code>
           <label>SBWh</label>
           <description>Subtropical desert</description>
         </item>
-        <item id="3351">
-          <code>SCs</code>
+        <item id="100274">
+          <code>22</code>
           <label>SCs</label>
           <description>Subtropical dry forest</description>
         </item>
-        <item id="3352">
-          <code>SBSh</code>
-          <label>SBSh</label>
-          <description>Subtropical steppe</description>
-        </item>
-        <item id="3353">
-          <code>TBWh</code>
-          <label>TBWh</label>
-          <description>Tropical desert</description>
-        </item>
-        <item id="3354">
-          <code>Water</code>
-          <label>Water</label>
-          <description>Water</description>
-        </item>
-        <item id="3355">
-          <code>SCf</code>
+        <item id="100275">
+          <code>21</code>
           <label>SCf</label>
           <description>Subtropical humid forest</description>
         </item>
-        <item id="3356">
-          <code>TeBWk</code>
+        <item id="100276">
+          <code>25</code>
+          <label>SM</label>
+          <description>Subtropical mountain system</description>
+        </item>
+        <item id="100277">
+          <code>23</code>
+          <label>SBSh</label>
+          <description>Subtropical steppe</description>
+        </item>
+        <item id="100278">
+          <code>32</code>
+          <label>TeDc</label>
+          <description>Temperate continental forest</description>
+        </item>
+        <item id="100279">
+          <code>34</code>
           <label>TeBWk</label>
           <description>Temperate desert</description>
         </item>
-        <item id="3357">
-          <code>TAwb</code>
-          <label>TAwb</label>
-          <description>Tropical dry forest</description>
+        <item id="100280">
+          <code>35</code>
+          <label>TeM</label>
+          <description>Temperate mountain system</description>
         </item>
-        <item id="3358">
-          <code>TeDo</code>
+        <item id="100281">
+          <code>31</code>
           <label>TeDo</label>
           <description>Temperate oceanic forest</description>
         </item>
-        <item id="3359">
-          <code>TAwa</code>
+        <item id="100282">
+          <code>33</code>
+          <label>TeBSk</label>
+          <description>Temperate steppe</description>
+        </item>
+        <item id="100283">
+          <code>15</code>
+          <label>TBWh</label>
+          <description>Tropical desert</description>
+        </item>
+        <item id="100284">
+          <code>13</code>
+          <label>TAwb</label>
+          <description>Tropical dry forest</description>
+        </item>
+        <item id="100285">
+          <code>12</code>
           <label>TAwa</label>
           <description>Tropical moist forest</description>
         </item>
-        <item id="3360">
-          <code>TM</code>
+        <item id="100286">
+          <code>16</code>
           <label>TM</label>
           <description>Tropical mountain system</description>
+        </item>
+        <item id="100287">
+          <code>11</code>
+          <label>TAr</label>
+          <description>Tropical rainforest</description>
+        </item>
+        <item id="100288">
+          <code>14</code>
+          <label>TBSh</label>
+          <description>Tropical shrubland</description>
+        </item>
+        <item id="100289">
+          <code>90</code>
+          <label>Water</label>
+          <description>Water</description>
+        </item>
+        <item id="100290">
+          <code>0</code>
+          <label>No data</label>
+          <description>No data</description>
         </item>
       </items>
     </list>
@@ -350,322 +422,338 @@ For more information or questions post a question in the forum : www.openforis.o
     <list id="222129" name="land_use_subcategory">
       <label type="item">Land Use Sub-category</label>
       <label type="list">Sub-Categories</label>
+      <description>These indicate the possible combinations of Land Use conversions</description>
       <hierarchy>
-        <level name="use">
-          <label xml:lang="en">Use</label>
-          <label xml:lang="es">Uso</label>
-        </level>
-        <level name="subcategory">
-          <label xml:lang="en">Subcategory</label>
-          <label xml:lang="es">Subcategoria</label>
-        </level>
+        <level name="use" />
+        <level name="subcategory" />
       </hierarchy>
       <items>
-        <item id="222130">
-          <code>forest</code>
+        <item id="100214">
+          <code>F</code>
           <label>Forest land</label>
-          <item id="222131">
-            <code>FLtoFL</code>
+          <item id="100215">
+            <code>FF</code>
             <label>F &gt; F</label>
             <description>Forest Land remaining Forest Land</description>
           </item>
-          <item id="222132">
-            <code>OTtoFL</code>
+          <item id="100216">
+            <code>OF</code>
             <label>O &gt; F</label>
             <description>Other Land becoming Forest Land</description>
           </item>
-          <item id="222133">
-            <code>CLtoFL</code>
+          <item id="100217">
+            <code>CF</code>
             <label>C &gt; F</label>
             <description>Crop Land becoming Forest Land</description>
           </item>
-          <item id="222134">
-            <code>GLtoFL</code>
+          <item id="100218">
+            <code>GF</code>
             <label>G &gt; F</label>
             <description>Grass Land becoming Forest Land</description>
           </item>
-          <item id="222135">
-            <code>WLtoFL</code>
+          <item id="100219">
+            <code>WF</code>
             <label>W &gt; F</label>
             <description>Wet Land becoming Forest Land</description>
           </item>
-          <item id="222136">
-            <code>SLtoFL</code>
+          <item id="100220">
+            <code>SF</code>
             <label>S &gt; F</label>
             <description>Settlement becoming Forest Land</description>
           </item>
         </item>
-        <item id="222137">
-          <code>cropland</code>
+        <item id="100221">
+          <code>C</code>
           <label>Cropland</label>
-          <item id="222138">
-            <code>CLtoCL</code>
+          <item id="100222">
+            <code>CC</code>
             <label>C &gt; C</label>
             <description>Crop Land remaining Crop Land</description>
           </item>
-          <item id="222139">
-            <code>OTtoCL</code>
+          <item id="100223">
+            <code>OC</code>
             <label>O &gt; C</label>
             <description>Other Land becoming Crop Land</description>
           </item>
-          <item id="222140">
-            <code>FLtoCL</code>
+          <item id="100224">
+            <code>FC</code>
             <label>F &gt; C</label>
             <description>Forest Land becoming Crop Land</description>
           </item>
-          <item id="222141">
-            <code>GLtoCL</code>
+          <item id="100225">
+            <code>GC</code>
             <label>G &gt; C</label>
             <description>Grass Land becoming Crop Land</description>
           </item>
-          <item id="222142">
-            <code>WLtoCL</code>
+          <item id="100226">
+            <code>WC</code>
             <label>W &gt; C</label>
             <description>Wet Land becoming Crop Land</description>
           </item>
-          <item id="222143">
-            <code>SLtoCL</code>
+          <item id="100227">
+            <code>SC</code>
             <label>S &gt; C</label>
             <description>Settlement becoming Crop Land</description>
           </item>
         </item>
-        <item id="222144">
-          <code>otherland</code>
+        <item id="100228">
+          <code>O</code>
           <label>Otherland</label>
-          <item id="222145">
-            <code>OTtoOT</code>
+          <item id="100229">
+            <code>OO</code>
             <label>O &gt; O</label>
             <description>Other Land remaining Other Land</description>
           </item>
-          <item id="222146">
-            <code>CLtoOT</code>
+          <item id="100230">
+            <code>CO</code>
             <label>C &gt; O</label>
             <description>Crop Land becoming Other Land</description>
           </item>
-          <item id="222147">
-            <code>FLtoOT</code>
+          <item id="100231">
+            <code>FO</code>
             <label>F &gt; O</label>
             <description>Forest Land becoming Other Land</description>
           </item>
-          <item id="222148">
-            <code>GLtoOT</code>
+          <item id="100232">
+            <code>GO</code>
             <label>G &gt; O</label>
             <description>Grass Land becoming Other Land</description>
           </item>
-          <item id="222149">
-            <code>WLtoOT</code>
+          <item id="100233">
+            <code>WO</code>
             <label>W &gt; O</label>
             <description>Wet Land becoming Other Land</description>
           </item>
-          <item id="222150">
-            <code>SLtoOT</code>
+          <item id="100234">
+            <code>SO</code>
             <label>S &gt; O</label>
             <description>Settlement becoming Other Land</description>
           </item>
         </item>
-        <item id="222151">
-          <code>grassland</code>
+        <item id="100235">
+          <code>G</code>
           <label>Grassland</label>
-          <item id="222152">
-            <code>GLtoGL</code>
+          <item id="100236">
+            <code>GG</code>
             <label>G &gt; G</label>
             <description>Grass Land remaining Grass Land</description>
           </item>
-          <item id="222153">
-            <code>OTtoGL</code>
+          <item id="100237">
+            <code>OG</code>
             <label>O &gt; G</label>
             <description>Other Land becoming Grass Land</description>
           </item>
-          <item id="222154">
-            <code>FLtoGL</code>
+          <item id="100238">
+            <code>FG</code>
             <label>F &gt; G</label>
             <description>Forest Land becoming Grass Land</description>
           </item>
-          <item id="222155">
-            <code>CLtoGL</code>
-            <label>F &gt; G</label>
+          <item id="100239">
+            <code>CG</code>
+            <label>C &gt; G</label>
             <description>Crop Land becoming Grass Land</description>
           </item>
-          <item id="222156">
-            <code>WLtoGL</code>
+          <item id="100240">
+            <code>WG</code>
             <label>W &gt; G</label>
             <description>Wet Land becoming Grass Land</description>
           </item>
-          <item id="222157">
-            <code>SLtoGL</code>
+          <item id="100241">
+            <code>SG</code>
             <label>S &gt; G</label>
             <description>Settlement becoming Grass Land</description>
           </item>
         </item>
-        <item id="222158">
-          <code>wetland</code>
+        <item id="100242">
+          <code>W</code>
           <label>Wetland</label>
-          <item id="222159">
-            <code>WLtoWL</code>
+          <item id="100243">
+            <code>WW</code>
             <label>W &gt; W</label>
             <description>Wet Land remaining Wet Land</description>
           </item>
-          <item id="222160">
-            <code>OTtoWL</code>
+          <item id="100244">
+            <code>OW</code>
             <label>O &gt; W</label>
             <description>Other Land becoming Wet Land</description>
           </item>
-          <item id="222161">
-            <code>FLtoWL</code>
+          <item id="100245">
+            <code>FW</code>
             <label>F &gt; W</label>
             <description>Forest Land becoming Wet Land</description>
           </item>
-          <item id="222162">
-            <code>CLtoWL</code>
+          <item id="100246">
+            <code>CW</code>
             <label>C &gt; W</label>
             <description>Crop Land becoming Wet Land</description>
           </item>
-          <item id="222163">
-            <code>GLtoWL</code>
+          <item id="100247">
+            <code>GW</code>
             <label>G &gt; W</label>
             <description>Grass Land becoming Wet Land</description>
           </item>
-          <item id="222164">
-            <code>SLtoWL</code>
+          <item id="100248">
+            <code>SW</code>
             <label>S &gt; W</label>
             <description>Settlement becoming Wet Land</description>
           </item>
         </item>
-        <item id="222165">
-          <code>settlement</code>
+        <item id="100249">
+          <code>S</code>
           <label>Settlement</label>
-          <item id="222166">
-            <code>SLtoSL</code>
+          <item id="100250">
+            <code>SS</code>
             <label>S &gt; S</label>
             <description>Settlement remaining Settlement</description>
           </item>
-          <item id="222167">
-            <code>OTtoSL</code>
+          <item id="100251">
+            <code>OS</code>
             <label>O &gt; S</label>
             <description>Other Land becoming Settlement</description>
           </item>
-          <item id="222168">
-            <code>FLtoSL</code>
+          <item id="100252">
+            <code>FS</code>
             <label>F &gt; S</label>
             <description>Forest Land becoming Settlement</description>
           </item>
-          <item id="222169">
-            <code>CLtoSL</code>
+          <item id="100253">
+            <code>CS</code>
             <label>C &gt; S</label>
             <description>Crop Land becoming Settlement</description>
           </item>
-          <item id="222170">
-            <code>GLtoSL</code>
+          <item id="100254">
+            <code>GS</code>
             <label>G &gt; S</label>
             <description>Grass Land becoming Settlement</description>
           </item>
-          <item id="222171">
-            <code>WLtoSL</code>
+          <item id="100255">
+            <code>WS</code>
             <label>W &gt; S</label>
             <description>Wet Land becoming Settlement</description>
           </item>
         </item>
-        <item id="222172">
-          <code>noData</code>
-          <label>No data</label>
-        </item>
       </items>
     </list>
-    <list id="132" name="topographical_elements">
+    <list id="132" name="elements">
       <label type="item">Element</label>
       <label type="list">Elements</label>
       <items>
-        <item id="133">
-          <code>road</code>
-          <label>Road</label>
+        <item id="100302">
+          <code>trees</code>
+          <label>Trees (in forest/grassland)</label>
         </item>
-        <item id="134">
-          <code>river</code>
-          <label>River</label>
+        <item id="100303">
+          <code>tof</code>
+          <label>Trees (in agriculture/settlement)</label>
         </item>
-        <item id="135">
-          <code>house</code>
-          <label>House</label>
-        </item>
-        <item id="138">
-          <code>lake</code>
-          <label>Lake</label>
-        </item>
-        <item id="139">
+        <item id="100304">
           <code>crops</code>
           <label>Crops</label>
         </item>
-        <item id="136">
-          <code>other</code>
-          <label>Other</label>
+        <item id="100305">
+          <code>grass</code>
+          <label>Grass</label>
+          <description>This category includes alfa (and of course meadow and lawn, etc.)</description>
         </item>
-        <item id="137">
-          <code>trees</code>
-          <label>Trees</label>
+        <item id="100306">
+          <code>shrubs</code>
+          <label>Bushes/Shrubs</label>
+          <description>This category includes: cactus, pastoral plantation, maquis, etc.</description>
+        </item>
+        <item id="100307">
+          <code>palm</code>
+          <label>Palm trees</label>
+        </item>
+        <item id="100308">
+          <code>housing</code>
+          <label>Built up</label>
+          <description>Urban areas, villages, hamlets, farms, single houses</description>
+        </item>
+        <item id="100309">
+          <code>infrastucture</code>
+          <label>Infrastructures</label>
+          <description>Roads, Railways, Airports, Ports, Electricity generation, Mining. Any human structures used for industry, transport or productive (non agricultural) use.</description>
+        </item>
+        <item id="100310">
+          <code>water_body</code>
+          <label>Water Body</label>
+          <description>River, Lake, Water Reservois, Dams, Lagoons, Swamp</description>
+        </item>
+        <item id="100311">
+          <code>bareSoil</code>
+          <label>Bare Soil</label>
         </item>
       </items>
     </list>
-    <list id="140" name="topographical_elements_coverage">
+    <list id="140" name="elements_coverage">
       <label type="item">Coverage</label>
       <label type="list">Coverages</label>
       <items>
-        <item id="2012">
+        <item id="100312">
           <code>na</code>
-          <label>Not Applicable</label>
+          <label>0 Points – No Coverage</label>
         </item>
-        <item id="2013">
-          <code>0-10</code>
-          <label>&lt; 10%</label>
+        <item id="100313">
+          <code>2</code>
+          <label>1 Points</label>
         </item>
-        <item id="2014">
-          <code>10-19</code>
-          <label>10 – 19%</label>
+        <item id="100314">
+          <code>4</code>
+          <label>2 Points</label>
         </item>
-        <item id="2015">
-          <code>20-29</code>
-          <label>20 – 29%</label>
+        <item id="100315">
+          <code>6</code>
+          <label>3 Points</label>
         </item>
-        <item id="2016">
-          <code>30-39</code>
-          <label>30 – 39%</label>
+        <item id="100316">
+          <code>8</code>
+          <label>4 Points</label>
         </item>
-        <item id="2017">
-          <code>40-49</code>
-          <label>40 – 49%</label>
+        <item id="100317">
+          <code>10</code>
+          <label>5-9 Points</label>
         </item>
-        <item id="2018">
-          <code>50-59</code>
-          <label>50 – 59%</label>
+        <item id="100318">
+          <code>20</code>
+          <label>10-14 Points</label>
         </item>
-        <item id="2019">
-          <code>60-69</code>
-          <label>60 – 69%</label>
+        <item id="100319">
+          <code>30</code>
+          <label>15-19 Points</label>
         </item>
-        <item id="2020">
-          <code>70-79</code>
-          <label>70 – 79%</label>
+        <item id="100320">
+          <code>40</code>
+          <label>20-24 Points</label>
         </item>
-        <item id="2021">
-          <code>80-89</code>
-          <label>80 – 89%</label>
+        <item id="100321">
+          <code>50</code>
+          <label>25-29 Points</label>
         </item>
-        <item id="2022">
-          <code>90-100</code>
-          <label>90 – 100%</label>
+        <item id="100322">
+          <code>60</code>
+          <label>30-34 Points</label>
+        </item>
+        <item id="100323">
+          <code>70</code>
+          <label>35-39 Points</label>
+        </item>
+        <item id="100324">
+          <code>80</code>
+          <label>40-44 Points</label>
+        </item>
+        <item id="100325">
+          <code>90</code>
+          <label>45-49 Points</label>
         </item>
       </items>
     </list>
-    <list id="146" name="human_impact_type">
-      <label type="item">Human Impact Type</label>
+    <list id="146" name="disturbance_type">
+      <label type="item">Disturbance Type</label>
       <label type="list">Human Impact Types</label>
       <items>
         <item id="147">
           <code>logging</code>
           <label>Logging</label>
-        </item>
-        <item id="148">
-          <code>fire</code>
-          <label>Fire</label>
         </item>
         <item id="149">
           <code>grazing</code>
@@ -679,6 +767,18 @@ For more information or questions post a question in the forum : www.openforis.o
           <code>shifting_cultivation</code>
           <label>Shifting Cultivation</label>
         </item>
+        <item id="100123">
+          <code>roads</code>
+          <label>Roads/Settlement</label>
+        </item>
+        <item id="148">
+          <code>fire</code>
+          <label>Fire</label>
+        </item>
+        <item id="100343">
+          <code>land_slides</code>
+          <label>Land slide</label>
+        </item>
         <item id="151">
           <code>other_human_impact</code>
           <label>Other</label>
@@ -689,8 +789,8 @@ For more information or questions post a question in the forum : www.openforis.o
         </item>
       </items>
     </list>
-    <list id="153" name="human_impact_grade">
-      <label type="item">Human Impact Grade</label>
+    <list id="153" name="disturbance_grade">
+      <label type="item">Disturbance Grade</label>
       <label type="list">Human Impact Grades</label>
       <items>
         <item id="154">
@@ -711,21 +811,9 @@ For more information or questions post a question in the forum : www.openforis.o
       <label type="item">Satellite</label>
       <label type="list">Satellites</label>
       <items>
-        <item id="3383">
-          <code>sentinel</code>
-          <label>Sentinel (GEE)</label>
-        </item>
-        <item id="158">
-          <code>landsat</code>
-          <label>Landsat (GEE)</label>
-        </item>
         <item id="159">
           <code>bing</code>
           <label>Bing Maps</label>
-        </item>
-        <item id="100000">
-          <code>planet</code>
-          <label>Planet Maps</label>
         </item>
         <item id="160">
           <code>googleEarth</code>
@@ -735,13 +823,13 @@ For more information or questions post a question in the forum : www.openforis.o
           <code>here</code>
           <label>Here Maps</label>
         </item>
-        <item id="3382">
-          <code>streetView</code>
-          <label>Google Street View</label>
+        <item id="100160">
+          <code>secureWatch</code>
+          <label>Secure Watch</label>
         </item>
         <item id="161">
-          <code>other_sat</code>
-          <label>Other VHR</label>
+          <code>no_vhr</code>
+          <label>No Very High Resolution Imagery available</label>
         </item>
       </items>
     </list>
@@ -749,45 +837,50 @@ For more information or questions post a question in the forum : www.openforis.o
       <label type="item">Soil Types</label>
       <description>Soil classes that are consistent with the IPCC defaults expected by ALU. You can obtain this data from : http://www.isric.org/content/download-form?dataset=CBP_Global_IPCC_soil_classes_2010Nov04.zip</description>
       <items>
-        <item id="3373">
-          <code>ORG</code>
+        <item id="100291">
+          <code>1</code>
           <label>ORG</label>
           <description>Organic</description>
         </item>
-        <item id="3374">
-          <code>SAN</code>
+        <item id="100292">
+          <code>2</code>
           <label>SAN</label>
           <description>Sandy Soils</description>
         </item>
-        <item id="3375">
-          <code>WET</code>
+        <item id="100293">
+          <code>3</code>
           <label>WET</label>
           <description>Wetland Soils</description>
         </item>
-        <item id="3376">
-          <code>VOL</code>
+        <item id="100294">
+          <code>4</code>
           <label>VOL</label>
           <description>Volcanic Soils</description>
         </item>
-        <item id="3377">
-          <code>SPO</code>
+        <item id="100295">
+          <code>5</code>
           <label>SPO</label>
           <description>Spodic Soils</description>
         </item>
-        <item id="3378">
-          <code>HAC</code>
+        <item id="100296">
+          <code>6</code>
           <label>HAC</label>
           <description>High Activity Clay Soils</description>
         </item>
-        <item id="3379">
-          <code>LAC</code>
+        <item id="100297">
+          <code>7</code>
           <label>LAC</label>
           <description>Low Activity Clay Soils</description>
         </item>
-        <item id="3380">
-          <code>OtherAreas</code>
+        <item id="100298">
+          <code>8</code>
           <label>OtherAreas</label>
           <description>Other Areas</description>
+        </item>
+        <item id="100299">
+          <code>0</code>
+          <label>No Data</label>
+          <description>The map contains no data for this plot</description>
         </item>
       </items>
     </list>
@@ -795,65 +888,69 @@ For more information or questions post a question in the forum : www.openforis.o
       <label type="item">Climate Zone</label>
       <description>These are the IPCC default climate zones as expected by the ALU tool, the dataset that can be used is hosted at  http://esdac.jrc.ec.europa.eu/projects/renewable-energy-directive</description>
       <items>
-        <item id="3361">
-          <code>WTM</code>
+        <item id="100256">
+          <code>1</code>
           <label>WTM</label>
           <description>Warm Temperate Moist</description>
         </item>
-        <item id="3362">
-          <code>WTD</code>
+        <item id="100257">
+          <code>2</code>
           <label>WTD</label>
           <description>Warm Temperate Dry</description>
         </item>
-        <item id="3363">
-          <code>CTM</code>
+        <item id="100258">
+          <code>3</code>
           <label>CTM</label>
           <description>Cool Temperate Moist</description>
         </item>
-        <item id="3364">
-          <code>CTD</code>
+        <item id="100259">
+          <code>4</code>
           <label>CTD</label>
           <description>Cool Temperate Dry</description>
         </item>
-        <item id="3365">
-          <code>POM</code>
+        <item id="100260">
+          <code>5</code>
           <label>POM</label>
           <description>Polar Moist</description>
         </item>
-        <item id="3366">
-          <code>POD</code>
+        <item id="100261">
+          <code>6</code>
           <label>POD</label>
           <description>Polar Dry</description>
         </item>
-        <item id="3367">
-          <code>BOM</code>
+        <item id="100262">
+          <code>7</code>
           <label>BOM</label>
           <description>Boreal Moist</description>
         </item>
-        <item id="3368">
-          <code>BOD</code>
+        <item id="100263">
+          <code>8</code>
           <label>BOD</label>
           <description>Boreal Dry</description>
         </item>
-        <item id="3369">
-          <code>TRMT</code>
+        <item id="100264">
+          <code>9</code>
           <label>TRMT</label>
           <description>Tropical Montane</description>
         </item>
-        <item id="3370">
-          <code>TRW</code>
+        <item id="100265">
+          <code>10</code>
           <label>TRW</label>
           <description>Tropical Wet</description>
         </item>
-        <item id="3371">
-          <code>TMM</code>
+        <item id="100266">
+          <code>11</code>
           <label>TMM</label>
           <description>Tropical Moist</description>
         </item>
-        <item id="3372">
-          <code>TRD</code>
+        <item id="100267">
+          <code>12</code>
           <label>TRD</label>
           <description>Tropical Dry</description>
+        </item>
+        <item id="100268">
+          <code>0</code>
+          <label>NO INFO</label>
         </item>
       </items>
     </list>
@@ -1206,13 +1303,216 @@ For more information or questions post a question in the forum : www.openforis.o
         <level name="level3" />
       </hierarchy>
     </list>
+    <list id="100124" name="years">
+      <codingScheme scope="local" />
+      <items>
+        <item id="100125">
+          <code>2020</code>
+          <label>2020</label>
+        </item>
+        <item id="100126">
+          <code>2019</code>
+          <label>2019</label>
+        </item>
+        <item id="100127">
+          <code>2018</code>
+          <label>2018</label>
+        </item>
+        <item id="100128">
+          <code>2017</code>
+          <label>2017</label>
+        </item>
+        <item id="100129">
+          <code>2016</code>
+          <label>2016</label>
+        </item>
+        <item id="100130">
+          <code>2015</code>
+          <label>2015</label>
+        </item>
+        <item id="100131">
+          <code>2014</code>
+          <label>2014</label>
+        </item>
+        <item id="100132">
+          <code>2013</code>
+          <label>2013</label>
+        </item>
+        <item id="100133">
+          <code>2012</code>
+          <label>2012</label>
+        </item>
+        <item id="100134">
+          <code>2011</code>
+          <label>2011</label>
+        </item>
+        <item id="100135">
+          <code>2010</code>
+          <label>2010</label>
+        </item>
+        <item id="100136">
+          <code>2009</code>
+          <label>2009</label>
+        </item>
+        <item id="100137">
+          <code>2008</code>
+          <label>2008</label>
+        </item>
+        <item id="100138">
+          <code>2007</code>
+          <label>2007</label>
+        </item>
+        <item id="100139">
+          <code>2006</code>
+          <label>2006</label>
+        </item>
+        <item id="100140">
+          <code>2005</code>
+          <label>2005</label>
+        </item>
+        <item id="100141">
+          <code>2004</code>
+          <label>2004</label>
+        </item>
+        <item id="100142">
+          <code>2003</code>
+          <label>2003</label>
+        </item>
+        <item id="100143">
+          <code>2002</code>
+          <label>2002</label>
+        </item>
+        <item id="100144">
+          <code>2001</code>
+          <label>2001</label>
+        </item>
+        <item id="100145">
+          <code>2000</code>
+          <label>2000</label>
+        </item>
+        <item id="100146">
+          <code>1999</code>
+          <label>1999</label>
+        </item>
+        <item id="100147">
+          <code>1998</code>
+          <label>1998</label>
+        </item>
+        <item id="100148">
+          <code>1997</code>
+          <label>1997</label>
+        </item>
+        <item id="100149">
+          <code>1996</code>
+          <label>1996</label>
+        </item>
+        <item id="100150">
+          <code>1995</code>
+          <label>1995</label>
+        </item>
+        <item id="100151">
+          <code>1994</code>
+          <label>1994</label>
+        </item>
+        <item id="100152">
+          <code>1993</code>
+          <label>1993</label>
+        </item>
+        <item id="100153">
+          <code>1992</code>
+          <label>1992</label>
+        </item>
+        <item id="100154">
+          <code>1991</code>
+          <label>1991</label>
+        </item>
+        <item id="100155">
+          <code>1990</code>
+          <label>1990</label>
+        </item>
+        <item id="100156">
+          <code>1989</code>
+          <label>1989</label>
+        </item>
+        <item id="100157">
+          <code>1988</code>
+          <label>1988</label>
+        </item>
+        <item id="100158">
+          <code>1987</code>
+          <label>1987</label>
+        </item>
+        <item id="100159">
+          <code>1986</code>
+          <label>1986</label>
+        </item>
+      </items>
+    </list>
+    <list id="100328" name="trees">
+      <label type="item">Number of trees</label>
+      <label type="item" xml:lang="fr">Nombre d'arbres</label>
+      <codingScheme scope="local" />
+      <items>
+        <item id="100330">
+          <code>0</code>
+          <label>No trees</label>
+        </item>
+        <item id="100331">
+          <code>1</code>
+          <label>1 tree</label>
+        </item>
+        <item id="100332">
+          <code>2</code>
+          <label>2 trees</label>
+        </item>
+        <item id="100333">
+          <code>3</code>
+          <label>3 trees</label>
+        </item>
+        <item id="100334">
+          <code>4</code>
+          <label>4 trees</label>
+        </item>
+        <item id="100335">
+          <code>5</code>
+          <label>5 trees</label>
+        </item>
+        <item id="100336">
+          <code>6</code>
+          <label>6 trees</label>
+        </item>
+        <item id="100337">
+          <code>7</code>
+          <label>7 trees</label>
+        </item>
+        <item id="100338">
+          <code>8</code>
+          <label>8 trees</label>
+        </item>
+        <item id="100339">
+          <code>9</code>
+          <label>9 trees</label>
+        </item>
+        <item id="100340">
+          <code>15</code>
+          <label>10-19 trees</label>
+        </item>
+        <item id="100341">
+          <code>25</code>
+          <label>20-29 trees</label>
+        </item>
+        <item id="100342">
+          <code>30</code>
+          <label>More than 30 trees</label>
+        </item>
+      </items>
+    </list>
   </codeLists>
   <spatialReferenceSystems>
-	<spatialReferenceSystem srid="EPSG:4326">
-		<label xml:lang="en">EPSG:4326</label>
-		<description xml:lang="en">EPSG:World Geodetic System 1984 Horizontal component of 3D system. Used by the GPS satellite navigation system and for NATO military geodetic surveying.</description>
-		<wkt><![CDATA[
-        GEOGCS["WGS 84", 
+    <spatialReferenceSystem srid="EPSG:4326">
+      <label xml:lang="en">EPSG:4326</label>
+      <description xml:lang="en">EPSG:World Geodetic System 1984 Horizontal component of 3D system. Used by the GPS satellite navigation system and for NATO military geodetic surveying.</description>
+      <wkt><![CDATA[GEOGCS["WGS 84", 
 		  DATUM["World Geodetic System 1984", 
 		    SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]], 
 		    AUTHORITY["EPSG","6326"]], 
@@ -1220,10 +1520,13 @@ For more information or questions post a question in the forum : www.openforis.o
 		  UNIT["degree", 0.017453292519943295], 
 		  AXIS["Geodetic longitude", EAST], 
 		  AXIS["Geodetic latitude", NORTH], 
-		  AUTHORITY["EPSG","4326"]]
-		]]></wkt>
-  </spatialReferenceSystem>
+		  AUTHORITY["EPSG","4326"]]]]>
+      </wkt>
+    </spatialReferenceSystem>
   </spatialReferenceSystems>
+  <referenceDataSchema>
+    <samplingPoint />
+  </referenceDataSchema>
   <schema>
     <entity id="1" name="plot" ui:tab="plot_tab" ui:tabSet="plot_tab_set">
       <label type="instance">Plot</label>
@@ -1237,112 +1540,122 @@ For more information or questions post a question in the forum : www.openforis.o
         <label type="instance">Operator</label>
       </text>
       <code id="5" name="land_use_category" required="true" list="land_use">
-        <label type="instance">Land Use</label>
+        <label type="instance">Land Use - 2020</label>
       </code>
       <code id="6" name="land_use_category_alias" ui:hide="true" calculated="true" list="land_use_subcategory">
-        <label type="instance">ALU Current Land Use</label>
+        <label type="instance">LU Current Land Use</label>
         <default expr="land_use_category" />
       </code>
       <boolean id="7" name="land_use_category_accuracy" required="true">
-        <label type="instance">Land Use Category - Confidence</label>
+        <label type="instance">Land Use Category 2020 - Confidence</label>
         <description>Is the user confident that the assessed Land Use category is the actual Land Use on the plot?</description>
       </boolean>
-      <code id="8" name="land_use_subcategory" relevant="land_use_category!='noData'" required="true" ui:hideWhenNotRelevant="true" list="land_use_subcategory" parent="land_use_category_alias">
+      <code id="8" name="land_use_subcategory" required="true" list="land_use_subcategory" parent="land_use_category_alias">
         <label type="instance">Land Use Conversion</label>
       </code>
-      <boolean id="9" name="land_use_subcategory_accuracy" relevant="land_use_category!='noData'" required="true" ui:hideWhenNotRelevant="true">
+      <boolean id="100356" name="land_use_category_has_changed" ui:hide="true" ui:tab="plot_tab" calculated="true">
+        <label type="instance">Land Use Category Has Changed</label>
+        <label type="instance" xml:lang="fr">Catégorie d'utilisation des terres a changé </label>
+        <description>This is a calculated field that helps us to keep truck if the LU category has changed or not</description>
+        <description xml:lang="fr">Ceci est un champ calculé qui nous aide à garder l'information si la catégorie LU a changé ou pas pour la placette</description>
+        <default expr="substring(land_use_subcategory,1,1)!=substring(land_use_subcategory,2,1)" />
+      </boolean>
+      <boolean id="9" name="land_use_subcategory_accuracy" relevant="boolean(land_use_subcategory)" required="true">
         <label type="instance">Land Use Conversion - Confidence</label>
         <description>Is the user confident that the assessed Land Use conversion is correct?</description>
       </boolean>
-      <boolean id="463" name="land_use_subcategory_year_of_change_know" relevant="land_use_category!='noData' and land_use_subcategory!='GLtoGL' and land_use_subcategory!='FLtoFL' and land_use_subcategory!='SLtoSL' and land_use_subcategory!='OTtoOT' and land_use_subcategory!='WLtoWL' and land_use_subcategory!='CLtoCL'" required="true" ui:hideWhenNotRelevant="true">
-        <label type="instance">Land Use Change - Known year of change</label>
-        <description>Is it possible to asses the year in which the Land Use has changed?</description>
-      </boolean>
-      <number id="44410" name="land_use_subcategory_year_of_change" relevant="land_use_subcategory_year_of_change_know=true() and &#10;land_use_category!='noData' and land_use_subcategory!='GLtoGL' and land_use_subcategory!='FLtoFL' and land_use_subcategory!='SLtoSL' and land_use_subcategory!='OTtoOT' and land_use_subcategory!='WLtoWL' and land_use_subcategory!='CLtoCL'" required="true" ui:hideWhenNotRelevant="true" type="integer">
+      <code id="44410" name="land_use_subcategory_year_of_change" relevant="land_use_category_has_changed" required="true" ui:hideWhenNotRelevant="true" ui:layoutType="dropdown" list="years">
         <label type="instance">Land Use Change - Year of change</label>
-        <compare flag="error" lt="2016" gt="1994" />
-      </number>
-      <code id="10" name="land_use_subdivision" relevant="boolean(land_use_category)" required="true" ui:layoutType="dropdown" list="land_use" parent="land_use_category">
-        <label type="instance">Current Land Use Sub-Division</label>
+        <compare flag="error" lte="2020" gt="1994" />
       </code>
-      <boolean id="11" name="land_use_subdivision_accuracy" relevant="land_use_category!='noData'" required="true">
-        <label type="instance">Land Use Sub-Division - Confidence</label>
+      <code id="10" name="land_use_subdivision" relevant="boolean(land_use_category)" required="true" ui:layoutType="dropdown" list="land_use" parent="land_use_category">
+        <label type="instance">Land Use Subdivision - 2020</label>
+      </code>
+      <boolean id="11" name="land_use_subdivision_accuracy" relevant="boolean(land_use_subdivision)" required="true">
+        <label type="instance">Land Use Subdivision 2020 - Confidence</label>
       </boolean>
-      <boolean id="1064" name="land_use_subdivision_change" relevant="land_use_subcategory='GLtoGL' or land_use_subcategory='FLtoFL' or land_use_subcategory='SLtoSL' or land_use_subcategory='OTtoOT' or land_use_subcategory='WLtoWL' or land_use_subcategory='CLtoCL'" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab">
-        <label type="instance">Has the Sub-Division changed?</label>
+      <boolean id="1064" name="land_use_subdivision_change" relevant="land_use_category_has_changed = false()" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab">
+        <label type="instance">Has the Subdivision changed?</label>
       </boolean>
       <code id="1068" name="calculated_initial_land_use" ui:hide="true" ui:tab="plot_tab" calculated="true" list="land_use">
-        <label type="instance">Initial Land Use Sub-Division</label>
-        <default value="forest" if="land_use_subcategory='FLtoFL' or land_use_subcategory='FLtoCL' or land_use_subcategory='FLtoGL' or land_use_subcategory='FLtoOT' or land_use_subcategory='FLtoWL' or land_use_subcategory='FLtoSL'" />
-        <default value="cropland" if="land_use_subcategory='CLtoFL' or land_use_subcategory='CLtoCL' or land_use_subcategory='CLtoGL' or land_use_subcategory='CLtoOT' or land_use_subcategory='CLtoWL' or land_use_subcategory='CLtoSL'" />
-        <default value="grassland" if="land_use_subcategory='GLtoFL' or land_use_subcategory='GLtoCL' or land_use_subcategory='GLtoGL' or land_use_subcategory='GLtoOT' or land_use_subcategory='GLtoWL' or land_use_subcategory='GLtoSL'" />
-        <default value="settlement" if="land_use_subcategory='SLtoFL' or land_use_subcategory='SLtoCL' or land_use_subcategory='SLtoGL' or land_use_subcategory='SLtoOT' or land_use_subcategory='SLtoWL' or land_use_subcategory='SLtoSL'" />
-        <default value="otherland" if="land_use_subcategory='OTtoFL' or land_use_subcategory='OTtoCL' or land_use_subcategory='OTtoGL' or land_use_subcategory='OTtoOT' or land_use_subcategory='OTtoWL' or land_use_subcategory='OTtoSL'" />
-        <default value="wetland" if="land_use_subcategory='WLtoFL' or land_use_subcategory='WLtoCL' or land_use_subcategory='WLtoGL' or land_use_subcategory='WLtoOT' or land_use_subcategory='WLtoWL' or land_use_subcategory='WLtoSL'" />
+        <label type="instance">Initial Land Use Category</label>
+        <default expr="substring(land_use_subcategory,1,1)" />
       </code>
-      <code id="12" name="site_accessibility" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland'" required="true" ui:tab="tab_1014" list="site_accessibility">
+      <code id="12" name="site_accessibility" relevant="land_use_category!='S' and land_use_category!='C'" required="true" ui:tab="tab_1012" list="site_accessibility">
         <label type="instance">Accessibility</label>
-        <description>This is used to measure the difficulty for a field visit to the plot.</description>
+        <description>This is used to measure the difficulty for a field visit to the plot.
+Use the ruler tool in Google Earth to measure the distance to the closest point of access.</description>
       </code>
-      <code id="13" name="site_bearing" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland' and site_accessibility!='inaccesible' and site_accessibility!='0-1'" required="true" ui:tab="tab_1014" list="orientation">
-        <label type="instance">Bearing</label>
-        <description>Direction that the road/path/river used to access the plot is FROM the plot.</description>
+      <code id="100329" name="tree_count" relevant='imagery_available != "no_vhr"' required="true" ui:tab="tab_1015" ui:layoutType="dropdown" list="trees">
+        <label type="instance">Tree Count</label>
+        <label type="instance" xml:lang="fr">Nombre d'arbres</label>
+        <description>Count the number of trees inside the plot</description>
+        <description xml:lang="fr">Compter le nombre d'arbres dans la placette</description>
+        <default value="0" />
+        <check flag="error" if="( land_cover[ element='trees' ]/percentage +   land_cover[ element='tof' ]/percentage) &gt; 0" expr="$this &gt; 0">
+          <message>If there is tree cover you must specify the number of trees</message>
+        </check>
       </code>
-      <text id="14" name="site_directions" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland'" ui:tab="tab_1014" type="memo">
-        <label type="instance">Directions</label>
-      </text>
-      <entity id="15" name="topography" multiple="true" ui:layout="table" ui:tab="tab_1015">
-        <label type="instance">Topography</label>
-        <code id="16" name="element" key="true" list="topographical_elements">
+      <entity id="15" name="land_cover" relevant='imagery_available!="no_vhr"' multiple="true" ui:layout="table" collect:enumerate="true" ui:tab="tab_1015">
+        <label type="instance">Elements in the plot - Latest image</label>
+        <code id="16" name="element" required="true" key="true" list="elements">
           <label type="instance">Element</label>
+          <label type="reporting">Plot Element - Type</label>
         </code>
-        <code id="17" name="coverage" ui:layoutType="dropdown" list="topographical_elements_coverage">
+        <code id="17" name="coverage" ui:layoutType="dropdown" list="elements_coverage">
           <label type="instance">Coverage</label>
+          <label type="reporting">Plot Element - Coverage</label>
+          <check flag="error" expr="sum(parent()/land_cover/percentage)&gt;=90">
+            <message>The sum of the Land Cover elements must be more than 90%</message>
+          </check>
         </code>
+        <number id="100326" name="percentage" relevant="false()" ui:hide="true" collect:includeInDataExport="false" calculated="true" type="integer">
+          <label type="instance">%</label>
+          <default value="0" if="coverage='na'" />
+          <default value="0" if="idm:blank(coverage)" />
+          <default expr="coverage" />
+        </number>
       </entity>
-      <code id="18" name="human_impact_type" multiple="true" minCount="1" maxCount="5" ui:tab="tab_1012" list="human_impact_type">
+      <code id="18" name="disturbance_type" relevant="land_use_category!='C' and land_use_category!='S'" multiple="true" minCount="1" maxCount="5" ui:tab="tab_1012" list="disturbance_type">
         <label type="instance">Type of Disturbance</label>
+        <label type="reporting">Disturbance - Type</label>
+        <description>Are there any human induced or natural disturbances in the plot?</description>
       </code>
-      <code id="19" name="human_impact_grade" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'" required="true" ui:tab="tab_1012" list="human_impact_grade">
+      <code id="19" name="disturbance_grade" relevant="disturbance_type != 'none'" required="true" ui:tab="tab_1012" list="disturbance_grade">
         <label type="instance">Grade</label>
-        <description>Grade of the human impact, this is only relevant for Forest, Grassland and Otherland plots.</description>
+        <label type="reporting">Distrubance - Grade</label>
+        <description>Grade of the human impact, this is only relevant for Forest, Grassland, Wetland and Otherland plots.</description>
       </code>
-      <boolean id="1017" name="continuous_human_impact" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012">
-        <label type="instance">Is the disturbance continuous?</label>
-        <description>For instance grazing is a continuous impact while for instance clear cutting is an specific disturbance for which the date can be assessed.</description>
-      </boolean>
-      <number id="20" name="human_impact_year" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'and continuous_human_impact=false()" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012" type="integer">
-        <label type="instance">Year of the disturbance</label>
-        <compare flag="error" lt="2016" gt="1980" />
-      </number>
-      <boolean id="21" name="human_impact_accuracy" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012">
-        <label type="instance">Interpretation Confidence</label>
-        <description>How confident is the user that the human impact actually happened.</description>
-      </boolean>
-      <date id="22" name="rs_date" relevant="land_use_category!='noData'" required="true" ui:tab="tab_1013">
-        <label type="instance">RS Date</label>
+      <code id="20" name="fire_year" relevant="idm:contains(disturbance_type , 'fire' )" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1012" ui:layoutType="dropdown" list="years">
+        <label type="instance">Fire - Year of the last fire</label>
+        <compare flag="error" lte="2020" gt="1980" />
+      </code>
+      <code id="23" name="imagery_available" required="true" ui:tab="tab_1013" list="rs_satellite">
+        <label type="instance">Imagery available</label>
+        <description>What type of VHR imagery is available?
+
+In case of Google Earth imagery being available for the site then choose Google Earth.
+Otherwise choose the other sources.</description>
+      </code>
+      <date id="22" name="rs_date" relevant="imagery_available='googleEarth' or imagery_available='secureWatch'" required="true" ui:tab="tab_1013">
+        <label type="instance">Latest Imagery date</label>
+        <description>You can see the date of the image in the bottom of the Google Earth frame.</description>
       </date>
-      <code id="23" name="rs_satellite" relevant="land_use_category!='noData'" required="true" ui:tab="tab_1013" list="rs_satellite">
-        <label type="instance">RS Satellite</label>
-      </code>
-      <boolean id="1041" name="more_than_thirty_trees" relevant="land_use_category!='forest' and land_use_category!='noData'" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1015">
-        <label type="instance">More than thirty trees in plot?</label>
-        <description>This should be hidden when the user chooses the "Forest" land use.
-Using this attribute and the "Number of trees in the plot" it is possible to estimate the number of trees outside the forest in the region.</description>
-      </boolean>
-      <number id="1000" name="tress_outside_forest" relevant="land_use_category!='forest' and land_use_category!='noData' and more_than_thirty_trees=false()" required="true" ui:hideWhenNotRelevant="true" ui:tab="tab_1015" type="integer">
-        <label type="instance">Number of trees in plot</label>
-        <compare flag="error" lte="30" gte="0">
-          <message xml:lang="en">The number of trees in the plot in non-forest categories should not exceed 30</message>
-        </compare>
+      <number id="100327" name="lc_points_summed" relevant='imagery_available != "no_vhr"' collect:includeInDataExport="false" ui:tab="tab_1015" calculated="true" type="integer">
+        <label type="instance">Minimum percentage sum</label>
+        <label type="instance" xml:lang="fr">Somme min. en pourcentage</label>
+        <default expr="sum(land_cover/percentage)" />
       </number>
-      <code id="1065" name="land_use_initial_subdivision" relevant="land_use_subdivision_change=true() or  (&#10;land_use_subcategory!='GLtoGL' and land_use_subcategory!='FLtoFL' and land_use_subcategory!='SLtoSL' and land_use_subcategory!='OTtoOT' and land_use_subcategory!='WLtoWL' and land_use_subcategory!='CLtoCL'&#10;)" required="true" ui:tab="plot_tab" ui:layoutType="dropdown" strict="false" list="land_use" parent="calculated_initial_land_use">
+      <code id="1065" name="land_use_initial_subdivision" relevant="land_use_subdivision_change=true() or substring(land_use_subcategory,1,1) != substring(land_use_subcategory,2,1)" required="true" ui:tab="plot_tab" ui:layoutType="dropdown" strict="false" list="land_use" parent="calculated_initial_land_use">
         <label type="instance">Previous Land Use Subdivision</label>
+        <check flag="error" expr="land_use_subdivision != land_use_initial_subdivision">
+          <message>Initial and previous land use subdivisions cannot be the same</message>
+        </check>
       </code>
-      <number id="1066" name="land_use_subdivision_year_of_change" relevant="land_use_subdivision_change=true()&#10;and&#10;(land_use_subcategory='GLtoGL' or land_use_subcategory='FLtoFL' or land_use_subcategory='SLtoSL' or land_use_subcategory='OTtoOT' or land_use_subcategory='WLtoWL' or land_use_subcategory='CLtoCL')" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" type="integer">
+      <code id="1066" name="land_use_subdivision_year_of_change" relevant="land_use_subdivision_change=true()" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" ui:layoutType="dropdown" list="years">
         <label type="instance">Year of the Sub-Division change</label>
-        <compare flag="error" lte="2016" gte="1980" />
-      </number>
+        <compare flag="error" lte="2020" gte="1980" />
+      </code>
       <boolean id="31" name="actively_saved">
         <label type="instance">Actively saved by user</label>
       </boolean>
@@ -1364,15 +1677,15 @@ Using this attribute and the "Number of trees in the plot" it is possible to est
       <code id="1031" name="soil" ui:tab="plot_tab" collectearth:fromcsv="true" list="soil_types">
         <label type="instance">ALU Soil type</label>
       </code>
+      <text id="34" name="country" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
+        <label type="instance">Country</label>
+      </text>
       <code id="1032" name="climate" ui:tab="plot_tab" collectearth:fromcsv="true" list="climate_zones">
         <label type="instance">ALU Climate zone</label>
       </code>
       <code id="3381" name="ecological_zone" required="true" ui:tab="plot_tab" collectearth:fromcsv="true" list="ecological_zones">
         <label type="instance">Ecological zone</label>
       </code>
-      <text id="34" name="region" relevant="false()" collectearth:fromcsv="true" type="short">
-        <label type="instance">Region</label>
-      </text>
       <code id="2538" name="calculated_elevation_range" ui:hide="true" ui:tab="plot_tab" calculated="true" list="elevation_ranges">
         <label type="instance">Elevation - range</label>
         <default expr=" format-number(ceiling(elevation div 100 ), '#')" />
@@ -1398,6 +1711,99 @@ Using this attribute and the "Number of trees in the plot" it is possible to est
         <default value="EXTREME" if="slope&gt;=46 and slope&lt;61" />
         <default value="FALL" if="slope&gt;=60" />
         <default value="NA" if="idm:blank(aspect)" />
+      </code>
+      <text id="100301" name="comments" ui:tab="tab_100300" type="memo">
+        <label type="instance">Comments</label>
+        <description>Here you can write any remarks about the plot that will make the review process easier.
+Try to add information about land use change.</description>
+      </text>
+      <text id="100345" name="region" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
+        <label type="instance">Region</label>
+      </text>
+      <text id="100346" name="district" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
+        <label type="instance">District</label>
+      </text>
+      <text id="100347" name="land_use_subdivision_combination" ui:hide="true" collect:includeInDataExport="false" ui:tab="plot_tab" calculated="true" type="short">
+        <label type="instance">Land Use Subdivision Combination</label>
+        <label type="instance" xml:lang="fr">Combinaison de subdivision d'utilisation des terres</label>
+        <default expr="concat( land_use_initial_subdivision, land_use_subdivision)" />
+      </text>
+      <boolean id="100348" name="land_use_change_once" ui:hide="true" collect:includeInDataExport="false" ui:tab="plot_tab" calculated="true">
+        <label type="instance">Land Use Change at least Once</label>
+        <label type="instance" xml:lang="fr">Changement d'affection des terres au moins une fois</label>
+        <default expr="land_use_category_has_changed or land_use_subdivision_change" />
+      </boolean>
+      <boolean id="100349" name="second_lu_change" relevant="land_use_change_once" required="true" ui:tab="plot_tab">
+        <label type="instance" xml:lang="es">Ha habido otro cambio anteriormente?</label>
+        <label type="instance">Has there been a previous land use?</label>
+        <label type="instance" xml:lang="fr">Y a-t-il eu une utilisation antérieure des terres</label>
+        <description>Has the land use change more than once since 2000?
+For instance this might happen if there is a transition from Forest in 2000 to Grassland in 2005 that becomes settlement in 2010.</description>
+        <description xml:lang="fr">L’utilisation des terres a-t-elle changé plusieurs fois depuis 2000?
+Par exemple, cela pourrait se produire s'il y a une transition de Terre forestière en 2000 à Prairie en 2005 qui devient Etablissement en 2010.</description>
+      </boolean>
+      <code id="100350" name="land_use_initial_category_alias" ui:hide="true" collect:includeInDataExport="false" ui:tab="plot_tab" calculated="true" list="land_use_subcategory">
+        <label type="instance">ALU Land Use Before Current</label>
+        <label type="instance" xml:lang="fr">ALU Utilisation des terres avant celle courante</label>
+        <default expr="substring(land_use_subcategory,1,1)" />
+      </code>
+      <code id="100351" name="second_lu_conversion" relevant="second_lu_change" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" list="land_use">
+        <label type="instance" xml:lang="es">Conversion UT anterior al ultimo cambio</label>
+        <label type="instance">Oldest Land Use</label>
+        <label type="instance" xml:lang="fr">Utilisation des terres la plus ancienne </label>
+      </code>
+      <code id="100352" name="second_lu_conversion_year" relevant="second_lu_change" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" ui:layoutType="dropdown" list="years">
+        <label type="instance" xml:lang="es">Año de conversion anterior al último cambio</label>
+        <label type="instance">Year of the conversion from the oldest land use</label>
+        <label type="instance" xml:lang="fr">Année du changement d'AT le plus ancien </label>
+        <description>If the dynamic is Forest -&gt; 2005 Grassland -&gt;2010 Settlement, then here you would set 2005.</description>
+        <description xml:lang="fr">Si la dynamique est Foret en 2005, Prairie en 2010 et ensuite Etablissements, il faudra saisir 2005</description>
+        <compare flag="error" if="land_use_category_has_changed" lt="land_use_subcategory_year_of_change" gt="1980">
+          <message xml:lang="es">El año delcambio ha de ser anterior al primer año de cambio registrado</message>
+        </compare>
+        <compare flag="error" if="land_use_subdivision_change" lt="land_use_subdivision_year_of_change" gt="1980" />
+      </code>
+      <text id="100353" name="land_use_oldest_subdivision_combination" ui:hide="true" collect:includeInDataExport="false" ui:tab="plot_tab" calculated="true" type="short">
+        <label type="instance">Land Use Oldest Subdivision Combination</label>
+        <label type="instance" xml:lang="fr">Combinaison de Subdivision de l'UT la plus ancienne</label>
+        <default expr="concat( second_lu_subdivision, land_use_initial_subdivision)" />
+      </text>
+      <boolean id="100354" name="validate_oldest_luc" ui:hide="true" collect:includeInDataExport="false" collect:showInMapBalloon="false" ui:tab="plot_tab" calculated="true">
+        <label type="instance">Validate Oldest LUC</label>
+        <label type="instance" xml:lang="fr">Valider l' UT la plus ancienne</label>
+        <default expr="land_use_oldest_subdivision_combination ='PBLPBL' or land_use_oldest_subdivision_combination ='PBLSBL' or land_use_oldest_subdivision_combination ='PBLPLANTF' or land_use_oldest_subdivision_combination ='PBLREGFOR' or land_use_oldest_subdivision_combination ='PBLSHIFTAGR' or land_use_oldest_subdivision_combination ='PBLINTAGR' or land_use_oldest_subdivision_combination ='PBLSAVG' or land_use_oldest_subdivision_combination ='PBLSHRUB' or land_use_oldest_subdivision_combination ='PBLPAST' or land_use_oldest_subdivision_combination ='PBLFOLL' or land_use_oldest_subdivision_combination ='PBLREGBUSH' or land_use_oldest_subdivision_combination ='PBLFTG' or land_use_oldest_subdivision_combination ='PBLCS' or land_use_oldest_subdivision_combination ='PBLTOWN' or land_use_oldest_subdivision_combination ='PBLVS' or land_use_oldest_subdivision_combination ='PBLOS' or land_use_oldest_subdivision_combination ='PBLRS' or land_use_oldest_subdivision_combination ='PBLMS' or land_use_oldest_subdivision_combination ='PBLAQC' or land_use_oldest_subdivision_combination ='PBLIS' or land_use_oldest_subdivision_combination ='PBLWL' or land_use_oldest_subdivision_combination ='PBLIWB'" if="second_lu_subdivision = 'PBL'" />
+        <default expr="land_use_oldest_subdivision_combination ='SBLSBL' or land_use_oldest_subdivision_combination ='SBLPLANTF' or land_use_oldest_subdivision_combination ='SBLREGFOR' or land_use_oldest_subdivision_combination ='SBLSHIFTAGR' or land_use_oldest_subdivision_combination ='SBLINTAGR' or land_use_oldest_subdivision_combination ='SBLSAVG' or land_use_oldest_subdivision_combination ='SBLSHRUB' or land_use_oldest_subdivision_combination ='SBLPAST' or land_use_oldest_subdivision_combination ='SBLFOLL' or land_use_oldest_subdivision_combination ='SBLREGBUSH' or land_use_oldest_subdivision_combination ='SBLFTG' or land_use_oldest_subdivision_combination ='SBLCS' or land_use_oldest_subdivision_combination ='SBLTOWN' or land_use_oldest_subdivision_combination ='SBLVS' or land_use_oldest_subdivision_combination ='SBLOS' or land_use_oldest_subdivision_combination ='SBLRS' or land_use_oldest_subdivision_combination ='SBLMS' or land_use_oldest_subdivision_combination ='SBLAQC' or land_use_oldest_subdivision_combination ='SBLIS' or land_use_oldest_subdivision_combination ='SBLWL' or land_use_oldest_subdivision_combination ='SBLIWB'" if="second_lu_subdivision = 'SBL'" />
+        <default expr="land_use_oldest_subdivision_combination ='PINEPINE' or land_use_oldest_subdivision_combination ='PINEPLANTF' or land_use_oldest_subdivision_combination ='PINEREGFOR' or land_use_oldest_subdivision_combination ='PINESHIFTAGR' or land_use_oldest_subdivision_combination ='PINEINTAGR' or land_use_oldest_subdivision_combination ='PINESAVG' or land_use_oldest_subdivision_combination ='PINESHRUB' or land_use_oldest_subdivision_combination ='PINEPAST' or land_use_oldest_subdivision_combination ='PINEFOLL' or land_use_oldest_subdivision_combination ='PINEREGBUSH' or land_use_oldest_subdivision_combination ='PINEFTG' or land_use_oldest_subdivision_combination ='PINECS' or land_use_oldest_subdivision_combination ='PINETOWN' or land_use_oldest_subdivision_combination ='PINEVS' or land_use_oldest_subdivision_combination ='PINEOS' or land_use_oldest_subdivision_combination ='PINERS' or land_use_oldest_subdivision_combination ='PINEMS' or land_use_oldest_subdivision_combination ='PINEAQC' or land_use_oldest_subdivision_combination ='PINEIS' or land_use_oldest_subdivision_combination ='PINEWL' or land_use_oldest_subdivision_combination ='PINEIWB'" if="second_lu_subdivision = 'PINE'" />
+        <default expr="land_use_oldest_subdivision_combination ='MANMAN' or land_use_oldest_subdivision_combination ='MANREGFOR' or land_use_oldest_subdivision_combination ='MANSHIFTAGR' or land_use_oldest_subdivision_combination ='MANINTAGR' or land_use_oldest_subdivision_combination ='MANSAVG' or land_use_oldest_subdivision_combination ='MANSHRUB' or land_use_oldest_subdivision_combination ='MANPAST' or land_use_oldest_subdivision_combination ='MANFOLL' or land_use_oldest_subdivision_combination ='MANREGBUSH' or land_use_oldest_subdivision_combination ='MANFTG' or land_use_oldest_subdivision_combination ='MANCS' or land_use_oldest_subdivision_combination ='MANTOWN' or land_use_oldest_subdivision_combination ='MANVS' or land_use_oldest_subdivision_combination ='MANOS' or land_use_oldest_subdivision_combination ='MANRS' or land_use_oldest_subdivision_combination ='MANMS' or land_use_oldest_subdivision_combination ='MANAQC' or land_use_oldest_subdivision_combination ='MANIS' or land_use_oldest_subdivision_combination ='MANWL' or land_use_oldest_subdivision_combination ='MANIWB'" if="second_lu_subdivision = 'MAN'" />
+        <default expr="land_use_oldest_subdivision_combination ='PLANTFSBL' or land_use_oldest_subdivision_combination ='PLANTFPINE' or land_use_oldest_subdivision_combination ='PLANTFPLANTF' or land_use_oldest_subdivision_combination ='PLANTFREGFOR' or land_use_oldest_subdivision_combination ='PLANTFSHIFTAGR' or land_use_oldest_subdivision_combination ='PLANTFINTAGR' or land_use_oldest_subdivision_combination ='PLANTFSAVG' or land_use_oldest_subdivision_combination ='PLANTFSHRUB' or land_use_oldest_subdivision_combination ='PLANTFPAST' or land_use_oldest_subdivision_combination ='PLANTFFOLL' or land_use_oldest_subdivision_combination ='PLANTFREGBUSH' or land_use_oldest_subdivision_combination ='PLANTFFTG' or land_use_oldest_subdivision_combination ='PLANTFCS' or land_use_oldest_subdivision_combination ='PLANTFTOWN' or land_use_oldest_subdivision_combination ='PLANTFVS' or land_use_oldest_subdivision_combination ='PLANTFOS' or land_use_oldest_subdivision_combination ='PLANTFRS' or land_use_oldest_subdivision_combination ='PLANTFMS' or land_use_oldest_subdivision_combination ='PLANTFAQC' or land_use_oldest_subdivision_combination ='PLANTFIS' or land_use_oldest_subdivision_combination ='PLANTFWL' or land_use_oldest_subdivision_combination ='PLANTFIWB'" if="second_lu_subdivision = 'PLANTF'" />
+        <default expr="land_use_oldest_subdivision_combination ='REGFORPBL' or land_use_oldest_subdivision_combination ='REGFORSBL' or land_use_oldest_subdivision_combination ='REGFORPINE' or land_use_oldest_subdivision_combination ='REGFORMAN' or land_use_oldest_subdivision_combination ='REGFORPLANTF' or land_use_oldest_subdivision_combination ='REGFORREGFOR' or land_use_oldest_subdivision_combination ='REGFORSHIFTAGR' or land_use_oldest_subdivision_combination ='REGFORINTAGR' or land_use_oldest_subdivision_combination ='REGFORSAVG' or land_use_oldest_subdivision_combination ='REGFORSHRUB' or land_use_oldest_subdivision_combination ='REGFORPAST' or land_use_oldest_subdivision_combination ='REGFORFOLL' or land_use_oldest_subdivision_combination ='REGFORREGBUSH' or land_use_oldest_subdivision_combination ='REGFORFTG' or land_use_oldest_subdivision_combination ='REGFORCS' or land_use_oldest_subdivision_combination ='REGFORTOWN' or land_use_oldest_subdivision_combination ='REGFORVS' or land_use_oldest_subdivision_combination ='REGFOROS' or land_use_oldest_subdivision_combination ='REGFORRS' or land_use_oldest_subdivision_combination ='REGFORMS' or land_use_oldest_subdivision_combination ='REGFORAQC' or land_use_oldest_subdivision_combination ='REGFORIS' or land_use_oldest_subdivision_combination ='REGFORWL' or land_use_oldest_subdivision_combination ='REGFORIWB'" if="second_lu_subdivision = 'REGFOR'" />
+        <default expr="land_use_oldest_subdivision_combination ='SHIFTAGRSBL' or land_use_oldest_subdivision_combination ='SHIFTAGRPINE' or land_use_oldest_subdivision_combination ='SHIFTAGRPLANTF' or land_use_oldest_subdivision_combination ='SHIFTAGRSHIFTAGR' or land_use_oldest_subdivision_combination ='SHIFTAGRINTAGR' or land_use_oldest_subdivision_combination ='SHIFTAGRSAVG' or land_use_oldest_subdivision_combination ='SHIFTAGRSHRUB' or land_use_oldest_subdivision_combination ='SHIFTAGRPAST' or land_use_oldest_subdivision_combination ='SHIFTAGRFOLL' or land_use_oldest_subdivision_combination ='SHIFTAGRREGBUSH' or land_use_oldest_subdivision_combination ='SHIFTAGRFTG' or land_use_oldest_subdivision_combination ='SHIFTAGRCS' or land_use_oldest_subdivision_combination ='SHIFTAGRTOWN' or land_use_oldest_subdivision_combination ='SHIFTAGRVS' or land_use_oldest_subdivision_combination ='SHIFTAGROS' or land_use_oldest_subdivision_combination ='SHIFTAGRRS' or land_use_oldest_subdivision_combination ='SHIFTAGRMS' or land_use_oldest_subdivision_combination ='SHIFTAGRAQC' or land_use_oldest_subdivision_combination ='SHIFTAGRIS' or land_use_oldest_subdivision_combination ='SHIFTAGRWL' or land_use_oldest_subdivision_combination ='SHIFTAGRIWB'" if="second_lu_subdivision = 'SHIFTAGR'" />
+        <default expr="land_use_oldest_subdivision_combination ='INTAGRSBL' or land_use_oldest_subdivision_combination ='INTAGRPINE' or land_use_oldest_subdivision_combination ='INTAGRPLANTF' or land_use_oldest_subdivision_combination ='INTAGRINTAGR' or land_use_oldest_subdivision_combination ='INTAGRSAVG' or land_use_oldest_subdivision_combination ='INTAGRSHRUB' or land_use_oldest_subdivision_combination ='INTAGRPAST' or land_use_oldest_subdivision_combination ='INTAGRFOLL' or land_use_oldest_subdivision_combination ='INTAGRREGBUSH' or land_use_oldest_subdivision_combination ='INTAGRFTG' or land_use_oldest_subdivision_combination ='INTAGRCS' or land_use_oldest_subdivision_combination ='INTAGRTOWN' or land_use_oldest_subdivision_combination ='INTAGRVS' or land_use_oldest_subdivision_combination ='INTAGROS' or land_use_oldest_subdivision_combination ='INTAGRRS' or land_use_oldest_subdivision_combination ='INTAGRMS' or land_use_oldest_subdivision_combination ='INTAGRAQC' or land_use_oldest_subdivision_combination ='INTAGRIS' or land_use_oldest_subdivision_combination ='INTAGRWL' or land_use_oldest_subdivision_combination ='INTAGRIWB'" if="second_lu_subdivision = 'INTAGR'" />
+        <default expr="land_use_oldest_subdivision_combination ='SAVGSBL' or land_use_oldest_subdivision_combination ='SAVGPINE' or land_use_oldest_subdivision_combination ='SAVGPLANTF' or land_use_oldest_subdivision_combination ='SAVGSHIFTAGR' or land_use_oldest_subdivision_combination ='SAVGINTAGR' or land_use_oldest_subdivision_combination ='SAVGSAVG' or land_use_oldest_subdivision_combination ='SAVGSHRUB' or land_use_oldest_subdivision_combination ='SAVGPAST' or land_use_oldest_subdivision_combination ='SAVGFOLL' or land_use_oldest_subdivision_combination ='SAVGFTG' or land_use_oldest_subdivision_combination ='SAVGCS' or land_use_oldest_subdivision_combination ='SAVGTOWN' or land_use_oldest_subdivision_combination ='SAVGVS' or land_use_oldest_subdivision_combination ='SAVGOS' or land_use_oldest_subdivision_combination ='SAVGRS' or land_use_oldest_subdivision_combination ='SAVGMS' or land_use_oldest_subdivision_combination ='SAVGAQC' or land_use_oldest_subdivision_combination ='SAVGIS' or land_use_oldest_subdivision_combination ='SAVGWL' or land_use_oldest_subdivision_combination ='SAVGIWB'" if="second_lu_subdivision = 'SAVG'" />
+        <default expr="land_use_oldest_subdivision_combination ='SHRUBSBL' or land_use_oldest_subdivision_combination ='SHRUBPINE' or land_use_oldest_subdivision_combination ='SHRUBPLANTF' or land_use_oldest_subdivision_combination ='SHRUBSHIFTAGR' or land_use_oldest_subdivision_combination ='SHRUBINTAGR' or land_use_oldest_subdivision_combination ='SHRUBSAVG' or land_use_oldest_subdivision_combination ='SHRUBSHRUB' or land_use_oldest_subdivision_combination ='SHRUBPAST' or land_use_oldest_subdivision_combination ='SHRUBFOLL' or land_use_oldest_subdivision_combination ='SHRUBFTG' or land_use_oldest_subdivision_combination ='SHRUBCS' or land_use_oldest_subdivision_combination ='SHRUBTOWN' or land_use_oldest_subdivision_combination ='SHRUBVS' or land_use_oldest_subdivision_combination ='SHRUBOS' or land_use_oldest_subdivision_combination ='SHRUBRS' or land_use_oldest_subdivision_combination ='SHRUBMS' or land_use_oldest_subdivision_combination ='SHRUBAQC' or land_use_oldest_subdivision_combination ='SHRUBIS' or land_use_oldest_subdivision_combination ='SHRUBWL' or land_use_oldest_subdivision_combination ='SHRUBIWB'" if="second_lu_subdivision = 'SHRUB'" />
+        <default expr="land_use_oldest_subdivision_combination ='PASTSBL' or land_use_oldest_subdivision_combination ='PASTPINE' or land_use_oldest_subdivision_combination ='PASTPLANTF' or land_use_oldest_subdivision_combination ='PASTSHIFTAGR' or land_use_oldest_subdivision_combination ='PASTINTAGR' or land_use_oldest_subdivision_combination ='PASTSAVG' or land_use_oldest_subdivision_combination ='PASTSHRUB' or land_use_oldest_subdivision_combination ='PASTPAST' or land_use_oldest_subdivision_combination ='PASTFOLL' or land_use_oldest_subdivision_combination ='PASTREGBUSH' or land_use_oldest_subdivision_combination ='PASTFTG' or land_use_oldest_subdivision_combination ='PASTCS' or land_use_oldest_subdivision_combination ='PASTTOWN' or land_use_oldest_subdivision_combination ='PASTVS' or land_use_oldest_subdivision_combination ='PASTOS' or land_use_oldest_subdivision_combination ='PASTRS' or land_use_oldest_subdivision_combination ='PASTMS' or land_use_oldest_subdivision_combination ='PASTAQC' or land_use_oldest_subdivision_combination ='PASTIS' or land_use_oldest_subdivision_combination ='PASTWL' or land_use_oldest_subdivision_combination ='PASTIWB'" if="second_lu_subdivision = 'PAST'" />
+        <default expr="land_use_oldest_subdivision_combination ='FOLLPLANTF' or land_use_oldest_subdivision_combination ='FOLLSHIFTAGR' or land_use_oldest_subdivision_combination ='FOLLINTAGR' or land_use_oldest_subdivision_combination ='FOLLSAVG' or land_use_oldest_subdivision_combination ='FOLLSHRUB' or land_use_oldest_subdivision_combination ='FOLLPAST' or land_use_oldest_subdivision_combination ='FOLLFOLL' or land_use_oldest_subdivision_combination ='FOLLREGBUSH' or land_use_oldest_subdivision_combination ='FOLLFTG' or land_use_oldest_subdivision_combination ='FOLLCS' or land_use_oldest_subdivision_combination ='FOLLTOWN' or land_use_oldest_subdivision_combination ='FOLLVS' or land_use_oldest_subdivision_combination ='FOLLOS' or land_use_oldest_subdivision_combination ='FOLLRS' or land_use_oldest_subdivision_combination ='FOLLMS' or land_use_oldest_subdivision_combination ='FOLLAQC' or land_use_oldest_subdivision_combination ='FOLLIS' or land_use_oldest_subdivision_combination ='FOLLWL' or land_use_oldest_subdivision_combination ='FOLLIWB'" if="second_lu_subdivision = 'FOLL'" />
+        <default expr="land_use_oldest_subdivision_combination ='REGBUSHSBL' or land_use_oldest_subdivision_combination ='REGBUSHPINE' or land_use_oldest_subdivision_combination ='REGBUSHPLANTF' or land_use_oldest_subdivision_combination ='REGBUSHSHIFTAGR' or land_use_oldest_subdivision_combination ='REGBUSHINTAGR' or land_use_oldest_subdivision_combination ='REGBUSHSHRUB' or land_use_oldest_subdivision_combination ='REGBUSHPAST' or land_use_oldest_subdivision_combination ='REGBUSHFOLL' or land_use_oldest_subdivision_combination ='REGBUSHREGBUSH' or land_use_oldest_subdivision_combination ='REGBUSHCS' or land_use_oldest_subdivision_combination ='REGBUSHTOWN' or land_use_oldest_subdivision_combination ='REGBUSHVS' or land_use_oldest_subdivision_combination ='REGBUSHOS' or land_use_oldest_subdivision_combination ='REGBUSHRS' or land_use_oldest_subdivision_combination ='REGBUSHMS' or land_use_oldest_subdivision_combination ='REGBUSHAQC' or land_use_oldest_subdivision_combination ='REGBUSHIS' or land_use_oldest_subdivision_combination ='REGBUSHWL' or land_use_oldest_subdivision_combination ='REGBUSHIWB'" if="second_lu_subdivision = 'REGBUSH'" />
+        <default expr="land_use_oldest_subdivision_combination ='FTGSBL' or land_use_oldest_subdivision_combination ='FTGPINE' or land_use_oldest_subdivision_combination ='FTGPLANTF' or land_use_oldest_subdivision_combination ='FTGSHIFTAGR' or land_use_oldest_subdivision_combination ='FTGINTAGR' or land_use_oldest_subdivision_combination ='FTGSAVG' or land_use_oldest_subdivision_combination ='FTGSHRUB' or land_use_oldest_subdivision_combination ='FTGPAST' or land_use_oldest_subdivision_combination ='FTGFOLL' or land_use_oldest_subdivision_combination ='FTGREGBUSH' or land_use_oldest_subdivision_combination ='FTGFTG' or land_use_oldest_subdivision_combination ='FTGCS' or land_use_oldest_subdivision_combination ='FTGTOWN' or land_use_oldest_subdivision_combination ='FTGVS' or land_use_oldest_subdivision_combination ='FTGOS' or land_use_oldest_subdivision_combination ='FTGRS' or land_use_oldest_subdivision_combination ='FTGMS' or land_use_oldest_subdivision_combination ='FTGAQC' or land_use_oldest_subdivision_combination ='FTGIS' or land_use_oldest_subdivision_combination ='FTGWL' or land_use_oldest_subdivision_combination ='FTGIWB'" if="second_lu_subdivision = 'FTG'" />
+        <default expr="land_use_oldest_subdivision_combination ='CSCS' or land_use_oldest_subdivision_combination ='CSTOWN' or land_use_oldest_subdivision_combination ='CSVS' or land_use_oldest_subdivision_combination ='CSOS' or land_use_oldest_subdivision_combination ='CSRS' or land_use_oldest_subdivision_combination ='CSMS' or land_use_oldest_subdivision_combination ='CSAQC' or land_use_oldest_subdivision_combination ='CSIS' or land_use_oldest_subdivision_combination ='CSIWB'" if="second_lu_subdivision = 'CS'" />
+        <default expr="land_use_oldest_subdivision_combination ='TOWNCS' or land_use_oldest_subdivision_combination ='TOWNTOWN' or land_use_oldest_subdivision_combination ='TOWNVS' or land_use_oldest_subdivision_combination ='TOWNOS' or land_use_oldest_subdivision_combination ='TOWNRS' or land_use_oldest_subdivision_combination ='TOWNMS' or land_use_oldest_subdivision_combination ='TOWNAQC' or land_use_oldest_subdivision_combination ='TOWNIS' or land_use_oldest_subdivision_combination ='TOWNIWB'" if="second_lu_subdivision = 'TOWN'" />
+        <default expr="land_use_oldest_subdivision_combination ='VSCS' or land_use_oldest_subdivision_combination ='VSTOWN' or land_use_oldest_subdivision_combination ='VSVS' or land_use_oldest_subdivision_combination ='VSOS' or land_use_oldest_subdivision_combination ='VSRS' or land_use_oldest_subdivision_combination ='VSMS' or land_use_oldest_subdivision_combination ='VSAQC' or land_use_oldest_subdivision_combination ='VSIS' or land_use_oldest_subdivision_combination ='VSIWB'" if="second_lu_subdivision = 'VS'" />
+        <default expr="land_use_oldest_subdivision_combination ='OSCS' or land_use_oldest_subdivision_combination ='OSTOWN' or land_use_oldest_subdivision_combination ='OSVS' or land_use_oldest_subdivision_combination ='OSOS' or land_use_oldest_subdivision_combination ='OSRS' or land_use_oldest_subdivision_combination ='OSMS' or land_use_oldest_subdivision_combination ='OSAQC' or land_use_oldest_subdivision_combination ='OSIS' or land_use_oldest_subdivision_combination ='OSIWB'" if="second_lu_subdivision = 'OS'" />
+        <default expr="land_use_oldest_subdivision_combination ='RSCS' or land_use_oldest_subdivision_combination ='RSTOWN' or land_use_oldest_subdivision_combination ='RSVS' or land_use_oldest_subdivision_combination ='RSOS' or land_use_oldest_subdivision_combination ='RSRS' or land_use_oldest_subdivision_combination ='RSMS' or land_use_oldest_subdivision_combination ='RSAQC' or land_use_oldest_subdivision_combination ='RSIS' or land_use_oldest_subdivision_combination ='RSIWB'" if="second_lu_subdivision = 'RS'" />
+        <default expr="land_use_oldest_subdivision_combination ='MSSBL' or land_use_oldest_subdivision_combination ='MSPINE' or land_use_oldest_subdivision_combination ='MSPLANTF' or land_use_oldest_subdivision_combination ='MSSAVG' or land_use_oldest_subdivision_combination ='MSSHRUB' or land_use_oldest_subdivision_combination ='MSPAST' or land_use_oldest_subdivision_combination ='MSFOLL' or land_use_oldest_subdivision_combination ='MSREGBUSH' or land_use_oldest_subdivision_combination ='MSFTG' or land_use_oldest_subdivision_combination ='MSCS' or land_use_oldest_subdivision_combination ='MSTOWN' or land_use_oldest_subdivision_combination ='MSVS' or land_use_oldest_subdivision_combination ='MSOS' or land_use_oldest_subdivision_combination ='MSRS' or land_use_oldest_subdivision_combination ='MSMS' or land_use_oldest_subdivision_combination ='MSAQC' or land_use_oldest_subdivision_combination ='MSIS' or land_use_oldest_subdivision_combination ='MSBARS' or land_use_oldest_subdivision_combination ='MSWL' or land_use_oldest_subdivision_combination ='MSIWB'" if="second_lu_subdivision = 'MS'" />
+        <default expr="land_use_oldest_subdivision_combination ='AQCMAN' or land_use_oldest_subdivision_combination ='AQCPLANTF' or land_use_oldest_subdivision_combination ='AQCSHIFTAGR' or land_use_oldest_subdivision_combination ='AQCINTAGR' or land_use_oldest_subdivision_combination ='AQCSAVG' or land_use_oldest_subdivision_combination ='AQCSHRUB' or land_use_oldest_subdivision_combination ='AQCPAST' or land_use_oldest_subdivision_combination ='AQCFOLL' or land_use_oldest_subdivision_combination ='AQCREGBUSH' or land_use_oldest_subdivision_combination ='AQCFTG' or land_use_oldest_subdivision_combination ='AQCCS' or land_use_oldest_subdivision_combination ='AQCTOWN' or land_use_oldest_subdivision_combination ='AQCVS' or land_use_oldest_subdivision_combination ='AQCOS' or land_use_oldest_subdivision_combination ='AQCRS' or land_use_oldest_subdivision_combination ='AQCMS' or land_use_oldest_subdivision_combination ='AQCAQC' or land_use_oldest_subdivision_combination ='AQCIS' or land_use_oldest_subdivision_combination ='AQCBARS' or land_use_oldest_subdivision_combination ='AQCWL' or land_use_oldest_subdivision_combination ='AQCIWB'" if="second_lu_subdivision = 'AQC'" />
+        <default expr="land_use_oldest_subdivision_combination ='ISSBL' or land_use_oldest_subdivision_combination ='ISPINE' or land_use_oldest_subdivision_combination ='ISPLANTF' or land_use_oldest_subdivision_combination ='ISSHIFTAGR' or land_use_oldest_subdivision_combination ='ISINTAGR' or land_use_oldest_subdivision_combination ='ISSAVG' or land_use_oldest_subdivision_combination ='ISSHRUB' or land_use_oldest_subdivision_combination ='ISPAST' or land_use_oldest_subdivision_combination ='ISFOLL' or land_use_oldest_subdivision_combination ='ISREGBUSH' or land_use_oldest_subdivision_combination ='ISFTG' or land_use_oldest_subdivision_combination ='ISCS' or land_use_oldest_subdivision_combination ='ISTOWN' or land_use_oldest_subdivision_combination ='ISVS' or land_use_oldest_subdivision_combination ='ISOS' or land_use_oldest_subdivision_combination ='ISRS' or land_use_oldest_subdivision_combination ='ISMS' or land_use_oldest_subdivision_combination ='ISAQC' or land_use_oldest_subdivision_combination ='ISIS' or land_use_oldest_subdivision_combination ='ISBARS' or land_use_oldest_subdivision_combination ='ISWL' or land_use_oldest_subdivision_combination ='ISIWB'" if="second_lu_subdivision = 'IS'" />
+        <default expr="land_use_oldest_subdivision_combination ='BARSCS' or land_use_oldest_subdivision_combination ='BARSTOWN' or land_use_oldest_subdivision_combination ='BARSVS' or land_use_oldest_subdivision_combination ='BARSOS' or land_use_oldest_subdivision_combination ='BARSRS' or land_use_oldest_subdivision_combination ='BARSMS' or land_use_oldest_subdivision_combination ='BARSAQC' or land_use_oldest_subdivision_combination ='BARSIS' or land_use_oldest_subdivision_combination ='BARSBARS' or land_use_oldest_subdivision_combination ='BARSWL' or land_use_oldest_subdivision_combination ='BARSIWB'" if="second_lu_subdivision = 'BARS'" />
+        <default expr="land_use_oldest_subdivision_combination ='WLSBL' or land_use_oldest_subdivision_combination ='WLPINE' or land_use_oldest_subdivision_combination ='WLMAN' or land_use_oldest_subdivision_combination ='WLPLANTF' or land_use_oldest_subdivision_combination ='WLREGFOR' or land_use_oldest_subdivision_combination ='WLSHIFTAGR' or land_use_oldest_subdivision_combination ='WLINTAGR' or land_use_oldest_subdivision_combination ='WLSAVG' or land_use_oldest_subdivision_combination ='WLSHRUB' or land_use_oldest_subdivision_combination ='WLPAST' or land_use_oldest_subdivision_combination ='WLFOLL' or land_use_oldest_subdivision_combination ='WLREGBUSH' or land_use_oldest_subdivision_combination ='WLFTG' or land_use_oldest_subdivision_combination ='WLCS' or land_use_oldest_subdivision_combination ='WLTOWN' or land_use_oldest_subdivision_combination ='WLVS' or land_use_oldest_subdivision_combination ='WLOS' or land_use_oldest_subdivision_combination ='WLRS' or land_use_oldest_subdivision_combination ='WLMS' or land_use_oldest_subdivision_combination ='WLAQC' or land_use_oldest_subdivision_combination ='WLIS' or land_use_oldest_subdivision_combination ='WLWL' or land_use_oldest_subdivision_combination ='WLIWB'" if="second_lu_subdivision = 'WL'" />
+        <default expr="land_use_oldest_subdivision_combination ='IWBSBL' or land_use_oldest_subdivision_combination ='IWBPINE' or land_use_oldest_subdivision_combination ='IWBPLANTF' or land_use_oldest_subdivision_combination ='IWBSHIFTAGR' or land_use_oldest_subdivision_combination ='IWBINTAGR' or land_use_oldest_subdivision_combination ='IWBSAVG' or land_use_oldest_subdivision_combination ='IWBSHRUB' or land_use_oldest_subdivision_combination ='IWBPAST' or land_use_oldest_subdivision_combination ='IWBFOLL' or land_use_oldest_subdivision_combination ='IWBREGBUSH' or land_use_oldest_subdivision_combination ='IWBFTG' or land_use_oldest_subdivision_combination ='IWBCS' or land_use_oldest_subdivision_combination ='IWBTOWN' or land_use_oldest_subdivision_combination ='IWBVS' or land_use_oldest_subdivision_combination ='IWBOS' or land_use_oldest_subdivision_combination ='IWBRS' or land_use_oldest_subdivision_combination ='IWBMS' or land_use_oldest_subdivision_combination ='IWBAQC' or land_use_oldest_subdivision_combination ='IWBIS' or land_use_oldest_subdivision_combination ='IWBBARS' or land_use_oldest_subdivision_combination ='IWBWL' or land_use_oldest_subdivision_combination ='IWBIWB'" if="second_lu_subdivision = 'IWB'" />
+      </boolean>
+      <code id="100355" name="second_lu_subdivision" relevant="second_lu_change" required="true" ui:hideWhenNotRelevant="true" ui:tab="plot_tab" ui:layoutType="dropdown" list="land_use" parent="second_lu_conversion">
+        <label type="instance" xml:lang="es">Subdivision UT inicial</label>
+        <label type="instance">Oldest Land Use Subdivision</label>
+        <label type="instance" xml:lang="fr">La subdivision d'UT la plus ancienne</label>
+        <check flag="error" expr="$this != land_use_initial_subdivision">
+          <message>The oldest land use subdivision must be different than the first change</message>
+        </check>
       </code>
     </entity>
   </schema>
