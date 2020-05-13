@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -18,8 +19,10 @@ import org.apache.commons.jxpath.ri.compiler.Constant;
 import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.openforis.collect.service.CollectSpeciesListService;
+import org.openforis.collect.utils.Numbers;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.Languages;
@@ -415,7 +418,19 @@ public class IDMFunctions extends CustomFunctions {
 		if (values == null) {
 			return false;
 		} else if (values instanceof Collection) {
-			return ((Collection) values).contains(item);
+			if (Numbers.isNumber(item)) {
+				Double itemDouble = Numbers.toDouble(item);
+				for (Object value : (Collection) values) {
+					if (itemDouble.equals(Numbers.toDouble(value))) {
+						return true;
+					}
+				}
+				return false;
+			} else {
+				return ((Collection) values).contains(item);
+			}
+		} else if (Numbers.isNumber(values) && Numbers.isNumber(item)) {
+			return Numbers.toDouble(values).equals(Numbers.toDouble(item));
 		} else {
 			return values.equals(item);
 		}
@@ -543,4 +558,6 @@ public class IDMFunctions extends CustomFunctions {
 			throw new IllegalArgumentException("Time unit not supported: " + timeUnit);
 		}
 	}
+	
+	
 }
