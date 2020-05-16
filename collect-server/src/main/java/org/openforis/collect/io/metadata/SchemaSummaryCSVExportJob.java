@@ -71,7 +71,7 @@ public class SchemaSummaryCSVExportJob extends Job {
 									String.valueOf(nodeDefn.isAlwaysRelevant()),
 									nodeDefn.isAlwaysRelevant() ? "" : nodeDefn.getRelevantExpression(),
 									String.valueOf(nodeDefn.isAlwaysRequired()),
-									nodeDefn.isAlwaysRequired() ? "" : nodeDefn.getMinCountExpression(),
+									nodeDefn.isAlwaysRequired() ? "" : nodeDefn.extractRequiredExpression(),
 									extractValidationRules(nodeDefn)
 							));
 							csvWriter.writeNext(values);
