@@ -492,7 +492,7 @@ public class CodeListManager {
 	
 	@Transactional
 	public void copyCodeLists(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
-		codeListItemDao.copyItems(fromSurvey.getId(), toSurvey.getId());
+		codeListItemDao.copyItems(fromSurvey.getId(), fromSurvey.getLanguages(), toSurvey.getId(), toSurvey.getLanguages());
 	}
 	
 	@Transactional

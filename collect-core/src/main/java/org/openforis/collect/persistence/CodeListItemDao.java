@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
@@ -54,7 +55,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 		OFC_CODE_LIST.LABEL3,
 		OFC_CODE_LIST.LABEL4,
 		OFC_CODE_LIST.LABEL5
-	}; 
+	};
 	
 	@SuppressWarnings("rawtypes")
 	private static final TableField[] DESCRIPTION_FIELDS = {
@@ -66,37 +67,48 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 	};
 	
 	@SuppressWarnings("rawtypes")
-	private static final TableField[] POJO_FIELDS = {
-		OFC_CODE_LIST.ID,
-		OFC_CODE_LIST.SURVEY_ID,
-		OFC_CODE_LIST.CODE_LIST_ID,
-		OFC_CODE_LIST.ITEM_ID,
-		OFC_CODE_LIST.PARENT_ID,
-		OFC_CODE_LIST.LEVEL,
-		OFC_CODE_LIST.SORT_ORDER,
-		OFC_CODE_LIST.CODE,
-		OFC_CODE_LIST.QUALIFIABLE,
-		OFC_CODE_LIST.SINCE_VERSION_ID,
-		OFC_CODE_LIST.DEPRECATED_VERSION_ID,
-		OFC_CODE_LIST.IMAGE_FILE_NAME,
-		OFC_CODE_LIST.COLOR,
-		OFC_CODE_LIST.LABEL1, 
-		OFC_CODE_LIST.LABEL2, 
-		OFC_CODE_LIST.LABEL3,
-		OFC_CODE_LIST.LABEL4,
-		OFC_CODE_LIST.LABEL5, 
-		OFC_CODE_LIST.DESCRIPTION1, 
-		OFC_CODE_LIST.DESCRIPTION2, 
-		OFC_CODE_LIST.DESCRIPTION3,
-		OFC_CODE_LIST.DESCRIPTION4,
-		OFC_CODE_LIST.DESCRIPTION5
-	};
+	private static final TableField[] getPojoFields(List<Integer> langIndexes) {
+		List<TableField> fields = new ArrayList<TableField>();
+		fields.addAll(Arrays.<TableField>asList(
+			OFC_CODE_LIST.ID,
+			OFC_CODE_LIST.SURVEY_ID,
+			OFC_CODE_LIST.CODE_LIST_ID,
+			OFC_CODE_LIST.ITEM_ID,
+			OFC_CODE_LIST.PARENT_ID,
+			OFC_CODE_LIST.LEVEL,
+			OFC_CODE_LIST.SORT_ORDER,
+			OFC_CODE_LIST.CODE,
+			OFC_CODE_LIST.QUALIFIABLE,
+			OFC_CODE_LIST.SINCE_VERSION_ID,
+			OFC_CODE_LIST.DEPRECATED_VERSION_ID,
+			OFC_CODE_LIST.IMAGE_FILE_NAME,
+			OFC_CODE_LIST.COLOR
+		));
+		List<TableField> labelFields = Arrays.<TableField>asList(LABEL_FIELDS);
+		fields.addAll(langIndexes == null ? labelFields : CollectionUtils.sublistByIndexes(labelFields, langIndexes));
+		List<TableField> descriptionFields = Arrays.<TableField>asList(DESCRIPTION_FIELDS);
+		fields.addAll(langIndexes == null ? descriptionFields : CollectionUtils.sublistByIndexes(descriptionFields, langIndexes));
+		return fields.toArray(new TableField[fields.size()]);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	private static final TableField[] ALL_POJO_FIELDS = getPojoFields(null);
+	
+	@SuppressWarnings("rawtypes")
+	private static TableField[] getAllFields(List<Integer> langIndexes) {
+		List<TableField> fields = new ArrayList<TableField>();
+		fields.addAll(Arrays.asList(getPojoFields(langIndexes)));
+		fields.add(OFC_CODE_LIST.IMAGE_CONTENT);
+		return fields.toArray(new TableField[fields.size()]);
+	}
 	
 	@SuppressWarnings("rawtypes")
 	private static final TableField[] ALL_FIELDS = ArrayUtils.addAll(
-		POJO_FIELDS, 
+		ALL_POJO_FIELDS, 
 		OFC_CODE_LIST.IMAGE_CONTENT
 	);
+	
 	
 	private boolean useCache;
 	private CodeListItemCache cache;
@@ -197,7 +209,12 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 		}
 	}
 	
-	public void copyItems(int fromSurveyId, int toSurveyId) {
+	public void copyItems(int fromSurveyId, List<String> fromSurveyLangs, 
+			int toSurveyId, List<String> toSurveyLangs) {
+		Set<String> langsToImport = CollectionUtils.intersect(fromSurveyLangs, toSurveyLangs);
+		List<Integer> langsToSelectIndexes = CollectionUtils.indexOfItems(fromSurveyLangs, langsToImport);
+		List<Integer> langsToImportIndexes = CollectionUtils.indexOfItems(toSurveyLangs, langsToImport);
+		
 		JooqDSLContext jf = dsl(null);
 		long minId = loadMinId(jf, fromSurveyId);
 		long nextId = jf.nextId();
@@ -218,15 +235,15 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 				OFC_CODE_LIST.IMAGE_FILE_NAME,
 				OFC_CODE_LIST.COLOR
 		));
-		selectFields.addAll(Arrays.<Field<?>>asList(LABEL_FIELDS));
-		selectFields.addAll(Arrays.<Field<?>>asList(DESCRIPTION_FIELDS));
-		selectFields.addAll(Arrays.<Field<?>>asList(OFC_CODE_LIST.IMAGE_CONTENT));
+		selectFields.addAll(CollectionUtils.sublistByIndexes(Arrays.<Field<?>>asList(LABEL_FIELDS), langsToSelectIndexes));
+		selectFields.addAll(CollectionUtils.sublistByIndexes(Arrays.<Field<?>>asList(DESCRIPTION_FIELDS), langsToSelectIndexes));
+		selectFields.add(OFC_CODE_LIST.IMAGE_CONTENT);
 		
 		Select<?> select = jf.select(selectFields)
 			.from(OFC_CODE_LIST)
 			.where(OFC_CODE_LIST.SURVEY_ID.equal(fromSurveyId))
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
-		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, ALL_FIELDS).select(select);
+		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, getAllFields(langsToImportIndexes)).select(select);
 		insert.execute();
 		restartIdSequence(jf);
 	}
@@ -234,7 +251,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 	public void copyItems(CodeList fromCodeList, CodeList toCodeList) {
 		JooqDSLContext dsl = dsl(fromCodeList);
 		List<PersistedCodeListItem> fromItems = loadAllItems(fromCodeList);
-		long minId = findMin(CollectionUtils.<Integer, PersistedCodeListItem>project(fromItems, "systemId"));
+		long minId = findMin(CollectionUtils.<Long, PersistedCodeListItem>project(fromItems, "systemId"));
 		long nextId = dsl.nextId();
 		long idGap = nextId - minId;
 		List<PersistedCodeListItem> newItems = new ArrayList<PersistedCodeListItem>(fromItems.size());
@@ -774,11 +791,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 		this.useCache = useCache;
 	}
 	
-	private int findMin(List<Integer> values) {
+	private long findMin(List<Long> values) {
 		if (values.isEmpty()) {
 			return 0;
 		}
-		Integer[] valuesArr = values.toArray(new Integer[values.size()]);
+		Long[] valuesArr = values.toArray(new Long[values.size()]);
 		Arrays.sort(valuesArr);
 		return valuesArr[0];
 	}
@@ -889,9 +906,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 		}
 		
 		public Insert<OfcCodeListRecord> createInsertStatement() {
-			Object[] valuesPlaceholders = new String[POJO_FIELDS.length];
+			Object[] valuesPlaceholders = new String[ALL_POJO_FIELDS.length];
 			Arrays.fill(valuesPlaceholders, "?");
-			return insertInto(OFC_CODE_LIST, POJO_FIELDS).values(valuesPlaceholders);
+			return insertInto(OFC_CODE_LIST, ALL_POJO_FIELDS).values(valuesPlaceholders);
 		}
 		
 		protected List<Object> extractValues(PersistedCodeListItem item) {
@@ -902,7 +919,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 			Integer sinceVersionId = sinceVersion == null ? null: sinceVersion.getId();
 			ModelVersion deprecatedVersion = item.getDeprecatedVersion();
 			Integer deprecatedVersionId = deprecatedVersion == null ? null: deprecatedVersion.getId();
-			List<Object> values = new ArrayList<Object>(POJO_FIELDS.length);
+			List<Object> values = new ArrayList<Object>(ALL_POJO_FIELDS.length);
 			values.addAll(Arrays.<Object>asList(item.getSystemId(), surveyId, 
 					list.getId(), item.getId(), item.getParentId(), item.getLevel(), item.getSortOrder(), item.getCode(), 
 					item.isQualifiable(), sinceVersionId, deprecatedVersionId, item.getImageFileName(), item.getColor()));
