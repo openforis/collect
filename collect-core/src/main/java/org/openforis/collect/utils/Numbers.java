@@ -1,7 +1,5 @@
 package org.openforis.collect.utils;
 
-import org.apache.commons.lang3.math.NumberUtils;
-
 /**
  * 
  * @author S. Ricci
@@ -37,18 +35,4 @@ public abstract class Numbers {
 		return total;
 	}
 
-	public static boolean isNumber(Object value) {
-		return value != null
-				&& (value instanceof Number || (value instanceof String && NumberUtils.isCreatable((String) value)));
-	}
-	
-	public static Double toDouble(Object value) {
-		if (value instanceof String) {
-			return Double.valueOf((String) value);
-		} else if (value instanceof Number) {
-			return ((Number) value).doubleValue();
-		} else {
-			return null;
-		}
-	}
 }
