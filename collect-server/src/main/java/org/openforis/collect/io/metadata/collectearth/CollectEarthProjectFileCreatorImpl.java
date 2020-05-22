@@ -41,7 +41,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 
 /**
- * 
+ *
  * @author S. Ricci
  * @author A. Sanchez-Paus Diaz
  *
@@ -60,18 +60,18 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final double HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR = 10000d;
 	private static final String README_FILE = "README.txt";
 	private static final String GRID_FOLDER_NAME = "grid";
-	
+
 	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
-		
+
 	private CodeListManager codeListManager;
 	private SurveyManager surveyManager;
-	
+
 	@Override
 	public File create(CollectSurvey survey, String language) throws Exception {
 		// create output zip file
 		File outputFile = File.createTempFile("openforis-collect-earth-temp", ".zip");
 		outputFile.delete(); //prevent exception creating zip file with zip4j
-		
+
 		// create placemark
 		File placemarkFile = createPlacemark(survey);
 		File projectProperties = generateProjectProperties(survey,language);
@@ -80,9 +80,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		File kmlTemplate = generateKMLTemplate(survey);
 		File testPlotsCSVFile = new CollectEarthGridTemplateGenerator().generateTemplateCSVFile(survey);
 		File readmeFile = getFileFromResouces(README_FILE_PATH);
-		
+
 		ZipFile zipFile = new ZipFile(outputFile);
-		
+
 		zipFile.add(projectProperties, PROJECT_PROPERTIES_FILE_NAME);
 		zipFile.add(placemarkFile, PLACEMARK_FILE_NAME);
 		zipFile.add(balloon, BALLOON_FILE_NAME);
@@ -90,13 +90,13 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		zipFile.add(kmlTemplate, KML_TEMPLATE_FILE_NAME);
 		zipFile.add(readmeFile, README_FILE);
 		zipFile.add(testPlotsCSVFile, TEST_PLOTS_FILE_NAME);
-		
+
 		addCodeListImages(zipFile, survey);
-		
+
 		includeSurveyFiles(zipFile, survey);
-		
+
 		includeEarthFiles(zipFile);
-		
+
 		return outputFile;
 	}
 
@@ -129,7 +129,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			}
 		}
 	}
-	
+
 	private File createPlacemark(CollectSurvey survey) throws IOException {
 		File file = File.createTempFile("collect-earth-placemark.idm", ".xml");
 		FileOutputStream os = new FileOutputStream(file);
@@ -157,6 +157,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("ui_language", language);
 		p.put("bing_maps_key", getBingMapsKey(survey));
 		p.put("open_bing_maps", isBingMapsEnabled(survey));
+		p.put("open_earth_map", isEarthMapEnabled(survey));
 		p.put("planet_maps_key", getPlanetMapsKey(survey));
 		p.put("open_planet_maps", isPlanetMapsEnabled(survey));
 		p.put("open_yandex_maps", isYandexMapsEnabled(survey));
@@ -196,57 +197,62 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getBingMapsKey();
 	}
-	
+
 	private String getPlanetMapsKey(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getPlanetMapsKey();
 	}
-	
+
 	private String getExtraMapUrl(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.getExtraMapUrl();
 	}
-	
+
 	private String isBingMapsEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isBingMapsEnabled()?"true":"false";
 	}
-	
+
+	private String isEarthMapEnabled(CollectSurvey survey){
+		CollectAnnotations annotations = survey.getAnnotations();
+		return annotations.isEarthMapEnabled()?"true":"false";
+	}
+
 	private String isPlanetMapsEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isPlanetMapsEnabled()?"true":"false";
 	}
-	
+
 	private String isYandexMapsEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isYandexMapsEnabled()?"true":"false";
 	}
-	
+
 	private String isGEEExplorerEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isGEEExplorerEnabled()?"true":"false";
 	}
-	
+
 	private String isGEECodeEditorEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isGEECodeEditorEnabled()?"true":"false";
 	}
-	
+
 	private String isGEEAppEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isGEEAppEnabled()?"true":"false";
 	}
-	
+
 	private String isSecureWatchEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isSecureWatchEnabled()?"true":"false";
 	}
-	
+
 	private String isStreetViewEnabled(CollectSurvey survey){
 		CollectAnnotations annotations = survey.getAnnotations();
 		return annotations.isStreetViewEnabled()?"true":"false";
 	}
-	
+
 	private int calculateFrameDistance(CollectSurvey survey) {
 		CollectAnnotations annotations = survey.getAnnotations();
 		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR);
@@ -255,20 +261,20 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			return Double.valueOf(Math.floor((double) (plotWidth / 2))).intValue();
 		}
 		double pointsPerSide = Math.sqrt(samplePoints);
-		int frameDistance = Double.valueOf(Math.floor((double) ((plotWidth / pointsPerSide) / 2))).intValue(); 
+		int frameDistance = Double.valueOf(Math.floor((double) ((plotWidth / pointsPerSide) / 2))).intValue();
 		return frameDistance;
 	}
-		
+
 	private int calculateDistanceBetweenSamplePoints(CollectSurvey survey) {
 		CollectAnnotations annotations = survey.getAnnotations();
-		
+
 		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_SQUARE_METERS_CONVERSION_FACTOR);
 		int samplePoints = annotations.getCollectEarthSamplePoints();
 		if (samplePoints <= 1) {
 			return 0;
 		}
 		double pointsPerWidth = Math.sqrt(samplePoints);
-		int frameDistance = calculateFrameDistance(survey); 
+		int frameDistance = calculateFrameDistance(survey);
 		int distanceInMeters = Double.valueOf(Math.floor((double) ((plotWidth - (frameDistance * 2)) / ( pointsPerWidth - 1 ) ))).intValue();
 		return distanceInMeters;
 	}
@@ -278,25 +284,25 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		String html = generator.generateHTML();
 		return Files.writeToTempFile(html, "collect-earth-project-file-creator", ".html");
 	}
-	
+
 	private File generateKMLTemplate(CollectSurvey survey) throws IOException {
 		//copy the template txt file into a String
 		InputStream is = getClass().getClassLoader().getResourceAsStream(KML_TEMPLATE_PATH);
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(is, writer, "UTF-8");
 		String templateContent = writer.toString();
-		
+
 		//find "fromCSV" attributes
 		List<AttributeDefinition> fromCsvAttributes = survey.getExtendedDataFields();
-		
+
 		//write the dynamic content to be replaced into the template
 		String nameOfField = "extraColumns";
 		StringBuffer extraHolders = addExtraDataHolders(fromCsvAttributes, nameOfField);
-		
+
 		nameOfField = "idColumns";
 		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getFirstRootEntityDefinition().getKeyAttributeDefinitions();
 		extraHolders.append( addExtraDataHolders( keyAttributeDefinitions, nameOfField) );
-		
+
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, extraHolders.toString());
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");
 	}
@@ -306,13 +312,13 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		int extraInfoIndex = 0;
 		StringBuffer sb = new StringBuffer();
 		for (AttributeDefinition attrDef : fromCsvAttributes) {
-			
+
 			String attrName = attrDef.getName();
 			sb.append("<Data name=\"EXTRA_" + attrName + "\">\n");
 			String value;
 			value = "${placemark."+ nameOfField + "[" + extraInfoIndex + "]}";
 			extraInfoIndex ++;
-			
+
 			sb.append("<value>");
 			sb.append(value);
 			sb.append("</value>\n");
@@ -324,11 +330,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private File generateCube(CollectSurvey survey, String language) throws IOException {
 		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey, language);
 		String xmlSchema = cubeGenerator.generateXMLSchema();
-		
+
 		// Replace the TOKENs inside the labels if dimensions/levels with the corresponding ampersand
 		// XStream replaces thh ampersands by default, since we are using unicode codes we don't want that behavior
 		xmlSchema = xmlSchema.replaceAll( HtmlUnicodeEscaperUtil.MONDRIAN_START_UNICODE, "&");
-		
+
 		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
 	}
 
@@ -361,7 +367,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 				EARTH_FILES_FOLDER_NAME, "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
 		return zipImageFileName;
 	}
-	
+
 	private void includeSurveyFiles(ZipFile zipFile, CollectSurvey survey) throws FileNotFoundException, IOException, ZipException {
 		List<SurveyFile> surveyFiles = surveyManager.loadSurveyFileSummaries(survey);
 		for (SurveyFile surveyFile : surveyFiles) {
@@ -378,7 +384,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			zipFile.add(tempSurveyFile, namePrefix + surveyFile.getFilename());
 		}
 	}
-	
+
 	private File copyToTempFile(byte[] content, String fileName) throws IOException, FileNotFoundException {
 		File imageFile = File.createTempFile("collect-earth-project-file-creator", fileName);
 		FileOutputStream fos = new FileOutputStream(imageFile);
@@ -390,7 +396,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	public void setCodeListManager(CodeListManager codeListManager) {
 		this.codeListManager = codeListManager;
 	}
-	
+
 	public void setSurveyManager(SurveyManager surveyManager) {
 		this.surveyManager = surveyManager;
 	}

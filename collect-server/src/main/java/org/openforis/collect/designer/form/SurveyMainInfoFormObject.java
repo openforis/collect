@@ -5,7 +5,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.springframework.util.StringUtils;
 
 /**
- * 
+ *
  * @author S. Ricci
  *
  */
@@ -21,6 +21,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String planetMapsKey;
 	private String extraMapUrl;
 	private boolean openBingMaps;
+	private boolean openEarthMap;
 	private boolean openPlanetMaps;
 	private boolean openYandexMaps;
 	private boolean openGEEExplorer;
@@ -28,22 +29,22 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private boolean openGEEApp;
 	private boolean openSecureWatch;
 	private boolean openStreetView;
-	
+
 	private String defaultDescription;
 	private String defaultProjectName;
-	
+
 	private boolean keyChangeAllowed;
-	
+
 	@Override
 	public void loadFrom(CollectSurvey source, String languageCode) {
 		name = source.getName();
 		description = source.getDescription(languageCode);
 		published = source.isPublished();
 		projectName = source.getProjectName(languageCode);
-		
+
 		defaultProjectName = source.getProjectName();
 		defaultDescription = source.getDescription();
-		
+
 		CollectAnnotations annotations = source.getAnnotations();
 		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
 		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
@@ -51,6 +52,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		planetMapsKey = annotations.getPlanetMapsKey();
 		extraMapUrl = annotations.getExtraMapUrl();
 		openBingMaps = annotations.isBingMapsEnabled();
+		openEarthMap = annotations.isEarthMapEnabled();
 		openPlanetMaps = annotations.isPlanetMapsEnabled();
 		openYandexMaps = annotations.isYandexMapsEnabled();
 		openStreetView = annotations.isStreetViewEnabled();
@@ -65,7 +67,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		return StringUtils.trimTrailingCharacter(
 				StringUtils.trimTrailingCharacter(number.toString().replace('.', '_'), '0'), '_');
 	}
-	
+
 	@Override
 	public void saveTo(CollectSurvey dest, String languageCode) {
 		dest.setName(name);
@@ -79,6 +81,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		annotations.setPlanetMapsKey(planetMapsKey);
 		annotations.setExtraMapUrl(extraMapUrl);
 		annotations.setBingMapsEnabled( openBingMaps );
+		annotations.setEarthMapEnabled( openEarthMap );
 		annotations.setPlanetMapsEnabled( openPlanetMaps );
 		annotations.setYandexMapsEnabled( openYandexMaps );
 		annotations.setStreetViewEnabled( openStreetView );
@@ -92,7 +95,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	protected double fromListitemValueToDouble(String value) {
 		return Double.parseDouble(value.replace('_', '.'));
 	}
-	
+
 	@Override
 	protected void reset() {
 		// TODO Auto-generated method stub
@@ -109,7 +112,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public boolean isPublished() {
 		return published;
 	}
-	
+
 	public String getPlanetMapsKey() {
 		return planetMapsKey;
 	}
@@ -129,7 +132,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public void setPublished(boolean published) {
 		this.published = published;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
@@ -145,19 +148,19 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}
-	
+
 	public String getCollectEarthSamplePoints() {
 		return collectEarthSamplePoints;
 	}
-	
+
 	public void setCollectEarthSamplePoints(String collectEarthSamplePoints) {
 		this.collectEarthSamplePoints = collectEarthSamplePoints;
 	}
-	
+
 	public String getCollectEarthPlotArea() {
 		return collectEarthPlotArea;
 	}
-	
+
 	public void setCollectEarthPlotArea(String collectEarthPlotArea) {
 		this.collectEarthPlotArea = collectEarthPlotArea;
 	}
@@ -173,11 +176,11 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public String getExtraMapUrl() {
 		return extraMapUrl;
 	}
-	
+
 	public void setExtraMapUrl(String extraMapUrl) {
 		this.extraMapUrl = extraMapUrl;
 	}
-	
+
 	public boolean isOpenBingMaps() {
 		return openBingMaps;
 	}
@@ -185,7 +188,15 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public void setOpenBingMaps(boolean openBingMaps) {
 		this.openBingMaps = openBingMaps;
 	}
-	
+
+	public boolean isOpenEarthMap() {
+		return openEarthMap;
+	}
+
+	public void setOpenEarthMap(boolean openEarthMap) {
+		this.openEarthMap = openEarthMap;
+	}
+
 	public boolean isOpenYandexMaps() {
 		return openYandexMaps;
 	}
@@ -209,7 +220,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public void setOpenGEECodeEditor(boolean openGEECodeEditor) {
 		this.openGEECodeEditor = openGEECodeEditor;
 	}
-	
+
 	public boolean isOpenGEEApp() {
 		return openGEEApp;
 	}
@@ -217,7 +228,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public void setOpenGEEApp(boolean openGEEApp) {
 		this.openGEEApp = openGEEApp;
 	}
-	
+
 	public boolean isOpenSecureWatch() {
 		return openSecureWatch;
 	}
@@ -237,15 +248,15 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	public String getDefaultProjectName() {
 		return defaultProjectName;
 	}
-	
+
 	public String getDefaultDescription() {
 		return defaultDescription;
 	}
-	
+
 	public boolean isKeyChangeAllowed() {
 		return keyChangeAllowed;
 	}
-	
+
 	public void setKeyChangeAllowed(boolean keyChangeAllowed) {
 		this.keyChangeAllowed = keyChangeAllowed;
 	}

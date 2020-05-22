@@ -29,12 +29,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
-	
+
 	//temporary instance variables
 	private transient ZipFile zipFile;
 	private transient ZipFileExtractor zipFileExtractor;
 	private transient File idmlFile;
-	
+
 	@Override
 	public void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
@@ -55,7 +55,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 		addTask(new AreaPerAttributeImportTask());
 		addTask(new GridFilesImportTask());
 	}
-	
+
 	@Override
 	protected void initializeTask(Worker task) {
 		if ( task instanceof IdmlUnmarshallTask ) {
@@ -91,7 +91,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 		}
 		super.initializeTask(task);
 	}
-	
+
 	@Override
 	protected void onTaskCompleted(Worker task) {
 		if ( task instanceof IdmlUnmarshallTask ) {
@@ -103,7 +103,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			this.survey = t.getSurvey();
 		}
 	}
-	
+
 	@Override
 	protected void onEnd() {
 		super.onEnd();
@@ -111,13 +111,13 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 	}
 
 	private static class CEPropertiesImportTask extends Task {
-		
+
 		private static final double[] PREDEFINED_PLOT_AREAS = new double[]{0.25d, 0.50d, 1.0d, 5.0d, 10.0d};
 		// input
 		private SurveyManager surveyManager;
 		private CollectSurvey survey;
 		private File file;
-		
+
 		@Override
 		protected void execute() throws Throwable {
 			Properties p = new Properties();
@@ -128,6 +128,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			annotations.setPlanetMapsKey((String) p.get("planet_maps_key"));
 			annotations.setPlanetMapsEnabled(Boolean.parseBoolean(p.getProperty("open_planet_maps")));
 
+			annotations.setEarthMapEnabled(Boolean.parseBoolean(p.getProperty("open_earth_map")));
 			annotations.setYandexMapsEnabled(Boolean.parseBoolean(p.getProperty("open_yandex_maps")));
 			annotations.setStreetViewEnabled(Boolean.parseBoolean(p.getProperty("open_street_view")));
 			annotations.setGEEExplorerEnabled(Boolean.parseBoolean(p.getProperty("open_earth_engine")));
@@ -143,7 +144,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			int numberOfSamplingPoints = getIntegerProperty(p, "number_of_sampling_points_in_plot", 9);
 			int distanceBetweenSamplePoints = getIntegerProperty(p, "distance_between_sample_points", 10);
 			int distanceToPlotBoundaries = getIntegerProperty(p, "distance_to_plot_boundaries", 5);
-			
+
 			double plotArea = Math.pow((Math.sqrt(numberOfSamplingPoints) - 1) * distanceBetweenSamplePoints + (distanceToPlotBoundaries * 2), 2);
 			double plotAreaHa = plotArea / 10000;
 			double roundedPlotAreaHa = 1.0d;
@@ -166,22 +167,22 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 				return Integer.parseInt(valueStr);
 			}
 		}
-		
+
 		public void setSurveyManager(SurveyManager surveyManager) {
 			this.surveyManager = surveyManager;
 		}
-		
+
 		public void setFile(File file) {
 			this.file = file;
-			
+
 		}
 		public void setSurvey(CollectSurvey survey) {
 			this.survey = survey;
 		}
 	}
-	
+
 	private static abstract class CollectEarthUniqueSurveyFileImportTask extends Task {
-		
+
 		// input
 		private SurveyFileType surveyFileType;
 		private SurveyManager surveyManager;
@@ -212,34 +213,34 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 				FileUtils.deleteQuietly(tempFile);
 			}
 		}
-		
+
 		public void setSurveyManager(SurveyManager surveyManager) {
 			this.surveyManager = surveyManager;
 		}
-		
+
 		public void setSurvey(CollectSurvey survey) {
 			this.survey = survey;
 		}
-		
+
 		public void setZipFileExtractor(ZipFileExtractor zipFileExtractor) {
 			this.zipFileExtractor = zipFileExtractor;
 		}
 	}
-	
+
 	private static class GoogleEarthEnginePlaygroundScriptImportTask extends CollectEarthUniqueSurveyFileImportTask {
-		
+
 		public GoogleEarthEnginePlaygroundScriptImportTask() {
 			super(SurveyFileType.COLLECT_EARTH_EE_SCRIPT);
 		}
 	}
-	
+
 	private static class AreaPerAttributeImportTask extends CollectEarthUniqueSurveyFileImportTask {
-		
+
 		public AreaPerAttributeImportTask() {
 			super(SurveyFileType.COLLECT_EARTH_AREA_PER_ATTRIBUTE);
 		}
 	}
-	
+
 	private static class GridFilesImportTask extends Task {
 
 		// input
@@ -280,7 +281,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 				}
 			}
 		}
-		
+
 		private String determineGridFilesPath() {
 			String[] gridPaths = new String[]{"grid", "grids"};
 			for (String path : gridPaths) {
@@ -291,7 +292,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 			}
 			return null;
 		}
-		
+
 		public void setSurveyManager(SurveyManager surveyManager) {
 			this.surveyManager = surveyManager;
 		}
@@ -299,7 +300,7 @@ public class CESurveyRestoreJob extends AbstractSurveyRestoreJob {
 		public void setSurvey(CollectSurvey survey) {
 			this.survey = survey;
 		}
-		
+
 		public void setZipFileExtractor(ZipFileExtractor backupFileExtractor) {
 			this.zipFileExtractor = backupFileExtractor;
 		}
