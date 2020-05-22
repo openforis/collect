@@ -57,3 +57,10 @@ OF.Arrays.shiftItem = function ( array, item, toIndex ) {
 		array.splice(toIndex, 0, item);
 	}
 };
+
+/**
+ * Returns the head (first element) of the given array.
+ */
+OF.Arrays.head = function (array) {
+	return array && array.length > 0 ? array[0] : null
+}

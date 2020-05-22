@@ -133,78 +133,86 @@ Collect.DataManager.MapPanelComposer.prototype.onDependenciesLoaded = function(o
 	});
 	$this.map.addControl(layerSwitcher);
 
-	var displayFeatureInfo = function(pixel, coordinate) {
-		var featureOrLayer = $this.map.forEachFeatureAtPixel(pixel, function(feature) {
-			return feature;
-		});
-		if (featureOrLayer) {
-			var features = featureOrLayer.get('features');
-			var feature;
-			var numberOfFeatures;
-			if (features) {
-				numberOfFeatures = features.length;
-				feature = features[0];
-			} else {
-				numberOfFeatures = 1;
-				feature = featureOrLayer;
-			}
-			var survey = feature.get('survey');
-			var htmlContent;
-			
-			if (numberOfFeatures > 1) {
-				htmlContent = "Cluster of " + numberOfFeatures + " ";
-				switch (feature.get('type')) {
-				case 'sampling_point':
-					htmlContent += " sampling points";
-					break;
-				case 'coordinate_attribute_value':
-					htmlContent += " sampling units";
-					break;
-				}
-			} else {
-				switch (feature.get('type')) {
-				case 'sampling_point':
-					var lonLat = coordinate;
-					var keyDefs = survey.getRooEntityKeyDefinitions();
-					function printLevelCodes(levelCodes) {
-						var result = "";
-						for (var i = 0; i < levelCodes.length; i++) {
-							var keyDef = keyDefs.length > i ? keyDefs[i] : null;
-							var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
-							result += levelName + ": " + levelCodes[i] + "<br>";
-						}
-						return result;
+	$this.map.on('singleclick', function(evt) {
+		const { pixel, coordinate } = evt;
+		// get feature with single point (if any)
+		const features = $this.map.getFeaturesAtPixel(pixel)
+		const featuresOfFeaturesArr = features.map(feature => feature.get('features'))
+		const feature = OF.Arrays.head(OF.Arrays.head(
+			featuresOfFeaturesArr
+				// get only features with only one feature
+				.filter(f => f.length === 1)
+				// give priority to coordinate_attribute_value features
+				.sort((featuresA, featuresB) => {
+					const typeA = featuresA[0].get('type')
+					const typeB = featuresB[0].get('type')
+					if (typeA === typeB) {
+						return 0
 					}
-					var levelCodes = feature.get('name').split('|');
-					htmlContent = OF.Strings.format(
-							//TODO improve level codes formatting
-							"<b>Sampling Point</b>"
-							+ "<br>"
-							+ "{0}"
-							+ "Latitude: {1}"
-							+ "<br>"
-							+ "Longitude: {2}"
-							+ "<br>"
-							, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
-					break;
-				case 'coordinate_attribute_value':
-					var point = feature.get('point');
-					htmlContent = $this.createNodeInfoBalloon(survey, point);
-					break;
+					return typeA === 'coordinate_attribute_value' ? -1 : 1
+				})
+			))
+		var infoContent;
+		if (feature) {
+			// single point info popup
+			var survey = feature.get('survey');
+			switch (feature.get('type')) {
+			case 'sampling_point':
+				var lonLat = feature.get('geometry').flatCoordinates;
+				var keyDefs = survey.getRooEntityKeyDefinitions();
+				function printLevelCodes(levelCodes) {
+					var result = "";
+					for (var i = 0; i < levelCodes.length; i++) {
+						var keyDef = keyDefs.length > i ? keyDefs[i] : null;
+						var levelName = keyDef ? keyDef.getLabelOrName() : "level " + (i + 1);
+						result += levelName + ": " + levelCodes[i] + "<br>";
+					}
+					return result;
 				}
+				var levelCodes = feature.get('name').split('|');
+				infoContent = OF.Strings.format(
+						//TODO improve level codes formatting
+						"<b>Sampling Point</b>"
+						+ "<br>"
+						+ "{0}"
+						+ "Latitude: {1}"
+						+ "<br>"
+						+ "Longitude: {2}"
+						+ "<br>"
+						, printLevelCodes(levelCodes), lonLat[1], lonLat[0]);
+				break;
+			case 'coordinate_attribute_value':
+				const point = feature.get('point');
+				infoContent = $this.createNodeInfoBalloon(survey, point);
+				break;
 			}
-			$this.popupContent.html(htmlContent);
+		} else if (features.length > 0) {
+			// cluster of points info popup
+			const topMostFeatures = featuresOfFeaturesArr[featuresOfFeaturesArr.length - 1]
+			const type = topMostFeatures[0].get('type')
+			infoContent = "Cluster of " + topMostFeatures.length + " ";
+			switch (type) {
+			case 'sampling_point':
+				infoContent += " sampling points";
+				break;
+			case 'coordinate_attribute_value':
+				infoContent += " sampling units";
+				break;
+			}
+			infoContent += '.<br/>Zoom in to get more details about each point.'
+		}
+		if (infoContent) {
+			$this.popupContent.html(infoContent);
 			$this.popupContent.find(".accordion").accordion({heightStyle: "content", animate: 0});
 			$this.popupContent.find(".data.info-icon-button").tooltip({
 				html: true,
 				title: 'In order to show or hide an attribute, use the \"Show in Map balloon\" option in the Survey Designer'
 			});
 			$this.overlay.setPosition(coordinate);
+		} else {
+			// close info popup
+			$this.overlay.setPosition(undefined);
 		}
-	};
-
-	$this.map.on('singleclick', function(evt) {
-		displayFeatureInfo(evt.pixel, evt.coordinate);
 	});
 
 	collect.surveyService.loadFullPublishedSurveys(function(surveys) {
