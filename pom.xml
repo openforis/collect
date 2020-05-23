@@ -27,7 +27,7 @@
 		<spring.version>5.2.5.RELEASE</spring.version>
 		<spring-security.version>5.3.1.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
-		<jetty.version>9.4.12.v20180830</jetty.version>
+		<jetty.version>9.4.29.v20200521</jetty.version>
 		<log4j.version>2.13.1</log4j.version>
 		<slf4j.version>1.7.30</slf4j.version>
 	</properties>
@@ -539,6 +539,11 @@
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-taglibs</artifactId>
 				<version>${spring-security.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.lingala.zip4j</groupId>
+				<artifactId>zip4j</artifactId>
+				<version>2.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-dbcp</groupId>

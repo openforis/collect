@@ -22,7 +22,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.openforis.web.server.ApplicationServer;
 import org.openforis.web.server.JndiDataSourceConfiguration;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.ZipFile;
 
 public abstract class JettyApplicationServer implements ApplicationServer {
 

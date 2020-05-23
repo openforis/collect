@@ -13,11 +13,11 @@ public class ZipFile {
 	private ZipParameters zipParameters;
 	private net.lingala.zip4j.ZipFile delegate;
 
-	public ZipFile(File outputFile) throws ZipException {
-		this.delegate = new net.lingala.zip4j.ZipFile(outputFile);
-		zipParameters = new ZipParameters();
-		zipParameters.setCompressionMethod(CompressionMethod.DEFLATE);
-		zipParameters.setCompressionLevel(CompressionLevel.ULTRA);
+	public ZipFile(File file) throws ZipException {
+		this.delegate = new net.lingala.zip4j.ZipFile(file);
+		this.zipParameters = new ZipParameters();
+		this.zipParameters.setCompressionMethod(CompressionMethod.DEFLATE);
+		this.zipParameters.setCompressionLevel(CompressionLevel.ULTRA);
 	}
 
 	public ZipFile add(File file, String name) throws ZipException {
@@ -38,6 +38,14 @@ public class ZipFile {
 			throw new ZipException(e);
 		}
 		return this;
+	}
+	
+	public void extractAll(String destinationPath) throws ZipException {
+		try {
+			this.delegate.extractAll(destinationPath);
+		} catch (net.lingala.zip4j.exception.ZipException e) {
+			throw new ZipException(e);
+		}
 	}
 
 	public File getOutputFile() {
