@@ -4,7 +4,7 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
 				  currentState="descriptionVisible"
-				  restrict="^(\*|-|\?|\w+(: ?.*)?)$"
+				  restrict="^(\*|-|\?|(\w|-)+(: ?.*)?)$"
 				  >
 	<fx:Script>
 		<![CDATA[
