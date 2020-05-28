@@ -70,8 +70,10 @@ The project has been developed as a Maven project and it's divided into sub-modu
 The release of a new version can be done using the Maven Release Plugin.
 Just run the following commands: 
 
-`mvn release:prepare`
-`mvn release:perform`
+```
+mvn release:prepare
+mvn release:perform
+```
 
 (All profiles are active during the release).
 
