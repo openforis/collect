@@ -1,0 +1,35 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+<vlayout id="samplingPointDataContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SamplingPointDataVM')"
+		validationMessages="@id('vmsgs')"
+		hflex="true" vflex="true">
+	<listbox id="samplingPointDataListBox" model="@load(vm.samplingPointItems)"
+      hflex="true"
+      rows="3">
+      <listhead>
+        <listheader label="${labels.survey.samplingPointData.level1}" />
+        <listheader label="${labels.survey.samplingPointData.level2}" />
+        <listheader label="${labels.survey.samplingPointData.level3}" />
+        <listheader label="${labels.survey.samplingPointData.x}"
+        	sort="auto(x)" />
+        <listheader label="${labels.survey.samplingPointData.y}"
+        	sort="auto(y)" />
+        <listheader label="${labels.survey.samplingPointData.srs}"
+        	sort="auto(srsId)" />
+      </listhead>
+      <template name="model">
+        <listitem>
+          <listcell label="@load(vm.getLevelCode(each, 1))" />
+          <listcell label="@load(vm.getLevelCode(each, 2))" />
+          <listcell label="@load(vm.getLevelCode(each, 3))" />
+          <listcell label="@load(each.x)" />
+          <listcell label="@load(each.y)" />
+          <listcell label="@load(each.srsId)" />
+        </listitem>
+      </template>
+    </listbox>
+</vlayout>
+</zk>

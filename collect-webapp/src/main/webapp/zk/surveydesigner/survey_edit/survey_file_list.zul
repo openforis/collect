@@ -1,6 +1,6 @@
 <zk>
   <vlayout>
-    <listbox id="checksList" model="@load(vm.surveyFiles)"
+    <listbox id="surveyFilesListBox" model="@load(vm.surveyFiles)"
       selectedItem="@bind(vm.selectedSurveyFile)"
       hflex="true"
       rows="3">

@@ -76,10 +76,9 @@
 								<label
 									value="${labels.survey.sampling_design_import.save_survey_before}"
 									visible="@load(empty vm.surveyId)" />
-								<flash
-									src="@load(vm.samplingDesignImportModuleUrl)"
-									sclass="maximised" height="100%" width="100%"
-									visible="@load(not empty vm.surveyId)" />
+								<include id="samplingPointDataInclude"
+									visible="@load(not empty vm.surveyId)"
+									src="survey_edit/sampling_point_data/sampling_point_data.zul" />
 							</tabpanel>
 							<tabpanel>
 								<include id="schemaInclude"
