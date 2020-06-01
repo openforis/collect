@@ -1,14 +1,16 @@
 package org.openforis.collect.io.metadata.samplingdesign;
 
+import java.util.Arrays;
+
 /**
  * 
  * @author S. Ricci
  *
  */
 public enum SamplingDesignFileColumn {
-	LEVEL_1("level1_code"), 
-	LEVEL_2("level2_code"), 
-	LEVEL_3("level3_code"), 
+	LEVEL_1("level1_code", 1), 
+	LEVEL_2("level2_code", 2), 
+	LEVEL_3("level3_code", 3), 
 	X("x"),
 	Y("y"),
 	SRS_ID("srs_id");
@@ -25,8 +27,15 @@ public enum SamplingDesignFileColumn {
 		LEVEL_COLUMN_NAMES = getColumnNames(LEVEL_COLUMNS);
 	}
 	
-	private String columnName;
-	
+	public static SamplingDesignFileColumn fromColumnName(String columnName) {
+		for (SamplingDesignFileColumn column : values()) {
+			if (column.getColumnName().equals(columnName)) {
+				return column;
+			}
+		}
+		return null;
+	}
+
 	private static String[] getColumnNames(SamplingDesignFileColumn[] columns) {
 		String [] result = new String[columns.length];
 		for (int i = 0 ; i < columns.length; i ++) {
@@ -36,11 +45,28 @@ public enum SamplingDesignFileColumn {
 		return result;
 	}
 	
-	private SamplingDesignFileColumn(String columnName) {
+	private String columnName;
+	private int level;
+	
+	private SamplingDesignFileColumn(String columnName, int level) {
 		this.columnName = columnName;
+		this.level = level;
+	}
+	
+	private SamplingDesignFileColumn(String columnName) {
+		this(columnName, -1);
 	}
 	
 	public String getColumnName() {
 		return columnName;
 	}
+	
+	public int getLevel() {
+		return level;
+	}
+	
+	public boolean isLevelColumn() {
+		return Arrays.asList(LEVEL_COLUMNS).contains(this);
+	}
+	
 }

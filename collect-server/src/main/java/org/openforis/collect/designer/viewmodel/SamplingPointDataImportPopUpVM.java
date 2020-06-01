@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.InputStream;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 
@@ -10,6 +11,8 @@ import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImpor
 import org.openforis.collect.io.metadata.samplingdesign.SamplingPointDataImportJob;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -40,6 +43,11 @@ public class SamplingPointDataImportPopUpVM extends BaseSurveyFileImportVM {
 			event.stopPropagation();
 		}
 		BindUtils.postGlobalCommand(null, null, SamplingPointDataVM.CLOSE_DATA_IMPORT_POP_UP_COMMAND, null);
+	}
+	
+	public String getAvailableSrsIds() {
+		List<SpatialReferenceSystem> spatialReferenceSystems = getSurvey().getSpatialReferenceSystems();
+		return String.join(", ", CollectionUtils.project(spatialReferenceSystems, "id"));
 	}
 	
 	@Command
