@@ -7,17 +7,16 @@
 		validationMessages="@id('vmsgs')"
 		hflex="true" vflex="true">
 	<listbox id="samplingPointDataListBox" model="@load(vm.samplingPointItems)"
-      hflex="true"
-      rows="3">
+      hflex="true" vflex="true">
       <listhead>
-        <listheader label="${labels.survey.samplingPointData.level1}" />
-        <listheader label="${labels.survey.samplingPointData.level2}" />
-        <listheader label="${labels.survey.samplingPointData.level3}" />
-        <listheader label="${labels.survey.samplingPointData.x}"
+        <listheader label="${labels.survey.sampling_point_data.level1}" />
+        <listheader label="${labels.survey.sampling_point_data.level2}" />
+        <listheader label="${labels.survey.sampling_point_data.level3}" />
+        <listheader label="${labels.survey.sampling_point_data.x}"
         	sort="auto(x)" />
-        <listheader label="${labels.survey.samplingPointData.y}"
+        <listheader label="${labels.survey.sampling_point_data.y}"
         	sort="auto(y)" />
-        <listheader label="${labels.survey.samplingPointData.srs}"
+        <listheader label="${labels.survey.sampling_point_data.srs}"
         	sort="auto(srsId)" />
       </listhead>
       <template name="model">
@@ -31,5 +30,25 @@
         </listitem>
       </template>
     </listbox>
+    
+    <box  
+		align="center" 
+		width="100%">
+    	<hbox spacing="100px"> 
+			<button
+				label="${labels.global.import_data}"
+				onClick="@command('openImportPopUp')" />
+			<combobutton label="${labels.global.export_data}" 
+				onClick="@command('exportToExcel')">
+				<menupopup>
+					<menuitem label="${labels.global.export_to_excel}"
+						onClick="@command('exportToExcel')" />
+					<menuitem label="${labels.global.export_to_csv}"
+						onClick="@command('exportToCsv')" />
+				</menupopup>
+			</combobutton>
+		</hbox>
+    </box>
 </vlayout>
+
 </zk>

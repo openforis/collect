@@ -5,6 +5,6 @@
 		type="javax.sql.DataSource"
 		global="jdbc/collectDs" />
 
-	<Parameter name="devMode" value="false" />
+	<Parameter name="devMode" value="true" />
 
 </Context>

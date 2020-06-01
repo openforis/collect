@@ -73,11 +73,7 @@
 									visible="@load(not empty vm.surveyId)" />
 							</tabpanel>
 							<tabpanel visible="@load(not vm.collectEarthSurvey)">
-								<label
-									value="${labels.survey.sampling_design_import.save_survey_before}"
-									visible="@load(empty vm.surveyId)" />
 								<include id="samplingPointDataInclude"
-									visible="@load(not empty vm.surveyId)"
 									src="survey_edit/sampling_point_data/sampling_point_data.zul" />
 							</tabpanel>
 							<tabpanel>

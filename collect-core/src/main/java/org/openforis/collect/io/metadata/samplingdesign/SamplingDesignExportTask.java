@@ -1,17 +1,22 @@
 package org.openforis.collect.io.metadata.samplingdesign;
 
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
+import org.openforis.commons.io.excel.ExcelFlatValuesWriter;
+import org.openforis.commons.io.flat.FlatDataWriter;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.ReferenceDataSchema;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
@@ -34,7 +39,12 @@ public class SamplingDesignExportTask extends Task {
 	//parameters
 	private CollectSurvey survey;
 	private OutputStream outputStream;
+	private OutputFormat outputFormat = OutputFormat.CSV;
 
+	public enum OutputFormat {
+		CSV, EXCEL
+	}
+	
 	@Override
 	protected long countTotalItems() {
 		Integer surveyId = survey.getId();
@@ -47,18 +57,27 @@ public class SamplingDesignExportTask extends Task {
 		if ( getTotalItems() > 0 ) {
 			Integer surveyId = survey.getId();
 			
-			CsvWriter writer = new CsvWriter(outputStream, OpenForisIOUtils.UTF_8, ',', '"');
-			SamplingDesignSummaries summaries = samplingDesignManager.loadBySurvey(surveyId);
-					
-			ArrayList<String> colNames = getHeaders();
-			writer.writeHeaders(colNames);
-			
-			List<SamplingDesignItem> items = summaries.getRecords();
-			for (SamplingDesignItem item : items) {
-				writeSummary(writer, item);
-				incrementProcessedItems();
+			FlatDataWriter writer = null;
+			try {
+				if (outputFormat == OutputFormat.CSV) {
+					OutputStreamWriter osWriter = new OutputStreamWriter(outputStream, Charset.forName(OpenForisIOUtils.UTF_8));
+					writer = new CsvWriter(osWriter, ',', '"');
+				} else {
+					writer = new ExcelFlatValuesWriter(outputStream);
+				}
+				SamplingDesignSummaries summaries = samplingDesignManager.loadBySurvey(surveyId);
+						
+				ArrayList<String> colNames = getHeaders();
+				writer.writeHeaders(colNames);
+				
+				List<SamplingDesignItem> items = summaries.getRecords();
+				for (SamplingDesignItem item : items) {
+					writeSummary(writer, item);
+					incrementProcessedItems();
+				}
+			} finally {
+				IOUtils.closeQuietly(writer);
 			}
-			writer.flush();
 		}
 	}
 
@@ -88,7 +107,7 @@ public class SamplingDesignExportTask extends Task {
 		}
 	}
 
-	protected void writeSummary(CsvWriter writer, SamplingDesignItem item) {
+	protected void writeSummary(FlatDataWriter writer, SamplingDesignItem item) {
 		List<String> lineValues = new ArrayList<String>();
 		List<String> levelCodes = item.getLevelCodes();
 		SamplingDesignFileColumn[] levelColumns = SamplingDesignFileColumn.LEVEL_COLUMNS;
@@ -117,14 +136,6 @@ public class SamplingDesignExportTask extends Task {
 		this.samplingDesignManager = samplingDesignManager;
 	}
 	
-	public OutputStream getOutputStream() {
-		return outputStream;
-	}
-
-	public void setOutputStream(OutputStream outputStream) {
-		this.outputStream = outputStream;
-	}
-
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
@@ -133,4 +144,20 @@ public class SamplingDesignExportTask extends Task {
 		this.survey = survey;
 	}
 	
+	public OutputStream getOutputStream() {
+		return outputStream;
+	}
+
+	public void setOutputStream(OutputStream outputStream) {
+		this.outputStream = outputStream;
+	}
+	
+	public OutputFormat getOutputFormat() {
+		return outputFormat;
+	}
+	
+	public void setOutputFormat(OutputFormat outputFormat) {
+		this.outputFormat = outputFormat;
+	}
+
 }

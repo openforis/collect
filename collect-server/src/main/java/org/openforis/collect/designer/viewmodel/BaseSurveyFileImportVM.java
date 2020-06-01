@@ -1,7 +1,10 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Locale;
 
+import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.util.MediaUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.zkoss.bind.BindContext;
@@ -21,8 +24,10 @@ public abstract class BaseSurveyFileImportVM extends SurveyBaseVM {
 
 	protected File uploadedFile;
 	protected String uploadedFileName;
+	private String[] allowedFileExtensions;
 	
-	public BaseSurveyFileImportVM() {
+	public BaseSurveyFileImportVM(String[] allowedFileExtensions) {
+		this.allowedFileExtensions = allowedFileExtensions;
 		reset();
 	}
 	
@@ -50,7 +55,14 @@ public abstract class BaseSurveyFileImportVM extends SurveyBaseVM {
 		notifyChange("uploadedFileName");
 	}
 	
-	protected abstract void checkCanImportFile(Media media);
+	private void checkCanImportFile(Media media) {
+		String fileName = media.getName();
+		String extension = FilenameUtils.getExtension(fileName).toLowerCase(Locale.ENGLISH);
+		if (!Arrays.asList(allowedFileExtensions).contains(extension)) {
+			throw new RuntimeException(String.format("Only %s file upload is supported, found: %s", 
+					String.join(",", allowedFileExtensions), extension));
+		}
+	}
 
 	protected boolean validateForm(BindContext ctx) {
 		String messageKey = null;

@@ -7,7 +7,6 @@ import java.io.InputStream;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
 import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM;
@@ -23,7 +22,6 @@ import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -46,6 +44,10 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 	// temp
 	private Window jobStatusPopUp;
 
+	public CodeListImportVM() {
+		super(new String[] {Files.CSV_FILE_EXTENSION, Files.EXCEL_FILE_EXTENSION});
+	}
+	
 	@Init(superclass = false)
 	public void init(@ExecutionArgParam("codeListId") int codeListId) {
 		super.init();
@@ -56,17 +58,6 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
 		event.stopPropagation();
 		BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND, null);
-	}
-
-	@Override
-	protected void checkCanImportFile(Media media) {
-		String fileName = media.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if (!(Files.CSV_FILE_EXTENSION.equalsIgnoreCase(extension)
-				|| Files.EXCEL_FILE_EXTENSION.equalsIgnoreCase(extension))) {
-			throw new RuntimeException(
-					String.format("Only CSV or Excel file upload is supported, found: %s", extension));
-		}
 	}
 
 	@Command
