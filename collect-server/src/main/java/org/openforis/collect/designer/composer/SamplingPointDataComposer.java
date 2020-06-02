@@ -16,6 +16,7 @@ import org.openforis.idm.metamodel.ReferenceDataSchema;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
 import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
+import org.zkoss.bind.GlobalCommandEvent;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -73,7 +74,10 @@ public class SamplingPointDataComposer extends SelectorComposer<Component> {
 		// Refresh model on sampling point data update
 		EventQueues.lookup(SamplingPointDataVM.SAMPLING_POINT_DATA_QUEUE).subscribe(new EventListener<Event>() {
 			public void onEvent(Event event) throws Exception {
-				onSamplingPointDataUpdated();
+				if (event instanceof GlobalCommandEvent && SamplingPointDataVM.SAMPLING_POINT_DATA_UPDATED_COMMAND
+						.equals(((GlobalCommandEvent) event).getCommand())) {
+					onSamplingPointDataUpdated();
+				}
 			}
 		});
 	}

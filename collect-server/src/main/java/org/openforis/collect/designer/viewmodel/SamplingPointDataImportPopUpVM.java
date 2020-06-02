@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
 import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingPointDataImportJob;
@@ -59,11 +60,20 @@ public class SamplingPointDataImportPopUpVM extends BaseSurveyFileImportVM {
 
 	@Command
 	public void importSamplingPointData() {
-		SamplingPointDataImportJob job = jobManager.createJob(SamplingPointDataImportJob.class);
-		job.setSurvey(getSurvey());
-		job.setFile(uploadedFile);
-		jobManager.start(job);
+		MessageUtil.showConfirm(new ConfirmHandler() {
+			public void onOk() {
+				SamplingPointDataImportJob job = jobManager.createJob(SamplingPointDataImportJob.class);
+				job.setSurvey(getSurvey());
+				job.setFile(uploadedFile);
+				jobManager.start(job);
 
+				monitorImportJob(job);
+			}
+
+		}, "survey.sampling_point_data.import_data.confirm_import");
+	}
+
+	private void monitorImportJob(SamplingPointDataImportJob job) {
 		String messagePrefix = "survey.sampling_point_data.import_data.";
 		jobStatusPopUp = JobStatusPopUpVM.openPopUp(messagePrefix + "title", job, true,
 				new JobEndHandler<SamplingPointDataImportJob>() {
@@ -76,7 +86,7 @@ public class SamplingPointDataImportPopUpVM extends BaseSurveyFileImportVM {
 							// Survey has been updated: save it!
 							SurveyEditVM.dispatchSurveySaveCommand();
 
-							SamplingPointDataVM.notifySamplingPointDataUpdate();
+							SamplingPointDataVM.notifySamplingPointDataUpdated();
 							close(null);
 							break;
 						case FAILED:
@@ -89,5 +99,4 @@ public class SamplingPointDataImportPopUpVM extends BaseSurveyFileImportVM {
 					}
 				});
 	}
-
 }
