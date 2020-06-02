@@ -2,6 +2,8 @@ package org.openforis.collect.io.metadata.samplingdesign;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * 
  * @author S. Ricci
@@ -18,13 +20,16 @@ public enum SamplingDesignFileColumn {
 	public static final SamplingDesignFileColumn[] LOCATION_COLUMNS = {X, Y};
 	public static final SamplingDesignFileColumn[] REQUIRED_COLUMNS = {LEVEL_1, X, Y, SRS_ID};
 	public static final SamplingDesignFileColumn[] LEVEL_COLUMNS = {LEVEL_1, LEVEL_2, LEVEL_3};
+	public static final SamplingDesignFileColumn[] ALL_COLUMNS = ArrayUtils.addAll(LEVEL_COLUMNS, X, Y, SRS_ID);
 	
 	public static final String[] REQUIRED_COLUMN_NAMES;
 	public static final String[] LEVEL_COLUMN_NAMES;
+	public static final String[] ALL_COLUMN_NAMES;
 	
 	static {
 		REQUIRED_COLUMN_NAMES = getColumnNames(REQUIRED_COLUMNS);
 		LEVEL_COLUMN_NAMES = getColumnNames(LEVEL_COLUMNS);
+		ALL_COLUMN_NAMES = getColumnNames(ALL_COLUMNS);
 	}
 	
 	public static SamplingDesignFileColumn fromColumnName(String columnName) {

@@ -1,29 +1,23 @@
-<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
 <vlayout id="samplingPointDataContainer"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SamplingPointDataVM')"
-		validationMessages="@id('vmsgs')"
 		hflex="true" vflex="true">
-	<listbox id="samplingPointDataListBox" model="@load(vm.samplingPointItems)"
-      hflex="true" vflex="true">
-      <listhead children="@load(vm.columnNames)">
+	
+	<box apply="org.openforis.collect.designer.composer.SamplingPointDataComposer"
+		hflex="true" vflex="true" align="center">
+		<listbox id="samplingPointDataListBox" hflex="true" vflex="true">
+	      <listhead children="@load($composer.columnNames)">
 	  		<template name="children" var="col">
-	  			<listheader label="@load(vm.getColLabel(col))" />
+	  			<listheader label="@load($composer.getColLabel(col))" />
 	  		</template>
-      </listhead>
-      <template name="model" var="item">
-        <listitem children="@load(vm.columnNames)">
-    	  <template name="children" var="col">
-         	<listcell label="@load(vm.getColValue(col, item))" />
-          </template>
-        </listitem>
-      </template>
-    </listbox>
-    
-    <box  
-		align="center" 
-		width="100%">
+	      </listhead>
+	    </listbox>
+	    
+	    <paging id="paging" width="700px"/>
+	</box>
+	
+    <box align="center" width="100%">
     	<hbox spacing="100px"> 
 			<button
 				label="${labels.global.import_data}"

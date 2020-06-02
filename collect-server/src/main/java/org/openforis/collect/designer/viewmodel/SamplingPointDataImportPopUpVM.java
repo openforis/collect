@@ -13,7 +13,6 @@ import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
@@ -27,29 +26,29 @@ public class SamplingPointDataImportPopUpVM extends BaseSurveyFileImportVM {
 
 	// transient
 	private Window jobStatusPopUp;
-	
+
 	public SamplingPointDataImportPopUpVM() {
-		super(new String[] {Files.CSV_FILE_EXTENSION, Files.EXCEL_FILE_EXTENSION});
+		super(new String[] { Files.CSV_FILE_EXTENSION, Files.EXCEL_FILE_EXTENSION });
 	}
-	
-	@Init(superclass=false)
+
+	@Init(superclass = false)
 	public void init() {
 		super.init();
 	}
-	
+
 	@Command
 	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
 		if (event != null) {
 			event.stopPropagation();
 		}
-		BindUtils.postGlobalCommand(null, null, SamplingPointDataVM.CLOSE_DATA_IMPORT_POP_UP_COMMAND, null);
+		SamplingPointDataVM.dispatchSamplingPointDataImportPopUpCloseCommand();
 	}
-	
+
 	public String getAvailableSrsIds() {
 		List<SpatialReferenceSystem> spatialReferenceSystems = getSurvey().getSpatialReferenceSystems();
 		return String.join(", ", CollectionUtils.project(spatialReferenceSystems, "id"));
 	}
-	
+
 	@Command
 	public void downloadExample() {
 		ServletContext context = getSession().getWebApp().getServletContext();
@@ -64,7 +63,7 @@ public class SamplingPointDataImportPopUpVM extends BaseSurveyFileImportVM {
 		job.setSurvey(getSurvey());
 		job.setFile(uploadedFile);
 		jobManager.start(job);
-		
+
 		String messagePrefix = "survey.sampling_point_data.import_data.";
 		jobStatusPopUp = JobStatusPopUpVM.openPopUp(messagePrefix + "title", job, true,
 				new JobEndHandler<SamplingPointDataImportJob>() {
@@ -76,6 +75,8 @@ public class SamplingPointDataImportPopUpVM extends BaseSurveyFileImportVM {
 							MessageUtil.showInfo(messagePrefix + "completed");
 							// Survey has been updated: save it!
 							SurveyEditVM.dispatchSurveySaveCommand();
+
+							SamplingPointDataVM.notifySamplingPointDataUpdate();
 							close(null);
 							break;
 						case FAILED:
