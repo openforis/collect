@@ -13,14 +13,35 @@
 		hflex="true" vflex="true" align="center"
 		visible="@load(not vm.samplingPointDataEmpty)">
 		<listbox id="samplingPointDataListBox" hflex="true" vflex="true">
-	      <listhead children="@load($composer.columnNames)">
-	  		<template name="children" var="col">
-	  			<listheader label="@load($composer.getColLabel(col))" />
+	      <listhead children="@load(vm.attributes) @template(each.editingStatus ? 'editable' : 'noneditable')">
+	  		<template name="editable">
+	  			<listheader width="200px">
+	  				<textbox inplace="true" width="115px" 
+	                	value="@load(each.name) @save(each.name, before='confirmAttributeUpdate')" />
+                    <button
+                        sclass="icon" height="16px"
+                    	image="/assets/images/tick-small.png"
+                        onClick="@command('confirmAttributeUpdate', attribute=each)" />
+                    <button
+                        sclass="icon" height="16px"
+                    	image="/assets/images/cross-small.png"
+                        onClick="@command('changeAttributeEditableStatus', attribute=each)" />
+	  			</listheader>
 	  		</template>
+	  		 <template name="noneditable" width="100px">
+            	<listheader width="120px">
+                    <label value="@load(each.name)" width="70px" />
+                    <button
+                    	visible="@load(each.editable)"
+                        sclass="icon" height="16px"
+                    	image="/assets/images/pencil-small.png"
+                        onClick="@command('changeAttributeEditableStatus', attribute=each)" />
+                </listheader>
+            </template>
 	      </listhead>
 	    </listbox>
 	    
-	    <paging id="paging" width="700px"/>
+	    <paging id="paging" hflex="true" />
 	</vbox>
 	
     <box align="center" hflex="true">

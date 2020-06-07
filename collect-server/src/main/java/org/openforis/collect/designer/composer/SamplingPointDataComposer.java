@@ -2,7 +2,6 @@ package org.openforis.collect.designer.composer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.openforis.collect.designer.viewmodel.SamplingPointDataPagingListModel;
@@ -12,10 +11,6 @@ import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
-import org.openforis.idm.metamodel.ReferenceDataSchema;
-import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
-import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
-import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.zkoss.bind.GlobalCommandEvent;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
@@ -90,13 +85,10 @@ public class SamplingPointDataComposer extends SelectorComposer<Component> {
 
 	public List<String> getColumnNames() {
 		ArrayList<String> colNames = new ArrayList<String>();
-
 		colNames.addAll(Arrays.asList(SamplingDesignFileColumn.ALL_COLUMN_NAMES));
-
-		// Info columns
-		for (ReferenceDataDefinition.Attribute attribute : getInfoAttributes()) {
-			colNames.add(attribute.getName());
-		}
+		List<String> infoAttributeNames = getSurvey().getReferenceDataSchema().getSamplingPointDefinition()
+				.getAttributeNames();
+		colNames.addAll(infoAttributeNames);
 		return colNames;
 	}
 
@@ -160,13 +152,6 @@ public class SamplingPointDataComposer extends SelectorComposer<Component> {
 
 	private CollectSurvey getSurvey() {
 		return sessionManager.getActiveDesignerSurvey();
-	}
-
-	private List<Attribute> getInfoAttributes() {
-		ReferenceDataSchema referenceDataSchema = getSurvey().getReferenceDataSchema();
-		SamplingPointDefinition samplingPointDefinition = referenceDataSchema == null ? null
-				: referenceDataSchema.getSamplingPointDefinition();
-		return samplingPointDefinition == null ? Collections.emptyList() : samplingPointDefinition.getAttributes();
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
 import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM;
@@ -30,6 +31,10 @@ public class SamplingPointDataImportPopUpVM extends BaseSurveyFileImportVM {
 
 	public SamplingPointDataImportPopUpVM() {
 		super(new String[] { Files.CSV_FILE_EXTENSION, Files.EXCEL_FILE_EXTENSION });
+	}
+
+	public static Window openPopUp() {
+		return openPopUp(Resources.Component.SAMPLING_POINT_DATA_IMPORT_POPUP.getLocation(), true);
 	}
 
 	@Init(superclass = false)
