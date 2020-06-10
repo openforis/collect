@@ -20,7 +20,7 @@ In order to create your own sampling design for this project you need to follow 
 
 1. Using Quantum GIS or Google Earth Engine to generate the sampling design ( the grid of plots ) that you want to assess. 
    Follow this manual if you want to use  QGis : http://www.openforis.org/tools/collect-earth/tutorials/qgis.html
-   Links Google Earth Engine scrits (you will need to be a Google Trusted Tester) :
+   Links Google Earth Engine scripts (you will need to be a Google Trusted Tester) :
    		- Systematic sampling design on a polygon : https://ee-api.appspot.com/806951f46d102f7b77cb54b9ab79a821 
    		- Random sampling design : https://ee-api.appspot.com/b255dbc07dcdc59ebd99f8a364aadda3  
    		- Example for Spain provinces : https://ee-api.appspot.com/806951f46d102f7b77cb54b9ab79a821
