@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.26.12] - 2020-06-10
+### Fixed
+- Fixed error when exporting to CEP in case there is ancillary data shown in the headers.
+
 ## [3.26.11] - 2020-05-29
 ### Fixed
 - Code attribute (text): allow inserting codes containing "-" character.
@@ -75,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.24.34] - 2019-12-04
 ### Added
-- Support filter by summary attributes in Collect Earth data export 
+- Support filter by summary attributes in Collect Earth data export
 
 ## [3.24.33] - 2019-11-29
 ### Fixed
@@ -110,7 +114,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.24.27] - 2019-10-22
 ### Fixed
-- Include all "enumerable" entities in CSV export when selecting "Include enumerated entities" option 
+- Include all "enumerable" entities in CSV export when selecting "Include enumerated entities" option
 
 ## [3.24.26] - 2019-10-04
 ### Added
