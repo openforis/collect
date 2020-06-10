@@ -128,7 +128,7 @@ public class CEComponentHTMLFormatter {
 		boolean firstChild = true;
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
-				informationFieldsBuilder.e("span" ).t( child.getLabelOrName() + ": $["+  CollectEarthBalloonGenerator.EXTRA_HIDDEN_PREFIX + child.getName()+ "]" ).e("br" );
+				informationFieldsBuilder.e("span" ).t( (firstChild?" ":", ") + child.getLabelOrName() + ": $["+  CollectEarthBalloonGenerator.EXTRA_HIDDEN_PREFIX + child.getName()+ "]" );
 				firstChild = false;
 			} else {
 				throw new IllegalArgumentException("Only attribute fields supported inside single entity"); //$NON-NLS-1$
