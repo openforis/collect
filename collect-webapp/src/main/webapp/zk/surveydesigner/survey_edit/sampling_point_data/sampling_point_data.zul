@@ -28,7 +28,7 @@
                         onClick="@command('changeAttributeEditableStatus', attribute=each)" />
 	  			</listheader>
 	  		</template>
-	  		 <template name="noneditable" width="100px">
+	  		 <template name="noneditable">
             	<listheader width="120px">
                     <label value="@load(each.name)" width="70px" />
                     <button

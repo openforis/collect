@@ -5,16 +5,15 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.designer.form.EditableFormObject;
+import org.openforis.collect.designer.form.AttributeFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
+import org.openforis.collect.io.metadata.ReferenceDataExportOutputFormat;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportJob;
-import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask.OutputFormat;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignFileColumn;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.MediaTypes;
-import org.openforis.collect.utils.SurveyObjects;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
 import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.openforis.idm.metamodel.Survey;
@@ -43,22 +42,22 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 	@WireVariable
 	private SamplingDesignManager samplingDesignManager;
 
-	private ListModelList<AttributeForm> attributes;
+	private ListModelList<AttributeFormObject> attributes;
 
 	@Init(superclass = false)
 	public void init() {
 		super.init();
 	}
 
-	public List<AttributeForm> getAttributes() {
+	public List<AttributeFormObject> getAttributes() {
 		if (attributes == null) {
 			attributes = new ListModelList<>();
 			for (String colName : SamplingDesignFileColumn.ALL_COLUMN_NAMES) {
-				attributes.add(new AttributeForm(false, attributes.getSize(), colName));
+				attributes.add(new AttributeFormObject(false, attributes.getSize(), colName));
 			}
 			List<String> infoAttributeNames = getSamplingPointDefinition().getAttributeNames();
 			for (String infoAttributeName : infoAttributeNames) {
-				attributes.add(new AttributeForm(true, attributes.getSize(), infoAttributeName));
+				attributes.add(new AttributeFormObject(true, attributes.getSize(), infoAttributeName));
 			}
 		}
 		return attributes;
@@ -86,12 +85,12 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 
 	@Command
 	public void exportToCsv() throws IOException {
-		export(OutputFormat.CSV);
+		export(ReferenceDataExportOutputFormat.CSV);
 	}
 
 	@Command
 	public void exportToExcel() throws IOException {
-		export(OutputFormat.EXCEL);
+		export(ReferenceDataExportOutputFormat.EXCEL);
 	}
 
 	@Command
@@ -104,22 +103,22 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 		}, "survey.sampling_point_data.confirm_delete_all_items");
 	}
 
-	private void export(OutputFormat outputFormat) throws IOException {
+	private void export(ReferenceDataExportOutputFormat outputFormat) throws IOException {
 		SamplingDesignExportJob job = jobManager.createJob(SamplingDesignExportJob.class);
 		job.setSurvey(getSurvey());
 		job.setOutputFormat(outputFormat);
 		jobManager.start(job, false);
 
-		String mediaType = outputFormat == OutputFormat.CSV ? MediaTypes.CSV_CONTENT_TYPE
+		String mediaType = outputFormat == ReferenceDataExportOutputFormat.CSV ? MediaTypes.CSV_CONTENT_TYPE
 				: MediaTypes.XLSX_CONTENT_TYPE;
-		String extension = outputFormat == OutputFormat.CSV ? "csv" : "xlsx";
+		String extension = outputFormat.getFileExtesion();
 		String fileName = String.format("%s_sampling_point_data_%s.%s", getSurvey().getName(), Dates.formatCompactNow(),
 				extension);
 		Filedownload.save(new FileInputStream(job.getOutputFile()), mediaType, fileName);
 	}
 
 	@Command
-	public void confirmAttributeUpdate(@BindingParam("attribute") AttributeForm attribute) {
+	public void confirmAttributeUpdate(@BindingParam("attribute") AttributeFormObject attribute) {
 		if (validateAttribute(attribute)) {
 			changeAttributeEditableStatus(attribute);
 			int infoAttributeIndex = attribute.getIndex() - SamplingDesignFileColumn.ALL_COLUMNS.length;
@@ -129,12 +128,12 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void changeAttributeEditableStatus(@BindingParam("attribute") AttributeForm attribute) {
+	public void changeAttributeEditableStatus(@BindingParam("attribute") AttributeFormObject attribute) {
 		attribute.setEditingStatus(!attribute.getEditingStatus());
 		refreshAttributeColumnTemplate(attribute);
 	}
 
-	private boolean validateAttribute(AttributeForm attribute) {
+	private boolean validateAttribute(AttributeFormObject attribute) {
 		String name = attribute.getName();
 		String error = null;
 		if (StringUtils.isBlank(name)) {
@@ -144,8 +143,8 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 		} else {
 			// validate name uniqueness
 			for (int index = 0; index < attributes.size(); index++) {
-				AttributeForm attributeForm = attributes.get(index);
-				if (name.equals(attributeForm.getName()) && attribute.getIndex() != index) {
+				AttributeFormObject attributeFormObject = attributes.get(index);
+				if (name.equals(attributeFormObject.getName()) && attribute.getIndex() != index) {
 					error = ERROR_ATTRIBUTE_NAME_DUPLICATE;
 					break;
 				}
@@ -163,7 +162,7 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 		return getSurvey().getReferenceDataSchema().getSamplingPointDefinition();
 	}
 
-	private void refreshAttributeColumnTemplate(AttributeForm attribute) {
+	private void refreshAttributeColumnTemplate(AttributeFormObject attribute) {
 		// replace the element in the collection by itself to trigger a model update
 		int index = attributes.indexOf(attribute);
 		attributes.set(index, attribute);
@@ -178,74 +177,6 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 
 	public static void dispatchSamplingPointDataImportPopUpCloseCommand() {
 		BindUtils.postGlobalCommand(null, null, CLOSE_SAMPLING_POINT_DATA_IMPORT_POPUP_COMMAND, null);
-	}
-
-	public static class AttributeForm extends EditableFormObject<Attribute> {
-
-		private String name;
-		private int index;
-
-		public AttributeForm(boolean editable, int index, String name) {
-			super(editable);
-			this.index = index;
-			this.name = name;
-		}
-
-		@Override
-		public void loadFrom(Attribute source, String language) {
-			super.loadFrom(source, language);
-			name = source.getName();
-		}
-
-		@Override
-		public void saveTo(Attribute dest, String language) {
-			super.saveTo(dest, language);
-			dest.setName(name);
-		}
-
-		@Override
-		protected void reset() {
-			super.reset();
-			name = null;
-		}
-
-		public int getIndex() {
-			return index;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = SurveyObjects.adjustInternalName(name);
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + ((name == null) ? 0 : name.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!super.equals(obj))
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			AttributeForm other = (AttributeForm) obj;
-			if (name == null) {
-				if (other.name != null)
-					return false;
-			} else if (!name.equals(other.name))
-				return false;
-			return true;
-		}
-
 	}
 
 }

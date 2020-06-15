@@ -30,6 +30,7 @@ import org.openforis.commons.lang.Strings;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.NamedObject;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
@@ -382,7 +383,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 		CollectSurvey survey = getSurvey();
 		boolean includeSamplingDesignList = survey.getTarget() != SurveyTarget.COLLECT_EARTH;
 		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists(includeSamplingDesignList));
-		result = sort(result);
+		result = sortByName(result);
 		return new BindingListModelList<CodeList>(result, false);
 	}
 	
@@ -440,12 +441,12 @@ public abstract class SurveyBaseVM extends BaseVM {
 		void onCancel();
 	}
 	
-	protected List<CodeList> sort(List<CodeList> codeLists) {
-		List<CodeList> result = new ArrayList<CodeList>(codeLists);
-		Collections.sort(result, new Comparator<CodeList>() {
+	protected <T extends NamedObject> List<T> sortByName(List<T> items) {
+		List<T> result = new ArrayList<T>(items);
+		Collections.sort(result, new Comparator<T>() {
 			@Override 
-	        public int compare(CodeList c1, CodeList c2) {
-	            return c1.getName().compareTo(c2.getName());
+	        public int compare(T item2, T item1) {
+	            return item2.getName().compareTo(item1.getName());
 	        }
 		});
 		return result;

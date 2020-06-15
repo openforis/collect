@@ -128,23 +128,22 @@ public class SpeciesManager {
 	}
 	
 	public TaxonSummaries loadFullTaxonSummariesOld(CollectTaxonomy taxonomy) {
+		return loadFullTaxonSummaries(taxonomy, TaxonRank.GENUS, false);
+	}
+	
+	public TaxonSummaries loadFullTaxonSummaries(CollectTaxonomy taxonomy) {
+		return loadFullTaxonSummaries(taxonomy, TaxonRank.FAMILY, true);
+	}
+
+	private TaxonSummaries loadFullTaxonSummaries(CollectTaxonomy taxonomy, TaxonRank startFromRank, boolean includeGeneratedItems) {
 		TaxonTree tree = loadTaxonTree(taxonomy);
-		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.GENUS, false);
+		List<TaxonSummary> summaries = tree.toSummaries(startFromRank, includeGeneratedItems);
 		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
 		Collections.sort(sortedVernacularNamesLanguageCodes);
 		List<String> infoAttributeNames = taxonomy.getSurvey().getReferenceDataSchema().getTaxonomyDefinition(taxonomy.getName()).getAttributeNames();
 		return new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes, infoAttributeNames);
 	}
 	
-	public TaxonSummaries loadFullTaxonSummaries(CollectTaxonomy taxonomy) {
-		TaxonTree tree = loadTaxonTree(taxonomy);
-		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.FAMILY, true);
-		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
-		Collections.sort(sortedVernacularNamesLanguageCodes);
-		List<String> infoAttributeNames = taxonomy.getSurvey().getReferenceDataSchema().getTaxonomyDefinition(taxonomy.getName()).getAttributeNames();
-		return new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes, infoAttributeNames);
-	}
-
 	public TaxonSummaries loadTaxonSummaries(CollectSurvey survey, int taxonomyId) {
 		return loadTaxonSummaries(survey, taxonomyId, 0, Integer.MAX_VALUE);
 	}
@@ -176,6 +175,10 @@ public class SpeciesManager {
 		TaxonTree taxonTree = loadTaxonTree(taxonomy);
 		Node node = taxonTree.getNodeByCode(code);
 		return node == null ? null : node.getTaxon();
+	}
+	
+	public List<String> loadTaxaVernacularLangCodes(int taxonomyId) {
+		return taxonVernacularNameDao.loadVernacularLangCodes(taxonomyId);
 	}
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
