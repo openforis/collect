@@ -252,9 +252,11 @@
       						<hbox spacing="100px">
 	       						<button
 	       							label="${labels.global.import_data}"
-	       							visible="@load(not vm.newItem and empty vm.editedItem.lookupTable)"
+	       							image="/assets/images/upload-small.png"
+									visible="@load(not vm.newItem and empty vm.editedItem.lookupTable)"
 	       							onClick="@command('openCodeListImportPopUp')" />
 								<combobutton label="${labels.global.export_data}" 
+									image="/assets/images/excel-small.png"
 									visible="@load(not vm.newItem and empty vm.editedItem.lookupTable)"
 									onClick="@command('exportCodeListToExcel')">
 									<menupopup>

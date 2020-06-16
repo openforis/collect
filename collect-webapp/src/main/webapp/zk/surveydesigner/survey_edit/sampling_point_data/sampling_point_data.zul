@@ -48,9 +48,11 @@
     	<hbox spacing="100px"> 
 			<button
 				label="${labels.global.import_data}"
+				image="/assets/images/upload-small.png"
 				onClick="@command('openImportPopUp')" />
 			<combobutton 
-				label="${labels.global.export_data}" 
+				label="${labels.global.export_data}"
+				image="/assets/images/excel-small.png"
 				onClick="@command('exportToExcel')"
 				visible="@load(not vm.samplingPointDataEmpty)">
 				<menupopup>
@@ -62,6 +64,7 @@
 			</combobutton>
 			<button
 				label="${labels.survey.sampling_point_data.delete_all_items}"
+				image="/assets/images/trash-small.png"
 				onClick="@command('deleteAllItems')"
 				visible="@load(not vm.samplingPointDataEmpty)" />			
 		</hbox>

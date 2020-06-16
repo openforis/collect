@@ -38,7 +38,7 @@
 						</listbox>
 						<menubar>
 							<menuitem sclass="icon-button with-label"
-								label="${labels.survey.taxonomy.add_taxonomy}"
+								label="${labels.survey.taxonomy.add_item}"
 								image="/assets/images/add.png" onClick="@command('newItem')"
 								width="70px" />
 							<menuitem sclass="icon-button"
@@ -55,13 +55,13 @@
 			<absolutelayout hflex="true" vflex="true">
 				<absolutechildren hflex="true" vflex="true">
 					<box pack="center" align="center" hflex="1"
-						vflex="1"  visible="@load(not(vm.editingItem))">
+						vflex="1" visible="@load(not(vm.editingItem))">
 						<label
 							value="${labels.global.item.select_or_create_new_one}" />
 					</box>
 				</absolutechildren>
 				<absolutechildren hflex="true" vflex="true">
-					<vlayout visible="@load(vm.editingItem)"
+					<vbox visible="@load(vm.editingItem)"
 						hflex="true" vflex="true">
 						<grid id="formContainer" sclass="form compact"
 							validationMessages="@id('vmsgs')"
@@ -94,7 +94,7 @@
 							<label
 								value="${labels.survey.taxonomy.empty_taxa}" />
 						</box>
-						<vbox hflex="true" vflex="true"
+						<vbox hflex="true" vflex="true" align="center"
 							visible="@load(vm.taxaTotal gt 0)">
 							<listbox id="taxaListBox"
 								model="@load(vm.taxa)" hflex="true" vflex="true">
@@ -138,14 +138,16 @@
 								pageSize="@load(vm.taxaPageSize)"
 								onPaging="@command(vm.updateTaxaPaging(event.activePage))" />
 						</vbox>
-						<box align="center" width="100%">
+						<box align="center" hflex="true" height="30px">
 							<hbox spacing="100px">
 								<button
 									label="${labels.global.import_data}"
+									image="/assets/images/upload-small.png"
 									visible="@load(not vm.newItem)"
 									onClick="@command('openImportPopUp')" />
 								<combobutton
 									label="${labels.global.export_data}"
+									image="/assets/images/excel-small.png"
 									visible="@load(not vm.newItem)"
 									onClick="@command('exportToExcel')">
 									<menupopup>
@@ -159,7 +161,7 @@
 								</combobutton>
 							</hbox>
 						</box>
-					</vlayout>
+					</vbox>
 				</absolutechildren>
 			</absolutelayout>
 		</center>
