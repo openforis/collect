@@ -45,7 +45,7 @@ public class ReferenceDataSchema {
 	}
 	
 	public void updateTaxonomyDefinitionName(String oldName, String newName) {
-		TaxonomyDefinition taxonomyDefinition = taxonomyDefinitionByName.get(oldName);
+		TaxonomyDefinition taxonomyDefinition = getTaxonomyDefinition(oldName);
 		taxonomyDefinitionByName.remove(oldName);
 		taxonomyDefinition.setTaxonomyName(newName);
 		taxonomyDefinitionByName.put(newName, taxonomyDefinition);

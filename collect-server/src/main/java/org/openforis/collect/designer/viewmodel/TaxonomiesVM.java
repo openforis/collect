@@ -29,6 +29,8 @@ import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.TaxonomyDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
@@ -56,7 +58,6 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	public static final String EDITING_ATTRIBUTE_PARAM = "editingAttribute";
 	public static final String SELECTED_TAXONOMY_PARAM = "selectedTaxonomy";
 	private static final String TAXONOMY_UPDATED_COMMAND = "taxonomyUpdated";
-	private static final String TAXONOMIES_UPDATED_COMMAND = "taxonomiesUpdated";
 	private static final String CLOSE_TAXONOMY_IMPORT_POP_UP_COMMAND = "closeTaxonomyImportPopUp";
 	private static final int TAXA_PAGE_SIZE = 30;
 
@@ -80,8 +81,8 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 		BindUtils.postGlobalCommand(null, null, TAXONOMY_UPDATED_COMMAND, args);
 	}
 
-	public static void dispatchTaxonomiesUpdatedCommand() {
-		BindUtils.postGlobalCommand(null, null, TAXONOMIES_UPDATED_COMMAND, null);
+	public static void dispatchCloseTaxonomyImportPopUpCommand() {
+		BindUtils.postGlobalCommand(null, null, CLOSE_TAXONOMY_IMPORT_POP_UP_COMMAND, null);
 	}
 
 	public TaxonomiesVM() {
@@ -111,31 +112,50 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	}
 
 	@Override
-	protected void deleteItemFromSurvey(CollectTaxonomy item) {
-		speciesManager.delete(item);
-		getSurvey().getReferenceDataSchema().removeTaxonomyDefinition(item.getName());
-		dispatchTaxonomiesUpdatedCommand();
-		SurveyEditVM.dispatchSurveySaveCommand();
-	}
-
-	@Override
 	protected FormObject<CollectTaxonomy> createFormObject() {
 		return new TaxonomyFormObject();
 	}
 
 	@Override
 	protected void moveSelectedItemInSurvey(int indexTo) {
+		// DO NOT ALLOW MOVE
 	}
 
 	@Override
 	protected CollectTaxonomy createItemInstance() {
-		return null;
+		CollectTaxonomy taxonomy = new CollectTaxonomy();
+		taxonomy.setSurvey(getSurvey());
+		return taxonomy;
 	}
 
 	@Override
 	protected void addNewItemToSurvey() {
+		ReferenceDataSchema referenceDataSchema = getSurvey().getReferenceDataSchema();
+		referenceDataSchema.addTaxonomyDefinition(new TaxonomyDefinition(editedItem.getName()));
+		speciesManager.save(editedItem);
+		dispatchTaxonomiesUpdatedCommand();
+		SurveyEditVM.dispatchSurveySaveCommand();
+	}
+	
+	@Override
+	protected void performNewItemCreation(Binder binder) {
+		super.performNewItemCreation(binder);
+		resetTaxa();
 	}
 
+	@Override
+	protected void deleteItemFromSurvey(CollectTaxonomy item) {
+		speciesManager.delete(item);
+		getSurvey().getReferenceDataSchema().removeTaxonomyDefinition(item.getName());
+		dispatchTaxonomiesUpdatedCommand();
+	}
+
+	@Override
+	protected void performDeleteItem(CollectTaxonomy item) {
+		super.performDeleteItem(item);
+		SurveyEditVM.dispatchSurveySaveCommand();
+	}
+	
 	@Override
 	protected void performItemSelection(CollectTaxonomy item) {
 		super.performItemSelection(item);
@@ -148,7 +168,7 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 				getSurvey().getReferenceDataSchema().getTaxonomyDefinition(item.getName()));
 		notifyChange("taxaAttributes");
 		taxaPage = 0;
-		reloadTaxa();
+		loadTaxa();
 	}
 
 	@Command
@@ -170,7 +190,7 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	}
 
 	protected List<TaxonAttributeDefinition> getReferences(CollectTaxonomy item) {
-		return survey.getSchema().getTaxonAttributeDefinitions(item.getName());
+		return getSurvey().getSchema().getTaxonAttributeDefinitions(item.getName());
 	}
 
 	@GlobalCommand
@@ -190,17 +210,19 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	@Override
 	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
 		String oldName = editedItem.getName();
-		List<TaxonAttributeDefinition> references = getReferences(editedItem);
+		List<TaxonAttributeDefinition> references = oldName == null ? null : getReferences(editedItem);
 		super.commitChanges(binder);
-		// update survey reference data
-		getSurvey().getReferenceDataSchema().updateTaxonomyDefinitionName(oldName, editedItem.getName());
-		// update selected taxonomy in survey schema node definitions
-		for (TaxonAttributeDefinition taxonAttributeDefinition : references) {
-			taxonAttributeDefinition.setTaxonomy(editedItem.getName());
+		if (oldName != null) {
+			// update survey reference data
+			getSurvey().getReferenceDataSchema().updateTaxonomyDefinitionName(oldName, editedItem.getName());
+			// update selected taxonomy in survey schema node definitions
+			for (TaxonAttributeDefinition taxonAttributeDefinition : references) {
+				taxonAttributeDefinition.setTaxonomy(editedItem.getName());
+			}
 		}
 		speciesManager.save(editedItem);
-		SurveyEditVM.dispatchSurveySaveCommand();
 		dispatchTaxonomiesUpdatedCommand();
+		SurveyEditVM.dispatchSurveySaveCommand();
 	}
 
 	@Command
@@ -241,10 +263,6 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	public void closeTaxonomyImportPopUp() {
 		closePopUp(taxonomyImportPopUp);
 		taxonomyImportPopUp = null;
-	}
-
-	public static void dispatchCloseTaxonomyImportPopUpCommand() {
-		BindUtils.postGlobalCommand(null, null, CLOSE_TAXONOMY_IMPORT_POP_UP_COMMAND, null);
 	}
 
 	@GlobalCommand
@@ -318,11 +336,11 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	}
 
 	public List<TaxonSummary> getTaxa() {
-		return isEditingItem() ? taxonSummaries.getItems() : null;
+		return isEditingItem() && taxonSummaries != null ? taxonSummaries.getItems() : null;
 	}
 
 	public int getTaxaTotal() {
-		return isEditingItem() ? taxonSummaries.getTotalCount() : 0;
+		return isEditingItem() && taxonSummaries != null ? taxonSummaries.getTotalCount() : 0;
 	}
 
 	public int getTaxaPage() {
@@ -350,10 +368,16 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	@Command
 	public void updateTaxaPaging(int newPageIndex) {
 		this.taxaPage = newPageIndex;
-		reloadTaxa();
+		loadTaxa();
 	}
 
-	private void reloadTaxa() {
+	private void resetTaxa() {
+		this.taxaPage = 0;
+		this.taxonSummaries = null;
+		notifyChange("taxa", "taxaTotal", "taxaPage");
+	}
+	
+	private void loadTaxa() {
 		taxonSummaries = speciesManager.loadTaxonSummaries(getSurvey(), editedItem.getId(), taxaPage * TAXA_PAGE_SIZE,
 				TAXA_PAGE_SIZE);
 		notifyChange("taxa", "taxaTotal", "taxaPage");

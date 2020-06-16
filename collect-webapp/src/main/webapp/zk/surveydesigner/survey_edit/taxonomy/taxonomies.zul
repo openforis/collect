@@ -55,7 +55,7 @@
 			<absolutelayout hflex="true" vflex="true">
 				<absolutechildren hflex="true" vflex="true">
 					<box pack="center" align="center" hflex="1"
-						vflex="1">
+						vflex="1"  visible="@load(not(vm.editingItem))">
 						<label
 							value="${labels.global.item.select_or_create_new_one}" />
 					</box>
@@ -89,47 +89,55 @@
 								</row>
 							</rows>
 						</grid>
-						<listbox id="taxaListBox" model="@load(vm.taxa)"
-							hflex="true" vflex="true">
-							<listhead
-								children="@load(vm.taxaAttributes) @template(each.editingStatus ? 'editing' : 'nonediting')">
-								<template name="editing">
-									<listheader width="200px">
-										<textbox inplace="true"
-											width="115px"
-											value="@load(each.name) @save(each.name, before='confirmAttributeUpdate')" />
-										<button sclass="icon"
-											height="16px" image="/assets/images/tick-small.png"
-											onClick="@command('confirmAttributeUpdate', attribute=each)" />
-										<button sclass="icon"
-											height="16px" image="/assets/images/cross-small.png"
-											onClick="@command('changeAttributeEditableStatus', attribute=each)" />
-									</listheader>
+						<box hflex="true" vflex="true" pack="center"
+							align="center" visible="@load(vm.taxaTotal eq 0)">
+							<label
+								value="${labels.survey.taxonomy.empty_taxa}" />
+						</box>
+						<vbox hflex="true" vflex="true"
+							visible="@load(vm.taxaTotal gt 0)">
+							<listbox id="taxaListBox"
+								model="@load(vm.taxa)" hflex="true" vflex="true">
+								<listhead
+									children="@load(vm.taxaAttributes) @template(each.editingStatus ? 'editing' : 'nonediting')">
+									<template name="editing">
+										<listheader width="200px">
+											<textbox inplace="true"
+												width="115px"
+												value="@load(each.name) @save(each.name, before='confirmAttributeUpdate')" />
+											<button sclass="icon"
+												height="16px" image="/assets/images/tick-small.png"
+												onClick="@command('confirmAttributeUpdate', attribute=each)" />
+											<button sclass="icon"
+												height="16px" image="/assets/images/cross-small.png"
+												onClick="@command('changeAttributeEditableStatus', attribute=each)" />
+										</listheader>
+									</template>
+									<template name="nonediting">
+										<listheader width="120px">
+											<label
+												value="@load(vm.getTaxaAttributeLabel(each))" width="70px" />
+											<button
+												visible="@load(each.editable)" sclass="icon" height="16px"
+												image="/assets/images/pencil-small.png"
+												onClick="@command('changeAttributeEditableStatus', attribute=each)" />
+										</listheader>
+									</template>
+								</listhead>
+								<template name="model" var="taxon">
+									<listitem>
+										<listcell
+											forEach="${vm.taxaAttributes}"
+											label="${vm.getTaxonAttribute(taxon, each.name)}" />
+									</listitem>
 								</template>
-								<template name="nonediting">
-									<listheader width="120px">
-										<label
-											value="@load(vm.getTaxaAttributeLabel(each))" width="70px" />
-										<button
-											visible="@load(each.editable)" sclass="icon" height="16px"
-											image="/assets/images/pencil-small.png"
-											onClick="@command('changeAttributeEditableStatus', attribute=each)" />
-									</listheader>
-								</template>
-							</listhead>
-							<template name="model" var="taxon">
-								<listitem>
-									<listcell
-										forEach="${vm.taxaAttributes}"
-										label="${vm.getTaxonAttribute(taxon, each.name)}" />
-								</listitem>
-							</template>
-						</listbox>
+							</listbox>
 
-						<paging id="taxaPaging" hflex="true"
-							activePage="@load(vm.taxaPage)" totalSize="@load(vm.taxaTotal)"
-							pageSize="@load(vm.taxaPageSize)" onPaging="@command(vm.updateTaxaPaging(event.activePage))" />
-
+							<paging id="taxaPaging" hflex="true"
+								activePage="@load(vm.taxaPage)" totalSize="@load(vm.taxaTotal)"
+								pageSize="@load(vm.taxaPageSize)"
+								onPaging="@command(vm.updateTaxaPaging(event.activePage))" />
+						</vbox>
 						<box align="center" width="100%">
 							<hbox spacing="100px">
 								<button
