@@ -16,7 +16,6 @@ import org.openforis.collect.designer.form.AttributeFormObject;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.TaxonomyFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.io.metadata.ReferenceDataExportOutputFormat;
 import org.openforis.collect.io.metadata.species.SpeciesExportJob;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
@@ -30,7 +29,6 @@ import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.MediaTypes;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
-import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
@@ -46,7 +44,6 @@ import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
-import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
 /**
@@ -58,8 +55,9 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 
 	public static final String EDITING_ATTRIBUTE_PARAM = "editingAttribute";
 	public static final String SELECTED_TAXONOMY_PARAM = "selectedTaxonomy";
+	private static final String TAXONOMY_UPDATED_COMMAND = "taxonomyUpdated";
 	private static final String TAXONOMIES_UPDATED_COMMAND = "taxonomiesUpdated";
-	public static final String CLOSE_TAXONOMY_IMPORT_POP_UP_COMMAND = "closeTaxonomyImportPopUp";
+	private static final String CLOSE_TAXONOMY_IMPORT_POP_UP_COMMAND = "closeTaxonomyImportPopUp";
 	private static final int TAXA_PAGE_SIZE = 30;
 
 	@WireVariable
@@ -75,6 +73,12 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	private ReferenceDataAttributesEditor referenceDataAttributesEditor;
 	private int taxaPage;
 	private TaxonSummaries taxonSummaries;
+
+	public static void dispatchTaxonomyUpdatedCommand(int taxonomyId) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("taxonomyId", taxonomyId);
+		BindUtils.postGlobalCommand(null, null, TAXONOMY_UPDATED_COMMAND, args);
+	}
 
 	public static void dispatchTaxonomiesUpdatedCommand() {
 		BindUtils.postGlobalCommand(null, null, TAXONOMIES_UPDATED_COMMAND, null);
@@ -109,6 +113,7 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	@Override
 	protected void deleteItemFromSurvey(CollectTaxonomy item) {
 		speciesManager.delete(item);
+		getSurvey().getReferenceDataSchema().removeTaxonomyDefinition(item.getName());
 		dispatchTaxonomiesUpdatedCommand();
 		SurveyEditVM.dispatchSurveySaveCommand();
 	}
@@ -173,17 +178,34 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 		notifyChange("items");
 	}
 
+	@GlobalCommand
+	public void taxonomyUpdated(@BindingParam("taxonomyId") int taxonomyId) {
+		if (isEditingItem() && editedItem.getId() == taxonomyId) {
+			// refresh taxonomy information
+			performItemSelection(editedItem);
+		}
+		dispatchTaxonomiesUpdatedCommand();
+	}
+
 	@Override
 	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
+		String oldName = editedItem.getName();
+		List<TaxonAttributeDefinition> references = getReferences(editedItem);
 		super.commitChanges(binder);
+		// update survey reference data
+		getSurvey().getReferenceDataSchema().updateTaxonomyDefinitionName(oldName, editedItem.getName());
+		// update selected taxonomy in survey schema node definitions
+		for (TaxonAttributeDefinition taxonAttributeDefinition : references) {
+			taxonAttributeDefinition.setTaxonomy(editedItem.getName());
+		}
+		speciesManager.save(editedItem);
+		SurveyEditVM.dispatchSurveySaveCommand();
 		dispatchTaxonomiesUpdatedCommand();
 	}
 
 	@Command
 	public void openImportPopUp() {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("taxonomyId", editedItem.getId());
-		taxonomyImportPopUp = openPopUp(Resources.Component.TAXONOMY_IMPORT_POPUP.getLocation(), true, args);
+		taxonomyImportPopUp = TaxonomyImportPopUpVM.openPopUp(editedItem.getId());
 	}
 
 	@Command
@@ -219,6 +241,10 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	public void closeTaxonomyImportPopUp() {
 		closePopUp(taxonomyImportPopUp);
 		taxonomyImportPopUp = null;
+	}
+
+	public static void dispatchCloseTaxonomyImportPopUpCommand() {
+		BindUtils.postGlobalCommand(null, null, CLOSE_TAXONOMY_IMPORT_POP_UP_COMMAND, null);
 	}
 
 	@GlobalCommand
@@ -283,6 +309,14 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 		referenceDataAttributesEditor.changeAttributeEditableStatus(attribute);
 	}
 
+	@Command
+	@NotifyChange("taxaAttributes")
+	public void confirmAttributeUpdate(@BindingParam("attribute") AttributeFormObject attribute) {
+		if (referenceDataAttributesEditor.confirmAttributeUpdate(attribute)) {
+			dispatchSurveyChangedCommand();
+		}
+	}
+
 	public List<TaxonSummary> getTaxa() {
 		return isEditingItem() ? taxonSummaries.getItems() : null;
 	}
@@ -294,7 +328,7 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	public int getTaxaPage() {
 		return taxaPage;
 	}
-	
+
 	public int getTaxaPageSize() {
 		return TAXA_PAGE_SIZE;
 	}
@@ -323,45 +357,6 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 		taxonSummaries = speciesManager.loadTaxonSummaries(getSurvey(), editedItem.getId(), taxaPage * TAXA_PAGE_SIZE,
 				TAXA_PAGE_SIZE);
 		notifyChange("taxa", "taxaTotal", "taxaPage");
-	}
-
-	private static class ReferenceDataAttributesEditor {
-
-		private ReferenceDataDefinition referenceDataDefinition;
-		private List<String> fixedColumnNames;
-		private ListModelList<AttributeFormObject> attributes;
-
-		public ReferenceDataAttributesEditor(List<String> fixedColumnNames,
-				ReferenceDataDefinition referenceDataDefinition) {
-			this.fixedColumnNames = fixedColumnNames;
-			this.referenceDataDefinition = referenceDataDefinition;
-		}
-
-		public List<AttributeFormObject> getAttributes() {
-			if (attributes == null) {
-				attributes = new ListModelList<AttributeFormObject>();
-				for (String colName : fixedColumnNames) {
-					attributes.add(new AttributeFormObject(false, attributes.size(), colName));
-				}
-				List<String> infoAttributeNames = referenceDataDefinition.getAttributeNames();
-				for (String infoAttributeName : infoAttributeNames) {
-					attributes.add(new AttributeFormObject(true, attributes.size(), infoAttributeName));
-				}
-			}
-			return attributes;
-		}
-
-		public void changeAttributeEditableStatus(AttributeFormObject attribute) {
-			attribute.setEditingStatus(!attribute.getEditingStatus());
-			refreshAttributeColumnTemplate(attribute);
-		}
-
-		private void refreshAttributeColumnTemplate(AttributeFormObject attribute) {
-			// replace the element in the collection by itself to trigger a model update
-			int index = attributes.indexOf(attribute);
-			attributes.set(index, attribute);
-		}
-
 	}
 
 }

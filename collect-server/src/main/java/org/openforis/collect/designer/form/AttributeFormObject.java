@@ -48,6 +48,7 @@ public class AttributeFormObject extends EditableFormObject<Attribute> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
+		result = prime * result + index;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -61,6 +62,8 @@ public class AttributeFormObject extends EditableFormObject<Attribute> {
 		if (getClass() != obj.getClass())
 			return false;
 		AttributeFormObject other = (AttributeFormObject) obj;
+		if (index != other.index)
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;

@@ -75,7 +75,7 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 	
 	public static class SpeciesCSVLineParser extends CSVReferenceDataLineParser<SpeciesLine> {
 		
-		protected static final String GENUS_SUFFIX = "sp.";
+		public static final String GENUS_SUFFIX = "sp.";
 		private static final String GENUS_PATTERN_STR = "[A-Z][a-z]+";
 		private static final String SPECIES_NAME_PATTERN_STR = "[a-z]+\\-?[a-z]+";
 		private static final String DEFAULT_HYBRID_FORMULA = "×";

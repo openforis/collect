@@ -43,6 +43,17 @@ public class ReferenceDataSchema {
 	public void addTaxonomyDefinition(TaxonomyDefinition taxonomyDefinition) {
 		this.taxonomyDefinitionByName.put(taxonomyDefinition.getTaxonomyName(), taxonomyDefinition);
 	}
+	
+	public void updateTaxonomyDefinitionName(String oldName, String newName) {
+		TaxonomyDefinition taxonomyDefinition = taxonomyDefinitionByName.get(oldName);
+		taxonomyDefinitionByName.remove(oldName);
+		taxonomyDefinition.setTaxonomyName(newName);
+		taxonomyDefinitionByName.put(newName, taxonomyDefinition);
+	}
+	
+	public void removeTaxonomyDefinition(String taxonomyName) {
+		this.taxonomyDefinitionByName.remove(taxonomyName);
+	}
 
 	public static abstract class ReferenceDataDefinition {
 

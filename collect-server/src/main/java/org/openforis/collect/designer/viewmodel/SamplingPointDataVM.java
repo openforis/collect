@@ -2,9 +2,9 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.AttributeFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
@@ -14,17 +14,15 @@ import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignFileColumn
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.MediaTypes;
-import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition.Attribute;
 import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
-import org.openforis.idm.metamodel.Survey;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
-import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
 public class SamplingPointDataVM extends SurveyBaseVM {
@@ -33,16 +31,12 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 	public static final String SAMPLING_POINT_DATA_UPDATED_COMMAND = "samplingPointDataUpdated";
 	public static final String CLOSE_SAMPLING_POINT_DATA_IMPORT_POPUP_COMMAND = "closeSamplingPointDataImportPopUp";
 
-	private static final String ERROR_ATTRIBUTE_NAME_REQUIRED = "survey.sampling_point_data.attribute.validation.name_required";
-	private static final String ERROR_ATTRIBUTE_NAME_INVALID = "global.validation.internal_name.invalid_value";
-	private static final String ERROR_ATTRIBUTE_NAME_DUPLICATE = "global.item.validation.name_already_defined";
-
 	private Window samplingPointDataImportPopUp;
 
 	@WireVariable
 	private SamplingDesignManager samplingDesignManager;
 
-	private ListModelList<AttributeFormObject> attributes;
+	private ReferenceDataAttributesEditor referenceDataAttributesEditor;
 
 	@Init(superclass = false)
 	public void init() {
@@ -50,17 +44,17 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 	}
 
 	public List<AttributeFormObject> getAttributes() {
-		if (attributes == null) {
-			attributes = new ListModelList<>();
-			for (String colName : SamplingDesignFileColumn.ALL_COLUMN_NAMES) {
-				attributes.add(new AttributeFormObject(false, attributes.getSize(), colName));
-			}
-			List<String> infoAttributeNames = getSamplingPointDefinition().getAttributeNames();
-			for (String infoAttributeName : infoAttributeNames) {
-				attributes.add(new AttributeFormObject(true, attributes.getSize(), infoAttributeName));
-			}
+		if (referenceDataAttributesEditor == null) {
+			referenceDataAttributesEditor = new ReferenceDataAttributesEditor(
+					Arrays.asList(SamplingDesignFileColumn.ALL_COLUMN_NAMES), getSamplingPointDefinition());
 		}
-		return attributes;
+		return referenceDataAttributesEditor.getAttributes();
+	}
+
+	@Command
+	@NotifyChange("attributes")
+	public void changeAttributeEditableStatus(@BindingParam("attribute") AttributeFormObject attribute) {
+		referenceDataAttributesEditor.changeAttributeEditableStatus(attribute);
 	}
 
 	public boolean isSamplingPointDataEmpty() {
@@ -119,54 +113,13 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 
 	@Command
 	public void confirmAttributeUpdate(@BindingParam("attribute") AttributeFormObject attribute) {
-		if (validateAttribute(attribute)) {
-			changeAttributeEditableStatus(attribute);
-			int infoAttributeIndex = attribute.getIndex() - SamplingDesignFileColumn.ALL_COLUMNS.length;
-			getSamplingPointDefinition().setAttribute(infoAttributeIndex, new Attribute(attribute.getName()));
+		if (referenceDataAttributesEditor.confirmAttributeUpdate(attribute)) {
 			dispatchSurveyChangedCommand();
-		}
-	}
-
-	@Command
-	public void changeAttributeEditableStatus(@BindingParam("attribute") AttributeFormObject attribute) {
-		attribute.setEditingStatus(!attribute.getEditingStatus());
-		refreshAttributeColumnTemplate(attribute);
-	}
-
-	private boolean validateAttribute(AttributeFormObject attribute) {
-		String name = attribute.getName();
-		String error = null;
-		if (StringUtils.isBlank(name)) {
-			error = ERROR_ATTRIBUTE_NAME_REQUIRED;
-		} else if (!name.matches(Survey.INTERNAL_NAME_REGEX)) {
-			error = ERROR_ATTRIBUTE_NAME_INVALID;
-		} else {
-			// validate name uniqueness
-			for (int index = 0; index < attributes.size(); index++) {
-				AttributeFormObject attributeFormObject = attributes.get(index);
-				if (name.equals(attributeFormObject.getName()) && attribute.getIndex() != index) {
-					error = ERROR_ATTRIBUTE_NAME_DUPLICATE;
-					break;
-				}
-			}
-		}
-		if (error == null) {
-			return true;
-		} else {
-			MessageUtil.showError(error);
-			return false;
 		}
 	}
 
 	private SamplingPointDefinition getSamplingPointDefinition() {
 		return getSurvey().getReferenceDataSchema().getSamplingPointDefinition();
-	}
-
-	private void refreshAttributeColumnTemplate(AttributeFormObject attribute) {
-		// replace the element in the collection by itself to trigger a model update
-		int index = attributes.indexOf(attribute);
-		attributes.set(index, attribute);
-		notifyChange("attributes");
 	}
 
 	public static void notifySamplingPointDataUpdated() {

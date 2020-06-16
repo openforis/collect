@@ -128,7 +128,7 @@
 
 						<paging id="taxaPaging" hflex="true"
 							activePage="@load(vm.taxaPage)" totalSize="@load(vm.taxaTotal)"
-							pageSize="30" onPaging="@command(vm.updateTaxaPaging(event.activePage))" />
+							pageSize="@load(vm.taxaPageSize)" onPaging="@command(vm.updateTaxaPaging(event.activePage))" />
 
 						<box align="center" width="100%">
 							<hbox spacing="100px">

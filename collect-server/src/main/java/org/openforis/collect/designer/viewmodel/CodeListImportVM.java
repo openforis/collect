@@ -3,10 +3,6 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import java.io.InputStream;
-
-import javax.servlet.ServletContext;
-
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM.JobEndHandler;
 import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorsPopUpVM;
@@ -14,7 +10,6 @@ import org.openforis.collect.io.metadata.codelist.CodeListImportJob;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Files;
-import org.openforis.collect.utils.MediaTypes;
 import org.openforis.idm.metamodel.CodeList;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -25,7 +20,6 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Window;
 
 /**
@@ -34,6 +28,8 @@ import org.zkoss.zul.Window;
  *
  */
 public class CodeListImportVM extends BaseSurveyFileImportVM {
+
+	private static final String EXAMPLE_XLSX = "code-list-import-example.xlsx";
 
 	@WireVariable
 	private CodeListManager codeListManager;
@@ -45,9 +41,9 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 	private Window jobStatusPopUp;
 
 	public CodeListImportVM() {
-		super(new String[] {Files.CSV_FILE_EXTENSION, Files.EXCEL_FILE_EXTENSION});
+		super(new String[] { Files.CSV_FILE_EXTENSION, Files.EXCEL_FILE_EXTENSION }, EXAMPLE_XLSX);
 	}
-	
+
 	@Init(superclass = false)
 	public void init(@ExecutionArgParam("codeListId") int codeListId) {
 		super.init();
@@ -95,11 +91,4 @@ public class CodeListImportVM extends BaseSurveyFileImportVM {
 				});
 	}
 
-	@Command
-	public void downloadExample() {
-		ServletContext context = getSession().getWebApp().getServletContext();
-		String fileName = "code-list-import-example.xlsx";
-		InputStream is = context.getResourceAsStream("/WEB-INF/resources/io/" + fileName);
-		Filedownload.save(is, MediaTypes.XLSX_CONTENT_TYPE, fileName);
-	}
 }
