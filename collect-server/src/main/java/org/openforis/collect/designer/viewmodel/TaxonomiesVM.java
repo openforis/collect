@@ -60,6 +60,8 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	private static final String TAXONOMY_UPDATED_COMMAND = "taxonomyUpdated";
 	private static final String CLOSE_TAXONOMY_IMPORT_POP_UP_COMMAND = "closeTaxonomyImportPopUp";
 	private static final int TAXA_PAGE_SIZE = 30;
+	private static final String RANK_COL_NAME = "rank";
+	private static final String LAT_LANG_CODE = "lat";
 
 	@WireVariable
 	private SurveyManager surveyManager;
@@ -136,7 +138,7 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 		dispatchTaxonomiesUpdatedCommand();
 		SurveyEditVM.dispatchSurveySaveCommand();
 	}
-	
+
 	@Override
 	protected void performNewItemCreation(Binder binder) {
 		super.performNewItemCreation(binder);
@@ -155,15 +157,18 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 		super.performDeleteItem(item);
 		SurveyEditVM.dispatchSurveySaveCommand();
 	}
-	
+
 	@Override
 	protected void performItemSelection(CollectTaxonomy item) {
 		super.performItemSelection(item);
 		List<String> fixedColumnNames = new ArrayList<String>();
 		// required columns
-		fixedColumnNames.addAll(Arrays.asList(SpeciesFileColumn.REQUIRED_COLUMN_NAMES));
-		// vernacular language codes
-		fixedColumnNames.addAll(speciesManager.loadTaxaVernacularLangCodes(item.getId()));
+		fixedColumnNames.addAll(Arrays.asList(SpeciesFileColumn.CODE.getColumnName(), RANK_COL_NAME,
+				SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), SpeciesFileColumn.SYNONYMS.getColumnName()));
+		// vernacular language codes (excluding lat = synonyms)
+		List<String> vernacularLangCodes = speciesManager.loadTaxaVernacularLangCodes(item.getId());
+		vernacularLangCodes.remove(LAT_LANG_CODE);
+		fixedColumnNames.addAll(vernacularLangCodes);
 		referenceDataAttributesEditor = new ReferenceDataAttributesEditor(fixedColumnNames,
 				getSurvey().getReferenceDataSchema().getTaxonomyDefinition(item.getName()));
 		notifyChange("taxaAttributes");
@@ -354,10 +359,12 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	public String getTaxonAttribute(TaxonSummary taxon, String colName) {
 		if (SpeciesFileColumn.CODE.getColumnName().equals(colName)) {
 			return taxon.getCode();
-		} else if (SpeciesFileColumn.FAMILY.getColumnName().equals(colName)) {
-			return taxon.getFamilyName();
+		} else if (RANK_COL_NAME.equals(colName)) {
+			return Labels.getLabel("survey.taxonomy.rank." + taxon.getRank().getName());
 		} else if (SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName().equals(colName)) {
 			return taxon.getScientificName();
+		} else if (SpeciesFileColumn.SYNONYMS.getColumnName().equals(colName)) {
+			return taxon.getJointSynonyms();
 		} else if (Languages.exists(Standard.ISO_639_3, colName)) {
 			return taxon.getJointVernacularNames(colName);
 		} else {
@@ -376,7 +383,7 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 		this.taxonSummaries = null;
 		notifyChange("taxa", "taxaTotal", "taxaPage");
 	}
-	
+
 	private void loadTaxa() {
 		taxonSummaries = speciesManager.loadTaxonSummaries(getSurvey(), editedItem.getId(), taxaPage * TAXA_PAGE_SIZE,
 				TAXA_PAGE_SIZE);
