@@ -61,10 +61,12 @@
 					</box>
 				</absolutechildren>
 				<absolutechildren hflex="true" vflex="true">
-					<vbox visible="@load(vm.editingItem)"
-						hflex="true" vflex="true">
+					<vbox visible="@load(vm.editingItem)" hflex="true"
+						vflex="true">
+						<label
+							value="${labels.survey.changes_saved_immediately}" />
 						<grid id="formContainer" sclass="form compact"
-							validationMessages="@id('vmsgs')"
+							hflex="true" validationMessages="@id('vmsgs')"
 							form="@id('fx') 
 							@load(vm.formObject) 
 			                @save(vm.formObject, before={'validate','applyChanges'})
@@ -138,7 +140,8 @@
 								pageSize="@load(vm.taxaPageSize)"
 								onPaging="@command(vm.updateTaxaPaging(event.activePage))" />
 						</vbox>
-						<box align="center" hflex="true" height="30px">
+						<box align="center" hflex="true"
+							height="30px">
 							<hbox spacing="100px">
 								<button
 									label="${labels.global.import_data}"
