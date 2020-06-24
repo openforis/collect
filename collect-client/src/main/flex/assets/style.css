@@ -168,7 +168,7 @@ mx|Alert {
 
 component|BlockingMessagePopUp,
 	concurrency|CollectJobStatusPopUp,
-	component|BackupRestorePopUp, component|DataExportPopUp, component|DataImportPopUp, 
+	component|BackupRestorePopUp, component|DataExportPopUp, 
 	component|SelectVersionPopUp,
 	component|SurveySelectionPopUp,
 	component|ConfigurationPopUp,
@@ -209,7 +209,7 @@ input|CodeListDialog s|CheckBox {
 	fontFamily: Verdana;
 }
 
-component|ErrorListPopUp, component|DataImportNodeErrorsPopUp {
+component|ErrorListPopUp {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.ResizableTitleWindowSkin");
 }
 

@@ -44,7 +44,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.AlertUtil;
 	import mx.events.MenuEvent;
 	import org.openforis.collect.util.PopUpUtil;
-	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.component.user.UserManagementPopUp;
 	import org.openforis.collect.ui.component.SurveySelectionPopUp;
 	import mx.managers.PopUpManager;

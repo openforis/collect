@@ -12,10 +12,8 @@ package org.openforis.collect.client {
 		private static var _collectJobClient:CollectJobClient;
 		private static var _codeListClient:CodeListClient;
 		private static var _configurationClient:ConfigurationClient;
-		private static var _csvDataImportClient:CSVDataImportClient;
 		private static var _dataClient:DataClient;
 		private static var _dataExportClient:DataExportClient;
-		private static var _dataImportClient:DataImportClient;
 		private static var _logoClient:LogoClient;
 		private static var _modelClient:ModelClient;
 		private static var _saikuClient:SaikuClient;
@@ -53,13 +51,6 @@ package org.openforis.collect.client {
 			return _configurationClient;
 		}
 		
-		public static function get csvDataImportClient():CSVDataImportClient {
-			if( _csvDataImportClient == null){
-				_csvDataImportClient = new CSVDataImportClient();
-			}
-			return _csvDataImportClient;
-		}
-		
 		public static function get dataClient():DataClient {
 			if(_dataClient == null){
 				_dataClient = new DataClient();
@@ -74,13 +65,6 @@ package org.openforis.collect.client {
 			return _dataExportClient;
 		}
 		
-		public static function get dataImportClient():DataImportClient {
-			if(_dataImportClient == null) {
-				_dataImportClient = new DataImportClient();
-			}
-			return _dataImportClient;
-		}
-
 		public static function get modelClient():ModelClient {
 			if(_modelClient == null){
 				_modelClient = new ModelClient();

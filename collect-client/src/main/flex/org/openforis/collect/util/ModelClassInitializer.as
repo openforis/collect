@@ -4,7 +4,6 @@ package org.openforis.collect.util {
 	import org.openforis.collect.CollectCompleteInfo;
 	import org.openforis.collect.io.data.DataExportStatus$Format;
 	import org.openforis.collect.io.data.proxy.DataExportStatusProxy;
-	import org.openforis.collect.io.data.proxy.DataImportStatusProxy;
 	import org.openforis.collect.io.data.proxy.DataParsingErrorProxy;
 	import org.openforis.collect.io.data.proxy.RecordImportErrorProxy;
 	import org.openforis.collect.manager.process.ProcessStatus;
@@ -77,11 +76,6 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonomyProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
-	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
-	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
-	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
-	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
-	import org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**
@@ -115,10 +109,6 @@ package org.openforis.collect.util {
 				CoordinateAttributeDefinitionProxy,
 				DataExportStatus$Format,
 				DataExportStatusProxy,
-				DataImportStateProxy,
-				DataImportStatusProxy,
-				DataImportSummaryProxy,
-				DataImportSummaryItemProxy,
 				DataParsingErrorProxy,
 				DateAttributeDefinitionProxy,
 				EntityAddChangeProxy,
@@ -128,7 +118,6 @@ package org.openforis.collect.util {
 				FieldLabelProxy,
 				FieldProxy,
 				FileAttributeDefinitionProxy,
-				FileUnmarshallingErrorProxy,
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
 				NodeDefinitionSummary,
@@ -136,7 +125,6 @@ package org.openforis.collect.util {
 				NodeLabelProxy,
 				NodeLabelProxy$Type,
 				NodeProxy,
-				NodeUnmarshallingErrorProxy,
 				ProcessStatus,
 				ProcessStatus$Step,
 				PrecisionProxy,
