@@ -131,7 +131,6 @@
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.DataExportStatus$Format</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.FileWrapper</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.codelistimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.concurrency.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataprocessing.DataProcessingStateProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportConflictProxy</includeClass>
@@ -140,8 +139,6 @@
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.speciesimport.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.samplingdesignimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.reporting.proxy.*</includeClass>
 							</includeJavaClasses>
 						</configuration>

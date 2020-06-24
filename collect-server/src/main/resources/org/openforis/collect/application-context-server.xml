@@ -45,9 +45,6 @@
 	<bean id="codeListSessionService"
 		class="org.openforis.collect.remoting.service.CodeListSessionService"
 		scope="session" />
-	<bean id="codeListImportService"
-		class="org.openforis.collect.remoting.service.CodeListImportService"
-		autowire="byName" init-method="init" />
 	<bean id="collectInfoService"
 		class="org.openforis.collect.remoting.service.CollectInfoService"
 		autowire="byName" />
@@ -75,16 +72,10 @@
 	<bean id="samplingDesignService"
 		class="org.openforis.collect.remoting.service.SamplingDesignService"
 		autowire="byName" />
-	<bean id="samplingDesignImportService"
-		class="org.openforis.collect.remoting.service.SamplingDesignImportService"
-		autowire="byName" init-method="init" />
 	<bean id="collectSessionService" class="org.openforis.collect.remoting.service.SessionService"
 		autowire="byName" />
 	<bean id="speciesService" class="org.openforis.collect.remoting.service.SpeciesService"
 		autowire="byName" />
-	<bean id="speciesImportService"
-		class="org.openforis.collect.remoting.service.SpeciesImportService"
-		autowire="byName" init-method="init" />
 	<bean id="userService" class="org.openforis.collect.remoting.service.UserService"
 		autowire="byName" />
 	<bean id="userSessionService" class="org.openforis.collect.remoting.service.UserSessionService"

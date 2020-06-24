@@ -53,7 +53,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.ui.component.SpeciesImportPopUp;
 	import mx.core.IFlexDisplayObject;
 	import org.openforis.collect.util.ObjectUtil;
 	import mx.resources.Locale;
@@ -80,7 +79,6 @@ package org.openforis.collect.presenter {
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
 		//private var _contextMenuPresenter:ContextMenuPresenter;
-		private var _speciesImportPopUp:SpeciesImportPopUp;
 		
 		private var _keepAliveTimer:Timer;
 		private var _keepAliveRetryTimes:int;
@@ -117,9 +115,6 @@ package org.openforis.collect.presenter {
 					var preview:Boolean = params.preview == "true";
 					var edit:Boolean = params.edit == "true";
 					var limitedDataEntry:Boolean = Application.user.canEditOnlyOwnedRecords;
-					var speciesImport:Boolean = params.species_import == "true";
-					var codeListImport:Boolean = params.code_list_import == "true";
-					var samplingDesignImport:Boolean = params.sampling_design_import == "true";
 					
 					var localeString:String = params.locale as String;
 					if ( preview ) {
@@ -128,12 +123,6 @@ package org.openforis.collect.presenter {
 						initLimitedDataEntry();
 					} else if ( edit ) {
 						initEditRecord(int(params.surveyId), int(params.recordId), localeString, true);
-					} else if ( speciesImport ) {
-						initSpeciesImport();
-					} else if ( samplingDesignImport ) {
-						initSamplingDesignImport();
-					} else if ( codeListImport ) {
-						initCodeListImport();
 					} else {
 						showListOfRecordsOrHomePage();
 					}
@@ -147,8 +136,6 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);
 			eventDispatcher.addEventListener(UIEvent.CHANGE_PASSWORD_CLICK, changePasswordClickHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
-			eventDispatcher.addEventListener(UIEvent.OPEN_SPECIES_IMPORT_POPUP, openSpeciesImportPopUpHandler);
-			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
 			eventDispatcher.addEventListener(UIEvent.TOGGLE_DETAIL_VIEW_SIZE, toggleDetailViewSizeHandler);
 			eventDispatcher.addEventListener(UIEvent.CHECK_VIEW_SIZE, checkViewSizeHandler);
 			eventDispatcher.addEventListener(UIEvent.RELOAD_SURVEYS, reloadSurveysHandler);
@@ -269,70 +256,6 @@ package org.openforis.collect.presenter {
 				eventDispatcher.dispatchEvent(editEvent);
 			});
 		}
-
-		protected function initSpeciesImport():void {
-			var token:ReferenceDataImportToken = new ReferenceDataImportToken();
-			if ( fillRefereceDataImportToken(token) ) {
-				token.uiEventName = UIEvent.SHOW_SPECIES_IMPORT;
-				initReferenceDataImport(token);
-			}
-		}
-		
-		protected function initSamplingDesignImport():void {
-			var token:ReferenceDataImportToken = new ReferenceDataImportToken();
-			if ( fillRefereceDataImportToken(token) ) {
-				token.uiEventName = UIEvent.SHOW_SAMPLING_DESIGN_IMPORT;
-				initReferenceDataImport(token);
-			}
-		}
-
-		protected function initCodeListImport():void {
-			var token:CodeListImportToken = new CodeListImportToken();
-			fillRefereceDataImportToken(token);
-			token.uiEventName = UIEvent.SHOW_CODE_LIST_IMPORT;
-			var params:Object = FlexGlobals.topLevelApplication.parameters;
-			token.codeListId = int(params.code_list_id);
-			if ( token.codeListId > 0 ) {
-				initReferenceDataImport(token);
-			} else {
-				AlertUtil.showError("referenceDataImport.invalidParameters");
-			}
-		}
-		
-		protected function initReferenceDataImport(token:ReferenceDataImportToken):void {
-			view.currentState = collect.FULL_SCREEN_STATE;
-			if ( token == null ) {
-				AlertUtil.showError("referenceDataImport.saveSurveyBefore");
-			} else {
-				var surveyId:int = token.surveyId;
-				var work:Boolean = token.work;
-				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:ReferenceDataImportToken):void {
-					var survey:SurveyProxy = event.result as SurveyProxy;
-					Application.activeSurvey = survey;
-					var uiEvent:UIEvent = new UIEvent(token.uiEventName);
-					uiEvent.obj = token;
-					eventDispatcher.dispatchEvent(uiEvent);
-				}, faultHandler, token);
-
-				ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
-			}
-		}
-		
-		protected function fillRefereceDataImportToken(token:ReferenceDataImportToken):Boolean {
-			var params:Object = FlexGlobals.topLevelApplication.parameters;
-			var localeString:String = params.locale as String;
-			var surveyId:int = int(params.surveyId);
-			var work:Boolean = params.work == "true";
-			if ( surveyId > 0 && params.work != "null" ) {
-				token.localeString = localeString;
-				token.surveyId = surveyId;
-				token.work = work;
-				return true;
-			} else {
-				AlertUtil.showError("referenceDataImport.invalidParameters");
-				return false;
-			}
-		}
 		
 		protected function toggleDetailViewSizeHandler(event:UIEvent):void {
 			Application.extendedDetailView = ! Application.extendedDetailView;
@@ -395,12 +318,6 @@ package org.openforis.collect.presenter {
 			ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
 		}
 		
-		internal function showSamplingDesignImport(token:Object):void {
-			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_SAMPLING_DESIGN_IMPORT);
-			uiEvent.obj = token;
-			eventDispatcher.dispatchEvent(uiEvent);
-		}
-		
 		protected function setActivePreviewSurveyResultHandler(event:ResultEvent, token:Object = null):void {
 			var survey:SurveyProxy = event.result as SurveyProxy;
 			adjustLocaleForSurvey(survey);
@@ -451,16 +368,6 @@ package org.openforis.collect.presenter {
 			popUp.automaticallySelect = automaticallySelect;
 			PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			PopUpManager.centerPopUp(popUp);
-		}
-		
-		protected function openSpeciesImportPopUpHandler(event:Event = null):void {
-			_speciesImportPopUp = SpeciesImportPopUp(PopUpUtil.createPopUp(SpeciesImportPopUp));
-		}
-		
-		protected function closeSpeciesImportPopUpHandler(event:Event = null):void {
-			if ( _speciesImportPopUp != null ) {
-				PopUpManager.removePopUp(_speciesImportPopUp);
-			}
 		}
 		
 		protected function showListOfRecordsOrHomePage():void {
@@ -543,56 +450,3 @@ package org.openforis.collect.presenter {
 	}
 }
 
-class ReferenceDataImportToken {
-	private var _surveyId:int;
-	private var _work:Boolean;
-	private var _localeString:String;
-	private var _uiEventName:String;
-	
-	public function get surveyId():int {
-		return _surveyId;
-	}
-
-	public function set surveyId(value:int):void {
-		_surveyId = value;
-	}
-
-	public function get work():Boolean {
-		return _work;
-	}
-
-	public function set work(value:Boolean):void {
-		_work = value;
-	}
-
-	public function get localeString():String {
-		return _localeString;
-	}
-
-	public function set localeString(value:String):void {
-		_localeString = value;
-	}
-
-	public function get uiEventName():String
-	{
-		return _uiEventName;
-	}
-
-	public function set uiEventName(value:String):void {
-		_uiEventName = value;
-	}
-
-}
-
-class CodeListImportToken extends ReferenceDataImportToken {
-	private var _codeListId:int;
-	
-	public function get codeListId():int {
-		return _codeListId;
-	}
-
-	public function set codeListId(value:int):void {
-		_codeListId = value;
-	}
-
-}

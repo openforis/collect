@@ -11,7 +11,6 @@ package org.openforis.collect.client {
 		private static var _collectInfoClient:CollectInfoClient;
 		private static var _collectJobClient:CollectJobClient;
 		private static var _codeListClient:CodeListClient;
-		private static var _codeListImportClient:CodeListImportClient;
 		private static var _configurationClient:ConfigurationClient;
 		private static var _csvDataImportClient:CSVDataImportClient;
 		private static var _dataClient:DataClient;
@@ -21,10 +20,8 @@ package org.openforis.collect.client {
 		private static var _modelClient:ModelClient;
 		private static var _saikuClient:SaikuClient;
 		private static var _samplingDesignClient:SamplingDesignClient;
-		private static var _samplingDesignImportClient:SamplingDesignImportClient;
 		private static var _sessionClient:SessionClient;
 		private static var _speciesClient:SpeciesClient;
-		private static var _speciesImportClient:SpeciesImportClient;
 		private static var _userClient:UserClient;
 		private static var _userSessionClient:UserSessionClient;
 		
@@ -49,13 +46,6 @@ package org.openforis.collect.client {
 			return _codeListClient;
 		}
 
-		public static function get codeListImportClient():CodeListImportClient {
-			if(_codeListImportClient == null){
-				_codeListImportClient = new CodeListImportClient();
-			}
-			return _codeListImportClient;
-		}
-		
 		public static function get configurationClient():ConfigurationClient {
 			if(_configurationClient == null){
 				_configurationClient = new ConfigurationClient();
@@ -105,13 +95,6 @@ package org.openforis.collect.client {
 			return _logoClient;
 		}
 		
-		public static function get samplingDesignImportClient():SamplingDesignImportClient {
-			if(_samplingDesignImportClient == null){
-				_samplingDesignImportClient = new SamplingDesignImportClient();
-			}
-			return _samplingDesignImportClient;
-		}
-		
 		public static function get samplingDesignClient():SamplingDesignClient {
 			if(_samplingDesignClient == null){
 				_samplingDesignClient = new SamplingDesignClient();
@@ -138,13 +121,6 @@ package org.openforis.collect.client {
 				_speciesClient = new SpeciesClient();
 			}
 			return _speciesClient;
-		}
-		
-		public static function get speciesImportClient():SpeciesImportClient {
-			if(_speciesImportClient == null){
-				_speciesImportClient = new SpeciesImportClient();
-			}
-			return _speciesImportClient;
 		}
 		
 		public static function get userClient():UserClient {

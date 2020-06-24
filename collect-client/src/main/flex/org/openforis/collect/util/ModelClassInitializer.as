@@ -77,14 +77,11 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonomyProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
-	import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
 	import org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy;
-	import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;
-	import org.openforis.collect.remoting.service.speciesimport.proxy.SpeciesImportStatusProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**
@@ -107,7 +104,6 @@ package org.openforis.collect.util {
 				BooleanAttributeDefinitionProxy,
 				CodeAttributeDefinitionProxy,
 				CodeAttributeProxy,
-				CodeListImportStatusProxy,
 				CodeListItemProxy,
 				CodeListLabelProxy,
 				CodeListLabelProxy$Type,
@@ -156,12 +152,10 @@ package org.openforis.collect.util {
 				NodeUpdateRequestProxy,
 				NodeUpdateRequestSetProxy,
 				NodeChangeSetProxy,
-				SamplingDesignImportStatusProxy,
 				SamplingDesignItemProxy,
 				SamplingDesignSummariesProxy,
 				SchemaProxy,
 				SpatialReferenceSystemProxy,
-				SpeciesImportStatusProxy,
 				SurveyAvailability,
 				SurveyProxy,
 				SurveySummary,

@@ -24,10 +24,8 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
-import org.openforis.collect.io.parsing.CSVFileOptions;
+import org.openforis.collect.io.metadata.species.SpeciesImportJob;
 import org.openforis.collect.manager.exception.SurveyValidationException;
-import org.openforis.collect.manager.speciesimport.SpeciesImportProcess;
-import org.openforis.collect.manager.speciesimport.SpeciesImportStatus;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
@@ -35,6 +33,7 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
+import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
@@ -45,7 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author S. Ricci
  */
-public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest {
+public class SpeciesImportJobIntegrationTest extends CollectIntegrationTest {
 
 	private static final String VALID_TEST_CSV = "species-test.csv";
 	private static final String VALID_EXTRA_COLUMNS_TEST_CSV = "species-valid-extra-columns-test.csv";
@@ -54,6 +53,8 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	private static final String TEST_TAXONOMY_NAME = "it_tree";
 	
+	@Autowired
+	private JobManager jobManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -74,24 +75,26 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		surveyManager.importModel(survey);
 	}
 	
-	public SpeciesImportProcess importCSVFile(String fileName) throws Exception {
+	public SpeciesImportJob importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
 		CollectTaxonomy taxonomy = new CollectTaxonomy();
 		taxonomy.setSurvey(survey);
 		taxonomy.setName(TEST_TAXONOMY_NAME);
 		speciesManager.save(taxonomy);
-		SpeciesImportProcess process = new SpeciesImportProcess(surveyManager, speciesManager, survey, 
-				taxonomy.getId(), file, new CSVFileOptions(), true);
-		process.call();
-		return process;
+		SpeciesImportJob job = jobManager.createJob(SpeciesImportJob.class);
+		job.setSurvey(survey);
+		job.setTaxonomyId(taxonomy.getId());
+		job.setFile(file);
+		job.setOverwriteAll(true);
+		jobManager.start(job, false);
+		return job;
 	}
 	
 	@Test
 	public void testSpeciesImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
-		SpeciesImportStatus status = process.getStatus();
-		assertTrue(status.isComplete());
-		assertTrue(status.getSkippedRows().isEmpty());
+		SpeciesImportJob job = importCSVFile(VALID_TEST_CSV);
+		assertTrue(job.isCompleted());
+		assertTrue(job.getSkippedRows().isEmpty());
 		{
 			String code = "OLE/CAP/macrocarpa";
 			TaxonOccurrence occurrence = findByCode(code);
@@ -159,10 +162,9 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 
 	@Test
 	public void testSpeciesImportWithExtraColumns() throws Exception {
-		SpeciesImportProcess process = importCSVFile(VALID_EXTRA_COLUMNS_TEST_CSV);
-		SpeciesImportStatus status = process.getStatus();
-		assertTrue(status.isComplete());
-		assertTrue(status.getSkippedRows().isEmpty());
+		SpeciesImportJob job = importCSVFile(VALID_EXTRA_COLUMNS_TEST_CSV);
+		assertTrue(job.isCompleted());
+		assertTrue(job.getSkippedRows().isEmpty());
 		{
 			String code = "AFZ/QUA";
 			TaxonOccurrence occurrence = findByCode(code);
@@ -191,9 +193,8 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	@Test
 	public void testVernacularNamesImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
-		SpeciesImportStatus status = process.getStatus();
-		assertTrue(status.isComplete());
+		SpeciesImportJob job = importCSVFile(VALID_TEST_CSV);
+		assertTrue(job.isCompleted());
 		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyByName(survey, TEST_TAXONOMY_NAME);
 		TaxonSearchParameters taxonSearchParameters = new TaxonSearchParameters();
 		taxonSearchParameters.setHighestRank(FAMILY);
@@ -248,9 +249,8 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 
 	@Test
 	public void testHierarchyImport() throws Exception {
-		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
-		SpeciesImportStatus status = process.getStatus();
-		assertTrue(status.isComplete());
+		SpeciesImportJob job = importCSVFile(VALID_TEST_CSV);
+		assertTrue(job.isCompleted());
 		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
 		{
 			Taxon variety = findTaxonByCode("ALB/SCH/amaniensis");
@@ -298,10 +298,9 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	@Test
 	public void testInvalidColumns() throws Exception {
-		SpeciesImportProcess process = importCSVFile(INVALID_MISSING_COLUMNS_TEST_CSV);
-		SpeciesImportStatus status = process.getStatus();
-		assertTrue(status.isError());
-		List<ParsingError> errors = status.getErrors();
+		SpeciesImportJob job = importCSVFile(INVALID_MISSING_COLUMNS_TEST_CSV);
+		assertTrue(job.isFailed());
+		List<ParsingError> errors = job.getErrors();
 		assertEquals(1, errors.size());
 		ParsingError error = errors.get(0);
 		ErrorType errorType = error.getErrorType();
@@ -310,25 +309,24 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	@Test
 	public void testErrorHandling() throws Exception {
-		SpeciesImportProcess process = importCSVFile(INVALID_TEST_CSV);
-		SpeciesImportStatus status = process.getStatus();
-		List<ParsingError> errors = status.getErrors();
+		SpeciesImportJob job = importCSVFile(INVALID_TEST_CSV);
+		List<ParsingError> errors = job.getErrors();
 		assertEquals(7, errors.size());
 		
-		assertTrue(status.isRowProcessed(1));
-		assertTrue(status.isRowProcessed(2));
-		assertTrue(status.isRowProcessed(4));
-		assertTrue(status.isRowProcessed(5));
+		assertTrue(job.isRowProcessed(1));
+		assertTrue(job.isRowProcessed(2));
+		assertTrue(job.isRowProcessed(4));
+		assertTrue(job.isRowProcessed(5));
 		
-		assertFalse(status.isRowProcessed(3));
-		assertFalse(status.isRowProcessed(6));
-		assertFalse(status.isRowProcessed(7));
-		assertFalse(status.isRowProcessed(8));
-		assertFalse(status.isRowProcessed(9));
-		assertFalse(status.isRowProcessed(10));
-		assertFalse(status.isRowProcessed(11));
+		assertFalse(job.isRowProcessed(3));
+		assertFalse(job.isRowProcessed(6));
+		assertFalse(job.isRowProcessed(7));
+		assertFalse(job.isRowProcessed(8));
+		assertFalse(job.isRowProcessed(9));
+		assertFalse(job.isRowProcessed(10));
+		assertFalse(job.isRowProcessed(11));
 		//unexisting row
-		assertFalse(status.isRowProcessed(12));
+		assertFalse(job.isRowProcessed(12));
 		
 		assertTrue(containsError(errors, 3, SpeciesFileColumn.CODE, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 6, SpeciesFileColumn.CODE, ErrorType.DUPLICATE_VALUE));
@@ -341,9 +339,8 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	@Test
 	public void testExport() throws Exception {
-		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
-		SpeciesImportStatus status = process.getStatus();
-		assertTrue(status.isComplete());
+		SpeciesImportJob job = importCSVFile(VALID_TEST_CSV);
+		assertTrue(job.isCompleted());
 		CollectTaxonomy taxonomy = taxonomyDao.loadByName(survey, TEST_TAXONOMY_NAME);
 		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy);
 		assertNotNull(summaries);

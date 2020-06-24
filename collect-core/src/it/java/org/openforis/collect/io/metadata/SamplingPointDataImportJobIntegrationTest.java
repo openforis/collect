@@ -17,8 +17,7 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignFileColumn;
-import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportProcess;
-import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportStatus;
+import org.openforis.collect.io.metadata.samplingdesign.SamplingPointDataImportJob;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
@@ -26,18 +25,21 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author S. Ricci
  */
-public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrationTest {
+public class SamplingPointDataImportJobIntegrationTest extends CollectIntegrationTest {
 
 	private static final String VALID_TEST_CSV = "sampling-design-test.csv";
 	private static final String VALID_FLAT_TEST_CSV = "sampling-design-flat-test.csv";
 	private static final String INVALID_TEST_CSV = "sampling-design-invalid-test.csv";
 
+	@Autowired
+	private JobManager jobManager;
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
@@ -52,20 +54,21 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		surveyManager.save(survey);
 	}
 	
-	public SamplingDesignImportProcess importCSVFile(String fileName) throws Exception {
+	public SamplingPointDataImportJob importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
-		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, surveyManager, survey, file, true);
-		process.call();
-		return process;
+		SamplingPointDataImportJob job = jobManager.createJob(SamplingPointDataImportJob.class);
+		job.setSurvey(survey);
+		job.setFile(file);
+		jobManager.start(job, false);
+		return job;
 	}
 	
 	@Test
 	public void testImport() throws Exception {
-		SamplingDesignImportProcess process = importCSVFile(VALID_TEST_CSV);
-		SamplingDesignImportStatus status = process.getStatus();
-		assertTrue(status.isComplete());
-		assertTrue(status.getSkippedRows().isEmpty());
-		assertEquals(27, status.getProcessed());
+		SamplingPointDataImportJob job = importCSVFile(VALID_TEST_CSV);
+		assertTrue(job.isCompleted());
+		assertTrue(job.getSkippedRows().isEmpty());
+		assertEquals(27, job.getProcessedItems());
 		
 		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
@@ -80,10 +83,9 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 	
 	@Test
 	public void testFlatImport() throws Exception {
-		SamplingDesignImportProcess process = importCSVFile(VALID_FLAT_TEST_CSV);
-		SamplingDesignImportStatus status = process.getStatus();
-		assertTrue(status.isComplete());
-		assertTrue(status.getSkippedRows().isEmpty());
+		SamplingPointDataImportJob job = importCSVFile(VALID_FLAT_TEST_CSV);
+		assertTrue(job.isCompleted());
+		assertTrue(job.getSkippedRows().isEmpty());
 		
 		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
@@ -103,10 +105,9 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 	
 	@Test
 	public void testInvalidData() throws Exception {
-		SamplingDesignImportProcess process = importCSVFile(INVALID_TEST_CSV);
-		SamplingDesignImportStatus status = process.getStatus();
-		assertTrue(status.isError());
-		List<ParsingError> errors = status.getErrors();
+		SamplingPointDataImportJob job = importCSVFile(INVALID_TEST_CSV);
+		assertTrue(job.isFailed());
+		List<ParsingError> errors = job.getErrors();
 		assertEquals(6, errors.size());
 		
 		assertTrue(containsError(errors, 3, SamplingDesignFileColumn.LEVEL_2, ErrorType.DUPLICATE_VALUE));

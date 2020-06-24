@@ -26,14 +26,6 @@
 				</properties>
 			</destination>
 			
-			<destination id="codeListImportService">
-				<properties>
-					<factory>springFactory</factory>
-					<source>codeListImportService</source>
-					<scope>application</scope>
-				</properties>
-			</destination>
-			
 			<destination id="collectInfoService">
 				<properties>
 					<factory>springFactory</factory>
@@ -130,14 +122,6 @@
 				</properties>
 			</destination>
 
-			<destination id="samplingDesignImportService">
-				<properties>
-					<factory>springFactory</factory>
-					<source>samplingDesignImportService</source>
-					<scope>application</scope>
-				</properties>
-			</destination>
-
 			<destination id="collectSessionService">
 				<properties>
 					<factory>springFactory</factory>
@@ -150,14 +134,6 @@
 				<properties>
 					<factory>springFactory</factory>
 					<source>speciesService</source>
-					<scope>application</scope>
-				</properties>
-			</destination>
-
-			<destination id="speciesImportService">
-				<properties>
-					<factory>springFactory</factory>
-					<source>speciesImportService</source>
 					<scope>application</scope>
 				</properties>
 			</destination>
