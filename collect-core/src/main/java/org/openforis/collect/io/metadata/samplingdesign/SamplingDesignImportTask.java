@@ -215,13 +215,9 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	protected void persistSamplingDesign() throws SurveyImportException {
 		List<String> infoColumnNames = reader.getInfoColumnNames();
 		List<ReferenceDataDefinition.Attribute> attributes = ReferenceDataDefinition.Attribute.fromNames(infoColumnNames);
-		SamplingPointDefinition samplingPoint;
-		if ( attributes.isEmpty() ) {
-			samplingPoint = null;
-		} else {
-			samplingPoint = new SamplingPointDefinition();
-			samplingPoint.setAttributes(attributes);
-		}
+		SamplingPointDefinition samplingPoint = new SamplingPointDefinition();
+		samplingPoint.setAttributes(attributes);
+		
 		ReferenceDataSchema referenceDataSchema = survey.getReferenceDataSchema();
 		if ( referenceDataSchema == null ) {
 			referenceDataSchema = new ReferenceDataSchema();
