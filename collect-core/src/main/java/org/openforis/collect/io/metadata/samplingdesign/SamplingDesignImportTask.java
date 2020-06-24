@@ -176,16 +176,6 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 				}
 			}
 		}
-//		for (SamplingDesignLine currentLine : lines) {
-//			if ( currentLine.getLineNumber() != line.getLineNumber() ) {
-//				if ( isDuplicateLocation(line, currentLine) ) {
-//					throwDuplicateLineException(line, currentLine, SamplingDesignFileColumn.LOCATION_COLUMNS);
-//				} else if ( line.getKey().getLevelCodes().equals(currentLine.getLevelCodes()) ) {
-//					SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getLevelCodes().size() - 1];
-//					throwDuplicateLineException(line, currentLine, new SamplingDesignFileColumn[]{lastLevelCol});
-//				}
-//			}
-//		}
 	}
 	
 	protected boolean isDuplicateLocation(SamplingDesignLine line1, SamplingDesignLine line2) throws ParsingException {

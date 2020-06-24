@@ -135,7 +135,7 @@
 								</template>
 							</listbox>
 
-							<paging id="taxaPaging" hflex="true"
+							<paging id="taxaPaging" hflex="true" detailed="true"
 								activePage="@load(vm.taxaPage)" totalSize="@load(vm.taxaTotal)"
 								pageSize="@load(vm.taxaPageSize)"
 								onPaging="@command(vm.updateTaxaPaging(event.activePage))" />
