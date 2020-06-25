@@ -116,7 +116,7 @@
 										</listheader>
 									</template>
 									<template name="nonediting">
-										<listheader width="120px">
+										<listheader width="@load(vm.getTaxaAttributeColumnWith(each))">
 											<label
 												value="@load(vm.getTaxaAttributeLabel(each))" width="70px" />
 											<button

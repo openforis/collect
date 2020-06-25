@@ -62,6 +62,19 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 	private static final int TAXA_PAGE_SIZE = 30;
 	private static final String RANK_COL_NAME = "rank";
 	private static final String LAT_LANG_CODE = "lat";
+	private static final String COL_WIDTH_INFO_ATTRIBUTE = "150px";
+	private static final String COL_WIDTH_SCIENTIFIC_NAME = "250px";
+	private static final String COL_WIDTH_VERNACULAR_NAME = "150px";
+
+	private final Map<String, String> WIDTH_BY_COL_NAME = new HashMap<String, String>() {
+		private static final long serialVersionUID = 1L;
+		{
+			this.put(SpeciesFileColumn.CODE.getColumnName(), "120px");
+			this.put(SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), COL_WIDTH_SCIENTIFIC_NAME);
+			this.put(RANK_COL_NAME, "80px");
+			this.put(SpeciesFileColumn.SYNONYMS.getColumnName(), COL_WIDTH_SCIENTIFIC_NAME);
+		}
+	};
 
 	@WireVariable
 	private SurveyManager surveyManager;
@@ -319,11 +332,24 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 
 	public String getTaxaAttributeLabel(AttributeFormObject attribute) {
 		String name = attribute.getName();
-		if (Languages.exists(Standard.ISO_639_3, name)) {
+		if (isVernacularNameColumn(name)) {
 			return String.format("%s (%s)", name, Labels.getLabel(name));
 		} else {
 			return name;
 		}
+	}
+
+	public String getTaxaAttributeColumnWith(AttributeFormObject attribute) {
+		String name = attribute.getName();
+		String width = WIDTH_BY_COL_NAME.get(name);
+		if (width == null) {
+			if (isVernacularNameColumn(name)) {
+				width = COL_WIDTH_VERNACULAR_NAME;
+			} else {
+				width = COL_WIDTH_INFO_ATTRIBUTE;
+			}
+		}
+		return width;
 	}
 
 	@Command
@@ -365,7 +391,7 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 			return taxon.getScientificName();
 		} else if (SpeciesFileColumn.SYNONYMS.getColumnName().equals(colName)) {
 			return taxon.getJointSynonyms();
-		} else if (Languages.exists(Standard.ISO_639_3, colName)) {
+		} else if (isVernacularNameColumn(colName)) {
 			return taxon.getJointVernacularNames(colName);
 		} else {
 			return taxon.getInfo(colName);
@@ -388,6 +414,10 @@ public class TaxonomiesVM extends SurveyObjectBaseVM<CollectTaxonomy> {
 		taxonSummaries = speciesManager.loadTaxonSummaries(getSurvey(), editedItem.getId(), taxaPage * TAXA_PAGE_SIZE,
 				TAXA_PAGE_SIZE);
 		notifyChange("taxa", "taxaTotal", "taxaPage");
+	}
+
+	private boolean isVernacularNameColumn(String colName) {
+		return Languages.exists(Standard.ISO_639_3, colName);
 	}
 
 }
