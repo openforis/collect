@@ -12,6 +12,7 @@ import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.BaseVM;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
+import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
@@ -23,10 +24,11 @@ import org.zkoss.zul.Window;
  *
  */
 public class ReferenceDataImportErrorsPopUpVM extends BaseVM {
-	
+
 	private static final String ERRORS_PARAM = "errors";
 	private static final String TITLE_PARAM = "title";
-	
+	private static final String MESSAGE_KEY_DUPLICATE_VALUE = "survey.reference_data.import_error.type.duplicate_value.message";
+
 	private List<ParsingError> errors;
 	private String title;
 
@@ -36,9 +38,9 @@ public class ReferenceDataImportErrorsPopUpVM extends BaseVM {
 		args.put(TITLE_PARAM, title);
 		return PopUpUtil.openPopUp(Resources.Component.REFERENCE_DATA_IMPORT_ERRORS_POPUP.getLocation(), true, args);
 	}
-	
+
 	@Init
-	public void init(@ExecutionArgParam(ERRORS_PARAM) List<ParsingError> errors, 
+	public void init(@ExecutionArgParam(ERRORS_PARAM) List<ParsingError> errors,
 			@ExecutionArgParam(TITLE_PARAM) String title) {
 		this.errors = errors;
 		this.title = title;
@@ -47,15 +49,22 @@ public class ReferenceDataImportErrorsPopUpVM extends BaseVM {
 	public List<ParsingError> getErrors() {
 		return new ListModelList<ParsingError>(errors);
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
-	
+
 	public String getErrorTypeLabel(ParsingError error) {
-		return Labels.getLabel(String.format("survey.reference_data.import_error.type.%s", 
+		return Labels.getLabel(String.format("survey.reference_data.import_error.type.%s",
 				error.getErrorType().name().toLowerCase(Locale.ENGLISH)));
 	}
-	
+
+	public String getErrorMessageLabel(ParsingError error) {
+		String label = Labels.getLabel(error.getMessage(), error.getMessageArgs());
+		if (label == null && error.getErrorType() == ErrorType.DUPLICATE_VALUE) {
+			label = Labels.getLabel(MESSAGE_KEY_DUPLICATE_VALUE, error.getMessageArgs());
+		}
+		return label == null ? error.getMessage() : label;
+	}
 
 }

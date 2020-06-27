@@ -104,7 +104,7 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 		private static final String DEFAULT_VERNACULAR_NAMES_SEPARATOR = ",";
 		private static final String OTHER_VERNACULAR_NAMES_SEPARATOR_EXPRESSION = "/";
 		
-		public static final String UNEXPECTED_SYNONYM_MESSAGE_KEY = "speciesImport.parsingError.unexpected_synonym.message";
+		public static final String UNEXPECTED_SYNONYM_MESSAGE_KEY = "survey.taxonomy.import_data.error.unexpected_synonym";
 		
 		SpeciesCSVLineParser(SpeciesCSVReader reader, CsvLine line, List<String> infoColumnNames) {
 			super(reader, line, infoColumnNames);

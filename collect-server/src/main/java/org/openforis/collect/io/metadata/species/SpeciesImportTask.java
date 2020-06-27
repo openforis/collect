@@ -52,12 +52,12 @@ public class SpeciesImportTask extends ReferenceDataImportTask<ParsingError> {
 
 	private static final String RAW_SCIENTIFIC_NAME_TREE_NODE_METADATA = "rawScientificName";
 	private static final String LINE_NUMBER_TREE_NODE_METADATA = "lineNumber";
-	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
-	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
-	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
-	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSpeciesName";
-	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificName";
-	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
+	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "survey.taxonomy.import_data.error.taxonomyNotFound";
+	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "survey.taxonomy.import_data.error.invalidFamilyName";
+	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "survey.taxonomy.import_data.error.invalidGenusName";
+	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "survey.taxonomy.import_data.error.invalidSpeciesName";
+	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "survey.taxonomy.import_data.error.invalidScientificName";
+	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "survey.taxonomy.import_data.error.internalErrorImportingFile";
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] { FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY,
 			CULTIVAR, FORM };
 

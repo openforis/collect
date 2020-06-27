@@ -1,4 +1,3 @@
-<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
 <zk>
   <window id="referenceDataImportErrorPopUp"
   	title="@load(vm.title)"
@@ -31,7 +30,7 @@
             <listcell label="@load(each.row)" />
             <listcell label="@load(vm.joinValues(each.columns, ', '))" />
             <listcell label="@load(vm.getErrorTypeLabel(each))" />
-            <listcell label="${c:l(each.message)}" />
+            <listcell label="@load(vm.getErrorMessageLabel(each))" />
           </listitem>
         </template>
       </listbox>
