@@ -243,9 +243,9 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	private void addSamplingDesignExportTask() {
 		if ( samplingDesignManager.hasSamplingDesign(survey) ) {
 			SamplingDesignExportTask task = createTask(SamplingDesignExportTask.class);
-			task.setSamplingDesignManager(samplingDesignManager);
 			task.setSurvey(survey);
 			task.setOutputStream(zipOutputStream);
+			task.setCloseWriterOnEnd(false);
 			task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, SAMPLING_DESIGN_ENTRY_NAME));
 			addTask(task);
 		}
@@ -256,10 +256,10 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		for (CollectTaxonomy taxonomy : taxonomies) {
 //			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
 				SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
-				task.setSpeciesManager(speciesManager);
 				task.setOutputStream(zipOutputStream);
 				task.setSurvey(survey);
 				task.setTaxonomyId(taxonomy.getId());
+				task.setCloseWriterOnEnd(false);
 				String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
 				task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, entryName));
 				addTask(task);
