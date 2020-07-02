@@ -16,6 +16,7 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
+import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class CollectSpeciesListService implements SpeciesListService {
@@ -33,6 +34,11 @@ public class CollectSpeciesListService implements SpeciesListService {
 	
 	@Autowired
 	private SpeciesManager speciesManager;
+	
+	@Override
+	public Taxonomy loadTaxonomyByName(Survey survey, String name) {
+		return speciesManager.loadTaxonomyByName((CollectSurvey) survey, name);
+	}
 	
 	@Override
 	public List<String> loadSpeciesListNames(Survey survey) {

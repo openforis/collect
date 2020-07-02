@@ -168,8 +168,8 @@ mx|Alert {
 
 component|BlockingMessagePopUp,
 	concurrency|CollectJobStatusPopUp,
-	component|BackupRestorePopUp, component|DataExportPopUp, component|DataImportPopUp, 
-	component|SelectVersionPopUp, component|SpeciesImportPopUp, 
+	component|BackupRestorePopUp, component|DataExportPopUp, 
+	component|SelectVersionPopUp,
 	component|SurveySelectionPopUp,
 	component|ConfigurationPopUp,
 	component|SaikuPopUp,
@@ -187,7 +187,7 @@ component|BlockingMessagePopUp,
 }
 
 component|BlockingMessagePopUp, concurrency|CollectJobStatusPopUp, component|SelectVersionPopUp, 
-	component|DataExportPopUp, component|BackupView, component|SpeciesImportPopUp {
+	component|DataExportPopUp, component|BackupView {
 	showCloseButton: false;
 }
 
@@ -209,7 +209,7 @@ input|CodeListDialog s|CheckBox {
 	fontFamily: Verdana;
 }
 
-component|ErrorListPopUp, component|DataImportNodeErrorsPopUp {
+component|ErrorListPopUp {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.ResizableTitleWindowSkin");
 }
 

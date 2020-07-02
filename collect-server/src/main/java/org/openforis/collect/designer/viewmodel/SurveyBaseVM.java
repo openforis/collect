@@ -22,14 +22,17 @@ import org.openforis.collect.designer.metamodel.SchemaUpdater;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.commons.lang.Strings;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.NamedObject;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
@@ -69,12 +72,15 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	public static final String DATE_FORMAT = Labels.getLabel("global.date_format");
 	
-	@WireVariable
-	protected CollectSurvey survey;
+	private static final String TAXONOMIES_UPDATED_COMMAND = "taxonomiesUpdated";
 	
 	@WireVariable
+	protected CollectSurvey survey;
+	@WireVariable
 	private ExpressionValidator expressionValidator;
-
+	@WireVariable
+	private SpeciesManager speciesManager;
+	
 	protected String currentLanguageCode;
 	
 	private boolean currentFormBlocking;
@@ -125,6 +131,11 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 	
 	@GlobalCommand
+	public void taxonomiesUpdated() {
+		notifyChange("taxonomyNames");
+	}
+	
+	@GlobalCommand
 	public void currentFormValidated(@BindingParam("valid") boolean valid, 
 			@BindingParam("blocking") Boolean blocking,
 			@BindingParam("validationMessagesByField") Map<String, List<String>> validationMessagesByField) {
@@ -170,6 +181,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public void dispatchSchemaChangedCommand() {
 		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
 		dispatchSurveyChangedCommand();
+	}
+	
+	public void dispatchTaxonomiesUpdatedCommand() {
+		BindUtils.postGlobalCommand(null, null, TAXONOMIES_UPDATED_COMMAND, null);
 	}
 
 	public void dispatchNodeConvertedCommand(final NodeDefinition nodeDef) {
@@ -382,8 +397,18 @@ public abstract class SurveyBaseVM extends BaseVM {
 		CollectSurvey survey = getSurvey();
 		boolean includeSamplingDesignList = survey.getTarget() != SurveyTarget.COLLECT_EARTH;
 		List<CodeList> result = new ArrayList<CodeList>(survey.getCodeLists(includeSamplingDesignList));
-		result = sort(result);
+		result = sortByName(result);
 		return new BindingListModelList<CodeList>(result, false);
+	}
+	
+	@DependsOn("surveyId")
+	public List<String> getTaxonomyNames() {
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey);
+		List<String> result = new ArrayList<String>();
+		for (CollectTaxonomy taxonomy : taxonomies) {
+			result.add(taxonomy.getName());
+		}
+		return result;
 	}
 	
 	public List<Unit> getUnits() {
@@ -440,12 +465,12 @@ public abstract class SurveyBaseVM extends BaseVM {
 		void onCancel();
 	}
 	
-	protected List<CodeList> sort(List<CodeList> codeLists) {
-		List<CodeList> result = new ArrayList<CodeList>(codeLists);
-		Collections.sort(result, new Comparator<CodeList>() {
+	protected <T extends NamedObject> List<T> sortByName(List<T> items) {
+		List<T> result = new ArrayList<T>(items);
+		Collections.sort(result, new Comparator<T>() {
 			@Override 
-	        public int compare(CodeList c1, CodeList c2) {
-	            return c1.getName().compareTo(c2.getName());
+	        public int compare(T item2, T item1) {
+	            return item2.getName().compareTo(item1.getName());
 	        }
 		});
 		return result;

@@ -90,8 +90,6 @@
                                 <includeClass>org.openforis.collect.io.parsing.CSVFileSeparator</includeClass>
                                 <includeClass>org.openforis.collect.io.parsing.CSVFileTextDelimiter</includeClass>
                                 <includeClass>org.openforis.collect.io.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.io.data.DataImportState$MainStep</includeClass>
-                                <includeClass>org.openforis.collect.io.data.DataImportState$SubStep</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataExportStatus$Format</includeClass>
                                 <includeClass>org.openforis.collect.io.data.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.io.metadata.parsing.ParsingError$ErrorType</includeClass>
@@ -99,7 +97,6 @@
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.manager.referencedataimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.manager.OperationResult</includeClass>
                                 <includeClass>org.openforis.collect.manager.TaxonSearchParameters</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.NodeDefinitionSummary</includeClass>
@@ -131,17 +128,8 @@
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.DataExportStatus$Format</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.FileWrapper</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.codelistimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.concurrency.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataprocessing.DataProcessingStateProxy</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportConflictProxy</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportStateProxy</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.speciesimport.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.samplingdesignimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.reporting.proxy.*</includeClass>
 							</includeJavaClasses>
 						</configuration>

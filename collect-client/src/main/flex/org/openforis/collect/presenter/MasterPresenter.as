@@ -66,9 +66,6 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.SHOW_ERROR_PAGE, showErrorPageHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_HOME_PAGE, backToHomeHandler);
 			eventDispatcher.addEventListener(UIEvent.BACK_TO_LIST, backToListHandler);
-			eventDispatcher.addEventListener(UIEvent.SHOW_SPECIES_IMPORT, showSpeciesImportModuleHandler);
-			eventDispatcher.addEventListener(UIEvent.SHOW_SAMPLING_DESIGN_IMPORT, showSamplingDesignImportHandler);
-			eventDispatcher.addEventListener(UIEvent.SHOW_CODE_LIST_IMPORT, showCodeListImportModuleHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_FOR_EDIT, loadRecordForEditHandler);
@@ -119,25 +116,6 @@ package org.openforis.collect.presenter {
 			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.CHECK_VIEW_SIZE));
 		}
 		
-		protected function showSpeciesImportModuleHandler(event:UIEvent):void {
-			view.currentState = MasterView.SPECIES_IMPORT_STATE;
-			view.speciesImportView.surveyId = event.obj.surveyId;
-			view.speciesImportView.work = event.obj.work;
-		}
-
-		protected function showCodeListImportModuleHandler(event:UIEvent):void {
-			view.currentState = MasterView.CODE_LIST_IMPORT_STATE;
-			view.codeListImportView.surveyId = event.obj.surveyId;
-			view.codeListImportView.work = event.obj.work;
-			view.codeListImportView.codeListId = event.obj.codeListId;
-		}
-
-		protected function showSamplingDesignImportHandler(event:UIEvent):void {
-			view.currentState = MasterView.SAMPLING_DESIGN_IMPORT_STATE;
-			view.samplingDesignImportView.surveyId = event.obj.surveyId;
-			view.samplingDesignImportView.work = event.obj.work;		
-		}
-
 		/**
 		 * RecordSummary selected from list page
 		 * */

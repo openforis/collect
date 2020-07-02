@@ -138,7 +138,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			return Collections.emptyList();
 		}
 		List<CodeList> codeLists = survey.getCodeLists(false);
-		codeLists = sort(codeLists);
+		codeLists = sortByName(codeLists);
 		return codeLists;
 	}
 

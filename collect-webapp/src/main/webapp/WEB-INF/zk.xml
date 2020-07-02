@@ -22,6 +22,7 @@
 		<!-- labels -->
         <label-location>/WEB-INF/labels/designer/label.properties</label-location>
         <label-location>/WEB-INF/labels/language_codes_iso_639_1.properties</label-location>
+        <label-location>/WEB-INF/labels/language_codes_iso_639_3.properties</label-location>
     </system-config>
     
 	<session-config>

@@ -1,14 +1,18 @@
 package org.openforis.collect.io.metadata.samplingdesign;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * 
  * @author S. Ricci
  *
  */
 public enum SamplingDesignFileColumn {
-	LEVEL_1("level1_code"), 
-	LEVEL_2("level2_code"), 
-	LEVEL_3("level3_code"), 
+	LEVEL_1("level1_code", 1), 
+	LEVEL_2("level2_code", 2), 
+	LEVEL_3("level3_code", 3), 
 	X("x"),
 	Y("y"),
 	SRS_ID("srs_id");
@@ -16,17 +20,27 @@ public enum SamplingDesignFileColumn {
 	public static final SamplingDesignFileColumn[] LOCATION_COLUMNS = {X, Y};
 	public static final SamplingDesignFileColumn[] REQUIRED_COLUMNS = {LEVEL_1, X, Y, SRS_ID};
 	public static final SamplingDesignFileColumn[] LEVEL_COLUMNS = {LEVEL_1, LEVEL_2, LEVEL_3};
+	public static final SamplingDesignFileColumn[] ALL_COLUMNS = ArrayUtils.addAll(LEVEL_COLUMNS, X, Y, SRS_ID);
 	
 	public static final String[] REQUIRED_COLUMN_NAMES;
 	public static final String[] LEVEL_COLUMN_NAMES;
+	public static final String[] ALL_COLUMN_NAMES;
 	
 	static {
 		REQUIRED_COLUMN_NAMES = getColumnNames(REQUIRED_COLUMNS);
 		LEVEL_COLUMN_NAMES = getColumnNames(LEVEL_COLUMNS);
+		ALL_COLUMN_NAMES = getColumnNames(ALL_COLUMNS);
 	}
 	
-	private String columnName;
-	
+	public static SamplingDesignFileColumn fromColumnName(String columnName) {
+		for (SamplingDesignFileColumn column : values()) {
+			if (column.getColumnName().equals(columnName)) {
+				return column;
+			}
+		}
+		return null;
+	}
+
 	private static String[] getColumnNames(SamplingDesignFileColumn[] columns) {
 		String [] result = new String[columns.length];
 		for (int i = 0 ; i < columns.length; i ++) {
@@ -36,11 +50,28 @@ public enum SamplingDesignFileColumn {
 		return result;
 	}
 	
-	private SamplingDesignFileColumn(String columnName) {
+	private String columnName;
+	private int level;
+	
+	private SamplingDesignFileColumn(String columnName, int level) {
 		this.columnName = columnName;
+		this.level = level;
+	}
+	
+	private SamplingDesignFileColumn(String columnName) {
+		this(columnName, -1);
 	}
 	
 	public String getColumnName() {
 		return columnName;
 	}
+	
+	public int getLevel() {
+		return level;
+	}
+	
+	public boolean isLevelColumn() {
+		return Arrays.asList(LEVEL_COLUMNS).contains(this);
+	}
+	
 }

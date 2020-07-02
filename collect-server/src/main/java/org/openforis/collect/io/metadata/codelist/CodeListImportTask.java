@@ -36,7 +36,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 
 	private static final Logger LOG = LogManager.getLogger(CodeListImportTask.class);
 
-	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";
+	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "survey.code_list.import_data.error.different_label";
 	
 	//input
 	private CodeListManager codeListManager;
@@ -208,7 +208,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		addParsingError(lineNumber, error);
 	}
 	
-	private void addDuplicateCodeError(CodeListLine line,	int levelIdx) {
+	private void addDuplicateCodeError(CodeListLine line, int levelIdx) {
 		String level = levels.get(levelIdx);
 		String column = level + CodeListCSVReader.CODE_COLUMN_SUFFIX;
 		long lineNumber = line.getLineNumber();

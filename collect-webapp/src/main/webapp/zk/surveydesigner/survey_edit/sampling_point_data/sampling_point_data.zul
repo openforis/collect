@@ -1,0 +1,82 @@
+<zk>
+	<vbox id="samplingPointDataContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SamplingPointDataVM')"
+		hflex="true" vflex="true" spacing="20px">
+
+		<box hflex="true" vflex="true" pack="center" align="center"
+			visible="@load(vm.samplingPointDataEmpty)">
+			<label
+				value="${labels.survey.sampling_point_data.no_items_found}" />
+		</box>
+
+		<vbox hflex="true" vflex="true" align="center"
+			visible="@load(not vm.samplingPointDataEmpty)">
+			<listbox id="samplingPointDataListBox"
+				model="@load(vm.items)" hflex="true" vflex="true">
+				<listhead
+					children="@load(vm.attributes) @template(each.editingStatus ? 'editable' : 'noneditable')">
+					<template name="editable">
+						<listheader width="200px">
+							<textbox inplace="true" width="115px"
+								value="@load(each.name) @save(each.name, before='confirmAttributeUpdate')" />
+							<button sclass="icon" height="16px"
+								image="/assets/images/tick-small.png"
+								onClick="@command('confirmAttributeUpdate', attribute=each)" />
+							<button sclass="icon" height="16px"
+								image="/assets/images/cross-small.png"
+								onClick="@command('changeAttributeEditableStatus', attribute=each)" />
+						</listheader>
+					</template>
+					<template name="noneditable">
+						<listheader width="120px">
+							<label value="@load(each.name)"
+								width="70px" />
+							<button visible="@load(each.editable)"
+								sclass="icon" height="16px"
+								image="/assets/images/pencil-small.png"
+								onClick="@command('changeAttributeEditableStatus', attribute=each)" />
+						</listheader>
+					</template>
+				</listhead>
+				<template name="model" var="item">
+					<listitem>
+						<listcell forEach="${vm.attributes}"
+							label="${vm.getAttributeValue(each, item)}" />
+					</listitem>
+				</template>
+			</listbox>
+
+			<paging id="paging" hflex="true" detailed="true"
+				activePage="@load(vm.itemsPage)" totalSize="@load(vm.itemsTotal)"
+				pageSize="@load(vm.itemsPageSize)"
+				onPaging="@command(vm.updateItemsPaging(event.activePage))" />
+		</vbox>
+
+		<box align="center" hflex="true">
+			<hbox spacing="100px">
+				<button label="${labels.global.import_data}"
+					image="/assets/images/upload-small.png"
+					onClick="@command('openImportPopUp')" />
+				<combobutton label="${labels.global.export_data}"
+					image="/assets/images/excel-small.png"
+					onClick="@command('exportToExcel')"
+					visible="@load(not vm.samplingPointDataEmpty)">
+					<menupopup>
+						<menuitem
+							label="${labels.global.export_to_excel}"
+							onClick="@command('exportToExcel')" />
+						<menuitem label="${labels.global.export_to_csv}"
+							onClick="@command('exportToCsv')" />
+					</menupopup>
+				</combobutton>
+				<button
+					label="${labels.survey.sampling_point_data.delete_all_items}"
+					image="/assets/images/trash-small.png"
+					onClick="@command('deleteAllItems')"
+					visible="@load(not vm.samplingPointDataEmpty)" />
+			</hbox>
+		</box>
+	</vbox>
+
+</zk>

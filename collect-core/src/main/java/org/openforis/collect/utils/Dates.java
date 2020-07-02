@@ -81,6 +81,10 @@ public class Dates {
 	public static Object formatCompactDateTime(Date dateTime) {
 		return format(dateTime, COMPACT_DATE_TIME_FORMAT);
 	}
+	
+	public static Object formatCompactNow() {
+		return formatCompactDateTime(new Date());
+	}
 
 	public static String formatDateTime(Date dateTime) {
 		String value = format(dateTime, DATE_TIME_FORMAT);

@@ -17,7 +17,7 @@ import org.openforis.commons.collection.Visitor;
  * @author G. Miceli
  * @author M. Togna
  */
-public class CodeList extends VersionableSurveyObject {
+public class CodeList extends VersionableSurveyObject implements NamedObject {
 
 	private static final long serialVersionUID = 1L;
 

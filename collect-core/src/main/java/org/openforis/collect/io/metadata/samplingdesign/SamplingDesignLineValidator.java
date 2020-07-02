@@ -15,9 +15,9 @@ import org.openforis.idm.metamodel.SpatialReferenceSystem;
  */
 public class SamplingDesignLineValidator {
 	
-	private static final String INVALID_X_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidX";
-	private static final String INVALID_Y_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidY";
-	private static final String INVALID_SRS_ID_MESSAGE_KEY = "samplingDesignImport.parsingError.invalidSrsId";
+	private static final String INVALID_X_MESSAGE_KEY = "survey.sampling_point_data.import_data.error.invalid_x";
+	private static final String INVALID_Y_MESSAGE_KEY = "survey.sampling_point_data.import_data.error.invalid_y";
+	private static final String INVALID_SRS_ID_MESSAGE_KEY = "survey.sampling_point_data.import_data.error.invalid_srs_id";
 	
 	private CollectSurvey survey;
 	private List<ParsingError> errors;

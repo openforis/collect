@@ -95,6 +95,17 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<Long, TaxonVer
 		return entities;
 	}
 
+	public List<String> loadVernacularLangCodes(int taxonomyId) {
+		return dsl()
+				.selectDistinct(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE)
+				.from(OFC_TAXON_VERNACULAR_NAME)
+				.where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.in(
+						dsl.select(OFC_TAXON.ID)
+							.from(OFC_TAXON)
+							.where(OFC_TAXON.TAXONOMY_ID.eq(taxonomyId)))
+				).orderBy(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE)
+				.fetch(OFC_TAXON_VERNACULAR_NAME.LANGUAGE_CODE);
+	}
 	
 	public void deleteByTaxonomy(int taxonomyId) {
 		TaxonVernacularNameDSLContext dsl = dsl();

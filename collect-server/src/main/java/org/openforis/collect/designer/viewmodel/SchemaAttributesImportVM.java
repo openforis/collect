@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -38,7 +37,6 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Window;
@@ -55,6 +53,7 @@ public class SchemaAttributesImportVM extends BaseSurveyFileImportVM {
 	private boolean labelsInSecondRow;
 	
 	public SchemaAttributesImportVM() {
+		super(new String[] {Files.CSV_FILE_EXTENSION}, null);
 		reset();
 	}
 	
@@ -79,15 +78,6 @@ public class SchemaAttributesImportVM extends BaseSurveyFileImportVM {
 		}
 	}
 	
-	@Override
-	protected void checkCanImportFile(Media media) {
-		String fileName = media.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if (!Files.CSV_FILE_EXTENSION.equalsIgnoreCase(extension)) {
-			throw new RuntimeException(String.format("Only CSV file upload is supported, found: %s", extension));
-		}
-	}
-
 	@Command
 	public void openParentEntitySelectionButton() {
 		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {

@@ -16,7 +16,6 @@ import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
@@ -25,7 +24,6 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
-import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -131,16 +129,6 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 		String labelKey = RANK_PREFIX + name.toLowerCase(Locale.ENGLISH);
 		String label = Labels.getLabel(labelKey);
 		return label;
-	}
-	
-	@DependsOn("surveyId")
-	public List<String> getTaxonomyNames() {
-		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey);
-		List<String> result = new ArrayList<String>();
-		for (CollectTaxonomy taxonomy : taxonomies) {
-			result.add(taxonomy.getName());
-		}
-		return result;
 	}
 	
 	public List<String[]> getVisibleFieldsTemplates() {

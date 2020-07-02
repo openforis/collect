@@ -75,7 +75,7 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 	
 	public static class SpeciesCSVLineParser extends CSVReferenceDataLineParser<SpeciesLine> {
 		
-		protected static final String GENUS_SUFFIX = "sp.";
+		public static final String GENUS_SUFFIX = "sp.";
 		private static final String GENUS_PATTERN_STR = "[A-Z][a-z]+";
 		private static final String SPECIES_NAME_PATTERN_STR = "[a-z]+\\-?[a-z]+";
 		private static final String DEFAULT_HYBRID_FORMULA = "×";
@@ -104,7 +104,7 @@ public class SpeciesCSVReader extends CSVReferenceDataImportReader<SpeciesLine> 
 		private static final String DEFAULT_VERNACULAR_NAMES_SEPARATOR = ",";
 		private static final String OTHER_VERNACULAR_NAMES_SEPARATOR_EXPRESSION = "/";
 		
-		public static final String UNEXPECTED_SYNONYM_MESSAGE_KEY = "speciesImport.parsingError.unexpected_synonym.message";
+		public static final String UNEXPECTED_SYNONYM_MESSAGE_KEY = "survey.taxonomy.import_data.error.unexpected_synonym";
 		
 		SpeciesCSVLineParser(SpeciesCSVReader reader, CsvLine line, List<String> infoColumnNames) {
 			super(reader, line, infoColumnNames);

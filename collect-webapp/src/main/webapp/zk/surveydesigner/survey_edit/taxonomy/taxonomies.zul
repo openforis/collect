@@ -1,0 +1,172 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<borderlayout id="taxonomiesContainer"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.TaxonomiesVM')"
+		validationMessages="@id('vmsgs')" hflex="true" vflex="true">
+		<west width="220px">
+			<borderlayout>
+				<center border="none"
+					title="${labels.survey.taxonomy.items.header}:">
+					<vlayout vflex="true">
+						<box pack="center" align="center" hflex="1"
+							vflex="1" visible="@load(empty vm.items)">
+							<label style="white-space: pre-line;"
+								value="${labels.survey.taxonomy.items.empty_list}" />
+						</box>
+						<listbox id="itemsListBox"
+							visible="@load(not empty vm.items)"
+							selectedItem="@load(vm.selectedItem)" model="@load(vm.items)"
+							onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
+							width="220px" vflex="true">
+							<listhead>
+								<listheader label="" width="175px" />
+								<listheader label="" width="30px" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.name)" />
+									<listcell
+										tooltiptext="@load(vm.getWarnings(each))">
+										<image
+											visible="@load(vm.hasWarnings(each))"
+											src="/assets/images/warning-small.png" />
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+						<menubar>
+							<menuitem sclass="icon-button with-label"
+								label="${labels.survey.taxonomy.add_item}"
+								image="/assets/images/add.png" onClick="@command('newItem')"
+								width="70px" />
+							<menuitem sclass="icon-button"
+								tooltiptext="${labels.global.delete_item}"
+								image="/assets/images/delete.png"
+								disabled="@load(empty vm.selectedItem)"
+								onClick="@command('deleteTaxonomy', item=vm.selectedItem)" />
+						</menubar>
+					</vlayout>
+				</center>
+			</borderlayout>
+		</west>
+		<center>
+			<absolutelayout hflex="true" vflex="true">
+				<absolutechildren hflex="true" vflex="true">
+					<box pack="center" align="center" hflex="1"
+						vflex="1" visible="@load(not(vm.editingItem))">
+						<label
+							value="${labels.global.item.select_or_create_new_one}" />
+					</box>
+				</absolutechildren>
+				<absolutechildren hflex="true" vflex="true">
+					<vbox visible="@load(vm.editingItem)" hflex="true"
+						vflex="true">
+						<label
+							value="${labels.survey.changes_saved_immediately}" />
+						<grid id="formContainer" sclass="form compact"
+							hflex="true" validationMessages="@id('vmsgs')"
+							form="@id('fx') 
+							@load(vm.formObject) 
+			                @save(vm.formObject, before={'validate','applyChanges'})
+			                @validator('org.openforis.collect.designer.form.validator.TaxonomyFormValidator')">
+							<columns>
+								<column width="150px" />
+								<column />
+							</columns>
+							<rows>
+								<row>
+									<fieldErrorHandler
+										message="@load(vmsgs['name'])">
+										<label
+											value="${labels.global.item.name.$}:" />
+									</fieldErrorHandler>
+									<fieldErrorHandler
+										message="@load(vmsgs['name'])">
+										<textbox id="nameTextbox"
+											width="150px" value="@bind(fx.name)"
+											onChange="@command('applyChanges')" />
+									</fieldErrorHandler>
+								</row>
+							</rows>
+						</grid>
+						<box hflex="true" vflex="true" pack="center"
+							align="center" visible="@load(vm.taxaTotal eq 0)">
+							<label
+								value="${labels.survey.taxonomy.empty_taxa}" />
+						</box>
+						<vbox hflex="true" vflex="true" align="center"
+							visible="@load(vm.taxaTotal gt 0)">
+							<listbox id="taxaListBox"
+								model="@load(vm.taxa)" hflex="true" vflex="true">
+								<listhead
+									children="@load(vm.taxaAttributes) @template(each.editingStatus ? 'editing' : 'nonediting')">
+									<template name="editing">
+										<listheader width="200px">
+											<textbox inplace="true"
+												width="115px"
+												value="@load(each.name) @save(each.name, before='confirmAttributeUpdate')" />
+											<button sclass="icon"
+												height="16px" image="/assets/images/tick-small.png"
+												onClick="@command('confirmAttributeUpdate', attribute=each)" />
+											<button sclass="icon"
+												height="16px" image="/assets/images/cross-small.png"
+												onClick="@command('changeAttributeEditableStatus', attribute=each)" />
+										</listheader>
+									</template>
+									<template name="nonediting">
+										<listheader width="@load(vm.getTaxaAttributeColumnWith(each))">
+											<label
+												value="@load(vm.getTaxaAttributeLabel(each))" width="70px" />
+											<button
+												visible="@load(each.editable)" sclass="icon" height="16px"
+												image="/assets/images/pencil-small.png"
+												onClick="@command('changeAttributeEditableStatus', attribute=each)" />
+										</listheader>
+									</template>
+								</listhead>
+								<template name="model" var="taxon">
+									<listitem>
+										<listcell
+											forEach="${vm.taxaAttributes}"
+											label="${vm.getTaxonAttribute(taxon, each.name)}" />
+									</listitem>
+								</template>
+							</listbox>
+
+							<paging id="taxaPaging" hflex="true" detailed="true"
+								activePage="@load(vm.taxaPage)" totalSize="@load(vm.taxaTotal)"
+								pageSize="@load(vm.taxaPageSize)"
+								onPaging="@command(vm.updateTaxaPaging(event.activePage))" />
+						</vbox>
+						<box align="center" hflex="true"
+							height="30px">
+							<hbox spacing="100px">
+								<button
+									label="${labels.global.import_data}"
+									image="/assets/images/upload-small.png"
+									visible="@load(not vm.newItem)"
+									onClick="@command('openImportPopUp')" />
+								<combobutton
+									label="${labels.global.export_data}"
+									image="/assets/images/excel-small.png"
+									visible="@load(not vm.newItem)"
+									onClick="@command('exportToExcel')">
+									<menupopup>
+										<menuitem
+											label="${labels.global.export_to_excel}"
+											onClick="@command('exportToExcel')" />
+										<menuitem
+											label="${labels.global.export_to_csv}"
+											onClick="@command('exportToCsv')" />
+									</menupopup>
+								</combobutton>
+							</hbox>
+						</box>
+					</vbox>
+				</absolutechildren>
+			</absolutelayout>
+		</center>
+	</borderlayout>
+</zk>

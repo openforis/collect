@@ -43,12 +43,6 @@ package org.openforis.collect.event {
 		//survey preview
 		public static const SHOW_SURVEY_PREVIEW:String = "showSurveyPreview";
 		
-		public static const OPEN_SPECIES_IMPORT_POPUP:String = "openSpeciesImportPopUp";
-		public static const CLOSE_SPECIES_IMPORT_POPUP:String = "closeSpeciesImportPopUp";
-		public static const SHOW_SPECIES_IMPORT:String = "showSpeciesImport";
-		public static const SHOW_SAMPLING_DESIGN_IMPORT:String = "showSamplingDesignImport";
-		public static const SHOW_CODE_LIST_IMPORT:String = "showCodeListImport";
-		
 		private var _obj:Object;
 		private var _params:Array;
 		

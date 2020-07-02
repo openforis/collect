@@ -1,10 +1,12 @@
 package org.openforis.idm.model.species;
 
+import org.openforis.idm.metamodel.NamedObject;
+
 /**
  * @author G. Miceli
  * @author M. Togna
  */
-public class Taxonomy {
+public class Taxonomy implements NamedObject {
 	
 	private Integer id;
 	private String name;
