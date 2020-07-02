@@ -1,5 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<name>Open Foris Collect</name>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
@@ -51,7 +53,7 @@
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
-	
+
 	<profiles>
 		<profile>
 			<id>installer</id>
@@ -60,10 +62,31 @@
 			</modules>
 		</profile>
 	</profiles>
-	
+
 	<build>
 		<plugins>
-			<!--  Create a build number to use for the InstallBuilder auto updater and set a ${buildNumber} variable --> 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.4.1</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.6.3</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Create a build number to use for the InstallBuilder auto updater 
+				and set a ${buildNumber} variable -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
@@ -83,8 +106,8 @@
 					</items>
 				</configuration>
 			</plugin>
-			
-			<!--  Set Eclipse project text encoding to UTF-8 -->
+
+			<!-- Set Eclipse project text encoding to UTF-8 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -115,7 +138,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -124,13 +146,14 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-			                <additionalparam>-Xdoclint:none</additionalparam>
-			            </configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- explicitly define maven-deploy-plugin after other to force exec order -->
+				<!-- explicitly define maven-deploy-plugin after other to force exec 
+					order -->
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.8.2</version>
 				<executions>
@@ -150,31 +173,31 @@
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<!-- During release:perform, enable these profiles -->
-<!-- 					<releaseProfiles>installer,publishupdater</releaseProfiles> -->
+					<!-- <releaseProfiles>installer,publishupdater</releaseProfiles> -->
 					<releaseProfiles>installer</releaseProfiles>
 				</configuration>
-	    	</plugin>
-<!-- 	    	<plugin> -->
-<!-- 				<groupId>com.soebes.maven.plugins.mlv</groupId> -->
-<!-- 				<artifactId>maven-license-verifier-plugin</artifactId> -->
-<!-- 				<version>0.4</version> -->
-<!-- 				<dependencies> -->
-<!-- 					<dependency> -->
-<!-- 						<groupId>org.openforis.common-build</groupId> -->
-<!-- 						<artifactId>common-build-license-verifier</artifactId> -->
-<!-- 						<version>1.0-SNAPSHOT</version> -->
-<!-- 					</dependency> -->
-<!-- 				</dependencies> -->
-<!-- 				<executions> -->
-<!-- 			      <execution> -->
-<!-- 						<id>license-verifier</id> -->
-<!-- 						<goals> -->
-<!-- 							<goal>report</goal> -->
-<!-- 							<goal>verify</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
+			</plugin>
+			<!-- <plugin> -->
+			<!-- <groupId>com.soebes.maven.plugins.mlv</groupId> -->
+			<!-- <artifactId>maven-license-verifier-plugin</artifactId> -->
+			<!-- <version>0.4</version> -->
+			<!-- <dependencies> -->
+			<!-- <dependency> -->
+			<!-- <groupId>org.openforis.common-build</groupId> -->
+			<!-- <artifactId>common-build-license-verifier</artifactId> -->
+			<!-- <version>1.0-SNAPSHOT</version> -->
+			<!-- </dependency> -->
+			<!-- </dependencies> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <id>license-verifier</id> -->
+			<!-- <goals> -->
+			<!-- <goal>report</goal> -->
+			<!-- <goal>verify</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -183,6 +206,41 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.8.2</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>2.5.2</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.9.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.22.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.22.2</version>
+				</plugin>
 				<plugin>
 					<groupId>org.sonatype.flexmojos</groupId>
 					<artifactId>flexmojos-maven-plugin</artifactId>
@@ -233,8 +291,9 @@
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.1.0</version>
 				</plugin>
-				
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -256,10 +315,7 @@
 									</pluginExecutionFilter>
 									<action>
 										<ignore />
-										<!-- 
-										Must ignore since m2e fails on copy-flex-resource
-										https://issues.sonatype.org/browse/MNGECLIPSE-1375
-										 -->
+										<!-- Must ignore since m2e fails on copy-flex-resource https://issues.sonatype.org/browse/MNGECLIPSE-1375 -->
 										<!-- <execute /> -->
 									</action>
 								</pluginExecution>
@@ -329,15 +385,15 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		
+
 		<!-- GeoTools -->
-<!-- 		<repository> -->
-<!-- 			<id>osgeo</id> -->
-<!-- 			<name>Open Source Geospatial Foundation Repository</name> -->
-<!-- 			<url>http://download.osgeo.org/webdav/geotools/</url> -->
-<!-- 		</repository> -->
+		<!-- <repository> -->
+		<!-- <id>osgeo</id> -->
+		<!-- <name>Open Source Geospatial Foundation Repository</name> -->
+		<!-- <url>http://download.osgeo.org/webdav/geotools/</url> -->
+		<!-- </repository> -->
 	</repositories>
-	
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>central</id>
@@ -577,5 +633,5 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 </project>

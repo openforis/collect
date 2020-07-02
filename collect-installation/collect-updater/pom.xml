@@ -89,7 +89,6 @@
 					<!-- 2. copy resource files -->
 					<plugin>
 						<artifactId>maven-resources-plugin</artifactId>
-						<version>2.6</version>
 						<executions>
 							<execution>
 								<id>copy-installbuilder-source-file</id>
