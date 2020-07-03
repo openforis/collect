@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.26.13] - 2020-07-03
+### Added
+- Removed need for Flash Player from Survey Designer Sampling Point Data and Species List editors.
+- Allow exporting survey to SQL format from Survey Designer / List of Surveys.
+
 ## [3.26.12] - 2020-06-10
 ### Fixed
 - Fixed error when exporting to CEP in case there is ancillary data shown in the headers.
