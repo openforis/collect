@@ -1,9 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect-installation</artifactId>
-		<version>3.26.14-SNAPSHOT</version>
+		<version>3.26.13-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-updater</artifactId>
 	<packaging>pom</packaging>
@@ -238,7 +240,10 @@
 											<configuration>
 												<skip>${installer.skip}</skip>
 												<target>
-													<move file="${installbuilder.builder.output}/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}" tofile="${project.build.directory}/${installer.classifier}-updater.${installer.extension}" failonerror="true" />
+													<move
+														file="${installbuilder.builder.output}/${installbuilder.project.name}-${installer-version-id}-${installer.classifier}-installer.${installer.extension}"
+														tofile="${project.build.directory}/${installer.classifier}-updater.${installer.extension}"
+														failonerror="true" />
 												</target>
 											</configuration>
 										</pluginExecutor>
@@ -282,12 +287,18 @@
 								<phase>install</phase>
 								<configuration>
 									<target>
-										<property name="host" value="${collect.autoupdater.ftp.host}" />
-										<property name="username" value="${collect.autoupdater.ftp.username}" />
-										<property name="password" value="${collect.autoupdater.ftp.password}" />
-										<property name="remote_folder" value="${collect.autoupdater.ftp.remotefolder}" />
-										<property name="local_folder" value="${installer-build-path}" />
-										<property name="file_name" value="${autoupdate-xml-file-name}" />
+										<property name="host"
+											value="${collect.autoupdater.ftp.host}" />
+										<property name="username"
+											value="${collect.autoupdater.ftp.username}" />
+										<property name="password"
+											value="${collect.autoupdater.ftp.password}" />
+										<property name="remote_folder"
+											value="${collect.autoupdater.ftp.remotefolder}" />
+										<property name="local_folder"
+											value="${installer-build-path}" />
+										<property name="file_name"
+											value="${autoupdate-xml-file-name}" />
 										<ant antfile="${installer-build-path}/ant_ftp_upload.xml" />
 									</target>
 								</configuration>
