@@ -36,13 +36,12 @@ public abstract class RDBPrintTask extends Task {
 	//transient
 	private transient SimpleDateFormat dateFormatter;
 	
-	public RDBPrintTask() {
-		this.dateTimeFormat = DEFAULT_DATE_TIME_FORMAT;
-	}
-	
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
+		if (StringUtils.isBlank(this.dateTimeFormat)) {
+			this.dateTimeFormat = DEFAULT_DATE_TIME_FORMAT;
+		}
 		this.dateFormatter = new SimpleDateFormat(dateTimeFormat);
 	}
 	

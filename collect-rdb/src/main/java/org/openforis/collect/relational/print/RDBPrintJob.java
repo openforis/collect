@@ -1,8 +1,11 @@
 package org.openforis.collect.relational.print;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.manager.RecordManager;
@@ -16,16 +19,22 @@ import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.collect.utils.Dates;
 import org.openforis.commons.collection.Visitor;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author S. Ricci
  *
  */
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RDBPrintJob extends Job {
 
 	public enum RdbDialect {
@@ -55,8 +64,11 @@ public class RDBPrintJob extends Job {
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
-		outputFile = File.createTempFile("rdb", ".sql");
-		writer = new FileWriter(outputFile);
+		outputFile = File.createTempFile("rdb", ".zip");
+		ZipEntry zipEntry = new ZipEntry(String.format("%s_rdb_%s.sql", survey.getName(), Dates.formatCompactNow()));
+		ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(outputFile));
+		zipOut.putNextEntry(zipEntry);
+		writer = new OutputStreamWriter(zipOut);
 	}
 	
 	@Override

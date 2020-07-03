@@ -288,7 +288,18 @@
                 "label": "Export mode",
                 "desktop": "Collect Desktop (backup)",
                 "earth": "Collect Earth",
-                "mobile": "Collect Mobile"
+                "mobile": "Collect Mobile",
+                "rdb": {
+                	"label": "Relational DB (SQL)",
+	                "dialect": {
+	            		"label": "Dialect",
+	            		"standard": "Standard (PostgreSQL/MySQL)",
+	            		"sqlite": "SQLite"
+                	},
+                	"includeData": "Include data",
+	            	"targetSchemaName": "Target schema",
+                	"dateTimeFormat": "Date-time format"
+            	}
             }
         },
         "import": {

@@ -14,7 +14,13 @@ const surveyTypes = {
 const outputFormats = {
     desktop: 'DESKTOP',
     earth: 'EARTH',
-    mobile: 'MOBILE'
+    mobile: 'MOBILE',
+    rdb: 'RDB'
+}
+
+const rdbDialects = {
+	standard: 'STANDARD',
+	sqlite: 'SQLITE',
 }
 
 class SurveyExportPage extends Component {
@@ -29,7 +35,11 @@ class SurveyExportPage extends Component {
             surveyType: null,
             skipValidation: true,
             outputSurveyDefaultLanguage: null,
-            availableLanguages: []
+            availableLanguages: [],
+            includeData: false,
+            rdbDialect: rdbDialects.standard,
+            rdbTargetSchemaName: null,
+            rdbDateTimeFormat: 'yyyy-MM-dd HH:mm',
         }
 
         this.handleExportButtonClick = this.handleExportButtonClick.bind(this)
@@ -67,7 +77,8 @@ class SurveyExportPage extends Component {
                 availableLanguages: surveySummary.languages && surveySummary.languages.length > 0
                     ? surveySummary.languages 
                     : [L.DEFAULT_LANG_CODE], //TODO don't default it!
-                outputSurveyDefaultLanguage: surveySummary.defaultLanguage
+                outputSurveyDefaultLanguage: surveySummary.defaultLanguage,
+                rdbTargetSchemaName: surveySummary.name,
             })
         }
     }
@@ -76,20 +87,25 @@ class SurveyExportPage extends Component {
         if (!this.validateForm()) {
             return
         }
-        const { surveySummary, surveyType, outputFormat, outputSurveyDefaultLanguage, skipValidation } = this.state
+        const { surveySummary, surveyType, outputFormat, outputSurveyDefaultLanguage, 
+        	skipValidation, includeData, rdbDialect, rdbTargetSchemaName, rdbDateTimeFormat } = this.state
 
         const languageCode = outputFormat === outputFormats.earth || outputFormat === outputFormats.mobile 
             ? outputSurveyDefaultLanguage
             : null
         
-        ServiceFactory.surveyService.startExport(
-            surveySummary.id,
-            surveySummary.uri,
+        ServiceFactory.surveyService.startExport({
+            surveyId: surveySummary.id,
+            surveyUri: surveySummary.uri,
             surveyType,
             outputFormat,
             languageCode,
-            skipValidation
-        ).then(job => {
+            skipValidation,
+            includeData,
+            rdbDialect,
+            rdbTargetSchemaName,
+            rdbDateTimeFormat
+        }).then(job => {
             this.props.dispatch(JobActions.startJobMonitor({
                 jobId: job.id,
                 title: 'Exporting survey',
@@ -106,38 +122,71 @@ class SurveyExportPage extends Component {
     handleExportModalOkButtonClick(job) {
         if (job.completed) {
             const surveySummary = this.state.surveySummary
-            const surveyId = surveySummary.id
-            ServiceFactory.surveyService.downloadExportResult(surveyId)
+            ServiceFactory.surveyService.downloadExportResult(surveySummary.id)
         }
         this.props.dispatch(JobActions.closeJobMonitor())
     }
 
     render() {
-        const { surveySummary, availableLanguages, surveyType, outputFormat, outputSurveyDefaultLanguage } = this.state
+        const { 
+        	surveySummary,
+        	availableLanguages,
+        	surveyType,
+        	outputFormat,
+        	outputSurveyDefaultLanguage,
+        	includeData,
+        	rdbDialect,
+        	rdbTargetSchemaName,
+        	rdbDateTimeFormat
+    		} = this.state
         if (!surveySummary) {
             return <div>Loading...</div>
         }
 
-        const surveyTypeCheckBoxes = Object.values(surveyTypes).map(type =>
-            <FormGroup>
-                <Label key={type} check>
+        const surveyTypeRadioBoxes = Object.values(surveyTypes).map(type =>
+            <FormGroup key={type}>
+                <Label check>
                     <Input type="radio" value={type} name="surveyType"
                         checked={surveyType === type}
-                        onChange={(event) => this.setState({ surveyType: event.target.value })}
-                        disabled={(type === surveyTypes.published && surveySummary.temporary && !surveySummary.publishedId)
-                            || (type === surveyTypes.temporary && !surveySummary.temporary)}
+                        onChange={(event) => {
+                        	const value = event.target.value
+                        	const newState = { 
+                        		surveyType: value
+                        	}
+                    		if (value === surveyTypes.temporary) {
+                    			// Temporary surveys cannot have data
+                    			newState.includeData = false
+                    		}
+                        	this.setState(newState)
+            			}}
+                        disabled={
+                    		(type === surveyTypes.published && surveySummary.temporary && !surveySummary.publishedId)
+                            || (type === surveyTypes.temporary && !surveySummary.temporary)
+                        }
                     />
                     {L.l('survey.surveyType.' + type.toLowerCase())}
                 </Label>
             </FormGroup>
         )
-        const outputFormatCheckboxes = Object.values(outputFormats).map(mode =>
-            <FormGroup>
-                <Label key={mode} check>
+        const outputFormatRadioBoxes = Object.values(outputFormats).map(mode =>
+            <FormGroup key={mode}>
+                <Label check>
                     <Input type="radio" value={mode} name="outputFormat"
                         checked={outputFormat === mode}
-                        onChange={(event) => this.setState({ outputFormat: event.target.value })} />
+                        onChange={(event) => this.setState({ outputFormat: event.target.value })}
+                    />
                     {L.l('survey.export.mode.' + mode.toLowerCase())}
+                </Label>
+            </FormGroup>
+        )
+        const rdbDialectRadioBoxes = Object.values(rdbDialects).map(dialect =>
+            <FormGroup key={dialect}>
+                <Label check>
+                    <Input type="radio" value={dialect} name="rdbDialect"
+                        checked={rdbDialect === dialect}
+                        onChange={(event) => this.setState({ rdbDialect: event.target.value })}
+                    />
+                    {L.l('survey.export.mode.rdb.dialect.' + dialect.toLowerCase())}
                 </Label>
             </FormGroup>
         )
@@ -152,7 +201,7 @@ class SurveyExportPage extends Component {
                             <Label for="surveyType" sm={3}>{L.l('survey.surveyType')}:</Label>
                             <Col sm={9}>
                                 <FormGroup check>
-                                    {surveyTypeCheckBoxes}
+                                    {surveyTypeRadioBoxes}
                                 </FormGroup>
                             </Col>
                         </FormGroup>
@@ -160,7 +209,7 @@ class SurveyExportPage extends Component {
                             <Label for="outputFormat" sm={3}>{L.l('survey.export.mode')}:</Label>
                             <Col sm={9}>
                                 <FormGroup check>
-                                    {outputFormatCheckboxes}
+                                    {outputFormatRadioBoxes}
                                 </FormGroup>
                             </Col>
                         </FormGroup>
@@ -175,6 +224,47 @@ class SurveyExportPage extends Component {
                                 </Col>
                             </FormGroup>
                         }
+                        {(outputFormat === outputFormats.rdb) && (
+                        	<React.Fragment>
+	                        	<FormGroup row>
+		                            <Label for="rdbDialect" sm={3}>{L.l('survey.export.mode.rdb.dialect')}:</Label>
+		                            <Col sm={9}>
+		                                <FormGroup check>
+		                                    {rdbDialectRadioBoxes}
+		                                </FormGroup>
+		                            </Col>
+		                        </FormGroup>
+		                        <FormGroup row>
+	                                <Label for="rdbTargetSchemaName" sm={4}>{L.l('survey.export.mode.rdb.targetSchemaName')}:</Label>
+	                                <Col sm={8}>
+	                                    <Input name="rdbTargetSchemaName" id="rdbTargetSchemaName" 
+	                                    	value={rdbTargetSchemaName}
+	                                        onChange={(event) => this.setState({ rdbTargetSchemaName: event.target.value })}
+	                                    	disabled={rdbDialect === rdbDialects.sqlite} />
+	                                </Col>
+	                            </FormGroup>
+		                        <FormGroup row>
+	                                <Label for="includeData" sm={4}>{L.l('survey.export.mode.rdb.includeData')}:</Label>
+	                                <Col sm={8}>
+	                                    <Input type="checkbox" name="includeData" id="includeData" 
+	                                    	checked={includeData}
+	                                        onChange={(event) => this.setState({ includeData: event.target.value })}
+	                                    	disabled={surveyType === surveyTypes.temporary} />
+	                                </Col>
+	                            </FormGroup>
+	                            {includeData && (
+                            		<FormGroup row>
+	                            		<Label for="rdbDateTimeFormat" sm={4}>{L.l('survey.export.mode.rdb.dateTimeFormat')}:</Label>
+	                            		<Col sm={8}>
+		                            		<Input name="rdbDateTimeFormat" id="rdbDateTimeFormat" 
+		                            			value={rdbDateTimeFormat}
+			                            		onChange={(event) => this.setState({ rdbDateTimeFormat: event.target.value })}
+			                            		disabled={rdbDialect === rdbDialects.sqlite} />
+	                            		</Col>
+                            		</FormGroup>
+	                            )}
+	                        </React.Fragment>
+                        )}
                     </Form>
                 </FormGroup>
                 <Row>

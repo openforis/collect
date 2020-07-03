@@ -56,14 +56,19 @@ export default class SurveyService extends AbstractService {
         return this.get('survey/importstatus')
     }
 
-    startExport(surveyId, surveyUri, surveyType, outputFormat, languageCode, skipValidation) {
+    startExport({surveyId, surveyUri, surveyType, outputFormat, languageCode, 
+    		skipValidation, includeData, rdbDialect, rdbTargetSchemaName, rdbDateTimeFormat}) {
         return this.post('survey/export/' + surveyId, {
             surveyId,
             surveyUri,
             surveyType,
             outputFormat,
             languageCode,
-            skipValidation
+            skipValidation,
+            includeData,
+            rdbDialect,
+            rdbTargetSchemaName,
+            rdbDateTimeFormat,
         })
     }
 

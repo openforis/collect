@@ -45,12 +45,15 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.view.SurveyView;
 import org.openforis.collect.metamodel.view.SurveyViewGenerator;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.collect.relational.print.RDBPrintJob;
+import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.Dates;
 import org.openforis.collect.utils.Files;
@@ -467,21 +470,18 @@ public class SurveyController extends BasicController {
 //				res.setErrorStatus();
 //				res.setErrorMessage("survey.validation.errors");
 //			}
-//		case RDB:
-//			RDBPrintJob job = null;
-//			job = new RDBPrintJob();
-//			job.setSurvey(loadedSurvey);
-//			job.setTargetSchemaName(loadedSurvey.getName());
-//			job.setRecordManager(recordManager);
-//			RecordFilter recordFilter = new RecordFilter(loadedSurvey);
-//			job.setRecordFilter(recordFilter);
-//			job.setIncludeData(parameters.isIncludeData());
-//			job.setDialect(parameters.getRdbDialectEnum());
-//			job.setDateTimeFormat(parameters.getRdbDateTimeFormat());
-//			job.setTargetSchemaName(parameters.getRdbTargetSchemaName());
-//			jobManager.start(job, String.valueOf(loadedSurvey.getId()));
-//
-//			break;
+		case RDB: {
+			RDBPrintJob job = jobManager.createJob(RDBPrintJob.class);
+			job.setSurvey(loadedSurvey);
+			job.setRecordFilter(new RecordFilter(loadedSurvey));
+			job.setIncludeData(params.isIncludeData());
+			job.setDialect(params.getRdbDialectEnum());
+			job.setDateTimeFormat(params.getRdbDateTimeFormat());
+			job.setTargetSchemaName(params.getRdbTargetSchemaName());
+			jobManager.start(job, String.valueOf(loadedSurvey.getId()));
+			this.surveyBackupJob = job;
+			return new JobView(job);
+		}
 		case MOBILE:
 		default:
 			SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
@@ -497,7 +497,7 @@ public class SurveyController extends BasicController {
 	}
 	
 	@RequestMapping(value="export/{surveyId}/result", method=GET)
-	public void downloadCsvExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
+	public void downloadExportResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		if (surveyBackupJob != null) {
 			File outputFile;
 			String outputFileExtension;
@@ -508,6 +508,12 @@ public class SurveyController extends BasicController {
 				outputFile = backupJob.getOutputFile();
 				outputFileExtension = COLLECT_EARTH_PROJECT_FILE_EXTENSION;
 				survey = backupJob.getSurvey();
+				projectName = survey.getName();
+			} else if (surveyBackupJob instanceof RDBPrintJob) {
+				RDBPrintJob rdbPrintJob = (RDBPrintJob) surveyBackupJob;
+				outputFile = rdbPrintJob.getOutputFile();
+				outputFileExtension = FilenameUtils.getExtension(outputFile.getName());
+				survey = rdbPrintJob.getSurvey();
 				projectName = survey.getName();
 			} else {
 				SurveyBackupJob backupJob = (SurveyBackupJob) surveyBackupJob;
@@ -645,6 +651,11 @@ public class SurveyController extends BasicController {
 		private OutputFormat outputFormat;
 		private String languageCode;
 		private boolean skipValidation;
+		// RDB export params
+		private boolean includeData;
+		private String rdbDialect;
+		private String rdbDateTimeFormat;
+		private String rdbTargetSchemaName;
 		
 		public enum OutputFormat {
 			MOBILE, DESKTOP, RDB, EARTH
@@ -652,6 +663,10 @@ public class SurveyController extends BasicController {
 		
 		public String getSurveyUri() {
 			return surveyUri;
+		}
+
+		public RdbDialect getRdbDialectEnum() {
+			return rdbDialect == null ? null : RdbDialect.valueOf(rdbDialect);
 		}
 
 		public void setSurveyUri(String surveyUri) {
@@ -696,6 +711,30 @@ public class SurveyController extends BasicController {
 		
 		public void setSkipValidation(boolean skipValidation) {
 			this.skipValidation = skipValidation;
+		}
+		
+		public boolean isIncludeData() {
+			return includeData;
+		}
+		
+		public void setIncludeData(boolean includeData) {
+			this.includeData = includeData;
+		}
+		
+		public String getRdbDateTimeFormat() {
+			return rdbDateTimeFormat;
+		}
+
+		public void setRdbDateTimeFormat(String rdbDateTimeFormat) {
+			this.rdbDateTimeFormat = rdbDateTimeFormat;
+		}
+		
+		public String getRdbTargetSchemaName() {
+			return rdbTargetSchemaName;
+		}
+		
+		public void setRdbTargetSchemaName(String rdbTargetSchemaName) {
+			this.rdbTargetSchemaName = rdbTargetSchemaName;
 		}
 	}
 	
