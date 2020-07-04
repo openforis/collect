@@ -173,7 +173,12 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	/**
-	 * @deprecated Use {@link #getChild(String, int)}  instead.
+	 * @param name Child name
+	 * @param index Child index
+	 * @return Child node
+	 * 
+	 * @deprecated
+	 * Use {@link #getChild(String, int)}  instead.
 	 */
 	@Deprecated
 	public Node<? extends NodeDefinition> get(String name, int index) {
@@ -181,7 +186,12 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	/**
-	 * @deprecated Use {@link #getChild(NodeDefinition, int)}  instead.
+	 * @param nodeDef Child node definition
+	 * @param index Child index
+	 * @return Child node
+	 * 
+	 * @deprecated
+	 * Use {@link #getChild(NodeDefinition, int)}  instead.
 	 */
 	@Deprecated
 	public Node<? extends NodeDefinition> get(NodeDefinition nodeDef, int index) {
@@ -197,7 +207,12 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	/**
-	 * @deprecated Replaced by {@link #findChildEntitiesByKeys(EntityDefinition, Value...)}
+	 * @param childEntityDef Child entity definition
+	 * @param keys Entity key values
+	 * @return Child node
+	 * 
+	 * @deprecated 
+	 * Replaced by {@link #findChildEntitiesByKeys(EntityDefinition, Value...)}
 	 */
 	public List<Entity> findChildEntitiesByKeys(EntityDefinition childEntityDef, final String... keys) {
 		@SuppressWarnings("unchecked")
@@ -246,6 +261,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	/**
+	 * @return Entity key values
 	 * 
 	 * @deprecated Replaced by {@link #getKeyAttributeValues}
 	 */
@@ -356,8 +372,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	/**
-	 * Returns the number of children
-	 * @return
+	 * @return the number of children
 	 */
 	public int size(){
 		return children.size();
@@ -413,8 +428,9 @@ public class Entity extends Node<EntityDefinition> {
 	 * Adds an item at the specified index. Assumed o has already been checked to be of the appropriate type. All added entities or attributes pass
 	 * through this method
 	 * 
-	 * @param child
-	 * @param idx
+	 * @param child Node to add
+	 * @param idx Index to add into
+	 * @return Added child
 	 */
 	private <T extends Node<?>> T addInternal(T child, Integer idx) {
 		NodeDefinition def = child.getDefinition();
@@ -445,9 +461,9 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	/**
-	 * @deprecated Use {@link Entity#getChildren()} instead.
 	 * @return Unmodifiable list of child instances, sorted by their schema
 	 *         order.
+	 * @deprecated Use {@link Entity#getChildren()} instead.
 	 */
 	@Deprecated
 	public List<Node<? extends NodeDefinition>> getAll() {
@@ -455,6 +471,9 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	/**
+	 * @param childDef Child node definition
+	 * @return Unmodifiable list of children nodes
+	 * 
 	 * @deprecated Use {@link Entity#getChildren(NodeDefinition)} instead.
 	 */
 	@Deprecated
@@ -463,6 +482,9 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	/**
+	 * @param name Child name
+	 * @return Unmodifiable list of children nodes
+	 * 
 	 * @deprecated Use {@link Entity#getChildren(String)} instead.
 	 */
 	@Deprecated
@@ -538,6 +560,9 @@ public class Entity extends Node<EntityDefinition> {
 	/**
 	 * Returns the children related to the child definition with the given name.
 	 * It's preferable to use {@link #getChildren(NodeDefinition)} because it's more efficient.
+	 * 
+	 * @param name Child definition name
+	 * @return Unmodifiable list of children nodes
 	 */
 	public List<Node<? extends NodeDefinition>> getChildren(String name) {
 		NodeDefinition childDef = definition.getChildDefinition(name);
@@ -619,9 +644,6 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 	
-	/**
-	 * Decrease nodes' index for each node after the specified index (included)
-	 */
 	private void decreaseNodeIndexes(List<Node<?>> nodes, int afterIndexInclusive) {
 		for(int i = afterIndexInclusive; i < nodes.size(); i++) {
 			Node<?> n = nodes.get(i);
@@ -629,9 +651,6 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 	
-	/**
-	 * Increment nodes' index for each node after the specified index
-	 */
 	private void increaseNodeIndexes(List<Node<?>> nodes, int afterIndexInclusive) {
 		for(int i = afterIndexInclusive; i < nodes.size(); i++) {
 			Node<?> n = nodes.get(i);
@@ -735,8 +754,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	/**
-	 * 
-	 * @param childName
+	 * @param childName Child definition name
 	 * @return minimum number of non-empty child nodes, based on minCount, required and 
 	 * requiredExpression properties
 	 */
@@ -746,7 +764,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	/**
-	 * Returns all the descendants in depth-first order
+	 * @return All the descendants in depth-first order
 	 */
 	public List<Node<?>> getDescendants() {
 		final List<Node<?>> result = new ArrayList<Node<?>>();

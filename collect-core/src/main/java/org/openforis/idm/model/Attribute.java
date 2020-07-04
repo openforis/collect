@@ -165,8 +165,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	}
 	
 	/**
-	 * Returns true if all fields have value specified
-	 * @return
+	 * @return true if all fields have value specified
 	 */
 	public boolean isFilled() {
 		return allFieldsFilled;

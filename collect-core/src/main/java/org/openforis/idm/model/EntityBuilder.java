@@ -27,25 +27,12 @@ import org.openforis.idm.metamodel.Unit;
  */
 public class EntityBuilder {
 
-	/**
-	 * @param name
-	 * @return the newly created Entity
-	 * @throws ArrayIndexOutOfBoundsException
-	 *             if adding would break the maxCount rule
-	 */
 	public static Entity addEntity(Entity parentEntity, String name) {
 		Entity entity = createEntity(parentEntity, name);
 		parentEntity.add(entity);
 		return entity;
 	}
 
-	/**
-	 * @param name
-	 * @param idx
-	 * @return the newly created Entity
-	 * @throws ArrayIndexOutOfBoundsException
-	 *             if adding would break the maxCount rule
-	 */
 	public static Entity addEntity(Entity parentEntity, String name, int idx) {
 		Entity entity = createEntity(parentEntity, name);
 		parentEntity.add(entity, idx);

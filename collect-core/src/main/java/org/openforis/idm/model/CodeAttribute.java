@@ -60,9 +60,9 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 	}
 	
 	/**
-	 * @deprecated Access code list items using manager class.
+	 * @return Related code list item
 	 * 
-	 * @return
+	 * @deprecated Access code list items using manager class.
 	 */
 	@Deprecated
 	public CodeListItem getCodeListItem() {
@@ -101,6 +101,8 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 	/**
 	 * Returns a list of ancestors CodeAttribute objects, starting from the root.
 	 * It is applicable only to hierarchical code lists.
+	 * 
+	 * @return List of ancestors CodeAttribute objects.
 	 */
 	public List<CodeAttribute> getCodeAncestors() {
 		List<CodeAttribute> result = new ArrayList<CodeAttribute>();

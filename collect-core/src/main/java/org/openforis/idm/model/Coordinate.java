@@ -33,7 +33,8 @@ public final class Coordinate extends AbstractValue {
 	 * Returns a Coordinate parsed from the string in input the string representation is based on posgis data type
 	 * http://postgis.refractions.net/docs/ch04.html#OpenGISWKBWKT SRID=32632;POINT(0 0) -- XY with SRID
 	 * 
-	 * @param coord
+	 * @param coord Coordinate string
+	 * @return Parsed Coordinate
 	 */
 	public static Coordinate parseCoordinate(Object coord) {
 		if ( coord == null ) {

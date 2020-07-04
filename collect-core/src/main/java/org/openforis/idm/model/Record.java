@@ -133,7 +133,9 @@ public class Record implements DeepComparable {
 	}
 
 	/**
-	 * @deprecated use {@link #findNodeByPath()} instead.  
+	 * @param path Node path
+	 * @return Node
+	 * @deprecated use {@link #findNodeByPath(path)} instead.  
 	 */
 	@Deprecated
 	public <N extends Node<?>> N getNodeByPath(String path) {
@@ -155,6 +157,8 @@ public class Record implements DeepComparable {
 	}
 
 	/**
+	 * @param path Nodes path
+	 * @return List of nodes
 	 * @deprecated Use {@link #findNodesByPath(String)} instead
 	 */
 	@Deprecated
@@ -181,8 +185,6 @@ public class Record implements DeepComparable {
 	
 	/**
 	 * Clear all node states
-	 * 
-	 * @param record
 	 */
 	public void clearNodeStates() {
 		rootEntity.traverse(new NodeVisitor() {
@@ -204,7 +206,7 @@ public class Record implements DeepComparable {
 	}
 	
 	/**
-	 * Returns the percentage of all filled relevant attributes among the required ones
+	 * @return the percentage of all filled relevant attributes among the required ones
 	 */
 	public int calculateCompletionPercent() {
 		if (getRootEntity() == null) {
