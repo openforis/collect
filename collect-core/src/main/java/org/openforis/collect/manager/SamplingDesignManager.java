@@ -85,6 +85,10 @@ public class SamplingDesignManager {
 	public int countBySurvey(int surveyId) {
 		return samplingDesignDao.countBySurvey(surveyId);
 	}
+	
+	public int countMaxChildrenInLevel(int surveyId, int level) {
+		return samplingDesignDao.countMaxByLevel(surveyId, level);
+	}
 
 	public void visitItems(int surveyId, Integer upToLevel, Visitor<SamplingDesignItem> visitor) {
 		samplingDesignDao.visitItems(surveyId, upToLevel, visitor);

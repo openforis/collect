@@ -113,7 +113,7 @@ public class CodeListManager {
 			return (T) getInternalCodeListItem(attribute);
 		}
 	}
-
+	
 	protected CodeListItem getInternalCodeListItem(CodeAttribute attribute) {
 		Code code = attribute.getValue();
 		if (code != null) {
@@ -240,6 +240,18 @@ public class CodeListManager {
 			return list.hasItemsInLevel(level - 1);
 		}
 	}
+	
+	public int countMaxChildren(CodeList list, int level) {
+		boolean persistedSurvey = list.getSurvey().getId() != null;
+		if ( list.isExternal() ) {
+			return provider.countMaxChildren(list, level);
+		} else if ( persistedSurvey && list.isEmpty()) {
+			return codeListItemDao.countMaxChildren(list, level);
+		} else {
+			return list.countItemsInLevel(level);
+		}
+	}
+
 	
 	@Transactional
 	public void removeLevel(CodeList list, int level) {

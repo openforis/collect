@@ -68,7 +68,13 @@ public class SamplingPointDataImportJobIntegrationTest extends CollectIntegratio
 		SamplingPointDataImportJob job = importCSVFile(VALID_TEST_CSV);
 		assertTrue(job.isCompleted());
 		assertTrue(job.getSkippedRows().isEmpty());
-		assertEquals(27, job.getProcessedItems());
+		
+		int totalItems = 26;
+		assertEquals(totalItems + 1, job.getProcessedItems());
+		assertEquals(totalItems, samplingDesignManager.countBySurvey(survey.getId()));
+		
+		assertEquals(6, samplingDesignManager.countMaxChildrenInLevel(survey.getId(), 1));
+		assertEquals(8, samplingDesignManager.countMaxChildrenInLevel(survey.getId(), 2));
 		
 		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
@@ -87,6 +93,10 @@ public class SamplingPointDataImportJobIntegrationTest extends CollectIntegratio
 		assertTrue(job.isCompleted());
 		assertTrue(job.getSkippedRows().isEmpty());
 		
+		int totalItems = 6;
+		assertEquals(totalItems, samplingDesignManager.countBySurvey(survey.getId()));
+		assertEquals(totalItems, samplingDesignManager.countMaxChildrenInLevel(survey.getId(), 1));
+
 		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
 		assertEquals(6, samplingDesignSummaries.getTotalCount());

@@ -101,6 +101,22 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Long, SamplingDesig
 		return (Integer) r.getValue(0);
 	}
 	
+	public int countMaxByLevel(int surveyId, int level) {
+		SamplingDesignDSLContext dsl = dsl();
+		SelectQuery<?> q = dsl.selectQuery();
+
+		List<Field<?>> groupByFields = Arrays.<Field<?>>asList(LEVEL_CODE_FIELDS).subList(0, level - 1);
+
+		q.addSelect(DSL.countDistinct(LEVEL_CODE_FIELDS[level - 1]).as("cnt"));
+		q.addFrom(OFC_SAMPLING_DESIGN);
+		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.eq(surveyId));
+		if (!groupByFields.isEmpty()) {
+			q.addGroupBy(groupByFields);
+		}
+
+		return dsl.select(DSL.max(DSL.field("cnt"))).from(q).fetchOne(0, Integer.class);
+	}
+
 	public void deleteBySurvey(int surveyId) {
 		dsl().delete(OFC_SAMPLING_DESIGN)
 			.where(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId))
@@ -197,7 +213,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Long, SamplingDesig
 		Record r = q.fetchAny();
 		return r == null ? null : dsl.fromRecord(r);
 	}
-
+	
 	private void addParentKeysConditions(SelectQuery<Record> q, String... parentKeys) {
 		if (parentKeys != null) {
 			for (int levelIdx = 0; levelIdx < parentKeys.length; levelIdx ++) {
@@ -272,11 +288,11 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<Long, SamplingDesig
 			.execute();
 	}
 
-	private void addLevelKeyNullConditions(SelectQuery<Record> q, Integer fromLevel) {
-		if (fromLevel == null || fromLevel == 0) {
+	private void addLevelKeyNullConditions(SelectQuery<?> q, Integer fromLevelIndex) {
+		if (fromLevelIndex == null || fromLevelIndex == 0) {
 			return;
 		}
-		for (int levelIdx = fromLevel; levelIdx < LEVEL_CODE_FIELDS.length; levelIdx ++) {
+		for (int levelIdx = fromLevelIndex; levelIdx < LEVEL_CODE_FIELDS.length; levelIdx ++) {
 			q.addConditions(LEVEL_CODE_FIELDS[levelIdx].isNull());
 		}
 	}

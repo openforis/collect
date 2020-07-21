@@ -696,6 +696,19 @@ public class CodeListItemDao extends MappingJooqDaoSupport<Long, PersistedCodeLi
 		    }
 		}
 	}
+	
+	public int countMaxChildren(CodeList list, int level) {
+		JooqDSLContext dsl = dsl(list);
+		return dsl.select(DSL.max(DSL.field("count")))
+			.from(
+				dsl.select(DSL.count().as("count"))
+					.from(OFC_CODE_LIST)
+					.where(OFC_CODE_LIST.CODE_LIST_ID.eq(list.getId())
+							.and(OFC_CODE_LIST.LEVEL.eq(level)))
+					.groupBy(OFC_CODE_LIST.PARENT_ID)
+				)
+			.fetchOne(0, Integer.class);
+	}
 
 	public void clearCache() {
 		cache.clear();

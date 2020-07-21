@@ -184,9 +184,12 @@ public class CodeList extends VersionableSurveyObject implements NamedObject {
 		hierarchy = null;
 	}
 
+	public int countItemsInLevel(int levelIndex) {
+		return getItemsInLevel(levelIndex).size();
+	}
+	
 	public boolean hasItemsInLevel(int levelIndex) {
-		List<CodeListItem> itemsInLevel = getItemsInLevel(levelIndex);
-		return ! itemsInLevel.isEmpty();
+		return countItemsInLevel(levelIndex) > 0;
 	}
 	
 	protected List<CodeListItem> getItemsInLevel(int levelIndex) {
