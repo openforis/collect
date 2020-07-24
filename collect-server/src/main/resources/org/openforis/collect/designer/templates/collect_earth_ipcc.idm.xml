@@ -1677,15 +1677,21 @@ Otherwise choose the other sources.</description>
       <code id="1031" name="soil" ui:tab="plot_tab" collectearth:fromcsv="true" list="soil_types">
         <label type="instance">ALU Soil type</label>
       </code>
-      <text id="34" name="country" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
-        <label type="instance">Country</label>
-      </text>
       <code id="1032" name="climate" ui:tab="plot_tab" collectearth:fromcsv="true" list="climate_zones">
         <label type="instance">ALU Climate zone</label>
       </code>
-      <code id="3381" name="ecological_zone" required="true" ui:tab="plot_tab" collectearth:fromcsv="true" list="ecological_zones">
+      <code id="3381" name="gez" required="true" ui:tab="plot_tab" collectearth:fromcsv="true" list="ecological_zones">
         <label type="instance">Ecological zone</label>
       </code>
+      <text id="34" name="country" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
+        <label type="instance">Country</label>
+      </text>
+      <text id="100345" name="region" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
+        <label type="instance">Region</label>
+      </text>
+      <text id="100346" name="district" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
+        <label type="instance">District</label>
+      </text>
       <code id="2538" name="calculated_elevation_range" ui:hide="true" ui:tab="plot_tab" calculated="true" list="elevation_ranges">
         <label type="instance">Elevation - range</label>
         <default expr=" format-number(ceiling(elevation div 100 ), '#')" />
@@ -1717,12 +1723,7 @@ Otherwise choose the other sources.</description>
         <description>Here you can write any remarks about the plot that will make the review process easier.
 Try to add information about land use change.</description>
       </text>
-      <text id="100345" name="region" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
-        <label type="instance">Region</label>
-      </text>
-      <text id="100346" name="district" relevant="false()" collectearth:includeinheader="true" ui:tab="tab_1013" collectearth:fromcsv="true" type="short">
-        <label type="instance">District</label>
-      </text>
+
       <text id="100347" name="land_use_subdivision_combination" ui:hide="true" collect:includeInDataExport="false" ui:tab="plot_tab" calculated="true" type="short">
         <label type="instance">Land Use Subdivision Combination</label>
         <label type="instance" xml:lang="fr">Combinaison de subdivision d'utilisation des terres</label>
