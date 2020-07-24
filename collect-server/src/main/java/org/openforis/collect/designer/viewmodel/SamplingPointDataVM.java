@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
@@ -160,10 +161,6 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 		return itemsSummaries == null ? 0 : itemsSummaries.getTotalCount();
 	}
 
-	public boolean isSamplingPointDataEmpty() {
-		return getItemsTotal() == 0;
-	}
-
 	public int getItemsPage() {
 		return itemsPage;
 	}
@@ -172,6 +169,10 @@ public class SamplingPointDataVM extends SurveyBaseVM {
 		return ITEMS_PAGE_SIZE;
 	}
 
+	@DependsOn("itemsTotal")
+	public boolean isSamplingPointDataEmpty() {
+		return getItemsTotal() == 0;
+	}
 
 	private void initReferenceDataAttributesEditor() {
 		SamplingPointDefinition samplingPointDefinition = getSurvey().getReferenceDataSchema().getSamplingPointDefinition();
