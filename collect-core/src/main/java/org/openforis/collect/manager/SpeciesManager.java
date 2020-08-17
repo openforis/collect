@@ -172,9 +172,7 @@ public class SpeciesManager {
 	}
 	
 	public Taxon loadTaxonByCode(CollectTaxonomy taxonomy, String code) {
-		TaxonTree taxonTree = loadTaxonTree(taxonomy);
-		Node node = taxonTree.getNodeByCode(code);
-		return node == null ? null : node.getTaxon();
+		return taxonDao.loadByCode(taxonomy, code);
 	}
 	
 	public List<String> loadTaxaVernacularLangCodes(int taxonomyId) {

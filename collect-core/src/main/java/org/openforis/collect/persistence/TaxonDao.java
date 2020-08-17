@@ -86,6 +86,16 @@ public class TaxonDao extends MappingJooqDaoSupport<Long, Taxon, TaxonDao.TaxonD
 	public Taxon loadById(Long id) {
 		throw new UnsupportedOperationException();
 	}
+	
+	public Taxon loadByCode(CollectTaxonomy taxonomy, String code) {
+		TaxonDSLContext dsl = dsl(taxonomy);
+		SelectConditionStep<Record> query = dsl.select()
+			.from(OFC_TAXON)
+			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomy.getId())
+				.and(OFC_TAXON.CODE.equal(code)));
+		Record record = query.fetchOne();
+		return record == null ? null : dsl.fromRecord(record);
+	}
 
 	@Override
 	public void insert(Taxon entity) {
