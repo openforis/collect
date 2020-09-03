@@ -16,7 +16,7 @@ export default class Constants {
 
     static determineBaseURL() {
         if (Constants.isDevEnvironment()) {
-            return "http://127.0.0.1:8080/collect/";
+            return "http://localhost:8080/collect/";
         } else {
             return getWindowLocationBaseUrl()
         }

@@ -6,11 +6,12 @@ import java.util.List;
 import org.openforis.collect.metamodel.ui.UITable;
 import org.openforis.collect.metamodel.ui.UITable.Direction;
 import org.openforis.collect.metamodel.ui.UITableHeadingComponent;
+import org.openforis.collect.metamodel.view.ViewContext;
 
 public class UITableView extends UIModelObjectView<UITable> implements UITabComponentView<UITable> {
 
-	public UITableView(UITable uiObject) {
-		super(uiObject);
+	public UITableView(UITable uiObject, ViewContext context) {
+		super(uiObject, context);
 	}
 	
 	@Override
@@ -23,14 +24,14 @@ public class UITableView extends UIModelObjectView<UITable> implements UITabComp
 	}
 	
 	public List<UITableHeadingComponentView<?>> getHeadingComponents() {
-		return UITableHeadingComponentView.fromObjects(uiObject.getHeadingComponents());
+		return UITableHeadingComponentView.fromObjects(uiObject.getHeadingComponents(), context);
 	}
 	
 	public List<List<UITableHeadingComponentView<?>>> getHeadingRows() {
 		List<List<UITableHeadingComponentView<?>>> rowViews = new ArrayList<List<UITableHeadingComponentView<?>>>();
 		List<List<UITableHeadingComponent>> rows = uiObject.getHeadingRows();
 		for (List<UITableHeadingComponent> row : rows) {
-			List<UITableHeadingComponentView<?>> rowView = UITableHeadingComponentView.fromObjects(row);
+			List<UITableHeadingComponentView<?>> rowView = UITableHeadingComponentView.fromObjects(row, context);
 			rowViews.add(rowView);
 		}
 		return rowViews;
@@ -41,7 +42,7 @@ public class UITableView extends UIModelObjectView<UITable> implements UITabComp
 	}
 	
 	public List<UIColumnView> getHeadingColumns() {
-		return UITableHeadingComponentView.fromObjects(uiObject.getHeadingColumns());
+		return UITableHeadingComponentView.fromObjects(uiObject.getHeadingColumns(), context);
 	}
 	
 	public int getTotalHeadingColumns() {

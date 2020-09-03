@@ -37,15 +37,22 @@ public class SurveyView {
 	private Date creationDate;
 	private Date modifiedDate;
 	
-	public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
+	private ViewContext context;
+	
+	public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target, ViewContext context) {
 		this.id = id;
 		this.name = name;
 		this.temporary = temporary;
 		this.target = target;
+		this.context = context;
 	}
 	
 	public SurveyView(CollectSurvey s) {
-		this(s.getId(), s.getName(), s.isTemporary(), s.getTarget());
+		this(s, new ViewContext(s.getDefaultLanguage()));
+	}
+	
+	public SurveyView(CollectSurvey s, ViewContext context) {
+		this(s.getId(), s.getName(), s.isTemporary(), s.getTarget(), context);
 		this.projectName = s.getProjectName();
 		this.description = s.getDescription();
 		this.defaultLanguage = s.getDefaultLanguage();
@@ -61,7 +68,7 @@ public class SurveyView {
 	}
 
 	public UIConfigurationView getUiConfiguration() {
-		return new UIConfigurationView(uiConfiguration);
+		return new UIConfigurationView(uiConfiguration, context);
 	}
 	
 	public void addCodeList(CodeListView codeListView) {
