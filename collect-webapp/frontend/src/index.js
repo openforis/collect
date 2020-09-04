@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter, Route, Switch } from 'react-router-dom'
 import thunkMiddleware from 'redux-thunk'
-import { createLogger } from 'redux-logger'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 
@@ -22,15 +21,10 @@ import Startup from 'common/containers/Startup'
 import SessionTimeoutVerifier from 'common/containers/SessionTimeoutVerifier'
 import Labels from 'utils/Labels'
 
-const loggerMiddleware = createLogger({
-  predicate: () => process.env.NODE_ENV === 'development'
-})
-
 const store = createStore(
   rootReducer,
   applyMiddleware(
     thunkMiddleware, // lets us dispatch() functions
-    loggerMiddleware // neat middleware that logs actions
   )
 )
 

@@ -12,6 +12,7 @@ public abstract class NodeCommand implements Command<List<RecordEvent>> {
 	private int surveyId;
 	private int recordId;
 	private int nodeDefId;
+	private Integer nodeId;
 	private String parentEntityPath;
 	private String nodePath;
 
@@ -41,6 +42,14 @@ public abstract class NodeCommand implements Command<List<RecordEvent>> {
 
 	public int getNodeDefId() {
 		return nodeDefId;
+	}
+	
+	public Integer getNodeId() {
+		return nodeId;
+	}
+	
+	public void setNodeId(Integer nodeId) {
+		this.nodeId = nodeId;
 	}
 
 	public void setNodeDefId(int nodeDefId) {

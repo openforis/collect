@@ -49,7 +49,7 @@ public class SurveyViewGenerator {
 	}
 	
 	public SurveyView generateView(final CollectSurvey survey, UserGroup userGroup, UserInGroup.UserGroupRole userInSurveyGroupRole) {
-		final SurveyView surveyView = new SurveyView(survey);
+		final SurveyView surveyView = new SurveyView(survey, new ViewContext(languageCode));
 
 		if (userGroup != null) {
 			surveyView.setUserGroupQualifierName(userGroup.getQualifierName());

@@ -32,9 +32,12 @@ public abstract class NodeCommandHandler<C extends NodeCommand> implements Comma
 		return findAttribute(command, record);
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Attribute<?, Value> findAttribute(NodeCommand command, CollectRecord record) {
-		Attribute<?,Value> attribute = record.findNodeByPath(command.getNodePath());
-		return attribute;
+		if (command.getNodeId() != null) {
+			return (Attribute<?, Value>) record.getNodeByInternalId(command.getNodeId());
+		}
+		return record.findNodeByPath(command.getNodePath());
 	}
 
 	protected CollectRecord findRecord(NodeCommand command) {

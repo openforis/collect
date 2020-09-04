@@ -9,7 +9,6 @@ import {
 import MaxAvailableSpaceContainer from 'common/components/MaxAvailableSpaceContainer';
 import Dialogs from 'common/components/Dialogs';
 import * as Formatters from 'common/components/datatable/formatters';
-import CheckedIconFormatter from 'common/components/datatable/CheckedIconFormatter'
 import UserGroupColumnEditor from 'common/components/surveydesigner/UserGroupColumnEditor';
 import ServiceFactory from 'services/ServiceFactory';
 import L from 'utils/Labels';

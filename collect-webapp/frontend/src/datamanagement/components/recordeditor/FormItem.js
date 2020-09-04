@@ -1,70 +1,69 @@
-import React, { Component, PropTypes } from 'react'
-import { Label, Row, Col } from 'reactstrap';
+import React, { Component } from 'react'
+import { Label, Row, Col } from 'reactstrap'
 
+import { AttributeDefinition } from '../../../model/Survey'
 import { FieldDefinition } from '../../../model/ui/FieldDefinition'
 import { FieldsetDefinition } from '../../../model/ui/FieldsetDefinition'
 import { MultipleFieldsetDefinition } from '../../../model/ui/MultipleFieldsetDefinition'
 import { TableDefinition } from '../../../model/ui/TableDefinition'
-import Fieldset from './Fieldset' 
-import MultipleFieldset from './MultipleFieldset' 
+import Fieldset from './Fieldset'
+import MultipleFieldset from './MultipleFieldset'
 import BooleanField from './fields/BooleanField'
 import CodeField from './fields/CodeField'
+import TextField from './fields/TextField'
+
+const FIELD_COMPONENTS_BY_TYPE = {
+  [AttributeDefinition.Types.BOOLEAN]: BooleanField,
+  [AttributeDefinition.Types.CODE]: CodeField,
+  [AttributeDefinition.Types.TEXT]: TextField,
+}
 
 export default class FormItem extends Component {
+  _createField(itemDef) {
+    const { parentEntity } = this.props
+    const attrDef = itemDef.attributeDefinition
+    const component = FIELD_COMPONENTS_BY_TYPE[attrDef.attributeType]
+    return component ? (
+      React.createElement(component, { fieldDef: itemDef, parentEntity })
+    ) : (
+      <div>Field type {attrDef.attributeType} to be implemented</div>
+    )
+  }
 
-    constructor(props) {
-        super(props)
-    }
+  render() {
+    const { itemDef, parentEntity } = this.props
 
-    _createField(itemDef) {
-        let attrDef = itemDef.attributeDefinition
-        switch(attrDef.attributeType) {
-        case 'BOOLEAN':
-            return <BooleanField fieldDef={itemDef} parentEntity={this.props.parentEntity} />
-        case 'CODE':
-            return <CodeField fieldDef={itemDef} parentEntity={this.props.parentEntity} />
-        default:
-            return <div>Field type {attrDef.attributeType} to be implemented</div>
-        }
+    if (itemDef instanceof FieldDefinition) {
+      return (
+        <Row>
+          <Col style={{ maxWidth: '150px' }}>
+            <Label>{itemDef.label}</Label>
+          </Col>
+          <Col>{this._createField(itemDef)}</Col>
+        </Row>
+      )
+    } else if (itemDef instanceof FieldsetDefinition) {
+      if (itemDef instanceof MultipleFieldsetDefinition) {
+        return (
+          <Row>
+            <Col>
+              <MultipleFieldset fieldsetDef={itemDef} parentEntity={parentEntity} />
+            </Col>
+          </Row>
+        )
+      } else {
+        return (
+          <Row>
+            <Col>
+              <Fieldset fieldsetDef={itemDef} parentEntity={parentEntity} />
+            </Col>
+          </Row>
+        )
+      }
+    } else if (itemDef instanceof TableDefinition) {
+      return <div>Table</div>
+    } else {
+      return <div>ERROR</div>
     }
-
-    render() {
-        let itemDef = this.props.itemDef
-        
-        if (itemDef instanceof FieldDefinition) {
-            return (
-                <Row>
-                    <Col style={{maxWidth: '150px'}}>
-                        <Label>{itemDef.label}</Label>
-                    </Col>
-                    <Col>
-                        {this._createField(itemDef)}
-                    </Col>
-                </Row>
-            )
-        } else if (itemDef instanceof FieldsetDefinition) {
-            if (itemDef instanceof MultipleFieldsetDefinition) {
-                return (
-                    <Row>
-                        <Col>
-                            <MultipleFieldset fieldsetDef={itemDef} parentEntity={this.props.parentEntity} />
-                        </Col>
-                    </Row>
-                )
-            } else {
-                return (
-                    <Row>
-                        <Col>
-                            <Fieldset fieldsetDef={itemDef} parentEntity={this.props.parentEntity} />
-                        </Col>
-                    </Row>
-                )
-            }
-        } else if (itemDef instanceof TableDefinition) {
-            return <div>Table</div>;
-        } else {
-            return <div>ERROR</div>;
-        }
-        
-    }
+  }
 }

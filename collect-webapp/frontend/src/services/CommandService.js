@@ -20,7 +20,7 @@ export default class CommandService extends AbstractService {
             nodeDefId: attrDef.id
         };
 
-        return this.postJson('command/record/attribute', command) 
+        return this.postJson('command/record/attribute/new', command) 
             .then(this._handleEventResponse)
     }
 
@@ -28,16 +28,16 @@ export default class CommandService extends AbstractService {
         let username = "admin";
 
         let command = {
-            username: username,
+            username,
             surveyId: attribute.record.survey.id,
             recordId: attribute.record.id,
             parentEntityId: attribute.parent.id,
             nodeDefId: attribute.definition.id,
             nodeId: attribute.id,
-            attributeType: attributeType,
-            valueByField: valueByField
+            attributeType,
+            valueByField
         }
-        return this.patchJson('command/record/attribute', command) 
+        return this.postJson('command/record/attribute', command) 
             .then(this._handleEventResponse)
     }
 

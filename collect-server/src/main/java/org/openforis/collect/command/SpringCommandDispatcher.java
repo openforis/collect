@@ -40,7 +40,8 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 		transactional(UpdateBooleanAttributeCommand.class, updateAttributeCommandHandler);
 		transactional(UpdateCodeAttributeCommand.class, updateAttributeCommandHandler);
 		transactional(UpdateDateAttributeCommand.class, updateAttributeCommandHandler);
-		
+		transactional(UpdateTextAttributeCommand.class, updateAttributeCommandHandler);
+
 		DeleteNodeCommandHandler deleteNodeCommandHandler = new DeleteNodeCommandHandler(surveyManager, recordProvider, recordManager);
 		transactional(DeleteAttributeCommand.class, deleteNodeCommandHandler);
 		transactional(DeleteEntityCommand.class, deleteNodeCommandHandler);

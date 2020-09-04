@@ -7,8 +7,8 @@ export default class TabSet extends Component {
   constructor(props) {
     super(props)
 
-    let tabs = props.tabSetDef.tabs
-    let firstTabId = tabs.length > 0 ? tabs[0].id : null
+    const tabs = props.tabSetDef.tabs
+    const firstTabId = tabs.length > 0 ? tabs[0].id : null
     this.toggle = this.toggle.bind(this)
     this.state = {
       activeTab: firstTabId,

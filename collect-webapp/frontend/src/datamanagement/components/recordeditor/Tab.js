@@ -1,14 +1,16 @@
 import React, { Component } from 'react'
-import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap'
+import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
 import classnames from 'classnames'
+
 import FormItems from './FormItems'
 
 export default class Tab extends Component {
   constructor(props) {
     super(props)
 
-    let tabs = props.tabDef.tabs
-    let firstTabId = tabs.length > 0 ? tabs[0].id : null
+    const tabs = props.tabDef.tabs
+    const firstTabId = tabs.length > 0 ? tabs[0].id : null
+
     this.state = {
       activeTab: firstTabId,
     }
@@ -18,12 +20,12 @@ export default class Tab extends Component {
 
   toggle(tabId) {
     if (this.state.activeTab !== tabId) {
-      this.setState({ ...this.state, activeTab: tabId })
+      this.setState({ activeTab: tabId })
     }
   }
 
   render() {
-    const { rootTabDef, parentEntity } = this.props
+    const { tabDef: rootTabDef, parentEntity } = this.props
     const { activeTab } = this.state
 
     if (!parentEntity) {
