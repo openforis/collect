@@ -14,7 +14,7 @@ export default class AbstractField extends Component {
     }
 
     this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
-    this.sendAttributeUpdateCommand = this.sendAttributeUpdateCommand.bind(this)
+    this.onAttributeUpdate = this.onAttributeUpdate.bind(this)
 
     EventQueue.subscribe('recordEvent', this.handleRecordEventReceived)
   }
@@ -47,15 +47,14 @@ export default class AbstractField extends Component {
     }
   }
 
-  sendAttributeUpdateCommand() {
+  onAttributeUpdate({ value }) {
     const { fieldDef } = this.props
-    const { dirty, value } = this.state
 
-    if (dirty) {
-      const attrType = fieldDef.attributeDefinition.attributeType
-      const attr = this.getSingleAttribute()
-      ServiceFactory.commandService.updateAttribute(attr, attrType, value)
-    }
+    this.setState({ value, dirty: true })
+
+    const attrType = fieldDef.attributeDefinition.attributeType
+    const attr = this.getSingleAttribute()
+    ServiceFactory.commandService.updateAttribute(attr, attrType, value)
   }
 
   handleRecordEventReceived(event) {

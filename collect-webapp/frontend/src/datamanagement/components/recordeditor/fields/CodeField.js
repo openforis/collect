@@ -28,31 +28,30 @@ export default class CodeField extends AbstractField {
     }
   }
 
+  extractValueFromProps() {
+    const attr = this.getSingleAttribute()
+    return this.fromCodeToValue(attr.fields[0].value)
+  }
+
+  fromCodeToValue(code) {
+    let codeUpdated = null
+    if (code === null) {
+      const layout = this.props.fieldDef.layout
+      codeUpdated = layout === 'DROPDOWN' ? '-1' : ''
+    } else {
+      codeUpdated = code
+    }
+    return { code: codeUpdated }
+  }
+
   handleParentEntityChanged() {
     const { parentEntity } = this.props
 
     if (parentEntity) {
       this.loadCodeListItems(parentEntity)
-      const attr = this.getSingleAttribute(parentEntity)
-      const codeVal = attr.fields[0].value
-      this.updateStateValue(codeVal)
+      const value = this.extractValueFromProps()
+      this.setState({ value })
     }
-  }
-
-  updateStateValue(code) {
-    if (code == null) {
-      //set empty option
-      const layout = this.props.fieldDef.layout
-
-      switch (layout) {
-        case 'DROPDOWN':
-          code = '-1'
-          break
-        default:
-          code = ''
-      }
-    }
-    this.setState({ value: { code } })
   }
 
   loadCodeListItems(parentEntity) {
@@ -66,18 +65,11 @@ export default class CodeField extends AbstractField {
 
   handleAttributeUpdatedEvent(event) {
     super.handleAttributeUpdatedEvent(event)
-    this.updateStateValue(event.code)
-    this.setState({ dirty: false })
+    this.setState({ dirty: false, value: this.fromCodeToValue(event.code) })
   }
 
   handleInputChange(event) {
-    const attr = this.getSingleAttribute()
-    if (attr) {
-      this.updateStateValue(event.target.value)
-      if (event.target.type != 'text') {
-        this.sendAttributeUpdateCommand()
-      }
-    }
+    this.onAttributeUpdate({ value: this.fromCodeToValue(event.target.value) })
   }
 
   render() {
@@ -89,54 +81,48 @@ export default class CodeField extends AbstractField {
       return <div>Loading...</div>
     }
 
-    const EMPTY_OPTION = (
-      <option key="-1" value="-1">
-        --- Select one ---
-      </option>
-    )
-
     const attrDef = fieldDef.attributeDefinition
     const layout = fieldDef.layout
 
     switch (layout) {
       case 'DROPDOWN':
-        let options = [EMPTY_OPTION].concat(
-          items.map((item) => (
-            <option key={item.code} value={item.code}>
-              {item.label}
-            </option>
-          ))
+        const EMPTY_OPTION = (
+          <option key="-1" value="-1">
+            --- Select one ---
+          </option>
         )
         return (
-          <Input type="select" onChange={this.handleInputChange} value={value}>
-            {options}
+          <Input type="select" onChange={this.handleInputChange} value={code}>
+            {[EMPTY_OPTION].concat(
+              items.map((item) => (
+                <option key={item.code} value={item.code}>
+                  {item.label}
+                </option>
+              ))
+            )}
           </Input>
         )
       case 'RADIO':
-        let radioBoxes = items.map((item) => (
-          <FormGroup check key={item.code}>
-            <Label check>
-              <Input
-                type="radio"
-                name={'code_group_' + parentEntity.id + '_' + attrDef.id}
-                value={item.code}
-                checked={value == item.code}
-                onChange={this.handleInputChange}
-              />{' '}
-              {item.label}
-            </Label>
-          </FormGroup>
-        ))
-        return <div>{radioBoxes}</div>
-      default:
         return (
-          <Input
-            value={code}
-            onChange={this.handleInputChange}
-            onBlur={this.sendAttributeUpdateCommand}
-            style={{ maxWidth: '100px' }}
-          />
+          <div>
+            {items.map((item) => (
+              <FormGroup check key={item.code}>
+                <Label check>
+                  <Input
+                    type="radio"
+                    name={'code_group_' + parentEntity.id + '_' + attrDef.id}
+                    value={item.code}
+                    checked={item.code === code}
+                    onChange={this.handleInputChange}
+                  />{' '}
+                  {item.label}
+                </Label>
+              </FormGroup>
+            ))}
+          </div>
         )
+      default:
+        return <Input value={code} onChange={this.handleInputChange} style={{ maxWidth: '100px' }} />
     }
   }
 }

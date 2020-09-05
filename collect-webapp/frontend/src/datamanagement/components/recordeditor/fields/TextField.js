@@ -17,13 +17,11 @@ export default class TextField extends AbstractField {
 
   extractValueFromProps() {
     const attr = this.getSingleAttribute()
-    return attr.value
+    return { value: attr.fields[0].value }
   }
 
   onChange(event) {
-    const { value } = event.target
-    this.setState({ value: { value }, dirty: true })
-    this.sendAttributeUpdateCommand()
+    this.onAttributeUpdate({ value: { value: event.target.value } })
   }
 
   render() {
