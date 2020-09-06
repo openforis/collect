@@ -48,7 +48,8 @@
     "redux-thunk": "^2.3.0",
     "sockjs": "^0.3.19",
     "sockjs-client": "^1.4.0",
-    "superagent": "^5.2.1"
+    "superagent": "^5.2.1",
+    "throttle-debounce": "^2.3.0"
   },
   "scripts": {
     "start": "cross-env NODE_PATH=src react-scripts start",

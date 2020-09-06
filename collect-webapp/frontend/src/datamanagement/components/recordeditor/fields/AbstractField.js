@@ -1,4 +1,5 @@
 import { Component } from 'react'
+import { debounce } from 'throttle-debounce'
 
 import { AttributeUpdatedEvent } from 'model/event/RecordEvent'
 import EventQueue from 'model/event/EventQueue'
@@ -13,6 +14,7 @@ export default class AbstractField extends Component {
       dirty: false,
     }
 
+    this.attributeUpdatedDebounced = null
     this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
     this.onAttributeUpdate = this.onAttributeUpdate.bind(this)
 
@@ -54,7 +56,13 @@ export default class AbstractField extends Component {
 
     const attrType = fieldDef.attributeDefinition.attributeType
     const attr = this.getSingleAttribute()
-    ServiceFactory.commandService.updateAttribute(attr, attrType, value)
+    if (this.attributeUpdatedDebounced) {
+      this.attributeUpdatedDebounced.cancel()
+    }
+    this.attributeUpdatedDebounced = debounce(3000, false, () =>
+      ServiceFactory.commandService.updateAttribute(attr, attrType, value)
+    )
+    this.attributeUpdatedDebounced()
   }
 
   handleRecordEventReceived(event) {
@@ -63,16 +71,21 @@ export default class AbstractField extends Component {
       return
     }
     if (event instanceof AttributeUpdatedEvent) {
-      const record = parentEntity.record
-      if (record && record.id === event.recordId && record.step === event.recordStep) {
-        const parentEntityId = event.parentEntityId
-        const attrDefId = fieldDef.attributeDefinitionId
-        if (parentEntityId === parentEntity.id && event.definitionId === attrDefId) {
-          this.handleAttributeUpdatedEvent(event)
-        }
+      if (
+        event.recordId === parentEntity.record.id &&
+        event.recordStep === parentEntity.record.step &&
+        Number(event.parentEntityId) === parentEntity.id &&
+        Number(event.definitionId) === fieldDef.attributeDefinitionId
+      ) {
+        this.handleAttributeUpdatedEvent(event)
       }
     }
   }
 
-  handleAttributeUpdatedEvent(event) {}
+  handleAttributeUpdatedEvent(event) {
+    const value = this.extractValueFromAttributeUpdateEvent(event)
+    this.setState({ dirty: false, value })
+  }
+
+  extractValueFromAttributeUpdateEvent(event) {}
 }

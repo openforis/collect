@@ -63,9 +63,8 @@ export default class CodeField extends AbstractField {
     }
   }
 
-  handleAttributeUpdatedEvent(event) {
-    super.handleAttributeUpdatedEvent(event)
-    this.setState({ dirty: false, value: this.fromCodeToValue(event.code) })
+  extractValueFromAttributeUpdateEvent(event) {
+    return this.fromCodeToValue(event.code)
   }
 
   handleInputChange(event) {
