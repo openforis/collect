@@ -9,7 +9,7 @@ import java.util.List;
  * @author S. Ricci
  *
  */
-public class EntityCreatedEvent extends RecordEvent {
+public class EntityCreatedEvent extends EntityEvent {
 
 	public EntityCreatedEvent(String surveyName, Integer recordId,
 			RecordStep step, String definitionId, List<String> ancestorIds,

@@ -9,11 +9,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.openforis.collect.event.ValidationResultsView.ValidationResultView;
 import org.openforis.collect.model.AttributeAddChange;
 import org.openforis.collect.model.AttributeChange;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.EntityAddChange;
+import org.openforis.collect.model.EntityChange;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.NodeDeleteChange;
@@ -24,6 +27,9 @@ import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.validation.ValidationResult;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.BooleanAttribute;
 import org.openforis.idm.model.BooleanValue;
@@ -62,7 +68,10 @@ public class EventProducer {
 				List<String> ancestorIds = getAncestorIds(nodeDef, node.getAncestorIds());
 				EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node, userName);
 				if (node instanceof Entity) {
-					events.addAll(factory.entityCreated());
+					Entity entity = (Entity) node;
+					events.addAll(factory.entityCreated(entity.getRelevanceByDefinitionId(), 
+							entity.getMinCountByDefinitionId(), entity.getMaxCountByDefinitionId(),
+							entity.getMinCountValidationResultByDefinitionId(), entity.getMaxCountValidationResultByDefinitionId()));
 				} else if (node instanceof Attribute) {
 					if (nodeDef.isMultiple()) {
 						events.addAll(factory.attributeCreated());
@@ -96,20 +105,18 @@ public class EventProducer {
 
 		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node, userName);
 
-		if (change instanceof EntityAddChange) {
-			return factory.entityCreated();
+		if (change instanceof EntityChange) {
+			EntityChange entityChange = (EntityChange) change;
+			return change instanceof EntityAddChange ? factory.entityCreated(entityChange.getChildrenRelevance(),
+					entityChange.getMinCountByChildDefinitionId(), entityChange.getMaxCountByChildDefinitionId(),
+					entityChange.getChildrenMinCountValidation(), entityChange.getChildrenMaxCountValidation())
+					: factory.entityUpdated(entityChange.getChildrenRelevance(),
+							entityChange.getMinCountByChildDefinitionId(), entityChange.getMaxCountByChildDefinitionId(),
+							entityChange.getChildrenMinCountValidation(), entityChange.getChildrenMaxCountValidation());
 		} else if (change instanceof AttributeChange) {
-			if (change instanceof AttributeAddChange) {
-				return factory.attributeCreated();
-			} else {
-				return factory.attributeUpdated();
-			}
+			return change instanceof AttributeAddChange ? factory.attributeCreated() : factory.attributeUpdated();
 		} else if (change instanceof NodeDeleteChange) {
-			if (node instanceof Entity) {
-				return factory.entityDeleted();
-			} else {
-				return factory.attributeDeleted();
-			}
+			return node instanceof Entity ? factory.entityDeleted() : factory.attributeDeleted();
 		}
 		return emptyList();
 	}
@@ -175,16 +182,24 @@ public class EventProducer {
 			this.timestamp = new Date();
 		}
 		
-		List<? extends RecordEvent> entityCreated() {
+		List<? extends RecordEvent> entityCreated(Map<Integer, Boolean> relevanceByChildDefinitionId,
+				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> minCountValidationByChildName,
+				Map<Integer, ValidationResultFlag> maxCountValidationByChildName) {
 			List<RecordEvent> events = new ArrayList<RecordEvent>();
 			Entity entity = (Entity) node;
-			if (entity.isRoot()) {
-				events.add(new RootEntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						String.valueOf(nodeId), timestamp, userName));
-			} else {
-				 events.add(new EntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), timestamp, userName));
-			}
+			EntityEvent entityEvent = entity.isRoot() 
+					? new RootEntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
+							String.valueOf(nodeId), timestamp, userName)
+					: new EntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
+							ancestorIds, String.valueOf(nodeId), timestamp, userName);
+			entityEvent.setRelevanceByChildDefinitionId(relevanceByChildDefinitionId);
+			entityEvent.setMinCountByChildDefinitionId(minCountByChildDefinitionId);
+			entityEvent.setMaxCountByChildDefinitionId(maxCountByChildDefinitionId);
+			entityEvent.setMinCountValidationByChildDefinitionId(minCountValidationByChildName);
+			entityEvent.setMaxCountValidationByChildDefinitionId(maxCountValidationByChildName);
+			events.add(entityEvent);
+			
 			//add node collection created events
 			for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
 				if (childDef.isMultiple()) {
@@ -200,6 +215,20 @@ public class EventProducer {
 				}
 			}
 			return events;
+		}
+		
+		List<? extends RecordEvent> entityUpdated(Map<Integer, Boolean> relevanceByChildDefinitionId,
+				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
+			EntityUpdatedEvent event = new EntityUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
+					ancestorIds, String.valueOf(nodeId), timestamp, userName);
+			event.setRelevanceByChildDefinitionId(relevanceByChildDefinitionId);
+			event.setMinCountByChildDefinitionId(minCountByChildDefinitionId);
+			event.setMaxCountByChildDefinitionId(maxCountByChildDefinitionId);
+			event.setMinCountValidationByChildDefinitionId(minCountValidationByChildDefinitionId);
+			event.setMaxCountValidationByChildDefinitionId(maxCountValidationByChildDefinitionId);
+			return Arrays.<RecordEvent>asList(event);
 		}
 		
 		List<? extends RecordEvent> attributeCreated() {
@@ -291,7 +320,11 @@ public class EventProducer {
 //				TODO fail for not supported node types
 //				throw new IllegalArgumentException("Unexpected node type: " + node.getClass().getSimpleName());
 			}
-			return event == null ? Collections.<RecordEvent>emptyList() : Arrays.<RecordEvent>asList(event);
+			if (event == null) {
+				return Collections.<RecordEvent>emptyList();
+			}
+			event.setValidationResults(toValidationResultsView(((Attribute<?, ?>) node).getValidationResults()));
+			return Arrays.<RecordEvent>asList(event);
 		}
 		
 		List<? extends RecordEvent> entityDeleted() {
@@ -303,6 +336,18 @@ public class EventProducer {
 			return asList(new AttributeDeletedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
 					ancestorIds, String.valueOf(nodeId), timestamp, userName));	
 		}
+	}
+	
+	private ValidationResultsView toValidationResultsView(ValidationResults validationResults) {
+		List<ValidationResultView> errors = new ArrayList<ValidationResultView>();
+		for (ValidationResult validationResult : validationResults.getErrors()) {
+			errors.add(new ValidationResultView(validationResult.getFlag(), validationResult.getValidator().getClass().getName()));
+		}
+		List<ValidationResultView> warnings = new ArrayList<ValidationResultView>();
+		for (ValidationResult validationResult : validationResults.getWarnings()) {
+			warnings.add(new ValidationResultView(validationResult.getFlag(), validationResult.getValidator().getClass().getName()));
+		}
+		return new ValidationResultsView(errors, warnings);
 	}
 
 }

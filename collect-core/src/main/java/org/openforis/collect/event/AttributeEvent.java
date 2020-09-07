@@ -10,6 +10,8 @@ import java.util.List;
  *
  */
 public abstract class AttributeEvent extends RecordEvent {
+	
+	private ValidationResultsView validationResults;
 
 	public AttributeEvent(String surveyName, Integer recordId, RecordStep step,
 			String definitionId, List<String> ancestorIds, String nodeId,
@@ -17,4 +19,11 @@ public abstract class AttributeEvent extends RecordEvent {
 		super(surveyName, recordId, step, definitionId, ancestorIds, nodeId, timestamp, userName);
 	}
 
+	public ValidationResultsView getValidationResults() {
+		return validationResults;
+	}
+	
+	public void setValidationResults(ValidationResultsView validationResults) {
+		this.validationResults = validationResults;
+	}
 }
