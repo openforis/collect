@@ -18,6 +18,7 @@ public abstract class UIModelObject implements Serializable, Identifiable {
 	private UIModelObject parent;
 	private int id;
 	private boolean hidden;
+	private boolean hideWhenNotRelevant;
 
 	UIModelObject(UIModelObject parent, int id) {
 		super();
@@ -66,4 +67,11 @@ public abstract class UIModelObject implements Serializable, Identifiable {
 		this.hidden = hidden;
 	}
 	
+	public boolean isHideWhenNotRelevant() {
+		return hideWhenNotRelevant;
+	}
+	
+	public void setHideWhenNotRelevant(boolean hideWhenNotRelevant) {
+		this.hideWhenNotRelevant = hideWhenNotRelevant;
+	}
 }

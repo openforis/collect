@@ -1,4 +1,6 @@
 import React from 'react'
 import { Spinner } from 'reactstrap'
 
-export default () => <Spinner style={{ position: 'absolute', top: 0, right: 0, marginRight: '20px' }} />
+export default () => (
+  <Spinner color="primary" size="sm" style={{ position: 'absolute', top: '10px', right: 0, marginRight: '20px' }} />
+)

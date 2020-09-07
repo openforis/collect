@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.openforis.collect.event.ValidationResultsView.ValidationResultView;
 import org.openforis.collect.model.AttributeAddChange;
@@ -184,8 +185,8 @@ public class EventProducer {
 		
 		List<? extends RecordEvent> entityCreated(Map<Integer, Boolean> relevanceByChildDefinitionId,
 				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
-				Map<Integer, ValidationResultFlag> minCountValidationByChildName,
-				Map<Integer, ValidationResultFlag> maxCountValidationByChildName) {
+				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
 			List<RecordEvent> events = new ArrayList<RecordEvent>();
 			Entity entity = (Entity) node;
 			EntityEvent entityEvent = entity.isRoot() 
@@ -193,12 +194,10 @@ public class EventProducer {
 							String.valueOf(nodeId), timestamp, userName)
 					: new EntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 							ancestorIds, String.valueOf(nodeId), timestamp, userName);
-			entityEvent.setRelevanceByChildDefinitionId(relevanceByChildDefinitionId);
-			entityEvent.setMinCountByChildDefinitionId(minCountByChildDefinitionId);
-			entityEvent.setMaxCountByChildDefinitionId(maxCountByChildDefinitionId);
-			entityEvent.setMinCountValidationByChildDefinitionId(minCountValidationByChildName);
-			entityEvent.setMaxCountValidationByChildDefinitionId(maxCountValidationByChildName);
 			events.add(entityEvent);
+			events.addAll(entityCreatedOrUpdated(relevanceByChildDefinitionId, minCountByChildDefinitionId,
+					maxCountByChildDefinitionId, minCountValidationByChildDefinitionId,
+					maxCountValidationByChildDefinitionId));
 			
 			//add node collection created events
 			for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
@@ -221,14 +220,11 @@ public class EventProducer {
 				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
 				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
 				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
-			EntityUpdatedEvent event = new EntityUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-					ancestorIds, String.valueOf(nodeId), timestamp, userName);
-			event.setRelevanceByChildDefinitionId(relevanceByChildDefinitionId);
-			event.setMinCountByChildDefinitionId(minCountByChildDefinitionId);
-			event.setMaxCountByChildDefinitionId(maxCountByChildDefinitionId);
-			event.setMinCountValidationByChildDefinitionId(minCountValidationByChildDefinitionId);
-			event.setMaxCountValidationByChildDefinitionId(maxCountValidationByChildDefinitionId);
-			return Arrays.<RecordEvent>asList(event);
+			List<RecordEvent> events = new ArrayList<RecordEvent>();
+			events.addAll(entityCreatedOrUpdated(relevanceByChildDefinitionId, minCountByChildDefinitionId,
+					maxCountByChildDefinitionId, minCountValidationByChildDefinitionId,
+					maxCountValidationByChildDefinitionId));
+			return events;
 		}
 		
 		List<? extends RecordEvent> attributeCreated() {
@@ -336,6 +332,54 @@ public class EventProducer {
 			return asList(new AttributeDeletedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
 					ancestorIds, String.valueOf(nodeId), timestamp, userName));	
 		}
+		
+		private List<? extends RecordEvent> entityCreatedOrUpdated(Map<Integer, Boolean> relevanceByChildDefinitionId,
+				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
+				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
+			List<RecordEvent> events = new ArrayList<RecordEvent>();
+			for (Entry<Integer, Boolean> entry : relevanceByChildDefinitionId.entrySet()) {
+				events.add(relevanceUpdated(entry.getKey(), entry.getValue()));
+			}
+			for (Entry<Integer, Integer> entry : minCountByChildDefinitionId.entrySet()) {
+				events.add(minCountUpdated(entry.getKey(), entry.getValue()));
+			}
+			for (Entry<Integer, Integer> entry : maxCountByChildDefinitionId.entrySet()) {
+				events.add(maxCountUpdated(entry.getKey(), entry.getValue()));
+			}
+			for (Entry<Integer, ValidationResultFlag> entry : minCountValidationByChildDefinitionId.entrySet()) {
+				events.add(minCountValidationUpdated(entry.getKey(), entry.getValue()));
+			}
+			for (Entry<Integer, ValidationResultFlag> entry : maxCountValidationByChildDefinitionId.entrySet()) {
+				events.add(maxCountValidationUpdated(entry.getKey(), entry.getValue()));
+			}
+			return events;
+		}
+		
+		private NodeRelevanceUpdatedEvent relevanceUpdated(int childDefinitionId, boolean relevant) {
+			return new NodeRelevanceUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
+					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, relevant);
+		}
+
+		private NodeMinCountUpdatedEvent minCountUpdated(int childDefinitionId, int minCount) {
+			return new NodeMinCountUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
+					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, minCount);			
+		}
+		
+		private NodeMaxCountUpdatedEvent maxCountUpdated(int childDefinitionId, int maxCount) {
+			return new NodeMaxCountUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
+					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, maxCount);			
+		}
+
+		private NodeMinCountValidationUpdatedEvent minCountValidationUpdated(int childDefinitionId, ValidationResultFlag flag) {
+			return new NodeMinCountValidationUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
+					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, flag);			
+		}
+
+		private NodeMaxCountValidationUpdatedEvent maxCountValidationUpdated(int childDefinitionId, ValidationResultFlag flag) {
+			return new NodeMaxCountValidationUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
+					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, flag);			
+		}
 	}
 	
 	private ValidationResultsView toValidationResultsView(ValidationResults validationResults) {
@@ -349,5 +393,7 @@ public class EventProducer {
 		}
 		return new ValidationResultsView(errors, warnings);
 	}
+
+	
 
 }

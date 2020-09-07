@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.metamodel.ui.UIModelObject;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.model.UserInGroup;
@@ -103,6 +104,9 @@ public class SurveyViewGenerator {
 							attrDef.isKey(), attrDef.isMultiple(), survey.getAnnotations().isShowInSummary(attrDef), 
 							survey.getAnnotations().isQualifier(attrDef));
 				}
+				UIModelObject uiModelObject = survey.getUIConfiguration().getModelObjectByNodeDefinitionId(def.getId());
+				view.setHideWhenNotRelevant(uiModelObject != null && uiModelObject.isHideWhenNotRelevant());
+				
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
 					surveyView.getSchema().addRootEntity((EntityDefView) view);

@@ -68,7 +68,10 @@ export default class CodeField extends AbstractField {
   }
 
   handleInputChange(event) {
-    this.onAttributeUpdate({ value: this.fromCodeToValue(event.target.value) })
+    const { fieldDef } = this.props
+    const { layout } = fieldDef
+    const debounced = layout === 'TEXT'
+    this.onAttributeUpdate({ value: this.fromCodeToValue(event.target.value), debounced })
   }
 
   render() {

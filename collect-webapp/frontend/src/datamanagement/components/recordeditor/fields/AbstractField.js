@@ -49,7 +49,7 @@ export default class AbstractField extends Component {
     }
   }
 
-  onAttributeUpdate({ value }) {
+  onAttributeUpdate({ value, debounced = true }) {
     const { fieldDef } = this.props
 
     this.setState({ value, dirty: true })
@@ -59,7 +59,7 @@ export default class AbstractField extends Component {
     if (this.attributeUpdatedDebounced) {
       this.attributeUpdatedDebounced.cancel()
     }
-    this.attributeUpdatedDebounced = debounce(3000, false, () =>
+    this.attributeUpdatedDebounced = debounce(debounced ? 1000 : 0, false, () =>
       ServiceFactory.commandService.updateAttribute(attr, attrType, value)
     )
     this.attributeUpdatedDebounced()

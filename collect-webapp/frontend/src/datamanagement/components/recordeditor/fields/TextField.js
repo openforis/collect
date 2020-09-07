@@ -22,7 +22,7 @@ export default class TextField extends AbstractField {
   }
 
   extractValueFromAttributeUpdateEvent(event) {
-    return { value: event.value }
+    return { value: event.text }
   }
 
   onChange(event) {
@@ -30,12 +30,13 @@ export default class TextField extends AbstractField {
   }
 
   render() {
-    const { value: valueState, dirty } = this.state
+    const { value: valueState = {}, dirty } = this.state
     const { value } = valueState
+    const text = value || ''
 
     return (
       <React.Fragment>
-        <Input value={value} onChange={this.onChange} />
+        <Input value={text} onChange={this.onChange} />
         {dirty && <FieldLoadingSpinner />}
       </React.Fragment>
     )

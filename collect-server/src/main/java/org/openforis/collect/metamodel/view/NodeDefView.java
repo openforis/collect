@@ -9,6 +9,7 @@ public abstract class NodeDefView extends SurveyObjectView {
 	private NodeType type;
 	private boolean key;
 	private boolean multiple;
+	private boolean hideWhenNotRelevant;
 	
 	public NodeDefView(int id, String name, String label, NodeType type, boolean key, boolean multiple) {
 		super();
@@ -39,6 +40,14 @@ public abstract class NodeDefView extends SurveyObjectView {
 	
 	public boolean isMultiple() {
 		return multiple;
+	}
+	
+	public boolean isHideWhenNotRelevant() {
+		return hideWhenNotRelevant;
+	}
+	
+	public void setHideWhenNotRelevant(boolean hideWhenNotRelevant) {
+		this.hideWhenNotRelevant = hideWhenNotRelevant;
 	}
 	
 }
