@@ -7,6 +7,7 @@ import org.openforis.collect.command.handler.DeleteNodeCommandHandler;
 import org.openforis.collect.command.handler.DeleteRecordHandler;
 import org.openforis.collect.command.handler.UpdateAttributeCommandHandler;
 import org.openforis.collect.manager.CachedRecordProvider;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordProvider;
 import org.openforis.collect.manager.SurveyManager;
@@ -24,30 +25,35 @@ public class SpringCommandDispatcher extends RegistryCommandDispatcher {
 	private UserManager userManager;
 	@Autowired
 	private PlatformTransactionManager transactionManager;
-	
+	@Autowired
+	private MessageSource messageSource;
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void init() {
-		transactional(CreateRecordCommand.class, new CreateRecordHandler(recordManager, surveyManager, userManager));
+		transactional(CreateRecordCommand.class, new CreateRecordHandler(recordManager, surveyManager, userManager, messageSource));
 		transactional(DeleteRecordCommand.class, new DeleteRecordHandler(recordManager, surveyManager));
-		
+
 		RecordProvider recordProvider = new CachedRecordProvider(recordManager);
-		
-		AddNodeCommandHandler addNodeCommandHandler = new AddNodeCommandHandler(surveyManager, recordProvider, recordManager);
+
+		AddNodeCommandHandler addNodeCommandHandler = new AddNodeCommandHandler(surveyManager, recordProvider,
+				recordManager, messageSource);
 		transactional(AddAttributeCommand.class, addNodeCommandHandler);
 		transactional(AddEntityCommand.class, addNodeCommandHandler);
-		
-		UpdateAttributeCommandHandler updateAttributeCommandHandler = new UpdateAttributeCommandHandler<UpdateBooleanAttributeCommand>(surveyManager, recordProvider, recordManager);
+
+		UpdateAttributeCommandHandler updateAttributeCommandHandler = new UpdateAttributeCommandHandler<UpdateBooleanAttributeCommand>(
+				surveyManager, recordProvider, recordManager, messageSource);
 		transactional(UpdateBooleanAttributeCommand.class, updateAttributeCommandHandler);
 		transactional(UpdateCodeAttributeCommand.class, updateAttributeCommandHandler);
 		transactional(UpdateDateAttributeCommand.class, updateAttributeCommandHandler);
 		transactional(UpdateTextAttributeCommand.class, updateAttributeCommandHandler);
 
-		DeleteNodeCommandHandler deleteNodeCommandHandler = new DeleteNodeCommandHandler(surveyManager, recordProvider, recordManager);
+		DeleteNodeCommandHandler deleteNodeCommandHandler = new DeleteNodeCommandHandler(surveyManager, recordProvider,
+				recordManager, messageSource);
 		transactional(DeleteAttributeCommand.class, deleteNodeCommandHandler);
 		transactional(DeleteEntityCommand.class, deleteNodeCommandHandler);
 	}
 
-	<R, C extends Command<R>> void transactional(Class<C> commandType, CommandHandler<R, C> handler) {
-		register(commandType, new SpringTransactionalCommandHandler<R, C>(transactionManager, handler));
+	<C extends Command> void transactional(Class<C> commandType, CommandHandler<C> handler) {
+		register(commandType, new SpringTransactionalCommandHandler<C>(transactionManager, handler));
 	}
 }

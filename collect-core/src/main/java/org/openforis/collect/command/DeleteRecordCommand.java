@@ -1,8 +1,6 @@
 package org.openforis.collect.command;
 
-import org.openforis.collect.event.RecordEvent;
-
-public class DeleteRecordCommand implements Command<RecordEvent> {
+public class DeleteRecordCommand implements Command {
 	
 	private static final long serialVersionUID = 1L;
 	

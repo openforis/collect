@@ -1,10 +1,6 @@
 package org.openforis.collect.command;
 
-import java.util.List;
-
-import org.openforis.collect.event.RecordEvent;
-
-public abstract class NodeCommand implements Command<List<RecordEvent>> {
+public abstract class NodeCommand implements Command {
 
 	private static final long serialVersionUID = 1L;
 

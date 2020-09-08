@@ -1,8 +1,5 @@
 package org.openforis.collect.event;
 
-import java.util.Date;
-import java.util.List;
-
 /**
  * 
  * @author D. Wiell
@@ -11,18 +8,14 @@ import java.util.List;
  */
 public class TextAttributeUpdatedEvent extends AttributeUpdatedEvent {
 
-	private final String text;
-
-	public TextAttributeUpdatedEvent(String surveyName, Integer recordId,
-			RecordStep step, String definitionId, List<String> ancestorIds,
-			String nodeId, String text, Date timestamp, String userName) {
-		super(surveyName, recordId, step, definitionId, ancestorIds, nodeId,
-				timestamp, userName);
-		this.text = text;
-	}
+	private String text;
 
 	public String getText() {
 		return text;
+	}
+	
+	public void setText(String text) {
+		this.text = text;
 	}
 
 }

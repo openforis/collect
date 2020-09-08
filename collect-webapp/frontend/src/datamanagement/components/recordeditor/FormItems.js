@@ -46,8 +46,8 @@ export default class FormItems extends Component {
 
           return (
             visible && (
-              <Fade in={visible}>
-                <FormItem key={itemDef.id} parentEntity={parentEntity} itemDef={itemDef} />
+              <Fade key={itemDef.id} in={visible}>
+                <FormItem parentEntity={parentEntity} itemDef={itemDef} />
               </Fade>
             )
           )

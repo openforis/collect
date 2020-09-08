@@ -1,18 +1,14 @@
 package org.openforis.collect.event;
 
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.openforis.collect.event.ValidationResultsView.ValidationResultView;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.model.AttributeAddChange;
 import org.openforis.collect.model.AttributeChange;
 import org.openforis.collect.model.CollectRecord;
@@ -28,9 +24,7 @@ import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
-import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.BooleanAttribute;
 import org.openforis.idm.model.BooleanValue;
@@ -57,69 +51,87 @@ import org.openforis.idm.model.TimeAttribute;
  */
 public class EventProducer {
 
-	public List<RecordEvent> produceFor(CollectRecord record, final String userName) {
+	private EventProducerContext context;
+	private EventListener consumer;
+
+	public EventProducer(EventProducerContext context, EventListener consumer) {
+		super();
+		this.context = context;
+		this.consumer = consumer;
+	}
+
+	public List<RecordEvent> produceFor(CollectRecord record) {
 		final List<RecordEvent> events = new ArrayList<RecordEvent>();
-		
+
 		final Integer recordId = record.getId();
 		final RecordStep recordStep = record.getStep().toRecordStep();
-		
+
 		record.getRootEntity().traverse(new NodeVisitor() {
 			public void visit(Node<? extends NodeDefinition> node, int idx) {
 				NodeDefinition nodeDef = node.getDefinition();
 				List<String> ancestorIds = getAncestorIds(nodeDef, node.getAncestorIds());
-				EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node, userName);
+				EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node);
 				if (node instanceof Entity) {
 					Entity entity = (Entity) node;
-					events.addAll(factory.entityCreated(entity.getRelevanceByDefinitionId(), 
-							entity.getMinCountByDefinitionId(), entity.getMaxCountByDefinitionId(),
-							entity.getMinCountValidationResultByDefinitionId(), entity.getMaxCountValidationResultByDefinitionId()));
+					factory.entityCreated(entity.getRelevanceByDefinitionId(), entity.getMinCountByDefinitionId(),
+							entity.getMaxCountByDefinitionId(), entity.getMinCountValidationResultByDefinitionId(),
+							entity.getMaxCountValidationResultByDefinitionId());
 				} else if (node instanceof Attribute) {
 					if (nodeDef.isMultiple()) {
-						events.addAll(factory.attributeCreated());
+						factory.attributeCreated();
 					} else {
-						events.addAll(factory.attributeUpdated());
+						factory.attributeUpdated();
 					}
 				}
 			}
 		});
 		return events;
 	}
-	
-	public List<RecordEvent> produceFor(NodeChangeSet changeSet, String userName) {
-		return toEvents(changeSet, userName);
+
+	public void produceFor(NodeChangeSet changeSet) {
+		toEvents(changeSet);
 	}
 
-	private List<RecordEvent> toEvents(NodeChangeSet changeSet, String userName) {
-		List<RecordEvent> events = new ArrayList<RecordEvent>();
+	private void toEvents(NodeChangeSet changeSet) {
 		List<NodeChange<?>> changes = changeSet.getChanges();
 		for (NodeChange<?> change : changes) {
-			events.addAll(toEvent(change, userName));
+			toEvent(change);
 		}
-		return events;
 	}
 
-	private List<? extends RecordEvent> toEvent(NodeChange<?> change, String userName) {
+	private void toEvent(NodeChange<?> change) {
 		Node<?> node = change.getNode();
 		List<String> ancestorIds = getAncestorIds(node.getDefinition(), change.getAncestorIds());
 		Integer recordId = change.getRecordId();
 		RecordStep recordStep = change.getRecordStep().toRecordStep();
 
-		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node, userName);
+		EventFactory factory = new EventFactory(recordId, recordStep, ancestorIds, node);
 
 		if (change instanceof EntityChange) {
 			EntityChange entityChange = (EntityChange) change;
-			return change instanceof EntityAddChange ? factory.entityCreated(entityChange.getChildrenRelevance(),
-					entityChange.getMinCountByChildDefinitionId(), entityChange.getMaxCountByChildDefinitionId(),
-					entityChange.getChildrenMinCountValidation(), entityChange.getChildrenMaxCountValidation())
-					: factory.entityUpdated(entityChange.getChildrenRelevance(),
-							entityChange.getMinCountByChildDefinitionId(), entityChange.getMaxCountByChildDefinitionId(),
-							entityChange.getChildrenMinCountValidation(), entityChange.getChildrenMaxCountValidation());
+			if (change instanceof EntityAddChange) {
+				factory.entityCreated(entityChange.getChildrenRelevance(),
+						entityChange.getMinCountByChildDefinitionId(), entityChange.getMaxCountByChildDefinitionId(),
+						entityChange.getChildrenMinCountValidation(), entityChange.getChildrenMaxCountValidation());
+			} else {
+				factory.entityUpdated(entityChange.getChildrenRelevance(),
+						entityChange.getMinCountByChildDefinitionId(), entityChange.getMaxCountByChildDefinitionId(),
+						entityChange.getChildrenMinCountValidation(), entityChange.getChildrenMaxCountValidation());
+			}
 		} else if (change instanceof AttributeChange) {
-			return change instanceof AttributeAddChange ? factory.attributeCreated() : factory.attributeUpdated();
+			if (change instanceof AttributeAddChange) {
+				factory.attributeCreated();
+			} else {
+				factory.attributeUpdated();
+			}
 		} else if (change instanceof NodeDeleteChange) {
-			return node instanceof Entity ? factory.entityDeleted() : factory.attributeDeleted();
+			if (node instanceof Entity) {
+				factory.entityDeleted();
+			} else {
+				factory.attributeDeleted();
+			}
 		}
-		return emptyList();
+
 	}
 
 	private List<String> getAncestorIds(NodeDefinition nodeDef, List<Integer> ancestorEntityIds) {
@@ -131,16 +143,16 @@ public class EventProducer {
 			int parentId = ancestorEntityIds.get(0);
 			ancestorIds.add(getNodeCollectionId(parentId, nodeDef));
 		}
-		
+
 		List<EntityDefinition> ancestorDefs = nodeDef.getAncestorEntityDefinitions();
 		for (int ancestorIdx = 0; ancestorIdx < ancestorEntityIds.size(); ancestorIdx++) {
 			int ancestorEntityId = ancestorEntityIds.get(ancestorIdx);
 			EntityDefinition ancestorDef = ancestorDefs.get(ancestorIdx);
 			ancestorIds.add(String.valueOf(ancestorEntityId));
-			boolean inCollection = ! ancestorDef.isRoot() && ancestorDef.isMultiple();
+			boolean inCollection = !ancestorDef.isRoot() && ancestorDef.isMultiple();
 			if (inCollection) {
 				Integer ancestorParentId = ancestorEntityIds.get(ancestorIdx + 1);
-				ancestorIds.add(getNodeCollectionId(ancestorParentId, ancestorDef)); 
+				ancestorIds.add(getNodeCollectionId(ancestorParentId, ancestorDef));
 			}
 		}
 		return ancestorIds;
@@ -149,16 +161,16 @@ public class EventProducer {
 	private String getNodeCollectionId(int parentId, NodeDefinition memberDef) {
 		return parentId + "|" + memberDef.getId();
 	}
-	
+
 	private String getNodeCollectionDefinitionId(EntityDefinition parentDef, NodeDefinition memberDef) {
 		return parentDef.getId() + "|" + memberDef.getId();
-	}	
+	}
 
 	private class EventFactory {
-		Node<?> node;
-		List<String> ancestorIds;
 		Integer recordId;
 		RecordStep recordStep;
+		List<String> ancestorIds;
+		Node<?> node;
 
 		Survey survey;
 		String surveyName;
@@ -166,15 +178,14 @@ public class EventProducer {
 		int definitionId;
 		int nodeId;
 		Date timestamp;
-		String userName;
-		
-		EventFactory(Integer recordId, RecordStep recordStep,  List<String> ancestorIds, Node<?> node, String userName) {
+
+		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds,
+				Node<?> node) {
 			this.recordId = recordId;
 			this.recordStep = recordStep;
 			this.ancestorIds = ancestorIds;
 			this.node = node;
-			this.userName = userName;
-			
+
 			this.survey = node.getSurvey();
 			this.surveyName = survey.getName();
 			this.nodeDef = node.getDefinition();
@@ -182,218 +193,223 @@ public class EventProducer {
 			this.nodeId = node.getInternalId();
 			this.timestamp = new Date();
 		}
-		
-		List<? extends RecordEvent> entityCreated(Map<Integer, Boolean> relevanceByChildDefinitionId,
+
+		void entityCreated(Map<Integer, Boolean> relevanceByChildDefinitionId,
 				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
 				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
 				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
-			List<RecordEvent> events = new ArrayList<RecordEvent>();
 			Entity entity = (Entity) node;
-			EntityEvent entityEvent = entity.isRoot() 
-					? new RootEntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							String.valueOf(nodeId), timestamp, userName)
-					: new EntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), timestamp, userName);
-			events.add(entityEvent);
-			events.addAll(entityCreatedOrUpdated(relevanceByChildDefinitionId, minCountByChildDefinitionId,
-					maxCountByChildDefinitionId, minCountValidationByChildDefinitionId,
-					maxCountValidationByChildDefinitionId));
-			
-			//add node collection created events
+			EntityCreatedEvent entityEvent = entity.isRoot() ? new RootEntityCreatedEvent() : new EntityCreatedEvent();
+			fillRecordEvent(entityEvent);
+
+			entityEvent.setRelevanceByChildDefinitionId(relevanceByChildDefinitionId);
+			entityEvent.setMinCountByChildDefinitionId(minCountByChildDefinitionId);
+			entityEvent.setMaxCountByChildDefinitionId(maxCountByChildDefinitionId);
+			entityEvent.setMinCountValidationByChildDefinitionId(minCountValidationByChildDefinitionId);
+			entityEvent.setMaxCountValidationByChildDefinitionId(maxCountValidationByChildDefinitionId);
+			consumer.onEvent(entityEvent);
+
+			// add node collection created events
 			for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
 				if (childDef.isMultiple()) {
 					String collectionId = getNodeCollectionId(nodeId, childDef);
 					String collectionDefId = getNodeCollectionDefinitionId(entity.getDefinition(), childDef);
-					if (childDef instanceof AttributeDefinition) {
-						events.add(new AttributeCollectionCreatedEvent(surveyName, recordId, recordStep, collectionDefId, 
-								ancestorIds, collectionId, timestamp, userName));
-					} else {
-						events.add(new EntityCollectionCreatedEvent(surveyName, recordId, recordStep, collectionDefId, 
-								ancestorIds, collectionId, timestamp, userName));
-					}
+					RecordEvent event = childDef instanceof AttributeDefinition ? new AttributeCollectionCreatedEvent()
+							: new EntityCollectionCreatedEvent();
+					event = fillRecordEvent(event);
+					event.setDefinitionId(collectionDefId);
+					event.setNodeId(collectionId);
+					consumer.onEvent(event);
 				}
 			}
-			return events;
 		}
-		
-		List<? extends RecordEvent> entityUpdated(Map<Integer, Boolean> relevanceByChildDefinitionId,
+
+		void entityUpdated(Map<Integer, Boolean> relevanceByChildDefinitionId,
 				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
 				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
 				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
-			List<RecordEvent> events = new ArrayList<RecordEvent>();
-			events.addAll(entityCreatedOrUpdated(relevanceByChildDefinitionId, minCountByChildDefinitionId,
-					maxCountByChildDefinitionId, minCountValidationByChildDefinitionId,
-					maxCountValidationByChildDefinitionId));
-			return events;
-		}
-		
-		List<? extends RecordEvent> attributeCreated() {
-			List<RecordEvent> result = new ArrayList<RecordEvent>();
-			result.add(new AttributeCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), timestamp, userName));
-			if (node.hasData()) {
-				result.addAll(attributeUpdated());
+			for (Entry<Integer, Boolean> entry : relevanceByChildDefinitionId.entrySet()) {
+				relevanceUpdated(entry.getKey(), entry.getValue());
 			}
-			return result;
+			for (Entry<Integer, Integer> entry : minCountByChildDefinitionId.entrySet()) {
+				minCountUpdated(entry.getKey(), entry.getValue());
+			}
+			for (Entry<Integer, Integer> entry : maxCountByChildDefinitionId.entrySet()) {
+				maxCountUpdated(entry.getKey(), entry.getValue());
+			}
+			for (Entry<Integer, ValidationResultFlag> entry : minCountValidationByChildDefinitionId.entrySet()) {
+				minCountValidationUpdated(entry.getKey(), entry.getValue());
+			}
+			for (Entry<Integer, ValidationResultFlag> entry : maxCountValidationByChildDefinitionId.entrySet()) {
+				maxCountValidationUpdated(entry.getKey(), entry.getValue());
+			}
 		}
-		
-		List<? extends RecordEvent> attributeUpdated() {
+
+		void attributeCreated() {
+			consumer.onEvent(fillRecordEvent(new AttributeCreatedEvent()));
+			if (node.hasData()) {
+				attributeUpdated();
+			}
+		}
+
+		@SuppressWarnings("unchecked")
+		void attributeUpdated() {
 			AttributeUpdatedEvent event = null;
 			if (node instanceof BooleanAttribute) {
+				event = new BooleanAttributeUpdatedEvent();
 				BooleanValue value = ((BooleanAttribute) node).getValue();
-				event = new BooleanAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.getValue(), timestamp, userName);
+				((BooleanAttributeUpdatedEvent) event).setValue(value.getValue());
 			} else if (node instanceof CodeAttribute) {
+				event = new CodeAttributeUpdatedEvent();
 				Code value = ((CodeAttribute) node).getValue();
-				event = new CodeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.getCode(), 
-						value.getQualifier(), timestamp, userName);
+				((CodeAttributeUpdatedEvent) event).setCode(value.getCode());
+				((CodeAttributeUpdatedEvent) event).setQualifier(value.getQualifier());
 			} else if (node instanceof CoordinateAttribute) {
+				event = new CoordinateAttributeUpdatedEvent();
 				Coordinate value = ((CoordinateAttribute) node).getValue();
-				event = new CoordinateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.getX(), value.getY(), value.getSrsId(), 
-						timestamp, userName);
+				((CoordinateAttributeUpdatedEvent) event).setX(value.getX());
+				((CoordinateAttributeUpdatedEvent) event).setY(value.getY());
+				((CoordinateAttributeUpdatedEvent) event).setSrsId(value.getSrsId());
 			} else if (node instanceof DateAttribute) {
 				org.openforis.idm.model.Date value = ((DateAttribute) node).getValue();
-				event = new DateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.toJavaDate(), timestamp, userName);
-			//TODO
+				event = new DateAttributeUpdatedEvent();
+				((DateAttributeUpdatedEvent) event).setDate(value.toJavaDate());
+				// TODO
 //				} else if (node instanceof FileAttribute) {
 			} else if (node instanceof NumberAttribute<?, ?>) {
 				NumberAttribute<?, ?> attribute = (NumberAttribute<?, ?>) node;
 				Number value = attribute.getNumber();
-				Integer unitId = attribute.getUnitId();
 				Type valueType = ((NumericAttributeDefinition) nodeDef).getType();
-				switch(valueType) {
+				switch (valueType) {
 				case INTEGER:
-					event = new IntegerAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), 
-							(Integer) value, unitId, timestamp, userName);
+					event = new IntegerAttributeUpdatedEvent();
 					break;
 				case REAL:
-					event = new DoubleAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), 
-							(Double) value, unitId, timestamp, userName);
+					event = new DoubleAttributeUpdatedEvent();
 					break;
 				default:
 					throw new IllegalArgumentException("Numeric type not supported: " + valueType);
 				}
+				((NumberAttributeUpdatedEvent<?>) event).setUnitId(attribute.getUnitId());
+				((NumberAttributeUpdatedEvent<Number>) event).setValue(value);
+
 			} else if (node instanceof NumericRangeAttribute<?, ?>) {
 				NumericRangeAttribute<?, ?> attribute = (NumericRangeAttribute<?, ?>) node;
 				Number from = attribute.getFrom();
 				Number to = attribute.getTo();
-				Integer unitId = attribute.getUnitId();
 				Type valueType = ((RangeAttributeDefinition) nodeDef).getType();
-				switch(valueType) {
+				switch (valueType) {
 				case INTEGER:
-					event = new IntegerRangeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), 
-							(Integer) from, (Integer) to, unitId, timestamp, userName);
+					event = new IntegerRangeAttributeUpdatedEvent();
 					break;
 				case REAL:
-					event = new DoubleRangeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-							ancestorIds, String.valueOf(nodeId), 
-							(Double) from, (Double) to, unitId, timestamp, userName);
+					event = new DoubleRangeAttributeUpdatedEvent();
 					break;
 				default:
 					throw new IllegalArgumentException("Numeric type not supported: " + valueType);
 				}
+				((RangeAttributeUpdatedEvent<?>) event).setUnitId(attribute.getUnitId());
+				((RangeAttributeUpdatedEvent<Number>) event).setFrom(from);
+				((RangeAttributeUpdatedEvent<Number>) event).setTo(to);
 			} else if (node instanceof TaxonAttribute) {
 				TaxonAttribute taxonAttr = (TaxonAttribute) node;
-				event = new TaxonAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), 
-						taxonAttr.getCode(), taxonAttr.getScientificName(), taxonAttr.getVernacularName(), taxonAttr.getLanguageCode(), 
-						taxonAttr.getLanguageVariety(), timestamp, userName);
+				TaxonAttributeUpdatedEvent taxonEvent = new TaxonAttributeUpdatedEvent();
+				taxonEvent.setCode(taxonAttr.getCode());
+				taxonEvent.setScientificName(taxonAttr.getScientificName());
+				taxonEvent.setVernacularName(taxonAttr.getVernacularName());
+				taxonEvent.setLanguageCode(taxonAttr.getLanguageCode());
+				taxonEvent.setLanguageVariety(taxonAttr.getLanguageVariety());
+				event = taxonEvent;
 			} else if (node instanceof TextAttribute) {
-				String text = ((TextAttribute) node).getText();
-				event = new TextAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), text, timestamp, userName);
+				event = new TextAttributeUpdatedEvent();
+				((TextAttributeUpdatedEvent) event).setText(((TextAttribute) node).getText());
 			} else if (node instanceof TimeAttribute) {
+				event = new TimeAttributeUpdatedEvent();
 				Time value = ((TimeAttribute) node).getValue();
-				event = new DateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-						ancestorIds, String.valueOf(nodeId), value.toJavaDate(), timestamp, userName);
+				((TimeAttributeUpdatedEvent) event).setTime(value.toJavaDate());
 //			} else {
 //				TODO fail for not supported node types
 //				throw new IllegalArgumentException("Unexpected node type: " + node.getClass().getSimpleName());
 			}
-			if (event == null) {
-				return Collections.<RecordEvent>emptyList();
+			if (event != null) {
+				fillRecordEvent(event);
+				event.setValidationResults(
+						new ValidationResultsView((Attribute<?, ?>) node, context.messageSource, context.locale));
+				consumer.onEvent(event);
 			}
-			event.setValidationResults(toValidationResultsView(((Attribute<?, ?>) node).getValidationResults()));
-			return Arrays.<RecordEvent>asList(event);
-		}
-		
-		List<? extends RecordEvent> entityDeleted() {
-			return asList(new EntityDeletedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
-					ancestorIds, String.valueOf(nodeId), timestamp, userName));
-		}
-		
-		List<? extends RecordEvent> attributeDeleted() {
-			return asList(new AttributeDeletedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
-					ancestorIds, String.valueOf(nodeId), timestamp, userName));	
-		}
-		
-		private List<? extends RecordEvent> entityCreatedOrUpdated(Map<Integer, Boolean> relevanceByChildDefinitionId,
-				Map<Integer, Integer> minCountByChildDefinitionId, Map<Integer, Integer> maxCountByChildDefinitionId,
-				Map<Integer, ValidationResultFlag> minCountValidationByChildDefinitionId,
-				Map<Integer, ValidationResultFlag> maxCountValidationByChildDefinitionId) {
-			List<RecordEvent> events = new ArrayList<RecordEvent>();
-			for (Entry<Integer, Boolean> entry : relevanceByChildDefinitionId.entrySet()) {
-				events.add(relevanceUpdated(entry.getKey(), entry.getValue()));
-			}
-			for (Entry<Integer, Integer> entry : minCountByChildDefinitionId.entrySet()) {
-				events.add(minCountUpdated(entry.getKey(), entry.getValue()));
-			}
-			for (Entry<Integer, Integer> entry : maxCountByChildDefinitionId.entrySet()) {
-				events.add(maxCountUpdated(entry.getKey(), entry.getValue()));
-			}
-			for (Entry<Integer, ValidationResultFlag> entry : minCountValidationByChildDefinitionId.entrySet()) {
-				events.add(minCountValidationUpdated(entry.getKey(), entry.getValue()));
-			}
-			for (Entry<Integer, ValidationResultFlag> entry : maxCountValidationByChildDefinitionId.entrySet()) {
-				events.add(maxCountValidationUpdated(entry.getKey(), entry.getValue()));
-			}
-			return events;
-		}
-		
-		private NodeRelevanceUpdatedEvent relevanceUpdated(int childDefinitionId, boolean relevant) {
-			return new NodeRelevanceUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
-					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, relevant);
 		}
 
-		private NodeMinCountUpdatedEvent minCountUpdated(int childDefinitionId, int minCount) {
-			return new NodeMinCountUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
-					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, minCount);			
-		}
-		
-		private NodeMaxCountUpdatedEvent maxCountUpdated(int childDefinitionId, int maxCount) {
-			return new NodeMaxCountUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
-					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, maxCount);			
+		void entityDeleted() {
+			EntityDeletedEvent event = new EntityDeletedEvent();
+			fillRecordEvent(event);
+			consumer.onEvent(event);
 		}
 
-		private NodeMinCountValidationUpdatedEvent minCountValidationUpdated(int childDefinitionId, ValidationResultFlag flag) {
-			return new NodeMinCountValidationUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
-					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, flag);			
+		void attributeDeleted() {
+			AttributeDeletedEvent event = new AttributeDeletedEvent();
+			fillRecordEvent(event);
+			consumer.onEvent(event);
 		}
 
-		private NodeMaxCountValidationUpdatedEvent maxCountValidationUpdated(int childDefinitionId, ValidationResultFlag flag) {
-			return new NodeMaxCountValidationUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
-					ancestorIds, String.valueOf(nodeId), timestamp, userName, childDefinitionId, flag);			
+		private void relevanceUpdated(int childDefinitionId, boolean relevant) {
+			NodeRelevanceUpdatedEvent event = new NodeRelevanceUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setRelevant(relevant);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private void minCountUpdated(int childDefinitionId, int minCount) {
+			NodeMinCountUpdatedEvent event = new NodeMinCountUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setCount(minCount);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private void maxCountUpdated(int childDefinitionId, int maxCount) {
+			NodeMaxCountUpdatedEvent event = new NodeMaxCountUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setCount(maxCount);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private void minCountValidationUpdated(int childDefinitionId, ValidationResultFlag flag) {
+			NodeMinCountValidationUpdatedEvent event = new NodeMinCountValidationUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setFlag(flag);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private void maxCountValidationUpdated(int childDefinitionId, ValidationResultFlag flag) {
+			NodeMaxCountValidationUpdatedEvent event = new NodeMaxCountValidationUpdatedEvent();
+			event.setChildDefinitionId(childDefinitionId);
+			event.setFlag(flag);
+			consumer.onEvent(fillRecordEvent(event));
+		}
+
+		private <E extends RecordEvent> E fillRecordEvent(E event) {
+			event.setSurveyName(surveyName);
+			event.setRecordId(recordId);
+			event.setRecordStep(recordStep);
+			event.setDefinitionId(String.valueOf(definitionId));
+			event.setAncestorIds(ancestorIds);
+			event.setNodeId(String.valueOf(nodeId));
+			event.setTimestamp(timestamp);
+			event.setUserName(context.userName);
+			return event;
 		}
 	}
-	
-	private ValidationResultsView toValidationResultsView(ValidationResults validationResults) {
-		List<ValidationResultView> errors = new ArrayList<ValidationResultView>();
-		for (ValidationResult validationResult : validationResults.getErrors()) {
-			errors.add(new ValidationResultView(validationResult.getFlag(), validationResult.getValidator().getClass().getName()));
-		}
-		List<ValidationResultView> warnings = new ArrayList<ValidationResultView>();
-		for (ValidationResult validationResult : validationResults.getWarnings()) {
-			warnings.add(new ValidationResultView(validationResult.getFlag(), validationResult.getValidator().getClass().getName()));
-		}
-		return new ValidationResultsView(errors, warnings);
-	}
 
-	
+	public static class EventProducerContext {
+		MessageSource messageSource;
+		Locale locale;
+		String userName;
+
+		public EventProducerContext(MessageSource messageSource, Locale locale, String userName) {
+			super();
+			this.messageSource = messageSource;
+			this.locale = locale;
+			this.userName = userName;
+		}
+	}
 
 }

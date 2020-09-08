@@ -2,18 +2,25 @@ package org.openforis.collect.io.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.event.RecordTransaction;
+import org.openforis.collect.event.EventProducer.EventProducerContext;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.NodeChangeBatchProcessor;
 import org.openforis.collect.model.NodeChangeSet;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class RecordEventBatchPublisher implements EventListener, NodeChangeBatchProcessor {
 
+	@Autowired
+	private MessageSource messageSource;
+	
 	private List<RecordEvent> events = new ArrayList<RecordEvent>();
 	private EventQueue eventQueue;
 	
@@ -22,11 +29,11 @@ public class RecordEventBatchPublisher implements EventListener, NodeChangeBatch
 	}
 	
 	@Override
-	public void onEvents(List<? extends RecordEvent> events) {
+	public void onEvent(RecordEvent event) {
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		this.events.addAll(events);
+		this.events.add(event);
 	}
 	
 	@Override
@@ -34,7 +41,8 @@ public class RecordEventBatchPublisher implements EventListener, NodeChangeBatch
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		this.events.addAll(new EventProducer().produceFor(nodeChanges, userName));
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, Locale.ENGLISH, userName);
+		new EventProducer(context, this).produceFor(nodeChanges);
 	}
 	
 	public void process(CollectRecord record) {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Input } from 'reactstrap'
+import { Input, FormFeedback } from 'reactstrap'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
@@ -30,15 +30,19 @@ export default class TextField extends AbstractField {
   }
 
   render() {
-    const { value: valueState = {}, dirty } = this.state
+    const { dirty, value: valueState = {}, errors, warnings } = this.state
     const { value } = valueState
     const text = value || ''
 
     return (
-      <React.Fragment>
-        <Input value={text} onChange={this.onChange} />
-        {dirty && <FieldLoadingSpinner />}
-      </React.Fragment>
+      <div>
+        <React.Fragment>
+          <Input invalid={Boolean(errors || warnings)} value={text} onChange={this.onChange} />
+          {dirty && <FieldLoadingSpinner />}
+        </React.Fragment>
+        {errors && <FormFeedback>{errors}</FormFeedback>}
+        {warnings && <FormFeedback>{warnings}</FormFeedback>}
+      </div>
     )
   }
 }

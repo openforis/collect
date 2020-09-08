@@ -5,13 +5,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.command.AddAttributeCommand;
 import org.openforis.collect.command.AddEntityCommand;
+import org.openforis.collect.command.Command;
 import org.openforis.collect.command.CommandDispatcher;
 import org.openforis.collect.command.CreateRecordCommand;
 import org.openforis.collect.command.DeleteNodeCommand;
@@ -23,6 +23,7 @@ import org.openforis.collect.command.UpdateCodeAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
 import org.openforis.collect.designer.metamodel.AttributeType;
+import org.openforis.collect.event.EventListenerToList;
 import org.openforis.collect.event.RecordEvent;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,55 +47,50 @@ public class CommandController {
 	@RequestMapping(value="record", method=POST, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> createRecord(@RequestBody CreateRecordCommand command) {
-		List<RecordEvent> events = commandDispatcher.submit(command);
-		return toView(events);
+		return submitCommand(command);
 	}
 
 	@RequestMapping(value="record", method=DELETE, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> deleteRecord(@RequestBody DeleteRecordCommand command) {
-		RecordEvent events = commandDispatcher.submit(command);
-		return toView(Arrays.asList(events));
+		return submitCommand(command);
 	}
 
 	@RequestMapping(value="record/attribute/new", method=POST, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> addAttribute(@RequestBody AddAttributeCommand command) {
-		List<RecordEvent> events = commandDispatcher.submit(command);
-		return toView(events);
+		return submitCommand(command);
 	}
 	
 	@RequestMapping(value="record/attributes", method=POST, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> addOrUpdateAttributes(@RequestBody UpdateAttributesCommandWrapper commandsWrapper) {
-		List<RecordEvent> events = new ArrayList<RecordEvent>(); 
+		EventListenerToList consumer = new EventListenerToList();
+		
 		commandsWrapper.commands.forEach(c -> {
 			UpdateAttributeCommand command = c.toCommand();
-			events.addAll(commandDispatcher.submit(command));
+			commandDispatcher.submit(command, consumer);
 		});
-		return toView(events);
+		return toView(consumer.getList());
 	}
 	
 	@RequestMapping(value="record/attribute", method=POST, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> updateAttribute(@RequestBody UpdateAttributeCommandWrapper commandWrapper) {
 		UpdateAttributeCommand command = commandWrapper.toCommand();
-		List<RecordEvent> events = commandDispatcher.submit(command);
-		return toView(events);
+		return submitCommand(command);
 	}
 	
 	@RequestMapping(value="record/entity", method=POST, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> addEntity(@RequestBody AddEntityCommand command) {
-		List<RecordEvent> events = commandDispatcher.submit(command);
-		return toView(events);
+		return submitCommand(command);
 	}
 	
 	@RequestMapping(value="record/node", method=DELETE, consumes=APPLICATION_JSON_VALUE)
 	@Transactional
 	public @ResponseBody List<RecordEventView> deleteNode(@RequestBody DeleteNodeCommand command) {
-		List<RecordEvent> events = commandDispatcher.submit(command);
-		return toView(events);
+		return submitCommand(command);
 	}
 	
 	private List<RecordEventView> toView(List<RecordEvent> events) {
@@ -104,7 +100,13 @@ public class CommandController {
 		}
 		return result;
 	}
-		
+	
+	private List<RecordEventView> submitCommand(Command command) {
+		EventListenerToList consumer = new EventListenerToList();
+		commandDispatcher.submit(command, consumer);
+		return toView(consumer.getList());
+	}
+
 	static class RecordEventView {
 		
 		private RecordEvent event;

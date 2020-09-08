@@ -53,6 +53,7 @@ export class RecordUpdater {
           parentEntity.addChild(attr)
         }
         this._setValueInAttribute(attr, event)
+        attr.validationResults = event.validationResults
       } else if (event instanceof NodeRelevanceUpdatedEvent) {
         const childDefIndex = definition.getChildDefinitionIndexById(event.childDefinitionId)
         node.childrenRelevance[childDefIndex] = event.relevant

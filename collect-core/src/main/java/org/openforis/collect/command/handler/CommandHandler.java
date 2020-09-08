@@ -1,9 +1,10 @@
 package org.openforis.collect.command.handler;
 
 import org.openforis.collect.command.Command;
+import org.openforis.collect.event.EventListener;
 
-public interface CommandHandler<R, C extends Command<R>> {
+public interface CommandHandler<C extends Command> {
 
-	R execute(C command);
+	void execute(C command, EventListener eventListener);
 	
 }

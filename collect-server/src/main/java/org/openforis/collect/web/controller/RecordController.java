@@ -31,10 +31,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.ProxyContext;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.event.EventListenerToList;
 import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.EventProducer.EventProducerContext;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordDeletedEvent;
-import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.SurveyBackupJob;
@@ -652,8 +653,11 @@ public class RecordController extends BasicController implements Serializable {
 		if (! eventQueue.isEnabled()) {
 			return;
 		}
-		List<RecordEvent> events = new EventProducer().produceFor(record, userName);
-		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), events));
+		SessionState sessionState = sessionManager.getSessionState(); 
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, sessionState.getLocale(), userName);
+		EventListenerToList consumer = new EventListenerToList();
+		new EventProducer(context, consumer).produceFor(record);
+		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), consumer.getList()));
 	}
 	
 	private void publishRecordDeletedEvent(CollectRecord record, RecordStep recordStep, String userName) {

@@ -10,8 +10,10 @@ export default class AbstractField extends Component {
     super(props)
 
     this.state = {
-      value: '',
       dirty: false,
+      value: '',
+      errors: null,
+      warnings: null,
     }
 
     this.attributeUpdatedDebounced = null
@@ -22,15 +24,31 @@ export default class AbstractField extends Component {
   }
 
   componentDidMount() {
-    this.setState({ value: this.extractValueFromProps() })
+    this.udpateStateFromProps()
   }
 
   componentWillUnmount() {
     EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
   }
 
+  udpateStateFromProps() {
+    this.setState({ dirty: false, value: this.extractValueFromProps(), ...this.extractValidationFromProps() })
+  }
+
   extractValueFromProps() {
     return null
+  }
+
+  extractValidationFromProps() {
+    const attr = this.getSingleAttribute()
+    let errors = null,
+      warnings = null
+    if (attr) {
+      const { errors: errorsArray, warnings: warningsArray } = attr.validationResults
+      errors = errorsArray ? errorsArray.join('; ') : null
+      warnings = warningsArray ? warningsArray.join('; ') : null
+    }
+    return { errors, warnings }
   }
 
   getSingleAttribute(parentEntity) {
@@ -43,8 +61,7 @@ export default class AbstractField extends Component {
       if (attrDef.multiple) {
         throw new Error('Expected single attribute, found multiple: ' + attrDef.name)
       } else {
-        const attribute = parentEntity.getSingleChild(attrDef.id)
-        return attribute
+        return parentEntity.getSingleChild(attrDef.id)
       }
     }
   }
@@ -82,9 +99,8 @@ export default class AbstractField extends Component {
     }
   }
 
-  handleAttributeUpdatedEvent(event) {
-    const value = this.extractValueFromAttributeUpdateEvent(event)
-    this.setState({ dirty: false, value })
+  handleAttributeUpdatedEvent(_) {
+    this.udpateStateFromProps()
   }
 
   extractValueFromAttributeUpdateEvent(event) {}

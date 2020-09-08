@@ -1,8 +1,5 @@
 package org.openforis.collect.event;
 
-import java.util.Date;
-import java.util.List;
-
 /**
  * 
  * @author D. Wiell
@@ -12,19 +9,18 @@ import java.util.List;
 public abstract class NumberAttributeUpdatedEvent<T extends Number> extends
 		NumericAttributeUpdatedEvent<T> {
 
-	private final T value;
-
-	public NumberAttributeUpdatedEvent(String surveyName, Integer recordId,
-			RecordStep step, String definitionId, List<String> ancestorIds,
-			String nodeId, T value, Class<T> valueType, Integer unitId,
-			Date timestamp, String userName) {
-		super(surveyName, recordId, step, definitionId, ancestorIds, nodeId,
-				valueType, unitId, timestamp, userName);
-		this.value = value;
+	private T value;
+	
+	public NumberAttributeUpdatedEvent(Class<T> valueType) {
+		super(valueType);
 	}
 
 	public T getValue() {
 		return value;
+	}
+	
+	public void setValue(T value) {
+		this.value = value;
 	}
 
 }

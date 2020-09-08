@@ -1,7 +1,9 @@
 package org.openforis.collect.command;
 
+import org.openforis.collect.event.EventListener;
+
 public interface CommandDispatcher {
 
-	<R> R submit(Command<R> command);
+	void submit(Command command, EventListener eventListener);
 	
 }

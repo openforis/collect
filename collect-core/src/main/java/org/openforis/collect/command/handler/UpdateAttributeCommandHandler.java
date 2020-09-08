@@ -1,14 +1,16 @@
 package org.openforis.collect.command.handler;
 
-import java.util.List;
+import java.util.Locale;
 
 import org.openforis.collect.command.UpdateAttributeCommand;
 import org.openforis.collect.command.UpdateBooleanAttributeCommand;
 import org.openforis.collect.command.UpdateCodeAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
+import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.EventProducer;
-import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.event.EventProducer.EventProducerContext;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordProvider;
 import org.openforis.collect.manager.SurveyManager;
@@ -23,12 +25,12 @@ import org.openforis.idm.model.Value;
 
 public class UpdateAttributeCommandHandler<C extends UpdateAttributeCommand> extends NodeCommandHandler<C> {
 
-	public UpdateAttributeCommandHandler(SurveyManager surveyManager, RecordProvider recordProvider, RecordManager recordManager) {
-		super(surveyManager, recordProvider, recordManager);
+	public UpdateAttributeCommandHandler(SurveyManager surveyManager, RecordProvider recordProvider, RecordManager recordManager, MessageSource messageSource) {
+		super(surveyManager, recordProvider, recordManager, messageSource);
 	}
 
 	@Override
-	public List<RecordEvent> execute(UpdateAttributeCommand command) {
+	public void execute(UpdateAttributeCommand command, EventListener eventListener) {
 		CollectRecord record = findRecord(command);
 		Attribute<?, Value> attribute = findAttribute(command, record);
 		Value value = extractValue(command);
@@ -36,8 +38,8 @@ public class UpdateAttributeCommandHandler<C extends UpdateAttributeCommand> ext
 		
 		recordManager.save(record);
 		
-		List<RecordEvent> events = new EventProducer().produceFor(changeSet, command.getUsername());
-		return events;
+		EventProducerContext context = new EventProducer.EventProducerContext(messageSource, Locale.ENGLISH, command.getUsername());
+		new EventProducer(context, eventListener).produceFor(changeSet);
 	}
 	
 	private Value extractValue(UpdateAttributeCommand command) {

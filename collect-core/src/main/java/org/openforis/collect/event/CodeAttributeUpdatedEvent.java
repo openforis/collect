@@ -1,8 +1,5 @@
 package org.openforis.collect.event;
 
-import java.util.Date;
-import java.util.List;
-
 /**
  * 
  * @author D. Wiell
@@ -11,24 +8,22 @@ import java.util.List;
  */
 public class CodeAttributeUpdatedEvent extends AttributeUpdatedEvent {
 
-	private final String code;
-	private final String qualifier;
-
-	public CodeAttributeUpdatedEvent(String surveyName, Integer recordId,
-			RecordStep step, String definitionId, List<String> ancestorIds,
-			String nodeId, String code, String qualifier, Date timestamp,
-			String userName) {
-		super(surveyName, recordId, step, definitionId, ancestorIds, nodeId,
-				timestamp, userName);
-		this.code = code;
-		this.qualifier = qualifier;
-	}
+	private String code;
+	private String qualifier;
 
 	public String getCode() {
 		return code;
 	}
+	
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 	public String getQualifier() {
 		return qualifier;
+	}
+	
+	public void setQualifier(String qualifier) {
+		this.qualifier = qualifier;
 	}
 }

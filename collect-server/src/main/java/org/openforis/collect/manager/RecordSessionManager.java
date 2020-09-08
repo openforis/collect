@@ -26,9 +26,9 @@ public class RecordSessionManager extends SessionManager implements EventListene
 	private transient List<RecordEvent> pendingEvents = new CopyOnWriteArrayList<RecordEvent>();
 	
 	@Override
-	public void onEvents(List<? extends RecordEvent> events) {
+	public void onEvent(RecordEvent event) {
 		//TODO filter events by active record
-		pendingEvents.addAll(events);
+		pendingEvents.add(event);
 	}
 	
 	@Override

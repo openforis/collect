@@ -3,9 +3,7 @@ package org.openforis.collect.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.event.RecordEvent;
-
-public class CreateRecordCommand implements Command<List<RecordEvent>> {
+public class CreateRecordCommand implements Command {
 	
 	private static final long serialVersionUID = 1L;
 	

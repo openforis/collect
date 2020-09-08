@@ -10,14 +10,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.EventProducer.EventProducerContext;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordDeletedEvent;
 import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.event.EventListenerToList;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.data.RecordImportError.Level;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordManager.RecordOperations;
 import org.openforis.collect.manager.RecordManager.RecordStepOperation;
@@ -57,6 +61,8 @@ public class DataRestoreTask extends Task {
 	
 	@Autowired
 	private EventQueue eventQueue;
+	@Autowired
+	private MessageSource messageSource;
 	
 	private RecordManager recordManager;
 	private UserManager userManager;
@@ -259,8 +265,6 @@ public class DataRestoreTask extends Task {
 
 	private final class EventPublisher implements Consumer<RecordStepOperation> {
 		
-		final EventProducer eventProducer = new EventProducer();
-		
 		@Override
 		public void consume(RecordStepOperation operation) {
 			CollectRecord record = operation.getRecord();
@@ -269,7 +273,9 @@ public class DataRestoreTask extends Task {
 			RecordStep recordStep = record.getStep().toRecordStep();
 			
 			String userName = record.getModifiedBy().getUsername();
-			List<RecordEvent> events = eventProducer.produceFor(record, userName);
+			EventProducerContext context = new EventProducerContext(messageSource, Locale.ENGLISH, userName);
+			List<RecordEvent> events = new ArrayList<RecordEvent>();
+			new EventProducer(context, new EventListenerToList(events)).produceFor(record);
 			
 			if (! operation.isNewRecord()) {
 				events.add(0, new RecordDeletedEvent(surveyName, recordId, new Date(), userName));
