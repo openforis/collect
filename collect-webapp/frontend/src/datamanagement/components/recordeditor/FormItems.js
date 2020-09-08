@@ -1,11 +1,36 @@
 import React, { Component } from 'react'
-import { Container } from 'reactstrap'
+import { Container, Fade } from 'reactstrap'
 
 import FormItem from './FormItem'
+import EventQueue from '../../../model/event/EventQueue'
+import { NodeRelevanceUpdatedEvent } from '../../../model/event/RecordEvent'
 
 export default class FormItems extends Component {
   constructor(props) {
     super(props)
+
+    this.handleRecordEventReceived = this.handleRecordEventReceived.bind(this)
+  }
+
+  componentDidMount() {
+    EventQueue.subscribe('recordEvent', this.handleRecordEventReceived)
+  }
+
+  componentWillUnmount() {
+    EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
+  }
+
+  handleRecordEventReceived(event) {
+    const { parentEntity } = this.props
+
+    if (
+      event instanceof NodeRelevanceUpdatedEvent &&
+      event.recordId === parentEntity.record.id &&
+      event.recordStep === parentEntity.record.step &&
+      Number(event.nodeId) === parentEntity.id
+    ) {
+      this.forceUpdate()
+    }
   }
 
   render() {
@@ -17,9 +42,13 @@ export default class FormItems extends Component {
           const nodeDefinition = itemDef.attributeDefinition || itemDef.entityDefinition
           const childDefIndex = parentEntity.definition.getChildDefinitionIndexById(nodeDefinition.id)
           const relevant = parentEntity.childrenRelevance[childDefIndex]
+          const visible = relevant || !nodeDefinition.hideWhenNotRelevant
+
           return (
-            (relevant || !nodeDefinition.hideWhenNotRelevant) && (
-              <FormItem key={itemDef.id} parentEntity={parentEntity} itemDef={itemDef} />
+            visible && (
+              <Fade in={visible}>
+                <FormItem key={itemDef.id} parentEntity={parentEntity} itemDef={itemDef} />
+              </Fade>
             )
           )
         })}
