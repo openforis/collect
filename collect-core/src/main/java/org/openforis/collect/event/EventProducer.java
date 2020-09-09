@@ -23,7 +23,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.BooleanAttribute;
@@ -171,12 +170,6 @@ public class EventProducer {
 		RecordStep recordStep;
 		List<String> ancestorIds;
 		Node<?> node;
-
-		Survey survey;
-		String surveyName;
-		NodeDefinition nodeDef;
-		int definitionId;
-		int nodeId;
 		Date timestamp;
 
 		EventFactory(Integer recordId, RecordStep recordStep, List<String> ancestorIds,
@@ -185,12 +178,6 @@ public class EventProducer {
 			this.recordStep = recordStep;
 			this.ancestorIds = ancestorIds;
 			this.node = node;
-
-			this.survey = node.getSurvey();
-			this.surveyName = survey.getName();
-			this.nodeDef = node.getDefinition();
-			this.definitionId = nodeDef.getId();
-			this.nodeId = node.getInternalId();
 			this.timestamp = new Date();
 		}
 
@@ -210,9 +197,10 @@ public class EventProducer {
 			consumer.onEvent(entityEvent);
 
 			// add node collection created events
-			for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
+			EntityDefinition entityDef = (EntityDefinition) node.getDefinition();
+			for (NodeDefinition childDef : entityDef.getChildDefinitions()) {
 				if (childDef.isMultiple()) {
-					String collectionId = getNodeCollectionId(nodeId, childDef);
+					String collectionId = getNodeCollectionId(entityDef.getId(), childDef);
 					String collectionDefId = getNodeCollectionDefinitionId(entity.getDefinition(), childDef);
 					RecordEvent event = childDef instanceof AttributeDefinition ? new AttributeCollectionCreatedEvent()
 							: new EntityCollectionCreatedEvent();
@@ -279,7 +267,7 @@ public class EventProducer {
 			} else if (node instanceof NumberAttribute<?, ?>) {
 				NumberAttribute<?, ?> attribute = (NumberAttribute<?, ?>) node;
 				Number value = attribute.getNumber();
-				Type valueType = ((NumericAttributeDefinition) nodeDef).getType();
+				Type valueType = ((NumericAttributeDefinition) node.getDefinition()).getType();
 				switch (valueType) {
 				case INTEGER:
 					event = new IntegerAttributeUpdatedEvent();
@@ -297,7 +285,7 @@ public class EventProducer {
 				NumericRangeAttribute<?, ?> attribute = (NumericRangeAttribute<?, ?>) node;
 				Number from = attribute.getFrom();
 				Number to = attribute.getTo();
-				Type valueType = ((RangeAttributeDefinition) nodeDef).getType();
+				Type valueType = ((RangeAttributeDefinition) node.getDefinition()).getType();
 				switch (valueType) {
 				case INTEGER:
 					event = new IntegerRangeAttributeUpdatedEvent();
@@ -387,12 +375,14 @@ public class EventProducer {
 		}
 
 		private <E extends RecordEvent> E fillRecordEvent(E event) {
-			event.setSurveyName(surveyName);
+			event.setSurveyName(node.getSurvey().getName());
 			event.setRecordId(recordId);
 			event.setRecordStep(recordStep);
-			event.setDefinitionId(String.valueOf(definitionId));
+			event.setDefinitionId(String.valueOf(node.getDefinition().getId()));
 			event.setAncestorIds(ancestorIds);
-			event.setNodeId(String.valueOf(nodeId));
+			event.setNodeId(String.valueOf(node.getInternalId()));
+			event.setNodePath(node.getPath());
+			event.setParentEntityPath(node.getParent() == null ? null : node.getParent().getPath());
 			event.setTimestamp(timestamp);
 			event.setUserName(context.userName);
 			return event;

@@ -17,20 +17,16 @@ export default class RecordEditPage extends Component {
     }
   }
 
-  static propTypes = {
-    survey: PropTypes.object,
-  }
-
   componentDidMount() {
-    let idParam = this.props.match.params.id
-    let recordId = parseInt(idParam)
+    const { id: idParam } = this.props.match.params
+    const recordId = Number(idParam)
 
     ServiceFactory.recordService.fetchSurveyId(recordId).then((res) => {
-      let surveyId = parseInt(res)
+      const surveyId = Number(res)
       ServiceFactory.surveyService.fetchById(surveyId).then((survey) => {
         ServiceFactory.recordService.fetchById(survey, recordId).then((record) => {
           this.recordUpdater = new RecordUpdater(record)
-          this.setState({ ...this.state, record: record })
+          this.setState({ record })
         })
       })
     })
@@ -43,14 +39,16 @@ export default class RecordEditPage extends Component {
   }
 
   render() {
-    let record = this.state.record
+    const { record } = this.state
     if (!record) {
       return <div>Loading...</div>
     }
-    let survey = record.survey
-    let uiConf = survey.uiConfiguration
-    let tabSetDefinition = uiConf.getTabSetByRootEntityDefinitionId(record.rootEntity.definition.id)
+    const { survey } = record
+    const { uiConfiguration } = survey
+    const tabSetDefinition = uiConfiguration.getTabSetByRootEntityDefinitionId(record.rootEntity.definition.id)
 
     return <TabSet tabSetDef={tabSetDefinition} record={record} />
   }
 }
+
+RecordEditPage.propTypes = {}

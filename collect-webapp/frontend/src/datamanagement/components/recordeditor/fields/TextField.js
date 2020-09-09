@@ -1,8 +1,9 @@
 import React from 'react'
-import { Input, FormFeedback } from 'reactstrap'
+import { Input } from 'reactstrap'
 
 import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
+import FieldValidationFeedback from './FieldValidationFeedback'
 
 export default class TextField extends AbstractField {
   constructor(props) {
@@ -37,11 +38,15 @@ export default class TextField extends AbstractField {
     return (
       <div>
         <React.Fragment>
-          <Input invalid={Boolean(errors || warnings)} value={text} onChange={this.onChange} />
+          <Input
+            invalid={Boolean(errors || warnings)}
+            className={warnings ? 'warning' : ''}
+            value={text}
+            onChange={this.onChange}
+          />
           {dirty && <FieldLoadingSpinner />}
         </React.Fragment>
-        {errors && <FormFeedback>{errors}</FormFeedback>}
-        {warnings && <FormFeedback>{warnings}</FormFeedback>}
+        <FieldValidationFeedback errors={errors} warnings={warnings} />
       </div>
     )
   }

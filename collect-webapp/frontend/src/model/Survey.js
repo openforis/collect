@@ -215,6 +215,10 @@ export class EntityDefinition extends NodeDefinition {
   getChildDefinitionIndexById(childDefId) {
     return this.children.findIndex((childDef) => childDef.id === childDefId)
   }
+
+  getChildDefinitionByName(childName) {
+    return this.children.find((childDef) => childDef.name === childName)
+  }
 }
 
 export class AttributeDefinition extends NodeDefinition {

@@ -1,66 +1,63 @@
-import AbstractService from './AbstractService';
+import AbstractService from './AbstractService'
 import { RecordEventWrapper } from '../model/event/RecordEvent'
 import EventQueue from '../model/event/EventQueue'
 
 export default class CommandService extends AbstractService {
+  constructor() {
+    super()
+    this._handleEventResponse = this._handleEventResponse.bind(this)
+  }
 
-    constructor() {
-        super()
-        this._handleEventResponse = this._handleEventResponse.bind(this)
+  addAttribute(record, parentEntityId, attrDef) {
+    let username = 'admin'
+
+    let command = {
+      username: username,
+      surveyId: record.survey.id,
+      recordId: record.id,
+      parentEntityId: parentEntityId,
+      nodeDefId: attrDef.id,
     }
 
-    addAttribute(record, parentEntityId, attrDef) {
-        let username = "admin";
+    return this.postJson('command/record/attribute/new', command).then(this._handleEventResponse)
+  }
 
-        let command = {
-            username: username,
-            surveyId: record.survey.id,
-            recordId: record.id,
-            parentEntityId: parentEntityId,
-            nodeDefId: attrDef.id
-        };
+  updateAttribute(attribute, attributeType, valueByField) {
+    const username = 'admin'
+    const { record, definition, parent } = attribute
 
-        return this.postJson('command/record/attribute/new', command) 
-            .then(this._handleEventResponse)
+    const command = {
+      username,
+      surveyId: record.survey.id,
+      recordId: record.id,
+      recordStep: record.step,
+      parentEntityPath: parent.getPath(),
+      nodeDefId: definition.id,
+      nodePath: attribute.getPath(),
+      attributeType,
+      valueByField,
+    }
+    return this.postJson('command/record/attribute', command).then(this._handleEventResponse)
+  }
+
+  addEntity(record, parentEntityId, entityDef) {
+    let username = 'admin'
+
+    let command = {
+      username: username,
+      surveyId: record.survey.id,
+      recordId: record.id,
+      parentEntityId: parentEntityId,
+      nodeDefId: entityDef.id,
     }
 
-    updateAttribute(attribute, attributeType, valueByField) {
-        let username = "admin";
+    return this.postJson('command/record/entity', command).then(this._handleEventResponse)
+  }
 
-        let command = {
-            username,
-            surveyId: attribute.record.survey.id,
-            recordId: attribute.record.id,
-            parentEntityId: attribute.parent.id,
-            nodeDefId: attribute.definition.id,
-            nodeId: attribute.id,
-            attributeType,
-            valueByField
-        }
-        return this.postJson('command/record/attribute', command) 
-            .then(this._handleEventResponse)
-    }
-
-    addEntity(record, parentEntityId, entityDef) {
-        let username = "admin";
-
-        let command = {
-            username: username,
-            surveyId: record.survey.id,
-            recordId: record.id,
-            parentEntityId: parentEntityId,
-            nodeDefId: entityDef.id
-        };
-
-        return this.postJson('command/record/entity', command) 
-            .then(this._handleEventResponse)
-        }
-
-
-    _handleEventResponse(res) {
-        res.forEach(eventJsonObj => {
-            let eventWrapper = new RecordEventWrapper(eventJsonObj);
-            EventQueue.publish('recordEvent', eventWrapper.event);
-        });
-    }
+  _handleEventResponse(res) {
+    res.forEach((eventJsonObj) => {
+      let eventWrapper = new RecordEventWrapper(eventJsonObj)
+      EventQueue.publish('recordEvent', eventWrapper.event)
+    })
+  }
 }

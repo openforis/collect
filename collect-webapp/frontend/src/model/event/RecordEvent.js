@@ -113,26 +113,29 @@ export class EntityCreatedEvent extends RecordEvent {}
 
 export class EntityCollectionCreatedEvent extends RecordEvent {}
 
-const eventClassByType = (type) => ({
-  EntityCreatedEvent: EntityCreatedEvent,
-  EntityCollectionCreatedEvent: EntityCollectionCreatedEvent,
-  NodeMaxCountUpdatedEvent: NodeMaxCountUpdatedEvent,
-  NodeMaxCountValidationUpdatedEvent: NodeMaxCountValidationUpdatedEvent,
-  NodeMinCountUpdatedEvent: NodeMinCountUpdatedEvent,
-  NodeMinCountValidationUpdatedEvent: NodeMinCountValidationUpdatedEvent,
-  NodeRelevanceUpdatedEvent: NodeRelevanceUpdatedEvent,
-  BooleanAttributeUpdatedEvent: BooleanAttributeUpdatedEvent,
-  CodeAttributeUpdatedEvent: CodeAttributeUpdatedEvent,
-  CoordinateAttributeUpdatedEvent: CoordinateAttributeUpdatedEvent,
-  DateAttributeUpdatedEvent: DateAttributeUpdatedEvent,
-  DoubleAttributeUpdatedEvent: DoubleAttributeUpdatedEvent,
-  DoubleRangeAttributeUpdatedEvent: DoubleRangeAttributeUpdatedEvent,
-  IntegerAttributeUpdatedEvent: IntegerAttributeUpdatedEvent,
-  IntegerRangeAttributeUpdatedEvent: IntegerRangeAttributeUpdatedEvent,
-  TaxonAttributeUpdatedEvent: TaxonAttributeUpdatedEvent,
-  TextAttributeUpdatedEvent: TextAttributeUpdatedEvent,
-  TimeAttributeUpdatedEvent: TimeAttributeUpdatedEvent,
-})
+const EVENT_CLASS_BY_TYPE = [
+  EntityCreatedEvent,
+  EntityCollectionCreatedEvent,
+  NodeMaxCountUpdatedEvent,
+  NodeMaxCountValidationUpdatedEvent,
+  NodeMinCountUpdatedEvent,
+  NodeMinCountValidationUpdatedEvent,
+  NodeRelevanceUpdatedEvent,
+  BooleanAttributeUpdatedEvent,
+  CodeAttributeUpdatedEvent,
+  CoordinateAttributeUpdatedEvent,
+  DateAttributeUpdatedEvent,
+  DoubleAttributeUpdatedEvent,
+  DoubleRangeAttributeUpdatedEvent,
+  IntegerAttributeUpdatedEvent,
+  IntegerRangeAttributeUpdatedEvent,
+  TaxonAttributeUpdatedEvent,
+  TextAttributeUpdatedEvent,
+  TimeAttributeUpdatedEvent,
+].reduce((acc, claz) => {
+  acc[claz.name] = claz
+  return acc
+}, {})
 
 export class RecordEventWrapper extends Serializable {
   event
@@ -152,46 +155,11 @@ export class RecordEventWrapper extends Serializable {
 
   _parseEvent(jsonObj) {
     const { eventType, event } = jsonObj
-    switch (eventType) {
-      case 'EntityCreatedEvent':
-        return new EntityCreatedEvent(event)
-      case 'EntityCollectionCreatedEvent':
-        return new EntityCreatedEvent(event)
-      case 'NodeMaxCountUpdatedEvent':
-        return new NodeMaxCountUpdatedEvent(event)
-      case 'NodeMaxCountValidationUpdatedEvent':
-        return new NodeMaxCountValidationUpdatedEvent(event)
-      case 'NodeMinCountUpdatedEvent':
-        return new NodeMinCountUpdatedEvent(jsonObj.event)
-      case 'NodeMinCountValidationUpdatedEvent':
-        return new NodeMinCountValidationUpdatedEvent(jsonObj.event)
-      case 'NodeRelevanceUpdatedEvent':
-        return new NodeRelevanceUpdatedEvent(jsonObj.event)
-      case 'BooleanAttributeUpdatedEvent':
-        return new BooleanAttributeUpdatedEvent(jsonObj.event)
-      case 'CodeAttributeUpdatedEvent':
-        return new CodeAttributeUpdatedEvent(jsonObj.event)
-      case 'CoordinateAttributeUpdatedEvent':
-        return new CoordinateAttributeUpdatedEvent(jsonObj.event)
-      case 'DateAttributeUpdatedEvent':
-        return new DateAttributeUpdatedEvent(jsonObj.event)
-      case 'DoubleAttributeUpdatedEvent':
-        return new DoubleAttributeUpdatedEvent(jsonObj.event)
-      case 'DoubleRangeAttributeUpdatedEvent':
-        return new DoubleRangeAttributeUpdatedEvent(jsonObj.event)
-      case 'IntegerAttributeUpdatedEvent':
-        return new IntegerAttributeUpdatedEvent(jsonObj.event)
-      case 'IntegerRangeAttributeUpdatedEvent':
-        return new IntegerRangeAttributeUpdatedEvent(jsonObj.event)
-      case 'TaxonAttributeUpdatedEvent':
-        return new TaxonAttributeUpdatedEvent(jsonObj.event)
-      case 'TextAttributeUpdatedEvent':
-        return new TextAttributeUpdatedEvent(jsonObj.event)
-      case 'TimeAttributeUpdatedEvent':
-        return new TimeAttributeUpdatedEvent(jsonObj.event)
-      default:
-        console.log('Unsupported event type: ' + jsonObj.eventType)
-        return null //TODO throw error?
+    const eventClass = EVENT_CLASS_BY_TYPE[eventType]
+    if (eventClass) {
+      return new eventClass(event)
+    } else {
+      console.log('Unsupported event type: ' + eventType)
     }
   }
 }

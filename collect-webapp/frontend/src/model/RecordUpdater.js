@@ -35,21 +35,17 @@ export class RecordUpdater {
     const record = this.record
     if (record && record.id == event.recordId && record.step == event.recordStep) {
       const survey = record.survey
-      const parentEntityId = event.parentEntityId
-      const parentEntity = record.getNodeById(parentEntityId)
       const definition = survey.schema.getDefinitionById(Number(event.definitionId))
-      const nodeId = Number(event.nodeId)
-      const node = record.getNodeById(nodeId)
+      const parentEntity = event.parentEntityPath ? record.getNodeByPath(event.parentEntityPath) : record.rootEntity
+      const node = record.getNodeByPath(event.nodePath)
 
       if (event instanceof EntityCreatedEvent) {
         const newEntity = new Entity(record, definition, parentEntity)
-        newEntity.id = nodeId
         parentEntity.addChild(newEntity)
       } else if (event instanceof AttributeUpdatedEvent) {
         let attr = node
         if (attr == null) {
           attr = new Attribute(record, definition, parentEntity)
-          attr.id = nodeId
           parentEntity.addChild(attr)
         }
         this._setValueInAttribute(attr, event)

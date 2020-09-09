@@ -8,13 +8,11 @@ export class Record extends Serializable {
   stepNumber
   rootEntity
   rootEntityKeys = []
-  nodeById = []
   owner
 
   constructor(survey, jsonData) {
     super()
     this.survey = survey
-    this.nodeById = []
     if (jsonData) {
       this.fillFromJSON(jsonData)
     }
@@ -28,15 +26,19 @@ export class Record extends Serializable {
 
     this.rootEntity = new Entity(this, rootEntityDef, null)
     this.rootEntity.fillFromJSON(jsonObj.rootEntity)
-    this.index(this.rootEntity)
   }
 
-  getNodeById(nodeId) {
-    return this.nodeById[nodeId]
-  }
-
-  index(node) {
-    this.nodeById[node.id] = node
+  getNodeByPath(path) {
+    const pathParts = path.split('/').slice(2)
+    let currentNode = this.rootEntity
+    pathParts.forEach((pathPart) => {
+      const pathPartMatch = pathPart.match(/(\w+)(\[(\d+)\])?/)
+      const nodeName = pathPartMatch[1]
+      const index = pathPartMatch[3] || 0
+      const currentNodeChildren = currentNode.getChildrenByChildName(nodeName)
+      currentNode = currentNodeChildren[index]
+    })
+    return currentNode
   }
 
   get ownerId() {
@@ -60,6 +62,18 @@ export class Node extends Serializable {
   fillFromJSON(jsonObj) {
     super.fillFromJSON(jsonObj)
   }
+
+  getPath() {
+    return (
+      (this.parent ? this.parent.getPath() + '/' : '/') +
+      this.definition.name +
+      (this.definition.multiple && this.parent ? '[' + this.getIndex() + ']' : '')
+    )
+  }
+
+  getIndex() {
+    return this.parent.childrenByDefinitionId[this.definition.id].indexOf(this)
+  }
 }
 
 export class Entity extends Node {
@@ -75,9 +89,6 @@ export class Entity extends Node {
 
   fillFromJSON(jsonObj) {
     super.fillFromJSON(jsonObj)
-
-    let $this = this
-    $this.record.index($this)
 
     this.childrenByDefinitionId = []
     for (var defIdStr in jsonObj.childrenByDefinitionId) {
@@ -118,7 +129,11 @@ export class Entity extends Node {
       this.childrenByDefinitionId[child.definition.id] = children
     }
     children.push(child)
-    this.record.index(child)
+  }
+
+  getChildrenByChildName(childName) {
+    const childDef = this.definition.getChildDefinitionByName(childName)
+    return this.childrenByDefinitionId[childDef.id]
   }
 }
 

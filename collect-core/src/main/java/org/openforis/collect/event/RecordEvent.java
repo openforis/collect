@@ -17,6 +17,8 @@ public abstract class RecordEvent {
 	private String definitionId;
 	private List<String> ancestorIds;
 	private String nodeId;
+	private String nodePath;
+	private String parentEntityPath;
 	private Date timestamp;
 	private String userName;
 	
@@ -78,6 +80,22 @@ public abstract class RecordEvent {
 	
 	public void setNodeId(String nodeId) {
 		this.nodeId = nodeId;
+	}
+	
+	public String getNodePath() {
+		return nodePath;
+	}
+	
+	public void setNodePath(String nodePath) {
+		this.nodePath = nodePath;
+	}
+	
+	public String getParentEntityPath() {
+		return parentEntityPath;
+	}
+	
+	public void setParentEntityPath(String parentEntityPath) {
+		this.parentEntityPath = parentEntityPath;
 	}
 	
 	public List<String> getAncestorIds() {
