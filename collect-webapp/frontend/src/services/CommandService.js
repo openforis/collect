@@ -9,10 +9,7 @@ export default class CommandService extends AbstractService {
   }
 
   addAttribute(record, parentEntityId, attrDef) {
-    let username = 'admin'
-
-    let command = {
-      username: username,
+    const command = {
       surveyId: record.survey.id,
       recordId: record.id,
       parentEntityId: parentEntityId,
@@ -23,11 +20,9 @@ export default class CommandService extends AbstractService {
   }
 
   updateAttribute(attribute, attributeType, valueByField) {
-    const username = 'admin'
     const { record, definition, parent } = attribute
 
     const command = {
-      username,
       surveyId: record.survey.id,
       recordId: record.id,
       recordStep: record.step,
@@ -40,14 +35,11 @@ export default class CommandService extends AbstractService {
     return this.postJson('command/record/attribute', command).then(this._handleEventResponse)
   }
 
-  addEntity(record, parentEntityId, entityDef) {
-    let username = 'admin'
-
-    let command = {
-      username: username,
+  addEntity(record, parentEntity, entityDef) {
+    const command = {
       surveyId: record.survey.id,
       recordId: record.id,
-      parentEntityId: parentEntityId,
+      parentEntityPath: parentEntity.path,
       nodeDefId: entityDef.id,
     }
 
@@ -56,7 +48,7 @@ export default class CommandService extends AbstractService {
 
   _handleEventResponse(res) {
     res.forEach((eventJsonObj) => {
-      let eventWrapper = new RecordEventWrapper(eventJsonObj)
+      const eventWrapper = new RecordEventWrapper(eventJsonObj)
       EventQueue.publish('recordEvent', eventWrapper.event)
     })
   }

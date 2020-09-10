@@ -40,8 +40,7 @@ export default class FormItems extends Component {
       <Container className="formItems">
         {itemDefs.map((itemDef) => {
           const nodeDefinition = itemDef.attributeDefinition || itemDef.entityDefinition
-          const childDefIndex = parentEntity.definition.getChildDefinitionIndexById(nodeDefinition.id)
-          const relevant = parentEntity.childrenRelevance[childDefIndex]
+          const relevant = parentEntity.childrenRelevanceByDefinitionId[nodeDefinition.id]
           const visible = relevant || !nodeDefinition.hideWhenNotRelevant
 
           return (

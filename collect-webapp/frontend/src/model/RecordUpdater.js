@@ -41,6 +41,11 @@ export class RecordUpdater {
 
       if (event instanceof EntityCreatedEvent) {
         const newEntity = new Entity(record, definition, parentEntity)
+        newEntity.childrenRelevanceByDefinitionId = event.childrenRelevanceByDefinitionId
+        newEntity.childrenMinCountByDefinitionId = event.childrenMinCountByDefinitionId
+        newEntity.childrenMaxCountByDefinitionId = event.childrenMaxCountByDefinitionId
+        newEntity.childrenMinCountValidationByDefinitionId = event.childrenMinCountValidationByDefinitionId
+        newEntity.childrenMaxCountValidationByDefinitionId = event.childrenMaxCountValidationByDefinitionId
         parentEntity.addChild(newEntity)
       } else if (event instanceof AttributeUpdatedEvent) {
         let attr = node
@@ -51,20 +56,15 @@ export class RecordUpdater {
         this._setValueInAttribute(attr, event)
         attr.validationResults = event.validationResults
       } else if (event instanceof NodeRelevanceUpdatedEvent) {
-        const childDefIndex = definition.getChildDefinitionIndexById(event.childDefinitionId)
-        node.childrenRelevance[childDefIndex] = event.relevant
+        node.childrenRelevanceByDefinitionId[event.childDefinitionId] = event.relevant
       } else if (event instanceof NodeMinCountUpdatedEvent) {
-        const childDefIndex = definition.getChildDefinitionIndexById(event.childDefinitionId)
-        node.childrenMinCount[childDefIndex] = event.count
+        node.childrenMinCountByDefinitionId[event.childDefinitionId] = event.count
       } else if (event instanceof NodeMaxCountUpdatedEvent) {
-        const childDefIndex = definition.getChildDefinitionIndexById(event.childDefinitionId)
-        node.childrenMaxCount[childDefIndex] = event.count
+        node.childrenMaxCountByDefinitionId[event.childDefinitionId] = event.count
       } else if (event instanceof NodeMinCountValidationUpdatedEvent) {
-        const childDefIndex = definition.getChildDefinitionIndexById(event.childDefinitionId)
-        node.childrenMinCountValidation[childDefIndex] = event.flag
+        node.childrenMinCountValidationByDefinitionId[event.childDefinitionId] = event.flag
       } else if (event instanceof NodeMaxCountValidationUpdatedEvent) {
-        const childDefIndex = definition.getChildDefinitionIndexById(event.childDefinitionId)
-        node.childrenMaxCountValidation[childDefIndex] = event.flag
+        node.childrenMaxCountValidationByDefinitionId[event.childDefinitionId] = event.flag
       }
     }
   }

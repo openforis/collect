@@ -188,12 +188,11 @@ public class EventProducer {
 			Entity entity = (Entity) node;
 			EntityCreatedEvent entityEvent = entity.isRoot() ? new RootEntityCreatedEvent() : new EntityCreatedEvent();
 			fillRecordEvent(entityEvent);
-
-			entityEvent.setRelevanceByChildDefinitionId(relevanceByChildDefinitionId);
-			entityEvent.setMinCountByChildDefinitionId(minCountByChildDefinitionId);
-			entityEvent.setMaxCountByChildDefinitionId(maxCountByChildDefinitionId);
-			entityEvent.setMinCountValidationByChildDefinitionId(minCountValidationByChildDefinitionId);
-			entityEvent.setMaxCountValidationByChildDefinitionId(maxCountValidationByChildDefinitionId);
+			entityEvent.setChildrenRelevanceByDefinitionId(relevanceByChildDefinitionId);
+			entityEvent.setChildrenMinCountByDefinitionId(minCountByChildDefinitionId);
+			entityEvent.setChildrenMaxCountByDefinitionId(maxCountByChildDefinitionId);
+			entityEvent.setChildrenMinCountValidationByDefinitionId(minCountValidationByChildDefinitionId);
+			entityEvent.setChildrenMaxCountValidationByDefinitionId(maxCountValidationByChildDefinitionId);
 			consumer.onEvent(entityEvent);
 
 			// add node collection created events

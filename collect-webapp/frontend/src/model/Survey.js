@@ -159,33 +159,27 @@ export class EntityDefinition extends NodeDefinition {
   }
 
   traverse(visitor) {
-    let stack = []
+    const stack = []
     stack.push(this)
     while (stack.length > 0) {
-      let nodeDef = stack.pop()
-      visitor(nodeDef)
-      if (nodeDef instanceof EntityDefinition) {
-        nodeDef.children.forEach((child) => stack.push(child))
+      const def = stack.pop()
+      visitor(def)
+      if (def instanceof EntityDefinition) {
+        stack.push(...def.children)
       }
     }
   }
 
   get keyAttributeDefinitions() {
-    return this.findDefinitions(function (n) {
-      return n instanceof AttributeDefinition && n.key
-    }, true)
+    return this.findDefinitions((def) => def instanceof AttributeDefinition && def.key, true)
   }
 
   get attributeDefinitionsShownInRecordSummaryList() {
-    return this.findDefinitions(function (n) {
-      return n instanceof AttributeDefinition && n.showInRecordSummaryList
-    }, true)
+    return this.findDefinitions((def) => def instanceof AttributeDefinition && def.showInRecordSummaryList, true)
   }
 
   get qualifierAttributeDefinitions() {
-    return this.findDefinitions(function (n) {
-      return n instanceof AttributeDefinition && n.qualifier
-    }, true)
+    return this.findDefinitions((def) => def instanceof AttributeDefinition && def.qualifier, true)
   }
 
   visit(visitor, onlyInsideSingleEntities) {

@@ -21,8 +21,8 @@ export class Record extends Serializable {
   fillFromJSON(jsonObj) {
     super.fillFromJSON(jsonObj)
 
-    let rootEntityDefId = parseInt(jsonObj.rootEntity.definitionId, 10)
-    let rootEntityDef = this.survey.schema.getDefinitionById(rootEntityDefId)
+    const rootEntityDefId = Number(jsonObj.rootEntity.definitionId)
+    const rootEntityDef = this.survey.schema.getDefinitionById(rootEntityDefId)
 
     this.rootEntity = new Entity(this, rootEntityDef, null)
     this.rootEntity.fillFromJSON(jsonObj.rootEntity)
@@ -32,11 +32,13 @@ export class Record extends Serializable {
     const pathParts = path.split('/').slice(2)
     let currentNode = this.rootEntity
     pathParts.forEach((pathPart) => {
-      const pathPartMatch = pathPart.match(/(\w+)(\[(\d+)\])?/)
-      const nodeName = pathPartMatch[1]
-      const index = pathPartMatch[3] || 0
-      const currentNodeChildren = currentNode.getChildrenByChildName(nodeName)
-      currentNode = currentNodeChildren[index]
+      if (currentNode) {
+        const pathPartMatch = pathPart.match(/(\w+)(\[(\d+)\])?/)
+        const nodeName = pathPartMatch[1]
+        const position = pathPartMatch[3] || 0
+        const currentNodeChildren = currentNode.getChildrenByChildName(nodeName)
+        currentNode = position > 0 && position <= currentNodeChildren.length ? currentNodeChildren[position - 1] : null
+      }
     })
     return currentNode
   }
@@ -63,28 +65,37 @@ export class Node extends Serializable {
     super.fillFromJSON(jsonObj)
   }
 
-  getPath() {
+  calculatePath() {
+    const { definition, parent, index } = this
+
     return (
-      (this.parent ? this.parent.getPath() + '/' : '/') +
-      this.definition.name +
-      (this.definition.multiple && this.parent ? '[' + this.getIndex() + ']' : '')
+      (parent ? parent.path : '') + '/' + definition.name + (definition.multiple && parent ? '[' + index + ']' : '')
     )
   }
 
-  getIndex() {
+  calculateIndex() {
     return this.parent.childrenByDefinitionId[this.definition.id].indexOf(this)
   }
 }
 
 export class Entity extends Node {
-  childrenByDefinitionId = []
-  childrenMinCount = []
-  childrenMaxCount = []
-  childrenMinCountValidation = []
-  childrenMaxCountValidation = []
+  childrenByDefinitionId = {}
+  childrenRelevanceByDefinitionId = {}
+  childrenMinCountByDefinitionId = {}
+  childrenMaxCountByDefinitionId = {}
+  childrenMinCountValidationByDefinitionId = {}
+  childrenMaxCountValidationByDefinitionId = {}
 
   get summaryLabel() {
-    return 'Entity ' + this.id
+    const { definition } = this
+    const keyDefs = definition.keyAttributeDefinitions
+    const keyValuePairs = keyDefs.map((keyDef) => {
+      const keyNodes = this.childrenByDefinitionId[keyDef.id]
+      const keyNode = keyNodes && keyNodes.length ? keyNodes[0] : null
+      const keyValue = keyNode ? keyNode.humanReadableValue : ''
+      return `${keyDef.label}: ${keyValue}`
+    })
+    return `${definition.label} [${keyValuePairs.join(', ')}]`
   }
 
   fillFromJSON(jsonObj) {
@@ -129,11 +140,17 @@ export class Entity extends Node {
       this.childrenByDefinitionId[child.definition.id] = children
     }
     children.push(child)
+    child.index = children.length - 1
+    child.path = child.calculatePath()
   }
 
   getChildrenByChildName(childName) {
     const childDef = this.definition.getChildDefinitionByName(childName)
-    return this.childrenByDefinitionId[childDef.id]
+    return this.childrenByDefinitionId[childDef.id] || []
+  }
+
+  getChildrenByDefinitionId(childDefId) {
+    return this.childrenByDefinitionId[childDefId] || []
   }
 }
 
@@ -169,6 +186,10 @@ export class Attribute extends Node {
       this.fields.push(new Field())
     }
     this.fields[fieldIdx].value = value
+  }
+
+  get humanReadableValue() {
+    return this.fields && this.fields.length ? this.fields[0].value || '' : ''
   }
 }
 
