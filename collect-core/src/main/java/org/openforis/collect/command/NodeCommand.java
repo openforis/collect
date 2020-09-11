@@ -1,39 +1,12 @@
 package org.openforis.collect.command;
 
-public abstract class NodeCommand implements Command {
+public abstract class NodeCommand extends RecordCommand {
 
 	private static final long serialVersionUID = 1L;
 
-	private String username;
-	private int surveyId;
-	private int recordId;
 	private int nodeDefId;
 	private String parentEntityPath;
 	private String nodePath;
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public int getSurveyId() {
-		return surveyId;
-	}
-
-	public void setSurveyId(int surveyId) {
-		this.surveyId = surveyId;
-	}
-
-	public int getRecordId() {
-		return recordId;
-	}
-
-	public void setRecordId(int recordId) {
-		this.recordId = recordId;
-	}
 
 	public int getNodeDefId() {
 		return nodeDefId;

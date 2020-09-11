@@ -26,9 +26,9 @@ export default class CommandService extends AbstractService {
       surveyId: record.survey.id,
       recordId: record.id,
       recordStep: record.step,
-      parentEntityPath: parent.getPath(),
+      parentEntityPath: parent.path,
       nodeDefId: definition.id,
-      nodePath: attribute.getPath(),
+      nodePath: attribute.path,
       attributeType,
       valueByField,
     }

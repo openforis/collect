@@ -58,10 +58,18 @@ public class EventProducer {
 		this.context = context;
 		this.consumer = consumer;
 	}
-
-	public List<RecordEvent> produceFor(CollectRecord record) {
-		final List<RecordEvent> events = new ArrayList<RecordEvent>();
-
+	
+	public void produceFor(Object obj) {
+		if (obj instanceof CollectRecord) {
+			produceFor((CollectRecord) obj);
+		} else if (obj instanceof NodeChangeSet) {
+			produceFor((NodeChangeSet) obj);
+		} else {
+			throw new IllegalArgumentException("Cannot produce events for object of type " + obj.getClass().getName());
+		}
+	}
+	
+	public void produceFor(CollectRecord record) {
 		final Integer recordId = record.getId();
 		final RecordStep recordStep = record.getStep().toRecordStep();
 
@@ -84,21 +92,19 @@ public class EventProducer {
 				}
 			}
 		});
-		return events;
 	}
 
 	public void produceFor(NodeChangeSet changeSet) {
-		toEvents(changeSet);
+		notifyEvents(changeSet);
 	}
 
-	private void toEvents(NodeChangeSet changeSet) {
-		List<NodeChange<?>> changes = changeSet.getChanges();
-		for (NodeChange<?> change : changes) {
-			toEvent(change);
+	private void notifyEvents(NodeChangeSet changeSet) {
+		for (NodeChange<?> change : changeSet.getChanges()) {
+			notifyEvents(change);
 		}
 	}
 
-	private void toEvent(NodeChange<?> change) {
+	private void notifyEvents(NodeChange<?> change) {
 		Node<?> node = change.getNode();
 		List<String> ancestorIds = getAncestorIds(node.getDefinition(), change.getAncestorIds());
 		Integer recordId = change.getRecordId();

@@ -17,7 +17,8 @@ public class AppWS {
 	public enum MessageType {
 		SURVEYS_UPDATED,
 		RECORD_LOCKED,
-		RECORD_UNLOCKED
+		RECORD_UNLOCKED,
+		RECORD_UPDATED,
 	}
 	
 	public void sendMessage(MessageType type) {
@@ -56,14 +57,14 @@ public class AppWS {
 	
 	private static abstract class RecordMessage extends Message {
 		
-		private int recordId;
+		private Integer recordId;
 		
 		public RecordMessage(MessageType type, int recordId) {
 			super(type.name());
 			this.recordId = recordId;
 		}
 
-		public int getRecordId() {
+		public Integer getRecordId() {
 			return recordId;
 		}
 
@@ -88,6 +89,19 @@ public class AppWS {
 		
 		public RecordUnlockedMessage(int recordId) {
 			super(MessageType.RECORD_UNLOCKED, recordId);
+		}
+	}
+	
+	public static class RecordEventMessage extends Message {
+		private Object event;
+
+		public RecordEventMessage(Object event) {
+			super(MessageType.RECORD_UPDATED.name());
+			this.event = event;
+		}
+		
+		public Object getEvent() {
+			return event;
 		}
 	}
 }

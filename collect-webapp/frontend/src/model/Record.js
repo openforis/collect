@@ -35,7 +35,7 @@ export class Record extends Serializable {
       if (currentNode) {
         const pathPartMatch = pathPart.match(/(\w+)(\[(\d+)\])?/)
         const nodeName = pathPartMatch[1]
-        const position = pathPartMatch[3] || 0
+        const position = pathPartMatch[3] || 1
         const currentNodeChildren = currentNode.getChildrenByChildName(nodeName)
         currentNode = position > 0 && position <= currentNodeChildren.length ? currentNodeChildren[position - 1] : null
       }

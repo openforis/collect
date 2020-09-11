@@ -2,17 +2,9 @@ package org.openforis.collect.command.handler;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 import org.openforis.collect.command.CreateRecordCommand;
-import org.openforis.collect.event.EventListener;
-import org.openforis.collect.event.EventProducer;
-import org.openforis.collect.event.EventProducer.EventProducerContext;
 import org.openforis.collect.event.RecordEvent;
-import org.openforis.collect.manager.MessageSource;
-import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -24,43 +16,33 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Value;
 
-public class CreateRecordHandler implements CommandHandler<CreateRecordCommand> {
+public class CreateRecordHandler extends RecordCommandHandler<CreateRecordCommand> {
 
-	private RecordManager recordManager;
-	private SurveyManager surveyManager;
-	private UserManager userManager;
-	private MessageSource messageSource;
-	
 	private RecordUpdater recordUpdater;
-	
-	public CreateRecordHandler(RecordManager recordManager, SurveyManager surveyManager, UserManager userManager, MessageSource messageSource) {
-		super();
-		this.recordManager = recordManager;
-		this.surveyManager = surveyManager;
-		this.userManager = userManager;
-		this.messageSource = messageSource;
 
+	public CreateRecordHandler() {
 		this.recordUpdater = new RecordUpdater();
 	}
 
 	@Override
-	public void execute(CreateRecordCommand command, final EventListener eventListener) {
+	protected RecordCommandResult executeForResult(CreateRecordCommand command) {
 		String username = command.getUsername();
 		User user = userManager.loadByUserName(username);
 		CollectSurvey survey = surveyManager.getById(command.getSurveyId());
 		List<EntityDefinition> rootDefs = survey.getSchema().getRootEntityDefinitions();
 		EntityDefinition firstRootEntity = rootDefs.get(0);
 		String firstRootEntityName = firstRootEntity.getName();
-		
-		final CollectRecord record = recordManager.instantiateRecord(survey, firstRootEntityName, user, command.getFormVersion(), Step.ENTRY);
+
+		final CollectRecord record = recordManager.instantiateRecord(survey, firstRootEntityName, user,
+				command.getFormVersion(), Step.ENTRY);
 		NodeChangeSet changeSet = recordManager.initializeRecord(record);
-		
+
 		List<String> keyValues = command.getKeyValues();
 		Iterator<String> keyValuesIt = keyValues.iterator();
-		
+
 		List<AttributeDefinition> keyAttributeDefinitions = firstRootEntity.getKeyAttributeDefinitions();
 		Iterator<AttributeDefinition> keyDefsIt = keyAttributeDefinitions.iterator();
-		
+
 		while (keyDefsIt.hasNext()) {
 			AttributeDefinition keyDef = keyDefsIt.next();
 			String keyVal = keyValuesIt.next();
@@ -68,14 +50,14 @@ public class CreateRecordHandler implements CommandHandler<CreateRecordCommand> 
 			Attribute<?, Value> keyAttr = record.findNodeByPath(keyDef.getPath());
 			recordUpdater.updateAttribute(keyAttr, keyValue);
 		}
-		recordManager.save(record);
-		EventProducerContext context = new EventProducerContext(messageSource, Locale.ENGLISH, user.getUsername());
-		new EventProducer(context, new EventListener() {
-			public void onEvent(RecordEvent event) {
-				event.initializeRecordId(record.getId());
-				eventListener.onEvent(event);
-			}
-		}).produceFor(changeSet);
+		
+		return new RecordCommandResult(record, changeSet);
 	}
-	
+
+	@Override
+	protected RecordEvent transformEvent(RecordCommandResult result, RecordEvent event) {
+		event.initializeRecordId(result.getRecord().getId());
+		return event;
+	}
+
 }
