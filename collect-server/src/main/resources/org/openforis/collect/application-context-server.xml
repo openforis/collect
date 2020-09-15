@@ -175,7 +175,7 @@
 	
 	<bean id="recordProviderSession" class="org.openforis.collect.web.manager.RecordProviderSession" 
 		scope="session">
-		<constructor-arg ref="recordManager" />
+		<constructor-arg ref="cachedRecordProvider" />
 	</bean>
 	
 	<bean id="commandDispatcher" class="org.openforis.collect.command.SpringCommandDispatcher" 

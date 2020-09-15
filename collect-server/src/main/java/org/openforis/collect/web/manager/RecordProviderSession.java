@@ -4,17 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openforis.collect.manager.CachedRecordProvider;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 
 public class RecordProviderSession extends CachedRecordProvider {
 
+	private CachedRecordProvider delegate;
 	private Map<Integer, CollectRecord> recordsPreviewBySurvey = new HashMap<Integer, CollectRecord>();
 
-	public RecordProviderSession(RecordManager recordManager) {
-		super(recordManager);
+	public RecordProviderSession(CachedRecordProvider cachedRecordProvider) {
+		super(null);
+		this.delegate = cachedRecordProvider;
 	}
 
 	@Override
@@ -23,7 +24,7 @@ public class RecordProviderSession extends CachedRecordProvider {
 			// Preview record
 			return this.recordsPreviewBySurvey.get(survey.getId());
 		} else {
-			return super.provide(survey, recordId, recordStep);
+			return delegate.provide(survey, recordId, recordStep);
 		}
 	}
 
@@ -31,11 +32,13 @@ public class RecordProviderSession extends CachedRecordProvider {
 		if (record.isPreview()) {
 			this.recordsPreviewBySurvey.put(record.getSurvey().getId(), record);
 		} else {
-			super.putRecord(record);
+			delegate.putRecord(record);
 		}
 	}
 
-	public void clearRecordPreview(int surveyId) {
+	@Override
+	public void clearRecords(int surveyId) {
+		delegate.clearRecords(surveyId);
 		this.recordsPreviewBySurvey.remove(surveyId);
 	}
 

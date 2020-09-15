@@ -8,12 +8,11 @@ import java.util.Map.Entry;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.Survey;
 
 public class CachedRecordProvider implements RecordProvider {
 
 	private RecordManager recordManager;
-	private Map<CollectSurvey, RecordCache> recordsBySurvey = new HashMap<CollectSurvey, RecordCache>();
+	private Map<Integer, RecordCache> recordsBySurvey = new HashMap<Integer, RecordCache>();
 	
 	public CachedRecordProvider(RecordManager recordManager) {
 		super();
@@ -22,7 +21,7 @@ public class CachedRecordProvider implements RecordProvider {
 
 	@Override
 	public CollectRecord provide(CollectSurvey survey, Integer recordId, Step recordStep) {
-		RecordCache recordCache = getRecordCache(survey);
+		RecordCache recordCache = getRecordCache(survey.getId());
 		RecordCacheKey key = new RecordCacheKey(recordId, recordStep);
 		CollectRecord record = recordCache.get(key);
 		if (record == null) {
@@ -34,14 +33,19 @@ public class CachedRecordProvider implements RecordProvider {
 
 	public void putRecord(CollectRecord record) {
 		RecordCacheKey key = new RecordCacheKey(record.getId(), record.getDataStep());
-		RecordCache recordCache = getRecordCache(record.getSurvey());
+		RecordCache recordCache = getRecordCache(record.getSurvey().getId());
 		recordCache.put(key, record);
 	}
 	
-	private RecordCache getRecordCache(Survey survey) {
-		RecordCache recordCache = recordsBySurvey.get(survey);
+	public void clearRecords(int surveyId) {
+		recordsBySurvey.remove(surveyId);
+	}
+	
+	private RecordCache getRecordCache(int surveyId) {
+		RecordCache recordCache = recordsBySurvey.get(surveyId);
 		if (recordCache == null) {
 			recordCache = new RecordCache();
+			recordsBySurvey.put(surveyId, recordCache);
 		}
 		return recordCache;
 	}
