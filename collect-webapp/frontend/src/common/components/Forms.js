@@ -109,31 +109,39 @@ export const getValidState = (fieldId, validationErrors) =>
         ? false
         : null
 
-export const handleValidationResponse = r => {
-    if (r.statusError) {
-        let result = {}
-        const errors = r.objects.errors
+const _extractErrorsFromValidationResponse = validationResponse => {
+    if (validationResponse.statusError) {
+        const result = {}
+        const errors = validationResponse.objects.errors
         if (errors) {
             errors.forEach(error => {
                 result[error.field] = L.l(error.code, error.arguments)
             })
         }
         let errorMessage = L.l('validation.errorsInTheForm')
-        if (r.errorMessage) {
-            errorMessage += ': ' + r.errorMessage
+        if (validationResponse.errorMessage) {
+            errorMessage += ': ' + validationResponse.errorMessage
         }
         result._error = errorMessage
-        throw result
+        return result
+    }
+    return null
+}
+
+export const handleValidationResponse = validationResponse => {
+    const errorResult = _extractErrorsFromValidationResponse(validationResponse)
+    if (errorResult) {
+        throw errorResult
     }
 }
 
 export const asyncValidate = validateFn => (...params) =>
     new Promise((resolve, reject) => {
         validateFn.apply(null, params)
-            .then(r => {
+            .then(validationResponse => {
                 try {
-                    handleValidationResponse(r)
-                    resolve()
+                    const errorResult = _extractErrorsFromValidationResponse(validationResponse)
+                    resolve(errorResult)
                 } catch (error) {
                     reject(error)
                 }

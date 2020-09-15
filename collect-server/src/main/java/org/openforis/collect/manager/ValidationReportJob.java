@@ -158,7 +158,8 @@ public class ValidationReportJob extends Job {
 
 		protected void writeValidationReport(CollectRecord record) throws IOException {
 			RecordValidationReportGenerator reportGenerator = new RecordValidationReportGenerator(record);
-			List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(input.locale,
+			Locale locale = input.locale == null ? new Locale(record.getSurvey().getDefaultLanguage()) : input.locale;
+			List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(locale,
 					ValidationResultFlag.WARNING, input.includeConfirmedErrors);
 			for (RecordValidationReportItem item : validationItems) {
 				writeValidationReportLine(record, item);

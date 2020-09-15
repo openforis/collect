@@ -7,12 +7,15 @@ import org.springframework.validation.Errors;
 
 @Component
 public class SurveyImportParametersValidator extends SimpleValidator<SurveyImportParameters> {
-	
+
 	private static final String NAME_FIELD = "name";
+	private static final String USER_GROUP_ID_FIELD = "userGroupId";
 
 	@Override
 	public void validateForm(SurveyImportParameters parameters, Errors errors) {
-		validateRequiredFields(errors, NAME_FIELD, "userGroupId");
+		if (validateRequiredField(errors, NAME_FIELD) && validateMinLength(errors, NAME_FIELD, 5)) {
+			validateInternalName(errors, NAME_FIELD);
+		}
+		validateRequiredField(errors, USER_GROUP_ID_FIELD);
 	}
-
 }
