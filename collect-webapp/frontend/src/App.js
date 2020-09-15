@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import Header from 'common/components/Header'
@@ -21,6 +21,7 @@ import SaikuPage from 'scenes/SaikuPage'
 import SurveyClonePage from 'surveydesigner/pages/SurveyClonePage'
 import SurveyEditPage from 'surveydesigner/pages/SurveyEditPage'
 import SurveysListPage from 'surveydesigner/pages/SurveysListPage'
+import SurveyDataEntryPreviewPage from 'surveydesigner/pages/SurveyDataEntryPreviewPage'
 import NewSurveyPage from 'surveydesigner/newSurvey/pages/NewSurveyPage'
 import SurveyExportPage from 'surveydesigner/pages/SurveyExportPage'
 import SurveyImportPage from 'surveydesigner/surveyImport/pages/SurveyImportPage'
@@ -31,54 +32,72 @@ import PasswordChangePage from 'security/pages/PasswordChangePage'
 
 import AppWebSocket from 'ws/appWebSocket'
 
-class App extends Component {
-  render() {
-    return (
+export const DefaultRoute = ({ component: Component, ...rest }) => (
+  <Route
+    {...rest}
+    component={(props) => (
       <div className="app">
         <Header />
         <div className="app-body">
-          <Sidebar {...this.props} />
+          <Sidebar />
           <main className="main">
             <div className="main-content-wrapper">
-              <Switch>
-                <Route path="/" exact name="HomePage" component={HomePage} />
-                <Route path="/backup" exact name="Backup" component={BackupPage} />
-                <Route path="/dashboard" exact name="Dashboard" component={DashboardPage} />
-                <Route path="/datamanagement" exact name="DataManagement" component={DataManagementPage} />
-                <Route path="/datamanagement/csvexport" exact name="CsvDataExport" component={CsvDataExportPage} />
-                <Route path="/datamanagement/backup" exact name="BackupDataExport" component={BackupDataExportPage} />
-                <Route
-                  path="/datamanagement/backupimport"
-                  exact
-                  name="BackupDataImport"
-                  component={BackupDataImportPage}
-                />
-                <Route path="/datamanagement/csvimport" exact name="CsvDataImport" component={CsvDataImportPage} />
-                <Route path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage} />
-                <Route path="/datamanagement_new/:id" name="RecordDetailsNew" component={RecordEditPage} />
-                <Route path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage} />
-                <Route path="/map" exact name="Map" component={MapPage} />
-                <Route path="/restore" exact name="Restore" component={RestorePage} />
-                <Route path="/saiku" exact name="Saiku" component={SaikuPage} />
-                <Route path="/surveydesigner" exact name="SurveysList" component={SurveysListPage} />
-                <Route path="/surveydesigner/new" exact name="NewSurvey" component={NewSurveyPage} />
-                <Route path="/surveydesigner/surveyimport" exact name="SurveyImport" component={SurveyImportPage} />
-                <Route path="/surveydesigner/:id" exact name="SurveyEdit" component={SurveyEditPage} />
-                <Route path="/surveydesigner/export/:id" exact name="SurveyExport" component={SurveyExportPage} />
-                <Route path="/surveydesigner/clone/:surveyName" exact name="SurveyClone" component={SurveyClonePage} />
-                <Route path="/users" exact name="Users" component={UsersPage} />
-                <Route path="/users/changepassword" exact name="ChangePassword" component={PasswordChangePage} />
-                <Route path="/usergroups" exact name="User Groups" component={UserGroupsPage} />
-                <Route path="/usergroups/:id" name="User Group" component={UserGroupDetailsPage} />
-              </Switch>
+              <Component {...props} />
             </div>
           </main>
         </div>
-        <CurrentJobMonitorDialog />
-        <AppWebSocket />
       </div>
-    )
-  }
-}
+    )}
+  />
+)
+
+export const FullScreenRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} component={(props) => <Component {...props} />} />
+)
+
+const App = () => (
+  <React.Fragment>
+    <Switch>
+      <DefaultRoute path="/" exact name="HomePage" component={HomePage} />
+      <DefaultRoute path="/backup" exact name="Backup" component={BackupPage} />
+      <DefaultRoute path="/dashboard" exact name="Dashboard" component={DashboardPage} />
+      <DefaultRoute path="/datamanagement" exact name="DataManagement" component={DataManagementPage} />
+      <DefaultRoute path="/datamanagement/csvexport" exact name="CsvDataExport" component={CsvDataExportPage} />
+      <DefaultRoute path="/datamanagement/backup" exact name="BackupDataExport" component={BackupDataExportPage} />
+      <DefaultRoute
+        path="/datamanagement/backupimport"
+        exact
+        name="BackupDataImport"
+        component={BackupDataImportPage}
+      />
+      <DefaultRoute path="/datamanagement/csvimport" exact name="CsvDataImport" component={CsvDataImportPage} />
+      <DefaultRoute path="/datamanagement/:id" name="RecordDetails" component={OldClientRecordEditPage} />
+      <DefaultRoute path="/datamanagement_new/:id" name="RecordDetailsNew" component={RecordEditPage} />
+      <DefaultRoute path="/datacleansing" exact name="DataCleansing" component={DataCleansingPage} />
+      <DefaultRoute path="/map" exact name="Map" component={MapPage} />
+      <DefaultRoute path="/restore" exact name="Restore" component={RestorePage} />
+      <DefaultRoute path="/saiku" exact name="Saiku" component={SaikuPage} />
+      <DefaultRoute path="/surveydesigner" exact name="SurveysList" component={SurveysListPage} />
+      <DefaultRoute path="/surveydesigner/new" exact name="NewSurvey" component={NewSurveyPage} />
+      <DefaultRoute path="/surveydesigner/surveyimport" exact name="SurveyImport" component={SurveyImportPage} />
+      <DefaultRoute path="/surveydesigner/:id" exact name="SurveyEdit" component={SurveyEditPage} />
+      <DefaultRoute path="/surveydesigner/export/:id" exact name="SurveyExport" component={SurveyExportPage} />
+      <DefaultRoute path="/surveydesigner/clone/:surveyName" exact name="SurveyClone" component={SurveyClonePage} />
+      <DefaultRoute path="/users" exact name="Users" component={UsersPage} />
+      <DefaultRoute path="/users/changepassword" exact name="ChangePassword" component={PasswordChangePage} />
+      <DefaultRoute path="/usergroups" exact name="User Groups" component={UserGroupsPage} />
+      <DefaultRoute path="/usergroups/:id" name="User Group" component={UserGroupDetailsPage} />
+
+      <FullScreenRoute
+        path="/surveypreview/:id"
+        exact
+        name="SurveyDataEntryPreview"
+        component={SurveyDataEntryPreviewPage}
+      />
+    </Switch>
+    <CurrentJobMonitorDialog />
+    <AppWebSocket />
+  </React.Fragment>
+)
 
 export default App

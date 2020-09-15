@@ -16,7 +16,8 @@ public class Resources {
 		DESIGNER("designer.htm"),
 		SURVEY_EDIT(COMPONENTS_BASE_PATH + "survey_edit.zul"),
 		COLLECT_SWF("collect.swf"),
-		PREVIEW_PATH("old_client.html");
+		PREVIEW_PATH("old_client.html"),
+		PREVIEW_PATH_NEW("surveypreview");
 		
 		private String location;
 	

@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSION;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,19 +11,21 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.metamodel.view.CodeListItemView;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.utils.MediaTypes;
+import org.openforis.collect.web.manager.RecordProviderSession;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@Scope(SCOPE_SESSION)
 @RequestMapping("api")
 public class CodeListController {
 
@@ -40,7 +44,7 @@ public class CodeListController {
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
-	private RecordManager recordManager;
+	private RecordProviderSession recordProviderSession;
 	
 	@RequestMapping(value = "survey/{surveyId}/codelist/{codeListId}.csv", method=GET)
 	public @ResponseBody String exportCodeListWork(HttpServletResponse response,
@@ -53,12 +57,13 @@ public class CodeListController {
 	public @ResponseBody List<CodeListItemView> loadAvailableItems(
 			@PathVariable Integer surveyId,
 			@PathVariable Integer codeListId,
-			@RequestParam Integer recordId,
-			@RequestParam Integer parentEntityId,
+			@RequestParam(required=false) Integer recordId,
+			@RequestParam Step recordStep,
+			@RequestParam String parentEntityPath,
 			@RequestParam Integer codeAttrDefId) {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
-		CollectRecord record = recordManager.load(survey, recordId, false);
-		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
+		CollectRecord record = recordProviderSession.provide(survey, recordId, recordStep);
+		Entity parentEntity = (Entity) record.findNodeByPath(parentEntityPath);
 		CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) survey.getSchema().getDefinitionById(codeAttrDefId);
 		List<CodeListItem> items = codeListManager.loadValidItems(parentEntity, codeAttrDef);
 		return toViews(items);

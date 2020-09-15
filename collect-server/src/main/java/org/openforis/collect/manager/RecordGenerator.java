@@ -46,16 +46,14 @@ public class RecordGenerator {
 	RecordUpdater recordUpdater = new RecordUpdater();
 	
 	@Transactional
-	public CollectRecord generate(int surveyId, NewRecordParameters parameters, List<String> recordKeyValues) {
-		CollectSurvey survey = surveyManager.getById(surveyId);
+	public CollectRecord generate(CollectSurvey survey, NewRecordParameters parameters, List<String> recordKeyValues) {
 		List<AttributeDefinition> keyDefs = getKeyAttributeDefs(survey);
 		RecordKey recordKey = new RecordKey(keyDefs, recordKeyValues);
-		return generate(surveyId, parameters, recordKey);
+		return generate(survey, parameters, recordKey);
 	}
 	
 	@Transactional
-	public CollectRecord generate(int surveyId, NewRecordParameters parameters, RecordKey recordKey) {
-		CollectSurvey survey = surveyManager.getById(surveyId);
+	public CollectRecord generate(CollectSurvey survey, NewRecordParameters parameters, RecordKey recordKey) {
 		User user = loadUser(parameters.getUserId(), parameters.getUsername());
 		
 		EntityDefinition rootEntityDef = StringUtils.isBlank(parameters.getRootEntityName()) ?
@@ -64,11 +62,14 @@ public class RecordGenerator {
 				
 		CollectRecord record = createRecord(survey, rootEntityDef, parameters.getVersionName(), 
 				user, recordKey);
-		
+		record.setPreview(parameters.isPreview());
+
 		if (parameters.isAddSecondLevelEntities()) {
 			addSecondLevelEntities(record, recordKey);
 		}
-		recordManager.save(record);
+		if (!record.isPreview()) {
+			recordManager.save(record);
+		}
 		return record;
 	}
 	
@@ -185,6 +186,7 @@ public class RecordGenerator {
 		private Integer userId;
 		private String rootEntityName;
 		private String versionName;
+		private boolean preview;
 		private boolean addSecondLevelEntities = false;
 		private boolean onlyUnanalyzedSamplingPoints = false;
 		private List<String> recordKey = new ArrayList<String>();
@@ -219,6 +221,14 @@ public class RecordGenerator {
 		
 		public void setVersionName(String versionName) {
 			this.versionName = versionName;
+		}
+		
+		public boolean isPreview() {
+			return preview;
+		}
+		
+		public void setPreview(boolean preview) {
+			this.preview = preview;
 		}
 		
 		public boolean isAddSecondLevelEntities() {

@@ -16,7 +16,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Value;
 
-public class CreateRecordHandler extends RecordCommandHandler<CreateRecordCommand> {
+public class CreateRecordHandler<C extends CreateRecordCommand> extends RecordCommandHandler<C> {
 
 	private RecordUpdater recordUpdater;
 
@@ -35,6 +35,7 @@ public class CreateRecordHandler extends RecordCommandHandler<CreateRecordComman
 
 		final CollectRecord record = recordManager.instantiateRecord(survey, firstRootEntityName, user,
 				command.getFormVersion(), Step.ENTRY);
+		record.setPreview(command.isPreview());
 		NodeChangeSet changeSet = recordManager.initializeRecord(record);
 
 		List<String> keyValues = command.getKeyValues();
@@ -56,7 +57,10 @@ public class CreateRecordHandler extends RecordCommandHandler<CreateRecordComman
 
 	@Override
 	protected RecordEvent transformEvent(RecordCommandResult result, RecordEvent event) {
-		event.initializeRecordId(result.getRecord().getId());
+		CollectRecord record = result.getRecord();
+		if (!record.isPreview()) {
+			event.initializeRecordId(record.getId());
+		}
 		return event;
 	}
 

@@ -178,6 +178,7 @@ public class CollectRecord extends Record {
 	private transient State state;
 	private transient Integer workflowSequenceNumber;
 	private transient Integer dataWorkflowSequenceNumber;
+	private transient boolean preview;
 
 	private transient Date creationDate;
 	private transient User createdBy;
@@ -314,6 +315,14 @@ public class CollectRecord extends Record {
 	
 	public void setDataWorkflowSequenceNumber(Integer dataWorkflowSequenceNumber) {
 		this.dataWorkflowSequenceNumber = dataWorkflowSequenceNumber;
+	}
+	
+	public boolean isPreview() {
+		return preview;
+	}
+	
+	public void setPreview(boolean preview) {
+		this.preview = preview;
 	}
 	
 	public Date getCreationDate() {

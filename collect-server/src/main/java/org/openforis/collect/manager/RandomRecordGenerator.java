@@ -31,7 +31,7 @@ public class RandomRecordGenerator extends RecordGenerator {
 		if (recordKey == null) {
 			return null;
 		}
-		return this.generate(surveyId, parameters, recordKey);
+		return this.generate(survey, parameters, recordKey);
 	}
 
 	private RecordKey provideRandomRecordKey(CollectSurvey survey, User user, boolean onlyUnanalyzed) {

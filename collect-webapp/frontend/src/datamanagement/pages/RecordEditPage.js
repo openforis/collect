@@ -1,17 +1,16 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 
-import TabSet from 'datamanagement/components/recordeditor/TabSet'
 import { RecordUpdater } from '../../model/RecordUpdater'
 
 import ServiceFactory from 'services/ServiceFactory'
 
+import RecordEditForm from '../components/RecordEditForm'
+
 export default class RecordEditPage extends Component {
   recordUpdater = null
 
-  constructor(props) {
-    super(props)
-
+  constructor() {
+    super()
     this.state = {
       record: null,
     }
@@ -40,14 +39,8 @@ export default class RecordEditPage extends Component {
 
   render() {
     const { record } = this.state
-    if (!record) {
-      return <div>Loading...</div>
-    }
-    const { survey } = record
-    const { uiConfiguration } = survey
-    const tabSetDefinition = uiConfiguration.getTabSetByRootEntityDefinitionId(record.rootEntity.definition.id)
 
-    return <TabSet tabSetDef={tabSetDefinition} record={record} />
+    return <RecordEditForm record={record} />
   }
 }
 

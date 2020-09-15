@@ -179,6 +179,9 @@
 								<menuitem
 									label="${labels.survey.preview.data_entry}"
 									onClick="@command('showDataEntryPreview')" />
+								<menuitem
+									label="${labels.survey.preview.data_entry_new_ui}"
+									onClick="@command('showDataEntryPreviewNew')" />
 							</menupopup>
 						</combobutton>
 					</hlayout>

@@ -43,10 +43,11 @@ export default class RecordService extends AbstractService {
         })
     }
 
-    createRecord(surveyId, rootEntityName = null, versionName = null) {
+    createRecord({surveyId, rootEntityName = null, versionName = null, preview = false}) {
         return this.postJson('survey/' + surveyId + '/data/records', {
-            rootEntityName: rootEntityName,
-            versionName: versionName
+            rootEntityName,
+            versionName,
+            preview
         })
     }
 

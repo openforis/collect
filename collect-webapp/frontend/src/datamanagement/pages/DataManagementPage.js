@@ -95,10 +95,10 @@ class DataManagementPage extends Component {
 	}
 
 	handleNewButtonClick() {
-		let survey = this.props.survey
+		const { survey } = this.props
 		if (survey.schema.rootEntities.length === 1 && survey.modelVersions.length <= 1) {
-			ServiceFactory.recordService.createRecord(survey.id).then(res => {
-				this.navigateToItemEditView(res.id)
+			ServiceFactory.recordService.createRecord({surveyId: survey.id}).then(record => {
+				this.navigateToItemEditView(record.id)
 			})
 		} else {
 			this.setState({
@@ -108,9 +108,9 @@ class DataManagementPage extends Component {
 	}
 
 	handleNewRecordParametersSelected(versionName) {
-		const survey = this.props.survey
-		ServiceFactory.recordService.createRecord(survey.id, null, versionName).then(res => {
-			this.navigateToItemEditView(res.id)
+		const { survey } = this.props
+		ServiceFactory.recordService.createRecord({survey: survey.id, versionName}).then(record => {
+			this.navigateToItemEditView(record.id)
 		})
 	}
 

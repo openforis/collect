@@ -94,6 +94,7 @@ import org.openforis.collect.utils.MediaTypes;
 import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.RecordStatsGenerator.RecordsStats;
+import org.openforis.collect.web.manager.RecordProviderSession;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.commons.web.HttpResponses;
@@ -149,6 +150,8 @@ public class RecordController extends BasicController implements Serializable {
 	private UserGroupManager userGroupManager;
 	@Autowired
 	private CollectJobManager jobManager;
+	@Autowired
+	private RecordProviderSession recordProviderSession;
 	@Autowired
 	private RecordStatsGenerator recordStatsGenerator;
 	@Autowired
@@ -320,11 +323,12 @@ public class RecordController extends BasicController implements Serializable {
 		if (user == null) {
 			user = loadUser(params.getUserId(), params.getUsername());
 		}
-		CollectSurvey survey = surveyManager.getById(surveyId);
+		CollectSurvey survey = params.isPreview() ? surveyManager.loadSurvey(surveyId) : surveyManager.getById(surveyId);
 		params.setRootEntityName(ObjectUtils.defaultIfNull(params.getRootEntityName(), survey.getSchema().getFirstRootEntityDefinition().getName()));
 		params.setVersionName(ObjectUtils.defaultIfNull(params.getVersionName(), survey.getLatestVersion() != null ? survey.getLatestVersion().getName(): null));
 		params.setUserId(user.getId());
-		CollectRecord record = recordGenerator.generate(surveyId, params, params.getRecordKey());
+		CollectRecord record = recordGenerator.generate(survey, params, params.getRecordKey());
+		recordProviderSession.putRecord(record);
 		return toProxy(record);
 	}
 	

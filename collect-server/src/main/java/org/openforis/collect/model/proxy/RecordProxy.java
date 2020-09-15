@@ -77,8 +77,18 @@ public class RecordProxy implements Proxy {
 	}
 	
 	@ExternalizedProperty
+	public boolean isPreview() {
+		return record.isPreview();
+	}
+	
+	@ExternalizedProperty
 	public Step getStep() {
 		return record.getStep();
+	}
+	
+	@ExternalizedProperty
+	public Step getDataStep() {
+		return record.getDataStep();
 	}
 
 	@ExternalizedProperty
