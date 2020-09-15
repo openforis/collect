@@ -28,7 +28,7 @@ const Dropzone = props => {
 
     const className = `dropzone${isDragActive ? ' active' : ''}`
 
-    return <div {...getRootProps({isDragActive, className, style: { width, height } })}>
+    return <div {...getRootProps({className, style: { width, height } })}>
         <input {...getInputProps()} />
         {fileToBeImportedPreview ?
             <p className="fileDroppedMessage">
