@@ -3,6 +3,7 @@ import { Attribute, Entity } from './Record'
 import {
   AttributeUpdatedEvent,
   EntityCreatedEvent,
+  BooleanAttributeUpdatedEvent,
   CodeAttributeUpdatedEvent,
   CoordinateAttributeUpdatedEvent,
   DateAttributeUpdatedEvent,
@@ -70,7 +71,9 @@ export class RecordUpdater {
   }
 
   _setValueInAttribute(attr, event) {
-    if (event instanceof CodeAttributeUpdatedEvent) {
+    if (event instanceof BooleanAttributeUpdatedEvent) {
+      attr.setFieldValue(0, event.value)
+    } else if (event instanceof CodeAttributeUpdatedEvent) {
       attr.setFieldValue(0, event.code)
       attr.setFieldValue(1, event.qualifier)
     } else if (event instanceof CoordinateAttributeUpdatedEvent) {

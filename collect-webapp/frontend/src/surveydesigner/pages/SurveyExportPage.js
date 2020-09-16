@@ -225,7 +225,7 @@ class SurveyExportPage extends Component {
                             </FormGroup>
                         }
                         {(outputFormat === outputFormats.rdb) && (
-                        	<React.Fragment>
+                        	<>
 	                        	<FormGroup row>
 		                            <Label for="rdbDialect" sm={3}>{L.l('survey.export.mode.rdb.dialect')}:</Label>
 		                            <Col sm={9}>
@@ -263,7 +263,7 @@ class SurveyExportPage extends Component {
 	                            		</Col>
                             		</FormGroup>
 	                            )}
-	                        </React.Fragment>
+	                        </>
                         )}
                     </Form>
                 </FormGroup>

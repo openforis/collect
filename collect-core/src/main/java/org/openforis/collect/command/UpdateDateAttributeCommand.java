@@ -8,9 +8,6 @@ public class UpdateDateAttributeCommand extends UpdateAttributeCommand {
 	
 	private Date value;
 
-	public UpdateDateAttributeCommand() {
-	}
-	
 	public Date getValue() {
 		return value;
 	}

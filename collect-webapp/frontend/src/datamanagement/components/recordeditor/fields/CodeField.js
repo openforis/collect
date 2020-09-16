@@ -63,10 +63,6 @@ export default class CodeField extends AbstractField {
     }
   }
 
-  extractValueFromAttributeUpdateEvent(event) {
-    return this.fromCodeToValue(event.code)
-  }
-
   handleInputChange(event) {
     const { fieldDef } = this.props
     const { layout } = fieldDef

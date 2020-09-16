@@ -570,6 +570,7 @@ public class RecordManager {
 		record.setModifiedBy(user);
 		record.setOwner(user);
 		record.setStep(step);
+		record.setDataStep(step);
 		return record;
 	}
 	

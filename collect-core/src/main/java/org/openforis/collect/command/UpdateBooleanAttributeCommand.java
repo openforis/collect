@@ -6,9 +6,6 @@ public class UpdateBooleanAttributeCommand extends UpdateAttributeCommand {
 	
 	private Boolean value;
 
-	public UpdateBooleanAttributeCommand() {
-	}
-	
 	public Boolean getValue() {
 		return value;
 	}

@@ -6,12 +6,12 @@ import EventQueue from 'model/event/EventQueue'
 import ServiceFactory from '../../../../services/ServiceFactory'
 
 export default class AbstractField extends Component {
-  constructor(props) {
-    super(props)
+  constructor() {
+    super()
 
     this.state = {
       dirty: false,
-      value: '',
+      value: null,
       errors: null,
       warnings: null,
     }
@@ -24,14 +24,14 @@ export default class AbstractField extends Component {
   }
 
   componentDidMount() {
-    this.udpateStateFromProps()
+    this.updateStateFromProps()
   }
 
   componentWillUnmount() {
     EventQueue.unsubscribe('recordEvent', this.handleRecordEventReceived)
   }
 
-  udpateStateFromProps() {
+  updateStateFromProps() {
     this.setState({ dirty: false, value: this.extractValueFromProps(), ...this.extractValidationFromProps() })
   }
 
@@ -91,7 +91,7 @@ export default class AbstractField extends Component {
       if (
         event.recordId === parentEntity.record.id &&
         event.recordStep === parentEntity.record.step &&
-        Number(event.parentEntityId) === parentEntity.id &&
+        event.parentEntityPath === parentEntity.path &&
         Number(event.definitionId) === fieldDef.attributeDefinitionId
       ) {
         this.handleAttributeUpdatedEvent(event)
@@ -100,8 +100,6 @@ export default class AbstractField extends Component {
   }
 
   handleAttributeUpdatedEvent(_) {
-    this.udpateStateFromProps()
+    this.updateStateFromProps()
   }
-
-  extractValueFromAttributeUpdateEvent(event) {}
 }

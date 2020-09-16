@@ -6,9 +6,6 @@ public class UpdateTextAttributeCommand extends UpdateAttributeCommand {
 	
 	private String value;
 
-	public UpdateTextAttributeCommand() {
-	}
-	
 	public String getValue() {
 		return value;
 	}

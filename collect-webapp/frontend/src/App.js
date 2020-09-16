@@ -56,7 +56,7 @@ export const FullScreenRoute = ({ component: Component, ...rest }) => (
 )
 
 const App = () => (
-  <React.Fragment>
+  <>
     <Switch>
       <DefaultRoute path="/" exact name="HomePage" component={HomePage} />
       <DefaultRoute path="/backup" exact name="Backup" component={BackupPage} />
@@ -97,7 +97,7 @@ const App = () => (
     </Switch>
     <CurrentJobMonitorDialog />
     <AppWebSocket />
-  </React.Fragment>
+  </>
 )
 
 export default App

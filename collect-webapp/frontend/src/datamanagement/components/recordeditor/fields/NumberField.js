@@ -5,9 +5,9 @@ import AbstractField from './AbstractField'
 import FieldLoadingSpinner from './FieldLoadingSpinner'
 import FieldValidationFeedback from './FieldValidationFeedback'
 
-export default class TextField extends AbstractField {
-  constructor() {
-    super()
+export default class NumberField extends AbstractField {
+  constructor(props) {
+    super(props)
 
     this.onChange = this.onChange.bind(this)
   }
@@ -30,6 +30,7 @@ export default class TextField extends AbstractField {
       <div>
         <>
           <Input
+            type="number"
             invalid={Boolean(errors || warnings)}
             className={warnings ? 'warning' : ''}
             value={text}

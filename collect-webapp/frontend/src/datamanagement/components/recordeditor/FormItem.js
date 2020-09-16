@@ -10,11 +10,13 @@ import Fieldset from './Fieldset'
 import MultipleFieldset from './MultipleFieldset'
 import BooleanField from './fields/BooleanField'
 import CodeField from './fields/CodeField'
+import NumberField from './fields/NumberField'
 import TextField from './fields/TextField'
 
 const FIELD_COMPONENTS_BY_TYPE = {
   [AttributeDefinition.Types.BOOLEAN]: BooleanField,
   [AttributeDefinition.Types.CODE]: CodeField,
+  [AttributeDefinition.Types.NUMBER]: NumberField,
   [AttributeDefinition.Types.TEXT]: TextField,
 }
 

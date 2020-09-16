@@ -3,6 +3,7 @@ import RecordEditForm from '../../datamanagement/components/RecordEditForm'
 import { Record } from '../../model/Record'
 
 import { RecordUpdater } from '../../model/RecordUpdater'
+import Workflow from '../../model/Workflow'
 import ServiceFactory from '../../services/ServiceFactory'
 
 export default class SurveyDataEntryPreviewPage extends Component {
@@ -20,11 +21,13 @@ export default class SurveyDataEntryPreviewPage extends Component {
     const surveyId = Number(idParam)
 
     ServiceFactory.surveyService.fetchById(surveyId).then((survey) => {
-      ServiceFactory.recordService.createRecord({ surveyId, preview: true }).then((recordRes) => {
-        const record = new Record(survey, recordRes)
-        this.recordUpdater = new RecordUpdater(record)
-        this.setState({ record })
-      })
+      ServiceFactory.recordService
+        .createRecord({ surveyId, step: Workflow.STEPS.cleansing, preview: true })
+        .then((recordRes) => {
+          const record = new Record(survey, recordRes)
+          this.recordUpdater = new RecordUpdater(record)
+          this.setState({ record })
+        })
     })
   }
 

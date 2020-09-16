@@ -4,5 +4,4 @@ public abstract class UpdateAttributeCommand extends NodeCommand {
 
 	private static final long serialVersionUID = 1L;
 	
-	
 }
