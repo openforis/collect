@@ -17,6 +17,7 @@ export class Survey extends Serializable {
   schema
   modelVersions = []
   codeLists = []
+  units = []
   uiConfiguration
   temporary
   published
@@ -34,9 +35,14 @@ export class Survey extends Serializable {
     super.fillFromJSON(jsonObj)
 
     this.codeLists = jsonObj.codeLists.map((codeListJsonObj) => {
-      var codeList = new CodeList(this)
+      const codeList = new CodeList(this)
       codeList.fillFromJSON(codeListJsonObj)
       return codeList
+    })
+    this.units = jsonObj.units.map((unitJsonObj) => {
+      const unit = new Unit(this)
+      unit.fillFromJSON(unitJsonObj)
+      return unit
     })
     this.languages = jsonObj.languages
     this.modelVersions = jsonObj.modelVersions
@@ -72,6 +78,18 @@ export class CodeListItem extends Serializable {
   code
   label
   color
+}
+
+export class Unit extends Serializable {
+  id
+  conversionFactor
+  abbreviation
+  label
+
+  constructor(survey) {
+    super()
+    this.survey = survey
+  }
 }
 
 export class Schema extends Serializable {
@@ -235,4 +253,5 @@ export class CodeAttributeDefinition extends AttributeDefinition {
 
 export class NumericAttributeDefinition extends AttributeDefinition {
   numericType
+  precisions
 }

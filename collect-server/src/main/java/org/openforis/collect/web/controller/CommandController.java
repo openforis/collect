@@ -23,6 +23,7 @@ import org.openforis.collect.command.UpdateAttributeCommand;
 import org.openforis.collect.command.UpdateBooleanAttributeCommand;
 import org.openforis.collect.command.UpdateCodeAttributeCommand;
 import org.openforis.collect.command.UpdateDateAttributeCommand;
+import org.openforis.collect.command.UpdateNumericAttributeCommand;
 import org.openforis.collect.command.UpdateTextAttributeCommand;
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.event.EventListener;
@@ -31,6 +32,10 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.web.ws.AppWS;
 import org.openforis.collect.web.ws.AppWS.RecordEventMessage;
 import org.openforis.commons.web.Response;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -172,16 +177,20 @@ public class CommandController {
 		void setValueInCommand(NodeCommand c) {
 			switch (attributeType) {
 			case BOOLEAN:
-				((UpdateBooleanAttributeCommand) c).setValue((Boolean) valueByField.get("value"));
+				((UpdateBooleanAttributeCommand) c).setValue((Boolean) valueByField.get(BooleanAttributeDefinition.VALUE_FIELD));
 				break;
 			case CODE:
-				((UpdateCodeAttributeCommand) c).setCode((String) valueByField.get("code"));
+				((UpdateCodeAttributeCommand) c).setCode((String) valueByField.get(CodeAttributeDefinition.CODE_FIELD));
 				break;
 			case DATE:
 				((UpdateDateAttributeCommand) c).setValue((Date) valueByField.get("value"));
 				break;
+			case NUMBER:
+				((UpdateNumericAttributeCommand) c).setValue((Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD));
+				((UpdateNumericAttributeCommand) c).setUnitId((Integer) valueByField.get(NumberAttributeDefinition.UNIT_FIELD));
+				break;
 			case TEXT:
-				((UpdateTextAttributeCommand) c).setValue((String) valueByField.get("value"));
+				((UpdateTextAttributeCommand) c).setValue((String) valueByField.get(TextAttributeDefinition.VALUE_FIELD));
 				break;
 			default:
 				throw new IllegalStateException("Unsupported command type: " + attributeType);
@@ -209,6 +218,8 @@ public class CommandController {
 				return UpdateCodeAttributeCommand.class;
 			case DATE:
 				return UpdateDateAttributeCommand.class;
+			case NUMBER:
+				return UpdateNumericAttributeCommand.class;
 			case TEXT:
 				return UpdateTextAttributeCommand.class;
 			default:

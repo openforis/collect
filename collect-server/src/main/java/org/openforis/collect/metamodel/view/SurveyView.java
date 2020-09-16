@@ -31,6 +31,7 @@ public class SurveyView {
 	private SchemaView schema;
 	private List<CodeListView> codeLists = new ArrayList<CodeListView>();
 	private List<ModelVersionView> modelVersions = new ArrayList<ModelVersionView>();
+	private List<UnitView> units = new ArrayList<UnitView>();
 	private CeoApplicationOptions ceoApplicationOptions;
 	private UIConfiguration uiConfiguration;
 	private SurveyAvailability availability;
@@ -77,6 +78,10 @@ public class SurveyView {
 	
 	public void addModelVersion(ModelVersionView modelVersion) {
 		this.modelVersions.add(modelVersion);
+	}
+	
+	public void addUnit(UnitView unit) {
+		this.units.add(unit);
 	}
 
 	public Integer getId() {
@@ -181,6 +186,10 @@ public class SurveyView {
 	
 	public List<ModelVersionView> getModelVersions() {
 		return modelVersions;
+	}
+	
+	public List<UnitView> getUnits() {
+		return units;
 	}
 	
 	public SchemaView getSchema() {

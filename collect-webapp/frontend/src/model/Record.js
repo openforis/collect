@@ -69,7 +69,10 @@ export class Node extends Serializable {
     const { definition, parent, index } = this
 
     return (
-      (parent ? parent.path : '') + '/' + definition.name + (definition.multiple && parent ? '[' + index + ']' : '')
+      (parent ? parent.path : '') +
+      '/' +
+      definition.name +
+      (definition.multiple && parent ? '[' + (index + 1) + ']' : '')
     )
   }
 
@@ -129,8 +132,8 @@ export class Entity extends Node {
   }
 
   getSingleChild(defId) {
-    let children = this.childrenByDefinitionId[defId]
-    return children === null || children.length === 0 ? null : children[0]
+    let children = this.getChildrenByDefinitionId(defId)
+    return children.length === 0 ? null : children[0]
   }
 
   addChild(child) {
@@ -146,7 +149,7 @@ export class Entity extends Node {
 
   getChildrenByChildName(childName) {
     const childDef = this.definition.getChildDefinitionByName(childName)
-    return this.childrenByDefinitionId[childDef.id] || []
+    return this.getChildrenByDefinitionId(childDef.id)
   }
 
   getChildrenByDefinitionId(childDefId) {

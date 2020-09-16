@@ -7,6 +7,8 @@ import {
   CodeAttributeUpdatedEvent,
   CoordinateAttributeUpdatedEvent,
   DateAttributeUpdatedEvent,
+  DoubleAttributeUpdatedEvent,
+  IntegerAttributeUpdatedEvent,
   TextAttributeUpdatedEvent,
   NodeRelevanceUpdatedEvent,
   NodeMinCountUpdatedEvent,
@@ -85,6 +87,9 @@ export class RecordUpdater {
       attr.setFieldValue(0, date.getFullYear())
       attr.setFieldValue(1, date.getMonth())
       attr.setFieldValue(2, date.getDay())
+    } else if (event instanceof IntegerAttributeUpdatedEvent || event instanceof DoubleAttributeUpdatedEvent) {
+      attr.setFieldValue(0, event.value)
+      attr.setFieldValue(1, event.unitId)
     } else if (event instanceof TextAttributeUpdatedEvent) {
       attr.setFieldValue(0, event.text)
     }
