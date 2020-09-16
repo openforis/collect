@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES6",
+    "baseUrl": "src",
+    "mapRoot": "src",
+    "rootDir": "src",
+    "sourceRoot": "src"
+  },
+  "include": ["common", "model", "services", "utils"]
+}
