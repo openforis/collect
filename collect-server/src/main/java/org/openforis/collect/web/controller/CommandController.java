@@ -5,7 +5,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +33,10 @@ import org.openforis.collect.web.ws.AppWS.RecordEventMessage;
 import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
+import org.openforis.idm.model.Date;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -121,13 +122,13 @@ public class CommandController {
 		});
 		return new Response();
 	}
-	
+
 	private List<RecordEventView> submitCommandSync(Command command) {
 		if (command instanceof RecordCommand) {
 			((RecordCommand) command).setUsername(sessionManager.getLoggedUsername());
 		}
 		List<RecordEvent> events = commandDispatcher.submitSync(command);
-		
+
 		List<RecordEventView> result = new ArrayList<RecordEventView>(events.size());
 		for (RecordEvent event : events) {
 			result.add(new RecordEventView(event));
@@ -177,20 +178,26 @@ public class CommandController {
 		void setValueInCommand(NodeCommand c) {
 			switch (attributeType) {
 			case BOOLEAN:
-				((UpdateBooleanAttributeCommand) c).setValue((Boolean) valueByField.get(BooleanAttributeDefinition.VALUE_FIELD));
+				((UpdateBooleanAttributeCommand) c)
+						.setValue((Boolean) valueByField.get(BooleanAttributeDefinition.VALUE_FIELD));
 				break;
 			case CODE:
 				((UpdateCodeAttributeCommand) c).setCode((String) valueByField.get(CodeAttributeDefinition.CODE_FIELD));
 				break;
 			case DATE:
-				((UpdateDateAttributeCommand) c).setValue((Date) valueByField.get("value"));
+				((UpdateDateAttributeCommand) c).setYear((Integer) valueByField.get(DateAttributeDefinition.YEAR_FIELD_NAME));
+				((UpdateDateAttributeCommand) c).setMonth((Integer) valueByField.get(DateAttributeDefinition.MONTH_FIELD_NAME));
+				((UpdateDateAttributeCommand) c).setDay((Integer) valueByField.get(DateAttributeDefinition.DAY_FIELD_NAME));
 				break;
 			case NUMBER:
-				((UpdateNumericAttributeCommand) c).setValue((Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD));
-				((UpdateNumericAttributeCommand) c).setUnitId((Integer) valueByField.get(NumberAttributeDefinition.UNIT_FIELD));
+				((UpdateNumericAttributeCommand) c)
+						.setValue((Number) valueByField.get(NumberAttributeDefinition.VALUE_FIELD));
+				((UpdateNumericAttributeCommand) c)
+						.setUnitId((Integer) valueByField.get(NumberAttributeDefinition.UNIT_FIELD));
 				break;
 			case TEXT:
-				((UpdateTextAttributeCommand) c).setValue((String) valueByField.get(TextAttributeDefinition.VALUE_FIELD));
+				((UpdateTextAttributeCommand) c)
+						.setValue((String) valueByField.get(TextAttributeDefinition.VALUE_FIELD));
 				break;
 			default:
 				throw new IllegalStateException("Unsupported command type: " + attributeType);

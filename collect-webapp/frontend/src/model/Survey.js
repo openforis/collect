@@ -241,6 +241,7 @@ export class AttributeDefinition extends NodeDefinition {
     BOOLEAN: 'BOOLEAN',
     CODE: 'CODE',
     COORDINATE: 'COORDINATE',
+    DATE: 'DATE',
     NUMBER: 'NUMBER',
     TEXT: 'TEXT',
   }

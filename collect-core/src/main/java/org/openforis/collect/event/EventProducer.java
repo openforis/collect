@@ -266,7 +266,9 @@ public class EventProducer {
 			} else if (node instanceof DateAttribute) {
 				org.openforis.idm.model.Date value = ((DateAttribute) node).getValue();
 				event = new DateAttributeUpdatedEvent();
-				((DateAttributeUpdatedEvent) event).setDate(value.toJavaDate());
+				((DateAttributeUpdatedEvent) event).setDay(value.getDay());
+				((DateAttributeUpdatedEvent) event).setMonth(value.getMonth());
+				((DateAttributeUpdatedEvent) event).setYear(value.getYear());
 				// TODO
 //				} else if (node instanceof FileAttribute) {
 			} else if (node instanceof NumberAttribute<?, ?>) {

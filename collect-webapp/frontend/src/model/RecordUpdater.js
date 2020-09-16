@@ -83,10 +83,9 @@ export class RecordUpdater {
       attr.setFieldValue(1, event.y)
       attr.setFieldValue(2, event.srsId)
     } else if (event instanceof DateAttributeUpdatedEvent) {
-      let date = event.date
-      attr.setFieldValue(0, date.getFullYear())
-      attr.setFieldValue(1, date.getMonth())
-      attr.setFieldValue(2, date.getDay())
+      attr.setFieldValue(0, event.year)
+      attr.setFieldValue(1, event.month)
+      attr.setFieldValue(2, event.day)
     } else if (event instanceof IntegerAttributeUpdatedEvent || event instanceof DoubleAttributeUpdatedEvent) {
       attr.setFieldValue(0, event.value)
       attr.setFieldValue(1, event.unitId)

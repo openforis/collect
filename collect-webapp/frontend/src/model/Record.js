@@ -194,6 +194,10 @@ export class Attribute extends Node {
   get humanReadableValue() {
     return this.fields && this.fields.length ? this.fields[0].value || '' : ''
   }
+
+  get empty() {
+    return !this.fields || this.fields.find((field) => !field.value)
+  }
 }
 
 export class Field extends Serializable {

@@ -1,15 +1,17 @@
-import Moment from 'moment'
+import DateFnsUtils from '@date-io/date-fns'
+
+const dateFnsUtils = new DateFnsUtils()
 
 export default class Dates {
-  static DATE_FORMAT = 'DD/MM/YYYY'
-  static DATETIME_FORMAT = 'DD/MM/YYYY HH:mm'
+  static DATE_FORMAT = 'dd/MM/yyyy'
+  static DATETIME_FORMAT = 'dd/MM/yyyy HH:mm'
   static MILLIS = 'millis'
   static DAYS = 'days'
   static MONTHS = 'months'
   static YEARS = 'years'
 
   static format(date, pattern = Dates.DATE_FORMAT) {
-    return date == null ? '' : Moment(date).format(pattern)
+    return date == null ? '' : dateFnsUtils.format(date, pattern)
   }
 
   static formatDatetime(dateTime) {

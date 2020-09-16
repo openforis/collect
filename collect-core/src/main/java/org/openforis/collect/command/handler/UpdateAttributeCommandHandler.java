@@ -38,7 +38,9 @@ public class UpdateAttributeCommandHandler<C extends UpdateAttributeCommand> ext
 		} else if (command instanceof UpdateBooleanAttributeCommand) {
 			return new BooleanValue(((UpdateBooleanAttributeCommand) command).getValue());
 		} else if (command instanceof UpdateDateAttributeCommand) {
-			return Date.parse(((UpdateDateAttributeCommand) command).getValue());
+			UpdateDateAttributeCommand updateDateAttributeCommand = (UpdateDateAttributeCommand) command;
+			return new Date(updateDateAttributeCommand.getYear(), updateDateAttributeCommand.getMonth(),
+					updateDateAttributeCommand.getDay());
 		} else if (command instanceof UpdateNumericAttributeCommand) {
 			Type type = ((NumberAttributeDefinition) attributeDefinition).getType();
 			UpdateNumericAttributeCommand updateNumericAttributeCommand = (UpdateNumericAttributeCommand) command;

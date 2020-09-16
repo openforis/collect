@@ -10,16 +10,16 @@
     "react-scripts": "^3.4.3"
   },
   "dependencies": {
+    "@date-io/date-fns": "^1.3.13",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
+    "@material-ui/pickers": "^3.2.10",
     "bootstrap": "^4.5.2",
     "chart.js": "^2.9.3",
-    "final-form": "^4.20.1",
     "formik": "^2.1.5",
     "hoek": "^6.1.3",
     "i18n-react": "^0.7.0",
     "jquery": "^3.5.1",
-    "moment": "^2.28.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-addons-css-transition-group": "^15.6.2",
