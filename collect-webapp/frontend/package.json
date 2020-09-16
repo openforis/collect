@@ -4,13 +4,11 @@
   "private": true,
   "homepage": ".",
   "devDependencies": {
-    "cross-env": "^5.2.1",
-    "eslint": "^4.19.1",
-    "gulp": "^3.9.1",
+    "cross-env": "^7.0.2",
+    "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
-    "gulp-sass": "^3.2.1",
-    "react-scripts": "^1.0.14",
-    "webpack": "^3.12.0"
+    "gulp-sass": "^4.1.0",
+    "react-scripts": "^3.4.3"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.0",
@@ -56,5 +54,17 @@
     "build": "cross-env NODE_PATH=src react-scripts build",
     "test": "cross-env NODE_PATH=src react-scripts test --env=jsdom",
     "eject": "cross-env NODE_PATH=src react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
