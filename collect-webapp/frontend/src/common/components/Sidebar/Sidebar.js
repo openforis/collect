@@ -16,15 +16,15 @@ const handleNavDropdownClick = (e) => {
 const Sidebar = (props) => {
   const { dispatch, isFetchingLoggedUser, loggedUser } = props
 
-  if (isFetchingLoggedUser) {
-    return <div>Loading...</div>
-  }
-
   const history = useHistory()
 
   const handleChangePasswordClick = () => RouterUtils.navigateToPasswordChangePage(history)
 
   const handleLogoutClick = () => dispatch(SessionActions.logout())
+
+  if (isFetchingLoggedUser) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="sidebar">

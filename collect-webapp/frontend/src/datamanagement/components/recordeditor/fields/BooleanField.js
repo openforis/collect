@@ -1,26 +1,22 @@
 import React, { Component } from 'react'
-import classnames from 'classnames';
-import { Label, Input } from 'reactstrap';
+import { Input } from 'reactstrap'
 
 export default class BooleanField extends Component {
+  constructor() {
+    super()
 
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            selected: false
-        }
-
-        this.handleInputChange = this.handleInputChange.bind(this)
+    this.state = {
+      selected: false,
     }
 
-    handleInputChange(event) {
-        this.setState({...this.state, selected: event.target.checked})
-    }
+    this.handleInputChange = this.handleInputChange.bind(this)
+  }
 
-    render() {
-        return (
-            <Input id="checkbox" type="checkbox" onChange={this.handleInputChange} />
-        )
-    }
+  handleInputChange(event) {
+    this.setState({ selected: event.target.checked })
+  }
+
+  render() {
+    return <Input id="checkbox" type="checkbox" onChange={this.handleInputChange} />
+  }
 }

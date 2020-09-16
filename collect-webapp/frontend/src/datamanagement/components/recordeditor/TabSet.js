@@ -1,13 +1,14 @@
-import React, { Component, PropTypes } from 'react'
-import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap'
+import React, { Component } from 'react'
+import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
 import classnames from 'classnames'
+
 import Tab from './Tab'
 
 export default class TabSet extends Component {
   constructor(props) {
-    super(props)
-
-    const tabs = props.tabSetDef.tabs
+    super()
+    const { tabSetDef } = props
+    const { tabs } = tabSetDef
     const firstTabId = tabs.length > 0 ? tabs[0].id : null
     this.toggle = this.toggle.bind(this)
     this.state = {

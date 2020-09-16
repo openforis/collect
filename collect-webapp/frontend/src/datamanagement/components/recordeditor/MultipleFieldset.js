@@ -1,17 +1,18 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import classnames from 'classnames'
 import { Button, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap'
+
 import Tab from './Tab'
 import FormItems from './FormItems'
-import ServiceFactory from '../../../services/ServiceFactory'
-import EventQueue from '../../../model/event/EventQueue'
-import { EntityCreatedEvent } from '../../../model/event/RecordEvent'
+import ServiceFactory from 'services/ServiceFactory'
+import EventQueue from 'model/event/EventQueue'
+import { EntityCreatedEvent } from 'model/event/RecordEvent'
 
 export default class MultipleFieldset extends Component {
   commandService = ServiceFactory.commandService
 
   constructor(props) {
-    super(props)
+    super()
     const { fieldsetDef } = props
 
     const { tabs } = fieldsetDef
