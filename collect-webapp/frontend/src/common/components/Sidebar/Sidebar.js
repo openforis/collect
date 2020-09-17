@@ -1,26 +1,34 @@
 import React from 'react'
 import { NavLink, useHistory } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap'
+import classnames from 'classnames'
 
 import * as SessionActions from 'actions/session'
+import * as SidebarActions from 'actions/sidebar'
 import VersionInfo from 'common/components/VersionInfo'
 import L from 'utils/Labels'
 import RouterUtils from 'utils/RouterUtils'
 
-const handleNavDropdownClick = (e) => {
-  e.preventDefault()
-  e.target.parentElement.classList.toggle('open')
-}
+const Sidebar = () => {
+  const { loggedUser } = useSelector((state) => state.session)
+  const { openNavItems } = useSelector((state) => state.sidebar)
+  const isFetchingLoggedUser = loggedUser === null
 
-const Sidebar = (props) => {
-  const { dispatch, isFetchingLoggedUser, loggedUser } = props
-
+  const dispatch = useDispatch()
   const history = useHistory()
+
+  const isNavItemOpen = (id) => Boolean(openNavItems[id])
 
   const handleChangePasswordClick = () => RouterUtils.navigateToPasswordChangePage(history)
 
   const handleLogoutClick = () => dispatch(SessionActions.logout())
+
+  const handleNavDropdownClick = (e) => {
+    e.preventDefault()
+    const elementLiId = e.target.parentElement.id
+    dispatch(SidebarActions.toggleSidebarDropdownItem(elementLiId))
+  }
 
   if (isFetchingLoggedUser) {
     return <div>Loading...</div>
@@ -30,26 +38,29 @@ const Sidebar = (props) => {
     <div className="sidebar">
       <nav className="sidebar-nav">
         <ul className="nav">
-          {
-            <li className="nav-item">
-              <NavLink to={'/dashboard'} className="nav-link" activeClassName="active">
-                <i className="fa fa-tachometer-alt"></i>Dashboard
-              </NavLink>
-            </li>
-          }
+          <li className="nav-item">
+            <NavLink to={'/dashboard'} className="nav-link" activeClassName="active">
+              <i className="fa fa-tachometer-alt"></i>Dashboard
+            </NavLink>
+          </li>
           <li className="nav-item">
             <NavLink to={'/datamanagement'} className="nav-link" activeClassName="active">
               <i className="fa fa-database"></i>Data Management
             </NavLink>
           </li>
           {loggedUser.canAccessSurveyDesigner && (
-            <li className="nav-item nav-dropdown">
+            <li
+              id="sidebar-nav-item-survey-designer"
+              className={`nav-item nav-dropdown ${classnames({
+                open: isNavItemOpen('sidebar-nav-item-survey-designer'),
+              })}`}
+            >
               <a className="nav-link nav-dropdown-toggle" href="#" onClick={handleNavDropdownClick}>
                 <i className="fa fa-flask" aria-hidden="true"></i>Survey Designer
               </a>
               <ul className="nav-dropdown-items">
                 <li className="nav-item">
-                  <NavLink to={'/surveydesigner'} className="nav-link" activeClassName="active">
+                  <NavLink to={'/surveydesigner'} exact className="nav-link" activeClassName="active">
                     <i className="fa fa-list" aria-hidden="true"></i> List of surveys
                   </NavLink>
                 </li>
@@ -86,7 +97,12 @@ const Sidebar = (props) => {
             </li>
           )}
           {loggedUser.canAccessBackupRestore ? (
-            <li className="nav-item nav-dropdown">
+            <li
+              id="sidebar-nav-item-backup-restore"
+              className={`nav-item nav-dropdown ${classnames({
+                open: isNavItemOpen('sidebar-nav-item-backup-restore'),
+              })}`}
+            >
               <a className="nav-link nav-dropdown-toggle" href="#" onClick={handleNavDropdownClick}>
                 <i className="fa fa-save"></i>
                 {L.l('backupRestore')}
@@ -109,7 +125,12 @@ const Sidebar = (props) => {
           )}
           <li className="divider"></li>
           {loggedUser.canAccessUsersManagement ? (
-            <li className="nav-item nav-dropdown">
+            <li
+              id="sidebar-nav-item-security"
+              className={`nav-item nav-dropdown ${classnames({
+                open: isNavItemOpen('sidebar-nav-item-security'),
+              })}`}
+            >
               <a className="nav-link nav-dropdown-toggle" href="#" onClick={handleNavDropdownClick}>
                 <i className="fa fa-lock"></i>Security
               </a>
@@ -164,14 +185,4 @@ const Sidebar = (props) => {
   )
 }
 
-const mapStateToProps = (state) => {
-  const { loggedUser } = state.session || {
-    isFetchingLoggedUser: true,
-  }
-  return {
-    loggedUser: loggedUser,
-    isFetchingLoggedUser: loggedUser === null,
-  }
-}
-
-export default connect(mapStateToProps)(Sidebar)
+export default Sidebar
