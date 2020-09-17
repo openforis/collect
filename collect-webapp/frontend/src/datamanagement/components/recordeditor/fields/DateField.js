@@ -54,8 +54,9 @@ export default class DateField extends AbstractField {
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
               variant="dialog"
+              inputVariant="outlined"
               format={Dates.DATE_FORMAT}
-              margin="normal"
+              margin="none"
               value={selectedDate}
               onChange={this.onChange}
               className={warnings ? 'warning' : ''}
