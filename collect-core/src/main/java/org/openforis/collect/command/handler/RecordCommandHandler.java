@@ -21,6 +21,7 @@ import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
+import org.openforis.concurrency.JobConfig;
 import org.openforis.concurrency.Task;
 
 public abstract class RecordCommandHandler<C extends RecordCommand> implements CommandHandler<C> {
@@ -79,8 +80,7 @@ public abstract class RecordCommandHandler<C extends RecordCommand> implements C
 				notifyEvents(result, command, eventListener);
 			}
 
-		});
-
+		}, new JobConfig(true, null, true));
 	}
 
 	private void notifyEvents(final RecordCommandResult result, final C command, final EventListener eventListener) {

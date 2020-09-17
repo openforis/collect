@@ -462,7 +462,13 @@ public class RDBReportingRepositories implements ReportingRepositories {
 						new ColumnValuePair<DataColumn, String>(dataTable.getDataColumn(coordinateAttrDef.getSrsIdField()), e.getSrsId())
 				);
 			} else if (recordEvent instanceof DateAttributeUpdatedEvent) {
-				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), ((DateAttributeUpdatedEvent) recordEvent).getDate()));
+				Integer year = ((DateAttributeUpdatedEvent) recordEvent).getYear();
+				Integer month = ((DateAttributeUpdatedEvent) recordEvent).getMonth();
+				Integer day = ((DateAttributeUpdatedEvent) recordEvent).getDay();
+				org.openforis.idm.model.Date date = year != null && month != null && day != null 
+						? new org.openforis.idm.model.Date(year, month, day)
+						: null;
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), date == null ? null : date.toJavaDate()));
 			} else if (recordEvent instanceof NumericAttributeUpdatedEvent) {
 				NumericAttributeUpdatedEvent<?> numericAttributeUpdatedEvent = (NumericAttributeUpdatedEvent<?>) recordEvent;
 				NumberAttributeDefinition numberAttrDef = (NumberAttributeDefinition) attributeDef;
