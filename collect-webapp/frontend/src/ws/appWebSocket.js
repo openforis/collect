@@ -18,7 +18,7 @@ const messageTypes = {
 }
 
 const handlersByType = {
-  [messageTypes.surveysUpdated]: () => fetchSurveySummaries,
+  [messageTypes.surveysUpdated]: fetchSurveySummaries,
   [messageTypes.recordLocked]: (message) => recordLocked(message.recordId, message.lockedBy),
   [messageTypes.recordUnlocked]: (message) => recordUnlocked(message.recordId),
   [messageTypes.recordUpdated]: (message) => () => {

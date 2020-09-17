@@ -113,7 +113,7 @@ export class EntityCreatedEvent extends RecordEvent {}
 
 export class EntityCollectionCreatedEvent extends RecordEvent {}
 
-const EVENT_CLASS_BY_TYPE = [
+const EVENT_CLASS_BY_TYPE = {
   EntityCreatedEvent,
   EntityCollectionCreatedEvent,
   NodeMaxCountUpdatedEvent,
@@ -132,10 +132,7 @@ const EVENT_CLASS_BY_TYPE = [
   TaxonAttributeUpdatedEvent,
   TextAttributeUpdatedEvent,
   TimeAttributeUpdatedEvent,
-].reduce((acc, claz) => {
-  acc[claz.name] = claz
-  return acc
-}, {})
+}
 
 export class RecordEventWrapper extends Serializable {
   event
