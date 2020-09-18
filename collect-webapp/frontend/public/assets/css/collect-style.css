@@ -2,6 +2,14 @@ body {
   overflow: hidden;
 }
 
+/* ==== start of Reactstrap style ==== */
+
+.nav-tabs .nav-link {
+  cursor: pointer;
+}
+
+/* ==== end of Reactstrap style ==== */
+
 header .breadcrumb-wrapper {
   width: calc(100% - 205px);
 }

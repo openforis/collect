@@ -33,9 +33,10 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 			@ExecutionArgParam("newUi") String newUi) throws URISyntaxException {
 		super.init();
 		
-		String path = Boolean.valueOf(newUi) ? Resources.Page.PREVIEW_PATH_NEW.getLocation() + "/" + surveyId
+		String path = Boolean.valueOf(newUi) ? Resources.Page.PREVIEW_PATH_NEW.getLocation() + surveyId
 				: Resources.Page.PREVIEW_PATH.getLocation();
 		URIBuilder uriBuilder = new URIBuilder(path)
+				.addParameter("preview", "true")
 				.addParameter("surveyId", surveyId)
 				.addParameter("work", work)
 				.addParameter("rootEntityId", rootEntityId)
